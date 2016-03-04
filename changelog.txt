@@ -1,5 +1,9 @@
+5.1.20.2 (2016-03-04)
+[fix] Live streams itag 91 patch
+[add] Kodi 17 Krypton support. Patch by Uukrul
+
 5.1.20 (2016-02-25)
-[fix] Final fix for API
+[fix] Final fix for APIs
 
 5.1.16 (2015-12-24)
 [fix] reverted search order by date

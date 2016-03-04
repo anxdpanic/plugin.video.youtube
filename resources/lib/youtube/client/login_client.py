@@ -6,6 +6,8 @@ import urlparse
 from resources.lib.kodion import simple_requests as requests
 from resources.lib.youtube.youtube_exceptions import LoginException
 
+# Kodi 17 support by Uukrul
+
 
 class LoginClient(object):
     CONFIGS = {
@@ -59,7 +61,13 @@ class LoginClient(object):
             'key': 'AIzaSyBS3rNymJtzPYbJX5lSGdNCBS6ajh4VDDY',
             'id': '879761788105-sduf0ht335dvg923ane7cg1jnt1d5l4k.apps.googleusercontent.com',
             'secret': 'vBVDa-kNdCHDTkpD8b8HO718'
-            }
+        },
+            'youtube-for-kodi-17': {
+            'system': 'Krypton',
+            'key': 'AIzaSyBS3rNymJtzPYbJX5lSGdNCBS6ajh4VDDY',
+            'id': '879761788105-sduf0ht335dvg923ane7cg1jnt1d5l4k.apps.googleusercontent.com',
+            'secret': 'vBVDa-kNdCHDTkpD8b8HO718'
+        }
     }
 
     def __init__(self, config={}, language='en-US', access_token='', access_token_tv=''):
