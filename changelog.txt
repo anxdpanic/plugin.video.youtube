@@ -1,3 +1,6 @@
+5.1.20.3 (2016-03-04)
+[fix] All Key changed with YouTube TV
+
 5.1.20.2 (2016-03-04)
 [fix] Live streams itag 91 patch
 [add] Kodi 17 Krypton support. Patch by Uukrul
