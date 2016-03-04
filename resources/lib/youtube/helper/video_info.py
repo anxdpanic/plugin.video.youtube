@@ -134,6 +134,12 @@ class VideoInfo(object):
                 'video': {'height': 720, 'encoding': 'vp8'},
                 'audio': {'bitrate': 192, 'encoding': 'vorbis'}},
         # === Live Streams ===
+        '91': {'container': 'ts',
+               'Live': True,
+               'title': 'Live@144p',
+               'sort': [144, 0],
+               'video': {'height': 144, 'encoding': 'h.264'},
+               'audio': {'bitrate': 48, 'encoding': 'aac'}},
         '92': {'container': 'ts',
                'Live': True,
                'title': 'Live@240p',
