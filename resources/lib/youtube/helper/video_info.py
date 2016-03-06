@@ -140,7 +140,7 @@ class VideoInfo(object):
                'sort': [144, 0],
                'video': {'height': 144, 'encoding': 'h.264'},
                'audio': {'bitrate': 48, 'encoding': 'aac'}},
-        '92': {'container': 'ts',
+        '91': {'container': 'ts',
                'Live': True,
                'title': 'Live@240p',
                'sort': [240, 0],

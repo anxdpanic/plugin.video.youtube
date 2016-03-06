@@ -1,3 +1,6 @@
+5.1.20.5
+[fix] unknown yt_format for itag 91 by clarjon1
+
 5.1.20.4 (2016-03-05)
 [add] API Key in add-on settings
 [upd] All string.po for new API Key functionality. New entries in language string.po files not translated from English.
