@@ -225,6 +225,28 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Limpar"
 
+#YouTube
+#empty strings from id 30121 to 30199
+
+msgctxt "#30200"
+msgid "API Key"
+msgstr ""
+
+msgctxt "#30201"
+msgid "API Key"
+msgstr ""
+
+msgctxt "#30202"
+msgid "API Id"
+msgstr ""
+
+msgctxt "#30203"
+msgid "API Secret"
+msgstr ""
+
+#YouTube
+#empty strings from id 30204 to 30499
+
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Canais"

@@ -43,4 +43,11 @@
         <setting type="sep" />
         <setting id="youtube.language" type="text" label="30523" enable="false" default="en-US"/>
     </category>
+    
+    <!-- personal api key -->
+    <category label="30200">
+        <setting id="youtube.api.key" type="text" label="30201" default="AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA"/>
+        <setting id="youtube.api.id" type="text" label="30202" default="861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68"/>
+        <setting id="youtube.api.secret" type="text" label="30203" default="SboVhoG9s0rNafixCSGGKXAT"/>
+    </category>
 </settings>
