@@ -1,3 +1,6 @@
+5.1.20.5 (2016-03-20)
+[upd] Ignore if '.apps.googleusercontent.com' entered in API Id string in add-on settings
+
 5.1.20.4 (2016-03-05)
 [add] API Key in add-on settings
 [upd] All string.po for new API Key functionality. New entries in language string.po files not translated from English.
