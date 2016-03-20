@@ -9,7 +9,7 @@ from resources.lib.youtube.youtube_exceptions import LoginException
 
 addon = xbmcaddon.Addon()
 api_key = addon.getSetting('youtube.api.key')
-api_id = addon.getSetting('youtube.api.id')
+api_id = addon.getSetting('youtube.api.id').replace('.apps.googleusercontent.com', '')
 api_secret = addon.getSetting('youtube.api.secret')
 
 # Kodi 17 support by Uukrul
