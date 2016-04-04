@@ -49,5 +49,6 @@
         <setting id="youtube.api.key" type="text" label="30201" default="AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA"/>
         <setting id="youtube.api.id" type="text" label="30202" default="861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68"/>
         <setting id="youtube.api.secret" type="text" label="30203" default="SboVhoG9s0rNafixCSGGKXAT"/>
+        <setting id="random.key.pool" type="bool" label="30204" default="true"/>
     </category>
 </settings>
