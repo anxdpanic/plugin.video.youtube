@@ -8,6 +8,10 @@ from resources.lib.youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
     yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
 from .youtube_exceptions import LoginException
+import xbmcaddon
+import random
+addon = xbmcaddon.Addon()
+random_key_pool = addon.getSetting('random.key.pool')
 
 
 class Provider(kodion.AbstractProvider):
@@ -105,10 +109,13 @@ class Provider(kodion.AbstractProvider):
 
         if not self._client:
             major_version = context.get_system_version().get_version()[0]
-            youtube_config = YouTube.CONFIGS.get('youtube-for-kodi-%d' % major_version, None)
-            if not youtube_config or youtube_config is None:
-                youtube_config = YouTube.CONFIGS['youtube-for-kodi-fallback']
-                pass
+            if random_key_pool == 'true':
+                youtube_config = random.choice(YouTube.CREDENTIALS_POOL)
+            else:
+                youtube_config = YouTube.CONFIGS.get('youtube-for-kodi-%d' % major_version, None)
+                if not youtube_config or youtube_config is None:
+                    youtube_config = YouTube.CONFIGS['youtube-for-kodi-fallback']
+                    pass
 
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
