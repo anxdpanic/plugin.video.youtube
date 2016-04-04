@@ -3,7 +3,7 @@
 [upd] All string.po for new random key pool functionality
 [add] Random key pool by ntdrt, modified by misty01
 [add] API keys used for random key pool by Kolifanes
-[add] Greek translation by twilight0
+[add] Greek Translation by twilight0
 [upd] Italian translation by DjDiabolik
 [fix] Typos in German translation by philippbeckmann
 
