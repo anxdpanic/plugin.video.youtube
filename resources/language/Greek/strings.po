@@ -253,12 +253,12 @@ msgctxt "#30203"
 msgid "API Secret"
 msgstr "Μυστικό API"
 
+#YouTube
+#empty strings from id 30205 to 30499
+
 msgctxt "#30204"
 msgid "Use random key pool"
 msgstr "Κάνε χρήση τυχαίας δεξαμενής κλειδιού"
-
-#YouTube
-#empty strings from id 30205 to 30499
 
 msgctxt "#30500"
 msgid "Channels"
@@ -459,3 +459,4 @@ msgstr "Περισσότερα..."
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Δεν βρέθηκαν άλλες ροές"
+

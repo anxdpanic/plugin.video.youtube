@@ -8,7 +8,7 @@
 	</extension>
 	<extension point="xbmc.addon.metadata">
         <summary lang="en">Plugin for YouTube</summary>
-        <description lang="en">YouTube is one of the biggest video-sharing websites of the world.</description>
+        <description lang="en">YouTube is a one of the biggest video-sharing websites of the world.</description>
 		<summary lang="de">Plugin für YouTube</summary>
         <description lang="de">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>
         <summary lang="pl">Wtyczka YouTube</summary>
@@ -25,7 +25,7 @@
         <description lang="zh">「Youtube」是全世界最大的影片分享網站</description>
         <summary lang="bg">Добавка за YouTube</summary>
         <description lang="bg">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
-        <summary lang="el">Πρόσθετο YouTube</summary>
+		<summary lang="el">Πρόσθετο YouTube</summary>
         <description lang="el">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
 		<disclaimer lang="en"></disclaimer>
 		<language></language>

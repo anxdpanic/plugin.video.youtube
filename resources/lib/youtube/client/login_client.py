@@ -16,7 +16,7 @@ api_secret = addon.getSetting('youtube.api.secret')
 
 class LoginClient(object):
     CONFIGS = {
-        'youtube-tv': {
+         'youtube-tv': {
             'system': 'All',
             'key': 'AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA',
             'id': '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com',
