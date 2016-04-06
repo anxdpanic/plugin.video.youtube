@@ -7,7 +7,6 @@
 [add] Greek Translation by twilight0
 [upd] Italian translation by DjDiabolik
 [fix] Typos in German translation by philippbeckmann
-[fix] Typos in addon.xml -- jdf
 
 5.1.20.5 (2016-03-20)
 [upd] Ignore if '.apps.googleusercontent.com' entered in API Id string in add-on settings
