@@ -429,11 +429,11 @@ msgstr "Trova link nella descrizione"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "Nessun link trovato."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr ""
+msgstr "Per favore fare 2 volte il Log In!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
@@ -445,4 +445,4 @@ msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "Nessun Stream Video trovato"
