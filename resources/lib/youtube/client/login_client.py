@@ -75,69 +75,6 @@ class LoginClient(object):
         }
     }
 
-    CREDENTIALS_POOL = [
-        {
-            'system': 'Kodi YouTube Pool 1',
-            'key': 'AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA',
-            'id': '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com',
-            'secret': 'SboVhoG9s0rNafixCSGGKXAT'
-        },
-        {
-            'system': 'Kodi YouTube Pool 2',
-            'key': 'AIzaSyBLzlcN2eCzOhnl1WhyX0kYuyu-kwshDt8',
-            'id': '707691027705-s4mq8q747f8mrb0vjcn3jvp17af4819o.apps.googleusercontent.com',
-            'secret': 'r_95MHjK38AyCkoEQm8fzcCM'
-        },
-        {
-            'system': 'Kodi YouTube Pool 3',
-            'key': 'AIzaSyAUjiaAUOcm6wmA8BHMloDby6U4RMtKLvs',
-            'id': '970514987436-b1rlhh1sf3fufqcvlm2a2taa2tq4t5uc.apps.googleusercontent.com',
-            'secret': 'zFaJYGEbvx329c8G_GPO5RJ3'
-        },
-        {
-            'system': 'Kodi YouTube Pool 4',
-            'key': 'AIzaSyCDn_9EybTJiymHipNS3jk5ZpCTXdCotQ0',
-            'id': '947596709414-08nrn314d8j3k91cl4f51srcu6m19hvu.apps.googleusercontent.com',
-            'secret': 'HsLT2ZCexIV-VFxWeYVZ2TUc'
-        },
-        {
-            'system': 'Kodi YouTube Pool 5',
-            'key': 'AIzaSyAmrf3BneEQPDiUEuQlzy0_rbFGDBg-bi0',
-            'id': '448940676713-min9u5frfujprbnb8f3dri3cv9jr32rn.apps.googleusercontent.com',
-            'secret': '79vMsJsNC9jypSfryUMu00jW'
-        },
-        {
-            'system': 'Kodi YouTube Pool 6',
-            'key': 'AIzaSyCCnZImC7gTniNfgwqGwixIdBVGxiCOKlU',
-            'id': '107500767506-9mvbaacuscf8cge2n3kkvj50a6dnrk8g.apps.googleusercontent.com',
-            'secret': '2ceVfognBCtn8uh20HmlJN4X'
-        },
-        {
-            'system': 'Kodi YouTube Pool 7',
-            'key': 'AIzaSyATqDim-56y8HcN1NAzQdVZgdMoc6d9Eys',
-            'id': '610696918705-bkt6v536k7gn2dtcv8vdngm4b0vt5sev.apps.googleusercontent.com',
-            'secret': 'kV7ReP1f_Lg9i2hWR2liHnO6'
-        },
-        {
-            'system': 'Kodi YouTube Pool 8',
-            'key': 'AIzaSyBS3rNymJtzPYbJX5lSGdNCBS6ajh4VDDY',
-            'id': '879761788105-sduf0ht335dvg923ane7cg1jnt1d5l4k.apps.googleusercontent.com',
-            'secret': 'vBVDa-kNdCHDTkpD8b8HO718'
-        },
-        {
-            'system': 'Kodi YouTube Pool 9',
-            'key': 'AIzaSyBynxCrJOe3NWa4l2VezTHWVIQOrI9nPgY',
-            'id': '167759489832-579ic1cjlk5j6fg6bo6d7btvces6528p.apps.googleusercontent.com',
-            'secret': 'n93VQADkcc-HIqbx_kvnpAs4'
-        },
-        {
-            'system': 'Kodi YouTube Pool 10',
-            'key': '%s' % api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
-        }
-    ]
-
     def __init__(self, config={}, language='en-US', access_token='', access_token_tv=''):
         if not config:
             config = self.CONFIGS['youtube-for-kodi-fallback']

@@ -244,12 +244,8 @@ msgctxt "#30203"
 msgid "API Secret"
 msgstr ""
 
-msgctxt "#30204"
-msgid "Use random key pool"
-msgstr ""
-
 #YouTube
-#empty strings from id 30205 to 30499
+#empty strings from id 30204 to 30499
 
 msgctxt "#30500"
 msgid "Channels"
