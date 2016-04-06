@@ -1,5 +1,6 @@
 5.1.20.6 (2016-04-03)
-[add] Greek Translation
+[add] Greek Translation from twilight0
+[upd] Fixed italian translation from DjDiabolik
 
 5.1.20.5 (2016-03-20)
 [upd] Ignore if '.apps.googleusercontent.com' entered in API Id string in add-on settings
