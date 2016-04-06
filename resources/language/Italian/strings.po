@@ -39,7 +39,7 @@ msgstr "Password"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Chiedi sempre qualità del video"
 
 msgctxt "#30010"
 msgid "Video Quality"
@@ -413,11 +413,11 @@ msgstr ""
 
 msgctxt "#30541"
 msgid "Show channel name in description"
-msgstr ""
+msgstr "Mostra nome canale in desrizione"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr ""
+msgstr "Streaming RTMP/RTMPE non supportati"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -425,7 +425,7 @@ msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "Trova link nella descrizione"
 
 msgctxt "#30545"
 msgid "No further links found."
