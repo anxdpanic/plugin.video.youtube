@@ -110,9 +110,7 @@ def _process_list_response(provider, context, json_data):
             video_item = items.VideoItem(title,
                                          context.create_uri(['play'], {'video_id': video_id}),
                                          image=image)
-            video_item.set_fanart(provider.get_fanart(context)) +            
-            #Get Track-ID from Playlist
-+           video_item.set_track_number(snippet['position'] + 1)
+            video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
             pass
