@@ -75,7 +75,7 @@ class LoginClient(object):
         }
     }
 
-    def __init__(self, config={}, language='en-US', access_token='', access_token_tv=''):
+    def __init__(self, config={}, language='en-US', region='', access_token='', access_token_tv=''):
         if not config:
             config = self.CONFIGS['youtube-for-kodi-fallback']
             pass

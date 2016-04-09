@@ -6,7 +6,7 @@ from ..helper.video_info import VideoInfo
 
 
 class YouTube(LoginClient):
-    def __init__(self, config={}, language='en-US', items_per_page=50, access_token='', access_token_tv=''):
+    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
         LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
                              access_token_tv=access_token_tv)
 
