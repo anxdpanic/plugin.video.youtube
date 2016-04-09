@@ -446,3 +446,7 @@ msgstr "更多選項"
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "沒有影片"
+
+msgctxt "#30550"
+msgid "Region"
+msgstr ""

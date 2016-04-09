@@ -456,3 +456,6 @@ msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Δεν βρέθηκαν άλλες ροές"
 
+msgctxt "#30550"
+msgid "Region"
+msgstr "περιοχή"

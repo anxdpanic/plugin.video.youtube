@@ -14,7 +14,7 @@ def _process_language(provider, context):
     items = json_data['items']
     language_list = []
     for item in items:
-        language_id = item['id'].split('-')[0]
+        language_id = item['id']
         language_name = item['snippet']['name']
         language_list.append((language_name, language_id))
         pass
@@ -38,9 +38,9 @@ def _process_language(provider, context):
     if region_id == -1:
         return
 
-    # set new language id
-    language_id = language_id + '-' + region_id
+    # set new language id and region id
     context.get_settings().set_string('youtube.language', language_id)
+    context.get_settings().set_string('youtube.region', region_id)
     provider.reset_client()
     pass
 

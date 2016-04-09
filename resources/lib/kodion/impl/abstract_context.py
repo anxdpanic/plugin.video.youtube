@@ -40,6 +40,9 @@ class AbstractContext(object):
 
     def get_language(self):
         raise NotImplementedError()
+    
+    def get_region(self):
+        raise NotImplementedError()
 
     def _get_cache_path(self):
         if not self._cache_path:
