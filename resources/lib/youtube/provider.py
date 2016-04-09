@@ -638,6 +638,8 @@ class Provider(kodion.AbstractProvider):
             context.add_sort_method(kodion.constants.sort_method.UNSORTED,
                                     kodion.constants.sort_method.VIDEO_RUNTIME,
                                     kodion.constants.sort_method.VIDEO_TITLE,
++                                    kodion.constants.sort_method.DATE_ADDED,
++                                    kodion.constants.sort_method.TRACK_NUMBER,
                                     kodion.constants.sort_method.DATE)
             pass
         pass
