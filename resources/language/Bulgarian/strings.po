@@ -446,3 +446,7 @@ msgstr "Още..."
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Не са открити видео потоци"
+
+msgctxt "#30550"
+msgid "Region"
+msgstr "държава"

@@ -446,3 +446,7 @@ msgstr "עוד..."
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "לא נמצא הזרמה של וידיאו"
+
+msgctxt "#30550"
+msgid "Region"
+msgstr "אזור"
