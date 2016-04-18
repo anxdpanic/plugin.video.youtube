@@ -446,3 +446,7 @@ msgstr "Więcej..."
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Brak strumieni wideo"
+
+msgctxt "#30550"
+msgid "Region"
+msgstr "Region"

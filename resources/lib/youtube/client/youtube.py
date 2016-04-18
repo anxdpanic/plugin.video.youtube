@@ -6,8 +6,8 @@ from ..helper.video_info import VideoInfo
 
 
 class YouTube(LoginClient):
-    def __init__(self, config={}, language='en-US', items_per_page=50, access_token='', access_token_tv=''):
-        LoginClient.__init__(self, config=config, language=language, access_token=access_token,
+    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
+        LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
                              access_token_tv=access_token_tv)
 
         self._max_results = items_per_page
@@ -19,8 +19,8 @@ class YouTube(LoginClient):
     def get_language(self):
         return self._language
 
-    def get_country(self):
-        return self._country
+    def get_region(self):
+        return self._region
 
     def calculate_next_page_token(self, page, max_result):
         page -= 1
@@ -100,7 +100,7 @@ class YouTube(LoginClient):
             pass
         _language = _language.replace('-', '_')
         params = {'part': 'snippet',
-                  'hl': _language.split('_')[0]}
+                  'hl': _language}
         return self._perform_v3_request(method='GET', path='i18nLanguages', params=params)
 
     def get_supported_regions(self, language=None):
@@ -198,7 +198,7 @@ class YouTube(LoginClient):
         params = {'part': 'snippet,contentDetails,brandingSettings',
                   'maxResults': str(self._max_results),
                   'categoryId': guide_category_id,
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
@@ -208,7 +208,7 @@ class YouTube(LoginClient):
     def get_guide_categories(self, page_token=''):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
@@ -219,7 +219,7 @@ class YouTube(LoginClient):
     def get_popular_videos(self, page_token=''):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language,
                   'chart': 'mostPopular'}
         if page_token:
@@ -232,7 +232,7 @@ class YouTube(LoginClient):
                   'maxResults': str(self._max_results),
                   'videoCategoryId': video_category_id,
                   'chart': 'mostPopular',
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
@@ -242,7 +242,7 @@ class YouTube(LoginClient):
     def get_video_categories(self, page_token=''):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
@@ -253,7 +253,7 @@ class YouTube(LoginClient):
     def get_activities(self, channel_id, page_token=''):
         params = {'part': 'snippet,contentDetails',
                   'maxResults': str(self._max_results),
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language}
         if channel_id == 'home':
             params['home'] = 'true'
@@ -272,7 +272,7 @@ class YouTube(LoginClient):
 
     def get_channel_sections(self, channel_id):
         params = {'part': 'snippet,contentDetails',
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language}
         if channel_id == 'mine':
             params['mine'] = 'true'
@@ -416,7 +416,7 @@ class YouTube(LoginClient):
                   'type': 'video',
                   'order': order,
                   'eventType': event_type,
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language,
                   'maxResults': str(self._max_results)}
         if page_token:
@@ -435,7 +435,7 @@ class YouTube(LoginClient):
         params = {'relatedToVideoId': video_id,
                   'part': 'snippet',
                   'type': 'video',
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language,
                   'maxResults': str(self._max_results)}
         if page_token:
@@ -472,7 +472,7 @@ class YouTube(LoginClient):
         # prepare params
         params = {'q': q,
                   'part': 'snippet',
-                  'regionCode': self._country,
+                  'regionCode': self._region,
                   'hl': self._language,
                   'maxResults': str(self._max_results)}
         if event_type and event_type in ['live', 'upcoming', 'completed']:
@@ -503,7 +503,7 @@ class YouTube(LoginClient):
                         'clientName': 'TVHTML5',
                         'clientVersion': '5.20150304',
                         'theme': 'CLASSIC',
-                        'acceptRegion': '%s' % self._country,
+                        'acceptRegion': '%s' % self._region,
                         'acceptLanguage': '%s' % self._language.replace('_', '-')
                     },
                     'user': {

@@ -182,5 +182,21 @@ class VideoItem(BaseItem):
 
     def get_genre(self):
         return self._genre
+        
+    def set_date(self, year, month, day, hour=0, minute=0, second=0):
+        date = datetime.datetime(year, month, day, hour, minute, second)
+        self._date = date.isoformat(sep=' ')
+        pass
 
+    def set_date_from_datetime(self, date_time):
+        self.set_date(year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour,
+                      minute=date_time.minute, second=date_time.second)
+        pass
+    
+    def get_date(self):
+        return self._date
+    
+    def set_track_number(self, track_number):
+        self._track_number = track_number
+        pass
     pass

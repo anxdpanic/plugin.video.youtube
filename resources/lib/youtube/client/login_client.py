@@ -75,7 +75,7 @@ class LoginClient(object):
         }
     }
 
-    def __init__(self, config={}, language='en-US', access_token='', access_token_tv=''):
+    def __init__(self, config={}, language='en-US', region='', access_token='', access_token_tv=''):
         if not config:
             config = self.CONFIGS['youtube-for-kodi-fallback']
             pass
@@ -89,13 +89,9 @@ class LoginClient(object):
             pass
 
         language = language.replace('-', '_')
-        language_components = language.split('_')
-        if len(language_components) != 2:
-            language = 'en_US'
-            pass
 
         self._language = language
-        self._country = language.split('_')[1]
+        self._region = region
         self._access_token = access_token
         self._access_token_tv = access_token_tv
         self._log_error_callback = None
@@ -272,8 +268,8 @@ class LoginClient(object):
                    'Connection': 'Keep-Alive',
                    'Accept-Encoding': 'gzip'}
 
-        post_data = {'device_country': self._country.lower(),
-                     'operatorCountry': self._country.lower(),
+        post_data = {'device_country': self._region.lower(),
+                     'operatorCountry': self._region.lower(),
                      'lang': self._language.replace('-', '_'),
                      'sdk_version': '19',
                      # 'google_play_services_version': '6188034',

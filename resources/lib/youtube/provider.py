@@ -113,6 +113,7 @@ class Provider(kodion.AbstractProvider):
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
             language = context.get_settings().get_string('youtube.language', 'en-US')
+            region = context.get_settings().get_string('youtube.region', 'US')
 
             # remove the old login.
             if access_manager.has_login_credentials():
@@ -177,11 +178,11 @@ class Provider(kodion.AbstractProvider):
                     access_tokens = ['', '']
                     pass
 
-                self._client = YouTube(language=language, items_per_page=items_per_page, access_token=access_tokens[1],
+                self._client = YouTube(language=language, region=region, items_per_page=items_per_page, access_token=access_tokens[1],
                                        access_token_tv=access_tokens[0], config=youtube_config)
                 self._client.set_log_error(context.log_error)
             else:
-                self._client = YouTube(items_per_page=items_per_page, language=language, config=youtube_config)
+                self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config)
                 self._client.set_log_error(context.log_error)
 
                 # in debug log the login status
@@ -636,6 +637,8 @@ class Provider(kodion.AbstractProvider):
             context.set_content_type(content_type)
             context.add_sort_method(kodion.constants.sort_method.UNSORTED,
                                     kodion.constants.sort_method.VIDEO_RUNTIME,
+                                    kodion.constants.sort_method.DATE_ADDED,
+                                    kodion.constants.sort_method.TRACK_NUMBER,
                                     kodion.constants.sort_method.VIDEO_TITLE,
                                     kodion.constants.sort_method.DATE)
             pass
