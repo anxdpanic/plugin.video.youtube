@@ -12,13 +12,13 @@ from resources.lib.youtube.helper.yt_change_api import Change_API
 addon = xbmcaddon.Addon()
 api = Change_API()
 if addon.getSetting('youtube.api.lastused.last_login') == '':
-    addon.setSetting(id='youtube.api.lastused.error', value='true')
+    addon.setSetting(id='youtube.api.lastused.error', value='false')
     api_error = addon.getSetting('youtube.api.lastused.error')
-    addon.setSetting(id='youtube.api.lastused.last_login', value = 'login_none')
+    addon.setSetting(id='youtube.api.lastused.last_login', value = 'login0')
     api_last_login = addon.getSetting('youtube.api.lastused.last_login')
-    addon.setSetting(id='youtube.api.lastused.key', value = api.get_api_key(api_error,api_last_login))
-    addon.setSetting(id='youtube.api.lastused.id', value = api.get_api_id(api_error,api_last_login))
-    addon.setSetting(id='youtube.api.lastused.secret', value = api.get_api_secret(api_error,api_last_login))
+    addon.setSetting(id='youtube.api.lastused.key', value = api.get_api_key(api_error,api_last_login, True))
+    addon.setSetting(id='youtube.api.lastused.id', value = api.get_api_id(api_error,api_last_login, True))
+    addon.setSetting(id='youtube.api.lastused.secret', value = api.get_api_secret(api_error,api_last_login, True))
     
 else:
     api_last_login = addon.getSetting('youtube.api.lastused.last_login')

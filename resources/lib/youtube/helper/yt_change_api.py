@@ -77,33 +77,33 @@ class Change_API():
         }
     }
     
-    def get_api_key(self, error, last_login):
+    def get_api_key(self, error, last_login, new_logon=False):
         
         if api_enable == 'true':
             return addon.getSetting('youtube.api.key')
-        elif error == 'true':
+        elif error == 'true' or not new_logon:
             api_key = self.get_api('key', error, last_login)
         else:
             api_key = addon.getSetting('youtube.api.lastused.key')
         
         return api_key
 
-    def get_api_id(self, error, last_login):
+    def get_api_id(self, error, last_login, new_logon=False):
         
         if api_enable == 'true':
             return addon.getSetting('youtube.api.id')
-        elif error == 'true':
+        elif error == 'true'or not new_logon:
             api_id = self.get_api('id', error, last_login)
         else:
             api_id = addon.getSetting('youtube.api.lastused.id')
             
         return api_id
 
-    def get_api_secret(self, error, last_login):
+    def get_api_secret(self, error, last_login, new_logon=False):
                 
         if api_enable == 'true':
             return addon.getSetting('youtube.api.secret')
-        elif error =='true':
+        elif error =='true' or not new_logon:
             api_secret = self.get_api('secret', error, last_login)
         else:
             api_secret = addon.getSetting('youtube.api.lastused.secret')
