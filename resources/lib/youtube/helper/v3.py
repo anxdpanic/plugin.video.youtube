@@ -58,7 +58,6 @@ def _process_list_response(provider, context, json_data):
             guide_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet['title']
-
             guide_item = items.DirectoryItem(title,
                                              context.create_uri(['special', 'browse_channels'], {'guide_id': guide_id}))
             guide_item.set_fanart(provider.get_fanart(context))
@@ -113,6 +112,28 @@ def _process_list_response(provider, context, json_data):
             video_item.set_fanart(provider.get_fanart(context))
             #Get Track-ID from Playlist
             video_item.set_track_number(snippet['position'] + 1)
+            result.append(video_item)
+            video_id_dict[video_id] = video_item
+            pass
+        elif yt_kind == 'youtube#activity':
+            snippet = yt_item['snippet']
+            details = yt_item['contentDetails']
+            actType = snippet['type']
+
+            # recommendations
+            if actType == 'recommendation':
+                video_id = details['recommendation']['resourceId']['videoId']
+            elif actType == 'upload':
+                video_id = details['upload']['videoId']
+            else:
+                continue
+
+            title = snippet['title']
+            image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+            video_item = items.VideoItem(title,
+                                         context.create_uri(['play'], {'video_id': video_id}),
+                                         image=image)
+            video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
             pass
@@ -189,7 +210,7 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     if kind == u'youtube#searchListResponse' or kind == u'youtube#playlistItemListResponse' or \
                     kind == u'youtube#playlistListResponse' or kind == u'youtube#subscriptionListResponse' or \
                     kind == u'youtube#guideCategoryListResponse' or kind == u'youtube#channelListResponse' or \
-                    kind == u'youtube#videoListResponse':
+                    kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse':
         result.extend(_process_list_response(provider, context, json_data))
         pass
     else:
