@@ -1,3 +1,6 @@
+5.2.0 (2016-05-11)
+[upd] APi-Changer - First login delete old Credentials - New Login Required! Sorry :)
+
 5.1.20.7 (2016-05-03)
 Workaround for the Quota Exceed-Error. 
 [add] API-Changer for a Pool of 6 API-Keys
