@@ -21,6 +21,17 @@ def _process_related_videos(provider, context, re_match):
     return result
 
 
+def _process_recommendations(provider, context, re_match):
+    result = []
+
+    page_token = context.get_param('page_token', '')
+    json_data = provider.get_client(context).get_activities('home', page_token=page_token)
+    if not v3.handle_error(provider, context, json_data):
+        return False
+    result.extend(v3.response_to_items(provider, context, json_data))
+    return result
+
+
 def _process_popular_right_now(provider, context, re_match):
     provider.set_content_type(context, kodion.constants.content_type.EPISODES)
 
@@ -223,6 +234,8 @@ def process(category, provider, context, re_match):
         return _process_related_videos(provider, context, re_match)
     elif category == 'popular_right_now':
         return _process_popular_right_now(provider, context, re_match)
+    elif category == 'recommendations':
+        return _process_recommendations(provider, context, re_match)
     elif category == 'browse_channels':
         return _process_browse_channels(provider, context, re_match)
     elif category == 'new_uploaded_videos_tv':
@@ -235,5 +248,3 @@ def process(category, provider, context, re_match):
         return _process_description_links(provider, context, re_match)
     else:
         raise kodion.KodionException("YouTube special category '%s' not found" % category)
-
-    return result

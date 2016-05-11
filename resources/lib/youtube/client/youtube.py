@@ -4,9 +4,9 @@ from resources.lib.kodion import simple_requests as requests
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 
-
 class YouTube(LoginClient):
     def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
+        
         LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
                              access_token_tv=access_token_tv)
 

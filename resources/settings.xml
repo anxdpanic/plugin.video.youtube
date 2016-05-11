@@ -17,6 +17,7 @@
     <category label="30516">
         <setting id="youtube.folder.sign.in.show" type="bool" label="30111" default="true"/>
         <setting id="youtube.folder.my_subscriptions.show" type="bool" label="30510" default="true"/>
+        <setting id="youtube.folder.recommendations.show" type="bool" label="30551" default="true"/>
         <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
         <setting id="youtube.folder.watch_later.show" type="bool" label="30107" default="true"/>
@@ -47,8 +48,10 @@
     
     <!-- personal api key -->
     <category label="30200">
-        <setting id="youtube.api.key" type="text" label="30201" default="AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA"/>
-        <setting id="youtube.api.id" type="text" label="30202" default="861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68"/>
-        <setting id="youtube.api.secret" type="text" label="30203" default="SboVhoG9s0rNafixCSGGKXAT"/>
+    	<setting id="youtube.api.enable" type="bool" label="30204" default="false"/>
+    	<setting id="youtube.api.autologin_enabled" type="bool" label="30205" enable="eq(-1,false)" default="true"/>
+        <setting id="youtube.api.key" type="text" label="30201" enable="eq(-2,true)" default="AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA"/>
+        <setting id="youtube.api.id" type="text" label="30202" enable="eq(-3,true)" default="861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68"/>
+        <setting id="youtube.api.secret" type="text" label="30203" enable="eq(-4,true)" default="SboVhoG9s0rNafixCSGGKXAT"/>
     </category>
 </settings>

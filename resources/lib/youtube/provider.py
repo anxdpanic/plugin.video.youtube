@@ -1,3 +1,4 @@
+from tokenize import group
 __author__ = 'bromix'
 
 from resources.lib.youtube.helper import yt_subscriptions
@@ -8,6 +9,7 @@ from resources.lib.youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
     yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
 from .youtube_exceptions import LoginException
+import xbmcaddon
 
 
 class Provider(kodion.AbstractProvider):
@@ -26,6 +28,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.delete': 30118,
                  'youtube.browse_channels': 30512,
                  'youtube.popular_right_now': 30513,
+                 'youtube.recommendations': 30551,
                  'youtube.related_videos': 30514,
                  'youtube.setting.auto_remove_watch_later': 30515,
                  'youtube.subscribe_to': 30517,
@@ -103,7 +106,7 @@ class Provider(kodion.AbstractProvider):
             self._client = None
             pass
 
-        if not self._client:
+        if not self._client:          
             major_version = context.get_system_version().get_version()[0]
             youtube_config = YouTube.CONFIGS.get('youtube-for-kodi-%d' % major_version, None)
             if not youtube_config or youtube_config is None:
@@ -415,7 +418,7 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/sign/(?P<mode>.*)/$')
     def _on_sign(self, context, re_match):
-        mode = re_match.group('mode')
+        mode = re_match.group('mode')            
         yt_login.process(mode, self, context, re_match)
         return True
 
@@ -485,12 +488,25 @@ class Provider(kodion.AbstractProvider):
         if old_action:
             return yt_old_actions.process_old_action(self, context, re_match)
 
+        addon = xbmcaddon.Addon()
+        
+        settings = context.get_settings()
+        
+        if settings.get_string('youtube.api.autologin', '') == '':
+            settings.set_bool('youtube.api.autologin', False) 
+        
+        if settings.get_bool('youtube.api.autologin', True):
+            mode = 'in'
+            yt_login.process(mode, self, context, re_match, False)
+            pass
+
         self.get_client(context)
         resource_manager = self.get_resource_manager(context)
 
         result = []
 
-        settings = context.get_settings()
+        if settings.get_bool('youtube.api.enable', True) and settings.get_bool('youtube.api.autologin', True):
+            settings.set_bool('youtube.api.autologin', False)
 
         # sign in
         if not self.is_logged_in() and settings.get_bool('youtube.folder.sign.in.show', True):
@@ -509,6 +525,16 @@ class Provider(kodion.AbstractProvider):
                 context.create_resource_path('media', 'new_uploads.png'))
             my_subscriptions_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_item)
+            pass
+
+        # Recommendations
+        if self.is_logged_in() and settings.get_bool('youtube.folder.recommendations.show', True):
+            recommendations_item = DirectoryItem(
+                context.localize(self.LOCAL_MAP['youtube.recommendations']),
+                context.create_uri(['special', 'recommendations']),
+                context.create_resource_path('media', 'popular.png'))
+            recommendations_item.set_fanart(self.get_fanart(context))
+            result.append(recommendations_item)
             pass
 
         # what to watch

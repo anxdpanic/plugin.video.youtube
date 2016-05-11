@@ -1,3 +1,10 @@
+5.1.20.7 (2016-05-03)
+Workaround for the Quota Exceed-Error. 
+[add] API-Changer for a Pool of 6 API-Keys
+[add] Auto-Reauthenticate with Pool-Key on "Quota Exceed" error
+[add] "Use own API"-Button
+[hint] The Message "Invalid Credentials" after Update could be fixed with deleting the Userdata-Settings.xml
+
 5.1.20.6 (2016-04-03)
 [add] Greek Translation from twilight0
 [upd] Fixed italian translation from DjDiabolik
