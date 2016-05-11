@@ -55,25 +55,10 @@ class Change_API():
             'key': 'AIzaSyAw6UkcDBiVMxevqhk7XOekPQSwRicJi8Q',
             'secret': 'CR18gzUiMN-WESUtg4tMK5gs',
         },
-        'login6': { #Deaktivated
-            'id': '294899064488-b90raque738iegfk72h836n2kbts7pvq',
-            'key': 'AIzaSyCmijFdsChPJ61VSOiLa4tm-JM4u2rvp3w',
-            'secret': 'dUFoZAoKmOUMTtJU4ZolqpzE',
-        },
-        'login7': { #Deaktivated
-            'id': '294899064488-j22rg2b1pbu52832derit4n0krmo60gu',
-            'key': 'AIzaSyCfkloKyoKINLi6RMdDR7CWUnELiXRcNhU',
-            'secret': 'uQ9Mo0i1sPvprKrmIXLPkTOV',
-        },
-        'login8': { #Deaktivated
-            'id': '294899064488-d0ad4495pgbcd2bcmf2r77khd2nj0nar',
-            'key': 'AIzaSyCyWNOnuccVdMNIdEwcW9Q3GDLm1NzrUCQ',
-            'secret': 'zHLEiFduvikezYjYtgPg-soL',
-        },
-        'login9': { #Deaktivated
-            'id': '294899064488-tr5n60fbnbsrvqr4dknpfbru05g7mtfp',
-            'key': 'AIzaSyALdQ2WEtAt1itffs-dksMrXkGAdi6oKGI',
-            'secret': 'YWA760XZkIRd6FrBN4UkLv-D',
+        'login6': { #Deaktivated / template
+            'id': '',
+            'key': '',
+            'secret': '',
         }
     }
     
@@ -81,7 +66,7 @@ class Change_API():
         
         if api_enable == 'true':
             return addon.getSetting('youtube.api.key')
-        elif error == 'true' or not new_logon:
+        elif error == 'true' or new_logon:
             api_key = self.get_api('key', error, last_login)
         else:
             api_key = addon.getSetting('youtube.api.lastused.key')
@@ -92,7 +77,7 @@ class Change_API():
         
         if api_enable == 'true':
             return addon.getSetting('youtube.api.id')
-        elif error == 'true'or not new_logon:
+        elif error == 'true'or new_logon:
             api_id = self.get_api('id', error, last_login)
         else:
             api_id = addon.getSetting('youtube.api.lastused.id')
@@ -103,7 +88,7 @@ class Change_API():
                 
         if api_enable == 'true':
             return addon.getSetting('youtube.api.secret')
-        elif error =='true' or not new_logon:
+        elif error =='true' or new_logon:
             api_secret = self.get_api('secret', error, last_login)
         else:
             api_secret = addon.getSetting('youtube.api.lastused.secret')
@@ -139,9 +124,16 @@ class Change_API():
         
         return part_value
     
-    def get_back_to_the_rootss(self):
-        if addon.getSetting('youtube.api.lastused.new_login'):
-            addon.setSetting(id='youtube.api.lastused.new_login', value = '')
-            pass
-                 
-        return True
+    def new_login(self):
+        addon.setSetting(id='kodion.access_token', value = '')
+        addon.setSetting(id='kodion.refresh_token', value = '')
+        addon.setSetting(id='kodion.access_token.expires', value = '')
+        addon.setSetting(id='youtube.api.lastused.error', value='false')
+        api_error = addon.getSetting('youtube.api.lastused.error')
+        addon.setSetting(id='youtube.api.lastused.last_login', value = 'login0')
+        api_last_login = addon.getSetting('youtube.api.lastused.last_login')
+        
+        addon.setSetting(id='youtube.api.lastused.key', value = self.get_api_key(api_error,api_last_login, True))
+        addon.setSetting(id='youtube.api.lastused.id', value = self.get_api_id(api_error,api_last_login, True))
+        addon.setSetting(id='youtube.api.lastused.secret', value = self.get_api_secret(api_error,api_last_login, True))
+        pass
