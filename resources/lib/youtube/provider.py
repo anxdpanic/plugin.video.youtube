@@ -28,6 +28,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.delete': 30118,
                  'youtube.browse_channels': 30512,
                  'youtube.popular_right_now': 30513,
+                 'youtube.recommendations': 30551,
                  'youtube.related_videos': 30514,
                  'youtube.setting.auto_remove_watch_later': 30515,
                  'youtube.subscribe_to': 30517,
@@ -524,6 +525,16 @@ class Provider(kodion.AbstractProvider):
                 context.create_resource_path('media', 'new_uploads.png'))
             my_subscriptions_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_item)
+            pass
+
+        # Recommendations
+        if self.is_logged_in() and settings.get_bool('youtube.folder.recommendations.show', True):
+            recommendations_item = DirectoryItem(
+                context.localize(self.LOCAL_MAP['youtube.recommendations']),
+                context.create_uri(['special', 'recommendations']),
+                context.create_resource_path('media', 'popular.png'))
+            recommendations_item.set_fanart(self.get_fanart(context))
+            result.append(recommendations_item)
             pass
 
         # what to watch
