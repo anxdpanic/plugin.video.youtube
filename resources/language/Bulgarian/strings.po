@@ -458,3 +458,7 @@ msgstr "Не са открити видео потоци"
 msgctxt "#30550"
 msgid "Region"
 msgstr "държава"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr ""

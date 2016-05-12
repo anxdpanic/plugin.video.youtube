@@ -458,3 +458,7 @@ msgstr ""
 msgctxt "#30550"
 msgid "Region"
 msgstr "Région"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr ""

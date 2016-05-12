@@ -458,3 +458,7 @@ msgstr "לא נמצא הזרמה של וידיאו"
 msgctxt "#30550"
 msgid "Region"
 msgstr "אזור"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr ""

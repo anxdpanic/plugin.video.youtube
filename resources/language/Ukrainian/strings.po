@@ -458,3 +458,7 @@ msgstr "Відеопотоки не знайдені"
 msgctxt "#30550"
 msgid "Region"
 msgstr "регіон"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr ""
