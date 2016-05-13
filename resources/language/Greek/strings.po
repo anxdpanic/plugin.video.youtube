@@ -254,7 +254,7 @@ msgid "API Secret"
 msgstr "Μυστικό API"
 
 msgctxt "#30204"
-msgid "Own API enable"
+msgid "Enable Personal API Keys"
 msgstr ""
 
 msgctxt "#30205"
@@ -467,3 +467,7 @@ msgstr "Δεν βρέθηκαν άλλες ροές"
 msgctxt "#30550"
 msgid "Region"
 msgstr "περιοχή"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr ""

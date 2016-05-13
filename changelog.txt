@@ -1,3 +1,6 @@
+5.2.1 (2016-05-12)
+[add] Additional "Recommend for You" section (thanks to anxdpanic)
+
 5.2.0 (2016-05-11)
 [upd] APi-Changer - First login delete old Credentials - New Login Required! Sorry :)
 
