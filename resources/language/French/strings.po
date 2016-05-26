@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2016-05-22 14:52+0200\n"
+"Last-Translator: \n"
+"Language-Team: Guilouz\n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -23,7 +23,9 @@ msgstr "Plugin pour YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "YouTube est l'un des plus grands sites de partage vidéos du monde."
+msgstr "YouTube est l'un des plus grands sites de partage de vidéos du monde."
+
+#Kodion Settings
 
 msgctxt "#30000"
 msgid "General"
@@ -37,13 +39,15 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Mot de passe"
 
+#empty strings from id 30003 to 30008
+
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Toujours demander la qualité de la vidéo"
 
 msgctxt "#30010"
 msgid "Video Quality"
-msgstr "Qualité de vidéo"
+msgstr "Qualité vidéo"
 
 msgctxt "#30011"
 msgid "480p"
@@ -59,11 +63,11 @@ msgstr "1080p (HD)"
 
 msgctxt "#30014"
 msgid "2160p (4k)"
-msgstr "2160p (4k)"
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8k)"
-msgstr "4320p (8k)"
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -73,9 +77,11 @@ msgctxt "#30017"
 msgid "360p"
 msgstr "360p"
 
+#empty strings from id 30018 to 30019
+
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr "Activer la 3D"
+msgstr "Autoriser la 3D"
 
 msgctxt "#30021"
 msgid "Show Fanart"
@@ -141,6 +147,9 @@ msgctxt "#30036"
 msgid "Support alternative player"
 msgstr "Support de lecteur alternatif"
 
+#Kodion Common
+#empty strings from id 30037 to 30099
+
 msgctxt "#30100"
 msgid "Favorites"
 msgstr "Favoris"
@@ -159,7 +168,7 @@ msgstr "Bibliothèque"
 
 msgctxt "#30104"
 msgid "Highlights"
-msgstr "Highlights"
+msgstr "En vedette"
 
 msgctxt "#30105"
 msgid "Archive"
@@ -171,7 +180,7 @@ msgstr "Page suivante (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "À regarder plus tard"
+msgstr "Regarder plus tard"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -199,7 +208,7 @@ msgstr "Renommer"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "Confirmer l'effacement"
+msgstr "Confirmer la suppression"
 
 msgctxt "#30115"
 msgid "Confirm remove"
@@ -207,7 +216,7 @@ msgstr "Confirmer la suppression"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "Effacer \"%s\"?"
+msgstr "Supprimer \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
@@ -215,45 +224,45 @@ msgstr "Supprimer \"%s\" ?"
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr "Effacer"
+msgstr "Supprimer"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr "Patientez..."
+msgstr "Veuillez patienter…"
 
 msgctxt "#30120"
 msgid "Clear"
 msgstr "Nettoyer"
 
-#YouTube
-#empty strings from id 30121 to 30199
+# YouTube
+# empty strings from id 30121 to 30199
 
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "Clé de l’API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "Clé de l’API"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "Id de l’API"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API secret"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr ""
+msgstr "Activer les clés API personnelles"
 
 msgctxt "#30205"
 msgid "Autologin on Error enable"
-msgstr ""
+msgstr "Activer la connexion automatique en cas d'erreur"
 
-#YouTube
-#empty strings from id 30206 to 30499
+# YouTube
+# empty strings from id 30204 to 30499
 
 msgctxt "#30500"
 msgid "Channels"
@@ -261,7 +270,7 @@ msgstr "Chaînes"
 
 msgctxt "#30501"
 msgid "Playlists"
-msgstr "Playlists"
+msgstr "Listes de lecture"
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -301,7 +310,7 @@ msgstr "Mes abonnements"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr "J'aime"
+msgstr "File d’attente vidéo"
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -317,7 +326,7 @@ msgstr "Vidéos similaires"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto suppression de 'À regarder plus tard'"
+msgstr "Auto suppression de 'Regarder plus tard'"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -341,11 +350,11 @@ msgstr "Ajouter à..."
 
 msgctxt "#30521"
 msgid "Select playlist"
-msgstr "Sélectionner la playlist"
+msgstr "Sélectionner la liste de lecture"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr "Nouvelle playlist..."
+msgstr "Nouvelle liste de lecture…"
 
 msgctxt "#30523"
 msgid "Language"
@@ -353,11 +362,11 @@ msgstr "Langue"
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr "Sélectionner une langue"
+msgstr "Sélectionner la langue"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr "Sélectionner une région"
+msgstr "Sélectionner la région"
 
 msgctxt "#30526"
 msgid "Adjust"
@@ -365,7 +374,7 @@ msgstr "Ajuster"
 
 msgctxt "#30527"
 msgid "Language and region?"
-msgstr "Langage et région ?"
+msgstr "Langue et région ?"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -397,11 +406,11 @@ msgstr "Aléatoire"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr "Sélectionner l'ordre de la playlist"
+msgstr "Sélectionner l'ordre de la liste de lecture"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr "Mettre à jour la playlist..."
+msgstr "Mettre à jour la liste de lecture…"
 
 msgctxt "#30537"
 msgid "Play from here"
@@ -413,7 +422,7 @@ msgstr "Vidéos que vous n'aimez pas"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "Directs"
+msgstr "Live"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -429,31 +438,31 @@ msgstr "Le streaming rtmpe n'est pas supporté"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr ""
+msgstr "Actualiser"
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "Plus de liens à partir de la description"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "Aucun autre lien trouvé."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr ""
+msgstr "Veuillez vous connecter en deux fois !"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "Vous devez activer les deux applications pour que YouTube fonctionne correctement."
 
 msgctxt "#30548"
 msgid "More..."
-msgstr ""
+msgstr "Plus…"
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "Aucun flux vidéos trouvé"
 
 msgctxt "#30550"
 msgid "Region"
@@ -461,4 +470,4 @@ msgstr "Région"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Recommandations"
