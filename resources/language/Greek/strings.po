@@ -255,11 +255,11 @@ msgstr "Μυστικό API"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr ""
+msgstr "Ενεργοποίηση προσωπικών κλειδιών API"
 
 msgctxt "#30205"
 msgid "Autologin on Error enable"
-msgstr ""
+msgstr "Ενεργοποίηση αυτόματης είσοδου σε περίπτωση σφάλματος"
 
 #YouTube
 #empty strings from id 30206 to 30499
@@ -466,8 +466,8 @@ msgstr "Δεν βρέθηκαν άλλες ροές"
 
 msgctxt "#30550"
 msgid "Region"
-msgstr "περιοχή"
+msgstr "Περιοχή"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Συστάσεις"
