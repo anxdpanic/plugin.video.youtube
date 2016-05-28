@@ -21,39 +21,39 @@ aktivated_logins = 5; # Change this value to get the logins above in the rotatio
 class Change_API():
     CONFIGS = {
         'last_used': {
-            'key': '%s' % api_key,
-            'id': '%s' % api_id,
-            'secret': '%s' % api_secret,
+            'key': api_key,
+            'id': api_id,
+            'secret': api_secret,
         },
-       'login0': { #Youtube Plugin for Kodi #1
+        'login0': { #Bromix youtube-for-kodi-12
+            'id': '947596709414-08nrn314d8j3k91cl4f51srcu6m19hvu',
+            'key': 'AIzaSyCDn_9EybTJiymHipNS3jk5ZpCTXdCotQ0',
+            'secret': 'HsLT2ZCexIV-VFxWeYVZ2TUc'
+        },
+       'login1': { #Youtube Plugin for Kodi #1
             'id': '294899064488-a8kc1k1jd00kamqre0vd2nftuiifrf6a',
             'key': 'AIzaSyCZwQuosFJbQznqnqpqpYlaJWVMn16wBvs',
             'secret': 'KTkBKINN5vf4Owj1NYyXLzbe',
         },
-        'login1': { #Youtube Plugin for Kodi #2
-            'id': '430572714882-9jp7cc5o2fddgadc6mc8jpukbfb9ls7o',
-            'key': 'AIzaSyDB1Te80ITz7XGvWTdsk8U25eTv9YiCKfs',
-            'secret': 'zA9wij-flItY35kHpl7sfekx',
+        'login2': { #Bromix youtube-for-kodi-13
+            'id': '448940676713-min9u5frfujprbnb8f3dri3cv9jr32rn',
+            'key': 'AIzaSyAmrf3BneEQPDiUEuQlzy0_rbFGDBg-bi0',
+            'secret': '79vMsJsNC9jypSfryUMu00jW'
         },
-        'login2': { #Youtube Plugin for Kodi #3
-            'id': '639620369361-boaoj435t2gp4rn3r4qr6nvio29p0frb',
-            'key': 'AIzaSyAP4xRmyNJrwWq1p6nJS-VwnrcgHXlYOqk',
-            'secret': 'WYndlTAlKiMef8QOcyPCdgWE',
+        'login3': { #Bromix youtube-for-kodi-14
+            'id': '107500767506-9mvbaacuscf8cge2n3kkvj50a6dnrk8g',
+            'key': 'AIzaSyCCnZImC7gTniNfgwqGwixIdBVGxiCOKlU',
+            'secret': '2ceVfognBCtn8uh20HmlJN4X'
         },
-        'login3': { #Youtube Plugin for Kodi #4
-            'id': '531513868019-i5hbh08uif89hk3ks6tf8dui9guitueg',
-            'key': 'AIzaSyDBAG0tetknUkjZ8ot3Eoy0ImQqX74WYMg',
-            'secret': 'TzlgideyMvhBpWbe02Z-1C5r',
+        'login4': { #Bromix youtube-for-kodi-15
+            'id': '610696918705-bkt6v536k7gn2dtcv8vdngm4b0vt5sev',
+            'key': 'AIzaSyATqDim-56y8HcN1NAzQdVZgdMoc6d9Eys',
+            'secret': 'kV7ReP1f_Lg9i2hWR2liHnO6'
         },
-        'login4': { #Youtube Plugin for Kodi #5
-            'id': '761252151047-sudci23270af36qgip84dv1ic7uvdc8b',
-            'key': 'AIzaSyDZ5ey4ORnxjGA25FDBDamyUIjDS-6JEHQ',
-            'secret': 'W3ZwJlvJ4SeQhI3kKjlXADY7',
-        },
-        'login5': { #Youtube Plugin for Kodi #6
-            'id': '865191284534-ss09oo0a085spf4uonp3rgfohjshs4e2',
-            'key': 'AIzaSyAw6UkcDBiVMxevqhk7XOekPQSwRicJi8Q',
-            'secret': 'CR18gzUiMN-WESUtg4tMK5gs',
+        'login5': { #Bromix youtube-for-kodi-16
+            'id': '879761788105-sduf0ht335dvg923ane7cg1jnt1d5l4k',
+            'key': 'AIzaSyBS3rNymJtzPYbJX5lSGdNCBS6ajh4VDDY',
+            'secret': 'vBVDa-kNdCHDTkpD8b8HO718'
         },
         'login6': { #Deaktivated / template
             'id': '',

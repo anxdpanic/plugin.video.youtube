@@ -1,3 +1,9 @@
+5.2.2 (2016-05-28)
+[upd] Insert old API-Keys from Bromix because of Quota-Exceed-Error
+[add] Dutch strings (thanks to Guilouz)
+[upd] French strings (thanks to royreinders)
+[upd] Greek strings (thanks to Twilight0)
+
 5.2.1 (2016-05-12)
 [add] Additional "Recommend for You" section (thanks to anxdpanic)
 
