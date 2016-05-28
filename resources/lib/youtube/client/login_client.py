@@ -35,52 +35,52 @@ class LoginClient(object):
         'youtube-for-kodi-quota': {
             'token-allowed': False,
             'system': 'All',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
         'youtube-for-kodi-fallback': {
             'token-allowed': False,
             'system': 'Fallback!',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
         'youtube-for-kodi-12': {
             'system': 'Frodo',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
         'youtube-for-kodi-13': {
             'system': 'Gotham',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
         'youtube-for-kodi-14': {
             'system': 'Helix',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
         'youtube-for-kodi-15': {
             'system': 'Isengard',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
         'youtube-for-kodi-16': {
             'system': 'Jarvis',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         },
             'youtube-for-kodi-17': {
             'system': 'Krypton',
-            'key': '%s' % api_key,
+            'key': api_key,
             'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': '%s' % api_secret
+            'secret': api_secret
         }
     }
     

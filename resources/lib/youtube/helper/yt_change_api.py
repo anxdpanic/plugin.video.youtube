@@ -21,9 +21,9 @@ aktivated_logins = 5; # Change this value to get the logins above in the rotatio
 class Change_API():
     CONFIGS = {
         'last_used': {
-            'key': '%s' % api_key,
-            'id': '%s' % api_id,
-            'secret': '%s' % api_secret,
+            'key': api_key,
+            'id': api_id,
+            'secret': api_secret,
         },
         'login0': { #Bromix youtube-for-kodi-12
             'id': '947596709414-08nrn314d8j3k91cl4f51srcu6m19hvu',
