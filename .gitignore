@@ -18,5 +18,10 @@ $RECYCLE.BIN/
 *.lnk
 
 #other
+/.settings
+/.project
+/.pydevproject
+*.pyc
 *.pyo
-.idea/*
+/.idea
+
