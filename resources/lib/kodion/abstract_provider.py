@@ -273,7 +273,7 @@ class AbstractProvider(object):
                 pass
 
             if search_history.is_empty():
-                context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
+                #  context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
                 pass
 
             return result, {self.RESULT_CACHE_TO_DISC: False}
