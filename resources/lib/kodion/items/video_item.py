@@ -26,6 +26,7 @@ class VideoItem(BaseItem):
         self._studio = None
         self._artist = None
         self._play_count = None
+        self._uses_dash = None
         pass
 
     def set_play_count(self, play_count):
@@ -199,4 +200,9 @@ class VideoItem(BaseItem):
     def set_track_number(self, track_number):
         self._track_number = track_number
         pass
-    pass
+
+    def set_use_dash(self, value=True):
+        self._uses_dash = value
+
+    def use_dash(self):
+        return self._uses_dash is True and 'manifest/dash' in self.get_uri()

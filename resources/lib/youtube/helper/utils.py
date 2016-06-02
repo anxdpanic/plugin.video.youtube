@@ -157,6 +157,9 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         snippet = yt_item['snippet']  # crash if not conform
 
+        # set uses_dash
+        video_item.set_use_dash(context.get_settings().use_dash())
+
         # set the title
         video_item.set_title(snippet['title'])
 

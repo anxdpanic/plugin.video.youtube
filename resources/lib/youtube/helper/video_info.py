@@ -318,6 +318,12 @@ class VideoInfo(object):
         '251': {'container': 'webm',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
+        # === DASH adaptive
+        '9999': {'container': 'mpd',
+                 'dash/audio': True,
+                 'dash/video': True,
+                 'audio': {'bitrate': 0, 'encoding': ''},
+                 'video': {'height': 0, 'encoding': ''}}
     }
 
     def __init__(self, context, access_token='', language='en-US'):
@@ -521,10 +527,7 @@ class VideoInfo(object):
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
         params = {'video_id': video_id,
                   'hl': self._language,
-                  'ps': 'leanback',
-                  'el': 'leanback',
-                  'width': '1920',
-                  'height': '1080',
+                  'eurl': 'https://youtube.googleapis.com/v/' + video_id,
                   'ssl_stream': '1',
                   'c': 'TVHTML5',
                   'cver': '4',
@@ -533,6 +536,12 @@ class VideoInfo(object):
                   'cbrver': '40.0.2214.115',
                   'cos': 'Windows',
                   'cosver': '6.1'}
+        if not self._context.get_settings().use_dash():
+            params.update({'ps': 'leanback',
+                           'el': 'leanback',
+                           'width': '1920',
+                           'height': '1080'})
+
         if self._access_token:
             params['access_token'] = self._access_token
             pass
@@ -599,6 +608,16 @@ class VideoInfo(object):
                 pass
             pass
         """
+
+        if self._context.get_settings().use_dash():
+            mpd_url = params.get('dashmpd', None)
+            if mpd_url:
+                video_stream = {'url': mpd_url,
+                                'title': meta_info['video'].get('title', ''),
+                                'meta': meta_info}
+                video_stream.update(self.FORMAT.get('9999'))
+                stream_list.append(video_stream)
+                return stream_list
 
         # extract streams from map
         url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')

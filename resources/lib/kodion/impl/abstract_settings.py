@@ -93,4 +93,7 @@ class AbstractSettings(object):
     def is_support_alternative_player_enabled(self):
         return self.get_bool(constants.setting.SUPPORT_ALTERNATIVE_PLAYER, False)
 
+    def use_dash(self):
+        return self.get_bool(constants.setting.USE_DASH, False)
+
     pass
