@@ -27,6 +27,8 @@
         <description lang="bg">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
 		<summary lang="el">Πρόσθετο YouTube</summary>
         <description lang="el">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
+        <summary lang="ru">Дополнение для YouTube</summary>
+        <description lang="en">YouTube является одним из крупнейших видеохостингов в мире.</description>
 		<disclaimer lang="en"></disclaimer>
 		<language></language>
 		<platform>all</platform>
