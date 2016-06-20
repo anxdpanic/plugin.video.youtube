@@ -1,3 +1,9 @@
+###### If you are getting
+###### Exception in ContentProvider: Unknown kind ''
+###### Quota Exceeded
+###### anything to do with content not working, more than likely 
+###### you've hit the famous Youtube Quote usage problem.
+
 ![](https://raw.githubusercontent.com/Kolifanes/plugin.video.youtube/master/icon.png)
 # **Links:**
 
