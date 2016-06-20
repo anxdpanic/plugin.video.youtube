@@ -25,6 +25,8 @@ msgctxt "Addon Description"
 msgid "YouTube is a one of the biggest video-sharing websites of the world."
 msgstr "Данное дополнение позволяет находить и смотреть видео на всеми любимом сайте."
 
+#Kodion Settings
+
 msgctxt "#30000"
 msgid "General"
 msgstr "Общие"
@@ -36,6 +38,8 @@ msgstr "Имя пользователя"
 msgctxt "#30002"
 msgid "Password"
 msgstr "Пароль"
+
+#empty strings from id 30003 to 30008
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -72,6 +76,8 @@ msgstr "240p"
 msgctxt "#30017"
 msgid "360p"
 msgstr "360p"
+
+#empty strings from id 30018 to 30019
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -140,6 +146,9 @@ msgstr "Вид: Альбомы"
 msgctxt "#30036"
 msgid "Support alternative player"
 msgstr "Поддержка альтернативного проигрывателя"
+
+#Kodion Common
+#empty strings from id 30037 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -230,27 +239,27 @@ msgstr "Очистить"
 
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "API Key"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API Key"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API Id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr ""
+msgstr "Использовать персональный API Key"
 
 msgctxt "#30205"
 msgid "Autologin on Error enable"
-msgstr ""
+msgstr "Разрешить автовход при ошибке"
 
 #YouTube
 #empty strings from id 30206 to 30499
@@ -461,4 +470,4 @@ msgstr "регион"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Рекомендации"
