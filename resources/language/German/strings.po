@@ -230,23 +230,23 @@ msgstr "Leeren"
 
 msgctxt "#30200"
 msgid "API Key"
-msgstr "API-Key"
+msgstr "API-Schlüssel"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr "API-Key"
+msgstr "API-Schlüssel"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr "API-ID"
+msgstr "Client-ID"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr "API-Geheimnis"
+msgstr "Clientschlüssel"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr "Aktiviere eigene API-Keys"
+msgstr "Aktiviere eigenen API-Schlüssel"
 
 msgctxt "#30205"
 msgid "Autologin on Error enable"
@@ -461,4 +461,4 @@ msgstr "Region"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr "Empfehlungen"
+msgstr "Empfohlen"
