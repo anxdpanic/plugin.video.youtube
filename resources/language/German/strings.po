@@ -230,27 +230,27 @@ msgstr "Leeren"
 
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "API-Schlüssel"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API-Schlüssel"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "Client-ID"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "Clientschlüssel"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr ""
+msgstr "Aktiviere eigenen API-Schlüssel"
 
 msgctxt "#30205"
 msgid "Autologin on Error enable"
-msgstr ""
+msgstr "Aktiviere automatischen Login bei Fehlern"
 
 #YouTube
 #empty strings from id 30206 to 30499
@@ -461,4 +461,4 @@ msgstr "Region"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Empfohlen"
