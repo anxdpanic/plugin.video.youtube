@@ -109,15 +109,15 @@ msgstr "Εναλλαγή Οθόνης"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr "Οθόνη: Προκαθορισμένη"
+msgstr "Απεικόνιση: Προκαθορισμένη"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr "Οθόνη: Επεισόδια"
+msgstr "Απεικόνιση: Επεισόδια"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr "Οθόνη: Ταινίες"
+msgstr "Απεικόνιση: Ταινίες"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
@@ -129,19 +129,19 @@ msgstr "Για προχωρημένους"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr "Οθόνη: Εκπομπές TV"
+msgstr "Απεικόνιση: Εκπομπές TV"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr "Οθόνη: Τραγούδια"
+msgstr "Απεικόνιση: Τραγούδια"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr "Οθόνη: Καλλιτέχνες"
+msgstr "Απεικόνιση: Καλλιτέχνες"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr "Οθόνη: Άλμπουμ"
+msgstr "Απεικόνιση: Άλμπουμ"
 
 msgctxt "#30036"
 msgid "Support alternative player"
