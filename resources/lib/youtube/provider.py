@@ -560,6 +560,8 @@ class Provider(kodion.AbstractProvider):
         # subscriptions
         if self.is_logged_in():
             playlists = resource_manager.get_related_playlists(channel_id='mine')
+            if playlists.has_key('watchLater'):
+                playlists['watchLater'] = ' WL'
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):
