@@ -611,7 +611,11 @@ class VideoInfo(object):
 
         if self._context.get_settings().use_dash():
             mpd_url = params.get('dashmpd', None)
+            use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
             if mpd_url:
+                if use_cipher_signature:
+                    # fuck!!! in this case we must call the web page
+                    return self._method_watch(video_id)
                 video_stream = {'url': mpd_url,
                                 'title': meta_info['video'].get('title', ''),
                                 'meta': meta_info}
