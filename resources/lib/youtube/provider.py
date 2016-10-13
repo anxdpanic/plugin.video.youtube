@@ -480,6 +480,11 @@ class Provider(kodion.AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
+    @kodion.RegisterProviderPath('^/config/mpd/$')
+    def configure_mpd_inputstream(self, context, query):
+        from xbmcaddon import Addon
+        Addon(id='inputstream.mpd').openSettings()
+
     def on_root(self, context, re_match):
         """
         Support old YouTube url calls, but also log a deprecation warnings.

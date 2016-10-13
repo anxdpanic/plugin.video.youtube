@@ -39,7 +39,15 @@ msgctxt "#30002"
 msgid "Password"
 msgstr ""
 
-#empty strings from id 30003 to 30008
+#empty strings from id 30003 to 30006
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Configure MPEG-DASH InputStream Client"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
