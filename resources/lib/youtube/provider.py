@@ -561,7 +561,8 @@ class Provider(kodion.AbstractProvider):
         if self.is_logged_in():
             playlists = resource_manager.get_related_playlists(channel_id='mine')
             if playlists.has_key('watchLater'):
-                playlists['watchLater'] = ' WL'
+                cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+                playlists['watchLater'] = ' %s' % cplid if cplid else ' WL'
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):
