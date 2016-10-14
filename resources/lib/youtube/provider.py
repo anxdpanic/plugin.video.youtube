@@ -402,9 +402,11 @@ class Provider(kodion.AbstractProvider):
 
                 # second: remove video from 'Watch Later' playlist
                 if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
-                    playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id='WL', video_id=video_id)
+                    cplid = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
+                    playlist_id = cplid if cplid else 'WL'
+                    playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=playlist_id, video_id=video_id)
                     if playlist_item_id:
-                        json_data = client.remove_video_from_playlist('WL', playlist_item_id)
+                        json_data = client.remove_video_from_playlist(playlist_id, playlist_item_id)
                         if not v3.handle_error(self, context, json_data):
                             return False
                         pass
@@ -560,6 +562,9 @@ class Provider(kodion.AbstractProvider):
         # subscriptions
         if self.is_logged_in():
             playlists = resource_manager.get_related_playlists(channel_id='mine')
+            if playlists.has_key('watchLater'):
+                cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+                playlists['watchLater'] = ' %s' % cplid if cplid else ' WL'
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):

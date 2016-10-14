@@ -23,6 +23,8 @@
         <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
         <setting id="youtube.folder.watch_later.show" type="bool" label="30107" default="true"/>
+        <setting id="youtube.folder.watch_later.playlist" type="text" label="30037" enable="eq(-1,true)"
+                 visible="eq(-1,true)" default=""/>
         <setting id="youtube.folder.liked_videos.show" type="bool" label="30508" default="true"/>
         <setting id="youtube.folder.disliked_videos.show" type="bool" label="30538" default="true"/>
         <setting id="youtube.folder.history.show" type="bool" label="30509" default="true"/>

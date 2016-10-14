@@ -27,6 +27,7 @@ class VideoItem(BaseItem):
         self._artist = None
         self._play_count = None
         self._uses_dash = None
+        self._mediatype = None
         pass
 
     def set_play_count(self, play_count):
@@ -206,3 +207,12 @@ class VideoItem(BaseItem):
 
     def use_dash(self):
         return self._uses_dash is True and 'manifest/dash' in self.get_uri()
+
+    def set_mediatype(self, mediatype):
+        self._mediatype = mediatype
+        pass
+
+    def get_mediatype(self):
+        if self._mediatype not in ['video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo']:
+            self._mediatype = 'video'
+        return self._mediatype

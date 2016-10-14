@@ -155,8 +155,12 @@ msgctxt "#30036"
 msgid "Support alternative player"
 msgstr ""
 
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr ""
+
 #Kodion Common
-#empty strings from id 30037 to 30099
+#empty strings from id 30038 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
