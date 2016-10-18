@@ -579,7 +579,7 @@ class VideoInfo(object):
             mpd_url = params.get('dashmpd', None)
             use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
             if mpd_url:
-                if use_cipher_signature:
+                if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
                     # fuck!!! in this case we must call the web page
                     return self._method_watch(video_id)
                 video_stream = {'url': mpd_url,
