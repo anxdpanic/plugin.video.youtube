@@ -483,3 +483,35 @@ msgstr ""
 msgctxt "#30551"
 msgid "Recommendations"
 msgstr ""
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr ""
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr ""
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr ""
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr ""
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr ""
+
+msgctxt "#30558"
+msgid "search history"
+msgstr ""
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr ""
