@@ -1,6 +1,7 @@
 from tokenize import group
 __author__ = 'bromix'
 
+import os
 from resources.lib.youtube.helper import yt_subscriptions
 from resources.lib import kodion
 from resources.lib.kodion.utils import FunctionCache
@@ -10,6 +11,7 @@ from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_
     yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
 from .youtube_exceptions import LoginException
 import xbmcaddon
+import xbmcvfs
 
 
 class Provider(kodion.AbstractProvider):
@@ -484,8 +486,31 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/config/mpd/$')
     def configure_mpd_inputstream(self, context, query):
-        from xbmcaddon import Addon
-        Addon(id='inputstream.mpd').openSettings()
+        xbmcaddon.Addon(id='inputstream.mpd').openSettings()
+
+    @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>.*)/(?P<action>.*)/$')
+    def maintenance_actions(self, context, re_match):
+        maint_type = re_match.group('maint_type')
+        action = re_match.group('action')
+        if action == 'clear':
+            if maint_type == 'function_cache':
+                if context.get_ui().on_remove_content(context.localize(30557)):
+                    context.get_function_cache().clear()
+            elif maint_type == 'search_cache':
+                if context.get_ui().on_remove_content(context.localize(30558)):
+                    context.get_search_history().clear()
+        elif action == 'delete':
+                _maint_files = {'function_cache': 'cache.sqlite',
+                                'search_cache': 'search.sqlite',
+                                'settings_xml': 'settings.xml'}
+                _file = _maint_files.get(maint_type, '')
+                if _file:
+                    if 'sqlite' in _file:
+                        _file_w_path = os.path.join(context._get_cache_path(), _file)
+                    else:
+                        _file_w_path = os.path.join(context._data_path, _file)
+                    if context.get_ui().on_delete_content(_file):
+                        xbmcvfs.delete(_file_w_path)
 
     def on_root(self, context, re_match):
         """
@@ -495,8 +520,6 @@ class Provider(kodion.AbstractProvider):
         if old_action:
             return yt_old_actions.process_old_action(self, context, re_match)
 
-        addon = xbmcaddon.Addon()
-        
         settings = context.get_settings()
         
         if settings.get_string('youtube.api.autologin', '') == '':
