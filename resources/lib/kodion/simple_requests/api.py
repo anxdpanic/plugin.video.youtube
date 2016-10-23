@@ -95,7 +95,8 @@ def _request(method, url,
             if isinstance(value, str):
                 value = value.decode('utf-8')
                 pass
-            params[key] = value.encode('utf-8')
+            if isinstance(value, basestring):
+                params[key] = value.encode('utf-8')
             pass
         query = urllib.urlencode(params)
         pass

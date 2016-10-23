@@ -96,4 +96,5 @@ class AbstractSettings(object):
     def use_dash(self):
         return self.get_bool(constants.setting.USE_DASH, False)
 
-    pass
+    def subtitle_languages(self):
+        return self.get_int(constants.setting.SUBTITLE_LANGUAGES, 0)
