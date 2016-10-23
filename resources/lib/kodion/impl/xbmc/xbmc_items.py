@@ -21,8 +21,6 @@ def to_video_item(context, video_item):
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
         pass
     if video_item.use_dash():
-        item.setProperty('inputstream.mpd.license_type', '')
-        item.setProperty('inputstream.mpd.license_key', '')
         item.setProperty('inputstreamaddon', 'inputstream.mpd')
     else:
         item.setProperty('inputstreamaddon', '')

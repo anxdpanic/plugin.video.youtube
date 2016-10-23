@@ -10,6 +10,7 @@
         <news>
 - Added MPEG-DASH support for Kodi 17 w/ inputstream.mpd Add-on
 - Added optional Watch Later custom playlist to Settings -> Folders
+- Added Maintenance section to Settings
 - Added 'Subtitle language(s) to download' selection to Settings -> General
         </news>
         <assets>
