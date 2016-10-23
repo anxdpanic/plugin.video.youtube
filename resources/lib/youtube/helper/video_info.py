@@ -7,6 +7,7 @@ import re
 from resources.lib.kodion import simple_requests as requests
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
+from subtitles import Subtitles
 
 
 class VideoInfo(object):
@@ -349,7 +350,9 @@ class VideoInfo(object):
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-        params = {'v': video_id}
+        params = {'v': video_id,
+                  'hl': self.language,
+                  'gl': self.region}
 
         url = 'https://www.youtube.com/watch'
 
@@ -370,6 +373,11 @@ class VideoInfo(object):
                 pass
             pass
 
+        meta_info = {'video': {},
+                     'channel': {},
+                     'images': {},
+                     'subtitles': []}
+
         re_match_hlsvp = re.search(r'\"hlsvp\"[^:]*:[^"]*\"(?P<hlsvp>[^"]*\")', html)
         if re_match_hlsvp:
             hlsvp = urllib.unquote(re_match_hlsvp.group('hlsvp')).replace('\/', '/')
@@ -381,6 +389,8 @@ class VideoInfo(object):
             js = re_match_js.group('js').replace('\\', '').strip('//')
             cipher = Cipher(self._context, java_script_url=js)
             pass
+
+        meta_info['subtitles'] = Subtitles(self._context, video_id).get()
 
         re_match = re.search(r'\"url_encoded_fmt_stream_map\"[^:]*:[^"]*\"(?P<url_encoded_fmt_stream_map>[^"]*\")',
                              html)
@@ -421,7 +431,8 @@ class VideoInfo(object):
                             continue
                             pass
 
-                        video_stream = {'url': url}
+                        video_stream = {'url': url,
+                                        'meta': meta_info}
                         video_stream.update(yt_format)
 
                         stream_list.append(video_stream)
@@ -433,7 +444,8 @@ class VideoInfo(object):
                         yt_format['rtmpe'] = True
                         if not yt_format:
                             raise Exception('unknown yt_format for itag "%s"' % itag)
-                        video_stream = {'url': url}
+                        video_stream = {'url': url,
+                                        'meta': meta_info}
                         video_stream.update(yt_format)
 
                         stream_list.append(video_stream)
@@ -532,7 +544,8 @@ class VideoInfo(object):
 
         meta_info = {'video': {},
                      'channel': {},
-                     'images': {}}
+                     'images': {},
+                     'subtitles': []}
         meta_info['video']['id'] = params.get('vid', params.get('video_id', ''))
         meta_info['video']['title'] = params.get('title', '').decode('utf-8')
         meta_info['channel']['author'] = params.get('author', '').decode('utf-8')
@@ -582,6 +595,8 @@ class VideoInfo(object):
                 if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
                     # fuck!!! in this case we must call the web page
                     return self._method_watch(video_id)
+
+                meta_info['subtitles'] = Subtitles(self._context, video_id).get()
                 video_stream = {'url': mpd_url,
                                 'title': meta_info['video'].get('title', ''),
                                 'meta': meta_info}
@@ -589,6 +604,7 @@ class VideoInfo(object):
                 stream_list.append(video_stream)
                 return stream_list
 
+        added_subs = False  # avoid repeat calls from loop or cipher signature
         # extract streams from map
         url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
         if url_encoded_fmt_stream_map:
@@ -614,6 +630,9 @@ class VideoInfo(object):
                         continue
                         pass
 
+                    if not added_subs:
+                        added_subs = True
+                        meta_info['subtitles'] = Subtitles(self._context, video_id).get()
                     video_stream = {'url': url,
                                     'meta': meta_info}
                     video_stream.update(yt_format)
@@ -626,6 +645,9 @@ class VideoInfo(object):
                     if not yt_format:
                         raise Exception('unknown yt_format for itag "%s"' % itag)
                     yt_format['video']['rtmpe'] = True
+                    if not added_subs:
+                        added_subs = True
+                        meta_info['subtitles'] = Subtitles(self._context, video_id).get()
                     video_stream = {'url': url,
                                     'meta': meta_info}
                     video_stream.update(yt_format)

@@ -515,3 +515,31 @@ msgstr ""
 msgctxt "#30559"
 msgid "Delete settings.xml"
 msgstr ""
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr ""
+
+msgctxt "#30561"
+msgid "None"
+msgstr ""
+
+msgctxt "#30562"
+msgid "All"
+msgstr ""
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr ""
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr ""
+
+msgctxt "#30565"
+msgid "English"
+msgstr ""
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr ""

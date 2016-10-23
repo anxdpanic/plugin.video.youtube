@@ -31,6 +31,10 @@ def play_video(provider, context, re_match):
             return False
 
         video_item = VideoItem(video_id, video_stream['url'])
+
+        if video_stream.get('meta', None):
+            video_item.set_subtitles(video_stream['meta'].get('subtitles', None))
+
         video_id_dict = {video_id: video_item}
         utils.update_video_infos(provider, context, video_id_dict)
 

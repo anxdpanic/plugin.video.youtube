@@ -28,6 +28,7 @@ class VideoItem(BaseItem):
         self._play_count = None
         self._uses_dash = None
         self._mediatype = None
+        self.subtitles = None
         pass
 
     def set_play_count(self, play_count):
@@ -216,3 +217,6 @@ class VideoItem(BaseItem):
         if self._mediatype not in ['video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo']:
             self._mediatype = 'video'
         return self._mediatype
+
+    def set_subtitles(self, value):
+        self.subtitles = value if value and isinstance(value, list) else None
