@@ -41,6 +41,14 @@ msgstr "Passord"
 
 #empty strings from id 30003 to 30008
 
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Bruk MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure MPEG-DASH InputStream Client"
+msgstr "Sett opp MPEG-DASH InputStream klient"
+
 msgctxt "#30009"
 msgid "Always ask for the video quality"
 msgstr "Alltid spør om videokvalitet"
@@ -146,6 +154,10 @@ msgstr "Visning: Album"
 msgctxt "#30036"
 msgid "Support alternative player"
 msgstr "Støtt alternativ avspiller"
+
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr "Tilpasset se senere Spilleliste-ID"
 
 #Kodion Common
 #empty strings from id 30037 to 30099
@@ -422,7 +434,7 @@ msgstr "Mislikte videoer"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "Live"
+msgstr "Direkte"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,3 +483,63 @@ msgstr "Region"
 msgctxt "#30551"
 msgid "Recommendations"
 msgstr "Anbefalinger"
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr "Velikehold"
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr "Slett mellomlagringsdatabasen for funksjoner"
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr "Slett databasen for søkehistorikk"
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr "Rens mellomlagringen for funksjoner"
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr "Rens søkehistorie"
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr "mellomlagringen for funksjoner"
+
+msgctxt "#30558"
+msgid "search history"
+msgstr "søkehistorie"
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr "Slett settings.xml"
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr "Undertekstspråk som skal lastes ned"
+
+msgctxt "#30561"
+msgid "None"
+msgstr "Ingen"
+
+msgctxt "#30562"
+msgid "All"
+msgstr "Alle"
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr "Instilling"
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr "Instilling og Engelsk"
+
+msgctxt "#30565"
+msgid "English"
+msgstr "Engelsk"
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr "Spør"
