@@ -1,7 +1,6 @@
 __author__ = 'bromix'
 
-import xbmc, xbmcgui
-import urllib, re
+import xbmcgui
 
 from ...items import VideoItem, AudioItem, UriItem
 from . import info_labels
@@ -21,12 +20,15 @@ def to_video_item(context, video_item):
     if video_item.get_context_menu() is not None:
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
         pass
+    if video_item.use_dash():
+        item.setProperty('inputstreamaddon', 'inputstream.mpd')
+    else:
+        item.setProperty('inputstreamaddon', '')
 
     item.setProperty(u'IsPlayable', u'true')
 
-    video_id = context.get_param('video_id')
-    if video_id is not None:
-        item.setSubtitles(download_subs(video_id))
+    if video_item.subtitles:
+        item.setSubtitles(video_item.subtitles)
 
     _info_labels = info_labels.create_from_item(context, video_item)
 
@@ -80,20 +82,3 @@ def to_item(context, base_item):
         return to_audio_item(context, base_item)
 
     return None
-
-
-def download_subs(video_id):
-    subs = []
-    sub_list = ("http://www.youtube.com/api/timedtext?type=list&v=%s" % (video_id))
-
-    sock = urllib.urlopen(sub_list)
-    xml = sock.read()
-    sock.close()
-
-    sub_langs = re.compile('lang_code=["](.*?)["]', re.IGNORECASE).findall(xml)
-    for lang in sub_langs:
-        sub_url = ("http://www.youtube.com/api/timedtext?fmt=vtt&v=%s&lang=%s" % (video_id, lang))
-        sub_file = xbmc.translatePath('special://temp/%s.srt' % (lang))
-        urllib.urlretrieve(sub_url, sub_file)
-        subs.append(sub_file)
-    return subs

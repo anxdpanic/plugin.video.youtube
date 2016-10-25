@@ -39,7 +39,15 @@ msgctxt "#30002"
 msgid "Password"
 msgstr ""
 
-#empty strings from id 30003 to 30008
+#empty strings from id 30003 to 30006
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Configure MPEG-DASH InputStream Client"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -147,8 +155,12 @@ msgctxt "#30036"
 msgid "Support alternative player"
 msgstr ""
 
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr ""
+
 #Kodion Common
-#empty strings from id 30037 to 30099
+#empty strings from id 30038 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -470,4 +482,64 @@ msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
+msgstr ""
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr ""
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr ""
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr ""
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr ""
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr ""
+
+msgctxt "#30558"
+msgid "search history"
+msgstr ""
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr ""
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr ""
+
+msgctxt "#30561"
+msgid "None"
+msgstr ""
+
+msgctxt "#30562"
+msgid "All"
+msgstr ""
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr ""
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr ""
+
+msgctxt "#30565"
+msgid "English"
+msgstr ""
+
+msgctxt "#30566"
+msgid "Prompt"
 msgstr ""

@@ -2,12 +2,21 @@
 <addon id="plugin.video.youtube" name="YouTube" version="5.2.4" provider-name="h0d3nt3uf3l, bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
-		<import addon="kodi.inputstream" version="1.0.5"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
 		<provides>video</provides>
 	</extension>
 	<extension point="xbmc.addon.metadata">
+        <news>
+- Added MPEG-DASH support for Kodi 17 w/ inputstream.mpd Add-on
+- Added optional Watch Later custom playlist to Settings -> Folders
+- Added Maintenance section to Settings
+- Added 'Subtitle language(s) to download' selection to Settings -> General
+        </news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
         <summary lang="en">Plugin for YouTube</summary>
         <description lang="en">YouTube is one of the biggest video-sharing websites of the world.</description>
 		<summary lang="de">Plugin für YouTube</summary>

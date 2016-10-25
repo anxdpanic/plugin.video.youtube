@@ -71,7 +71,7 @@ def select_stream(context, stream_data_list, quality_map_override=None):
         pass
 
     selected_stream_data = None
-    if context.get_settings().ask_for_video_quality() and len(sorted_stream_data_list) > 0:
+    if context.get_settings().ask_for_video_quality() and len(sorted_stream_data_list) > 1:
         items = []
         for sorted_stream_data in sorted_stream_data_list:
             items.append((sorted_stream_data['title'], sorted_stream_data))

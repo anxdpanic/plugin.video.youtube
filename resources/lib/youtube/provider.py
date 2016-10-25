@@ -1,6 +1,7 @@
 from tokenize import group
 __author__ = 'bromix'
 
+import os
 from resources.lib.youtube.helper import yt_subscriptions
 from resources.lib import kodion
 from resources.lib.kodion.utils import FunctionCache
@@ -10,6 +11,7 @@ from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_
     yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
 from .youtube_exceptions import LoginException
 import xbmcaddon
+import xbmcvfs
 
 
 class Provider(kodion.AbstractProvider):
@@ -402,9 +404,11 @@ class Provider(kodion.AbstractProvider):
 
                 # second: remove video from 'Watch Later' playlist
                 if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
-                    playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id='WL', video_id=video_id)
+                    cplid = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
+                    playlist_id = cplid if cplid else 'WL'
+                    playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=playlist_id, video_id=video_id)
                     if playlist_item_id:
-                        json_data = client.remove_video_from_playlist('WL', playlist_item_id)
+                        json_data = client.remove_video_from_playlist(playlist_id, playlist_item_id)
                         if not v3.handle_error(self, context, json_data):
                             return False
                         pass
@@ -480,6 +484,34 @@ class Provider(kodion.AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
+    @kodion.RegisterProviderPath('^/config/mpd/$')
+    def configure_mpd_inputstream(self, context, query):
+        xbmcaddon.Addon(id='inputstream.mpd').openSettings()
+
+    @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>.*)/(?P<action>.*)/$')
+    def maintenance_actions(self, context, re_match):
+        maint_type = re_match.group('maint_type')
+        action = re_match.group('action')
+        if action == 'clear':
+            if maint_type == 'function_cache':
+                if context.get_ui().on_remove_content(context.localize(30557)):
+                    context.get_function_cache().clear()
+            elif maint_type == 'search_cache':
+                if context.get_ui().on_remove_content(context.localize(30558)):
+                    context.get_search_history().clear()
+        elif action == 'delete':
+                _maint_files = {'function_cache': 'cache.sqlite',
+                                'search_cache': 'search.sqlite',
+                                'settings_xml': 'settings.xml'}
+                _file = _maint_files.get(maint_type, '')
+                if _file:
+                    if 'sqlite' in _file:
+                        _file_w_path = os.path.join(context._get_cache_path(), _file)
+                    else:
+                        _file_w_path = os.path.join(context._data_path, _file)
+                    if context.get_ui().on_delete_content(_file):
+                        xbmcvfs.delete(_file_w_path)
+
     def on_root(self, context, re_match):
         """
         Support old YouTube url calls, but also log a deprecation warnings.
@@ -488,8 +520,6 @@ class Provider(kodion.AbstractProvider):
         if old_action:
             return yt_old_actions.process_old_action(self, context, re_match)
 
-        addon = xbmcaddon.Addon()
-        
         settings = context.get_settings()
         
         if settings.get_string('youtube.api.autologin', '') == '':
@@ -555,6 +585,9 @@ class Provider(kodion.AbstractProvider):
         # subscriptions
         if self.is_logged_in():
             playlists = resource_manager.get_related_playlists(channel_id='mine')
+            if playlists.has_key('watchLater'):
+                cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+                playlists['watchLater'] = ' %s' % cplid if cplid else ' WL'
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):

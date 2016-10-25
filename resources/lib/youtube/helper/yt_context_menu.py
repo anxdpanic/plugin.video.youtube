@@ -94,6 +94,9 @@ def append_rate_video(context_menu, provider, context, video_id, refresh_contain
 
 
 def append_watch_later(context_menu, provider, context, playlist_id, video_id):
+    cplid = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
+    if cplid:
+        playlist_id = cplid
     playlist_path = kodion.utils.create_path('channel', 'mine', 'playlist', playlist_id)
     if playlist_id and playlist_path != context.get_path():
         context_menu.append((context.localize(provider.LOCAL_MAP['youtube.watch_later']),
