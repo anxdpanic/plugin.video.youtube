@@ -1,7 +1,6 @@
 # Kodi Media Center language file
 # Addon Name: YouTube
 # Addon id: plugin.video.youtube
-# Addon version: 5.1.9~beta1
 # Addon Provider: MaikoHermans
 msgid ""
 msgstr ""
