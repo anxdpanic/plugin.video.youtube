@@ -248,7 +248,7 @@ msgid "Own API enable"
 msgstr ""
 
 msgctxt "#30205"
-msgid "Autologin on Error enable"
+msgid "Use preset API key set"
 msgstr ""
 
 #YouTube

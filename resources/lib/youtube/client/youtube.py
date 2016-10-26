@@ -582,9 +582,9 @@ class YouTube(LoginClient):
         # first set the config for the corresponding system (Frodo, Gotham, Helix, ...)
         yt_config = self._config
         # in any case of these APIs we change the config to a common key to save some quota
-        if quota_optimized and path in ['channels', 'search']:
-            yt_config = self.CONFIGS['youtube-for-kodi-quota']
-            pass
+        # if quota_optimized and path in ['channels', 'search']:
+        #    yt_config = self.CONFIGS['youtube-for-kodi-quota']
+        #    pass
 
         # params
         if not params:
