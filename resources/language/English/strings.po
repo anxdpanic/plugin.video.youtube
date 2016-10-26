@@ -542,3 +542,19 @@ msgstr ""
 msgctxt "#30566"
 msgid "Prompt"
 msgstr ""
+
+msgctxt "#30567"
+msgid "Set as Watch Later"
+msgstr ""
+
+msgctxt "#30568"
+msgid "Remove as Watch Later"
+msgstr ""
+
+msgctxt "#30569"
+msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgstr ""
+
+msgctxt "#30570"
+msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr ""
