@@ -461,3 +461,79 @@ msgstr "地區"
 msgctxt "#30551"
 msgid "Recommendations"
 msgstr "推薦的影片"
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr ""
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr ""
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr ""
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr ""
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr ""
+
+msgctxt "#30558"
+msgid "search history"
+msgstr ""
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr ""
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr ""
+
+msgctxt "#30561"
+msgid "None"
+msgstr ""
+
+msgctxt "#30562"
+msgid "All"
+msgstr ""
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr ""
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr ""
+
+msgctxt "#30565"
+msgid "English"
+msgstr ""
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr ""
+
+msgctxt "#30567"
+msgid "Set as Watch Later"
+msgstr ""
+
+msgctxt "#30568"
+msgid "Remove as Watch Later"
+msgstr ""
+
+msgctxt "#30569"
+msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgstr ""
+
+msgctxt "#30570"
+msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr ""
