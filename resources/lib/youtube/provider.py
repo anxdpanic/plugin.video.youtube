@@ -68,7 +68,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.video.more': 30548,
                  'youtube.live': 30539,
                  'youtube.error.no_video_streams_found': 30549,
-                 'youtube.error.rtmpe_not_supported': 30542}
+                 'youtube.error.rtmpe_not_supported': 30542,
+                 'youtube.remove.as.watchlater': 30568,
+                 'youtube.set.as.watchlater': 30567}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)

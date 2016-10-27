@@ -28,7 +28,7 @@
                  visible="eq(-1,true)" default=""/>
         <setting id="youtube.folder.liked_videos.show" type="bool" label="30508" default="true"/>
         <setting id="youtube.folder.disliked_videos.show" type="bool" label="30538" default="true"/>
-        <setting id="youtube.folder.history.show" type="bool" label="30509" default="true"/>
+        <setting id="youtube.folder.history.show" type="bool" label="30509" default="false"/>
         <setting id="youtube.folder.playlists.show" type="bool" label="30501" default="true"/>
         <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
         <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>

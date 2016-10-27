@@ -9,7 +9,7 @@
 	<extension point="xbmc.addon.metadata">
         <news>
 - Added MPEG-DASH support for Kodi 17 w/ inputstream.mpd Add-on
-- Added optional Watch Later custom playlist to Settings -> Folders
+- Added optional Watch Later custom playlist to Settings -> Folders, or (My)Playlists context menu to set/remove
 - Added Maintenance section to Settings
 - Added 'Subtitle language(s) to download' selection to Settings -> General
         </news>
