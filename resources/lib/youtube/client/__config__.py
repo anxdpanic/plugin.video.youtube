@@ -117,14 +117,8 @@ def get_last_hash():
 
 
 def _resolve_old_login():
-    access_manager = __context.get_access_manager()
-    if access_manager.has_login_credentials():
-        __context.log_debug('API key set changed: Removing login credentials')
-        access_manager.remove_login_credentials()
-
-    if access_manager.has_login_credentials() or access_manager.has_refresh_token():
-        __context.log_debug('API key set changed: Updating access token')
-        access_manager.update_access_token(access_token='', refresh_token='')
+    __context.log_debug('API key set changed: Signing out')
+    __context.execute('RunPlugin(%s)' % __context.create_uri(['sign', 'out']))
 
 
 def check_for_key_changes():
