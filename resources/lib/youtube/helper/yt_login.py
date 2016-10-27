@@ -68,6 +68,7 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
         client = provider.get_client(context)
         if access_manager.has_refresh_token():
             refresh_tokens = access_manager.get_refresh_token().split('|')
+            refresh_tokens = list(set(refresh_tokens))
             for refresh_token in refresh_tokens:
                 client.revoke(refresh_token)
                 pass
