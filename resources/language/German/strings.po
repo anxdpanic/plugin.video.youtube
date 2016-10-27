@@ -248,8 +248,8 @@ msgid "Enable Personal API Keys"
 msgstr "Aktiviere eigenen API-Schlüssel"
 
 msgctxt "#30205"
-msgid "Autologin on Error enable"
-msgstr "Aktiviere automatischen Login bei Fehlern"
+msgid "Use preset API key set"
+msgstr ""
 
 #YouTube
 #empty strings from id 30206 to 30499

@@ -1,4 +1,3 @@
-from tokenize import group
 __author__ = 'bromix'
 
 import os
@@ -110,13 +109,8 @@ class Provider(kodion.AbstractProvider):
             self._client = None
             pass
 
-        if not self._client:          
-            major_version = context.get_system_version().get_version()[0]
-            youtube_config = YouTube.CONFIGS.get('youtube-for-kodi-%d' % major_version, None)
-            if not youtube_config or youtube_config is None:
-                youtube_config = YouTube.CONFIGS['youtube-for-kodi-fallback']
-                pass
-
+        youtube_config = YouTube.CONFIGS.get('youtube-tv')
+        if not self._client:
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
             language = context.get_settings().get_string('youtube.language', 'en-US')
@@ -128,15 +122,10 @@ class Provider(kodion.AbstractProvider):
                 pass
 
             if access_manager.has_login_credentials() or access_manager.has_refresh_token():
-                last_kodi_version = settings.get_int('youtube.login.version', 0)
-
-                if last_kodi_version != major_version:
-                    context.log_warning(
-                        'Different KODI versions (%d != %d) signing out for new login' % (
-                            last_kodi_version, major_version))
+                if YouTube.api_keys_changed:
+                    context.log_warning('API key set changed: Resetting client and updating access token')
                     self.reset_client()
                     access_manager.update_access_token(access_token='', refresh_token='')
-                    pass
 
                 # username, password = access_manager.get_login_credentials()
                 access_tokens = access_manager.get_access_token()
@@ -155,9 +144,13 @@ class Provider(kodion.AbstractProvider):
                         access_token_tv, expires_in_tv = YouTube(language=language,
                                                                  config=youtube_config).refresh_token_tv(
                             refresh_tokens[0])
-                        access_token_kodi, expires_in_kodi = YouTube(language=language,
-                                                                     config=youtube_config).refresh_token(
-                            refresh_tokens[1])
+
+                        access_token_kodi, expires_in_kodi = access_token_tv, expires_in_tv
+
+                        #access_token_kodi, expires_in_kodi = YouTube(language=language,
+                        #                                             config=youtube_config).refresh_token(
+                        #    refresh_tokens[1])
+
                         access_tokens = [access_token_tv, access_token_kodi]
 
                         access_token = '%s|%s' % (access_token_tv, access_token_kodi)
@@ -523,22 +516,11 @@ class Provider(kodion.AbstractProvider):
             return yt_old_actions.process_old_action(self, context, re_match)
 
         settings = context.get_settings()
-        
-        if settings.get_string('youtube.api.autologin', '') == '':
-            settings.set_bool('youtube.api.autologin', False) 
-        
-        if settings.get_bool('youtube.api.autologin', True):
-            mode = 'in'
-            yt_login.process(mode, self, context, re_match, False)
-            pass
 
         self.get_client(context)
         resource_manager = self.get_resource_manager(context)
 
         result = []
-
-        if settings.get_bool('youtube.api.enable', True) and settings.get_bool('youtube.api.autologin', True):
-            settings.set_bool('youtube.api.autologin', False)
 
         # sign in
         if not self.is_logged_in() and settings.get_bool('youtube.folder.sign.in.show', True):

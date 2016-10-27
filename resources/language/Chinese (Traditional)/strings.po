@@ -248,8 +248,8 @@ msgid "Enable Personal API Keys"
 msgstr "啟用個人 API 密鑰"
 
 msgctxt "#30205"
-msgid "Autologin on Error enable"
-msgstr "當出現錯誤時自動登入"
+msgid "Use preset API key set"
+msgstr ""
 
 #YouTube
 #empty strings from id 30206 to 30499

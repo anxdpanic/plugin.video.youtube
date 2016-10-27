@@ -12,6 +12,8 @@ def _process_list(provider, context, re_match):
     page_token = context.get_param('page_token', '')
     # no caching
     json_data = provider.get_client(context).get_subscription('mine', page_token=page_token)
+    if not v3.handle_error(provider, context, json_data):
+        return []
     result.extend(v3.response_to_items(provider, context, json_data))
 
     return result
