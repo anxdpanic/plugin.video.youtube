@@ -69,7 +69,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.error.no_video_streams_found': 30549,
                  'youtube.error.rtmpe_not_supported': 30542,
                  'youtube.remove.as.watchlater': 30568,
-                 'youtube.set.as.watchlater': 30567}
+                 'youtube.set.as.watchlater': 30567,
+                 'youtube.remove.as.history': 30572,
+                 'youtube.set.as.history': 30571}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -406,10 +408,12 @@ class Provider(kodion.AbstractProvider):
                         json_data = client.remove_video_from_playlist(playlist_id, playlist_item_id)
                         if not v3.handle_error(self, context, json_data):
                             return False
-                        pass
-                    pass
-                pass
-            pass
+
+                history_playlist_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
+                if history_playlist_id:
+                    json_data = client.add_video_to_playlist(history_playlist_id, video_id)
+                    if not v3.handle_error(self, context, json_data):
+                        return False
         else:
             context.log_warning('Missing video ID for post play event')
             pass
@@ -572,6 +576,9 @@ class Provider(kodion.AbstractProvider):
             if playlists.has_key('watchLater'):
                 cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
                 playlists['watchLater'] = ' %s' % cplid if cplid else ' WL'
+            if playlists.has_key('watchHistory'):
+                cplid = settings.get_string('youtube.folder.history.playlist', '').strip()
+                playlists['watchHistory'] = '%s' % cplid if cplid else 'HL'
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):
