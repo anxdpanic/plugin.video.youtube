@@ -140,6 +140,14 @@ msgctxt "#30036"
 msgid "Support alternative player"
 msgstr "Uruchom obsługę alternatywnego odtwarzacza"
 
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Custom History Playlist ID"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Favorites"
 msgstr "Ulubione"
@@ -536,4 +544,20 @@ msgstr ""
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr ""
+
+msgctxt "#30571"
+msgid "Set as History"
+msgstr ""
+
+msgctxt "#30572"
+msgid "Remove as History"
+msgstr ""
+
+msgctxt "#30573"
+msgid "Are you sure you want to remove '%s' as your History list?"
+msgstr ""
+
+msgctxt "#30574"
+msgid "Are you sure you want to replace your current History list with '%s'?"
 msgstr ""
