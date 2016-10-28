@@ -4,7 +4,7 @@ import time
 import urlparse
 from resources.lib.kodion import simple_requests as requests
 from resources.lib.youtube.youtube_exceptions import LoginException
-from __config__ import api, keys_changed
+from __config__ import api, youtube_tv, keys_changed
 
 
 class LoginClient(object):
@@ -12,6 +12,12 @@ class LoginClient(object):
 
     CONFIGS = {
         'youtube-tv': {
+            'system': 'YouTube TV',
+            'key': youtube_tv['key'],
+            'id': youtube_tv['id'],
+            'secret': youtube_tv['secret']
+        },
+        'main': {
             'system': 'All',
             'key': api['key'],
             'id': api['id'],
@@ -20,7 +26,7 @@ class LoginClient(object):
     }
 
     def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv=''):
-        self._config = self.CONFIGS['youtube-tv'] if config is None else config
+        self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
 
         # the default language is always en_US (like YouTube on the WEB)

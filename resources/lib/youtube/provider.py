@@ -109,7 +109,8 @@ class Provider(kodion.AbstractProvider):
             self._client = None
             pass
 
-        youtube_config = YouTube.CONFIGS.get('youtube-tv')
+        youtubetv_config = YouTube.CONFIGS.get('youtube-tv')
+        youtube_config = YouTube.CONFIGS.get('main')
         if not self._client:
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
@@ -141,15 +142,14 @@ class Provider(kodion.AbstractProvider):
                 # create a new access_token
                 if len(access_tokens) != 2 and len(refresh_tokens) == 2:
                     try:
-                        access_token_tv, expires_in_tv = YouTube(language=language,
-                                                                 config=youtube_config).refresh_token_tv(
-                            refresh_tokens[0])
 
-                        access_token_kodi, expires_in_kodi = access_token_tv, expires_in_tv
-
-                        #access_token_kodi, expires_in_kodi = YouTube(language=language,
-                        #                                             config=youtube_config).refresh_token(
-                        #    refresh_tokens[1])
+                        access_token_kodi, expires_in_kodi = \
+                            YouTube(language=language, config=youtube_config).refresh_token(refresh_tokens[1])
+                        if not settings.requires_dual_login():
+                            access_token_tv, expires_in_tv = access_token_kodi, expires_in_kodi
+                        else:
+                            access_token_tv, expires_in_tv = \
+                                YouTube(language=language, config=youtubetv_config).refresh_token_tv(refresh_tokens[0])
 
                         access_tokens = [access_token_tv, access_token_kodi]
 
@@ -418,7 +418,7 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/sign/(?P<mode>.*)/$')
     def _on_sign(self, context, re_match):
         mode = re_match.group('mode')            
-        yt_login.process(mode, self, context, re_match)
+        yt_login.process(mode, self, context, re_match, context.get_settings().requires_dual_login())
         return True
 
     @kodion.RegisterProviderPath('^/search/$')
