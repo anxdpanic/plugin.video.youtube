@@ -39,6 +39,11 @@ def __get_key_switch():
 
 
 key_sets = {
+    'youtube-tv': {
+        'id': 'ODYxNTU2NzA4NDU0LWQ2ZGxtM2xoMDVpZGQ4bnBlazE4azZiZThiYTNvYzY4',
+        'key': 'QUl6YVN5QWQtWUVPcVp6OW5YVnpHdG4zS1d6WUxiTGFhamhxSURB',
+        'secret': 'U2JvVmhvRzlzMHJOYWZpeENTR0dLWEFU'
+    },
     'own': {
         'key': _own_key,
         'id': _own_id,
@@ -75,11 +80,6 @@ key_sets = {
             'id': 'ODc5NzYxNzg4MTA1LXNkdWYwaHQzMzVkdmc5MjNhbmU3Y2cxam50MWQ1bDRr',
             'key': 'QUl6YVN5QlMzck55bUp0elBZYkpYNWxTR2ROQ0JTNmFqaDRWRERZ',
             'secret': 'dkJWRGEta05kQ0hEVGtwRDhiOEhPNzE4'
-        },
-        '6': {
-            'id': 'ODYxNTU2NzA4NDU0LWQ2ZGxtM2xoMDVpZGQ4bnBlazE4azZiZThiYTNvYzY4',
-            'key': 'QUl6YVN5QWQtWUVPcVp6OW5YVnpHdG4zS1d6WUxiTGFhamhxSURB',
-            'secret': 'U2JvVmhvRzlzMHJOYWZpeENTR0dLWEFU'
         }
     }
 }
@@ -121,6 +121,13 @@ def _resolve_old_login():
     __context.execute('RunPlugin(%s)' % __context.create_uri(['sign', 'out']))
 
 
+# make sure we have a valid switch, if not use default
+if not has_own_keys:
+    if not key_sets['provided'].get(key_sets['provided']['switch'], None):
+        __settings.set_string('youtube.api.key.switch', str(DEFAULT_SWITCH))
+        key_sets['provided']['switch'] = __get_key_switch()
+
+
 def check_for_key_changes():
     last_switch = get_last_switch()
     current_switch = get_current_switch()
@@ -153,6 +160,12 @@ api = {
         if has_own_keys
         else
         b64decode(key_sets['provided'][key_sets['provided']['switch']]['secret'])
+}
+
+youtube_tv = {
+    'key': b64decode(key_sets['youtube-tv']['key']),
+    'id': '%s.apps.googleusercontent.com' % b64decode(key_sets['youtube-tv']['id']),
+    'secret': b64decode(key_sets['youtube-tv']['secret'])
 }
 
 keys_changed = check_for_key_changes()
