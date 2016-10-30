@@ -75,7 +75,6 @@
         <setting id="kodion.maintain.delete.func" type="action" label="30553" action="RunPlugin(plugin://plugin.video.youtube/maintain/function_cache/delete/)"/>
         <setting id="kodion.maintain.delete.search" type="action" label="30554" action="RunPlugin(plugin://plugin.video.youtube/maintain/search_cache/delete/)"/>
         <setting type="sep" />
-        <setting id="kodion.maintain.delete.settings" type="action" label="30559" action="RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)"/>
         <setting id="kodion.maintain.delete.settings" type="action" label="30559" option="close" action="RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)"/>
     </category>
 </settings>
