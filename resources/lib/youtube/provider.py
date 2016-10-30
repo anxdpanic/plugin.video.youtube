@@ -502,9 +502,11 @@ class Provider(kodion.AbstractProvider):
             if maint_type == 'function_cache':
                 if context.get_ui().on_remove_content(context.localize(30557)):
                     context.get_function_cache().clear()
+                    context.get_ui().show_notification(context.localize(30575))
             elif maint_type == 'search_cache':
                 if context.get_ui().on_remove_content(context.localize(30558)):
                     context.get_search_history().clear()
+                    context.get_ui().show_notification(context.localize(30575))
         elif action == 'delete':
                 _maint_files = {'function_cache': 'cache.sqlite',
                                 'search_cache': 'search.sqlite',
@@ -516,7 +518,11 @@ class Provider(kodion.AbstractProvider):
                     else:
                         _file_w_path = os.path.join(context._data_path, _file)
                     if context.get_ui().on_delete_content(_file):
-                        xbmcvfs.delete(_file_w_path)
+                        success = xbmcvfs.delete(_file_w_path)
+                        if success:
+                            context.get_ui().show_notification(context.localize(30575))
+                        else:
+                            context.get_ui().show_notification(context.localize(30576))
 
     def on_root(self, context, re_match):
         """

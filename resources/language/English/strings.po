@@ -586,3 +586,11 @@ msgstr ""
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
 msgstr ""
+
+msgctxt "#30575"
+msgid "Succeeded"
+msgstr ""
+
+msgctxt "#30576"
+msgid "Failed"
+msgstr ""
