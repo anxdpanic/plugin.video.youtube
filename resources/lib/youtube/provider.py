@@ -483,9 +483,16 @@ class Provider(kodion.AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
-    @kodion.RegisterProviderPath('^/config/mpd/$')
-    def configure_mpd_inputstream(self, context, query):
-        xbmcaddon.Addon(id='inputstream.mpd').openSettings()
+    @kodion.RegisterProviderPath('^/config/(?P<switch>.*)/$')
+    def configure_mpd_inputstream(self, context, re_match):
+        switch = re_match.group('switch')
+        if switch == 'mpd':
+            xbmcaddon.Addon(id='inputstream.mpd').openSettings()
+        elif switch == 'urlresolver':
+            import urlresolver
+            urlresolver.display_settings()
+        else:
+            return False
 
     @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>.*)/(?P<action>.*)/$')
     def maintenance_actions(self, context, re_match):
