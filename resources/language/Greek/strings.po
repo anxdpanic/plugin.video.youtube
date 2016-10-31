@@ -39,6 +39,12 @@ msgid "Password"
 msgstr "Κωδικός"
 
 #empty strings from id 30003 to 30008
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Χρησιμοποίησε το MPEG-DASH"
+msgctxt "#30008"
+msgid "Configure MPEG-DASH InputStream Client"
+msgstr "Ρύθμιση πελάτη MPEG-DASH Inputstream"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -148,19 +154,19 @@ msgstr "Υποστήριξη εναλλακτικού αναπαραγωγέα"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
-msgstr ""
+msgstr "Τροποποιημένη λίστα αναπαραγωγής παρακολούθησης αργότερα"
 
 msgctxt "#30038"
 msgid "Custom History Playlist ID"
-msgstr ""
+msgstr "Τροποποιημένο ID λίστας αναπαραγωγής"
 
 msgctxt "#30039"
 msgid "Enable URLResolver Debrid support"
-msgstr ""
+msgstr "Ενεργοποίηση υποστήριξης URLResolver Derbid"
 
 msgctxt "#30040"
 msgid "Configure URLResolver"
-msgstr ""
+msgstr "Ρύθμιση URLResolver"
 
 #Kodion Common
 #empty strings from id 30037 to 30099
@@ -253,8 +259,8 @@ msgstr "Καθαρισμός"
 #empty strings from id 30121 to 30199
 
 msgctxt "#30200"
-msgid "API Key"
-msgstr "Κλειδί API"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -489,100 +495,100 @@ msgstr "Συστάσεις"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Συντήρηση"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Λειτουργία διαγραφής βάσης δεδομένων λανθάνουσας μνήμης"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Διαγραφή βάσης δεδομένων ιστορικού αναζήτησης"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Λειτουργία διαγραφής λανθάνουσας μνήμης"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Διαγραφή ιστορικού αναζήτησης"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "λειτουργία λανθάνουσας μνήμης"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "ιστορικό αναζήτησης"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Διαγραφή του settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language(s) to download"
-msgstr ""
+msgstr "Γλώσσα/γλώσσες διαθέσιμες για μεταφόρτωση"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Κενό"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Όλα"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Ρύθμιση"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Ρύθμιση, Αγγλικά"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Αγγλικά"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Προτροπή"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Τοποθέτηση στο Δείτε Αργότερα"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Αφαίρεση από το Δείτε Αργότερα"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' από το Δείτε Αργότερα?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα Δείτε Αργότερα με το '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Θέσε ως Ιστορικό"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Αφαίρεση ως ιστορικό"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' ως την λίστα ιστορικού σας?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα ιστορικού με το '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Επιτυχία"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Αποτυχία"
