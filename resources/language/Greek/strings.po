@@ -126,7 +126,7 @@ msgstr "Απεικόνιση: Ταινίες"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Εκτέλεση οδηγού ρυθμίσεων;"
+msgstr "Εκτέλεση οδηγού ρυθμίσεων?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -527,7 +527,7 @@ msgstr "Διαγραφή του settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language(s) to download"
-msgstr "Γλώσσα/γλώσσες διαθέσιμες για μεταφόρτωση"
+msgstr "Γλώσσα-ες υποτίτλων διαθέσιμη-ες για μεταφόρτωση"
 
 msgctxt "#30561"
 msgid "None"
