@@ -3,11 +3,7 @@ __author__ = 'bromix'
 from resources.lib.youtube.helper import yt_context_menu
 from resources.lib import kodion
 from resources.lib.kodion import items
-from resources.lib.youtube.helper.yt_change_api import Change_API
-
 from . import utils
-
-import xbmcaddon
 
 def _process_list_response(provider, context, json_data):
     video_id_dict = {}
@@ -260,20 +256,13 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
 def handle_error(provider, context, json_data):
     if json_data and 'error' in json_data:
         message = json_data['error'].get('message', '')
-        reason = json_data['error']['errors'][0].get('reason','')
-        if message:              
-            context.get_ui().show_notification(message)
-            pass
-        
-        if reason == 'quotaExceeded' or reason == 'dailyLimitExceeded': 
-            addon = xbmcaddon.Addon()
-            context.get_settings().set_bool('youtube.api.lastused.error', True)
-            if context.get_settings().get_bool('youtube.api.autologin_enabled', True):
-                context.get_settings().set_bool('youtube.api.autologin', True)
-                provider.reset_client()
-                context.get_ui().refresh_container()
-                pass
-            
+        reason = json_data['error']['errors'][0].get('reason', '')
+        title = '%s: %s' % (context.get_name(), reason)
+        message_timeout = 5000
+        if reason == 'quotaExceeded' or reason == 'dailyLimitExceeded':
+            message_timeout = 7000
+        context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
+        context.log_error('Error reason: |%s| with message: |%s|' % (reason, message))
         return False
 
     return True

@@ -1,7 +1,6 @@
 # Kodi Media Center language file
 # Addon Name: YouTube
 # Addon id: plugin.video.youtube
-# Addon version: 5.1.9~beta1
 # Addon Provider: bromix
 msgid ""
 msgstr ""
@@ -141,6 +140,22 @@ msgctxt "#30036"
 msgid "Support alternative player"
 msgstr "Podpora alternativního přehrávače"
 
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr ""
+
+msgctxt "#30038"
+msgid "Custom History Playlist ID"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Enable URLResolver Debrid support"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Configure URLResolver"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Favorites"
 msgstr "Oblíbené"
@@ -249,7 +264,7 @@ msgid "Enable Personal API Keys"
 msgstr ""
 
 msgctxt "#30205"
-msgid "Autologin on Error enable"
+msgid "Use preset API key set"
 msgstr ""
 
 #YouTube
@@ -461,4 +476,104 @@ msgstr "Region"
 
 msgctxt "#30551"
 msgid "Recommendations"
+msgstr ""
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr ""
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr ""
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr ""
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr ""
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr ""
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr ""
+
+msgctxt "#30558"
+msgid "search history"
+msgstr ""
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr ""
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr ""
+
+msgctxt "#30561"
+msgid "None"
+msgstr ""
+
+msgctxt "#30562"
+msgid "All"
+msgstr ""
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr ""
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr ""
+
+msgctxt "#30565"
+msgid "English"
+msgstr ""
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr ""
+
+msgctxt "#30567"
+msgid "Set as Watch Later"
+msgstr ""
+
+msgctxt "#30568"
+msgid "Remove as Watch Later"
+msgstr ""
+
+msgctxt "#30569"
+msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgstr ""
+
+msgctxt "#30570"
+msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr ""
+
+msgctxt "#30571"
+msgid "Set as History"
+msgstr ""
+
+msgctxt "#30572"
+msgid "Remove as History"
+msgstr ""
+
+msgctxt "#30573"
+msgid "Are you sure you want to remove '%s' as your History list?"
+msgstr ""
+
+msgctxt "#30574"
+msgid "Are you sure you want to replace your current History list with '%s'?"
+msgstr ""
+
+msgctxt "#30575"
+msgid "Succeeded"
+msgstr ""
+
+msgctxt "#30576"
+msgid "Failed"
 msgstr ""

@@ -1,4 +1,3 @@
-from tokenize import group
 __author__ = 'bromix'
 
 import os
@@ -68,7 +67,11 @@ class Provider(kodion.AbstractProvider):
                  'youtube.video.more': 30548,
                  'youtube.live': 30539,
                  'youtube.error.no_video_streams_found': 30549,
-                 'youtube.error.rtmpe_not_supported': 30542}
+                 'youtube.error.rtmpe_not_supported': 30542,
+                 'youtube.remove.as.watchlater': 30568,
+                 'youtube.set.as.watchlater': 30567,
+                 'youtube.remove.as.history': 30572,
+                 'youtube.set.as.history': 30571}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -108,13 +111,9 @@ class Provider(kodion.AbstractProvider):
             self._client = None
             pass
 
-        if not self._client:          
-            major_version = context.get_system_version().get_version()[0]
-            youtube_config = YouTube.CONFIGS.get('youtube-for-kodi-%d' % major_version, None)
-            if not youtube_config or youtube_config is None:
-                youtube_config = YouTube.CONFIGS['youtube-for-kodi-fallback']
-                pass
-
+        youtubetv_config = YouTube.CONFIGS.get('youtube-tv')
+        youtube_config = YouTube.CONFIGS.get('main')
+        if not self._client:
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
             language = context.get_settings().get_string('youtube.language', 'en-US')
@@ -126,15 +125,10 @@ class Provider(kodion.AbstractProvider):
                 pass
 
             if access_manager.has_login_credentials() or access_manager.has_refresh_token():
-                last_kodi_version = settings.get_int('youtube.login.version', 0)
-
-                if last_kodi_version != major_version:
-                    context.log_warning(
-                        'Different KODI versions (%d != %d) signing out for new login' % (
-                            last_kodi_version, major_version))
+                if YouTube.api_keys_changed:
+                    context.log_warning('API key set changed: Resetting client and updating access token')
                     self.reset_client()
                     access_manager.update_access_token(access_token='', refresh_token='')
-                    pass
 
                 # username, password = access_manager.get_login_credentials()
                 access_tokens = access_manager.get_access_token()
@@ -150,12 +144,15 @@ class Provider(kodion.AbstractProvider):
                 # create a new access_token
                 if len(access_tokens) != 2 and len(refresh_tokens) == 2:
                     try:
-                        access_token_tv, expires_in_tv = YouTube(language=language,
-                                                                 config=youtube_config).refresh_token_tv(
-                            refresh_tokens[0])
-                        access_token_kodi, expires_in_kodi = YouTube(language=language,
-                                                                     config=youtube_config).refresh_token(
-                            refresh_tokens[1])
+
+                        access_token_kodi, expires_in_kodi = \
+                            YouTube(language=language, config=youtube_config).refresh_token(refresh_tokens[1])
+                        if not settings.requires_dual_login():
+                            access_token_tv, expires_in_tv = access_token_kodi, expires_in_kodi
+                        else:
+                            access_token_tv, expires_in_tv = \
+                                YouTube(language=language, config=youtubetv_config).refresh_token_tv(refresh_tokens[0])
+
                         access_tokens = [access_token_tv, access_token_kodi]
 
                         access_token = '%s|%s' % (access_token_tv, access_token_kodi)
@@ -411,10 +408,12 @@ class Provider(kodion.AbstractProvider):
                         json_data = client.remove_video_from_playlist(playlist_id, playlist_item_id)
                         if not v3.handle_error(self, context, json_data):
                             return False
-                        pass
-                    pass
-                pass
-            pass
+
+                history_playlist_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
+                if history_playlist_id:
+                    json_data = client.add_video_to_playlist(history_playlist_id, video_id)
+                    if not v3.handle_error(self, context, json_data):
+                        return False
         else:
             context.log_warning('Missing video ID for post play event')
             pass
@@ -423,7 +422,7 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/sign/(?P<mode>.*)/$')
     def _on_sign(self, context, re_match):
         mode = re_match.group('mode')            
-        yt_login.process(mode, self, context, re_match)
+        yt_login.process(mode, self, context, re_match, context.get_settings().requires_dual_login())
         return True
 
     @kodion.RegisterProviderPath('^/search/$')
@@ -484,9 +483,16 @@ class Provider(kodion.AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
-    @kodion.RegisterProviderPath('^/config/mpd/$')
-    def configure_mpd_inputstream(self, context, query):
-        xbmcaddon.Addon(id='inputstream.mpd').openSettings()
+    @kodion.RegisterProviderPath('^/config/(?P<switch>.*)/$')
+    def configure_mpd_inputstream(self, context, re_match):
+        switch = re_match.group('switch')
+        if switch == 'mpd':
+            xbmcaddon.Addon(id='inputstream.mpd').openSettings()
+        elif switch == 'urlresolver':
+            import urlresolver
+            urlresolver.display_settings()
+        else:
+            return False
 
     @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>.*)/(?P<action>.*)/$')
     def maintenance_actions(self, context, re_match):
@@ -496,9 +502,11 @@ class Provider(kodion.AbstractProvider):
             if maint_type == 'function_cache':
                 if context.get_ui().on_remove_content(context.localize(30557)):
                     context.get_function_cache().clear()
+                    context.get_ui().show_notification(context.localize(30575))
             elif maint_type == 'search_cache':
                 if context.get_ui().on_remove_content(context.localize(30558)):
                     context.get_search_history().clear()
+                    context.get_ui().show_notification(context.localize(30575))
         elif action == 'delete':
                 _maint_files = {'function_cache': 'cache.sqlite',
                                 'search_cache': 'search.sqlite',
@@ -510,7 +518,11 @@ class Provider(kodion.AbstractProvider):
                     else:
                         _file_w_path = os.path.join(context._data_path, _file)
                     if context.get_ui().on_delete_content(_file):
-                        xbmcvfs.delete(_file_w_path)
+                        success = xbmcvfs.delete(_file_w_path)
+                        if success:
+                            context.get_ui().show_notification(context.localize(30575))
+                        else:
+                            context.get_ui().show_notification(context.localize(30576))
 
     def on_root(self, context, re_match):
         """
@@ -521,22 +533,11 @@ class Provider(kodion.AbstractProvider):
             return yt_old_actions.process_old_action(self, context, re_match)
 
         settings = context.get_settings()
-        
-        if settings.get_string('youtube.api.autologin', '') == '':
-            settings.set_bool('youtube.api.autologin', False) 
-        
-        if settings.get_bool('youtube.api.autologin', True):
-            mode = 'in'
-            yt_login.process(mode, self, context, re_match, False)
-            pass
 
         self.get_client(context)
         resource_manager = self.get_resource_manager(context)
 
         result = []
-
-        if settings.get_bool('youtube.api.enable', True) and settings.get_bool('youtube.api.autologin', True):
-            settings.set_bool('youtube.api.autologin', False)
 
         # sign in
         if not self.is_logged_in() and settings.get_bool('youtube.folder.sign.in.show', True):
@@ -588,6 +589,9 @@ class Provider(kodion.AbstractProvider):
             if playlists.has_key('watchLater'):
                 cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
                 playlists['watchLater'] = ' %s' % cplid if cplid else ' WL'
+            if playlists.has_key('watchHistory'):
+                cplid = settings.get_string('youtube.folder.history.playlist', '').strip()
+                playlists['watchHistory'] = '%s' % cplid if cplid else 'HL'
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):

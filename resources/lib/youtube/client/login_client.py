@@ -1,96 +1,32 @@
 __author__ = 'bromix'
 
-import xbmcaddon
 import time
 import urlparse
-
-from random import randint
 from resources.lib.kodion import simple_requests as requests
 from resources.lib.youtube.youtube_exceptions import LoginException
-from resources.lib.youtube.helper.yt_change_api import Change_API
+from __config__ import api, youtube_tv, keys_changed
 
-addon = xbmcaddon.Addon()
-api = Change_API()
-if addon.getSetting('youtube.api.lastused.last_login') == '':
-    api.new_login()
-    pass
-
-api_last_login = addon.getSetting('youtube.api.lastused.last_login')
-api_error = addon.getSetting('youtube.api.lastused.error')
-api_secret = api.get_api_secret(api_error, api_last_login)
-api_key = api.get_api_key(api_error, api_last_login)
-api_id = api.get_api_id(api_error, api_last_login)
-
-# Kodi 17 support by Uukrul
 
 class LoginClient(object):
+    api_keys_changed = keys_changed
+
     CONFIGS = {
-         'youtube-tv': {
+        'youtube-tv': {
+            'system': 'YouTube TV',
+            'key': youtube_tv['key'],
+            'id': youtube_tv['id'],
+            'secret': youtube_tv['secret']
+        },
+        'main': {
             'system': 'All',
-            'key': 'AIzaSyAd-YEOqZz9nXVzGtn3KWzYLbLaajhqIDA',
-            'id': '861556708454-d6dlm3lh05idd8npek18k6be8ba3oc68.apps.googleusercontent.com',
-            'secret': 'SboVhoG9s0rNafixCSGGKXAT'
-        },
-        # API KEY for search and channel infos. These should work most of the time without login to safe some quota
-        'youtube-for-kodi-quota': {
-            'token-allowed': False,
-            'system': 'All',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-        'youtube-for-kodi-fallback': {
-            'token-allowed': False,
-            'system': 'Fallback!',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-        'youtube-for-kodi-12': {
-            'system': 'Frodo',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-        'youtube-for-kodi-13': {
-            'system': 'Gotham',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-        'youtube-for-kodi-14': {
-            'system': 'Helix',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-        'youtube-for-kodi-15': {
-            'system': 'Isengard',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-        'youtube-for-kodi-16': {
-            'system': 'Jarvis',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
-        },
-            'youtube-for-kodi-17': {
-            'system': 'Krypton',
-            'key': api_key,
-            'id': '%s.apps.googleusercontent.com' % api_id,
-            'secret': api_secret
+            'key': api['key'],
+            'id': api['id'],
+            'secret': api['secret']
         }
     }
-    
-    def __init__(self, config={}, language='en-US', region='', access_token='', access_token_tv=''):
-       
-        if not config:
-            config = self.CONFIGS['youtube-for-kodi-fallback']
-            pass
 
-        self._config = config
+    def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv=''):
+        self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
 
         # the default language is always en_US (like YouTube on the WEB)
@@ -120,7 +56,7 @@ class LoginClient(object):
             pass
         pass
 
-    def revoke(self, refresh_token, context):
+    def revoke(self, refresh_token):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'Origin': 'https://www.youtube.com',
@@ -139,7 +75,6 @@ class LoginClient(object):
 
         result = requests.post(url, data=post_data, headers=headers, verify=False)
         if result.status_code != requests.codes.ok:
-            context.log_debug('Request answer: %s' % result.text)
             raise LoginException('Logout Failed')
 
         pass
@@ -190,12 +125,12 @@ class LoginClient(object):
 
         return '', ''
 
-    def get_device_token_tv(self, code, context, client_id='', client_secret='', grant_type=''):
+    def get_device_token_tv(self, code, client_id='', client_secret='', grant_type=''):
         client_id = self.CONFIGS['youtube-tv']['id']
         client_secret = self.CONFIGS['youtube-tv']['secret']
-        return self.get_device_token(code, context, client_id=client_id, client_secret=client_secret, grant_type=grant_type)
+        return self.get_device_token(code, client_id=client_id, client_secret=client_secret, grant_type=grant_type)
 
-    def get_device_token(self, code, context, client_id='', client_secret='', grant_type=''):
+    def get_device_token(self, code, client_id='', client_secret='', grant_type=''):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'Origin': 'https://www.youtube.com',
@@ -225,7 +160,6 @@ class LoginClient(object):
 
         result = requests.post(url, data=post_data, headers=headers, verify=False)
         if result.status_code != requests.codes.ok:
-            context.log_debug('Request answer: %s' % result.text)
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
@@ -233,11 +167,11 @@ class LoginClient(object):
 
         return None
 
-    def generate_user_code_tv(self, context):
+    def generate_user_code_tv(self):
         client_id = self.CONFIGS['youtube-tv']['id']
-        return self.generate_user_code(context, client_id=client_id)
+        return self.generate_user_code(client_id=client_id)
 
-    def generate_user_code(self, context, client_id=''):
+    def generate_user_code(self, client_id=''):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'Origin': 'https://www.youtube.com',
@@ -261,7 +195,6 @@ class LoginClient(object):
 
         result = requests.post(url, data=post_data, headers=headers, verify=False)
         if result.status_code != requests.codes.ok:
-            context.log_debug('Request answer: %s' % result.text)
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):

@@ -83,6 +83,9 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
     resource_manager = provider.get_resource_manager(context)
     playlist_data = resource_manager.get_playlists(playlist_ids)
 
+    custom_watch_later_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
+    custom_history_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
+
     for playlist_id in playlist_data.keys():
         yt_item = playlist_data[playlist_id]
         playlist_item = playlist_id_dict[playlist_id]
@@ -114,6 +117,20 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
 
                 # rename playlist
                 yt_context_menu.append_rename_playlist(context_menu, provider, context, playlist_id, title)
+
+                # remove as my custom watch later playlist
+                if playlist_id == custom_watch_later_id:
+                    yt_context_menu.append_remove_as_watchlater(context_menu, provider, context, playlist_id, title)
+                # set as my custom watch later playlist
+                else:
+                    yt_context_menu.append_set_as_watchlater(context_menu, provider, context, playlist_id, title)
+                pass
+                # remove as custom history playlist
+                if playlist_id == custom_history_id:
+                    yt_context_menu.append_remove_as_history(context_menu, provider, context, playlist_id, title)
+                # set as custom history playlist
+                else:
+                    yt_context_menu.append_set_as_history(context_menu, provider, context, playlist_id, title)
                 pass
             pass
 

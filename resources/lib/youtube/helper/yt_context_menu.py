@@ -79,6 +79,34 @@ def append_delete_playlist(context_menu, provider, context, playlist_id, playlis
     pass
 
 
+def append_remove_as_watchlater(context_menu, provider, context, playlist_id, playlist_name):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove.as.watchlater']),
+                         'RunPlugin(%s)' % context.create_uri(['playlist', 'remove', 'watchlater'],
+                                                              {'playlist_id': playlist_id,
+                                                               'playlist_name': playlist_name})))
+
+
+def append_set_as_watchlater(context_menu, provider, context, playlist_id, playlist_name):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.set.as.watchlater']),
+                         'RunPlugin(%s)' % context.create_uri(['playlist', 'set', 'watchlater'],
+                                                              {'playlist_id': playlist_id,
+                                                               'playlist_name': playlist_name})))
+
+
+def append_remove_as_history(context_menu, provider, context, playlist_id, playlist_name):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove.as.history']),
+                         'RunPlugin(%s)' % context.create_uri(['playlist', 'remove', 'history'],
+                                                              {'playlist_id': playlist_id,
+                                                               'playlist_name': playlist_name})))
+
+
+def append_set_as_history(context_menu, provider, context, playlist_id, playlist_name):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.set.as.history']),
+                         'RunPlugin(%s)' % context.create_uri(['playlist', 'set', 'history'],
+                                                              {'playlist_id': playlist_id,
+                                                               'playlist_name': playlist_name})))
+
+
 def append_rate_video(context_menu, provider, context, video_id, refresh_container=False):
     if refresh_container:
         refresh_container = '1'

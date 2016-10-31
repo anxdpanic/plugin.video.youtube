@@ -15,6 +15,8 @@ def _process_related_videos(provider, context, re_match):
     video_id = context.get_param('video_id', '')
     if video_id:
         json_data = provider.get_client(context).get_related_videos(video_id=video_id, page_token=page_token)
+        if not v3.handle_error(provider, context, json_data):
+            return False
         result.extend(v3.response_to_items(provider, context, json_data, process_next_page=False))
         pass
 
@@ -39,6 +41,8 @@ def _process_popular_right_now(provider, context, re_match):
 
     page_token = context.get_param('page_token', '')
     json_data = provider.get_client(context).get_popular_videos(page_token=page_token)
+    if not v3.handle_error(provider, context, json_data):
+        return False
     result.extend(v3.response_to_items(provider, context, json_data))
 
     return result
@@ -51,10 +55,14 @@ def _process_browse_channels(provider, context, re_match):
     guide_id = context.get_param('guide_id', '')
     if guide_id:
         json_data = provider.get_client(context).get_guide_category(guide_id)
+        if not v3.handle_error(provider, context, json_data):
+            return False
         result.extend(v3.response_to_items(provider, context, json_data))
         pass
     else:
         json_data = provider.get_client(context).get_guide_categories()
+        if not v3.handle_error(provider, context, json_data):
+            return False
         result.extend(v3.response_to_items(provider, context, json_data))
         pass
 

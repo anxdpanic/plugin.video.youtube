@@ -1,7 +1,6 @@
 # Kodi Media Center language file
 # Addon Name: YouTube
 # Addon id: plugin.video.youtube
-# Addon version: 5.1.9~beta1
 # Addon Provider: bromix
 msgid ""
 msgstr ""
@@ -40,6 +39,14 @@ msgid "Password"
 msgstr "Passord"
 
 #empty strings from id 30003 to 30008
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Bruk MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure MPEG-DASH InputStream Client"
+msgstr "Sett opp MPEG-DASH InputStream klient"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -147,8 +154,24 @@ msgctxt "#30036"
 msgid "Support alternative player"
 msgstr "Støtt alternativ avspiller"
 
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr "Tilpasset se senere Spilleliste-ID"
+
+msgctxt "#30038"
+msgid "Custom History Playlist ID"
+msgstr ""
+
+msgctxt "#30039"
+msgid "Enable URLResolver Debrid support"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Configure URLResolver"
+msgstr ""
+
 #Kodion Common
-#empty strings from id 30037 to 30099
+#empty strings from id 30038 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -258,8 +281,8 @@ msgid "Enable Personal API Keys"
 msgstr "Aktiver personlig API-nøkkeler (Keys)"
 
 msgctxt "#30205"
-msgid "Autologin on Error enable"
-msgstr "Autoinnlogging når feil er aktivert"
+msgid "Use preset API key set"
+msgstr ""
 
 #YouTube
 #empty strings from id 30204 to 30499
@@ -422,7 +445,7 @@ msgstr "Mislikte videoer"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "Live"
+msgstr "Direkte"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,3 +494,103 @@ msgstr "Region"
 msgctxt "#30551"
 msgid "Recommendations"
 msgstr "Anbefalinger"
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr "Velikehold"
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr "Slett mellomlagringsdatabasen for funksjoner"
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr "Slett databasen for søkehistorikk"
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr "Rens mellomlagringen for funksjoner"
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr "Rens søkehistorie"
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr "mellomlagringen for funksjoner"
+
+msgctxt "#30558"
+msgid "search history"
+msgstr "søkehistorie"
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr "Slett settings.xml"
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr "Undertekstspråk som skal lastes ned"
+
+msgctxt "#30561"
+msgid "None"
+msgstr "Ingen"
+
+msgctxt "#30562"
+msgid "All"
+msgstr "Alle"
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr "Instilling"
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr "Instilling og Engelsk"
+
+msgctxt "#30565"
+msgid "English"
+msgstr "Engelsk"
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr "Spør"
+
+msgctxt "#30567"
+msgid "Set as Watch Later"
+msgstr ""
+
+msgctxt "#30568"
+msgid "Remove as Watch Later"
+msgstr ""
+
+msgctxt "#30569"
+msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgstr ""
+
+msgctxt "#30570"
+msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr ""
+
+msgctxt "#30571"
+msgid "Set as History"
+msgstr ""
+
+msgctxt "#30572"
+msgid "Remove as History"
+msgstr ""
+
+msgctxt "#30573"
+msgid "Are you sure you want to remove '%s' as your History list?"
+msgstr ""
+
+msgctxt "#30574"
+msgid "Are you sure you want to replace your current History list with '%s'?"
+msgstr ""
+
+msgctxt "#30575"
+msgid "Succeeded"
+msgstr ""
+
+msgctxt "#30576"
+msgid "Failed"
+msgstr ""

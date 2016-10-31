@@ -8,10 +8,10 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
         _client = provider.get_client(context)
         json_data = {}
         if _for_tv:
-            json_data = _client.generate_user_code_tv(context)
+            json_data = _client.generate_user_code_tv()
             pass
         else:
-            json_data = _client.generate_user_code(context)
+            json_data = _client.generate_user_code()
             pass
         
         interval = int(json_data.get('interval', 5)) * 1000
@@ -26,17 +26,16 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
         dialog = context.get_ui().create_progress_dialog(
             heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
         
-        i=0
         steps = (10 * 60 * 1000) / interval  # 10 Minutes
         dialog.set_total(steps)
         for i in range(steps):
             dialog.update()
             json_data = {}
             if _for_tv:
-                json_data = _client.get_device_token_tv(device_code, context)
+                json_data = _client.get_device_token_tv(device_code)
                 pass
             else:
-                json_data = _client.get_device_token(device_code, context)
+                json_data = _client.get_device_token(device_code)
                 pass
 
             if not 'error' in json_data:
@@ -54,8 +53,6 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
 
             if dialog.is_aborted():
                 dialog.close()
-                if context.get_settings().get_bool('youtube.api.autologin', True):
-                    context.get_settings().set_bool('youtube.api.autologin', False)
                 return '', 0, ''
 
             context.sleep(interval)
@@ -71,8 +68,9 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
         client = provider.get_client(context)
         if access_manager.has_refresh_token():
             refresh_tokens = access_manager.get_refresh_token().split('|')
+            refresh_tokens = list(set(refresh_tokens))
             for refresh_token in refresh_tokens:
-                client.revoke(refresh_token, context)
+                client.revoke(refresh_token)
                 pass
             pass
         provider.reset_client()
@@ -104,32 +102,18 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
             context.get_ui().refresh_container()
             return
 
-        if needs_tv_login:
-            access_token = '%s|%s' % (access_token_tv, access_token_kodi)
-            refresh_token = '%s|%s' % (refresh_token_tv, refresh_token_kodi)
-            expires_in = min(expires_in_tv, expires_in_kodi)
-            pass
-        else:
-            if context.get_settings().get_bool('youtube.api.autologin', True):
-                access_manager = context.get_access_manager()
-                access_tokens = access_manager.get_access_token()
-                if access_tokens:
-                    access_tokens = access_tokens.split('|')
-                
-                refresh_tokens = access_manager.get_refresh_token()
-                if access_tokens:
-                    refresh_tokens = refresh_tokens.split('|')
-                 
-                access_token = '%s|%s' % (access_tokens[0], access_token_kodi)
-                refresh_token = '%s|%s' % (refresh_tokens[0], refresh_token_kodi)
-                expires_in = context.get_settings().get_int('kodion.access_token.expires',0)
-                context.get_settings().set_bool('youtube.api.autologin', False)
-                pass
-            else:
-                access_token = access_token_kodi
-                refresh_token = refresh_token_kodi
-                expires_in = expires_in_kodi
-                pass
+        if not context.get_settings().requires_dual_login():
+            access_token_tv, expires_in_tv, refresh_token_tv = access_token_kodi, expires_in_kodi, refresh_token_kodi
+
+        # if needs_tv_login:
+        access_token = '%s|%s' % (access_token_tv, access_token_kodi)
+        refresh_token = '%s|%s' % (refresh_token_tv, refresh_token_kodi)
+        expires_in = min(expires_in_tv, expires_in_kodi)
+        # else:
+        #     access_token = access_token_kodi
+        #     refresh_token = refresh_token_kodi
+        #     expires_in = expires_in_kodi
+        #     pass
 
         major_version = context.get_system_version().get_version()[0]
         context.get_settings().set_int('youtube.login.version', major_version)

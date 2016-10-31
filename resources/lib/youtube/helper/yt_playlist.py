@@ -139,6 +139,60 @@ def _process_rename_playlist(provider, context, re_match):
     pass
 
 
+def _watchlater_playlist_id_change(provider, context, re_match, method):
+    playlist_id = context.get_param('playlist_id', '')
+    if not playlist_id:
+        raise kodion.KodionException('watchlater_list/%s: missing playlist_id' % method)
+    playlist_name = context.get_param('playlist_name', '')
+    if not playlist_name:
+        raise kodion.KodionException('watchlater_list/%s: missing playlist_name' % method)
+
+    if method == 'set':
+        current_pl_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
+        if current_pl_id:
+            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30570) % playlist_name):
+                context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id)
+            else:
+                return
+        else:
+            context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id)
+    elif method == 'remove':
+        if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30569) % playlist_name):
+            context.get_settings().set_string('youtube.folder.watch_later.playlist', '')
+        else:
+            return
+    else:
+        return
+    context.get_ui().refresh_container()
+
+
+def _history_playlist_id_change(provider, context, re_match, method):
+    playlist_id = context.get_param('playlist_id', '')
+    if not playlist_id:
+        raise kodion.KodionException('history_list/%s: missing playlist_id' % method)
+    playlist_name = context.get_param('playlist_name', '')
+    if not playlist_name:
+        raise kodion.KodionException('history_list/%s: missing playlist_name' % method)
+
+    if method == 'set':
+        current_pl_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
+        if current_pl_id:
+            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30574) % playlist_name):
+                context.get_settings().set_string('youtube.folder.history.playlist', playlist_id)
+            else:
+                return
+        else:
+            context.get_settings().set_string('youtube.folder.history.playlist', playlist_id)
+    elif method == 'remove':
+        if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30573) % playlist_name):
+            context.get_settings().set_string('youtube.folder.history.playlist', '')
+        else:
+            return
+    else:
+        return
+    context.get_ui().refresh_container()
+
+
 def process(method, category, provider, context, re_match):
     if method == 'add' and category == 'video':
         return _process_add_video(provider, context, re_match)
@@ -150,6 +204,10 @@ def process(method, category, provider, context, re_match):
         return _process_select_playlist(provider, context, re_match)
     elif method == 'rename' and category == 'playlist':
         return _process_rename_playlist(provider, context, re_match)
+    elif (method == 'set' or method == 'remove') and category == 'watchlater':
+        return _watchlater_playlist_id_change(provider, context, re_match, method)
+    elif (method == 'set' or method == 'remove') and category == 'history':
+        return _history_playlist_id_change(provider, context, re_match, method)
     else:
         raise kodion.KodionException("Unknown category '%s' or method '%s'" % (category, method))
 
