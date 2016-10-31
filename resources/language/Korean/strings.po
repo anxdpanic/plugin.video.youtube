@@ -148,6 +148,14 @@ msgctxt "#30038"
 msgid "Custom History Playlist ID"
 msgstr ""
 
+msgctxt "#30039"
+msgid "Enable URLResolver Debrid support"
+msgstr ""
+
+msgctxt "#30040"
+msgid "Configure URLResolver"
+msgstr ""
+
 msgctxt "#30100"
 msgid "Favorites"
 msgstr "즐겨찾기"
@@ -560,4 +568,12 @@ msgstr ""
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
+msgstr ""
+
+msgctxt "#30575"
+msgid "Succeeded"
+msgstr ""
+
+msgctxt "#30576"
+msgid "Failed"
 msgstr ""
