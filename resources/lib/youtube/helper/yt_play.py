@@ -27,9 +27,15 @@ def play_video(provider, context, re_match):
             hmf = urlresolver.HostedMediaFile(url=resolver_url)
             resolved = hmf.resolve()
             if not resolved or not isinstance(resolved, basestring):
-                context.log_debug('Unable to resolve: %s' % resolver_url)
+                try:
+                    message = resolved.msg
+                except:
+                    message = 'Reason unknown, refer to URLResolver debug logging.'
+                context.log_warning('URLResolver unable to resolve: %s\n%s' % (resolver_url, message))
             elif resolved.startswith('plugin://'):
-                context.log_debug('URLResolver unusable url: %s' % resolved)
+                context.log_warning('URLResolver unusable result: %s\nCheck the log above for debrid resolver errors, '
+                                    'confirm debrid resolver is enabled, and has a lower number set in the priority '
+                                    'setting than the YouTube(or offending) resolver.' % resolved)
             else:
                 video_stream = {'container': 'URLResolver',
                                 'title': video_streams[0]['title'],
