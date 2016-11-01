@@ -594,6 +594,7 @@ class VideoInfo(object):
             if mpd_url:
                 if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
                     # fuck!!! in this case we must call the web page
+                    self._context.log_warning('Unable to use mpeg-dash for %s, unable to decipher signature' % video_id)
                     return self._method_watch(video_id)
 
                 meta_info['subtitles'] = Subtitles(self._context, video_id).get()
