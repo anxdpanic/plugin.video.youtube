@@ -92,11 +92,11 @@ msgstr "Items per pagina"
 
 msgctxt "#30023"
 msgid "Search History Size"
-msgstr "Zoek historie grote"
+msgstr "Zoek historie grootte"
 
 msgctxt "#30024"
 msgid "Cache Size (MB)"
-msgstr "Cache Grote (MB)"
+msgstr "Cache Grootte (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -144,7 +144,7 @@ msgstr "Venster: Albums"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr "Support alternative afspeler"
+msgstr "Ondersteun alternatieve speler"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
@@ -171,7 +171,7 @@ msgstr "Favorieten"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr "Voeg to om favorieten toe te voegen"
+msgstr "Voeg toe aan addon favorieten"
 
 msgctxt "#30102"
 msgid "Search"
@@ -191,11 +191,11 @@ msgstr "Archief"
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
-msgstr "Volgende Pagina (%)"
+msgstr "Volgende Pagina (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "Kijk Later"
+msgstr "Later Bekijken"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -223,7 +223,7 @@ msgstr "Hernoem"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "Bevestig delete"
+msgstr "Bevestig wissen"
 
 msgctxt "#30115"
 msgid "Confirm remove"
@@ -239,7 +239,7 @@ msgstr "Verwijder \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr "Verwijder"
+msgstr "Wis"
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -270,11 +270,11 @@ msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr "Schakel personelijke API sleutels in"
+msgstr "Schakel persoonlijke API sleutels in"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Gebruik vooraf ingestelde API sleutel set"
 
 #YouTube
 #empty strings from id 30206 to 30499
@@ -293,11 +293,11 @@ msgstr "Ga naar %s"
 
 msgctxt "#30503"
 msgid "Show channel fanart"
-msgstr "Toon kanaal kunst door fans"
+msgstr "Toon kanaal afbeeldingen"
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr "Abbonee's"
+msgstr "Abonnementen"
 
 msgctxt "#30505"
 msgid "Afmelden"
@@ -305,7 +305,7 @@ msgstr ""
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr "Abboneer"
+msgstr "Abonneer"
 
 msgctxt "#30507"
 msgid "My Channel"
@@ -313,7 +313,7 @@ msgstr "Mijn Kanaal"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr "Gelikete Video's"
+msgstr "Leuk gevonden Video's"
 
 msgctxt "#30509"
 msgid "History"
@@ -321,7 +321,7 @@ msgstr "Geschiedenis"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr "Mijn Abbonee's"
+msgstr "Mijn Abonnementen"
 
 msgctxt "#30511"
 msgid "Queue video"
@@ -349,7 +349,7 @@ msgstr "Mappen"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr "Abboneer op %s"
+msgstr "Abonneer op %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
@@ -417,15 +417,15 @@ msgstr "Omgekeerd"
 
 msgctxt "#30534"
 msgid "Shuffle"
-msgstr "Schuifelen"
+msgstr "Willekeurige volgorde"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr "Selecteer volgerde van de afspeellijst"
+msgstr "Selecteer volgorde van de afspeellijst"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr "Afspeellijst updaten..."
+msgstr "Afspeellijst bijwerken..."
 
 msgctxt "#30537"
 msgid "Play from here"
