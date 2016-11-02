@@ -577,3 +577,7 @@ msgstr ""
 msgctxt "#30576"
 msgid "Failed"
 msgstr ""
+
+msgctxt "#30577"
+msgid "Settings"
+msgstr ""
