@@ -71,7 +71,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.remove.as.watchlater': 30568,
                  'youtube.set.as.watchlater': 30567,
                  'youtube.remove.as.history': 30572,
-                 'youtube.set.as.history': 30571}
+                 'youtube.set.as.history': 30571,
+                 'youtube.settings': 30577}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -486,7 +487,9 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/config/(?P<switch>.*)/$')
     def configure_mpd_inputstream(self, context, re_match):
         switch = re_match.group('switch')
-        if switch == 'mpd':
+        if switch == 'youtube':
+            context._addon.openSettings()
+        elif switch == 'mpd':
             xbmcaddon.Addon(id='inputstream.mpd').openSettings()
         elif switch == 'urlresolver':
             import urlresolver
@@ -692,6 +695,13 @@ class Provider(kodion.AbstractProvider):
             sign_out_item.set_fanart(self.get_fanart(context))
             result.append(sign_out_item)
             pass
+
+        if settings.get_bool('youtube.folder.settings.show', True):
+            settings_menu_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.settings']),
+                                               context.create_uri(['config', 'youtube']),
+                                               image=context.create_resource_path('media', 'settings.png'))
+            settings_menu_item.set_fanart(self.get_fanart(context))
+            result.append(settings_menu_item)
 
         return result
 

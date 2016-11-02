@@ -36,6 +36,7 @@
         <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
         <setting id="youtube.folder.live.show" type="bool" label="30539" default="true"/>
         <setting id="youtube.folder.sign.out.show" type="bool" label="30112" default="true"/>
+        <setting id="youtube.folder.settings.show" type="bool" label="30577" default="true"/>
     </category>
 
     <category label="30031">

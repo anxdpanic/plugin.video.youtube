@@ -567,3 +567,7 @@ msgstr "Efetuado com sucesso"
 msgctxt "#30576"
 msgid "Failed"
 msgstr "Falhou"
+
+msgctxt "#30577"
+msgid "Settings"
+msgstr ""
