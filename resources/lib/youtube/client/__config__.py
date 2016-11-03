@@ -51,35 +51,35 @@ key_sets = {
     },
     'provided': {
         'switch': __get_key_switch(),
-        '0': {  # Bromix youtube-for-kodi-12
-            'id': 'OTQ3NTk2NzA5NDE0LTA4bnJuMzE0ZDhqM2s5MWNsNGY1MXNyY3U2bTE5aHZ1',
-            'key': 'QUl6YVN5Q0RuXzlFeWJUSml5bUhpcE5TM2prNVpwQ1RYZENvdFEw',
-            'secret': 'SHNMVDJaQ2V4SVYtVkZ4V2VZVloyVFVj'
+        '0': {  # youtube-plugin-for-kodi-2
+            'id': 'NDMwNTcyNzE0ODgyLTlqcDdjYzVvMmZkZGdhZGM2bWM4anB1a2JmYjlsczdv',
+            'key': 'QUl6YVN5REIxVGU4MElUejdYR3ZXVGRzazhVMjVlVHY5WWlDS2Zz',
+            'secret': 'ekE5d2lqLWZsSXRZMzVrSHBsN3NmZWt4'
         },
-        '1': {  # Youtube Plugin for Kodi #1
+        '1': {  # youtube-plugin-for-kodi
             'id': 'Mjk0ODk5MDY0NDg4LWE4a2MxazFqZDAwa2FtcXJlMHZkMm5mdHVpaWZyZjZh',
             'key': 'QUl6YVN5Q1p3UXVvc0ZKYlF6bnFucXBxcFlsYUpXVk1uMTZ3QnZz',
             'secret': 'S1RrQktJTk41dmY0T3dqMU5ZeVhMemJl',
         },
-        '2': {  # Bromix youtube-for-kodi-13
-            'id': 'NDQ4OTQwNjc2NzEzLW1pbjl1NWZyZnVqcHJibmI4ZjNkcmkzY3Y5anIzMnJu',
-            'key': 'QUl6YVN5QW1yZjNCbmVFUVBEaVVFdVFsenkwX3JiRkdEQmctYmkw',
-            'secret': 'Nzl2TXNKc05DOWp5cFNmcnlVTXUwMGpX'
+        '2': {  # youtube-plugin-for-kodi-3
+            'id': 'NjM5NjIwMzY5MzYxLWJvYW9qNDM1dDJncDRybjNyNHFyNm52aW8yOXAwZnJi',
+            'key': 'QUl6YVN5QVA0eFJteU5KcndXcTFwNm5KUy1Wd25yY2dIWGxZT3Fr',
+            'secret': 'V1luZGxUQWxLaU1lZjhRT2N5UENkZ1dF'
         },
-        '3': {  # Bromix youtube-for-kodi-14
-            'id': 'MTA3NTAwNzY3NTA2LTltdmJhYWN1c2NmOGNnZTJuM2trdmo1MGE2ZG5yazhn',
-            'key': 'QUl6YVN5Q0NuWkltQzdnVG5pTmZnd3FHd2l4SWRCVkd4aUNPS2xV',
-            'secret': 'MmNlVmZvZ25CQ3RuOHVoMjBIbWxKTjRY'
+        '3': {  # youtube-plugin-for-kodi-4
+            'id': 'NTMxNTEzODY4MDE5LWk1aGJoMDh1aWY4OWhrM2tzNnRmOGR1aTlndWl0dWVn',
+            'key': 'QUl6YVN5REJBRzB0ZXRrblVralo4b3QzRW95MEltUXFYNzRXWU1n',
+            'secret': 'VHpsZ2lkZXlNdmhCcFdiZTAyWi0xQzVy'
         },
-        '4': {  # Bromix youtube-for-kodi-15
-            'id': 'NjEwNjk2OTE4NzA1LWJrdDZ2NTM2azdnbjJkdGN2OHZkbmdtNGIwdnQ1c2V2',
-            'key': 'QUl6YVN5QVRxRGltLTU2eThIY04xTkF6UWRWWmdkTW9jNmQ5RXlz',
-            'secret': 'a1Y3UmVQMWZfTGc5aTJoV1IybGlIbk82'
+        '4': {  # youtube-plugin-for-kodi-5
+            'id': 'NzYxMjUyMTUxMDQ3LXN1ZGNpMjMyNzBhZjM2cWdpcDg0ZHYxaWM3dXZkYzhi',
+            'key': 'QUl6YVN5RFo1ZXk0T1JueGpHQTI1RkRCRGFteVVJakRTLTZKRUhR',
+            'secret': 'VzNad0psdko0U2VRaEkza0tqbFhBRFk3'
         },
-        '5': {  # Bromix youtube-for-kodi-16
-            'id': 'ODc5NzYxNzg4MTA1LXNkdWYwaHQzMzVkdmc5MjNhbmU3Y2cxam50MWQ1bDRr',
-            'key': 'QUl6YVN5QlMzck55bUp0elBZYkpYNWxTR2ROQ0JTNmFqaDRWRERZ',
-            'secret': 'dkJWRGEta05kQ0hEVGtwRDhiOEhPNzE4'
+        '5': {  # youtube-plugin-for-kodi-6
+            'id': 'ODY1MTkxMjg0NTM0LXNzMDlvbzBhMDg1c3BmNHVvbnAzcmdmb2hqc2hzNGUy',
+            'key': 'QUl6YVN5QXc2VWtjREJpVk14ZXZxaGs3WE9la1BRU3dSaWNKaThR',
+            'secret': 'Q1IxOGd6VWlNTi1XRVNVdGc0dE1LNWdz'
         }
     }
 }
