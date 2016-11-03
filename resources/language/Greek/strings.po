@@ -595,4 +595,4 @@ msgstr "Αποτυχία"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Ρυθμίσεις"
