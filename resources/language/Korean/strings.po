@@ -72,6 +72,10 @@ msgctxt "#30017"
 msgid "360p"
 msgstr "360p"
 
+msgctxt "#30018"
+msgid "1080p Live / 720p (HD)"
+msgstr ""
+
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "3D 허용"
