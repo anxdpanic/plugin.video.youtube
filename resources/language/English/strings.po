@@ -166,16 +166,8 @@ msgctxt "#30038"
 msgid "Custom History Playlist ID"
 msgstr ""
 
-msgctxt "#30039"
-msgid "Enable URLResolver (Debrid) support"
-msgstr ""
-
-msgctxt "#30040"
-msgid "Configure URLResolver"
-msgstr ""
-
 #Kodion Common
-#empty strings from id 30041 to 30099
+#empty strings from id 30039 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"

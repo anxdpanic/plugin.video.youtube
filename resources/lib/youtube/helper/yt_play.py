@@ -20,41 +20,15 @@ def play_video(provider, context, re_match):
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
-        video_stream = None
-        if context.get_settings().use_debrid():
-            import urlresolver
-            resolver_url = 'http://youtube.com/watch?v=%s' % video_id
-            hmf = urlresolver.HostedMediaFile(url=resolver_url)
-            resolved = hmf.resolve()
-            if not resolved or not isinstance(resolved, basestring):
-                try:
-                    message = resolved.msg
-                except:
-                    message = 'Reason unknown, refer to URLResolver debug logging.'
-                context.log_warning('URLResolver unable to resolve: %s\n%s' % (resolver_url, message))
-            elif resolved.startswith('plugin://'):
-                context.log_warning('URLResolver unusable result: %s\nCheck the log above for debrid resolver errors, '
-                                    'confirm debrid resolver is enabled, and has a lower number set in the priority '
-                                    'setting than the YouTube(or offending) resolver.' % resolved)
-            else:
-                video_stream = {'container': 'URLResolver',
-                                'title': video_streams[0]['title'],
-                                'url': resolved,
-                                'meta': video_streams[0]['meta'],
-                                'video': {'encoding': '', 'height': 0},
-                                'audio': {'bitrate': 0, 'encoding': ''}}
-                context.log_debug('URLResolver resolved now using video_stream:\n%s' % video_stream)
+        video_stream = kodion.utils.select_stream(context, video_streams)
 
-        if not video_stream:
-            video_stream = kodion.utils.select_stream(context, video_streams)
+        if video_stream is None:
+            return False
 
-            if video_stream is None:
-                return False
-
-            if video_stream['video'].get('rtmpe', False):
-                message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
-                context.get_ui().show_notification(message, time_milliseconds=5000)
-                return False
+        if video_stream['video'].get('rtmpe', False):
+            message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
+            context.get_ui().show_notification(message, time_milliseconds=5000)
+            return False
 
         video_item = VideoItem(video_id, video_stream['url'])
 
