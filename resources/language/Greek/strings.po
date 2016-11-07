@@ -511,7 +511,7 @@ msgstr "Διαγραφή ιστορικού αναζήτησης"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr "λειτουργία λανθάνουσας μνήμης"
+msgstr "λειτουργίας λανθάνουσας μνήμης"
 
 msgctxt "#30558"
 msgid "search history"
