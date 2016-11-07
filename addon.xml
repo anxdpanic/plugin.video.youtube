@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.3.0" provider-name="jdf76, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.3.1" provider-name="jdf76, bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0"/>
-        <import addon="script.module.urlresolver" optional="true"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
 		<provides>video</provides>
@@ -15,7 +14,6 @@
 - Added 'Subtitle language(s) to download' selection to Settings -> General
 - API key set switching from Settings -> API (this will log you out)
 - Dual login only required if My Subscriptions folder is enabled at sign-in
-- Added optional URLResolver (Debrid) support to Settings -> Advanced -> Enable URLResolver (Debrid) support
         </news>
         <assets>
             <icon>icon.png</icon>

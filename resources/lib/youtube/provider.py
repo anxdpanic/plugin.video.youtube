@@ -491,9 +491,6 @@ class Provider(kodion.AbstractProvider):
             context._addon.openSettings()
         elif switch == 'mpd':
             xbmcaddon.Addon(id='inputstream.mpd').openSettings()
-        elif switch == 'urlresolver':
-            import urlresolver
-            urlresolver.display_settings()
         else:
             return False
 

@@ -7,7 +7,6 @@ CACHE_SIZE = 'kodion.cache.size'  # (int)
 VIDEO_QUALITY = 'kodion.video.quality'  # (int)
 VIDEO_QUALITY_ASK = 'kodion.video.quality.ask'  # (bool)
 USE_DASH = 'kodion.video.quality.mpd'  # (bool)
-DEBRID_SUPPORT = 'kodion.support.urlresolver_debrid'  # (bool)
 SUBTITLE_LANGUAGES = 'kodion.subtitle.languages'  # (int)
 SETUP_WIZARD = 'kodion.setup_wizard'  # (bool)
 

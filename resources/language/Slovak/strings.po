@@ -152,14 +152,6 @@ msgctxt "#30038"
 msgid "Custom History Playlist ID"
 msgstr ""
 
-msgctxt "#30039"
-msgid "Enable URLResolver Debrid support"
-msgstr ""
-
-msgctxt "#30040"
-msgid "Configure URLResolver"
-msgstr ""
-
 msgctxt "#30100"
 msgid "Favorites"
 msgstr "Obľúbené"
