@@ -24,6 +24,7 @@ def _process_related_videos(provider, context, re_match):
 
 
 def _process_recommendations(provider, context, re_match):
+    provider.set_content_type(context, kodion.constants.content_type.EPISODES)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -70,6 +71,7 @@ def _process_browse_channels(provider, context, re_match):
 
 
 def _process_disliked_videos(provider, context, re_match):
+    provider.set_content_type(context, kodion.constants.content_type.EPISODES)
     result = []
 
     page_token = context.get_param('page_token', '')
