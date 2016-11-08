@@ -128,6 +128,8 @@ class Storage(object):
 
         self._open()
         now = datetime.datetime.now()
+        if not now.microsecond:  # now is to the second
+            now += datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
         self._execute(True, query, values=[item_id, now, _encode(item)])
         self._optimize_item_count()
