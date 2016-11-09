@@ -75,7 +75,7 @@ class ViewManager(object):
                 {'name': 'InfoWall', 'id': 51}
             ]
         },
-        'skin.1080xf': {
+        'skin.xperience1080+': {
             'default': [
                 {'name': 'List', 'id': 50},
                 {'name': 'Thumbnail', 'id': 500},
