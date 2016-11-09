@@ -115,6 +115,9 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
         #     expires_in = expires_in_kodi
         #     pass
 
+        # we clear the cache, so none cached data of an old account will be displayed.
+        context.get_function_cache().clear()
+
         major_version = context.get_system_version().get_version()[0]
         context.get_settings().set_int('youtube.login.version', major_version)
 
