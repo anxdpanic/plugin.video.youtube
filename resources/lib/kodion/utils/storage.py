@@ -80,6 +80,7 @@ class Storage(object):
 
     def _close(self):
         if self._file is not None:
+            self.sync()
             self._file.commit()
             self._cursor.close()
             self._cursor = None
@@ -117,10 +118,9 @@ class Storage(object):
         pass
 
     def sync(self):
-        if self._file is not None and self._needs_commit:
+        if self._cursor is not None and self._needs_commit:
             self._needs_commit = False
-            return self._file.commit()
-        pass
+            return self._execute(False, 'COMMIT')
 
     def _set(self, item_id, item):
         def _encode(obj):
