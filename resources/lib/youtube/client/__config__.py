@@ -9,8 +9,12 @@ __context = __Context()
 __settings = __context.get_settings()
 
 _own_key = __settings.get_string('youtube.api.key', '').strip()
-_own_id = __settings.get_string('youtube.api.id', '').strip().replace('.apps.googleusercontent.com', '')
+_own_id = __settings.get_string('youtube.api.id', '').replace('.apps.googleusercontent.com', '').strip()
 _own_secret = __settings.get_string('youtube.api.secret', '').strip()
+
+__settings.set_string('youtube.api.key', _own_key)
+__settings.set_string('youtube.api.id', _own_id)
+__settings.set_string('youtube.api.secret', _own_secret)
 
 
 def _has_own_keys():
