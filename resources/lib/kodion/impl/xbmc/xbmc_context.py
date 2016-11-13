@@ -3,6 +3,7 @@ import urllib
 import urlparse
 import weakref
 import datetime
+import json
 
 import xbmc
 import xbmcaddon
@@ -229,4 +230,36 @@ class XbmcContext(AbstractContext):
         xbmc.sleep(milli_seconds)
         pass
 
-    pass
+    def addon_enabled(self, addon_id):
+        rpc_request = json.dumps({"jsonrpc": "2.0",
+                                  "method": "Addons.GetAddonDetails",
+                                  "id": 1,
+                                  "params": {"addonid": "%s" % addon_id,
+                                             "properties": ["enabled"]}
+                                  })
+        response = json.loads(xbmc.executeJSONRPC(rpc_request))
+        try:
+            return response['result']['addon']['enabled'] == 'true'
+        except KeyError:
+            message = response['error']['message']
+            code = response['error']['code']
+            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
+            xbmc.log(error, xbmc.LOGERROR)
+            raise KeyError(error)
+
+    def set_addon_enabled(self, addon_id, enabled=True):
+        rpc_request = json.dumps({"jsonrpc": "2.0",
+                                  "method": "Addons.SetAddonEnabled",
+                                  "id": 1,
+                                  "params": {"addonid": "%s" % addon_id,
+                                             "enabled": enabled}
+                                  })
+        response = json.loads(xbmc.executeJSONRPC(rpc_request))
+        try:
+            return response['result'] == 'OK'
+        except KeyError:
+            message = response['error']['message']
+            code = response['error']['code']
+            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
+            xbmc.log(error, xbmc.LOGERROR)
+            raise KeyError(error)
