@@ -589,21 +589,26 @@ class VideoInfo(object):
         """
 
         if self._context.get_settings().use_dash():
-            mpd_url = params.get('dashmpd', None)
-            use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
-            if mpd_url:
-                if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
-                    # fuck!!! in this case we must call the web page
-                    self._context.log_warning('Unable to use mpeg-dash for %s, unable to decipher signature' % video_id)
-                    return self._method_watch(video_id)
+            use_dash = True
+            if not self._context.addon_enabled('inputstream.mpd'):
+                if not self._context.set_addon_enabled('inputstream.mpd'):  # already 'enabled this in youtube settings'
+                    use_dash = False
+            if use_dash:
+                mpd_url = params.get('dashmpd', None)
+                use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
+                if mpd_url:
+                    if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
+                        # fuck!!! in this case we must call the web page
+                        self._context.log_warning('Unable to use mpeg-dash for %s, unable to decipher signature' % video_id)
+                        return self._method_watch(video_id)
 
-                meta_info['subtitles'] = Subtitles(self._context, video_id).get()
-                video_stream = {'url': mpd_url,
-                                'title': meta_info['video'].get('title', ''),
-                                'meta': meta_info}
-                video_stream.update(self.FORMAT.get('9999'))
-                stream_list.append(video_stream)
-                return stream_list
+                    meta_info['subtitles'] = Subtitles(self._context, video_id).get()
+                    video_stream = {'url': mpd_url,
+                                    'title': meta_info['video'].get('title', ''),
+                                    'meta': meta_info}
+                    video_stream.update(self.FORMAT.get('9999'))
+                    stream_list.append(video_stream)
+                    return stream_list
 
         added_subs = False  # avoid repeat calls from loop or cipher signature
         # extract streams from map
