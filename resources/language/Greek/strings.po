@@ -114,7 +114,7 @@ msgstr "Επιτρέψτε τον οδηγό ρυθμίσεων"
 
 msgctxt "#30026"
 msgid "Override View"
-msgstr "Εναλλαγή Οθόνης"
+msgstr "Επιβολή τρόπου απεικόνισης"
 
 msgctxt "#30027"
 msgid "View: Default"
