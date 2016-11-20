@@ -278,8 +278,6 @@ class AbstractProvider(object):
 
             return result, {self.RESULT_CACHE_TO_DISC: False}
 
-        return False
-
     def handle_exception(self, context, exception_to_handle):
         return True
 
