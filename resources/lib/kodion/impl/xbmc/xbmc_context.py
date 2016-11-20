@@ -244,8 +244,8 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            xbmc.log(error, xbmc.LOGERROR)
-            raise KeyError(error)
+            xbmc.log(error, xbmc.LOGDEBUG)
+            return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
         rpc_request = json.dumps({"jsonrpc": "2.0",
@@ -261,5 +261,5 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            xbmc.log(error, xbmc.LOGERROR)
-            raise KeyError(error)
+            xbmc.log(error, xbmc.LOGDEBUG)
+            return False

@@ -589,10 +589,15 @@ class VideoInfo(object):
         """
 
         if self._context.get_settings().use_dash():
-            use_dash = True
-            if not self._context.addon_enabled('inputstream.mpd'):
-                if not self._context.set_addon_enabled('inputstream.mpd'):  # already 'enabled this in youtube settings'
-                    use_dash = False
+            major_version = self._context.get_system_version().get_version()[0]
+            if major_version >= 17:
+                use_dash = True
+                if not self._context.addon_enabled('inputstream.mpd'):
+                    use_dash = self._context.set_addon_enabled('inputstream.mpd')  # already 'enabled' this in youtube settings
+            else:
+                use_dash = False
+                self._context.get_settings().set_bool('kodion.video.quality.mpd', False)
+
             if use_dash:
                 mpd_url = params.get('dashmpd', None)
                 use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
