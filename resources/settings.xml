@@ -40,6 +40,7 @@
     </category>
 
     <category label="30031">
+        <setting id="simple.requests.ssl.verify" type="bool" label="30578" default="false"/>
         <setting id="kodion.support.alternative_player" type="bool" label="30036" default="false"/>
         <setting id="youtube.view.description.show_channel_name" type="bool" label="30541" default="true"/>
         <setting type="sep" />

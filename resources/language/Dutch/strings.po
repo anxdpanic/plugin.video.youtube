@@ -586,3 +586,7 @@ msgstr ""
 msgctxt "#30577"
 msgid "Settings"
 msgstr ""
+
+msgctxt "#30578"
+msgid "Force SSL Certificate verification"
+msgstr ""

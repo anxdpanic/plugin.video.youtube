@@ -7,6 +7,10 @@ import gzip
 
 import json as real_json
 from ..utils import to_utf8
+from .. import Context as __Context
+
+__context = __Context()
+__settings = __context.get_settings()
 
 
 class ErrorHandler(urllib2.HTTPDefaultErrorHandler):
@@ -71,8 +75,13 @@ def _request(method, url,
     handlers = []
 
     import sys
+
+    _verify = __settings.get_bool('simple.requests.ssl.verify', False)
+    if _verify:
+        verify = _verify
+
     # starting with python 2.7.9 urllib verifies every https request
-    if False == verify and sys.version_info >= (2, 7, 9):
+    if verify is False and sys.version_info >= (2, 7, 9):
         import ssl
 
         ssl_context = ssl.create_default_context()

@@ -592,3 +592,7 @@ msgstr "Αποτυχία"
 msgctxt "#30577"
 msgid "Settings"
 msgstr "Ρυθμίσεις"
+
+msgctxt "#30578"
+msgid "Force SSL Certificate verification"
+msgstr ""
