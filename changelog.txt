@@ -1,0 +1,396 @@
+5.3.5
+[add] MPEG-DASH support for Kodi 17 w/ inputstream.adaptive Add-on
+[add] optional History and Watch Later custom playlist to Settings -> Folders, or (My)Playlists context menu to set/remove
+[add] Maintenance section to Settings
+[add] 'Subtitle language(s) to download' selection to Settings -> General
+[add] 'Force SSL Certificate verification' to Settings -> Advanced
+[upd] API key set switching from Settings -> API (this will log you out)
+[upd] Dual login only required if My Subscriptions folder is enabled at sign-in
+[upd] setting content type from episodes, now videos
+[del] override view options
+[upd] Norwegian strings [torstehu]
+[upd] Greek strings [twilight0]
+[upd] Portuguese strings [Wanilton]
+[upd] Dutch strings [flemlion]
+[fix/upd] API tweaking and various other updates
+
+5.2.2 (2016-05-28)
+[upd] Insert old API-Keys from Bromix because of Quota-Exceed-Error
+[add] Dutch strings (thanks to Guilouz)
+[upd] French strings (thanks to royreinders)
+[upd] Greek strings (thanks to Twilight0)
+
+5.2.1 (2016-05-12)
+[add] Additional "Recommend for You" section (thanks to anxdpanic)
+
+5.2.0 (2016-05-11)
+[upd] APi-Changer - First login delete old Credentials - New Login Required! Sorry :)
+
+5.1.20.7 (2016-05-03)
+Workaround for the Quota Exceed-Error. 
+[add] API-Changer for a Pool of 6 API-Keys
+[add] Auto-Reauthenticate with Pool-Key on "Quota Exceed" error
+[add] "Use own API"-Button
+[hint] The Message "Invalid Credentials" after Update could be fixed with deleting the Userdata-Settings.xml
+[add] add Recommendations to main listing when logged in [anxdpanic]
+
+5.1.20.6 (2016-04-03)
+[add] Greek Translation from twilight0
+[upd] Fixed italian translation from DjDiabolik
+
+5.1.20.5 (2016-03-20)
+[upd] Ignore if '.apps.googleusercontent.com' entered in API Id string in add-on settings
+
+5.1.20.4 (2016-03-05)
+[add] API Key in add-on settings
+[upd] All string.po for new API Key functionality. New entries in language string.po files not translated from English.
+
+5.1.20.3 (2016-03-04)
+[fix] All Key changed with YouTube TV
+
+5.1.20.2 (2016-03-04)
+[fix] Live streams itag 91 patch
+[add] Kodi 17 Krypton support. Patch by Uukrul
+
+5.1.20 (2016-02-25)
+[fix] Final fix for APIs
+
+5.1.16 (2015-12-24)
+[fix] reverted search order by date
+
+5.1.15 (2015-12-22)
+[fix] signature calculation
+
+5.1.14 (2015-12-22)
+[upd] default search order by date (newest first)
+[fix] VEVO signature calculation
+
+5.1.13 (2015-12-20)
+[fix] frodo...DIE FRODO DIE !!!
+[fix] some cleanup for Jarvis
+
+5.1.12 (2015-11-29)
+[fix] sort issues with Jarvis (thx 2 guidosarducci)
+
+5.1.11 (2015-11-24)
+[fix] signature calculation (e.g. VEVO)
+
+5.1.10 (2015-11-13)
+[fix] signature calculation (e.g. VEVO)
+
+5.1.9 (2015-09-21)
+[add] Hebrew (thx 2 smoky-jr)
+[upd] don't set default season and episodes (1x1)
+[upd] another try to optimize the quota problem. Move all searches to the individual keys instead of one global
+[fix] playback issues (skip discontinued video/format by YouTube)
+
+5.1.8 (2015-08-23)
+[add] Bulgarian (thx 2 NEOhidra)
+[upd] new quota shaping
+[fix] personal playlists (Watch Later, Liked Video, ...) should work again
+[fix] playback of VEVO videos - some videos still using discontinued ITAG13
+[fix] show login, when an endpoint is called, which requires permissions.
+
+5.1.7 (2015-07-15)
+ADD: quota optimization via separate key for none-token depended API calls
+UPD: new login semantic to sign out if someone upgrades to a newer version of KODI
+FIX: 'Next Page (X)' item was added to the current playlist for playback
+
+5.1.6 (2015-06-14)
+ADD: Chinese (Traditional) (thx 2 beddfaf916)
+ADD: Czech (thx 2 tomaswcz)
+ADD: Romanian (thx 2 Danny3)
+UPD: test some new pagination for 'My Subscriptions'
+UPD: Polish (thx 2 Etharr)
+FIX: show notification again for unsupported rtmpe streams
+FIX: unicode/utf-8 trouble in kodion
+
+5.1.5 (2015-05-29)
+UPD: remove deprecation warning for Isengard
+FIX: Issue 7163 (Missing pagination for subscriptions - YouTube APIv3 bug)
+
+5.1.4 (2015-05-26)
+ADD: Frodo support (only if you install via zip or bromix repo)
+UPD: new API-KEY - thanks to the guy for hijacking the key for trailer searches
+UPD: Russian (thx 2 BytEvil)
+FIX: cache wasn't working correctly without login
+
+5.1.3 (2015-05-16)
+UPD: code cleaning
+FIX: minor fixes
+
+5.1.2 (2015-05-15)
+ADD: ask for video quality (optional)
+UPD: code cleaning
+UPD: Russian (thx 2 BytEvil)
+UPD: kodion
+FIX: add 'Play all' for playlist (again)
+
+5.1.1 (2015-05-10)
+ADD: 'More...' in context menu to provide more items
+ADD: show deprecation warning of old plugin calls starting with Isengard
+ADD: EndPoint: 'plugin://plugin.video.youtube/search/?q=[URL_ENC_TEXT]'
+ADD: API Key for each major version of KODI
+UPD: Ukrainian (thx 2 Dukobpa3)
+UPD: Russian (thx 2 BytEvil)
+UPD: new second fanart
+UPD: reorganized context menu
+UPD: improved logging (debug only)
+UPD: Improved error handling
+FIX: refresh after rating a video (own playlist only)
+FIX: add 'refresh' again for 'My subscriptions'
+DEL: removed old v2 API
+
+5.1.0 (2015-04-22)
+ADD: Double login to support 'My subscriptions' via YouTube TV API
+ADD: 'More Links from the description' - extracts further links from the description
+ADD: Korean (thx 2 piodio)
+UPD: removed old implementation of 'My Subscriptions'
+UPD: new fanart and icon
+UPD: changed credentials
+UPD: minimal quota-optimization
+UPD: French (thx 2 eauland)
+UPD: YouTube relevant description links - improved extraction and resolving of video/playlist urls
+UPD: YouTube relevant description links - improved extraction and resolving of user/channel urls
+UPD: YouTube relevant description links - improved performance resolving urls with caching
+UPD: regex optimizations for season and expisode extraction
+FIX: support fanart of channel in new implementation of 'My Subscriptions'
+FIX: YouTube relevant description links - script error while some server return garbage for a location
+FIX: script error while resolving url fails
+FIX: script error while adding video to a playlist
+FIX: show seconds (runtime) in Gotham
+
+5.0.9 (2015-03-14)
+ADD: 'duration' optimized for KODI 15.X (Isengard)
+ADD: EndPoint for listing the videos of a playlist: "plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>/"
+UPD: optimized client-/server transfer (use gzip)
+
+5.0.8 (2015-03-05)
+UPD: Polish (thx 2 Etharr)
+UPD: Russian (thx 2 BytEvil)
+FIX: improved playback
+
+5.0.7 (2015-02-27)
+ADD: 'Refresh' in 'My Subscriptions' and all my playlists
+ADD: rename search history item
+UPD: French (thx 2 Trilip)
+UPD: Ukrainian (thx 2 posledov)
+UPD: Spanish (thx 2 PatOso)
+FIX: possible crash on not well formed language ids
+FIX: optimized logging
+FIX: unicode trouble
+
+5.0.6 (2015-02-17)
+ADD: setting for hiding the channel name in the description
+ADD: Ukrainian (thx 2 posledov)
+UPD: show 'Watch History' (default)
+UPD: Russian (thx 2 BytEvil)
+UPD: improved support for live streams
+UPD: improved stream selection based on container
+FIX: 'What to watch' => 'Popular right now'
+FIX: don't crash while trying to play rtmpe
+FIX: corrected ITAG 18 in 360p instead of 260p
+
+
+5.0.5 (2015-02-01)
+ADD: clear search history items
+UPD: replace context menu not everywhere
+UPD: dropped dependency of 'requests'-module because of performance issues
+FIX: Add playing video to the 'Watch History'
+FIX: maybe a fix for a problem (again!) on unix systems while using python 2.7.9 + certificate verification
+FIX: removed pagination for "Related Videos" - the fix before produced some nasty side-effects
+FIX: Vevo signature
+
+5.0.4 (2015-01-15)
+ADD: 'Live' in search
+ADD: 'Play with...' for supporting external/alternative player
+ADD: live events (needed some tests and feedback)
+ADD: support for user names instead of channel ids
+UPD: set XBMC/KODI to at least Gotham 13.2
+UPD: Setup-Wizard views based on content type (KODION update)
+FIX: Playlist should work again
+FIX: Pagination in APIv2
+FIX: settings for hiding 'Live' menu
+DEL: support for Frodo
+
+5.0.3 (2015-01-08)
+ADD: 'Disliked Videos'
+ADD: 240p, 360p and 480p
+UPD: adjustment in KODION classes (maybe causing problems on MAC OS X 10.10.X + Python 2.6)
+UPD: Russian (thx 2 BytEvil)
+UPD: Spanish (thx 2 PatOso)
+UPD: Polish (thx 2 D.K.)
+FIX: German translation
+FIX: some Frodo updates
+
+5.0.2 (2015-01-01)
+ADD: Support for shared playlists via Yatse
+ADD: 'Play from here' for playlists
+ADD: 'Queue Video'
+FIX: German translation
+FIX: Portuguese (Brazil) (thx 2 ASH_Macedo)
+
+5.0.1 (2014-12-31)
+ADD: 'Play all' (default, reverse, shuffle)
+ADD: Italian (thx 2 peppe_sr)
+ADD: Portuguese (Brazil) (thx 2 ASH_Macedo)
+ADD: Hungarian (thx 2 gyeben)
+ADD: Portuguese (thx 2 enen92)
+ADD: Polish (thx 2 D.K.)
+ADD: Russian (thx 2 BytEvil)
+ADD: Spanish (thx 2 PatOso)
+ADD: French (thx 2 roondar)
+UPD: support for '1080XF' and 'Xperience1080'
+FIX: some live streams should work
+FIX: update meta data for video played via ext. url
+FIX: remove video from 'Watch Later' playlist
+REV: reverted to requests
+
+5.0.0 (2014-12-27)
+DEL: removed beta
+ADD: new rating system - like/dislike/remove
+ADD: show confirmation before remove a video or deleting a playlist
+ADD: rename your playlists
+ADD: setup default view modes (default and videos)
+ADD: setup correct language and region for YouTube
+ADD: support for old YouTube url calls (plugin://plugin.video.youtube/?action=play_video&videoid=[ID])
+UPD: new icons
+UPD: reorganized context menu
+UPD: some minor tests
+UPD: moved 'Watch Later' up in context menu
+FIX: rename playlist
+FIX: show newest videos first (uploads of channel)
+FIX: show fanarts in 'Watch Later' and 'Liked Videos'
+
+1.0.0~alpha29 (2014-12-14)
+UPD: new login mechanism (removed the old one)
+ADD: translation fr-FR (thanks to roondar)
+ADD: manage playlists - create, remove and add videos to a selected playlists
+FIX: support cyrillic letters
+
+1.0.0~alpha28 (2014-12-07)
+ADD: subscribe to channel (from videos and playlist)
+UPD: rework of handling context menu
+FIX: remove next page for related videos (because APIv3 is broken)
+
+1.0.0~alpha27 (2014-12-01)
+UPD: performance improved for auto-removing videos from 'Watch Later' list
+FIX: error while navigating to the next page
+
+1.0.0~alpha26 (2014-11-30)
+ADD: hide all entries (except search) via settings in the root menu
+ADD: missing pagination for 'My Subscriptions'
+FIX: next page is working again (Watch Later)
+UPD: disabled language (for now) Kodi isn't providing reliable language IDs
+
+1.0.0~alpha25 (2014-11-29)
+UPD: requests with language/region
+UPD: new icons
+ADD: Auto-Remove from 'Watch Later' list
+ADD: 'Related Videos'
+UPD: show channel name in the description
+FIX: disable verification warnings
+
+1.0.0~alpha24 (2014-11-27)
+ADD: 'Browse Channels'
+FIX: support for skins calling '.*/extrafanart/'
+
+1.0.0~alpha23 (2014-11-26)
+ADD: 'What to watch'
+FIX: 'My subscriptions' switched to version APIv2.1 (Google) DAMN YOU!!!
+
+1.0.0~alpha22 (2014-11-25)
+ADD: sorting
+FIX: crash when calling 'My subscriptions'
+FIX: signature calculation
+
+1.0.0~alpha21 (2014-11-24)
+CHG: method for playing a video changed to a more query like uri
+FIX: crash under android systems. Regular Expressions work a little different :)
+
+1.0.0~alpha20 (2014-11-23)
+FIX: Git merge with master
+
+1.0.0~alpha19 (2014-11-23)
+UPD: complete rewrite
+UPD: switch to kodion
+
+1.0.0~alpha18 (2014-08-31)
+- ADD: Support for ETag - could improve performance
+- ADD: remove item of search history
+- FIX: #22 calculation of duration
+- FIX: #28 display 'general' instead of 'like' in settings
+
+1.0.0~alpha17 (2014-08-10)
+- ADD: 'Go to CHANNEL' of a selected video
+- ADD: Support for 'Subscribe' and 'Unsubscribe' of channels
+- ADD: Full support for 'Like'
+- ADD: Remove own playlist via context menu
+- ADD: Show/Hide 'Browse Channels' via settings
+- FIX: Using only thumbnails from API v3 - 'My Subscriptions' is using v2 and returning different thumbnails
+- FIX: Displaying false channel in video description
+- FIX: Don't update search history before showing the search result
+
+1.0.0~alpha16 (2014-08-08)
+- FIX: provide 'Next Page' under 'My Subscriptions' if there are more results
+- ADD: Hide and show menu items via settings 
+- ADD: Search history (set the size via settings from 0-50 items)
+
+1.0.0~alpha15 (2014-08-04)
+- FIX: moved (only) for the subscribtions to V2 to see new uploaded videos
+
+1.0.0~alpha14 (2014-08-03)
+- ADD: 'Remove' via context menu for playlists
+- ADD: 'Watch Later' via context menu to add a video to the 'Watch Later' playlist
+- ADD: Automatic remove from the 'Watch Later' playlists (optional via settings - default = true)
+- ADD: Support for history - after playback the video should be added to the history. Not working correct.
+- ADD: Fanart for channels. Only if you select a channel directly.
+- optimized some of the addon code
+
+1.0.0~alpha13 (2014-08-02)
+- FIX: improved token and login validation
+
+1.0.0~alpha12 (2014-08-01)
+- ADD: Show 'Published on' and 'Channel' in the description of a video (can be disabled via setting)
+- ADD: support for 3D videos (can be disabled via setting)
+- Accelerated resolving of video URLs (almost 2x as fast) 
+
+1.0.0~alpha11 (2014-07-30)
+- FIX: added a fallback for videos that require a login (works very fast?!?!)
+- FIX: if username or password is missing reset the whole token logic 
+
+1.0.0~alpha10 (2014-07-29)
+- FIX: improved performance on decoding signatures for some videos 
+- ADD: support for custom-created playlists
+- FIX: sort own subscriptions
+- ADD: enable/disable video, channel and/or playlist search
+
+1.0.0~alpha9 (2014-07-28)
+- FIX: removed debug
+
+1.0.0~alpha8 (2014-07-28)
+- ADD: login tests
+
+1.0.0~alpha7 (2014-07-27)
+- FIX: added support from freemake.com to decode signatures of some videos
+
+1.0.0~alpha6 (2014-07-27)
+- added support of playlists of a channel (first page only)
+- optimized some major routines for easier support of all youtube's content 
+
+1.0.0~alpha5 (2014-07-27)
+- version bump for tests
+
+1.0.0~alpha4 (2014-07-26)
+- added runtime for each video (crazy hack)
+- disabled debug
+
+1.0.0~alpha3 (2014-07-26)
+- little fixes regarding youtube channels
+
+1.0.0~alpha2 (2014-07-26)
+- added youtube channels and search
+- added playback
+
+1.0.0~alpha (2014-07-26)
+- initial version for tests

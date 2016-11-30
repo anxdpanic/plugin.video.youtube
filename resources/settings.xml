@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <!-- kodion General -->
+    <category label="30000">
+
+        <!-- kodion Visual -->
+        <setting id="kodion.video.quality" type="enum" label="30010" enable="eq(1,false)" lvalues="30016|30017|30011|30012|30018" default="3"/>
+        <setting id="kodion.video.quality.ask" type="bool" label="30009" default="false"/>
+        <setting id="kodion.video.quality.mpd" type="bool" label="30007" default="false" enable="System.HasAddon(inputstream.adaptive)"/>
+        <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)" visible="eq(-1,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
+        <setting id="kodion.subtitle.languages" type="enum" label="30560" lvalues="30561|30562|30563|30564|30565|30566" default="0"/>
+        <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
+        <setting type="sep" />
+        <setting id="kodion.fanart.show" type="bool" label="30021" default="true"/>
+        <setting id="youtube.channel.fanart.show" type="bool" label="30503" enable="eq(-1,true)" default="true"/>
+        <setting id="kodion.content.max_per_page" type="enum" label="30022" values="5|10|15|20|25|30|35|40|45|50" default="9" />
+        <setting id="kodion.search.size" type="enum" label="30023" values="0|10|20|30|40|50" default="1" />
+    </category>
+
+    <category label="30516">
+        <setting id="youtube.folder.sign.in.show" type="bool" label="30111" default="true"/>
+        <setting id="youtube.folder.my_subscriptions.show" type="bool" label="30510" default="true"/>
+        <setting id="youtube.folder.recommendations.show" type="bool" label="30551" default="true"/>
+        <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
+        <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
+        <setting id="youtube.folder.watch_later.show" type="bool" label="30107" default="true"/>
+        <setting id="youtube.folder.watch_later.playlist" type="text" label="30037" enable="eq(-1,true)"
+                 visible="eq(-1,true)" default=""/>
+        <setting id="youtube.folder.liked_videos.show" type="bool" label="30508" default="true"/>
+        <setting id="youtube.folder.disliked_videos.show" type="bool" label="30538" default="true"/>
+        <setting id="youtube.folder.history.show" type="bool" label="30509" default="true"/>
+        <setting id="youtube.folder.history.playlist" type="text" label="30038" enable="eq(-1,true)"
+                 visible="eq(-1,true)" default=""/>
+        <setting id="youtube.folder.playlists.show" type="bool" label="30501" default="true"/>
+        <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
+        <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
+        <setting id="youtube.folder.live.show" type="bool" label="30539" default="true"/>
+        <setting id="youtube.folder.sign.out.show" type="bool" label="30112" default="true"/>
+        <setting id="youtube.folder.settings.show" type="bool" label="30577" default="true"/>
+    </category>
+
+    <category label="30031">
+        <setting id="simple.requests.ssl.verify" type="bool" label="30578" default="false"/>
+        <setting id="kodion.support.alternative_player" type="bool" label="30036" default="false"/>
+        <setting id="youtube.view.description.show_channel_name" type="bool" label="30541" default="true"/>
+        <setting type="sep" />
+        <setting id="kodion.cache.size" type="slider" label="30024" default="5" range="1,1,20" option="int"/>
+        <setting id="kodion.setup_wizard" type="bool" label="30025" default="true"/>
+        <setting type="sep" />
+        <setting id="youtube.language" type="text" label="30523" enable="false" default="en-US"/>
+        <setting id="youtube.region" type="text" label="30550" enable="false" default="US"/>
+    </category>
+    
+    <!-- personal api key -->
+    <category label="30200">
+        <setting id="youtube.api.enable" type="bool" label="30204" default="false"/>
+        <setting id="youtube.api.key" type="text" label="30201" default="" visible="eq(-1,true)"/>
+        <setting id="youtube.api.id" type="text" label="30202" default="" visible="eq(-2,true)"/>
+        <setting id="youtube.api.secret" type="text" label="30203" default="" visible="eq(-3,true)"/>
+        <setting id="youtube.api.key.switch" type="enum" label="30205" values="0|1|2|3|4|5" visible="eq(-4,false)" default="1"/>
+        <setting id="youtube.api.last.switch" type="text" label="" visible="false" enable="true" default=""/>
+        <setting id="youtube.api.last.hash" type="text" label="" visible="false" enable="true" default=""/>
+        <setting id="youtube.api.key.switch.use" type="text" label="" visible="false" enable="true" default=""/>
+    </category>
+
+    <!-- Maintenance -->
+    <category label="30552">
+        <setting id="kodion.maintain.clear.func" type="action" label="30555" action="RunPlugin(plugin://plugin.video.youtube/maintain/function_cache/clear/)"/>
+        <setting id="kodion.maintain.clear.search" type="action" label="30556" action="RunPlugin(plugin://plugin.video.youtube/maintain/search_cache/clear/)"/>
+        <setting type="sep" />
+        <setting id="kodion.maintain.delete.func" type="action" label="30553" action="RunPlugin(plugin://plugin.video.youtube/maintain/function_cache/delete/)"/>
+        <setting id="kodion.maintain.delete.search" type="action" label="30554" action="RunPlugin(plugin://plugin.video.youtube/maintain/search_cache/delete/)"/>
+        <setting type="sep" />
+        <setting id="kodion.maintain.delete.settings" type="action" label="30559" option="close" action="RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)"/>
+    </category>
+</settings>

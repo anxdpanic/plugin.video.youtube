@@ -1,0 +1,602 @@
+# Kodi Media Center language file
+# Addon Name: YouTube
+# Addon id: plugin.video.youtube
+# Addon Provider: bromix
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2016-04-04 11:01+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: el\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Πρόσθετο Youtube"
+
+msgctxt "Addon Description"
+msgid "YouTube is a one of the biggest video-sharing websites of the world."
+msgstr "Το Youtube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο"
+
+#Kodion Settings
+
+msgctxt "#30000"
+msgid "General"
+msgstr "Γενικά"
+
+msgctxt "#30001"
+msgid "Username"
+msgstr "Όνομα Χρήστη"
+
+msgctxt "#30002"
+msgid "Password"
+msgstr "Κωδικός"
+
+#empty strings from id 30003 to 30008
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Χρησιμοποίησε το MPEG-DASH"
+msgctxt "#30008"
+msgid "Configure inputstream.adaptive"
+msgstr "Ρύθμιση πελάτη MPEG-DASH Inputstream"
+
+msgctxt "#30009"
+msgid "Always ask for the video quality"
+msgstr "Πάντα ερώτηση για την ποιότητα του βίντεο"
+
+msgctxt "#30010"
+msgid "Video Quality"
+msgstr "Ποιότητα Βίντεο"
+
+msgctxt "#30011"
+msgid "480p"
+msgstr "480p"
+
+msgctxt "#30012"
+msgid "720p (HD)"
+msgstr "720p (ΥΕ)"
+
+msgctxt "#30013"
+msgid "1080p (HD)"
+msgstr "1080p (ΥΕ)"
+
+msgctxt "#30014"
+msgid "2160p (4k)"
+msgstr "2160p (4k)"
+
+msgctxt "#30015"
+msgid "4320p (8k)"
+msgstr "4320p (8k)"
+
+msgctxt "#30016"
+msgid "240p"
+msgstr "240p"
+
+msgctxt "#30017"
+msgid "360p"
+msgstr "360p"
+
+msgctxt "#30018"
+msgid "1080p Live / 720p (HD)"
+msgstr "1080p Ζωντανά / 720p (ΥΕ)"
+
+#empty strings 30019
+
+msgctxt "#30020"
+msgid "Allow 3D"
+msgstr "Επιτρέψτε το 3Δ"
+
+msgctxt "#30021"
+msgid "Show Fanart"
+msgstr "Δείξε τις εικόνες Fanart"
+
+msgctxt "#30022"
+msgid "Items per page"
+msgstr "Αντικείμενα ανά σελίδα"
+
+msgctxt "#30023"
+msgid "Search History Size"
+msgstr "Μέγεθος Ιστορικού Αναζήτησης"
+
+msgctxt "#30024"
+msgid "Cache Size (MB)"
+msgstr "Λανθάνουσα Μνήμη σε (MB)"
+
+msgctxt "#30025"
+msgid "Enable setup-wizard"
+msgstr "Επιτρέψτε τον οδηγό ρυθμίσεων"
+
+msgctxt "#30026"
+msgid "Override View"
+msgstr "Επιβολή τρόπου απεικόνισης"
+
+msgctxt "#30027"
+msgid "View: Default"
+msgstr "Απεικόνιση: Προκαθορισμένη"
+
+msgctxt "#30028"
+msgid "View: Episodes"
+msgstr "Απεικόνιση: Επεισόδια"
+
+msgctxt "#30029"
+msgid "View: Movies"
+msgstr "Απεικόνιση: Ταινίες"
+
+msgctxt "#30030"
+msgid "Execute setup-wizard?"
+msgstr "Εκτέλεση οδηγού ρυθμίσεων?"
+
+msgctxt "#30031"
+msgid "Advanced"
+msgstr "Για προχωρημένους"
+
+msgctxt "#30032"
+msgid "View: TV Shows"
+msgstr "Απεικόνιση: Εκπομπές TV"
+
+msgctxt "#30033"
+msgid "View: Songs"
+msgstr "Απεικόνιση: Τραγούδια"
+
+msgctxt "#30034"
+msgid "View: Artists"
+msgstr "Απεικόνιση: Καλλιτέχνες"
+
+msgctxt "#30035"
+msgid "View: Albums"
+msgstr "Απεικόνιση: Άλμπουμ"
+
+msgctxt "#30036"
+msgid "Support alternative player"
+msgstr "Υποστήριξη εναλλακτικού αναπαραγωγέα"
+
+msgctxt "#30037"
+msgid "Custom Watch Later Playlist ID"
+msgstr "Τροποποιημένη λίστα αναπαραγωγής παρακολούθησης αργότερα"
+
+msgctxt "#30038"
+msgid "Custom History Playlist ID"
+msgstr "Τροποποιημένο ID λίστας αναπαραγωγής"
+
+#Kodion Common
+#empty strings from id 30037 to 30099
+
+msgctxt "#30100"
+msgid "Favorites"
+msgstr "Αγαπημένα"
+
+msgctxt "#30101"
+msgid "Add to addon favs"
+msgstr "Προσθήκη στα αγαπημένα του προσθέτου"
+
+msgctxt "#30102"
+msgid "Search"
+msgstr "Αναζήτηση"
+
+msgctxt "#30103"
+msgid "Library"
+msgstr "Βιβλιοθήκη"
+
+msgctxt "#30104"
+msgid "Highlights"
+msgstr "Διακεκριμένα"
+
+msgctxt "#30105"
+msgid "Archive"
+msgstr "Αρχείο"
+
+msgctxt "#30106"
+msgid "Next Page (%d)"
+msgstr "Επόμενη Σελίδα (%d)"
+
+msgctxt "#30107"
+msgid "Watch Later"
+msgstr "Δείτε αργότερα"
+
+msgctxt "#30108"
+msgid "Remove"
+msgstr "Αφαίρεση"
+
+msgctxt "#30109"
+msgid "Latest Videos"
+msgstr "Τελευταία Βίντεο"
+
+msgctxt "#30110"
+msgid "New Search"
+msgstr "Νέα Αναζήτηση"
+
+msgctxt "#30111"
+msgid "Sign In"
+msgstr "Είσοδος"
+
+msgctxt "#30112"
+msgid "Sign Out"
+msgstr "Έξοδος"
+
+msgctxt "#30113"
+msgid "Rename"
+msgstr "Μετονομασία"
+
+msgctxt "#30114"
+msgid "Confirm delete"
+msgstr "Επιβεβαίωση διαγραφής"
+
+msgctxt "#30115"
+msgid "Confirm remove"
+msgstr "Επιβεβαίωση αφαίρεσης"
+
+msgctxt "#30116"
+msgid "Delete \"%s\"?"
+msgstr "Διαγραφή \"%s\"?"
+
+msgctxt "#30117"
+msgid "Remove \"%s\"?"
+msgstr "Αφαίρεση \"%s\"?""
+
+msgctxt "#30118"
+msgid "Delete"
+msgstr "Διαγραφή"
+
+msgctxt "#30119"
+msgid "Please wait..."
+msgstr "Παρακαλώ περιμένετε..."
+
+msgctxt "#30120"
+msgid "Clear"
+msgstr "Καθαρισμός"
+
+#YouTube
+#empty strings from id 30121 to 30199
+
+msgctxt "#30200"
+msgid "API"
+msgstr "API"
+
+msgctxt "#30201"
+msgid "API Key"
+msgstr "Κλειδί API"
+
+msgctxt "#30202"
+msgid "API Id"
+msgstr "Αναγνωριστικό API"
+
+msgctxt "#30203"
+msgid "API Secret"
+msgstr "Μυστικό API"
+
+msgctxt "#30204"
+msgid "Enable Personal API Keys"
+msgstr "Ενεργοποίηση προσωπικών κλειδιών API"
+
+msgctxt "#30205"
+msgid "Use preset API key set"
+msgstr "Χρησιμοποίησε το προκαθορισμένο σετ κλειδιών API"
+
+#YouTube
+#empty strings from id 30206 to 30499
+
+msgctxt "#30500"
+msgid "Channels"
+msgstr "Κανάλια"
+
+msgctxt "#30501"
+msgid "Playlists"
+msgstr "Λίστες Αναπαραγωγής"
+
+msgctxt "#30502"
+msgid "Go to %s"
+msgstr "Πήγαινε σε %s"
+
+msgctxt "#30503"
+msgid "Show channel fanart"
+msgstr "Δείξε εικόνα καναλιού fanart"
+
+msgctxt "#30504"
+msgid "Subscriptions"
+msgstr "Συνδρομές"
+
+msgctxt "#30505"
+msgid "Unsubscribe"
+msgstr "Αφαίρεση συνδρομής"
+
+msgctxt "#30506"
+msgid "Subscribe"
+msgstr "Προσθήκη συνδρομής"
+
+msgctxt "#30507"
+msgid "My Channel"
+msgstr "Το κανάλι μου"
+
+msgctxt "#30508"
+msgid "Liked Videos"
+msgstr "Βίντεο που σας άρεσαν"
+
+msgctxt "#30509"
+msgid "History"
+msgstr "Ιστορικό"
+
+msgctxt "#30510"
+msgid "My Subscriptions"
+msgstr "Οι συνδρομές μου"
+
+msgctxt "#30511"
+msgid "Queue video"
+msgstr "Προσθήκη βίντεο στην ουρά"
+
+msgctxt "#30512"
+msgid "Browse Channels"
+msgstr "Περιήγηση Καναλιών"
+
+msgctxt "#30513"
+msgid "Popular right now"
+msgstr "Δημοφιλή αυτήν την στιγμή"
+
+msgctxt "#30514"
+msgid "Related Videos"
+msgstr "Σχετικά Βίντεο"
+
+msgctxt "#30515"
+msgid "Auto-Remove from 'Watch Later'"
+msgstr "Αυτόματη αφαίρεση από την λίστα 'Δείτε Αργότερα'"
+
+msgctxt "#30516"
+msgid "Folders"
+msgstr "Φακέλοι"
+
+msgctxt "#30517"
+msgid "Subscribe to %s"
+msgstr "Εγγραφή σε %s"
+
+msgctxt "#30518"
+msgid "Go to '%s'"
+msgstr "Πήγαινε σε '%s'"
+
+msgctxt "#30519"
+msgid "and enter the following code:"
+msgstr "και εισάγετε τον παρόν κωδικό:"
+
+msgctxt "#30520"
+msgid "Add to..."
+msgstr "Προσθέστε στο..."
+
+msgctxt "#30521"
+msgid "Select playlist"
+msgstr "Επιλογή λίστας αναπαραγωγής"
+
+msgctxt "#30522"
+msgid "New playlist..."
+msgstr "Νέα λίστα αναπαραγωγής..."
+
+msgctxt "#30523"
+msgid "Language"
+msgstr "Γλώσσα"
+
+msgctxt "#30524"
+msgid "Select language"
+msgstr "Επιλογή Γλώσσας"
+
+msgctxt "#30525"
+msgid "Select region"
+msgstr "Επιλογή Περιοχής"
+
+msgctxt "#30526"
+msgid "Adjust"
+msgstr "Ρύθμιση"
+
+msgctxt "#30527"
+msgid "Language and region?"
+msgstr "Γλώσσα και περιοχή;"
+
+msgctxt "#30528"
+msgid "Rate..."
+msgstr "Βαθμολογείστε..."
+
+msgctxt "#30529"
+msgid "I like this"
+msgstr "Μου αρέσει αυτό"
+
+msgctxt "#30530"
+msgid "I dislike this"
+msgstr "Δεν μου αρέσει αυτό"
+
+msgctxt "#30531"
+msgid "Play all"
+msgstr "Αναπαραγωγή όλων"
+
+msgctxt "#30532"
+msgid "Default"
+msgstr "Προκαθορισμένο"
+
+msgctxt "#30533"
+msgid "Reverse"
+msgstr "Προς τα πίσω"
+
+msgctxt "#30534"
+msgid "Shuffle"
+msgstr "Σε τυχαία σειρά"
+
+msgctxt "#30535"
+msgid "Select the order of the playlist"
+msgstr "Επιλέξτε την σειρά της λίστας αναπαραγωγής"
+
+msgctxt "#30536"
+msgid "Updating Playlist..."
+msgstr "Ενημέρωση λίστας αναπαραγωγής..."
+
+msgctxt "#30537"
+msgid "Play from here"
+msgstr "Αναπαραγωγή από εδώ"
+
+msgctxt "#30538"
+msgid "Disliked Videos"
+msgstr "Βίντεο που δεν σας αρέσουν"
+
+msgctxt "#30539"
+msgid "Live"
+msgstr "Ζωντανά"
+
+msgctxt "#30540"
+msgid "Play with..."
+msgstr "Αναπαραγωγή με..."
+
+msgctxt "#30541"
+msgid "Show channel name in description"
+msgstr "Δείξε το όνομα του καναλιού στην περιγραφή"
+
+msgctxt "#30542"
+msgid "rtmpe streams are not supported"
+msgstr "Οι ροές rtmpe δεν υποστηρίζονται"
+
+msgctxt "#30543"
+msgid "Refresh"
+msgstr "Ανανέωση"
+
+msgctxt "#30544"
+msgid "More Links from the description"
+msgstr "Περισσότεροι σύνδεσμοι από την περιγραφή"
+
+msgctxt "#30545"
+msgid "No further links found."
+msgstr "Δεν βρέθηκαν άλλοι σύνδεσμοι."
+
+msgctxt "#30546"
+msgid "Please log in twice!"
+msgstr "Παρακαλώ πραγματοποιήστε είσοδο δύο φορές!"
+
+msgctxt "#30547"
+msgid "You must enable two applications so that YouTube is functioning properly."
+msgstr "Πρέπει να επιτρέψετε δύο εφαρμογές του πρόσθετου Youtube ώστε να λειτουργεί σωστά"
+
+msgctxt "#30548"
+msgid "More..."
+msgstr "Περισσότερα..."
+
+msgctxt "#30549"
+msgid "No videos streams found"
+msgstr "Δεν βρέθηκαν άλλες ροές"
+
+msgctxt "#30550"
+msgid "Region"
+msgstr "Περιοχή"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr "Συστάσεις"
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr "Συντήρηση"
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr "Λειτουργία διαγραφής βάσης δεδομένων λανθάνουσας μνήμης"
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr "Διαγραφή βάσης δεδομένων ιστορικού αναζήτησης"
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr "Λειτουργία διαγραφής λανθάνουσας μνήμης"
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr "Διαγραφή ιστορικού αναζήτησης"
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr "λειτουργίας λανθάνουσας μνήμης"
+
+msgctxt "#30558"
+msgid "search history"
+msgstr "ιστορικό αναζήτησης"
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr "Διαγραφή του settings.xml"
+
+msgctxt "#30560"
+msgid "Subtitle language(s) to download"
+msgstr "Γλώσσα-ες υποτίτλων διαθέσιμη-ες για μεταφόρτωση"
+
+msgctxt "#30561"
+msgid "None"
+msgstr "Κενό"
+
+msgctxt "#30562"
+msgid "All"
+msgstr "Όλα"
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr "Ρύθμιση"
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr "Ρύθμιση, Αγγλικά"
+
+msgctxt "#30565"
+msgid "English"
+msgstr "Αγγλικά"
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr "Προτροπή"
+
+msgctxt "#30567"
+msgid "Set as Watch Later"
+msgstr "Τοποθέτηση στο Δείτε Αργότερα"
+
+msgctxt "#30568"
+msgid "Remove as Watch Later"
+msgstr "Αφαίρεση από το Δείτε Αργότερα"
+
+msgctxt "#30569"
+msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' από το Δείτε Αργότερα?"
+
+msgctxt "#30570"
+msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα Δείτε Αργότερα με το '%s'?"
+
+msgctxt "#30571"
+msgid "Set as History"
+msgstr "Θέσε ως Ιστορικό"
+
+msgctxt "#30572"
+msgid "Remove as History"
+msgstr "Αφαίρεση ως ιστορικό"
+
+msgctxt "#30573"
+msgid "Are you sure you want to remove '%s' as your History list?"
+msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' ως την λίστα ιστορικού σας?"
+
+msgctxt "#30574"
+msgid "Are you sure you want to replace your current History list with '%s'?"
+msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα ιστορικού με το '%s'?"
+
+msgctxt "#30575"
+msgid "Succeeded"
+msgstr "Επιτυχία"
+
+msgctxt "#30576"
+msgid "Failed"
+msgstr "Αποτυχία"
+
+msgctxt "#30577"
+msgid "Settings"
+msgstr "Ρυθμίσεις"
+
+msgctxt "#30578"
+msgid "Force SSL Certificate verification"
+msgstr "Επιβολή επιβεβαίωσης πιστοποιητικού SSL"
+
+msgctxt "#30579"
+msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
+msgstr "Το MPEG-DASH είναι ενεργοποιημένο στις ρυθμίσεις, αλλά το inputstream.adaptive φαίνεται να είναι απενεργοποιημένο. Επιθυμείτε την ενεργοποίησή του inputstream.adaptive τώρα;"

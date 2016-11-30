@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="plugin.video.youtube" name="YouTube" version="5.3.5" provider-name="jdf76, bromix">
+	<requires>
+		<import addon="xbmc.python" version="2.1.0"/>
+	</requires>
+	<extension point="xbmc.python.pluginsource" library="default.py">
+		<provides>video</provides>
+	</extension>
+	<extension point="xbmc.addon.metadata">
+        <news>
+[add] MPEG-DASH support for Kodi 17 w/ inputstream.adaptive Add-on
+[add] optional History and Watch Later custom playlist to Settings -> Folders, or (My)Playlists context menu to set/remove
+[add] Maintenance section to Settings
+[add] 'Subtitle language(s) to download' selection to Settings -> General
+[add] 'Force SSL Certificate verification' to Settings -> Advanced
+[upd] API key set switching from Settings -> API (this will log you out)
+[upd] Dual login only required if My Subscriptions folder is enabled at sign-in
+[upd] setting content type from episodes, now videos
+[del] override view options
+[upd] Norwegian strings [torstehu]
+[upd] Greek strings [twilight0]
+[upd] Portuguese strings [Wanilton]
+[upd] Dutch strings [flemlion]
+[fix/upd] API tweaking and various other updates
+        </news>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+        <summary lang="en">Plugin for YouTube</summary>
+        <description lang="en">YouTube is one of the biggest video-sharing websites of the world.</description>
+		<summary lang="de">Plugin für YouTube</summary>
+        <description lang="de">YouTube ist eines der größten Video-Sharing-Websites der Welt.</description>
+        <summary lang="pl">Wtyczka YouTube</summary>
+        <description lang="pl">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
+		<summary lang="hu">Kiegészítő  a YouTube-hoz</summary>
+        <description lang="hu">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>
+        <summary lang="es">Plugin para YouTube</summary>
+        <description lang="es">YouTube es un uno de los mayores sitios web de intercambio de vídeos del mundo.</description>
+        <summary lang="ru">Видеодополнение YouTube</summary>
+        <description lang="ru">Данное дополнение позволяет находить и смотреть видео на всеми любимом сайте.</description>
+        <summary lang="fr">Plugin pour YouTube</summary>
+        <description lang="fr">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>
+        <summary lang="zh">YouTube附加元件</summary>
+        <description lang="zh">「Youtube」是全世界最大的影片分享網站</description>
+        <summary lang="bg">Добавка за YouTube</summary>
+        <description lang="bg">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
+		<summary lang="el">Πρόσθετο YouTube</summary>
+        <description lang="el">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
+        <summary lang="no">Tillegg for YouTube</summary>
+        <description lang="no">YouTube er en av verdens største nettsider for videodeling.</description>
+        <disclaimer lang="en"></disclaimer>
+		<language></language>
+		<platform>all</platform>
+		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+		<forum>http://forum.kodi.tv/showthread.php?tid=267160</forum>
+		<website>http://www.youtube.com</website>
+		<email>ytplugin at datanet dot ws</email>
+		<source>https://github.com/Kolifanes/plugin.video.youtube</source>
+	</extension>
+</addon>

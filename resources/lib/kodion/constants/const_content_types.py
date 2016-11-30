@@ -1,0 +1,11 @@
+__author__ = 'bromix'
+
+FILES = 'files'
+SONGS = 'songs'
+ARTISTS = 'artists'
+ALBUMS = 'albums'
+MOVIES = 'movies'
+TV_SHOWS = 'tvshows'
+EPISODES = 'episodes'
+VIDEOS = 'videos'
+MUSIC_VIDEOS = 'musicvideos'
