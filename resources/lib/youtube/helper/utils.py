@@ -178,7 +178,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_use_dash(context.get_settings().use_dash())
 
         # set mediatype
-        video_item.set_mediatype('episode')  # using episode since all setContent is currently episode as well
+        video_item.set_mediatype('video')  # using video
 
         # set the title
         video_item.set_title(snippet['title'])
