@@ -26,7 +26,7 @@ def to_video_item(context, video_item):
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
         pass
 
-    if video_item.use_dash():
+    if video_item.use_dash() and settings.dash_support_addon():
         item.setProperty('inputstreamaddon', 'inputstream.adaptive')
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
 

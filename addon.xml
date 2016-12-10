@@ -6,9 +6,10 @@
 	<extension point="xbmc.python.pluginsource" library="default.py">
 		<provides>video</provides>
 	</extension>
+    <extension point="xbmc.service" library="startup.py" start="startup" />
 	<extension point="xbmc.addon.metadata">
         <news>
-[add] MPEG-DASH support for Kodi 17 w/ inputstream.adaptive Add-on
+[add] MPEG-DASH support for Kodi 17 w/ inputstream.adaptive add-on or SPMC 16 w/ builtin-in
 [add] optional History and Watch Later custom playlist to Settings -> Folders, or (My)Playlists context menu to set/remove
 [add] Maintenance section to Settings
 [add] 'Subtitle language(s) to download' selection to Settings -> General
