@@ -21,7 +21,7 @@ class MockContext(AbstractContext):
                                    5001: u'MOCK Plugin'}
 
         self._ui = None
-        self._system_version = MockSystemVersion(1, 3, 'Kodion Test System')
+        self._system_version = MockSystemVersion(1, 3, 'Kodion Test System', 'MOCK App')
         self._language = 'en-US'
         self._version = '1.9'
         pass

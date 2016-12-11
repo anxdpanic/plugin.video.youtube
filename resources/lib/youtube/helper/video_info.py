@@ -595,17 +595,15 @@ class VideoInfo(object):
             pass
         """
 
-        if self._context.get_settings().use_dash():
-            major_version = self._context.get_system_version().get_version()[0]
-            if major_version > 16:
-                use_dash = True
-                if not self._context.addon_enabled('inputstream.adaptive'):
-                    if self._context.get_ui().on_yes_no_input(self._context.get_name(), self._context.localize(30579)):
-                        use_dash = self._context.set_addon_enabled('inputstream.adaptive')
-                    else:
-                        use_dash = False
-            else:
-                use_dash = False
+        settings = self._context.get_settings()
+        use_dash = settings.use_dash()
+
+        if use_dash:
+            if settings.dash_support_addon() and not self._context.addon_enabled('inputstream.adaptive'):
+                if self._context.get_ui().on_yes_no_input(self._context.get_name(), self._context.localize(30579)):
+                    use_dash = self._context.set_addon_enabled('inputstream.adaptive')
+                else:
+                    use_dash = False
 
             if use_dash:
                 mpd_url = params.get('dashmpd', None)
@@ -623,8 +621,6 @@ class VideoInfo(object):
                     video_stream.update(self.FORMAT.get('9999'))
                     stream_list.append(video_stream)
                     return stream_list
-            else:
-                self._context.get_settings().set_bool('kodion.video.quality.mpd', False)
 
         added_subs = False  # avoid repeat calls from loop or cipher signature
         # extract streams from map

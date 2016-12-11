@@ -93,6 +93,12 @@ class AbstractSettings(object):
     def use_dash(self):
         return self.get_bool(constants.setting.USE_DASH, False)
 
+    def dash_support_builtin(self):
+        return self.get_bool(constants.setting.DASH_SUPPORT_BUILTIN, False)
+
+    def dash_support_addon(self):
+        return self.get_bool(constants.setting.DASH_SUPPORT_ADDON, False)
+
     def subtitle_languages(self):
         return self.get_int(constants.setting.SUBTITLE_LANGUAGES, 0)
 
