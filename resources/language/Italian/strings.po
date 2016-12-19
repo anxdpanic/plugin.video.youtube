@@ -536,15 +536,15 @@ msgstr "Prompt"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr "Configura come Gaurda Dopo"
+msgstr "Configura come Guarda Dopo"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr "Rimuovi da Gaurda Dopo"
+msgstr "Rimuovi da Guarda Dopo"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Sei sicuro che vuoi rimuovere '%s' dalla lista Gaurda Dopo?"
+msgstr "Sei sicuro che vuoi rimuovere '%s' dalla lista Guarda Dopo?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
