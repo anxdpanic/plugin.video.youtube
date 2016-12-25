@@ -146,7 +146,7 @@ msgstr "Soporte de reproductor alternativo"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
-msgstr "Personalizar ID lista reproducción 'Ver más tarde"
+msgstr "Personalizar ID lista reproducción 'Ver más tarde'"
 
 msgctxt "#30038"
 msgid "Custom History Playlist ID"
@@ -516,7 +516,7 @@ msgstr "Ninguno"
 
 msgctxt "#30562"
 msgid "All"
-msgstr "Todo"
+msgstr "Todos"
 
 msgctxt "#30563"
 msgid "Setting"
@@ -532,7 +532,7 @@ msgstr "Inglés"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr "Disponible"
+msgstr "Disponibles"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
