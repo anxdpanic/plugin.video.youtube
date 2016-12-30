@@ -281,7 +281,7 @@ msgstr "Kanalen"
 
 msgctxt "#30501"
 msgid "Playlists"
-msgstr "Aspeellijsten"
+msgstr "Afspeellijsten"
 
 msgctxt "#30502"
 msgid "Go to %s"
