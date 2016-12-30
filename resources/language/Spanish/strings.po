@@ -158,7 +158,7 @@ msgstr "Favoritos"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr "Añadir al favoritos del Addon"
+msgstr "Añadir a favoritos del Addon"
 
 msgctxt "#30102"
 msgid "Search"
@@ -230,7 +230,7 @@ msgstr "Borrar"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr "Por favor espere ..."
+msgstr "Por favor espere..."
 
 msgctxt "#30120"
 msgid "Clear"
@@ -348,7 +348,7 @@ msgstr "Escriba el siguiente código:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr "Añadir a ..."
+msgstr "Añadir a..."
 
 msgctxt "#30521"
 msgid "Select playlist"
@@ -356,7 +356,7 @@ msgstr "Seleccione una lista"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr "Nueva lista ..."
+msgstr "Nueva lista..."
 
 msgctxt "#30523"
 msgid "Language"
@@ -380,7 +380,7 @@ msgstr "¿Lenguaje y región?"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr "Valorar ..."
+msgstr "Valorar..."
 
 msgctxt "#30529"
 msgid "I like this"
@@ -412,7 +412,7 @@ msgstr "Seleccione el orden para la lista de reproducción"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr "Actualizando lista de reproducción ..."
+msgstr "Actualizando lista de reproducción..."
 
 msgctxt "#30537"
 msgid "Play from here"
@@ -428,7 +428,7 @@ msgstr "En Directo"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr "Abrir con ..."
+msgstr "Abrir con..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
@@ -436,7 +436,7 @@ msgstr "Mostrar nombre del canal en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "Flujos rtmpe  no son soportados"
+msgstr "streams rtmpe no son soportados"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -460,7 +460,7 @@ msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente"
 
 msgctxt "#30548"
 msgid "More..."
-msgstr "Más ..."
+msgstr "Más..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
@@ -480,7 +480,7 @@ msgstr "Mantenimiento"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr "Eliminar base de datos de función caché"
+msgstr "Eliminar base de datos de caché de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
@@ -488,7 +488,7 @@ msgstr "Eliminar base de datos de historial de búsqueda"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr "Limpiar función caché"
+msgstr "Limpiar caché de funciones"
 
 msgctxt "#30556"
 msgid "Clear search history"
@@ -584,4 +584,4 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
-msgstr "MPEG-DASH está habilitado en la configuración de YouTube, sin embargo, inputstream.adaptive parece estar deshabilitado. ¿Quiere habilitar inputstream.adaptive ahora?"
+msgstr "MPEG-DASH está activado en la configuración de YouTube, sin embargo inputstream.adaptive parece estar deshabilitado. ¿Quiere habilitar inputstream.adaptive ahora?"
