@@ -230,7 +230,7 @@ msgstr "Borrar"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr "Por favor espere..."
+msgstr "Por favor espere ..."
 
 msgctxt "#30120"
 msgid "Clear"
@@ -348,7 +348,7 @@ msgstr "Escriba el siguiente código:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr "Añadir a..."
+msgstr "Añadir a ..."
 
 msgctxt "#30521"
 msgid "Select playlist"
@@ -356,7 +356,7 @@ msgstr "Seleccione una lista"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr "Nueva lista..."
+msgstr "Nueva lista ..."
 
 msgctxt "#30523"
 msgid "Language"
@@ -380,7 +380,7 @@ msgstr "¿Lenguaje y región?"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr "Valorar..."
+msgstr "Valorar ..."
 
 msgctxt "#30529"
 msgid "I like this"
@@ -412,7 +412,7 @@ msgstr "Seleccione el orden para la lista de reproducción"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr "Actualizando lista de reproducción..."
+msgstr "Actualizando lista de reproducción ..."
 
 msgctxt "#30537"
 msgid "Play from here"
