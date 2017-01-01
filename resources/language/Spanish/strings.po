@@ -452,11 +452,11 @@ msgstr "No se encontrarón enlaces"
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Por favor inicie sesión dos veces"
+msgstr "Por favor inicie sesión dos veces!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente"
+msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente."
 
 msgctxt "#30548"
 msgid "More..."
@@ -464,7 +464,7 @@ msgstr "Más..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr "No encontrados streams de video"
+msgstr "No se han encontrados videos"
 
 msgctxt "#30550"
 msgid "Region"
@@ -484,7 +484,7 @@ msgstr "Eliminar base de datos de caché de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr "Eliminar base de datos de historial de búsqueda"
+msgstr "Eliminar base de datos de historial de búsquedas"
 
 msgctxt "#30555"
 msgid "Clear function cache"
