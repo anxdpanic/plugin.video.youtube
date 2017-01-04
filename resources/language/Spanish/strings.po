@@ -74,7 +74,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p En Directo / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -142,7 +142,7 @@ msgstr "Vista: Albums"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr "Soporte de reproductor alternativo"
+msgstr "Soportar reproductor alternativo"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
@@ -158,7 +158,7 @@ msgstr "Favoritos"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr "Añadir al favoritos del Addon"
+msgstr "Añadir a favoritos del Addon"
 
 msgctxt "#30102"
 msgid "Search"
@@ -424,11 +424,11 @@ msgstr "No me gustó el video"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr ""
+msgstr "En Directo"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr "Abrir con ..."
+msgstr "Abrir con..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
@@ -436,7 +436,7 @@ msgstr "Mostrar nombre del canal en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "rtmpe streams no son soportados"
+msgstr "streams rtmpe no son soportados"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -452,19 +452,19 @@ msgstr "No se encontrarón enlaces"
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Por favor inicie sesión dos veces"
+msgstr "Por favor inicie sesión dos veces!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente"
+msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente."
 
 msgctxt "#30548"
 msgid "More..."
-msgstr "Más ..."
+msgstr "Más..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr "No encontrados streams de video"
+msgstr "No se han encontrados videos"
 
 msgctxt "#30550"
 msgid "Region"
@@ -484,7 +484,7 @@ msgstr "Eliminar base de datos de caché de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr "Eliminar base de datos de historial de búsqueda"
+msgstr "Eliminar base de datos de historial de búsquedas"
 
 msgctxt "#30555"
 msgid "Clear function cache"
@@ -520,11 +520,11 @@ msgstr "Todos"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr "Configuración"
+msgstr "Ajustes"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr "Configuración, Inglés"
+msgstr "Ajustes, Inglés"
 
 msgctxt "#30565"
 msgid "English"
@@ -584,4 +584,4 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
-msgstr "MPEG-DASH está habilitado en la configuración de YouTube, sin embargo, inputstream.adaptive parece estar deshabilitado. ¿Quieres habilitar inputstream.adaptive ahora?"
+msgstr "MPEG-DASH está activado en la configuración de YouTube, sin embargo inputstream.adaptive parece estar deshabilitado. ¿Quiere habilitar inputstream.adaptive ahora?"
