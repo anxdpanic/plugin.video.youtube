@@ -18,6 +18,7 @@ def to_video_item(context, video_item):
         fanart = video_item.get_fanart()
     if major_version <= 12:
         item.setIconImage(thumb)
+        item.setProperty("Fanart_Image", fanart)
     elif major_version <= 15:
         item.setArt({'thumb': thumb, 'fanart': fanart})
         item.setIconImage(thumb)
@@ -62,6 +63,7 @@ def to_audio_item(context, audio_item):
         fanart = audio_item.get_fanart()
     if major_version <= 12:
         item.setIconImage(thumb)
+        item.setProperty("Fanart_Image", fanart)
     elif major_version <= 15:
         item.setArt({'thumb': thumb, 'fanart': fanart})
         item.setIconImage(thumb)
