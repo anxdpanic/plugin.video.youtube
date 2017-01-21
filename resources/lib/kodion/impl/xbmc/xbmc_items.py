@@ -16,7 +16,10 @@ def to_video_item(context, video_item):
     item = xbmcgui.ListItem(label=title)
     if video_item.get_fanart() and settings.show_fanart():
         fanart = video_item.get_fanart()
-    if major_version <= 15:
+    if major_version <= 12:
+        item.setIconImage(thumb)
+        item.setProperty("Fanart_Image", fanart)
+    elif major_version <= 15:
         item.setArt({'thumb': thumb, 'fanart': fanart})
         item.setIconImage(thumb)
     else:
@@ -58,7 +61,10 @@ def to_audio_item(context, audio_item):
     item = xbmcgui.ListItem(label=title)
     if audio_item.get_fanart() and settings.show_fanart():
         fanart = audio_item.get_fanart()
-    if major_version <= 15:
+    if major_version <= 12:
+        item.setIconImage(thumb)
+        item.setProperty("Fanart_Image", fanart)
+    elif major_version <= 15:
         item.setArt({'thumb': thumb, 'fanart': fanart})
         item.setIconImage(thumb)
     else:
