@@ -7,14 +7,16 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2017-01-26 13:56+0100\n"
+"Last-Translator: Marcin W.\n"
+"Language-Team: Polish (Poland) (http://www.transifex.com/teamxbmc/kodi-main/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: pl\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Last-Translator: \n"
+"X-Generator: Poedit 1.8.11\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -74,7 +76,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p na żywo / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -90,11 +92,11 @@ msgstr "Pozycji na stronę"
 
 msgctxt "#30023"
 msgid "Search History Size"
-msgstr "Pozycji w historii"
+msgstr "Liczba pozycji na liście Historia"
 
 msgctxt "#30024"
 msgid "Cache Size (MB)"
-msgstr "Wielkość bufora (MB)"
+msgstr "Rozmiar bufora (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -142,15 +144,15 @@ msgstr "Widok: Albumy"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr "Uruchom obsługę alternatywnego odtwarzacza"
+msgstr "Obsługuj alternatywne odtwarzacze"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
-msgstr ""
+msgstr "Identyfikator niestandardowej listy  Do obejrzenia"
 
 msgctxt "#30038"
 msgid "Custom History Playlist ID"
-msgstr ""
+msgstr "Identyfikator niestandardowej listy Historii"
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -170,7 +172,7 @@ msgstr "Biblioteka"
 
 msgctxt "#30104"
 msgid "Highlights"
-msgstr "Na topie"
+msgstr "Na czasie"
 
 msgctxt "#30105"
 msgid "Archive"
@@ -190,7 +192,7 @@ msgstr "Usuń"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr "Ostatnie wideo"
+msgstr "Najnowsze"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -236,36 +238,34 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Wyczyść"
 
-#YouTube
-#empty strings from id 30121 to 30199
-
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "Klucz dostępu API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "Klucz dostępu API"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "Identyfikator API"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "Klucz szyfrowania API"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr ""
+msgstr "Aktywuj osobiste klucze API"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Użyj wbudowanego zestawu kluczy API"
 
-#YouTube
-#empty strings from id 30206 to 30499
-
+# YouTube
+# empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Kanały"
@@ -324,11 +324,11 @@ msgstr "Popularne"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr "Podobne filmy"
+msgstr "Powiązane"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Usuwaj po obejrzeniu pozycje listy Do obejrzenia"
+msgstr "Usuwaj po obejrzeniu pozycję z listy Do obejrzenia"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -344,7 +344,7 @@ msgstr "Przejdź do '%s'"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr "i wpisz następujący kod:"
+msgstr "i wprowadź następujący kod:"
 
 msgctxt "#30520"
 msgid "Add to..."
@@ -408,7 +408,7 @@ msgstr "Losowa"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr "Wybierz kolejność"
+msgstr "Wybierz kolejność odtwarzania"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
@@ -416,7 +416,7 @@ msgstr "Aktualizacja listy odtwarzania..."
 
 msgctxt "#30537"
 msgid "Play from here"
-msgstr "Odtwórz z tego miejsca"
+msgstr "Odtwarzaj z tego miejsca"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
@@ -452,11 +452,11 @@ msgstr "Brak kolejnych łączy."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Wymagane dwukrotne logowanie!"
+msgstr "Wymagane dwukrotna aktywacja!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Musisz aktywować dwie aplikacje, aby YouTube działało poprawnie."
+msgstr "Musisz wykonać aktywację dwukrotnie, aby dodatek YouTube działał poprawnie."
 
 msgctxt "#30548"
 msgid "More..."
@@ -472,116 +472,116 @@ msgstr "Region"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Rekomendacje"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Konserwacja"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Wyczyść bazę bufora funkcji"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Wyczyść bazę historii wyszukiwania"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Wyczyść bufor funkcji"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Wyczyść historię wyszukiwania"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "bufor funkcji"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "historia wyszukiwania"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Usuń plik ustawień settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language(s) to download"
-msgstr ""
+msgstr "Język pobieranych napisów"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Brak"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Wszystkie"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Ustawienie"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Ustawienie, Angielski"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Angielski"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Pytaj"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Podłącz jako listę Do obejrzenia"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Odłącz od listy Do obejrzenia"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Czy jesteś pewien, że chcesz odłączyć listę '%s' od listy Do obejrzenia?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Czy jesteś pewien, że chcesz zastąpić aktualną listę Do obejrzenia listą '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Podłącz jako listę Historia"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Odłącz od listy Historia"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Czy jesteś pewien, że chcesz odłączyć listę '%s' od listy Historia?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Czy jesteś pewien, że chcesz zastąpić aktualną listę Historii listą '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Zakończone powodzeniem"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Zakończone niepowodzeniem"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Ustawienia"
 
 msgctxt "#30578"
 msgid "Force SSL Certificate verification"
-msgstr ""
+msgstr "Wymuszaj weryfikację certyfikatu SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
-msgstr ""
+msgstr "W ustawieniach wtyczki YouTube aktywowano transmisję MPEG-DASH, aczkolwiek wygląda na to, że wtyczka strumienia wejściowego InputStream Adaptive jest nieaktywna. Czy chciałbyś aktywować ją teraz?"
