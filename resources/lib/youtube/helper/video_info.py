@@ -388,6 +388,8 @@ class VideoInfo(object):
         cipher = None
         if re_match_js:
             js = re_match_js.group('js').replace('\\', '').strip('//')
+            if not js.startswith('http'):
+                js = 'http://www.youtube.com/%s' % js
             cipher = Cipher(self._context, java_script_url=js)
             pass
 
