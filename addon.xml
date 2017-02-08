@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.3.8" provider-name="jdf76, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.3.9" provider-name="jdf76, bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
 	</requires>
@@ -23,6 +23,7 @@
 [upd] Portuguese strings [Wanilton]
 [upd] Dutch strings [flemlion]
 [fix/upd] API tweaking and various other updates
+[upd] Syncing all versions to the latest code changes
         </news>
         <assets>
             <icon>icon.png</icon>
