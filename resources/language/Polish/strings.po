@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2017-01-26 13:56+0100\n"
+"PO-Revision-Date: 2017-02-09 12:44+0100\n"
 "Last-Translator: Marcin W.\n"
 "Language-Team: Polish (Poland) (http://www.transifex.com/teamxbmc/kodi-main/language/pl_PL/)\n"
 "MIME-Version: 1.0\n"
@@ -148,7 +148,7 @@ msgstr "Obsługuj alternatywne odtwarzacze"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
-msgstr "Identyfikator niestandardowej listy  Do obejrzenia"
+msgstr "Identyfikator niestandardowej listy Do obejrzenia"
 
 msgctxt "#30038"
 msgid "Custom History Playlist ID"
@@ -262,7 +262,7 @@ msgstr "Aktywuj osobiste klucze API"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr "Użyj wbudowanego zestawu kluczy API"
+msgstr "Używaj wbudowanego zestawu kluczy API"
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -452,7 +452,7 @@ msgstr "Brak kolejnych łączy."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Wymagane dwukrotna aktywacja!"
+msgstr "Wymagana dwukrotna aktywacja!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
