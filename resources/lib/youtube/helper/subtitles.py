@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import xbmcvfs
 import re
+import HTMLParser
 from resources.lib.kodion import simple_requests as requests
 
 
@@ -99,7 +100,8 @@ class Subtitles(object):
                                   verify=False, allow_redirects=True)
             if result.text:
                 self.context.log_debug('Subtitle found for: %s' % language)
-                result = self._write_file(fname, result.text)
+                result = self._write_file(fname, bytearray(HTMLParser.HTMLParser().unescape(result.text.decode('utf8')),
+                                          encoding='utf8', errors='ignore'))
                 if result:
                     return_list.append(fname)
                 continue
@@ -122,7 +124,8 @@ class Subtitles(object):
                                   verify=False, allow_redirects=True)
             if result.text:
                 self.context.log_debug('Subtitle found for: %s' % language)
-                result = self._write_file(fname, result.text)
+                result = self._write_file(fname, bytearray(HTMLParser.HTMLParser().unescape(result.text.decode('utf8')),
+                                          encoding='utf8', errors='ignore'))
                 if result:
                     return [fname]
                 else:
@@ -144,7 +147,8 @@ class Subtitles(object):
                                       verify=False, allow_redirects=True)
                 if result.text:
                     self.context.log_debug('Subtitle found for: %s' % language)
-                    result = self._write_file(fname, result.text)
+                    result = self._write_file(fname, bytearray(HTMLParser.HTMLParser().unescape(result.text.decode('utf8')),
+                                          encoding='utf8', errors='ignore'))
                     if result:
                         return [fname]
                     else:
@@ -184,7 +188,8 @@ class Subtitles(object):
                                   verify=False, allow_redirects=True)
             if result.text:
                 self.context.log_debug('Subtitle found for: %s' % language)
-                result = self._write_file(fname, result.text)
+                result = self._write_file(fname, bytearray(HTMLParser.HTMLParser().unescape(result.text.decode('utf8')),
+                                          encoding='utf8', errors='ignore'))
                 if result:
                     return [fname]
                 else:
