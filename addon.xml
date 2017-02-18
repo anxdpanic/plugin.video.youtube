@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.3.9" provider-name="jdf76, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.3.10" provider-name="jdf76, bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
 	</requires>
@@ -9,21 +9,9 @@
     <extension point="xbmc.service" library="startup.py" start="startup" />
 	<extension point="xbmc.addon.metadata">
         <news>
-[add] MPEG-DASH support for Kodi 17 w/ inputstream.adaptive add-on or SPMC 16 w/ builtin-in
-[add] optional History and Watch Later custom playlist to Settings -> Folders, or (My)Playlists context menu to set/remove
-[add] Maintenance section to Settings
-[add] 'Subtitle language(s) to download' selection to Settings -> General
-[add] 'Force SSL Certificate verification' to Settings -> Advanced
-[upd] API key set switching from Settings -> API (this will log you out)
-[upd] Dual login only required if My Subscriptions folder is enabled at sign-in
-[upd] setting content type from episodes, now videos
-[del] override view options
-[upd] Norwegian strings [torstehu]
-[upd] Greek strings [twilight0]
-[upd] Portuguese strings [Wanilton]
-[upd] Dutch strings [flemlion]
-[fix/upd] API tweaking and various other updates
-[upd] Syncing all versions to the latest code changes
+[fix/upd] resolve 'No video streams found' for age-gated content and other minor.
+[fix/upd] unescaping HTML entities in subtitles [mdmdmdmdmd]
+[upd] Polish strings [Etharr]
         </news>
         <assets>
             <icon>icon.png</icon>

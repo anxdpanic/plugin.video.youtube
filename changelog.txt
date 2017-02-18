@@ -1,3 +1,16 @@
+5.3.10
+[fix/upd] resolve 'No video streams found' for age-gated content and other minor.
+[fix/upd] unescaping HTML entities in subtitles [mdmdmdmdmd]
+[upd] Polish strings [Etharr]
+
+5.3.6-9
+[fix/upd] resolve 'No video streams found'
+[fix/upd] SPMC dash support guidosarducci
+[upd] Italian strings [iz8mbw]
+[upd] Spanish strings [roliverosc]
+[upd] Dutch strings [Sjord]
+[fix/upd] Frodo backwards compat. setArt [lulol]
+
 5.3.5
 [add] MPEG-DASH support for Kodi 17 w/ inputstream.adaptive Add-on
 [add] optional History and Watch Later custom playlist to Settings -> Folders, or (My)Playlists context menu to set/remove
