@@ -354,6 +354,9 @@ class VideoInfo(object):
                   'hl': self.language,
                   'gl': self.region}
 
+        if self._access_token:
+            params['access_token'] = self._access_token
+
         url = 'https://www.youtube.com/watch'
 
         result = requests.get(url, params=params, headers=headers, verify=False, allow_redirects=True)

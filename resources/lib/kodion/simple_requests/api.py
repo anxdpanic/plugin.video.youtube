@@ -1,5 +1,7 @@
 __author__ = 'bromix'
 
+import sys
+import ssl
 import urllib
 import urllib2
 from StringIO import StringIO
@@ -74,16 +76,12 @@ def _request(method, url,
 
     handlers = []
 
-    import sys
-
     _verify = __settings.get_bool('simple.requests.ssl.verify', False)
     if _verify:
         verify = _verify
 
     # starting with python 2.7.9 urllib verifies every https request
     if verify is False and sys.version_info >= (2, 7, 9):
-        import ssl
-
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
