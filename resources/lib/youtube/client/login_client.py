@@ -25,10 +25,10 @@ class LoginClient(object):
         }
     }
 
-    def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv=''):
+    def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv='', verify_ssl=False):
         self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
-
+        self._verify = verify_ssl
         # the default language is always en_US (like YouTube on the WEB)
         if not language:
             language = 'en_US'
@@ -73,7 +73,7 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/revoke'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
         if result.status_code != requests.codes.ok:
             raise LoginException('Logout Failed')
 
@@ -113,7 +113,7 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/token'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 
@@ -158,7 +158,7 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/token'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 
@@ -193,7 +193,7 @@ class LoginClient(object):
         # url
         url = 'https://www.youtube.com/o/oauth2/device/code'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 
@@ -233,7 +233,7 @@ class LoginClient(object):
         # url
         url = 'https://android.clients.google.com/auth'
 
-        result = requests.post(url, data=post_data, headers=headers, verify=False)
+        result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 

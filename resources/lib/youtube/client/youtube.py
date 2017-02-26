@@ -5,10 +5,10 @@ from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 
 class YouTube(LoginClient):
-    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
-        
+    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv='', verify_ssl=False):
+        self._verify = verify_ssl
         LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
-                             access_token_tv=access_token_tv)
+                             access_token_tv=access_token_tv, verify_ssl=self._verify)
 
         self._max_results = items_per_page
         pass
@@ -71,7 +71,7 @@ class YouTube(LoginClient):
 
         url = 'https://www.youtube.com/user_watch'
 
-        result = requests.get(url, params=params, headers=headers, verify=False, allow_redirects=True)
+        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         pass
 
     def get_video_streams(self, context, video_id):
@@ -612,20 +612,20 @@ class YouTube(LoginClient):
         result = None
 
         if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=False, allow_redirects=allow_redirects)
+            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
             pass
         elif method == 'POST':
             _headers['content-type'] = 'application/json'
-            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=False,
+            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
                                    allow_redirects=allow_redirects)
             pass
         elif method == 'PUT':
             _headers['content-type'] = 'application/json'
-            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=False,
+            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
                                   allow_redirects=allow_redirects)
             pass
         elif method == 'DELETE':
-            result = requests.delete(_url, params=_params, headers=_headers, verify=False,
+            result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
                                      allow_redirects=allow_redirects)
             pass
 
@@ -669,20 +669,20 @@ class YouTube(LoginClient):
         result = None
 
         if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=False, allow_redirects=allow_redirects)
+            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
             pass
         elif method == 'POST':
             _headers['content-type'] = 'application/json'
-            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=False,
+            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
                                    allow_redirects=allow_redirects)
             pass
         elif method == 'PUT':
             _headers['content-type'] = 'application/json'
-            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=False,
+            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
                                   allow_redirects=allow_redirects)
             pass
         elif method == 'DELETE':
-            result = requests.delete(_url, params=_params, headers=_headers, verify=False,
+            result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
                                      allow_redirects=allow_redirects)
             pass
 

@@ -1,3 +1,6 @@
+5.3.11
+[fix/upd] replace custom simple_requests with script.module.requests to resolve ssl and cross-platform issues
+
 5.3.10
 [fix/upd] resolve 'No video streams found' for age-gated content and other minor.
 [fix/upd] unescaping HTML entities in subtitles [mdmdmdmdmd]
