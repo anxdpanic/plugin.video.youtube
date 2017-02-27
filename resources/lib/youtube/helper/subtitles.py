@@ -2,7 +2,7 @@
 import xbmcvfs
 import re
 import HTMLParser
-from resources.lib.kodion import simple_requests as requests
+import requests
 
 
 class Subtitles(object):

@@ -4,7 +4,7 @@ __author__ = 'bromix'
 
 import urlparse
 from resources.lib.kodion.utils import FunctionCache
-import resources.lib.kodion.simple_requests as requests
+import requests
 
 
 class AbstractResolver(object):

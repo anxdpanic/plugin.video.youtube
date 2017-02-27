@@ -4,7 +4,7 @@ import json
 import os
 import re
 
-from resources.lib.kodion import simple_requests as requests
+import requests
 from resources.lib.kodion.utils import FunctionCache
 from .json_script_engine import JsonScriptEngine
 

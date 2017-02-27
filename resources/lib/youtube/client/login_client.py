@@ -2,7 +2,7 @@ __author__ = 'bromix'
 
 import time
 import urlparse
-from resources.lib.kodion import simple_requests as requests
+import requests
 from resources.lib.youtube.youtube_exceptions import LoginException
 from __config__ import api, youtube_tv, keys_changed
 
