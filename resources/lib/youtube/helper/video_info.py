@@ -4,7 +4,7 @@ import urllib
 import urlparse
 import re
 
-from resources.lib.kodion import simple_requests as requests
+import requests
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from subtitles import Subtitles
@@ -551,7 +551,11 @@ class VideoInfo(object):
                      'images': {},
                      'subtitles': []}
         meta_info['video']['id'] = params.get('vid', params.get('video_id', ''))
-        meta_info['video']['title'] = params.get('title', '').decode('utf-8')
+        meta_info['video']['title'] = params.get('title', '')
+        try:
+            meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+        except:
+            pass
         meta_info['channel']['author'] = params.get('author', '').decode('utf-8')
         meta_info['channel']['id'] = 'UC%s' % params.get('uid', '')
         image_data_list = [
