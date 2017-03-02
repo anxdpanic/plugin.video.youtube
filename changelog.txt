@@ -1,5 +1,7 @@
 5.3.11
 [fix/upd] replace custom simple_requests with script.module.requests to resolve ssl and cross-platform issues
+[add] 'Reset access manager' added to Maintenance section, sign out process(available when logged out)  to clean up tokens in settings.xml
+[upd] set default for SSL certificate verification to 'true'
 
 5.3.10
 [fix/upd] resolve 'No video streams found' for age-gated content and other minor.

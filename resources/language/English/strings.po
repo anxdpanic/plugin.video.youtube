@@ -602,3 +602,11 @@ msgstr ""
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
 msgstr ""
+
+msgctxt "#30580"
+msgid "Reset access manager"
+msgstr ""
+
+msgctxt "#30581"
+msgid "Are you sure you want to reset access manager?"
+msgstr ""

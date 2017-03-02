@@ -48,8 +48,11 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
                     # provider.reset_client()
                     # context.get_access_manager().update_access_token(access_token, expires_in, refresh_token)
                     #context.get_ui().refresh_container()
-                    break
-                pass
+            elif json_data['error'] != u'authorization_pending':
+                message = json_data['error']
+                title = '%s: %s' % (context.get_name(), message)
+                context.get_ui().show_notification(message, title)
+                context.log_error('Error: |%s|' % message)
 
             if dialog.is_aborted():
                 dialog.close()
@@ -81,12 +84,15 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
         access_token_tv = ''
         expires_in_tv = 0
         refresh_token_tv = ''
+        requires_dual_login = context.get_settings().requires_dual_login()
+        context.log_debug('Sign-in: Dual login required |%s|' % requires_dual_login)
         if needs_tv_login:
             context.get_ui().on_ok(context.localize(provider.LOCAL_MAP['youtube.sign.twice.title']),
                                    context.localize(provider.LOCAL_MAP['youtube.sign.twice.text']))
 
             access_token_tv, expires_in_tv, refresh_token_tv = _do_login(_for_tv=True)
             # abort tv login
+            context.log_debug('YouTube-TV Login: Access Token |%s| Refresh Token |%s| Expires |%s|' % (access_token_tv != '', refresh_token_tv != '', expires_in_tv))
             if not access_token_tv and not refresh_token_tv:
                 provider.reset_client()
                 context.get_access_manager().update_access_token('')
@@ -96,13 +102,14 @@ def process(mode, provider, context, re_match, needs_tv_login=True):
 
         access_token_kodi, expires_in_kodi, refresh_token_kodi = _do_login(_for_tv=False)
         # abort kodi login
+        context.log_debug('YouTube-Kodi Login: Access Token |%s| Refresh Token |%s| Expires |%s|' % (access_token_kodi != '', refresh_token_kodi != '', expires_in_kodi))
         if not access_token_kodi and not refresh_token_kodi:
             provider.reset_client()
             context.get_access_manager().update_access_token('')
             context.get_ui().refresh_container()
             return
 
-        if not context.get_settings().requires_dual_login():
+        if not requires_dual_login:
             access_token_tv, expires_in_tv, refresh_token_tv = access_token_kodi, expires_in_kodi, refresh_token_kodi
 
         # if needs_tv_login:
