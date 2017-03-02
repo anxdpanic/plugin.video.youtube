@@ -74,6 +74,11 @@ class LoginClient(object):
         url = 'https://www.youtube.com/o/oauth2/revoke'
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+
+        json_data = result.json()
+        if 'error' in json_data:
+            raise LoginException(json_data['error'])
+
         if result.status_code != requests.codes.ok:
             raise LoginException('Logout Failed')
 
@@ -114,11 +119,15 @@ class LoginClient(object):
         url = 'https://www.youtube.com/o/oauth2/token'
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+
+        json_data = result.json()
+        if 'error' in json_data:
+            raise LoginException(json_data['error'])
+
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            json_data = result.json()
             access_token = json_data['access_token']
             expires_in = time.time() + int(json_data.get('expires_in', 3600))
             return access_token, expires_in
@@ -159,6 +168,12 @@ class LoginClient(object):
         url = 'https://www.youtube.com/o/oauth2/token'
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+
+        json_data = result.json()
+        if 'error' in json_data:
+            if json_data['error'] != u'authorization_pending':
+                raise LoginException(json_data['error'])
+
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 
@@ -194,6 +209,11 @@ class LoginClient(object):
         url = 'https://www.youtube.com/o/oauth2/device/code'
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
+
+        json_data = result.json()
+        if 'error' in json_data:
+            raise LoginException(json_data['error'])
+
         if result.status_code != requests.codes.ok:
             raise LoginException('Login Failed')
 
