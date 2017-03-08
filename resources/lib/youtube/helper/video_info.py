@@ -552,11 +552,12 @@ class VideoInfo(object):
                      'subtitles': []}
         meta_info['video']['id'] = params.get('vid', params.get('video_id', ''))
         meta_info['video']['title'] = params.get('title', '')
+        meta_info['channel']['author'] = params.get('author', '')
         try:
             meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+            meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
         except:
             pass
-        meta_info['channel']['author'] = params.get('author', '').decode('utf-8')
         meta_info['channel']['id'] = 'UC%s' % params.get('uid', '')
         image_data_list = [
             {'from': 'iurlhq', 'to': 'high'},
