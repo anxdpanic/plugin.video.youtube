@@ -589,3 +589,13 @@ msgstr "Forcer la vérification du certificat SSL"
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
 msgstr "MPEG-DASH est activée dans YouTube, cependant inputstream.adaptative semble être désactivé. Voulez-vous activer inputstream.adaptive maintenant ?"
+
+msgctxt "#30580"
+msgid "Reset access manager"
+msgstr "Réinitialiser le gestionnaire d'accès"
+
+msgctxt "#30581"
+msgid "Are you sure you want to reset access manager?"
+msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès?"
+
+
