@@ -610,3 +610,7 @@ msgstr ""
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
 msgstr ""
+
+msgctxt "#30582"
+msgid "Autoplay suggested videos"
+msgstr ""
