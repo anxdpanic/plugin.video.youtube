@@ -599,3 +599,6 @@ msgid "Are you sure you want to reset access manager?"
 msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès?"
 
 
+msgctxt "#30582"
+msgid "Autoplay suggested videos"
+msgstr "Jouer automatiquement les vidéos suggérées"
