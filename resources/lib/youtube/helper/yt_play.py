@@ -15,14 +15,7 @@ def play_video(provider, context, re_match):
         video_id = context.get_param('video_id')
         client = provider.get_client(context)
         settings = context.get_settings()
-        play_suggested = settings.get_bool('youtube.suggested_videos', False)
-        if play_suggested:
-          json_data = client.get_related_videos(video_id)
-          items = v3.response_to_items(provider, context, json_data, process_next_page=False)
-          playlist = context.get_video_playlist()
-          for i in items:
-            playlist.add(i)
-            
+
         video_streams = client.get_video_streams(context, video_id)
         if len(video_streams) == 0:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
@@ -38,6 +31,14 @@ def play_video(provider, context, re_match):
             message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
+
+        play_suggested = settings.get_bool('youtube.suggested_videos', False)
+        if play_suggested:
+          json_data = client.get_related_videos(video_id)
+          items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+          playlist = context.get_video_playlist()
+          for i in items:
+            playlist.add(i)
 
         video_item = VideoItem(video_id, video_stream['url'])
 
