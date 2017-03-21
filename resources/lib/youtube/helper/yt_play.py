@@ -165,7 +165,6 @@ def play_playlist(provider, context, re_match):
         pass
 
     if context.get_param('play', '') == '1':
-        player.play(playlist_index=playlist_position)
-        pass
+        return videos[playlist_position]
 
     return True
