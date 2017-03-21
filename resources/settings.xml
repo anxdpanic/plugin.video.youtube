@@ -11,13 +11,13 @@
         <setting id="kodion.video.quality.mpd" type="bool" label="30007" default="false" enable="eq(-1,true)|eq(-2,true)"/>
         <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)+eq(-2,true)" visible="eq(-1,true)+eq(-2,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
         <setting id="kodion.subtitle.languages" type="enum" label="30560" lvalues="30561|30562|30563|30564|30565|30566" default="0"/>
+        <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
         <setting type="sep" />
         <setting id="kodion.fanart.show" type="bool" label="30021" default="true"/>
         <setting id="youtube.channel.fanart.show" type="bool" label="30503" enable="eq(-1,true)" default="true"/>
         <setting id="kodion.content.max_per_page" type="enum" label="30022" values="5|10|15|20|25|30|35|40|45|50" default="9" />
         <setting id="kodion.search.size" type="enum" label="30023" values="0|10|20|30|40|50" default="1" />
-        <setting id="youtube.suggested_videos" type="bool" label="30582" default="true"/>
     </category>
 
     <category label="30516">
