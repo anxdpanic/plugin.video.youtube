@@ -149,7 +149,8 @@ class LoginClient(object):
                    'DNT': '1',
                    'Referer': 'https://www.youtube.com/tv',
                    'Accept-Encoding': 'gzip, deflate',
-                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
+                   'If-Match': '*'}
 
         _client_id = client_id
         if not client_id:
@@ -169,13 +170,13 @@ class LoginClient(object):
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
 
+        if result.status_code != requests.codes.ok:
+            raise LoginException('Login Failed: Code %s' % result.status_code)
+
         json_data = result.json()
         if 'error' in json_data:
             if json_data['error'] != u'authorization_pending':
                 raise LoginException(json_data['error'])
-
-        if result.status_code != requests.codes.ok:
-            raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
             return result.json()
@@ -196,7 +197,8 @@ class LoginClient(object):
                    'DNT': '1',
                    'Referer': 'https://www.youtube.com/tv',
                    'Accept-Encoding': 'gzip, deflate',
-                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
+                   'If-Match': '*'}
 
         _client_id = client_id
         if not client_id:
@@ -210,12 +212,12 @@ class LoginClient(object):
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
 
+        if result.status_code != requests.codes.ok:
+            raise LoginException('Login Failed: Code %s' % result.status_code)
+
         json_data = result.json()
         if 'error' in json_data:
             raise LoginException(json_data['error'])
-
-        if result.status_code != requests.codes.ok:
-            raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
             return result.json()
