@@ -33,12 +33,17 @@ def play_video(provider, context, re_match):
             return False
 
         play_suggested = settings.get_bool('youtube.suggested_videos', False)
+        items = None
         if play_suggested:
-          json_data = client.get_related_videos(video_id)
-          items = v3.response_to_items(provider, context, json_data, process_next_page=False)
-          playlist = context.get_video_playlist()
-          for i in items:
-            playlist.add(i)
+            try:
+                json_data = client.get_related_videos(video_id)
+                items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+            except:
+                context.get_ui().show_notification('Failed to add suggested videos.', time_milliseconds=5000)
+        if items:
+            playlist = context.get_video_playlist()
+            for i in items:
+                playlist.add(i)
 
         video_item = VideoItem(video_id, video_stream['url'])
 
@@ -50,18 +55,17 @@ def play_video(provider, context, re_match):
 
         # Trigger post play events
         if provider.is_logged_in():
-            command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
-            context.execute(command)
-            pass
+            try:
+                command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
+                context.execute(command)
+            except:
+                context.get_ui().show_notification('Failed to execute post play events.', time_milliseconds=5000)
 
         return video_item
     except YouTubeException, ex:
         message = ex.get_message()
         message = kodion.utils.strip_html_from_text(message)
         context.get_ui().show_notification(message, time_milliseconds=15000)
-        pass
-
-    pass
 
 
 def play_playlist(provider, context, re_match):
