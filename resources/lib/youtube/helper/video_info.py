@@ -321,6 +321,8 @@ class VideoInfo(object):
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
         # === DASH adaptive
         '9999': {'container': 'mpd',
+                 'sort': [1080, 0],
+                 'title': 'DASH',
                  'dash/audio': True,
                  'dash/video': True,
                  'audio': {'bitrate': 0, 'encoding': ''},
@@ -606,32 +608,19 @@ class VideoInfo(object):
             pass
         """
 
-        settings = self._context.get_settings()
-        use_dash = settings.use_dash()
+        mpd_url = params.get('dashmpd', '')
+        use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
+        if mpd_url:
+            if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
+                # in this case we must call the web page
+                self._context.log_info('Unable to use mpeg-dash for %s, unable to decipher signature. Attempting fallback play method...' % video_id)
+                return self._method_watch(video_id, meta_info=meta_info)
 
-        if use_dash:
-            if settings.dash_support_addon() and not self._context.addon_enabled('inputstream.adaptive'):
-                if self._context.get_ui().on_yes_no_input(self._context.get_name(), self._context.localize(30579)):
-                    use_dash = self._context.set_addon_enabled('inputstream.adaptive')
-                else:
-                    use_dash = False
-
-            if use_dash:
-                mpd_url = params.get('dashmpd', None)
-                use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
-                if mpd_url:
-                    if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
-                        # in this case we must call the web page
-                        self._context.log_info('Unable to use mpeg-dash for %s, unable to decipher signature. Attempting fallback play method...' % video_id)
-                        return self._method_watch(video_id, meta_info=meta_info)
-
-                    meta_info['subtitles'] = Subtitles(self._context, video_id).get()
-                    video_stream = {'url': mpd_url,
-                                    'title': meta_info['video'].get('title', ''),
-                                    'meta': meta_info}
-                    video_stream.update(self.FORMAT.get('9999'))
-                    stream_list.append(video_stream)
-                    return stream_list
+            meta_info['subtitles'] = Subtitles(self._context, video_id).get()
+            video_stream = {'url': mpd_url,
+                            'meta': meta_info}
+            video_stream.update(self.FORMAT.get('9999'))
+            stream_list.append(video_stream)
 
         added_subs = False  # avoid repeat calls from loop or cipher signature
         # extract streams from map
