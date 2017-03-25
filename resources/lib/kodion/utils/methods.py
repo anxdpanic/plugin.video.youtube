@@ -27,6 +27,11 @@ def to_unicode(text):
 
 
 def find_best_fit(data, compare_method=None):
+    try:
+        return next(item for item in data if item['container'] == 'mpd')
+    except StopIteration:
+        pass
+
     result = None
 
     last_fit = -1
@@ -57,6 +62,19 @@ def select_stream(context, stream_data_list, quality_map_override=None):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
         return _stream_data.get('sort', 0)
+
+    settings = context.get_settings()
+    use_dash = settings.use_dash()
+
+    if use_dash:
+        if settings.dash_support_addon() and not context.addon_enabled('inputstream.adaptive'):
+            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30579)):
+                use_dash = context.set_addon_enabled('inputstream.adaptive')
+            else:
+                use_dash = False
+
+    if not use_dash:
+        stream_data_list = [item for item in stream_data_list if item['container'] != 'mpd']
 
     video_quality = context.get_settings().get_video_quality(quality_map_override=quality_map_override)
 
