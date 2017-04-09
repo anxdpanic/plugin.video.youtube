@@ -232,12 +232,23 @@ def _process_new_uploaded_videos_tv(provider, context, re_match):
     return result
 
 
+def _process_new_uploaded_videos_tv_filtered(provider, context, re_match):
+    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+
+    result = []
+    next_page_token = context.get_param('next_page_token', '')
+    offset = int(context.get_param('offset', 0))
+    json_data = provider.get_client(context).get_my_subscriptions(page_token=next_page_token, offset=offset)
+    result.extend(tv.my_subscriptions_to_items(provider, context, json_data, do_filter=True))
+
+    return result
+
 def process(category, provider, context, re_match):
     result = []
 
     # we need a login
     client = provider.get_client(context)
-    if not provider.is_logged_in() and category in ['new_uploaded_videos_tv', 'disliked_videos']:
+    if not provider.is_logged_in() and category in ['new_uploaded_videos_tv', 'new_uploaded_videos_tv_filtered', 'disliked_videos']:
         return UriItem(context.create_uri(['sign', 'in']))
 
     if category == 'related_videos':
@@ -250,6 +261,8 @@ def process(category, provider, context, re_match):
         return _process_browse_channels(provider, context, re_match)
     elif category == 'new_uploaded_videos_tv':
         return _process_new_uploaded_videos_tv(provider, context, re_match)
+    elif category == 'new_uploaded_videos_tv_filtered':
+        return _process_new_uploaded_videos_tv_filtered(provider, context, re_match)
     elif category == 'disliked_videos':
         return _process_disliked_videos(provider, context, re_match)
     elif category == 'live':

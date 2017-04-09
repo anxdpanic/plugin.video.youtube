@@ -537,7 +537,8 @@ class YouTube(LoginClient):
                 _item = _item.get('gridVideoRenderer', {})
                 if _item:
                     _video_item = {'id': _item['videoId'],
-                                   'title': _item.get('title', {}).get('runs', [{}])[0].get('text', '')}
+                                   'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
+                                   'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
                     _result['items'].append(_video_item)
                     pass
                 pass
