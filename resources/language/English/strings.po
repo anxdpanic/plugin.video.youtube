@@ -614,3 +614,7 @@ msgstr ""
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
 msgstr ""
+
+msgctxt "#31583"
+msgid "Automatic"
+msgstr ""
