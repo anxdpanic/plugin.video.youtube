@@ -411,7 +411,7 @@ msgstr "Αναπαραγωγή όλων"
 
 msgctxt "#30532"
 msgid "Default"
-msgstr "Προκαθορισμένο"
+msgstr "Προεπιλογή"
 
 msgctxt "#30533"
 msgid "Reverse"
@@ -419,7 +419,7 @@ msgstr "Προς τα πίσω"
 
 msgctxt "#30534"
 msgid "Shuffle"
-msgstr "Σε τυχαία σειρά"
+msgstr "Τυχαία σειρά"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -495,7 +495,7 @@ msgstr "Συντήρηση"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr "Λειτουργία διαγραφής βάσης δεδομένων λανθάνουσας μνήμης"
+msgstr "Λειτουργία διαγραφής βάσης δεδομένων προσωρινής μνήμης"
 
 msgctxt "#30554"
 msgid "Delete search history database"
@@ -503,7 +503,7 @@ msgstr "Διαγραφή βάσης δεδομένων ιστορικού ανα
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr "Λειτουργία διαγραφής λανθάνουσας μνήμης"
+msgstr "Λειτουργία διαγραφής προσωρινής μνήμης"
 
 msgctxt "#30556"
 msgid "Clear search history"
@@ -511,7 +511,7 @@ msgstr "Διαγραφή ιστορικού αναζήτησης"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr "λειτουργίας λανθάνουσας μνήμης"
+msgstr "λειτουργίας προσωρινής μνήμης"
 
 msgctxt "#30558"
 msgid "search history"
@@ -559,11 +559,11 @@ msgstr "Αφαίρεση από το Δείτε Αργότερα"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' από το Δείτε Αργότερα?"
+msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' από το 'Δείτε Αργότερα'?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα Δείτε Αργότερα με το '%s'?"
+msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα 'Δείτε Αργότερα' με το '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -571,7 +571,7 @@ msgstr "Θέσε ως Ιστορικό"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr "Αφαίρεση ως ιστορικό"
+msgstr "Αφαίρεση από ιστορικό"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
@@ -600,3 +600,15 @@ msgstr "Επιβολή επιβεβαίωσης πιστοποιητικού SSL
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
 msgstr "Το MPEG-DASH είναι ενεργοποιημένο στις ρυθμίσεις, αλλά το inputstream.adaptive φαίνεται να είναι απενεργοποιημένο. Επιθυμείτε την ενεργοποίησή του inputstream.adaptive τώρα;"
+
+msgctxt "#30580"
+msgid "Reset access manager"
+msgstr "Επαναφορά διαχειριστή πρόσβασης"
+
+msgctxt "#30581"
+msgid "Are you sure you want to reset access manager?"
+msgstr "Είστε σίγουροι ότι θέλετε να επαναφέρετε τον διαχειριστή πρόσβασης;"
+
+msgctxt "#30582"
+msgid "Autoplay suggested videos"
+msgstr "Αυτόματη αναπαραγωγή προτεινόμενων βίντεο"
