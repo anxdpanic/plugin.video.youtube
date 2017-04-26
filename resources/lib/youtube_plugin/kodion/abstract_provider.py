@@ -220,11 +220,15 @@ class AbstractProvider(object):
 
             return True
         elif command == 'query':
-            query = params['q']
-            search_history.update(query)
-            return self.on_search(query, context, re_match)
+            try:
+                query = params['q']
+                search_history.update(query)
+                return self.on_search(query, context, re_match)
+            except:
+                result =[]
+                return result
         else:
-            result = []
+            result = [] 
 
             # 'New Search...'
             new_search_item = items.NewSearchItem(context, fanart=self.get_alternative_fanart(context))
