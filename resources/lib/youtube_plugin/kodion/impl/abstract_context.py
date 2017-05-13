@@ -60,8 +60,7 @@ class AbstractContext(object):
 
     def get_search_history(self):
         if not self._search_history:
-            max_search_history_items = self.get_settings().get_int(constants.setting.SEARCH_SIZE, 50,
-                                                                            lambda x: x * 10)
+            max_search_history_items = self.get_settings().get_int(constants.setting.SEARCH_SIZE, 50)
             self._search_history = SearchHistory(os.path.join(self._get_cache_path(), 'search'),
                                                  max_search_history_items)
             pass

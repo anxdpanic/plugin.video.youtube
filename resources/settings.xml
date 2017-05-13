@@ -17,7 +17,7 @@
         <setting id="kodion.fanart.show" type="bool" label="30021" default="true"/>
         <setting id="youtube.channel.fanart.show" type="bool" label="30503" enable="eq(-1,true)" default="true"/>
         <setting id="kodion.content.max_per_page" type="enum" label="30022" values="5|10|15|20|25|30|35|40|45|50" default="9" />
-        <setting id="kodion.search.size" type="enum" label="30023" values="0|10|20|30|40|50" default="1" />
+        <setting label="30023" type="slider" id="kodion.search.size" default="10" range="0,10,200" option="int" />
     </category>
 
     <category label="30516">
