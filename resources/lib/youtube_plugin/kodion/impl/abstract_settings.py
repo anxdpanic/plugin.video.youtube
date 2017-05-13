@@ -82,7 +82,7 @@ class AbstractSettings(object):
         return self.get_bool(constants.setting.SHOW_FANART, True)
 
     def get_search_history_size(self):
-        return self.get_int(constants.setting.SEARCH_SIZE, 50, lambda x: x * 10)
+        return self.get_int(constants.setting.SEARCH_SIZE, 50)
 
     def is_setup_wizard_enabled(self):
         return self.get_bool(constants.setting.SETUP_WIZARD, False)
