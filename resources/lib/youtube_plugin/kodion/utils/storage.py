@@ -55,6 +55,7 @@ class Storage(object):
             self._file.isolation_level = None
             self._cursor = self._file.cursor()
             self._cursor.execute('PRAGMA journal_mode=MEMORY')
+            self._cursor.execute('PRAGMA busy_timeout=20000')
             # self._cursor.execute('PRAGMA synchronous=OFF')
             self._create_table()
         pass
