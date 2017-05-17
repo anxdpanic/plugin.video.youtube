@@ -15,7 +15,7 @@ class Subtitles(object):
 
     SUBTITLE_LIST_URL = 'http://www.youtube.com/api/timedtext?type=list&v=%s'
     SUBTITLE_URL = 'http://www.youtube.com/api/timedtext?fmt=vtt&v=%s&lang=%s'
-    SRT_FILE = 'special://temp/%s.%s.srt'
+    SRT_FILE = 'special://temp/temp/%s.%s.srt'
 
     def __init__(self, context, video_id):
         self.context = context
