@@ -89,7 +89,7 @@ class Cipher(object):
 
             # real object functions
             cipher_match = re.match(
-                r'(?P<object_name>[\$a-zA-Z0-9]+)\.(?P<function_name>[\$a-zA-Z0-9]+)\((?P<parameter>[^)]+)\)',
+                r'(?P<object_name>[\$a-zA-Z0-9]+)\.?\[?"?(?P<function_name>[\$a-zA-Z0-9]+)"?\]?\((?P<parameter>[^)]+)\)',
                 line)
             if cipher_match:
                 object_name = cipher_match.group('object_name')
@@ -186,7 +186,7 @@ class Cipher(object):
 
             match = re.match('(?P<name>[^:]*):function\((?P<parameter>[^)]*)\)\{(?P<body>[^}]+)\}', _function)
             if match:
-                name = match.group('name')
+                name = match.group('name').replace('"', '')
                 parameter = match.group('parameter')
                 body = match.group('body').split(';')
 
