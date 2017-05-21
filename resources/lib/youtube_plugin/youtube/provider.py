@@ -277,6 +277,7 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/channel/(?P<channel_id>.*)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
+        self.set_content_type(context, kodion.constants.content_type.FILES)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -448,7 +449,8 @@ class Provider(kodion.AbstractProvider):
 
         if search_type == 'video':
             self.set_content_type(context, kodion.constants.content_type.VIDEOS)
-            pass
+        else:
+            self.set_content_type(context, kodion.constants.content_type.FILES)
 
         if page == 1 and search_type == 'video' and not event_type:
             channel_params = {}
@@ -558,6 +560,8 @@ class Provider(kodion.AbstractProvider):
 
         self.get_client(context)
         resource_manager = self.get_resource_manager(context)
+
+        self.set_content_type(context, kodion.constants.content_type.FILES)
 
         result = []
 
@@ -725,8 +729,8 @@ class Provider(kodion.AbstractProvider):
         return result
 
     def set_content_type(self, context, content_type):
+        context.set_content_type(content_type)
         if content_type == kodion.constants.content_type.VIDEOS:
-            context.set_content_type(content_type)
             context.add_sort_method(kodion.constants.sort_method.UNSORTED,
                                     kodion.constants.sort_method.VIDEO_RUNTIME,
                                     kodion.constants.sort_method.DATE_ADDED,
