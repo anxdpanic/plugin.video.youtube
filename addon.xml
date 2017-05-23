@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.3.13~alpha6" provider-name="jdf76, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.3.13" provider-name="bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -11,9 +11,17 @@
 	<extension point="xbmc.python.module" library="resources/lib/" />
 	<extension point="xbmc.addon.metadata">
         <news>
-[fix/upd] replace custom simple_requests with script.module.requests to resolve ssl and cross-platform issues
-[add] 'Reset access manager' added to Maintenance section, sign out process(available when logged out) to clean up tokens in settings.xml
-[upd] set default for SSL certificate verification to 'true'
+            set content_type to files for search history
+            Updated cypher
+            Updated subtitles.py
+            add youtube_resolver.resolve for module endpoint, allows other add-on… …	d3ab6ca
+            change search limit to slider and increase limit to 200	103f84b
+            sqlite increase timeout	96a17ca
+            refactor to relative imports, add module extension point
+            refactor dash to allow in ask for quality
+            [fix/upd] replace custom simple_requests with script.module.requests to resolve ssl and cross-platform issues
+            [add] 'Reset access manager' added to Maintenance section, sign out process(available when logged out) to clean up tokens in settings.xml
+            [upd] set default for SSL certificate verification to 'true'
         </news>
         <assets>
             <icon>icon.png</icon>
