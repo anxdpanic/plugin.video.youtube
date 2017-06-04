@@ -169,7 +169,9 @@ def play_playlist(provider, context, re_match):
         progress_dialog.close()
         pass
 
-    if context.get_param('play', '') == '1':
+    if (context.get_param('play', '') == '1') and (context.get_handle() == -1):
+        player.play(playlist_index=playlist_position)
+    elif context.get_param('play', '') == '1':
         return videos[playlist_position]
 
     return True
