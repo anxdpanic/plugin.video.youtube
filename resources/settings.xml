@@ -24,7 +24,8 @@
         <setting id="youtube.folder.sign.in.show" type="bool" label="30111" default="true"/>
         <setting id="youtube.folder.my_subscriptions.show" type="bool" label="30510" default="true"/>
         <setting id="youtube.folder.my_subscriptions_filtered.show" type="bool" label="31584" default="false"/>
-        <setting id="youtube.filter.my_subscriptions_filtered.whitelist" type="text" label="31585" enable="eq(-1,true)" default=""/>
+        <setting id="youtube.filter.my_subscriptions_filtered.whitelist" type="text" label="31585" enable="eq(-1,true)"
+                 visible="eq(-1,true)" default=""/>
         <setting id="youtube.folder.recommendations.show" type="bool" label="30551" default="true"/>
         <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
