@@ -1,3 +1,27 @@
+5.4.0
+[upd] Greek strings [Twilight0]
+[upd] Polish strings [Etharr]
+[upd] Finnish strings [teemue]
+[fix/upd] resolve "Error Contents: 'q'" error [horstepipe]
+[fix/upd] resolve Play All/Play from here not starting playback
+[fix/upd] resolve playlists starting on second item
+[fix/upd] allow dash in quality choices
+[fix/upd] set content to files for menus, resolves mouse/scrolling
+[fix/upd] fix cipher
+[fix/upd] increase search history limit to 200
+[add] Auto-play suggested [mehdilauters]
+[add] Automatic subtitles [Uukrull]
+[add] My Subscriptions (Filtered) - whitelisted version of My Subscriptions [chhe]
+[add] module extension point:
+        add-ons can now add plugin.video.youtube dependency and resolve youtube video id's using the youtube plugin
+        """ <addon.xml>
+        <import addon="plugin.video.youtube"/>
+        """
+        """ <example.py>
+        import youtube_resolver
+        streams = youtube_resolver.resolve(youtube_video_id)
+        """
+
 5.3.11
 [fix/upd] replace custom simple_requests with script.module.requests to resolve ssl and cross-platform issues
 [add] 'Reset access manager' added to Maintenance section, sign out process(available when logged out)  to clean up tokens in settings.xml

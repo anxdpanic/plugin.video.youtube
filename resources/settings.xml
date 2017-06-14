@@ -10,7 +10,7 @@
         <setting id="kodion.video.support.mpd.addon" type="bool" label="" visible="false" enable="true" default="false"/>
         <setting id="kodion.video.quality.mpd" type="bool" label="30007" default="false" enable="eq(-1,true)|eq(-2,true)"/>
         <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)+eq(-2,true)" visible="eq(-1,true)+eq(-2,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
-        <setting id="kodion.subtitle.languages" type="enum" label="30560" lvalues="30561|30562|30563|30564|30565|30566" default="0"/>
+        <setting id="kodion.subtitle.languages" type="enum" label="30560" lvalues="30561|30562|30563|30564|30565|30566|31583" default="0"/>
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
         <setting type="sep" />
@@ -23,6 +23,8 @@
     <category label="30516">
         <setting id="youtube.folder.sign.in.show" type="bool" label="30111" default="true"/>
         <setting id="youtube.folder.my_subscriptions.show" type="bool" label="30510" default="true"/>
+        <setting id="youtube.folder.my_subscriptions_filtered.show" type="bool" label="31584" default="false"/>
+        <setting id="youtube.filter.my_subscriptions_filtered.whitelist" type="text" label="31585" enable="eq(-1,true)" default=""/>
         <setting id="youtube.folder.recommendations.show" type="bool" label="30551" default="true"/>
         <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
@@ -53,7 +55,7 @@
         <setting id="youtube.language" type="text" label="30523" enable="false" default="en-US"/>
         <setting id="youtube.region" type="text" label="30550" enable="false" default="US"/>
     </category>
-    
+
     <!-- personal api key -->
     <category label="30200">
         <setting id="youtube.api.enable" type="bool" label="30204" default="false"/>
