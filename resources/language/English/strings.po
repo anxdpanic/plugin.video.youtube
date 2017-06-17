@@ -624,5 +624,25 @@ msgid "My Subscriptions (Filtered)"
 msgstr ""
 
 msgctxt "#31585"
-msgid "Channel whitelist (comma delimited)"
+msgid "Filtered channel list (comma delimited)"
+msgstr ""
+
+msgctxt "#31586"
+msgid "Blacklist"
+msgstr ""
+
+msgctxt "#31587"
+msgid "Add to My Subscriptions filter"
+msgstr ""
+
+msgctxt "#31588"
+msgid "Remove from My Subscriptions filter"
+msgstr ""
+
+msgctxt "#31589"
+msgid "Added %s to My Subscriptions filter"
+msgstr ""
+
+msgctxt "#31590"
+msgid "Removed %s from My Subscriptions filter"
 msgstr ""

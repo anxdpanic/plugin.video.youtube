@@ -38,6 +38,13 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
     resource_manager = provider.get_resource_manager(context)
     channel_data = resource_manager.get_channels(channel_ids)
 
+    filter_list = []
+    if context.get_path() == '/subscriptions/list/':
+        filter_string = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.list', '')
+        filter_string = filter_string.replace(', ', ',')
+        filter_list = filter_string.split(',')
+        filter_list = [x.lower() for x in filter_list]
+
     for channel_id in channel_data.keys():
         yt_item = channel_data[channel_id]
         channel_item = channel_id_dict[channel_id]
@@ -63,6 +70,15 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         if provider.is_logged_in() and context.get_path() != '/subscriptions/list/':
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
             pass
+
+        if context.get_path() == '/subscriptions/list/':
+            channel = title.lower()
+            channel = channel.replace(',', '')
+            if channel in filter_list:
+                yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
+            else:
+                yt_context_menu.append_add_my_subscriptions_filter(context_menu, provider, context, title)
+
         channel_item.set_context_menu(context_menu)
 
         # update channel mapping
