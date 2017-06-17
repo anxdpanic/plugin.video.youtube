@@ -73,7 +73,11 @@ class Provider(kodion.AbstractProvider):
                  'youtube.set.as.watchlater': 30567,
                  'youtube.remove.as.history': 30572,
                  'youtube.set.as.history': 30571,
-                 'youtube.settings': 30577}
+                 'youtube.settings': 30577,
+                 'youtube.remove.my_subscriptions.filter': 31588,
+                 'youtube.add.my_subscriptions.filter': 31587,
+                 'youtube.removed.my_subscriptions.filter': 31590,
+                 'youtube.added.my_subscriptions.filter': 31589}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -500,6 +504,43 @@ class Provider(kodion.AbstractProvider):
             xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
         else:
             return False
+
+    @kodion.RegisterProviderPath('^/my_subscriptions/filter/$')
+    def manage_my_subscription_filter(self, context, re_match):
+        params = context.get_params()
+        action = params.get('action')
+        channel = params.get('channel_name')
+        if (not channel) or (not action):
+            return
+
+        filter_enabled = context.get_settings().get_bool('youtube.folder.my_subscriptions_filtered.show', False)
+        if not filter_enabled:
+            return
+
+        channel_name = channel.lower()
+        channel_name = channel_name.replace(',', '')
+
+        filter_string = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.list', '')
+        filter_string = filter_string.replace(', ', ',')
+        filter_list = filter_string.split(',')
+        filter_list = [x.lower() for x in filter_list]
+
+        if action == 'add':
+            if channel_name not in filter_list:
+                filter_list.append(channel_name)
+        elif action == 'remove':
+            if channel_name in filter_list:
+                filter_list = [chan_name for chan_name in filter_list if chan_name != channel_name]
+
+        modified_string = ','.join(map(str, filter_list))
+        if filter_string != modified_string:
+            context.get_settings().set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
+            if action == 'add':
+                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.added.my_subscriptions.filter']) % channel)
+            elif action == 'remove':
+                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.removed.my_subscriptions.filter']) % channel)
+
+            context.get_ui().refresh_container()
 
     @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>.*)/(?P<action>.*)/$')
     def maintenance_actions(self, context, re_match):

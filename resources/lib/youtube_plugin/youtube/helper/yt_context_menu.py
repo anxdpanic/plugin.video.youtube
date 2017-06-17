@@ -107,6 +107,20 @@ def append_set_as_history(context_menu, provider, context, playlist_id, playlist
                                                                'playlist_name': playlist_name})))
 
 
+def append_remove_my_subscriptions_filter(context_menu, provider, context, channel_name):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove.my_subscriptions.filter']),
+                         'RunPlugin(%s)' % context.create_uri(['my_subscriptions', 'filter'],
+                                                              {'channel_name': channel_name,
+                                                               'action': 'remove'})))
+
+
+def append_add_my_subscriptions_filter(context_menu, provider, context, channel_name):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.add.my_subscriptions.filter']),
+                         'RunPlugin(%s)' % context.create_uri(['my_subscriptions', 'filter'],
+                                                              {'channel_name': channel_name,
+                                                               'action': 'add'})))
+
+
 def append_rate_video(context_menu, provider, context, video_id, refresh_container=False):
     if refresh_container:
         refresh_container = '1'
