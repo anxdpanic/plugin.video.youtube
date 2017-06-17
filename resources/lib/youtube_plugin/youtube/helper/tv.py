@@ -9,18 +9,21 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     result = []
     video_id_dict = {}
 
-    white_list = []
+    filter_list = []
+    black_list = False
     if do_filter:
-        white_list = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.whitelist', '')
-        white_list = white_list.replace(', ', ',')
-        white_list = white_list.split(',')
-        white_list = [x.lower() for x in white_list]
+        black_list = context.get_settings().get_bool('youtube.filter.my_subscriptions_filtered.blacklist', False)
+        filter_list = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.list', '')
+        filter_list = filter_list.replace(', ', ',')
+        filter_list = filter_list.split(',')
+        filter_list = [x.lower() for x in filter_list]
 
     items = json_data.get('items', [])
     for item in items:
         channel = item['channel'].lower()
         channel = channel.replace(',', '')
-        if not do_filter or (channel in white_list):
+        if not do_filter or (do_filter and (not black_list) and (channel in filter_list)) or \
+                (do_filter and black_list and (channel not in filter_list)):
             video_id = item['id']
             video_item = VideoItem(item['title'],
                                    uri=context.create_uri(['play'], {'video_id': video_id}))
