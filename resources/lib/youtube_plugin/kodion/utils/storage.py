@@ -10,8 +10,6 @@ try:
 except ImportError:
     import pickle
 
-    pass
-
 
 class Storage(object):
     def __init__(self, filename, max_item_count=1000, max_file_size_kb=-1):
@@ -19,7 +17,6 @@ class Storage(object):
         self._filename = filename
         if not self._filename.endswith('.sqlite'):
             self._filename += '.sqlite'
-            pass
         self._file = None
         self._cursor = None
         self._max_item_count = max_item_count
@@ -27,19 +24,15 @@ class Storage(object):
 
         self._table_created = False
         self._needs_commit = False
-        pass
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
-        pass
 
     def set_max_file_size_kb(self, max_file_size_kb):
         self._max_file_size_kb = max_file_size_kb
-        pass
 
     def __del__(self):
         self._close()
-        pass
 
     def _open(self):
         if self._file is None:
@@ -48,7 +41,6 @@ class Storage(object):
             path = os.path.dirname(self._filename)
             if not os.path.exists(path):
                 os.makedirs(path)
-                pass
 
             self._file = sqlite3.connect(self._filename, check_same_thread=False, detect_types=sqlite3.PARSE_DECLTYPES,
                                          timeout=1)
@@ -58,13 +50,11 @@ class Storage(object):
             self._cursor.execute('PRAGMA busy_timeout=20000')
             # self._cursor.execute('PRAGMA synchronous=OFF')
             self._create_table()
-        pass
 
     def _execute(self, needs_commit, query, values=[]):
         if not self._needs_commit and needs_commit:
             self._needs_commit = True
             self._cursor.execute('BEGIN')
-            pass
 
         """
         Tests revealed that sqlite has problems to release the database in time. This happens no so often, but just to
@@ -73,11 +63,12 @@ class Storage(object):
         for tries in range(5):
             try:
                 return self._cursor.execute(query, values)
+            except TypeError:
+                return None
             except:
                 time.sleep(2)
-                pass
         else:
-            return self._cursor.execute(query, values)
+            return None
 
     def _close(self):
         if self._file is not None:
@@ -87,8 +78,6 @@ class Storage(object):
             self._cursor = None
             self._file.close()
             self._file = None
-            pass
-        pass
 
     def _optimize_file_size(self):
         # do nothing - only we have given a size
@@ -106,8 +95,6 @@ class Storage(object):
         file_size_kb = os.path.getsize(self._filename) / 1024
         if file_size_kb >= self._max_file_size_kb:
             os.remove(self._filename)
-            pass
-        pass
 
     def _create_table(self):
         self._open()
@@ -115,8 +102,6 @@ class Storage(object):
             query = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time TIMESTAMP, value BLOB)' % self._table_name
             self._execute(True, query)
             self._table_created = True
-            pass
-        pass
 
     def sync(self):
         if self._cursor is not None and self._needs_commit:
@@ -134,7 +119,7 @@ class Storage(object):
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
         self._execute(True, query, values=[item_id, now, _encode(item)])
         self._optimize_item_count()
-        pass
+        self._close()
 
     def _optimize_item_count(self):
         self._open()
@@ -143,23 +128,23 @@ class Storage(object):
         if result is not None:
             for item in result:
                 self._remove(item[0])
-                pass
-            pass
-        pass
+        self._close()
 
     def _clear(self):
         self._open()
         query = 'DELETE FROM %s' % self._table_name
         self._execute(True, query)
         self._create_table()
-        pass
+        self._close()
 
     def _is_empty(self):
         self._open()
         query = 'SELECT exists(SELECT 1 FROM %s LIMIT 1);' % self._table_name
         result = self._execute(False, query)
-        for item in result:
-            return item[0] == 0
+        self._close()
+        if result is not None:
+            for item in result:
+                return item[0] == 0
 
         return False
 
@@ -169,19 +154,16 @@ class Storage(object):
         query = 'SELECT key FROM %s' % self._table_name
         if oldest_first:
             query = '%s ORDER BY time ASC' % query
-            pass
         else:
             query = '%s ORDER BY time DESC' % query
-            pass
 
         query_result = self._execute(False, query)
+        self._close()
 
         result = []
         if query_result:
             for item in query_result:
                 result.append(item[0])
-                pass
-            pass
 
         return result
 
@@ -193,18 +175,19 @@ class Storage(object):
         query = 'SELECT time, value FROM %s WHERE key=?' % self._table_name
         result = self._execute(False, query, [item_id])
         if result is None:
+            self._close()
             return None
 
         item = result.fetchone()
         if item is None:
+            self._close()
             return None
 
+        self._close()
         return _decode(item[1]), item[0]
 
     def _remove(self, item_id):
         self._open()
         query = 'DELETE FROM %s WHERE key = ?' % self._table_name
         self._execute(True, query, [item_id])
-        pass
-
-    pass
+        self._close()
