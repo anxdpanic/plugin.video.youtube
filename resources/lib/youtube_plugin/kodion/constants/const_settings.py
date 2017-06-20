@@ -1,5 +1,6 @@
 __author__ = 'bromix'
 
+THUMB_SIZE = 'kodion.thumbnail.size'  # (int)
 SHOW_FANART = 'kodion.fanart.show'  # (bool)
 ITEMS_PER_PAGE = 'kodion.content.max_per_page'  # (int)
 SEARCH_SIZE = 'kodion.search.size'  # (int)

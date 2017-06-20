@@ -14,6 +14,7 @@ def _process_list_response(provider, context, json_data):
 
     result = []
 
+    thumb_size = context.get_settings().use_thumbnail_size()
     yt_items = json_data.get('items', [])
     if len(yt_items) == 0:
         context.log_warning('List of search result is empty')
@@ -25,7 +26,7 @@ def _process_list_response(provider, context, json_data):
             video_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet['title']
-            image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+            image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             video_item = items.VideoItem(title,
                                          context.create_uri(['play'], {'video_id': video_id}),
                                          image=image)
@@ -37,7 +38,7 @@ def _process_list_response(provider, context, json_data):
             channel_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet['title']
-            image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+            image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
             channel_item = items.DirectoryItem(title,
                                                context.create_uri(['channel', channel_id]),
@@ -64,7 +65,7 @@ def _process_list_response(provider, context, json_data):
             pass
         elif yt_kind == u'youtube#subscription':
             snippet = yt_item['snippet']
-            image = snippet.get('thumbnails', {}).get('high', {}).get('url', '')
+            image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             channel_id = snippet['resourceId']['channelId']
             channel_item = items.DirectoryItem(snippet['title'],
                                                 context.create_uri(['channel', channel_id]),
@@ -81,7 +82,7 @@ def _process_list_response(provider, context, json_data):
             playlist_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet['title']
-            image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+            image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
             channel_id = snippet['channelId']
 
@@ -104,7 +105,7 @@ def _process_list_response(provider, context, json_data):
             playlist_item_id_dict[video_id] = yt_item['id']
 
             title = snippet['title']
-            image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+            image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             video_item = items.VideoItem(title,
                                          context.create_uri(['play'], {'video_id': video_id}),
                                          image=image)
@@ -128,7 +129,7 @@ def _process_list_response(provider, context, json_data):
                 continue
 
             title = snippet['title']
-            image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+            image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             video_item = items.VideoItem(title,
                                          context.create_uri(['play'], {'video_id': video_id}),
                                          image=image)
@@ -144,7 +145,7 @@ def _process_list_response(provider, context, json_data):
                 video_id = yt_item['id']['videoId']
                 snippet = yt_item['snippet']
                 title = snippet['title']
-                image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+                image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
                 video_item = items.VideoItem(title,
                                              context.create_uri(['play'], {'video_id': video_id}),
                                              image=image)
@@ -157,7 +158,7 @@ def _process_list_response(provider, context, json_data):
                 playlist_id = yt_item['id']['playlistId']
                 snippet = yt_item['snippet']
                 title = snippet['title']
-                image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+                image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
                 channel_id = snippet['channelId']
                 # if the path directs to a playlist of our own, we correct the channel id to 'mine'
@@ -177,7 +178,7 @@ def _process_list_response(provider, context, json_data):
                 channel_id = yt_item['id']['channelId']
                 snippet = yt_item['snippet']
                 title = snippet['title']
-                image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+                image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
                 channel_item = items.DirectoryItem(title,
                                                    context.create_uri(['channel', channel_id]),

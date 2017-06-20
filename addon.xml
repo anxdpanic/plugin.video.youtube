@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.4.0~alpha2" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.4.0~alpha3" provider-name="bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -21,6 +21,8 @@
 [fix/upd] set content to files for menus, resolves mouse/scrolling
 [fix/upd] fix cipher
 [fix/upd] increase search history limit to 200
+[fix/upd] storage db
+[add] Thumbnail size to Settings -> General
 [add] Auto-play suggested [mehdilauters]
 [add] Automatic subtitles [Uukrull]
 [add] My Subscriptions (Filtered) - whitelist/blacklist version of My Subscriptions [chhe]

@@ -104,3 +104,8 @@ class AbstractSettings(object):
 
     def requires_dual_login(self):
         return self.get_bool('youtube.folder.my_subscriptions.show', True)
+
+    def use_thumbnail_size(self):
+        size = self.get_int(constants.setting.THUMB_SIZE, 0)
+        sizes = {0: 'medium', 1: 'high'}
+        return sizes[size]
