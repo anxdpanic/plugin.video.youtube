@@ -45,6 +45,7 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         filter_list = filter_string.split(',')
         filter_list = [x.lower() for x in filter_list]
 
+    thumb_size = context.get_settings().use_thumbnail_size()
     for channel_id in channel_data.keys():
         yt_item = channel_data[channel_id]
         channel_item = channel_id_dict[channel_id]
@@ -56,7 +57,7 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         channel_item.set_name(title)
 
         # image
-        image = snippet.get('thumbnails', {}).get('medium', {}).get('url', '')
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         channel_item.set_image(image)
 
         # - update context menu
@@ -102,6 +103,7 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
     custom_watch_later_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
     custom_history_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
 
+    thumb_size = context.get_settings().use_thumbnail_size()
     for playlist_id in playlist_data.keys():
         yt_item = playlist_data[playlist_id]
         playlist_item = playlist_id_dict[playlist_id]
@@ -109,7 +111,8 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
         snippet = yt_item['snippet']
         title = snippet['title']
         playlist_item.set_name(title)
-        playlist_item.set_image(snippet.get('thumbnails', {}).get('medium', {}).get('url', ''))
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        playlist_item.set_image(image)
 
         channel_id = snippet['channelId']
         # if the path directs to a playlist of our own, we correct the channel id to 'mine'
@@ -184,6 +187,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         my_playlists = resource_manager.get_related_playlists(channel_id='mine')
         pass
 
+    thumb_size = context.get_settings().use_thumbnail_size()
     for video_id in video_data.keys():
         yt_item = video_data[video_id]
         video_item = video_id_dict[video_id]
@@ -245,14 +249,8 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_duration_from_seconds(duration.seconds - 1)
 
         # try to find a better resolution for the image
-        thumbnails = snippet.get('thumbnails', {})
-        thumbnail_sizes = ['high', 'medium', 'default']
-        for thumbnail_size in thumbnail_sizes:
-            image = thumbnails.get(thumbnail_size, {}).get('url', '')
-            if image:
-                video_item.set_image(image)
-                break
-            pass
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        video_item.set_image(image)
 
         # set fanart
         video_item.set_fanart(provider.get_fanart(context))
@@ -367,3 +365,17 @@ def update_fanarts(provider, context, channel_items_dict):
             pass
         pass
     pass
+
+
+def get_thumbnail(thumb_size, thumbnails):
+    if thumb_size == 'high':
+        thumbnail_sizes = ['high', 'medium', 'default']
+    else:
+        thumbnail_sizes = ['medium', 'high', 'default']
+
+    image = ''
+    for thumbnail_size in thumbnail_sizes:
+        image = thumbnails.get(thumbnail_size, {}).get('url', '')
+        if image:
+            break
+    return image

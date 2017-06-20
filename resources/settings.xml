@@ -14,6 +14,7 @@
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
         <setting type="sep" />
+        <setting id="kodion.thumbnail.size" type="enum" label="31591" lvalues="31592|31593" default="1" />
         <setting id="kodion.fanart.show" type="bool" label="30021" default="true"/>
         <setting id="youtube.channel.fanart.show" type="bool" label="30503" enable="eq(-1,true)" default="true"/>
         <setting id="kodion.content.max_per_page" type="enum" label="30022" values="5|10|15|20|25|30|35|40|45|50" default="9" />

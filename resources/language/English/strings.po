@@ -646,3 +646,15 @@ msgstr ""
 msgctxt "#31590"
 msgid "Removed %s from My Subscriptions filter"
 msgstr ""
+
+msgctxt "#31591"
+msgid "Thumbnail size"
+msgstr ""
+
+msgctxt "#31592"
+msgid "Medium"
+msgstr ""
+
+msgctxt "#31593"
+msgid "High"
+msgstr ""
