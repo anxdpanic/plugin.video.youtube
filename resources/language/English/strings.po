@@ -652,9 +652,9 @@ msgid "Thumbnail size"
 msgstr ""
 
 msgctxt "#31592"
-msgid "Medium"
+msgid "Medium (16:9)"
 msgstr ""
 
 msgctxt "#31593"
-msgid "High"
+msgid "High (4:3)"
 msgstr ""

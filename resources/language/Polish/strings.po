@@ -634,9 +634,9 @@ msgid "Thumbnail size"
 msgstr "Rozmiar miniatur"
 
 msgctxt "#31592"
-msgid "Medium"
-msgstr "Średni"
+msgid "Medium (16:9)"
+msgstr "Średni (16:9)"
 
 msgctxt "#31593"
-msgid "High"
-msgstr "Duży"
+msgid "High (4:3)"
+msgstr "Duży (4:3)"
