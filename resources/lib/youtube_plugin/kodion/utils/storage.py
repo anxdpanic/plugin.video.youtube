@@ -141,12 +141,13 @@ class Storage(object):
         self._open()
         query = 'SELECT exists(SELECT 1 FROM %s LIMIT 1);' % self._table_name
         result = self._execute(False, query)
-        self._close()
+        is_empty = True
         if result is not None:
             for item in result:
-                return item[0] == 0
-
-        return False
+                is_empty = item[0] == 0
+                break
+        self._close()
+        return is_empty
 
     def _get_ids(self, oldest_first=True):
         self._open()
@@ -158,13 +159,13 @@ class Storage(object):
             query = '%s ORDER BY time DESC' % query
 
         query_result = self._execute(False, query)
-        self._close()
 
         result = []
         if query_result:
             for item in query_result:
                 result.append(item[0])
 
+        self._close()
         return result
 
     def _get(self, item_id):
@@ -190,4 +191,3 @@ class Storage(object):
         self._open()
         query = 'DELETE FROM %s WHERE key = ?' % self._table_name
         self._execute(True, query, [item_id])
-        self._close()
