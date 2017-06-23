@@ -644,3 +644,15 @@ msgstr "Προσθήκη %s φίλτρο των συνδρομών μου"
 msgctxt "#31590"
 msgid "Removed %s from My Subscriptions filter"
 msgstr "Αφαίρεση %s από το φίλτρο των εγγραφών μου"
+
+msgctxt "#31591"
+msgid "Thumbnail size"
+msgstr "Μέγεθος εικονιδίων προεσκόπισης"
+
+msgctxt "#31592"
+msgid "Medium (16:9)"
+msgstr "Μέτριο (16:9)"
+
+msgctxt "#31593"
+msgid "High (4:3)"
+msgstr "Υψηλό (4:3)"
