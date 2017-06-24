@@ -109,3 +109,8 @@ class AbstractSettings(object):
         size = self.get_int(constants.setting.THUMB_SIZE, 0)
         sizes = {0: 'medium', 1: 'high'}
         return sizes[size]
+
+    def safe_search(self):
+        index = self.get_int(constants.setting.SAFE_SEARCH, 0)
+        values = {0: 'moderate', 1: 'none', 2: 'strict'}
+        return values[index]

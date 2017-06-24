@@ -450,6 +450,7 @@ class Provider(kodion.AbstractProvider):
         page_token = context.get_param('page_token', '')
         search_type = context.get_param('search_type', 'video')
         event_type = context.get_param('event_type', '')
+        safe_search = context.get_settings().safe_search()
         page = int(context.get_param('page', 1))
 
         if search_type == 'video':
@@ -489,7 +490,7 @@ class Provider(kodion.AbstractProvider):
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,
                                                      q=search_text, search_type=search_type, event_type=event_type,
-                                                     page_token=page_token)
+                                                     safe_search=safe_search, page_token=page_token)
         if not v3.handle_error(self, context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))

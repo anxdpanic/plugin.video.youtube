@@ -658,3 +658,15 @@ msgstr ""
 msgctxt "#31593"
 msgid "High (4:3)"
 msgstr ""
+
+msgctxt "#31594"
+msgid "Safe Search"
+msgstr ""
+
+msgctxt "#31595"
+msgid "Moderate"
+msgstr ""
+
+msgctxt "#31596"
+msgid "Strict"
+msgstr ""
