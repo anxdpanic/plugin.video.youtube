@@ -10,18 +10,21 @@
 [fix/upd] fix cipher
 [fix/upd] increase search history limit to 200
 [fix/upd] storage db
+[add] Safe Search to Settings -> General
 [add] Thumbnail size to Settings -> General
 [add] Auto-play suggested [mehdilauters]
 [add] Automatic subtitles [Uukrull]
 [add] My Subscriptions (Filtered) - whitelist/blacklist version of My Subscriptions [chhe]
 [add] module extension point:
-        add-ons can now add plugin.video.youtube dependency and resolve youtube video id's using the youtube plugin
+        add-ons can now add plugin.video.youtube dependency and resolve youtube video id's or make v3 api requests using the youtube plugin,
         """ <addon.xml>
         <import addon="plugin.video.youtube"/>
         """
         """ <example.py>
         import youtube_resolver
-        streams = youtube_resolver.resolve(youtube_video_id)
+        streams = youtube_resolver.resolve(<video_id>)
+        import youtube_requests
+        videos = youtube_requests.get_videos([<video_id_1>, <video_id_2>, <video_id_3>])
         """
 
 5.3.11
