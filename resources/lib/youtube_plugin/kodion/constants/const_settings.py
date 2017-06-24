@@ -2,6 +2,7 @@ __author__ = 'bromix'
 
 THUMB_SIZE = 'kodion.thumbnail.size'  # (int)
 SHOW_FANART = 'kodion.fanart.show'  # (bool)
+SAFE_SEARCH = 'kodion.safe.search'  # (int)
 ITEMS_PER_PAGE = 'kodion.content.max_per_page'  # (int)
 SEARCH_SIZE = 'kodion.search.size'  # (int)
 CACHE_SIZE = 'kodion.cache.size'  # (int)
