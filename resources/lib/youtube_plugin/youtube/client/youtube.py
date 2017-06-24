@@ -444,7 +444,7 @@ class YouTube(LoginClient):
 
         return self._perform_v3_request(method='GET', path='search', params=params, quota_optimized=True)
 
-    def search(self, q, search_type=['video', 'channel', 'playlist'], event_type='', page_token=''):
+    def search(self, q, search_type=['video', 'channel', 'playlist'], event_type='', channel_id='', order='relevance', safe_search='moderate', page_token=''):
         """
         Returns a collection of search results that match the query parameters specified in the API request. By default,
         a search result set identifies matching video, channel, and playlist resources, but you can also configure
@@ -452,6 +452,9 @@ class YouTube(LoginClient):
         :param q:
         :param search_type: acceptable values are: 'video' | 'channel' | 'playlist'
         :param event_type: 'live', 'completed', 'upcoming'
+        :param channel_id: limit search to channel id
+        :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
+        :param safe_search: one of: 'moderate', 'none', 'strict'
         :param page_token: can be ''
         :return:
         """
@@ -481,9 +484,26 @@ class YouTube(LoginClient):
         if search_type:
             params['type'] = search_type
             pass
+        if channel_id:
+            params['channelId'] = channel_id
+            pass
+        if order:
+            params['order'] = order
+            pass
+        if safe_search:
+            params['safeSearch'] = safe_search
+            pass
         if page_token:
             params['pageToken'] = page_token
             pass
+
+        video_only_params = ['eventType', 'videoCaption', 'videoCategoryId', 'videoDefinition',
+                             'videoDimension', 'videoDuration', 'videoEmbeddable', 'videoLicense',
+                             'videoSyndicated', 'videoType', 'relatedToVideoId', 'forMine']
+        for key in video_only_params:
+            if params.get(key) is not None:
+                params['type'] = 'video'
+                break
 
         return self._perform_v3_request(method='GET', path='search', params=params, quota_optimized=False)
 
