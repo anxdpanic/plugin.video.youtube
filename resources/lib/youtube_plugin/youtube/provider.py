@@ -394,11 +394,15 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/subscriptions/(?P<method>.*)/$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
+        if method == 'list':
+            self.set_content_type(context, kodion.constants.content_type.FILES)
         return yt_subscriptions.process(method, self, context, re_match)
 
     @kodion.RegisterProviderPath('^/special/(?P<category>.*)/$')
     def _on_yt_specials(self, context, re_match):
         category = re_match.group('category')
+        if category == 'browse_channels':
+            self.set_content_type(context, kodion.constants.content_type.FILES)
         return yt_specials.process(category, self, context, re_match)
 
     @kodion.RegisterProviderPath('^/events/post_play/$')
