@@ -96,6 +96,11 @@ def create_from_item(context, base_item):
     # 'date' = '09.03.1982'
     _process_date(info_labels, base_item.get_date())
 
+    # Directory
+    if isinstance(base_item, DirectoryItem):
+        _process_string_value(info_labels, 'plot', base_item.get_plot())
+        pass
+
     # Image
     if isinstance(base_item, ImageItem):
         # 'title' = 'Blow Your Head Off' (string)
