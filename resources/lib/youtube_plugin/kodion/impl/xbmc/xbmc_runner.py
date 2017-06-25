@@ -91,6 +91,8 @@ class XbmcRunner(AbstractProviderRunner):
                                      replaceItems=directory_item.replace_context_menu())
             pass
 
+        item.setInfo(type=u'video', infoLabels=info_labels.create_from_item(context, directory_item))
+
         xbmcplugin.addDirectoryItem(handle=context.get_handle(),
                                     url=directory_item.get_uri(),
                                     listitem=item,
