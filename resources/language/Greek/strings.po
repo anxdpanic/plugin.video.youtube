@@ -656,3 +656,15 @@ msgstr "Μέτριο (16:9)"
 msgctxt "#31593"
 msgid "High (4:3)"
 msgstr "Υψηλό (4:3)"
+
+msgctxt "#31594"
+msgid "Safe Search"
+msgstr "Ασφαλής αναζήτηση"
+
+msgctxt "#31595"
+msgid "Moderate"
+msgstr "Μέτριο"
+
+msgctxt "#31596"
+msgid "Strict"
+msgstr "Αυστρηρό"
