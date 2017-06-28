@@ -2,6 +2,7 @@
 [upd] Greek strings [Twilight0]
 [upd] Polish strings [Etharr]
 [upd] Finnish strings [teemue]
+[upd] Spanish strings [roliverosc]
 [fix/upd] resolve "Error Contents: 'q'" error [horstepipe]
 [fix/upd] resolve Play All/Play from here not starting playback
 [fix/upd] resolve playlists starting on second item
