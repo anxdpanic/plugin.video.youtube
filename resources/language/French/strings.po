@@ -598,7 +598,63 @@ msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
 msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès?"
 
-
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
 msgstr "Jouer automatiquement les vidéos suggérées"
+
+msgctxt "#31583"
+msgid "Automatic"
+msgstr "Automatique"
+
+msgctxt "#31584"
+msgid "My Subscriptions (Filtered)"
+msgstr "Mes abonnements (filtrés)"
+
+msgctxt "#31585"
+msgid "Filtered channel list (comma delimited)"
+msgstr "Liste des chaînes filtrées (délimitées par des virgules)"
+
+msgctxt "#31586"
+msgid "Blacklist"
+msgstr "Blackliste"
+
+msgctxt "#31587"
+msgid "Add to My Subscriptions filter"
+msgstr "Ajouter au filtre Mes abonnements"
+
+msgctxt "#31588"
+msgid "Remove from My Subscriptions filter"
+msgstr "Supprimer du filtre Mes abonnements"
+
+msgctxt "#31589"
+msgid "Added %s to My Subscriptions filter"
+msgstr "Ajouter %s au filtre Mes abonnements"
+
+msgctxt "#31590"
+msgid "Removed %s from My Subscriptions filter"
+msgstr "Supprimer %s du filtre Mes abonnements"
+
+msgctxt "#31591"
+msgid "Thumbnail size"
+msgstr "Taille des vignettes"
+
+msgctxt "#31592"
+msgid "Medium (16:9)"
+msgstr "Moyen (16:9)"
+
+msgctxt "#31593"
+msgid "High (4:3)"
+msgstr "Haut (4: 3)"
+
+msgctxt "#31594"
+msgid "Safe Search"
+msgstr "Recherche sécurisée"
+
+msgctxt "#31595"
+msgid "Moderate"
+msgstr "Modéré"
+
+msgctxt "#31596"
+msgid "Strict"
+msgstr "Strict"
+
