@@ -620,19 +620,19 @@ msgstr "Blackliste"
 
 msgctxt "#31587"
 msgid "Add to My Subscriptions filter"
-msgstr "Ajouter au filtre Mes abonnements"
+msgstr "Ajouter à ma liste d'abonnement filtré"
 
 msgctxt "#31588"
 msgid "Remove from My Subscriptions filter"
-msgstr "Supprimer du filtre Mes abonnements"
+msgstr "Supprimer de mes abonnements filtré"
 
 msgctxt "#31589"
 msgid "Added %s to My Subscriptions filter"
-msgstr "Ajouter %s au filtre Mes abonnements"
+msgstr "Ajouté %s pour mes abonnements filtré"
 
 msgctxt "#31590"
 msgid "Removed %s from My Subscriptions filter"
-msgstr "Supprimer %s du filtre Mes abonnements"
+msgstr "Supprimer %s de mes abonnements filtré"
 
 msgctxt "#31591"
 msgid "Thumbnail size"
@@ -640,11 +640,11 @@ msgstr "Taille des vignettes"
 
 msgctxt "#31592"
 msgid "Medium (16:9)"
-msgstr "Moyen (16:9)"
+msgstr "Moyennes (16:9)"
 
 msgctxt "#31593"
 msgid "High (4:3)"
-msgstr "Haut (4: 3)"
+msgstr "Hautes (4: 3)"
 
 msgctxt "#31594"
 msgid "Safe Search"
@@ -656,5 +656,5 @@ msgstr "Modéré"
 
 msgctxt "#31596"
 msgid "Strict"
-msgstr "Strict"
+msgstr "Stricte"
 
