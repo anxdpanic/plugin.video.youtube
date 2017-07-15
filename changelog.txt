@@ -1,3 +1,7 @@
+[fix/upd] dash working for vevo/etc
+[upd] rework of auto subtitles
+[fix] add undefined settings to xml for leia nightly login issues
+
 5.4.0
 [upd] Greek strings [Twilight0]
 [upd] Polish strings [Etharr]

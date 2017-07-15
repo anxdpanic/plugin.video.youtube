@@ -3,9 +3,6 @@ import xbmcvfs
 import re
 import HTMLParser
 import requests
-import urllib
-
-from .signature.cipher import Cipher
 
 
 class Subtitles(object):
@@ -20,11 +17,9 @@ class Subtitles(object):
     SUBTITLE_LIST_URL = 'http://www.youtube.com/api/timedtext?type=list&v=%s'
     SUBTITLE_URL = 'http://www.youtube.com/api/timedtext?fmt=vtt&v=%s&name=%s&lang=%s'
     VIDEO_URL = 'http://www.youtube.com/watch?v=%s'
-    SUBTITLE_AUTO_LIST_URL = 'http://www.youtube.com/api/timedtext?key=yttt1&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&caps=asr&asrs=1&type=list&tlangs=1&expire={0}&signature={1}&asr_langs={2}&v={3}'
-    SUBTITLE_AUTO_URL = 'http://www.youtube.com/api/timedtext?key=yttt1&sparams=asr_langs%2Ccaps%2Cv%2Cexpire&caps=asr&name=&type=track&kind=asr&fmt=vtt&lang=en&expire={0}&signature={1}&asr_langs={2}&tlang={3}&v={4}'
     SRT_FILE = 'special://temp/temp/%s.%s.srt'
 
-    def __init__(self, context, video_id):
+    def __init__(self, context, video_id, captions):
         self.context = context
         self._verify = context.get_settings().get_bool('simple.requests.ssl.verify', False)
         self.video_id = video_id
@@ -38,6 +33,29 @@ class Subtitles(object):
                         'Referer': 'https://www.youtube.com/tv',
                         'Accept-Encoding': 'gzip, deflate',
                         'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+
+        self.translation_langs = []
+        self.caption_track = {}
+        renderer = captions.get('playerCaptionsTracklistRenderer', {})
+        default_audio = renderer.get('defaultAudioTrackIndex')
+        if default_audio is not None:
+            audio_tracks = renderer.get('audioTracks', [])
+            try:
+                audio_track = audio_tracks[default_audio]
+            except:
+                audio_track = None
+            if audio_track:
+                default_caption = audio_track.get('defaultCaptionTrackIndex')
+                if default_caption is not None:
+                    caption_tracks = renderer.get('captionTracks', [])
+                    try:
+                        self.caption_track = caption_tracks[default_caption]
+                    except:
+                        pass
+        if self.caption_track.get('isTranslatable') is True:
+            translation_langs = renderer.get('translationLanguages', [])
+            for lang in translation_langs:
+                self.translation_langs.append(lang.get('languageCode'))
 
     def get(self):
         if self._languages() != self.LANG_NONE:
@@ -106,8 +124,7 @@ class Subtitles(object):
             elif languages == self.LANG_AUTO:
                 list_of_subs = []
                 list_of_subs.extend(self._get_current(result.text))
-                video_url = self.VIDEO_URL % self.video_id
-                list_of_subs.extend(self._get_auto(video_url, language=self.language.split('-')[0]))
+                list_of_subs.extend(self._get_auto(language=self.language.split('-')[0]))
                 list_of_subs.extend(self._get_en(result.text))
                 return list(set(list_of_subs))
             else:
@@ -229,66 +246,31 @@ class Subtitles(object):
             self.context.log_debug('No subtitles found for: %s' % reg_exp)
             return []
 
-    def _get_auto(self, video_url, language='en'):
+    def _get_auto(self, language='en'):
         fname = self.srt_filename_auto(language)
         if xbmcvfs.exists(fname):
             self.context.log_debug('Automatic subtitle exists for: %s, filename: %s' % (language, fname))
             return [fname]
 
-        result = requests.get(video_url, headers=self.headers,
-                              verify=self._verify, allow_redirects=True)
+        if (self.caption_track.get('languageCode') != language) and (language not in self.translation_langs):
+            self.context.log_debug('No automatic subtitles found for: %s' % language)
+            return []
 
-        if result.text:
-            tts_result = result.text
-            if tts_result.find("'TTS_URL': \"") > -1:
-                tts_result = tts_result.split("'TTS_URL': \"")
-                tts_result = tts_result[1].split("\"")[0]
-                if len(tts_result) < 250:
-                    return []
+        base_url = self.caption_track.get('baseUrl')
+        if base_url:
+            subtitle_auto_url = base_url + '&fmt=vtt&type=track&tlang=%s' % language
+            self.context.log_debug('Auto subtitle url: %s' % subtitle_auto_url)
+
+            result_auto = requests.get(subtitle_auto_url, headers=self.headers,
+                                       verify=self._verify, allow_redirects=True)
+
+            if result_auto.text:
+                self.context.log_debug('Auto subtitle found for: %s' % language)
+                self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
+                return [fname]
             else:
+                self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
                 return []
-
-            tts_result = tts_result.replace("\\/", "/")
-            tts_result = tts_result.replace("\\u0026", "&")
-            tts_result = tts_result.replace("%2C", ",")
-            tts_result = tts_result.split("?")[1]
-            tts_result += '&'
-            self.context.log_debug('Auto Subtitle debug: %s' % tts_result)
-
-            asr_langs = re.compile('asr_langs=(.*?)[&]').findall(tts_result)
-            if asr_langs and (language in asr_langs[0]):
-                asr_langs = asr_langs[0]
-                signature = re.compile('signature=(.*?)[&]').findall(tts_result)
-                if not signature:
-                    signature = re.compile('s=(.*?)[&]').findall(tts_result)
-                    if signature:
-                        re_match_js = re.search(r'\"js\"[^:]*:[^"]*\"(?P<js>.+?)\"', tts_result)
-                        cipher = None
-                        if re_match_js:
-                            js = re_match_js.group('js').replace('\\', '').strip('//')
-                            if not js.startswith('http'):
-                                js = 'http://www.youtube.com/%s' % js
-                            cipher = Cipher(self.context, java_script_url=js)
-                        signature = cipher.get_signature(signature[0])
-                else:
-                    signature = signature[0]
-                expire = re.compile('expire=(.*?)[&]').findall(tts_result)
-                if expire:
-                    expire = expire[0]
-
-                if expire and signature and asr_langs:
-                    subtitle_auto_url = self.SUBTITLE_AUTO_URL.format(expire, signature, urllib.quote(asr_langs), language, self.video_id)
-                    self.context.log_debug('Auto subtitle url: %s' % subtitle_auto_url)
-
-                    result_auto = requests.get(subtitle_auto_url, headers=self.headers,
-                                               verify=self._verify, allow_redirects=True)
-
-                    if result_auto.text:
-                        self.context.log_debug('Auto subtitle found for: %s' % language)
-                        self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
-                        return [fname]
-                    else:
-                        self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
 
         self.context.log_debug('No automatic subtitles found for: %s' % language)
         return []
