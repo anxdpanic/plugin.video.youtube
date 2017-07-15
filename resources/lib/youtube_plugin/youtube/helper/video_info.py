@@ -346,50 +346,31 @@ class VideoInfo(object):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-                   'Accept': '*/*',
+                   'Accept': 'application/json',
                    'DNT': '1',
                    'Referer': 'https://www.youtube.com',
                    'Accept-Encoding': 'gzip, deflate',
-                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
+                   'X-SPF-Previous': 'https://www.youtube.com',
+                   'X-SPF-Referer': 'https://www.youtube.com',
+                   'X-SPF-Request': 'navigate'}
 
         params = {'v': video_id,
                   'hl': self.language,
-                  'gl': self.region}
-
-        if self._access_token:
-            params['access_token'] = self._access_token
+                  'gl': self.region,
+                  'spf': 'navigate'}
 
         url = 'https://www.youtube.com/watch'
 
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        html = result.text
+        spf_response = result.json()
 
-        """
-        This will almost double the speed for the regular expressions, because we only must match
-        a small portion of the whole html. And only if we find positions, we cut down the html.
+        for item in spf_response:
+            if item.get('attr', {}).get('player'):
+                if item.get('data', {}).get('swfcfg'):
+                    return item.get('data')
 
-        """
-        player_config = dict()
-        pos = html.find('ytplayer.config = ')
-        if pos >= 0:
-            html2 = html[pos + 18:]
-            pos = html2.find(';ytplayer.load')
-            if pos:
-                player_config = html2[:pos]
-                try:
-                    player_config = json.loads(player_config)
-                except:
-                    player_config = dict()
-
-        re_match_js = re.search(r'\"js\"[^:]*:[^"]*\"(?P<js>.+?)\"', html)
-        cipher = None
-        if re_match_js:
-            js = re_match_js.group('js').replace('\\', '').strip('//')
-            if not js.startswith('http'):
-                js = 'http://www.youtube.com/%s' % js
-            cipher = Cipher(self._context, java_script_url=js)
-
-        return player_config, cipher
+        return dict()
 
     def _method_watch(self, video_id, reason=u'', meta_info=None):
         stream_list = []
@@ -577,6 +558,7 @@ class VideoInfo(object):
                    'Referer': 'https://www.youtube.com/tv',
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+
         params = {'video_id': video_id,
                   'hl': self.language,
                   'gl': self.region,
@@ -585,8 +567,20 @@ class VideoInfo(object):
                   'ps': 'default',
                   'el': 'default'}
 
-        player_config, cipher = self.get_player_config(video_id)
-        params['sts'] = player_config.get('sts', '')
+        player_config = self.get_player_config(video_id)
+
+        swfcfg = player_config.get('swfcfg', {})
+        player_assets = swfcfg.get('assets', {})
+        player_args = swfcfg.get('args', {})
+        js = player_assets.get('js')
+
+        cipher = None
+        if js:
+            if not js.startswith('http'):
+                js = 'http://www.youtube.com/%s' % js
+            cipher = Cipher(self._context, java_script_url=js)
+
+        params['sts'] = swfcfg.get('sts', '')
 
         if self._access_token:
             params['access_token'] = self._access_token
@@ -667,18 +661,20 @@ class VideoInfo(object):
             mpd_sig_deciphered = True
             if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
                 mpd_sig_deciphered = False
-                sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
-                if sig:
-                    sig = sig.group('sig')
-                    sig = cipher.get_signature(sig)
-                    mpd_url = re.sub('/s/[0-9A-F\.]+', '/signature/' + sig, mpd_url)
-                    mpd_sig_deciphered = True
+                if cipher:
+                    sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
+                    if sig:
+                        signature = cipher.get_signature(sig.group('sig'))
+                        mpd_url = re.sub('/s/[0-9A-F\.]+', '/signature/' + signature, mpd_url)
+                        mpd_sig_deciphered = True
             if mpd_sig_deciphered:
                 meta_info['subtitles'] = Subtitles(self._context, video_id).get()
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info}
                 video_stream.update(self.FORMAT.get('9999'))
                 stream_list.append(video_stream)
+            else:
+                return self._method_watch(video_id)
 
         added_subs = False  # avoid repeat calls from loop or cipher signature
         # extract streams from map
@@ -694,8 +690,10 @@ class VideoInfo(object):
                     if 'sig' in stream_map:
                         url += '&signature=%s' % stream_map['sig']
                     elif 's' in stream_map:
-                        url += '&signature=%s' % cipher.get_signature(stream_map['s'])
-
+                        if cipher:
+                            url += '&signature=%s' % cipher.get_signature(stream_map['s'])
+                        else:
+                            return self._method_watch(video_id)
                     itag = stream_map['itag']
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:

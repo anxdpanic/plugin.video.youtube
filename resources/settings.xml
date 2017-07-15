@@ -68,6 +68,7 @@
         <setting id="youtube.api.id" type="text" label="30202" default="" visible="eq(-2,true)"/>
         <setting id="youtube.api.secret" type="text" label="30203" default="" visible="eq(-3,true)"/>
         <setting id="youtube.api.key.switch" type="enum" label="30205" values="0|1|2|3|4|5" visible="eq(-4,false)" default="1"/>
+        <!-- Not user configured -->
         <setting id="youtube.api.last.switch" type="text" label="" visible="false" enable="true" default=""/>
         <setting id="youtube.api.last.hash" type="text" label="" visible="false" enable="true" default=""/>
         <setting id="youtube.api.key.switch.use" type="text" label="" visible="false" enable="true" default=""/>
@@ -84,5 +85,11 @@
         <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" action="RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/reset/)" option="close"/>
         <setting type="sep" />
         <setting id="kodion.maintain.delete.settings" type="action" label="30559" option="close" action="RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)"/>
+        <!-- Not user configured -->
+        <setting id="kodion.access_token" type="text" visible="false" enabled="true" default=""/>
+        <setting id="kodion.access_token.expires" type="text" visible="false" enabled="true" default=""/>
+        <setting id="kodion.refresh_token" type="text" visible="false" enabled="true" default=""/>
+        <setting id="kodion.login.hash" type="text" visible="false" enabled="true" default=""/>
+        <setting id="youtube.login.version" type="text" visible="false" enabled="true" default=""/>
     </category>
 </settings>
