@@ -365,12 +365,14 @@ class VideoInfo(object):
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         spf_response = result.json()
 
+        player_config = dict()
+
         for item in spf_response:
             if item.get('attr', {}).get('player'):
                 if item.get('data', {}).get('swfcfg'):
-                    return item.get('data')
+                    player_config.update(item.get('data'))
 
-        return dict()
+        return player_config
 
     def _method_watch(self, video_id, reason=u'', meta_info=None):
         stream_list = []
@@ -430,7 +432,14 @@ class VideoInfo(object):
             cipher = Cipher(self._context, java_script_url=js)
             pass
 
-        meta_info['subtitles'] = Subtitles(self._context, video_id).get()
+        player_config = self.get_player_config(video_id)
+
+        swfcfg = player_config.get('swfcfg', {})
+        player_args = swfcfg.get('args', {})
+        player_response = json.loads(player_args.get('player_response', '{}'))
+        captions = player_response.get('captions', {})
+
+        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
 
         re_match = re.search(r'\"url_encoded_fmt_stream_map\"[^:]*:[^"]*\"(?P<url_encoded_fmt_stream_map>[^"]*\")',
                              html)
@@ -572,6 +581,8 @@ class VideoInfo(object):
         swfcfg = player_config.get('swfcfg', {})
         player_assets = swfcfg.get('assets', {})
         player_args = swfcfg.get('args', {})
+        player_response = json.loads(player_args.get('player_response', '{}'))
+        captions = player_response.get('captions', {})
         js = player_assets.get('js')
 
         cipher = None
@@ -629,31 +640,7 @@ class VideoInfo(object):
                 return self._load_manifest(url, video_id, meta_info=meta_info)
             pass
 
-        """
-        fmt_list = params.get('fmt_list', '')
-        if fmt_list:
-            fmt_list = fmt_list.split(',')
-            for item in fmt_list:
-                data = item.split('/')
-                size = data[1].split('x')
-                pass
-            pass
-        """
-
-        # read adaptive_fmts
-        """
-        adaptive_fmts = params['adaptive_fmts']
-        adaptive_fmts = adaptive_fmts.split(',')
-        for item in adaptive_fmts:
-            stream_map = dict(urlparse.parse_qsl(item))
-
-            if stream_map['itag'] != '140' and stream_map['itag'] != '171':
-                video_stream = {'url': stream_map['url'],
-                                'yt_format': itag_map[stream_map['itag']]}
-                stream_list.append(video_stream)
-                pass
-            pass
-        """
+        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
 
         mpd_url = params.get('dashmpd', '')
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
@@ -668,7 +655,6 @@ class VideoInfo(object):
                         mpd_url = re.sub('/s/[0-9A-F\.]+', '/signature/' + signature, mpd_url)
                         mpd_sig_deciphered = True
             if mpd_sig_deciphered:
-                meta_info['subtitles'] = Subtitles(self._context, video_id).get()
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info}
                 video_stream.update(self.FORMAT.get('9999'))
@@ -676,7 +662,6 @@ class VideoInfo(object):
             else:
                 return self._method_watch(video_id)
 
-        added_subs = False  # avoid repeat calls from loop or cipher signature
         # extract streams from map
         url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
         if url_encoded_fmt_stream_map:
@@ -703,9 +688,6 @@ class VideoInfo(object):
                         continue
                         pass
 
-                    if not added_subs:
-                        added_subs = True
-                        meta_info['subtitles'] = Subtitles(self._context, video_id).get()
                     video_stream = {'url': url,
                                     'meta': meta_info}
                     video_stream.update(yt_format)
@@ -717,10 +699,7 @@ class VideoInfo(object):
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:
                         raise Exception('unknown yt_format for itag "%s"' % itag)
-                    yt_format['video']['rtmpe'] = True
-                    if not added_subs:
-                        added_subs = True
-                        meta_info['subtitles'] = Subtitles(self._context, video_id).get()
+
                     video_stream = {'url': url,
                                     'meta': meta_info}
                     video_stream.update(yt_format)
