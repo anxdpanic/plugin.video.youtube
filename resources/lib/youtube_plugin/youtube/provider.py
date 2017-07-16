@@ -503,10 +503,21 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/config/(?P<switch>.*)/$')
     def configure_addon(self, context, re_match):
         switch = re_match.group('switch')
+        settings = context.get_settings()
         if switch == 'youtube':
             context._addon.openSettings()
         elif switch == 'mpd':
-            xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
+            use_dash = context.addon_enabled('inputstream.adaptive') or settings.dash_support_builtin()
+            if settings.dash_support_addon() and not use_dash:
+                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30579)):
+                    use_dash = context.set_addon_enabled('inputstream.adaptive')
+                else:
+                    use_dash = False
+            if use_dash:
+                if settings.dash_support_addon():
+                    xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
+            else:
+                settings.set_bool('kodion.video.quality.mpd', False)
         else:
             return False
 
