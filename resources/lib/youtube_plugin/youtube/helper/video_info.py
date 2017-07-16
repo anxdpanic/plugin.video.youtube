@@ -423,22 +423,14 @@ class VideoInfo(object):
             hlsvp = urllib.unquote(re_match_hlsvp.group('hlsvp')).replace('\/', '/')
             return self._load_manifest(hlsvp, video_id, meta_info=meta_info)
 
-        player_config = self.get_player_config(video_id)
-
-        swfcfg = player_config.get('swfcfg', {})
-        player_assets = swfcfg.get('assets', {})
-        player_args = swfcfg.get('args', {})
-        player_response = json.loads(player_args.get('player_response', '{}'))
-        captions = player_response.get('captions', {})
-        js = player_assets.get('js')
-
+        re_match_js = re.search(r'\"js\"[^:]*:[^"]*\"(?P<js>.+?)\"', html)
         cipher = None
-        if js:
+        if re_match_js:
+            js = re_match_js.group('js').replace('\\', '').strip('//')
             if not js.startswith('http'):
                 js = 'http://www.youtube.com/%s' % js
             cipher = Cipher(self._context, java_script_url=js)
-
-        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
+            pass
 
         re_match = re.search(r'\"url_encoded_fmt_stream_map\"[^:]*:[^"]*\"(?P<url_encoded_fmt_stream_map>[^"]*\")',
                              html)
