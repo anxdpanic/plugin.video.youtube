@@ -653,13 +653,15 @@ class VideoInfo(object):
                         signature = cipher.get_signature(sig.group('sig'))
                         mpd_url = re.sub('/s/[0-9A-F\.]+', '/signature/' + signature, mpd_url)
                         mpd_sig_deciphered = True
+                else:
+                    raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info}
                 video_stream.update(self.FORMAT.get('9999'))
                 stream_list.append(video_stream)
             else:
-                return self._method_watch(video_id)
+                raise YouTubeException('Failed to decipher signature')
 
         # extract streams from map
         url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
@@ -677,7 +679,8 @@ class VideoInfo(object):
                         if cipher:
                             url += '&signature=%s' % cipher.get_signature(stream_map['s'])
                         else:
-                            return self._method_watch(video_id)
+                            raise YouTubeException('Cipher: Not Found')
+
                     itag = stream_map['itag']
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:
@@ -709,8 +712,6 @@ class VideoInfo(object):
 
         # last fallback
         if not stream_list:
-            return self._method_watch(video_id)
+            raise YouTubeException('No streams found')
 
         return stream_list
-
-    pass
