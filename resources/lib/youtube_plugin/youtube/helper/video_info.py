@@ -622,6 +622,8 @@ class VideoInfo(object):
                 pass
             pass
 
+        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
+
         if params.get('status', '') == 'fail':
             return self._method_watch(video_id, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
 
@@ -630,8 +632,6 @@ class VideoInfo(object):
             if url:
                 return self._load_manifest(url, video_id, meta_info=meta_info)
             pass
-
-        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
 
         mpd_url = params.get('dashmpd', '')
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
