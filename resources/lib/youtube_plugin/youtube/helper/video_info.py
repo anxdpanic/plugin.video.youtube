@@ -362,8 +362,11 @@ class VideoInfo(object):
 
         url = 'https://www.youtube.com/watch'
 
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        spf_response = result.json()
+        try:
+            result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+            spf_response = result.json()
+        except:
+            return dict()
 
         player_config = dict()
 
@@ -403,14 +406,26 @@ class VideoInfo(object):
         a small portion of the whole html. And only if we find positions, we cut down the html.
 
         """
-        pos = html.find('ytplayer.config')
+        _player_config = '{}'
+        lead = 'ytplayer.config = '
+        tail = ';ytplayer.load'
+        pos = html.find(lead)
         if pos >= 0:
-            html2 = html[pos:]
-            pos = html2.find('</script>')
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
             if pos:
-                html = html2[:pos]
-                pass
-            pass
+                _player_config = html2[:pos]
+
+        try:
+            player_config = json.loads(_player_config)
+        except:
+            player_config = dict()
+
+        player_assets = player_config.get('assets', {})
+        player_args = player_config.get('args', {})
+        player_response = json.loads(player_args.get('player_response', '{}'))
+        captions = player_response.get('captions', {})
+        js = player_assets.get('js')
 
         _meta_info = {'video': {},
                       'channel': {},
@@ -418,28 +433,65 @@ class VideoInfo(object):
                       'subtitles': []}
         meta_info = meta_info if meta_info else _meta_info
 
-        re_match_hlsvp = re.search(r'\"hlsvp\"[^:]*:[^"]*\"(?P<hlsvp>[^"]*\")', html)
-        if re_match_hlsvp:
-            hlsvp = urllib.unquote(re_match_hlsvp.group('hlsvp')).replace('\/', '/')
-            return self._load_manifest(hlsvp, video_id, meta_info=meta_info)
+        if not meta_info['video'].get('id'):
+            meta_info['video']['id'] = player_args.get('video_id', '')
+        if not meta_info['video'].get('title'):
+            meta_info['video']['title'] = player_args.get('title', '')
+        if not meta_info['channel'].get('author'):
+            meta_info['channel']['author'] = player_args.get('author', '')
+        if not meta_info['channel'].get('id'):
+            meta_info['channel']['id'] = player_args.get('ucid', '')
+        try:
+            meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+            meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
+        except:
+            pass
 
-        re_match_js = re.search(r'\"js\"[^:]*:[^"]*\"(?P<js>.+?)\"', html)
+        if (not meta_info['images'].get('high')) or (not meta_info['images'].get('medium')) or \
+                (not meta_info['images'].get('standard')) or (not meta_info['images'].get('default')):
+            _related_args = '{}'
+            lead = '\'RELATED_PLAYER_ARGS\': '
+            tail = ',\n'
+            pos = html.find(lead)
+            if pos >= 0:
+                html2 = html[pos + len(lead):]
+                pos = html2.find(tail)
+                if pos:
+                    _related_args = html2[:pos]
+
+            try:
+                related_args = json.loads(_related_args)
+                related_args = dict(urlparse.parse_qsl(related_args.get('rvs')))
+            except:
+                related_args = dict()
+
+            image_data_list = [
+                {'from': 'iurlhq', 'to': 'high'},
+                {'from': 'iurlmq', 'to': 'medium'},
+                {'from': 'iurlsd', 'to': 'standard'},
+                {'from': 'thumbnail_url', 'to': 'default'}]
+            for image_data in image_data_list:
+                image_url = related_args.get(image_data['from'], '')
+                if image_url:
+                    meta_info['images'][image_data['to']] = image_url
+
+        if not meta_info['subtitles']:
+            meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
+
+        if player_args.get('hlsvp'):
+            return self._load_manifest(player_args.get('hlsvp'), video_id, meta_info=meta_info)
+
         cipher = None
-        if re_match_js:
-            js = re_match_js.group('js').replace('\\', '').strip('//')
+        if js:
             if not js.startswith('http'):
                 js = 'http://www.youtube.com/%s' % js
             cipher = Cipher(self._context, java_script_url=js)
-            pass
 
-        re_match = re.search(r'\"url_encoded_fmt_stream_map\"[^:]*:[^"]*\"(?P<url_encoded_fmt_stream_map>[^"]*\")',
-                             html)
-        if re_match:
-            url_encoded_fmt_stream_map = re_match.group('url_encoded_fmt_stream_map')
+        if player_args.get('url_encoded_fmt_stream_map'):
+            url_encoded_fmt_stream_map = player_args.get('url_encoded_fmt_stream_map')
             url_encoded_fmt_stream_map = url_encoded_fmt_stream_map.split(',')
 
             for value in url_encoded_fmt_stream_map:
-                value = value.replace('\\u0026', '&')
                 attr = dict(urlparse.parse_qsl(value))
 
                 try:
