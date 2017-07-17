@@ -91,5 +91,7 @@
         <setting id="kodion.refresh_token" type="text" visible="false" enabled="true" default=""/>
         <setting id="kodion.login.hash" type="text" visible="false" enabled="true" default=""/>
         <setting id="youtube.login.version" type="text" visible="false" enabled="true" default=""/>
+        <setting id="kodion.login.username" type="text" visible="false" enabled="true" default=""/>
+        <setting id="kodion.login.password" type="text" visible="false" enabled="true" default=""/>
     </category>
 </settings>
