@@ -628,7 +628,7 @@ class VideoInfo(object):
             meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
         except:
             pass
-        meta_info['channel']['id'] = 'UC%s' % params.get('uid', '')
+        meta_info['channel']['id'] = params.get('ucid', '')
         image_data_list = [
             {'from': 'iurlhq', 'to': 'high'},
             {'from': 'iurlmq', 'to': 'medium'},
