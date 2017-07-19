@@ -346,34 +346,38 @@ class VideoInfo(object):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-                   'Accept': 'application/json',
+                   'Accept': '*/*',
                    'DNT': '1',
                    'Referer': 'https://www.youtube.com',
                    'Accept-Encoding': 'gzip, deflate',
-                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
-                   'X-SPF-Previous': 'https://www.youtube.com',
-                   'X-SPF-Referer': 'https://www.youtube.com',
-                   'X-SPF-Request': 'navigate'}
+                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
         params = {'v': video_id,
                   'hl': self.language,
-                  'gl': self.region,
-                  'spf': 'navigate'}
+                  'gl': self.region}
+
+        if self._access_token:
+            params['access_token'] = self._access_token
 
         url = 'https://www.youtube.com/watch'
 
+        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        html = result.text
+
+        _player_config = '{}'
+        lead = 'ytplayer.config = '
+        tail = ';ytplayer.load'
+        pos = html.find(lead)
+        if pos >= 0:
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
+            if pos:
+                _player_config = html2[:pos]
+
         try:
-            result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-            spf_response = result.json()
+            player_config = json.loads(_player_config)
         except:
-            return dict()
-
-        player_config = dict()
-
-        for item in spf_response:
-            if item.get('attr', {}).get('player'):
-                if item.get('data', {}).get('swfcfg'):
-                    player_config.update(item.get('data'))
+            player_config = dict()
 
         return player_config
 
@@ -621,9 +625,8 @@ class VideoInfo(object):
 
         player_config = self.get_player_config(video_id)
 
-        swfcfg = player_config.get('swfcfg', {})
-        player_assets = swfcfg.get('assets', {})
-        player_args = swfcfg.get('args', {})
+        player_assets = player_config.get('assets', {})
+        player_args = player_config.get('args', {})
         player_response = json.loads(player_args.get('player_response', '{}'))
         captions = player_response.get('captions', {})
         js = player_assets.get('js')
@@ -634,7 +637,7 @@ class VideoInfo(object):
                 js = 'http://www.youtube.com/%s' % js
             cipher = Cipher(self._context, java_script_url=js)
 
-        params['sts'] = swfcfg.get('sts', '')
+        params['sts'] = player_config.get('sts', '')
 
         if self._access_token:
             params['access_token'] = self._access_token
