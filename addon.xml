@@ -13,7 +13,8 @@
         <news>
 [fix/upd] dash working for vevo/etc
 [upd] rework of auto subtitles
-[fix] add undefined settings to xml for leia nightly login issues
+[fix] leia nightly login issues
+[fix] 403 error on 'My Channel'/uploaded videos
         </news>
         <assets>
             <icon>icon.png</icon>
