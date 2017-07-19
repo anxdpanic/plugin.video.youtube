@@ -1,6 +1,7 @@
 [fix/upd] dash working for vevo/etc
 [upd] rework of auto subtitles
-[fix] add undefined settings to xml for leia nightly login issues
+[fix] leia nightly login issues
+[fix] 403 error on 'My Channel'/uploaded videos
 
 5.4.0
 [upd] Greek strings [Twilight0]

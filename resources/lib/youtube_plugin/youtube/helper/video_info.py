@@ -611,10 +611,6 @@ class VideoInfo(object):
         params['cos'] = player_args.get('cos', 'Windows')
         params['cosver'] = player_args.get('cosver', '10.0')
 
-        if self._access_token:
-            params['access_token'] = self._access_token
-            pass
-
         url = 'https://www.youtube.com/get_video_info'
 
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
