@@ -342,7 +342,7 @@ class VideoInfo(object):
     def load_stream_infos(self, video_id):
         return self._method_get_video_info(video_id)
 
-    def get_player_config(self, video_id):
+    def get_watch_page(self, video_id):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -362,8 +362,9 @@ class VideoInfo(object):
         url = 'https://www.youtube.com/watch'
 
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        html = result.text
+        return result.text
 
+    def get_player_config(self, html):
         _player_config = '{}'
         lead = 'ytplayer.config = '
         tail = ';ytplayer.load'
@@ -381,49 +382,10 @@ class VideoInfo(object):
 
         return player_config
 
-    def _method_watch(self, video_id, reason=u'', meta_info=None):
+    def _method_watch(self, video_id, html, reason=u'', meta_info=None):
         stream_list = []
 
-        headers = {'Host': 'www.youtube.com',
-                   'Connection': 'keep-alive',
-                   'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-                   'Accept': '*/*',
-                   'DNT': '1',
-                   'Referer': 'https://www.youtube.com',
-                   'Accept-Encoding': 'gzip, deflate',
-                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-
-        params = {'v': video_id,
-                  'hl': self.language,
-                  'gl': self.region}
-
-        if self._access_token:
-            params['access_token'] = self._access_token
-
-        url = 'https://www.youtube.com/watch'
-
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        html = result.text
-
-        """
-        This will almost double the speed for the regular expressions, because we only must match
-        a small portion of the whole html. And only if we find positions, we cut down the html.
-
-        """
-        _player_config = '{}'
-        lead = 'ytplayer.config = '
-        tail = ';ytplayer.load'
-        pos = html.find(lead)
-        if pos >= 0:
-            html2 = html[pos + len(lead):]
-            pos = html2.find(tail)
-            if pos:
-                _player_config = html2[:pos]
-
-        try:
-            player_config = json.loads(_player_config)
-        except:
-            player_config = dict()
+        player_config = self.get_player_config(html)
 
         player_assets = player_config.get('assets', {})
         player_args = player_config.get('args', {})
@@ -623,7 +585,9 @@ class VideoInfo(object):
                   'ps': 'default',
                   'el': 'default'}
 
-        player_config = self.get_player_config(video_id)
+        html = self.get_watch_page(video_id)
+
+        player_config = self.get_player_config(html)
 
         player_assets = player_config.get('assets', {})
         player_args = player_config.get('args', {})
@@ -680,7 +644,7 @@ class VideoInfo(object):
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
 
         if params.get('status', '') == 'fail':
-            return self._method_watch(video_id, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
+            return self._method_watch(video_id, html, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
 
         if params.get('live_playback', '0') == '1':
             url = params.get('hlsvp', '')
