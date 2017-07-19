@@ -582,8 +582,8 @@ class VideoInfo(object):
                   'gl': self.region,
                   'eurl': 'https://youtube.googleapis.com/v/' + video_id,
                   'ssl_stream': '1',
-                  'ps': 'default',
-                  'el': 'default'}
+                  'el': 'default',
+                  'html5': '1'}
 
         html = self.get_watch_page(video_id)
 
@@ -602,6 +602,14 @@ class VideoInfo(object):
             cipher = Cipher(self._context, java_script_url=js)
 
         params['sts'] = player_config.get('sts', '')
+
+        params['c'] = player_args.get('c', 'WEB')
+        params['cver'] = player_args.get('cver', '1.20170712')
+        params['cplayer'] = player_args.get('cplayer', 'UNIPLAYER')
+        params['cbr'] = player_args.get('cbr', 'Chrome')
+        params['cbrver'] = player_args.get('cbrver', '53.0.2785.143')
+        params['cos'] = player_args.get('cos', 'Windows')
+        params['cosver'] = player_args.get('cosver', '10.0')
 
         if self._access_token:
             params['access_token'] = self._access_token
