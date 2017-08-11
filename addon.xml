@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.4.1" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.4.2" provider-name="bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -11,10 +11,7 @@
 	<extension point="xbmc.python.module" library="resources/lib/" />
 	<extension point="xbmc.addon.metadata">
         <news>
-[fix/upd] dash working for vevo/etc
-[upd] rework of auto subtitles
-[fix] leia nightly login issues
-[fix] 403 error on 'My Channel'/uploaded videos
+[fix/upd] My Subscriptions
         </news>
         <assets>
             <icon>icon.png</icon>

@@ -1,3 +1,7 @@
+5.4.2
+[fix/upd] My Subscriptions
+
+5.4.1
 [fix/upd] dash working for vevo/etc
 [upd] rework of auto subtitles
 [fix] leia nightly login issues
