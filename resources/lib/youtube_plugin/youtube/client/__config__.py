@@ -57,7 +57,7 @@ def __get_key_switch():
 key_sets = {
     'youtube-tv': {
         'id': 'ODYxNTU2NzA4NDU0LWQ2ZGxtM2xoMDVpZGQ4bnBlazE4azZiZThiYTNvYzY4',
-        'key': 'QUl6YVN5QWQtWUVPcVp6OW5YVnpHdG4zS1d6WUxiTGFhamhxSURB',
+        'key': 'QUl6YVN5QzZmdlpTSkhBN1Z6NWo4akNpS1J0N3RVSU9xakUyTjNn',
         'secret': 'U2JvVmhvRzlzMHJOYWZpeENTR0dLWEFU'
     },
     'own': {
