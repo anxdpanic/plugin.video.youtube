@@ -12,9 +12,9 @@ _own_key = __settings.get_string('youtube.api.key', '')
 _own_id = __settings.get_string('youtube.api.id', '')
 _own_secret = __settings.get_string('youtube.api.secret', '')
 
-_stripped_key = _own_key.strip()
-_stripped_id = _own_id.replace('.apps.googleusercontent.com', '').strip()
-_stripped_secret = _own_secret.strip()
+_stripped_key = ''.join(_own_key.split())
+_stripped_id = ''.join(_own_id.replace('.apps.googleusercontent.com', '').split())
+_stripped_secret = ''.join(_own_secret.split())
 
 if _own_key != _stripped_key:
     _own_key = _stripped_key
