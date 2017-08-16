@@ -12,19 +12,25 @@ _own_key = __settings.get_string('youtube.api.key', '')
 _own_id = __settings.get_string('youtube.api.id', '')
 _own_secret = __settings.get_string('youtube.api.secret', '')
 
-_stripped_key = _own_key.strip()
-_stripped_id = _own_id.replace('.apps.googleusercontent.com', '').strip()
-_stripped_secret = _own_secret.strip()
+_stripped_key = ''.join(_own_key.split())
+_stripped_id = ''.join(_own_id.replace('.apps.googleusercontent.com', '').split())
+_stripped_secret = ''.join(_own_secret.split())
 
 if _own_key != _stripped_key:
+    __context.log_debug('Personal API setting: |Key| had whitespace removed')
     _own_key = _stripped_key
     __settings.set_string('youtube.api.key', _own_key)
 
 if _own_id != _stripped_id:
+    googleusercontent = ''
+    if '.apps.googleusercontent.com' in _own_id:
+        googleusercontent = ' and .apps.googleusercontent.com'
+    __context.log_debug('Personal API setting: |Id| had whitespace%s removed' % googleusercontent)
     _own_id = _stripped_id
     __settings.set_string('youtube.api.id', _own_id)
 
 if _own_secret != _stripped_secret:
+    __context.log_debug('Personal API setting: |Secret| had whitespace removed')
     _own_secret = _stripped_secret
     __settings.set_string('youtube.api.secret', _own_secret)
 
