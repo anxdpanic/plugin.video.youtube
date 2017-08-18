@@ -650,7 +650,7 @@ class VideoInfo(object):
         if params.get('status', '') == 'fail':
             return self._method_watch(video_id, html, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
 
-        if params.get('live_playback', '0') == '1':
+        if params.get('live_playback', '0') == '1' and (not self._context.get_settings().use_dash()):
             url = params.get('hlsvp', '')
             if url:
                 return self._load_manifest(url, video_id, meta_info=meta_info)
