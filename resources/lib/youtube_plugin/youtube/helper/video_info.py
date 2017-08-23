@@ -9,6 +9,8 @@ import requests
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from subtitles import Subtitles
+from distutils.version import LooseVersion
+import xbmcaddon
 
 
 class VideoInfo(object):
@@ -320,6 +322,14 @@ class VideoInfo(object):
         '251': {'container': 'webm',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
+        # === Live DASH adaptive
+        '9998': {'container': 'mpd',
+                 'sort': [1080, 0],
+                 'title': 'Live DASH',
+                 'dash/audio': True,
+                 'dash/video': True,
+                 'audio': {'bitrate': 0, 'encoding': ''},
+                 'video': {'height': 0, 'encoding': ''}},
         # === DASH adaptive
         '9999': {'container': 'mpd',
                  'sort': [1080, 0],
@@ -650,17 +660,24 @@ class VideoInfo(object):
         if params.get('status', '') == 'fail':
             return self._method_watch(video_id, html, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
 
+        if self._context.get_settings().use_dash():
+            inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
+            live_dash_supported = LooseVersion(inputstream_version) >= LooseVersion('2.0.11')
+        else:
+            live_dash_supported = False
+
         if params.get('live_playback', '0') == '1':
             url = params.get('hlsvp', '')
             if url:
-                return self._load_manifest(url, video_id, meta_info=meta_info)
-            pass
+                stream_list = self._load_manifest(url, video_id, meta_info=meta_info)
+            if not live_dash_supported:
+                return stream_list
 
         mpd_url = params.get('dashmpd', '')
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
-            if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
+            if (use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url)) and (not re.search('/signature/[0-9A-F\.]+', mpd_url)):
                 mpd_sig_deciphered = False
                 if cipher:
                     sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
@@ -673,7 +690,11 @@ class VideoInfo(object):
             if mpd_sig_deciphered:
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info}
-                video_stream.update(self.FORMAT.get('9999'))
+                if params.get('live_playback', '0') == '1':
+                    video_stream['url'] += '&start_seq=$START_NUMBER$'
+                    video_stream.update(self.FORMAT.get('9998'))
+                else:
+                    video_stream.update(self.FORMAT.get('9999'))
                 stream_list.append(video_stream)
             else:
                 raise YouTubeException('Failed to decipher signature')

@@ -30,8 +30,11 @@ def to_video_item(context, video_item):
         pass
 
     if video_item.use_dash() and settings.dash_support_addon():
+        item.setContentLookup(False)
+        item.setMimeType('application/xml+dash')
         item.setProperty('inputstreamaddon', 'inputstream.adaptive')
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+        #item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
 
     item.setProperty(u'IsPlayable', u'true')
 
