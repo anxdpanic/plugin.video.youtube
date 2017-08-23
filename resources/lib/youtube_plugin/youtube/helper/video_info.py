@@ -677,7 +677,7 @@ class VideoInfo(object):
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
-            if use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url):
+            if (use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url)) and (not re.search('/signature/[0-9A-F\.]+', mpd_url)):
                 mpd_sig_deciphered = False
                 if cipher:
                     sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
