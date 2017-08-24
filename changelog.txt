@@ -1,6 +1,7 @@
 5.4.3
-[add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.11)
+[add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.12)
 [fix/upd] add My Subscriptions (Filtered) to dual login requirements
+[upd] Greek strings [Twilight0]
 
 5.4.2
 [fix/upd] My Subscriptions

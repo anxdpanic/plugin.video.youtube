@@ -662,7 +662,7 @@ class VideoInfo(object):
 
         if self._context.get_settings().use_dash():
             inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
-            live_dash_supported = LooseVersion(inputstream_version) >= LooseVersion('2.0.11')
+            live_dash_supported = LooseVersion(inputstream_version) >= LooseVersion('2.0.12')
         else:
             live_dash_supported = False
 
