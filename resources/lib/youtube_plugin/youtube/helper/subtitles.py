@@ -46,6 +46,10 @@ class Subtitles(object):
                 audio_track = None
             if audio_track:
                 default_caption = audio_track.get('defaultCaptionTrackIndex')
+                if default_caption is None:
+                    default_caption = audio_track.get('captionTrackIndices')
+                    if (default_caption is not None) and (isinstance(default_caption, list)):
+                        default_caption = default_caption[0]
                 if default_caption is not None:
                     caption_tracks = renderer.get('captionTracks', [])
                     try:
