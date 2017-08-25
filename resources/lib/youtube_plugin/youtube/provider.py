@@ -760,14 +760,14 @@ class Provider(kodion.AbstractProvider):
                 pass
             pass
 
-        # browse channels
-        if settings.get_bool('youtube.folder.browse_channels.show', True):
-            browse_channels_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.browse_channels']),
-                                                 context.create_uri(['special', 'browse_channels']),
-                                                 image=context.create_resource_path('media', 'browse_channels.png'))
-            browse_channels_item.set_fanart(self.get_fanart(context))
-            result.append(browse_channels_item)
-            pass
+            # browse channels
+            if settings.get_bool('youtube.folder.browse_channels.show', True):
+                browse_channels_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.browse_channels']),
+                                                     context.create_uri(['special', 'browse_channels']),
+                                                     image=context.create_resource_path('media', 'browse_channels.png'))
+                browse_channels_item.set_fanart(self.get_fanart(context))
+                result.append(browse_channels_item)
+                pass
 
         # live events
         if settings.get_bool('youtube.folder.live.show', True):
