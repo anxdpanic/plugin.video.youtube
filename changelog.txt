@@ -2,6 +2,7 @@
 [add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.12)
 [fix/upd] auto subtitles to include auto-generated
 [fix/upd] add My Subscriptions (Filtered) to dual login requirements
+[fix/upd] only show Browse Channels when logged in
 [upd] Greek strings [Twilight0]
 
 5.4.2
