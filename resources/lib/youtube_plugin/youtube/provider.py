@@ -697,7 +697,8 @@ class Provider(kodion.AbstractProvider):
                 pass
 
             # watch later
-            if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True):
+            if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True) and \
+                    settings.get_string('youtube.folder.watch_later.playlist', '').strip():
                 watch_later_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.watch_later']),
                                                  context.create_uri(
                                                      ['channel', 'mine', 'playlist', playlists['watchLater']]),
@@ -732,7 +733,8 @@ class Provider(kodion.AbstractProvider):
                 pass
 
             # history
-            if 'watchHistory' in playlists and settings.get_bool('youtube.folder.history.show', False):
+            if 'watchHistory' in playlists and settings.get_bool('youtube.folder.history.show', False) and \
+                    settings.get_string('youtube.folder.history.playlist', '').strip():
                 watch_history_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.history']),
                                                    context.create_uri(
                                                        ['channel', 'mine', 'playlist', playlists['watchHistory']]),
