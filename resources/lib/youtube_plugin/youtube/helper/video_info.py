@@ -452,7 +452,7 @@ class VideoInfo(object):
                     meta_info['images'][image_data['to']] = image_url
 
         if not meta_info['subtitles']:
-            meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
+            meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
         if player_args.get('hlsvp'):
             return self._load_manifest(player_args.get('hlsvp'), video_id, meta_info=meta_info)
@@ -655,7 +655,7 @@ class VideoInfo(object):
                 pass
             pass
 
-        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get()
+        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
         if params.get('status', '') == 'fail':
             return self._method_watch(video_id, html, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)

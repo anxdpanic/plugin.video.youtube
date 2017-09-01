@@ -10,7 +10,7 @@
         <setting id="kodion.video.support.mpd.addon" type="bool" label="" visible="false" enable="true" default="false"/>
         <setting id="kodion.video.quality.mpd" type="bool" label="30007" default="false" enable="eq(-1,true)|eq(-2,true)"/>
         <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)+eq(-2,true)" visible="eq(-1,true)+eq(-2,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
-        <setting id="kodion.subtitle.languages" type="enum" label="30560" lvalues="30561|30562|30563|30564|30565|30566|31583" default="0"/>
+        <setting id="kodion.subtitle.language" type="enum" label="30560" lvalues="30561|31583|30563|30566" default="0"/>
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
         <setting type="sep" />
