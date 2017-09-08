@@ -1,9 +1,12 @@
 5.4.3
 [add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.12)
+[add] add route to update api keys
+    plugin://plugin.video.youtube/api/update/?enable=true&client_id=<client_id>&client_secret=<client_secret>&api_key=<api_key>
 [fix/upd] refactor subtitles ** subtitles setting will be reset
 [fix/upd] add My Subscriptions (Filtered) to dual login requirements
 [fix/upd] only show Browse Channels when logged in
 [upd] Greek strings [Twilight0]
+[upd] Polish strings [Etharr]
 
 5.4.2
 [fix/upd] My Subscriptions

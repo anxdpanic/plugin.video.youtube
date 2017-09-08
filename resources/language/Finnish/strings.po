@@ -509,8 +509,8 @@ msgid "Delete settings.xml"
 msgstr "Poista settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
-msgstr "Ladattavat tekstityskiele(t)"
+msgid "Subtitle language"
+msgstr "Tekstityksen kieli"
 
 msgctxt "#30561"
 msgid "None"
