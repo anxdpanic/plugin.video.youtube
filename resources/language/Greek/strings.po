@@ -527,7 +527,7 @@ msgstr "Γλώσσα υποτίτλων"
 
 msgctxt "#30561"
 msgid "None"
-msgstr "Κενό"
+msgstr "Καμία"
 
 msgctxt "#30562"
 msgid "All"
@@ -547,7 +547,7 @@ msgstr "Αγγλικά"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr "Προτροπή"
+msgstr "Ερώτηση"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -663,8 +663,20 @@ msgstr "Ασφαλής αναζήτηση"
 
 msgctxt "#31595"
 msgid "Moderate"
-msgstr "Μέτριο"
+msgstr "Μέτρια"
 
 msgctxt "#31596"
 msgid "Strict"
-msgstr "Αυστρηρό"
+msgstr "Αυστηρή"
+
+msgctxt "#31597"
+msgid "Updated: %s"
+msgstr "Ενημερωθηκε: %s"
+
+msgctxt "#31598"
+msgid "Personal API keys enabled"
+msgstr "Ενεργοποιήθηκαν τα προσωπικά κλειδιά API"
+
+msgctxt "#31599"
+msgid "Failed to enable personal API keys. Missing: %s"
+msgstr "Αποτυχία ενεργοποίησης προσωπικών κλειδιών API. Λείπει: %s"
