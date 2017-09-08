@@ -524,8 +524,8 @@ msgid "Delete settings.xml"
 msgstr "Slett settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
-msgstr "Undertekstspråk som skal lastes ned"
+msgid "Subtitle language"
+msgstr "Språk for undertekst"
 
 msgctxt "#30561"
 msgid "None"

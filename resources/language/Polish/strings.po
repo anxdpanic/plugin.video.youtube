@@ -506,8 +506,8 @@ msgid "Delete settings.xml"
 msgstr "Usuń plik ustawień settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
-msgstr "Język(i) pobieranych napisów"
+msgid "Subtitle language"
+msgstr "Język napisów"
 
 msgctxt "#30561"
 msgid "None"

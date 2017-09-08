@@ -522,8 +522,8 @@ msgid "Delete settings.xml"
 msgstr "Διαγραφή του settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
-msgstr "Γλώσσα-ες υποτίτλων διαθέσιμη-ες για μεταφόρτωση"
+msgid "Subtitle language"
+msgstr "Γλώσσα υποτίτλων"
 
 msgctxt "#30561"
 msgid "None"

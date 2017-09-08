@@ -511,8 +511,8 @@ msgid "Delete settings.xml"
 msgstr "Supprimer settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
-msgstr "Sous-titre langue(s) à télécharger"
+msgid "Subtitle language"
+msgstr "Sous-titre langue"
 
 msgctxt "#30561"
 msgid "None"

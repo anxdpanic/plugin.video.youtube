@@ -516,7 +516,7 @@ msgid "Delete settings.xml"
 msgstr ""
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
+msgid "Subtitle language"
 msgstr ""
 
 msgctxt "#30561"

@@ -505,8 +505,8 @@ msgid "Delete settings.xml"
 msgstr "Deletar o arquivo settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language(s) to download"
-msgstr "Idioma(s) de legendas para download"
+msgid "Subtitle language"
+msgstr "Idioma de legendas"
 
 msgctxt "#30561"
 msgid "None"
