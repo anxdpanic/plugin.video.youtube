@@ -670,3 +670,15 @@ msgstr ""
 msgctxt "#31596"
 msgid "Strict"
 msgstr ""
+
+msgctxt "#31597"
+msgid "Updated: %s"
+msgstr ""
+
+msgctxt "#31598"
+msgid "Personal API keys enabled"
+msgstr ""
+
+msgctxt "#31599"
+msgid "Failed to enable personal API keys. Missing: %s"
+msgstr ""

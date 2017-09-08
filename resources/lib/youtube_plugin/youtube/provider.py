@@ -606,6 +606,49 @@ class Provider(kodion.AbstractProvider):
                         else:
                             context.get_ui().show_notification(context.localize(30576))
 
+    @kodion.RegisterProviderPath('^/api/update/$')
+    def api_key_update(self, context, re_match):
+        settings = context.get_settings()
+        params = context.get_params()
+        client_id = params.get('client_id')
+        client_secret = params.get('client_secret')
+        api_key = params.get('api_key')
+        enable = params.get('enable', '').lower() == 'true'
+        updated_list = []
+
+        if api_key:
+            settings.set_string('youtube.api.key', api_key)
+            updated_list.append(context.localize(30201))
+        if client_id:
+            settings.set_string('youtube.api.id', client_id)
+            updated_list.append(context.localize(30202))
+        if client_secret:
+            settings.set_string('youtube.api.secret', client_secret)
+            updated_list.append(context.localize(30203))
+        if updated_list:
+            context.get_ui().show_notification(context.localize(31597) % ', '.join(updated_list))
+        context.log_debug('Updated API keys: %s' % ', '.join(updated_list))
+
+        client_id = settings.get_string('youtube.api.id', '')
+        client_secret = settings.get_string('youtube.api.secret', '')
+        api_key = settings.get_string('youtube.api.key', '')
+        missing_list = []
+
+        if enable and client_id and client_secret and api_key:
+            settings.set_bool('youtube.api.enable', True)
+            context.get_ui().show_notification(context.localize(31598))
+            context.log_debug('Personal API keys enabled')
+        elif enable:
+            if not api_key:
+                missing_list.append(context.localize(30201))
+            if not client_id:
+                missing_list.append(context.localize(30202))
+            if not client_secret:
+                missing_list.append(context.localize(30203))
+            settings.set_bool('youtube.api.enable', False)
+            context.get_ui().show_notification(context.localize(31599) % ', '.join(missing_list))
+            context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(missing_list))
+
     def on_root(self, context, re_match):
         """
         Support old YouTube url calls, but also log a deprecation warnings.
