@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.4.3" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.4.4" provider-name="bromix">
 	<requires>
 		<import addon="xbmc.python" version="2.19.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -11,6 +11,7 @@
 	<extension point="xbmc.python.module" library="resources/lib/" />
 	<extension point="xbmc.addon.metadata">
         <news>
+[fix] overlapping regex causing no playlist videos
 [add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.12)
 [add] add route to update api keys
 [fix/upd] refactor subtitles ** subtitles setting will be reset
