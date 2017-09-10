@@ -1,3 +1,6 @@
+5.4.4
+[fix] overlapping regex causing no playlist videos
+
 5.4.3
 [add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.12)
 [add] add route to update api keys
