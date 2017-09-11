@@ -233,7 +233,7 @@ class Provider(kodion.AbstractProvider):
 
         return False
 
-    @kodion.RegisterProviderPath('^/playlist/(?P<playlist_id>.*)/$')
+    @kodion.RegisterProviderPath('^/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
@@ -252,12 +252,12 @@ class Provider(kodion.AbstractProvider):
 
     """
     Lists the videos of a playlist.
-    path       : '/channel/(?P<channel_id>.*)/playlist/(?P<playlist_id>.*)/'
+    path       : '/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/'
     channel_id : ['mine'|<CHANNEL_ID>]
     playlist_id: <PLAYLIST_ID>
     """
 
-    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>.*)/playlist/(?P<playlist_id>.*)/$')
+    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_channel_playlist(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
@@ -276,11 +276,11 @@ class Provider(kodion.AbstractProvider):
 
     """
     Lists all playlists of a channel.
-    path      : '/channel/(?P<channel_id>.*)/playlists/'
+    path      : '/channel/(?P<channel_id>[^/]+)/playlists/'
     channel_id: <CHANNEL_ID>
     """
 
-    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>.*)/playlists/$')
+    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.FILES)
         result = []
@@ -298,11 +298,11 @@ class Provider(kodion.AbstractProvider):
 
     """
     Lists a playlist folder and all uploaded videos of a channel.
-    path      :'/channel|user/(?P<channel_id|username>)[^/]*/'
+    path      :'/channel|user/(?P<channel_id|username>)[^/]+/'
     channel_id: <CHANNEL_ID>
     """
 
-    @kodion.RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]*)/$')
+    @kodion.RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
@@ -380,25 +380,25 @@ class Provider(kodion.AbstractProvider):
 
         return False
 
-    @kodion.RegisterProviderPath('^/video/(?P<method>.*)/$')
+    @kodion.RegisterProviderPath('^/video/(?P<method>[^/]+)/$')
     def _on_video_x(self, context, re_match):
         method = re_match.group('method')
         return yt_video.process(method, self, context, re_match)
 
-    @kodion.RegisterProviderPath('^/playlist/(?P<method>.*)/(?P<category>.*)/$')
+    @kodion.RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/$')
     def _on_playlist_x(self, context, re_match):
         method = re_match.group('method')
         category = re_match.group('category')
         return yt_playlist.process(method, category, self, context, re_match)
 
-    @kodion.RegisterProviderPath('^/subscriptions/(?P<method>.*)/$')
+    @kodion.RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
         if method == 'list':
             self.set_content_type(context, kodion.constants.content_type.FILES)
         return yt_subscriptions.process(method, self, context, re_match)
 
-    @kodion.RegisterProviderPath('^/special/(?P<category>.*)/$')
+    @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
     def _on_yt_specials(self, context, re_match):
         category = re_match.group('category')
         if category == 'browse_channels':
@@ -434,7 +434,7 @@ class Provider(kodion.AbstractProvider):
             pass
         return True
 
-    @kodion.RegisterProviderPath('^/sign/(?P<mode>.*)/$')
+    @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
         mode = re_match.group('mode')
         yt_login.process(mode, self, context, re_match, context.get_settings().requires_dual_login())
@@ -500,7 +500,7 @@ class Provider(kodion.AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
-    @kodion.RegisterProviderPath('^/config/(?P<switch>.*)/$')
+    @kodion.RegisterProviderPath('^/config/(?P<switch>[^/]+)/$')
     def configure_addon(self, context, re_match):
         switch = re_match.group('switch')
         settings = context.get_settings()
@@ -558,7 +558,7 @@ class Provider(kodion.AbstractProvider):
 
             context.get_ui().refresh_container()
 
-    @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>.*)/(?P<action>.*)/$')
+    @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
     def maintenance_actions(self, context, re_match):
         maint_type = re_match.group('maint_type')
         action = re_match.group('action')

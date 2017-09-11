@@ -279,7 +279,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        some_playlist_match = re.match(r'^(/channel/(.+))?/playlist/(?P<playlist_id>.*)/$', context.get_path())
+        some_playlist_match = re.match(r'^(/channel/([^/]+))/playlist/(?P<playlist_id>[^/]+)/$', context.get_path())
         if some_playlist_match:
             replace_context_menu = True
             playlist_id = some_playlist_match.group('playlist_id')
@@ -300,7 +300,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
             # provide 'remove' for videos in my playlists
             if video_id in playlist_item_id_dict:
-                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>.*)/$', context.get_path())
+                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', context.get_path())
                 if playlist_match:
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
