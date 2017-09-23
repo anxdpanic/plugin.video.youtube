@@ -647,7 +647,7 @@ msgstr "Αφαίρεση %s από το φίλτρο των εγγραφών μ�
 
 msgctxt "#31591"
 msgid "Thumbnail size"
-msgstr "Μέγεθος εικονιδίων προεσκόπισης"
+msgstr "Μέγεθος εικονιδίων προεπισκόπησης"
 
 msgctxt "#31592"
 msgid "Medium (16:9)"
