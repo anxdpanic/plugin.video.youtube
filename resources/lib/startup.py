@@ -23,5 +23,5 @@ if __name__ == '__main__':
 
     settings.set_bool(setting.DASH_SUPPORT_BUILTIN, mpd_builtin)
     settings.set_bool(setting.DASH_SUPPORT_ADDON, mpd_addon)
-    context.log_notice('Startup: detected %s, setting DASH_SUPPORT_BUILTIN = %s, DASH_SUPPORT_ADDON = %s' %
-        (context.get_system_version(), mpd_builtin, mpd_addon))
+    context.log_notice('Startup: detected {0}, setting DASH_SUPPORT_BUILTIN = {1}, DASH_SUPPORT_ADDON = {2}'
+                       .format(context.get_system_version(), mpd_builtin, mpd_addon))
