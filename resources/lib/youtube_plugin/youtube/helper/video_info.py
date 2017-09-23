@@ -9,9 +9,13 @@ import requests
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from subtitles import Subtitles
-from distutils.version import LooseVersion
 import xbmcaddon
 
+def LooseVersion(v):
+   filled = []
+   for point in v.split("."):
+      filled.append(point.zfill(8))
+   return tuple(filled)
 
 class VideoInfo(object):
     FORMAT = {
