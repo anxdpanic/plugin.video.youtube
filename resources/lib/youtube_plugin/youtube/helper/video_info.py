@@ -11,11 +11,13 @@ from .signature.cipher import Cipher
 from subtitles import Subtitles
 import xbmcaddon
 
+
 def LooseVersion(v):
    filled = []
    for point in v.split("."):
       filled.append(point.zfill(8))
    return tuple(filled)
+
 
 class VideoInfo(object):
     FORMAT = {
@@ -353,8 +355,8 @@ class VideoInfo(object):
         self._access_token = access_token
         pass
 
-    def load_stream_infos(self, video_id):
-        return self._method_get_video_info(video_id)
+    def load_stream_infos(self, video_id=None, player_config=None):
+        return self._method_get_video_info(video_id, player_config)
 
     def get_watch_page(self, video_id):
         headers = {'Host': 'www.youtube.com',
@@ -581,7 +583,7 @@ class VideoInfo(object):
             pass
         return streams
 
-    def _method_get_video_info(self, video_id):
+    def _method_get_video_info(self, video_id=None, player_config=None):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -591,23 +593,31 @@ class VideoInfo(object):
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-        params = {'video_id': video_id,
-                  'hl': self.language,
+        params = {'hl': self.language,
                   'gl': self.region,
-                  'eurl': 'https://youtube.googleapis.com/v/' + video_id,
                   'ssl_stream': '1',
                   'el': 'default',
                   'html5': '1'}
 
-        html = self.get_watch_page(video_id)
-
-        player_config = self.get_player_config(html)
+        if player_config is None:
+            html = self.get_watch_page(video_id)
+            player_config = self.get_player_config(html)
 
         player_assets = player_config.get('assets', {})
         player_args = player_config.get('args', {})
         player_response = json.loads(player_args.get('player_response', '{}'))
         captions = player_response.get('captions', {})
         js = player_assets.get('js')
+
+        if video_id is None:
+            if 'video_id' in player_args:
+                video_id = player_args['video_id']
+
+        if video_id:
+            params['video_id'] = video_id
+            params['eurl'] = 'https://youtube.googleapis.com/v/' + video_id
+        else:
+            raise YouTubeException('_method_get_video_info: no video_id')
 
         cipher = None
         if js:
