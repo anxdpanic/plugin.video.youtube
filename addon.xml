@@ -11,14 +11,8 @@
 	<extension point="xbmc.python.module" library="resources/lib/" />
 	<extension point="xbmc.addon.metadata">
         <news>
-[fix] tighten regex for routing, resolving incorrect routing
-[add] mpeg-dash support for live content (requires inputstream.adaptive >= 2.0.12)
-[add] add route to update api keys
-[fix/upd] refactor subtitles ** subtitles setting will be reset
-[fix/upd] add My Subscriptions (Filtered) to dual login requirements
-[fix/upd] only show Browse Channels when logged in
-[upd] Greek strings [Twilight0]
-[upd] Polish strings [Etharr]
+[upd] language/translation paths * Isengard (15.x)+ required
+[fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
         </news>
         <assets>
             <icon>icon.png</icon>
