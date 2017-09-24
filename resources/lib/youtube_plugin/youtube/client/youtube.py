@@ -74,10 +74,10 @@ class YouTube(LoginClient):
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         pass
 
-    def get_video_streams(self, context, video_id):
+    def get_video_streams(self, context, video_id=None, player_config=None):
         video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
 
-        video_streams = video_info.load_stream_infos(video_id)
+        video_streams = video_info.load_stream_infos(video_id, player_config)
 
         # update title
         for video_stream in video_streams:
