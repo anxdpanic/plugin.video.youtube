@@ -1,3 +1,6 @@
+5.5.0
+[fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
+
 5.4.5
 [fix] tighten regex for routing, resolving incorrect routing
 
