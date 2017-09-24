@@ -1,3 +1,7 @@
+5.5.0
+[upd] language/translation paths * Isengard (15.x)+ required
+[fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
+
 5.4.5
 [fix] tighten regex for routing, resolving incorrect routing
 
