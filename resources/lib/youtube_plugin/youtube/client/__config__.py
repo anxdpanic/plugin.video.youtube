@@ -17,22 +17,31 @@ _stripped_id = ''.join(_own_id.replace('.apps.googleusercontent.com', '').split(
 _stripped_secret = ''.join(_own_secret.split())
 
 if _own_key != _stripped_key:
-    __context.log_debug('Personal API setting: |Key| had whitespace removed')
-    _own_key = _stripped_key
-    __settings.set_string('youtube.api.key', _own_key)
+    if _stripped_key not in _own_key:
+        __context.log_debug('Personal API setting: |Key| Skipped: potentially mangled by stripping')
+    else:
+        __context.log_debug('Personal API setting: |Key| had whitespace removed')
+        _own_key = _stripped_key
+        __settings.set_string('youtube.api.key', _own_key)
 
 if _own_id != _stripped_id:
-    googleusercontent = ''
-    if '.apps.googleusercontent.com' in _own_id:
-        googleusercontent = ' and .apps.googleusercontent.com'
-    __context.log_debug('Personal API setting: |Id| had whitespace%s removed' % googleusercontent)
-    _own_id = _stripped_id
-    __settings.set_string('youtube.api.id', _own_id)
+    if _stripped_id not in _own_id:
+        __context.log_debug('Personal API setting: |Id| Skipped: potentially mangled by stripping')
+    else:
+        googleusercontent = ''
+        if '.apps.googleusercontent.com' in _own_id:
+            googleusercontent = ' and .apps.googleusercontent.com'
+        __context.log_debug('Personal API setting: |Id| had whitespace%s removed' % googleusercontent)
+        _own_id = _stripped_id
+        __settings.set_string('youtube.api.id', _own_id)
 
 if _own_secret != _stripped_secret:
-    __context.log_debug('Personal API setting: |Secret| had whitespace removed')
-    _own_secret = _stripped_secret
-    __settings.set_string('youtube.api.secret', _own_secret)
+    if _stripped_secret not in _own_secret:
+        __context.log_debug('Personal API setting: |Secret| Skipped: potentially mangled by stripping')
+    else:
+        __context.log_debug('Personal API setting: |Secret| had whitespace removed')
+        _own_secret = _stripped_secret
+        __settings.set_string('youtube.api.secret', _own_secret)
 
 
 def _has_own_keys():
