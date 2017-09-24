@@ -615,24 +615,29 @@ class Provider(kodion.AbstractProvider):
         api_key = params.get('api_key')
         enable = params.get('enable', '').lower() == 'true'
         updated_list = []
+        log_list = []
 
         if api_key:
             settings.set_string('youtube.api.key', api_key)
             updated_list.append(context.localize(30201))
+            log_list.append('Key')
         if client_id:
             settings.set_string('youtube.api.id', client_id)
             updated_list.append(context.localize(30202))
+            log_list.append('Id')
         if client_secret:
             settings.set_string('youtube.api.secret', client_secret)
             updated_list.append(context.localize(30203))
+            log_list.append('Secret')
         if updated_list:
             context.get_ui().show_notification(context.localize(31597) % ', '.join(updated_list))
-        context.log_debug('Updated API keys: %s' % ', '.join(updated_list))
+        context.log_debug('Updated API keys: %s' % ', '.join(log_list))
 
         client_id = settings.get_string('youtube.api.id', '')
         client_secret = settings.get_string('youtube.api.secret', '')
         api_key = settings.get_string('youtube.api.key', '')
         missing_list = []
+        log_list = []
 
         if enable and client_id and client_secret and api_key:
             settings.set_bool('youtube.api.enable', True)
@@ -641,13 +646,16 @@ class Provider(kodion.AbstractProvider):
         elif enable:
             if not api_key:
                 missing_list.append(context.localize(30201))
+                log_list.append('Key')
             if not client_id:
                 missing_list.append(context.localize(30202))
+                log_list.append('Id')
             if not client_secret:
                 missing_list.append(context.localize(30203))
+                log_list.append('Secret')
             settings.set_bool('youtube.api.enable', False)
             context.get_ui().show_notification(context.localize(31599) % ', '.join(missing_list))
-            context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(missing_list))
+            context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
     def on_root(self, context, re_match):
         """
