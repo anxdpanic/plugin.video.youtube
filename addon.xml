@@ -11,7 +11,10 @@
 	<extension point="xbmc.python.module" library="resources/lib/" />
 	<extension point="xbmc.addon.metadata">
         <news>
+[upd] youtube_resolver: allow resolve by url
 [fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
+[fix/upd] add check to api key stripping
+[fix] /api/update route logging
         </news>
         <assets>
             <icon>icon.png</icon>
