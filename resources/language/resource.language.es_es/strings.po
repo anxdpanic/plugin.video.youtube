@@ -646,3 +646,39 @@ msgstr "Añadido %s a filtro de 'Mis Suscripciones'"
 msgctxt "#31590"
 msgid "Removed %s from My Subscriptions filter"
 msgstr "Eliminar %s de filtro de 'Mis Suscripciones'"
+
+msgctxt "#31591"
+msgid "Thumbnail size"
+msgstr ""
+
+msgctxt "#31592"
+msgid "Medium (16:9)"
+msgstr ""
+
+msgctxt "#31593"
+msgid "High (4:3)"
+msgstr ""
+
+msgctxt "#31594"
+msgid "Safe Search"
+msgstr ""
+
+msgctxt "#31595"
+msgid "Moderate"
+msgstr ""
+
+msgctxt "#31596"
+msgid "Strict"
+msgstr ""
+
+msgctxt "#31597"
+msgid "Updated: %s"
+msgstr ""
+
+msgctxt "#31598"
+msgid "Personal API keys enabled"
+msgstr ""
+
+msgctxt "#31599"
+msgid "Failed to enable personal API keys. Missing: %s"
+msgstr ""
