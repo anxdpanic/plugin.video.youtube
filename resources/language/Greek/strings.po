@@ -613,70 +613,70 @@ msgctxt "#30582"
 msgid "Autoplay suggested videos"
 msgstr "Αυτόματη αναπαραγωγή προτεινόμενων βίντεο"
 
-msgctxt "#31583"
+msgctxt "#30583"
 msgid "Automatic"
 msgstr "Αυτόματο"
 
-msgctxt "#31584"
+msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
 msgstr "Οι συνδρομές μου (Φιλτραρισμένες)"
 
-msgctxt "#31585"
+msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
 msgstr "Φιλτραρισμένη λίστα καναλιών (οριοθετημένα με κόμμα)"
 
-msgctxt "#31586"
+msgctxt "#30586"
 msgid "Blacklist"
 msgstr "Μαύρη λίστα"
 
-msgctxt "#31587"
+msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
 msgstr "Προσθήκη στο φίλτρο των συνδρομών μου"
 
-msgctxt "#31588"
+msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
 msgstr "Αφαίρεση από το φίλτρο των συνδρομών μου"
 
-msgctxt "#31589"
+msgctxt "#30589"
 msgid "Added %s to My Subscriptions filter"
 msgstr "Προσθήκη %s φίλτρο των συνδρομών μου"
 
-msgctxt "#31590"
+msgctxt "#30590"
 msgid "Removed %s from My Subscriptions filter"
 msgstr "Αφαίρεση %s από το φίλτρο των εγγραφών μου"
 
-msgctxt "#31591"
+msgctxt "#30591"
 msgid "Thumbnail size"
 msgstr "Μέγεθος εικονιδίων προεπισκόπησης"
 
-msgctxt "#31592"
+msgctxt "#30592"
 msgid "Medium (16:9)"
 msgstr "Μέτριο (16:9)"
 
-msgctxt "#31593"
+msgctxt "#30593"
 msgid "High (4:3)"
 msgstr "Υψηλό (4:3)"
 
-msgctxt "#31594"
+msgctxt "#30594"
 msgid "Safe Search"
 msgstr "Ασφαλής αναζήτηση"
 
-msgctxt "#31595"
+msgctxt "#30595"
 msgid "Moderate"
 msgstr "Μέτρια"
 
-msgctxt "#31596"
+msgctxt "#30596"
 msgid "Strict"
 msgstr "Αυστηρή"
 
-msgctxt "#31597"
+msgctxt "#30597"
 msgid "Updated: %s"
 msgstr "Ενημερωθηκε: %s"
 
-msgctxt "#31598"
+msgctxt "#30598"
 msgid "Personal API keys enabled"
 msgstr "Ενεργοποιήθηκαν τα προσωπικά κλειδιά API"
 
-msgctxt "#31599"
+msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Αποτυχία ενεργοποίησης προσωπικών κλειδιών API. Λείπει: %s"
