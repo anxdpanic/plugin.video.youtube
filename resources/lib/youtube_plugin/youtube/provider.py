@@ -25,7 +25,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.refresh': 30543,
                  'youtube.history': 30509,
                  'youtube.my_subscriptions': 30510,
-                 'youtube.my_subscriptions_filtered': 31584,
+                 'youtube.my_subscriptions_filtered': 30584,
                  'youtube.remove': 30108,
                  'youtube.delete': 30118,
                  'youtube.browse_channels': 30512,
@@ -74,10 +74,10 @@ class Provider(kodion.AbstractProvider):
                  'youtube.remove.as.history': 30572,
                  'youtube.set.as.history': 30571,
                  'youtube.settings': 30577,
-                 'youtube.remove.my_subscriptions.filter': 31588,
-                 'youtube.add.my_subscriptions.filter': 31587,
-                 'youtube.removed.my_subscriptions.filter': 31590,
-                 'youtube.added.my_subscriptions.filter': 31589}
+                 'youtube.remove.my_subscriptions.filter': 30588,
+                 'youtube.add.my_subscriptions.filter': 30587,
+                 'youtube.removed.my_subscriptions.filter': 30590,
+                 'youtube.added.my_subscriptions.filter': 30589}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -630,7 +630,7 @@ class Provider(kodion.AbstractProvider):
             updated_list.append(context.localize(30203))
             log_list.append('Secret')
         if updated_list:
-            context.get_ui().show_notification(context.localize(31597) % ', '.join(updated_list))
+            context.get_ui().show_notification(context.localize(30597) % ', '.join(updated_list))
         context.log_debug('Updated API keys: %s' % ', '.join(log_list))
 
         client_id = settings.get_string('youtube.api.id', '')
@@ -641,7 +641,7 @@ class Provider(kodion.AbstractProvider):
 
         if enable and client_id and client_secret and api_key:
             settings.set_bool('youtube.api.enable', True)
-            context.get_ui().show_notification(context.localize(31598))
+            context.get_ui().show_notification(context.localize(30598))
             context.log_debug('Personal API keys enabled')
         elif enable:
             if not api_key:
@@ -654,7 +654,7 @@ class Provider(kodion.AbstractProvider):
                 missing_list.append(context.localize(30203))
                 log_list.append('Secret')
             settings.set_bool('youtube.api.enable', False)
-            context.get_ui().show_notification(context.localize(31599) % ', '.join(missing_list))
+            context.get_ui().show_notification(context.localize(30599) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
     def on_root(self, context, re_match):
