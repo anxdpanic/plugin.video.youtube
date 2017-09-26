@@ -602,59 +602,59 @@ msgctxt "#30582"
 msgid "Autoplay suggested videos"
 msgstr "Jouer automatiquement les vidéos suggérées"
 
-msgctxt "#31583"
+msgctxt "#30583"
 msgid "Automatic"
 msgstr "Automatique"
 
-msgctxt "#31584"
+msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
 msgstr "Mes abonnements (filtrés)"
 
-msgctxt "#31585"
+msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
 msgstr "Liste des chaînes filtrées (délimitées par des virgules)"
 
-msgctxt "#31586"
+msgctxt "#30586"
 msgid "Blacklist"
 msgstr "Blackliste"
 
-msgctxt "#31587"
+msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
 msgstr "Ajouter à ma liste d'abonnement filtré"
 
-msgctxt "#31588"
+msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
 msgstr "Supprimer de mes abonnements filtré"
 
-msgctxt "#31589"
+msgctxt "#30589"
 msgid "Added %s to My Subscriptions filter"
 msgstr "Ajouté %s pour mes abonnements filtré"
 
-msgctxt "#31590"
+msgctxt "#30590"
 msgid "Removed %s from My Subscriptions filter"
 msgstr "Supprimer %s de mes abonnements filtré"
 
-msgctxt "#31591"
+msgctxt "#30591"
 msgid "Thumbnail size"
 msgstr "Taille des vignettes"
 
-msgctxt "#31592"
+msgctxt "#30592"
 msgid "Medium (16:9)"
 msgstr "Moyennes (16:9)"
 
-msgctxt "#31593"
+msgctxt "#30593"
 msgid "High (4:3)"
 msgstr "Hautes (4: 3)"
 
-msgctxt "#31594"
+msgctxt "#30594"
 msgid "Safe Search"
 msgstr "Recherche sécurisée"
 
-msgctxt "#31595"
+msgctxt "#30595"
 msgid "Moderate"
 msgstr "Modéré"
 
-msgctxt "#31596"
+msgctxt "#30596"
 msgid "Strict"
 msgstr "Stricte"
 
