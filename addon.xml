@@ -16,6 +16,7 @@
 [fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
 [fix/upd] add check to api key stripping
 [fix] /api/update route logging
+[upd] Hebrew strings [Eng2Heb]
         </news>
         <assets>
             <icon>icon.png</icon>

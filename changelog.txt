@@ -4,6 +4,7 @@
 [fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
 [fix/upd] add check to api key stripping
 [fix] /api/update route logging
+[upd] Hebrew strings [Eng2Heb]
 
 5.4.5
 [fix] tighten regex for routing, resolving incorrect routing
