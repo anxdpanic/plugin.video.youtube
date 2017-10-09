@@ -81,11 +81,17 @@ class YouTube(LoginClient):
 
         # update title
         for video_stream in video_streams:
-            title = '[B]%s[/B] (%s;%s / %s@%d)' % (
-                video_stream['title'], video_stream['container'], video_stream['video']['encoding'],
-                video_stream['audio']['encoding'], video_stream['audio']['bitrate'])
+            if not video_stream.get('dash/video', False) and video_stream.get('dash/audio', False):
+                title = '[B]%s[/B] (%s; / %s@%d)' % (
+                    video_stream['title'], video_stream['container'],
+                    video_stream['audio']['encoding'], video_stream['audio']['bitrate'])
+            else:
+                title = '[B]%s[/B] (%s;%s / %s@%d)' % (
+                    video_stream['title'], video_stream['container'], video_stream['video']['encoding'],
+                    video_stream['audio']['encoding'], video_stream['audio']['bitrate'])
+
             video_stream['title'] = title
-            pass
+
         return video_streams
 
     def remove_playlist(self, playlist_id):
