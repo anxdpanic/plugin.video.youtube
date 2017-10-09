@@ -198,10 +198,6 @@ class VideoItem(BaseItem):
     
     def get_date(self):
         return self._date
-    
-    def set_track_number(self, track_number):
-        self._track_number = track_number
-        pass
 
     def set_use_dash(self, value=True):
         self._uses_dash = value
