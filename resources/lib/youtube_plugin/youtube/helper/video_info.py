@@ -305,27 +305,35 @@ class VideoInfo(object):
                 'video': {'height': 2160, 'encoding': 'vp9'}},
         # === Dash (audio only)
         '139': {'container': 'mp4',
+                'title': 'aac@48',
                 'dash/audio': True,
                 'audio': {'bitrate': 48, 'encoding': 'aac'}},
         '140': {'container': 'mp4',
+                'title': 'aac@128',
                 'dash/audio': True,
                 'audio': {'bitrate': 128, 'encoding': 'aac'}},
         '141': {'container': 'mp4',
+                'title': 'aac@256',
                 'dash/audio': True,
                 'audio': {'bitrate': 256, 'encoding': 'aac'}},
         '171': {'container': 'webm',
+                'title': 'vorbis@128',
                 'dash/audio': True,
                 'audio': {'bitrate': 128, 'encoding': 'vorbis'}},
         '172': {'container': 'webm',
+                'title': 'vorbis@192',
                 'dash/audio': True,
                 'audio': {'bitrate': 192, 'encoding': 'vorbis'}},
         '249': {'container': 'webm',
+                'title': 'opus@50',
                 'dash/audio': True,
                 'audio': {'bitrate': 50, 'encoding': 'opus'}},
         '250': {'container': 'webm',
+                'title': 'opus@70',
                 'dash/audio': True,
                 'audio': {'bitrate': 70, 'encoding': 'opus'}},
         '251': {'container': 'webm',
+                'title': 'opus@160',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
         # === Live DASH adaptive
@@ -599,6 +607,7 @@ class VideoInfo(object):
                   'el': 'default',
                   'html5': '1'}
 
+        html = None
         if player_config is None:
             html = self.get_watch_page(video_id)
             player_config = self.get_player_config(html)
@@ -671,7 +680,7 @@ class VideoInfo(object):
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
-        if params.get('status', '') == 'fail':
+        if (params.get('status', '') == 'fail') and html:
             return self._method_watch(video_id, html, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
 
         if self._context.get_settings().use_dash():
@@ -713,11 +722,8 @@ class VideoInfo(object):
             else:
                 raise YouTubeException('Failed to decipher signature')
 
-        # extract streams from map
-        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
-        if url_encoded_fmt_stream_map:
-            url_encoded_fmt_stream_map = url_encoded_fmt_stream_map.split(',')
-            for item in url_encoded_fmt_stream_map:
+        def parse_to_stream_list(stream_map_list):
+            for item in stream_map_list:
                 stream_map = dict(urlparse.parse_qsl(item))
 
                 url = stream_map.get('url', None)
@@ -736,15 +742,13 @@ class VideoInfo(object):
                     if not yt_format:
                         raise Exception('unknown yt_format for itag "%s"' % itag)
 
-                    if yt_format.get('discontinued', False):
+                    if yt_format.get('discontinued', False) or (yt_format.get('dash/video', False) and not yt_format.get('dash/audio', False)):
                         continue
-                        pass
 
                     video_stream = {'url': url,
                                     'meta': meta_info}
                     video_stream.update(yt_format)
                     stream_list.append(video_stream)
-                    pass
                 elif conn:
                     url = '%s?%s' % (conn, urllib.unquote(stream_map['stream']))
                     itag = stream_map['itag']
@@ -755,10 +759,19 @@ class VideoInfo(object):
                     video_stream = {'url': url,
                                     'meta': meta_info}
                     video_stream.update(yt_format)
-                    stream_list.append(video_stream)
-                    pass
-                pass
-            pass
+                    if video_stream:
+                        stream_list.append(video_stream)
+
+        # extract streams from map
+        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
+        if url_encoded_fmt_stream_map:
+            url_encoded_fmt_stream_map = url_encoded_fmt_stream_map.split(',')
+            parse_to_stream_list(url_encoded_fmt_stream_map)
+
+        adaptive_fmts = params.get('adaptive_fmts', '')
+        if adaptive_fmts:
+            adaptive_fmts = adaptive_fmts.split(',')
+            parse_to_stream_list(adaptive_fmts)
 
         # last fallback
         if not stream_list:

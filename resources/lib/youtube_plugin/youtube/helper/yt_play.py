@@ -5,7 +5,7 @@ __author__ = 'bromix'
 
 from ... import kodion
 from ...kodion import constants
-from ...kodion.items import VideoItem
+from ...kodion.items import VideoItem, AudioVideoItem
 from ...youtube.youtube_exceptions import YouTubeException
 from ...youtube.helper import utils, v3
 
@@ -27,7 +27,9 @@ def play_video(provider, context, re_match):
         if video_stream is None:
             return False
 
-        if video_stream['video'].get('rtmpe', False):
+        is_video = True if video_stream.get('video') else False
+
+        if is_video and video_stream['video'].get('rtmpe', False):
             message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
@@ -45,7 +47,10 @@ def play_video(provider, context, re_match):
             for i in items:
                 playlist.add(i)
 
-        video_item = VideoItem(video_id, video_stream['url'])
+        if is_video:
+            video_item = VideoItem(video_id, video_stream['url'])
+        else:
+            video_item = AudioVideoItem(video_id, video_stream['url'])
 
         if video_stream.get('meta', None):
             video_item.set_subtitles(video_stream['meta'].get('subtitles', None))
