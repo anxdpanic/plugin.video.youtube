@@ -316,6 +316,26 @@ class VideoInfo(object):
                 'title': 'aac@256',
                 'dash/audio': True,
                 'audio': {'bitrate': 256, 'encoding': 'aac'}},
+        '256': {'container': 'mp4',
+                'title': 'aac/itag 256',
+                'dash/audio': True,
+                'unsupported': True,
+                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+        '258': {'container': 'mp4',
+                'title': 'aac/itag 258',
+                'dash/audio': True,
+                'unsupported': True,
+                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+        '325': {'container': 'mp4',
+                'title': 'dtse/itag 325',
+                'dash/audio': True,
+                'unsupported': True,
+                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+        '328': {'container': 'mp4',
+                'title': 'ec-3/itag 328',
+                'dash/audio': True,
+                'unsupported': True,
+                'audio': {'bitrate': 0, 'encoding': 'aac'}},
         '171': {'container': 'webm',
                 'title': 'vorbis@128',
                 'dash/audio': True,
@@ -509,7 +529,7 @@ class VideoInfo(object):
                             raise Exception('unknown yt_format for itag "%s"' % itag)
 
                         # this format is discontinued
-                        if yt_format.get('discontinued', False):
+                        if yt_format.get('discontinued', False) or yt_format.get('unsupported', False):
                             continue
                             pass
 
@@ -742,7 +762,8 @@ class VideoInfo(object):
                     if not yt_format:
                         raise Exception('unknown yt_format for itag "%s"' % itag)
 
-                    if yt_format.get('discontinued', False) or (yt_format.get('dash/video', False) and not yt_format.get('dash/audio', False)):
+                    if yt_format.get('discontinued', False) or yt_format.get('unsupported', False) or \
+                            (yt_format.get('dash/video', False) and not yt_format.get('dash/audio', False)):
                         continue
 
                     video_stream = {'url': url,
