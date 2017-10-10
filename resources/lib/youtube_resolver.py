@@ -48,6 +48,16 @@ def get_player_config(client, url):
     except:
         player_config = dict()
 
+    if not player_config:
+        blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+        if not blank_config:
+            player_config = dict()
+        else:
+            try:
+                player_config = json.loads(blank_config.group('player_config'))
+            except:
+                player_config = dict()
+
     return player_config
 
 
@@ -67,10 +77,12 @@ def resolve(video_id, sort=True):
     if not video_id.startswith('http'):
         streams = client.get_video_streams(context=context, video_id=video_id)
     else:
-        if 'v=' in video_id:
-            v_id = re.search('v=(?P<video_id>[^&]+)', video_id)
+        url_patterns = ['v=(?P<video_id>[a-zA-Z0-9_\-]+)', '/v/(?P<video_id>[a-zA-Z0-9_\-]+)']
+        for pattern in url_patterns:
+            v_id = re.search(pattern, video_id)
             if v_id:
                 streams = client.get_video_streams(context=context, video_id=v_id.group('video_id'))
+                break
 
         if streams is None:
             player_config = get_player_config(client, video_id)

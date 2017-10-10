@@ -682,3 +682,7 @@ msgstr ""
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
+
+msgctxt "#30600"
+msgid "Setting, No ASR"
+msgstr ""

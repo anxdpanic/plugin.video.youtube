@@ -29,6 +29,8 @@ def to_video_item(context, video_item):
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
         pass
 
+    item.setProperty('inputstreamaddon', '')
+    item.setProperty('inputstream.adaptive.manifest_type', '')
     if video_item.use_dash() and settings.dash_support_addon():
         item.setContentLookup(False)
         item.setMimeType('application/xml+dash')
