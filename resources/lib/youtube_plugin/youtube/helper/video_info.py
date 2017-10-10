@@ -424,6 +424,16 @@ class VideoInfo(object):
         except:
             player_config = dict()
 
+        if not player_config:
+            blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+            if not blank_config:
+                player_config = dict()
+            else:
+                try:
+                    player_config = json.loads(blank_config.group('player_config'))
+                except:
+                    player_config = dict()
+
         return player_config
 
     def _method_watch(self, video_id, html, reason=u'', meta_info=None):
