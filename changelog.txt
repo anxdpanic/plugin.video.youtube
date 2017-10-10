@@ -1,8 +1,12 @@
 5.5.0
+[add] audio only to quality selection
+[add] 'Setting, No ASR' to subtitle language setting
+    - No auto-generated subtitles
 [upd] language/translation paths * Isengard (15.x)+ required
 [upd] youtube_resolver: allow resolve by url
 [fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]
 [fix/upd] add check to api key stripping
+[fix/upd] subtitles default to non asr track when possible
 [fix] /api/update route logging
 [upd] Hebrew strings [Eng2Heb]
 
