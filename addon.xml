@@ -12,8 +12,9 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [add] audio only to quality selection
-[add] 'Setting, No ASR' to subtitle language setting
-    - No auto-generated subtitles
+[fix/upd] use select dialog for subtitle setting
+    - [add] Configure subtitles to Settings -> General
+    - [add] Current language with No auto-generated subtitles option
 [upd] language/translation paths * Isengard (15.x)+ required
 [upd] youtube_resolver: allow resolve by url
 [fix/upd] do not use distutils.version.LooseVersion for version compare [stefansaraev]

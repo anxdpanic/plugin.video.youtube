@@ -102,6 +102,9 @@ class AbstractSettings(object):
     def subtitle_languages(self):
         return self.get_int(constants.setting.SUBTITLE_LANGUAGE, 0)
 
+    def set_subtitle_languages(self, value):
+        return self.set_int(constants.setting.SUBTITLE_LANGUAGE, value)
+
     def requires_dual_login(self):
         return self.get_bool('youtube.folder.my_subscriptions.show', True) or \
                self.get_bool('youtube.folder.my_subscriptions_filtered.show', True)
