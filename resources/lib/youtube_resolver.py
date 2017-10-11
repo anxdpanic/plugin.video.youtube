@@ -74,10 +74,10 @@ def resolve(video_id, sort=True):
     provider, context, client = get_core_components()
     streams = None
 
-    if not video_id.startswith('http'):
+    if re.match('[a-zA-Z0-9_\-]{11}', video_id):
         streams = client.get_video_streams(context=context, video_id=video_id)
     else:
-        url_patterns = ['v=(?P<video_id>[a-zA-Z0-9_\-]+)', '/v/(?P<video_id>[a-zA-Z0-9_\-]+)']
+        url_patterns = ['(?:youtu.be/|/embed/|/v/|v=)(?P<video_id>[a-zA-Z0-9_\-]{11})']
         for pattern in url_patterns:
             v_id = re.search(pattern, video_id)
             if v_id:
