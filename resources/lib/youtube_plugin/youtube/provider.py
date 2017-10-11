@@ -518,6 +518,26 @@ class Provider(kodion.AbstractProvider):
                     xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
             else:
                 settings.set_bool('kodion.video.quality.mpd', False)
+        elif switch == 'subtitles':
+            yt_language = context.get_settings().get_string('youtube.language', 'en-US')
+            sub_setting = context.get_settings().subtitle_languages()
+
+            if yt_language.startswith('en'):
+                sub_opts = [context.localize(30561), context.localize(30566),
+                            context.localize(30601) % ('en', 'en-US/en-GB'), yt_language,
+                            '%s (%s)' % (yt_language, context.localize(30602))]
+
+            else:
+                sub_opts = [context.localize(30561), context.localize(30566),
+                            context.localize(30601) % (yt_language, 'en'), yt_language,
+                            '%s (%s)' % (yt_language, context.localize(30602))]
+
+            sub_opts[sub_setting] = '[B]%s[/B]' % sub_opts[sub_setting]
+
+            result = context.get_ui().on_select(context.localize(30560), sub_opts)
+            if result == -1:
+                return False
+            context.get_settings().set_subtitle_languages(result)
         else:
             return False
 

@@ -684,5 +684,13 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid "Setting, No ASR"
+msgid "Configure subtitles"
+msgstr ""
+
+msgctxt "#30601"
+msgid "%s with %s fallback"
+msgstr ""
+
+msgctxt "#30602"
+msgid "No auto-generated"
 msgstr ""

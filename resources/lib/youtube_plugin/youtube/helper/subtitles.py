@@ -6,9 +6,9 @@ import requests
 
 class Subtitles(object):
     LANG_NONE = 0
-    LANG_AUTO = 1
-    LANG_CURR = 2
-    LANG_PROMPT = 3
+    LANG_PROMPT = 1
+    LANG_CURR_FALLBACK = 2
+    LANG_CURR = 3
     LANG_CURR_NO_ASR = 4
 
     SRT_FILE = 'special://temp/temp/%s.%s.srt'
@@ -79,6 +79,7 @@ class Subtitles(object):
 
     def get_subtitles(self):
         languages = self.context.get_settings().subtitle_languages()
+        self.context.log_debug('Subtitle get_subtitles: for setting |%s|' % str(languages))
         if languages == self.LANG_NONE:
             return []
         elif languages == self.LANG_CURR:
@@ -93,7 +94,7 @@ class Subtitles(object):
             return list(set(list_of_subs))
         elif languages == self.LANG_PROMPT:
             return self._prompt()
-        elif languages == self.LANG_AUTO:
+        elif languages == self.LANG_CURR_FALLBACK:
             list_of_subs = []
             list_of_subs.extend(self._get(language=self.language))
             list_of_subs.extend(self._get(language=self.language.split('-')[0]))
