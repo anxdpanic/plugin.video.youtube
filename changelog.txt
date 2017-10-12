@@ -1,5 +1,7 @@
 5.5.0
 [add] audio only to quality selection
+[add] age gate enforcement - Settings -> General
+[add] allow offensive content - Settings -> General
 [fix/upd] use select dialog for subtitle settings
     - [add] Configure subtitles to Settings -> General
     - [add] Current language with No auto-generated subtitles option
@@ -10,6 +12,7 @@
 [fix/upd] subtitles default to non asr track when possible
 [fix] /api/update route logging
 [upd] Hebrew strings [Eng2Heb]
+[upd] Polish strings [Etharr]
 
 5.4.5
 [fix] tighten regex for routing, resolving incorrect routing
