@@ -680,3 +680,19 @@ msgstr "Ενεργοποιήθηκαν τα προσωπικά κλειδιά AP
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Αποτυχία ενεργοποίησης προσωπικών κλειδιών API. Λείπει: %s"
+
+msgctxt "#30600"
+msgid "Configure subtitles"
+msgstr ""
+
+msgctxt "#30601"
+msgid "%s with %s fallback"
+msgstr ""
+
+msgctxt "#30602"
+msgid "No auto-generated"
+msgstr ""
+
+msgctxt "#30603"
+msgid "Age gate"
+msgstr ""
