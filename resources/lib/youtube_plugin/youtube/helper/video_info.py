@@ -421,7 +421,7 @@ class VideoInfo(object):
 
         try:
             player_config = json.loads(_player_config)
-        except:
+        except TypeError:
             player_config = dict()
 
         if not player_config:
@@ -431,8 +431,18 @@ class VideoInfo(object):
             else:
                 try:
                     player_config = json.loads(blank_config.group('player_config'))
-                except:
+                except TypeError:
                     player_config = dict()
+
+        if not player_config.get('args', {}).get('player_response'):
+            result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
+            player_config['args']['player_response'] = '{}' if not result else result.group('player_response')
+
+        if isinstance(player_config.get('args', {}).get('player_response'), basestring):
+            try:
+                player_config['args']['player_response'] = json.loads(player_config['args']['player_response'])
+            except TypeError:
+                player_config['args']['player_response'] = dict()
 
         return player_config
 
@@ -637,14 +647,14 @@ class VideoInfo(object):
                   'el': 'default',
                   'html5': '1'}
 
-        html = None
         if player_config is None:
             html = self.get_watch_page(video_id)
             player_config = self.get_player_config(html)
 
         player_assets = player_config.get('assets', {})
         player_args = player_config.get('args', {})
-        player_response = json.loads(player_args.get('player_response', '{}'))
+        player_response = player_args.get('player_response', {})
+        playability_status = player_response.get('playabilityStatus', {})
         captions = player_response.get('captions', {})
         js = player_assets.get('js')
 
@@ -710,8 +720,14 @@ class VideoInfo(object):
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
-        if (params.get('status', '') == 'fail') and html:
-            return self._method_watch(video_id, html, reason=params.get('reason', 'UNKNOWN'), meta_info=meta_info)
+        if (params.get('status', '') == 'fail') or (playability_status.get('status', 'ok').lower() != 'ok'):
+            if ((playability_status.get('desktopLegacyAgeGateReason', 0) == 0) or
+                    ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and
+                         self._context.get_settings().age_gate())):
+                reason = params.get('reason')
+                if not reason:
+                    reason = playability_status.get('reason', 'UNKNOWN')
+                raise YouTubeException(reason)
 
         if self._context.get_settings().use_dash():
             inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')

@@ -694,3 +694,7 @@ msgstr ""
 msgctxt "#30602"
 msgid "No auto-generated"
 msgstr ""
+
+msgctxt "#30603"
+msgid "Age gate"
+msgstr ""
