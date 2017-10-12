@@ -676,3 +676,7 @@ msgstr "%s z %s zapasowym"
 msgctxt "#30602"
 msgid "No auto-generated"
 msgstr "Bez generowanych automatycznie"
+
+msgctxt "#30603"
+msgid "Age gate"
+msgstr ""
