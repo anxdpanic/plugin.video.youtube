@@ -121,3 +121,6 @@ class AbstractSettings(object):
 
     def age_gate(self):
         return self.get_bool(constants.setting.AGE_GATE, True)
+
+    def offensive_content(self):
+        return self.get_bool(constants.setting.OFFENSIVE_CONTENT, False)

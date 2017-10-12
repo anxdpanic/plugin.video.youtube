@@ -698,3 +698,7 @@ msgstr ""
 msgctxt "#30603"
 msgid "Age gate"
 msgstr ""
+
+msgctxt "#30604"
+msgid "Allow offensive content"
+msgstr ""

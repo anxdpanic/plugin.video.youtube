@@ -12,7 +12,8 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [add] audio only to quality selection
-[add] Age gate enforcement - Settings -> General
+[add] age gate enforcement - Settings -> General
+[add] allow offensive content - Settings -> General
 [fix/upd] use select dialog for subtitle setting
     - [add] Configure subtitles to Settings -> General
     - [add] Current language with No auto-generated subtitles option

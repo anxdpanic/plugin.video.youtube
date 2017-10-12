@@ -60,6 +60,8 @@ def get_player_config(client, url):
 
     if not player_config.get('args', {}).get('player_response'):
         result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
+        if 'args' not in player_config:
+            player_config['args'] = dict()
         player_config['args']['player_response'] = '{}' if not result else result.group('player_response')
 
     if isinstance(player_config.get('args', {}).get('player_response'), basestring):

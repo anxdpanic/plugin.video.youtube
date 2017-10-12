@@ -436,6 +436,8 @@ class VideoInfo(object):
 
         if not player_config.get('args', {}).get('player_response'):
             result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
+            if 'args' not in player_config:
+                player_config['args'] = dict()
             player_config['args']['player_response'] = '{}' if not result else result.group('player_response')
 
         if isinstance(player_config.get('args', {}).get('player_response'), basestring):
@@ -721,12 +723,15 @@ class VideoInfo(object):
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
         if (params.get('status', '') == 'fail') or (playability_status.get('status', 'ok').lower() != 'ok'):
-            if ((playability_status.get('desktopLegacyAgeGateReason', 0) == 0) or
-                    ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and
-                         self._context.get_settings().age_gate())):
+            if (not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()) and
+                    not ((playability_status.get('status', 'ok').lower() == 'content_check_required') and self._context.get_settings().offensive_content())):
                 reason = params.get('reason')
                 if not reason:
-                    reason = playability_status.get('reason', 'UNKNOWN')
+                    reason = playability_status.get('reason')
+                    if not reason:
+                        reason = 'UNKNOWN'
+                        if 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
+                            reason = playability_status['errorScreen']['playerErrorMessageRenderer'].get('reason', {}).get('simpleText', 'UNKNOWN')
                 raise YouTubeException(reason)
 
         if self._context.get_settings().use_dash():
