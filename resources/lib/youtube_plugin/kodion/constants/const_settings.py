@@ -11,6 +11,7 @@ VIDEO_QUALITY_ASK = 'kodion.video.quality.ask'  # (bool)
 DASH_SUPPORT_BUILTIN = 'kodion.video.support.mpd.builtin'  # (bool)
 DASH_SUPPORT_ADDON = 'kodion.video.support.mpd.addon'  # (bool)
 USE_DASH = 'kodion.video.quality.mpd'  # (bool)
+AGE_GATE = 'kodion.age.gate'  # (bool)
 SUBTITLE_LANGUAGE = 'kodion.subtitle.languages.num'  # (int)
 SETUP_WIZARD = 'kodion.setup_wizard'  # (bool)
 

@@ -118,3 +118,6 @@ class AbstractSettings(object):
         index = self.get_int(constants.setting.SAFE_SEARCH, 0)
         values = {0: 'moderate', 1: 'none', 2: 'strict'}
         return values[index]
+
+    def age_gate(self):
+        return self.get_bool(constants.setting.AGE_GATE, True)

@@ -21,6 +21,7 @@
         <setting id="kodion.content.max_per_page" type="enum" label="30022" values="5|10|15|20|25|30|35|40|45|50" default="9" />
         <setting label="30023" type="slider" id="kodion.search.size" default="10" range="0,10,200" option="int" />
         <setting id="kodion.safe.search" type="enum" label="30594" lvalues="30595|30561|30596" default="0" />
+        <setting id="kodion.age.gate" type="bool" label="30603" default="true"/>
     </category>
 
     <category label="30516">
