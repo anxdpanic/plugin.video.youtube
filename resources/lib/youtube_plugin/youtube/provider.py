@@ -748,6 +748,21 @@ class Provider(kodion.AbstractProvider):
                                               fanart=self.get_fanart(context))
         result.append(search_item)
 
+        if settings.get_bool('youtube.folder.quick_search.show', True):
+            quick_search_item = kodion.items.NewSearchItem(context,
+                                                           alt_name=context.localize(30605),
+                                                           image=context.create_resource_path('media', 'search.png'),
+                                                           fanart=self.get_fanart(context))
+            result.append(quick_search_item)
+
+        if settings.get_bool('youtube.folder.quick_search_incognito.show', True):
+            quick_search_incognito_item = kodion.items.NewSearchItem(context,
+                                                                     alt_name=context.localize(30606),
+                                                                     image=context.create_resource_path('media', 'search.png'),
+                                                                     fanart=self.get_fanart(context),
+                                                                     use_history=False)
+            result.append(quick_search_incognito_item)
+
         # subscriptions
         if self.is_logged_in():
             playlists = resource_manager.get_related_playlists(channel_id='mine')
