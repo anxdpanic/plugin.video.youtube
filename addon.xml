@@ -15,6 +15,7 @@
 [add] age gate enforcement - Settings -> General
 [add] allow offensive content - Settings -> General
 [add] quick search and quick search (incognito) to Settings -> Folders
+    - incognito doesn't add to search history or run post play events (add to watch history)
 [fix/upd] use select dialog for subtitle setting
     - [add] Configure subtitles to Settings -> General
     - [add] Current language with No auto-generated subtitles option
