@@ -61,7 +61,7 @@ def play_video(provider, context, re_match):
         # Trigger post play events
         if provider.is_logged_in():
             try:
-                if str(context.get_param('use_history', True)).lower() == 'true':
+                if str(context.get_param('incognito', False)).lower() != 'true':
                     command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
                     context.execute(command)
             except:
