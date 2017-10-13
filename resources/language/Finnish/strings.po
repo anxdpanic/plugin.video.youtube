@@ -687,3 +687,11 @@ msgstr ""
 msgctxt "#30604"
 msgid "Allow offensive content"
 msgstr ""
+
+msgctxt "#30605"
+msgid "Quick Search"
+msgstr ""
+
+msgctxt "#30606"
+msgid "Quick Search (Incognito)"
+msgstr ""
