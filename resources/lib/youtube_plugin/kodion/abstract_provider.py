@@ -213,18 +213,18 @@ class AbstractProvider(object):
             return True
         elif command == 'input':
             result, query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
-            use_history = str(params.get('use_history', 'true')).lower() == 'true'
+            incognito = params.get('incognito', False)
             if result:
                 context.execute(
-                    'Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], {'q': query, 'use_history': use_history}))
+                    'Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], {'q': query, 'incognito': incognito}))
                 pass
 
             return True
         elif command == 'query':
-            use_history = str(params.get('use_history', 'true')).lower() == 'true'
+            incognito = params.get('incognito', False)
             try:
                 query = params['q']
-                if use_history:
+                if not incognito:
                     search_history.update(query)
                 return self.on_search(query, context, re_match)
             except:

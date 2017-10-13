@@ -760,7 +760,7 @@ class Provider(kodion.AbstractProvider):
                                                                      alt_name=context.localize(30606),
                                                                      image=context.create_resource_path('media', 'search.png'),
                                                                      fanart=self.get_fanart(context),
-                                                                     use_history=False)
+                                                                     incognito=True)
             result.append(quick_search_incognito_item)
 
         # subscriptions
