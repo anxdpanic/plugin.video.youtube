@@ -20,6 +20,8 @@ def _process_list_response(provider, context, json_data):
         context.log_warning('List of search result is empty')
         return result
 
+    use_history = context.get_param('use_history', True)
+
     for yt_item in yt_items:
         yt_kind = yt_item.get('kind', '')
         if yt_kind == u'youtube#video':
@@ -28,7 +30,7 @@ def _process_list_response(provider, context, json_data):
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             video_item = items.VideoItem(title,
-                                         context.create_uri(['play'], {'video_id': video_id}),
+                                         context.create_uri(['play'], {'video_id': video_id, 'use_history': use_history}),
                                          image=image)
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
@@ -41,7 +43,7 @@ def _process_list_response(provider, context, json_data):
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
             channel_item = items.DirectoryItem(title,
-                                               context.create_uri(['channel', channel_id]),
+                                               context.create_uri(['channel', channel_id], {'use_history': use_history}),
                                                image=image)
             channel_item.set_fanart(provider.get_fanart(context))
 
@@ -59,7 +61,7 @@ def _process_list_response(provider, context, json_data):
             snippet = yt_item['snippet']
             title = snippet['title']
             guide_item = items.DirectoryItem(title,
-                                             context.create_uri(['special', 'browse_channels'], {'guide_id': guide_id}))
+                                             context.create_uri(['special', 'browse_channels'], {'guide_id': guide_id, 'use_history': use_history}))
             guide_item.set_fanart(provider.get_fanart(context))
             result.append(guide_item)
             pass
@@ -68,8 +70,8 @@ def _process_list_response(provider, context, json_data):
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             channel_id = snippet['resourceId']['channelId']
             channel_item = items.DirectoryItem(snippet['title'],
-                                                context.create_uri(['channel', channel_id]),
-                                                image=image)
+                                               context.create_uri(['channel', channel_id], {'use_history': use_history}),
+                                               image=image)
             channel_item.set_fanart(provider.get_fanart(context))
 
             # map channel id with subscription id - we need it for the unsubscription
@@ -91,7 +93,7 @@ def _process_list_response(provider, context, json_data):
                 channel_id = 'mine'
                 pass
             playlist_item = items.DirectoryItem(title,
-                                                context.create_uri(['channel', channel_id, 'playlist', playlist_id]),
+                                                context.create_uri(['channel', channel_id, 'playlist', playlist_id], {'use_history': use_history}),
                                                 image=image)
             playlist_item.set_fanart(provider.get_fanart(context))
             result.append(playlist_item)
@@ -107,7 +109,7 @@ def _process_list_response(provider, context, json_data):
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             video_item = items.VideoItem(title,
-                                         context.create_uri(['play'], {'video_id': video_id}),
+                                         context.create_uri(['play'], {'video_id': video_id, 'use_history': use_history}),
                                          image=image)
             video_item.set_fanart(provider.get_fanart(context))
             #Get Track-ID from Playlist
@@ -131,7 +133,7 @@ def _process_list_response(provider, context, json_data):
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             video_item = items.VideoItem(title,
-                                         context.create_uri(['play'], {'video_id': video_id}),
+                                         context.create_uri(['play'], {'video_id': video_id, 'use_history': use_history}),
                                          image=image)
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
@@ -147,7 +149,7 @@ def _process_list_response(provider, context, json_data):
                 title = snippet['title']
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
                 video_item = items.VideoItem(title,
-                                             context.create_uri(['play'], {'video_id': video_id}),
+                                             context.create_uri(['play'], {'video_id': video_id, 'use_history': use_history}),
                                              image=image)
                 video_item.set_fanart(provider.get_fanart(context))
                 result.append(video_item)
@@ -168,7 +170,7 @@ def _process_list_response(provider, context, json_data):
                 channel_name = snippet.get('channelTitle', '')
                 playlist_item = items.DirectoryItem(title,
                                                     context.create_uri(
-                                                        ['channel', channel_id, 'playlist', playlist_id]),
+                                                        ['channel', channel_id, 'playlist', playlist_id], {'use_history': use_history}),
                                                     image=image)
                 playlist_item.set_fanart(provider.get_fanart(context))
                 result.append(playlist_item)
@@ -181,7 +183,7 @@ def _process_list_response(provider, context, json_data):
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
                 channel_item = items.DirectoryItem(title,
-                                                   context.create_uri(['channel', channel_id]),
+                                                   context.create_uri(['channel', channel_id], {'use_history': use_history}),
                                                    image=image)
                 channel_item.set_fanart(provider.get_fanart(context))
                 result.append(channel_item)
