@@ -213,16 +213,19 @@ class AbstractProvider(object):
             return True
         elif command == 'input':
             result, query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
+            use_history = str(params.get('use_history', 'true')).lower() == 'true'
             if result:
                 context.execute(
-                    'Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], {'q': query}))
+                    'Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], {'q': query, 'use_history': use_history}))
                 pass
 
             return True
         elif command == 'query':
+            use_history = str(params.get('use_history', 'true')).lower() == 'true'
             try:
                 query = params['q']
-                search_history.update(query)
+                if use_history:
+                    search_history.update(query)
                 return self.on_search(query, context, re_match)
             except:
                 result =[]
