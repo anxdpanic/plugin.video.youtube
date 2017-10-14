@@ -75,23 +75,14 @@ class LoginClient(object):
         try:
             json_data = result.json()
             if 'error' in json_data:
-                context.log_error('Revoke failed: JSON: |%s|' % json_data)
+                context.log_error('Revoke failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
                 raise LoginException(json_data['error'])
         except ValueError:
             json_data = None
 
         if result.status_code != requests.codes.ok:
-            if json_data:
-                response_dump = json_data
-            else:
-                try:
-                    response_dump = result.json()
-                except ValueError:
-                    try:
-                        response_dump = result.text
-                    except:
-                        response_dump = 'None'
-            context.log_error('Revoke failed: Response dump: |%s|' % response_dump)
+            response_dump = self._get_response_dump(result, json_data)
+            context.log_error('Revoke failed: Code: |%s| Response dump: |%s|' % (str(result.status_code), response_dump))
             raise LoginException('Logout Failed')
 
     def refresh_token_tv(self, refresh_token, grant_type=''):
@@ -132,24 +123,15 @@ class LoginClient(object):
         try:
             json_data = result.json()
             if 'error' in json_data:
-                context.log_error('Refresh Failed: JSON: |%s|' % json_data)
+                context.log_error('Refresh Failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
                 raise LoginException(json_data['error'])
         except ValueError:
             json_data = None
 
         if result.status_code != requests.codes.ok:
-            if json_data:
-                response_dump = json_data
-            else:
-                try:
-                    response_dump = result.json()
-                except ValueError:
-                    try:
-                        response_dump = result.text
-                    except:
-                        response_dump = 'None'
-            context.log_error('Refresh failed: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Response dump |%s|' %
-                              (config_type, client_id[:5], client_secret[:5], response_dump))
+            response_dump = self._get_response_dump(result, json_data)
+            context.log_error('Refresh failed: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Code: |%s| Response dump |%s|' %
+                              (config_type, client_id[:5], client_secret[:5], str(result.status_code), response_dump))
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
@@ -200,25 +182,16 @@ class LoginClient(object):
             json_data = result.json()
             if 'error' in json_data:
                 if json_data['error'] != u'authorization_pending':
-                    context.log_error('Retrieving device token: JSON: |%s|' % json_data)
+                    context.log_error('Retrieving device token: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
                     raise LoginException(json_data['error'])
         except ValueError:
             json_data = None
 
         if result.status_code != requests.codes.ok:
-            if json_data:
-                response_dump = json_data
-            else:
-                try:
-                    response_dump = result.json()
-                except ValueError:
-                    try:
-                        response_dump = result.text
-                    except:
-                        response_dump = 'None'
-            context.log_error('Retrieving device token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Response dump |%s|' %
-                              (config_type, client_id[:5], client_secret[:5], response_dump))
-            raise LoginException('Login Failed: Code %s' % result.status_code)
+            response_dump = self._get_response_dump(result, json_data)
+            context.log_error('Retrieving device token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Code: |%s| Response dump |%s|' %
+                              (config_type, client_id[:5], client_secret[:5], str(result.status_code), response_dump))
+            raise LoginException('Login Failed: Code %s' % str(result.status_code))
 
         if result.headers.get('content-type', '').startswith('application/json'):
             if json_data:
@@ -263,24 +236,15 @@ class LoginClient(object):
         try:
             json_data = result.json()
             if 'error' in json_data:
-                context.log_error('Generate user code failed: JSON: |%s|' % json_data)
+                context.log_error('Generate user code failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
                 raise LoginException(json_data['error'])
         except ValueError:
             json_data = None
 
         if result.status_code != requests.codes.ok:
-            if json_data:
-                response_dump = json_data
-            else:
-                try:
-                    response_dump = result.json()
-                except ValueError:
-                    try:
-                        response_dump = result.text
-                    except:
-                        response_dump = 'None'
-            context.log_error('Generate user code failed: Config: |%s| Client id [:5]: |%s| Response dump |%s|' %
-                              (config_type, client_id[:5], response_dump))
+            response_dump = self._get_response_dump(result, json_data)
+            context.log_error('Generate user code failed: Config: |%s| Client id [:5]: |%s| Code: |%s| Response dump |%s|' %
+                              (config_type, client_id[:5], str(result.status_code), response_dump))
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
@@ -346,8 +310,21 @@ class LoginClient(object):
         if not using_conf_main and not using_conf_tv:
             return 'None'
         elif using_conf_tv:
-            return 'YouTube TV'
+            return 'YouTube-TV'
         elif using_conf_main:
-            return 'Add-on'
+            return 'YouTube-Kodi'
         else:
             return 'Unknown'
+
+    @staticmethod
+    def _get_response_dump(response, json_data=None):
+        if json_data:
+            return json_data
+        else:
+            try:
+                return response.json()
+            except ValueError:
+                try:
+                    return response.text
+                except:
+                    return 'None'
