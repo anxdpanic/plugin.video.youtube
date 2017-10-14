@@ -4,7 +4,10 @@ import time
 import urlparse
 import requests
 from ...youtube.youtube_exceptions import LoginException
+from ...kodion import Context
 from __config__ import api, youtube_tv, keys_changed
+
+context = Context()
 
 
 class LoginClient(object):
@@ -75,20 +78,32 @@ class LoginClient(object):
 
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
 
-        json_data = result.json()
-        if 'error' in json_data:
-            raise LoginException(json_data['error'])
+        try:
+            json_data = result.json()
+            if 'error' in json_data:
+                context.log_error('Revoke failed: JSON: |%s|' % json_data)
+                raise LoginException(json_data['error'])
+        except ValueError:
+            json_data = None
 
         if result.status_code != requests.codes.ok:
+            if json_data:
+                response_dump = json_data
+            else:
+                try: response_dump = result.json()
+                except ValueError:
+                    try: response_dump = result.text
+                    except: response_dump = 'None'
+            context.log_error('Revoke failed: Response dump: |%s|' % response_dump)
             raise LoginException('Logout Failed')
 
         pass
 
     def refresh_token_tv(self, refresh_token, grant_type=''):
-        client_id = self.CONFIGS['youtube-tv']['id']
-        client_secret = self.CONFIGS['youtube-tv']['secret']
-        return self.refresh_token(refresh_token, client_id=client_id, client_secret=client_secret,
-                                  grant_type=grant_type)
+        client_id = str(self.CONFIGS['youtube-tv']['id'])
+        client_secret = str(self.CONFIGS['youtube-tv']['secret'])
+        return self.refresh_token(refresh_token, client_id=client_id,
+                                  client_secret=client_secret, grant_type=grant_type)
 
     def refresh_token(self, refresh_token, client_id='', client_secret='', grant_type=''):
         headers = {'Host': 'www.youtube.com',
@@ -102,32 +117,46 @@ class LoginClient(object):
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-        _client_id = client_id
-        if not client_id:
-            _client_id = self._config['id']
-            pass
-        _client_secret = client_secret
-        if not _client_secret:
-            _client_secret = self._config['secret']
-            pass
-        post_data = {'client_id': _client_id,
-                     'client_secret': _client_secret,
+        client_id = client_id or self._config['id']
+        client_secret = client_secret or self._config['secret']
+
+        post_data = {'client_id': client_id,
+                     'client_secret': client_secret,
                      'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
 
         # url
         url = 'https://www.youtube.com/o/oauth2/token'
 
+        config_type = self._get_config_type(client_id, client_secret)
+        context.log_debug('Refresh token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s|' %
+                          (config_type, client_id[:5], client_secret[:5]))
+
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
 
-        json_data = result.json()
-        if 'error' in json_data:
-            raise LoginException(json_data['error'])
+        try:
+            json_data = result.json()
+            if 'error' in json_data:
+                context.log_error('Refresh Failed: JSON: |%s|' % json_data)
+                raise LoginException(json_data['error'])
+        except ValueError:
+            json_data = None
 
         if result.status_code != requests.codes.ok:
+            if json_data:
+                response_dump = json_data
+            else:
+                try: response_dump = result.json()
+                except ValueError:
+                    try: response_dump = result.text
+                    except: response_dump = 'None'
+            context.log_error('Refresh failed: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Response dump |%s|' %
+                              (config_type, client_id[:5], client_secret[:5], response_dump))
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
+            if not json_data:
+                json_data = result.json()
             access_token = json_data['access_token']
             expires_in = time.time() + int(json_data.get('expires_in', 3600))
             return access_token, expires_in
@@ -135,8 +164,8 @@ class LoginClient(object):
         return '', ''
 
     def get_device_token_tv(self, code, client_id='', client_secret='', grant_type=''):
-        client_id = self.CONFIGS['youtube-tv']['id']
-        client_secret = self.CONFIGS['youtube-tv']['secret']
+        client_id = client_id or self.CONFIGS['youtube-tv']['id']
+        client_secret = client_secret or self.CONFIGS['youtube-tv']['secret']
         return self.get_device_token(code, client_id=client_id, client_secret=client_secret, grant_type=grant_type)
 
     def get_device_token(self, code, client_id='', client_secret='', grant_type=''):
@@ -152,39 +181,52 @@ class LoginClient(object):
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
                    'If-Match': '*'}
 
-        _client_id = client_id
-        if not client_id:
-            _client_id = self._config['id']
-            pass
-        _client_secret = client_secret
-        if not _client_secret:
-            _client_secret = self._config['secret']
-            pass
-        post_data = {'client_id': _client_id,
-                     'client_secret': _client_secret,
+        client_id = client_id or self._config['id']
+        client_secret = client_secret or self._config['secret']
+
+        post_data = {'client_id': client_id,
+                     'client_secret': client_secret,
                      'code': code,
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
         # url
         url = 'https://www.youtube.com/o/oauth2/token'
 
+        config_type = self._get_config_type(client_id, client_secret)
+        context.log_debug('Retrieving device token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s|' %
+                          (config_type, client_id[:5], client_secret[:5]))
+
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
 
+        try:
+            json_data = result.json()
+            if 'error' in json_data:
+                if json_data['error'] != u'authorization_pending':
+                    context.log_error('Retrieving device token: JSON: |%s|' % json_data)
+                    raise LoginException(json_data['error'])
+        except ValueError:
+            json_data = None
+
         if result.status_code != requests.codes.ok:
+            if json_data:
+                response_dump = json_data
+            else:
+                try: response_dump = result.json()
+                except ValueError:
+                    try: response_dump = result.text
+                    except: response_dump = 'None'
+            context.log_error('Retrieving device token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Response dump |%s|' %
+                              (config_type, client_id[:5], client_secret[:5], response_dump))
             raise LoginException('Login Failed: Code %s' % result.status_code)
 
-        json_data = result.json()
-        if 'error' in json_data:
-            if json_data['error'] != u'authorization_pending':
-                raise LoginException(json_data['error'])
-
         if result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+            if json_data: return json_data
+            else: return result.json()
 
         return None
 
     def generate_user_code_tv(self):
-        client_id = self.CONFIGS['youtube-tv']['id']
+        client_id = str(self.CONFIGS['youtube-tv']['id'])
         return self.generate_user_code(client_id=client_id)
 
     def generate_user_code(self, client_id=''):
@@ -200,27 +242,44 @@ class LoginClient(object):
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6',
                    'If-Match': '*'}
 
-        _client_id = client_id
-        if not client_id:
-            _client_id = self._config['id']
-        post_data = {'client_id': _client_id,
+        client_id = client_id or self._config['id']
+
+        post_data = {'client_id': client_id,
                      'scope': 'https://www.googleapis.com/auth/youtube'}
         # 'scope': 'http://gdata.youtube.com https://www.googleapis.com/auth/youtube-paid-content'}
 
         # url
         url = 'https://www.youtube.com/o/oauth2/device/code'
 
+        config_type = self._get_config_type(client_id)
+        context.log_debug('Generating user code: Config: |%s| Client id [:5]: |%s|' %
+                          (config_type, client_id[:5]))
+
         result = requests.post(url, data=post_data, headers=headers, verify=self._verify)
 
-        if result.status_code != requests.codes.ok:
-            raise LoginException('Login Failed: Code %s' % result.status_code)
+        try:
+            json_data = result.json()
+            if 'error' in json_data:
+                context.log_error('Generate user code failed: JSON: |%s|' % json_data)
+                raise LoginException(json_data['error'])
+        except ValueError:
+            json_data = None
 
-        json_data = result.json()
-        if 'error' in json_data:
-            raise LoginException(json_data['error'])
+        if result.status_code != requests.codes.ok:
+            if json_data:
+                response_dump = json_data
+            else:
+                try: response_dump = result.json()
+                except ValueError:
+                    try: response_dump = result.text
+                    except: response_dump = 'None'
+            context.log_error('Generate user code failed: Config: |%s| Client id [:5]: |%s| Response dump |%s|' %
+                              (config_type, client_id[:5], response_dump))
+            raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+            if json_data: return json_data
+            else: return result.json()
 
         return None
 
@@ -268,4 +327,19 @@ class LoginClient(object):
 
         return token, expires
 
-    pass
+    def _get_config_type(self, client_id, client_secret=None):
+        """used for logging"""
+        if client_secret is None:
+            using_conf_tv = (client_id == self.CONFIGS['youtube-tv'].get('id'))
+            using_conf_main = (client_id == self.CONFIGS['main'].get('id'))
+        else:
+            using_conf_tv = ((client_id == self.CONFIGS['youtube-tv'].get('id')) and (client_secret == self.CONFIGS['youtube-tv'].get('secret')))
+            using_conf_main = ((client_id == self.CONFIGS['main'].get('id')) and (client_secret == self.CONFIGS['main'].get('secret')))
+        if not using_conf_main and not using_conf_tv:
+            return 'None'
+        elif using_conf_tv:
+            return 'YouTube TV'
+        elif using_conf_main:
+            return 'Add-on'
+        else:
+            return 'Unknown'
