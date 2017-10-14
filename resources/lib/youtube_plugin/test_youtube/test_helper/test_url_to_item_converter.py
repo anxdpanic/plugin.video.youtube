@@ -20,7 +20,7 @@ class TestUrlExtract(unittest.TestCase):
         list_of_50 = []
         pos = 0
         while pos < len(list_63):
-            list_of_50.append(list_63[pos:pos+50])
+            list_of_50.append(list_63[pos:pos + 50])
             pos += 50
 
     def test_complete_sequence(self):

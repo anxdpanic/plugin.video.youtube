@@ -61,13 +61,13 @@ class AudioItem(BaseItem):
         return self._track_number
 
     def set_duration_from_milli_seconds(self, milli_seconds):
-        self.set_duration_from_seconds(int(milli_seconds)/1000)
+        self.set_duration_from_seconds(int(milli_seconds) / 1000)
 
     def set_duration_from_seconds(self, seconds):
         self._duration = int(seconds)
 
     def set_duration_from_minutes(self, minutes):
-        self.set_duration_from_seconds(int(minutes)*60)
+        self.set_duration_from_seconds(int(minutes) * 60)
 
     def get_duration(self):
         return self._duration

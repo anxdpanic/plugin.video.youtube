@@ -5,6 +5,7 @@ from ... import kodion
 from ...kodion import items
 from . import utils
 
+
 def _process_list_response(provider, context, json_data):
     video_id_dict = {}
     channel_id_dict = {}
@@ -105,7 +106,7 @@ def _process_list_response(provider, context, json_data):
                                          context.create_uri(['play'], {'video_id': video_id, 'incognito': incognito}),
                                          image=image)
             video_item.set_fanart(provider.get_fanart(context))
-            #Get Track-ID from Playlist
+            # Get Track-ID from Playlist
             video_item.set_track_number(snippet['position'] + 1)
             result.append(video_item)
             video_id_dict[video_id] = video_item
@@ -222,7 +223,7 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     if yt_next_page_token or (page * yt_results_per_page < yt_total_results):
         if not yt_next_page_token:
             client = provider.get_client(context)
-            yt_next_page_token = client.calculate_next_page_token(page+1, yt_results_per_page)
+            yt_next_page_token = client.calculate_next_page_token(page + 1, yt_results_per_page)
 
         new_params = {}
         new_params.update(context.get_params())

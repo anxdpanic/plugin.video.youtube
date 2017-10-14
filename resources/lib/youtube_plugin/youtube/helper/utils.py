@@ -8,7 +8,6 @@ from ... import kodion
 from ...kodion import utils
 from ...youtube.helper import yt_context_menu
 
-
 __RE_SEASON_EPISODE_MATCHES__ = [re.compile(r'Part (?P<episode>\d+)'),
                                  re.compile(r'#(?P<episode>\d+)'),
                                  re.compile(r'Ep.[^\w]?(?P<episode>\d+)'),
@@ -189,8 +188,8 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         This is not based on any language. In some cases this won't work at all.
         TODO: via language and settings provide the regex for matching episode and season.
         """
-        #video_item.set_season(1)
-        #video_item.set_episode(1)
+        # video_item.set_season(1)
+        # video_item.set_episode(1)
         for regex in __RE_SEASON_EPISODE_MATCHES__:
             re_match = regex.search(video_item.get_name())
             if re_match:

@@ -84,7 +84,7 @@ class ResourceManager(object):
         list_of_50 = []
         pos = 0
         while pos < len(list_of_ids):
-            list_of_50.append(list_of_ids[pos:pos+50])
+            list_of_50.append(list_of_ids[pos:pos + 50])
             pos += 50
         return list_of_50
 

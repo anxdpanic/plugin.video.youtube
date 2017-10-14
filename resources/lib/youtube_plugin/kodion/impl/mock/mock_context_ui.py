@@ -45,4 +45,3 @@ class MockContextUI(AbstractContextUI):
 
     def refresh_container(self):
         log("called 'refresh_container'")
-

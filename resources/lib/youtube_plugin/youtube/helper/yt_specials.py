@@ -232,6 +232,7 @@ def _process_new_uploaded_videos_tv_filtered(provider, context, re_match):
 
     return result
 
+
 def process(category, provider, context, re_match):
     result = []
 

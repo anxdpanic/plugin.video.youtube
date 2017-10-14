@@ -29,7 +29,8 @@ class TestUrlExtract(unittest.TestCase):
     def test_urls(self):
         urls = [
             ('https://youtu.be/GdhfwW5zHEY', 'https://www.youtube.com/watch?v=GdhfwW5zHEY&feature=youtu.be'),
-            ('https://www.youtube.com/redirect?q=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D9DKZbZyW2-g%26list%3DPL3tRBEVW0hiAOf_drlpS1hqZjJknW88cB%26index%3D1&redir_token=IBH7ovJdGv031f2JRlnYAKfq0m98MTQyODE1NjI2MEAxNDI4MDY5ODYw', 'http://www.youtube.com/watch?v=9DKZbZyW2-g&list=PL3tRBEVW0hiAOf_drlpS1hqZjJknW88cB&index=1'),
+            ('https://www.youtube.com/redirect?q=http%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3D9DKZbZyW2-g%26list%3DPL3tRBEVW0hiAOf_drlpS1hqZjJknW88cB%26index%3D1&redir_token=IBH7ovJdGv031f2JRlnYAKfq0m98MTQyODE1NjI2MEAxNDI4MDY5ODYw',
+             'http://www.youtube.com/watch?v=9DKZbZyW2-g&list=PL3tRBEVW0hiAOf_drlpS1hqZjJknW88cB&index=1'),
             ('http://smo.sh/SubscribeSmoshGames', 'https://www.youtube.com/channel/UCJ2ZDzMRgSrxmwphstrm8Ww?sub_confirmation=1'),
             ('http://ow.ly/LcFu4', 'http://www.heise.de/'),
             ('http://goo.gl/CRiy4L', 'http://www.shortnews.de')
@@ -54,7 +55,7 @@ class TestUrlExtract(unittest.TestCase):
         for url in urls:
             res_urls.append(resolver.resolve(url))
         end = time.clock()
-        print end-start
+        print end - start
 
     def test_resolve_urls_2(self):
         description = (

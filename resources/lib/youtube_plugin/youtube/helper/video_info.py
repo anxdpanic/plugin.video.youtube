@@ -13,10 +13,10 @@ import xbmcaddon
 
 
 def LooseVersion(v):
-   filled = []
-   for point in v.split("."):
-      filled.append(point.zfill(8))
-   return tuple(filled)
+    filled = []
+    for point in v.split("."):
+        filled.append(point.zfill(8))
+    return tuple(filled)
 
 
 class VideoInfo(object):
