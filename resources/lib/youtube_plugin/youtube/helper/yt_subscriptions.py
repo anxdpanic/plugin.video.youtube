@@ -36,7 +36,6 @@ def _process_remove(provider, context, re_match):
             return False
 
         context.get_ui().refresh_container()
-        pass
     return True
 
 
@@ -50,7 +49,6 @@ def process(method, provider, context, re_match):
 
     if method == 'list':
         result.extend(_process_list(provider, context, re_match))
-        pass
     elif method == 'add':
         return _process_add(provider, context, re_match)
     elif method == 'remove':

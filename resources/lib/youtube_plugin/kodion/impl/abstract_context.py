@@ -10,7 +10,6 @@ class AbstractContext(object):
     def __init__(self, path=u'/', params=None, plugin_name=u'', plugin_id=u''):
         if not params:
             params = {}
-            pass
 
         self._cache_path = None
 
@@ -30,7 +29,6 @@ class AbstractContext(object):
 
         # create valid uri
         self._uri = self.create_uri(self._path, self._params)
-        pass
 
     def format_date_short(self, date_obj):
         raise NotImplementedError()
@@ -40,14 +38,13 @@ class AbstractContext(object):
 
     def get_language(self):
         raise NotImplementedError()
-    
+
     def get_region(self):
         raise NotImplementedError()
 
     def _get_cache_path(self):
         if not self._cache_path:
             self._cache_path = os.path.join(self.get_data_path(), 'kodion')
-            pass
         return self._cache_path
 
     def get_function_cache(self):
@@ -55,7 +52,6 @@ class AbstractContext(object):
             max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, 5)
             self._function_cache = FunctionCache(os.path.join(self._get_cache_path(), 'cache'),
                                                  max_file_size_kb=max_cache_size_mb * 1024)
-            pass
         return self._function_cache
 
     def get_search_history(self):
@@ -63,25 +59,21 @@ class AbstractContext(object):
             max_search_history_items = self.get_settings().get_int(constants.setting.SEARCH_SIZE, 50)
             self._search_history = SearchHistory(os.path.join(self._get_cache_path(), 'search'),
                                                  max_search_history_items)
-            pass
         return self._search_history
 
     def get_favorite_list(self):
         if not self._favorite_list:
             self._favorite_list = FavoriteList(os.path.join(self._get_cache_path(), 'favorites'))
-            pass
         return self._favorite_list
 
     def get_watch_later_list(self):
         if not self._watch_later_list:
             self._watch_later_list = WatchLaterList(os.path.join(self._get_cache_path(), 'watch_later'))
-            pass
         return self._watch_later_list
 
     def get_access_manager(self):
         if not self._access_manager:
             self._access_manager = AccessManager(self.get_settings())
-            pass
         return self._access_manager
 
     def get_video_playlist(self):
@@ -105,14 +97,12 @@ class AbstractContext(object):
     def create_uri(self, path=u'/', params=None):
         if not params:
             params = {}
-            pass
 
         uri = create_uri_path(path)
         if uri:
             uri = "%s://%s%s" % ('plugin', self._plugin_id.encode('utf-8'), uri)
         else:
             uri = "%s://%s/" % ('plugin', self._plugin_id.encode('utf-8'))
-            pass
 
         if len(params) > 0:
             # make a copy of the map
@@ -123,12 +113,9 @@ class AbstractContext(object):
             for param in uri_params:
                 if isinstance(params[param], int):
                     params[param] = str(params[param])
-                    pass
 
                 uri_params[param] = to_utf8(params[param])
-                pass
             uri += '?' + urllib.urlencode(uri_params)
-            pass
 
         return uri
 
@@ -161,7 +148,6 @@ class AbstractContext(object):
         path_comps = []
         for arg in args:
             path_comps.extend(arg.split('/'))
-            pass
         path = os.path.join(self.get_native_path(), 'resources', *path_comps)
         return path
 
@@ -196,27 +182,21 @@ class AbstractContext(object):
         log_line = '[%s] %s' % (self.get_id(), text)
 
         log(log_line, log_level)
-        pass
 
     def log_warning(self, text):
         self.log(text, constants.log.WARNING)
-        pass
 
     def log_error(self, text):
         self.log(text, constants.log.ERROR)
-        pass
 
     def log_notice(self, text):
         self.log(text, constants.log.NOTICE)
-        pass
 
     def log_debug(self, text):
         self.log(text, constants.log.DEBUG)
-        pass
 
     def log_info(self, text):
         self.log(text, constants.log.INFO)
-        pass
 
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()

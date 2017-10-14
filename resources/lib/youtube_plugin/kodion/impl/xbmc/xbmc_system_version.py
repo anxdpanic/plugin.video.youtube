@@ -17,29 +17,19 @@ class XbmcSystemVersion(AbstractSystemVersion):
             version_installed = json_query['result']['version']
             self._version = (version_installed.get('major', 1), version_installed.get('minor', 0))
             self._appname = json_query['result']['name']
-            pass
         except:
             self._version = (1, 0)  # Frodo
             self._appname = 'Unknown Application'
-            pass
         self._releasename = 'Unknown XBMC Release'
         if self._version >= (12, 0):
             self._releasename = 'Frodo'
-            pass
         if self._version >= (13, 0):
             self._releasename = 'Gotham'
-            pass
         if self._version >= (14, 0):
             self._releasename = 'Helix'
-            pass
         if self._version >= (15, 0):
             self._releasename = 'Isengard'
-            pass
         if self._version >= (16, 0):
             self._releasename = 'Jarvis'
-            pass
         if self._version >= (17, 0):
             self._releasename = 'Krypton'
-            pass
-
-    pass

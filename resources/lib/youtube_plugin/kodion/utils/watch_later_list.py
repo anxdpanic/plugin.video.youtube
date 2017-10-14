@@ -9,11 +9,9 @@ from .. import items
 class WatchLaterList(Storage):
     def __init__(self, filename):
         Storage.__init__(self, filename)
-        pass
 
     def clear(self):
         self._clear()
-        pass
 
     def list(self):
         result = []
@@ -22,7 +20,6 @@ class WatchLaterList(Storage):
             data = self._get(key)
             item = items.from_json(data[0])
             result.append(item)
-            pass
 
         def _sort(video_item):
             return video_item.get_date()
@@ -38,8 +35,6 @@ class WatchLaterList(Storage):
 
         item_json_data = items.to_json(base_item)
         self._set(base_item.get_id(), item_json_data)
-        pass
 
     def remove(self, base_item):
         self._remove(base_item.get_id())
-        pass

@@ -7,20 +7,16 @@ class AbstractSystemVersion(object):
             self._version = (0, 0, 0, 0)
         else:
             self._version = version
-            pass
 
         if not releasename or not isinstance(releasename, basestring):
             self._releasename = 'UNKNOWN'
         else:
             self._releasename = releasename
-            pass
 
         if not appname or not isinstance(appname, basestring):
             self._appname = 'UNKNOWN'
         else:
             self._appname = appname
-            pass
-        pass
 
     def __str__(self):
         return unicode(self).encode('utf-8')
@@ -37,5 +33,3 @@ class AbstractSystemVersion(object):
 
     def get_app_name(self):
         return self._appname
-
-    pass

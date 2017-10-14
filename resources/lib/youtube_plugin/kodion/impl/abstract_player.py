@@ -13,5 +13,3 @@ class AbstractPlayer(object):
 
     def pause(self):
         raise NotImplementedError()
-
-    pass

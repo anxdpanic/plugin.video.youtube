@@ -122,7 +122,6 @@ class ViewManager(object):
 
     def __init__(self, context):
         self._context = context
-        pass
 
     def has_supported_views(self):
         """
@@ -141,12 +140,9 @@ class ViewManager(object):
             items = []
             for view_data in skin_data:
                 items.append((view_data['name'], view_data['id']))
-                pass
             view_id = self._context.get_ui().on_select(title, items)
-            pass
         else:
             self._context.log_notice("ViewManager: Unknown skin id '%s'" % skin_id)
-            pass
 
         if view_id == -1:
             old_value = settings.get_string(constants.setting.VIEW_X % view, '')
@@ -154,14 +150,9 @@ class ViewManager(object):
                 result, view_id = self._context.get_ui().on_numeric_input(title, old_value)
                 if not result:
                     view_id = -1
-                    pass
-                pass
-            pass
 
         if view_id > -1:
             settings.set_int(constants.setting.VIEW_X % view, view_id)
             return True
 
         return False
-
-    pass

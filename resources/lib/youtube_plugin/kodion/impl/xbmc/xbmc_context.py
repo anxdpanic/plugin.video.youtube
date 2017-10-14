@@ -27,7 +27,6 @@ class XbmcContext(AbstractContext):
             self._addon = xbmcaddon.Addon(id=plugin_id)
         else:
             self._addon = xbmcaddon.Addon()
-            pass
 
         self._system_version = None
 
@@ -53,9 +52,6 @@ class XbmcContext(AbstractContext):
                     for _param in params:
                         item = params[_param]
                         self._params[_param] = item.decode('utf-8')
-                        pass
-                    pass
-                pass
 
         self._ui = None
         self._video_playlist = None
@@ -75,18 +71,14 @@ class XbmcContext(AbstractContext):
         self._data_path = xbmc.translatePath('special://profile/addon_data/%s' % self._plugin_id)
         if isinstance(self._data_path, str):
             self._data_path = self._data_path.decode('utf-8')
-            pass
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
-            pass
-        pass
 
     def format_date_short(self, date_obj):
         date_format = xbmc.getRegion('dateshort')
         _date_obj = date_obj
         if isinstance(_date_obj, datetime.date):
             _date_obj = datetime.datetime(_date_obj.year, _date_obj.month, _date_obj.day)
-            pass
 
         return _date_obj.strftime(date_format)
 
@@ -95,7 +87,6 @@ class XbmcContext(AbstractContext):
         _time_obj = time_obj
         if isinstance(_time_obj, datetime.time):
             _time_obj = datetime.time(_time_obj.hour, _time_obj.minute, _time_obj.second)
-            pass
 
         return _time_obj.strftime(time_format)
 
@@ -117,44 +108,37 @@ class XbmcContext(AbstractContext):
         except Exception, ex:
             self.log_error('Failed to get system language (%s)', ex.__str__())
             return 'en-US'
-        pass
         """
 
     def get_system_version(self):
         if not self._system_version:
             self._system_version = XbmcSystemVersion(version='', releasename='', appname='')
-            pass
 
         return self._system_version
 
     def get_video_playlist(self):
         if not self._video_playlist:
             self._video_playlist = XbmcPlaylist('video', weakref.proxy(self))
-            pass
         return self._video_playlist
 
     def get_audio_playlist(self):
         if not self._audio_playlist:
             self._audio_playlist = XbmcPlaylist('audio', weakref.proxy(self))
-            pass
         return self._audio_playlist
 
     def get_video_player(self):
         if not self._video_player:
             self._video_player = XbmcPlayer('video', weakref.proxy(self))
-            pass
         return self._video_player
 
     def get_audio_player(self):
         if not self._audio_player:
             self._audio_player = XbmcPlayer('audio', weakref.proxy(self))
-            pass
         return self._audio_player
 
     def get_ui(self):
         if not self._ui:
             self._ui = XbmcContextUI(self._addon, weakref.proxy(self))
-            pass
         return self._ui
 
     def get_handle(self):
@@ -180,8 +164,6 @@ class XbmcContext(AbstractContext):
                 result = xbmc.getLocalizedString(text_id)
                 if result is not None and result:
                     return utils.to_unicode(result)
-                pass
-            pass
 
         result = self._addon.getLocalizedString(int(text_id))
         if result is not None and result:
@@ -192,22 +174,17 @@ class XbmcContext(AbstractContext):
     def set_content_type(self, content_type):
         self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
         xbmcplugin.setContent(self._plugin_handle, content_type)
-        pass
 
     def add_sort_method(self, *sort_methods):
         for sort_method in sort_methods:
             xbmcplugin.addSortMethod(self._plugin_handle, sort_method)
-            pass
-        pass
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:
             new_path = self.get_path()
-            pass
 
         if not new_params:
             new_params = self.get_params()
-            pass
 
         new_context = XbmcContext(path=new_path, params=new_params, plugin_name=self._plugin_name,
                                   plugin_id=self._plugin_id, override=False)
@@ -224,11 +201,9 @@ class XbmcContext(AbstractContext):
 
     def execute(self, command):
         xbmc.executebuiltin(command)
-        pass
 
     def sleep(self, milli_seconds):
         xbmc.sleep(milli_seconds)
-        pass
 
     def addon_enabled(self, addon_id):
         rpc_request = json.dumps({"jsonrpc": "2.0",

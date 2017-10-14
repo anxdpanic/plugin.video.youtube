@@ -24,15 +24,12 @@ class MockContext(AbstractContext):
         self._system_version = MockSystemVersion(1, 3, 'Kodion Test System', 'MOCK App')
         self._language = 'en-US'
         self._version = '1.9'
-        pass
 
     def set_localization(self, text_id, value):
         self._dict_localization[text_id] = value
-        pass
 
     def set_language(self, language):
         self._language = language
-        pass
 
     def get_language(self):
         return self._language
@@ -43,7 +40,6 @@ class MockContext(AbstractContext):
     def get_ui(self):
         if not self._ui:
             self._ui = MockContextUI()
-            pass
         return self._ui
 
     def get_handle(self):
@@ -63,22 +59,17 @@ class MockContext(AbstractContext):
 
     def set_content_type(self, content_type):
         log("Set ContentType to '%s'" % content_type)
-        pass
 
     def add_sort_method(self, *sort_methods):
         for sort_method in sort_methods:
             log("add SortMethod '%s'" % (str(sort_method)))
-            pass
-        pass
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:
             new_path = self.get_path()
-            pass
 
         if not new_params:
             new_params = self.get_params()
-            pass
 
         new_context = MockContext(path=new_path, params=new_params, plugin_name=self._plugin_name,
                                   plugin_id=self._plugin_id)
@@ -93,10 +84,6 @@ class MockContext(AbstractContext):
 
     def execute(self, command):
         log("execute '%s'" % command)
-        pass
 
     def sleep(self, milli_seconds):
-        time.sleep(milli_seconds/1000.0)
-        pass
-
-    pass
+        time.sleep(milli_seconds / 1000.0)

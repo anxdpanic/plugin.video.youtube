@@ -4,14 +4,13 @@ __author__ = 'bromix'
 class JsonScriptEngine(object):
     def __init__(self, json_script):
         self._json_script = json_script
-        pass
 
     def execute(self, signature):
         _signature = signature
 
         _actions = self._json_script['actions']
         for action in _actions:
-            func = '_'+action['func']
+            func = '_' + action['func']
             params = action['params']
 
             if func == '_return':
@@ -23,15 +22,12 @@ class JsonScriptEngine(object):
                     param = _signature
                     params[i] = param
                     break
-                pass
 
             method = getattr(self, func)
             if method:
                 _signature = method(*params)
-                pass
             else:
                 raise Exception("Unknown method '%s'" % func)
-            pass
 
         return _signature
 
@@ -57,5 +53,3 @@ class JsonScriptEngine(object):
         signature[0] = signature[b % len(signature)]
         signature[b] = c
         return signature
-
-    pass

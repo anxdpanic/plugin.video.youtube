@@ -42,10 +42,6 @@ class AbstractProvider(object):
             method = getattr(self, method_name)
             if hasattr(method, 'kodion_re_path'):
                 self.register_path(method.kodion_re_path, method_name)
-                pass
-            pass
-
-        pass
 
     def get_alternative_fanart(self, context):
         return context.get_fanart()
@@ -58,7 +54,6 @@ class AbstractProvider(object):
         :return:
         """
         self._dict_path[re_path] = method_name
-        pass
 
     def _process_wizard(self, context):
         # start the setup wizard
@@ -93,10 +88,7 @@ class AbstractProvider(object):
                     result = method(context, re_match)
                     if not isinstance(result, tuple):
                         result = result, {}
-                        pass
                     return result
-                pass
-            pass
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
@@ -135,12 +127,10 @@ class AbstractProvider(object):
         if command == 'add':
             fav_item = items.from_json(params['item'])
             context.get_favorite_list().add(fav_item)
-            pass
         elif command == 'remove':
             fav_item = items.from_json(params['item'])
             context.get_favorite_list().remove(fav_item)
             context.get_ui().refresh_container()
-            pass
         elif command == 'list':
 
             directory_items = context.get_favorite_list().list()
@@ -150,12 +140,10 @@ class AbstractProvider(object):
                                  'RunPlugin(%s)' % context.create_uri([constants.paths.FAVORITES, 'remove'],
                                                                       params={'item': items.to_jsons(directory_item)}))]
                 directory_item.set_context_menu(context_menu)
-                pass
 
             return directory_items
         else:
             pass
-        pass
 
     def _internal_watch_later(self, context, re_match):
         self.on_watch_later(context, re_match)
@@ -166,12 +154,10 @@ class AbstractProvider(object):
         if command == 'add':
             item = items.from_json(params['item'])
             context.get_watch_later_list().add(item)
-            pass
         elif command == 'remove':
             item = items.from_json(params['item'])
             context.get_watch_later_list().remove(item)
             context.get_ui().refresh_container()
-            pass
         elif command == 'list':
             video_items = context.get_watch_later_list().list()
 
@@ -180,13 +166,11 @@ class AbstractProvider(object):
                                  'RunPlugin(%s)' % context.create_uri([constants.paths.WATCH_LATER, 'remove'],
                                                                       params={'item': items.to_jsons(video_item)}))]
                 video_item.set_context_menu(context_menu)
-                pass
 
             return video_items
         else:
             # do something
             pass
-        pass
 
     def _internal_search(self, context, re_match):
         params = context.get_params()
@@ -205,7 +189,6 @@ class AbstractProvider(object):
             if result:
                 search_history.rename(query, new_query)
                 context.get_ui().refresh_container()
-                pass
             return True
         elif command == 'clear':
             search_history.clear()
@@ -217,7 +200,6 @@ class AbstractProvider(object):
             if result:
                 context.execute(
                     'Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], {'q': query, 'incognito': incognito}))
-                pass
 
             return True
         elif command == 'query':
@@ -228,7 +210,7 @@ class AbstractProvider(object):
                     search_history.update(query)
                 return self.on_search(query, context, re_match)
             except:
-                result =[]
+                result = []
                 return result
         else:
             context.set_content_type(constants.content_type.FILES)
@@ -242,13 +224,11 @@ class AbstractProvider(object):
                 # little fallback for old history entries
                 if isinstance(search, items.DirectoryItem):
                     search = search.get_name()
-                    pass
 
                 # we create a new instance of the SearchItem
                 search_history_item = items.SearchHistoryItem(context, search,
                                                               fanart=self.get_alternative_fanart(context))
                 result.append(search_history_item)
-                pass
 
             if search_history.is_empty():
                 #  context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
@@ -261,5 +241,3 @@ class AbstractProvider(object):
 
     def tear_down(self, context):
         pass
-
-    pass

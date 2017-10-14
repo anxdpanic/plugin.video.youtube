@@ -48,5 +48,3 @@ class AbstractContextUI(object):
         :return:
         """
         raise NotImplementedError()
-
-    pass

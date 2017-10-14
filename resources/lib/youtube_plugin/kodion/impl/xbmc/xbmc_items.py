@@ -27,7 +27,6 @@ def to_video_item(context, video_item):
 
     if video_item.get_context_menu() is not None:
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
-        pass
 
     item.setProperty('inputstreamaddon', '')
     item.setProperty('inputstream.adaptive.manifest_type', '')
@@ -36,7 +35,7 @@ def to_video_item(context, video_item):
         item.setMimeType('application/xml+dash')
         item.setProperty('inputstreamaddon', 'inputstream.adaptive')
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        #item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
+        # item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
 
     item.setProperty(u'IsPlayable', u'true')
 
@@ -50,7 +49,6 @@ def to_video_item(context, video_item):
         duration = _info_labels['duration']
         del _info_labels['duration']
         item.addStreamInfo('video', {'duration': duration})
-        pass
 
     item.setInfo(type=u'video', infoLabels=_info_labels)
     return item
@@ -77,7 +75,6 @@ def to_audio_item(context, audio_item):
 
     if audio_item.get_context_menu() is not None:
         item.addContextMenuItems(audio_item.get_context_menu(), replaceItems=audio_item.replace_context_menu())
-        pass
 
     item.setProperty(u'IsPlayable', u'true')
 

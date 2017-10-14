@@ -22,8 +22,6 @@ def _process_rate_video(provider, context, re_match):
         for rating in ratings:
             if rating != current_rating:
                 rating_items.append((context.localize(provider.LOCAL_MAP['youtube.video.rate.%s' % rating]), rating))
-                pass
-            pass
         result = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.video.rate']), rating_items)
         if result != -1:
             client = provider.get_client(context).rate_video(video_id, result)
@@ -31,10 +29,6 @@ def _process_rate_video(provider, context, re_match):
             # this will be set if we are in the 'Liked Video' playlist
             if context.get_param('refresh_container', '0') == '1':
                 context.get_ui().refresh_container()
-                pass
-            pass
-        pass
-    pass
 
 
 def _process_more_for_video(provider, context, re_match):
@@ -63,13 +57,10 @@ def _process_more_for_video(provider, context, re_match):
         items.append((context.localize(provider.LOCAL_MAP['youtube.video.rate']),
                       'RunPlugin(%s)' % context.create_uri(['video', 'rate'], {'video_id': video_id,
                                                                                'refresh_container': refresh_container})))
-        pass
 
     result = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.video.more']), items)
     if result != -1:
         context.execute(result)
-        pass
-    pass
 
 
 def process(method, provider, context, re_match):

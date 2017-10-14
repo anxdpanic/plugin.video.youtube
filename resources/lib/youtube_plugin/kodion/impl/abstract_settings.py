@@ -6,7 +6,6 @@ from .. import constants
 class AbstractSettings(object):
     def __init__(self):
         object.__init__(self)
-        pass
 
     def get_string(self, setting_id, default_value=None):
         raise NotImplementedError()
@@ -20,7 +19,6 @@ class AbstractSettings(object):
     def get_int(self, setting_id, default_value, converter=None):
         if not converter:
             converter = lambda x: x
-            pass
 
         value = self.get_string(setting_id)
         if value is None or value == '':
@@ -32,13 +30,11 @@ class AbstractSettings(object):
             from . import log
 
             log("Failed to get setting '%s' as 'int' (%s)" % setting_id, ex.__str__())
-            pass
 
         return default_value
 
     def set_int(self, setting_id, value):
         self.set_string(setting_id, str(value))
-        pass
 
     def set_bool(self, setting_id, value):
         if value:
@@ -70,7 +66,6 @@ class AbstractSettings(object):
 
         if quality_map_override is not None:
             vq_dict = quality_map_override
-            pass
 
         vq = self.get_int(constants.setting.VIDEO_QUALITY, 1)
         return vq_dict[vq]

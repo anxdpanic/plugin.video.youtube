@@ -17,7 +17,6 @@ class TestProvider(unittest.TestCase):
         context.set_localization(30502, 'Go to %s')
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_playlist(self):
         provider = Provider()
@@ -27,7 +26,6 @@ class TestProvider(unittest.TestCase):
         context.set_localization(30502, 'Go to %s')
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_channel_by_name(self):
         provider = Provider()
@@ -37,7 +35,6 @@ class TestProvider(unittest.TestCase):
         context.set_localization(30502, 'Go to %s')
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_play(self):
         provider = Provider()
@@ -47,7 +44,6 @@ class TestProvider(unittest.TestCase):
         context.set_localization(30502, 'Go to %s')
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_on_channel_playlists(self):
         provider = Provider()
@@ -56,7 +52,6 @@ class TestProvider(unittest.TestCase):
         context = kodion.Context(path=path)
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_on_channel_playlist(self):
         provider = Provider()
@@ -66,7 +61,6 @@ class TestProvider(unittest.TestCase):
         context.set_localization(30502, 'Go to %s')
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_on_channel(self):
         provider = Provider()
@@ -75,7 +69,6 @@ class TestProvider(unittest.TestCase):
         context = kodion.Context(path=path)
         result = provider.navigate(context)
         items = result[0]
-        pass
 
     def test_on_search_playlist(self):
         provider = Provider()
@@ -92,7 +85,6 @@ class TestProvider(unittest.TestCase):
         items = result[0]
         self.assertGreater(len(items), 0)
         kodion.utils.print_items(items)
-        pass
 
     def test_on_search(self):
         provider = Provider()
@@ -104,7 +96,6 @@ class TestProvider(unittest.TestCase):
         items = result[0]
         self.assertGreater(len(items), 0)
         kodion.utils.print_items(items)
-        pass
 
     def test_on_search_video(self):
         provider = Provider()
@@ -116,7 +107,6 @@ class TestProvider(unittest.TestCase):
         items = result[0]
         self.assertGreater(len(items), 0)
         kodion.utils.print_items(items)
-        pass
 
     def test_on_root(self):
         provider = Provider()
@@ -128,6 +118,3 @@ class TestProvider(unittest.TestCase):
         self.assertGreater(len(items), 0)
 
         kodion.utils.print_items(items)
-        pass
-
-    pass
