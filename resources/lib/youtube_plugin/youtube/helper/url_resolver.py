@@ -17,15 +17,12 @@ class AbstractResolver(object):
     def resolve(self, url, url_components):
         raise NotImplementedError()
 
-    pass
-
 
 class YouTubeResolver(AbstractResolver):
     RE_USER_NAME = re.compile(r'http(s)?://(www.)?youtube.com/(?P<user_name>[a-zA-Z0-9]+)$')
 
     def __init__(self):
         AbstractResolver.__init__(self)
-        pass
 
     def supports_url(self, url, url_components):
         if url_components.hostname == 'www.youtube.com' or url_components.hostname == 'youtube.com':
@@ -38,8 +35,6 @@ class YouTubeResolver(AbstractResolver):
             re_match = self.RE_USER_NAME.match(url)
             if re_match:
                 return True
-
-            pass
 
         return False
 
@@ -61,7 +56,6 @@ class YouTubeResolver(AbstractResolver):
                     if re_match:
                         channel_id = re_match.group('channel_id')
                         return 'https://www.youtube.com/channel/%s' % channel_id
-                    pass
             except:
                 # do nothing
                 pass
@@ -81,13 +75,10 @@ class YouTubeResolver(AbstractResolver):
 
         return url
 
-    pass
-
 
 class CommonResolver(AbstractResolver, list):
     def __init__(self):
         AbstractResolver.__init__(self)
-        pass
 
     def supports_url(self, url, url_components):
         return True
@@ -129,7 +120,6 @@ class CommonResolver(AbstractResolver, list):
                     location = headers.get('Location', '')
                     if location:
                         return _loop(location, tries=tries - 1)
-                    pass
             except:
                 # do nothing
                 pass
@@ -139,8 +129,6 @@ class CommonResolver(AbstractResolver, list):
         resolved_url = _loop(url)
 
         return resolved_url
-
-    pass
 
 
 class UrlResolver(object):
@@ -152,11 +140,9 @@ class UrlResolver(object):
             self._youtube_resolver,
             CommonResolver()
         ]
-        pass
 
     def clear(self):
         self._context.get_function_cache().clear()
-        pass
 
     def _resolve(self, url):
         # try one of the resolver
@@ -174,8 +160,6 @@ class UrlResolver(object):
                     return self._youtube_resolver.resolve(resolved_url, url_components)
 
                 return resolved_url
-            pass
-        pass
 
     def resolve(self, url):
         function_cache = self._context.get_function_cache()
@@ -184,5 +168,3 @@ class UrlResolver(object):
             return url
 
         return resolved_url
-
-    pass

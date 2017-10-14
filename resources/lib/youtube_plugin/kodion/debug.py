@@ -11,8 +11,6 @@ def debug_here(host='localhost'):
             pydevd_path = os.path.normpath(os.path.join(comp, os.pardir, 'script.module.pydevd', 'lib'))
             sys.path.append(pydevd_path)
             break
-        pass
 
     import pydevd
     pydevd.settrace(host, stdoutToServer=True, stderrToServer=True)
-    pass

@@ -11,7 +11,6 @@ __RUNNER__ = Runner()
 def run(provider, context=None):
     if not context:
         context = Context(plugin_id='plugin.video.youtube')
-        pass
 
     context.log_debug('Starting Kodion framework by bromix...')
     python_version = 'Unknown version of Python'
@@ -40,4 +39,3 @@ def run(provider, context=None):
     __RUNNER__.run(provider, context)
     provider.tear_down(context)
     context.log_debug('Shutdown of Kodion')
-    pass

@@ -16,14 +16,12 @@ class Cipher(object):
         self._java_script_url = java_script_url
 
         self._object_cache = {}
-        pass
 
     def get_signature(self, signature):
         function_cache = self._context.get_function_cache()
         json_script = function_cache.get_cached_only(self._load_json_script, self._java_script_url)
         if not json_script:
             json_script = function_cache.get(FunctionCache.ONE_DAY, self._load_json_script, self._java_script_url)
-            pass
 
         if json_script:
             json_script_engine = JsonScriptEngine(json_script)
@@ -35,14 +33,11 @@ class Cipher(object):
         if self._cache_folder:
             if not os.path.exists(self._cache_folder):
                 os.makedirs(self._cache_folder)
-                pass
 
             filename = md5_hash + '.jsonscript'
             filename = os.path.join(self._cache_folder, filename)
             with open(filename, 'w') as outfile:
                 json.dump(json_script, outfile, sort_keys=True, indent=4, ensure_ascii=False)
-            pass
-        pass
 
     def _load_json_script(self, java_script_url):
         headers = {'Connection': 'keep-alive',
@@ -55,7 +50,6 @@ class Cipher(object):
         url = java_script_url
         if not url.startswith('http'):
             url = 'http://' + url
-            pass
 
         result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
         java_script = result.text
@@ -78,14 +72,12 @@ class Cipher(object):
             if split_match:
                 json_script['actions'].append({'func': 'list',
                                                'params': ['%SIG%']})
-                pass
 
             # return
             return_match = re.match('return\s+%s.join\(""\)' % function_parameter[0], line)
             if return_match:
                 json_script['actions'].append({'func': 'join',
                                                'params': ['%SIG%']})
-                pass
 
             # real object functions
             cipher_match = re.match(
@@ -101,10 +93,8 @@ class Cipher(object):
                         param = '%SIG%'
                     else:
                         param = int(param)
-                        pass
 
                     parameter[i] = param
-                    pass
 
                 # get function from object
                 function = self._get_object_function(object_name, function_name, java_script)
@@ -116,7 +106,6 @@ class Cipher(object):
                     params = ['%SIG%', a, parameter[1]]
                     json_script['actions'].append({'func': 'slice',
                                                    'params': params})
-                    pass
 
                 splice_match = re.match('[a-zA-Z]+.splice\((?P<a>\d+),[a-zA-Z]+\)', function['body'][0])
                 if splice_match:
@@ -124,23 +113,18 @@ class Cipher(object):
                     params = ['%SIG%', a, parameter[1]]
                     json_script['actions'].append({'func': 'splice',
                                                    'params': params})
-                    pass
 
                 swap_match = re.match('var\s?[a-zA-Z]+=\s?[a-zA-Z]+\[0\]', function['body'][0])
                 if swap_match:
                     params = ['%SIG%', parameter[1]]
                     json_script['actions'].append({'func': 'swap',
                                                    'params': params})
-                    pass
 
                 reverse_match = re.match('[a-zA-Z].reverse\(\)', function['body'][0])
                 if reverse_match:
                     params = ['%SIG%']
                     json_script['actions'].append({'func': 'reverse',
                                                    'params': params})
-                    pass
-                pass
-            pass
 
         return json_script
 
@@ -174,14 +158,12 @@ class Cipher(object):
         else:
             if function_name in self._object_cache[object_name]:
                 return self._object_cache[object_name][function_name]
-            pass
 
         _object_body = self._find_object_body(object_name, java_script)
         _object_body = _object_body.split('},')
         for _function in _object_body:
             if not _function.endswith('}'):
                 _function += '}'
-                pass
             _function = _function.strip()
 
             match = re.match('(?P<name>[^:]*):function\((?P<parameter>[^)]*)\)\{(?P<body>[^}]+)\}', _function)
@@ -193,7 +175,5 @@ class Cipher(object):
                 self._object_cache[object_name][name] = {'name': name,
                                                          'body': body,
                                                          'params': parameter}
-                pass
-            pass
 
         return self._object_cache[object_name][function_name]

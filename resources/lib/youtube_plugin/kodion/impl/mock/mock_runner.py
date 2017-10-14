@@ -10,7 +10,6 @@ from ...exceptions import KodionException
 class MockRunner(AbstractProviderRunner):
     def __init__(self):
         AbstractProviderRunner.__init__(self)
-        pass
 
     def run(self, provider, context=None):
         results = None
@@ -19,7 +18,6 @@ class MockRunner(AbstractProviderRunner):
         except KodionException, ex:
             if provider.handle_exception(context, ex):
                 provider.log(ex.message, constants.log.ERROR)
-                pass
             return
 
         result = results[0]
@@ -33,11 +31,6 @@ class MockRunner(AbstractProviderRunner):
         elif isinstance(result, list):
             for content_item in result:
                 log("%s" % (content_item.get_name()))
-                pass
-            pass
         else:
             # handle exception
             pass
-        pass
-
-    pass

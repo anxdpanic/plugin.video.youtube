@@ -11,10 +11,8 @@ class XbmcPlayer(AbstractPlayer):
         self._player_type = player_type
         if player_type == 'audio':
             self._player_type = 'music'
-            pass
 
         self._context = context
-        pass
 
     def play(self, playlist_index=-1):
         """
@@ -28,25 +26,17 @@ class XbmcPlayer(AbstractPlayer):
         playlist = None
         if self._player_type == 'video':
             playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-            pass
         elif self._player_type == 'music':
             playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
-            pass
 
         if playlist_index >= 0:
             xbmc.Player().play(item=playlist, startpos=playlist_index)
         else:
             xbmc.Player().play(item=playlist)
-            pass
         """
-        pass
 
     def stop(self):
         xbmc.Player().stop()
-        pass
 
     def pause(self):
         xbmc.Player().pause()
-        pass
-
-    pass
