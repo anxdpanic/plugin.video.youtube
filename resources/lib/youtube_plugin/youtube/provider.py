@@ -437,6 +437,8 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
         mode = re_match.group('mode')
+        if (mode == 'in') and context.get_access_manager().has_refresh_token():
+            yt_login.process('out', self, context, re_match, context.get_settings().requires_dual_login(), sign_out_refresh=False)
         yt_login.process(mode, self, context, re_match, context.get_settings().requires_dual_login())
         return True
 
