@@ -23,7 +23,6 @@ class TestClient(unittest.TestCase):
             print '%d\t%s' % (i, page_token)
         """
 
-
         client = YouTube()
         token = client.calculate_next_page_token(2, 1)
         for i in range(2, 50):
@@ -50,8 +49,8 @@ class TestClient(unittest.TestCase):
     def test_get_channels(self):
         client = YouTube()
 
-        #json_data = client.get_channels('mine')
-        #json_data = client.get_channels(['UCDbAn9LEzqONk__uXA6a9jQ', 'UC8i4HhaJSZhm-fu84Bl72TA'])
+        # json_data = client.get_channels('mine')
+        # json_data = client.get_channels(['UCDbAn9LEzqONk__uXA6a9jQ', 'UC8i4HhaJSZhm-fu84Bl72TA'])
         json_data = client.get_channels(['UCZBxCJSGxNVsWpHP3R5YThg'])
 
     def test_get_playlist_items(self):
@@ -165,31 +164,31 @@ class TestClient(unittest.TestCase):
 
         # ranadom stuff
         streams = client.get_video_streams(context, 'VznAYy5yL2A')
-        #streams = client.get_video_streams(context, 'FlvtHMO6XHY')
-        #streams = client.get_video_streams(context, 'zyg0WUsY9HI')
+        # streams = client.get_video_streams(context, 'FlvtHMO6XHY')
+        # streams = client.get_video_streams(context, 'zyg0WUsY9HI')
 
         # Exception: Sign in to confirm your age
-        #streams = client.get_video_streams(context, 'B3eAMGXFw1o')
+        # streams = client.get_video_streams(context, 'B3eAMGXFw1o')
 
         # VEVO
-        #streams = client.get_video_streams(context, 'YQHsXMglC9A')
-        #streams = client.get_video_streams(context, 'VHrLPs3_1Fs')
-        #streams = client.get_video_streams(context, 'a3ir9HC9vYg')
+        # streams = client.get_video_streams(context, 'YQHsXMglC9A')
+        # streams = client.get_video_streams(context, 'VHrLPs3_1Fs')
+        # streams = client.get_video_streams(context, 'a3ir9HC9vYg')
 
-        #streams = client.get_video_streams(context, 'nfWlot6h_JM')
+        # streams = client.get_video_streams(context, 'nfWlot6h_JM')
         self.assertGreater(len(streams), 0)
 
         # VEVO (Restricted)
-        #streams = client.get_video_streams(context, 'O-zpOMYRi0w')
+        # streams = client.get_video_streams(context, 'O-zpOMYRi0w')
         self.assertGreater(len(streams), 0)
 
-        #streams = client.get_video_streams(context, 'NmugSMBh_iI')
+        # streams = client.get_video_streams(context, 'NmugSMBh_iI')
         self.assertGreater(len(streams), 0)
 
         # VEVO Gema
         # blocked (gema)
-        #streams = client.get_video_streams(context, 'XbiH6pQI7pU')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, 'XbiH6pQI7pU')
+        # self.assertGreater(len(streams), 0)
 
     def test_get_streams_live_streams(self):
         client = YouTube()
@@ -199,31 +198,31 @@ class TestClient(unittest.TestCase):
         # working with old addon
         streams = client.get_video_streams(context, 'Hrc4rwZ29y4')
 
-        #Live
+        # Live
         # blocked
-        #streams = client.get_video_streams(context, 'y1knc30OqKQ')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, 'y1knc30OqKQ')
+        # self.assertGreater(len(streams), 0)
 
         # blocked
-        #streams = client.get_video_streams(context, '7UFbGKo21lc')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, '7UFbGKo21lc')
+        # self.assertGreater(len(streams), 0)
 
         # private
-        #streams = client.get_video_streams(context, 'RqbyYOCAFJU')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, 'RqbyYOCAFJU')
+        # self.assertGreater(len(streams), 0)
 
-        #streams = client.get_video_streams(context, 'P8-yDTXnXAI')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, 'P8-yDTXnXAI')
+        # self.assertGreater(len(streams), 0)
 
-        #streams = client.get_video_streams(context, 'pvEWZY3Eqsg')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, 'pvEWZY3Eqsg')
+        # self.assertGreater(len(streams), 0)
 
     def test_get_video_streams_rtmpe(self):
         client = YouTube()
 
         context = kodion.Context()
-        #streams = client.get_video_streams(context, 'vIi57zhDl78')
-        #self.assertGreater(len(streams), 0)
+        # streams = client.get_video_streams(context, 'vIi57zhDl78')
+        # self.assertGreater(len(streams), 0)
 
         # #190 - viewster video
         streams = client.get_video_streams(context, 'xq2aaB_Awno')

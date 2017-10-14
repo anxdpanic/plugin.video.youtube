@@ -41,7 +41,7 @@ class AccessManager(object):
         password = self._settings.get_string(constants.setting.LOGIN_PASSWORD, '')
 
         m = hashlib.md5()
-        m.update(username.encode('utf-8')+password.encode('utf-8'))
+        m.update(username.encode('utf-8') + password.encode('utf-8'))
         current_hash = m.hexdigest()
         old_hash = self._settings.get_string(constants.setting.LOGIN_HASH, '')
         if current_hash != old_hash:

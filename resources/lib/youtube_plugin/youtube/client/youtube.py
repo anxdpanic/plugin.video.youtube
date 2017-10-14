@@ -4,6 +4,7 @@ import requests
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 
+
 class YouTube(LoginClient):
     def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv='', verify_ssl=False):
         self._verify = verify_ssl

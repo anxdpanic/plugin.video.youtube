@@ -210,7 +210,7 @@ class AbstractProvider(object):
                     search_history.update(query)
                 return self.on_search(query, context, re_match)
             except:
-                result =[]
+                result = []
                 return result
         else:
             context.set_content_type(constants.content_type.FILES)

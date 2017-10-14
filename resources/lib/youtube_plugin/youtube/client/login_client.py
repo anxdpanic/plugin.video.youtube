@@ -84,10 +84,13 @@ class LoginClient(object):
             if json_data:
                 response_dump = json_data
             else:
-                try: response_dump = result.json()
+                try:
+                    response_dump = result.json()
                 except ValueError:
-                    try: response_dump = result.text
-                    except: response_dump = 'None'
+                    try:
+                        response_dump = result.text
+                    except:
+                        response_dump = 'None'
             context.log_error('Revoke failed: Response dump: |%s|' % response_dump)
             raise LoginException('Logout Failed')
 
@@ -138,10 +141,13 @@ class LoginClient(object):
             if json_data:
                 response_dump = json_data
             else:
-                try: response_dump = result.json()
+                try:
+                    response_dump = result.json()
                 except ValueError:
-                    try: response_dump = result.text
-                    except: response_dump = 'None'
+                    try:
+                        response_dump = result.text
+                    except:
+                        response_dump = 'None'
             context.log_error('Refresh failed: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Response dump |%s|' %
                               (config_type, client_id[:5], client_secret[:5], response_dump))
             raise LoginException('Login Failed')
@@ -203,17 +209,22 @@ class LoginClient(object):
             if json_data:
                 response_dump = json_data
             else:
-                try: response_dump = result.json()
+                try:
+                    response_dump = result.json()
                 except ValueError:
-                    try: response_dump = result.text
-                    except: response_dump = 'None'
+                    try:
+                        response_dump = result.text
+                    except:
+                        response_dump = 'None'
             context.log_error('Retrieving device token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Response dump |%s|' %
                               (config_type, client_id[:5], client_secret[:5], response_dump))
             raise LoginException('Login Failed: Code %s' % result.status_code)
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            if json_data: return json_data
-            else: return result.json()
+            if json_data:
+                return json_data
+            else:
+                return result.json()
 
         return None
 
@@ -261,17 +272,22 @@ class LoginClient(object):
             if json_data:
                 response_dump = json_data
             else:
-                try: response_dump = result.json()
+                try:
+                    response_dump = result.json()
                 except ValueError:
-                    try: response_dump = result.text
-                    except: response_dump = 'None'
+                    try:
+                        response_dump = result.text
+                    except:
+                        response_dump = 'None'
             context.log_error('Generate user code failed: Config: |%s| Client id [:5]: |%s| Response dump |%s|' %
                               (config_type, client_id[:5], response_dump))
             raise LoginException('Login Failed')
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            if json_data: return json_data
-            else: return result.json()
+            if json_data:
+                return json_data
+            else:
+                return result.json()
 
         return None
 

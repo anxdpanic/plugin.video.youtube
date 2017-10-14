@@ -10,7 +10,7 @@ class JsonScriptEngine(object):
 
         _actions = self._json_script['actions']
         for action in _actions:
-            func = '_'+action['func']
+            func = '_' + action['func']
             params = action['params']
 
             if func == '_return':

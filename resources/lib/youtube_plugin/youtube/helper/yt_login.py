@@ -38,7 +38,7 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
         text += '[CR]%s [B]%s[/B]' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']), user_code)
         dialog = context.get_ui().create_progress_dialog(
             heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
-        
+
         steps = (10 * 60 * 1000) / interval  # 10 Minutes
         dialog.set_total(steps)
         for i in range(steps):
