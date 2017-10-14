@@ -14,4 +14,3 @@ except ImportError:
     from .mock.mock_context import MockContext as Context
     from .mock.mock_context_ui import MockContextUI as ContextUI
     from .mock.mock_runner import MockRunner as Runner
-    pass

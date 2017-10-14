@@ -16,5 +16,3 @@ class AbstractPlaylist(object):
 
     def unshuffle(self):
         raise NotImplementedError()
-
-    pass

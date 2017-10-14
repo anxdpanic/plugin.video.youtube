@@ -82,7 +82,6 @@ def play_playlist(provider, context, re_match):
             _progress_dialog = context.get_ui().create_progress_dialog(
                 context.localize(provider.LOCAL_MAP['youtube.playlist.progress.updating']),
                 context.localize(constants.localize.COMMON_PLEASE_WAIT), background=True)
-            pass
         json_data = client.get_playlist_items(playlist_id, page_token=_page_token)
         if not v3.handle_error(provider, context, json_data):
             return False
@@ -97,7 +96,6 @@ def play_playlist(provider, context, re_match):
         next_page_token = json_data.get('nextPageToken', '')
         if next_page_token:
             _load_videos(_page_token=next_page_token, _progress_dialog=_progress_dialog)
-            pass
 
         return _progress_dialog
 
@@ -109,16 +107,13 @@ def play_playlist(provider, context, re_match):
         # we support shuffle only without a starting video position
         if not video_id:
             order_list.append('shuffle')
-            pass
         items = []
         for order in order_list:
             items.append((context.localize(provider.LOCAL_MAP['youtube.playlist.play.%s' % order]), order))
-            pass
 
         order = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.playlist.play.select']), items)
         if not order in order_list:
             return False
-        pass
 
     player = context.get_video_player()
     player.stop()
@@ -132,11 +127,9 @@ def play_playlist(provider, context, re_match):
     # reverse the list
     if order == 'reverse':
         videos = videos[::-1]
-        pass
     elif order == 'shuffle':
         # we have to shuffle the playlist by our self. The implementation of XBMC/KODI is quite weak :(
         random.shuffle(videos)
-        pass
 
     playlist_position = 0
     # check if we have a video as starting point for the playlist
@@ -147,8 +140,6 @@ def play_playlist(provider, context, re_match):
             if video_id_match and video_id_match.group('video_id') == video_id:
                 break
             playlist_position += 1
-            pass
-        pass
 
     # clear the playlist
     playlist = context.get_video_playlist()
@@ -157,23 +148,19 @@ def play_playlist(provider, context, re_match):
     # select unshuffle
     if order == 'shuffle':
         playlist.unshuffle()
-        pass
 
     # add videos to playlist
     for video in videos:
         playlist.add(video)
-        pass
 
     # we use the shuffle implementation of the playlist
     """
     if order == 'shuffle':
         playlist.shuffle()
-        pass
     """
 
     if progress_dialog:
         progress_dialog.close()
-        pass
 
     if (context.get_param('play', '') == '1') and (context.get_handle() == -1):
         player.play(playlist_index=playlist_position)

@@ -64,11 +64,9 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         subscription_id = subscription_id_dict.get(channel_id, '')
         if subscription_id:
             yt_context_menu.append_unsubscribe_from_channel(context_menu, provider, context, subscription_id)
-            pass
         # -- subscribe to the channel
         if provider.is_logged_in() and context.get_path() != '/subscriptions/list/':
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
-            pass
 
         if context.get_path() == '/subscriptions/list/':
             channel = title.lower()
@@ -85,9 +83,6 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
             if not channel_id in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(channel_item)
-            pass
-        pass
-    pass
 
 
 def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict=None):
@@ -116,7 +111,6 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
         # if the path directs to a playlist of our own, we correct the channel id to 'mine'
         if context.get_path() == '/channel/mine/playlists/':
             channel_id = 'mine'
-            pass
         channel_name = snippet.get('channelTitle', '')
         context_menu = []
         # play all videos of the playlist
@@ -127,7 +121,6 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
                 # subscribe to the channel via the playlist item
                 yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id,
                                                             channel_name)
-                pass
             else:
                 # remove my playlist
                 yt_context_menu.append_delete_playlist(context_menu, provider, context, playlist_id, title)
@@ -141,29 +134,21 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
                 # set as my custom watch later playlist
                 else:
                     yt_context_menu.append_set_as_watchlater(context_menu, provider, context, playlist_id, title)
-                pass
                 # remove as custom history playlist
                 if playlist_id == custom_history_id:
                     yt_context_menu.append_remove_as_history(context_menu, provider, context, playlist_id, title)
                 # set as custom history playlist
                 else:
                     yt_context_menu.append_set_as_history(context_menu, provider, context, playlist_id, title)
-                pass
-            pass
 
         if len(context_menu) > 0:
             playlist_item.set_context_menu(context_menu)
-            pass
 
         # update channel mapping
         if channel_items_dict is not None:
             if not channel_id in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(playlist_item)
-            pass
-        pass
-
-    pass
 
 
 def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=None, channel_items_dict=None):
@@ -175,7 +160,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
     if not playlist_item_id_dict:
         playlist_item_id_dict = {}
-        pass
 
     resource_manager = provider.get_resource_manager(context)
     video_data = resource_manager.get_videos(video_ids)
@@ -183,7 +167,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
     my_playlists = {}
     if provider.is_logged_in():
         my_playlists = resource_manager.get_related_playlists(channel_id='mine')
-        pass
 
     thumb_size = context.get_settings().use_thumbnail_size()
     for video_id in video_data.keys():
@@ -213,20 +196,16 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             if re_match:
                 if 'season' in re_match.groupdict():
                     video_item.set_season(int(re_match.group('season')))
-                    pass
 
                 if 'episode' in re_match.groupdict():
                     video_item.set_episode(int(re_match.group('episode')))
-                    pass
                 break
-            pass
 
         # plot
         channel_name = snippet.get('channelTitle', '')
         description = kodion.utils.strip_html_from_text(snippet['description'])
         if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
             description = '[UPPERCASE][B]%s[/B][/UPPERCASE][CR][CR]%s' % (channel_name, description)
-            pass
         video_item.set_studio(channel_name)
         # video_item.add_cast(channel_name)
         video_item.add_artist(channel_name)
@@ -259,7 +238,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             if not channel_id in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(video_item)
-            pass
 
         context_menu = []
         replace_context_menu = False
@@ -268,7 +246,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         if context.get_path() == '/special/new_uploaded_videos_tv/' or context.get_path().startswith(
                 '/channel/mine/playlist/'):
             yt_context_menu.append_refresh(context_menu, provider, context)
-            pass
 
         # Queue Video
         yt_context_menu.append_queue_video(context_menu, provider, context)
@@ -286,12 +263,10 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
             yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id, video_id)
             yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id)
-            pass
 
         # 'play with...' (external player)
         if context.get_settings().is_support_alternative_player_enabled():
             yt_context_menu.append_play_with(context_menu, provider, context)
-            pass
 
         if provider.is_logged_in():
             # add 'Watch Later' only if we are not in my 'Watch Later' list
@@ -311,23 +286,16 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                                                  ['playlist', 'remove', 'video'],
                                                  {'playlist_id': playlist_id, 'video_id': playlist_item_id,
                                                   'video_name': video_item.get_name()})))
-                        pass
-                    pass
-                pass
-            pass
 
         # got to [CHANNEL]
         if channel_id and channel_name:
             # only if we are not directly in the channel provide a jump to the channel
             if kodion.utils.create_path('channel', channel_id) != context.get_path():
                 yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
-                pass
-            pass
 
         if provider.is_logged_in():
             # subscribe to the channel of the video
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
-            pass
 
         # more...
         refresh_container = context.get_path().startswith(
@@ -338,10 +306,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         if len(context_menu) > 0:
             video_item.set_context_menu(context_menu, replace=replace_context_menu)
-            pass
-        pass
-
-    pass
 
 
 def update_fanarts(provider, context, channel_items_dict):
@@ -359,10 +323,6 @@ def update_fanarts(provider, context, channel_items_dict):
             fanart = fanarts.get(channel_id, '')
             if fanart:
                 channel_item.set_fanart(fanart)
-                pass
-            pass
-        pass
-    pass
 
 
 def get_thumbnail(thumb_size, thumbnails):

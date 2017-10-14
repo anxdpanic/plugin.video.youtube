@@ -60,6 +60,5 @@ def parse(datetime_string):
                         hour=_to_int(abbreviated_match.group('hour')),
                         minute=_to_int(abbreviated_match.group('minute')),
                         second=_to_int(abbreviated_match.group('second')))
-        pass
 
     raise KodionException("Could not parse iso 8601 timestamp '%s'" % datetime_string)

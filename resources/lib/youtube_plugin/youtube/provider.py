@@ -85,7 +85,6 @@ class Provider(kodion.AbstractProvider):
 
         self._client = None
         self._is_logged_in = False
-        pass
 
     def get_wizard_supported_views(self):
         return ['default', 'episodes']
@@ -98,7 +97,6 @@ class Provider(kodion.AbstractProvider):
 
     def reset_client(self):
         self._client = None
-        pass
 
     def get_client(self, context):
         # set the items per page (later)
@@ -117,7 +115,6 @@ class Provider(kodion.AbstractProvider):
             # context.get_function_cache().clear()
             # reset the client
             self._client = None
-            pass
 
         youtubetv_config = YouTube.CONFIGS.get('youtube-tv')
         youtube_config = YouTube.CONFIGS.get('main')
@@ -130,7 +127,6 @@ class Provider(kodion.AbstractProvider):
             # remove the old login.
             if access_manager.has_login_credentials():
                 access_manager.remove_login_credentials()
-                pass
             if access_manager.has_login_credentials() or access_manager.has_refresh_token():
                 if YouTube.api_keys_changed:
                     context.log_warning('API key set changed: Resetting client and updating access token')
@@ -141,12 +137,10 @@ class Provider(kodion.AbstractProvider):
                 access_tokens = access_manager.get_access_token()
                 if access_tokens:
                     access_tokens = access_tokens.split('|')
-                    pass
 
                 refresh_tokens = access_manager.get_refresh_token()
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
-                    pass
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
                 # create a new access_token
                 if len(access_tokens) != 2 and len(refresh_tokens) == 2:
@@ -175,8 +169,6 @@ class Provider(kodion.AbstractProvider):
                         access_manager.update_access_token('')
                         # we clear the cache, so none cached data of an old account will be displayed.
                         context.get_function_cache().clear()
-                        pass
-                    pass
 
                 # in debug log the login status
                 self._is_logged_in = len(access_tokens) == 2
@@ -184,11 +176,9 @@ class Provider(kodion.AbstractProvider):
                     context.log_debug('User is logged in')
                 else:
                     context.log_debug('User is not logged in')
-                    pass
 
                 if len(access_tokens) == 0:
                     access_tokens = ['', '']
-                    pass
 
                 self._client = YouTube(language=language, region=region, items_per_page=items_per_page, access_token=access_tokens[1],
                                        access_token_tv=access_tokens[0], config=youtube_config, verify_ssl=verify_ssl)
@@ -199,8 +189,6 @@ class Provider(kodion.AbstractProvider):
 
                 # in debug log the login status
                 context.log_debug('User is not logged in')
-                pass
-            pass
 
         return self._client
 
@@ -208,7 +196,6 @@ class Provider(kodion.AbstractProvider):
         if not self._resource_manager:
             # self._resource_manager = ResourceManager(weakref.proxy(context), weakref.proxy(self.get_client(context)))
             self._resource_manager = ResourceManager(context, self.get_client(context))
-            pass
         return self._resource_manager
 
     def get_alternative_fanart(self, context):
@@ -329,11 +316,9 @@ class Provider(kodion.AbstractProvider):
             items = json_data.get('items', [])
             if len(items) > 0:
                 channel_id = items[0]['id']
-                pass
             else:
                 context.log_warning('Could not find channel ID for user "%s"' % channel_id)
                 return False
-            pass
 
         channel_fanarts = resource_manager.get_fanarts([channel_id])
         page = int(context.get_param('page', 1))
@@ -345,7 +330,6 @@ class Provider(kodion.AbstractProvider):
                                            image=context.create_resource_path('media', 'playlist.png'))
             playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
             result.append(playlists_item)
-            pass
 
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
@@ -358,7 +342,6 @@ class Provider(kodion.AbstractProvider):
 
             result.extend(
                 v3.response_to_items(self, context, json_data, sort=lambda x: x.get_aired(), reverse_sort=True))
-            pass
 
         return result
 
@@ -431,7 +414,6 @@ class Provider(kodion.AbstractProvider):
                         return False
         else:
             context.log_warning('Missing video ID for post play event')
-            pass
         return True
 
     @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
@@ -492,7 +474,6 @@ class Provider(kodion.AbstractProvider):
                                       context.create_uri([context.get_path()], live_params),
                                       image=context.create_resource_path('media', 'live.png'))
             result.append(live_item)
-            pass
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,
                                                      q=search_text, search_type=search_type, event_type=event_type,
@@ -703,7 +684,6 @@ class Provider(kodion.AbstractProvider):
                                          image=context.create_resource_path('media', 'sign_in.png'))
             sign_in_item.set_fanart(self.get_fanart(context))
             result.append(sign_in_item)
-            pass
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
@@ -713,7 +693,6 @@ class Provider(kodion.AbstractProvider):
                 context.create_resource_path('media', 'new_uploads.png'))
             my_subscriptions_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_item)
-            pass
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
             # my subscriptions filtered
@@ -723,7 +702,6 @@ class Provider(kodion.AbstractProvider):
                 context.create_resource_path('media', 'new_uploads.png'))
             my_subscriptions_filtered_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_filtered_item)
-            pass
 
         # Recommendations
         if self.is_logged_in() and settings.get_bool('youtube.folder.recommendations.show', True):
@@ -733,7 +711,6 @@ class Provider(kodion.AbstractProvider):
                 context.create_resource_path('media', 'popular.png'))
             recommendations_item.set_fanart(self.get_fanart(context))
             result.append(recommendations_item)
-            pass
 
         # what to watch
         if settings.get_bool('youtube.folder.popular_right_now.show', True):
@@ -743,7 +720,6 @@ class Provider(kodion.AbstractProvider):
                 context.create_resource_path('media', 'popular.png'))
             what_to_watch_item.set_fanart(self.get_fanart(context))
             result.append(what_to_watch_item)
-            pass
 
         # search
         search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
@@ -782,7 +758,6 @@ class Provider(kodion.AbstractProvider):
                                                 image=context.create_resource_path('media', 'channel.png'))
                 my_channel_item.set_fanart(self.get_fanart(context))
                 result.append(my_channel_item)
-                pass
 
             # watch later
             if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True) and \
@@ -796,7 +771,6 @@ class Provider(kodion.AbstractProvider):
                 yt_context_menu.append_play_all_from_playlist(context_menu, self, context, playlists['watchLater'])
                 watch_later_item.set_context_menu(context_menu)
                 result.append(watch_later_item)
-                pass
 
             # liked videos
             if 'likes' in playlists and settings.get_bool('youtube.folder.liked_videos.show', True):
@@ -809,7 +783,6 @@ class Provider(kodion.AbstractProvider):
                 yt_context_menu.append_play_all_from_playlist(context_menu, self, context, playlists['likes'])
                 liked_videos_item.set_context_menu(context_menu)
                 result.append(liked_videos_item)
-                pass
 
             # disliked videos
             if settings.get_bool('youtube.folder.disliked_videos.show', True):
@@ -818,7 +791,6 @@ class Provider(kodion.AbstractProvider):
                                                      context.create_resource_path('media', 'dislikes.png'))
                 disliked_videos_item.set_fanart(self.get_fanart(context))
                 result.append(disliked_videos_item)
-                pass
 
             # history
             if 'watchHistory' in playlists and settings.get_bool('youtube.folder.history.show', False) and \
@@ -829,7 +801,6 @@ class Provider(kodion.AbstractProvider):
                                                    context.create_resource_path('media', 'history.png'))
                 watch_history_item.set_fanart(self.get_fanart(context))
                 result.append(watch_history_item)
-                pass
 
             # (my) playlists
             if settings.get_bool('youtube.folder.playlists.show', True):
@@ -838,7 +809,6 @@ class Provider(kodion.AbstractProvider):
                                                context.create_resource_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
-                pass
 
             # subscriptions
             if settings.get_bool('youtube.folder.subscriptions.show', True):
@@ -847,8 +817,6 @@ class Provider(kodion.AbstractProvider):
                                                    image=context.create_resource_path('media', 'channels.png'))
                 subscriptions_item.set_fanart(self.get_fanart(context))
                 result.append(subscriptions_item)
-                pass
-            pass
 
             # browse channels
             if settings.get_bool('youtube.folder.browse_channels.show', True):
@@ -857,7 +825,6 @@ class Provider(kodion.AbstractProvider):
                                                      image=context.create_resource_path('media', 'browse_channels.png'))
                 browse_channels_item.set_fanart(self.get_fanart(context))
                 result.append(browse_channels_item)
-                pass
 
         # live events
         if settings.get_bool('youtube.folder.live.show', True):
@@ -866,7 +833,6 @@ class Provider(kodion.AbstractProvider):
                                              image=context.create_resource_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
-            pass
 
         # sign out
         if self.is_logged_in() and settings.get_bool('youtube.folder.sign.out.show', True):
@@ -875,7 +841,6 @@ class Provider(kodion.AbstractProvider):
                                           image=context.create_resource_path('media', 'sign_out.png'))
             sign_out_item.set_fanart(self.get_fanart(context))
             result.append(sign_out_item)
-            pass
 
         if settings.get_bool('youtube.folder.settings.show', True):
             settings_menu_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.settings']),
@@ -895,8 +860,6 @@ class Provider(kodion.AbstractProvider):
                                     kodion.constants.sort_method.TRACK_NUMBER,
                                     kodion.constants.sort_method.VIDEO_TITLE,
                                     kodion.constants.sort_method.DATE)
-            pass
-        pass
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, LoginException):
@@ -908,5 +871,3 @@ class Provider(kodion.AbstractProvider):
             return False
 
         return True
-
-    pass

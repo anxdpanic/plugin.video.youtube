@@ -23,7 +23,6 @@ def _process_language(provider, context):
         language_id = item['id']
         language_name = item['snippet']['name']
         language_list.append((language_name, language_id))
-        pass
     language_list = sorted(language_list, key=lambda x: x[0])
     language_id = context.get_ui().on_select(
         context.localize(provider.LOCAL_MAP['youtube.setup_wizard.select_language']), language_list)
@@ -40,7 +39,6 @@ def _process_language(provider, context):
         region_id = item['id']
         region_name = item['snippet']['name']
         region_list.append((region_name, region_id))
-        pass
     region_list = sorted(region_list, key=lambda x: x[0])
     region_id = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.setup_wizard.select_region']),
                                            region_list)
@@ -51,9 +49,7 @@ def _process_language(provider, context):
     context.get_settings().set_string('youtube.language', language_id)
     context.get_settings().set_string('youtube.region', region_id)
     provider.reset_client()
-    pass
 
 
 def process(provider, context):
     _process_language(provider, context)
-    pass

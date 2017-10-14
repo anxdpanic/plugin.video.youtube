@@ -7,7 +7,6 @@ try:
 except:
     _xbmc = False
     _count = 0
-    pass
 
 
 def _const(name):
@@ -17,7 +16,6 @@ def _const(name):
         global _count
         _count += 1
         return _count
-    pass
 
 
 ALBUM = _const('SORT_METHOD_ALBUM')

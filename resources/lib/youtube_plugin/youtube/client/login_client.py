@@ -35,7 +35,6 @@ class LoginClient(object):
         # the default language is always en_US (like YouTube on the WEB)
         if not language:
             language = 'en_US'
-            pass
 
         language = language.replace('-', '_')
 
@@ -44,20 +43,15 @@ class LoginClient(object):
         self._access_token = access_token
         self._access_token_tv = access_token_tv
         self._log_error_callback = None
-        pass
 
     def set_log_error(self, callback):
         self._log_error_callback = callback
-        pass
 
     def log_error(self, text):
         if self._log_error_callback:
             self._log_error_callback(text)
-            pass
         else:
             print text
-            pass
-        pass
 
     def revoke(self, refresh_token):
         headers = {'Host': 'www.youtube.com',
@@ -96,8 +90,6 @@ class LoginClient(object):
                     except: response_dump = 'None'
             context.log_error('Revoke failed: Response dump: |%s|' % response_dump)
             raise LoginException('Logout Failed')
-
-        pass
 
     def refresh_token_tv(self, refresh_token, grant_type=''):
         client_id = str(self.CONFIGS['youtube-tv']['id'])

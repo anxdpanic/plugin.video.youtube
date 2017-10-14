@@ -9,7 +9,6 @@ __author__ = 'bromix'
 class AccessManager(object):
     def __init__(self, settings):
         self._settings = settings
-        pass
 
     def has_login_credentials(self):
         """
@@ -23,7 +22,6 @@ class AccessManager(object):
     def remove_login_credentials(self):
         self._settings.set_string(constants.setting.LOGIN_USERNAME, '')
         self._settings.set_string(constants.setting.LOGIN_PASSWORD, '')
-        pass
 
     def get_login_credentials(self):
         """
@@ -49,7 +47,6 @@ class AccessManager(object):
         if current_hash != old_hash:
             if update_hash:
                 self._settings.set_string(constants.setting.LOGIN_HASH, current_hash)
-                pass
             return True
 
         return False
@@ -100,10 +97,6 @@ class AccessManager(object):
         self._settings.set_string(constants.setting.ACCESS_TOKEN, access_token)
         if unix_timestamp is not None:
             self._settings.set_int(constants.setting.ACCESS_TOKEN_EXPIRES, int(unix_timestamp))
-            pass
 
         if refresh_token is not None:
             self._settings.set_string(constants.setting.REFRESH_TOKEN, refresh_token)
-        pass
-
-    pass

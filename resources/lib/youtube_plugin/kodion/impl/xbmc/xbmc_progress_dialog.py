@@ -13,14 +13,11 @@ class XbmcProgressDialog(AbstractProgressDialog):
         # simple reset because KODI won't do it :(
         self._position = 1
         self.update(steps=-1)
-        pass
 
     def close(self):
         if self._dialog:
             self._dialog.close()
             self._dialog = None
-            pass
-        pass
 
     def update(self, steps=1, text=None):
         self._position += steps
@@ -28,13 +25,8 @@ class XbmcProgressDialog(AbstractProgressDialog):
 
         if isinstance(text, basestring):
             self._dialog.update(position, text)
-            pass
         else:
             self._dialog.update(position)
-            pass
-        pass
 
     def is_aborted(self):
         return self._dialog.iscanceled()
-
-    pass

@@ -381,7 +381,6 @@ class VideoInfo(object):
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
         self.region = context.get_settings().get_string('youtube.region', 'US')
         self._access_token = access_token
-        pass
 
     def load_stream_infos(self, video_id=None, player_config=None):
         return self._method_get_video_info(video_id, player_config)
@@ -535,14 +534,11 @@ class VideoInfo(object):
                         signature = ''
                         if attr.get('s', ''):
                             signature = cipher.get_signature(attr['s'])
-                            pass
                         elif attr.get('sig', ''):
                             signature = attr.get('sig', '')
-                            pass
 
                         if signature:
                             url += '&signature=%s' % signature
-                            pass
 
                         itag = attr['itag']
                         yt_format = self.FORMAT.get(itag, None)
@@ -553,14 +549,12 @@ class VideoInfo(object):
                         # this format is discontinued
                         if yt_format.get('discontinued', False) or yt_format.get('unsupported', False):
                             continue
-                            pass
 
                         video_stream = {'url': url,
                                         'meta': meta_info}
                         video_stream.update(yt_format)
 
                         stream_list.append(video_stream)
-                        pass
                     elif conn:  # rtmpe
                         url = '%s?%s' % (conn, urllib.unquote(attr['stream']))
                         itag = attr['itag']
@@ -573,7 +567,6 @@ class VideoInfo(object):
                         video_stream.update(yt_format)
 
                         stream_list.append(video_stream)
-                        pass
                 except Exception as ex:
                     pass
 
@@ -582,8 +575,6 @@ class VideoInfo(object):
             reason_match = re.search(r'<h1[^>]*>(?P<reason>[^<]+)', html)
             if reason_match:
                 reason = reason_match.group('reason').strip()
-                pass
-            pass
 
         # this is a reason from get_video_info. We should at least display the reason why the video couldn't be loaded
         if len(stream_list) == 0 and reason:
@@ -628,9 +619,6 @@ class VideoInfo(object):
                                     'meta': meta_info}
                     video_stream.update(yt_format)
                     streams.append(video_stream)
-                    pass
-                pass
-            pass
         return streams
 
     def _method_get_video_info(self, video_id=None, player_config=None):
@@ -707,6 +695,7 @@ class VideoInfo(object):
             meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
         except:
             pass
+
         meta_info['channel']['id'] = params.get('ucid', '')
         image_data_list = [
             {'from': 'iurlhq', 'to': 'high'},
@@ -717,8 +706,6 @@ class VideoInfo(object):
             image_url = params.get(image_data['from'], '')
             if image_url:
                 meta_info['images'][image_data['to']] = image_url
-                pass
-            pass
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 

@@ -27,7 +27,6 @@ def from_json(json_data):
             if item_type == key:
                 item = mapping[key]()
                 break
-            pass
 
         if item is None:
             return _json_data
@@ -36,8 +35,6 @@ def from_json(json_data):
         for key in data:
             if hasattr(item, key):
                 setattr(item, key, data[key])
-                pass
-            pass
 
         return item
 
@@ -69,7 +66,6 @@ def to_json(base_item):
         for key in mapping:
             if isinstance(obj, key):
                 return {'type': mapping[key], 'data': obj.__dict__}
-            pass
 
         return obj.__dict__
 

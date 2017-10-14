@@ -15,8 +15,6 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
             refresh_tokens = list(set(refresh_tokens))
             for _refresh_token in refresh_tokens:
                 provider.get_client(context).revoke(_refresh_token)
-                pass
-            pass
         provider.reset_client()
         signout_access_manager.update_access_token(access_token='', refresh_token='')
 
@@ -25,17 +23,14 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
         try:
             if _for_tv:
                 json_data = _client.generate_user_code_tv()
-                pass
             else:
                 json_data = _client.generate_user_code()
-                pass
         except LoginException:
             _do_logout()
             raise
         interval = int(json_data.get('interval', 5)) * 1000
         if interval > 60000:
             interval = 5000
-            pass
         device_code = json_data['device_code']
         user_code = json_data['user_code']
 
@@ -51,10 +46,8 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
             try:
                 if _for_tv:
                     json_data = _client.get_device_token_tv(device_code)
-                    pass
                 else:
                     json_data = _client.get_device_token(device_code)
-                    pass
             except LoginException:
                 _do_logout()
                 raise
@@ -77,15 +70,12 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
                 return '', 0, ''
 
             context.sleep(interval)
-            pass
         dialog.close()
-        pass
 
     if mode == 'out':
         _do_logout()
         if sign_out_refresh:
             context.get_ui().refresh_container()
-        pass
     elif mode == 'in':
         access_token_tv = ''
         expires_in_tv = 0
@@ -104,7 +94,6 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
                 context.get_access_manager().update_access_token('')
                 context.get_ui().refresh_container()
                 return
-            pass
 
         access_token_kodi, expires_in_kodi, refresh_token_kodi = _do_login(_for_tv=False)
         # abort kodi login
@@ -132,5 +121,3 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
         provider.reset_client()
         context.get_access_manager().update_access_token(access_token, expires_in, refresh_token)
         context.get_ui().refresh_container()
-        pass
-    pass

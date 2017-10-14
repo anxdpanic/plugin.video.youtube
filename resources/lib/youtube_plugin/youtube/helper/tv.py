@@ -30,7 +30,6 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
             result.append(video_item)
 
             video_id_dict[video_id] = video_item
-        pass
 
     channel_item_dict = {}
     utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict)
@@ -49,6 +48,5 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         current_page = int(new_context.get_param('page', 1))
         next_page_item = kodion.items.NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
-        pass
 
     return result
