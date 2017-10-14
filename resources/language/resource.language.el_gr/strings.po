@@ -683,28 +683,28 @@ msgstr "Αποτυχία ενεργοποίησης προσωπικών κλε�
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Ρύθμιση υποτίτλων"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s με %s ως υπαναχώρηση"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Χωρίς αυτο-δημιουργημένους"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Ηλικιακή πύλη"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Επέτρεψε προσβλητικό περιεχόμενο"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Γρήγορη Αναζήτηση"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Γρήγορη Αναζήτηση (Κρυφή)"
