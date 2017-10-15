@@ -729,7 +729,6 @@ class Provider(kodion.AbstractProvider):
         if settings.get_bool('youtube.folder.quick_search.show', True):
             quick_search_item = kodion.items.NewSearchItem(context,
                                                            alt_name=context.localize(30605),
-                                                           image=context.create_resource_path('media', 'search.png'),
                                                            fanart=self.get_fanart(context))
             result.append(quick_search_item)
 

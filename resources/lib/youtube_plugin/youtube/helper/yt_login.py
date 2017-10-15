@@ -22,9 +22,9 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
         _client = provider.get_client(context)
         try:
             if _for_tv:
-                json_data = _client.generate_user_code_tv()
+                json_data = _client.request_device_and_user_code_tv()
             else:
-                json_data = _client.generate_user_code()
+                json_data = _client.request_device_and_user_code()
         except LoginException:
             _do_logout()
             raise
@@ -45,9 +45,9 @@ def process(mode, provider, context, re_match, needs_tv_login=True, sign_out_ref
             dialog.update()
             try:
                 if _for_tv:
-                    json_data = _client.get_device_token_tv(device_code)
+                    json_data = _client.request_access_token_tv(device_code)
                 else:
-                    json_data = _client.get_device_token(device_code)
+                    json_data = _client.request_access_token(device_code)
             except LoginException:
                 _do_logout()
                 raise
