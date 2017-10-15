@@ -203,7 +203,7 @@ class AbstractProvider(object):
 
             return True
         elif command == 'query':
-            incognito = params.get('incognito', False)
+            incognito = str(context.get_param('incognito', False)).lower() == 'true'
             try:
                 query = params['q']
                 if not incognito:
