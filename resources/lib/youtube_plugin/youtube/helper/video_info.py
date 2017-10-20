@@ -12,13 +12,6 @@ from subtitles import Subtitles
 import xbmcaddon
 
 
-def LooseVersion(v):
-    filled = []
-    for point in v.split("."):
-        filled.append(point.zfill(8))
-    return tuple(filled)
-
-
 class VideoInfo(object):
     FORMAT = {
         # === Non-DASH ===
@@ -358,6 +351,7 @@ class VideoInfo(object):
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
         # === Live DASH adaptive
         '9998': {'container': 'mpd',
+                 'Live': True,
                  'sort': [1080, 0],
                  'title': 'Live DASH',
                  'dash/audio': True,
@@ -722,18 +716,10 @@ class VideoInfo(object):
                             reason = playability_status['errorScreen']['playerErrorMessageRenderer'].get('reason', {}).get('simpleText', 'UNKNOWN')
                 raise YouTubeException(reason)
 
-        if self._context.get_settings().use_dash():
-            inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
-            live_dash_supported = LooseVersion(inputstream_version) >= LooseVersion('2.0.12')
-        else:
-            live_dash_supported = False
-
         if params.get('live_playback', '0') == '1':
             url = params.get('hlsvp', '')
             if url:
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info)
-            if not live_dash_supported:
-                return stream_list
 
         mpd_url = params.get('dashmpd', '')
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)

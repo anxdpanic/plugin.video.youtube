@@ -6,6 +6,14 @@ __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_item
 import urllib
 import re
 from ..constants import localize
+import xbmcaddon
+
+
+def loose_version(v):
+    filled = []
+    for point in v.split("."):
+        filled.append(point.zfill(8))
+    return tuple(filled)
 
 
 def to_utf8(text):
@@ -65,8 +73,20 @@ def select_stream(context, stream_data_list, quality_map_override=None):
             else:
                 use_dash = False
 
+    try:
+        inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
+        live_dash_supported = loose_version(inputstream_version) >= loose_version('2.0.12')
+    except RuntimeError:
+        live_dash_supported = False
+
+    if not live_dash_supported:
+        stream_data_list = [item for item in stream_data_list
+                            if ((item['container'] != 'mpd') or
+                                ((item['container'] == 'mpd') and
+                                 (item.get('Live') is not True)))]
+
     if not use_dash:
-        stream_data_list = [item for item in stream_data_list if item['container'] != 'mpd']
+        stream_data_list = [item for item in stream_data_list if (item['container'] != 'mpd')]
 
     video_quality = context.get_settings().get_video_quality(quality_map_override=quality_map_override)
 
