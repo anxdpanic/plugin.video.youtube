@@ -4,12 +4,13 @@ __author__ = 'bromix'
 
 import urlparse
 from ...kodion.utils import FunctionCache
+from ...kodion import Context as _Context
 import requests
 
 
 class AbstractResolver(object):
     def __init__(self):
-        pass
+        self._verify = _Context().get_settings().get_bool('simple.requests.ssl.verify', False)
 
     def supports_url(self, url, url_components):
         raise NotImplementedError()
@@ -50,7 +51,7 @@ class YouTubeResolver(AbstractResolver):
                            'DNT': '1',
                            'Accept-Encoding': 'gzip, deflate',
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.get(url, headers=headers)
+                response = requests.get(url, headers=headers, verify=self._verify)
                 if response.status_code == 200:
                     re_match = re.search(r'<meta itemprop="channelId" content="(?P<channel_id>.+)">', response.text)
                     if re_match:
@@ -95,7 +96,7 @@ class CommonResolver(AbstractResolver, list):
                            'DNT': '1',
                            'Accept-Encoding': 'gzip, deflate',
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.head(_url, headers=headers, allow_redirects=False)
+                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=False)
                 if response.status_code == 304:
                     return url
 
@@ -155,8 +156,7 @@ class UrlResolver(object):
                 # one last check...sometimes the resolved url is YouTube-specific and can be resolved again or
                 # simplified.
                 url_components = urlparse.urlparse(resolved_url)
-                if resolver is not self._youtube_resolver and self._youtube_resolver.supports_url(resolved_url,
-                                                                                                  url_components):
+                if resolver is not self._youtube_resolver and self._youtube_resolver.supports_url(resolved_url, url_components):
                     return self._youtube_resolver.resolve(resolved_url, url_components)
 
                 return resolved_url
