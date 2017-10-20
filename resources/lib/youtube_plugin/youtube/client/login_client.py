@@ -28,10 +28,10 @@ class LoginClient(object):
         }
     }
 
-    def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv='', verify_ssl=False):
+    def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv=''):
         self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
-        self._verify = verify_ssl
+        self._verify = context.get_settings().verify_ssl()
         # the default language is always en_US (like YouTube on the WEB)
         if not language:
             language = 'en_US'

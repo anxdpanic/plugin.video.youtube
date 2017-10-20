@@ -369,7 +369,7 @@ class VideoInfo(object):
 
     def __init__(self, context, access_token='', language='en-US'):
         self._context = context
-        self._verify = context.get_settings().get_bool('simple.requests.ssl.verify', False)
+        self._verify = context.get_settings().verify_ssl()
         self._language = language.replace('-', '_')
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
         self.region = context.get_settings().get_string('youtube.region', 'US')

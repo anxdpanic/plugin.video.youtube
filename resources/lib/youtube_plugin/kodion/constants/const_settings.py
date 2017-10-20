@@ -15,6 +15,7 @@ AGE_GATE = 'kodion.age.gate'  # (bool)
 OFFENSIVE_CONTENT = 'kodion.offensive.content'  # (bool)
 SUBTITLE_LANGUAGE = 'kodion.subtitle.languages.num'  # (int)
 SETUP_WIZARD = 'kodion.setup_wizard'  # (bool)
+VERIFY_SSL = 'simple.requests.ssl.verify'  # (bool)
 
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 

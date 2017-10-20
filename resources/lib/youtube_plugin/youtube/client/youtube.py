@@ -6,10 +6,9 @@ from ..helper.video_info import VideoInfo
 
 
 class YouTube(LoginClient):
-    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv='', verify_ssl=False):
-        self._verify = verify_ssl
+    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
         LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
-                             access_token_tv=access_token_tv, verify_ssl=self._verify)
+                             access_token_tv=access_token_tv)
 
         self._max_results = items_per_page
 

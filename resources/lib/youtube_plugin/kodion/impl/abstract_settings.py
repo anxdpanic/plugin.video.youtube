@@ -1,5 +1,6 @@
 __author__ = 'bromix'
 
+import sys
 from .. import constants
 
 
@@ -119,3 +120,9 @@ class AbstractSettings(object):
 
     def offensive_content(self):
         return self.get_bool(constants.setting.OFFENSIVE_CONTENT, False)
+
+    def verify_ssl(self):
+        verify = self.get_bool(constants.setting.VERIFY_SSL, False)
+        if sys.version_info <= (2, 7, 9):
+            verify = False
+        return verify
