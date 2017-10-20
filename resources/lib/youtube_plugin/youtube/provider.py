@@ -147,12 +147,12 @@ class Provider(kodion.AbstractProvider):
                     try:
 
                         access_token_kodi, expires_in_kodi = \
-                            YouTube(language=language, config=youtube_config).refresh_token(refresh_tokens[1])
+                            YouTube(language=language, config=youtube_config, verify_ssl=verify_ssl).refresh_token(refresh_tokens[1])
                         if not settings.requires_dual_login():
                             access_token_tv, expires_in_tv = access_token_kodi, expires_in_kodi
                         else:
                             access_token_tv, expires_in_tv = \
-                                YouTube(language=language, config=youtubetv_config).refresh_token_tv(refresh_tokens[0])
+                                YouTube(language=language, config=youtubetv_config, verify_ssl=verify_ssl).refresh_token_tv(refresh_tokens[0])
 
                         access_tokens = [access_token_tv, access_token_kodi]
 
