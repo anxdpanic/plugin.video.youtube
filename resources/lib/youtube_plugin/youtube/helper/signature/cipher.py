@@ -12,7 +12,7 @@ from .json_script_engine import JsonScriptEngine
 class Cipher(object):
     def __init__(self, context, java_script_url):
         self._context = context
-        self._verify = context.get_settings().get_bool('simple.requests.ssl.verify', False)
+        self._verify = context.get_settings().verify_ssl()
         self._java_script_url = java_script_url
 
         self._object_cache = {}

@@ -101,7 +101,6 @@ class Provider(kodion.AbstractProvider):
     def get_client(self, context):
         # set the items per page (later)
         settings = context.get_settings()
-        verify_ssl = settings.get_bool('simple.requests.ssl.verify', False)
 
         items_per_page = settings.get_items_per_page()
 
@@ -181,10 +180,10 @@ class Provider(kodion.AbstractProvider):
                     access_tokens = ['', '']
 
                 self._client = YouTube(language=language, region=region, items_per_page=items_per_page, access_token=access_tokens[1],
-                                       access_token_tv=access_tokens[0], config=youtube_config, verify_ssl=verify_ssl)
+                                       access_token_tv=access_tokens[0], config=youtube_config)
                 self._client.set_log_error(context.log_error)
             else:
-                self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config, verify_ssl=verify_ssl)
+                self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config)
                 self._client.set_log_error(context.log_error)
 
                 # in debug log the login status
