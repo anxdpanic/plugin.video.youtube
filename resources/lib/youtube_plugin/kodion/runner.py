@@ -2,6 +2,7 @@ __author__ = 'bromix'
 
 __all__ = ['run']
 
+import copy
 from .impl import Runner
 from .impl import Context
 
@@ -28,7 +29,7 @@ def run(provider, context=None):
         'Running: %s (%s) on %s with %s' % (context.get_name(), context.get_version(), version, python_version))
     context.log_debug('Path: "%s' % context.get_path())
     redacted = '<redacted>'
-    context_params = context.get_params().copy()
+    context_params = copy.deepcopy(context.get_params())
     if 'api_key' in context_params:
         context_params['api_key'] = redacted
     if 'client_id' in context_params:
