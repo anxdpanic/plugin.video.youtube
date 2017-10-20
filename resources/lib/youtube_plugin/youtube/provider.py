@@ -101,7 +101,6 @@ class Provider(kodion.AbstractProvider):
     def get_client(self, context):
         # set the items per page (later)
         settings = context.get_settings()
-        verify_ssl = settings.get_bool('simple.requests.ssl.verify', False)
 
         items_per_page = settings.get_items_per_page()
 
@@ -147,12 +146,12 @@ class Provider(kodion.AbstractProvider):
                     try:
 
                         access_token_kodi, expires_in_kodi = \
-                            YouTube(language=language, config=youtube_config, verify_ssl=verify_ssl).refresh_token(refresh_tokens[1])
+                            YouTube(language=language, config=youtube_config).refresh_token(refresh_tokens[1])
                         if not settings.requires_dual_login():
                             access_token_tv, expires_in_tv = access_token_kodi, expires_in_kodi
                         else:
                             access_token_tv, expires_in_tv = \
-                                YouTube(language=language, config=youtubetv_config, verify_ssl=verify_ssl).refresh_token_tv(refresh_tokens[0])
+                                YouTube(language=language, config=youtubetv_config).refresh_token_tv(refresh_tokens[0])
 
                         access_tokens = [access_token_tv, access_token_kodi]
 
@@ -181,10 +180,10 @@ class Provider(kodion.AbstractProvider):
                     access_tokens = ['', '']
 
                 self._client = YouTube(language=language, region=region, items_per_page=items_per_page, access_token=access_tokens[1],
-                                       access_token_tv=access_tokens[0], config=youtube_config, verify_ssl=verify_ssl)
+                                       access_token_tv=access_tokens[0], config=youtube_config)
                 self._client.set_log_error(context.log_error)
             else:
-                self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config, verify_ssl=verify_ssl)
+                self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config)
                 self._client.set_log_error(context.log_error)
 
                 # in debug log the login status

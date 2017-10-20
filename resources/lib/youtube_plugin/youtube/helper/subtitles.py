@@ -15,7 +15,7 @@ class Subtitles(object):
 
     def __init__(self, context, video_id, captions):
         self.context = context
-        self._verify = context.get_settings().get_bool('simple.requests.ssl.verify', False)
+        self._verify = context.get_settings().verify_ssl()
         self.video_id = video_id
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('_', '-')
         self.headers = {'Host': 'www.youtube.com',
