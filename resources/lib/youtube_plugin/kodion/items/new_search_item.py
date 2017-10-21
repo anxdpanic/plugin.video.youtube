@@ -13,7 +13,10 @@ class NewSearchItem(DirectoryItem):
         if image is None:
             image = context.create_resource_path('media/new_search.png')
 
-        DirectoryItem.__init__(self, name, context.create_uri([constants.paths.SEARCH, 'input'], params={'incognito': incognito}), image=image)
+        item_params = {}
+        if incognito:
+            item_params.update({'incognito': incognito})
+        DirectoryItem.__init__(self, name, context.create_uri([constants.paths.SEARCH, 'input'], params=item_params), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

@@ -21,7 +21,7 @@ def _process_list_response(provider, context, json_data):
         context.log_warning('List of search result is empty')
         return result
 
-    incognito = context.get_param('incognito', False)
+    incognito = str(context.get_param('incognito', False)).lower() == 'true'
 
     for yt_item in yt_items:
         yt_kind = yt_item.get('kind', '')
@@ -30,9 +30,13 @@ def _process_list_response(provider, context, json_data):
             snippet = yt_item['snippet']
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-            video_item = items.VideoItem(title,
-                                         context.create_uri(['play'], {'video_id': video_id, 'incognito': incognito}),
-                                         image=image)
+            item_params = {'video_id': video_id}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['play'], item_params)
+            video_item = items.VideoItem(title, item_uri, image=image)
+            if incognito:
+                video_item.set_play_count(0)
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
@@ -41,10 +45,11 @@ def _process_list_response(provider, context, json_data):
             snippet = yt_item['snippet']
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-
-            channel_item = items.DirectoryItem(title,
-                                               context.create_uri(['channel', channel_id], {'incognito': incognito}),
-                                               image=image)
+            item_params = {}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['channel', channel_id], item_params)
+            channel_item = items.DirectoryItem(title, item_uri, image=image)
             channel_item.set_fanart(provider.get_fanart(context))
 
             # if logged in => provide subscribing to the channel
@@ -58,17 +63,22 @@ def _process_list_response(provider, context, json_data):
             guide_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet['title']
-            guide_item = items.DirectoryItem(title,
-                                             context.create_uri(['special', 'browse_channels'], {'guide_id': guide_id, 'incognito': incognito}))
+            item_params = {'guide_id': guide_id}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['special', 'browse_channels'], item_params)
+            guide_item = items.DirectoryItem(title, item_uri)
             guide_item.set_fanart(provider.get_fanart(context))
             result.append(guide_item)
         elif yt_kind == u'youtube#subscription':
             snippet = yt_item['snippet']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             channel_id = snippet['resourceId']['channelId']
-            channel_item = items.DirectoryItem(snippet['title'],
-                                               context.create_uri(['channel', channel_id], {'incognito': incognito}),
-                                               image=image)
+            item_params = {}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['channel', channel_id], item_params)
+            channel_item = items.DirectoryItem(snippet['title'], item_uri, image=image)
             channel_item.set_fanart(provider.get_fanart(context))
 
             # map channel id with subscription id - we need it for the unsubscription
@@ -87,9 +97,11 @@ def _process_list_response(provider, context, json_data):
             # if the path directs to a playlist of our own, we correct the channel id to 'mine'
             if context.get_path() == '/channel/mine/playlists/':
                 channel_id = 'mine'
-            playlist_item = items.DirectoryItem(title,
-                                                context.create_uri(['channel', channel_id, 'playlist', playlist_id], {'incognito': incognito}),
-                                                image=image)
+            item_params = {}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
+            playlist_item = items.DirectoryItem(title, item_uri, image=image)
             playlist_item.set_fanart(provider.get_fanart(context))
             result.append(playlist_item)
             playlist_id_dict[playlist_id] = playlist_item
@@ -102,9 +114,13 @@ def _process_list_response(provider, context, json_data):
 
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-            video_item = items.VideoItem(title,
-                                         context.create_uri(['play'], {'video_id': video_id, 'incognito': incognito}),
-                                         image=image)
+            item_params = {'video_id': video_id}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['play'], item_params)
+            video_item = items.VideoItem(title, item_uri, image=image)
+            if incognito:
+                video_item.set_play_count(0)
             video_item.set_fanart(provider.get_fanart(context))
             # Get Track-ID from Playlist
             video_item.set_track_number(snippet['position'] + 1)
@@ -125,9 +141,13 @@ def _process_list_response(provider, context, json_data):
 
             title = snippet['title']
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-            video_item = items.VideoItem(title,
-                                         context.create_uri(['play'], {'video_id': video_id, 'incognito': incognito}),
-                                         image=image)
+            item_params = {'video_id': video_id}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            item_uri = context.create_uri(['play'], item_params)
+            video_item = items.VideoItem(title, item_uri, image=image)
+            if incognito:
+                video_item.set_play_count(0)
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
@@ -140,9 +160,13 @@ def _process_list_response(provider, context, json_data):
                 snippet = yt_item['snippet']
                 title = snippet['title']
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-                video_item = items.VideoItem(title,
-                                             context.create_uri(['play'], {'video_id': video_id, 'incognito': incognito}),
-                                             image=image)
+                item_params = {'video_id': video_id}
+                if incognito:
+                    item_params.update({'incognito': incognito})
+                item_uri = context.create_uri(['play'], item_params)
+                video_item = items.VideoItem(title, item_uri, image=image)
+                if incognito:
+                    video_item.set_play_count(0)
                 video_item.set_fanart(provider.get_fanart(context))
                 result.append(video_item)
                 video_id_dict[video_id] = video_item
@@ -158,10 +182,11 @@ def _process_list_response(provider, context, json_data):
                 if context.get_path() == '/channel/mine/playlists/':
                     channel_id = 'mine'
                 channel_name = snippet.get('channelTitle', '')
-                playlist_item = items.DirectoryItem(title,
-                                                    context.create_uri(
-                                                        ['channel', channel_id, 'playlist', playlist_id], {'incognito': incognito}),
-                                                    image=image)
+                item_params = {}
+                if incognito:
+                    item_params.update({'incognito': incognito})
+                item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
+                playlist_item = items.DirectoryItem(title, item_uri, image=image)
                 playlist_item.set_fanart(provider.get_fanart(context))
                 result.append(playlist_item)
                 playlist_id_dict[playlist_id] = playlist_item
@@ -170,10 +195,11 @@ def _process_list_response(provider, context, json_data):
                 snippet = yt_item['snippet']
                 title = snippet['title']
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-
-                channel_item = items.DirectoryItem(title,
-                                                   context.create_uri(['channel', channel_id], {'incognito': incognito}),
-                                                   image=image)
+                item_params = {}
+                if incognito:
+                    item_params.update({'incognito': incognito})
+                item_uri = context.create_uri(['channel', channel_id], item_params)
+                channel_item = items.DirectoryItem(title, item_uri, image=image)
                 channel_item.set_fanart(provider.get_fanart(context))
                 result.append(channel_item)
                 channel_id_dict[channel_id] = channel_item
