@@ -862,9 +862,32 @@ class Provider(kodion.AbstractProvider):
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, LoginException):
             context.get_access_manager().update_access_token('')
-            title = '%s: %s' % (context.get_name(), 'LoginException')
-            context.get_ui().show_notification(exception_to_handle.message, title)
-            context.log_error('%s: %s' % (title, exception_to_handle.message))
+
+            msg = message = exception_to_handle.message
+            error = ''
+            code = ''
+
+            if isinstance(msg, dict):
+                if 'error_description' in msg:
+                    message = msg['error_description']
+                elif 'message' in msg:
+                    message = msg['message']
+
+                if 'error' in msg:
+                    error = msg['error']
+
+                if 'code' in msg:
+                    code = msg['code']
+
+            if error and code:
+                title = '%s: [%s] %s' % ('LoginException', code, error)
+            elif error:
+                title = '%s: %s' % ('LoginException', error)
+            else:
+                title = 'LoginException'
+
+            context.get_ui().show_notification(message, title)
+            context.log_error('%s: %s' % (title, message))
             context.get_ui().open_settings()
             return False
 

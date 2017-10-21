@@ -98,6 +98,8 @@ def _process_live_events(provider, context, re_match):
 
 
 def _process_description_links(provider, context, re_match):
+    incognito = context.get_param('incognito', False)
+
     def _extract_urls(_video_id):
         provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
@@ -152,7 +154,7 @@ def _process_description_links(provider, context, re_match):
         _channel_id_dict = {}
 
         for channel_id in _channel_ids:
-            channel_item = DirectoryItem('', context.create_uri(['channel', channel_id]))
+            channel_item = DirectoryItem('', context.create_uri(['channel', channel_id], {'incognito': incognito}))
             channel_item.set_fanart(provider.get_fanart(context))
             _channel_id_dict[channel_id] = channel_item
 
@@ -171,7 +173,7 @@ def _process_description_links(provider, context, re_match):
     def _display_playlists(_playlist_ids):
         _playlist_id_dict = {}
         for playlist_id in _playlist_ids:
-            playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
+            playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id], {'incognito': incognito}))
             playlist_item.set_fanart(provider.get_fanart(context))
             _playlist_id_dict[playlist_id] = playlist_item
 
