@@ -70,7 +70,8 @@ class LoginClient(object):
             json_data = result.json()
             if 'error' in json_data:
                 context.log_error('Revoke failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
-                raise LoginException(json_data['error'])
+                json_data.update({'code': str(result.status_code)})
+                raise LoginException(json_data)
         except ValueError:
             json_data = None
 
@@ -112,7 +113,8 @@ class LoginClient(object):
             json_data = result.json()
             if 'error' in json_data:
                 context.log_error('Refresh Failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
-                raise LoginException(json_data['error'])
+                json_data.update({'code': str(result.status_code)})
+                raise LoginException(json_data)
         except ValueError:
             json_data = None
 
@@ -165,7 +167,8 @@ class LoginClient(object):
             if 'error' in json_data:
                 if json_data['error'] != u'authorization_pending':
                     context.log_error('Requesting access token: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
-                    raise LoginException(json_data['error'])
+                    json_data.update({'code': str(result.status_code)})
+                    raise LoginException(json_data)
                 else:
                     authorization_pending = True
         except ValueError:
@@ -216,7 +219,8 @@ class LoginClient(object):
             json_data = result.json()
             if 'error' in json_data:
                 context.log_error('Requesting device and user code failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
-                raise LoginException(json_data['error'])
+                json_data.update({'code': str(result.status_code)})
+                raise LoginException(json_data)
         except ValueError:
             json_data = None
 
