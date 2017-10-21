@@ -9,6 +9,8 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     result = []
     video_id_dict = {}
 
+    incognito = context.get_param('incognito', False)
+
     filter_list = []
     black_list = False
     if do_filter:
@@ -26,7 +28,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
                 (do_filter and black_list and (channel not in filter_list)):
             video_id = item['id']
             video_item = VideoItem(item['title'],
-                                   uri=context.create_uri(['play'], {'video_id': video_id}))
+                                   uri=context.create_uri(['play'], {'video_id': video_id, 'incognito': incognito}))
             result.append(video_item)
 
             video_id_dict[video_id] = video_item
