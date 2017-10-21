@@ -596,19 +596,19 @@ msgstr ""
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Auto esecuzione video suggeriti"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Automatico"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Le Mie Sottoscrizioni (Filtrate)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "Lista canali filtri (divisi da una ,)"
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -616,43 +616,43 @@ msgstr ""
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "Aggiunti alle Mie Sottoscrizioni"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr ""
+msgstr "Rimuovi dalle Mie Sottoscrizione"
 
 msgctxt "#30589"
 msgid "Added %s to My Subscriptions filter"
-msgstr ""
+msgstr "%s aggiunto alle Mie Sottoscrizioni (filtrate)"
 
 msgctxt "#30590"
 msgid "Removed %s from My Subscriptions filter"
-msgstr ""
+msgstr "%s rimosso dalle Mie Sottoscrizioni (filtrate)"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Dimensioni Miniature"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Medie 16:9"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Grandi (4:3)"
 
 msgctxt "#30594"
 msgid "Safe Search"
-msgstr ""
+msgstr "Filtro Sicurezza"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Moderato"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Severo"
 
 msgctxt "#30597"
 msgid "Updated: %s"
@@ -660,15 +660,15 @@ msgstr ""
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Chiave API personale attiva"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Chiave API personale non attivata. Manca %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Configura i sottotitoli"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
@@ -676,20 +676,20 @@ msgstr ""
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "NON auto-generati"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Filtro Età"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Consenti contenuti offensivi"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Ricerca Rapida"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Ricerca Rapida (Anonima)"
