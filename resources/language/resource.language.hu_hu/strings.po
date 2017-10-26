@@ -7,18 +7,19 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2017-10-26 14:03+0200\n"
 "Language-Team: LANGUAGE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu_HU\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Last-Translator: Kardos László <lacesz at ox dot io>\n"
+"X-Generator: Poedit 2.0.4\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr "Kiegészítő  a YouTube-hoz"
+msgstr "YouTube kiegészítő"
 
 msgctxt "Addon Description"
 msgid "YouTube is a one of the biggest video-sharing websites of the world."
@@ -38,11 +39,11 @@ msgstr "Jelszó"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Mindig kérdezze meg a videó minőségét"
 
 msgctxt "#30010"
 msgid "Video Quality"
-msgstr "Videó minősége"
+msgstr "Videó minőség"
 
 msgctxt "#30011"
 msgid "480p"
@@ -74,11 +75,11 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Élő / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr "3D engedélyezése"
+msgstr "3D engedélyezés"
 
 msgctxt "#30021"
 msgid "Show Fanart"
@@ -90,7 +91,7 @@ msgstr "Elemek száma oldalanként"
 
 msgctxt "#30023"
 msgid "Search History Size"
-msgstr "Keresési előzmények mérete"
+msgstr "Keresési előzmény mérete"
 
 msgctxt "#30024"
 msgid "Cache Size (MB)"
@@ -98,7 +99,7 @@ msgstr "Gyorsítótár mérete (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
-msgstr "Beállító varázsló engedélyezése"
+msgstr "Beállítás varázsló engedélyezése"
 
 msgctxt "#30026"
 msgid "Override View"
@@ -106,51 +107,51 @@ msgstr "Nézet felülírása"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr "Nézet: alapértelmezett"
+msgstr "Nézet: Alapértelmezett"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr "Nézet: videók"
+msgstr "Nézet: Epizódok"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr ""
+msgstr "Nézet: Videók"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Le szeretnéd futtatni a beállító varázslót?"
+msgstr "Szeretné futtatni a beállítás varázslót?"
 
 msgctxt "#30031"
 msgid "Advanced"
-msgstr "Fejlett"
+msgstr "Részletes"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr ""
+msgstr "Nézet: TV műsorok"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr ""
+msgstr "Nézet: Dalok"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr ""
+msgstr "Nézet: Szerzők"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr ""
+msgstr "Nézet: Albumok"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr ""
+msgstr "Alternatív lejátszás támogatás"
 
 msgctxt "#30037"
 msgid "Custom Watch Later Playlist ID"
-msgstr ""
+msgstr "Későbbi lejátszási lista egyedi megtekintés azonosító"
 
 msgctxt "#30038"
 msgid "Custom History Playlist ID"
-msgstr ""
+msgstr "Előzmények egyedi azonosító"
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -158,7 +159,7 @@ msgstr "Kedvencek"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr "Hozzáadása a kiegészító kedvencekhez"
+msgstr "Kiegészítő hozzáadása a kedvencekhez"
 
 msgctxt "#30102"
 msgid "Search"
@@ -218,11 +219,11 @@ msgstr "Eltávolítás megerősítése"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "Törölni szeretnéd ezt: \"%s\"?"
+msgstr "Törölni szeretné ezt: \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "El szeretnéd távolítani ezt: \"%s\"?"
+msgstr "Eltávolítja ezt: \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -230,42 +231,40 @@ msgstr "Törlés"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr ""
+msgstr "Kérjük várjon..."
 
 msgctxt "#30120"
 msgid "Clear"
-msgstr ""
+msgstr "Törlés"
 
-#YouTube
-#empty strings from id 30121 to 30199
-
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "API Kulcs"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API Kulcs"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API ID"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable Personal API Keys"
-msgstr ""
+msgstr "Személyes API Kulcs engedélyezés"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Jelenlegi API Kulcs használata"
 
-#YouTube
-#empty strings from id 30206 to 30499
-
+# YouTube
+# empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Csatornák"
@@ -280,7 +279,7 @@ msgstr "Ugrás ide: %s"
 
 msgctxt "#30503"
 msgid "Show channel fanart"
-msgstr "Csatorna fanart megjelenítése"
+msgstr "Fanart csatorna megjelenítése"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -296,7 +295,7 @@ msgstr "Feliratkozás"
 
 msgctxt "#30507"
 msgid "My Channel"
-msgstr "A csatornám"
+msgstr "Csatornám"
 
 msgctxt "#30508"
 msgid "Liked Videos"
@@ -312,7 +311,7 @@ msgstr "Feliratkozások"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr ""
+msgstr "Várólista"
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -328,7 +327,7 @@ msgstr "Kapcsolódó videók"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto. eltávolítás a megnézendő videók közül"
+msgstr "Automatikus eltávolítás a megnézendő videók közül"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -344,7 +343,7 @@ msgstr "Ugrás ide: '%s'"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr "és add meg a következő kódot:"
+msgstr "és írja le a következő kódot:"
 
 msgctxt "#30520"
 msgid "Add to..."
@@ -392,79 +391,79 @@ msgstr "Ez nem tetszik nekem"
 
 msgctxt "#30531"
 msgid "Play all"
-msgstr ""
+msgstr "Összes lejátszása"
 
 msgctxt "#30532"
 msgid "Default"
-msgstr ""
+msgstr "Alapértelmezett"
 
 msgctxt "#30533"
 msgid "Reverse"
-msgstr ""
+msgstr "Ellentétes"
 
 msgctxt "#30534"
 msgid "Shuffle"
-msgstr ""
+msgstr "Keverés"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr ""
+msgstr "Válassza ki a lejátszási lista sorrendjét"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr ""
+msgstr "Lejátszási lista frissítése..."
 
 msgctxt "#30537"
 msgid "Play from here"
-msgstr ""
+msgstr "Lejátszás itt"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr ""
+msgstr "Nem kedvelt videók"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr ""
+msgstr "Élő"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr ""
+msgstr "Lejátszás..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
-msgstr ""
+msgstr "A csatorna nevének megjelenítése a leírásban"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr ""
+msgstr "Az rtmpe streamek nem támogatottak"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr ""
+msgstr "Frissítés"
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "További hivatkozások a leírásból"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "Nem találhatók további hivatkozások."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr ""
+msgstr "Kérjük, jelentkezzen be kétszer!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "Engedélyeznie kell két alkalmazás használatát, hogy a YouTube megfelelően működjön."
 
 msgctxt "#30548"
 msgid "More..."
-msgstr ""
+msgstr "Részletek..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "Videó streamek nem találhatók"
 
 msgctxt "#30550"
 msgid "Region"
@@ -472,224 +471,224 @@ msgstr "Ország"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Ajánlott videók"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Karbantartás"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "A funkció gyorsítótár-adatbázisának törlése"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Keresési előzmények adatbázis törlése"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "A funkció gyorsítótárának törlése"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Keresési előzmények törlése"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "Funkció gyorsítótár"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "keresési előzmények"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "settings.xml törlése"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Felirat nyelve"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Nincs"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Összes"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Beállítás"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Beállítás, Angol"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Angol"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Súgás"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Megtekintés később"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Eltávolítás a megtekintendő videók közül"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Biztos benne, hogy eltávolítja a megtekintendő videók közül: \"%s\"?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Biztos benne, hogy az aktuális megtekintési listát a(z) '%s' helyettesíti?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Keresési előzmények"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Eltávolítás az előzményekből"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Biztos benne, hogy eltávolítja az előzményekből \"%s\" videót?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Biztos benne, hogy lecseréli az aktuális előzmények listát erre a kifelyezésre: '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Sikeres"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Nem sikerült"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Beállítások"
 
 msgctxt "#30578"
 msgid "Force SSL Certificate verification"
-msgstr ""
+msgstr "SSL Tanúsítvány megerősítése"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
-msgstr ""
+msgstr "Az MPEG-DASH engedélyezve van a YouTube beállításaiban, de a bemeneti adaptív alkalmazások le vannak tiltva. Szeretné most engedélyezni a bemeneti adaptív alkalmazásokat?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "A hozzáférési jogosultság visszaállítása"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Biztos benne, hogy visszaállítja a hozzáférési jogosultságokat?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Javasolt videók automatikus lejátszása"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Automatikus"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Felíratkozások (Szűrt)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "Szűrt csatorna lista (vesszővel elválasztva)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Feketelista"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "Hozzáadás a szűrt Felíratkozásokhoz"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr ""
+msgstr "Eltávolítás a szűrt Felíratkozások közül"
 
 msgctxt "#30589"
 msgid "Added %s to My Subscriptions filter"
-msgstr ""
+msgstr "%s hozzáadva a szűrt Felíratkozásokhoz"
 
 msgctxt "#30590"
 msgid "Removed %s from My Subscriptions filter"
-msgstr ""
+msgstr "%s eltávolítva a szűrt Felíratkozások közül"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Bélyegkép méret"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Közepes (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Magas (4:3)"
 
 msgctxt "#30594"
 msgid "Safe Search"
-msgstr ""
+msgstr "Biztonságos keresés"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Mérsékelt"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Szigorú"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Frissítve: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Személyes API Kulcsok engedélyezve"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Nem sikerült engedélyezni a személyes API-kulcsokat. Hiányzik: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Feliratok beállítása"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s - %s visszajelzés"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Nincs automatikusan generált"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Korhatár"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Sértő tartalom engedélyezése"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Gyors keresés"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Gyors keresés (Inkongnito mód)"
