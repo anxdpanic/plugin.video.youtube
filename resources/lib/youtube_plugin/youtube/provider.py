@@ -283,6 +283,29 @@ class Provider(kodion.AbstractProvider):
         return result
 
     """
+    List live streams for channel.
+    path      : '/channel/(?P<channel_id>[^/]+)/live/'
+    channel_id: <CHANNEL_ID>
+    """
+
+    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
+    def _on_channel_live(self, context, re_match):
+        self.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        result = []
+
+        channel_id = re_match.group('channel_id')
+        page_token = context.get_param('page_token', '')
+        safe_search = context.get_settings().safe_search()
+
+        # no caching
+        json_data = self.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, page_token=page_token, safe_search=safe_search)
+        if not v3.handle_error(self, context, json_data):
+            return False
+        result.extend(v3.response_to_items(self, context, json_data))
+
+        return result
+
+    """
     Lists a playlist folder and all uploaded videos of a channel.
     path      :'/channel|user/(?P<channel_id|username>)[^/]+/'
     channel_id: <CHANNEL_ID>
@@ -329,6 +352,11 @@ class Provider(kodion.AbstractProvider):
                                            image=context.create_resource_path('media', 'playlist.png'))
             playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
             result.append(playlists_item)
+            if channel_id != 'mine':
+                live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
+                                          context.create_uri(['channel', channel_id, 'live']),
+                                          image=context.create_resource_path('media', 'live.png'))
+                result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
