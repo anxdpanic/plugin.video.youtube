@@ -4,7 +4,8 @@
     <category label="30000">
 
         <!-- kodion Visual -->
-        <setting id="kodion.video.quality" type="enum" label="30010" enable="eq(1,false)" lvalues="30016|30017|30011|30012|30018" default="3"/>
+        <setting id="kodion.video.quality" type="enum" label="30010" enable="eq(2,false)" lvalues="30016|30017|30011|30012|30018" default="3"/>
+        <setting id="kodion.audio_only" type="bool" label="30607" enable="eq(1,false)" default="false"/>
         <setting id="kodion.video.quality.ask" type="bool" label="30009" default="false"/>
         <setting id="kodion.video.support.mpd.builtin" type="bool" label="" visible="false" enable="true" default="false"/>
         <setting id="kodion.video.support.mpd.addon" type="bool" label="" visible="false" enable="true" default="false"/>

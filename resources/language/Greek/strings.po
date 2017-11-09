@@ -708,3 +708,7 @@ msgstr "Γρήγορη Αναζήτηση"
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
 msgstr "Γρήγορη Αναζήτηση (Κρυφή)"
+
+msgctxt "#30607"
+msgid "Audio Only"
+msgstr ""

@@ -692,3 +692,7 @@ msgstr "Szybkie wyszukiwanie"
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
 msgstr "Szybkie wyszukiwanie (tryb prywatny)"
+
+msgctxt "#30607"
+msgid "Audio Only"
+msgstr ""

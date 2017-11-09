@@ -65,6 +65,21 @@ def select_stream(context, stream_data_list, quality_map_override=None):
 
     settings = context.get_settings()
     use_dash = settings.use_dash()
+    ask_for_quality = context.get_settings().ask_for_video_quality()
+    video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
+    audio_only = False if ask_for_quality else settings.audio_only()  # don't filter streams to audio only if we're asking for quality
+
+    if audio_only:  # check for live stream, audio only not supported
+        for item in stream_data_list:
+            if item.get('Live', False):
+                audio_only = False
+                break
+
+    if audio_only:
+        use_dash = False
+        stream_data_list = [item for item in stream_data_list
+                            if (item.get('dash/audio', False) and
+                                not item.get('dash/video', False))]
 
     if use_dash:
         if settings.dash_support_addon() and not context.addon_enabled('inputstream.adaptive'):
@@ -88,10 +103,11 @@ def select_stream(context, stream_data_list, quality_map_override=None):
     if not use_dash:
         stream_data_list = [item for item in stream_data_list if (item['container'] != 'mpd')]
 
-    video_quality = context.get_settings().get_video_quality(quality_map_override=quality_map_override)
-
     def _find_best_fit_video(_stream_data):
-        return video_quality - _stream_data.get('video', {}).get('height', 0)
+        if audio_only:
+            return video_quality - _stream_data.get('sort', [0, 0])[0]
+        else:
+            return video_quality - _stream_data.get('video', {}).get('height', 0)
 
     sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data, reverse=True)
 
@@ -100,7 +116,7 @@ def select_stream(context, stream_data_list, quality_map_override=None):
         context.log_debug('selectable stream: %s' % sorted_stream_data)
 
     selected_stream_data = None
-    if context.get_settings().ask_for_video_quality() and len(sorted_stream_data_list) > 1:
+    if ask_for_quality and len(sorted_stream_data_list) > 1:
         items = []
         for sorted_stream_data in sorted_stream_data_list:
             items.append((sorted_stream_data['title'], sorted_stream_data))
