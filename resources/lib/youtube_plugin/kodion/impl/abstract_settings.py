@@ -61,9 +61,7 @@ class AbstractSettings(object):
                    1: 360,
                    2: 480,  # 576 seems not to work well
                    3: 720,
-                   4: 1080,
-                   5: 2160,
-                   6: 4320}
+                   4: 1080}
 
         if quality_map_override is not None:
             vq_dict = quality_map_override
@@ -97,6 +95,9 @@ class AbstractSettings(object):
 
     def subtitle_languages(self):
         return self.get_int(constants.setting.SUBTITLE_LANGUAGE, 0)
+
+    def audio_only(self):
+        return self.get_bool(constants.setting.AUDIO_ONLY, False)
 
     def set_subtitle_languages(self, value):
         return self.set_int(constants.setting.SUBTITLE_LANGUAGE, value)

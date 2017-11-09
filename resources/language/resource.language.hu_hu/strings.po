@@ -692,3 +692,7 @@ msgstr "Gyors keresés"
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
 msgstr "Gyors keresés (Inkongnito mód)"
+
+msgctxt "#30607"
+msgid "Audio Only"
+msgstr ""
