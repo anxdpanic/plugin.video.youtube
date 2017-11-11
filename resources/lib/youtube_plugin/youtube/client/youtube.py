@@ -314,8 +314,11 @@ class YouTube(LoginClient):
         :param channel_id: list or comma-separated list of the YouTube channel ID(s)
         :return:
         """
-        params = {'part': 'id',
-                  'forUsername': username}
+        params = {'part': 'id'}
+        if username == 'mine':
+            params.update({'mine': 'true'})
+        else:
+            params.update({'forUsername': username})
 
         return self._perform_v3_request(method='GET', path='channels', params=params)
 
