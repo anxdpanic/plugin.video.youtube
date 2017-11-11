@@ -3,6 +3,9 @@ __author__ = 'bromix'
 import requests
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
+from ...kodion import Context
+
+context = Context()
 
 
 class YouTube(LoginClient):
@@ -577,6 +580,7 @@ class YouTube(LoginClient):
 
         result = None
 
+        context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
         if method == 'GET':
             result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
         elif method == 'POST':
@@ -626,6 +630,7 @@ class YouTube(LoginClient):
 
         result = None
 
+        context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
         if method == 'GET':
             result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
         elif method == 'POST':
