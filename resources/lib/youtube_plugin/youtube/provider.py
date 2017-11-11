@@ -321,12 +321,13 @@ class Provider(kodion.AbstractProvider):
 
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
+        mine_id = ''
 
         """
         This is a helper routine if we only have the username of a channel. This will retrieve the correct channel id
         based on the username.
         """
-        if method == 'user':
+        if method == 'user' or channel_id == 'mine':
             context.log_debug('Trying to get channel id for user "%s"' % channel_id)
 
             json_data = context.get_function_cache().get(FunctionCache.ONE_DAY,
@@ -337,10 +338,14 @@ class Provider(kodion.AbstractProvider):
             # we correct the channel id based on the username
             items = json_data.get('items', [])
             if len(items) > 0:
-                channel_id = items[0]['id']
+                if method == 'user':
+                    channel_id = items[0]['id']
+                else:
+                    mine_id = items[0]['id']
             else:
                 context.log_warning('Could not find channel ID for user "%s"' % channel_id)
-                return False
+                if method == 'user':
+                    return False
 
         channel_fanarts = resource_manager.get_fanarts([channel_id])
         page = int(context.get_param('page', 1))
@@ -352,11 +357,15 @@ class Provider(kodion.AbstractProvider):
                                            image=context.create_resource_path('media', 'playlist.png'))
             playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
             result.append(playlists_item)
-            if channel_id != 'mine':
-                live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
-                                          context.create_uri(['channel', channel_id, 'live']),
-                                          image=context.create_resource_path('media', 'live.png'))
-                result.append(live_item)
+            search_live_id = mine_id if mine_id else channel_id
+            search_item = kodion.items.NewSearchItem(context, alt_name='[B]' + context.localize(30102) + '[/B]',
+                                                     image=context.create_resource_path('media', 'search.png'),
+                                                     fanart=self.get_fanart(context), channel_id=search_live_id)
+            result.append(search_item)
+            live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
+                                      context.create_uri(['channel', search_live_id, 'live']),
+                                      image=context.create_resource_path('media', 'live.png'))
+            result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
@@ -462,6 +471,7 @@ class Provider(kodion.AbstractProvider):
     def on_search(self, search_text, context, re_match):
         result = []
 
+        channel_id = context.get_param('channel_id', '')
         page_token = context.get_param('page_token', '')
         search_type = context.get_param('search_type', 'video')
         event_type = context.get_param('event_type', '')
@@ -474,14 +484,15 @@ class Provider(kodion.AbstractProvider):
             self.set_content_type(context, kodion.constants.content_type.FILES)
 
         if page == 1 and search_type == 'video' and not event_type:
-            channel_params = {}
-            channel_params.update(context.get_params())
-            channel_params['search_type'] = 'channel'
-            channel_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.channels']) + '[/B]',
-                                         context.create_uri([context.get_path()], channel_params),
-                                         image=context.create_resource_path('media', 'channels.png'))
-            channel_item.set_fanart(self.get_fanart(context))
-            result.append(channel_item)
+            if not channel_id:
+                channel_params = {}
+                channel_params.update(context.get_params())
+                channel_params['search_type'] = 'channel'
+                channel_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.channels']) + '[/B]',
+                                             context.create_uri([context.get_path()], channel_params),
+                                             image=context.create_resource_path('media', 'channels.png'))
+                channel_item.set_fanart(self.get_fanart(context))
+                result.append(channel_item)
 
             playlist_params = {}
             playlist_params.update(context.get_params())
@@ -492,19 +503,20 @@ class Provider(kodion.AbstractProvider):
             playlist_item.set_fanart(self.get_fanart(context))
             result.append(playlist_item)
 
-            # live
-            live_params = {}
-            live_params.update(context.get_params())
-            live_params['search_type'] = 'video'
-            live_params['event_type'] = 'live'
-            live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
-                                      context.create_uri([context.get_path()], live_params),
-                                      image=context.create_resource_path('media', 'live.png'))
-            result.append(live_item)
+            if not channel_id:
+                # live
+                live_params = {}
+                live_params.update(context.get_params())
+                live_params['search_type'] = 'video'
+                live_params['event_type'] = 'live'
+                live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
+                                          context.create_uri([context.get_path()], live_params),
+                                          image=context.create_resource_path('media', 'live.png'))
+                result.append(live_item)
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,
                                                      q=search_text, search_type=search_type, event_type=event_type,
-                                                     safe_search=safe_search, page_token=page_token)
+                                                     safe_search=safe_search, page_token=page_token, channel_id=channel_id)
         if not v3.handle_error(self, context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
