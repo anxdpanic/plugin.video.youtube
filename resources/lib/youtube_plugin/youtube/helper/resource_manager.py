@@ -39,16 +39,14 @@ class ResourceManager(object):
                 result[channel_id] = channel_data
 
         if len(channel_ids_to_update) > 0:
-            json_data = self._context.get_function_cache().get(FunctionCache.ONE_WEEK, self._youtube_client.get_channels,
-                                                               channel_ids_to_update)
+            json_data = function_cache.get(FunctionCache.ONE_WEEK, self._youtube_client.get_channels, channel_ids_to_update)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
                 channel_id = unicode(yt_item['id'])
                 self._channel_data[channel_id] = yt_item
 
                 # this will cache the channel data
-                result[channel_id] = self._context.get_function_cache().get(FunctionCache.ONE_WEEK,
-                                                                            self._get_channel_data, channel_id)
+                result[channel_id] = function_cache.get(FunctionCache.ONE_WEEK, self._get_channel_data, channel_id)
 
         return result
 
@@ -67,16 +65,14 @@ class ResourceManager(object):
                 result[video_id] = video_data
 
         if len(video_ids_to_update) > 0:
-            json_data = self._context.get_function_cache().get(FunctionCache.ONE_MONTH, self._youtube_client.get_videos,
-                                                               video_ids_to_update)
+            json_data = function_cache.get(FunctionCache.ONE_MONTH, self._youtube_client.get_videos, video_ids_to_update)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
                 video_id = unicode(yt_item['id'])
                 self._video_data[video_id] = yt_item
 
                 # this will cache the channel data
-                result[video_id] = self._context.get_function_cache().get(FunctionCache.ONE_MONTH,
-                                                                          self._get_video_data, video_id)
+                result[video_id] = function_cache.get(FunctionCache.ONE_MONTH, self._get_video_data, video_id)
 
         return result
 
@@ -111,17 +107,14 @@ class ResourceManager(object):
                 result[playlist_id] = playlist_data
 
         if len(playlist_ids_to_update) > 0:
-            json_data = self._context.get_function_cache().get(FunctionCache.ONE_DAY,
-                                                               self._youtube_client.get_playlists,
-                                                               playlist_ids_to_update)
+            json_data = function_cache.get(FunctionCache.ONE_DAY, self._youtube_client.get_playlists, playlist_ids_to_update)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
                 playlist_id = unicode(yt_item['id'])
                 self._playlist_data[playlist_id] = yt_item
 
                 # this will cache the channel data
-                result[playlist_id] = self._context.get_function_cache().get(FunctionCache.ONE_DAY,
-                                                                             self._get_playlist_data, playlist_id)
+                result[playlist_id] = function_cache.get(FunctionCache.ONE_DAY, self._get_playlist_data, playlist_id)
 
         return result
 
