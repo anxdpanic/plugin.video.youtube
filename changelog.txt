@@ -4,6 +4,7 @@
 [add] allow offensive content - Settings -> General
 [add] quick search and quick search (incognito) to Settings -> Folders
     - incognito doesn't add to search history or run post play events (add to watch history)
+[add] quick search to channels (no history)
 [add] Live folder to channels
 [fix/upd] use select dialog for subtitle settings
     - [add] Configure subtitles to Settings -> General
