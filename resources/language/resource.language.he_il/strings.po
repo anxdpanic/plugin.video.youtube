@@ -708,3 +708,7 @@ msgstr "חיפוש מהיר (גלישה בסתר)"
 msgctxt "#30607"
 msgid "Audio Only"
 msgstr "שמע בלבד"
+
+msgctxt "#30608"
+msgid "Allow developer keys"
+msgstr ""
