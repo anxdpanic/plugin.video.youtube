@@ -11,6 +11,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[add] allow developers to use their own api key
 [add] audio only to quality selection
 [add] age gate enforcement - Settings -> General
 [add] allow offensive content - Settings -> General
