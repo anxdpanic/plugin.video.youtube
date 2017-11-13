@@ -127,3 +127,6 @@ class AbstractSettings(object):
         if sys.version_info <= (2, 7, 9):
             verify = False
         return verify
+
+    def allow_dev_keys(self):
+        return self.get_bool(constants.setting.ALLOW_DEV_KEYS, True)

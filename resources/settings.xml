@@ -74,6 +74,7 @@
         <setting id="youtube.api.id" type="text" label="30202" default="" visible="eq(-2,true)"/>
         <setting id="youtube.api.secret" type="text" label="30203" default="" visible="eq(-3,true)"/>
         <setting id="youtube.api.key.switch" type="enum" label="30205" values="0|1|2|3|4|5" visible="eq(-4,false)" default="1"/>
+        <setting id="youtube.allow.dev.keys" type="bool" label="30608" default="true"/>
         <!-- Not user configured -->
         <setting id="youtube.api.last.switch" type="text" label="" visible="false" enable="true" default=""/>
         <setting id="youtube.api.last.hash" type="text" label="" visible="false" enable="true" default=""/>

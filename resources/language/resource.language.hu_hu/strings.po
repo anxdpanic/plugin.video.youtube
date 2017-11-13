@@ -696,3 +696,7 @@ msgstr "Gyors keresés (Inkongnito mód)"
 msgctxt "#30607"
 msgid "Audio Only"
 msgstr ""
+
+msgctxt "#30608"
+msgid "Allow developer keys"
+msgstr ""

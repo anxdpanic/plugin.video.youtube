@@ -159,10 +159,8 @@ class Provider(kodion.AbstractProvider):
                         expires_in = min(expires_in_tv, expires_in_kodi)
 
                         access_manager.update_access_token(access_token, expires_in)
-                    except LoginException, ex:
-                        title = '%s: %s' % (context.get_name(), 'LoginException')
-                        context.get_ui().show_notification(ex.message, title)
-                        context.log_error('%s: %s' % (title, ex.message))
+                    except LoginException as ex:
+                        self.handle_exception(context, ex)
                         access_tokens = ['', '']
                         # reset access_token
                         access_manager.update_access_token('')

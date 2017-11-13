@@ -34,7 +34,8 @@ def play_video(provider, context, re_match):
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
-        play_suggested = settings.get_bool('youtube.suggested_videos', False)
+        suggested_param = str(context.get_param('suggested', True)).lower() == 'true'
+        play_suggested = settings.get_bool('youtube.suggested_videos', False) and suggested_param
         items = None
         if play_suggested:
             try:
