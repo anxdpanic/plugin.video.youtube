@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: plugin.video.youtube\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2017-09-26 17:00+0300\n"
+"PO-Revision-Date: 2017-11-13 09:47+0200\n"
 "Last-Translator: A. Dambledore\n"
 "Language-Team: Eng2Heb\n"
 "MIME-Version: 1.0\n"
@@ -15,7 +15,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he_IL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.4\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -25,6 +24,7 @@ msgctxt "Addon Description"
 msgid "YouTube is a one of the biggest video-sharing websites of the world."
 msgstr "YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם."
 
+# Kodion Settings
 msgctxt "#30000"
 msgid "General"
 msgstr "כללי"
@@ -36,6 +36,15 @@ msgstr "שם משתמש"
 msgctxt "#30002"
 msgid "Password"
 msgstr "סיסמה"
+
+# empty strings from id 30003 to 30006
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "תשתמש ב-MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure inputstream.adaptive"
+msgstr "הגדרת inputstream.adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -77,6 +86,7 @@ msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p חי / 720p (HD)"
 
+# empty strings 30019
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "אפשר 3D"
@@ -153,8 +163,10 @@ msgctxt "#30038"
 msgid "Custom History Playlist ID"
 msgstr "מזהה רשימת השמעה מותאם אישית - היסטוריה"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
+msgid "Favourites"
 msgstr "מועדפים"
 
 msgctxt "#30101"
@@ -167,7 +179,7 @@ msgstr "חיפוש"
 
 msgctxt "#30103"
 msgid "Library"
-msgstr "ספרייה"
+msgstr "ספריה"
 
 msgctxt "#30104"
 msgid "Highlights"
@@ -211,7 +223,7 @@ msgstr "שינוי שם"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "אשר מחיקה"
+msgstr "אישור מחיקה"
 
 msgctxt "#30115"
 msgid "Confirm remove"
@@ -240,8 +252,8 @@ msgstr "נקה"
 # YouTube
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
-msgid "API Key"
-msgstr "מפתח API"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -347,7 +359,7 @@ msgstr "והזן את הקוד הבא:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr "הוסף ל..."
+msgstr "הוסף אל..."
 
 msgctxt "#30521"
 msgid "Select playlist"
@@ -487,7 +499,7 @@ msgstr "מחק את מטמון היסטורית החיפוש"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr "נקה מטמון"
+msgstr "מחק מטמון"
 
 msgctxt "#30556"
 msgid "Clear search history"
@@ -499,7 +511,7 @@ msgstr "מטמון הפונקציה"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr "היסטוריית חיפוש"
+msgstr "חפש היסטוריה"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
@@ -507,7 +519,7 @@ msgstr "מחיקת settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr "שפת הכתוביות"
+msgstr "שפת כתוביות"
 
 msgctxt "#30561"
 msgid "None"
@@ -515,7 +527,7 @@ msgstr "ללא"
 
 msgctxt "#30562"
 msgid "All"
-msgstr "הכול"
+msgstr "הכל"
 
 msgctxt "#30563"
 msgid "Setting"
@@ -543,11 +555,11 @@ msgstr "הסרה מצפייה בהמשך"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "האם אתה בטוח שברצונך להסיר את '%s' מהרשימה לצפייה בהמשך?"
+msgstr "האם אתה בטוח שברצונך להסיר את \\'%s\\' מהרשימה לצפייה בהמשך?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "האם אתה בטוח שברצונך להחליף את הרשימה לצפייה בהמשך הנוכחית עם '%s'?"
+msgstr "האם אתה בטוח שברצונך להחליף את הרשימה לצפייה בהמשך הנוכחית עם \\'%s\\'?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -559,11 +571,11 @@ msgstr "הסר כהיסטוריה"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "האם אתה בטוח שברצונך להסיר את '%s' כרשימת ההיסטוריה שלך?"
+msgstr "האם אתה בטוח שברצונך להסיר את \\'%s\\' כרשימת ההיסטוריה שלך?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "האם אתה בטוח שברצונך להחליף את הרשימה הנוכחית של ההיסטוריה עם '%s'?"
+msgstr "האם אתה בטוח שברצונך להחליף את הרשימה הנוכחית של ההיסטוריה עם \\'%s\\'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -667,32 +679,32 @@ msgstr "נכשל בהפעלת מפתח ה-API האישי. חסר: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "קביעת תצורת כתוביות"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s עם %s מאוחזר"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "לא נוצר אוטומטית"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "שער גיל"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "אפשר תוכן פוגעני"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "חיפוש מהיר"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "חיפוש מהיר (גלישה בסתר)"
 
 msgctxt "#30607"
 msgid "Audio Only"
-msgstr ""
+msgstr "שמע בלבד"
