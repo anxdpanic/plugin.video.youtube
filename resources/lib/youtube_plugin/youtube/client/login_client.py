@@ -1,5 +1,6 @@
 __author__ = 'bromix'
 
+import json
 import time
 import urlparse
 import requests
@@ -8,10 +9,14 @@ from ...kodion import Context
 from __config__ import api, youtube_tv, keys_changed
 
 context = Context()
+ui = context.get_ui()
 
 
 class LoginClient(object):
     api_keys_changed = keys_changed
+
+    DEV_CONFIG = ui.get_home_window_property('configs')
+    ui.clear_home_window_property('configs')
 
     CONFIGS = {
         'youtube-tv': {
@@ -29,6 +34,30 @@ class LoginClient(object):
     }
 
     def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv=''):
+
+        self._dev_config = None
+        if self.DEV_CONFIG is not None:
+            if context.get_settings().allow_dev_keys():
+                try:
+                    self._dev_config = json.loads(self.DEV_CONFIG)
+                except ValueError:
+                    context.log_error('Error loading developer key: |invalid json|')
+
+                if self._dev_config is not None:
+                    if not self._dev_config.get('main') or not self._dev_config['main'].get('key') \
+                            or not self._dev_config['main'].get('system') or not self._dev_config.get('origin'):
+                        context.log_error('Error loading developer key: |invalid structure| '
+                                          'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY}}|')
+                    else:
+                        dev_origin = self._dev_config['origin']
+                        dev_main = self._dev_config['main']
+                        dev_system = dev_main['system']
+
+                        context.log_debug('Developer key origin: |{0}| for system |{1}| using api key'.format(dev_origin, dev_system))
+                        self.CONFIGS['main']['key'] = dev_main['key']
+            else:
+                context.log_debug('Developer keys ignored')
+
         self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
         self._verify = context.get_settings().verify_ssl()
