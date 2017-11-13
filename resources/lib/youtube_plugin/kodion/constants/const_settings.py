@@ -27,3 +27,5 @@ LOGIN_HASH = 'kodion.login.hash'
 ACCESS_TOKEN = 'kodion.access_token'
 REFRESH_TOKEN = 'kodion.refresh_token'
 ACCESS_TOKEN_EXPIRES = 'kodion.access_token.expires'
+
+ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)

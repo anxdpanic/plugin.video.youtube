@@ -697,3 +697,11 @@ msgstr ""
 msgctxt "#30607"
 msgid "Audio Only"
 msgstr ""
+
+msgctxt "#30608"
+msgid "Allow developer keys"
+msgstr ""
+
+msgctxt "#30608"
+msgid "Allow developer keys"
+msgstr ""
