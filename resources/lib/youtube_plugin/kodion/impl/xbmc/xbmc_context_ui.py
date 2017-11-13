@@ -125,3 +125,18 @@ class XbmcContextUI(AbstractContextUI):
 
     def refresh_container(self):
         xbmc.executebuiltin("Container.Refresh")
+
+    @staticmethod
+    def set_home_window_property(property_id, value):
+        property_id = 'plugin.video.youtube-' + property_id
+        xbmcgui.Window(10000).setProperty(property_id, value)
+
+    @staticmethod
+    def get_home_window_property(property_id):
+        property_id = 'plugin.video.youtube-' + property_id
+        return xbmcgui.Window(10000).getProperty(property_id) or None
+
+    @staticmethod
+    def clear_home_window_property(property_id):
+        property_id = 'plugin.video.youtube-' + property_id
+        xbmcgui.Window(10000).clearProperty(property_id)
