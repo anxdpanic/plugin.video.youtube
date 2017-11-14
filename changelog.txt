@@ -1,6 +1,6 @@
 5.5.0
 [add] allow developers to use their own api key
-    - xbmcgui.Window(10000).setProperty('plugin.video.youtube-configs', json.dumps({"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY}}))
+    - xbmcgui.Window(10000).setProperty('plugin.video.youtube-configs', json.dumps({"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY[, "id": CLIENT_ID, "secret": CLIENT_SECRET]}}))
 [add] audio only to quality selection
 [add] age gate enforcement - Settings -> General
 [add] allow offensive content - Settings -> General
