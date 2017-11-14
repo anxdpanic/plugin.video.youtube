@@ -675,7 +675,7 @@ msgstr "Ενημερωθηκε: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr "Ενεργοποιήθηκαν τα προσωπικά κλειδιά API"
+msgstr "Προσωπικά κλειδιά API ενεργοποιήθηκαν"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
@@ -711,8 +711,8 @@ msgstr "Γρήγορη Αναζήτηση (Κρυφή)"
 
 msgctxt "#30607"
 msgid "Audio Only"
-msgstr ""
+msgstr "Ήχος μόνο"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Επέτρεψε την χρήση κλειδιών από προγραμματιστές"
