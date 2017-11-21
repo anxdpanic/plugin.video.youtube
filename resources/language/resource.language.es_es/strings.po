@@ -175,7 +175,7 @@ msgstr "Favoritos"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr "Añadir a favoritos del Addon"
+msgstr "Añadir a favoritos del Add-on"
 
 msgctxt "#30102"
 msgid "Search"
@@ -235,11 +235,11 @@ msgstr "Confirme quitar"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "¿Desea borrar \"%s\"?"
+msgstr "¿Esta seguro de que desea borrar \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "¿Desea quitar \"%s\"?"
+msgstr "¿Esta seguro de que desea quitar \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -247,7 +247,7 @@ msgstr "Borrar"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr "Por favor espere ..."
+msgstr "Por favor espere..."
 
 msgctxt "#30120"
 msgid "Clear"
@@ -365,7 +365,7 @@ msgstr "Escriba el siguiente código:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr "Añadir a ..."
+msgstr "Añadir a..."
 
 msgctxt "#30521"
 msgid "Select playlist"
@@ -373,15 +373,15 @@ msgstr "Seleccione una lista"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr "Nueva lista ..."
+msgstr "Nueva lista..."
 
 msgctxt "#30523"
 msgid "Language"
-msgstr "Lenguaje"
+msgstr "Idioma"
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr "Seleccione lenguaje"
+msgstr "Seleccione el idioma"
 
 msgctxt "#30525"
 msgid "Select region"
@@ -393,11 +393,11 @@ msgstr "Ajustar"
 
 msgctxt "#30527"
 msgid "Language and region?"
-msgstr "¿Lenguaje y región?"
+msgstr "¿Idioma y región?"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr "Valorar ..."
+msgstr "Valorar..."
 
 msgctxt "#30529"
 msgid "I like this"
@@ -429,7 +429,7 @@ msgstr "Seleccione el orden para la lista de reproducción"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr "Actualizando lista de reproducción ..."
+msgstr "Actualizando lista de reproducción..."
 
 msgctxt "#30537"
 msgid "Play from here"
@@ -453,7 +453,7 @@ msgstr "Mostrar nombre del canal en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "streams rtmpe no son soportados"
+msgstr "Los streams rtmpe no son soportados"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -465,7 +465,7 @@ msgstr "Enlaces en la descripción"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "No se encontrarón enlaces"
+msgstr "No se encontraron enlaces"
 
 msgctxt "#30546"
 msgid "Please log in twice!"
@@ -473,7 +473,7 @@ msgstr "Por favor inicie sesión dos veces!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente."
+msgstr "Debe habilitar dos sesiones para que el add-on YouTube funcione correctamente."
 
 msgctxt "#30548"
 msgid "More..."
@@ -497,7 +497,7 @@ msgstr "Mantenimiento"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr "Eliminar base de datos caché para funciones"
+msgstr "Eliminar base de datos para cache de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
@@ -521,11 +521,11 @@ msgstr "Historial de búsqueda"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr "Eliminar settings.xml"
+msgstr "Eliminar ajustes personales (settings.xml)"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr "Lenguaje de subtítulos"
+msgstr "Idioma para subtítulos"
 
 msgctxt "#30561"
 msgid "None"
@@ -561,7 +561,7 @@ msgstr "Eliminar como 'Ver más tarde'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "¿Esta seguro que desea eliminar '%s' como su lista 'Ver más tarde'?"
+msgstr "¿Está seguro de que desea eliminar '%s' como su lista 'Ver más tarde'?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
@@ -577,11 +577,11 @@ msgstr "Eliminar como 'Historial'"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "¿Está seguro que quiere eliminar '%s' como su lista 'Historial'?"
+msgstr "¿Está seguro de que quiere eliminar '%s' como su lista 'Historial'?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "¿Está seguro que quiere remplazar su actual lista 'Historial' por '%s'? "
+msgstr "¿Está seguro de que quiere remplazar su actual lista 'Historial' por '%s'? "
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -601,15 +601,15 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
-msgstr "MPEG-DASH está activado en la configuración de YouTube, sin embargo inputstream.adaptive parece estar deshabilitado. ¿Quiere habilitar inputstream.adaptive ahora?"
+msgstr "MPEG-DASH está activado en la configuración de YouTube, sin embargo inputstream.adaptive parece estar deshabilitado. ¿Le gustaría habilitar inputstream.adaptive ahora?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr "Restablecer administrador de acceso"
+msgstr "Restablecer credenciales de acceso"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr "¿Está seguro de que desea restablecer el administrador de acceso?"
+msgstr "¿Está seguro de que desea restablecer las credenciales de acceso?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
@@ -649,43 +649,43 @@ msgstr "Eliminar %s de filtro de 'Mis Suscripciones'"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Tamaño de miniaturas"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Medio (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Alto (4:3)"
 
 msgctxt "#30594"
 msgid "Safe Search"
-msgstr ""
+msgstr "Filtrado SafeSearch"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Moderado"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Estricto"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Actualizado: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Claves API personales habilitadas"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Error al habilitar claves API personales. Ausente: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Configurar subtítulos"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
@@ -693,28 +693,28 @@ msgstr ""
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Sin autogenerado"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Acceso por edad"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Permitir contenido ofensivo"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Búsqueda rápida"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Búsqueda rápida (Incógnito)"
 
 msgctxt "#30607"
 msgid "Audio Only"
-msgstr ""
+msgstr "Solo Audio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Permitir claves API para desarrolladores"
