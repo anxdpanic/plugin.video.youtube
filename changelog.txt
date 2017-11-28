@@ -20,6 +20,7 @@
 [upd] Hebrew strings [Eng2Heb]
 [upd] Polish strings [Etharr]
 [upd] Italian strings [DjDiabolik]
+[upd] Hungarian strings [lacesz-sh]
 
 5.4.5
 [fix] tighten regex for routing, resolving incorrect routing
