@@ -1,6 +1,7 @@
 __author__ = 'bromix'
 
 import os
+import re
 import json
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
@@ -195,11 +196,9 @@ class Provider(kodion.AbstractProvider):
 
                             access_token_kodi, expires_in_kodi = \
                                 YouTube(language=language, config=youtube_config).refresh_token(refresh_tokens[1])
-                            if not settings.requires_dual_login():
-                                access_token_tv, expires_in_tv = access_token_kodi, expires_in_kodi
-                            else:
-                                access_token_tv, expires_in_tv = \
-                                    YouTube(language=language, config=youtubetv_config).refresh_token_tv(refresh_tokens[0])
+
+                            access_token_tv, expires_in_tv = \
+                                YouTube(language=language, config=youtubetv_config).refresh_token_tv(refresh_tokens[0])
 
                             access_tokens = [access_token_tv, access_token_kodi]
 
@@ -292,14 +291,23 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_channel_playlist(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.VIDEOS)
-
+        client = self.get_client(context)
+        settings = context.get_settings()
         result = []
 
         playlist_id = re_match.group('playlist_id')
         page_token = context.get_param('page_token', '')
 
+        if re.match('\s*WL', playlist_id):
+            watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+            if re.match('\s*(?:WL)*', watch_later_id):
+                watch_later_id = client.get_watch_later_id()
+                if watch_later_id:
+                    settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+                    playlist_id = watch_later_id
+
         # no caching
-        json_data = self.get_client(context).get_playlist_items(playlist_id=playlist_id, page_token=page_token)
+        json_data = client.get_playlist_items(playlist_id=playlist_id, page_token=page_token)
         if not v3.handle_error(self, context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
@@ -502,8 +510,8 @@ class Provider(kodion.AbstractProvider):
     def _on_sign(self, context, re_match):
         mode = re_match.group('mode')
         if (mode == 'in') and context.get_access_manager().has_refresh_token():
-            yt_login.process('out', self, context, re_match, context.get_settings().requires_dual_login(), sign_out_refresh=False)
-        yt_login.process(mode, self, context, re_match, context.get_settings().requires_dual_login())
+            yt_login.process('out', self, context, re_match, sign_out_refresh=False)
+        yt_login.process(mode, self, context, re_match)
         return True
 
     @kodion.RegisterProviderPath('^/search/$')
@@ -844,8 +852,7 @@ class Provider(kodion.AbstractProvider):
                 result.append(my_channel_item)
 
             # watch later
-            if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True) and \
-                    settings.get_string('youtube.folder.watch_later.playlist', '').strip():
+            if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True):
                 watch_later_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.watch_later']),
                                                  context.create_uri(
                                                      ['channel', 'mine', 'playlist', playlists['watchLater']]),

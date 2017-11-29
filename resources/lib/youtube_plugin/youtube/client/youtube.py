@@ -548,6 +548,39 @@ class YouTube(LoginClient):
 
         return _perform(_page_token=page_token, _offset=offset, _result=result)
 
+    def get_watch_later_id(self):
+        post_data = {
+            'context': {
+                'client': {
+                    'clientName': 'TVHTML5',
+                    'clientVersion': '5.20150304',
+                    'theme': 'CLASSIC',
+                    'acceptRegion': '%s' % self._region,
+                    'acceptLanguage': '%s' % self._language.replace('_', '-')
+                },
+                'user': {
+                    'enableSafetyMode': False
+                }
+            },
+            'browseId': 'default'
+        }
+
+        json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=post_data)
+        contents = json_data.get('contents', {})
+        section = contents.get('sectionListRenderer', {})
+        contents = section.get('contents', [{}])
+        shelf = contents[0].get('shelfRenderer', {})
+        endpoint = shelf.get('endpoint', {})
+        browse_endpoint = endpoint.get('browseEndpoint', {})
+        browse_id = browse_endpoint.get('browseId', '')
+
+        if browse_id.startswith('VLPL'):
+            browse_id = browse_id.lstrip('VL')
+        if not browse_id.startswith('PL'):
+            browse_id = ''
+
+        return browse_id
+
     def _perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
                             allow_redirects=True, quota_optimized=True):
 
