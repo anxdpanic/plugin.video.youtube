@@ -597,7 +597,7 @@ class YouTube(LoginClient):
             if watch_later_id:
                 break
 
-            continuations = section.get('continuations', [])[0]
+            continuations = section.get('continuations', [{}])[0]
             next_continuation_data = continuations.get('nextContinuationData', {})
             continuation = next_continuation_data.get('continuation', '')
 
