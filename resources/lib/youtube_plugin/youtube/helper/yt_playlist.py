@@ -2,19 +2,30 @@ from ...kodion.utils.function_cache import FunctionCache
 
 __author__ = 'bromix'
 
+import re
 from ... import kodion
 from ...youtube.helper import v3
 
 
 def _process_add_video(provider, context, re_match):
+    client = provider.get_client(context)
+    settings = context.get_settings()
+
     playlist_id = context.get_param('playlist_id', '')
+
+    if re.match('\s*WL', playlist_id):
+        watch_later_id = client.get_watch_later_id()
+        if watch_later_id:
+            settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+            playlist_id = watch_later_id
+
     if not playlist_id:
         raise kodion.KodionException('Playlist/Remove: missing playlist_id')
     video_id = context.get_param('video_id', '')
     if not video_id:
         raise kodion.KodionException('Playlist/Remove: missing video_id')
 
-    json_data = provider.get_client(context).add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
+    json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
     if not v3.handle_error(provider, context, json_data):
         return False
 

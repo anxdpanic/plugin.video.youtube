@@ -167,7 +167,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
     if provider.is_logged_in():
         my_playlists = resource_manager.get_related_playlists(channel_id='mine')
 
-    thumb_size = context.get_settings().use_thumbnail_size()
+    thumb_size = settings.use_thumbnail_size()
     for video_id in video_data.keys():
         yt_item = video_data[video_id]
         video_item = video_id_dict[video_id]
@@ -175,7 +175,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         snippet = yt_item['snippet']  # crash if not conform
 
         # set uses_dash
-        video_item.set_use_dash(context.get_settings().use_dash())
+        video_item.set_use_dash(settings.use_dash())
 
         # set mediatype
         video_item.set_mediatype('video')  # using video
@@ -264,12 +264,17 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id)
 
         # 'play with...' (external player)
-        if context.get_settings().is_support_alternative_player_enabled():
+        if settings.is_support_alternative_player_enabled():
             yt_context_menu.append_play_with(context_menu, provider, context)
 
         if provider.is_logged_in():
             # add 'Watch Later' only if we are not in my 'Watch Later' list
             watch_later_playlist_id = my_playlists.get('watchLater', '')
+            if not watch_later_playlist_id or re.match('\s*WL', watch_later_playlist_id):
+                cplid = settings.get_string('youtube.folder.watch_later.playlist', ' WL').strip()
+                if not cplid:
+                    cplid = ' WL'
+                watch_later_playlist_id = cplid
             yt_context_menu.append_watch_later(context_menu, provider, context, watch_later_playlist_id, video_id)
 
             # provide 'remove' for videos in my playlists
