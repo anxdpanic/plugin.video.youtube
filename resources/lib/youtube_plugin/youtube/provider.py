@@ -79,7 +79,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.remove.my_subscriptions.filter': 30588,
                  'youtube.add.my_subscriptions.filter': 30587,
                  'youtube.removed.my_subscriptions.filter': 30590,
-                 'youtube.added.my_subscriptions.filter': 30589}
+                 'youtube.added.my_subscriptions.filter': 30589,
+                 'youtube.clear_history': 30609,
+                 'youtube.clear_history_confirmation': 30610}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -477,6 +479,13 @@ class Provider(kodion.AbstractProvider):
         if category == 'browse_channels':
             self.set_content_type(context, kodion.constants.content_type.FILES)
         return yt_specials.process(category, self, context, re_match)
+
+    @kodion.RegisterProviderPath('^/history/clear/$')
+    def _on_yt_clear_history(self, context, re_match):
+        if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.clear_history_confirmation'])):
+            json_data = self.get_client(context).clear_watch_history()
+            if 'error' not in json_data:
+                context.get_ui().show_notification(context.localize(30575))
 
     @kodion.RegisterProviderPath('^/events/post_play/$')
     def _on_post_play(self, context, re_match):
@@ -891,13 +900,19 @@ class Provider(kodion.AbstractProvider):
                 result.append(disliked_videos_item)
 
             # history
-            if 'watchHistory' in playlists and settings.get_bool('youtube.folder.history.show', False) and \
-                    settings.get_string('youtube.folder.history.playlist', '').strip():
-                watch_history_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.history']),
-                                                   context.create_uri(
-                                                       ['channel', 'mine', 'playlist', playlists['watchHistory']]),
-                                                   context.create_resource_path('media', 'history.png'))
-                watch_history_item.set_fanart(self.get_fanart(context))
+            if 'watchHistory' in playlists and settings.get_bool('youtube.folder.history.show', False):
+                if playlists['watchHistory'] == 'HL':
+                    watch_history_item = DirectoryItem(
+                        context.localize(self.LOCAL_MAP['youtube.history']),
+                        context.create_uri(['special', 'watch_history_tv']),
+                        context.create_resource_path('media', 'history.png'))
+                    watch_history_item.set_fanart(self.get_fanart(context))
+                else:
+                    watch_history_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.history']),
+                                                       context.create_uri(
+                                                           ['channel', 'mine', 'playlist', playlists['watchHistory']]),
+                                                       context.create_resource_path('media', 'history.png'))
+                    watch_history_item.set_fanart(self.get_fanart(context))
                 result.append(watch_history_item)
 
             # (my) playlists

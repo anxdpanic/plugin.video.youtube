@@ -291,6 +291,10 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                                                  {'playlist_id': playlist_id, 'video_id': playlist_item_id,
                                                   'video_name': video_item.get_name()})))
 
+            is_history = re.match('^/special/watch_history_tv/$', context.get_path())
+            if is_history:
+                yt_context_menu.append_clear_watch_history(context_menu, provider, context)
+
         # got to [CHANNEL]
         if channel_id and channel_name:
             # only if we are not directly in the channel provide a jump to the channel

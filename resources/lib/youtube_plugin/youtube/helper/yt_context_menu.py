@@ -140,6 +140,11 @@ def append_related_videos(context_menu, provider, context, video_id):
                                                                      {'video_id': video_id})))
 
 
+def append_clear_watch_history(context_menu, provider, context):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.clear_history']),
+                         'Container.Update(%s)' % context.create_uri(['history', 'clear'])))
+
+
 def append_refresh(context_menu, provider, context):
     context_menu.append((context.localize(provider.LOCAL_MAP['youtube.refresh']), 'Container.Refresh'))
 
