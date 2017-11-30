@@ -222,6 +222,18 @@ def _process_description_links(provider, context, re_match):
     return False
 
 
+def _process_watch_history_tv(provider, context, re_match):
+    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+
+    result = []
+    next_page_token = context.get_param('next_page_token', '')
+    offset = int(context.get_param('offset', 0))
+    json_data = provider.get_client(context).get_watch_history(page_token=next_page_token, offset=offset)
+    result.extend(tv.watch_history_to_items(provider, context, json_data))
+
+    return result
+
+
 def _process_new_uploaded_videos_tv(provider, context, re_match):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
@@ -262,6 +274,8 @@ def process(category, provider, context, re_match):
         return _process_recommendations(provider, context, re_match)
     elif category == 'browse_channels':
         return _process_browse_channels(provider, context, re_match)
+    elif category == 'watch_history_tv':
+        return _process_watch_history_tv(provider, context, re_match)
     elif category == 'new_uploaded_videos_tv':
         return _process_new_uploaded_videos_tv(provider, context, re_match)
     elif category == 'new_uploaded_videos_tv_filtered':

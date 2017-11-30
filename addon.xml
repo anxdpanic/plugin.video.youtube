@@ -27,7 +27,11 @@
 [fix/upd] add check to api key stripping
 [fix/upd] subtitles default to non asr track when possible
 [fix/upd] login client logging and endpoints
-[fix/upd] Watch Later working  * Clear Settings - Folders - Custom Watch Later Playlist ID
+[fix/upd] Watch Later working
+    - Clear Settings - Folders - Custom Watch Later Playlist ID
+[fix/upd] History working
+    - cannot add to history from add-on
+    - Clear Settings - Folders - Custom History Playlist ID
 [fix] /api/update route logging
 [upd] Hebrew strings [Eng2Heb]
 [upd] Polish strings [Etharr]

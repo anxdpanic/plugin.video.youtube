@@ -718,3 +718,11 @@ msgstr "Solo Audio"
 msgctxt "#30608"
 msgid "Allow developer keys"
 msgstr "Permitir claves API para desarrolladores"
+
+msgctxt "#30609"
+msgid "Clear watch history"
+msgstr ""
+
+msgctxt "#30610"
+msgid "This will clear your account's watch history from all devices. You can't undo this."
+msgstr ""
