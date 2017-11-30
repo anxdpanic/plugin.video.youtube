@@ -300,9 +300,9 @@ class Provider(kodion.AbstractProvider):
         playlist_id = re_match.group('playlist_id')
         page_token = context.get_param('page_token', '')
 
-        if re.match('\s*WL', playlist_id):
+        if re.match('^\s*WL$', playlist_id):
             watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
-            if re.match('\s*(?:WL)*', watch_later_id):
+            if re.match('^\s*(?:WL)*$', watch_later_id):
                 watch_later_id = client.get_watch_later_id()
                 if watch_later_id:
                     settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
@@ -501,7 +501,7 @@ class Provider(kodion.AbstractProvider):
                 # second: remove video from 'Watch Later' playlist
                 if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
                     watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
-                    if re.match('\s*(?:WL)*', watch_later_id):
+                    if re.match('^\s*(?:WL)*$', watch_later_id):
                         watch_later_id = client.get_watch_later_id()
                         if watch_later_id:
                             settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)

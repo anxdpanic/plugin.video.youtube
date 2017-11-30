@@ -270,9 +270,9 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         if provider.is_logged_in():
             # add 'Watch Later' only if we are not in my 'Watch Later' list
             watch_later_playlist_id = my_playlists.get('watchLater', '')
-            if not watch_later_playlist_id or re.match('\s*WL', watch_later_playlist_id):
+            if not watch_later_playlist_id or re.match('^\s*WL$', watch_later_playlist_id):
                 cplid = settings.get_string('youtube.folder.watch_later.playlist', ' WL').strip()
-                if not cplid:
+                if re.match('^\s*(?:WL)*$', cplid):
                     cplid = ' WL'
                 watch_later_playlist_id = cplid
             yt_context_menu.append_watch_later(context_menu, provider, context, watch_later_playlist_id, video_id)
