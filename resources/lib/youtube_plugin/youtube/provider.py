@@ -483,21 +483,28 @@ class Provider(kodion.AbstractProvider):
         video_id = context.get_param('video_id', '')
         if video_id:
             client = self.get_client(context)
+            settings = context.get_settings()
+
             if self.is_logged_in():
                 # first: update history
                 client.update_watch_history(video_id)
 
                 # second: remove video from 'Watch Later' playlist
                 if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
-                    watch_later_playlist_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
-                    if watch_later_playlist_id:
-                        playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_playlist_id, video_id=video_id)
+                    watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+                    if re.match('\s*(?:WL)*', watch_later_id):
+                        watch_later_id = client.get_watch_later_id()
+                        if watch_later_id:
+                            settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+
+                    if watch_later_id:
+                        playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
                         if playlist_item_id:
-                            json_data = client.remove_video_from_playlist(watch_later_playlist_id, playlist_item_id)
+                            json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
                             if not v3.handle_error(self, context, json_data):
                                 return False
 
-                history_playlist_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
+                history_playlist_id = settings.get_string('youtube.folder.history.playlist', '').strip()
                 if history_playlist_id:
                     json_data = client.add_video_to_playlist(history_playlist_id, video_id)
                     if not v3.handle_error(self, context, json_data):
