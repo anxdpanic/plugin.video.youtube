@@ -301,10 +301,11 @@ class YouTube(LoginClient):
 
         return None
 
-    def get_playlist_items(self, playlist_id, page_token=''):
+    def get_playlist_items(self, playlist_id, page_token='', max_results=None):
         # prepare params
+        max_results = str(self._max_results) if max_results is None else str(max_results)
         params = {'part': 'snippet',
-                  'maxResults': str(self._max_results),
+                  'maxResults': max_results,
                   'playlistId': playlist_id}
         if page_token:
             params['pageToken'] = page_token
@@ -549,37 +550,82 @@ class YouTube(LoginClient):
         return _perform(_page_token=page_token, _offset=offset, _result=result)
 
     def get_watch_later_id(self):
-        post_data = {
-            'context': {
-                'client': {
-                    'clientName': 'TVHTML5',
-                    'clientVersion': '5.20150304',
-                    'theme': 'CLASSIC',
-                    'acceptRegion': '%s' % self._region,
-                    'acceptLanguage': '%s' % self._language.replace('_', '-')
-                },
-                'user': {
-                    'enableSafetyMode': False
+        browse_ids = list()
+        watch_later_id = ''
+
+        def _get_items(continuation=None):
+            post_data = {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5',
+                        'clientVersion': '5.20150304',
+                        'theme': 'CLASSIC',
+                        'acceptRegion': '%s' % self._region,
+                        'acceptLanguage': '%s' % self._language.replace('_', '-')
+                    },
+                    'user': {
+                        'enableSafetyMode': False
+                    }
                 }
-            },
-            'browseId': 'default'
-        }
+            }
 
-        json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=post_data)
-        contents = json_data.get('contents', {})
-        section = contents.get('sectionListRenderer', {})
-        contents = section.get('contents', [{}])
-        shelf = contents[0].get('shelfRenderer', {})
-        endpoint = shelf.get('endpoint', {})
-        browse_endpoint = endpoint.get('browseEndpoint', {})
-        browse_id = browse_endpoint.get('browseId', '')
+            if continuation:
+                post_data.update({'continuation': continuation})
+            else:
+                post_data.update({'browseId': 'default'})
 
-        if browse_id.startswith('VLPL'):
-            browse_id = browse_id.lstrip('VL')
-        if not browse_id.startswith('PL'):
-            browse_id = ''
 
-        return browse_id
+            return self._perform_v1_tv_request(method='POST', path='browse', post_data=post_data)
+
+        json_data = _get_items()
+        wl_results = self.get_playlist_items(' WL', max_results=5)
+        wl_results = wl_results.get('items', [])
+        for idx, item in enumerate(wl_results):
+            wl_results[idx]['snippet']['playlistId'] = 'WL'
+            del wl_results[idx]['id']
+            del wl_results[idx]['etag']
+
+        pages = 5
+
+        while pages > 0:
+            contents = json_data.get('contents', json_data.get('continuationContents', {}))
+            section = contents.get('sectionListRenderer', contents.get('sectionListContinuation', {}))
+            contents = section.get('contents', [{}])
+
+            for shelf in contents:
+                renderer = shelf.get('shelfRenderer', {})
+                endpoint = renderer.get('endpoint', {})
+                browse_endpoint = endpoint.get('browseEndpoint', {})
+                browse_id = browse_endpoint.get('browseId', '')
+                if browse_id.startswith('VLPL'):
+                    browse_ids.append((browse_id.lstrip('VL'), renderer.get('title')))
+
+            for browse_id, title in browse_ids:
+                comp_results = self.get_playlist_items(browse_id, max_results=5)
+                comp_results = comp_results.get('items')
+                for idx, item in enumerate(comp_results):
+                    comp_results[idx]['snippet']['playlistId'] = 'WL'
+                    del comp_results[idx]['id']
+                    del comp_results[idx]['etag']
+
+                if wl_results == comp_results:
+                    watch_later_id = browse_id
+                    break
+
+            if watch_later_id:
+                break
+
+            continuations = section.get('continuations', [])[0]
+            next_continuation_data = continuations.get('nextContinuationData', {})
+            continuation = next_continuation_data.get('continuation', '')
+
+            if continuation:
+                pages -= 1
+                json_data = _get_items(continuation)
+            else:
+                break
+
+        return watch_later_id
 
     def _perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
                             allow_redirects=True, quota_optimized=True):
