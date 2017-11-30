@@ -552,7 +552,7 @@ class YouTube(LoginClient):
     def get_watch_later_id(self):
         watch_later_id = ''
 
-        def _get_items(continuation=None):
+        def _get_items(_continuation=None):
             post_data = {
                 'context': {
                     'client': {
@@ -565,13 +565,12 @@ class YouTube(LoginClient):
                     'user': {
                         'enableSafetyMode': False
                     }
-                }
+                },
+                'browseId': 'default'
             }
 
-            if continuation:
-                post_data.update({'continuation': continuation})
-            else:
-                post_data.update({'browseId': 'default'})
+            if _continuation:
+                post_data['continuation'] = _continuation
 
             return self._perform_v1_tv_request(method='POST', path='browse', post_data=post_data)
 
