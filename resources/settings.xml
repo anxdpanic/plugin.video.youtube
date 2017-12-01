@@ -48,6 +48,7 @@
         <setting id="youtube.folder.history.playlist" type="text" label="30038" enable="eq(-1,true)"
                  visible="eq(-1,true)" default=""/>
         <setting id="youtube.folder.playlists.show" type="bool" label="30501" default="true"/>
+        <setting id="youtube.folder.saved.playlists.show" type="bool" label="30611" default="true"/>
         <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
         <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
         <setting id="youtube.folder.live.show" type="bool" label="30539" default="true"/>

@@ -100,3 +100,48 @@ def watch_history_to_items(provider, context, json_data):
         result.append(next_page_item)
 
     return result
+
+
+def saved_playlists_to_items(provider, context, json_data):
+    result = []
+    playlist_id_dict = {}
+
+    incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    thumb_size = context.get_settings().use_thumbnail_size()
+
+    items = json_data.get('items', [])
+    for item in items:
+        title = item['title']
+        channel_id = item['channel_id']
+        playlist_id = item['id']
+        image = utils.get_thumbnail(thumb_size, item.get('thumbnails', {}))
+
+        item_params = {}
+        if incognito:
+            item_params.update({'incognito': incognito})
+
+        item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
+        playlist_item = kodion.items.DirectoryItem(title, item_uri, image=image)
+        playlist_item.set_fanart(provider.get_fanart(context))
+        result.append(playlist_item)
+        playlist_id_dict[playlist_id] = playlist_item
+
+    channel_items_dict = {}
+    utils.update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict)
+    utils.update_fanarts(provider, context, channel_items_dict)
+
+    # next page
+    next_page_token = json_data.get('next_page_token', '')
+    if next_page_token or json_data.get('continue', False):
+        new_params = {}
+        new_params.update(context.get_params())
+        new_params['next_page_token'] = next_page_token
+        new_params['offset'] = int(json_data.get('offset', 0))
+
+        new_context = context.clone(new_params=new_params)
+
+        current_page = int(new_context.get_param('page', 1))
+        next_page_item = kodion.items.NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        result.append(next_page_item)
+
+    return result
