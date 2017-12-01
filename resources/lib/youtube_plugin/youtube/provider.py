@@ -81,7 +81,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.removed.my_subscriptions.filter': 30590,
                  'youtube.added.my_subscriptions.filter': 30589,
                  'youtube.clear_history': 30609,
-                 'youtube.clear_history_confirmation': 30610}
+                 'youtube.clear_history_confirmation': 30610,
+                 'youtube.saved.playlists': 30611}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -919,6 +920,14 @@ class Provider(kodion.AbstractProvider):
             if settings.get_bool('youtube.folder.playlists.show', True):
                 playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.playlists']),
                                                context.create_uri(['channel', 'mine', 'playlists']),
+                                               context.create_resource_path('media', 'playlist.png'))
+                playlists_item.set_fanart(self.get_fanart(context))
+                result.append(playlists_item)
+
+            # saved playlists
+            if settings.get_bool('youtube.folder.saved.playlists.show', True):
+                playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.saved.playlists']),
+                                               context.create_uri(['special', 'saved_playlists']),
                                                context.create_resource_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)

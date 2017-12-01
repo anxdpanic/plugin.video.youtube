@@ -222,6 +222,18 @@ def _process_description_links(provider, context, re_match):
     return False
 
 
+def _process_saved_playlists_tv(provider, context, re_match):
+    provider.set_content_type(context, kodion.constants.content_type.FILES)
+
+    result = []
+    next_page_token = context.get_param('next_page_token', '')
+    offset = int(context.get_param('offset', 0))
+    json_data = provider.get_client(context).get_saved_playlists(page_token=next_page_token, offset=offset)
+    result.extend(tv.saved_playlists_to_items(provider, context, json_data))
+
+    return result
+
+
 def _process_watch_history_tv(provider, context, re_match):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
@@ -280,6 +292,8 @@ def process(category, provider, context, re_match):
         return _process_new_uploaded_videos_tv(provider, context, re_match)
     elif category == 'new_uploaded_videos_tv_filtered':
         return _process_new_uploaded_videos_tv_filtered(provider, context, re_match)
+    elif category == 'saved_playlists':
+        return _process_saved_playlists_tv(provider, context, re_match)
     elif category == 'disliked_videos':
         return _process_disliked_videos(provider, context, re_match)
     elif category == 'live':
