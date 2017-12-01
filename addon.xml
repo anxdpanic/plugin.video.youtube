@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.5.0~alpha11" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.5.0~alpha12" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -11,6 +11,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[add] Saved Playlists
 [add] allow developers to use their own api key
 [add] audio only to quality selection
 [add] age gate enforcement - Settings -> General
@@ -28,9 +29,9 @@
 [fix/upd] add check to api key stripping
 [fix/upd] subtitles default to non asr track when possible
 [fix/upd] login client logging and endpoints
-[fix/upd] Watch Later working
+[fix/upd] Watch Later
     - Clear Settings - Folders - Custom Watch Later Playlist ID
-[fix/upd] History working
+[fix/upd] History
     - cannot add to history from add-on
     - Clear Settings - Folders - Custom History Playlist ID
 [fix] /api/update route logging
