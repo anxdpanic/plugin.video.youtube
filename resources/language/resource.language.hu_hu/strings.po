@@ -700,3 +700,11 @@ msgstr "Csak audio"
 msgctxt "#30608"
 msgid "Allow developer keys"
 msgstr "Fejlesztői kulcsok engedélyezése"
+
+msgctxt "#30609"
+msgid "Clear watch history"
+msgstr ""
+
+msgctxt "#30610"
+msgid "This will clear your account's watch history from all devices. You can't undo this."
+msgstr ""

@@ -13,7 +13,7 @@ def _process_add_video(provider, context, re_match):
 
     playlist_id = context.get_param('playlist_id', '')
 
-    if re.match('\s*WL', playlist_id):
+    if re.match('^\s*WL$', playlist_id):
         watch_later_id = client.get_watch_later_id()
         if watch_later_id:
             settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
