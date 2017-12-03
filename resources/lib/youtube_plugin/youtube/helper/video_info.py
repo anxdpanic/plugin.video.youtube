@@ -498,6 +498,9 @@ class VideoInfo(object):
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
+        if self._access_token:
+            headers['Authorization'] = 'Bearer %s' % self._access_token
+
         params = {'hl': self.language,
                   'gl': self.region,
                   'ssl_stream': '1',
