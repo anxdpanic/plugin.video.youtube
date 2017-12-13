@@ -727,3 +727,7 @@ msgstr ""
 msgctxt "#30615"
 msgid "Cancel"
 msgstr ""
+
+msgctxt "#30616"
+msgid "Must be signed in."
+msgstr ""

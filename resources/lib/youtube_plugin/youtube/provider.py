@@ -105,7 +105,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.saved.playlists': 30611,
                  'youtube.retry': 30612,
                  'youtube.failed.watch_later.retry': 30614,
-                 'youtube.cancel': 30615
+                 'youtube.cancel': 30615,
+                 'youtube.must.be.signed.in': 30616
                  }
 
     def __init__(self):
@@ -513,23 +514,25 @@ class Provider(kodion.AbstractProvider):
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
 
     @kodion.RegisterProviderPath('^/watch_later/playlist_id/$')
-    def _on_yt_clear_history(self, context, re_match):
+    def _on_yt_get_watch_later_id(self, context, re_match):
         client = self.get_client(context)
         settings = context.get_settings()
+        if self.is_logged_in():
+            watch_later_id = None
+            while not watch_later_id:
+                watch_later_id = client.get_watch_later_id()
 
-        watch_later_id = None
-        while not watch_later_id:
-            watch_later_id = client.get_watch_later_id()
-
-            if watch_later_id:
-                settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
-                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
-                break
-            else:
-                if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry']),
-                                                        nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
-                                                        yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
+                if watch_later_id:
+                    settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     break
+                else:
+                    if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry']),
+                                                            nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
+                                                            yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
+                        break
+        else:
+            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.must.be.signed.in']))
 
     @kodion.RegisterProviderPath('^/events/post_play/$')
     def _on_post_play(self, context, re_match):
@@ -568,10 +571,15 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
+        sign_out_confirmed = False
         mode = re_match.group('mode')
         if (mode == 'in') and context.get_access_manager().has_refresh_token():
             yt_login.process('out', self, context, re_match, sign_out_refresh=False)
-        yt_login.process(mode, self, context, re_match)
+        if (mode == 'out') and context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.sign.out']) + '?'):
+            sign_out_confirmed = True
+
+        if (mode == 'in') or ((mode == 'out') and sign_out_confirmed):
+            yt_login.process(mode, self, context, re_match)
         return True
 
     @kodion.RegisterProviderPath('^/search/$')
