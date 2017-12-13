@@ -16,77 +16,97 @@ import xbmcvfs
 
 
 class Provider(kodion.AbstractProvider):
-    LOCAL_MAP = {'youtube.channels': 30500,
+    LOCAL_MAP = {'youtube.search': 30102,
+                 'youtube.watch_later': 30107,
+                 'youtube.video.rate.none': 30108,
+                 'youtube.remove': 30108,
+                 'youtube.sign.in': 30111,
+                 'youtube.sign.out': 30112,
+                 'youtube.rename': 30113,
+                 'youtube.delete': 30118,
+                 'youtube.api.key': 30201,
+                 'youtube.api.id': 30202,
+                 'youtube.api.secret': 30203,
+                 'youtube.channels': 30500,
                  'youtube.playlists': 30501,
                  'youtube.go_to_channel': 30502,
                  'youtube.subscriptions': 30504,
                  'youtube.unsubscribe': 30505,
                  'youtube.subscribe': 30506,
                  'youtube.my_channel': 30507,
-                 'youtube.watch_later': 30107,
-                 'youtube.refresh': 30543,
+                 'youtube.video.liked': 30508,
                  'youtube.history': 30509,
                  'youtube.my_subscriptions': 30510,
-                 'youtube.my_subscriptions_filtered': 30584,
-                 'youtube.remove': 30108,
-                 'youtube.delete': 30118,
+                 'youtube.video.queue': 30511,
                  'youtube.browse_channels': 30512,
                  'youtube.popular_right_now': 30513,
-                 'youtube.recommendations': 30551,
                  'youtube.related_videos': 30514,
                  'youtube.setting.auto_remove_watch_later': 30515,
                  'youtube.subscribe_to': 30517,
-                 'youtube.sign.in': 30111,
-                 'youtube.sign.out': 30112,
                  'youtube.sign.go_to': 30518,
                  'youtube.sign.enter_code': 30519,
-                 'youtube.sign.twice.title': 30546,
-                 'youtube.sign.twice.text': 30547,
+                 'youtube.video.add_to_playlist': 30520,
                  'youtube.playlist.select': 30521,
-                 'youtube.playlist.play.all': 30531,
-                 'youtube.playlist.play.default': 30532,
-                 'youtube.playlist.play.reverse': 30533,
-                 'youtube.playlist.play.shuffle': 30534,
-                 'youtube.playlist.play.select': 30535,
-                 'youtube.playlist.play.from_here': 30537,
-                 'youtube.playlist.progress.updating': 30536,
-                 'youtube.rename': 30113,
                  'youtube.playlist.create': 30522,
                  'youtube.setup_wizard.select_language': 30524,
                  'youtube.setup_wizard.select_region': 30525,
                  'youtube.setup_wizard.adjust': 30526,
                  'youtube.setup_wizard.adjust.language_and_region': 30527,
-                 'youtube.video.add_to_playlist': 30520,
-                 'youtube.video.liked': 30508,
-                 'youtube.video.description.links': 30544,
-                 'youtube.video.description.links.not_found': 30545,
-                 'youtube.video.disliked': 30538,
-                 'youtube.video.queue': 30511,
                  'youtube.video.rate': 30528,
                  'youtube.video.rate.like': 30529,
                  'youtube.video.rate.dislike': 30530,
-                 'youtube.video.rate.none': 30108,
-                 'youtube.video.play_with': 30540,
-                 'youtube.video.more': 30548,
+                 'youtube.playlist.play.all': 30531,
+                 'youtube.playlist.play.default': 30532,
+                 'youtube.playlist.play.reverse': 30533,
+                 'youtube.playlist.play.shuffle': 30534,
+                 'youtube.playlist.play.select': 30535,
+                 'youtube.playlist.progress.updating': 30536,
+                 'youtube.playlist.play.from_here': 30537,
+                 'youtube.video.disliked': 30538,
                  'youtube.live': 30539,
-                 'youtube.error.no_video_streams_found': 30549,
+                 'youtube.video.play_with': 30540,
                  'youtube.error.rtmpe_not_supported': 30542,
-                 'youtube.remove.as.watchlater': 30568,
+                 'youtube.refresh': 30543,
+                 'youtube.video.description.links': 30544,
+                 'youtube.video.description.links.not_found': 30545,
+                 'youtube.sign.twice.title': 30546,
+                 'youtube.sign.twice.text': 30547,
+                 'youtube.video.more': 30548,
+                 'youtube.error.no_video_streams_found': 30549,
+                 'youtube.recommendations': 30551,
+                 'youtube.function.cache': 30557,
+                 'youtube.search.history': 30558,
+                 'youtube.subtitle.language': 30560,
+                 'youtube.none': 30561,
+                 'youtube.prompt': 30566,
                  'youtube.set.as.watchlater': 30567,
-                 'youtube.remove.as.history': 30572,
+                 'youtube.remove.as.watchlater': 30568,
                  'youtube.set.as.history': 30571,
+                 'youtube.remove.as.history': 30572,
+                 'youtube.succeeded': 30575,
+                 'youtube.failed': 30576,
                  'youtube.settings': 30577,
-                 'youtube.remove.my_subscriptions.filter': 30588,
+                 'youtube.dash.enable.confirm': 30579,
+                 'youtube.reset.access.manager.confirm': 30581,
+                 'youtube.my_subscriptions_filtered': 30584,
                  'youtube.add.my_subscriptions.filter': 30587,
-                 'youtube.removed.my_subscriptions.filter': 30590,
+                 'youtube.remove.my_subscriptions.filter': 30588,
                  'youtube.added.my_subscriptions.filter': 30589,
+                 'youtube.removed.my_subscriptions.filter': 30590,
+                 'youtube.updated_': 30597,
+                 'youtube.api.personal.enabled': 30598,
+                 'youtube.api.personal.failed': 30599,
+                 'youtube.subtitle._with_fallback': 30601,
+                 'youtube.subtitle.no.auto.generated': 30602,
+                 'youtube.quick.search': 30605,
+                 'youtube.quick.search.incognito': 30606,
                  'youtube.clear_history': 30609,
                  'youtube.clear_history_confirmation': 30610,
                  'youtube.saved.playlists': 30611,
-                 'youtube.succeeded': 30575,
                  'youtube.retry': 30612,
                  'youtube.failed.watch_later.retry': 30614,
-                 'youtube.cancel': 30615}
+                 'youtube.cancel': 30615
+                 }
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -419,7 +439,7 @@ class Provider(kodion.AbstractProvider):
             playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
             result.append(playlists_item)
             search_live_id = mine_id if mine_id else channel_id
-            search_item = kodion.items.NewSearchItem(context, alt_name='[B]' + context.localize(30102) + '[/B]',
+            search_item = kodion.items.NewSearchItem(context, alt_name='[B]' + context.localize(self.LOCAL_MAP['youtube.search']) + '[/B]',
                                                      image=context.create_resource_path('media', 'search.png'),
                                                      fanart=self.get_fanart(context), channel_id=search_live_id)
             result.append(search_item)
@@ -490,7 +510,7 @@ class Provider(kodion.AbstractProvider):
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.clear_history_confirmation'])):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
-                context.get_ui().show_notification(context.localize(30575))
+                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
 
     @kodion.RegisterProviderPath('^/watch_later/playlist_id/$')
     def _on_yt_clear_history(self, context, re_match):
@@ -625,7 +645,7 @@ class Provider(kodion.AbstractProvider):
         elif switch == 'mpd':
             use_dash = context.addon_enabled('inputstream.adaptive') or settings.dash_support_builtin()
             if settings.dash_support_addon() and not use_dash:
-                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30579)):
+                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.dash.enable.confirm'])):
                     use_dash = context.set_addon_enabled('inputstream.adaptive')
                 else:
                     use_dash = False
@@ -639,18 +659,18 @@ class Provider(kodion.AbstractProvider):
             sub_setting = context.get_settings().subtitle_languages()
 
             if yt_language.startswith('en'):
-                sub_opts = [context.localize(30561), context.localize(30566),
-                            context.localize(30601) % ('en', 'en-US/en-GB'), yt_language,
-                            '%s (%s)' % (yt_language, context.localize(30602))]
+                sub_opts = [context.localize(self.LOCAL_MAP['youtube.none']), context.localize(self.LOCAL_MAP['youtube.prompt']),
+                            context.localize(self.LOCAL_MAP['youtube.subtitle._with_fallback']) % ('en', 'en-US/en-GB'), yt_language,
+                            '%s (%s)' % (yt_language, context.localize(self.LOCAL_MAP['youtube.subtitle.no.auto.generated']))]
 
             else:
-                sub_opts = [context.localize(30561), context.localize(30566),
-                            context.localize(30601) % (yt_language, 'en'), yt_language,
-                            '%s (%s)' % (yt_language, context.localize(30602))]
+                sub_opts = [context.localize(self.LOCAL_MAP['youtube.none']), context.localize(self.LOCAL_MAP['youtube.prompt']),
+                            context.localize(self.LOCAL_MAP['youtube.subtitle._with_fallback']) % (yt_language, 'en'), yt_language,
+                            '%s (%s)' % (yt_language, context.localize(self.LOCAL_MAP['youtube.subtitle.no.auto.generated']))]
 
             sub_opts[sub_setting] = '[B]%s[/B]' % sub_opts[sub_setting]
 
-            result = context.get_ui().on_select(context.localize(30560), sub_opts)
+            result = context.get_ui().on_select(context.localize(self.LOCAL_MAP['youtube.subtitle.language']), sub_opts)
             if result == -1:
                 return False
             context.get_settings().set_subtitle_languages(result)
@@ -700,16 +720,16 @@ class Provider(kodion.AbstractProvider):
         action = re_match.group('action')
         if action == 'clear':
             if maint_type == 'function_cache':
-                if context.get_ui().on_remove_content(context.localize(30557)):
+                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.function.cache'])):
                     context.get_function_cache().clear()
-                    context.get_ui().show_notification(context.localize(30575))
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
             elif maint_type == 'search_cache':
-                if context.get_ui().on_remove_content(context.localize(30558)):
+                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.search.history'])):
                     context.get_search_history().clear()
-                    context.get_ui().show_notification(context.localize(30575))
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
         elif action == 'reset':
             if maint_type == 'access_manager':
-                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30581)):
+                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.reset.access.manager.confirm'])):
                     try:
                         context.get_function_cache().clear()
                         access_manager = context.get_access_manager()
@@ -722,9 +742,9 @@ class Provider(kodion.AbstractProvider):
                         self.reset_client()
                         access_manager.update_access_token(access_token='', refresh_token='')
                         context.get_ui().refresh_container()
-                        context.get_ui().show_notification(context.localize(30575))
+                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     except:
-                        context.get_ui().show_notification(context.localize(30576))
+                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
@@ -738,9 +758,9 @@ class Provider(kodion.AbstractProvider):
                 if context.get_ui().on_delete_content(_file):
                     success = xbmcvfs.delete(_file_w_path)
                     if success:
-                        context.get_ui().show_notification(context.localize(30575))
+                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     else:
-                        context.get_ui().show_notification(context.localize(30576))
+                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
 
     @kodion.RegisterProviderPath('^/api/update/$')
     def api_key_update(self, context, re_match):
@@ -755,18 +775,18 @@ class Provider(kodion.AbstractProvider):
 
         if api_key:
             settings.set_string('youtube.api.key', api_key)
-            updated_list.append(context.localize(30201))
+            updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.key']))
             log_list.append('Key')
         if client_id:
             settings.set_string('youtube.api.id', client_id)
-            updated_list.append(context.localize(30202))
+            updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.id']))
             log_list.append('Id')
         if client_secret:
             settings.set_string('youtube.api.secret', client_secret)
-            updated_list.append(context.localize(30203))
+            updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
             log_list.append('Secret')
         if updated_list:
-            context.get_ui().show_notification(context.localize(30597) % ', '.join(updated_list))
+            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.updated_']) % ', '.join(updated_list))
         context.log_debug('Updated API keys: %s' % ', '.join(log_list))
 
         client_id = settings.get_string('youtube.api.id', '')
@@ -777,20 +797,20 @@ class Provider(kodion.AbstractProvider):
 
         if enable and client_id and client_secret and api_key:
             settings.set_bool('youtube.api.enable', True)
-            context.get_ui().show_notification(context.localize(30598))
+            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.enabled']))
             context.log_debug('Personal API keys enabled')
         elif enable:
             if not api_key:
-                missing_list.append(context.localize(30201))
+                missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.key']))
                 log_list.append('Key')
             if not client_id:
-                missing_list.append(context.localize(30202))
+                missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.id']))
                 log_list.append('Id')
             if not client_secret:
-                missing_list.append(context.localize(30203))
+                missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
                 log_list.append('Secret')
             settings.set_bool('youtube.api.enable', False)
-            context.get_ui().show_notification(context.localize(30599) % ', '.join(missing_list))
+            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
     def on_root(self, context, re_match):
@@ -861,13 +881,13 @@ class Provider(kodion.AbstractProvider):
 
         if settings.get_bool('youtube.folder.quick_search.show', True):
             quick_search_item = kodion.items.NewSearchItem(context,
-                                                           alt_name=context.localize(30605),
+                                                           alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search']),
                                                            fanart=self.get_fanart(context))
             result.append(quick_search_item)
 
         if settings.get_bool('youtube.folder.quick_search_incognito.show', True):
             quick_search_incognito_item = kodion.items.NewSearchItem(context,
-                                                                     alt_name=context.localize(30606),
+                                                                     alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search.incognito']),
                                                                      image=context.create_resource_path('media', 'search.png'),
                                                                      fanart=self.get_fanart(context),
                                                                      incognito=True)
