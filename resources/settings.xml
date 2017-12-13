@@ -42,6 +42,9 @@
         <setting id="youtube.folder.watch_later.show" type="bool" label="30107" default="true"/>
         <setting id="youtube.folder.watch_later.playlist" type="text" label="30037" enable="eq(-1,true)"
                  visible="eq(-1,true)" default=""/>
+        <setting id="youtube.get.watch_later.playlist.id" type="action" label="30613"
+                 action="RunPlugin(plugin://plugin.video.youtube/watch_later/playlist_id/)"
+                 option="close" enable="eq(-2,true)" visible="eq(-2,true)"/>
         <setting id="youtube.folder.liked_videos.show" type="bool" label="30508" default="true"/>
         <setting id="youtube.folder.disliked_videos.show" type="bool" label="30538" default="true"/>
         <setting id="youtube.folder.history.show" type="bool" label="30509" default="true"/>

@@ -68,9 +68,9 @@ class XbmcContextUI(AbstractContextUI):
 
         return False, None
 
-    def on_yes_no_input(self, title, text):
+    def on_yes_no_input(self, title, text, nolabel='', yeslabel=''):
         dialog = xbmcgui.Dialog()
-        return dialog.yesno(title, text)
+        return dialog.yesno(title, text, nolabel=nolabel, yeslabel=yeslabel)
 
     def on_ok(self, title, text):
         dialog = xbmcgui.Dialog()
