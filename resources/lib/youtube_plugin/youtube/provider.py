@@ -82,7 +82,11 @@ class Provider(kodion.AbstractProvider):
                  'youtube.added.my_subscriptions.filter': 30589,
                  'youtube.clear_history': 30609,
                  'youtube.clear_history_confirmation': 30610,
-                 'youtube.saved.playlists': 30611}
+                 'youtube.saved.playlists': 30611,
+                 'youtube.succeeded': 30575,
+                 'youtube.retry': 30612,
+                 'youtube.failed.watch_later.retry': 30614,
+                 'youtube.cancel': 30615}
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -487,6 +491,25 @@ class Provider(kodion.AbstractProvider):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(30575))
+
+    @kodion.RegisterProviderPath('^/watch_later/playlist_id/$')
+    def _on_yt_clear_history(self, context, re_match):
+        client = self.get_client(context)
+        settings = context.get_settings()
+
+        watch_later_id = None
+        while not watch_later_id:
+            watch_later_id = client.get_watch_later_id()
+
+            if watch_later_id:
+                settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                break
+            else:
+                if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry']),
+                                                        nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
+                                                        yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
+                    break
 
     @kodion.RegisterProviderPath('^/events/post_play/$')
     def _on_post_play(self, context, re_match):

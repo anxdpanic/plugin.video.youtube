@@ -724,3 +724,19 @@ msgstr ""
 msgctxt "#30611"
 msgid "Saved Playlists"
 msgstr ""
+
+msgctxt "#30612"
+msgid "Retry"
+msgstr ""
+
+msgctxt "#30613"
+msgid "Retrieve Watch Later playlist id"
+msgstr ""
+
+msgctxt "#30614"
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
+msgstr ""
+
+msgctxt "#30615"
+msgid "Cancel"
+msgstr ""
