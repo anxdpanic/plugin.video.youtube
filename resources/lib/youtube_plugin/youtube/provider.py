@@ -571,10 +571,15 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
+        sign_out_confirmed = False
         mode = re_match.group('mode')
         if (mode == 'in') and context.get_access_manager().has_refresh_token():
             yt_login.process('out', self, context, re_match, sign_out_refresh=False)
-        yt_login.process(mode, self, context, re_match)
+        if (mode == 'out') and context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.sign.out']) + '?'):
+            sign_out_confirmed = True
+
+        if (mode == 'in') or ((mode == 'out') and sign_out_confirmed):
+            yt_login.process(mode, self, context, re_match)
         return True
 
     @kodion.RegisterProviderPath('^/search/$')
