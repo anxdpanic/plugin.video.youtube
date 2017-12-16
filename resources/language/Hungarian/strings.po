@@ -703,32 +703,32 @@ msgstr "Fejlesztői kulcsok engedélyezése"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Megtekintési előzmények törlése"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Az összes eszközről törli a fiók megtekintési előzményeit. Ezt nem vonható vissza."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Mentett lejátszási listák"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Próbálja meg újra"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Megtekintés később lejátszási lista azonosítója"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
-msgstr ""
+msgstr "Nem sikerült lekérni a későbbi lejátszási lista azonosítóját. Adjon hozzá néhány videót a későbbiekben a webes/android-alkalmazáshoz, majd próbálja meg újra."
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Mégse"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Jelentkezzen be"
