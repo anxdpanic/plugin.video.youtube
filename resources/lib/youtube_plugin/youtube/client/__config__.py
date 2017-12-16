@@ -149,7 +149,7 @@ def get_last_hash():
 
 def _resolve_old_login():
     __context.log_debug('API key set changed: Signing out')
-    __context.execute('RunPlugin(%s)' % __context.create_uri(['sign', 'out']))
+    __context.execute('RunPlugin(%s)' % __context.create_uri(['sign', 'out'], {'confirmed': 'true'}))
 
 
 # make sure we have a valid switch, if not use default
