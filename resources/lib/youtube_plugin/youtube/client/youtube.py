@@ -3,6 +3,7 @@ __author__ = 'bromix'
 import requests
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
+from ..helper.utils import get_shelf_index_by_title
 from ...kodion import Context
 
 context = Context()
@@ -553,11 +554,13 @@ class YouTube(LoginClient):
         if not page_token:
             page_token = ''
 
+        shelf_title = 'Saved Playlists'
+
         result = {'items': [],
                   'next_page_token': page_token,
                   'offset': offset}
 
-        def _perform(_playlist_idx, _page_token, _offset, _result):
+        def _perform(_page_token, _offset, _result, _shelf_index=None):
             _post_data = {
                 'context': {
                     'client': {
@@ -582,8 +585,13 @@ class YouTube(LoginClient):
             if 'continuationContents' in _json_data:
                 _data = _json_data.get('continuationContents', {}).get('horizontalListContinuation', {})
             elif 'contents' in _json_data:
-                _data = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])[_playlist_idx].get(
-                    'shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
+                _contents = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+
+                if _shelf_index is None:
+                    _shelf_index = get_shelf_index_by_title(context, _json_data, shelf_title)
+
+                if _shelf_index is not None:
+                    _data = _contents[_shelf_index].get('shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
 
             _items = _data.get('items', [])
             if not _result:
@@ -624,7 +632,7 @@ class YouTube(LoginClient):
                 _result['next_page_token'] = _continuations
 
                 if len(_result['items']) < self._max_results:
-                    _result = _perform(_playlist_idx=playlist_index, _page_token=_continuations, _offset=0, _result=_result)
+                    _result = _perform(_page_token=_continuations, _offset=0, _result=_result, _shelf_index=_shelf_index)
 
             # trim result
             if len(_result['items']) > self._max_results:
@@ -645,36 +653,29 @@ class YouTube(LoginClient):
 
             return _result
 
-        _en_post_data = {
-            'context': {
-                'client': {
-                    'clientName': 'TVHTML5',
-                    'clientVersion': '5.20150304',
-                    'theme': 'CLASSIC',
-                    'acceptRegion': 'US',
-                    'acceptLanguage': 'en-US'
+        shelf_index = None
+        if self._language != 'en' and not self._language.startswith('en-') and not page_token:
+            #  shelf index is a moving target, make a request in english first to find the correct index by title
+            _en_post_data = {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5',
+                        'clientVersion': '5.20150304',
+                        'theme': 'CLASSIC',
+                        'acceptRegion': 'US',
+                        'acceptLanguage': 'en-US'
+                    },
+                    'user': {
+                        'enableSafetyMode': False
+                    }
                 },
-                'user': {
-                    'enableSafetyMode': False
-                }
-            },
-            'browseId': 'FEmy_youtube'
-        }
+                'browseId': 'FEmy_youtube'
+            }
 
-        playlist_index = None
-        json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=_en_post_data)
-        contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+            json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=_en_post_data)
+            shelf_index = get_shelf_index_by_title(context, json_data, shelf_title)
 
-        for idx, shelf in enumerate(contents):
-            title = shelf.get('shelfRenderer', {}).get('title', {}).get('runs', [{}])[0].get('text', '')
-            if title.lower() == 'saved playlists':
-                playlist_index = idx
-                break
-
-        if playlist_index is not None:
-            contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
-            if 0 <= playlist_index < len(contents):
-                result = _perform(_playlist_idx=playlist_index, _page_token=page_token, _offset=offset, _result=result)
+        result = _perform(_page_token=page_token, _offset=offset, _result=result, _shelf_index=shelf_index)
 
         return result
 
