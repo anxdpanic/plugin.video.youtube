@@ -345,3 +345,22 @@ def get_thumbnail(thumb_size, thumbnails):
         if image:
             break
     return image
+
+
+def get_shelf_index_by_title(context, json_data, shelf_title):
+    shelf_index = None
+
+    contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+    for idx, shelf in enumerate(contents):
+        title = shelf.get('shelfRenderer', {}).get('title', {}).get('runs', [{}])[0].get('text', '')
+        if title.lower() == shelf_title.lower():
+            shelf_index = idx
+            context.log_debug('Found shelf index |{index}| for |{title}|'.format(index=str(shelf_index), title=shelf_title))
+            break
+
+    if shelf_index is not None:
+        if 0 > shelf_index >= len(contents):
+            context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(index=str(shelf_index), content_length=str(len(contents))))
+            shelf_index = None
+
+    return shelf_index
