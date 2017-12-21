@@ -812,7 +812,7 @@ class YouTube(LoginClient):
                 browse_endpoint = endpoint.get('browseEndpoint', {})
                 browse_id = browse_endpoint.get('browseId', '')
                 title = renderer.get('title', {})
-                title_runs = title.get('runs', [])[0]
+                title_runs = title.get('runs', [{}])[0]
                 title_text = title_runs.get('text', '')
                 if (title_text.lower() == 'watch later') and (browse_id.startswith('VLPL') or browse_id.startswith('PL')):
                     watch_later_id = browse_id.lstrip('VL')
