@@ -357,11 +357,11 @@ msgstr "Suscribirse a %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr "Ir a '%s'"
+msgstr "Visite la URL '%s' desde cualquier navegador web" 
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr "Escriba el siguiente código:"
+msgstr "e introduzca el siguiente código:"
 
 msgctxt "#30520"
 msgid "Add to..."
