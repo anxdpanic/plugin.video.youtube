@@ -42,7 +42,7 @@ msgid "Always ask for the video quality"
 msgstr "Mindig kérdezze meg a videó minőségét"
 
 msgctxt "#30010"
-msgid "Video Quality"
+msgid "Video quality"
 msgstr "Videó minőség"
 
 msgctxt "#30011"
@@ -82,7 +82,7 @@ msgid "Allow 3D"
 msgstr "3D engedélyezés"
 
 msgctxt "#30021"
-msgid "Show Fanart"
+msgid "Show fanart"
 msgstr "Fanart megjelenítése"
 
 msgctxt "#30022"
@@ -90,11 +90,11 @@ msgid "Items per page"
 msgstr "Elemek száma oldalanként"
 
 msgctxt "#30023"
-msgid "Search History Size"
+msgid "Search history size"
 msgstr "Keresési előzmény mérete"
 
 msgctxt "#30024"
-msgid "Cache Size (MB)"
+msgid "Cache size (MB)"
 msgstr "Gyorsítótár mérete (MB)"
 
 msgctxt "#30025"
@@ -102,7 +102,7 @@ msgid "Enable setup-wizard"
 msgstr "Beállítás varázsló engedélyezése"
 
 msgctxt "#30026"
-msgid "Override View"
+msgid "Override view"
 msgstr "Nézet felülírása"
 
 msgctxt "#30027"
@@ -146,11 +146,11 @@ msgid "Support alternative player"
 msgstr "Alternatív lejátszás támogatás"
 
 msgctxt "#30037"
-msgid "Custom Watch Later Playlist ID"
+msgid "Custom Watch Later playlist id"
 msgstr "Későbbi lejátszási lista egyedi megtekintés azonosító"
 
 msgctxt "#30038"
-msgid "Custom History Playlist ID"
+msgid "Custom History playlist id"
 msgstr "Előzmények egyedi azonosító"
 
 msgctxt "#30100"
@@ -256,7 +256,7 @@ msgid "API Secret"
 msgstr "API Secret"
 
 msgctxt "#30204"
-msgid "Enable Personal API Keys"
+msgid "Enable personal API keys"
 msgstr "Személyes API Kulcs engedélyezés"
 
 msgctxt "#30205"
@@ -578,11 +578,11 @@ msgid "Settings"
 msgstr "Beállítások"
 
 msgctxt "#30578"
-msgid "Force SSL Certificate verification"
+msgid "Force SSL certificate verification"
 msgstr "SSL Tanúsítvány megerősítése"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
+msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
 msgstr "Az MPEG-DASH engedélyezve van a YouTube beállításaiban, de a bemeneti adaptív alkalmazások le vannak tiltva. Szeretné most engedélyezni a bemeneti adaptív alkalmazásokat?"
 
 msgctxt "#30580"
@@ -642,7 +642,7 @@ msgid "High (4:3)"
 msgstr "Magas (4:3)"
 
 msgctxt "#30594"
-msgid "Safe Search"
+msgid "Safe search"
 msgstr "Biztonságos keresés"
 
 msgctxt "#30595"
@@ -694,7 +694,7 @@ msgid "Quick Search (Incognito)"
 msgstr "Gyors keresés (Inkongnito mód)"
 
 msgctxt "#30607"
-msgid "Audio Only"
+msgid "Audio only"
 msgstr "Csak audio"
 
 msgctxt "#30608"
@@ -722,7 +722,7 @@ msgid "Retrieve Watch Later playlist id"
 msgstr "Megtekintés később lejátszási lista azonosítója"
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
 msgstr "Nem sikerült lekérni a későbbi lejátszási lista azonosítóját. Adjon hozzá néhány videót a későbbiekben a webes/android-alkalmazáshoz, majd próbálja meg újra."
 
 msgctxt "#30615"

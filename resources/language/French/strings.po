@@ -43,7 +43,7 @@ msgid "Use MPEG-DASH"
 msgstr "Utiliser MPEG-DASH"
 
 msgctxt "#30008"
-msgid "Configure inputstream.adaptive"
+msgid "Configure InputStream Adaptive"
 msgstr "Configurer inputstream.adaptive"
 
 msgctxt "#30009"
@@ -51,7 +51,7 @@ msgid "Always ask for the video quality"
 msgstr "Toujours demander la qualité de la vidéo"
 
 msgctxt "#30010"
-msgid "Video Quality"
+msgid "Video quality"
 msgstr "Qualité vidéo"
 
 msgctxt "#30011"
@@ -91,7 +91,7 @@ msgid "Allow 3D"
 msgstr "Autoriser la 3D"
 
 msgctxt "#30021"
-msgid "Show Fanart"
+msgid "Show fanart"
 msgstr "Afficher les fanarts"
 
 msgctxt "#30022"
@@ -99,11 +99,11 @@ msgid "Items per page"
 msgstr "Nombre d'éléments par page"
 
 msgctxt "#30023"
-msgid "Search History Size"
+msgid "Search history size"
 msgstr "Taille de l'historique de recherche"
 
 msgctxt "#30024"
-msgid "Cache Size (MB)"
+msgid "Cache size (MB)"
 msgstr "Taille du cache (Mo)"
 
 msgctxt "#30025"
@@ -111,7 +111,7 @@ msgid "Enable setup-wizard"
 msgstr "Activer l'assistant de démarrage"
 
 msgctxt "#30026"
-msgid "Override View"
+msgid "Override view"
 msgstr "Remplacer l'affichage"
 
 msgctxt "#30027"
@@ -155,11 +155,11 @@ msgid "Support alternative player"
 msgstr "Support de lecteur alternatif"
 
 msgctxt "#30037"
-msgid "Custom Watch Later Playlist ID"
+msgid "Custom Watch Later playlist id"
 msgstr "Personnaliser l'ID de la Playlist 'Regarder plus tard'"
 
 msgctxt "#30038"
-msgid "Custom History Playlist ID"
+msgid "Custom History playlist id"
 msgstr "Personnaliser l'ID historique de la liste de lecture"
 
 msgctxt "#30100"
@@ -263,7 +263,7 @@ msgid "API Secret"
 msgstr "API secret"
 
 msgctxt "#30204"
-msgid "Enable Personal API Keys"
+msgid "Enable personal API keys"
 msgstr "Activer les clés API personnelles"
 
 msgctxt "#30205"
@@ -583,11 +583,11 @@ msgid "Settings"
 msgstr "Paramètres"
 
 msgctxt "#30578"
-msgid "Force SSL Certificate verification"
+msgid "Force SSL certificate verification"
 msgstr "Forcer la vérification du certificat SSL"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
+msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
 msgstr "MPEG-DASH est activée dans YouTube, cependant inputstream.adaptative semble être désactivé. Voulez-vous activer inputstream.adaptive maintenant ?"
 
 msgctxt "#30580"
@@ -647,7 +647,7 @@ msgid "High (4:3)"
 msgstr "Hautes (4: 3)"
 
 msgctxt "#30594"
-msgid "Safe Search"
+msgid "Safe search"
 msgstr "Recherche sécurisée"
 
 msgctxt "#30595"
@@ -699,7 +699,7 @@ msgid "Quick Search (Incognito)"
 msgstr ""
 
 msgctxt "#30607"
-msgid "Audio Only"
+msgid "Audio only"
 msgstr ""
 
 msgctxt "#30608"
@@ -727,7 +727,7 @@ msgid "Retrieve Watch Later playlist id"
 msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
 msgstr ""
 
 msgctxt "#30615"

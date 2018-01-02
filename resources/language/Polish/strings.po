@@ -42,7 +42,7 @@ msgid "Always ask for the video quality"
 msgstr "Pytaj o jakość strumienia wideo"
 
 msgctxt "#30010"
-msgid "Video Quality"
+msgid "Video quality"
 msgstr "Jakość wideo"
 
 msgctxt "#30011"
@@ -82,7 +82,7 @@ msgid "Allow 3D"
 msgstr "Dopuszczaj materiały 3D"
 
 msgctxt "#30021"
-msgid "Show Fanart"
+msgid "Show fanart"
 msgstr "Pokazuj fototapetę"
 
 msgctxt "#30022"
@@ -90,11 +90,11 @@ msgid "Items per page"
 msgstr "Pozycji na stronę"
 
 msgctxt "#30023"
-msgid "Search History Size"
+msgid "Search history size"
 msgstr "Liczba pozycji na liście Historia"
 
 msgctxt "#30024"
-msgid "Cache Size (MB)"
+msgid "Cache size (MB)"
 msgstr "Rozmiar bufora (MB)"
 
 msgctxt "#30025"
@@ -102,7 +102,7 @@ msgid "Enable setup-wizard"
 msgstr "Uruchamiaj kreatora konfiguracji"
 
 msgctxt "#30026"
-msgid "Override View"
+msgid "Override view"
 msgstr "Wymuszaj widok"
 
 msgctxt "#30027"
@@ -146,11 +146,11 @@ msgid "Support alternative player"
 msgstr "Obsługuj alternatywne odtwarzacze"
 
 msgctxt "#30037"
-msgid "Custom Watch Later Playlist ID"
+msgid "Custom Watch Later playlist id"
 msgstr "Identyfikator niestandardowej listy Do obejrzenia"
 
 msgctxt "#30038"
-msgid "Custom History Playlist ID"
+msgid "Custom History playlist id"
 msgstr "Identyfikator niestandardowej listy Historii"
 
 msgctxt "#30100"
@@ -256,7 +256,7 @@ msgid "API Secret"
 msgstr "Klucz szyfrowania API"
 
 msgctxt "#30204"
-msgid "Enable Personal API Keys"
+msgid "Enable personal API keys"
 msgstr "Używaj osobistego zestawu kluczy API"
 
 msgctxt "#30205"
@@ -578,11 +578,11 @@ msgid "Settings"
 msgstr "Ustawienia"
 
 msgctxt "#30578"
-msgid "Force SSL Certificate verification"
+msgid "Force SSL certificate verification"
 msgstr "Wymuszaj weryfikację certyfikatu SSL"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
+msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
 msgstr "W ustawieniach wtyczki YouTube aktywowano transmisję MPEG-DASH, ale wygląda na to, że wtyczka strumienia wejściowego InputStream Adaptive jest nieaktywna. Czy chciałbyś aktywować ją teraz?"
 
 msgctxt "#30580"
@@ -642,7 +642,7 @@ msgid "High (4:3)"
 msgstr "Duży (4:3)"
 
 msgctxt "#30594"
-msgid "Safe Search"
+msgid "Safe search"
 msgstr "Filtr kontroli rodzicielskiej"
 
 msgctxt "#30595"
@@ -694,7 +694,7 @@ msgid "Quick Search (Incognito)"
 msgstr "Szybkie wyszukiwanie (tryb prywatny)"
 
 msgctxt "#30607"
-msgid "Audio Only"
+msgid "Audio only"
 msgstr ""
 
 msgctxt "#30608"
@@ -722,7 +722,7 @@ msgid "Retrieve Watch Later playlist id"
 msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
 msgstr ""
 
 msgctxt "#30615"
