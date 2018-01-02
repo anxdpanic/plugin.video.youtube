@@ -41,7 +41,7 @@ msgid "Use MPEG-DASH"
 msgstr "MPEG-DASH käytössä"
 
 msgctxt "#30008"
-msgid "Configure inputstream.adaptive"
+msgid "Configure InputStream Adaptive"
 msgstr "Muokkaa inputstream.adaptive-asetuksia"
 
 msgctxt "#30009"
@@ -49,7 +49,7 @@ msgid "Always ask for the video quality"
 msgstr "Kysy aina videon laatu"
 
 msgctxt "#30010"
-msgid "Video Quality"
+msgid "Video quality"
 msgstr "Videon laatu"
 
 msgctxt "#30011"
@@ -89,7 +89,7 @@ msgid "Allow 3D"
 msgstr "3D käytössä"
 
 msgctxt "#30021"
-msgid "Show Fanart"
+msgid "Show fanart"
 msgstr "Näytä fanitaide"
 
 msgctxt "#30022"
@@ -97,11 +97,11 @@ msgid "Items per page"
 msgstr "Kohteita sivulla"
 
 msgctxt "#30023"
-msgid "Search History Size"
+msgid "Search history size"
 msgstr "Hakuhistorian koko"
 
 msgctxt "#30024"
-msgid "Cache Size (MB)"
+msgid "Cache size (MB)"
 msgstr "Välimuistin koko (Mt)"
 
 msgctxt "#30025"
@@ -109,7 +109,7 @@ msgid "Enable setup-wizard"
 msgstr "Tee asetukset opastetusti"
 
 msgctxt "#30026"
-msgid "Override View"
+msgid "Override view"
 msgstr "Pakota näkymä"
 
 msgctxt "#30027"
@@ -153,11 +153,11 @@ msgid "Support alternative player"
 msgstr "Tue vaihtoehtoista soitinta"
 
 msgctxt "#30037"
-msgid "Custom Watch Later Playlist ID"
+msgid "Custom Watch Later playlist id"
 msgstr "Valinnainen Katso myöhemmin-listan ID"
 
 msgctxt "#30038"
-msgid "Custom History Playlist ID"
+msgid "Custom History playlist id"
 msgstr "Valinnainen historialistan ID"
 
 msgctxt "#30100"
@@ -261,7 +261,7 @@ msgid "API Secret"
 msgstr "API secret"
 
 msgctxt "#30204"
-msgid "Enable Personal API Keys"
+msgid "Enable personal API keys"
 msgstr "Käytä henkilökohtaisia API-avaimia"
 
 msgctxt "#30205"
@@ -581,11 +581,11 @@ msgid "Settings"
 msgstr "Asetukset"
 
 msgctxt "#30578"
-msgid "Force SSL Certificate verification"
+msgid "Force SSL certificate verification"
 msgstr "Pakota SSL-varmistus"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
+msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
 msgstr "MPEG-DASH on käytössä asetuksissa, mutta inputstream.adaptive näyttää olevan poissa käytöstä. Otetaanko inputstream.adaptive käyttöön?"
 
 msgctxt "#30580"
@@ -645,7 +645,7 @@ msgid "High (4:3)"
 msgstr ""
 
 msgctxt "#30594"
-msgid "Safe Search"
+msgid "Safe search"
 msgstr ""
 
 msgctxt "#30595"
@@ -697,7 +697,7 @@ msgid "Quick Search (Incognito)"
 msgstr ""
 
 msgctxt "#30607"
-msgid "Audio Only"
+msgid "Audio only"
 msgstr ""
 
 msgctxt "#30608"
@@ -725,7 +725,7 @@ msgid "Retrieve Watch Later playlist id"
 msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
 msgstr ""
 
 msgctxt "#30615"

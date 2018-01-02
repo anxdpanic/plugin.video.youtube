@@ -41,7 +41,7 @@ msgid "Always ask for the video quality"
 msgstr "Întreabă întotdeauna pentru calitatea video"
 
 msgctxt "#30010"
-msgid "Video Quality"
+msgid "Video quality"
 msgstr "Calitate video"
 
 msgctxt "#30011"
@@ -81,7 +81,7 @@ msgid "Allow 3D"
 msgstr "Permite 3D"
 
 msgctxt "#30021"
-msgid "Show Fanart"
+msgid "Show fanart"
 msgstr "Arată creație artistică"
 
 msgctxt "#30022"
@@ -89,11 +89,11 @@ msgid "Items per page"
 msgstr "Elemente per pagină"
 
 msgctxt "#30023"
-msgid "Search History Size"
+msgid "Search history size"
 msgstr "Dimensiune istoric căutare"
 
 msgctxt "#30024"
-msgid "Cache Size (MB)"
+msgid "Cache size (MB)"
 msgstr "Dimensiune cache (MB)"
 
 msgctxt "#30025"
@@ -101,7 +101,7 @@ msgid "Enable setup-wizard"
 msgstr "Activează asistentul de instalare"
 
 msgctxt "#30026"
-msgid "Override View"
+msgid "Override view"
 msgstr "Suprascrie vizualizarea"
 
 msgctxt "#30027"
@@ -145,11 +145,11 @@ msgid "Support alternative player"
 msgstr "Compatiblitate lector alternativ"
 
 msgctxt "#30037"
-msgid "Custom Watch Later Playlist ID"
+msgid "Custom Watch Later playlist id"
 msgstr ""
 
 msgctxt "#30038"
-msgid "Custom History Playlist ID"
+msgid "Custom History playlist id"
 msgstr ""
 
 msgctxt "#30100"
@@ -256,7 +256,7 @@ msgid "API Secret"
 msgstr ""
 
 msgctxt "#30204"
-msgid "Enable Personal API Keys"
+msgid "Enable personal API keys"
 msgstr ""
 
 msgctxt "#30205"
@@ -579,11 +579,11 @@ msgid "Settings"
 msgstr ""
 
 msgctxt "#30578"
-msgid "Force SSL Certificate verification"
+msgid "Force SSL certificate verification"
 msgstr ""
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however inputstream.adaptive appears to be disabled. Would you like to enable inputstream.adaptive now?"
+msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -643,7 +643,7 @@ msgid "High (4:3)"
 msgstr ""
 
 msgctxt "#30594"
-msgid "Safe Search"
+msgid "Safe search"
 msgstr ""
 
 msgctxt "#30595"
@@ -695,7 +695,7 @@ msgid "Quick Search (Incognito)"
 msgstr ""
 
 msgctxt "#30607"
-msgid "Audio Only"
+msgid "Audio only"
 msgstr ""
 
 msgctxt "#30608"
@@ -723,7 +723,7 @@ msgid "Retrieve Watch Later playlist id"
 msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/android app and retry."
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
 msgstr ""
 
 msgctxt "#30615"
