@@ -420,32 +420,38 @@ class VideoInfo(object):
             if pos:
                 _player_config = html2[:pos]
 
-        try:
-            player_config = json.loads(_player_config)
-        except TypeError:
+        blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+        if not blank_config:
             player_config = dict()
-
-        if not player_config:
-            blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
-            if not blank_config:
+        else:
+            try:
+                player_config = json.loads(blank_config.group('player_config'))
+            except TypeError:
                 player_config = dict()
-            else:
-                try:
-                    player_config = json.loads(blank_config.group('player_config'))
-                except TypeError:
-                    player_config = dict()
 
-        if not player_config.get('args', {}).get('player_response'):
-            result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
-            if 'args' not in player_config:
-                player_config['args'] = dict()
-            player_config['args']['player_response'] = '{}' if not result else result.group('player_response')
+        try:
+            player_config.update(json.loads(_player_config))
+        except TypeError:
+            pass
+
+        if 'args' not in player_config:
+            player_config['args'] = dict()
+
+        if 'player_response' not in player_config['args']:
+            player_config['args']['player_response'] = dict()
 
         if isinstance(player_config.get('args', {}).get('player_response'), basestring):
             try:
                 player_config['args']['player_response'] = json.loads(player_config['args']['player_response'])
             except TypeError:
                 player_config['args']['player_response'] = dict()
+
+        result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
+        if result:
+            try:
+                player_config['args']['player_response'].update(json.loads(result.group('player_response')))
+            except TypeError:
+                pass
 
         return player_config
 
