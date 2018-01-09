@@ -115,9 +115,6 @@ class AbstractSettings(object):
     def age_gate(self):
         return self.get_bool(constants.setting.AGE_GATE, True)
 
-    def offensive_content(self):
-        return self.get_bool(constants.setting.OFFENSIVE_CONTENT, False)
-
     def verify_ssl(self):
         verify = self.get_bool(constants.setting.VERIFY_SSL, False)
         if sys.version_info <= (2, 7, 9):
