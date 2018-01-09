@@ -604,7 +604,7 @@ class VideoInfo(object):
             if url:
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info)
 
-        mpd_url = params.get('dashmpd', '')
+        mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
@@ -672,12 +672,12 @@ class VideoInfo(object):
                         stream_list.append(video_stream)
 
         # extract streams from map
-        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
+        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', player_args.get('url_encoded_fmt_stream_map', ''))
         if url_encoded_fmt_stream_map:
             url_encoded_fmt_stream_map = url_encoded_fmt_stream_map.split(',')
             parse_to_stream_list(url_encoded_fmt_stream_map)
 
-        adaptive_fmts = params.get('adaptive_fmts', '')
+        adaptive_fmts = params.get('adaptive_fmts', player_args.get('adaptive_fmts', ''))
         if adaptive_fmts:
             adaptive_fmts = adaptive_fmts.split(',')
             parse_to_stream_list(adaptive_fmts)
