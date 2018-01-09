@@ -198,6 +198,18 @@ class VideoInfo(object):
                 'sort': [72, 0],
                 'video': {'height': 72, 'encoding': 'h.264'},
                 'audio': {'bitrate': 24, 'encoding': 'aac'}},
+        '300': {'container': 'ts',
+                'Live': True,
+                'title': 'Live@720p',
+                'sort': [720, 0],
+                'video': {'height': 720, 'encoding': 'h.264'},
+                'audio': {'bitrate': 128, 'encoding': 'aac'}},
+        '301': {'container': 'ts',
+                'Live': True,
+                'title': 'Live@1080p',
+                'sort': [1080, 0],
+                'video': {'height': 1080, 'encoding': 'h.264'},
+                'audio': {'bitrate': 128, 'encoding': 'aac'}},
         # === DASH (video only)
         '133': {'container': 'mp4',
                 'dash/video': True,
@@ -486,7 +498,8 @@ class VideoInfo(object):
                     itag = re_itag_match.group('itag')
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:
-                        raise Exception('unknown yt_format for itag "%s"' % itag)
+                        self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                        continue
 
                     width = int(re_match.group('width'))
                     height = int(re_match.group('height'))
@@ -647,7 +660,8 @@ class VideoInfo(object):
                     itag = stream_map['itag']
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:
-                        raise Exception('unknown yt_format for itag "%s"' % itag)
+                        self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                        continue
 
                     if yt_format.get('discontinued', False) or yt_format.get('unsupported', False) or \
                             (yt_format.get('dash/video', False) and not yt_format.get('dash/audio', False)):
@@ -662,7 +676,8 @@ class VideoInfo(object):
                     itag = stream_map['itag']
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:
-                        raise Exception('unknown yt_format for itag "%s"' % itag)
+                        self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                        continue
 
                     video_stream = {'url': url,
                                     'meta': meta_info}
