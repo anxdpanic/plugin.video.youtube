@@ -510,7 +510,6 @@ class VideoInfo(object):
         params = {'hl': self.language,
                   'gl': self.region,
                   'ssl_stream': '1',
-                  'el': 'default',
                   'html5': '1'}
 
         if player_config is None:
