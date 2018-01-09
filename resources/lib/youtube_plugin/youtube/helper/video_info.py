@@ -588,8 +588,7 @@ class VideoInfo(object):
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
         if (params.get('status', '') == 'fail') or (playability_status.get('status', 'ok').lower() != 'ok'):
-            if (not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()) and
-                    not ((playability_status.get('status', 'ok').lower() == 'content_check_required') and self._context.get_settings().offensive_content())):
+            if not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()):
                 reason = params.get('reason')
                 if not reason:
                     reason = playability_status.get('reason')
