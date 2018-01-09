@@ -437,21 +437,23 @@ class VideoInfo(object):
         if 'args' not in player_config:
             player_config['args'] = dict()
 
-        if 'player_response' not in player_config['args']:
-            player_config['args']['player_response'] = dict()
-
-        if isinstance(player_config.get('args', {}).get('player_response'), basestring):
+        player_response = player_config['args'].get('player_response', dict())
+        if isinstance(player_response, basestring):
             try:
-                player_config['args']['player_response'] = json.loads(player_config['args']['player_response'])
+                player_response = json.loads(player_response)
             except TypeError:
-                player_config['args']['player_response'] = dict()
+                player_response = dict()
+
+        player_config['args']['player_response'] = dict()
 
         result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
         if result:
             try:
-                player_config['args']['player_response'].update(json.loads(result.group('player_response')))
+                player_config['args']['player_response'] = json.loads(result.group('player_response'))
             except TypeError:
                 pass
+
+        player_config['args']['player_response'].update(player_response)
 
         return player_config
 
@@ -586,8 +588,7 @@ class VideoInfo(object):
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
         if (params.get('status', '') == 'fail') or (playability_status.get('status', 'ok').lower() != 'ok'):
-            if (not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()) and
-                    not ((playability_status.get('status', 'ok').lower() == 'content_check_required') and self._context.get_settings().offensive_content())):
+            if not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()):
                 reason = params.get('reason')
                 if not reason:
                     reason = playability_status.get('reason')
@@ -602,7 +603,7 @@ class VideoInfo(object):
             if url:
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info)
 
-        mpd_url = params.get('dashmpd', '')
+        mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
@@ -670,12 +671,12 @@ class VideoInfo(object):
                         stream_list.append(video_stream)
 
         # extract streams from map
-        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', '')
+        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', player_args.get('url_encoded_fmt_stream_map', ''))
         if url_encoded_fmt_stream_map:
             url_encoded_fmt_stream_map = url_encoded_fmt_stream_map.split(',')
             parse_to_stream_list(url_encoded_fmt_stream_map)
 
-        adaptive_fmts = params.get('adaptive_fmts', '')
+        adaptive_fmts = params.get('adaptive_fmts', player_args.get('adaptive_fmts', ''))
         if adaptive_fmts:
             adaptive_fmts = adaptive_fmts.split(',')
             parse_to_stream_list(adaptive_fmts)
