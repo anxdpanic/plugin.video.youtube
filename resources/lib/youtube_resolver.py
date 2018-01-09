@@ -60,21 +60,23 @@ def get_player_config(client, url):
     if 'args' not in player_config:
         player_config['args'] = dict()
 
-    if 'player_response' not in player_config['args']:
-        player_config['args']['player_response'] = dict()
-
-    if isinstance(player_config.get('args', {}).get('player_response'), basestring):
+    player_response = player_config['args'].get('player_response', dict())
+    if isinstance(player_response, basestring):
         try:
-            player_config['args']['player_response'] = json.loads(player_config['args']['player_response'])
+            player_response = json.loads(player_response)
         except TypeError:
-            player_config['args']['player_response'] = dict()
+            player_response = dict()
+
+    player_config['args']['player_response'] = dict()
 
     result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
     if result:
         try:
-            player_config['args']['player_response'].update(json.loads(result.group('player_response')))
+            player_config['args']['player_response'] = json.loads(result.group('player_response'))
         except TypeError:
             pass
+
+    player_config['args']['player_response'].update(player_response)
 
     return player_config
 
