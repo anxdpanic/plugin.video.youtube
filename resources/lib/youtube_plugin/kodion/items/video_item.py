@@ -29,6 +29,7 @@ class VideoItem(BaseItem):
         self._uses_dash = None
         self._mediatype = None
         self.subtitles = None
+        self._headers = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count)
@@ -188,3 +189,9 @@ class VideoItem(BaseItem):
 
     def set_subtitles(self, value):
         self.subtitles = value if value and isinstance(value, list) else None
+
+    def set_headers(self, value):
+        self._headers = value
+
+    def get_headers(self):
+        return self._headers
