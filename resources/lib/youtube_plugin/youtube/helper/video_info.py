@@ -396,8 +396,8 @@ class VideoInfo(object):
         self.region = context.get_settings().get_string('youtube.region', 'US')
         self._access_token = access_token
 
-    def load_stream_infos(self, video_id=None, player_config=None):
-        return self._method_get_video_info(video_id, player_config)
+    def load_stream_infos(self, video_id=None, player_config=None, cookies=None):
+        return self._method_get_video_info(video_id, player_config, cookies)
 
     def get_watch_page(self, video_id):
         headers = {'Host': 'www.youtube.com',
@@ -419,7 +419,7 @@ class VideoInfo(object):
         url = 'https://www.youtube.com/watch'
 
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        return result.text
+        return {'html': result.text, 'cookies': result.cookies}
 
     def get_player_config(self, html):
         _player_config = '{}'
@@ -469,7 +469,7 @@ class VideoInfo(object):
 
         return player_config
 
-    def _load_manifest(self, url, video_id, meta_info=None):
+    def _load_manifest(self, url, video_id, meta_info=None, curl_headers=''):
         headers = {'Host': 'manifest.googlevideo.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -504,12 +504,14 @@ class VideoInfo(object):
                     width = int(re_match.group('width'))
                     height = int(re_match.group('height'))
                     video_stream = {'url': line,
-                                    'meta': meta_info}
+                                    'meta': meta_info,
+                                    'headers': curl_headers
+                    }
                     video_stream.update(yt_format)
                     streams.append(video_stream)
         return streams
 
-    def _method_get_video_info(self, video_id=None, player_config=None):
+    def _method_get_video_info(self, video_id=None, player_config=None, cookies=None):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -528,8 +530,21 @@ class VideoInfo(object):
                   'html5': '1'}
 
         if player_config is None:
-            html = self.get_watch_page(video_id)
+            watch_page_result = self.get_watch_page(video_id)
+            html = watch_page_result.get('html')
+            cookies = watch_page_result.get('cookies')
             player_config = self.get_player_config(html)
+
+        curl_headers = ''
+        if cookies:
+            cookies_list = list()
+            for c in cookies:
+                cookies_list.append('{0}={1};'.format(c.name, c.value))
+            if cookies_list:
+                curl_headers = 'Cookie={cookies}'\
+                    .format(cookies=urllib.quote(' '.join(cookies_list)))
+        else:
+            cookies = dict()
 
         player_assets = player_config.get('assets', {})
         player_args = player_config.get('args', {})
@@ -567,7 +582,7 @@ class VideoInfo(object):
 
         url = 'https://www.youtube.com/get_video_info'
 
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        result = requests.get(url, params=params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
 
         stream_list = []
 
@@ -614,7 +629,7 @@ class VideoInfo(object):
         if params.get('live_playback', '0') == '1':
             url = params.get('hlsvp', '')
             if url:
-                stream_list = self._load_manifest(url, video_id, meta_info=meta_info)
+                stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
 
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
@@ -632,7 +647,8 @@ class VideoInfo(object):
                     raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
                 video_stream = {'url': mpd_url,
-                                'meta': meta_info}
+                                'meta': meta_info,
+                                'headers': curl_headers}
                 if params.get('live_playback', '0') == '1':
                     video_stream['url'] += '&start_seq=$START_NUMBER$'
                     video_stream.update(self.FORMAT.get('9998'))
@@ -668,7 +684,8 @@ class VideoInfo(object):
                         continue
 
                     video_stream = {'url': url,
-                                    'meta': meta_info}
+                                    'meta': meta_info,
+                                    'headers': curl_headers}
                     video_stream.update(yt_format)
                     stream_list.append(video_stream)
                 elif conn:
@@ -680,7 +697,8 @@ class VideoInfo(object):
                         continue
 
                     video_stream = {'url': url,
-                                    'meta': meta_info}
+                                    'meta': meta_info,
+                                    'headers': curl_headers}
                     video_stream.update(yt_format)
                     if video_stream:
                         stream_list.append(video_stream)
