@@ -183,6 +183,9 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         # set the title
         video_item.set_title(snippet['title'])
 
+        if not video_item.use_dash() and video_item.get_headers() and video_item.get_uri().startswith('http'):
+            video_item.set_uri(video_item.get_uri() + '|' + video_item.get_headers())
+
         """
         This is experimental. We try to get the most information out of the title of a video.
         This is not based on any language. In some cases this won't work at all.
