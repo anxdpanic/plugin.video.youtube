@@ -714,6 +714,79 @@ class VideoInfo(object):
             adaptive_fmts = adaptive_fmts.split(',')
             parse_to_stream_list(adaptive_fmts)
 
+
+
+
+        duration = params.get('length_seconds')
+        fmts_list = params.get('adaptive_fmts').split(',')
+        data = {}
+        for item in fmts_list:
+            stream_map = dict(urlparse.parse_qsl(item))
+
+            t = stream_map.get('type')
+            t = urllib.unquote(t).decode('utf8')
+            t = t.split(';')
+            mime = t[0]
+            i = stream_map.get('itag')
+            if not data.has_key(mime):
+                data[mime] = {}
+            data[mime][i] = {}
+
+            data[mime][i]['codecs'] = t[1][1:]
+            data[mime][i]['id'] = i
+
+            s = stream_map.get('size')
+            if s:
+                s=s.split('x')
+                data[mime][i]['width'] = s[0]
+                data[mime][i]['height'] = s[1]
+
+            data[mime][i]['bandwidth'] = stream_map.get('bitrate')
+            data[mime][i]['frameRate'] = stream_map.get('fps')
+
+            url = urllib.unquote(stream_map.get('url')).decode('utf8')
+            url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+            data[mime][i]['baseUrl'] = url
+
+            data[mime][i]['indexRange'] = stream_map.get('index')
+            data[mime][i]['init'] = stream_map.get('init')
+
+
+
+        out = '<?xml version="1.0" encoding="UTF-8"?>' + \
+        '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" ' + \
+        'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" ' + \
+        'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration +'S" type="static" availabilityStartTime="2001-12-17T09:40:57Z" profiles="urn:mpeg:dash:profile:isoff-main:2011">'
+        out += '<Period start="PT0S" duration="PT' + duration +'S">\n'
+
+        n = 0
+        for mime in data:
+            out += '<AdaptationSet id="' + str(n) + '" mimeType="' + mime + '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true">\n'
+            out += '<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n'
+            for i in data[mime]:
+                if 'audio' in mime:
+                    out += '<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
+                        ' bandwidth="' + data[mime][i]['bandwidth'] + \
+                        '">\n'
+                    out += '<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n'
+                else:
+                    out += '<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
+                        ' startWithSAP="1" bandwidth="' + data[mime][i]['bandwidth'] + \
+                        '" width="' + data[mime][i]['width'] + '" height="' + data[mime][i]['height'] + \
+                        '" frameRate="' + data[mime][i]['frameRate'] + '">\n'
+
+                out += '<BaseURL>' + data[mime][i]['baseUrl'] + '</BaseURL>\n'
+                out += '<SegmentBase indexRange="' + data[mime][i]['indexRange'] + '">\n' + \
+                '<Initialization range="' + data[mime][i]['init'] + '" />\n' + \
+                '</SegmentBase>\n'
+                out += '</Representation>\n'
+            out += '</AdaptationSet>\n'
+            n = n + 1
+        out += '</Period></MPD>\n'
+
+        with open('out.mpd', 'w') as the_file:
+            the_file.write(out)
+
         # last fallback
         if not stream_list:
             raise YouTubeException('No streams found')
