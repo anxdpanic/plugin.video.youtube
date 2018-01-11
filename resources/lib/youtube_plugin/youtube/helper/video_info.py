@@ -10,6 +10,9 @@ from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from subtitles import Subtitles
 
+import xbmc
+import xbmcvfs
+
 
 class VideoInfo(object):
     FORMAT = {
@@ -632,19 +635,22 @@ class VideoInfo(object):
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
 
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
+        if not mpd_url and params.get('live_playback', '0') == '0':
+            mpd_url = self.generate_mpd(video_id, params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')), params.get('length_seconds', '0'), cipher)
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
-            if (use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url)) and (not re.search('/signature/[0-9A-F\.]+', mpd_url)):
-                mpd_sig_deciphered = False
-                if cipher:
-                    sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
-                    if sig:
-                        signature = cipher.get_signature(sig.group('sig'))
-                        mpd_url = re.sub('/s/[0-9A-F\.]+', '/signature/' + signature, mpd_url)
-                        mpd_sig_deciphered = True
-                else:
-                    raise YouTubeException('Cipher: Not Found')
+            if mpd_url.startswith('http'):
+                if (use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url)) and (not re.search('/signature/[0-9A-F\.]+', mpd_url)):
+                    mpd_sig_deciphered = False
+                    if cipher:
+                        sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
+                        if sig:
+                            signature = cipher.get_signature(sig.group('sig'))
+                            mpd_url = re.sub('/s/[0-9A-F\.]+', '/signature/' + signature, mpd_url)
+                            mpd_sig_deciphered = True
+                    else:
+                        raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info,
@@ -714,11 +720,14 @@ class VideoInfo(object):
             adaptive_fmts = adaptive_fmts.split(',')
             parse_to_stream_list(adaptive_fmts)
 
+        # last fallback
+        if not stream_list:
+            raise YouTubeException('No streams found')
 
+        return stream_list
 
-
-        duration = params.get('length_seconds')
-        fmts_list = params.get('adaptive_fmts').split(',')
+    def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
+        fmts_list = adaptive_fmts.split(',')
         data = {}
         for item in fmts_list:
             stream_map = dict(urlparse.parse_qsl(item))
@@ -737,7 +746,7 @@ class VideoInfo(object):
 
             s = stream_map.get('size')
             if s:
-                s=s.split('x')
+                s = s.split('x')
                 data[mime][i]['width'] = s[0]
                 data[mime][i]['height'] = s[1]
 
@@ -745,19 +754,26 @@ class VideoInfo(object):
             data[mime][i]['frameRate'] = stream_map.get('fps')
 
             url = urllib.unquote(stream_map.get('url')).decode('utf8')
+
+            if 'sig' in stream_map:
+                url += '&signature=%s' % stream_map['sig']
+            elif 's' in stream_map:
+                if cipher:
+                    url += '&signature=%s' % cipher.get_signature(stream_map['s'])
+                else:
+                    raise YouTubeException('Cipher: Not Found')
+
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
             data[mime][i]['baseUrl'] = url
 
             data[mime][i]['indexRange'] = stream_map.get('index')
             data[mime][i]['init'] = stream_map.get('init')
 
-
-
         out = '<?xml version="1.0" encoding="UTF-8"?>' + \
-        '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" ' + \
-        'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" ' + \
-        'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration +'S" type="static" availabilityStartTime="2001-12-17T09:40:57Z" profiles="urn:mpeg:dash:profile:isoff-main:2011">'
-        out += '<Period start="PT0S" duration="PT' + duration +'S">\n'
+              '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" ' + \
+              'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" ' + \
+              'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration + 'S" type="static" availabilityStartTime="2001-12-17T09:40:57Z" profiles="urn:mpeg:dash:profile:isoff-main:2011">'
+        out += '<Period start="PT0S" duration="PT' + duration + 'S">\n'
 
         n = 0
         for mime in data:
@@ -766,29 +782,29 @@ class VideoInfo(object):
             for i in data[mime]:
                 if 'audio' in mime:
                     out += '<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
-                        ' bandwidth="' + data[mime][i]['bandwidth'] + \
-                        '">\n'
+                           ' bandwidth="' + data[mime][i]['bandwidth'] + \
+                           '">\n'
                     out += '<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n'
                 else:
                     out += '<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
-                        ' startWithSAP="1" bandwidth="' + data[mime][i]['bandwidth'] + \
-                        '" width="' + data[mime][i]['width'] + '" height="' + data[mime][i]['height'] + \
-                        '" frameRate="' + data[mime][i]['frameRate'] + '">\n'
+                           ' startWithSAP="1" bandwidth="' + data[mime][i]['bandwidth'] + \
+                           '" width="' + data[mime][i]['width'] + '" height="' + data[mime][i]['height'] + \
+                           '" frameRate="' + data[mime][i]['frameRate'] + '">\n'
 
                 out += '<BaseURL>' + data[mime][i]['baseUrl'] + '</BaseURL>\n'
                 out += '<SegmentBase indexRange="' + data[mime][i]['indexRange'] + '">\n' + \
-                '<Initialization range="' + data[mime][i]['init'] + '" />\n' + \
-                '</SegmentBase>\n'
+                       '<Initialization range="' + data[mime][i]['init'] + '" />\n' + \
+                       '</SegmentBase>\n'
                 out += '</Representation>\n'
             out += '</AdaptationSet>\n'
             n = n + 1
         out += '</Period></MPD>\n'
 
-        with open('out.mpd', 'w') as the_file:
-            the_file.write(out)
-
-        # last fallback
-        if not stream_list:
-            raise YouTubeException('No streams found')
-
-        return stream_list
+        filepath = 'special://temp/temp/{video_id}.mpd'.format(video_id=video_id)
+        try:
+            f = xbmcvfs.File(filepath, 'w')
+            f.write(out.encode('utf-8'))
+            f.close()
+            return xbmc.translatePath(filepath)
+        except:
+            return None
