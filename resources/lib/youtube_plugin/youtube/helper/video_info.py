@@ -527,10 +527,10 @@ class VideoInfo(object):
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
-        params = {'hl': self.language,
-                  'gl': self.region,
-                  'ssl_stream': '1',
-                  'html5': '1'}
+        http_params = {'hl': self.language,
+                       'gl': self.region,
+                       'ssl_stream': '1',
+                       'html5': '1'}
 
         if player_config is None:
             watch_page_result = self.get_watch_page(video_id)
@@ -561,8 +561,8 @@ class VideoInfo(object):
                 video_id = player_args['video_id']
 
         if video_id:
-            params['video_id'] = video_id
-            params['eurl'] = 'https://youtube.googleapis.com/v/' + video_id
+            http_params['video_id'] = video_id
+            http_params['eurl'] = 'https://youtube.googleapis.com/v/' + video_id
         else:
             raise YouTubeException('_method_get_video_info: no video_id')
 
@@ -573,24 +573,30 @@ class VideoInfo(object):
             self._context.log_debug('Cipher: js player: |%s|' % js)
             cipher = Cipher(self._context, java_script_url=js)
 
-        params['sts'] = player_config.get('sts', '')
+        http_params['sts'] = player_config.get('sts', '')
 
-        params['c'] = player_args.get('c', 'WEB')
-        params['cver'] = player_args.get('cver', '1.20170712')
-        params['cplayer'] = player_args.get('cplayer', 'UNIPLAYER')
-        params['cbr'] = player_args.get('cbr', 'Chrome')
-        params['cbrver'] = player_args.get('cbrver', '53.0.2785.143')
-        params['cos'] = player_args.get('cos', 'Windows')
-        params['cosver'] = player_args.get('cosver', '10.0')
+        http_params['c'] = player_args.get('c', 'WEB')
+        http_params['cver'] = player_args.get('cver', '1.20170712')
+        http_params['cplayer'] = player_args.get('cplayer', 'UNIPLAYER')
+        http_params['cbr'] = player_args.get('cbr', 'Chrome')
+        http_params['cbrver'] = player_args.get('cbrver', '53.0.2785.143')
+        http_params['cos'] = player_args.get('cos', 'Windows')
+        http_params['cosver'] = player_args.get('cosver', '10.0')
 
         url = 'https://www.youtube.com/get_video_info'
 
-        result = requests.get(url, params=params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
+        el_values = ['detailpage', 'embedded']
+        params = dict()
+
+        for el in el_values:
+            http_params['el'] = el
+            result = requests.get(url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
+            data = result.text
+            params = dict(urlparse.parse_qsl(data))
+            if params.get('url_encoded_fmt_stream_map'):
+                break
 
         stream_list = []
-
-        data = result.text
-        params = dict(urlparse.parse_qsl(data))
 
         meta_info = {'video': {},
                      'channel': {},
