@@ -177,7 +177,7 @@ class VideoItem(BaseItem):
         self._uses_dash = value
 
     def use_dash(self):
-        return self._uses_dash is True and 'manifest/dash' in self.get_uri()
+        return self._uses_dash is True and ('manifest/dash' in self.get_uri() or self.get_uri().endswith('.mpd'))
 
     def set_mediatype(self, mediatype):
         self._mediatype = mediatype

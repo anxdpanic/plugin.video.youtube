@@ -7,10 +7,6 @@
         <setting id="kodion.video.quality" type="enum" label="30010" enable="eq(2,false)" lvalues="30016|30017|30011|30012|30018" default="3"/>
         <setting id="kodion.audio_only" type="bool" label="30607" enable="eq(1,false)" default="false"/>
         <setting id="kodion.video.quality.ask" type="bool" label="30009" default="false"/>
-        <setting id="kodion.video.support.mpd.builtin" type="bool" label="" visible="false" enable="true" default="false"/>
-        <setting id="kodion.video.support.mpd.addon" type="bool" label="" visible="false" enable="true" default="false"/>
-        <setting id="kodion.video.quality.mpd" type="bool" label="30007" default="false" enable="eq(-1,true)|eq(-2,true)"/>
-        <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)+eq(-2,true)" visible="eq(-1,true)+eq(-2,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
         <setting id="kodion.subtitle.configure" type="action" label="30600" enable="true" visible="true" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/subtitles/)"/>
         <setting id="kodion.subtitle.languages.num" type="number" value="0" visible="false"/>
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
@@ -24,7 +20,15 @@
         <setting id="kodion.safe.search" type="enum" label="30594" lvalues="30595|30561|30596" default="0" />
         <setting id="kodion.age.gate" type="bool" label="30603" default="true"/>
     </category>
-
+    <category label="30617">
+        <setting id="kodion.video.support.mpd.builtin" type="bool" label="" visible="false" enable="true" default="false"/>
+        <setting id="kodion.video.support.mpd.addon" type="bool" label="" visible="false" enable="true" default="false"/>
+        <setting id="kodion.video.quality.mpd" type="bool" label="30007" default="false" enable="eq(-1,true)|eq(-2,true)"/>
+        <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)+eq(-2,true)" visible="eq(-1,true)+eq(-2,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
+        <setting type="lsep" label="30621" visible="eq(-2,true)"/>
+        <setting id="kodion.mpd.proxy" type="bool" label="30618" default="false" enable="eq(-3,true)" visible="eq(-3,true)"/>
+        <setting id="kodion.mpd.proxy.port" type="number" label="30619" default="50152" enable="eq(-4,true)" visible="eq(-4,true)"/>
+    </category>
     <category label="30516">
         <setting id="youtube.folder.sign.in.show" type="bool" label="30111" default="true"/>
         <setting id="youtube.folder.my_subscriptions.show" type="bool" label="30510" default="true"/>

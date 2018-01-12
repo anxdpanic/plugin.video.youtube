@@ -123,3 +123,9 @@ class AbstractSettings(object):
 
     def allow_dev_keys(self):
         return self.get_bool(constants.setting.ALLOW_DEV_KEYS, True)
+
+    def use_dash_proxy(self):
+        return self.get_bool(constants.setting.DASH_PROXY, True)
+
+    def dash_proxy_port(self):
+        return self.get_int(constants.setting.DASH_PROXY_PORT, 50152)
