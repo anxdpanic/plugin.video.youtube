@@ -752,20 +752,20 @@ msgstr "Πρέπει να είστε συνδεδεμένοι"
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Ενεργοποίηση μεσολαβητή mpeg-dash"
 
 msgctxt "#30619"
 msgid "Proxy port"
-msgstr ""
+msgstr "Θύρα μεσολαβητή"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start proxy server."
-msgstr ""
+msgstr "Η θύρα %s χρησιμοποιείται ήδη. Αδυναμία έναρξης μεσολαβητή."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr ""
+msgstr "Ο μεσολαβητής απαιτείται για την αναπαραγωγή mpeg-dash"
