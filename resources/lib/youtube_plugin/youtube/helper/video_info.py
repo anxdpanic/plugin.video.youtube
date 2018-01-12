@@ -6,11 +6,11 @@ import re
 import json
 
 import requests
+from ...kodion.utils.dash_proxy import proxy_is_live
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from subtitles import Subtitles
 
-import xbmc
 import xbmcvfs
 
 
@@ -635,7 +635,9 @@ class VideoInfo(object):
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
 
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
-        if not mpd_url and params.get('live_playback', '0') == '0':
+        if not mpd_url and params.get('live_playback', '0') == '0' and \
+                self._context.get_settings().use_dash_proxy() and \
+                proxy_is_live(port=self._context.get_settings().dash_proxy_port()):
             mpd_url = self.generate_mpd(video_id, params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')), params.get('length_seconds', '0'), cipher)
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
@@ -805,6 +807,6 @@ class VideoInfo(object):
             f = xbmcvfs.File(filepath, 'w')
             f.write(out.encode('utf-8'))
             f.close()
-            return xbmc.translatePath(filepath)
+            return 'http://127.0.0.1:{port}/{video_id}.mpd'.format(port=self._context.get_settings().dash_proxy_port(), video_id=video_id)
         except:
             return None

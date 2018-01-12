@@ -750,3 +750,19 @@ msgstr ""
 msgctxt "#30616"
 msgid "Must be signed in."
 msgstr ""
+
+msgctxt "#30617"
+msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30618"
+msgid "Enable mpeg-dash proxy (required for vods)"
+msgstr ""
+
+msgctxt "#30619"
+msgid "Proxy port"
+msgstr ""
+
+msgctxt "#30620"
+msgid "Port %s already in use. Cannot start proxy server."
+msgstr ""
