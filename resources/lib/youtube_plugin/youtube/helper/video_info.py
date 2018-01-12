@@ -729,6 +729,7 @@ class VideoInfo(object):
         return stream_list
 
     def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
+        supported_mime_types = ['audio/mp4', 'video/mp4']
         fmts_list = adaptive_fmts.split(',')
         data = {}
         for item in fmts_list:
@@ -771,36 +772,37 @@ class VideoInfo(object):
             data[mime][i]['indexRange'] = stream_map.get('index')
             data[mime][i]['init'] = stream_map.get('init')
 
-        out = '<?xml version="1.0" encoding="UTF-8"?>' + \
+        out = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
               '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" ' + \
               'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" ' + \
-              'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration + 'S" type="static" availabilityStartTime="2001-12-17T09:40:57Z" profiles="urn:mpeg:dash:profile:isoff-main:2011">'
-        out += '<Period start="PT0S" duration="PT' + duration + 'S">\n'
+              'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration + 'S" type="static" availabilityStartTime="2001-12-17T09:40:57Z" profiles="urn:mpeg:dash:profile:isoff-main:2011">\n'
+        out += '\t<Period>\n'
 
         n = 0
         for mime in data:
-            out += '<AdaptationSet id="' + str(n) + '" mimeType="' + mime + '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true">\n'
-            out += '<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n'
-            for i in data[mime]:
-                if 'audio' in mime:
-                    out += '<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
-                           ' bandwidth="' + data[mime][i]['bandwidth'] + \
-                           '">\n'
-                    out += '<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n'
-                else:
-                    out += '<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
-                           ' startWithSAP="1" bandwidth="' + data[mime][i]['bandwidth'] + \
-                           '" width="' + data[mime][i]['width'] + '" height="' + data[mime][i]['height'] + \
-                           '" frameRate="' + data[mime][i]['frameRate'] + '">\n'
+            if mime in supported_mime_types :
+                out += '\t\t<AdaptationSet id="' + str(n) + '" mimeType="' + mime + '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true">\n'
+                out += '\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n'
+                for i in data[mime]:
+                    if 'audio' in mime:
+                        out += '\t\t\t<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
+                               ' bandwidth="' + data[mime][i]['bandwidth'] + \
+                               '">\n'
+                        out += '\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n'
+                    else:
+                        out += '\t\t\t<Representation id="' + i + '" ' + data[mime][i]['codecs'] + \
+                               ' startWithSAP="1" bandwidth="' + data[mime][i]['bandwidth'] + \
+                               '" width="' + data[mime][i]['width'] + '" height="' + data[mime][i]['height'] + \
+                               '" frameRate="' + data[mime][i]['frameRate'] + '">\n'
 
-                out += '<BaseURL>' + data[mime][i]['baseUrl'] + '</BaseURL>\n'
-                out += '<SegmentBase indexRange="' + data[mime][i]['indexRange'] + '">\n' + \
-                       '<Initialization range="' + data[mime][i]['init'] + '" />\n' + \
-                       '</SegmentBase>\n'
-                out += '</Representation>\n'
-            out += '</AdaptationSet>\n'
+                    out += '\t\t\t\t<BaseURL>' + data[mime][i]['baseUrl'] + '</BaseURL>\n'
+                    out += '\t\t\t\t<SegmentBase indexRange="' + data[mime][i]['indexRange'] + '">\n' + \
+                           '\t\t\t\t\t\t<Initialization range="' + data[mime][i]['init'] + '" />\n' + \
+                           '\t\t\t\t</SegmentBase>\n'
+                    out += '\t\t\t</Representation>\n'
+                out += '\t\t</AdaptationSet>\n'
             n = n + 1
-        out += '</Period></MPD>\n'
+        out += '\t</Period>\n</MPD>\n'
 
         filepath = 'special://temp/temp/{video_id}.mpd'.format(video_id=video_id)
         try:
