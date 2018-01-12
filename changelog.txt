@@ -8,6 +8,8 @@
     - incognito doesn't add to search history or run post play events (add to watch history)
 [add] quick search to channels (no history)
 [add] Live folder to channels
+[fix] mpeg-dash vods, proxy required Settings - MPEG-DASH
+    - Thanks to Schtek for generating the needed mpd file
 [fix/upd] use select dialog for subtitle settings
     - [add] Configure subtitles to Settings -> General
     - [add] Current language with No auto-generated subtitles option
