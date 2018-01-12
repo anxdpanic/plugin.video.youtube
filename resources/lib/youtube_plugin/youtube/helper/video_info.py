@@ -593,7 +593,7 @@ class VideoInfo(object):
             result = requests.get(url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urlparse.parse_qsl(data))
-            if params.get('url_encoded_fmt_stream_map'):
+            if params.get('url_encoded_fmt_stream_map') or params.get('live_playback', '0') == '1':
                 break
 
         stream_list = []
