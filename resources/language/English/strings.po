@@ -756,7 +756,7 @@ msgid "MPEG-DASH"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy (required for vods)"
+msgid "Enable mpeg-dash proxy"
 msgstr ""
 
 msgctxt "#30619"
@@ -765,4 +765,8 @@ msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start proxy server."
+msgstr ""
+
+msgctxt "#30621"
+msgid "Proxy is required for mpeg-dash vods"
 msgstr ""
