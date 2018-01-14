@@ -28,7 +28,11 @@ class YouTubeMonitor(xbmc.Monitor):
     def proxy_port(self):
         return int(self._proxy_port)
 
-    def proxy_port_changed(self):
-        changed = self._old_proxy_port != self._proxy_port
+    def old_proxy_port(self):
+        return int(self._old_proxy_port)
+
+    def proxy_port_sync(self):
         self._old_proxy_port = self._proxy_port
-        return changed
+
+    def proxy_port_changed(self):
+        return self._old_proxy_port != self._proxy_port
