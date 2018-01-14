@@ -800,7 +800,7 @@ class VideoInfo(object):
 
         n = 0
         for mime in data:
-            if mime in supported_mime_types :
+            if mime in supported_mime_types:
                 out += '\t\t<AdaptationSet id="' + str(n) + '" mimeType="' + mime + '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true">\n'
                 out += '\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n'
                 for i in data[mime]:
