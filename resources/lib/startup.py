@@ -81,17 +81,20 @@ if mpd_addon or mpd_builtin:
 
             if use_proxy:
                 if dash_proxy is None:
-                    context.log_debug('DashProxy: Starting |{port}|'.format(port=proxy_port))
+                    context.log_debug('DashProxy: Starting |{port}|'.format(port=str(proxy_port)))
+                    monitor.proxy_port_sync()
                     dash_proxy = get_proxy_server(port=proxy_port)
                     if dash_proxy:
                         proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
                         proxy_thread.daemon = True
                         proxy_thread.start()
                 elif dash_proxy and monitor.proxy_port_changed():
-                    context.log_debug('DashProxy: Port changed, restarting... |{port}|'.format(port=proxy_port))
+                    context.log_debug('DashProxy: Port changed, restarting... |{old_port}| -> |{port}|'
+                                      .format(old_port=str(monitor.old_proxy_port()), port=str(proxy_port)))
                     dash_proxy.shutdown()
                     proxy_thread.join()
                     proxy_thread = None
+                    monitor.proxy_port_sync()
                     dash_proxy = get_proxy_server(port=proxy_port)
                     if dash_proxy:
                         proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
@@ -99,7 +102,8 @@ if mpd_addon or mpd_builtin:
                         proxy_thread.start()
             else:
                 if dash_proxy is not None:
-                    context.log_debug('DashProxy: Shutting down |{port}|'.format(port=proxy_port))
+                    context.log_debug('DashProxy: Shutting down |{port}|'.format(port=str(monitor.old_proxy_port())))
+                    monitor.proxy_port_sync()
                     dash_proxy.shutdown()
                     proxy_thread.join()
                     proxy_thread = None
@@ -113,10 +117,12 @@ if mpd_addon or mpd_builtin:
 
             if dash_proxy:
                 if not is_proxy_live(port=proxy_port):
-                    context.log_debug('DashProxy: No response, restarting... |{port}|'.format(port=proxy_port))
+                    context.log_debug('DashProxy: Port changed, restarting... |{old_port}| -> |{port}|'
+                                      .format(old_port=str(monitor.old_proxy_port()), port=str(proxy_port)))
                     dash_proxy.shutdown()
                     proxy_thread.join()
                     proxy_thread = None
+                    monitor.proxy_port_sync()
                     dash_proxy = get_proxy_server(port=proxy_port)
                     if dash_proxy:
                         proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
