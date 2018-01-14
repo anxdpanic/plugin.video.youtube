@@ -6,10 +6,7 @@ import threading
 
 from youtube_plugin.kodion.impl import Context
 from youtube_plugin.kodion.constants import setting
-from youtube_plugin.kodion.utils import get_proxy_server, proxy_is_live
-
-import xbmc
-import xbmcaddon
+from youtube_plugin.kodion.utils import get_proxy_server, is_proxy_live, Monitor
 
 context = Context(plugin_id='plugin.video.youtube')
 
@@ -68,24 +65,19 @@ ping_timestamp = None
 first_run = True
 dash_proxy = None
 proxy_thread = None
-old_proxy_port = None
 
 if mpd_addon or mpd_builtin:
-    monitor = xbmc.Monitor()
+    monitor = Monitor()
     while not monitor.abortRequested():
 
         proxy_diff = get_stamp_diff(proxy_timestamp)
         ping_diff = get_stamp_diff(ping_timestamp)
 
-        if (ping_timestamp is None) or (ping_diff >= ping_delay_time) or \
-                (proxy_timestamp is None) or (proxy_diff >= proxy_delay_time):
-            addon = xbmcaddon.Addon('plugin.video.youtube')
-
         if (proxy_timestamp is None) or (proxy_diff >= proxy_delay_time):
             proxy_timestamp = str(datetime.now())
 
-            use_proxy = addon.getSetting('kodion.mpd.proxy') == 'true'
-            proxy_port = int(addon.getSetting('kodion.mpd.proxy.port'))
+            use_proxy = monitor.use_proxy()
+            proxy_port = monitor.proxy_port()
 
             if use_proxy:
                 if dash_proxy is None:
@@ -95,9 +87,11 @@ if mpd_addon or mpd_builtin:
                         proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
                         proxy_thread.daemon = True
                         proxy_thread.start()
-                elif dash_proxy and old_proxy_port != proxy_port:
-                    context.log_debug('DashProxy: Restarting |{port}|'.format(port=proxy_port))
+                elif dash_proxy and monitor.proxy_port_changed():
+                    context.log_debug('DashProxy: Port changed, restarting... |{port}|'.format(port=proxy_port))
                     dash_proxy.shutdown()
+                    proxy_thread.join()
+                    proxy_thread = None
                     dash_proxy = get_proxy_server(port=proxy_port)
                     if dash_proxy:
                         proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
@@ -107,20 +101,22 @@ if mpd_addon or mpd_builtin:
                 if dash_proxy is not None:
                     context.log_debug('DashProxy: Shutting down |{port}|'.format(port=proxy_port))
                     dash_proxy.shutdown()
+                    proxy_thread.join()
+                    proxy_thread = None
                     dash_proxy = None
-
-            old_proxy_port = proxy_port
 
         if (ping_timestamp is None) or (ping_diff >= ping_delay_time):
             ping_timestamp = str(datetime.now())
 
-            use_proxy = addon.getSetting('kodion.mpd.proxy') == 'true'
-            proxy_port = int(addon.getSetting('kodion.mpd.proxy.port'))
+            use_proxy = monitor.use_proxy()
+            proxy_port = monitor.proxy_port()
 
             if dash_proxy:
-                if not proxy_is_live(port=proxy_port):
-                    context.log_debug('DashProxy: Restarting |{port}|'.format(port=proxy_port))
+                if not is_proxy_live(port=proxy_port):
+                    context.log_debug('DashProxy: No response, restarting... |{port}|'.format(port=proxy_port))
                     dash_proxy.shutdown()
+                    proxy_thread.join()
+                    proxy_thread = None
                     dash_proxy = get_proxy_server(port=proxy_port)
                     if dash_proxy:
                         proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
@@ -133,4 +129,6 @@ if mpd_addon or mpd_builtin:
         if monitor.waitForAbort(sleep_time):
             if dash_proxy is not None:
                 dash_proxy.shutdown()
+            if proxy_thread is not None:
+                proxy_thread.join()
             break

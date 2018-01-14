@@ -53,7 +53,7 @@ def get_proxy_server(address=None, port=None):
         return None
 
 
-def proxy_is_live(address=None, port=None):
+def is_proxy_live(address=None, port=None):
     address = address if address else '127.0.0.1'
     port = int(port) if port else 50152
     url = 'http://{address}:{port}/ping'.format(address=address, port=port)
