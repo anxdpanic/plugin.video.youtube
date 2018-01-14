@@ -735,20 +735,20 @@ msgstr "Jelentkezzen be"
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Mpeg-dash proxy engedélyezése"
 
 msgctxt "#30619"
 msgid "Proxy port"
-msgstr ""
+msgstr "Proxy port"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start proxy server."
-msgstr ""
+msgstr "%s port használatban van. Nem lehet elindítani a proxy kiszolgálót."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr ""
+msgstr "Proxy szükséges az mpeg-dash formátumhoz"
