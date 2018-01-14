@@ -15,9 +15,14 @@ import xbmcvfs
 class DashProxyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
+        local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
+        if not self.client_address[0].startswith(local_ranges):
+            self.send_error(403)
+            return
+
         if self.path.endswith('.mpd'):
             file_path = 'special://temp/temp' + self.path
-            xbmc.log('[plugin.video.youtube] DashProxy: Request |{path}|'.format(path=self.path), xbmc.LOGDEBUG)
+            xbmc.log('[plugin.video.youtube] DashProxy: Request |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path), xbmc.LOGDEBUG)
             if xbmcvfs.exists(file_path):
                 f = xbmcvfs.File(file_path, 'r')
                 response = f.read()
@@ -27,7 +32,7 @@ class DashProxyHandler(BaseHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(response)
             else:
-                response = 'File Not Found: {proxy_path} | {file_path}'.format(proxy_path=self.path, file_path=file_path)
+                response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path)
                 self.send_error(404, response)
         elif self.path == '/ping':
             self.send_response(204)
