@@ -113,7 +113,10 @@ class Provider(kodion.AbstractProvider):
                  'youtube.failed.watch_later.retry': 30614,
                  'youtube.cancel': 30615,
                  'youtube.must.be.signed.in': 30616,
-                 'youtube.select.listen.ip': 30644
+                 'youtube.select.listen.ip': 30644,
+                 'youtube.purchases': 30622,
+                 'youtube.requires.krypton': 30624,
+                 'youtube.inputstreamhelper.is.installed': 30625
                  }
 
     def __init__(self):
@@ -839,6 +842,16 @@ class Provider(kodion.AbstractProvider):
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     else:
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
+        elif action == 'install':
+            if maint_type == 'inputstreamhelper':
+                if context.get_system_version().get_version()[0] >= 17:
+                    try:
+                        xbmcaddon.Addon('script.module.inputstreamhelper')
+                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.inputstreamhelper.is.installed']))
+                    except RuntimeError:
+                        context.execute('InstallAddon(script.module.inputstreamhelper)')
+                else:
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.requires.krypton']))
 
     @kodion.RegisterProviderPath('^/api/update/$')
     def api_key_update(self, context, re_match):
@@ -989,6 +1002,17 @@ class Provider(kodion.AbstractProvider):
                                                 image=context.create_resource_path('media', 'channel.png'))
                 my_channel_item.set_fanart(self.get_fanart(context))
                 result.append(my_channel_item)
+
+            # purchases
+            if settings.get_bool('youtube.folder.purchases.show', False) and \
+                    settings.use_dash() and \
+                    settings.dash_support_addon() and \
+                    'drm' in context.inputstream_adaptive_capabilities():
+                purchases_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.purchases']),
+                                               context.create_uri(['special', 'purchases']),
+                                               image=context.create_resource_path('media', 'popular.png'))
+                purchases_item.set_fanart(self.get_fanart(context))
+                result.append(purchases_item)
 
             # watch later
             if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True):

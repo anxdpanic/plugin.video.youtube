@@ -62,7 +62,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     return result
 
 
-def watch_history_to_items(provider, context, json_data):
+def tv_videos_to_items(provider, context, json_data):
     result = []
     video_id_dict = {}
 

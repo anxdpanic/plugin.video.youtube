@@ -11,6 +11,11 @@
 [add] screensaver=true parameter to /play route - no suggested videos, no post play events, don't ask for quality
 [add] play route for channel live streams
         - plugin://plugin.video.youtube/play/?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&live=1
+[add] Purchases
+        - requires inputstream.adaptive >= 2.0.14
+        - YouTube includes resolutions that are not available, to work around this;
+            - set InputStream Adaptive -> Settings -> Stream selection manual
+            - change video stream during playback to preferred working resolution
 [fix] search input, now works with Yatse
 [fix] Signature deciphering
 [fix] context menu after playback

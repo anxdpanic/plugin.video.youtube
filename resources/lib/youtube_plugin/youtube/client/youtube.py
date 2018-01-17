@@ -550,6 +550,119 @@ class YouTube(LoginClient):
 
         return _perform(_page_token=page_token, _offset=offset, _result=result)
 
+    def get_purchases(self, page_token, offset):
+        if not page_token:
+            page_token = ''
+
+        shelf_title = 'Purchases'
+
+        result = {'items': [],
+                  'next_page_token': page_token,
+                  'offset': offset}
+
+        def _perform(_page_token, _offset, _result, _shelf_index=None):
+            _post_data = {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5',
+                        'clientVersion': '5.20150304',
+                        'theme': 'CLASSIC',
+                        'acceptRegion': '%s' % self._region,
+                        'acceptLanguage': '%s' % self._language.replace('_', '-')
+                    },
+                    'user': {
+                        'enableSafetyMode': False
+                    }
+                }
+            }
+            if _page_token:
+                _post_data['continuation'] = _page_token
+            else:
+                _post_data['browseId'] = 'FEmy_youtube'
+
+            _json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=_post_data)
+
+            _data = {}
+            if 'continuationContents' in _json_data:
+                _data = _json_data.get('continuationContents', {}).get('horizontalListContinuation', {})
+            elif 'contents' in _json_data:
+                _contents = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+
+                if _shelf_index is None:
+                    _shelf_index = get_shelf_index_by_title(context, _json_data, shelf_title)
+
+                if _shelf_index is not None:
+                    _data = _contents[_shelf_index].get('shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
+
+            _items = _data.get('items', [])
+            if not _result:
+                _result = {'items': []}
+
+            _new_offset = self._max_results - len(_result['items']) + _offset
+            if _offset > 0:
+                _items = _items[_offset:]
+            _result['offset'] = _new_offset
+
+            for _item in _items:
+                _item = _item.get('gridVideoRenderer', {})
+                if _item:
+                    _video_item = {'id': _item['videoId'],
+                                   'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
+                                   'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
+                    _result['items'].append(_video_item)
+
+            _continuations = _data.get('continuations', [{}])[0].get('nextContinuationData', {}).get('continuation', '')
+            if _continuations and len(_result['items']) <= self._max_results:
+                _result['next_page_token'] = _continuations
+
+                if len(_result['items']) < self._max_results:
+                    _result = _perform(_page_token=_continuations, _offset=0, _result=_result, _shelf_index=shelf_index)
+
+            # trim result
+            if len(_result['items']) > self._max_results:
+                _items = _result['items']
+                _items = _items[:self._max_results]
+                _result['items'] = _items
+                _result['continue'] = True
+
+            if len(_result['items']) < self._max_results:
+                if 'continue' in _result:
+                    del _result['continue']
+
+                if 'next_page_token' in _result:
+                    del _result['next_page_token']
+
+                if 'offset' in _result:
+                    del _result['offset']
+
+            return _result
+
+        shelf_index = None
+        if self._language != 'en' and not self._language.startswith('en-') and not page_token:
+            #  shelf index is a moving target, make a request in english first to find the correct index by title
+            _en_post_data = {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5',
+                        'clientVersion': '5.20150304',
+                        'theme': 'CLASSIC',
+                        'acceptRegion': 'US',
+                        'acceptLanguage': 'en-US'
+                    },
+                    'user': {
+                        'enableSafetyMode': False
+                    }
+                },
+                'browseId': 'FEmy_youtube'
+            }
+
+            json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=_en_post_data)
+            shelf_index = get_shelf_index_by_title(context, json_data, shelf_title)
+
+        result = _perform(_page_token=page_token, _offset=offset, _result=result, _shelf_index=shelf_index)
+
+        return result
+
     def get_saved_playlists(self, page_token, offset):
         if not page_token:
             page_token = ''
