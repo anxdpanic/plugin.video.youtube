@@ -646,7 +646,7 @@ class Provider(kodion.AbstractProvider):
         if switch == 'youtube':
             context._addon.openSettings()
         elif switch == 'mpd':
-            use_dash = context.addon_enabled('inputstream.adaptive') or settings.dash_support_builtin()
+            use_dash = context.addon_enabled('inputstream.adaptive')
             if settings.dash_support_addon() and not use_dash:
                 if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.dash.enable.confirm'])):
                     use_dash = context.set_addon_enabled('inputstream.adaptive')
