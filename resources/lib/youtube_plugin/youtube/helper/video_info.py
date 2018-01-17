@@ -821,7 +821,7 @@ class VideoInfo(object):
                            '\t\t\t\t</SegmentBase>\n'
                     out += '\t\t\t</Representation>\n'
                 out += '\t\t</AdaptationSet>\n'
-            n = n + 1
+                n = n + 1
         out += '\t</Period>\n</MPD>\n'
 
         filepath = 'special://temp/temp/{video_id}.mpd'.format(video_id=video_id)
