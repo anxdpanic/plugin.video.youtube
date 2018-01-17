@@ -29,6 +29,7 @@
     - cannot add to history from add-on
     - Clear: Settings - Folders - Custom History playlist id
 [fix] /api/update route logging
+[rem] SPMC mpeg-dash support
 [upd] Hebrew strings [Eng2Heb]
 [upd] Polish strings [Etharr]
 [upd] Italian strings [DjDiabolik]
