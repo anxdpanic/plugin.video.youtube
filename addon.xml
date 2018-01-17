@@ -77,5 +77,6 @@
         <website>https://www.youtube.com</website>
         <email>ytplugin at datanet dot ws</email>
         <source>https://github.com/jdf76/plugin.video.youtube</source>
+        <size>1756155</size>
     </extension>
 </addon>
