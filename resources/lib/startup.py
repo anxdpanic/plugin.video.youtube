@@ -2,11 +2,10 @@ __author__ = 'bromix'
 
 from datetime import datetime
 import time
-import threading
 
 from youtube_plugin.kodion.impl import Context
 from youtube_plugin.kodion.constants import setting
-from youtube_plugin.kodion.utils import get_proxy_server, is_proxy_live, Monitor
+from youtube_plugin.kodion.utils import Monitor
 
 context = Context(plugin_id='plugin.video.youtube')
 
@@ -57,84 +56,28 @@ def get_stamp_diff(current_stamp):
     return total_seconds
 
 
-sleep_time = 1
-proxy_delay_time = 30
+sleep_time = 10
 ping_delay_time = 60
-proxy_timestamp = None
 ping_timestamp = None
 first_run = True
-dash_proxy = None
-proxy_thread = None
+
 
 if mpd_addon or mpd_builtin:
     monitor = Monitor()
     while not monitor.abortRequested():
 
-        proxy_diff = get_stamp_diff(proxy_timestamp)
         ping_diff = get_stamp_diff(ping_timestamp)
-
-        if (proxy_timestamp is None) or (proxy_diff >= proxy_delay_time):
-            proxy_timestamp = str(datetime.now())
-
-            use_proxy = monitor.use_proxy()
-            proxy_port = monitor.proxy_port()
-
-            if use_proxy:
-                if dash_proxy is None:
-                    context.log_debug('DashProxy: Starting |{port}|'.format(port=str(proxy_port)))
-                    monitor.proxy_port_sync()
-                    dash_proxy = get_proxy_server(port=proxy_port)
-                    if dash_proxy:
-                        proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
-                        proxy_thread.daemon = True
-                        proxy_thread.start()
-                elif dash_proxy and monitor.proxy_port_changed():
-                    context.log_debug('DashProxy: Port changed, restarting... |{old_port}| -> |{port}|'
-                                      .format(old_port=str(monitor.old_proxy_port()), port=str(proxy_port)))
-                    dash_proxy.shutdown()
-                    proxy_thread.join()
-                    proxy_thread = None
-                    monitor.proxy_port_sync()
-                    dash_proxy = get_proxy_server(port=proxy_port)
-                    if dash_proxy:
-                        proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
-                        proxy_thread.daemon = True
-                        proxy_thread.start()
-            else:
-                if dash_proxy is not None:
-                    context.log_debug('DashProxy: Shutting down |{port}|'.format(port=str(monitor.old_proxy_port())))
-                    monitor.proxy_port_sync()
-                    dash_proxy.shutdown()
-                    proxy_thread.join()
-                    proxy_thread = None
-                    dash_proxy = None
 
         if (ping_timestamp is None) or (ping_diff >= ping_delay_time):
             ping_timestamp = str(datetime.now())
 
-            use_proxy = monitor.use_proxy()
-            proxy_port = monitor.proxy_port()
-
-            if dash_proxy:
-                if not is_proxy_live(port=proxy_port):
-                    context.log_debug('DashProxy: Port changed, restarting... |{old_port}| -> |{port}|'
-                                      .format(old_port=str(monitor.old_proxy_port()), port=str(proxy_port)))
-                    dash_proxy.shutdown()
-                    proxy_thread.join()
-                    proxy_thread = None
-                    monitor.proxy_port_sync()
-                    dash_proxy = get_proxy_server(port=proxy_port)
-                    if dash_proxy:
-                        proxy_thread = threading.Thread(target=dash_proxy.serve_forever)
-                        proxy_thread.daemon = True
-                        proxy_thread.start()
+            if monitor.dash_proxy and not monitor.ping_proxy():
+                monitor.restart_proxy()
 
         if first_run:
             first_run = False
 
         if monitor.waitForAbort(sleep_time):
-            if dash_proxy is not None:
-                dash_proxy.shutdown()
-            if proxy_thread is not None:
-                proxy_thread.join()
+            if monitor.dash_proxy:
+                monitor.shutdown_proxy()
             break
