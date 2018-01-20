@@ -33,25 +33,26 @@
         <setting id="youtube.folder.my_subscriptions.show" type="bool" label="30510" default="true"/>
         <setting id="youtube.folder.my_subscriptions_filtered.show" type="bool" label="30584" default="false"/>
         <setting id="youtube.filter.my_subscriptions_filtered.blacklist" type="bool" label="30586" default="false"
-                 enable="eq(-1,true)" visible="eq(-1,true)"/>
+                 enable="eq(-1,true)" visible="eq(-1,true)" subsetting="true"/>
         <setting id="youtube.filter.my_subscriptions_filtered.list" type="text" label="30585" enable="eq(-2,true)"
-                 visible="eq(-2,true)" default=""/>
+                 visible="eq(-2,true)" default="" subsetting="true"/>
         <setting id="youtube.folder.recommendations.show" type="bool" label="30551" default="true"/>
         <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
+        <setting id="youtube.folder.search.show" type="bool" label="30102" default="true"/>
         <setting id="youtube.folder.quick_search.show" type="bool" label="30605" default="false"/>
         <setting id="youtube.folder.quick_search_incognito.show" type="bool" label="30606" default="false"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
         <setting id="youtube.folder.watch_later.show" type="bool" label="30107" default="true"/>
         <setting id="youtube.folder.watch_later.playlist" type="text" label="30037" enable="eq(-1,true)"
-                 visible="eq(-1,true)" default=""/>
+                 visible="eq(-1,true)" default="" subsetting="true"/>
         <setting id="youtube.get.watch_later.playlist.id" type="action" label="30613"
                  action="RunPlugin(plugin://plugin.video.youtube/watch_later/playlist_id/)"
-                 option="close" enable="eq(-2,true)" visible="eq(-2,true)"/>
+                 option="close" enable="eq(-2,true)" visible="eq(-2,true)" subsetting="true"/>
         <setting id="youtube.folder.liked_videos.show" type="bool" label="30508" default="true"/>
         <setting id="youtube.folder.disliked_videos.show" type="bool" label="30538" default="true"/>
         <setting id="youtube.folder.history.show" type="bool" label="30509" default="true"/>
         <setting id="youtube.folder.history.playlist" type="text" label="30038" enable="eq(-1,true)"
-                 visible="eq(-1,true)" default=""/>
+                 visible="eq(-1,true)" default="" subsetting="true"/>
         <setting id="youtube.folder.playlists.show" type="bool" label="30501" default="true"/>
         <setting id="youtube.folder.saved.playlists.show" type="bool" label="30611" default="true"/>
         <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
