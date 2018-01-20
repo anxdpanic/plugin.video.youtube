@@ -696,43 +696,43 @@ msgstr "Ricerca Rapida (Anonima)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Solo Audio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Permetti API Keys Developers"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Resetta Storico Visti"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Questo cancellerà la lista dei video visti del tuo account per tutti i device. Operazione non REVERSIBILE!"
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Playlist Salvate"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Riprova"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Recupera Guarda Dopo Playlist ID"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Recupero Guarda Dopo Playlist ID. Aggiungi qualche video al Guarda Dopo via WEB o da una APP e riprova..."
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Necessità di essere Loggati"
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
@@ -740,16 +740,16 @@ msgstr ""
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Attiva mpeg-dash proxy"
 
 msgctxt "#30619"
 msgid "Proxy port"
-msgstr ""
+msgstr "Porta Proxy"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start proxy server."
-msgstr ""
+msgstr "La Porta %s è già in uso. Non posso avviare il Server Proxy."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr ""
+msgstr "Il Proxy è richiesto per i mpeg-dash vod"
