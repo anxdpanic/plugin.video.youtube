@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="5.4.6~beta1" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="5.4.6" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.19.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -75,6 +75,6 @@
         <website>https://www.youtube.com</website>
         <email>ytplugin at datanet dot ws</email>
         <source>https://github.com/jdf76/plugin.video.youtube</source>
-        <size>1756155</size>
+        <size>1775888</size>
     </extension>
 </addon>
