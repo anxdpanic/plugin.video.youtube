@@ -38,6 +38,7 @@
                  visible="eq(-2,true)" default=""/>
         <setting id="youtube.folder.recommendations.show" type="bool" label="30551" default="true"/>
         <setting id="youtube.folder.popular_right_now.show" type="bool" label="30513" default="true"/>
+        <setting id="youtube.folder.search.show" type="bool" label="30102" default="true"/>
         <setting id="youtube.folder.quick_search.show" type="bool" label="30605" default="false"/>
         <setting id="youtube.folder.quick_search_incognito.show" type="bool" label="30606" default="false"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>

@@ -878,9 +878,10 @@ class Provider(kodion.AbstractProvider):
             result.append(what_to_watch_item)
 
         # search
-        search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
-                                              fanart=self.get_fanart(context))
-        result.append(search_item)
+        if settings.get_bool('youtube.folder.search.show', True):
+            search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
+                                                  fanart=self.get_fanart(context))
+            result.append(search_item)
 
         if settings.get_bool('youtube.folder.quick_search.show', True):
             quick_search_item = kodion.items.NewSearchItem(context,
