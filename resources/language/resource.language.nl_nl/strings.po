@@ -88,7 +88,7 @@ msgstr "Sta 3D Toe"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr "Toon Kunst door Fans"
+msgstr "Toon Fanart"
 
 msgctxt "#30022"
 msgid "Items per page"
@@ -96,7 +96,7 @@ msgstr "Items per pagina"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr "Zoek historie grootte"
+msgstr "Zoekhistorie grootte"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
@@ -152,11 +152,11 @@ msgstr "Ondersteun alternatieve speler"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "Aangepast Bekijk Later afspeellijst ID"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "Aangepast Geschiedenis afspeellijst ID"
 
 #Kodion Common
 #empty strings from id 30037 to 30099
@@ -191,7 +191,7 @@ msgstr "Volgende Pagina (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "Later Bekijken"
+msgstr "Bekijk Later"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -199,7 +199,7 @@ msgstr "Verwijder"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr "Laatste Video's"
+msgstr "Nieuwste Video's"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -215,7 +215,7 @@ msgstr "Uitloggen"
 
 msgctxt "#30113"
 msgid "Rename"
-msgstr "Hernoem"
+msgstr "Hernoemen"
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -266,7 +266,7 @@ msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr "Schakel persoonlijke API sleutels in"
+msgstr "Peroonlijke API sleutels inschakelen"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
@@ -297,7 +297,7 @@ msgstr "Abonnementen"
 
 msgctxt "#30505"
 msgid "Afmelden"
-msgstr ""
+msgstr "Afmelden"
 
 msgctxt "#30506"
 msgid "Subscribe"
@@ -393,11 +393,11 @@ msgstr "Beoordeling..."
 
 msgctxt "#30529"
 msgid "I like this"
-msgstr "Ik vind dit leuk"
+msgstr "Leuk"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr "Ik vind dit niet leuk"
+msgstr "Niet leuk"
 
 msgctxt "#30531"
 msgid "Play all"
@@ -441,15 +441,15 @@ msgstr "Afspelen met..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
-msgstr "Toon kanaal naam in beschrijving"
+msgstr "Toon kanaalnaam in beschrijving"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "rtmpe streams zijn niet toegestaan"
+msgstr "rtmpe streams worden niet ondersteund"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr "Herladen"
+msgstr "Verversen"
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -457,7 +457,7 @@ msgstr "Meer links van de beschrijving"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "Geen andere links gevonden"
+msgstr "Geen verdere links gevonden"
 
 msgctxt "#30546"
 msgid "Please log in twice!"
@@ -465,7 +465,7 @@ msgstr "Log AUB twee keer in!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Je moet twee applicaties inschakelen zodat YouTube volledig kan functioneren."
+msgstr "Je moet twee applicaties inschakelen zodat YouTube correct kan functioneren."
 
 msgctxt "#30548"
 msgid "More..."
@@ -473,7 +473,7 @@ msgstr "Meer..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr "Geen video streams gevonden"
+msgstr "Geen videostreams gevonden"
 
 msgctxt "#30550"
 msgid "Region"
@@ -485,280 +485,280 @@ msgstr "Aanbevolen"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Onderhoud"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Verwijder functie cache database"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Verwijder zoekhistorie database"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Wis functie cache"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Wis zoekhistorie"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "Functie cache"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "Zoekhistorie"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Verwijder settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Te downloaden ondertitelingstaal"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Geen"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Alles"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Instelling"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Instelling, Engels"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Engels"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Waarschuwen"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Bekijk Later"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Verwijder van Bekijk Later"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Weet je zeker dat je '%s' wilt verwijderen van je Bekijk Later lijst?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Weet je zeker dat je je huidige Bekijk Later lijst wilt vervangen met '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Als geschiedenis instellen"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Verwijder van geschiedenis"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Weet je zeker dat je '%s' wilt verwijderen van je Geschiedenis lijst?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Weet je zeker dat je je huidige Geschiedenis lijst wilt vervangen met '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Geslaagd"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Mislukt"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Instellingen"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Forceer SSL certificaat verificatie"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "MPEG-DASH is ingeschakeld in de YouTube instellingen. Echter inputstream.adaptive lijkt te zijn uitgeschakeld. Wil je inputstream.adaptive nu inschakelen?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "Inlogbeheer resetten"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Weet je zeker dat je inlogbeheer wilt resetten?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Speel aanbevolen video's automatisch af"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisch"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Mijn Abonnementen (Gefilterd)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "Gefilterde Kanaal Lijst (komma gescheiden)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Zwarte lijst"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "Toevoegen aan Mijn Abonnementen filter "
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr ""
+msgstr "Verwijder van Mijn Abonnementen filter"
 
 msgctxt "#30589"
 msgid "Added %s to My Subscriptions filter"
-msgstr ""
+msgstr "%s toegevoegd aan Mijn Abonnementen filter"
 
 msgctxt "#30590"
 msgid "Removed %s from My Subscriptions filter"
-msgstr ""
+msgstr "%s verwijderd van Mijn Abonnementen filter"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Miniatuur formaat"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Medium"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Hoog"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Veilig zoeken"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Gemiddeld"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Streng"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "%s bijgewerkt"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Persoonlijke API sleutels ingeschakeld"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Inschakelen persoonlijke API sleutels mislukt. %s ontbreekt"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Configureer ondertiteling"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s met %s terugval"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Geen automatisch gegenereerde"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Leeftijdscontrole"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Beledigende inhoud toestaan"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Snelzoeken"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Snelzoeken  (Incognito)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Alleen geluid"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Ontwikkelaarsleutels toestaan"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Kijkgeschiedenis opschonen"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Dit zal de kijkgeschiedenis van je account op alle apparaten opschonen. Deze actie kan niet ongedaan worden gemaakt"
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Opgeslagen afspeelljsten"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Probeer nogmaals"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Bekijk Later afspeellijst-id ophalen"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Ophalen afspeellijst-id mislukt. Voeg een aantal video's toe aan Bekijk Later via internet/app en probeer nogmaals. "
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Annuleren"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Je moet ingelogd zijn."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Gebruik MPEG Dash proxy"
 
 msgctxt "#30619"
 msgid "Proxy port"
-msgstr ""
+msgstr "Proxypoort"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start proxy server."
-msgstr ""
+msgstr "Port %s al in gebruik. Kan de proxyserver niet starten."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr ""
+msgstr "Proxy is vereist voor mpeg-dash vods. "
