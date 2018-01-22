@@ -11,33 +11,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[add] Saved Playlists
-[add] Audio only: Settings -> General
-[add] Age gate enforcement: Settings -> General
-[add] Quick search and Quick search (Incognito)
-    - Settings -> Folders
-    - incognito doesn't add to search history or run post play events (add to watch history)
-[add] Quick search to channels (no history)
-[add] Live folder to channels
-[fix] My Channel videos incl. private
-[fix] mpeg-dash vods, proxy required
-    - Settings - MPEG-DASH
-    - Thanks to Schtek for generating the needed mpd file
-[fix/upd] use select dialog for subtitle settings
-    - [add] Configure subtitles: Settings -> General
-    - [add] Current language with No auto-generated subtitles option
-[fix/upd] subtitles default to non asr track when possible
-[fix/upd] Watch Later
-    - Clear: Settings - Folders - Custom Watch Later playlist id
-    - Settings - Folders - Retrieve Watch Later playlist id
-[fix/upd] History
-    - cannot add to history from add-on
-    - Clear: Settings - Folders - Custom History playlist id
-[rem] SPMC mpeg-dash support
-[upd] Hebrew strings [Eng2Heb]
-[upd] Polish strings [Etharr]
-[upd] Italian strings [DjDiabolik]
-[upd] Hungarian strings [lacesz-sh]
+[upd] Dutch strings [MB1968]
         </news>
         <assets>
             <icon>icon.png</icon>
