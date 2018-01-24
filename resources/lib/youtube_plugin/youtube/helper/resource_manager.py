@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 __author__ = 'bromix'
 
 from ...kodion.utils import FunctionCache
@@ -30,7 +32,7 @@ class ResourceManager(object):
         channel_ids_to_update = []
         function_cache = self._context.get_function_cache()
         for channel_id in channel_ids:
-            channel_data = function_cache.get_cached_only(self._get_channel_data, unicode(channel_id))
+            channel_data = function_cache.get_cached_only(self._get_channel_data, str(channel_id))
             if channel_data is None:
                 self._context.log_debug("No data for channel '%s' cached" % channel_id)
                 channel_ids_to_update.append(channel_id)
@@ -42,7 +44,7 @@ class ResourceManager(object):
             json_data = function_cache.get(FunctionCache.ONE_WEEK, self._youtube_client.get_channels, channel_ids_to_update)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
-                channel_id = unicode(yt_item['id'])
+                channel_id = str(yt_item['id'])
                 self._channel_data[channel_id] = yt_item
 
                 # this will cache the channel data
@@ -56,7 +58,7 @@ class ResourceManager(object):
         video_ids_to_update = []
         function_cache = self._context.get_function_cache()
         for video_id in video_ids:
-            video_data = function_cache.get_cached_only(self._get_video_data, unicode(video_id))
+            video_data = function_cache.get_cached_only(self._get_video_data, str(video_id))
             if video_data is None:
                 self._context.log_debug("No data for video '%s' cached" % video_id)
                 video_ids_to_update.append(video_id)
@@ -68,7 +70,7 @@ class ResourceManager(object):
             json_data = function_cache.get(FunctionCache.ONE_MONTH, self._youtube_client.get_videos, video_ids_to_update)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
-                video_id = unicode(yt_item['id'])
+                video_id = str(yt_item['id'])
                 self._video_data[video_id] = yt_item
 
                 # this will cache the channel data
@@ -98,7 +100,7 @@ class ResourceManager(object):
         playlist_ids_to_update = []
         function_cache = self._context.get_function_cache()
         for playlist_id in playlists_ids:
-            playlist_data = function_cache.get_cached_only(self._get_playlist_data, unicode(playlist_id))
+            playlist_data = function_cache.get_cached_only(self._get_playlist_data, str(playlist_id))
             if playlist_data is None:
                 self._context.log_debug("No data for playlist '%s' cached" % playlist_id)
                 playlist_ids_to_update.append(playlist_id)
@@ -110,7 +112,7 @@ class ResourceManager(object):
             json_data = function_cache.get(FunctionCache.ONE_DAY, self._youtube_client.get_playlists, playlist_ids_to_update)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
-                playlist_id = unicode(yt_item['id'])
+                playlist_id = str(yt_item['id'])
                 self._playlist_data[playlist_id] = yt_item
 
                 # this will cache the channel data
@@ -158,7 +160,7 @@ class ResourceManager(object):
         result = self._update_channels(channel_ids)
 
         # transform
-        for key in result.keys():
+        for key in list(result.keys()):
             item = result[key]
 
             # set an empty url

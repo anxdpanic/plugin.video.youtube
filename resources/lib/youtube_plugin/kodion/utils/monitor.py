@@ -1,3 +1,4 @@
+from builtins import str
 import threading
 
 from ..utils import get_proxy_server, is_proxy_live

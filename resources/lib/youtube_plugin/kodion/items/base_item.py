@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import hashlib
 import datetime
 
@@ -8,7 +10,7 @@ class BaseItem(object):
 
     def __init__(self, name, uri, image=u'', fanart=u''):
         self._version = BaseItem.VERSION
-        self._name = unicode(name)
+        self._name = str(name)
         self._uri = str(uri)
 
         self._image = u''
@@ -20,14 +22,11 @@ class BaseItem(object):
         self._date = None
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __unicode__(self):
         name = self._name
         uri = self._uri
         obj_str = "------------------------------\n'%s'\nURI: %s\nImage: %s\n------------------------------" % (
             name, uri, self._image)
-        return obj_str
+        return str(obj_str)
 
     def get_id(self):
         """

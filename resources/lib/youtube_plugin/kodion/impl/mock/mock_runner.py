@@ -15,7 +15,7 @@ class MockRunner(AbstractProviderRunner):
         results = None
         try:
             results = provider.navigate(context)
-        except KodionException, ex:
+        except KodionException as ex:
             if provider.handle_exception(context, ex):
                 provider.log(ex.message, constants.log.ERROR)
             return

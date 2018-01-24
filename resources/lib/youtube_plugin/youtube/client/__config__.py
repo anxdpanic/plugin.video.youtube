@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from builtins import str
 from base64 import b64decode
 from hashlib import md5
 from ...kodion import Context as __Context
@@ -129,13 +130,20 @@ def set_last_switch(value):
 
 
 def get_key_set_hash(value):
-    m = md5()
     if value == 'own':
-        m.update('%s%s%s' % (key_sets[value]['key'], key_sets[value]['id'], key_sets[value]['secret']))
+        api_key = key_sets[value]['key'].encode('utf-8')
+        client_id = key_sets[value]['id'].encode('utf-8')
+        client_secret = key_sets[value]['secret'].encode('utf-8')
     else:
-        m.update('%s%s%s' % \
-                 (key_sets['provided'][value]['key'], key_sets['provided'][value]['id'],
-                  key_sets['provided'][value]['secret']))
+        api_key = key_sets['provided'][value]['key'].encode('utf-8')
+        client_id = key_sets['provided'][value]['id'].encode('utf-8')
+        client_secret = key_sets['provided'][value]['secret'].encode('utf-8')
+
+    m = md5()
+    m.update(api_key)
+    m.update(client_id)
+    m.update(client_secret)
+
     return m.hexdigest()
 
 
@@ -174,29 +182,20 @@ def check_for_key_changes():
     return False
 
 
-api = {
-    'key':
-        key_sets['own']['key']
-        if has_own_keys
-        else
-        b64decode(key_sets['provided'][key_sets['provided']['switch']]['key']),
-    'id':
-        '%s.apps.googleusercontent.com' %
-        (key_sets['own']['id']
-         if has_own_keys
-         else
-         b64decode(key_sets['provided'][key_sets['provided']['switch']]['id'])),
-    'secret':
-        key_sets['own']['secret']
-        if has_own_keys
-        else
-        b64decode(key_sets['provided'][key_sets['provided']['switch']]['secret'])
-}
+api = dict()
+if has_own_keys:
+    api['key'] = key_sets['own']['key']
+    api['id'] = key_sets['own']['id'] + '.apps.googleusercontent.com'
+    api['secret'] = key_sets['own']['secret']
+else:
+    api['key'] = b64decode(key_sets['provided'][key_sets['provided']['switch']]['key']).decode('utf-8')
+    api['id'] = b64decode(key_sets['provided'][key_sets['provided']['switch']]['id']).decode('utf-8') + '.apps.googleusercontent.com'
+    api['secret'] = b64decode(key_sets['provided'][key_sets['provided']['switch']]['secret']).decode('utf-8')
 
 youtube_tv = {
-    'key': b64decode(key_sets['youtube-tv']['key']),
-    'id': '%s.apps.googleusercontent.com' % b64decode(key_sets['youtube-tv']['id']),
-    'secret': b64decode(key_sets['youtube-tv']['secret'])
+    'key': b64decode(key_sets['youtube-tv']['key']).decode('utf-8'),
+    'id': '%s.apps.googleusercontent.com' % b64decode(key_sets['youtube-tv']['id']).decode('utf-8'),
+    'secret': b64decode(key_sets['youtube-tv']['secret']).decode('utf-8')
 }
 
 keys_changed = check_for_key_changes()

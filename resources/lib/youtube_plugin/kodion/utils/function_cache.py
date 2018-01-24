@@ -1,8 +1,11 @@
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 from functools import partial
 import hashlib
 import datetime
 
-from storage import Storage
+from .storage import Storage
 
 
 class FunctionCache(Storage):
@@ -41,10 +44,10 @@ class FunctionCache(Storage):
         :return: id for the given function
         """
         m = hashlib.md5()
-        m.update(partial_func.func.__module__)
-        m.update(partial_func.func.__name__)
-        m.update(str(partial_func.args))
-        m.update(str(partial_func.keywords))
+        m.update(partial_func.func.__module__.encode('utf-8'))
+        m.update(partial_func.func.__name__.encode('utf-8'))
+        m.update(str(partial_func.args).encode('utf-8'))
+        m.update(str(partial_func.keywords).encode('utf-8'))
         return m.hexdigest()
 
     def _get_cached_data(self, partial_func):
@@ -68,7 +71,7 @@ class FunctionCache(Storage):
     def get(self, seconds, func, *args, **keywords):
         def _seconds_difference(_first, _last):
             _delta = _last - _first
-            return 24 * 60 * 60 * _delta.days + _delta.seconds + _delta.microseconds / 1000000.
+            return 24 * 60 * 60 * _delta.days + _delta.seconds + old_div(_delta.microseconds, 1000000.)
 
         """
         Returns the cached data of the given function.

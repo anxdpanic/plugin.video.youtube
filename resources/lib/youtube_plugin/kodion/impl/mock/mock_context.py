@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import str
+from past.utils import old_div
 import time
 
 __author__ = 'bromix'
@@ -86,4 +89,4 @@ class MockContext(AbstractContext):
         log("execute '%s'" % command)
 
     def sleep(self, milli_seconds):
-        time.sleep(milli_seconds / 1000.0)
+        time.sleep(old_div(milli_seconds, 1000.0))

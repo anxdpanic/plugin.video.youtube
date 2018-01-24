@@ -2,6 +2,7 @@
 <addon id="plugin.video.youtube" name="YouTube" version="5.5.0" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
+        <import addon="script.module.future"/>
         <import addon="script.module.requests" version="2.12.4"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
@@ -11,6 +12,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[add] Python 3 compat.
 [fix] context menu after playback
 [fix] alternative player, do not append headers
 [fix/upd] set title from metadata on play

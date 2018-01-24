@@ -1,3 +1,4 @@
+from builtins import str
 __author__ = 'bromix'
 
 from ...youtube.helper import yt_context_menu

@@ -1,8 +1,12 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import os
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from .. import constants
-from ..logging import *
+from ..logging import log
 from ..utils import *
 
 
@@ -19,7 +23,7 @@ class AbstractContext(object):
         self._watch_later_list = None
         self._access_manager = None
 
-        self._plugin_name = unicode(plugin_name)
+        self._plugin_name = str(plugin_name)
         self._version = 'UNKNOWN'
         self._plugin_id = plugin_id
         self._path = create_path(path)
@@ -100,9 +104,9 @@ class AbstractContext(object):
 
         uri = create_uri_path(path)
         if uri:
-            uri = "%s://%s%s" % ('plugin', self._plugin_id.encode('utf-8'), uri)
+            uri = "%s://%s%s" % ('plugin', str(self._plugin_id), uri)
         else:
-            uri = "%s://%s/" % ('plugin', self._plugin_id.encode('utf-8'))
+            uri = "%s://%s/" % ('plugin', str(self._plugin_id))
 
         if len(params) > 0:
             # make a copy of the map
@@ -115,7 +119,7 @@ class AbstractContext(object):
                     params[param] = str(params[param])
 
                 uri_params[param] = to_utf8(params[param])
-            uri += '?' + urllib.urlencode(uri_params)
+            uri += '?' + urllib.parse.urlencode(uri_params)
 
         return uri
 
@@ -180,7 +184,6 @@ class AbstractContext(object):
 
     def log(self, text, log_level=constants.log.NOTICE):
         log_line = '[%s] %s' % (self.get_id(), text)
-
         log(log_line, log_level)
 
     def log_warning(self, text):

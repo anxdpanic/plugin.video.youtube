@@ -1,3 +1,4 @@
+from __future__ import print_function
 __author__ = 'bromix'
 
 from ... import constants
@@ -19,4 +20,4 @@ class MockLogger(AbstractLogger):
                               constants.log.NONE: 'NONE'}
 
         log_text = "[%s] %s" % (log_level_2_string.get(log_level, 'UNKNOWN'), text)
-        print log_text.encode('utf-8')
+        print(log_text.encode('utf-8'))

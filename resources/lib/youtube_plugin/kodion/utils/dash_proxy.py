@@ -1,8 +1,7 @@
-try:
-    from http.server import BaseHTTPRequestHandler, HTTPServer
-except ImportError:
-    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
-
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 import requests
 import socket

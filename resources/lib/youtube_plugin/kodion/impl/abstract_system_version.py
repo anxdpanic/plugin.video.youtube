@@ -1,3 +1,7 @@
+from builtins import str
+from builtins import map
+from past.builtins import basestring
+from builtins import object
 __author__ = 'bromix'
 
 
@@ -19,11 +23,8 @@ class AbstractSystemVersion(object):
             self._appname = appname
 
     def __str__(self):
-        return unicode(self).encode('utf-8')
-
-    def __unicode__(self):
         obj_str = "%s (%s-%s)" % (self._releasename, self._appname, '.'.join(map(str, self._version)))
-        return obj_str
+        return str(obj_str)
 
     def get_release_name(self):
         return self._releasename

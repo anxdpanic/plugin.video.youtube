@@ -1,6 +1,7 @@
+from future import standard_library
+standard_library.install_aliases()
 import sys
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
 import weakref
 import datetime
 import json
@@ -38,8 +39,8 @@ class XbmcContext(AbstractContext):
         # first the path of the uri
         if override:
             self._uri = sys.argv[0]
-            comps = urlparse.urlparse(self._uri)
-            self._path = urllib.unquote(comps.path).decode('utf-8')
+            comps = urllib.parse.urlparse(self._uri)
+            self._path = urllib.parse.unquote(comps.path)
 
             # after that try to get the params
             if len(sys.argv) > 2:
@@ -48,10 +49,10 @@ class XbmcContext(AbstractContext):
                     self._uri = self._uri + '?' + params
 
                     self._params = {}
-                    params = dict(urlparse.parse_qsl(params))
+                    params = dict(urllib.parse.parse_qsl(params))
                     for _param in params:
                         item = params[_param]
-                        self._params[_param] = item.decode('utf-8')
+                        self._params[_param] = item
 
         self._ui = None
         self._video_playlist = None
@@ -70,7 +71,7 @@ class XbmcContext(AbstractContext):
         """
         self._data_path = xbmc.translatePath('special://profile/addon_data/%s' % self._plugin_id)
         if isinstance(self._data_path, str):
-            self._data_path = self._data_path.decode('utf-8')
+            self._data_path = self._data_path
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
 

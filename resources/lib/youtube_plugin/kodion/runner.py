@@ -1,3 +1,4 @@
+from builtins import str
 __author__ = 'bromix'
 
 __all__ = ['run']
@@ -25,8 +26,9 @@ def run(provider, context=None):
         pass
 
     version = context.get_system_version()
-    context.log_notice(
-        'Running: %s (%s) on %s with %s' % (context.get_name(), context.get_version(), version, python_version))
+    name = context.get_name()
+    addon_version = context.get_version()
+    context.log_notice('Running: %s (%s) on %s with %s' % (name, addon_version, version, python_version))
     context.log_debug('Path: "%s' % context.get_path())
     redacted = '<redacted>'
     context_params = copy.deepcopy(context.get_params())
@@ -36,7 +38,7 @@ def run(provider, context=None):
         context_params['client_id'] = redacted
     if 'client_secret' in context_params:
         context_params['client_secret'] = redacted
-    context.log_debug('Params: "%s"' % unicode(context_params))
+    context.log_debug('Params: "%s"' % str(context_params))
     __RUNNER__.run(provider, context)
     provider.tear_down(context)
     context.log_debug('Shutdown of Kodion')

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import xbmcvfs
-import HTMLParser
+import html.parser
 import requests
 
 
@@ -72,7 +76,7 @@ class Subtitles(object):
         except:
             self.context.log_debug('Subtitle unescape: failed to decode utf-8')
         try:
-            text = HTMLParser.HTMLParser().unescape(text)
+            text = html.parser.HTMLParser().unescape(text)
         except:
             self.context.log_debug('Subtitle unescape: failed to unescape text')
         return text

@@ -1,3 +1,6 @@
+from __future__ import division
+from past.builtins import basestring
+from past.utils import old_div
 __author__ = 'bromix'
 
 import xbmcgui
@@ -21,7 +24,7 @@ class XbmcProgressDialogBG(AbstractProgressDialog):
 
     def update(self, steps=1, text=None):
         self._position += steps
-        position = int(float(100.0 / self._total) * self._position)
+        position = int(float(old_div(100.0, self._total)) * self._position)
 
         if isinstance(text, basestring):
             self._dialog.update(percent=position, message=text)

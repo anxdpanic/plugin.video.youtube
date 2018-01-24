@@ -1,3 +1,9 @@
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
+from past.utils import old_div
 __author__ = 'bromix'
 
 import datetime
@@ -5,10 +11,7 @@ import os
 import sqlite3
 import time
 
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle as pickle
 
 
 class Storage(object):
@@ -92,7 +95,7 @@ class Storage(object):
         if not os.path.exists(self._filename):
             return
 
-        file_size_kb = os.path.getsize(self._filename) / 1024
+        file_size_kb = old_div(os.path.getsize(self._filename), 1024)
         if file_size_kb >= self._max_file_size_kb:
             os.remove(self._filename)
 
@@ -170,7 +173,7 @@ class Storage(object):
 
     def _get(self, item_id):
         def _decode(obj):
-            return pickle.loads(bytes(obj))
+            return pickle.loads(obj)
 
         self._open()
         query = 'SELECT time, value FROM %s WHERE key=?' % self._table_name

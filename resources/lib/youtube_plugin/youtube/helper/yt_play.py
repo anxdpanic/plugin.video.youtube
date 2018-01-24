@@ -1,3 +1,4 @@
+from builtins import str
 import random
 import re
 
@@ -73,7 +74,7 @@ def play_video(provider, context, re_match):
                 context.get_ui().show_notification('Failed to execute post play events.', time_milliseconds=5000)
 
         return video_item
-    except YouTubeException, ex:
+    except YouTubeException as ex:
         message = ex.get_message()
         message = kodion.utils.strip_html_from_text(message)
         context.get_ui().show_notification(message, time_milliseconds=15000)
