@@ -48,10 +48,11 @@ def play_video(provider, context, re_match):
             for i in items:
                 playlist.add(i)
 
+        title = video_stream.get('meta', {}).get('title', video_id)
         if is_video:
-            video_item = VideoItem(video_id, video_stream['url'])
+            video_item = VideoItem(title, video_stream['url'])
         else:
-            video_item = AudioVideoItem(video_id, video_stream['url'])
+            video_item = AudioVideoItem(title, video_stream['url'])
 
         if video_stream.get('meta', None):
             video_item.set_subtitles(video_stream['meta'].get('subtitles', None))
