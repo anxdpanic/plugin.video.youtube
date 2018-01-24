@@ -315,7 +315,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                                               is_logged_in=provider.is_logged_in(),
                                               refresh_container=refresh_container)
 
-        if len(context_menu) > 0:
+        if len(context_menu) > 0 and context.get_path() != '/play/':
             video_item.set_context_menu(context_menu, replace=replace_context_menu)
 
 
