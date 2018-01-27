@@ -1,3 +1,6 @@
+[fix] context menu after playback
+[fix] alternative player, do not append headers
+[fix/upd] set title from metadata on play
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]
 
