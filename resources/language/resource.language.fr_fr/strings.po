@@ -8,15 +8,13 @@ msgstr ""
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2016-05-22 14:52+0200\n"
-"Last-Translator: \n"
+"Last-Translator: bubuleur\n"
 "Language-Team: Guilouz\n"
 "Language: fr_FR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-
-# Updated by bubuleur.
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -660,100 +658,100 @@ msgstr "Stricte"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Actualisé: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Clés API personnelles activées"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Impossible d'activer les clés API personnelles. Disparu: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Configurer les sous-titres"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s avec %s retiré"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Non généré automatiquement"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Barrière d'âge"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Autoriser le contenu choquant"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Recherche rapide"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Recherche rapide (Incognito)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Audio seulement"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Autoriser les clés de développeur"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Effacer l'historique des vidéos"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Cela effacera l'historique des vidéos de votre compte sur tous les appareils. Vous ne pouvez pas annuler ceci"
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Sauvegarder Playlists"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Recommencez"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Récupérer le contenu de la playlist de la dernière écoute"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Échec de l'extraction de l'ID de la playlist (Regarder plus tard). Ajouter quelques vidéos à regarder plus tard via le web/app et réessayez"
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Doit être signé"
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Activer le proxy MPEG-DASH"
 
 msgctxt "#30619"
 msgid "Proxy port"
-msgstr ""
+msgstr "Port proxy"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start proxy server."
-msgstr ""
+msgstr "Port %s est déjà en cours d'utilisation. Impossible de démarrer le serveur proxy"
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr ""
+msgstr "Proxy est nécessaire pour MPEG-Dash vidéos"

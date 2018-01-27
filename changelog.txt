@@ -1,4 +1,5 @@
 [upd] Dutch strings [MB1968]
+[upd] French strings [bubuleur]
 
 5.5.0
 [add] Saved Playlists

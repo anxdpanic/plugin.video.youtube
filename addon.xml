@@ -12,6 +12,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [upd] Dutch strings [MB1968]
+[upd] French strings [bubuleur]
         </news>
         <assets>
             <icon>icon.png</icon>
