@@ -761,4 +761,20 @@ msgstr "Port %s al in gebruik. Kan de proxyserver niet starten."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr "Proxy is vereist voor mpeg-dash vods. "
+msgstr "Proxy is vereist voor mpeg-dash vods."
+
+msgctxt "#30622"
+msgid "Purchases"
+msgstr ""
+
+msgctxt "#30623"
+msgid "Install InputStream Helper"
+msgstr ""
+
+msgctxt "#30624"
+msgid "Requires Kodi 17+"
+msgstr ""
+
+msgctxt "#30625"
+msgid "InputStream Helper is already installed."
+msgstr ""
