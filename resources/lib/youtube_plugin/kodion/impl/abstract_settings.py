@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 __author__ = 'bromix'
 
 import sys
@@ -27,7 +29,7 @@ class AbstractSettings(object):
 
         try:
             return converter(int(value))
-        except Exception, ex:
+        except Exception as ex:
             from . import log
 
             log("Failed to get setting '%s' as 'int' (%s)" % setting_id, ex.__str__())

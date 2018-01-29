@@ -1,3 +1,4 @@
+from builtins import str
 __author__ = 'bromix'
 
 from .base_item import BaseItem
@@ -9,7 +10,7 @@ class ImageItem(BaseItem):
         self._title = None
 
     def set_title(self, title):
-        self._title = unicode(title)
+        self._title = str(title)
 
     def get_title(self):
         return self._title

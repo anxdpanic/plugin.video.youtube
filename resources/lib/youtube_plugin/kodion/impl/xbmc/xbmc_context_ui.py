@@ -1,3 +1,5 @@
+from builtins import str
+from past.builtins import basestring
 __author__ = 'bromix'
 
 import xbmc
@@ -106,7 +108,7 @@ class XbmcContextUI(AbstractContextUI):
         _header = header
         if not _header:
             _header = self._context.get_name()
-        _header = utils.to_utf8(_header)
+        _header = utils.to_unicode(_header)
 
         _image = image_uri
         if not _image:
@@ -114,7 +116,6 @@ class XbmcContextUI(AbstractContextUI):
 
         _message = utils.to_unicode(message)
         _message = _message.replace(',', ' ')
-        _message = utils.to_utf8(_message)
         _message = _message.replace('\n', ' ')
 
         xbmc.executebuiltin(

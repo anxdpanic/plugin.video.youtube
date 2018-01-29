@@ -1,6 +1,6 @@
 import hashlib
 
-from storage import Storage
+from .storage import Storage
 from .methods import to_utf8
 
 

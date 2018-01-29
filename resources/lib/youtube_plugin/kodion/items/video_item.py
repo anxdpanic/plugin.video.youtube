@@ -1,3 +1,4 @@
+from builtins import str
 import re
 import datetime
 
@@ -40,19 +41,19 @@ class VideoItem(BaseItem):
     def add_artist(self, artist):
         if self._artist is None:
             self._artist = []
-        self._artist.append(unicode(artist))
+        self._artist.append(str(artist))
 
     def get_artist(self):
         return self._artist
 
     def set_studio(self, studio):
-        self._studio = unicode(studio)
+        self._studio = str(studio)
 
     def get_studio(self):
         return self._studio
 
     def set_title(self, title):
-        self._title = unicode(title)
+        self._title = str(title)
         self._name = self._title
 
     def get_title(self):
@@ -84,7 +85,7 @@ class VideoItem(BaseItem):
         return self._premiered
 
     def set_plot(self, plot):
-        self._plot = unicode(plot)
+        self._plot = str(plot)
 
     def get_plot(self):
         return self._plot
@@ -96,7 +97,7 @@ class VideoItem(BaseItem):
         return self._rating
 
     def set_director(self, director_name):
-        self._director = unicode(director_name)
+        self._director = str(director_name)
 
     def get_director(self):
         return self._director
@@ -157,7 +158,7 @@ class VideoItem(BaseItem):
         return self._aired
 
     def set_genre(self, genre):
-        self._genre = unicode(genre)
+        self._genre = str(genre)
 
     def get_genre(self):
         return self._genre

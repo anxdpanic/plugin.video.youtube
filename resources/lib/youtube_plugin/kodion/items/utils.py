@@ -1,3 +1,4 @@
+from past.builtins import basestring
 import json
 
 __author__ = 'bromix'

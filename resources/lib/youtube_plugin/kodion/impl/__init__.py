@@ -1,6 +1,6 @@
 __author__ = 'bromix'
 
-__all__ = ['Settings', 'Context']
+__all__ = ['Settings', 'Context', 'Logger', 'ContextUI', 'Runner']
 
 try:
     from .xbmc.xbmc_logger import XbmcLogger as Logger

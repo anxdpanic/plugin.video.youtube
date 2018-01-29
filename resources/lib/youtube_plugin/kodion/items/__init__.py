@@ -2,7 +2,7 @@ __all__ = ['BaseItem', 'AudioItem', 'DirectoryItem', 'VideoItem', 'AudioVideoIte
            'SearchItem', 'NewSearchItem', 'SearchHistoryItem', 'NextPageItem', 'UriItem',
            'from_json', 'to_json', 'to_jsons']
 
-from utils import to_json, from_json, to_jsons
+from .utils import to_json, from_json, to_jsons
 
 from .uri_item import UriItem
 from .base_item import BaseItem

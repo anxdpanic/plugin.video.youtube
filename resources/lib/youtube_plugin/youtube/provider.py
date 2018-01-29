@@ -1,3 +1,4 @@
+from builtins import map
 __author__ = 'bromix'
 
 import os
@@ -900,10 +901,10 @@ class Provider(kodion.AbstractProvider):
         # subscriptions
         if self.is_logged_in():
             playlists = resource_manager.get_related_playlists(channel_id='mine')
-            if playlists.has_key('watchLater'):
+            if 'watchLater' in playlists:
                 cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
                 playlists['watchLater'] = cplid if cplid else ' WL'
-            if playlists.has_key('watchHistory'):
+            if 'watchHistory' in playlists:
                 cplid = settings.get_string('youtube.folder.history.playlist', '').strip()
                 playlists['watchHistory'] = cplid if cplid else 'HL'
 
@@ -1034,7 +1035,7 @@ class Provider(kodion.AbstractProvider):
         if isinstance(exception_to_handle, LoginException):
             context.get_access_manager().update_access_token('')
 
-            msg = message = exception_to_handle.message
+            msg = message = exception_to_handle.get_message()
             error = ''
             code = ''
 

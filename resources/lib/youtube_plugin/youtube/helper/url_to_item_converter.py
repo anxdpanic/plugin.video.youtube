@@ -1,7 +1,10 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 __author__ = 'bromix'
 
 import re
-import urlparse
+import urllib.parse
 from ...kodion.items import VideoItem, DirectoryItem
 from . import utils
 
@@ -24,9 +27,9 @@ class UrlToItemConverter(object):
         self._channel_ids = []
 
     def add_url(self, url, provider, context):
-        url_components = urlparse.urlparse(url)
+        url_components = urllib.parse.urlparse(url)
         if url_components.hostname.lower() == 'youtube.com' or url_components.hostname.lower() == 'www.youtube.com':
-            params = dict(urlparse.parse_qsl(url_components.query))
+            params = dict(urllib.parse.parse_qsl(url_components.query))
             if url_components.path.lower() == '/watch':
                 video_id = params.get('v', '')
                 if video_id:

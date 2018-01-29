@@ -1,3 +1,6 @@
+from __future__ import division
+from builtins import range
+from past.utils import old_div
 __author__ = 'bromix'
 
 import time
@@ -39,7 +42,7 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         dialog = context.get_ui().create_progress_dialog(
             heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
 
-        steps = (10 * 60 * 1000) / interval  # 10 Minutes
+        steps = old_div((10 * 60 * 1000), interval)  # 10 Minutes
         dialog.set_total(steps)
         for i in range(steps):
             dialog.update()
