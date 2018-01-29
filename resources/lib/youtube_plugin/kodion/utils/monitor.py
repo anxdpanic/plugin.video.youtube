@@ -22,6 +22,7 @@ class YouTubeMonitor(xbmc.Monitor):
         xbmc.Monitor.__init__(self)
 
     def onSettingsChanged(self):
+        _use_dash = _addon.getSetting('kodion.video.quality.mpd') == 'true'
         _use_proxy = _addon.getSetting('kodion.mpd.proxy') == 'true'
         _proxy_port = int(_addon.getSetting('kodion.mpd.proxy.port'))
 
@@ -32,14 +33,14 @@ class YouTubeMonitor(xbmc.Monitor):
             self._old_proxy_port = self._proxy_port
             self._proxy_port = _proxy_port
 
-        if self.use_proxy() and not self.dash_proxy:
+        if self.use_proxy() and not self.dash_proxy and _use_dash:
             self.start_proxy()
-        elif self.use_proxy() and (self.old_proxy_port() != self.proxy_port()):
+        elif self.use_proxy() and (self.old_proxy_port() != self.proxy_port()) and _use_dash:
             if self.dash_proxy:
                 self.restart_proxy()
             elif not self.dash_proxy:
                 self.start_proxy()
-        elif not self.use_proxy() and self.dash_proxy:
+        elif (not self.use_proxy() or not _use_dash) and self.dash_proxy:
             self.shutdown_proxy()
 
     def use_proxy(self):
