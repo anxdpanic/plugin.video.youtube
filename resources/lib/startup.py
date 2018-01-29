@@ -8,7 +8,7 @@ import time
 
 from youtube_plugin.kodion.impl import Context
 from youtube_plugin.kodion.constants import setting
-from youtube_plugin.kodion.utils import Monitor
+from youtube_plugin.kodion.utils import YouTubeMonitor, YouTubePlayer
 
 context = Context(plugin_id='plugin.video.youtube')
 
@@ -59,8 +59,10 @@ ping_delay_time = 60
 ping_timestamp = None
 first_run = True
 
+player = YouTubePlayer(context=context)
+
 if mpd_addon:
-    monitor = Monitor()
+    monitor = YouTubeMonitor()
     while not monitor.abortRequested():
 
         ping_diff = get_stamp_diff(ping_timestamp)

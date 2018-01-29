@@ -73,6 +73,8 @@ def play_video(provider, context, re_match):
             except:
                 context.get_ui().show_notification('Failed to execute post play events.', time_milliseconds=5000)
 
+        context.get_ui().set_home_window_property('playing', 'true')
+
         return video_item
     except YouTubeException as ex:
         message = ex.get_message()
