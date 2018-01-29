@@ -6,7 +6,7 @@ from builtins import object
 import xbmcvfs
 import html.parser
 import requests
-
+from ...kodion.utils import make_dirs
 
 class Subtitles(object):
     LANG_NONE = 0
@@ -15,7 +15,8 @@ class Subtitles(object):
     LANG_CURR = 3
     LANG_CURR_NO_ASR = 4
 
-    SRT_FILE = 'special://temp/temp/%s.%s.srt'
+    BASE_PATH = 'special://temp/plugin.video.youtube/'
+    SRT_FILE = BASE_PATH + '%s.%s.srt'
 
     def __init__(self, context, video_id, captions):
         self.context = context
@@ -60,6 +61,9 @@ class Subtitles(object):
         return self.SRT_FILE % (self.video_id, sub_language)
 
     def _write_file(self, _file, contents):
+        if not make_dirs(self.BASE_PATH):
+            self.context.log_debug('Failed to create directories: %s' % self.BASE_PATH)
+            return False
         self.context.log_debug('Writing subtitle file: %s' % _file)
         try:
             f = xbmcvfs.File(_file, 'w')

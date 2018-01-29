@@ -14,7 +14,7 @@ import xbmcgui
 class DashProxyHandler(BaseHTTPRequestHandler):
     local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
     chunk_size = 1024 * 64
-    base_path = 'special://temp/temp'
+    base_path = 'special://temp/plugin.video.youtube'
 
     def do_GET(self):
         if not self.client_address[0].startswith(self.local_ranges):

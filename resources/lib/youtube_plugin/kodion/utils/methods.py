@@ -6,12 +6,13 @@ from builtins import str
 __author__ = 'bromix'
 
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_unicode', 'select_stream']
+           'to_unicode', 'select_stream', 'make_dirs']
 
 import urllib.request, urllib.parse, urllib.error
 import re
 from ..constants import localize
 import xbmcaddon
+import xbmcvfs
 
 
 def loose_version(v):
@@ -191,3 +192,13 @@ def print_items(items):
 
     for item in items:
         print(item)
+
+
+def make_dirs(path):
+    if not xbmcvfs.exists(path):
+        try:
+            r = xbmcvfs.mkdirs(path)
+            return True
+        except:
+            return False
+    return True
