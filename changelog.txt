@@ -1,3 +1,4 @@
+6.0.0
 [add] Python 3 compat.
 [add] Settings -> Maintenance -> Delete temporary files
 [add] Settings -> General -> Rate video after watching
