@@ -21,6 +21,7 @@
 [fix/upd] set title from metadata on play
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]
+[upd] Greek strings [twilight0]
         </news>
         <assets>
             <icon>icon.png</icon>
@@ -28,6 +29,7 @@
         </assets>
         <summary lang="en_gb">Plugin for YouTube</summary>
         <description lang="en_gb">YouTube is one of the biggest video-sharing websites of the world.</description>
+        <disclaimer lang="en_gb">This plugin is not endorsed by Google</disclaimer>
         <summary lang="he_il">תוסף עבור YouTube</summary>
         <description lang="he_il">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>
         <summary lang="de_de">Plugin für YouTube</summary>
@@ -48,9 +50,9 @@
         <description lang="bg_bg">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
         <summary lang="el_gr">Πρόσθετο YouTube</summary>
         <description lang="el_gr">Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο.</description>
+        <disclaimer lang="el_gr">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>
         <summary lang="nb_no">Tillegg for YouTube</summary>
         <description lang="nb_no">YouTube er en av verdens største nettsider for videodeling.</description>
-        <disclaimer lang="en_gb"></disclaimer>
         <language></language>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
@@ -58,6 +60,6 @@
         <website>https://www.youtube.com</website>
         <email>ytplugin at datanet dot ws</email>
         <source>https://github.com/jdf76/plugin.video.youtube</source>
-        <size>1775888</size>
+        <size>1776578</size>
     </extension>
 </addon>
