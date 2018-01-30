@@ -13,6 +13,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [add] Python 3 compat.
+[add] Settings -> Maintenance -> Delete temporary files
 [fix] context menu after playback
 [fix] alternative player, do not append headers
 [fix/upd] set title from metadata on play

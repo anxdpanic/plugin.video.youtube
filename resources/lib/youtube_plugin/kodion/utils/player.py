@@ -17,7 +17,7 @@ class YouTubePlayer(xbmc.Player):
     def remove_temp_dir(self):
         temp_path = 'special://temp/plugin.video.youtube/'
         try:
-            xbmcvfs.rmdir(temp_path)
+            xbmcvfs.rmdir(temp_path, force=True)
             return True
         except:
             self.context.log_debug('Failed to remove directory: {dir}'.format(dir=temp_path))

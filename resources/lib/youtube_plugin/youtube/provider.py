@@ -742,7 +742,10 @@ class Provider(kodion.AbstractProvider):
                             refresh_tokens = access_manager.get_refresh_token().split('|')
                             refresh_tokens = list(set(refresh_tokens))
                             for refresh_token in refresh_tokens:
-                                client.revoke(refresh_token)
+                                try:
+                                    client.revoke(refresh_token)
+                                except:
+                                    pass
                         self.reset_client()
                         access_manager.update_access_token(access_token='', refresh_token='')
                         context.get_ui().refresh_container()
@@ -752,15 +755,22 @@ class Provider(kodion.AbstractProvider):
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
-                            'settings_xml': 'settings.xml'}
+                            'settings_xml': 'settings.xml',
+                            'temp_files': 'special://temp/plugin.video.youtube/'}
             _file = _maint_files.get(maint_type, '')
+            success = False
             if _file:
                 if 'sqlite' in _file:
                     _file_w_path = os.path.join(context._get_cache_path(), _file)
+                elif maint_type == 'temp_files':
+                    _file_w_path = _file
                 else:
                     _file_w_path = os.path.join(context._data_path, _file)
                 if context.get_ui().on_delete_content(_file):
-                    success = xbmcvfs.delete(_file_w_path)
+                    if maint_type == 'temp_files':
+                        success = xbmcvfs.rmdir(_file_w_path, force=True)
+                    elif _file_w_path:
+                        success = xbmcvfs.delete(_file_w_path)
                     if success:
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     else:

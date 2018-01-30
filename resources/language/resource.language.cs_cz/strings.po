@@ -773,3 +773,7 @@ msgstr ""
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
 msgstr ""
+
+msgctxt "#30626"
+msgid "Delete temporary files"
+msgstr ""
