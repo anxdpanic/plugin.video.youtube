@@ -772,24 +772,24 @@ msgstr "Ο μεσολαβητής απαιτείται για την αναπα�
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Αγορές"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Εγκατάσταση βοηθού InputStream"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Απαιτεί Kodi 17+"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "Ο βοηθός InputStream είναι ήδη εγκατεστημένος"
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Διαγραφή προσωρινών αρχείων"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Βαθμολόγηση βίντεο με το πέρας παρακολούθησης"
