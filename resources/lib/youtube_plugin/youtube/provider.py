@@ -559,6 +559,17 @@ class Provider(kodion.AbstractProvider):
                     json_data = client.add_video_to_playlist(history_playlist_id, video_id)
                     if not v3.handle_error(self, context, json_data):
                         return False
+
+                # rate video
+                if context.get_settings().get_bool('youtube.post.play.rate', False):
+                    json_data = client.get_video_rating(video_id)
+                    if not v3.handle_error(self, context, json_data):
+                        return False
+                    items = json_data.get('items', [{'rating': 'none'}])
+                    rating = items[0].get('rating', 'none')
+                    if rating == 'none':
+                        rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
+                        yt_video.process('rate', self, context, rating_match)
         else:
             context.log_warning('Missing video ID for post play event')
         return True

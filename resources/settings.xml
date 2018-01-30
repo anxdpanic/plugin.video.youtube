@@ -11,6 +11,7 @@
         <setting id="kodion.subtitle.languages.num" type="number" value="0" visible="false"/>
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
+        <setting id="youtube.post.play.rate" type="bool" label="30627" default="false" />
         <setting type="sep" />
         <setting id="kodion.thumbnail.size" type="enum" label="30591" lvalues="30592|30593" default="1" />
         <setting id="kodion.fanart.show" type="bool" label="30021" default="true"/>
