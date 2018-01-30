@@ -12,7 +12,7 @@ import re
 import json
 
 import requests
-from ...kodion.utils.dash_proxy import is_proxy_live
+from ...kodion.utils import is_proxy_live, make_dirs
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
@@ -755,6 +755,11 @@ class VideoInfo(object):
         return stream_list
 
     def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
+        basepath = 'special://temp/plugin.video.youtube/'
+        if not make_dirs(basepath):
+            self._context.log_debug('Failed to create directories: %s' % basepath)
+            return None
+
         supported_mime_types = ['audio/mp4', 'video/mp4']
         fmts_list = adaptive_fmts.split(',')
         data = {}
@@ -830,7 +835,7 @@ class VideoInfo(object):
                 n = n + 1
         out += '\t</Period>\n</MPD>\n'
 
-        filepath = 'special://temp/temp/{video_id}.mpd'.format(video_id=video_id)
+        filepath = '{base_path}{video_id}.mpd'.format(base_path=basepath, video_id=video_id)
         try:
             f = xbmcvfs.File(filepath, 'w')
             try:

@@ -786,3 +786,11 @@ msgstr ""
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
 msgstr ""
+
+msgctxt "#30626"
+msgid "Delete temporary files"
+msgstr ""
+
+msgctxt "#30627"
+msgid "Rate video after watching"
+msgstr ""

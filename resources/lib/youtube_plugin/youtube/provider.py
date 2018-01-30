@@ -559,6 +559,17 @@ class Provider(kodion.AbstractProvider):
                     json_data = client.add_video_to_playlist(history_playlist_id, video_id)
                     if not v3.handle_error(self, context, json_data):
                         return False
+
+                # rate video
+                if context.get_settings().get_bool('youtube.post.play.rate', False):
+                    json_data = client.get_video_rating(video_id)
+                    if not v3.handle_error(self, context, json_data):
+                        return False
+                    items = json_data.get('items', [{'rating': 'none'}])
+                    rating = items[0].get('rating', 'none')
+                    if rating == 'none':
+                        rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
+                        yt_video.process('rate', self, context, rating_match)
         else:
             context.log_warning('Missing video ID for post play event')
         return True
@@ -742,7 +753,10 @@ class Provider(kodion.AbstractProvider):
                             refresh_tokens = access_manager.get_refresh_token().split('|')
                             refresh_tokens = list(set(refresh_tokens))
                             for refresh_token in refresh_tokens:
-                                client.revoke(refresh_token)
+                                try:
+                                    client.revoke(refresh_token)
+                                except:
+                                    pass
                         self.reset_client()
                         access_manager.update_access_token(access_token='', refresh_token='')
                         context.get_ui().refresh_container()
@@ -752,15 +766,22 @@ class Provider(kodion.AbstractProvider):
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
-                            'settings_xml': 'settings.xml'}
+                            'settings_xml': 'settings.xml',
+                            'temp_files': 'special://temp/plugin.video.youtube/'}
             _file = _maint_files.get(maint_type, '')
+            success = False
             if _file:
                 if 'sqlite' in _file:
                     _file_w_path = os.path.join(context._get_cache_path(), _file)
+                elif maint_type == 'temp_files':
+                    _file_w_path = _file
                 else:
                     _file_w_path = os.path.join(context._data_path, _file)
                 if context.get_ui().on_delete_content(_file):
-                    success = xbmcvfs.delete(_file_w_path)
+                    if maint_type == 'temp_files':
+                        success = xbmcvfs.rmdir(_file_w_path, force=True)
+                    elif _file_w_path:
+                        success = xbmcvfs.delete(_file_w_path)
                     if success:
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     else:
