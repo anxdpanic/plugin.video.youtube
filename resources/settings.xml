@@ -27,7 +27,6 @@
         <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)+eq(-2,true)" visible="eq(-1,true)+eq(-2,true)" option="close" action="RunPlugin(plugin://plugin.video.youtube/config/mpd/)"/>
         <setting type="lsep" label="30621" visible="eq(-2,true)+eq(-3,true)"/>
         <setting id="kodion.mpd.proxy" type="bool" label="30618" default="false" enable="eq(-3,true)+eq(-4,true)" visible="eq(-3,true)+eq(-4,true)"/>
-        <setting id="kodion.mpd.proxy.port" type="number" label="30619" default="50152" enable="eq(-4,true)+eq(-5,true)" visible="eq(-4,true)+eq(-5,true)"/>
     </category>
     <category label="30516">
         <setting id="youtube.folder.sign.in.show" type="bool" label="30111" default="true"/>
@@ -75,6 +74,11 @@
         <setting id="youtube.region" type="text" label="30550" enable="false" default="US"/>
     </category>
 
+    <category label="30628">
+        <setting id="kodion.http.ip.whitelist" type="text" label="30629" enable="true"/>
+        <setting id="kodion.mpd.proxy.port" type="number" label="30619" default="50152" enable="true"/>
+    </category>
+
     <!-- personal api key -->
     <category label="30200">
         <setting id="youtube.api.enable" type="bool" label="30204" default="false"/>
@@ -83,6 +87,8 @@
         <setting id="youtube.api.secret" type="text" label="30203" default="" visible="eq(-3,true)"/>
         <setting id="youtube.api.key.switch" type="enum" label="30205" values="0|1|2|3|4|5" visible="eq(-4,false)" default="1"/>
         <setting id="youtube.allow.dev.keys" type="bool" label="30608" default="true"/>
+        <setting id="youtube.api.config.address" type="lsep" label="30633" visible="eq(1,true)"/>
+        <setting id="youtube.api.config.page" type="bool" label="30632" default="false"/>
         <!-- Not user configured -->
         <setting id="youtube.api.last.switch" type="text" label="" visible="false" enable="true" default=""/>
         <setting id="youtube.api.last.hash" type="text" label="" visible="false" enable="true" default=""/>
