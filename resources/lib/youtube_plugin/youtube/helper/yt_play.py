@@ -1,8 +1,7 @@
-from builtins import str
+__author__ = 'bromix'
+
 import random
 import re
-
-__author__ = 'bromix'
 
 from ... import kodion
 from ...kodion import constants

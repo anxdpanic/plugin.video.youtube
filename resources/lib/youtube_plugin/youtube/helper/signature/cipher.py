@@ -1,6 +1,6 @@
-from builtins import range
-from builtins import object
 __author__ = 'bromix'
+
+from six.moves import range
 
 import json
 import os

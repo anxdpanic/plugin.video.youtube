@@ -1,6 +1,3 @@
-from builtins import str
-from ...kodion.items import VideoItem
-
 __author__ = 'bromix'
 
 import re

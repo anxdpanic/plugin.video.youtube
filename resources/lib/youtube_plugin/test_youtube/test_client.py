@@ -1,6 +1,6 @@
-from __future__ import print_function
-from builtins import range
 __author__ = 'bromix'
+
+from six.moves import range
 
 import unittest
 

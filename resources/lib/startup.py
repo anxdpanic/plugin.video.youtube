@@ -1,6 +1,3 @@
-from __future__ import division
-from builtins import str
-from past.utils import old_div
 __author__ = 'bromix'
 
 from datetime import datetime
@@ -50,7 +47,7 @@ def get_stamp_diff(current_stamp):
     time_delta = current_datetime - stamp_datetime
     total_seconds = 0
     if time_delta:
-        total_seconds = old_div(((time_delta.seconds + time_delta.days * 24 * 3600) * 10 ** 6), 10 ** 6)
+        total_seconds = ((time_delta.seconds + time_delta.days * 24 * 3600) * 10 ** 6) // (10 ** 6)
     return total_seconds
 
 

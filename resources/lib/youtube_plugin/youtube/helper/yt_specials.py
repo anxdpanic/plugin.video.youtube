@@ -1,4 +1,3 @@
-from builtins import str
 __author__ = 'bromix'
 
 from ... import kodion

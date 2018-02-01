@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from builtins import str
+
 from base64 import b64decode
 from hashlib import md5
 from ...kodion import Context as __Context

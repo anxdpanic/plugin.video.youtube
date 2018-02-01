@@ -1,13 +1,9 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import range
-from past.builtins import basestring
-from builtins import object
 __author__ = 'bromix'
 
-import urllib.request, urllib.parse, urllib.error
-import urllib.parse
+from six.moves import range
+from six import string_types
+from six.moves import urllib
+
 import re
 import json
 
@@ -459,7 +455,7 @@ class VideoInfo(object):
             player_config['args'] = dict()
 
         player_response = player_config['args'].get('player_response', dict())
-        if isinstance(player_response, basestring):
+        if isinstance(player_response, string_types):
             try:
                 player_response = json.loads(player_response)
             except TypeError:

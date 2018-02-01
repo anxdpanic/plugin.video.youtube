@@ -1,8 +1,6 @@
-from __future__ import division
-from past.utils import old_div
-from ...kodion.utils.function_cache import FunctionCache
-
 __author__ = 'bromix'
+
+from ...kodion.utils.function_cache import FunctionCache
 
 from ... import kodion
 from ...youtube.helper import v3
@@ -67,7 +65,7 @@ def _process_remove_playlist(provider, context, re_match):
 
 
 def _process_select_playlist(provider, context, re_match):
-    json_data = context.get_function_cache().get(old_div(FunctionCache.ONE_MINUTE, 3),
+    json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
                                                  provider.get_client(context).get_playlists_of_channel,
                                                  channel_id='mine')
     playlists = json_data.get('items', [])

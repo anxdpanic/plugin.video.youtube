@@ -1,10 +1,8 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
 __author__ = 'bromix'
 
+from six.moves import urllib
+
 import re
-import urllib.parse
 from ...kodion.items import VideoItem, DirectoryItem
 from . import utils
 

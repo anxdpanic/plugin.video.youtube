@@ -1,12 +1,8 @@
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
 __author__ = 'bromix'
 
+from six.moves import urllib
+
 import time
-import urllib.parse
 import requests
 from ...youtube.youtube_exceptions import LoginException
 from ...kodion import Context

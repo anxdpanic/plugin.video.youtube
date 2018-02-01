@@ -1,7 +1,6 @@
-from future import standard_library
-standard_library.install_aliases()
+from six.moves import urllib
+
 import sys
-import urllib.request, urllib.parse, urllib.error
 import weakref
 import datetime
 import json

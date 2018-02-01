@@ -1,4 +1,3 @@
-from builtins import object
 __author__ = 'bromix'
 
 

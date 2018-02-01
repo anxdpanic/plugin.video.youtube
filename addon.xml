@@ -2,7 +2,7 @@
 <addon id="plugin.video.youtube" name="YouTube" version="6.0.0~alpha1" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
-        <import addon="script.module.future"/>
+        <import addon="script.module.six"/>
         <import addon="script.module.requests" version="2.12.4"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">

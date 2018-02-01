@@ -1,7 +1,5 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from six.moves import BaseHTTPServer
+
 import os
 import requests
 import socket
@@ -11,7 +9,7 @@ import xbmcaddon
 import xbmcgui
 
 
-class DashProxyHandler(BaseHTTPRequestHandler):
+class DashProxyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
     chunk_size = 1024 * 64
     base_path = 'special://temp/plugin.video.youtube'
@@ -71,7 +69,7 @@ def get_proxy_server(address=None, port=None):
     address = address if address else '127.0.0.1'
     port = int(port) if port else 50152
     try:
-        server = HTTPServer((address, port), DashProxyHandler)
+        server = BaseHTTPServer.HTTPServer((address, port), DashProxyHandler)
         return server
     except socket.error:
         addon = xbmcaddon.Addon('plugin.video.youtube')

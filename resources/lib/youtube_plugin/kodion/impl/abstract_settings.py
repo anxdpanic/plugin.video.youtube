@@ -1,5 +1,3 @@
-from builtins import str
-from builtins import object
 __author__ = 'bromix'
 
 import sys

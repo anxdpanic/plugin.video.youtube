@@ -1,4 +1,3 @@
-from builtins import str
 __author__ = 'bromix'
 
 from .directory_item import DirectoryItem

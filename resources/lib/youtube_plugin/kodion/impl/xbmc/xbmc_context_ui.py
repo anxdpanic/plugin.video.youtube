@@ -1,6 +1,6 @@
-from builtins import str
-from past.builtins import basestring
 __author__ = 'bromix'
+
+from six import string_types
 
 import xbmc
 import xbmcgui
@@ -28,7 +28,7 @@ class XbmcContextUI(AbstractContextUI):
         return XbmcProgressDialog(heading, text)
 
     def set_view_mode(self, view_mode):
-        if isinstance(view_mode, basestring):
+        if isinstance(view_mode, string_types):
             view_mode = self._context.get_settings().get_int(constants.setting.VIEW_X % view_mode, 50)
 
         self._view_mode = view_mode
@@ -79,11 +79,11 @@ class XbmcContextUI(AbstractContextUI):
         return dialog.ok(title, text)
 
     def on_remove_content(self, content_name):
-        text = self._context.localize(constants.localize.REMOVE_CONTENT) % content_name
+        text = self._context.localize(constants.localize.REMOVE_CONTENT) % utils.to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_REMOVE), text)
 
     def on_delete_content(self, content_name):
-        text = self._context.localize(constants.localize.DELETE_CONTENT) % content_name
+        text = self._context.localize(constants.localize.DELETE_CONTENT) % utils.to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_DELETE), text)
 
     def on_select(self, title, items=[]):

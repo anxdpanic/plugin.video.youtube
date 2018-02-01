@@ -1,6 +1,5 @@
 __author__ = 'bromix'
 
-import xbmc
 import xbmcgui
 import xbmcplugin
 
