@@ -760,11 +760,11 @@ msgstr "Ενεργοποίηση μεσολαβητή mpeg-dash"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Θύρα"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Η θύρα %s χρησιμοποιείται ήδη. Αδυναμία έναρξης εξυπηρετητή http."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
@@ -796,24 +796,24 @@ msgstr "Βαθμολόγηση βίντεο με το πέρας παρακολ�
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "Εξυπηρετητής HTTP"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "Λίστα επιτρεπομένων IP (διαχωρισμένες με κόμμα)"
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Αποθήκευση"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Επιτυχής ενημέρωση του: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Επέτρεψε την σελίδα ρυθμίσεων κλειδιών API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://διεύθυνσηIP:θύρα/api (βλέπε εξυπηρετητής HTTP)"
