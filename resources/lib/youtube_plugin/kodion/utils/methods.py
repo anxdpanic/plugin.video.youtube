@@ -1,14 +1,12 @@
-from __future__ import print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import next
-from builtins import str
 __author__ = 'bromix'
 
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
            'to_unicode', 'select_stream', 'make_dirs']
 
-import urllib.request, urllib.parse, urllib.error
+from six.moves import urllib
+from six import next
+from six import string_types
+
 import re
 from ..constants import localize
 import xbmcaddon
@@ -24,18 +22,21 @@ def loose_version(v):
 
 def to_utf8(text):
     result = text
-    if isinstance(text, str):
-        result = text.encode('utf-8')
+    if isinstance(text, string_types):
+        try:
+            result = text.encode('utf-8')
+        except UnicodeDecodeError:
+            pass
 
     return result
 
 
 def to_unicode(text):
     result = text
-    if isinstance(text, str):
+    if isinstance(text, string_types):
         try:
             result = text.decode('utf-8')
-        except AttributeError:
+        except (AttributeError, UnicodeEncodeError):
             pass
 
     return result

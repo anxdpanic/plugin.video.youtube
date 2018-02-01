@@ -1,4 +1,4 @@
-from past.builtins import basestring
+from six import string_types
 import re
 import json
 import requests
@@ -63,7 +63,7 @@ def _get_config_and_cookies(client, url):
         player_config['args'] = dict()
 
     player_response = player_config['args'].get('player_response', dict())
-    if isinstance(player_response, basestring):
+    if isinstance(player_response, string_types):
         try:
             player_response = json.loads(player_response)
         except TypeError:

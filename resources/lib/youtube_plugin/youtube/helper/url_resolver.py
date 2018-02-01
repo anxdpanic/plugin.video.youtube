@@ -1,11 +1,9 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import object
-import re
-
 __author__ = 'bromix'
 
-import urllib.parse
+from six.moves import urllib
+
+import re
+
 from ...kodion.utils import FunctionCache
 from ...kodion import Context as _Context
 import requests

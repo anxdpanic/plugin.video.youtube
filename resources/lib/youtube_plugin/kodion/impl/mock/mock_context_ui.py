@@ -1,4 +1,3 @@
-from __future__ import print_function
 __author__ = 'bromix'
 
 from ..abstract_context_ui import AbstractContextUI

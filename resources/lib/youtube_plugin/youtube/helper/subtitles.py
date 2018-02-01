@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import object
+
+from six.moves import html_parser
+
 import xbmcvfs
-import html.parser
 import requests
 from ...kodion.utils import make_dirs
+
 
 class Subtitles(object):
     LANG_NONE = 0
@@ -80,7 +79,7 @@ class Subtitles(object):
         except:
             self.context.log_debug('Subtitle unescape: failed to decode utf-8')
         try:
-            text = html.parser.HTMLParser().unescape(text)
+            text = html_parser.HTMLParser().unescape(text)
         except:
             self.context.log_debug('Subtitle unescape: failed to unescape text')
         return text

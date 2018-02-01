@@ -1,6 +1,3 @@
-from __future__ import division
-from builtins import str
-from past.utils import old_div
 __author__ = 'bromix'
 
 from .base_item import BaseItem
@@ -25,25 +22,25 @@ class AudioItem(BaseItem):
         return self._rating
 
     def set_title(self, title):
-        self._title = str(title)
+        self._title = title
 
     def get_title(self):
         return self._title
 
     def set_artist_name(self, artist_name):
-        self._artist = str(artist_name)
+        self._artist = artist_name
 
     def get_artist_name(self):
         return self._artist
 
     def set_album_name(self, album_name):
-        self._album = str(album_name)
+        self._album = album_name
 
     def get_album_name(self):
         return self._album
 
     def set_genre(self, genre):
-        self._genre = str(genre)
+        self._genre = genre
 
     def get_genre(self):
         return self._genre
@@ -64,7 +61,7 @@ class AudioItem(BaseItem):
         return self._track_number
 
     def set_duration_from_milli_seconds(self, milli_seconds):
-        self.set_duration_from_seconds(old_div(int(milli_seconds), 1000))
+        self.set_duration_from_seconds(int(milli_seconds) // 1000)
 
     def set_duration_from_seconds(self, seconds):
         self._duration = int(seconds)

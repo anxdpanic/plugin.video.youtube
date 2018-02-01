@@ -1,4 +1,3 @@
-from __future__ import print_function
 __author__ = 'bromix'
 
 from ..abstract_progress_dialog import AbstractProgressDialog

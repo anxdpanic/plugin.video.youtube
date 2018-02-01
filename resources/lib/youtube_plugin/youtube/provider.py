@@ -1,5 +1,5 @@
-from builtins import map
 __author__ = 'bromix'
+from six.moves import map
 
 import os
 import re

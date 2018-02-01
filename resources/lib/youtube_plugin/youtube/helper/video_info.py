@@ -1,18 +1,14 @@
-from future import standard_library
-standard_library.install_aliases()
-from builtins import str
-from builtins import range
-from past.builtins import basestring
-from builtins import object
 __author__ = 'bromix'
 
-import urllib.request, urllib.parse, urllib.error
-import urllib.parse
+from six.moves import range
+from six import string_types
+from six.moves import urllib
+
 import re
 import json
 
 import requests
-from ...kodion.utils import is_proxy_live, make_dirs
+from ...kodion.utils import is_httpd_live, make_dirs
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
@@ -459,7 +455,7 @@ class VideoInfo(object):
             player_config['args'] = dict()
 
         player_response = player_config['args'].get('player_response', dict())
-        if isinstance(player_response, basestring):
+        if isinstance(player_response, string_types):
             try:
                 player_response = json.loads(player_response)
             except TypeError:
@@ -663,7 +659,7 @@ class VideoInfo(object):
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         if not mpd_url and params.get('live_playback', '0') == '0' and \
                 self._context.get_settings().use_dash_proxy() and \
-                is_proxy_live(port=self._context.get_settings().dash_proxy_port()):
+                is_httpd_live(port=self._context.get_settings().httpd_port()):
             mpd_url = self.generate_mpd(video_id, params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')), params.get('length_seconds', '0'), cipher)
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
@@ -843,6 +839,6 @@ class VideoInfo(object):
             except TypeError:
                 result = f.write(str(out))
             f.close()
-            return 'http://127.0.0.1:{port}/{video_id}.mpd'.format(port=self._context.get_settings().dash_proxy_port(), video_id=video_id)
+            return 'http://127.0.0.1:{port}/{video_id}.mpd'.format(port=self._context.get_settings().httpd_port(), video_id=video_id)
         except:
             return None

@@ -55,7 +55,7 @@ class TestUrlExtract(unittest.TestCase):
         for url in urls:
             res_urls.append(resolver.resolve(url))
         end = time.clock()
-        print end - start
+        print(end - start)
 
     def test_resolve_urls_2(self):
         description = (

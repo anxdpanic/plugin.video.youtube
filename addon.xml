@@ -2,7 +2,7 @@
 <addon id="plugin.video.youtube" name="YouTube" version="6.0.0~alpha1" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
-        <import addon="script.module.future"/>
+        <import addon="script.module.six"/>
         <import addon="script.module.requests" version="2.12.4"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
@@ -15,6 +15,9 @@
 [add] Python 3 compat.
 [add] Settings -> Maintenance -> Delete temporary files
 [add] Settings -> General -> Rate video after watching
+[add] Settings -> API -> Enable API configuration page
+        - when enabled, visit http://ipaddress:port/api to configure API keys from a web browser
+        - port is configured in Settings - HTTP Server - Port
 [fix] context menu after playback
 [fix] alternative player, do not append headers
 [fix/upd] post play events happen post play

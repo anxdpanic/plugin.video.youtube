@@ -2,6 +2,9 @@
 [add] Python 3 compat.
 [add] Settings -> Maintenance -> Delete temporary files
 [add] Settings -> General -> Rate video after watching
+[add] Settings -> API -> Enable API configuration page
+        - when enabled, visit http://ipaddress:port/api to configure API keys from a web browser
+        - port is configured in Settings - HTTP Server - Port
 [fix] context menu after playback
 [fix] alternative player, do not append headers
 [fix/upd] post play events happen post play

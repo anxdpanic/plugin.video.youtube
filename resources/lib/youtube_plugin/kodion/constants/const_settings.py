@@ -30,4 +30,4 @@ ACCESS_TOKEN_EXPIRES = 'kodion.access_token.expires'
 ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
 DASH_PROXY = 'kodion.mpd.proxy'  # (bool)
-DASH_PROXY_PORT = 'kodion.mpd.proxy.port'  # (number)
+HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)

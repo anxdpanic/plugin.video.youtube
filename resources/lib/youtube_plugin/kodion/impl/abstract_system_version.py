@@ -1,10 +1,11 @@
-from builtins import str
-from builtins import map
-from past.builtins import basestring
-from builtins import object
 __author__ = 'bromix'
 
+from six.moves import map
+from six import string_types
+from six import python_2_unicode_compatible
 
+
+@python_2_unicode_compatible
 class AbstractSystemVersion(object):
     def __init__(self, version, releasename, appname):
         if not isinstance(version, tuple):
@@ -12,19 +13,19 @@ class AbstractSystemVersion(object):
         else:
             self._version = version
 
-        if not releasename or not isinstance(releasename, basestring):
+        if not releasename or not isinstance(releasename, string_types):
             self._releasename = 'UNKNOWN'
         else:
             self._releasename = releasename
 
-        if not appname or not isinstance(appname, basestring):
+        if not appname or not isinstance(appname, string_types):
             self._appname = 'UNKNOWN'
         else:
             self._appname = appname
 
     def __str__(self):
         obj_str = "%s (%s-%s)" % (self._releasename, self._appname, '.'.join(map(str, self._version)))
-        return str(obj_str)
+        return obj_str
 
     def get_release_name(self):
         return self._releasename

@@ -1,6 +1,3 @@
-from __future__ import division
-from builtins import str
-from past.utils import old_div
 from functools import partial
 import hashlib
 import datetime
@@ -71,7 +68,7 @@ class FunctionCache(Storage):
     def get(self, seconds, func, *args, **keywords):
         def _seconds_difference(_first, _last):
             _delta = _last - _first
-            return 24 * 60 * 60 * _delta.days + _delta.seconds + old_div(_delta.microseconds, 1000000.)
+            return 24 * 60 * 60 * _delta.days + _delta.seconds + (_delta.microseconds // 1000000.)
 
         """
         Returns the cached data of the given function.

@@ -743,12 +743,12 @@ msgid "Enable mpeg-dash proxy"
 msgstr "Attiva mpeg-dash proxy"
 
 msgctxt "#30619"
-msgid "Proxy port"
-msgstr "Porta Proxy"
+msgid "Port"
+msgstr "Porta"
 
 msgctxt "#30620"
-msgid "Port %s already in use. Cannot start proxy server."
-msgstr "La Porta %s è già in uso. Non posso avviare il Server Proxy."
+msgid "Port %s already in use. Cannot start http server."
+msgstr "La Porta %s è già in uso. Non posso avviare il Server http."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
@@ -776,4 +776,28 @@ msgstr ""
 
 msgctxt "#30627"
 msgid "Rate video after watching"
+msgstr ""
+
+msgctxt "#30628"
+msgid "HTTP Server"
+msgstr ""
+
+msgctxt "#30629"
+msgid "IP whitelist (comma delimited)"
+msgstr ""
+
+msgctxt "#30630"
+msgid "Save"
+msgstr ""
+
+msgctxt "#30631"
+msgid "Successfully updated: %s"
+msgstr ""
+
+msgctxt "#30632"
+msgid "Enable API configuration page"
+msgstr ""
+
+msgctxt "#30633"
+msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
 msgstr ""

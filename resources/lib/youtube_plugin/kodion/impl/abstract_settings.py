@@ -1,5 +1,3 @@
-from builtins import str
-from builtins import object
 __author__ = 'bromix'
 
 import sys
@@ -129,5 +127,5 @@ class AbstractSettings(object):
     def use_dash_proxy(self):
         return self.get_bool(constants.setting.DASH_PROXY, True)
 
-    def dash_proxy_port(self):
-        return self.get_int(constants.setting.DASH_PROXY_PORT, 50152)
+    def httpd_port(self):
+        return self.get_int(constants.setting.HTTPD_PORT, 50152)
