@@ -65,10 +65,10 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             elif api_config_enabled and self.path.startswith('/api_submit'):
                 addon = xbmcaddon.Addon('plugin.video.youtube')
                 i18n = addon.getLocalizedString
+                xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
                 old_api_key = addon.getSetting('youtube.api.key')
                 old_api_id = addon.getSetting('youtube.api.id')
                 old_api_secret = addon.getSetting('youtube.api.secret')
-                xbmc.executebuiltin('Dialog.Close(all,true)')
                 params = parse_qs(urlparse(self.path).query)
                 api_key = params.get('api_key', [''])[0]
                 api_id = params.get('api_id', [''])[0]
