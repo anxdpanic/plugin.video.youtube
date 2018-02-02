@@ -755,48 +755,48 @@ msgstr "Proxy szükséges az mpeg-dash formátumhoz"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Vásárlások"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "InputStream Helper telepítés"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Kodi 17+ szükséges"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper már telepítésre került."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Ideiglenes fájlok törlése"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Videó értékelése megtekintés után"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP kiszolgáló"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "IP fehérlista (vesszővel elválasztva)"
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Mentés"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Sikeres frissítés: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "API beállítások oldal engedélyezése"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (lásd HTTP kiszolgáló)"
