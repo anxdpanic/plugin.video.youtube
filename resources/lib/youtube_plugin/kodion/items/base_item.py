@@ -1,4 +1,5 @@
 from six import python_2_unicode_compatible
+from six import string_types
 
 import hashlib
 import datetime
@@ -47,7 +48,7 @@ class BaseItem(object):
         return self._name
 
     def set_uri(self, uri):
-        if isinstance(uri, str):
+        if isinstance(uri, string_types):
             self._uri = uri
         else:
             self._uri = ''
