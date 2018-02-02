@@ -4,6 +4,8 @@ from six.moves import map
 import os
 import re
 import json
+import shutil
+
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
 from ..kodion.utils import FunctionCache
@@ -12,6 +14,8 @@ from ..youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
     yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
 from .youtube_exceptions import LoginException
+
+import xbmc
 import xbmcaddon
 import xbmcvfs
 
@@ -779,7 +783,17 @@ class Provider(kodion.AbstractProvider):
                     _file_w_path = os.path.join(context._data_path, _file)
                 if context.get_ui().on_delete_content(_file):
                     if maint_type == 'temp_files':
-                        success = xbmcvfs.rmdir(_file_w_path, force=True)
+                        _trans_path = xbmc.translatePath(_file_w_path)
+                        try:
+                            xbmcvfs.rmdir(_trans_path, force=True)
+                        except:
+                            pass
+                        if xbmcvfs.exists(_trans_path):
+                            try:
+                                shutil.rmtree(_trans_path)
+                            except:
+                                pass
+                        success = not xbmcvfs.exists(_trans_path)
                     elif _file_w_path:
                         success = xbmcvfs.delete(_file_w_path)
                     if success:

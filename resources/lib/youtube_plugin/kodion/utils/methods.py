@@ -7,8 +7,12 @@ from six.moves import urllib
 from six import next
 from six import string_types
 
+import os
 import re
+
 from ..constants import localize
+
+import xbmc
 import xbmcaddon
 import xbmcvfs
 
@@ -198,10 +202,17 @@ def print_items(items):
 def make_dirs(path):
     if not path.endswith('/'):
         path += '/'
+    path = xbmc.translatePath(path)
     if not xbmcvfs.exists(path):
         try:
             r = xbmcvfs.mkdirs(path)
-            return True
         except:
-            return False
+            pass
+        if not xbmcvfs.exists(path):
+            try:
+                os.makedirs(path)
+            except:
+                pass
+        return xbmcvfs.exists(path)
+
     return True
