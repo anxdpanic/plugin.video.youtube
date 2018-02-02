@@ -17,9 +17,10 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         addon = xbmcaddon.Addon('plugin.video.youtube')
         whitelist_ips = addon.getSetting('kodion.http.ip.whitelist')
         whitelist_ips = ''.join(whitelist_ips.split())
-        whitelist_ips = tuple(whitelist_ips.split(','))
+        whitelist_ips = whitelist_ips.split(',')
         local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
-        self.allowed_ips = local_ranges + whitelist_ips
+        self.local_ranges = local_ranges
+        self.whitelist_ips = whitelist_ips
         self.chunk_size = 1024 * 64
         self.base_path = 'special://temp/plugin.video.youtube'
         BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
@@ -29,7 +30,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         dash_proxy_enabled = addon.getSetting('kodion.mpd.proxy') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
 
-        if not self.client_address[0].startswith(self.allowed_ips):
+        if not self.client_address[0].startswith(self.local_ranges) and not self.client_address[0] in self.whitelist_ips:
             self.send_error(403)
         else:
             if dash_proxy_enabled and self.path.endswith('.mpd'):
@@ -106,7 +107,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.send_error(403)
 
     def do_HEAD(self):
-        if not self.client_address[0].startswith(self.allowed_ips):
+        if not self.client_address[0].startswith(self.local_ranges) and not self.client_address[0] in self.whitelist_ips:
             self.send_error(403)
         else:
             addon = xbmcaddon.Addon('plugin.video.youtube')
