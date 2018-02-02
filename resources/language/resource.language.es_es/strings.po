@@ -227,7 +227,7 @@ msgstr "Renombrar"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "Confirmación para borrar"
+msgstr "Confirmación para eliminar"
 
 msgctxt "#30115"
 msgid "Confirm remove"
@@ -235,7 +235,7 @@ msgstr "Confirmación para quitar"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "¿Esta seguro de que desea borrar \"%s\"?"
+msgstr "¿Esta seguro de que desea eliminar \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
@@ -385,7 +385,7 @@ msgstr "Seleccione el idioma"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr "Seleccione región"
+msgstr "Seleccione una región"
 
 msgctxt "#30526"
 msgid "Adjust"
@@ -625,7 +625,7 @@ msgstr "Mis Suscripciones (Filtrado)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr "Lista de canales filtrados (separados por comas)"
+msgstr "Lista de canales filtrados (separado por comas)"
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -697,7 +697,7 @@ msgstr "Sin autogenerado"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr Activar restricciones por edad"
+msgstr "Activar restricciones por edad"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
@@ -705,11 +705,11 @@ msgstr "Permitir contenido ofensivo"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr "Búsqueda rápida"
+msgstr "Búsqueda Rápida"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr "Búsqueda rápida (Incógnito)"
+msgstr "Búsqueda Rápida (Incógnito)"
 
 msgctxt "#30607"
 msgid "Audio only"
@@ -757,63 +757,63 @@ msgstr ""
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Habilitar proxy mpeg-dash"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Puerto"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Puerto %s ya en uso. No se ha podido iniciar el servidor HTTP"
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr ""
+msgstr "Para VODs mpeg-dash es necesario proxy"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Compras"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Necesario Kodi 17 o superior"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper ya está instalado"
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Eliminar archivos temporales"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Calificar video después de ver"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "Server HTTP"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "Lista blanca IP (separado por comas)"
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Guardar"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Actualizado correctamente: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Habilitar página de configuración de API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
