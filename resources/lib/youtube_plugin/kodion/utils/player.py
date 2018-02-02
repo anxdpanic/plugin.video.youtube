@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import shutil
+
 import xbmc
 import xbmcvfs
 
@@ -19,12 +21,21 @@ class YouTubePlayer(xbmc.Player):
 
     def remove_temp_dir(self):
         temp_path = 'special://temp/plugin.video.youtube/'
+        path = xbmc.translatePath(temp_path)
         try:
-            xbmcvfs.rmdir(temp_path, force=True)
-            return True
+            xbmcvfs.rmdir(path, force=True)
         except:
-            self.context.log_debug('Failed to remove directory: {dir}'.format(dir=temp_path))
+            pass
+        if xbmcvfs.exists(path):
+            try:
+                shutil.rmtree(path)
+            except:
+                pass
+        if xbmcvfs.exists(path):
+            self.context.log_debug('Failed to remove directory: {dir}'.format(dir=path))
             return False
+        else:
+            return True
 
     def post_play(self):
         is_playing = self.ui.get_home_window_property('playing')
