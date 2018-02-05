@@ -800,3 +800,23 @@ msgstr "API beállítások oldal engedélyezése"
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
 msgstr "http://<ipaddress>:<port>/api (lásd HTTP kiszolgáló)"
+
+msgctxt "#30634"
+msgid "YouTube Add-on API Configuration"
+msgstr ""
+
+msgctxt "#30635"
+msgid "No changes detected, API keys were not updated."
+msgstr ""
+
+msgctxt "#30636"
+msgid "Personal API keys are enabled."
+msgstr ""
+
+msgctxt "#30637"
+msgid "Personal API keys are disabled."
+msgstr ""
+
+msgctxt "#30638"
+msgid "Bookmark this page to quickly add your keys in the future."
+msgstr ""
