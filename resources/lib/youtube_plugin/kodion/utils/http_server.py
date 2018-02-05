@@ -18,9 +18,10 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         whitelist_ips = addon.getSetting('kodion.http.ip.whitelist')
         whitelist_ips = ''.join(whitelist_ips.split())
         whitelist_ips = whitelist_ips.split(',')
-        local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
+        local_ranges = ('10.', '172.16.', '192.168.')
+        local_ips = ['127.0.0.1', 'localhost', '::1']
         self.local_ranges = local_ranges
-        self.whitelist_ips = whitelist_ips
+        self.whitelist_ips = whitelist_ips + local_ips
         self.chunk_size = 1024 * 64
         self.base_path = 'special://temp/plugin.video.youtube'
         BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
