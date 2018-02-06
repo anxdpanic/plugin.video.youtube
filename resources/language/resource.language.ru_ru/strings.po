@@ -830,3 +830,15 @@ msgstr ""
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
 msgstr ""
+
+msgctxt "#30639"
+msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
+msgstr ""
+
+msgctxt "#30640"
+msgid "Restore"
+msgstr ""
+
+msgctxt "#30641"
+msgid "Delete api_keys.json"
+msgstr ""

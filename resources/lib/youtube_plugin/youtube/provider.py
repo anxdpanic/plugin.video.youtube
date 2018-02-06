@@ -771,6 +771,7 @@ class Provider(kodion.AbstractProvider):
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
                             'settings_xml': 'settings.xml',
+                            'api_keys': 'api_keys.json',
                             'temp_files': 'special://temp/plugin.video.youtube/'}
             _file = _maint_files.get(maint_type, '')
             success = False

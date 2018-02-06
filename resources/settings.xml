@@ -106,8 +106,8 @@
         <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" action="RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/reset/)" option="close"/>
         <setting type="sep" />
         <setting id="kodion.maintain.delete.settings" type="action" label="30559" option="close" action="RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)"/>
-        <setting type="sep" />
         <setting id="kodion.maintain.delete.temp" type="action" label="30626" action="RunPlugin(plugin://plugin.video.youtube/maintain/temp_files/delete/)"/>
+        <setting id="kodion.maintain.delete.api_keys" type="action" label="30641" action="RunPlugin(plugin://plugin.video.youtube/maintain/api_keys/delete/)"/>
         <!-- Not user configured -->
         <setting id="kodion.access_token" type="text" visible="false" enabled="true" default=""/>
         <setting id="kodion.access_token.expires" type="text" visible="false" enabled="true" default=""/>
