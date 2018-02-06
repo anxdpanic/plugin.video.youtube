@@ -7,8 +7,14 @@ __author__ = 'bromix'
 
 
 class AccessManager(object):
-    def __init__(self, settings):
-        self._settings = settings
+    def __init__(self, context, jstore):
+        self._settings = context.get_settings()
+        self.jstore = jstore(context, 'access_manager.json')
+        self.json = self.jstore.load(force=True)
+        if 'access_manager' not in self.json:
+            self.json['access_manager'] = {'access_token': '', 'refresh_token': '', 'token_expires': -1}
+            self.jstore.save(self.json)
+        self.restore_tokens()
 
     def has_login_credentials(self):
         """
@@ -50,6 +56,20 @@ class AccessManager(object):
             return True
 
         return False
+
+    def restore_tokens(self):
+        access_token = self._settings.get_string(constants.setting.ACCESS_TOKEN, '')
+        refresh_token = self._settings.get_string(constants.setting.REFRESH_TOKEN, '')
+        token_expires = self._settings.get_int(constants.setting.ACCESS_TOKEN_EXPIRES, -1)
+        json_access_token = self.json['access_manager'].get('access_token', '')
+        json_refresh_token = self.json['access_manager'].get('refresh_token', '')
+        json_token_expires = self.json['access_manager'].get('token_expires', -1)
+        if not access_token or not refresh_token:
+            if json_access_token and json_token_expires and json_refresh_token:
+                self.update_access_token(json_access_token, json_token_expires, json_refresh_token)
+        else:
+            if not json_access_token or not json_token_expires or not json_refresh_token:
+                self.update_access_token(access_token, token_expires, refresh_token)
 
     def get_access_token(self):
         """
@@ -94,9 +114,14 @@ class AccessManager(object):
         :param access_token:
         :return:
         """
+        self.json['access_manager']['access_token'] = access_token
         self._settings.set_string(constants.setting.ACCESS_TOKEN, access_token)
         if unix_timestamp is not None:
+            self.json['access_manager']['token_expires'] = int(unix_timestamp)
             self._settings.set_int(constants.setting.ACCESS_TOKEN_EXPIRES, int(unix_timestamp))
 
         if refresh_token is not None:
+            self.json['access_manager']['refresh_token'] = refresh_token
             self._settings.set_string(constants.setting.REFRESH_TOKEN, refresh_token)
+
+        self.jstore.save(self.json)

@@ -39,13 +39,13 @@ class JSONStore:
             if not self.make_dirs(self.base_path):
                 self.context.log_debug('JSONStore Save |{filename}| failed to create directories.'.format(filename=self.filename))
                 return
-        with open(self.filename, 'wb') as jsonfile:
+        with open(self.filename, 'w') as jsonfile:
             self.context.log_debug('JSONStore Save |{filename}|'.format(filename=self.filename))
             json.dump(data, jsonfile, indent=4, sort_keys=True)
 
     def load(self, force=False):
         if force or not self._data:
-            with open(self.filename, 'rb') as jsonfile:
+            with open(self.filename, 'r') as jsonfile:
                 data = json.load(jsonfile)
                 self._data = data
                 self.context.log_debug('JSONStore Load |{filename}|'.format(filename=self.filename))

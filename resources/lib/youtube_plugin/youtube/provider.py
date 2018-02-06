@@ -1069,6 +1069,7 @@ class Provider(kodion.AbstractProvider):
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, LoginException):
+            failed_refresh = False
             context.get_access_manager().update_access_token('')
 
             msg = message = exception_to_handle.get_message()
@@ -1087,6 +1088,9 @@ class Provider(kodion.AbstractProvider):
                 if 'code' in msg:
                     code = msg['code']
 
+                if message == u'Unauthorized' and error == u'unauthorized_client':
+                    failed_refresh = True
+
             if error and code:
                 title = '%s: [%s] %s' % ('LoginException', code, error)
             elif error:
@@ -1096,7 +1100,8 @@ class Provider(kodion.AbstractProvider):
 
             context.get_ui().show_notification(message, title)
             context.log_error('%s: %s' % (title, message))
-            context.get_ui().open_settings()
+            if not failed_refresh:
+                context.get_ui().open_settings()
             return False
 
         return True
