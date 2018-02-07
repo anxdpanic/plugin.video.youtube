@@ -833,3 +833,7 @@ msgstr ""
 msgctxt "#30641"
 msgid "Delete api_keys.json"
 msgstr ""
+
+msgctxt "#30642"
+msgid "Delete access_manager.json"
+msgstr ""
