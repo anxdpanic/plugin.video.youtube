@@ -755,7 +755,9 @@ class VideoInfo(object):
         if not make_dirs(basepath):
             self._context.log_debug('Failed to create directories: %s' % basepath)
             return None
-
+        ipaddress = self._context.get_settings().httpd_listen()
+        if ipaddress == '0.0.0.0':
+            ipaddress = '127.0.0.1'
         supported_mime_types = ['audio/mp4', 'video/mp4']
         fmts_list = adaptive_fmts.split(',')
         data = {}
@@ -839,6 +841,6 @@ class VideoInfo(object):
             except TypeError:
                 result = f.write(str(out))
             f.close()
-            return 'http://127.0.0.1:{port}/{video_id}.mpd'.format(port=self._context.get_settings().httpd_port(), video_id=video_id)
+            return 'http://{ipaddress}:{port}/{video_id}.mpd'.format(ipaddress=ipaddress, port=self._context.get_settings().httpd_port(), video_id=video_id)
         except:
             return None

@@ -129,3 +129,9 @@ class AbstractSettings(object):
 
     def httpd_port(self):
         return self.get_int(constants.setting.HTTPD_PORT, 50152)
+
+    def httpd_listen(self):
+        return self.get_string(constants.setting.HTTPD_LISTEN, '0.0.0.0')
+
+    def set_httpd_listen(self, value):
+        return self.set_string(constants.setting.HTTPD_LISTEN, value)

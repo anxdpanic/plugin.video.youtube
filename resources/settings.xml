@@ -75,8 +75,10 @@
     </category>
 
     <category label="30628">
-        <setting id="kodion.http.ip.whitelist" type="text" label="30629" enable="true"/>
+        <setting id="kodion.http.listen" type="ipaddress" label="30643" default="0.0.0.0" enable="true"/>
+        <setting id="kodion.http.listen.select" type="action" label="30644" action="RunPlugin(plugin://plugin.video.youtube/config/listen_ip/)" option="close"/>
         <setting id="kodion.mpd.proxy.port" type="number" label="30619" default="50152" enable="true"/>
+        <setting id="kodion.http.ip.whitelist" type="text" label="30629" enable="true"/>
     </category>
 
     <!-- personal api key -->
@@ -106,8 +108,9 @@
         <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" action="RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/reset/)" option="close"/>
         <setting type="sep" />
         <setting id="kodion.maintain.delete.settings" type="action" label="30559" option="close" action="RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)"/>
-        <setting id="kodion.maintain.delete.temp" type="action" label="30626" action="RunPlugin(plugin://plugin.video.youtube/maintain/temp_files/delete/)"/>
         <setting id="kodion.maintain.delete.api_keys" type="action" label="30641" action="RunPlugin(plugin://plugin.video.youtube/maintain/api_keys/delete/)"/>
+        <setting id="kodion.maintain.delete.access_manager" type="action" label="30642" action="RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/delete/)"/>
+        <setting id="kodion.maintain.delete.temp" type="action" label="30626" action="RunPlugin(plugin://plugin.video.youtube/maintain/temp_files/delete/)"/>
         <!-- Not user configured -->
         <setting id="kodion.access_token" type="text" visible="false" enabled="true" default=""/>
         <setting id="kodion.access_token.expires" type="text" visible="false" enabled="true" default=""/>
