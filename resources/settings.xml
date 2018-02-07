@@ -75,8 +75,10 @@
     </category>
 
     <category label="30628">
-        <setting id="kodion.http.ip.whitelist" type="text" label="30629" enable="true"/>
+        <setting id="kodion.http.listen" type="ipaddress" label="30643" default="0.0.0.0" enable="true"/>
+        <setting id="kodion.http.listen.select" type="action" label="30644" action="RunPlugin(plugin://plugin.video.youtube/config/listen_ip/)" option="close"/>
         <setting id="kodion.mpd.proxy.port" type="number" label="30619" default="50152" enable="true"/>
+        <setting id="kodion.http.ip.whitelist" type="text" label="30629" enable="true"/>
     </category>
 
     <!-- personal api key -->

@@ -853,3 +853,11 @@ msgstr ""
 msgctxt "#30642"
 msgid "Delete access_manager.json"
 msgstr ""
+
+msgctxt "#30643"
+msgid "Listen on IP"
+msgstr ""
+
+msgctxt "#30644"
+msgid "Select listen IP"
+msgstr ""

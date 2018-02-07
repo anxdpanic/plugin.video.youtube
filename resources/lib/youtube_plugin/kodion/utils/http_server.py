@@ -344,21 +344,26 @@ class Pages(object):
 
 
 def get_http_server(address=None, port=None):
-    address = address if address else '0.0.0.0'
+    addon = xbmcaddon.Addon('plugin.video.youtube')
+    address = address if address else addon.getSetting('kodion.http.listen')
+    address = address if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address) else '0.0.0.0'
     port = int(port) if port else 50152
     try:
         server = BaseHTTPServer.HTTPServer((address, port), YouTubeRequestHandler)
         return server
-    except socket.error:
-        addon = xbmcaddon.Addon('plugin.video.youtube')
-        xbmcgui.Dialog().notification(addon.getAddonInfo('name'), addon.getLocalizedString(30620) % str(port),
+    except socket.error as e:
+        xbmc.log('[plugin.video.youtube] HTTPServer: Failed to start |{address}:{port}| |{response}|'.format(address=address, port=port, response=str(e)), xbmc.LOGDEBUG)
+        xbmcgui.Dialog().notification(addon.getAddonInfo('name'), str(e),
                                       xbmc.translatePath('special://home/addons/{0!s}/icon.png'.format(addon.getAddonInfo('id'))),
                                       5000, False)
         return None
 
 
 def is_httpd_live(address=None, port=None):
-    address = address if address else '127.0.0.1'
+    addon = xbmcaddon.Addon('plugin.video.youtube')
+    address = address if address else addon.getSetting('kodion.http.listen')
+    address = '127.0.0.1' if address == '0.0.0.0' else address
+    address = address if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address) else '127.0.0.1'
     port = int(port) if port else 50152
     url = 'http://{address}:{port}/ping'.format(address=address, port=port)
     try:

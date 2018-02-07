@@ -15,7 +15,9 @@ class YouTubeMonitor(xbmc.Monitor):
         self._old_httpd_port = self._httpd_port
         self._use_httpd = (_addon.getSetting('kodion.mpd.proxy') == 'true' and _addon.getSetting('kodion.video.quality.mpd') == 'true') or \
                           (_addon.getSetting('youtube.api.config.page') == 'true')
-        self.use_dash = _addon.getSetting('kodion.video.support.mpd.addon') == 'true'
+        self._use_dash = _addon.getSetting('kodion.video.support.mpd.addon') == 'true'
+        self._httpd_address = _addon.getSetting('kodion.http.listen')
+        self._old_httpd_address = self._httpd_address
         self.httpd = None
         self.httpd_thread = None
         if self.use_httpd():
@@ -28,10 +30,12 @@ class YouTubeMonitor(xbmc.Monitor):
         _httpd_port = int(_addon.getSetting('kodion.mpd.proxy.port'))
         _whitelist = _addon.getSetting('kodion.http.ip.whitelist')
         _use_dash = _addon.getSetting('kodion.video.support.mpd.addon') == 'true'
+        _httpd_address = _addon.getSetting('kodion.http.listen')
         whitelist_changed = _whitelist != self._whitelist
         port_changed = self._httpd_port != _httpd_port
+        address_changed = self._httpd_address != _httpd_address
 
-        if not _use_dash and self.use_dash:
+        if not _use_dash and self._use_dash:
             _addon.setSetting('kodion.video.support.mpd.addon', 'true')
 
         if _whitelist != self._whitelist:
@@ -44,9 +48,13 @@ class YouTubeMonitor(xbmc.Monitor):
             self._old_httpd_port = self._httpd_port
             self._httpd_port = _httpd_port
 
+        if self._httpd_address != _httpd_address:
+            self._old_httpd_address = self._httpd_address
+            self._httpd_address = _httpd_address
+
         if self.use_httpd() and not self.httpd:
             self.start_httpd()
-        elif self.use_httpd() and (port_changed or whitelist_changed):
+        elif self.use_httpd() and (port_changed or whitelist_changed or address_changed):
             if self.httpd:
                 self.restart_httpd()
             else:
@@ -60,6 +68,12 @@ class YouTubeMonitor(xbmc.Monitor):
     def httpd_port(self):
         return int(self._httpd_port)
 
+    def httpd_address(self):
+        return self._httpd_address
+
+    def old_httpd_address(self):
+        return self._old_httpd_address
+
     def old_httpd_port(self):
         return int(self._old_httpd_port)
 
@@ -68,9 +82,9 @@ class YouTubeMonitor(xbmc.Monitor):
 
     def start_httpd(self):
         if not self.httpd:
-            xbmc.log('[plugin.video.youtube] HTTPServer: Starting |{port}|'.format(port=str(self.httpd_port())), xbmc.LOGDEBUG)
+            xbmc.log('[plugin.video.youtube] HTTPServer: Starting |{ip}:{port}|'.format(ip=self.httpd_address(), port=str(self.httpd_port())), xbmc.LOGDEBUG)
             self.httpd_port_sync()
-            self.httpd = get_http_server(port=self.httpd_port())
+            self.httpd = get_http_server(address=self.httpd_address(), port=self.httpd_port())
             if self.httpd:
                 self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
                 self.httpd_thread.daemon = True
@@ -80,7 +94,7 @@ class YouTubeMonitor(xbmc.Monitor):
 
     def shutdown_httpd(self):
         if self.httpd:
-            xbmc.log('[plugin.video.youtube] HTTPServer: Shutting down |{port}|'.format(port=str(self.old_httpd_port())), xbmc.LOGDEBUG)
+            xbmc.log('[plugin.video.youtube] HTTPServer: Shutting down |{ip}:{port}|'.format(ip=self.old_httpd_address(), port=str(self.old_httpd_port())), xbmc.LOGDEBUG)
             self.httpd_port_sync()
             self.httpd.shutdown()
             self.httpd.socket.close()
@@ -89,8 +103,8 @@ class YouTubeMonitor(xbmc.Monitor):
             self.httpd = None
 
     def restart_httpd(self):
-        xbmc.log('[plugin.video.youtube] HTTPServer: Restarting... |{old_port}| -> |{port}|'
-                 .format(old_port=str(self.old_httpd_port()), port=str(self.httpd_port())), xbmc.LOGDEBUG)
+        xbmc.log('[plugin.video.youtube] HTTPServer: Restarting... |{old_ip}:{old_port}| -> |{ip}:{port}|'
+                 .format(old_ip=self.old_httpd_address(), old_port=str(self.old_httpd_port()), ip=self.httpd_address(), port=str(self.httpd_port())), xbmc.LOGDEBUG)
         self.shutdown_httpd()
         self.start_httpd()
 

@@ -5,6 +5,7 @@ import os
 import re
 import json
 import shutil
+import socket
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
@@ -111,7 +112,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.retry': 30612,
                  'youtube.failed.watch_later.retry': 30614,
                  'youtube.cancel': 30615,
-                 'youtube.must.be.signed.in': 30616
+                 'youtube.must.be.signed.in': 30616,
+                 'youtube.select.listen.ip': 30644
                  }
 
     def __init__(self):
@@ -693,6 +695,14 @@ class Provider(kodion.AbstractProvider):
             if result == -1:
                 return False
             context.get_settings().set_subtitle_languages(result)
+        elif switch == 'listen_ip':
+            local_ranges = ('10.', '172.16.', '192.168.')
+            addresses = [iface[4][0] for iface in socket.getaddrinfo(socket.gethostname(), None) if iface[4][0].startswith(local_ranges)] + ['127.0.0.1', '0.0.0.0']
+            selected_address = context.get_ui().on_select(context.localize(self.LOCAL_MAP['youtube.select.listen.ip']), addresses)
+            if selected_address == -1:
+                return False
+            else:
+                context.get_settings().set_httpd_listen(addresses[selected_address])
         else:
             return False
 
