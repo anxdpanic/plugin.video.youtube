@@ -818,3 +818,35 @@ msgstr ""
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
 msgstr ""
+
+msgctxt "#30634"
+msgid "YouTube Add-on API Configuration"
+msgstr ""
+
+msgctxt "#30635"
+msgid "No changes detected, API keys were not updated."
+msgstr ""
+
+msgctxt "#30636"
+msgid "Personal API keys are enabled."
+msgstr ""
+
+msgctxt "#30637"
+msgid "Personal API keys are disabled."
+msgstr ""
+
+msgctxt "#30638"
+msgid "Bookmark this page to quickly add your keys in the future."
+msgstr ""
+
+msgctxt "#30639"
+msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
+msgstr ""
+
+msgctxt "#30640"
+msgid "Restore"
+msgstr ""
+
+msgctxt "#30641"
+msgid "Delete api_keys.json"
+msgstr ""

@@ -15,6 +15,7 @@ class YouTubeMonitor(xbmc.Monitor):
         self._old_httpd_port = self._httpd_port
         self._use_httpd = (_addon.getSetting('kodion.mpd.proxy') == 'true' and _addon.getSetting('kodion.video.quality.mpd') == 'true') or \
                           (_addon.getSetting('youtube.api.config.page') == 'true')
+        self.use_dash = _addon.getSetting('kodion.video.support.mpd.addon') == 'true'
         self.httpd = None
         self.httpd_thread = None
         if self.use_httpd():
@@ -26,8 +27,12 @@ class YouTubeMonitor(xbmc.Monitor):
                      (_addon.getSetting('youtube.api.config.page') == 'true')
         _httpd_port = int(_addon.getSetting('kodion.mpd.proxy.port'))
         _whitelist = _addon.getSetting('kodion.http.ip.whitelist')
+        _use_dash = _addon.getSetting('kodion.video.support.mpd.addon') == 'true'
         whitelist_changed = _whitelist != self._whitelist
         port_changed = self._httpd_port != _httpd_port
+
+        if not _use_dash and self.use_dash:
+            _addon.setSetting('kodion.video.support.mpd.addon', 'true')
 
         if _whitelist != self._whitelist:
             self._whitelist = _whitelist

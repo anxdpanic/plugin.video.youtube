@@ -771,6 +771,7 @@ class Provider(kodion.AbstractProvider):
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
                             'settings_xml': 'settings.xml',
+                            'api_keys': 'api_keys.json',
                             'temp_files': 'special://temp/plugin.video.youtube/'}
             _file = _maint_files.get(maint_type, '')
             success = False
@@ -1068,6 +1069,7 @@ class Provider(kodion.AbstractProvider):
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, LoginException):
+            failed_refresh = False
             context.get_access_manager().update_access_token('')
 
             msg = message = exception_to_handle.get_message()
@@ -1086,6 +1088,9 @@ class Provider(kodion.AbstractProvider):
                 if 'code' in msg:
                     code = msg['code']
 
+                if message == u'Unauthorized' and error == u'unauthorized_client':
+                    failed_refresh = True
+
             if error and code:
                 title = '%s: [%s] %s' % ('LoginException', code, error)
             elif error:
@@ -1095,7 +1100,8 @@ class Provider(kodion.AbstractProvider):
 
             context.get_ui().show_notification(message, title)
             context.log_error('%s: %s' % (title, message))
-            context.get_ui().open_settings()
+            if not failed_refresh:
+                context.get_ui().open_settings()
             return False
 
         return True

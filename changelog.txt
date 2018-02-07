@@ -5,6 +5,8 @@
 [add] Settings -> API -> Enable API configuration page
         - when enabled, visit http://ipaddress:port/api to configure API keys from a web browser
         - port is configured in Settings - HTTP Server - Port
+[add] Storing personal api keys in api_keys.json, restore keys from json on settings loss
+[add] Storing login tokens in access_manager.json, restore tokens from json on settings loss
 [fix] context menu after playback
 [fix] alternative player, do not append headers
 [fix/upd] post play events happen post play
