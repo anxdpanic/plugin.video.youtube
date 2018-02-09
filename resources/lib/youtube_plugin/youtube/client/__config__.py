@@ -213,6 +213,8 @@ def check_for_key_changes():
     return False
 
 
+developer_keys = _json_api['keys']['developer']
+
 api = dict()
 if has_own_keys:
     api['key'] = key_sets['own']['key']

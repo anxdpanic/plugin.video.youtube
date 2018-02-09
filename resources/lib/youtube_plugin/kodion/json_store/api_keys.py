@@ -23,7 +23,10 @@ class APIKeyStore(JSONStore):
 
     def set_defaults(self):
         if 'keys' not in self._data:
-            self.save({'keys': {'personal': {'api_key': '', 'client_id': '', 'client_secret': ''}}})
+            self.save({'keys': {'personal': {'api_key': '', 'client_id': '', 'client_secret': ''}, 'developer': {}}})
         if 'personal' not in self._data['keys']:
             self._data['keys']['personal'] = {'api_key': '', 'client_id': '', 'client_secret': ''}
+            self.save(self._data)
+        if 'developer' not in self._data['keys']:
+            self._data['keys']['developer'] = {}
             self.save(self._data)

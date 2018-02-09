@@ -197,7 +197,10 @@ class AbstractProvider(object):
             result, query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
+            addon_id = context.get_param('addon_id', '')
             item_params = {'q': query}
+            if addon_id:
+                item_params.update({'addon_id': addon_id})
             if incognito:
                 item_params.update({'incognito': incognito})
             if channel_id:

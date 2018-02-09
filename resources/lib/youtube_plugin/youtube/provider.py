@@ -6,6 +6,7 @@ import re
 import json
 import shutil
 import socket
+from base64 import b64decode
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
@@ -133,42 +134,46 @@ class Provider(kodion.AbstractProvider):
         return self._is_logged_in
 
     @staticmethod
-    def get_dev_config(context):
+    def get_dev_config(context, addon_id, dev_configs):
         _dev_config = context.get_ui().get_home_window_property('configs')
         context.get_ui().clear_home_window_property('configs')
 
         dev_config = None
         if _dev_config is not None:
-            if context.get_settings().allow_dev_keys():
-                try:
-                    dev_config = json.loads(_dev_config)
-                except ValueError:
-                    context.log_error('Error loading developer key: |invalid json|')
+            context.log_debug('Using window property for developer keys is deprecated, instead use the youtube_registration module.')
+            try:
+                dev_config = json.loads(_dev_config)
+            except ValueError:
+                context.log_error('Error loading developer key: |invalid json|')
+        if not dev_config and addon_id and dev_configs:
+            dev_config = dev_configs.get(addon_id)
 
-                if dev_config is not None:
-                    if not dev_config.get('main') or not dev_config['main'].get('key') \
-                            or not dev_config['main'].get('system') or not dev_config.get('origin'):
-                        context.log_error('Error loading developer config: |invalid structure| '
-                                          'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY[, "id": CLIENT_ID, "secret": CLIENT_SECRET]}}|')
-                    else:
-                        dev_origin = dev_config['origin']
-                        dev_main = dev_config['main']
-                        dev_system = dev_main['system']
-                        dev_key = dev_main['key']
-                        dev_id = dev_main.get('id')
-                        dev_secret = dev_main.get('secret')
-                        return_config = dict()
-                        if dev_id and dev_secret:
-                            context.log_debug('Developer config origin: |{0}| for system |{1}| using api key, client id, and client secret'.format(dev_origin, dev_system))
-                            return_config.update({'id': dev_id, 'secret': dev_secret})
-                        else:
-                            context.log_debug('Developer config origin: |{0}| for system |{1}| using api key'.format(dev_origin, dev_system))
-                        return_config.update({'key': dev_key, 'system': dev_system})
-
-                        return return_config
+        if dev_config is not None and not context.get_settings().allow_dev_keys():
+            context.log_debug('Developer config ignored')
+            return None
+        elif dev_config:
+            if not dev_config.get('main') or not dev_config['main'].get('key') \
+                    or not dev_config['main'].get('system') or not dev_config.get('origin') \
+                    or not dev_config['main'].get('id') or not dev_config['main'].get('secret'):
+                context.log_error('Error loading developer config: |invalid structure| '
+                                  'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
+                return None
             else:
-                context.log_debug('Developer config ignored')
-        return None
+                dev_origin = dev_config['origin']
+                dev_main = dev_config['main']
+                dev_system = dev_main['system']
+                if dev_system == 'JSONStore':
+                    dev_key = b64decode(dev_main['key'])
+                    dev_id = b64decode(dev_main['id'])
+                    dev_secret = b64decode(dev_main['secret'])
+                else:
+                    dev_key = dev_main['key']
+                    dev_id = dev_main['id']
+                    dev_secret = dev_main['secret']
+                context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
+                return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
+        else:
+            return None
 
     def reset_client(self):
         self._client = None
@@ -179,21 +184,31 @@ class Provider(kodion.AbstractProvider):
 
         items_per_page = settings.get_items_per_page()
 
-        language = context.get_settings().get_string('youtube.language', 'en-US')
-        region = context.get_settings().get_string('youtube.region', 'US')
+        language = settings.get_string('youtube.language', 'en-US')
+        region = settings.get_string('youtube.region', 'US')
+
+        api_last_origin = settings.get_api_last_origin()
 
         youtubetv_config = YouTube.CONFIGS.get('youtube-tv')
         youtube_config = YouTube.CONFIGS.get('main')
 
-        dev_config = self.get_dev_config(context)
-        has_dev_id_and_secret = (dev_config is not None and dev_config.get('id') is not None and dev_config.get('secret') is not None)
-        if has_dev_id_and_secret:
-            self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=dev_config)
+        dev_id = context.get_param('addon_id', None)
+        dev_configs = YouTube.CONFIGS.get('developer')
+        dev_config = self.get_dev_config(context, dev_id, dev_configs)
+        if dev_config:
+            dev_keys = dev_config.get('main')
+            if api_last_origin != dev_config.get('origin'):
+                context.log_debug('API key origin changed, clearing cache. |%s|' % dev_config.get('origin'))
+                context.get_function_cache().clear()
+                settings.set_api_last_origin(dev_config.get('origin'))
+            self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=dev_keys)
             self._client.set_log_error(context.log_error)
-        elif dev_config:
-            youtube_config.update(dev_config)
+        else:
+            if api_last_origin != 'plugin.video.youtube':
+                context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
+                context.get_function_cache().clear()
+                settings.set_api_last_origin('plugin.video.youtube')
 
-        if not has_dev_id_and_secret:
             access_manager = context.get_access_manager()
             access_tokens = access_manager.get_access_token().split('|')
             if access_manager.is_new_login_credential() or len(access_tokens) != 2 or access_manager.is_access_token_expired():
@@ -436,20 +451,27 @@ class Provider(kodion.AbstractProvider):
         channel_fanarts = resource_manager.get_fanarts([channel_id])
         page = int(context.get_param('page', 1))
         page_token = context.get_param('page_token', '')
+        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        addon_id = context.get_param('addon_id', '')
+        item_params = {}
+        if incognito:
+            item_params.update({'incognito': incognito})
+        if addon_id:
+            item_params.update({'addon_id': addon_id})
 
         if page == 1:
             playlists_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
-                                           context.create_uri(['channel', channel_id, 'playlists']),
+                                           context.create_uri(['channel', channel_id, 'playlists'], item_params),
                                            image=context.create_resource_path('media', 'playlist.png'))
             playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
             result.append(playlists_item)
             search_live_id = mine_id if mine_id else channel_id
             search_item = kodion.items.NewSearchItem(context, alt_name='[B]' + context.localize(self.LOCAL_MAP['youtube.search']) + '[/B]',
                                                      image=context.create_resource_path('media', 'search.png'),
-                                                     fanart=self.get_fanart(context), channel_id=search_live_id)
+                                                     fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
             result.append(search_item)
             live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
-                                      context.create_uri(['channel', search_live_id, 'live']),
+                                      context.create_uri(['channel', search_live_id, 'live'], item_params),
                                       image=context.create_resource_path('media', 'live.png'))
             result.append(live_item)
 
