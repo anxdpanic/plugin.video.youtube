@@ -24,14 +24,20 @@ import xbmcvfs
 import xbmc
 
 
-class JSONStore:
+class JSONStore(object):
     def __init__(self, context, filename):
         self.context = context
         self.base_path = context._data_path
         self.filename = os.path.join(context._data_path, filename)
-        if not xbmcvfs.exists(self.filename):
-            self.save({})
         self._data = None
+        if xbmcvfs.exists(self.filename):
+            self.load(force=True)
+        else:
+            self.save({})
+        self.set_defaults()
+
+    def set_defaults(self):
+        pass
 
     def save(self, data):
         self._data = data
