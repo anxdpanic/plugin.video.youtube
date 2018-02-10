@@ -26,7 +26,7 @@ class XbmcContext(AbstractContext):
         if plugin_id:
             self._addon = xbmcaddon.Addon(id=plugin_id)
         else:
-            self._addon = xbmcaddon.Addon()
+            self._addon = xbmcaddon.Addon(id='plugin.video.youtube')
 
         self._system_version = None
 

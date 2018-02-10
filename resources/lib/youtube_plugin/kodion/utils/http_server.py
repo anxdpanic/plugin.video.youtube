@@ -49,10 +49,6 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                             file_chunk = f.read(self.chunk_size)
                             if file_chunk:
                                 self.wfile.write(file_chunk)
-                    try:
-                        os.remove(file_path)
-                    except OSError:
-                        xbmc.log('[plugin.video.youtube] HTTPServer: File removal failed |{file_path}|'.format(file_path=file_path), xbmc.LOGERROR)
                 except IOError:
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path)
                     self.send_error(404, response)

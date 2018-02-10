@@ -8,7 +8,7 @@ from ...youtube.youtube_exceptions import LoginException
 from ...kodion import Context
 from .__config__ import api, youtube_tv, developer_keys, keys_changed
 
-context = Context()
+context = Context(plugin_id='plugin.video.youtube')
 
 
 class LoginClient(object):

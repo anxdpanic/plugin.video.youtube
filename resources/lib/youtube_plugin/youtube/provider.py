@@ -476,8 +476,6 @@ class Provider(kodion.AbstractProvider):
             result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
-        if not v3.handle_error(self, context, playlists):
-            return False
         upload_playlist = playlists.get('uploads', '')
         if upload_playlist:
             json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 5,

@@ -6,7 +6,7 @@ from ..helper.video_info import VideoInfo
 from ..helper.utils import get_shelf_index_by_title
 from ...kodion import Context
 
-context = Context()
+context = Context(plugin_id='plugin.video.youtube')
 
 
 class YouTube(LoginClient):
