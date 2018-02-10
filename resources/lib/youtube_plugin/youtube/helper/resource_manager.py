@@ -49,13 +49,14 @@ class ResourceManager(object):
                 # this will cache the channel data
                 result[channel_id] = function_cache.get(FunctionCache.ONE_WEEK, self._get_channel_data, channel_id)
 
-        if 'error' in json_data:
-            return json_data
+        if self.handle_error(json_data):
+            return result
 
         return result
 
     def _update_videos(self, video_ids):
         result = {}
+        json_data = {}
 
         video_ids_to_update = []
         function_cache = self._context.get_function_cache()
@@ -78,7 +79,8 @@ class ResourceManager(object):
                 # this will cache the channel data
                 result[video_id] = function_cache.get(FunctionCache.ONE_MONTH, self._get_video_data, video_id)
 
-        return result
+        if self.handle_error(json_data):
+            return result
 
     def _make_list_of_50(self, list_of_ids):
         list_of_50 = []
@@ -98,6 +100,7 @@ class ResourceManager(object):
 
     def _update_playlists(self, playlists_ids):
         result = {}
+        json_data = {}
 
         playlist_ids_to_update = []
         function_cache = self._context.get_function_cache()
@@ -120,7 +123,8 @@ class ResourceManager(object):
                 # this will cache the channel data
                 result[playlist_id] = function_cache.get(FunctionCache.ONE_DAY, self._get_playlist_data, playlist_id)
 
-        return result
+        if self.handle_error(json_data):
+            return result
 
     def get_playlists(self, playlists_ids):
         list_of_50s = self._make_list_of_50(playlists_ids)
@@ -132,9 +136,6 @@ class ResourceManager(object):
 
     def get_related_playlists(self, channel_id):
         result = self._update_channels([channel_id])
-
-        if 'error' in result:
-            return result
 
         # transform
         item = None
@@ -179,3 +180,18 @@ class ResourceManager(object):
                     break
 
         return result
+
+    def handle_error(self, json_data):
+        context = self._context
+        if json_data and 'error' in json_data:
+            message = json_data['error'].get('message', '')
+            reason = json_data['error']['errors'][0].get('reason', '')
+            title = '%s: %s' % (context.get_name(), reason)
+            message_timeout = 5000
+            if reason == 'quotaExceeded' or reason == 'dailyLimitExceeded':
+                message_timeout = 7000
+            context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
+            error_message = 'Error reason: |%s| with message: |%s|' % (reason, message)
+            raise Exception(error_message)
+
+        return True
