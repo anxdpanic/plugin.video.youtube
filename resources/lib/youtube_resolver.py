@@ -7,9 +7,12 @@ from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 
 
-def _get_core_components():
+def _get_core_components(addon_id=None):
     provider = Provider()
-    context = Context(plugin_id='plugin.video.youtube')
+    if addon_id is not None:
+        context = Context(params={'addon_id': addon_id}, plugin_id='plugin.video.youtube')
+    else:
+        context = Context(plugin_id='plugin.video.youtube')
     client = provider.get_client(context=context)
 
     return provider, context, client
@@ -83,17 +86,19 @@ def _get_config_and_cookies(client, url):
     return {'config': player_config, 'cookies': cookies}
 
 
-def resolve(video_id, sort=True):
+def resolve(video_id, sort=True, addon_id=None):
     """
 
     :param video_id: video id / video url
     :param sort: sort results by quality highest->lowest
+    :param addon_id: addon id associated with developer keys to use for requests
     :type video_id: str
     :type sort: bool
+    :type addon_id: str
     :return: all video items (resolved urls and metadata) for the given video id
     :rtype: list of dict
     """
-    provider, context, client = _get_core_components()
+    provider, context, client = _get_core_components(addon_id)
     streams = None
 
     if re.match('[a-zA-Z0-9_\-]{11}', video_id):
