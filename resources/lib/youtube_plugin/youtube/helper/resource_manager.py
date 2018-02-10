@@ -26,6 +26,7 @@ class ResourceManager(object):
 
     def _update_channels(self, channel_ids):
         result = {}
+        json_data = {}
 
         channel_ids_to_update = []
         function_cache = self._context.get_function_cache()
@@ -47,6 +48,9 @@ class ResourceManager(object):
 
                 # this will cache the channel data
                 result[channel_id] = function_cache.get(FunctionCache.ONE_WEEK, self._get_channel_data, channel_id)
+
+        if 'error' in json_data:
+            return json_data
 
         return result
 
@@ -128,6 +132,9 @@ class ResourceManager(object):
 
     def get_related_playlists(self, channel_id):
         result = self._update_channels([channel_id])
+
+        if 'error' in result:
+            return result
 
         # transform
         item = None
