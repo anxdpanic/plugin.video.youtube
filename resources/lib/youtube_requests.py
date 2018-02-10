@@ -2,9 +2,12 @@ from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 
 
-def get_core_components():
+def get_core_components(addon_id=None):
     provider = Provider()
-    context = Context(plugin_id='plugin.video.youtube')
+    if addon_id is not None:
+        context = Context(params={'addon_id': addon_id}, plugin_id='plugin.video.youtube')
+    else:
+        context = Context(plugin_id='plugin.video.youtube')
     client = provider.get_client(context=context)
 
     return provider, context, client
@@ -21,11 +24,13 @@ def handle_error(context, json_data):
     return True
 
 
-def v3_request(method='GET', headers=None, path=None, post_data=None, params=None, allow_redirects=True):
+def v3_request(method='GET', headers=None, path=None, post_data=None, params=None, allow_redirects=True, addon_id=None):
     """
         https://developers.google.com/youtube/v3/docs/
+        :param addon_id: addon id associated with developer keys to use for requests
+        :type addon_id: str
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
     return client._perform_v3_request(method=method, headers=headers, path=path, post_data=post_data, params=params, allow_redirects=allow_redirects)
 
 
@@ -36,16 +41,18 @@ def _append_missing_page_token(items):
     return items
 
 
-def get_videos(video_id):
+def get_videos(video_id, addon_id=None):
     """
 
     :param video_id: video id(s)
+    :param addon_id: addon id associated with developer keys to use for requests
     :type video_id: str | list
+    :type addon_id: str
     :return: list of <kind: youtube#video> <parts: ['snippet', 'contentDetails']> for the given video id(s)
                 see also https://developers.google.com/youtube/v3/docs/videos#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     json_data = client.get_videos(video_id)
     if not handle_error(context, json_data):
@@ -54,20 +61,22 @@ def get_videos(video_id):
     return [item for item in json_data.get('items', [])]
 
 
-def get_activities(channel_id, page_token='', all_pages=False):
+def get_activities(channel_id, page_token='', all_pages=False, addon_id=None):
     """
     :param channel_id: channel id
     :param page_token: nextPageToken for starting page
     :param all_pages: return all pages(starting at page_token) or single page
+    :param addon_id: addon id associated with developer keys to use for requests
     :type channel_id: str
     :type page_token: str
     :type all_pages: bool
+    :type addon_id: str
     :return: list of <kind: youtube#activity> <parts: ['snippet', 'contentDetails']> for the given channel id
                 see also https://developers.google.com/youtube/v3/docs/activities#resource
              last item contains nextPageToken
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     items = []
 
@@ -92,21 +101,23 @@ def get_activities(channel_id, page_token='', all_pages=False):
     return items
 
 
-def get_playlist_items(playlist_id, page_token='', all_pages=False):
+def get_playlist_items(playlist_id, page_token='', all_pages=False, addon_id=None):
     """
 
     :param playlist_id: playlist id
     :param page_token: nextPageToken for starting page
     :param all_pages: return all pages(starting at page_token) or single page
+    :param addon_id: addon id associated with developer keys to use for requests
     :type playlist_id: str
     :type page_token: str
     :type all_pages: bool
+    :type addon_id: str
     :return: list of <kind: youtube#playlistItem> <parts: ['snippet', 'contentDetails']> for the given playlist id
                 see also https://developers.google.com/youtube/v3/docs/playlistItems#resource
              last item contains nextPageToken
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     items = []
 
@@ -131,16 +142,18 @@ def get_playlist_items(playlist_id, page_token='', all_pages=False):
     return items
 
 
-def get_channel_id(channel_name):
+def get_channel_id(channel_name, addon_id=None):
     """
 
     :param channel_name: channel name
+    :param addon_id: addon id associated with developer keys to use for requests
     :type channel_name: str
+    :type addon_id: str
     :return: list of <kind: youtube#channel> <parts: ['id']> for the given channel name
                 see also https://developers.google.com/youtube/v3/docs/channels#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     json_data = client.get_channel_by_username(channel_name)
     if not handle_error(context, json_data):
@@ -149,16 +162,18 @@ def get_channel_id(channel_name):
     return [item for item in json_data.get('items', [])]
 
 
-def get_channels(channel_id):
+def get_channels(channel_id, addon_id=None):
     """
 
     :param channel_id: channel id(s)
+    :param addon_id: addon id associated with developer keys to use for requests
     :type channel_id: str | list
+    :type addon_id: str
     :return: list of <kind: youtube#channel> <parts: ['snippet', 'contentDetails', 'brandingSettings']> for the given channel id(s)
                 see also https://developers.google.com/youtube/v3/docs/channels#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     json_data = client.get_channels(channel_id)
     if not handle_error(context, json_data):
@@ -167,16 +182,18 @@ def get_channels(channel_id):
     return [item for item in json_data.get('items', [])]
 
 
-def get_channel_sections(channel_id):
+def get_channel_sections(channel_id, addon_id=None):
     """
 
     :param channel_id: channel id
+    :param addon_id: addon id associated with developer keys to use for requests
     :type channel_id: str
+    :type addon_id: str
     :return: list of <kind: youtube#channelSections> <parts: ['snippet', 'contentDetails']> for the given channel id
                 see also https://developers.google.com/youtube/v3/docs/channelSections#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     json_data = client.get_channel_sections(channel_id)
     if not handle_error(context, json_data):
@@ -185,21 +202,23 @@ def get_channel_sections(channel_id):
     return [item for item in json_data.get('items', [])]
 
 
-def get_playlists_of_channel(channel_id, page_token='', all_pages=False):
+def get_playlists_of_channel(channel_id, page_token='', all_pages=False, addon_id=None):
     """
 
     :param channel_id: channel id
     :param page_token: nextPageToken for starting page
     :param all_pages: return all pages(starting at page_token) or single page
+    :param addon_id: addon id associated with developer keys to use for requests
     :type channel_id: str
     :type page_token: str
     :type all_pages: bool
+    :type addon_id: str
     :return: list of <kind: youtube#playlists> <parts: ['snippet']> for the given channel id
                 see also https://developers.google.com/youtube/v3/docs/playlists#resource
              last item contains nextPageToken
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     items = []
 
@@ -224,16 +243,18 @@ def get_playlists_of_channel(channel_id, page_token='', all_pages=False):
     return items
 
 
-def get_playlists(playlist_id):
+def get_playlists(playlist_id, addon_id=None):
     """
 
     :param playlist_id: playlist id(s)
+    :param addon_id: addon id associated with developer keys to use for requests
     :type playlist_id: str | list
+    :type addon_id: str
     :return: list of <kind: youtube#playlists> <parts: ['snippet', 'contentDetails']> for the given playlist id(s)
                 see also https://developers.google.com/youtube/v3/docs/playlists#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     json_data = client.get_playlists(playlist_id)
     if not handle_error(context, json_data):
@@ -242,20 +263,22 @@ def get_playlists(playlist_id):
     return [item for item in json_data.get('items', [])]
 
 
-def get_related_videos(video_id, page_token=''):
+def get_related_videos(video_id, page_token='', addon_id=None):
     """
 
     :param video_id: video id
     :param page_token: nextPageToken for page
+    :param addon_id: addon id associated with developer keys to use for requests
     :type video_id: str
     :type page_token: str
+    :type addon_id: str
     :return: list of <kind: youtube#searchResult> <parts: ['snippet']> for the given video id
                 see also https://developers.google.com/youtube/v3/docs/search#resource
              last item contains nextPageToken
     :rtype: list of dict
     :note: this is a search api request with high cost
     """
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     items = []
 
@@ -279,7 +302,7 @@ def get_related_videos(video_id, page_token=''):
     return items
 
 
-def get_search(q, search_type='', event_type='', channel_id='', order='relevance', safe_search='moderate', page_token=''):
+def get_search(q, search_type='', event_type='', channel_id='', order='relevance', safe_search='moderate', page_token='', addon_id=None):
     """
 
     :param q: search query
@@ -289,6 +312,7 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
     :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
     :param safe_search: one of: 'moderate', 'none', 'strict'
     :param page_token: nextPageToken for page
+    :param addon_id: addon id associated with developer keys to use for requests
     :type q: str
     :type search_type: str | list
     :type event_type: str
@@ -296,6 +320,7 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
     :type order: str
     :type safe_search: str
     :type page_token: str
+    :type addon_id: str
     :return: list of <kind: youtube#searchResult> <parts: ['snippet']> for the given parameters,
                 see also https://developers.google.com/youtube/v3/docs/search#resource
              last item contains nextPageToken
@@ -303,7 +328,7 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
     :note: this is a search api request with high cost
     """
     search_type = search_type or ['video', 'channel', 'playlist']
-    provider, context, client = get_core_components()
+    provider, context, client = get_core_components(addon_id)
 
     items = []
 
