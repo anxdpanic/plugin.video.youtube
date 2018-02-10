@@ -1,4 +1,4 @@
-__all__ = ['KodionException', 'RegisterProviderPath', 'AbstractProvider', 'Context', 'utils']
+__all__ = ['KodionException', 'RegisterProviderPath', 'AbstractProvider', 'Context', 'utils', 'json_store']
 
 __version__ = '1.5.4'
 

@@ -99,6 +99,7 @@ def _process_live_events(provider, context, re_match):
 
 def _process_description_links(provider, context, re_match):
     incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    addon_id = context.get_param('addon_id', '')
 
     def _extract_urls(_video_id):
         provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
@@ -156,6 +157,8 @@ def _process_description_links(provider, context, re_match):
         item_params = {}
         if incognito:
             item_params.update({'incognito': incognito})
+        if addon_id:
+            item_params.update({'addon_id': addon_id})
 
         for channel_id in _channel_ids:
             item_uri = context.create_uri(['channel', channel_id], item_params)
@@ -181,6 +184,8 @@ def _process_description_links(provider, context, re_match):
         item_params = {}
         if incognito:
             item_params.update({'incognito': incognito})
+        if addon_id:
+            item_params.update({'addon_id': addon_id})
 
         for playlist_id in _playlist_ids:
             item_uri = context.create_uri(['playlist', playlist_id], item_params)

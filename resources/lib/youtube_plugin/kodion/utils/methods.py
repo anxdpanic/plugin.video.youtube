@@ -72,14 +72,14 @@ def find_best_fit(data, compare_method=None):
     return result
 
 
-def select_stream(context, stream_data_list, quality_map_override=None):
+def select_stream(context, stream_data_list, quality_map_override=None, ask_for_quality=None):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
         return _stream_data.get('sort', 0)
 
     settings = context.get_settings()
     use_dash = settings.use_dash()
-    ask_for_quality = context.get_settings().ask_for_video_quality()
+    ask_for_quality = context.get_settings().ask_for_video_quality() if ask_for_quality is None else ask_for_quality
     video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
     audio_only = False if ask_for_quality else settings.audio_only()  # don't filter streams to audio only if we're asking for quality
 

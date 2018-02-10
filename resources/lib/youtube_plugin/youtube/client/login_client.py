@@ -6,7 +6,7 @@ import time
 import requests
 from ...youtube.youtube_exceptions import LoginException
 from ...kodion import Context
-from .__config__ import api, youtube_tv, keys_changed
+from .__config__ import api, youtube_tv, developer_keys, keys_changed
 
 context = Context()
 
@@ -26,7 +26,8 @@ class LoginClient(object):
             'key': api['key'],
             'id': api['id'],
             'secret': api['secret']
-        }
+        },
+        'developer': developer_keys
     }
 
     def __init__(self, config=None, language='en-US', region='', access_token='', access_token_tv=''):

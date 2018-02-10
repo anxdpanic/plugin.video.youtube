@@ -2,19 +2,17 @@ import hashlib
 import time
 
 from .. import constants
+from ..json_store import LoginTokenStore
 
 __author__ = 'bromix'
 
 
 class AccessManager(object):
-    def __init__(self, context, jstore):
+    def __init__(self, context):
         self._settings = context.get_settings()
-        self.jstore = jstore(context, 'access_manager.json')
-        self.json = self.jstore.load(force=True)
-        if 'access_manager' not in self.json:
-            self.json['access_manager'] = {'access_token': '', 'refresh_token': '', 'token_expires': -1}
-            self.jstore.save(self.json)
-        self.restore_tokens()
+        self.jstore = LoginTokenStore(context)
+        self.json = self.jstore.load()
+        self.sync_tokens()
 
     def has_login_credentials(self):
         """
@@ -57,7 +55,7 @@ class AccessManager(object):
 
         return False
 
-    def restore_tokens(self):
+    def sync_tokens(self):
         access_token = self._settings.get_string(constants.setting.ACCESS_TOKEN, '')
         refresh_token = self._settings.get_string(constants.setting.REFRESH_TOKEN, '')
         token_expires = self._settings.get_int(constants.setting.ACCESS_TOKEN_EXPIRES, -1)

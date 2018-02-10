@@ -16,13 +16,19 @@ def play_video(provider, context, re_match):
         client = provider.get_client(context)
         settings = context.get_settings()
 
+        ask_for_quality = None
+        screensaver = False
+        if context.get_param('screensaver', None) and str(context.get_param('screensaver')).lower() == 'true':
+            ask_for_quality = False
+            screensaver = True
+
         video_streams = client.get_video_streams(context, video_id)
         if len(video_streams) == 0:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
-        video_stream = kodion.utils.select_stream(context, video_streams)
+        video_stream = kodion.utils.select_stream(context, video_streams, ask_for_quality=ask_for_quality)
 
         if video_stream is None:
             return False
@@ -37,7 +43,7 @@ def play_video(provider, context, re_match):
         suggested_param = str(context.get_param('suggested', True)).lower() == 'true'
         play_suggested = settings.get_bool('youtube.suggested_videos', False) and suggested_param
         items = None
-        if play_suggested:
+        if play_suggested and not screensaver:
             try:
                 json_data = client.get_related_videos(video_id)
                 items = v3.response_to_items(provider, context, json_data, process_next_page=False)
@@ -66,7 +72,7 @@ def play_video(provider, context, re_match):
         # Trigger post play events
         if provider.is_logged_in():
             try:
-                if str(context.get_param('incognito', False)).lower() != 'true':
+                if str(context.get_param('incognito', False)).lower() != 'true' and not screensaver:
                     command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
                     context.get_ui().set_home_window_property('post_play', command)
             except:

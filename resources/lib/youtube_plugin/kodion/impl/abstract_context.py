@@ -74,7 +74,7 @@ class AbstractContext(object):
 
     def get_access_manager(self):
         if not self._access_manager:
-            self._access_manager = AccessManager(self, JSONStore)
+            self._access_manager = AccessManager(self)
         return self._access_manager
 
     def get_video_playlist(self):

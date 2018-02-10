@@ -3,21 +3,15 @@
 from base64 import b64decode
 from hashlib import md5
 from ...kodion import Context as __Context
-from ...kodion.utils import JSONStore
+from ...kodion.json_store import APIKeyStore
 
 DEFAULT_SWITCH = 1
 
 __context = __Context(plugin_id='plugin.video.youtube')
 __settings = __context.get_settings()
 
-_api_jstore = JSONStore(__context, 'api_keys.json')
-_json_api = _api_jstore.load(force=True)
-if 'keys' not in _json_api:
-    _json_api = {'keys': {'personal': {'api_key': '', 'client_id': '', 'client_secret': ''}}}
-    _api_jstore.save(_json_api)
-if 'personal' not in _json_api['keys']:
-    _json_api['keys']['personal'] = {'api_key': '', 'client_id': '', 'client_secret': ''}
-    _api_jstore.save(_json_api)
+_api_jstore = APIKeyStore(__context)
+_json_api = _api_jstore.load()
 
 _j_key = _json_api['keys']['personal'].get('api_key', '')
 _j_id = _json_api['keys']['personal'].get('client_id', '')
@@ -218,6 +212,8 @@ def check_for_key_changes():
         return True
     return False
 
+
+developer_keys = _json_api['keys']['developer']
 
 api = dict()
 if has_own_keys:
