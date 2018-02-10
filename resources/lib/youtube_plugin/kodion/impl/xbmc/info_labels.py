@@ -98,7 +98,7 @@ def create_from_item(context, base_item):
         _process_audio_rating(info_labels, base_item.get_rating())
 
     # Video
-    if isinstance(base_item, VideoItem):
+    if isinstance(base_item, VideoItem) or isinstance(base_item, AudioVideoItem):
         # mediatype
         _process_mediatype(info_labels, 'mediatype', base_item.get_mediatype())
 
@@ -146,7 +146,7 @@ def create_from_item(context, base_item):
         _process_list_value(info_labels, 'cast', base_item.get_cast())
 
     # Audio and Video
-    if isinstance(base_item, AudioItem) or isinstance(base_item, VideoItem):
+    if isinstance(base_item, AudioItem) or isinstance(base_item, VideoItem) or isinstance(base_item, AudioVideoItem):
         # 'title' = 'Blow Your Head Off' (string)
         _process_string_value(info_labels, 'title', base_item.get_title())
 
