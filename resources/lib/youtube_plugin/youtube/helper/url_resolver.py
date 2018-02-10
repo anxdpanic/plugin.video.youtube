@@ -11,7 +11,7 @@ import requests
 
 class AbstractResolver(object):
     def __init__(self):
-        self._verify = _Context().get_settings().verify_ssl()
+        self._verify = _Context(plugin_id='plugin.video.youtube').get_settings().verify_ssl()
 
     def supports_url(self, url, url_components):
         raise NotImplementedError()
