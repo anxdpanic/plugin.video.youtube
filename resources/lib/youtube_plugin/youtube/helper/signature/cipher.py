@@ -22,6 +22,8 @@ class Cipher(object):
             func = self._parse_sig_js(javascript)
             if func:
                 return func(signature)
+            else:
+                raise Exception('Signature function not found')
 
         return u''
 
