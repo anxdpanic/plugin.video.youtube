@@ -22,6 +22,7 @@
 [add] Storing login tokens in access_manager.json, restore tokens from json on settings loss
 [add] youtube_registration module, register developer keys and use them by appending an addon_id=:addon_id parameter to youtube add-on plugin urls
 [add] screensaver=true parameter to /play route - no suggested videos, no post play events, don't ask for quality
+[fix] Signature deciphering
 [fix] context menu after playback
 [fix] alternative player, do not append headers
 [fix/upd] post play events happen post play
