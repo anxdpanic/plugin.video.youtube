@@ -1,3 +1,6 @@
+5.5.1
+[fix] Signature deciphering
+
 5.5.0
 [add] Saved Playlists
 [add] allow developers to use their own api key
