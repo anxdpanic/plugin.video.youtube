@@ -573,7 +573,7 @@ class VideoInfo(object):
             if not js.startswith('http'):
                 js = 'http://www.youtube.com/%s' % js.lstrip('/')
             self._context.log_debug('Cipher: js player: |%s|' % js)
-            cipher = Cipher(self._context, java_script_url=js)
+            cipher = Cipher(self._context, javascript_url=js)
 
         http_params['sts'] = player_config.get('sts', '')
 
