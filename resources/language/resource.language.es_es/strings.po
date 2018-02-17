@@ -262,15 +262,15 @@ msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "Clave API"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "ID API"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API Secreta"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
@@ -453,7 +453,7 @@ msgstr "Mostrar nombre del canal en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "Los streams rtmpe no son soportados"
+msgstr "Los streams rtmpe no están soportados"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -513,11 +513,11 @@ msgstr "Limpiar historial de búsqueda"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr "Cache de funciones"
+msgstr "La cache para funciones"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr "Historial de búsqueda"
+msgstr "El Historial de búsqueda"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
@@ -645,7 +645,7 @@ msgstr "Añadido %s a filtro de 'Mis Suscripciones'"
 
 msgctxt "#30590"
 msgid "Removed %s from My Subscriptions filter"
-msgstr "Eliminar %s de filtro de 'Mis Suscripciones'"
+msgstr "Eliminado %s de filtro de 'Mis Suscripciones'"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
@@ -681,7 +681,7 @@ msgstr "Claves API personales habilitadas"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr "Error al habilitar claves API personales. Ausente: %s"
+msgstr "Error al habilitar claves API personales. No encontrado: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
@@ -737,7 +737,7 @@ msgstr "Volver a intentarlo"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr "Recuperar ID lista de reproducción 'Ver más tarde'"
+msgstr "Recuperar ID para lista de reproducción 'Ver más tarde'"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
@@ -765,7 +765,7 @@ msgstr "Puerto"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "Puerto %s ya en uso. No se ha podido iniciar el servidor HTTP"
+msgstr "EL puerto %s ya esta en uso. No se ha podido iniciar el servicio HTTP"
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
@@ -781,7 +781,7 @@ msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr "Necesario Kodi 17 o superior"
+msgstr "Es Necesario Kodi 17 o superior"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -813,52 +813,52 @@ msgstr "Actualizado correctamente: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr "Habilitar página de configuración de API"
+msgstr "Habilitar página de configuración API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<direccion_ip>:<puerto>/api (ver server HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Configuración API Add-on Youtube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "No se detectaron cambios, las claves API no se actualizaron"
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Claves API personales habilitadas."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Claves API personales deshabilitadas."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Añada como marcador esta página para agregar sus claves rápidamente en el futuro."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Encontradas claves API personales en api_keys.json, ¿Le gustaría restaurarlas? Seleccionar NO sobrescribirá este archivo."
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Restaurar"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Eliminar api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Eliminar access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "IP a la escucha"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Seleccione IP a la escucha"
