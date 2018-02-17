@@ -16,6 +16,7 @@
 [fix/upd] set title from metadata on play
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]
+[upd] Spanish strings [roliverosc]
 
 5.5.0
 [add] Saved Playlists
