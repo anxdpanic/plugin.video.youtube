@@ -226,11 +226,6 @@ class Provider(kodion.AbstractProvider):
                 if access_manager.has_login_credentials():
                     access_manager.remove_login_credentials()
                 if access_manager.has_login_credentials() or access_manager.has_refresh_token():
-                    if YouTube.api_keys_changed:
-                        context.log_warning('API key set changed: Resetting client and updating access token')
-                        self.reset_client()
-                        access_manager.update_access_token(access_token='', refresh_token='')
-
                     # username, password = access_manager.get_login_credentials()
                     access_tokens = access_manager.get_access_token()
                     if access_tokens:
