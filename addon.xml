@@ -27,9 +27,11 @@
 [fix] alternative player, do not append headers
 [fix/upd] post play events happen post play
 [fix/upd] set title from metadata on play
+[upd] Use monitor to track api key changes
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]
 [upd] Greek strings [twilight0]
+[upd] Spanish strings [roliverosc]
         </news>
         <assets>
             <icon>icon.png</icon>
