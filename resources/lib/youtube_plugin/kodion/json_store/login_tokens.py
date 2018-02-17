@@ -18,9 +18,11 @@ from . import JSONStore
 
 
 class LoginTokenStore(JSONStore):
-    def __init__(self, context):
-        JSONStore.__init__(self, context, 'access_manager.json')
+    def __init__(self):
+        JSONStore.__init__(self, 'access_manager.json')
 
     def set_defaults(self):
-        if 'access_manager' not in self._data:
-            self.save({'access_manager': {'access_token': '', 'refresh_token': '', 'token_expires': -1}})
+        data = self._data
+        if 'access_manager' not in data:
+            data = {'access_manager': {'access_token': '', 'refresh_token': '', 'token_expires': -1}}
+        self.save(data)

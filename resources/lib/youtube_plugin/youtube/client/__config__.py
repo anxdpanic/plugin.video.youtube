@@ -10,7 +10,7 @@ DEFAULT_SWITCH = 1
 __context = __Context(plugin_id='plugin.video.youtube')
 __settings = __context.get_settings()
 
-_api_jstore = APIKeyStore(__context)
+_api_jstore = APIKeyStore()
 _json_api = _api_jstore.load()
 
 _j_key = _json_api['keys']['personal'].get('api_key', '')

@@ -10,7 +10,7 @@ __author__ = 'bromix'
 class AccessManager(object):
     def __init__(self, context):
         self._settings = context.get_settings()
-        self.jstore = LoginTokenStore(context)
+        self.jstore = LoginTokenStore()
         self.json = self.jstore.load()
         self.sync_tokens()
 

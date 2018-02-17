@@ -36,7 +36,7 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
         context.log_error('Register API Keys: |%s| Invalid addon_id' % addon_id)
         return
 
-    api_jstore = APIKeyStore(context)
+    api_jstore = APIKeyStore()
     json_api = api_jstore.load()
 
     jkeys = json_api['keys']['developer'].get(addon_id, {})
