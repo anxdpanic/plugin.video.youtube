@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.0.0~alpha6" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.0.0~alpha7" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -27,9 +27,11 @@
 [fix] alternative player, do not append headers
 [fix/upd] post play events happen post play
 [fix/upd] set title from metadata on play
+[upd] Use monitor to track api key changes
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]
 [upd] Greek strings [twilight0]
+[upd] Spanish strings [roliverosc]
         </news>
         <assets>
             <icon>icon.png</icon>
