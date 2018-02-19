@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.0.0~alpha7" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.0.0~beta1" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -22,6 +22,8 @@
 [add] Storing login tokens in access_manager.json, restore tokens from json on settings loss
 [add] youtube_registration module, register developer keys and use them by appending an addon_id=:addon_id parameter to youtube add-on plugin urls
 [add] screensaver=true parameter to /play route - no suggested videos, no post play events, don't ask for quality
+[add] play route for channel live streams
+        - plugin://plugin.video.youtube/play/?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&amp;live=1
 [fix] Signature deciphering
 [fix] context menu after playback
 [fix] alternative player, do not append headers

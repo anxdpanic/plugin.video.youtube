@@ -488,8 +488,13 @@ class Provider(kodion.AbstractProvider):
     Plays a video.
     path for video: '/play/?video_id=XXXXXXX'
 
-    TODO: path for playlist: '/play/?playlist_id=XXXXXXX&mode=[OPTION]'
+    path for playlist: '/play/?playlist_id=XXXXXXX&mode=[OPTION]'
     OPTION: [normal(default)|reverse|shuffle]
+    
+    path for channel live streams: '/play/?channel_id=UCXXXXXXX&live=X
+    OPTION: 
+        live parameter required, live=1 for first live stream
+        live = index of live stream if channel has multiple live streams
     """
 
     @kodion.RegisterProviderPath('^/play/$')
@@ -499,7 +504,9 @@ class Provider(kodion.AbstractProvider):
             return yt_play.play_video(self, context, re_match)
         elif 'playlist_id' in params:
             return yt_play.play_playlist(self, context, re_match)
-
+        elif 'channel_id' in params and 'live' in params:
+            if int(params['live']) > 0:
+                return yt_play.play_channel_live(self, context, re_match)
         return False
 
     @kodion.RegisterProviderPath('^/video/(?P<method>[^/]+)/$')

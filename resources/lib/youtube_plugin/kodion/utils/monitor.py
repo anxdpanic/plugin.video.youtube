@@ -198,7 +198,6 @@ class YouTubeMonitor(xbmc.Monitor):
         if updated_hash:
             xbmc.log('[plugin.video.youtube] Switching API key set to %s' % current_switch, xbmc.LOGWARNING)
             _addon.setSetting('youtube.api.last.hash', updated_hash)
-            _addon.setSetting('youtube.api.key.switch', current_switch)
             xbmc.log('[plugin.video.youtube] API key set changed: Signing out', xbmc.LOGDEBUG)
             xbmc.executebuiltin('RunPlugin(plugin://plugin.video.youtube/sign/out/?confirmed=true)')
         else:
