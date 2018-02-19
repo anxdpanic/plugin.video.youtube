@@ -181,3 +181,32 @@ def play_playlist(provider, context, re_match):
         return videos[playlist_position]
 
     return True
+
+
+def play_channel_live(provider, context, re_match):
+    channel_id = context.get_param('channel_id')
+    index = int(context.get_param('live')) - 1
+    if index < 0:
+        index = 0
+    json_data = provider.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, safe_search=False)
+    if not v3.handle_error(provider, context, json_data):
+        return False
+
+    video_items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+
+    try:
+        video_item = video_items[index]
+    except IndexError:
+        return False
+
+    player = context.get_video_player()
+    player.stop()
+
+    playlist = context.get_video_playlist()
+    playlist.clear()
+    playlist.add(video_item)
+
+    if context.get_handle() == -1:
+        player.play(playlist_index=0)
+    else:
+        return video_item
