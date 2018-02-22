@@ -106,7 +106,7 @@ msgstr "Taille du cache (Mo)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
-msgstr "Activer l'assistant de démarrage"
+msgstr "Activer l'assistance de démarrage"
 
 msgctxt "#30026"
 msgid "Override view"
@@ -126,7 +126,7 @@ msgstr "Affichage par films"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Exécuter l'assistant de démarrage ?"
+msgstr "Exécuter l'assistance de démarrage ?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -178,7 +178,7 @@ msgstr "Bibliothèque"
 
 msgctxt "#30104"
 msgid "Highlights"
-msgstr "En vedette"
+msgstr "Points forts"
 
 msgctxt "#30105"
 msgid "Archive"
@@ -754,96 +754,97 @@ msgstr "Port %s est déjà en cours d'utilisation. Impossible de démarrer le se
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
-msgstr "Proxy est nécessaire pour MPEG-Dash vidéos"
+msgstr "Un proxy est nécessaire pour MPEG-Dash vidéos"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Achats"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Installez l'aide d'InputStream"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Nécessite Kodi 17+"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "L'aide d'InputStream est déjà installé"
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Supprimer les fichiers temporaires"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Notez la vidéo après l'avoir regardé"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "Serveur HTTP"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "Liste IP blanche (délimitée par des virgules)"
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Sauvegarder"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Mise à jour réussie: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Activer la page de configuration de l'API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (voir serveur HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Configuration de l'API des modules complémentaires YouTube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Aucun changement détecté, les clés API n'ont pas été mises à jour"
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Les clés API personnelles sont activées"
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Les clés API personnelles sont désactivées"
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Ajoutez cette page aux favoris pour ajouter rapidement vos clés dans le futur"
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Clés API personnelles trouvées dans api_keys.json, voulez-vous les restaurer? Choisir non va les remplacer"
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Restaurer"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Supprimer api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Supprimer access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Écoute sur IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Sélectionnez l'écoute IP"
+
