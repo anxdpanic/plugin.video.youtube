@@ -92,9 +92,7 @@
         <setting id="youtube.api.config.address" type="lsep" label="30633" visible="eq(1,true)"/>
         <setting id="youtube.api.config.page" type="bool" label="30632" default="false"/>
         <!-- Not user configured -->
-        <setting id="youtube.api.last.switch" type="text" label="" visible="false" enable="true" default=""/>
         <setting id="youtube.api.last.hash" type="text" label="" visible="false" enable="true" default=""/>
-        <setting id="youtube.api.key.switch.use" type="text" label="" visible="false" enable="true" default=""/>
         <setting id="youtube.api.last.origin" type="text" visible="false" enabled="true" default="plugin.video.youtube"/>
     </category>
 

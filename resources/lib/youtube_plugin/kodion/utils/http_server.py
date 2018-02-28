@@ -112,7 +112,6 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.end_headers()
                 for chunk in self.get_chunks(html):
                     self.wfile.write(chunk)
-                xbmc.executebuiltin('NotifyAll(plugin.video.youtube,check_api_keys,\\"{}\\")')
             elif self.path == '/ping':
                 self.send_error(204)
             else:
