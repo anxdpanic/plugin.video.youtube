@@ -54,7 +54,7 @@ def play_video(provider, context, re_match):
             for i in items:
                 playlist.add(i)
 
-        title = video_stream.get('meta', {}).get('title', video_id)
+        title = video_stream.get('meta', {}).get('video', {}).get('title', '')
         if is_video:
             video_item = VideoItem(title, video_stream['url'])
         else:

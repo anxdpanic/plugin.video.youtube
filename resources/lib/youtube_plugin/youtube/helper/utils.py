@@ -179,7 +179,8 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_mediatype('video')  # using video
 
         # set the title
-        video_item.set_title(snippet['title'])
+        if context.get_path() != '/play/' or not video_item.get_title():
+            video_item.set_title(snippet['title'])
 
         if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
                 video_item.get_headers() and video_item.get_uri().startswith('http'):
