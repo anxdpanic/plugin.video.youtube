@@ -37,7 +37,7 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
         return
 
     api_jstore = APIKeyStore()
-    json_api = api_jstore.load()
+    json_api = api_jstore.get_data()
 
     jkeys = json_api['keys']['developer'].get(addon_id, {})
 

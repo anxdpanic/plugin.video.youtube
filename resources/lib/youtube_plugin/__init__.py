@@ -8,11 +8,6 @@ key_sets = {
         'key': 'QUl6YVN5QzZmdlpTSkhBN1Z6NWo4akNpS1J0N3RVSU9xakUyTjNn',
         'secret': 'U2JvVmhvRzlzMHJOYWZpeENTR0dLWEFU'
     },
-    'own': {
-        'key': '',
-        'id': '',
-        'secret': ''
-    },
     'provided': {
         '0': {  # youtube-plugin-for-kodi-2
             'id': 'NDMwNTcyNzE0ODgyLTlqcDdjYzVvMmZkZGdhZGM2bWM4anB1a2JmYjlsczdv',
