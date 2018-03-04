@@ -86,8 +86,8 @@ def _process_language(provider, context):
         return
 
     # set new language id and region id
-    context.get_settings().set_string('youtube.language', language_id)
-    context.get_settings().set_string('youtube.region', region_id)
+    context.get_settings().set_string('youtube.language', language_id, on_changed=False)
+    context.get_settings().set_string('youtube.region', region_id, on_changed=False)
     provider.reset_client()
 
 

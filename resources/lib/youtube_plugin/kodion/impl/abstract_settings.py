@@ -11,7 +11,7 @@ class AbstractSettings(object):
     def get_string(self, setting_id, default_value=None):
         raise NotImplementedError()
 
-    def set_string(self, setting_id, value):
+    def set_string(self, setting_id, value, on_changed=True):
         raise NotImplementedError()
 
     def open_settings(self):
@@ -34,14 +34,14 @@ class AbstractSettings(object):
 
         return default_value
 
-    def set_int(self, setting_id, value):
-        self.set_string(setting_id, str(value))
+    def set_int(self, setting_id, value, on_changed=True):
+        self.set_string(setting_id, str(value), on_changed)
 
-    def set_bool(self, setting_id, value):
+    def set_bool(self, setting_id, value, on_changed=True):
         if value:
-            self.set_string(setting_id, 'true')
+            self.set_string(setting_id, 'true', on_changed)
         else:
-            self.set_string(setting_id, 'false')
+            self.set_string(setting_id, 'false', on_changed)
 
     def get_bool(self, setting_id, default_value):
         value = self.get_string(setting_id)
@@ -100,7 +100,7 @@ class AbstractSettings(object):
         return self.get_bool(constants.setting.AUDIO_ONLY, False)
 
     def set_subtitle_languages(self, value):
-        return self.set_int(constants.setting.SUBTITLE_LANGUAGE, value)
+        return self.set_int(constants.setting.SUBTITLE_LANGUAGE, value, on_changed=False)
 
     def use_thumbnail_size(self):
         size = self.get_int(constants.setting.THUMB_SIZE, 0)
@@ -135,9 +135,3 @@ class AbstractSettings(object):
 
     def set_httpd_listen(self, value):
         return self.set_string(constants.setting.HTTPD_LISTEN, value)
-
-    def get_api_last_origin(self):
-        return self.get_string(constants.setting.API_LAST_ORIGIN, 'plugin.video.youtube')
-
-    def set_api_last_origin(self, value):
-        return self.set_string(constants.setting.API_LAST_ORIGIN, value)

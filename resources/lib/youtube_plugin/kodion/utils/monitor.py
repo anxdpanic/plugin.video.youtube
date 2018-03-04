@@ -4,6 +4,7 @@ from ..utils import get_http_server, is_httpd_live
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 
 
 class YouTubeMonitor(xbmc.Monitor):
@@ -25,45 +26,49 @@ class YouTubeMonitor(xbmc.Monitor):
         del addon
 
     def onSettingsChanged(self):
-        addon = xbmcaddon.Addon('plugin.video.youtube')
-        _use_httpd = (addon.getSetting('kodion.mpd.proxy') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true') or \
-                     (addon.getSetting('youtube.api.config.page') == 'true')
-        _httpd_port = int(addon.getSetting('kodion.mpd.proxy.port'))
-        _whitelist = addon.getSetting('kodion.http.ip.whitelist')
-        _use_dash = addon.getSetting('kodion.video.support.mpd.addon') == 'true'
-        _httpd_address = addon.getSetting('kodion.http.listen')
-        whitelist_changed = _whitelist != self._whitelist
-        port_changed = self._httpd_port != _httpd_port
-        address_changed = self._httpd_address != _httpd_address
+        if xbmcgui.Window(10000).getProperty('plugin.video.youtube-setting_cb_disabled') != 'true':
+            xbmc.log('[plugin.video.youtube] Executing onSettingsChanged', xbmc.LOGDEBUG)
+            addon = xbmcaddon.Addon('plugin.video.youtube')
+            _use_httpd = (addon.getSetting('kodion.mpd.proxy') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true') or \
+                         (addon.getSetting('youtube.api.config.page') == 'true')
+            _httpd_port = int(addon.getSetting('kodion.mpd.proxy.port'))
+            _whitelist = addon.getSetting('kodion.http.ip.whitelist')
+            _use_dash = addon.getSetting('kodion.video.support.mpd.addon') == 'true'
+            _httpd_address = addon.getSetting('kodion.http.listen')
+            whitelist_changed = _whitelist != self._whitelist
+            port_changed = self._httpd_port != _httpd_port
+            address_changed = self._httpd_address != _httpd_address
 
-        if _whitelist != self._whitelist:
-            self._whitelist = _whitelist
+            if _whitelist != self._whitelist:
+                self._whitelist = _whitelist
 
-        if self._use_httpd != _use_httpd:
-            self._use_httpd = _use_httpd
+            if self._use_httpd != _use_httpd:
+                self._use_httpd = _use_httpd
 
-        if self._httpd_port != _httpd_port:
-            self._old_httpd_port = self._httpd_port
-            self._httpd_port = _httpd_port
+            if self._httpd_port != _httpd_port:
+                self._old_httpd_port = self._httpd_port
+                self._httpd_port = _httpd_port
 
-        if self._httpd_address != _httpd_address:
-            self._old_httpd_address = self._httpd_address
-            self._httpd_address = _httpd_address
+            if self._httpd_address != _httpd_address:
+                self._old_httpd_address = self._httpd_address
+                self._httpd_address = _httpd_address
 
-        if self.use_httpd() and not self.httpd:
-            self.start_httpd()
-        elif self.use_httpd() and (port_changed or whitelist_changed or address_changed):
-            if self.httpd:
-                self.restart_httpd()
-            else:
+            if self.use_httpd() and not self.httpd:
                 self.start_httpd()
-        elif not self.use_httpd() and self.httpd:
-            self.shutdown_httpd()
+            elif self.use_httpd() and (port_changed or whitelist_changed or address_changed):
+                if self.httpd:
+                    self.restart_httpd()
+                else:
+                    self.start_httpd()
+            elif not self.use_httpd() and self.httpd:
+                self.shutdown_httpd()
 
-        if not _use_dash and self._use_dash:
-            addon.setSetting('kodion.video.support.mpd.addon', 'true')
-
-        del addon
+            if not _use_dash and self._use_dash:
+                addon.setSetting('kodion.video.support.mpd.addon', 'true')
+            del addon
+        else:
+            xbmc.log('[plugin.video.youtube] Skipping onSettingsChanged', xbmc.LOGDEBUG)
+            xbmcgui.Window(10000).clearProperty('plugin.video.youtube-setting_cb_disabled')
 
     def use_httpd(self):
         return self._use_httpd

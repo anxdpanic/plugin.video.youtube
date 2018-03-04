@@ -10,5 +10,5 @@ class MockSettings(AbstractSettings):
     def get_string(self, settings_id, default_value=None):
         return self._settings.get(settings_id, default_value)
 
-    def set_string(self, settings_id, value):
+    def set_string(self, settings_id, value, on_changed=True):
         self._settings[settings_id] = value

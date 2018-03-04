@@ -12,6 +12,18 @@ import xbmcaddon
 import xbmcgui
 
 
+def set_setting(addon, setting, value):  # don't trigger onSettingsChanged
+    xbmcgui.Window(10000).setProperty('plugin.video.youtube-setting_cb_disabled', 'true')
+    addon.setSetting(setting, value)
+    i = 0
+    while xbmcgui.Window(10000).getProperty('plugin.video.youtube-setting_cb_disabled') == 'true':
+        xbmc.sleep(1)
+        i += 1
+        if i > 60:
+            xbmcgui.Window(10000).clearProperty('plugin.video.youtube-setting_cb_disabled')
+            break
+
+
 class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def __init__(self, request, client_address, server):
@@ -85,21 +97,21 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     api_secret = ''
                 updated = []
                 if api_key is not None and api_key != old_api_key:
-                    addon.setSetting('youtube.api.key', api_key)
+                    set_setting(addon, 'youtube.api.key', api_key)
                     updated.append(i18n(30201))
                 if api_id is not None and api_id != old_api_id:
-                    addon.setSetting('youtube.api.id', api_id)
+                    set_setting(addon, 'youtube.api.id', api_id)
                     updated.append(i18n(30202))
                 if api_secret is not None and api_secret != old_api_secret:
                     updated.append(i18n(30203))
-                    addon.setSetting('youtube.api.secret', api_secret)
+                    set_setting(addon, 'youtube.api.secret', api_secret)
                 if addon.getSetting('youtube.api.key') and addon.getSetting('youtube.api.id') and \
                         addon.getSetting('youtube.api.secret'):
                     enabled = i18n(30636)
-                    addon.setSetting('youtube.api.enable', 'true')
+                    set_setting(addon, 'youtube.api.enable', 'true')
                 else:
                     enabled = i18n(30637)
-                    addon.setSetting('youtube.api.enable', 'false')
+                    set_setting(addon, 'youtube.api.enable', 'false')
                 if not updated:
                     updated = i18n(30635)
                 else:
