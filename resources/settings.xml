@@ -91,9 +91,6 @@
         <setting id="youtube.allow.dev.keys" type="bool" label="30608" default="true"/>
         <setting id="youtube.api.config.address" type="lsep" label="30633" visible="eq(1,true)"/>
         <setting id="youtube.api.config.page" type="bool" label="30632" default="false"/>
-        <!-- Not user configured -->
-        <setting id="youtube.api.last.hash" type="text" label="" visible="false" enable="true" default=""/>
-        <setting id="youtube.api.last.origin" type="text" visible="false" enabled="true" default="plugin.video.youtube"/>
     </category>
 
     <!-- Maintenance -->
@@ -110,13 +107,5 @@
         <setting id="kodion.maintain.delete.api_keys" type="action" label="30641" action="RunPlugin(plugin://plugin.video.youtube/maintain/api_keys/delete/)"/>
         <setting id="kodion.maintain.delete.access_manager" type="action" label="30642" action="RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/delete/)"/>
         <setting id="kodion.maintain.delete.temp" type="action" label="30626" action="RunPlugin(plugin://plugin.video.youtube/maintain/temp_files/delete/)"/>
-        <!-- Not user configured -->
-        <setting id="kodion.access_token" type="text" visible="false" enabled="true" default=""/>
-        <setting id="kodion.access_token.expires" type="text" visible="false" enabled="true" default=""/>
-        <setting id="kodion.refresh_token" type="text" visible="false" enabled="true" default=""/>
-        <setting id="kodion.login.hash" type="text" visible="false" enabled="true" default=""/>
-        <setting id="youtube.login.version" type="text" visible="false" enabled="true" default=""/>
-        <setting id="kodion.login.username" type="text" visible="false" enabled="true" default=""/>
-        <setting id="kodion.login.password" type="text" visible="false" enabled="true" default=""/>
     </category>
 </settings>

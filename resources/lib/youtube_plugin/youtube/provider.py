@@ -181,13 +181,14 @@ class Provider(kodion.AbstractProvider):
     def get_client(self, context):
         # set the items per page (later)
         settings = context.get_settings()
+        access_manager = context.get_access_manager()
 
         items_per_page = settings.get_items_per_page()
 
         language = settings.get_string('youtube.language', 'en-US')
         region = settings.get_string('youtube.region', 'US')
 
-        api_last_origin = settings.get_api_last_origin()
+        api_last_origin = access_manager.get_last_origin()
 
         youtube_config = YouTube.CONFIGS.get('main')
 
@@ -199,18 +200,17 @@ class Provider(kodion.AbstractProvider):
             if api_last_origin != dev_config.get('origin'):
                 context.log_debug('API key origin changed, clearing cache. |%s|' % dev_config.get('origin'))
                 context.get_function_cache().clear()
-                settings.set_api_last_origin(dev_config.get('origin'))
+                access_manager.set_last_origin(dev_config.get('origin'))
             self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=dev_keys)
             self._client.set_log_error(context.log_error)
         else:
             if api_last_origin != 'plugin.video.youtube':
                 context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
                 context.get_function_cache().clear()
-                settings.set_api_last_origin('plugin.video.youtube')
+                access_manager.set_last_origin('plugin.video.youtube')
 
-            access_manager = context.get_access_manager()
             access_tokens = access_manager.get_access_token().split('|')
-            if access_manager.is_new_login_credential() or len(access_tokens) != 2 or access_manager.is_access_token_expired():
+            if len(access_tokens) != 2 or access_manager.is_access_token_expired():
                 # reset access_token
                 access_manager.update_access_token('')
                 # we clear the cache, so none cached data of an old account will be displayed.
@@ -221,16 +221,12 @@ class Provider(kodion.AbstractProvider):
             if not self._client:
                 context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
-                # remove the old login.
-                if access_manager.has_login_credentials():
-                    access_manager.remove_login_credentials()
-                if access_manager.has_login_credentials() or access_manager.has_refresh_token():
+                if access_manager.has_refresh_token():
                     if YouTube.api_keys_changed:
                         context.log_warning('API key set changed: Resetting client and updating access token')
                         self.reset_client()
                         access_manager.update_access_token(access_token='', refresh_token='')
 
-                    # username, password = access_manager.get_login_credentials()
                     access_tokens = access_manager.get_access_token()
                     if access_tokens:
                         access_tokens = access_tokens.split('|')
@@ -554,7 +550,7 @@ class Provider(kodion.AbstractProvider):
                 watch_later_id = client.get_watch_later_id()
 
                 if watch_later_id:
-                    settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+                    settings.set_string('youtube.folder.watch_later.playlist', watch_later_id, on_changed=False)
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     break
                 else:
@@ -762,7 +758,7 @@ class Provider(kodion.AbstractProvider):
 
         modified_string = ','.join(map(str, filter_list))
         if filter_string != modified_string:
-            context.get_settings().set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
+            context.get_settings().set_string('youtube.filter.my_subscriptions_filtered.list', modified_string, on_changed=False)
             if action == 'add':
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.added.my_subscriptions.filter']) % channel)
             elif action == 'remove':
@@ -852,15 +848,15 @@ class Provider(kodion.AbstractProvider):
         log_list = []
 
         if api_key:
-            settings.set_string('youtube.api.key', api_key)
+            settings.set_string('youtube.api.key', api_key, on_changed=False)
             updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.key']))
             log_list.append('Key')
         if client_id:
-            settings.set_string('youtube.api.id', client_id)
+            settings.set_string('youtube.api.id', client_id, on_changed=False)
             updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.id']))
             log_list.append('Id')
         if client_secret:
-            settings.set_string('youtube.api.secret', client_secret)
+            settings.set_string('youtube.api.secret', client_secret, on_changed=False)
             updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
             log_list.append('Secret')
         if updated_list:
@@ -874,7 +870,7 @@ class Provider(kodion.AbstractProvider):
         log_list = []
 
         if enable and client_id and client_secret and api_key:
-            settings.set_bool('youtube.api.enable', True)
+            settings.set_bool('youtube.api.enable', True, on_changed=False)
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.enabled']))
             context.log_debug('Personal API keys enabled')
         elif enable:
@@ -887,7 +883,7 @@ class Provider(kodion.AbstractProvider):
             if not client_secret:
                 missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
                 log_list.append('Secret')
-            settings.set_bool('youtube.api.enable', False)
+            settings.set_bool('youtube.api.enable', False, on_changed=False)
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 

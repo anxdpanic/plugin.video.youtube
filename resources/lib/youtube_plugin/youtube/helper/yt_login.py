@@ -107,9 +107,6 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         # we clear the cache, so none cached data of an old account will be displayed.
         context.get_function_cache().clear()
 
-        major_version = context.get_system_version().get_version()[0]
-        context.get_settings().set_int('youtube.login.version', major_version)
-
         provider.reset_client()
         context.get_access_manager().update_access_token(access_token, expires_in, refresh_token)
         context.get_ui().refresh_container()

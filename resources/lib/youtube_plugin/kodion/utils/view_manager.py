@@ -152,7 +152,7 @@ class ViewManager(object):
                     view_id = -1
 
         if view_id > -1:
-            settings.set_int(constants.setting.VIEW_X % view, view_id)
+            settings.set_int(constants.setting.VIEW_X % view, view_id, on_changed=False)
             return True
 
         return False
