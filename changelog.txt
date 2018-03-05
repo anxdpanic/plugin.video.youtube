@@ -11,6 +11,7 @@
 [add] screensaver=true parameter to /play route - no suggested videos, no post play events, don't ask for quality
 [add] play route for channel live streams
         - plugin://plugin.video.youtube/play/?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&live=1
+[fix] search input, now works with Yatse
 [fix] Signature deciphering
 [fix] context menu after playback
 [fix] alternative player, do not append headers
