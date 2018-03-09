@@ -141,14 +141,14 @@ def _watchlater_playlist_id_change(provider, context, re_match, method):
         current_pl_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
         if current_pl_id:
             if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30570) % playlist_name):
-                context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id, on_changed=False)
+                context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id)
             else:
                 return
         else:
-            context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id, on_changed=False)
+            context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id)
     elif method == 'remove':
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30569) % playlist_name):
-            context.get_settings().set_string('youtube.folder.watch_later.playlist', '', on_changed=False)
+            context.get_settings().set_string('youtube.folder.watch_later.playlist', '')
         else:
             return
     else:
@@ -168,14 +168,14 @@ def _history_playlist_id_change(provider, context, re_match, method):
         current_pl_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
         if current_pl_id:
             if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30574) % playlist_name):
-                context.get_settings().set_string('youtube.folder.history.playlist', playlist_id, on_changed=False)
+                context.get_settings().set_string('youtube.folder.history.playlist', playlist_id)
             else:
                 return
         else:
-            context.get_settings().set_string('youtube.folder.history.playlist', playlist_id, on_changed=False)
+            context.get_settings().set_string('youtube.folder.history.playlist', playlist_id)
     elif method == 'remove':
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30573) % playlist_name):
-            context.get_settings().set_string('youtube.folder.history.playlist', '', on_changed=False)
+            context.get_settings().set_string('youtube.folder.history.playlist', '')
         else:
             return
     else:

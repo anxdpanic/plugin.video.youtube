@@ -40,9 +40,9 @@ class APICheck(object):
             own_key, own_id, own_secret = self._strip_api_keys(original_key, original_id, original_secret)
             if own_key and own_id and own_secret:
                 if (original_key != own_key) or (original_id != own_id) or (original_secret != own_secret):
-                    self._settings.set_string('youtube.api.key', own_key, on_changed=False)
-                    self._settings.set_string('youtube.api.id', own_id, on_changed=False)
-                    self._settings.set_string('youtube.api.secret', own_secret, on_changed=False)
+                    self._settings.set_string('youtube.api.key', own_key)
+                    self._settings.set_string('youtube.api.id', own_id)
+                    self._settings.set_string('youtube.api.secret', own_secret)
 
                 if (j_key != own_key) or (j_id != own_id) or (j_secret != own_secret):
                     self._json_api['keys']['personal'] = {'api_key': own_key, 'client_id': own_id, 'client_secret': own_secret}
@@ -54,10 +54,10 @@ class APICheck(object):
                 j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
         if not original_key or not original_id or not original_secret and (j_key and j_secret and j_id):
-            self._settings.set_string('youtube.api.key', j_key, on_changed=False)
-            self._settings.set_string('youtube.api.id', j_id, on_changed=False)
-            self._settings.set_string('youtube.api.secret', j_secret, on_changed=False)
-            self._settings.set_bool('youtube.api.enable', True, on_changed=False)
+            self._settings.set_string('youtube.api.key', j_key)
+            self._settings.set_string('youtube.api.id', j_id)
+            self._settings.set_string('youtube.api.secret', j_secret)
+            self._settings.set_bool('youtube.api.enable', True)
 
         switch = self.get_current_switch()
         user = self.get_current_user()
@@ -175,6 +175,8 @@ class APICheck(object):
 
         return return_key, return_id, return_secret
 
+
+__context.send_notification('check_settings')
 
 _api_check = APICheck(__context)
 

@@ -25,9 +25,9 @@ class YouTubeMonitor(xbmc.Monitor):
             self.start_httpd()
         del addon
 
-    def onSettingsChanged(self):
-        if xbmcgui.Window(10000).getProperty('plugin.video.youtube-setting_cb_disabled') != 'true':
-            xbmc.log('[plugin.video.youtube] Executing onSettingsChanged', xbmc.LOGDEBUG)
+    def onNotification(self, sender, method, data):
+        if sender == 'plugin.video.youtube' and method.endswith('.check_settings'):
+            xbmc.log('[plugin.video.youtube] onNotification: |check_settings|', xbmc.LOGDEBUG)
             addon = xbmcaddon.Addon('plugin.video.youtube')
             _use_httpd = (addon.getSetting('kodion.mpd.proxy') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true') or \
                          (addon.getSetting('youtube.api.config.page') == 'true')
@@ -66,9 +66,8 @@ class YouTubeMonitor(xbmc.Monitor):
             if not _use_dash and self._use_dash:
                 addon.setSetting('kodion.video.support.mpd.addon', 'true')
             del addon
-        else:
-            xbmc.log('[plugin.video.youtube] Skipping onSettingsChanged', xbmc.LOGDEBUG)
-            xbmcgui.Window(10000).clearProperty('plugin.video.youtube-setting_cb_disabled')
+        elif sender == 'plugin.video.youtube':
+            xbmc.log('[plugin.video.youtube] onNotification: |unknown method|', xbmc.LOGDEBUG)
 
     def use_httpd(self):
         return self._use_httpd

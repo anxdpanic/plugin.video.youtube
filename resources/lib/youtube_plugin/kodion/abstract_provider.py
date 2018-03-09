@@ -58,7 +58,7 @@ class AbstractProvider(object):
         # start the setup wizard
         wizard_steps = []
         if context.get_settings().is_setup_wizard_enabled():
-            context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False, on_changed=False)
+            context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
             wizard_steps.extend(self.get_wizard_steps(context))
 
         if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
