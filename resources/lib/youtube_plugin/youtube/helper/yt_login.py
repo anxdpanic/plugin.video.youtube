@@ -2,6 +2,8 @@ __author__ = 'bromix'
 
 from six.moves import range
 
+import copy
+import json
 import time
 from ...youtube.youtube_exceptions import LoginException
 
@@ -53,19 +55,28 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
             except LoginException:
                 _do_logout()
                 raise
+
+            log_data = copy.deepcopy(json_data)
+            if 'access_token' in log_data:
+                log_data['access_token'] = '<redacted>'
+            if 'refresh_token' in log_data:
+                log_data['refresh_token'] = '<redacted>'
+            context.log_debug('Requesting access token: |%s|' % json.dumps(log_data))
+
             if not 'error' in json_data:
                 _access_token = json_data.get('access_token', '')
                 _expires_in = time.time() + int(json_data.get('expires_in', 3600))
                 _refresh_token = json_data.get('refresh_token', '')
-                if _access_token and _refresh_token:
-                    dialog.close()
-                    return _access_token, _expires_in, _refresh_token
+                dialog.close()
+                if not _access_token and not _refresh_token:
+                    _expires_in = 0
+                return _access_token, _expires_in, _refresh_token
 
             elif json_data['error'] != u'authorization_pending':
                 message = json_data['error']
                 title = '%s: %s' % (context.get_name(), message)
                 context.get_ui().show_notification(message, title)
-                context.log_error('Error: |%s|' % message)
+                context.log_error('Error requesting access token: |%s|' % message)
 
             if dialog.is_aborted():
                 dialog.close()

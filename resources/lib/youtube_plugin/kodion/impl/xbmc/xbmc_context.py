@@ -238,3 +238,7 @@ class XbmcContext(AbstractContext):
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
             xbmc.log(error, xbmc.LOGDEBUG)
             return False
+
+    def send_notification(self, method):
+        self.log_debug('send_notification: |%s|' % method)
+        self.execute('NotifyAll(plugin.video.youtube,%s,{})' % method)
