@@ -645,18 +645,20 @@ class Provider(kodion.AbstractProvider):
             if not channel_id:
                 channel_params = {}
                 channel_params.update(context.get_params())
+                channel_params['q'] = search_text
                 channel_params['search_type'] = 'channel'
                 channel_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.channels']) + '[/B]',
-                                             context.create_uri([context.get_path()], channel_params),
+                                             context.create_uri([context.get_path().replace('input', 'query')], channel_params),
                                              image=context.create_resource_path('media', 'channels.png'))
                 channel_item.set_fanart(self.get_fanart(context))
                 result.append(channel_item)
 
             playlist_params = {}
             playlist_params.update(context.get_params())
+            playlist_params['q'] = search_text
             playlist_params['search_type'] = 'playlist'
             playlist_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
-                                          context.create_uri([context.get_path()], playlist_params),
+                                          context.create_uri([context.get_path().replace('input', 'query')], playlist_params),
                                           image=context.create_resource_path('media', 'playlist.png'))
             playlist_item.set_fanart(self.get_fanart(context))
             result.append(playlist_item)
@@ -665,10 +667,11 @@ class Provider(kodion.AbstractProvider):
                 # live
                 live_params = {}
                 live_params.update(context.get_params())
+                live_params['q'] = search_text
                 live_params['search_type'] = 'video'
                 live_params['event_type'] = 'live'
                 live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
-                                          context.create_uri([context.get_path()], live_params),
+                                          context.create_uri([context.get_path().replace('input', 'query')], live_params),
                                           image=context.create_resource_path('media', 'live.png'))
                 result.append(live_item)
 
