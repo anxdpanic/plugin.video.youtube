@@ -615,12 +615,12 @@ class VideoInfo(object):
 
         meta_info['channel']['id'] = params.get('ucid', '')
         image_data_list = [
-            {'from': 'iurlhq', 'to': 'high'},
-            {'from': 'iurlmq', 'to': 'medium'},
-            {'from': 'iurlsd', 'to': 'standard'},
-            {'from': 'thumbnail_url', 'to': 'default'}]
+            {'from': 'iurlhq', 'to': 'high', 'image': 'hqdefault.jpg'},
+            {'from': 'iurlmq', 'to': 'medium', 'image': 'mqdefault.jpg'},
+            {'from': 'iurlsd', 'to': 'standard', 'image': 'sddefault.jpg'},
+            {'from': 'thumbnail_url', 'to': 'default', 'image': 'default.jpg'}]
         for image_data in image_data_list:
-            image_url = params.get(image_data['from'], '')
+            image_url = params.get(image_data['from'], 'https://i.ytimg.com/vi/{video_id}/{image}'.format(video_id=video_id, image=image_data['image']))
             if image_url:
                 meta_info['images'][image_data['to']] = image_url
 

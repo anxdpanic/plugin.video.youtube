@@ -179,7 +179,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_mediatype('video')  # using video
 
         # set the title
-        if context.get_path() != '/play/' or not video_item.get_title():
+        if not video_item.get_title():
             video_item.set_title(snippet['title'])
 
         if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
@@ -315,8 +315,91 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                                               is_logged_in=provider.is_logged_in(),
                                               refresh_container=refresh_container)
 
-        if len(context_menu) > 0 and context.get_path() != '/play/':
+        if len(context_menu) > 0:
             video_item.set_context_menu(context_menu, replace=replace_context_menu)
+
+
+def update_play_info(provider, context, video_id, video_item, meta_data=None):
+    settings = context.get_settings()
+    resource_manager = provider.get_resource_manager(context)
+    video_data = resource_manager.get_videos([video_id])
+
+    thumb_size = settings.use_thumbnail_size()
+    image = None
+
+    if meta_data:
+        video_item.set_subtitles(meta_data.get('subtitles', None))
+        video_item.set_headers(meta_data.get('headers', ''))
+        image = get_thumbnail(thumb_size, meta_data.get('images', {}))
+
+    yt_item = video_data[video_id]
+
+    snippet = yt_item['snippet']  # crash if not conform
+
+    # set uses_dash
+    video_item.set_use_dash(settings.use_dash())
+
+    # set mediatype
+    video_item.set_mediatype('video')  # using video
+
+    # set the title
+    if not video_item.get_title():
+        video_item.set_title(snippet['title'])
+
+    if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
+            video_item.get_headers() and video_item.get_uri().startswith('http'):
+        video_item.set_uri(video_item.get_uri() + '|' + video_item.get_headers())
+
+    """
+    This is experimental. We try to get the most information out of the title of a video.
+    This is not based on any language. In some cases this won't work at all.
+    TODO: via language and settings provide the regex for matching episode and season.
+    """
+    # video_item.set_season(1)
+    # video_item.set_episode(1)
+    for regex in __RE_SEASON_EPISODE_MATCHES__:
+        re_match = regex.search(video_item.get_name())
+        if re_match:
+            if 'season' in re_match.groupdict():
+                video_item.set_season(int(re_match.group('season')))
+
+            if 'episode' in re_match.groupdict():
+                video_item.set_episode(int(re_match.group('episode')))
+            break
+
+    # plot
+    channel_name = snippet.get('channelTitle', '')
+    description = kodion.utils.strip_html_from_text(snippet['description'])
+    if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
+        description = '[UPPERCASE][B]%s[/B][/UPPERCASE][CR][CR]%s' % (channel_name, description)
+    video_item.set_studio(channel_name)
+    # video_item.add_cast(channel_name)
+    video_item.add_artist(channel_name)
+    video_item.set_plot(description)
+
+    # date time
+    if 'publishedAt' in snippet:
+        date_time = utils.datetime_parser.parse(snippet['publishedAt'])
+        video_item.set_year_from_datetime(date_time)
+        video_item.set_aired_from_datetime(date_time)
+        video_item.set_premiered_from_datetime(date_time)
+        video_item.set_date_from_datetime(date_time)
+
+    # duration
+    duration = yt_item.get('contentDetails', {}).get('duration', '')
+    duration = utils.datetime_parser.parse(duration)
+    # we subtract 1 seconds because YouTube returns +1 second to much
+    video_item.set_duration_from_seconds(duration.seconds - 1)
+
+    if not image:
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+
+    video_item.set_image(image)
+
+    # set fanart
+    video_item.set_fanart(provider.get_fanart(context))
+
+    return video_item
 
 
 def update_fanarts(provider, context, channel_items_dict):
@@ -344,7 +427,10 @@ def get_thumbnail(thumb_size, thumbnails):
 
     image = ''
     for thumbnail_size in thumbnail_sizes:
-        image = thumbnails.get(thumbnail_size, {}).get('url', '')
+        try:
+            image = thumbnails.get(thumbnail_size, {}).get('url', '')
+        except AttributeError:
+            image = thumbnails.get(thumbnail_size, '')
         if image:
             break
     return image
