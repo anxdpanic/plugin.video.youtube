@@ -599,6 +599,7 @@ class VideoInfo(object):
                 break
 
         stream_list = []
+        is_live = params.get('live_playback', '0') == '1'
 
         meta_info = {'video': {},
                      'channel': {},
@@ -622,6 +623,8 @@ class VideoInfo(object):
         for image_data in image_data_list:
             image_url = params.get(image_data['from'], 'https://i.ytimg.com/vi/{video_id}/{image}'.format(video_id=video_id, image=image_data['image']))
             if image_url:
+                if is_live:
+                    image_url = image_url.replace('.jpg', '_live.jpg')
                 meta_info['images'][image_data['to']] = image_url
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
@@ -651,7 +654,7 @@ class VideoInfo(object):
 
                 raise YouTubeException(reason)
 
-        if params.get('live_playback', '0') == '1':
+        if is_live:
             url = params.get('hlsvp', '')
             if url:
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
@@ -679,7 +682,7 @@ class VideoInfo(object):
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info,
                                 'headers': curl_headers}
-                if params.get('live_playback', '0') == '1':
+                if is_live:
                     video_stream['url'] += '&start_seq=$START_NUMBER$'
                     video_stream.update(self.FORMAT.get('9998'))
                 else:

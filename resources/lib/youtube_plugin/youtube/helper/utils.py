@@ -1,6 +1,7 @@
 __author__ = 'bromix'
 
 import re
+import time
 
 from ... import kodion
 from ...kodion import utils
@@ -23,6 +24,10 @@ def extract_urls(text):
     result = matches or result
 
     return result
+
+
+def get_thumb_timestamp(minutes=15):
+    return str(time.mktime(time.gmtime(minutes * 60 * (round(time.time() / (minutes * 60))))))
 
 
 def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict={}, channel_items_dict=None):
@@ -166,6 +171,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         my_playlists = resource_manager.get_related_playlists(channel_id='mine')
 
     thumb_size = settings.use_thumbnail_size()
+    thumb_stamp = get_thumb_timestamp()
     for video_id in list(video_data.keys()):
         yt_item = video_data[video_id]
         video_item = video_id_dict[video_id]
@@ -229,6 +235,8 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         # try to find a better resolution for the image
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        if image.endswith('_live.jpg'):
+            image += '?ct=' + thumb_stamp
         video_item.set_image(image)
 
         # set fanart
@@ -319,7 +327,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             video_item.set_context_menu(context_menu, replace=replace_context_menu)
 
 
-def update_play_info(provider, context, video_id, video_item, meta_data=None):
+def update_play_info(provider, context, video_id, video_item, meta_data=None, live=False):
     settings = context.get_settings()
     resource_manager = provider.get_resource_manager(context)
     video_data = resource_manager.get_videos([video_id])
@@ -394,6 +402,8 @@ def update_play_info(provider, context, video_id, video_item, meta_data=None):
     if not image:
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
+    if live and image:
+        image += '?ct=' + get_thumb_timestamp()
     video_item.set_image(image)
 
     # set fanart

@@ -61,7 +61,8 @@ def play_video(provider, context, re_match):
             video_item = AudioVideoItem(title, video_stream['url'])
 
         video_item = utils.update_play_info(provider, context, video_id, video_item,
-                                            meta_data=video_stream.get('meta', None))
+                                            meta_data=video_stream.get('meta', None),
+                                            live=video_stream.get('Live', False))
 
         # Trigger post play events
         if provider.is_logged_in():
