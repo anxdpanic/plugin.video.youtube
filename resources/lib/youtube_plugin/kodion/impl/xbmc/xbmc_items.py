@@ -14,7 +14,10 @@ def to_video_item(context, video_item):
     title = video_item.get_title() if video_item.get_title() else video_item.get_name()
     fanart = ''
     settings = context.get_settings()
-    item = xbmcgui.ListItem(label=utils.to_unicode(title))
+    if major_version > 17:
+        item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
+    else:
+        item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if video_item.get_fanart() and settings.show_fanart():
         fanart = video_item.get_fanart()
     if major_version <= 12:
@@ -64,7 +67,10 @@ def to_audio_item(context, audio_item):
     title = audio_item.get_name()
     fanart = ''
     settings = context.get_settings()
-    item = xbmcgui.ListItem(label=utils.to_unicode(title))
+    if major_version > 17:
+        item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
+    else:
+        item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if audio_item.get_fanart() and settings.show_fanart():
         fanart = audio_item.get_fanart()
     if major_version <= 12:
@@ -87,7 +93,11 @@ def to_audio_item(context, audio_item):
 
 def to_uri_item(context, base_item):
     context.log_debug('Converting UriItem')
-    item = xbmcgui.ListItem(path=base_item.get_uri())
+    major_version = context.get_system_version().get_version()[0]
+    if major_version > 17:
+        item = xbmcgui.ListItem(path=base_item.get_uri(), offscreen=True)
+    else:
+        item = xbmcgui.ListItem(path=base_item.get_uri())
     item.setProperty(u'IsPlayable', u'true')
     return item
 

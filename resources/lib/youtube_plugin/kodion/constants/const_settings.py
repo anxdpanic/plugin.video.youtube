@@ -24,3 +24,6 @@ ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 DASH_PROXY = 'kodion.mpd.proxy'  # (bool)
 HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)
 HTTPD_LISTEN = 'kodion.http.listen'  # (string)
+HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (string)
+
+API_CONFIG_PAGE = 'youtube.api.config.page'  # (bool)

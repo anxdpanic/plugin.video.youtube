@@ -135,3 +135,9 @@ class AbstractSettings(object):
 
     def set_httpd_listen(self, value):
         return self.set_string(constants.setting.HTTPD_LISTEN, value)
+
+    def httpd_whitelist(self):
+        return self.get_string(constants.setting.HTTPD_WHITELIST, '')
+
+    def api_config_page(self):
+        return self.get_bool(constants.setting.API_CONFIG_PAGE, False)

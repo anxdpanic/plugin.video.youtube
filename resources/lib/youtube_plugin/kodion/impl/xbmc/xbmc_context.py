@@ -239,6 +239,8 @@ class XbmcContext(AbstractContext):
             xbmc.log(error, xbmc.LOGDEBUG)
             return False
 
-    def send_notification(self, method):
-        self.log_debug('send_notification: |%s|' % method)
-        self.execute('NotifyAll(plugin.video.youtube,%s,{})' % method)
+    def send_notification(self, method, data):
+        data = json.dumps(data)
+        self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
+        data = '\\"[\\"%s\\"]\\"' % urllib.parse.quote(data)
+        self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))

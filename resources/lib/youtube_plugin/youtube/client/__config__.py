@@ -14,9 +14,9 @@ __settings = __context.get_settings()
 
 class APICheck(object):
 
-    def __init__(self, context):
+    def __init__(self, context, settings):
         self._context = context
-        self._settings = context.get_settings()
+        self._settings = settings
         self._ui = context.get_ui()
         self._api_jstore = APIKeyStore()
         self._json_api = self._api_jstore.get_data()
@@ -61,6 +61,29 @@ class APICheck(object):
 
         switch = self.get_current_switch()
         user = self.get_current_user()
+
+        access_token = self._settings.get_string('kodion.access_token', '')
+        refresh_token = self._settings.get_string('kodion.refresh_token', '')
+        token_expires = self._settings.get_int('kodion.access_token.expires', -1)
+        last_hash = self._settings.get_string('youtube.api.last.hash', '')
+        if not self._json_am['access_manager'].get(user, {}).get('access_token') or \
+                not self._json_am['access_manager'].get(user, {}).get('refresh_token'):
+            if access_token and refresh_token:
+                self._json_am['access_manager'][user]['access_token'] = access_token
+                self._json_am['access_manager'][user]['refresh_token'] = refresh_token
+                self._json_am['access_manager'][user]['token_expires'] = token_expires
+                if switch == 'own':
+                    own_key_hash = self._get_key_set_hash('own')
+                    if last_hash == self._get_key_set_hash('own', True) or \
+                            last_hash == own_key_hash:
+                        self._json_am['access_manager'][user]['last_key_hash'] = own_key_hash
+                self._am_jstore.save(self._json_am)
+        if access_token or refresh_token or last_hash:
+            self._settings.set_string('kodion.access_token', '')
+            self._settings.set_string('kodion.refresh_token', '')
+            self._settings.set_int('kodion.access_token.expires', -1)
+            self._settings.set_string('youtube.api.last.hash', '')
+
         updated_hash = self._api_keys_changed(switch)
         if updated_hash:
             self._context.log_warning('User: |%s| Switching API key set to |%s|' % (user, switch))
@@ -123,10 +146,12 @@ class APICheck(object):
             self.changed = False
             return None
 
-    def _get_key_set_hash(self, switch):
+    def _get_key_set_hash(self, switch, old=False):
         if not switch or (switch == 'own' and not self.has_own_api_keys()):
             switch = '1'
         api_key, client_id, client_secret = self.get_api_keys(switch)
+        if old and switch == 'own':
+            client_id = client_id.replace(u'.apps.googleusercontent.com', u'')
         m = md5()
         m.update(api_key.encode('utf-8'))
         m.update(client_id.encode('utf-8'))
@@ -176,9 +201,18 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-__context.send_notification('check_settings')
+notification_data = {'use_httpd': (__settings.use_dash_proxy() and
+                                   __settings.use_dash()) or
+                                  (__settings.api_config_page()),
+                     'httpd_port': __settings.httpd_port(),
+                     'whitelist': __settings.httpd_whitelist(),
+                     'use_dash': __settings.dash_support_addon(),
+                     'httpd_address': __settings.httpd_listen()
+                     }
 
-_api_check = APICheck(__context)
+__context.send_notification('check_settings', notification_data)
+
+_api_check = APICheck(__context, __settings)
 
 keys_changed = _api_check.changed
 current_user = _api_check.get_current_user()
