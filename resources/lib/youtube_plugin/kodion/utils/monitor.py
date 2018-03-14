@@ -1,10 +1,12 @@
+from six.moves.urllib.parse import unquote
+
+import json
 import threading
 
 from ..utils import get_http_server, is_httpd_live
 
 import xbmc
 import xbmcaddon
-import xbmcgui
 
 
 class YouTubeMonitor(xbmc.Monitor):
@@ -27,14 +29,16 @@ class YouTubeMonitor(xbmc.Monitor):
 
     def onNotification(self, sender, method, data):
         if sender == 'plugin.video.youtube' and method.endswith('.check_settings'):
-            xbmc.log('[plugin.video.youtube] onNotification: |check_settings|', xbmc.LOGDEBUG)
-            addon = xbmcaddon.Addon('plugin.video.youtube')
-            _use_httpd = (addon.getSetting('kodion.mpd.proxy') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true') or \
-                         (addon.getSetting('youtube.api.config.page') == 'true')
-            _httpd_port = int(addon.getSetting('kodion.mpd.proxy.port'))
-            _whitelist = addon.getSetting('kodion.http.ip.whitelist')
-            _use_dash = addon.getSetting('kodion.video.support.mpd.addon') == 'true'
-            _httpd_address = addon.getSetting('kodion.http.listen')
+            data = json.loads(data)
+            data = json.loads(unquote(data[0]))
+            xbmc.log('[plugin.video.youtube] onNotification: |check_settings| -> |%s|' % json.dumps(data), xbmc.LOGDEBUG)
+
+            _use_httpd = data.get('use_httpd')
+            _httpd_port = data.get('httpd_port')
+            _whitelist = data.get('whitelist')
+            _use_dash = data.get('use_dash')
+            _httpd_address = data.get('httpd_address')
+
             whitelist_changed = _whitelist != self._whitelist
             port_changed = self._httpd_port != _httpd_port
             address_changed = self._httpd_address != _httpd_address
@@ -64,8 +68,8 @@ class YouTubeMonitor(xbmc.Monitor):
                 self.shutdown_httpd()
 
             if not _use_dash and self._use_dash:
-                addon.setSetting('kodion.video.support.mpd.addon', 'true')
-            del addon
+                xbmcaddon.Addon('plugin.video.youtube').setSetting('kodion.video.support.mpd.addon', 'true')
+
         elif sender == 'plugin.video.youtube':
             xbmc.log('[plugin.video.youtube] onNotification: |unknown method|', xbmc.LOGDEBUG)
 

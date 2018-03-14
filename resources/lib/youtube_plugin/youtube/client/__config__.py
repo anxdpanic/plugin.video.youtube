@@ -14,9 +14,9 @@ __settings = __context.get_settings()
 
 class APICheck(object):
 
-    def __init__(self, context):
+    def __init__(self, context, settings):
         self._context = context
-        self._settings = context.get_settings()
+        self._settings = settings
         self._ui = context.get_ui()
         self._api_jstore = APIKeyStore()
         self._json_api = self._api_jstore.get_data()
@@ -201,9 +201,18 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-__context.send_notification('check_settings')
+notification_data = {'use_httpd': (__settings.use_dash_proxy() and
+                                   __settings.use_dash()) or
+                                  (__settings.api_config_page()),
+                     'httpd_port': __settings.httpd_port(),
+                     'whitelist': __settings.httpd_whitelist(),
+                     'use_dash': __settings.dash_support_addon(),
+                     'httpd_address': __settings.httpd_listen()
+                     }
 
-_api_check = APICheck(__context)
+__context.send_notification('check_settings', notification_data)
+
+_api_check = APICheck(__context, __settings)
 
 keys_changed = _api_check.changed
 current_user = _api_check.get_current_user()
