@@ -762,6 +762,8 @@ class VideoInfo(object):
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
         supported_mime_types = ['audio/mp4', 'video/mp4']
+        if 'webm' in self._context.inputstream_adaptive_capabilities():
+            supported_mime_types.extend(['video/webm', 'audio/webm'])
         fmts_list = adaptive_fmts.split(',')
         data = {}
         for item in fmts_list:
