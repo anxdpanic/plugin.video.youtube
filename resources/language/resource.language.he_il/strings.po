@@ -634,12 +634,12 @@ msgid "Remove from My Subscriptions filter"
 msgstr "הסר מתוך מסנן המנויים שלי"
 
 msgctxt "#30589"
-msgid "Added %s to My Subscriptions filter"
-msgstr "%s נוסף למסנן המנויים שלי"
+msgid "Added to My Subscriptions filter"
+msgstr "נוסף למסנן המנויים שלי"
 
 msgctxt "#30590"
-msgid "Removed %s from My Subscriptions filter"
-msgstr "%s הוסר ממסנן המנויים שלי"
+msgid "Removed from My Subscriptions filter"
+msgstr "הוסר ממסנן המנויים שלי"
 
 msgctxt "#30591"
 msgid "Thumbnail size"

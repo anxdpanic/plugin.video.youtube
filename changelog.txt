@@ -15,6 +15,7 @@
 [fix] Signature deciphering
 [fix] context menu after playback
 [fix] alternative player, do not append headers
+[fix] My Subscriptions (Filtered) channel matching
 [fix/upd] post play events happen post play
 [fix/upd] set title from metadata on play
 [upd] Use monitor to track api key changes
