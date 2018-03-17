@@ -625,11 +625,11 @@ msgid "Remove from My Subscriptions filter"
 msgstr ""
 
 msgctxt "#30589"
-msgid "Added %s to My Subscriptions filter"
+msgid "Added to My Subscriptions filter"
 msgstr ""
 
 msgctxt "#30590"
-msgid "Removed %s from My Subscriptions filter"
+msgid "Removed from My Subscriptions filter"
 msgstr ""
 
 msgctxt "#30591"

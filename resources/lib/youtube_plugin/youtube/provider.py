@@ -1,5 +1,4 @@
 __author__ = 'bromix'
-from six.moves import map
 
 import os
 import re
@@ -759,15 +758,17 @@ class Provider(kodion.AbstractProvider):
             if channel_name in filter_list:
                 filter_list = [chan_name for chan_name in filter_list if chan_name != channel_name]
 
-        modified_string = ','.join(map(str, filter_list))
+        modified_string = ','.join(filter_list).lstrip(',')
         if filter_string != modified_string:
             context.get_settings().set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
+            message = ''
             if action == 'add':
-                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.added.my_subscriptions.filter']) % channel)
+                message = context.localize(self.LOCAL_MAP['youtube.added.my_subscriptions.filter'])
             elif action == 'remove':
-                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.removed.my_subscriptions.filter']) % channel)
-
-            context.get_ui().refresh_container()
+                message = context.localize(self.LOCAL_MAP['youtube.removed.my_subscriptions.filter'])
+            if message:
+                context.get_ui().show_notification(message=message)
+        context.get_ui().refresh_container()
 
     @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
     def maintenance_actions(self, context, re_match):

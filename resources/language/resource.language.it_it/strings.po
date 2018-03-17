@@ -623,12 +623,12 @@ msgid "Remove from My Subscriptions filter"
 msgstr "Rimuovi dalle Mie Sottoscrizione"
 
 msgctxt "#30589"
-msgid "Added %s to My Subscriptions filter"
-msgstr "%s aggiunto alle Mie Sottoscrizioni (filtrate)"
+msgid "Added to My Subscriptions filter"
+msgstr "Aggiunto alle Mie Sottoscrizioni (filtrate)"
 
 msgctxt "#30590"
-msgid "Removed %s from My Subscriptions filter"
-msgstr "%s rimosso dalle Mie Sottoscrizioni (filtrate)"
+msgid "Removed from My Subscriptions filter"
+msgstr "Rimosso dalle Mie Sottoscrizioni (filtrate)"
 
 msgctxt "#30591"
 msgid "Thumbnail size"

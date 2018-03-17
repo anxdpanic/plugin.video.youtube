@@ -576,7 +576,7 @@ class VideoInfo(object):
             cipher = Cipher(self._context, javascript_url=js)
 
         http_params['sts'] = player_config.get('sts', '')
-
+        http_params['t'] = player_args.get('t', '')
         http_params['c'] = player_args.get('c', 'WEB')
         http_params['cver'] = player_args.get('cver', '1.20170712')
         http_params['cplayer'] = player_args.get('cplayer', 'UNIPLAYER')
@@ -660,7 +660,7 @@ class VideoInfo(object):
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
 
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
-        if not mpd_url and params.get('live_playback', '0') == '0' and \
+        if not mpd_url and not is_live and \
                 self._context.get_settings().use_dash_proxy() and \
                 is_httpd_live(port=self._context.get_settings().httpd_port()):
             mpd_url = self.generate_mpd(video_id, params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')), params.get('length_seconds', '0'), cipher)
@@ -762,6 +762,8 @@ class VideoInfo(object):
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
         supported_mime_types = ['audio/mp4', 'video/mp4']
+        if 'webm' in self._context.inputstream_adaptive_capabilities():
+            supported_mime_types.extend(['video/webm', 'audio/webm'])
         fmts_list = adaptive_fmts.split(',')
         data = {}
         for item in fmts_list:

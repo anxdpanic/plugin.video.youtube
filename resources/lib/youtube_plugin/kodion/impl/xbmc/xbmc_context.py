@@ -244,3 +244,26 @@ class XbmcContext(AbstractContext):
         self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
         data = '\\"[\\"%s\\"]\\"' % urllib.parse.quote(data)
         self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
+
+    @staticmethod
+    def inputstream_adaptive_capabilities(capability=None):
+        # return a list inputstream.adaptive capabilities, if capability set return version required
+        if capability is None:
+            try:
+                inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
+            except RuntimeError:
+                return []
+
+            capabilities = []
+            ia_loose_version = utils.loose_version(inputstream_version)
+            if ia_loose_version >= utils.loose_version('2.0.12'):
+                capabilities.append('live')
+            if ia_loose_version >= utils.loose_version('2.2.0'):
+                capabilities.append('webm')
+            return capabilities
+        elif capability == 'live':
+            return '2.0.12'
+        elif capability == 'webm':
+            return '2.2.0'
+        else:
+            return None

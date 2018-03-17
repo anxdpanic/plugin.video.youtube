@@ -625,12 +625,12 @@ msgid "Remove from My Subscriptions filter"
 msgstr "Supprimer de mes abonnements filtré"
 
 msgctxt "#30589"
-msgid "Added %s to My Subscriptions filter"
-msgstr "Ajouté %s pour mes abonnements filtré"
+msgid "Added to My Subscriptions filter"
+msgstr "Ajouté pour mes abonnements filtré"
 
 msgctxt "#30590"
-msgid "Removed %s from My Subscriptions filter"
-msgstr "Supprimer %s de mes abonnements filtré"
+msgid "Removed from My Subscriptions filter"
+msgstr "Supprimer de mes abonnements filtré"
 
 msgctxt "#30591"
 msgid "Thumbnail size"

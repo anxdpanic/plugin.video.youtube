@@ -102,11 +102,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
             else:
                 use_dash = False
 
-    try:
-        inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
-        live_dash_supported = loose_version(inputstream_version) >= loose_version('2.0.12')
-    except RuntimeError:
-        live_dash_supported = False
+    live_dash_supported = 'live' in context.inputstream_adaptive_capabilities()
 
     if not live_dash_supported:
         stream_data_list = [item for item in stream_data_list
