@@ -31,7 +31,7 @@
 [fix] My Subscriptions (Filtered) channel matching
 [fix/upd] post play events happen post play
 [fix/upd] set title from metadata on play
-[upd] Use monitor to track api key changes
+[chg] only automatically remove temp folder at start-up
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]
 [upd] Greek strings [twilight0]
