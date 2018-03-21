@@ -59,6 +59,8 @@ first_run = True
 player = YouTubePlayer(context=context)
 monitor = YouTubeMonitor()
 
+monitor.remove_temp_dir()
+
 while not monitor.abortRequested():
 
     ping_diff = get_stamp_diff(ping_timestamp)

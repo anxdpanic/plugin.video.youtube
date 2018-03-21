@@ -1,12 +1,14 @@
 from six.moves.urllib.parse import unquote
 
 import json
+import shutil
 import threading
 
 from ..utils import get_http_server, is_httpd_live
 
 import xbmc
 import xbmcaddon
+import xbmcvfs
 
 
 class YouTubeMonitor(xbmc.Monitor):
@@ -122,3 +124,21 @@ class YouTubeMonitor(xbmc.Monitor):
     def ping_httpd(self):
         return is_httpd_live(port=self.httpd_port())
 
+    @staticmethod
+    def remove_temp_dir():
+        temp_path = 'special://temp/plugin.video.youtube/'
+        path = xbmc.translatePath(temp_path)
+        try:
+            xbmcvfs.rmdir(path, force=True)
+        except:
+            pass
+        if xbmcvfs.exists(path):
+            try:
+                shutil.rmtree(path)
+            except:
+                pass
+        if xbmcvfs.exists(path):
+            xbmc.log('Failed to remove directory: {dir}'.format(dir=path), xbmc.LOGDEBUG)
+            return False
+        else:
+            return True
