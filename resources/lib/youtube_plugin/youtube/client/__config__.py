@@ -206,7 +206,6 @@ notification_data = {'use_httpd': (__settings.use_dash_proxy() and
                                   (__settings.api_config_page()),
                      'httpd_port': __settings.httpd_port(),
                      'whitelist': __settings.httpd_whitelist(),
-                     'use_dash': __settings.dash_support_addon(),
                      'httpd_address': __settings.httpd_listen()
                      }
 

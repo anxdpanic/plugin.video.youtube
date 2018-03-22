@@ -245,9 +245,28 @@ class XbmcContext(AbstractContext):
         data = '\\"[\\"%s\\"]\\"' % urllib.parse.quote(data)
         self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
 
-    @staticmethod
-    def inputstream_adaptive_capabilities(capability=None):
+    def use_inputstream_adaptive(self):
+        addon_enabled = self.addon_enabled('inputstream.adaptive')
+        if self._settings.use_dash() and not addon_enabled:
+            if self._ui.on_yes_no_input(self.get_name(), self.localize(30579)):
+                use_dash = self.set_addon_enabled('inputstream.adaptive')
+            else:
+                use_dash = False
+        elif self._settings.use_dash() and addon_enabled:
+            use_dash = True
+        else:
+            use_dash = False
+        return use_dash
+
+    def inputstream_adaptive_capabilities(self, capability=None):
         # return a list inputstream.adaptive capabilities, if capability set return version required
+
+        use_dash = self.use_inputstream_adaptive()
+        if not use_dash and capability is not None:
+            return None
+        if not use_dash and capability is None:
+            return []
+
         if capability is None:
             try:
                 inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')

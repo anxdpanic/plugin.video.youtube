@@ -97,11 +97,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
                                 not item.get('dash/video', False))]
 
     if use_dash:
-        if settings.dash_support_addon() and not context.addon_enabled('inputstream.adaptive'):
-            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30579)):
-                use_dash = context.set_addon_enabled('inputstream.adaptive')
-            else:
-                use_dash = False
+        use_dash = context.use_inputstream_adaptive()
 
     live_dash_supported = 'live' in context.inputstream_adaptive_capabilities()
 

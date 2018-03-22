@@ -692,15 +692,9 @@ class Provider(kodion.AbstractProvider):
         if switch == 'youtube':
             context._addon.openSettings()
         elif switch == 'mpd':
-            use_dash = context.addon_enabled('inputstream.adaptive')
-            if settings.dash_support_addon() and not use_dash:
-                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.dash.enable.confirm'])):
-                    use_dash = context.set_addon_enabled('inputstream.adaptive')
-                else:
-                    use_dash = False
+            use_dash = context.use_inputstream_adaptive()
             if use_dash:
-                if settings.dash_support_addon():
-                    xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
+                xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
             else:
                 settings.set_bool('kodion.video.quality.mpd', False)
         elif switch == 'subtitles':
@@ -1006,7 +1000,6 @@ class Provider(kodion.AbstractProvider):
             # purchases
             if settings.get_bool('youtube.folder.purchases.show', False) and \
                     settings.use_dash() and \
-                    settings.dash_support_addon() and \
                     'drm' in context.inputstream_adaptive_capabilities():
                 purchases_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.purchases']),
                                                context.create_uri(['special', 'purchases']),

@@ -36,7 +36,7 @@ def to_video_item(context, video_item):
 
     item.setProperty('inputstreamaddon', '')
     item.setProperty('inputstream.adaptive.manifest_type', '')
-    if video_item.use_dash() and settings.dash_support_addon():
+    if video_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
         item.setContentLookup(False)
         item.setMimeType('application/xml+dash')
         item.setProperty('inputstreamaddon', 'inputstream.adaptive')
