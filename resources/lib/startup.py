@@ -4,7 +4,6 @@ from datetime import datetime
 import time
 
 from youtube_plugin.kodion.impl import Context
-from youtube_plugin.kodion.constants import setting
 from youtube_plugin.kodion.utils import YouTubeMonitor, YouTubePlayer
 
 context = Context(plugin_id='plugin.video.youtube')
@@ -12,17 +11,6 @@ context = Context(plugin_id='plugin.video.youtube')
 context.log_debug('YouTube settings startup initialization...')
 version = context.get_system_version().get_version()
 settings = context.get_settings()
-
-mpd_addon = False
-
-if version >= (17, 0):
-    mpd_addon = True
-else:
-    settings.set_bool(setting.USE_DASH, False)
-
-settings.set_bool(setting.DASH_SUPPORT_ADDON, mpd_addon)
-context.log_notice('Startup: detected {0}, DASH_SUPPORT_ADDON = {1}'
-                   .format(context.get_system_version(), mpd_addon))
 
 
 def strptime(stamp, stamp_fmt):

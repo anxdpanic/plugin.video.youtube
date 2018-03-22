@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 __author__ = 'bromix'
 
 import xbmcgui
@@ -34,13 +36,18 @@ def to_video_item(context, video_item):
 
     item.setProperty('inputstreamaddon', '')
     item.setProperty('inputstream.adaptive.manifest_type', '')
-    if video_item.use_dash() and settings.dash_support_addon():
+    if video_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
         item.setContentLookup(False)
         item.setMimeType('application/xml+dash')
         item.setProperty('inputstreamaddon', 'inputstream.adaptive')
         item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if video_item.get_headers():
             item.setProperty('inputstream.adaptive.stream_headers', video_item.get_headers())
+
+        if video_item.get_license_key():
+            item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+            item.setProperty('inputstream.adaptive.license_key', video_item.get_license_key())
+
         # item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
 
     item.setProperty(u'IsPlayable', u'true')

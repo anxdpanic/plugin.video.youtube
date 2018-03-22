@@ -30,6 +30,7 @@ class VideoItem(BaseItem):
         self._mediatype = None
         self.subtitles = None
         self._headers = None
+        self.license_key = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count)
@@ -195,3 +196,9 @@ class VideoItem(BaseItem):
 
     def get_headers(self):
         return self._headers
+
+    def set_license_key(self, url):
+        self.license_key = url
+
+    def get_license_key(self):
+        return self.license_key

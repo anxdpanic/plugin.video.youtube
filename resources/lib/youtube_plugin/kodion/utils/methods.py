@@ -8,6 +8,7 @@ from six import next
 from six import string_types
 
 import os
+import copy
 import re
 
 from ..constants import localize
@@ -96,11 +97,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
                                 not item.get('dash/video', False))]
 
     if use_dash:
-        if settings.dash_support_addon() and not context.addon_enabled('inputstream.adaptive'):
-            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30579)):
-                use_dash = context.set_addon_enabled('inputstream.adaptive')
-            else:
-                use_dash = False
+        use_dash = context.use_inputstream_adaptive()
 
     live_dash_supported = 'live' in context.inputstream_adaptive_capabilities()
 
@@ -123,7 +120,10 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
     for sorted_stream_data in sorted_stream_data_list:
-        context.log_debug('selectable stream: %s' % sorted_stream_data)
+        log_data = copy.deepcopy(sorted_stream_data)
+        if 'license_url' in log_data:
+            log_data['license_url'] = '[not shown]' if log_data['license_url'] else None
+        context.log_debug('selectable stream: %s' % log_data)
 
     selected_stream_data = None
     if ask_for_quality and len(sorted_stream_data_list) > 1:
@@ -138,7 +138,10 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
         selected_stream_data = find_best_fit(sorted_stream_data_list, _find_best_fit_video)
 
     if selected_stream_data is not None:
-        context.log_debug('selected stream: %s' % selected_stream_data)
+        log_data = copy.deepcopy(selected_stream_data)
+        if 'license_url' in log_data:
+            log_data['license_url'] = '[not shown]' if log_data['license_url'] else None
+        context.log_debug('selected stream: %s' % log_data)
 
     return selected_stream_data
 

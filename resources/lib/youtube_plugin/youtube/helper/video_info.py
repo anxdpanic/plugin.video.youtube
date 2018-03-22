@@ -679,9 +679,23 @@ class VideoInfo(object):
                     else:
                         raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
+                license_url = None
+                license_info = player_args.get('license_info', '').split(',')
+                for li_info in license_info:
+                    li_info = dict(urllib.parse.parse_qsl(li_info))
+                    if li_info.get('family') == 'widevine':
+                        license_url = li_info.get('url', '')
+                        if license_url:
+                            self._context.log_debug('Found widevine license url: |%s|' % license_url)
+                            license_url += '|Content-Type=application%2Fx-www-form-urlencoded&Authorization={bearer}'\
+                                .format(bearer=urllib.parse.quote('Bearer {token}'.format(token=self._access_token))) + '|R{SSM}|HB'
+                            break
+
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info,
-                                'headers': curl_headers}
+                                'headers': curl_headers,
+                                'license_url': license_url}
+
                 if is_live:
                     video_stream['url'] += '&start_seq=$START_NUMBER$'
                     video_stream.update(self.FORMAT.get('9998'))

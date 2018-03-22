@@ -246,7 +246,19 @@ def _process_watch_history_tv(provider, context, re_match):
     next_page_token = context.get_param('next_page_token', '')
     offset = int(context.get_param('offset', 0))
     json_data = provider.get_client(context).get_watch_history(page_token=next_page_token, offset=offset)
-    result.extend(tv.watch_history_to_items(provider, context, json_data))
+    result.extend(tv.tv_videos_to_items(provider, context, json_data))
+
+    return result
+
+
+def _process_purchases_tv(provider, context, re_match):
+    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+
+    result = []
+    next_page_token = context.get_param('next_page_token', '')
+    offset = int(context.get_param('offset', 0))
+    json_data = provider.get_client(context).get_purchases(page_token=next_page_token, offset=offset)
+    result.extend(tv.tv_videos_to_items(provider, context, json_data))
 
     return result
 
@@ -299,6 +311,8 @@ def process(category, provider, context, re_match):
         return _process_new_uploaded_videos_tv_filtered(provider, context, re_match)
     elif category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context, re_match)
+    elif category == 'purchases':
+        return _process_purchases_tv(provider, context, re_match)
     elif category == 'disliked_videos':
         return _process_disliked_videos(provider, context, re_match)
     elif category == 'live':

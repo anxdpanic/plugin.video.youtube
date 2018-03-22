@@ -3,14 +3,22 @@
 [add] Settings -> Maintenance -> Delete temporary files
 [add] Settings -> General -> Rate video after watching
 [add] Settings -> API -> Enable API configuration page
-        - when enabled, visit http://ipaddress:port/api to configure API keys from a web browser
+        - when enabled, visit http://<ipaddress>:<port>/api to configure API keys from a web browser
         - port is configured in Settings - HTTP Server - Port
 [chg] Storing personal api keys in api_keys.json
 [chg] Storing login tokens in access_manager.json
-[add] youtube_registration module, register developer keys and use them by appending an addon_id=:addon_id parameter to youtube add-on plugin urls
+[add] youtube_registration module, register developer keys and use them by appending an addon_id=<addon_id> parameter to youtube add-on plugin urls
 [add] screensaver=true parameter to /play route - no suggested videos, no post play events, don't ask for quality
 [add] play route for channel live streams
         - plugin://plugin.video.youtube/play/?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&live=1
+[add] Purchases
+        - support is incomplete
+        - requires inputstream.adaptive >= 2.0.28
+        - YouTube includes resolutions that are not available, currently to work around this;
+            - set InputStream Adaptive -> Settings -> Stream selection -> manual
+            - change video stream during playback to preferred working resolution
+        - Android plays only first 5 minutes
+        - huge thanks to peak3d
 [fix] search input, now works with Yatse
 [fix] Signature deciphering
 [fix] context menu after playback
