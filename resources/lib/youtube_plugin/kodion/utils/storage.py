@@ -91,9 +91,12 @@ class Storage(object):
         if not os.path.exists(self._filename):
             return
 
-        file_size_kb = (os.path.getsize(self._filename) // 1024)
-        if file_size_kb >= self._max_file_size_kb:
-            os.remove(self._filename)
+        try:
+            file_size_kb = (os.path.getsize(self._filename) // 1024)
+            if file_size_kb >= self._max_file_size_kb:
+                os.remove(self._filename)
+        except OSError:
+            pass
 
     def _create_table(self):
         self._open()
