@@ -243,7 +243,7 @@ msgstr "¿Esta seguro de que desea quitar \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr "Borrar"
+msgstr "Eliminar"
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -369,7 +369,7 @@ msgstr "Añadir a..."
 
 msgctxt "#30521"
 msgid "Select playlist"
-msgstr "Seleccione una lista"
+msgstr "Seleccione una lista de reproducción"
 
 msgctxt "#30522"
 msgid "New playlist..."
@@ -501,7 +501,7 @@ msgstr "Eliminar base de datos para cache de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr "Eliminar base de datos de historial de búsquedas"
+msgstr "Eliminar base de datos para historial de búsquedas"
 
 msgctxt "#30555"
 msgid "Clear function cache"
@@ -601,7 +601,7 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "MPEG-DASH está activado en los ajustes de YouTube, sin embargo InputStream Adaptive parece estar deshabilitado. ¿Le gustaría habilitar ahora InputStream Adaptive?"
+msgstr "MPEG-DASH ha sido activado en los ajustes para YouTube, sin embargo InputStream Adaptive parece estar deshabilitado. ¿Le gustaría habilitar ahora InputStream Adaptive?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -765,7 +765,7 @@ msgstr "Puerto"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "EL puerto %s ya esta en uso. No se ha podido iniciar el servicio HTTP"
+msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servicio HTTP"
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods"
@@ -781,7 +781,7 @@ msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr "Es Necesario Kodi 17 o superior"
+msgstr "Necesario Kodi 17 o superior"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
