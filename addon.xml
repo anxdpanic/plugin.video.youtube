@@ -33,6 +33,8 @@
             - change video stream during playback to preferred working resolution
         - Android plays only first 5 minutes
         - huge thanks to peak3d
+[add] relevanceLanguage to search requests
+[fix] mpeg-dash proxy with multi-profiles
 [fix] search input, now works with Yatse
 [fix] Signature deciphering
 [fix] context menu after playback
