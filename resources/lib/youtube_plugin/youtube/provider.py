@@ -638,6 +638,10 @@ class Provider(kodion.AbstractProvider):
         safe_search = context.get_settings().safe_search()
         page = int(context.get_param('page', 1))
 
+        context.set_param('q', search_text)
+        if context.get_path() == '/kodion/search/input/':
+            context.set_path('/kodion/search/query/')
+
         if search_type == 'video':
             self.set_content_type(context, kodion.constants.content_type.VIDEOS)
         else:
@@ -647,7 +651,6 @@ class Provider(kodion.AbstractProvider):
             if not channel_id:
                 channel_params = {}
                 channel_params.update(context.get_params())
-                channel_params['q'] = search_text
                 channel_params['search_type'] = 'channel'
                 channel_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.channels']) + '[/B]',
                                              context.create_uri([context.get_path().replace('input', 'query')], channel_params),
@@ -657,7 +660,6 @@ class Provider(kodion.AbstractProvider):
 
             playlist_params = {}
             playlist_params.update(context.get_params())
-            playlist_params['q'] = search_text
             playlist_params['search_type'] = 'playlist'
             playlist_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
                                           context.create_uri([context.get_path().replace('input', 'query')], playlist_params),
@@ -669,7 +671,6 @@ class Provider(kodion.AbstractProvider):
                 # live
                 live_params = {}
                 live_params.update(context.get_params())
-                live_params['q'] = search_text
                 live_params['search_type'] = 'video'
                 live_params['event_type'] = 'live'
                 live_item = DirectoryItem('[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.live']),
