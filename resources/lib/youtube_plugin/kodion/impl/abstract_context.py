@@ -123,11 +123,17 @@ class AbstractContext(object):
     def get_path(self):
         return self._path
 
+    def set_path(self, value):
+        self._path = value
+
     def get_params(self):
         return self._params
 
     def get_param(self, name, default=None):
         return self.get_params().get(name, default)
+
+    def set_param(self, name, value):
+        self._params[name] = value
 
     def get_data_path(self):
         """
