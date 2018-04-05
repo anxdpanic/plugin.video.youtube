@@ -338,6 +338,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
 def update_play_info(provider, context, video_id, video_item, video_stream):
     settings = context.get_settings()
+    ui = context.get_ui()
     resource_manager = provider.get_resource_manager(context)
     video_data = resource_manager.get_videos([video_id])
 
@@ -362,11 +363,18 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
     # set mediatype
     video_item.set_mediatype('video')  # using video
 
-    if inputstreamhelper and video_stream.get('license_url'):
+    license_info = video_stream.get('license_info', {})
+
+    if inputstreamhelper and \
+            license_info.get('proxy') and \
+            license_info.get('url') and \
+            license_info.get('token'):
         ishelper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')
         ishelper.check_inputstream()
 
-    video_item.set_license_key(video_stream.get('license_url'))
+    video_item.set_license_key(license_info.get('proxy'))
+    ui.set_home_window_property('license_url', license_info.get('url'))
+    ui.set_home_window_property('license_token', license_info.get('token'))
 
     # set the title
     if not video_item.get_title():

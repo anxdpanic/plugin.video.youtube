@@ -11,7 +11,7 @@ class YouTubePlayer(xbmc.Player):
         self.reset()
 
     def reset(self):
-        properties = ['playing', 'post_play']
+        properties = ['playing', 'post_play', 'license_url', 'license_token']
         for prop in properties:
             if self.ui.get_home_window_property(prop) is not None:
                 self.context.log_debug('Clearing home window property: {property}'.format(property=prop))

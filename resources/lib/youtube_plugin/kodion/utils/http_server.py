@@ -136,6 +136,52 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             else:
                 self.send_error(403)
 
+    def do_POST(self):
+        if not self.client_address[0].startswith(self.local_ranges) and not self.client_address[0] in self.whitelist_ips:
+            self.send_error(403)
+        elif self.path.startswith('/widevine'):
+            xbmc.log('[plugin.video.youtube] HTTPServer: Request |{proxy_path}|'.format(proxy_path=self.path), xbmc.LOGDEBUG)
+            license_url = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_url')
+            license_token = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_token')
+            size_limit = None
+            if not license_url:
+                self.send_error(404)
+            if not license_token:
+                self.send_error(403)
+            length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(length)
+
+            li_headers = {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Authorization': 'Bearer %s' % license_token
+            }
+            result = requests.post(url=license_url, headers=li_headers, data=post_data, stream=True)
+            response_length = int(result.headers.get('content-length'))
+            content = result.raw.read(response_length)
+            match = re.search('^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', content, re.MULTILINE)
+            if match:
+                authorized_types = match.group('authorized_types').split(',')
+                xbmc.log('[plugin.video.youtube] HTTPServer: Found authorized formats |{authorized_fmts}|'.format(authorized_fmts=authorized_types), xbmc.LOGDEBUG)
+                if 'HD' in authorized_types:
+                    size_limit = 7680 * 4320
+                elif 'HD720' in authorized_types:
+                    if xbmc.getCondVisibility('system.platform.android'):
+                        size_limit = 1280 * 720
+                    else:
+                        size_limit = (1280 * 720) - 1
+                elif 'SD' in authorized_types:
+                    size_limit = (1280 * 720) - 1
+
+            self.send_response(200)
+            if size_limit:
+                self.send_header('X-Limit-Video', 'max={size_limit}px'.format(size_limit=str(size_limit)))
+            for d in list(result.headers.items()):
+                self.send_header(d[0], d[1])
+            self.end_headers()
+            self.wfile.write(content)
+        else:
+            self.send_error(403)
+
     def log_message(self, format, *args):
         return
 

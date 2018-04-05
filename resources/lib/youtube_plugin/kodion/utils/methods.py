@@ -121,8 +121,9 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
     for sorted_stream_data in sorted_stream_data_list:
         log_data = copy.deepcopy(sorted_stream_data)
-        if 'license_url' in log_data:
-            log_data['license_url'] = '[not shown]' if log_data['license_url'] else None
+        if 'license_info' in log_data:
+            log_data['license_info']['url'] = '[not shown]' if log_data['license_info'].get('url') else None
+            log_data['license_info']['token'] = '[not shown]' if log_data['license_info'].get('token') else None
         context.log_debug('selectable stream: %s' % log_data)
 
     selected_stream_data = None
@@ -139,8 +140,9 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 
     if selected_stream_data is not None:
         log_data = copy.deepcopy(selected_stream_data)
-        if 'license_url' in log_data:
-            log_data['license_url'] = '[not shown]' if log_data['license_url'] else None
+        if 'license_info' in log_data:
+            log_data['license_info']['url'] = '[not shown]' if log_data['license_info'].get('url') else None
+            log_data['license_info']['token'] = '[not shown]' if log_data['license_info'].get('token') else None
         context.log_debug('selected stream: %s' % log_data)
 
     return selected_stream_data

@@ -26,12 +26,12 @@
 [add] play route for channel live streams
         - plugin:&#47;&#47;plugin.video.youtube&#47;play&#47;?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&#38;live=1
 [add] Purchases
-        - support is incomplete
-        - requires inputstream.adaptive &#62;= 2.0.28
-        - YouTube includes resolutions that are not available, currently to work around this;
+        - requires Kodi 18
+        - requires inputstream.adaptive &#62;= 2.2.12
+        - if a purchase fails after 10 seconds
+            - provide a debug log
             - set InputStream Adaptive -&#62; Settings -&#62; Stream selection -&#62; manual
             - change video stream during playback to preferred working resolution
-        - Android plays only first 5 minutes
         - huge thanks to peak3d
 [add] relevanceLanguage to search requests
 [fix] mpeg-dash proxy with multi-profiles
