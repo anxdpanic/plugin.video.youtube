@@ -692,7 +692,7 @@ class VideoInfo(object):
                             if li_ipaddress == '0.0.0.0':
                                 li_ipaddress = '127.0.0.1'
                             license_info['proxy'] = 'http://{ipaddress}:{port}/widevine'.format(ipaddress=li_ipaddress, port=self._context.get_settings().httpd_port())
-                            license_info['proxy'] += '||R{SSM}|HB'
+                            license_info['proxy'] += '||R{SSM}|'
                             license_info['token'] = self._access_token
                             break
 

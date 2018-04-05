@@ -141,13 +141,17 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_error(403)
         elif self.path.startswith('/widevine'):
             xbmc.log('[plugin.video.youtube] HTTPServer: Request |{proxy_path}|'.format(proxy_path=self.path), xbmc.LOGDEBUG)
+
             license_url = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_url')
             license_token = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_token')
-            size_limit = None
+
             if not license_url:
                 self.send_error(404)
             if not license_token:
                 self.send_error(403)
+
+            size_limit = None
+
             length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(length)
 
@@ -155,30 +159,46 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'Authorization': 'Bearer %s' % license_token
             }
+
             result = requests.post(url=license_url, headers=li_headers, data=post_data, stream=True)
+
             response_length = int(result.headers.get('content-length'))
             content = result.raw.read(response_length)
-            match = re.search('^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', content, re.MULTILINE)
+
+            content_split = content.split('\r\n\r\n')
+            response_header = content_split[0]
+            response_body = content_split[1]
+            response_length = len(response_body)
+
+            match = re.search('^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', response_header, re.MULTILINE)
             if match:
                 authorized_types = match.group('authorized_types').split(',')
                 xbmc.log('[plugin.video.youtube] HTTPServer: Found authorized formats |{authorized_fmts}|'.format(authorized_fmts=authorized_types), xbmc.LOGDEBUG)
+
+                fmt_to_px = {'SD': (1280 * 720) - 1, 'HD720': 1280 * 720, 'HD': 7680 * 4320}
                 if 'HD' in authorized_types:
-                    size_limit = 7680 * 4320
+                    size_limit = fmt_to_px['HD']
                 elif 'HD720' in authorized_types:
                     if xbmc.getCondVisibility('system.platform.android'):
-                        size_limit = 1280 * 720
+                        size_limit = fmt_to_px['HD720']
                     else:
-                        size_limit = (1280 * 720) - 1
+                        size_limit = fmt_to_px['SD']
                 elif 'SD' in authorized_types:
-                    size_limit = (1280 * 720) - 1
+                    size_limit = fmt_to_px['SD']
 
             self.send_response(200)
+
             if size_limit:
                 self.send_header('X-Limit-Video', 'max={size_limit}px'.format(size_limit=str(size_limit)))
             for d in list(result.headers.items()):
-                self.send_header(d[0], d[1])
+                if re.match('^[Cc]ontent-[Ll]ength$', d[0]):
+                    self.send_header(d[0], response_length)
+                else:
+                    self.send_header(d[0], d[1])
             self.end_headers()
-            self.wfile.write(content)
+
+            for chunk in self.get_chunks(response_body):
+                self.wfile.write(chunk)
         else:
             self.send_error(403)
 
