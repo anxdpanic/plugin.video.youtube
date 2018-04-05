@@ -165,8 +165,8 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             response_length = int(result.headers.get('content-length'))
             content = result.raw.read(response_length)
 
-            content_split = content.split('\r\n\r\n')
-            response_header = content_split[0]
+            content_split = content.split('\r\n\r\n'.encode('utf-8'))
+            response_header = content_split[0].decode('utf-8', 'ignore')
             response_body = content_split[1]
             response_length = len(response_body)
 
