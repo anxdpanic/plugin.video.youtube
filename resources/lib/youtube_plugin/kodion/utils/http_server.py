@@ -147,8 +147,10 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             if not license_url:
                 self.send_error(404)
+                return
             if not license_token:
                 self.send_error(403)
+                return
 
             size_limit = None
 
@@ -175,11 +177,11 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 authorized_types = match.group('authorized_types').split(',')
                 xbmc.log('[plugin.video.youtube] HTTPServer: Found authorized formats |{authorized_fmts}|'.format(authorized_fmts=authorized_types), xbmc.LOGDEBUG)
 
-                fmt_to_px = {'SD': (1280 * 720) - 1, 'HD720': 1280 * 720, 'HD': 7680 * 4320}
+                fmt_to_px = {'SD': (1280 * 528) - 1, 'HD720': 1280 * 720, 'HD': 7680 * 4320}
                 if 'HD' in authorized_types:
                     size_limit = fmt_to_px['HD']
                 elif 'HD720' in authorized_types:
-                    if xbmc.getCondVisibility('system.platform.android'):
+                    if xbmc.getCondVisibility('system.platform.android') == 1:
                         size_limit = fmt_to_px['HD720']
                     else:
                         size_limit = fmt_to_px['SD']
