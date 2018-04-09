@@ -43,7 +43,7 @@
         <setting id="youtube.folder.quick_search.show" type="bool" label="30605" default="false"/>
         <setting id="youtube.folder.quick_search_incognito.show" type="bool" label="30606" default="false"/>
         <setting id="youtube.folder.my_channel.show" type="bool" label="30507" default="true"/>
-        <setting id="youtube.folder.purchases.show" type="bool" label="30622" default="false"/>
+        <setting id="youtube.folder.purchases.show" type="bool" label="30622" default="true"/>
         <setting id="youtube.folder.watch_later.show" type="bool" label="30107" default="true"/>
         <setting id="youtube.folder.watch_later.playlist" type="text" label="30037" enable="eq(-1,true)"
                  visible="eq(-1,true)" default="" subsetting="true"/>
