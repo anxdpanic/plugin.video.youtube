@@ -541,6 +541,9 @@ class YouTube(LoginClient):
                 _result['items'] = _items
                 _result['continue'] = True
 
+            if 'offset' in _result and _result['offset'] >= 100:
+                _result['offset'] -= 100
+
             if len(_result['items']) < self._max_results:
                 if 'continue' in _result:
                     del _result['continue']
