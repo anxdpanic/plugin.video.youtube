@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.0.0~beta9" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.0.0~beta10" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -41,6 +41,8 @@
 [fix] alternative player, do not append headers
 [fix] My Subscriptions (Filtered) channel matching
 [fix] Audio only, failover to video if no audio only streams available
+[fix] My Subscriptions missing page 3
+[fix&#47;upd] function cache, update max rows and resolve hang on some requests
 [fix&#47;upd] post play events happen post play
 [fix&#47;upd] set title from metadata on play
 [chg] only automatically remove temp folder at start-up
