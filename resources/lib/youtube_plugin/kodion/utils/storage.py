@@ -57,15 +57,15 @@ class Storage(object):
 
         """
         Tests revealed that sqlite has problems to release the database in time. This happens no so often, but just to
-        be sure, we try at least 5 times to execute out statement.
+        be sure, we try at least 3 times to execute out statement.
         """
-        for tries in range(5):
+        for tries in range(3):
             try:
                 return self._cursor.execute(query, values)
             except TypeError:
                 return None
             except:
-                time.sleep(2)
+                time.sleep(0.1)
         else:
             return None
 

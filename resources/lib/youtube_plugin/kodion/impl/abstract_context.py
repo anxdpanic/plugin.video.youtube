@@ -52,7 +52,7 @@ class AbstractContext(object):
         if not self._function_cache:
             max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, 5)
             self._function_cache = FunctionCache(os.path.join(self._get_cache_path(), 'cache'),
-                                                 max_file_size_kb=max_cache_size_mb * 1024)
+                                                 max_file_size_mb=max_cache_size_mb)
         return self._function_cache
 
     def get_search_history(self):

@@ -41,6 +41,7 @@
 [fix] alternative player, do not append headers
 [fix] My Subscriptions (Filtered) channel matching
 [fix] Audio only, failover to video if no audio only streams available
+[fix&#47;upd] function cache, update max rows and resolve hang on some requests
 [fix&#47;upd] post play events happen post play
 [fix&#47;upd] set title from metadata on play
 [chg] only automatically remove temp folder at start-up
