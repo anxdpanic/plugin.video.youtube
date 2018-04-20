@@ -34,6 +34,7 @@
         - change video stream during playback to preferred working resolution
     - huge thanks to peak3d
 [add] relevanceLanguage to search requests
+[add] Refresh to My Subscriptions (Filtered)
 [fix] mpeg-dash proxy with multi-profiles
 [fix] search input, now works with Yatse
 [fix] Signature deciphering
