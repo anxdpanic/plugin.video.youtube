@@ -50,11 +50,11 @@ msgstr "Configurar InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr "Preguntar siempre por calidad de video"
+msgstr "Preguntar siempre por calidad de vídeo"
 
 msgctxt "#30010"
 msgid "Video quality"
-msgstr "Calidad de Video"
+msgstr "Calidad de vídeo"
 
 msgctxt "#30011"
 msgid "480p"
@@ -108,7 +108,7 @@ msgstr "Tamaño historial de búsqueda"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr "Tamaño cache (MB)"
+msgstr "Tamaño para cache de funciones (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -160,11 +160,11 @@ msgstr "Soportar reproductor alternativo"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr "Personalizar ID lista reproducción 'Ver más tarde'"
+msgstr "Personalizar ID para lista de reproducción 'Ver más tarde'"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr "Personalizar ID lista reproducción 'Historial'"
+msgstr "Personalizar ID para lista de reproducción 'Historial'"
 
 #Kodion Common
 #empty strings from id 30039 to 30099
@@ -203,11 +203,11 @@ msgstr "Ver más tarde"
 
 msgctxt "#30108"
 msgid "Remove"
-msgstr "Quitar"
+msgstr "Suprimir"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr "Últimos Videos"
+msgstr "Últimos Vídeos"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -231,7 +231,7 @@ msgstr "Confirmación para eliminar"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr "Confirmación para quitar"
+msgstr "Confirmación para suprimir"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
@@ -239,7 +239,7 @@ msgstr "¿Esta seguro de que desea eliminar \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "¿Esta seguro de que desea quitar \"%s\"?"
+msgstr "¿Esta seguro de que desea suprimir \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -247,7 +247,7 @@ msgstr "Eliminar"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr "Por favor espere..."
+msgstr "Por favor, espere..."
 
 msgctxt "#30120"
 msgid "Clear"
@@ -317,7 +317,7 @@ msgstr "Mi Canal"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr "Me gustó el video"
+msgstr "Me gustó el vídeo"
 
 msgctxt "#30509"
 msgid "History"
@@ -341,11 +341,11 @@ msgstr "Popular en YouTube"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr "Videos relacionados"
+msgstr "Vídeos relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto-Eliminar de 'Ver más tarde'"
+msgstr "Auto-eliminar de 'Ver más tarde'"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -357,11 +357,11 @@ msgstr "Suscribirse a %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr "Visite la URL '%s' desde cualquier navegador web" 
+msgstr "Por favor, vaya a la URL '%s' desde"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr "e introduzca el siguiente código:"
+msgstr "cualquier navegador web e introduzca el siguiente código..."
 
 msgctxt "#30520"
 msgid "Add to..."
@@ -437,7 +437,7 @@ msgstr "Reproducir desde aquí"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr "No me gustó el video"
+msgstr "No me gustó el vídeo"
 
 msgctxt "#30539"
 msgid "Live"
@@ -469,11 +469,11 @@ msgstr "No se encontraron enlaces"
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Por favor inicie sesión dos veces!"
+msgstr "Por favor, inicie sesión dos veces!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Debe habilitar dos sesiones para que el add-on YouTube funcione correctamente."
+msgstr "Para que el add-on YouTube funcione correctamente se deben habilitar dos sesiones."
 
 msgctxt "#30548"
 msgid "More..."
@@ -481,7 +481,7 @@ msgstr "Más..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr "No se han encontrados videos"
+msgstr "No se han encontrados vídeos"
 
 msgctxt "#30550"
 msgid "Region"
@@ -513,11 +513,11 @@ msgstr "Limpiar historial de búsqueda"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr "La cache para funciones"
+msgstr "cache para funciones"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr "El Historial de búsqueda"
+msgstr "historial de búsqueda"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
@@ -613,7 +613,7 @@ msgstr "¿Está seguro de que desea restablecer las credenciales de acceso?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr "Reproducir automáticamente videos sugeridos"
+msgstr "Reproducir vídeos sugeridos automáticamente"
 
 msgctxt "#30583"
 msgid "Automatic"
@@ -649,7 +649,7 @@ msgstr "Eliminado de filtro de 'Mis Suscripciones'"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr "Tamaño miniaturas"
+msgstr "Tamaño para miniaturas"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
@@ -689,11 +689,11 @@ msgstr "Configurar subtítulos"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s con %s como respaldo"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr "Sin autogenerado"
+msgstr "sin autogenerado"
 
 msgctxt "#30603"
 msgid "Age gate"
@@ -729,7 +729,7 @@ msgstr "Esta acción borrará su historial de reproducción en todos los disposi
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr "Guardar listas de reproducción"
+msgstr "Listas de reproducción guardadas"
 
 msgctxt "#30612"
 msgid "Retry"
@@ -741,7 +741,7 @@ msgstr "Recuperar ID para lista de reproducción 'Ver más tarde'"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "¡Vaya! Algo ha fallado al recuperar la ID para la lista de reproducción 'Ver más tarde'. Agregue algunos videos a 'Ver más tarde' a través de la aplicación web / Android y vuelva a intentarlo."
+msgstr "¡Vaya! Algo ha fallado al recuperar la ID para la lista de reproducción 'Ver más tarde'. Agregue algunos vídeos a 'Ver más tarde' a través de la aplicación web / Android y vuelva a intentarlo."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -793,7 +793,7 @@ msgstr "Eliminar archivos temporales"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr "Calificar video después de ver"
+msgstr "Calificar vídeo después de ver"
 
 msgctxt "#30628"
 msgid "HTTP Server"
@@ -849,7 +849,7 @@ msgstr "Restaurar"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr "Eliminar api_keys.json"
+msgstr "Eliminar claves api (api_keys.json)"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
