@@ -14,26 +14,27 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [add] Python 3 compat.
-[add] Settings -&#62; Maintenance -&#62; Delete temporary files
-[add] Settings -&#62; General -&#62; Rate video after watching
-[add] Settings -&#62; API -&#62; Enable API configuration page
-        - when enabled, visit http:&#47;&#47;&#60;ipaddress&#62;:&#60;port&#62;&#47;api to configure API keys from a web browser
-        - port is configured in Settings - HTTP Server - Port
+[add] Settings -&gt; Maintenance -&gt; Delete temporary files
+[add] Settings -&gt; General -&gt; Rate video after watching
+[add] Settings -&gt; API -&gt; Enable API configuration page
+    - when enabled, visit http://&lt;ipaddress&gt;:&lt;port&gt;/api to configure API keys from a web browser
+    - port is configured in Settings - HTTP Server - Port
 [chg] Storing personal api keys in api_keys.json
 [chg] Storing login tokens in access_manager.json
-[add] youtube_registration module, register developer keys and use them by appending an addon_id=&#60;addon_id&#62; parameter to youtube add-on plugin urls
-[add] screensaver=true parameter to &#47;play route - no suggested videos, no post play events, don't ask for quality
+[add] youtube_registration module, register developer keys and use them by appending an addon_id=&lt;addon_id&gt; parameter to youtube add-on plugin urls
+[add] screensaver=true parameter to /play route - no suggested videos, no post play events, don&#39;t ask for quality
 [add] play route for channel live streams
-        - plugin:&#47;&#47;plugin.video.youtube&#47;play&#47;?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&#38;live=1
+    - plugin://plugin.video.youtube/play/?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&amp;live=1
 [add] Purchases
-        - requires Kodi 18
-        - requires inputstream.adaptive &#62;= 2.2.12
-        - if a purchase fails after 10 seconds
-            - provide a debug log
-            - set InputStream Adaptive -&#62; Settings -&#62; Stream selection -&#62; manual
-            - change video stream during playback to preferred working resolution
-        - huge thanks to peak3d
+    - requires Kodi 18
+    - requires inputstream.adaptive &gt;= 2.2.12
+    - if a purchase fails after 10 seconds
+        - provide a debug log
+        - set InputStream Adaptive -&gt; Settings -&gt; Stream selection -&gt; manual
+        - change video stream during playback to preferred working resolution
+    - huge thanks to peak3d
 [add] relevanceLanguage to search requests
+[add] Refresh to My Subscriptions (Filtered)
 [fix] mpeg-dash proxy with multi-profiles
 [fix] search input, now works with Yatse
 [fix] Signature deciphering
@@ -42,9 +43,9 @@
 [fix] My Subscriptions (Filtered) channel matching
 [fix] Audio only, failover to video if no audio only streams available
 [fix] My Subscriptions missing page 3
-[fix&#47;upd] function cache, update max rows and resolve hang on some requests
-[fix&#47;upd] post play events happen post play
-[fix&#47;upd] set title from metadata on play
+[fix/upd] function cache, update max rows and resolve hang on some requests
+[fix/upd] post play events happen post play
+[fix/upd] set title from metadata on play
 [chg] only automatically remove temp folder at start-up
 [upd] Dutch strings [MB1968]
 [upd] French strings [bubuleur]

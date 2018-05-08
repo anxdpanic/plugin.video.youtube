@@ -114,7 +114,10 @@ class XbmcContextUI(AbstractContextUI):
         if not _image:
             _image = self._context.get_icon()
 
-        _message = utils.to_unicode(message)
+        try:
+            _message = message.decode('utf-8', 'ignore')
+        except AttributeError:
+            _message = message.encode('utf-8', 'ignore').decode('utf-8', 'ignore')
         _message = _message.replace(',', ' ')
         _message = _message.replace('\n', ' ')
 
