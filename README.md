@@ -3,7 +3,7 @@
 # **Links:**
 
 * [YouTube](http://www.youtube.com)
-* [Support thread](http://forum.kodi.tv/showthread.php?tid=267160)
+* [Support thread](http://forum.kodi.tv/showthread.php?tid=325740)
 
 # **Images:**
 ![](https://i.imgur.com/WvJRshc.png)
