@@ -29,7 +29,7 @@ def to_utf8(text):
     result = text
     if isinstance(text, string_types):
         try:
-            result = text.encode('utf-8')
+            result = text.encode('utf-8', 'ignore')
         except UnicodeDecodeError:
             pass
 
@@ -38,9 +38,9 @@ def to_utf8(text):
 
 def to_unicode(text):
     result = text
-    if isinstance(text, string_types):
+    if isinstance(text, string_types) or isinstance(text, bytes):
         try:
-            result = text.decode('utf-8')
+            result = text.decode('utf-8', 'ignore')
         except (AttributeError, UnicodeEncodeError):
             pass
 
