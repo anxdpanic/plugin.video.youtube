@@ -863,3 +863,7 @@ msgstr ""
 msgctxt "#30644"
 msgid "Select listen IP"
 msgstr ""
+
+msgctxt "#30645"
+msgid "Refresh after watching"
+msgstr ""

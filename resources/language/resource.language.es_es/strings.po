@@ -862,3 +862,7 @@ msgstr "IP a la escucha"
 msgctxt "#30644"
 msgid "Select listen IP"
 msgstr "Seleccione IP a la escucha"
+
+msgctxt "#30645"
+msgid "Refresh after watching"
+msgstr ""

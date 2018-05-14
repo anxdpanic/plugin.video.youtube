@@ -601,6 +601,9 @@ class Provider(kodion.AbstractProvider):
                     if rating == 'none':
                         rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
                         yt_video.process('rate', self, context, rating_match)
+
+            if context.get_settings().get_bool('youtube.post.play.refresh', False):
+                context.get_ui().refresh_container()
         else:
             context.log_warning('Missing video ID for post play event')
         return True

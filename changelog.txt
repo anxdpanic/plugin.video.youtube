@@ -1,3 +1,6 @@
+6.1.0
+[add] Refresh after watching
+
 6.0.1
 [fix] notification encoding
 
