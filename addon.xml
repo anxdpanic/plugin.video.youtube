@@ -17,6 +17,7 @@
 [add] Refresh after watching
 [add] Completed Live
 [add] Upcoming Live
+[upd] Localize API key errors, provide a more descriptive notification
         </news>
         <assets>
             <icon>icon.png</icon>

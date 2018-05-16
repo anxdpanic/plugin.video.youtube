@@ -119,6 +119,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.inputstreamhelper.is.installed': 30625,
                  'youtube.upcoming.live': 30646,
                  'youtube.completed.live': 30647,
+                 'youtube.api.key.incorrect': 30648,
+                 'youtube.client.id.incorrect': 30649,
+                 'youtube.client.secret.incorrect': 30650
                  }
 
     def __init__(self):
@@ -1147,18 +1150,21 @@ class Provider(kodion.AbstractProvider):
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, LoginException):
+            message_timeout = 5000
             failed_refresh = False
             context.get_access_manager().update_access_token('')
 
             msg = message = exception_to_handle.get_message()
             error = ''
             code = ''
-
+            log_message = message
             if isinstance(msg, dict):
                 if 'error_description' in msg:
                     message = msg['error_description']
+                    log_message = message
                 elif 'message' in msg:
                     message = msg['message']
+                    log_message = message
 
                 if 'error' in msg:
                     error = msg['error']
@@ -1169,6 +1175,14 @@ class Provider(kodion.AbstractProvider):
                 if message == u'Unauthorized' and error == u'unauthorized_client':
                     failed_refresh = True
 
+            if error == 'invalid_client':
+                if message == 'The OAuth client was not found.':
+                    message = context.localize(self.LOCAL_MAP['youtube.client.id.incorrect'])
+                    message_timeout = 7000
+                elif message == 'Unauthorized':
+                    message = context.localize(self.LOCAL_MAP['youtube.client.secret.incorrect'])
+                    message_timeout = 7000
+
             if error and code:
                 title = '%s: [%s] %s' % ('LoginException', code, error)
             elif error:
@@ -1176,8 +1190,8 @@ class Provider(kodion.AbstractProvider):
             else:
                 title = 'LoginException'
 
-            context.get_ui().show_notification(message, title)
-            context.log_error('%s: %s' % (title, message))
+            context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
+            context.log_error('%s: %s' % (title, log_message))
             if not failed_refresh:
                 context.get_ui().open_settings()
             return False

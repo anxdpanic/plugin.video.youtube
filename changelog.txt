@@ -2,6 +2,7 @@
 [add] Refresh after watching
 [add] Completed Live
 [add] Upcoming Live
+[upd] Localize API key errors, provide a more descriptive notification
 
 6.0.1
 [fix] notification encoding
