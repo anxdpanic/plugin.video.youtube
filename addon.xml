@@ -14,9 +14,9 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.1.0
-[add] Refresh after watching
-[add] Completed Live
-[add] Upcoming Live
+[add] Refresh after watching (default: off) Settings -&gt; General
+[add] Completed Live folder (default: off) Settings -&gt; Folders
+[add] Upcoming Live folder (default: off) Settings -&gt; Folders
 [upd] Localize API key errors, provide a more descriptive notification
         </news>
         <assets>
