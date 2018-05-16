@@ -633,15 +633,20 @@ class VideoInfo(object):
             if not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()):
                 reason = None
                 if playability_status.get('status') == 'LIVE_STREAM_OFFLINE':
-                    live_streamability = playability_status.get('liveStreamability', {})
-                    live_streamability_renderer = live_streamability.get('liveStreamabilityRenderer', {})
-                    offline_slate = live_streamability_renderer.get('offlineSlate', {})
-                    live_stream_offline_slate_renderer = offline_slate.get('liveStreamOfflineSlateRenderer', {})
-                    renderer_main_text = live_stream_offline_slate_renderer.get('mainText', {})
-                    main_text_runs = renderer_main_text.get('runs', [{}])
-                    reason_text = main_text_runs[0].get('text')
-                    if reason_text:
-                        reason = reason_text
+                    if playability_status.get('reason'):
+                        reason = playability_status.get('reason')
+                    else:
+                        live_streamability = playability_status.get('liveStreamability', {})
+                        live_streamability_renderer = live_streamability.get('liveStreamabilityRenderer', {})
+                        offline_slate = live_streamability_renderer.get('offlineSlate', {})
+                        live_stream_offline_slate_renderer = offline_slate.get('liveStreamOfflineSlateRenderer', {})
+                        renderer_main_text = live_stream_offline_slate_renderer.get('mainText', {})
+                        main_text_runs = renderer_main_text.get('runs', [{}])
+                        reason_text = ''
+                        for text in main_text_runs:
+                            reason_text += text.get('text', '')
+                        if reason_text:
+                            reason = reason_text
                 else:
                     reason = params.get('reason')
                     if not reason and 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:

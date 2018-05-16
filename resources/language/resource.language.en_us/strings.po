@@ -863,3 +863,27 @@ msgstr ""
 msgctxt "#30644"
 msgid "Select listen IP"
 msgstr ""
+
+msgctxt "#30645"
+msgid "Refresh after watching"
+msgstr ""
+
+msgctxt "#30646"
+msgid "Upcoming Live"
+msgstr ""
+
+msgctxt "#30647"
+msgid "Completed Live"
+msgstr ""
+
+msgctxt "#30648"
+msgid "API Key is incorrect. Settings - API - API Key"
+msgstr ""
+
+msgctxt "#30649
+msgid "Client Id is incorrect. Settings - API - API Id"
+msgstr ""
+
+msgctxt "#30650"
+msgid "Client Secret is incorrect. Settings - API - API Secret"
+msgstr ""

@@ -287,14 +287,21 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
 
 def handle_error(provider, context, json_data):
     if json_data and 'error' in json_data:
-        message = json_data['error'].get('message', '')
-        reason = json_data['error']['errors'][0].get('reason', '')
-        title = '%s: %s' % (context.get_name(), reason)
+        open_settings = False
         message_timeout = 5000
+        message = log_message = json_data['error'].get('message', '')
+        reason = json_data['error']['errors'][0].get('reason', '')
+        if reason == 'keyInvalid' and message == 'Bad Request':
+            message = context.localize(provider.LOCAL_MAP['youtube.api.key.incorrect'])
+            message_timeout = 7000
+            open_settings = True
+        title = '%s: %s' % (context.get_name(), reason)
         if reason == 'quotaExceeded' or reason == 'dailyLimitExceeded':
             message_timeout = 7000
         context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
-        context.log_error('Error reason: |%s| with message: |%s|' % (reason, message))
+        context.log_error('Error reason: |%s| with message: |%s|' % (reason, log_message))
+        if open_settings:
+            context.get_ui().open_settings()
         return False
 
     return True

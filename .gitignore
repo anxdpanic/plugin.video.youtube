@@ -25,3 +25,4 @@ $RECYCLE.BIN/
 *.pyo
 /.idea
 
+/resources/language/append_to_languages.py

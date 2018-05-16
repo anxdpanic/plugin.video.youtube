@@ -116,7 +116,12 @@ class Provider(kodion.AbstractProvider):
                  'youtube.select.listen.ip': 30644,
                  'youtube.purchases': 30622,
                  'youtube.requires.krypton': 30624,
-                 'youtube.inputstreamhelper.is.installed': 30625
+                 'youtube.inputstreamhelper.is.installed': 30625,
+                 'youtube.upcoming.live': 30646,
+                 'youtube.completed.live': 30647,
+                 'youtube.api.key.incorrect': 30648,
+                 'youtube.client.id.incorrect': 30649,
+                 'youtube.client.secret.incorrect': 30650
                  }
 
     def __init__(self):
@@ -601,6 +606,9 @@ class Provider(kodion.AbstractProvider):
                     if rating == 'none':
                         rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
                         yt_video.process('rate', self, context, rating_match)
+
+            if context.get_settings().get_bool('youtube.post.play.refresh', False):
+                context.get_ui().refresh_container()
         else:
             context.log_warning('Missing video ID for post play event')
         return True
@@ -1089,6 +1097,22 @@ class Provider(kodion.AbstractProvider):
                 browse_channels_item.set_fanart(self.get_fanart(context))
                 result.append(browse_channels_item)
 
+        # completed live events
+        if settings.get_bool('youtube.folder.completed.live.show', True):
+            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.completed.live']),
+                                             context.create_uri(['special', 'completed_live']),
+                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item.set_fanart(self.get_fanart(context))
+            result.append(live_events_item)
+
+        # upcoming live events
+        if settings.get_bool('youtube.folder.upcoming.live.show', True):
+            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.upcoming.live']),
+                                             context.create_uri(['special', 'upcoming_live']),
+                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item.set_fanart(self.get_fanart(context))
+            result.append(live_events_item)
+
         # live events
         if settings.get_bool('youtube.folder.live.show', True):
             live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.live']),
@@ -1126,18 +1150,21 @@ class Provider(kodion.AbstractProvider):
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, LoginException):
+            message_timeout = 5000
             failed_refresh = False
             context.get_access_manager().update_access_token('')
 
             msg = message = exception_to_handle.get_message()
             error = ''
             code = ''
-
+            log_message = message
             if isinstance(msg, dict):
                 if 'error_description' in msg:
                     message = msg['error_description']
+                    log_message = message
                 elif 'message' in msg:
                     message = msg['message']
+                    log_message = message
 
                 if 'error' in msg:
                     error = msg['error']
@@ -1148,6 +1175,14 @@ class Provider(kodion.AbstractProvider):
                 if message == u'Unauthorized' and error == u'unauthorized_client':
                     failed_refresh = True
 
+            if error == 'invalid_client':
+                if message == 'The OAuth client was not found.':
+                    message = context.localize(self.LOCAL_MAP['youtube.client.id.incorrect'])
+                    message_timeout = 7000
+                elif message == 'Unauthorized':
+                    message = context.localize(self.LOCAL_MAP['youtube.client.secret.incorrect'])
+                    message_timeout = 7000
+
             if error and code:
                 title = '%s: [%s] %s' % ('LoginException', code, error)
             elif error:
@@ -1155,8 +1190,8 @@ class Provider(kodion.AbstractProvider):
             else:
                 title = 'LoginException'
 
-            context.get_ui().show_notification(message, title)
-            context.log_error('%s: %s' % (title, message))
+            context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
+            context.log_error('%s: %s' % (title, log_message))
             if not failed_refresh:
                 context.get_ui().open_settings()
             return False

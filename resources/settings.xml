@@ -12,6 +12,7 @@
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
         <setting id="youtube.post.play.rate" type="bool" label="30627" default="false" />
+        <setting id="youtube.post.play.refresh" type="bool" label="30645" default="false" />
         <setting type="sep" />
         <setting id="kodion.thumbnail.size" type="enum" label="30591" lvalues="30592|30593" default="1" />
         <setting id="kodion.fanart.show" type="bool" label="30021" default="true"/>
@@ -59,6 +60,8 @@
         <setting id="youtube.folder.saved.playlists.show" type="bool" label="30611" default="true"/>
         <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
         <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
+        <setting id="youtube.folder.completed.live.show" type="bool" label="30647" default="false"/>
+        <setting id="youtube.folder.upcoming.live.show" type="bool" label="30646" default="false"/>
         <setting id="youtube.folder.live.show" type="bool" label="30539" default="true"/>
         <setting id="youtube.folder.sign.out.show" type="bool" label="30112" default="true"/>
         <setting id="youtube.folder.settings.show" type="bool" label="30577" default="true"/>
