@@ -60,6 +60,8 @@
         <setting id="youtube.folder.saved.playlists.show" type="bool" label="30611" default="true"/>
         <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
         <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
+        <setting id="youtube.folder.completed.live.show" type="bool" label="30647" default="false"/>
+        <setting id="youtube.folder.upcoming.live.show" type="bool" label="30646" default="false"/>
         <setting id="youtube.folder.live.show" type="bool" label="30539" default="true"/>
         <setting id="youtube.folder.sign.out.show" type="bool" label="30112" default="true"/>
         <setting id="youtube.folder.settings.show" type="bool" label="30577" default="true"/>

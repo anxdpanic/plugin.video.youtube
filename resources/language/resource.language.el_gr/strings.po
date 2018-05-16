@@ -865,3 +865,11 @@ msgstr ""
 msgctxt "#30645"
 msgid "Refresh after watching"
 msgstr ""
+
+msgctxt "#30646"
+msgid "Upcoming Live"
+msgstr ""
+
+msgctxt "#30647"
+msgid "Completed Live"
+msgstr ""

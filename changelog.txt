@@ -1,5 +1,7 @@
 6.1.0
 [add] Refresh after watching
+[add] Completed Live
+[add] Upcoming Live
 
 6.0.1
 [fix] notification encoding

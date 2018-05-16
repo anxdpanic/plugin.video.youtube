@@ -116,7 +116,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.select.listen.ip': 30644,
                  'youtube.purchases': 30622,
                  'youtube.requires.krypton': 30624,
-                 'youtube.inputstreamhelper.is.installed': 30625
+                 'youtube.inputstreamhelper.is.installed': 30625,
+                 'youtube.upcoming.live': 30646,
+                 'youtube.completed.live': 30647,
                  }
 
     def __init__(self):
@@ -1091,6 +1093,22 @@ class Provider(kodion.AbstractProvider):
                                                      image=context.create_resource_path('media', 'browse_channels.png'))
                 browse_channels_item.set_fanart(self.get_fanart(context))
                 result.append(browse_channels_item)
+
+        # completed live events
+        if settings.get_bool('youtube.folder.completed.live.show', True):
+            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.completed.live']),
+                                             context.create_uri(['special', 'completed_live']),
+                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item.set_fanart(self.get_fanart(context))
+            result.append(live_events_item)
+
+        # upcoming live events
+        if settings.get_bool('youtube.folder.upcoming.live.show', True):
+            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.upcoming.live']),
+                                             context.create_uri(['special', 'upcoming_live']),
+                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item.set_fanart(self.get_fanart(context))
+            result.append(live_events_item)
 
         # live events
         if settings.get_bool('youtube.folder.live.show', True):
