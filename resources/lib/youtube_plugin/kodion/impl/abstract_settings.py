@@ -135,3 +135,12 @@ class AbstractSettings(object):
 
     def api_config_page(self):
         return self.get_bool(constants.setting.API_CONFIG_PAGE, False)
+
+    def get_location(self):
+        return self.get_string(constants.setting.LOCATION, '').strip()
+
+    def set_location(self, value):
+        self.set_string(constants.setting.LOCATION, value)
+
+    def get_location_radius(self):
+        return str(self.get_int(constants.setting.LOCATION_RADIUS, 500)) + 'km'
