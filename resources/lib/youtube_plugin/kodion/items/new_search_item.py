@@ -5,7 +5,7 @@ from .. import constants
 
 
 class NewSearchItem(DirectoryItem):
-    def __init__(self, context, alt_name=None, image=None, fanart=None, incognito=False, channel_id='', addon_id=''):
+    def __init__(self, context, alt_name=None, image=None, fanart=None, incognito=False, channel_id='', addon_id='', location=False):
         name = alt_name
         if not name:
             name = '[B]' + context.localize(constants.localize.SEARCH_NEW) + '[/B]'
@@ -20,6 +20,9 @@ class NewSearchItem(DirectoryItem):
             item_params.update({'incognito': incognito})
         if channel_id:
             item_params.update({'channel_id': channel_id})
+        if location:
+            item_params.update({'location': location})
+
         DirectoryItem.__init__(self, name, context.create_uri([constants.paths.SEARCH, 'input'], params=item_params), image=image)
         if fanart:
             self.set_fanart(fanart)

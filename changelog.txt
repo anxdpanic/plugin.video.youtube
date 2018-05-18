@@ -1,7 +1,8 @@
 6.1.0
 [add] Refresh after watching (default: off) Settings -> General
-[add] Completed Live folder (default: off) Settings -> Folders
-[add] Upcoming Live folder (default: off) Settings -> Folders
+[add] Completed Live folder (default: on) Settings -> Folders
+[add] Upcoming Live folder (default: on) Settings -> Folders
+[add] My Location folder (default: on) Settings - Advanced - Enable setup-wizard
 [upd] Localize API key errors, provide a more descriptive notification
 
 6.0.1

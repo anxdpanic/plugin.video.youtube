@@ -54,7 +54,7 @@ class ResourceManager(object):
 
         return result
 
-    def _update_videos(self, video_ids):
+    def _update_videos(self, video_ids, live_details=False):
         result = {}
         json_data = {}
 
@@ -70,7 +70,7 @@ class ResourceManager(object):
                 result[video_id] = video_data
 
         if len(video_ids_to_update) > 0:
-            json_data = function_cache.get(FunctionCache.ONE_MONTH, self._youtube_client.get_videos, video_ids_to_update)
+            json_data = function_cache.get(FunctionCache.ONE_MONTH, self._youtube_client.get_videos, video_ids_to_update, live_details)
             yt_items = json_data.get('items', [])
             for yt_item in yt_items:
                 video_id = str(yt_item['id'])
@@ -90,12 +90,12 @@ class ResourceManager(object):
             pos += 50
         return list_of_50
 
-    def get_videos(self, video_ids):
+    def get_videos(self, video_ids, live_details=False):
         list_of_50s = self._make_list_of_50(video_ids)
 
         result = {}
         for list_of_50 in list_of_50s:
-            result.update(self._update_videos(list_of_50))
+            result.update(self._update_videos(list_of_50, live_details))
         return result
 
     def _update_playlists(self, playlists_ids):

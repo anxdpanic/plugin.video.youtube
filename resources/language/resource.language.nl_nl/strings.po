@@ -878,3 +878,19 @@ msgstr ""
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
 msgstr ""
+
+msgctxt "#30651"
+msgid "Location"
+msgstr ""
+
+msgctxt "#30652"
+msgid "Location radius (km)"
+msgstr ""
+
+msgctxt "#30653"
+msgid "Perform geolocation? Used for [B]My Location[/B]"
+msgstr ""
+
+msgctxt "#30654"
+msgid "My Location"
+msgstr ""

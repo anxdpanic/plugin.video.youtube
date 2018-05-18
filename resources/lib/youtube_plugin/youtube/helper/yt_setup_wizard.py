@@ -1,4 +1,6 @@
 __author__ = 'bromix'
+from ...kodion.utils import ipstack
+
 
 DEFAULT_LANGUAGES = {u'items': [{u'snippet': {u'name': u'Afrikaans', u'hl': u'af'}, u'id': u'af'}, {u'snippet': {u'name': u'Azerbaijani', u'hl': u'az'}, u'id': u'az'}, {u'snippet': {u'name': u'Indonesian', u'hl': u'id'}, u'id': u'id'}, {u'snippet': {u'name': u'Malay', u'hl': u'ms'}, u'id': u'ms'},
                                 {u'snippet': {u'name': u'Catalan', u'hl': u'ca'}, u'id': u'ca'}, {u'snippet': {u'name': u'Czech', u'hl': u'cs'}, u'id': u'cs'}, {u'snippet': {u'name': u'Danish', u'hl': u'da'}, u'id': u'da'}, {u'snippet': {u'name': u'German', u'hl': u'de'}, u'id': u'de'},
@@ -91,5 +93,25 @@ def _process_language(provider, context):
     provider.reset_client()
 
 
+def _process_geo_location(provider, context):
+    settings = context.get_settings()
+    current_location = settings.get_location()
+    if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(provider.LOCAL_MAP['youtube.perform.geolocation'])):
+        if current_location:
+            settings.set_location('')
+        return
+
+    result = ipstack.locate_requester()
+    if 'error' in result:
+        context.log_error(result.get('error', ''))
+        return
+
+    if 'latitude' in result and 'longitude' in result:
+        settings.set_location('{lat},{long}'.format(lat=result['latitude'], long=result['longitude']))
+    else:
+        context.log_error('No coordinates returned.')
+
+
 def process(provider, context):
     _process_language(provider, context)
+    _process_geo_location(provider, context)

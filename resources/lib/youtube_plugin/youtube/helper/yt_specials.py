@@ -89,7 +89,9 @@ def _process_live_events(provider, context, re_match, event_type='live'):
 
     # TODO: cache result
     page_token = context.get_param('page_token', '')
-    json_data = provider.get_client(context).get_live_events(event_type=event_type, page_token=page_token)
+    location = str(context.get_param('location', False)).lower() == 'true'
+
+    json_data = provider.get_client(context).get_live_events(event_type=event_type, page_token=page_token, location=location)
     if not v3.handle_error(provider, context, json_data):
         return False
     result.extend(v3.response_to_items(provider, context, json_data, sort=_sort, reverse_sort=True))

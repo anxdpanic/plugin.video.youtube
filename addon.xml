@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.1.0~alpha1" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.1.0~alpha2" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -15,8 +15,9 @@
         <news>
 6.1.0
 [add] Refresh after watching (default: off) Settings -&gt; General
-[add] Completed Live folder (default: off) Settings -&gt; Folders
-[add] Upcoming Live folder (default: off) Settings -&gt; Folders
+[add] Completed Live folder (default: on) Settings -&gt; Folders
+[add] Upcoming Live folder (default: on) Settings -&gt; Folders
+[add] My Location folder (default: on) Settings - Advanced - Enable setup-wizard
 [upd] Localize API key errors, provide a more descriptive notification
         </news>
         <assets>

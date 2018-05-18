@@ -5,12 +5,15 @@ from .. import constants
 
 
 class SearchHistoryItem(DirectoryItem):
-    def __init__(self, context, query, image=None, fanart=None):
+    def __init__(self, context, query, image=None, fanart=None, location=False):
         if image is None:
             image = context.create_resource_path('media/search.png')
 
-        DirectoryItem.__init__(self, query, context.create_uri([constants.paths.SEARCH, 'query'], {'q': query}),
-                               image=image)
+        params = {'q': query}
+        if location:
+            params['location'] = location
+
+        DirectoryItem.__init__(self, query, context.create_uri([constants.paths.SEARCH, 'query'], params=params), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

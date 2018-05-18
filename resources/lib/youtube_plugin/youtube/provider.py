@@ -121,7 +121,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.completed.live': 30647,
                  'youtube.api.key.incorrect': 30648,
                  'youtube.client.id.incorrect': 30649,
-                 'youtube.client.secret.incorrect': 30650
+                 'youtube.client.secret.incorrect': 30650,
+                 'youtube.perform.geolocation': 30653,
+                 'youtube.my_location': 30654
                  }
 
     def __init__(self):
@@ -490,6 +492,43 @@ class Provider(kodion.AbstractProvider):
 
         return result
 
+    @kodion.RegisterProviderPath('^/location/mine/$')
+    def _on_my_location(self, context, re_match):
+        self.set_content_type(context, kodion.constants.content_type.FILES)
+
+        settings = context.get_settings()
+        result = list()
+
+        # search
+        search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
+                                              fanart=self.get_fanart(context), location=True)
+        result.append(search_item)
+
+        # completed live events
+        if settings.get_bool('youtube.folder.completed.live.show', True):
+            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.completed.live']),
+                                             context.create_uri(['special', 'completed_live'], params={'location': True}),
+                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item.set_fanart(self.get_fanart(context))
+            result.append(live_events_item)
+
+        # upcoming live events
+        if settings.get_bool('youtube.folder.upcoming.live.show', True):
+            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.upcoming.live']),
+                                             context.create_uri(['special', 'upcoming_live'], params={'location': True}),
+                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item.set_fanart(self.get_fanart(context))
+            result.append(live_events_item)
+
+        # live events
+        live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.live']),
+                                         context.create_uri(['special', 'live'], params={'location': True}),
+                                         image=context.create_resource_path('media', 'live.png'))
+        live_events_item.set_fanart(self.get_fanart(context))
+        result.append(live_events_item)
+
+        return result
+
     """
     Plays a video.
     path for video: '/play/?video_id=XXXXXXX'
@@ -645,6 +684,7 @@ class Provider(kodion.AbstractProvider):
         event_type = context.get_param('event_type', '')
         safe_search = context.get_settings().safe_search()
         page = int(context.get_param('page', 1))
+        location = str(context.get_param('location', False)).lower() == 'true'
 
         context.set_param('q', search_text)
         if context.get_path() == '/kodion/search/input/':
@@ -656,7 +696,7 @@ class Provider(kodion.AbstractProvider):
             self.set_content_type(context, kodion.constants.content_type.FILES)
 
         if page == 1 and search_type == 'video' and not event_type:
-            if not channel_id:
+            if not channel_id and not location:
                 channel_params = {}
                 channel_params.update(context.get_params())
                 channel_params['search_type'] = 'channel'
@@ -665,15 +705,15 @@ class Provider(kodion.AbstractProvider):
                                              image=context.create_resource_path('media', 'channels.png'))
                 channel_item.set_fanart(self.get_fanart(context))
                 result.append(channel_item)
-
-            playlist_params = {}
-            playlist_params.update(context.get_params())
-            playlist_params['search_type'] = 'playlist'
-            playlist_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
-                                          context.create_uri([context.get_path().replace('input', 'query')], playlist_params),
-                                          image=context.create_resource_path('media', 'playlist.png'))
-            playlist_item.set_fanart(self.get_fanart(context))
-            result.append(playlist_item)
+            if not location:
+                playlist_params = {}
+                playlist_params.update(context.get_params())
+                playlist_params['search_type'] = 'playlist'
+                playlist_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
+                                              context.create_uri([context.get_path().replace('input', 'query')], playlist_params),
+                                              image=context.create_resource_path('media', 'playlist.png'))
+                playlist_item.set_fanart(self.get_fanart(context))
+                result.append(playlist_item)
 
             if not channel_id:
                 # live
@@ -688,7 +728,7 @@ class Provider(kodion.AbstractProvider):
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,
                                                      q=search_text, search_type=search_type, event_type=event_type,
-                                                     safe_search=safe_search, page_token=page_token, channel_id=channel_id)
+                                                     safe_search=safe_search, page_token=page_token, channel_id=channel_id, location=location)
         if not v3.handle_error(self, context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
@@ -987,6 +1027,14 @@ class Provider(kodion.AbstractProvider):
                                                                      fanart=self.get_fanart(context),
                                                                      incognito=True)
             result.append(quick_search_incognito_item)
+
+        # my location
+        if settings.get_bool('youtube.folder.my_location.show', True) and settings.get_location():
+            my_location_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.my_location']),
+                                            context.create_uri(['location', 'mine']),
+                                            image=context.create_resource_path('media', 'channel.png'))
+            my_location_item.set_fanart(self.get_fanart(context))
+            result.append(my_location_item)
 
         # subscriptions
         if self.is_logged_in():
