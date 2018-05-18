@@ -62,3 +62,14 @@ def parse(datetime_string):
                         second=_to_int(abbreviated_match.group('second')))
 
     raise KodionException("Could not parse iso 8601 timestamp '%s'" % datetime_string)
+
+
+def get_scheduled_start(datetime_object):
+    start_hour = '{:02d}'.format(datetime_object.hour)
+    start_minute = '{:<02d}'.format(datetime_object.minute)
+    start_time = start_hour + ':' + start_minute
+    start_date = str(datetime_object.date())
+    now = datetime.now()
+    start_date = start_date.replace(str(now.year), '').lstrip('-')
+    start_date = start_date.replace('{:02d}'.format(now.month) + '-' + '{:02d}'.format(now.day), '')
+    return start_date, start_time

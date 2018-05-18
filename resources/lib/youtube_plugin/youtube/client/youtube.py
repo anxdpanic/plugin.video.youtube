@@ -358,16 +358,21 @@ class YouTube(LoginClient):
 
         return self._perform_v3_request(method='GET', path='videos', params=params)
 
-    def get_videos(self, video_id):
+    def get_videos(self, video_id, live_details=False):
         """
         Returns a list of videos that match the API request parameters
         :param video_id: list of video ids
+        :param live_details: also retrieve liveStreamingDetails
         :return:
         """
         if isinstance(video_id, list):
             video_id = ','.join(video_id)
 
-        params = {'part': 'snippet,contentDetails',
+        part = 'snippet,contentDetails'
+        if live_details:
+            part += ',liveStreamingDetails'
+
+        params = {'part': part,
                   'id': video_id}
         return self._perform_v3_request(method='GET', path='videos', params=params)
 

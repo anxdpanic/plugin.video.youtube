@@ -162,7 +162,7 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
             channel_items_dict[channel_id].append(playlist_item)
 
 
-def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=None, channel_items_dict=None):
+def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=None, channel_items_dict=None, live_details=False):
     settings = context.get_settings()
 
     video_ids = list(video_id_dict.keys())
@@ -173,7 +173,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         playlist_item_id_dict = {}
 
     resource_manager = provider.get_resource_manager(context)
-    video_data = resource_manager.get_videos(video_ids)
+    video_data = resource_manager.get_videos(video_ids, live_details=live_details)
 
     my_playlists = {}
     if provider.is_logged_in():
@@ -182,6 +182,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
     for video_id in list(video_data.keys()):
+        datetime = None
         yt_item = video_data[video_id]
         video_item = video_id_dict[video_id]
 
@@ -193,9 +194,21 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         # set mediatype
         video_item.set_mediatype('video')  # using video
 
-        # set the title
-        if not video_item.get_title():
-            video_item.set_title(snippet['title'])
+        scheduled_start = video_data[video_id].get('liveStreamingDetails', {}).get('scheduledStartTime')
+        if scheduled_start:
+            datetime = utils.datetime_parser.parse(scheduled_start)
+            start_date, start_time = utils.datetime_parser.get_scheduled_start(datetime)
+            if start_date:
+                title = u'({live} {date}@{time}UTC) {title}'\
+                    .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
+            else:
+                title = u'({live} @ {time}UTC) {title}'\
+                    .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
+            video_item.set_title(title)
+        else:
+            # set the title
+            if not video_item.get_title():
+                video_item.set_title(snippet['title'])
 
         if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
                 video_item.get_headers() and video_item.get_uri().startswith('http'):
@@ -229,8 +242,10 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_plot(description)
 
         # date time
-        if 'publishedAt' in snippet:
+        if not datetime and 'publishedAt' in snippet:
             datetime = utils.datetime_parser.parse(snippet['publishedAt'])
+
+        if datetime:
             video_item.set_year_from_datetime(datetime)
             video_item.set_aired_from_datetime(datetime)
             video_item.set_premiered_from_datetime(datetime)
