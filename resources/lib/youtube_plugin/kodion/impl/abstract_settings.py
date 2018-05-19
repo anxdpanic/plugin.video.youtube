@@ -137,7 +137,23 @@ class AbstractSettings(object):
         return self.get_bool(constants.setting.API_CONFIG_PAGE, False)
 
     def get_location(self):
-        return self.get_string(constants.setting.LOCATION, '').strip()
+        location = self.get_string(constants.setting.LOCATION, '').replace(' ', '').strip()
+        coords = location.split(',')
+        latitude = longitude = None
+        if len(coords) == 2:
+            try:
+                latitude = float(coords[0])
+                longitude = float(coords[1])
+                if latitude > 90.0 or latitude < -90.0:
+                    latitude = None
+                if longitude > 180.0 or longitude < -180.0:
+                    longitude = None
+            except ValueError:
+                latitude = longitude = None
+        if latitude and longitude:
+            return '{lat},{long}'.format(lat=latitude, long=longitude)
+        else:
+            return ''
 
     def set_location(self, value):
         self.set_string(constants.setting.LOCATION, value)
