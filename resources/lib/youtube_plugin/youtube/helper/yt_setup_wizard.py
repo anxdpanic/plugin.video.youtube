@@ -95,10 +95,7 @@ def _process_language(provider, context):
 
 def _process_geo_location(provider, context):
     settings = context.get_settings()
-    current_location = settings.get_location()
     if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(provider.LOCAL_MAP['youtube.perform.geolocation'])):
-        if current_location:
-            settings.set_location('')
         return
 
     result = ipstack.locate_requester()
