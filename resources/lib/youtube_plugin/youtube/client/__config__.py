@@ -66,17 +66,17 @@ class APICheck(object):
         refresh_token = self._settings.get_string('kodion.refresh_token', '')
         token_expires = self._settings.get_int('kodion.access_token.expires', -1)
         last_hash = self._settings.get_string('youtube.api.last.hash', '')
-        if not self._json_am['access_manager'].get(user, {}).get('access_token') or \
-                not self._json_am['access_manager'].get(user, {}).get('refresh_token'):
+        if not self._json_am['access_manager']['users'].get(user, {}).get('access_token') or \
+                not self._json_am['access_manager']['users'].get(user, {}).get('refresh_token'):
             if access_token and refresh_token:
-                self._json_am['access_manager'][user]['access_token'] = access_token
-                self._json_am['access_manager'][user]['refresh_token'] = refresh_token
-                self._json_am['access_manager'][user]['token_expires'] = token_expires
+                self._json_am['access_manager']['users'][user]['access_token'] = access_token
+                self._json_am['access_manager']['users'][user]['refresh_token'] = refresh_token
+                self._json_am['access_manager']['users'][user]['token_expires'] = token_expires
                 if switch == 'own':
                     own_key_hash = self._get_key_set_hash('own')
                     if last_hash == self._get_key_set_hash('own', True) or \
                             last_hash == own_key_hash:
-                        self._json_am['access_manager'][user]['last_key_hash'] = own_key_hash
+                        self._json_am['access_manager']['users'][user]['last_key_hash'] = own_key_hash
                 self._am_jstore.save(self._json_am)
         if access_token or refresh_token or last_hash:
             self._settings.set_string('kodion.access_token', '')
@@ -87,7 +87,7 @@ class APICheck(object):
         updated_hash = self._api_keys_changed(switch)
         if updated_hash:
             self._context.log_warning('User: |%s| Switching API key set to |%s|' % (user, switch))
-            self._json_am['access_manager'][user]['last_key_hash'] = updated_hash
+            self._json_am['access_manager']['users'][user]['last_key_hash'] = updated_hash
             self._am_jstore.save(self._json_am)
             self._context.log_debug('API key set changed: Signing out')
             self._context.execute('RunPlugin(plugin://plugin.video.youtube/sign/out/?confirmed=true)')
@@ -99,7 +99,7 @@ class APICheck(object):
 
     def get_current_user(self):
         self._json_am = self._am_jstore.get_data()
-        return self._json_am['access_manager'].get('current_user', 'default')
+        return self._json_am['access_manager'].get('current_user', '0')
 
     def has_own_api_keys(self):
         self._json_api = self._api_jstore.get_data()
@@ -137,7 +137,7 @@ class APICheck(object):
         if not switch or (switch == 'own' and not self.has_own_api_keys()):
             switch = '1'
         user = self.get_current_user()
-        last_set_hash = self._json_am['access_manager'].get(user, {}).get('last_key_hash', '')
+        last_set_hash = self._json_am['access_manager']['users'].get(user, {}).get('last_key_hash', '')
         current_set_hash = self._get_key_set_hash(switch)
         if last_set_hash != current_set_hash:
             self.changed = True

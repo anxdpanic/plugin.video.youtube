@@ -123,7 +123,12 @@ class Provider(kodion.AbstractProvider):
                  'youtube.client.id.incorrect': 30649,
                  'youtube.client.secret.incorrect': 30650,
                  'youtube.perform.geolocation': 30653,
-                 'youtube.my_location': 30654
+                 'youtube.my_location': 30654,
+                 'youtube.switch.user': 30655,
+                 'youtube.user.new': 30656,
+                 'youtube.user.unnamed': 30657,
+                 'youtube.enter.user.name': 30658,
+                 'youtube.user.changed': 30659
                  }
 
     def __init__(self):
@@ -652,6 +657,46 @@ class Provider(kodion.AbstractProvider):
             context.log_warning('Missing video ID for post play event')
         return True
 
+    @kodion.RegisterProviderPath('^/switch/user/$')
+    def _on_switch_user(self, context, re_match):
+        access_manager = context.get_access_manager()
+        access_manager_users = access_manager.get_users()
+        ui = context.get_ui()
+        user = None
+        users = [context.localize(self.LOCAL_MAP['youtube.user.new'])]
+        user_index_map = []
+        for k in list(access_manager_users.keys()):
+            users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+            user_index_map.append(k)
+        result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.switch.user']), users)
+        if result == -1:
+            return True
+        elif result == 0:
+            new_user_name = ui.on_keyboard_input(context.localize(self.LOCAL_MAP['youtube.enter.user.name']))[1]
+
+            if not new_user_name.strip():
+                new_user_name = context.localize(self.LOCAL_MAP['youtube.user.unnamed'])
+            new_users = {}
+            for i, u in enumerate(list(access_manager_users.keys())):
+                new_users[str(i)] = access_manager_users[u]
+            new_users[str(len(new_users))] = {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '', 'name': new_user_name}
+            access_manager.set_users(new_users)
+            user = str(len(new_users) - 1)
+        else:
+            user = user_index_map[result - 1]
+
+        if user:
+            user_name = access_manager.get_users()[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
+            access_manager.set_user(user, switch_to=True)
+            ui.show_notification(context.localize(self.LOCAL_MAP['youtube.user.changed']) % user_name,
+                                 context.localize(self.LOCAL_MAP['youtube.switch.user']))
+            context.get_function_cache().clear()
+            if context.get_system_version().get_version()[0] <= 17:
+                ui.refresh_container()  # causes lockup/crash with Kodi 18
+            else:
+                context.execute('RunPlugin(%s)' % context.create_uri())
+        return True
+
     @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
         sign_out_confirmed = context.get_param('confirmed', '').lower() == 'true'
@@ -1168,6 +1213,14 @@ class Provider(kodion.AbstractProvider):
                                              image=context.create_resource_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
+
+        # switch user
+        if settings.get_bool('youtube.folder.switch.user.show', True):
+            switch_user_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.switch.user']),
+                                             context.create_uri(['switch', 'user']),
+                                             image=context.create_resource_path('media', 'sign_out.png'))
+            switch_user_item.set_fanart(self.get_fanart(context))
+            result.append(switch_user_item)
 
         # sign out
         if self.is_logged_in() and settings.get_bool('youtube.folder.sign.out.show', True):

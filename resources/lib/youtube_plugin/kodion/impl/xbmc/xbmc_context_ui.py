@@ -129,7 +129,8 @@ class XbmcContextUI(AbstractContextUI):
     def open_settings(self):
         self._xbmc_addon.openSettings()
 
-    def refresh_container(self):
+    @staticmethod
+    def refresh_container():
         xbmc.executebuiltin("Container.Refresh")
 
     @staticmethod

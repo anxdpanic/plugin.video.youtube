@@ -12,8 +12,25 @@ class AccessManager(object):
         self._settings = context.get_settings()
         self._jstore = LoginTokenStore()
         self._json = self._jstore.get_data()
-        self._user = self._json['access_manager'].get('current_user', '')
+        self._user = self._json['access_manager'].get('current_user', '0')
         self._last_origin = self._json['access_manager'].get('last_origin', 'plugin.video.youtube')
+
+    def get_users(self):
+        """
+        Returns users
+        :return: users
+        """
+        return self._json['access_manager'].get('users', {})
+
+    def set_users(self, users):
+        """
+        Updates the users
+        :param users: dict, users
+        :return:
+        """
+        self._json = self._jstore.get_data()
+        self._json['access_manager']['users'] = users
+        self._jstore.save(self._json)
 
     def set_user(self, user, switch_to=False):
         """
@@ -60,7 +77,7 @@ class AccessManager(object):
         :return: access_token
         """
         self._json = self._jstore.get_data()
-        return self._json['access_manager'].get(self._user, {}).get('access_token', '')
+        return self._json['access_manager']['users'].get(self._user, {}).get('access_token', '')
 
     def get_refresh_token(self):
         """
@@ -68,7 +85,7 @@ class AccessManager(object):
         :return: refresh token
         """
         self._json = self._jstore.get_data()
-        return self._json['access_manager'].get(self._user, {}).get('refresh_token', '')
+        return self._json['access_manager']['users'].get(self._user, {}).get('refresh_token', '')
 
     def has_refresh_token(self):
         return self.get_refresh_token() != ''
@@ -81,8 +98,8 @@ class AccessManager(object):
         :return:
         """
         self._json = self._jstore.get_data()
-        access_token = self._json['access_manager'].get(self._user, {}).get('access_token', '')
-        expires = int(self._json['access_manager'].get(self._user, {}).get('token_expires', -1))
+        access_token = self._json['access_manager']['users'].get(self._user, {}).get('access_token', '')
+        expires = int(self._json['access_manager']['users'].get(self._user, {}).get('token_expires', -1))
 
         # with no access_token it must be expired
         if not access_token:
@@ -102,12 +119,12 @@ class AccessManager(object):
         :return:
         """
         self._json = self._jstore.get_data()
-        self._json['access_manager'][self._user]['access_token'] = access_token
+        self._json['access_manager']['users'][self._user]['access_token'] = access_token
 
         if unix_timestamp is not None:
-            self._json['access_manager'][self._user]['token_expires'] = int(unix_timestamp)
+            self._json['access_manager']['users'][self._user]['token_expires'] = int(unix_timestamp)
 
         if refresh_token is not None:
-            self._json['access_manager'][self._user]['refresh_token'] = refresh_token
+            self._json['access_manager']['users'][self._user]['refresh_token'] = refresh_token
 
         self._jstore.save(self._json)
