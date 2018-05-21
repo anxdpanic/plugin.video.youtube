@@ -128,7 +128,12 @@ class Provider(kodion.AbstractProvider):
                  'youtube.user.new': 30656,
                  'youtube.user.unnamed': 30657,
                  'youtube.enter.user.name': 30658,
-                 'youtube.user.changed': 30659
+                 'youtube.user.changed': 30659,
+                 'youtube.remove.a.user': 30662,
+                 'youtube.rename.a.user': 30663,
+                 'youtube.switch.user.now': 30665,
+                 'youtube.removed': 30666,
+                 'youtube.renamed': 30667
                  }
 
     def __init__(self):
@@ -657,44 +662,150 @@ class Provider(kodion.AbstractProvider):
             context.log_warning('Missing video ID for post play event')
         return True
 
-    @kodion.RegisterProviderPath('^/switch/user/$')
-    def _on_switch_user(self, context, re_match):
+    @kodion.RegisterProviderPath('^/user/(?P<action>[^/]+)/$')
+    def _on_user(self, context, re_match):
+        action = re_match.group('action')
+        refresh = context.get_param('refresh', 'true').lower() == 'true'
         access_manager = context.get_access_manager()
-        access_manager_users = access_manager.get_users()
         ui = context.get_ui()
-        user = None
-        users = [context.localize(self.LOCAL_MAP['youtube.user.new'])]
-        user_index_map = []
-        for k in list(access_manager_users.keys()):
-            users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
-            user_index_map.append(k)
-        result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.switch.user']), users)
-        if result == -1:
-            return True
-        elif result == 0:
-            new_user_name = ui.on_keyboard_input(context.localize(self.LOCAL_MAP['youtube.enter.user.name']))[1]
 
-            if not new_user_name.strip():
-                new_user_name = context.localize(self.LOCAL_MAP['youtube.user.unnamed'])
-            new_users = {}
-            for i, u in enumerate(list(access_manager_users.keys())):
-                new_users[str(i)] = access_manager_users[u]
-            new_users[str(len(new_users))] = {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '', 'name': new_user_name}
-            access_manager.set_users(new_users)
-            user = str(len(new_users) - 1)
-        else:
-            user = user_index_map[result - 1]
+        def add_user(_access_manager_users):
+            _results = ui.on_keyboard_input(context.localize(self.LOCAL_MAP['youtube.enter.user.name']))
+            if _results[0] is False:
+                return None
+            _new_user_name = _results[1]
+            if not _new_user_name.strip():
+                _new_user_name = context.localize(self.LOCAL_MAP['youtube.user.unnamed'])
+            _new_users = {}
+            for i, u in enumerate(list(_access_manager_users.keys())):
+                _new_users[str(i)] = _access_manager_users[u]
+            _new_users[str(len(_new_users))] = {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '', 'name': _new_user_name}
+            access_manager.set_users(_new_users)
+            return str(len(_new_users) - 1)
 
-        if user:
-            user_name = access_manager.get_users()[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
-            access_manager.set_user(user, switch_to=True)
-            ui.show_notification(context.localize(self.LOCAL_MAP['youtube.user.changed']) % user_name,
+        def switch_to_user(_user):
+            _user_name = access_manager.get_users()[_user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
+            access_manager.set_user(_user, switch_to=True)
+            ui.show_notification(context.localize(self.LOCAL_MAP['youtube.user.changed']) % _user_name,
                                  context.localize(self.LOCAL_MAP['youtube.switch.user']))
             context.get_function_cache().clear()
-            if context.get_system_version().get_version()[0] <= 17:
-                ui.refresh_container()  # causes lockup/crash with Kodi 18
+            if refresh:
+                if context.get_system_version().get_version()[0] <= 17:
+                    ui.refresh_container()  # causes lockup/crash with Kodi 18
+                else:
+                    context.execute('RunPlugin(%s)' % context.create_uri())
+
+        if action == 'switch':
+            access_manager_users = access_manager.get_users()
+            current_user = access_manager.get_user()
+            user = None
+            users = ['[B]%s[/B]' % context.localize(self.LOCAL_MAP['youtube.user.new'])]
+            user_index_map = []
+            for k in list(access_manager_users.keys()):
+                if k == current_user:
+                    if access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+                        users.append('[COLOR=limegreen]%s *[/COLOR]' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                    else:
+                        users.append('%s *' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                elif access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+                    users.append('[COLOR=limegreen]%s[/COLOR]' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                else:
+                    users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                user_index_map.append(k)
+            result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.switch.user']), users)
+            if result == -1:
+                return True
+            elif result == 0:
+                user = add_user(access_manager_users)
             else:
-                context.execute('RunPlugin(%s)' % context.create_uri())
+                user = user_index_map[result - 1]
+
+            if user and (user != access_manager.get_user()):
+                switch_to_user(user)
+
+        elif action == 'add':
+            user = add_user(access_manager.get_users())
+            if user:
+                user_name = access_manager.get_users()[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
+                result = ui.on_yes_no_input(context.localize(self.LOCAL_MAP['youtube.switch.user']), context.localize(self.LOCAL_MAP['youtube.switch.user.now']) % user_name)
+                if result:
+                    switch_to_user(user)
+
+        elif action == 'remove':
+            access_manager_users = access_manager.get_users()
+            users = []
+            user_index_map = []
+            current_user = access_manager.get_user()
+            current_user_dict = access_manager_users[current_user]
+            for k in list(access_manager_users.keys()):
+                if k == current_user:
+                    if access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+                        users.append('[COLOR=limegreen]%s *[/COLOR]' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                    else:
+                        users.append('%s *' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                elif access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+                    users.append('[COLOR=limegreen]%s[/COLOR]' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                else:
+                    users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                user_index_map.append(k)
+            result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.remove.a.user']), users)
+            if result == -1:
+                return True
+            else:
+                user = user_index_map[result]
+                user_name = access_manager_users[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
+                result = ui.on_remove_content(user_name)
+                if result:
+                    if user == current_user:
+                        access_manager.set_user('0', switch_to=True)
+                    del access_manager_users[user]
+                    new_users = {}
+                    for i, u in enumerate(list(access_manager_users.keys())):
+                        if access_manager_users[u] == current_user_dict:
+                            access_manager.set_user(str(i), switch_to=True)
+                        new_users[str(i)] = access_manager_users[u]
+
+                    if not new_users.get(access_manager.get_user()):
+                        access_manager.set_user('0', switch_to=True)
+
+                    access_manager.set_users(new_users)
+                    ui.show_notification(context.localize(self.LOCAL_MAP['youtube.removed']) % user_name,
+                                         context.localize(self.LOCAL_MAP['youtube.remove']))
+
+        elif action == 'rename':
+            access_manager_users = access_manager.get_users()
+            users = []
+            user_index_map = []
+            current_user = access_manager.get_user()
+            for k in list(access_manager_users.keys()):
+                if k == current_user:
+                    if access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+                        users.append('[COLOR=limegreen]%s *[/COLOR]' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                    else:
+                        users.append('%s *' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                elif access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+                    users.append('[COLOR=limegreen]%s[/COLOR]' % access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                else:
+                    users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
+                user_index_map.append(k)
+            result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.rename.a.user']), users)
+            if result == -1:
+                return True
+            else:
+                user = user_index_map[result]
+                old_user_name = access_manager_users[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
+                results = ui.on_keyboard_input(context.localize(self.LOCAL_MAP['youtube.enter.user.name']), default=old_user_name)
+                if results[0] is False:
+                    return True
+                new_user_name = results[1]
+                if not new_user_name.strip() or (old_user_name == new_user_name):
+                    return True
+
+                access_manager_users[user]['name'] = new_user_name
+                access_manager.set_users(access_manager_users)
+                ui.show_notification(context.localize(self.LOCAL_MAP['youtube.renamed']) % (old_user_name, new_user_name),
+                                     context.localize(self.LOCAL_MAP['youtube.rename']))
+
         return True
 
     @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
@@ -1217,7 +1328,7 @@ class Provider(kodion.AbstractProvider):
         # switch user
         if settings.get_bool('youtube.folder.switch.user.show', True):
             switch_user_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.switch.user']),
-                                             context.create_uri(['switch', 'user']),
+                                             context.create_uri(['user', 'switch']),
                                              image=context.create_resource_path('media', 'sign_out.png'))
             switch_user_item.set_fanart(self.get_fanart(context))
             result.append(switch_user_item)
