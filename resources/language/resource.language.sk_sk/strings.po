@@ -885,3 +885,55 @@ msgstr ""
 msgctxt "#30654"
 msgid "My Location"
 msgstr ""
+
+msgctxt "#30655"
+msgid "Switch User"
+msgstr ""
+
+msgctxt "#30656"
+msgid "New user"
+msgstr ""
+
+msgctxt "#30657"
+msgid "Unnamed"
+msgstr ""
+
+msgctxt "#30658"
+msgid "Enter a name for this user"
+msgstr ""
+
+msgctxt "#30659"
+msgid "User is now '%s'"
+msgstr ""
+
+msgctxt "#30660"
+msgid "Users"
+msgstr ""
+
+msgctxt "#30661"
+msgid "Add a user"
+msgstr ""
+
+msgctxt "#30662"
+msgid "Remove a user"
+msgstr ""
+
+msgctxt "#30663"
+msgid "Rename a user"
+msgstr ""
+
+msgctxt "#30664"
+msgid "Switch user"
+msgstr ""
+
+msgctxt "#30665"
+msgid "Switch to '%s' now?"
+msgstr ""
+
+msgctxt "#30666"
+msgid "Removed '%s'"
+msgstr ""
+
+msgctxt "#30667"
+msgid "Renamed '%s' to '%s'"
+msgstr ""
