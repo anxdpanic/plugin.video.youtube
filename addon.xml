@@ -14,6 +14,10 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.1.0
+[add] Multi-user support
+    - Switch User folder (default: on) Settings -&gt; Folders
+    - User management (Add, Remove, Rename, Switch) Settings - Users
+    - Signed in users are green, Current user has an *
 [add] Refresh after watching (default: off) Settings -&gt; General
 [add] Completed Live folder (default: on) Settings -&gt; Folders
 [add] Upcoming Live folder (default: on) Settings -&gt; Folders
