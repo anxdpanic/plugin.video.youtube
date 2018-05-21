@@ -1076,8 +1076,8 @@ class Provider(kodion.AbstractProvider):
         # my location
         if settings.get_bool('youtube.folder.my_location.show', True) and settings.get_location():
             my_location_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.my_location']),
-                                            context.create_uri(['location', 'mine']),
-                                            image=context.create_resource_path('media', 'channel.png'))
+                                             context.create_uri(['location', 'mine']),
+                                             image=context.create_resource_path('media', 'channel.png'))
             my_location_item.set_fanart(self.get_fanart(context))
             result.append(my_location_item)
 
