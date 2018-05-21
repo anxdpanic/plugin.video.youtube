@@ -662,8 +662,8 @@ class Provider(kodion.AbstractProvider):
             context.log_warning('Missing video ID for post play event')
         return True
 
-    @kodion.RegisterProviderPath('^/user/(?P<action>[^/]+)/$')
-    def _on_user(self, context, re_match):
+    @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
+    def _on_users(self, context, re_match):
         action = re_match.group('action')
         refresh = context.get_param('refresh', 'true').lower() == 'true'
         access_manager = context.get_access_manager()
@@ -1328,8 +1328,8 @@ class Provider(kodion.AbstractProvider):
         # switch user
         if settings.get_bool('youtube.folder.switch.user.show', True):
             switch_user_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.switch.user']),
-                                             context.create_uri(['user', 'switch']),
-                                             image=context.create_resource_path('media', 'sign_out.png'))
+                                             context.create_uri(['users', 'switch']),
+                                             image=context.create_resource_path('media', 'channel.png'))
             switch_user_item.set_fanart(self.get_fanart(context))
             result.append(switch_user_item)
 

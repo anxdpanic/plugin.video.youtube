@@ -69,10 +69,10 @@
         <setting id="youtube.folder.settings.show" type="bool" label="30577" default="true"/>
     </category>
     <category label="30660">
-        <setting id="kodion.users.add" type="action" label="30661" action="RunPlugin(plugin://$ID/user/add/?refresh=false)"/>
-        <setting id="kodion.users.remove" type="action" label="30662" action="RunPlugin(plugin://$ID/user/remove/?refresh=false)"/>
-        <setting id="kodion.users.rename" type="action" label="30663" action="RunPlugin(plugin://$ID/user/rename/?refresh=false)"/>
-        <setting id="kodion.users.switch" type="action" label="30664" action="RunPlugin(plugin://$ID/user/switch/?refresh=false)"/>
+        <setting id="kodion.users.add" type="action" label="30661" action="RunPlugin(plugin://$ID/users/add/?refresh=false)"/>
+        <setting id="kodion.users.remove" type="action" label="30662" action="RunPlugin(plugin://$ID/users/remove/?refresh=false)"/>
+        <setting id="kodion.users.rename" type="action" label="30663" action="RunPlugin(plugin://$ID/users/rename/?refresh=false)"/>
+        <setting id="kodion.users.switch" type="action" label="30664" action="RunPlugin(plugin://$ID/users/switch/?refresh=false)"/>
     </category>
     <category label="30031">
         <setting id="simple.requests.ssl.verify" type="bool" label="30578" default="true"/>
