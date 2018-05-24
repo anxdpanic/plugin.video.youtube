@@ -680,7 +680,7 @@ class VideoInfo(object):
             if mpd_sig_deciphered:
                 license_info = {'url': None, 'proxy': None, 'token': None}
                 pa_li_info = player_args.get('license_info', '').split(',')
-                if pa_li_info and not httpd_is_live:
+                if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
                     raise YouTubeException('Proxy is not running')
                 for li_info in pa_li_info:
                     li_info = dict(urllib.parse.parse_qsl(li_info))
