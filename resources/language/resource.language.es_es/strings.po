@@ -258,19 +258,19 @@ msgstr "Limpiar"
 
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr "Clave API"
+msgstr "API Key"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr "ID API"
+msgstr "API Id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr "API Secreta"
+msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
@@ -521,7 +521,7 @@ msgstr "historial de búsqueda"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr "Eliminar ajustes personales (settings.xml)"
+msgstr "Eliminar settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
@@ -625,7 +625,7 @@ msgstr "Mis Suscripciones (Filtrado)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr "Lista de canales filtrados (separado por comas)"
+msgstr "Lista de canales filtrados (utilice comas como separador)"
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -697,7 +697,7 @@ msgstr "sin autogenerado"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr "Activar restricciones por edad"
+msgstr "Habilitar restricciones por edad"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
@@ -753,7 +753,7 @@ msgstr "Debe estar registrado."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
@@ -781,7 +781,7 @@ msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr "Necesario Kodi 17 o superior"
+msgstr "Es necesario Kodi 17 o superior"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -797,11 +797,11 @@ msgstr "Calificar vídeo después de ver"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr "Server HTTP"
+msgstr "Servidor HTTP"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr "Lista blanca IP (separado por comas)"
+msgstr "Lista blanca IP (utilice comas como separador)"
 
 msgctxt "#30630"
 msgid "Save"
@@ -817,7 +817,7 @@ msgstr "Habilitar página de configuración API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<direccion_ip>:<puerto>/api (ver server HTTP)"
+msgstr "http://<direccion_ip>:<puerto>/api (ver Servidor HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -849,7 +849,7 @@ msgstr "Restaurar"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr "Eliminar claves api (api_keys.json)"
+msgstr "Eliminar api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
@@ -861,15 +861,15 @@ msgstr "IP a la escucha"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr "Seleccione IP a la escucha"
+msgstr "Seleccionar IP a la escucha"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Actualizar después de ver"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Próximamente en Directo"
 
 msgctxt "#30647"
 msgid "Completed Live"
@@ -877,80 +877,80 @@ msgstr ""
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "La clave API es incorrecta. Ajustes - API - API Key"
 
 msgctxt "#30649
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "La ID de cliente es incorrecta. Ajustes - API - API ID"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "La ID Secreta es incorrecta. Ajustes - API - API Secret"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Ubicación"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Radio de ubicación (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "¿Desea usar la geolocalización? Sera usado para [B]Mi Ubicación[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Mi Ubicación"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Cambiar de usuario"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Nuevo usuario"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Sin nombre"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Introduzca un nombre para este usuario"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "El nombre de usuario es ahora '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "usuarios"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Añadir un usuario"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Suprimir un usuario"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Renombrar un usuario"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Cambiar de usuario"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "¿Desea cambiar a '%s' ahora?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "Suprimir '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "Renombrar '$s' a '%s'"
