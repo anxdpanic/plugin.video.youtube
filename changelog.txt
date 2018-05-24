@@ -1,3 +1,6 @@
+6.0.2
+[fix] incorrectly raised 'Proxy is not running' error
+
 6.0.1
 [fix] notification encoding
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.0.1" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.0.2" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -13,48 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-6.0.1
-[fix] notification encoding
-
-6.0.0
-[add] Python 3 compat.
-[add] Settings -&gt; Maintenance -&gt; Delete temporary files
-[add] Settings -&gt; General -&gt; Rate video after watching
-[add] Settings -&gt; API -&gt; Enable API configuration page
-    - when enabled, visit http://&lt;ipaddress&gt;:&lt;port&gt;/api to configure API keys from a web browser
-    - port is configured in Settings - HTTP Server - Port
-[chg] Storing personal api keys in api_keys.json
-[chg] Storing login tokens in access_manager.json
-[add] youtube_registration module, register developer keys and use them by appending an addon_id=&lt;addon_id&gt; parameter to youtube add-on plugin urls
-[add] screensaver=true parameter to /play route - no suggested videos, no post play events, don&#39;t ask for quality
-[add] play route for channel live streams
-    - plugin://plugin.video.youtube/play/?channel_id=UCLA_DiR1FfKNvjuUpBHmylQ&amp;live=1
-[add] Purchases
-    - requires Kodi 18
-    - requires inputstream.adaptive &gt;= 2.2.12
-    - if a purchase fails after 10 seconds
-        - provide a debug log
-        - set InputStream Adaptive -&gt; Settings -&gt; Stream selection -&gt; manual
-        - change video stream during playback to preferred working resolution
-    - huge thanks to peak3d
-[add] relevanceLanguage to search requests
-[add] Refresh to My Subscriptions (Filtered)
-[fix] mpeg-dash proxy with multi-profiles
-[fix] search input, now works with Yatse
-[fix] Signature deciphering
-[fix] context menu after playback
-[fix] alternative player, do not append headers
-[fix] My Subscriptions (Filtered) channel matching
-[fix] Audio only, failover to video if no audio only streams available
-[fix] My Subscriptions missing page 3
-[fix/upd] function cache, update max rows and resolve hang on some requests
-[fix/upd] post play events happen post play
-[fix/upd] set title from metadata on play
-[chg] only automatically remove temp folder at start-up
-[upd] Dutch strings [MB1968]
-[upd] French strings [bubuleur]
-[upd] Greek strings [twilight0]
-[upd] Spanish strings [roliverosc]
+6.0.2
+[fix] incorrectly raised 'Proxy is not running' error
         </news>
         <assets>
             <icon>icon.png</icon>
