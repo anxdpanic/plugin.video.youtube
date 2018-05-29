@@ -210,10 +210,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             if not video_item.get_title():
                 video_item.set_title(snippet['title'])
 
-        if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
-                video_item.get_headers() and video_item.get_uri().startswith('http'):
-            video_item.set_uri(video_item.get_uri() + '|' + video_item.get_headers())
-
         """
         This is experimental. We try to get the most information out of the title of a video.
         This is not based on any language. In some cases this won't work at all.
@@ -394,6 +390,9 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
     # set the title
     if not video_item.get_title():
         video_item.set_title(snippet['title'])
+
+    if 'headers' in video_stream:
+        video_item.set_headers(video_stream['headers'])
 
     if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
             video_item.get_headers() and video_item.get_uri().startswith('http'):
