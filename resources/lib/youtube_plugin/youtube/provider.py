@@ -679,7 +679,7 @@ class Provider(kodion.AbstractProvider):
             _new_users = {}
             for i, u in enumerate(list(_access_manager_users.keys())):
                 _new_users[str(i)] = _access_manager_users[u]
-            _new_users[str(len(_new_users))] = {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '', 'name': _new_user_name}
+            _new_users[str(len(_new_users))] = access_manager.get_new_user(_new_user_name)
             access_manager.set_users(_new_users)
             return str(len(_new_users) - 1)
 

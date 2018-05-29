@@ -1,7 +1,6 @@
-import hashlib
+import uuid
 import time
 
-from .. import constants
 from ..json_store import LoginTokenStore
 
 __author__ = 'bromix'
@@ -14,6 +13,24 @@ class AccessManager(object):
         self._json = self._jstore.get_data()
         self._user = self._json['access_manager'].get('current_user', '0')
         self._last_origin = self._json['access_manager'].get('last_origin', 'plugin.video.youtube')
+
+    def get_new_user(self, user_name):
+        """
+        :param user_name: string, users name
+        :return: a new user dict
+        """
+        uuids = list()
+        new_uuid = uuid.uuid4().hex
+
+        for k in list(self._json['access_manager']['users'].keys()):
+            user_uuid = self._json['access_manager']['users'][k].get('id')
+            if user_uuid:
+                uuids.append(user_uuid)
+
+        while new_uuid in uuids:
+            new_uuid = uuid.uuid4().hex
+
+        return {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '', 'name': user_name, 'id': new_uuid}
 
     def get_users(self):
         """
