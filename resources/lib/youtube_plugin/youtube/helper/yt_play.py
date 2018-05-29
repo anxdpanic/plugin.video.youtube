@@ -5,7 +5,7 @@ import re
 
 from ... import kodion
 from ...kodion import constants
-from ...kodion.items import VideoItem, AudioVideoItem
+from ...kodion.items import VideoItem
 from ...youtube.youtube_exceptions import YouTubeException
 from ...youtube.helper import utils, v3
 
@@ -55,10 +55,7 @@ def play_video(provider, context, re_match):
                 playlist.add(i)
 
         title = video_stream.get('meta', {}).get('video', {}).get('title', '')
-        if is_video:
-            video_item = VideoItem(title, video_stream['url'])
-        else:
-            video_item = AudioVideoItem(title, video_stream['url'])
+        video_item = VideoItem(title, video_stream['url'])
 
         video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream)
 

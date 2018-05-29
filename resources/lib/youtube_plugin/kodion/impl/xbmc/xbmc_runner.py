@@ -60,7 +60,7 @@ class XbmcRunner(AbstractProviderRunner):
             pass
 
     def _set_resolved_url(self, context, base_item, succeeded=True):
-        item = xbmc_items.to_item(context, base_item)
+        item = xbmc_items.to_playback_item(context, base_item)
         item.setPath(base_item.get_uri())
         xbmcplugin.setResolvedUrl(self.handle, succeeded=succeeded, listitem=item)
 
