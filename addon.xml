@@ -15,14 +15,16 @@
         <news>
 6.1.0
 [add] Multi-user support
-    - Switch User folder (default: on) Settings -&gt; Folders
+    - Switch User folder (default: on) Settings -&amp;gt; Folders
     - User management (Add, Remove, Rename, Switch) Settings - Users
     - Signed in users are green, Current user has an *
-[add] Refresh after watching (default: off) Settings -&gt; General
-[add] Completed Live folder (default: on) Settings -&gt; Folders
-[add] Upcoming Live folder (default: on) Settings -&gt; Folders
+[add] Refresh after watching (default: off) Settings -&amp;gt; General
+[add] Completed Live folder (default: on) Settings -&amp;gt; Folders
+[add] Upcoming Live folder (default: on) Settings -&amp;gt; Folders
 [add] My Location folder (default: on) Settings - Advanced - Enable setup-wizard
 [upd] Localize API key errors, provide a more descriptive notification
+[fix] My Channel videos (Error 403)
+[lang] Spanish strings [roliverosc]
         </news>
         <assets>
             <icon>icon.png</icon>
