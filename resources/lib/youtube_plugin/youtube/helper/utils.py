@@ -188,9 +188,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         snippet = yt_item['snippet']  # crash if not conform
 
-        # set uses_dash
-        video_item.set_use_dash(settings.use_dash())
-
         # set mediatype
         video_item.set_mediatype('video')  # using video
 
@@ -199,20 +196,16 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             datetime = utils.datetime_parser.parse(scheduled_start)
             start_date, start_time = utils.datetime_parser.get_scheduled_start(datetime)
             if start_date:
-                title = u'({live} {date}@{time}UTC) {title}'\
+                title = u'({live} {date}@{time}UTC) {title}' \
                     .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
             else:
-                title = u'({live} @ {time}UTC) {title}'\
+                title = u'({live} @ {time}UTC) {title}' \
                     .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
             video_item.set_title(title)
         else:
             # set the title
             if not video_item.get_title():
                 video_item.set_title(snippet['title'])
-
-        if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
-                video_item.get_headers() and video_item.get_uri().startswith('http'):
-            video_item.set_uri(video_item.get_uri() + '|' + video_item.get_headers())
 
         """
         This is experimental. We try to get the most information out of the title of a video.
@@ -365,18 +358,21 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
 
     if meta_data:
         video_item.set_subtitles(meta_data.get('subtitles', None))
-        video_item.set_headers(meta_data.get('headers', ''))
         image = get_thumbnail(thumb_size, meta_data.get('images', {}))
+
+    if 'headers' in video_stream:
+        video_item.set_headers(video_stream['headers'])
 
     yt_item = video_data[video_id]
 
     snippet = yt_item['snippet']  # crash if not conform
 
+    # set the title
+    if not video_item.get_title():
+        video_item.set_title(snippet['title'])
+
     # set uses_dash
     video_item.set_use_dash(settings.use_dash())
-
-    # set mediatype
-    video_item.set_mediatype('video')  # using video
 
     license_info = video_stream.get('license_info', {})
 
@@ -390,14 +386,6 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
     video_item.set_license_key(license_info.get('proxy'))
     ui.set_home_window_property('license_url', license_info.get('url'))
     ui.set_home_window_property('license_token', license_info.get('token'))
-
-    # set the title
-    if not video_item.get_title():
-        video_item.set_title(snippet['title'])
-
-    if not video_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
-            video_item.get_headers() and video_item.get_uri().startswith('http'):
-        video_item.set_uri(video_item.get_uri() + '|' + video_item.get_headers())
 
     """
     This is experimental. We try to get the most information out of the title of a video.

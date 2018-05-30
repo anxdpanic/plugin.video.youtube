@@ -14,6 +14,7 @@
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
+import uuid
 from . import JSONStore
 
 
@@ -54,4 +55,25 @@ class LoginTokenStore(JSONStore):
             del data['access_manager']['default']
         # end clean up
 
+        # ensure all users have uuid
+        uuids = list()
+        uuid_update = False
+        for k in list(data['access_manager']['users'].keys()):
+            c_uuid = data['access_manager']['users'][k].get('id')
+            if c_uuid:
+                uuids.append(c_uuid)
+            else:
+                if not uuid_update:
+                    uuid_update = True
+
+        if uuid_update:
+            for k in list(data['access_manager']['users'].keys()):
+                c_uuid = data['access_manager']['users'][k].get('id')
+                if not c_uuid:
+                    g_uuid = uuid.uuid4().hex
+                    while g_uuid in uuids:
+                        g_uuid = uuid.uuid4().hex
+                    data['access_manager']['users'][k]['id'] = g_uuid
+        # end uuid check
+        
         self.save(data)

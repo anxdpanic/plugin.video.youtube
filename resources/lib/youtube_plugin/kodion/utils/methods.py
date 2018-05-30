@@ -93,12 +93,12 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
                 break
 
     if audio_only:
-        use_dash = False
         audio_stream_data_list = [item for item in stream_data_list
                                   if (item.get('dash/audio', False) and
                                       not item.get('dash/video', False))]
 
         if audio_stream_data_list:
+            use_dash = False
             stream_data_list = audio_stream_data_list
         else:
             context.log_debug('Select stream: Audio only, no audio only streams found')

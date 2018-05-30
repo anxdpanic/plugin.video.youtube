@@ -9,6 +9,67 @@ from ... import utils
 from . import info_labels
 
 
+def to_play_item(context, play_item):
+    context.log_debug('Converting PlayItem |%s|' % play_item.get_uri())
+
+    major_version = context.get_system_version().get_version()[0]
+    thumb = play_item.get_image() if play_item.get_image() else u'DefaultVideo.png'
+    title = play_item.get_title() if play_item.get_title() else play_item.get_name()
+    fanart = ''
+    settings = context.get_settings()
+    if major_version > 17:
+        list_item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
+    else:
+        list_item = xbmcgui.ListItem(label=utils.to_unicode(title))
+
+    list_item.setProperty(u'IsPlayable', u'true')
+
+    if play_item.get_fanart() and settings.show_fanart():
+        fanart = play_item.get_fanart()
+    if major_version <= 12:
+        list_item.setIconImage(thumb)
+        list_item.setProperty("Fanart_Image", fanart)
+    elif major_version <= 15:
+        list_item.setArt({'thumb': thumb, 'fanart': fanart})
+        list_item.setIconImage(thumb)
+    else:
+        list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
+
+    if not play_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
+            play_item.get_headers() and play_item.get_uri().startswith('http'):
+        play_item.set_uri(play_item.get_uri() + '|' + play_item.get_headers())
+
+    list_item.setProperty('inputstreamaddon', '')
+    list_item.setProperty('inputstream.adaptive.manifest_type', '')
+    if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
+        list_item.setContentLookup(False)
+        list_item.setMimeType('application/xml+dash')
+        list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+        list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+        if play_item.get_headers():
+            list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
+
+        if play_item.get_license_key():
+            list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+            list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
+
+        # item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
+
+    if play_item.subtitles:
+        list_item.setSubtitles(play_item.subtitles)
+
+    _info_labels = info_labels.create_from_item(context, play_item)
+
+    # This should work for all versions of XBMC/KODI.
+    if 'duration' in _info_labels:
+        duration = _info_labels['duration']
+        del _info_labels['duration']
+        list_item.addStreamInfo('video', {'duration': duration})
+
+    list_item.setInfo(type=u'video', infoLabels=_info_labels)
+    return list_item
+
+
 def to_video_item(context, video_item):
     context.log_debug('Converting VideoItem |%s|' % video_item.get_uri())
     major_version = context.get_system_version().get_version()[0]
@@ -34,26 +95,7 @@ def to_video_item(context, video_item):
     if video_item.get_context_menu() is not None:
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
 
-    item.setProperty('inputstreamaddon', '')
-    item.setProperty('inputstream.adaptive.manifest_type', '')
-    if video_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
-        item.setContentLookup(False)
-        item.setMimeType('application/xml+dash')
-        item.setProperty('inputstreamaddon', 'inputstream.adaptive')
-        item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        if video_item.get_headers():
-            item.setProperty('inputstream.adaptive.stream_headers', video_item.get_headers())
-
-        if video_item.get_license_key():
-            item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            item.setProperty('inputstream.adaptive.license_key', video_item.get_license_key())
-
-        # item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
-
     item.setProperty(u'IsPlayable', u'true')
-
-    if video_item.subtitles:
-        item.setSubtitles(video_item.subtitles)
 
     _info_labels = info_labels.create_from_item(context, video_item)
 
@@ -109,14 +151,14 @@ def to_uri_item(context, base_item):
     return item
 
 
-def to_item(context, base_item):
+def to_playback_item(context, base_item):
     if isinstance(base_item, UriItem):
         return to_uri_item(context, base_item)
 
-    if isinstance(base_item, VideoItem):
-        return to_video_item(context, base_item)
-
     if isinstance(base_item, AudioItem):
         return to_audio_item(context, base_item)
+
+    if isinstance(base_item, VideoItem):
+        return to_play_item(context, base_item)
 
     return None
