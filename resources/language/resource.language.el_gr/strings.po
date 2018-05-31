@@ -820,19 +820,19 @@ msgstr "http://διεύθυνσηIP:θύρα/api (βλέπε εξυπηρετη�
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Ρύθμιση API προσθέτου Youtube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Δεν ανιχνέφθηκαν αλλαγές, τα κλειδιά API δεν ενημερώθηκαν"
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Τα προσωπικά κλειδιά API έχουν ενεργοποιηθεί"
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Τα προσωπικά κλειδιά API έχουν απενεργοποιηθεί"
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
@@ -840,116 +840,116 @@ msgstr ""
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Βρέθηκαν προσωπικά κλειδιά API στο api_keys.json, θέλετε να τα ανακτήσετε; Επιλέγοντας Όχι θα τα αντικαταστήσει"
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Ανάκτηση"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Διαγραφή api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Διαγραφή access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Ακρόαση στην IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Επιλογή IP ακρόασης"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Ανανέωση μετά την παρακολούθηση"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Ανερχόμενες ζωντανές μεταδόσεις"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Ολοκληρωμένες ζωντανές μεταδόσεις"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "Τα κλειδί API είναι λανθασμένο. Ρυθμίσεις - API - Κλειδί API"
 
 msgctxt "#30649
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "Τα αναγνωριστικό πελάτη είναι λανθασμένο. Ρυθμίσεις - API - Αναγνωριστικό API"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "Τα μυστικό πελάτη είναι λανθασμένο. Ρυθμίσεις - API - Μυστικό API"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Τοποθεσία"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Εύρος τοποθεσίας (χλμ)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "Εκτέλεση εύρεσης τοποθεσίας; Χρησιμοποιείται για την [B]Η Τοποθεσία μου[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Η Τοποθεσία μου"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Αλλαγή χρήστη"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Νέος χρήστης"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Ανώνυμος"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Εισαγωγή ονόματος για αυτόν τον χρήστη"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Τωρινός χρήστης '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Χρήστες"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Προσθήκη χρήστη"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Αφαίρεση χρήστη"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Μετονομασία χρήστη"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Αλλαγή χρήστη"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Αλλαγή στον/στην '%s' τώρα;"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "Αφαίρεση '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "Αλλαγή '%s' σε '%s'"
