@@ -11,6 +11,7 @@
 [fix] My Channel videos (Error 403)
 [fix] allow fallback to dash, when using Audio only
 [fix] Signature function not found error for some users
+[fix] Context Menu -> More -> Related Videos w/ Kodi 18
 [lang] Spanish strings [roliverosc]
 [lang] Greek strings [twilight0]
 
