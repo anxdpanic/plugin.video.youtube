@@ -251,7 +251,9 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_duration_from_seconds(duration.seconds - 1)
 
         # try to find a better resolution for the image
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        image = video_item.get_image()
+        if not image:
+            image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         if image.endswith('_live.jpg'):
             image += '?ct=' + thumb_stamp
         video_item.set_image(image)
