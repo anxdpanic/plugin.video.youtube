@@ -28,6 +28,9 @@ class VideoItem(BaseItem):
         self._play_count = None
         self._uses_dash = None
         self._mediatype = None
+        self._last_played = None
+        self._start_percent = None
+        self._start_time = None
         self.subtitles = None
         self._headers = None
         self.license_key = None
@@ -202,3 +205,21 @@ class VideoItem(BaseItem):
 
     def get_license_key(self):
         return self.license_key
+
+    def set_last_played(self, last_played):
+        self._last_played = last_played
+
+    def get_last_played(self):
+        return self._last_played
+
+    def set_start_percent(self, start_percent):
+        self._start_percent = start_percent
+
+    def get_start_percent(self):
+        return self._start_percent
+
+    def set_start_time(self, start_time):
+        self._start_time = start_time
+
+    def get_start_time(self):
+        return self._start_time

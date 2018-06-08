@@ -6,7 +6,9 @@
 [add] Refresh after watching (default: off) Settings -> General
 [add] Completed Live folder (default: on) Settings -> Folders
 [add] Upcoming Live folder (default: on) Settings -> Folders
-[add] My Location folder (default: on) Settings - Advanced - Enable setup-wizard
+[add] My Location folder (default: on) Settings -> Advanced -> Enable setup-wizard
+[add] Play count minimum percent (default: 85%) Settings -> General -> Play count minimum percent
+[add] Playback history (default: off) Settings -> Advanced -> Use playback history
 [upd] Localize API key errors, provide a more descriptive notification
 [fix] My Channel videos (Error 403)
 [fix] allow fallback to dash, when using Audio only

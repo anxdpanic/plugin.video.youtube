@@ -14,6 +14,14 @@ class AccessManager(object):
         self._user = self._json['access_manager'].get('current_user', '0')
         self._last_origin = self._json['access_manager'].get('last_origin', 'plugin.video.youtube')
 
+    def get_current_user_id(self):
+        """
+
+        :return: uuid of the current user
+        """
+        self._json = self._jstore.get_data()
+        return self._json['access_manager']['users'][self.get_user()]['id']
+
     def get_new_user(self, user_name):
         """
         :param user_name: string, users name

@@ -160,3 +160,9 @@ class AbstractSettings(object):
 
     def get_location_radius(self):
         return str(self.get_int(constants.setting.LOCATION_RADIUS, 500)) + 'km'
+
+    def get_play_count_min_percent(self):
+        return self.get_int(constants.setting.PLAY_COUNT_MIN_PERCENT, 0)
+
+    def use_playback_history(self):
+        return self.get_bool(constants.setting.USE_PLAYBACK_HISTORY, False)

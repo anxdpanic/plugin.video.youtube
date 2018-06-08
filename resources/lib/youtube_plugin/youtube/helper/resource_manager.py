@@ -79,6 +79,14 @@ class ResourceManager(object):
                 # this will cache the channel data
                 result[video_id] = function_cache.get(FunctionCache.ONE_MONTH, self._get_video_data, video_id)
 
+        played_items = dict()
+        if self._context.get_settings().use_playback_history():
+            playback_history = self._context.get_playback_history()
+            played_items = playback_history.get_items(video_ids)
+
+        for k in list(result.keys()):
+            result[k]['play_data'] = played_items.get(k, dict())
+
         if self.handle_error(json_data):
             return result
 
