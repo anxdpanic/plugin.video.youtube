@@ -831,7 +831,7 @@ class Provider(kodion.AbstractProvider):
 
         if (mode == 'in') or ((mode == 'out') and sign_out_confirmed):
             yt_login.process(mode, self, context, re_match)
-        return True
+        return False
 
     @kodion.RegisterProviderPath('^/search/$')
     def endpoint_search(self, context, re_match):
