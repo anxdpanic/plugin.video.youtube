@@ -6,6 +6,7 @@ import json
 import shutil
 import socket
 from base64 import b64decode
+from datetime import datetime
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
@@ -133,7 +134,11 @@ class Provider(kodion.AbstractProvider):
                  'youtube.rename.a.user': 30663,
                  'youtube.switch.user.now': 30665,
                  'youtube.removed': 30666,
-                 'youtube.renamed': 30667
+                 'youtube.renamed': 30667,
+                 'youtube.playback.history': 30673,
+                 'youtube.mark.watched': 30670,
+                 'youtube.mark.unwatched': 30669,
+                 'youtube.reset.resume.point': 30674,
                  }
 
     def __init__(self):
@@ -620,45 +625,48 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/events/post_play/$')
     def _on_post_play(self, context, re_match):
         video_id = context.get_param('video_id', '')
+        refresh_only = context.get_param('refresh_only', 'false') == 'true'
         if video_id:
-            client = self.get_client(context)
-            settings = context.get_settings()
+            if not refresh_only:
+                client = self.get_client(context)
+                settings = context.get_settings()
 
-            if self.is_logged_in():
-                # first: update history
-                client.update_watch_history(video_id)
+                if self.is_logged_in():
+                    # first: update history
+                    client.update_watch_history(video_id)
 
-                # second: remove video from 'Watch Later' playlist
-                if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
-                    watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+                    # second: remove video from 'Watch Later' playlist
+                    if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
+                        watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
 
-                    if watch_later_id:
-                        playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
-                        if playlist_item_id:
-                            json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
-                            if not v3.handle_error(self, context, json_data):
-                                return False
+                        if watch_later_id:
+                            playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
+                            if playlist_item_id:
+                                json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
+                                if not v3.handle_error(self, context, json_data):
+                                    return False
 
-                history_playlist_id = settings.get_string('youtube.folder.history.playlist', '').strip()
-                if history_playlist_id:
-                    json_data = client.add_video_to_playlist(history_playlist_id, video_id)
-                    if not v3.handle_error(self, context, json_data):
-                        return False
+                    history_playlist_id = settings.get_string('youtube.folder.history.playlist', '').strip()
+                    if history_playlist_id:
+                        json_data = client.add_video_to_playlist(history_playlist_id, video_id)
+                        if not v3.handle_error(self, context, json_data):
+                            return False
 
-                # rate video
-                if context.get_settings().get_bool('youtube.post.play.rate', False):
-                    json_data = client.get_video_rating(video_id)
-                    if not v3.handle_error(self, context, json_data):
-                        return False
-                    items = json_data.get('items', [{'rating': 'none'}])
-                    rating = items[0].get('rating', 'none')
-                    if rating == 'none':
-                        rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
-                        yt_video.process('rate', self, context, rating_match)
+                    # rate video
+                    if context.get_settings().get_bool('youtube.post.play.rate', False):
+                        json_data = client.get_video_rating(video_id)
+                        if not v3.handle_error(self, context, json_data):
+                            return False
+                        items = json_data.get('items', [{'rating': 'none'}])
+                        rating = items[0].get('rating', 'none')
+                        if rating == 'none':
+                            rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
+                            yt_video.process('rate', self, context, rating_match)
+
             if context.get_settings().get_bool('youtube.post.play.refresh', False) and \
                     xbmc.getInfoLabel('Container.FolderPath') != context.create_uri(['kodion', 'search', 'input']):
-                    # don't refresh search input it causes request for new input, (Container.Update in abstract_provider /kodion/search/input/
-                    # would resolve this but doesn't work with Remotes(Yatse))
+                # don't refresh search input it causes request for new input, (Container.Update in abstract_provider /kodion/search/input/
+                # would resolve this but doesn't work with Remotes(Yatse))
                 context.get_ui().refresh_container()
         else:
             context.log_warning('Missing video ID for post play event')
@@ -823,7 +831,7 @@ class Provider(kodion.AbstractProvider):
 
         if (mode == 'in') or ((mode == 'out') and sign_out_confirmed):
             yt_login.process(mode, self, context, re_match)
-        return True
+        return False
 
     @kodion.RegisterProviderPath('^/search/$')
     def endpoint_search(self, context, re_match):
@@ -987,6 +995,10 @@ class Provider(kodion.AbstractProvider):
                 if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.search.history'])):
                     context.get_search_history().clear()
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+            elif maint_type == 'playback_history':
+                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.playback.history'])):
+                    context.get_playback_history().clear()
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
         elif action == 'reset':
             if maint_type == 'access_manager':
                 if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.reset.access.manager.confirm'])):
@@ -1011,6 +1023,7 @@ class Provider(kodion.AbstractProvider):
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
+                            'playback_history': 'playback_history',
                             'settings_xml': 'settings.xml',
                             'api_keys': 'api_keys.json',
                             'access_manager': 'access_manager.json',
@@ -1022,6 +1035,9 @@ class Provider(kodion.AbstractProvider):
                     _file_w_path = os.path.join(context._get_cache_path(), _file)
                 elif maint_type == 'temp_files':
                     _file_w_path = _file
+                elif _file == 'playback_history':
+                    _file = str(context.get_access_manager().get_current_user_id()) + '.sqlite'
+                    _file_w_path = os.path.join(os.path.join(context.get_data_path(), 'playback'), _file)
                 else:
                     _file_w_path = os.path.join(context._data_path, _file)
                 if context.get_ui().on_delete_content(_file):
@@ -1104,6 +1120,39 @@ class Provider(kodion.AbstractProvider):
             settings.set_bool('youtube.api.enable', False)
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
+
+    @kodion.RegisterProviderPath('^/playback_history/$')
+    def on_playback_history(self, context, re_match):
+        params = context.get_params()
+        video_id = params.get('video_id')
+        action = params.get('action')
+        if not video_id or not action:
+            return True
+        playback_history = context.get_playback_history()
+        items = playback_history.get_items([video_id])
+        if not items or not items.get(video_id):
+            item_dict = {'play_count': '0', 'total_time': '0.0',
+                         'played_time': '0.0', 'played_percent': '0'}
+        else:
+            item_dict = items.get(video_id)
+        if action == 'mark_unwatched':
+            if int(item_dict.get('play_count', 0)) > 0:
+                item_dict['play_count'] = '0'
+                item_dict['played_time'] = '0.0'
+                item_dict['played_percent'] = '0'
+        elif action == 'mark_watched':
+            if int(item_dict.get('play_count', 0)) == 0:
+                item_dict['play_count'] = '1'
+        elif action == 'reset_resume':
+            item_dict['played_time'] = '0.0'
+            item_dict['played_percent'] = '0'
+        item_dict['play_count'] = item_dict.get('play_count', '0')
+        item_dict['total_time'] = item_dict.get('total_time', '0.0')
+        item_dict['played_time'] = item_dict.get('played_time', '0.0')
+        item_dict['played_percent'] = item_dict.get('played_percent', '0')
+        playback_history.update(video_id, item_dict['play_count'], item_dict['total_time'], item_dict['played_time'], item_dict['played_percent'])
+        context.get_ui().refresh_container()
+        return True
 
     def on_root(self, context, re_match):
         """

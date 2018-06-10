@@ -939,3 +939,35 @@ msgstr ""
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
 msgstr ""
+
+msgctxt "#30668"
+msgid "Play count minimum percent"
+msgstr ""
+
+msgctxt "#30669"
+msgid "Mark unwatched"
+msgstr ""
+
+msgctxt "#30670"
+msgid "Mark watched"
+msgstr ""
+
+msgctxt "#30671"
+msgid "Clear playback history"
+msgstr ""
+
+msgctxt "#30672"
+msgid "Delete playback history"
+msgstr ""
+
+msgctxt "#30673"
+msgid "playback history"
+msgstr ""
+
+msgctxt "#30674"
+msgid "Reset resume point"
+msgstr ""
+
+msgctxt "#30675"
+msgid "Use playback history (watched, resume tracking)"
+msgstr ""

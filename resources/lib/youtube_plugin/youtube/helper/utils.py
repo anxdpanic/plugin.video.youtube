@@ -187,9 +187,32 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item = video_id_dict[video_id]
 
         snippet = yt_item['snippet']  # crash if not conform
+        play_data = yt_item['play_data']
 
         # set mediatype
         video_item.set_mediatype('video')  # using video
+
+        # duration
+        if play_data.get('total_time'):
+            video_item.set_duration_from_seconds(float(play_data.get('total_time')))
+        else:
+            duration = yt_item.get('contentDetails', {}).get('duration', '')
+            duration = utils.datetime_parser.parse(duration)
+            # we subtract 1 seconds because YouTube returns +1 second to much
+            video_item.set_duration_from_seconds(duration.seconds - 1)
+
+        # play count
+        if not video_data[video_id].get('liveStreamingDetails') and play_data.get('play_count'):
+            video_item.set_play_count(int(play_data.get('play_count')))
+
+        if play_data.get('played_percent'):
+            video_item.set_start_percent(play_data.get('played_percent'))
+
+        if play_data.get('played_time'):
+            video_item.set_start_time(play_data.get('played_time'))
+
+        if play_data.get('last_played'):
+            video_item.set_last_played(play_data.get('last_played'))
 
         scheduled_start = video_data[video_id].get('liveStreamingDetails', {}).get('scheduledStartTime')
         if scheduled_start:
@@ -244,14 +267,10 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             video_item.set_premiered_from_datetime(datetime)
             video_item.set_date_from_datetime(datetime)
 
-        # duration
-        duration = yt_item.get('contentDetails', {}).get('duration', '')
-        duration = utils.datetime_parser.parse(duration)
-        # we subtract 1 seconds because YouTube returns +1 second to much
-        video_item.set_duration_from_seconds(duration.seconds - 1)
-
         # try to find a better resolution for the image
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        image = video_item.get_image()
+        if not image:
+            image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         if image.endswith('_live.jpg'):
             image += '?ct=' + thumb_stamp
         video_item.set_image(image)
@@ -333,6 +352,15 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             # subscribe to the channel of the video
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
 
+        if not video_data[video_id].get('liveStreamingDetails') and play_data:
+            if play_data.get('play_count') is None or int(play_data.get('play_count')) == 0:
+                yt_context_menu.append_mark_watched(context_menu, provider, context, video_id)
+            else:
+                yt_context_menu.append_mark_unwatched(context_menu, provider, context, video_id)
+
+            if int(play_data.get('played_percent', '0')) > 0 or float(play_data.get('played_time', '0.0')) > 0.0:
+                yt_context_menu.append_reset_resume_point(context_menu, provider, context, video_id)
+
         # more...
         refresh_container = context.get_path().startswith('/channel/mine/playlist/LL') or \
                             context.get_path() == '/special/disliked_videos/'
@@ -366,6 +394,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
     yt_item = video_data[video_id]
 
     snippet = yt_item['snippet']  # crash if not conform
+    play_data = yt_item['play_data']
 
     # set the title
     if not video_item.get_title():
@@ -386,6 +415,28 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
     video_item.set_license_key(license_info.get('proxy'))
     ui.set_home_window_property('license_url', license_info.get('url'))
     ui.set_home_window_property('license_token', license_info.get('token'))
+
+    # duration
+    if not video_data[video_id].get('liveStreamingDetails') and play_data.get('total_time'):
+        video_item.set_duration_from_seconds(float(play_data.get('total_time')))
+    else:
+        duration = yt_item.get('contentDetails', {}).get('duration', '')
+        duration = utils.datetime_parser.parse(duration)
+        # we subtract 1 seconds because YouTube returns +1 second to much
+        video_item.set_duration_from_seconds(duration.seconds - 1)
+
+    # play count
+    if not video_data[video_id].get('liveStreamingDetails') and play_data.get('play_count'):
+        video_item.set_play_count(int(play_data.get('play_count')))
+
+    if play_data.get('played_percent'):
+        video_item.set_start_percent(play_data.get('played_percent'))
+
+    if play_data.get('played_time'):
+        video_item.set_start_time(play_data.get('played_time'))
+
+    if play_data.get('last_played'):
+        video_item.set_last_played(play_data.get('last_played'))
 
     """
     This is experimental. We try to get the most information out of the title of a video.
@@ -421,12 +472,6 @@ def update_play_info(provider, context, video_id, video_item, video_stream):
         video_item.set_aired_from_datetime(date_time)
         video_item.set_premiered_from_datetime(date_time)
         video_item.set_date_from_datetime(date_time)
-
-    # duration
-    duration = yt_item.get('contentDetails', {}).get('duration', '')
-    duration = utils.datetime_parser.parse(duration)
-    # we subtract 1 seconds because YouTube returns +1 second to much
-    video_item.set_duration_from_seconds(duration.seconds - 1)
 
     if not image:
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))

@@ -62,13 +62,26 @@ def play_video(provider, context, re_match):
         # Trigger post play events
         if provider.is_logged_in():
             try:
-                if str(context.get_param('incognito', False)).lower() != 'true' and not screensaver:
+                if str(context.get_param('incognito', False)).lower() == 'true':
+                    command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id, 'refresh_only': 'true'})
+                elif screensaver:
+                    command = None
+                else:
                     command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
+                if command:
                     context.get_ui().set_home_window_property('post_play', command)
             except:
                 context.log_debug('Failed to set post play events.')
 
-        context.get_ui().set_home_window_property('playing', video_id)
+        if settings.use_playback_history():
+            major_version = context.get_system_version().get_version()[0]
+            if video_item.get_start_time() and video_item.use_dash() and major_version > 17:
+                context.get_ui().set_home_window_property('seek_time', video_item.get_start_time())
+
+            play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
+            context.get_ui().set_home_window_property('play_count', str(play_count))
+
+        context.get_ui().set_home_window_property('playing', str(video_id))
 
         return video_item
     except YouTubeException as ex:

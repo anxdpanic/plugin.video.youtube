@@ -13,10 +13,10 @@ def append_more_for_video(context_menu, provider, context, video_id, is_logged_i
         _refresh_container = '1'
 
     context_menu.append((context.localize(provider.LOCAL_MAP['youtube.video.more']),
-                         'Container.Update(%s)' % context.create_uri(['video', 'more'],
-                                                                     {'video_id': video_id,
-                                                                      'logged_in': _is_logged_in,
-                                                                      'refresh_container': _refresh_container})))
+                         'RunPlugin(%s)' % context.create_uri(['video', 'more'],
+                                                              {'video_id': video_id,
+                                                               'logged_in': _is_logged_in,
+                                                               'refresh_container': _refresh_container})))
 
 
 def append_content_from_description(context_menu, provider, context, video_id):
@@ -166,3 +166,24 @@ def append_unsubscribe_from_channel(context_menu, provider, context, channel_id,
     context_menu.append((context.localize(provider.LOCAL_MAP['youtube.unsubscribe']),
                          'RunPlugin(%s)' % context.create_uri(['subscriptions', 'remove'],
                                                               {'subscription_id': channel_id})))
+
+
+def append_mark_watched(context_menu, provider, context, video_id):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.mark.watched']),
+                         'RunPlugin(%s)' % context.create_uri(['playback_history'],
+                                                              {'video_id': video_id,
+                                                               'action': 'mark_watched'})))
+
+
+def append_mark_unwatched(context_menu, provider, context, video_id):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.mark.unwatched']),
+                         'RunPlugin(%s)' % context.create_uri(['playback_history'],
+                                                              {'video_id': video_id,
+                                                               'action': 'mark_unwatched'})))
+
+
+def append_reset_resume_point(context_menu, provider, context, video_id):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.reset.resume.point']),
+                         'RunPlugin(%s)' % context.create_uri(['playback_history'],
+                                                              {'video_id': video_id,
+                                                               'action': 'reset_resume'})))
