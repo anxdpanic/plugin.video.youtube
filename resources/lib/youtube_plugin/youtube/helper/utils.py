@@ -219,10 +219,10 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             datetime = utils.datetime_parser.parse(scheduled_start)
             start_date, start_time = utils.datetime_parser.get_scheduled_start(datetime)
             if start_date:
-                title = u'({live} {date}@{time}UTC) {title}' \
+                title = u'({live} {date}@{time}) {title}' \
                     .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
             else:
-                title = u'({live} @ {time}UTC) {title}' \
+                title = u'({live} @ {time}) {title}' \
                     .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
             video_item.set_title(title)
         else:
