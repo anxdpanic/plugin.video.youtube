@@ -11,6 +11,7 @@ class VideoItem(BaseItem):
         BaseItem.__init__(self, name, uri, image, fanart)
         self._genre = None
         self._aired = None
+        self._aired_utc = None
         self._duration = None
         self._director = None
         self._premiered = None
@@ -153,6 +154,12 @@ class VideoItem(BaseItem):
     def set_aired(self, year, month, day):
         date = datetime.date(year, month, day)
         self._aired = date.isoformat()
+
+    def set_aired_utc(self, dt):
+        self._aired_utc = dt
+
+    def get_aired_utc(self):
+        return self._aired_utc
 
     def set_aired_from_datetime(self, date_time):
         self.set_aired(year=date_time.year, month=date_time.month, day=date_time.day)

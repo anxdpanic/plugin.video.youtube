@@ -862,7 +862,7 @@ msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
 msgstr ""
 
-msgctxt "#30649
+msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
 msgstr ""
 
@@ -969,3 +969,39 @@ msgstr ""
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
 msgstr ""
+
+msgctxt "#30676"
+msgid "Just now"
+msgstr "Jetzt"
+
+msgctxt "#30677"
+msgid "A minute ago"
+msgstr "Vor einer Minute"
+
+msgctxt "#30678"
+msgid "Recently"
+msgstr "Kürzlich"
+
+msgctxt "#30679"
+msgid "An hour ago"
+msgstr "Vor einer Stunde"
+
+msgctxt "#30680"
+msgid "Two hours ago"
+msgstr "Vor zwei Stunden"
+
+msgctxt "#30681"
+msgid "Three hours ago"
+msgstr "Vor drei Stunden"
+
+msgctxt "#30682"
+msgid "Yesterday at"
+msgstr "Gestern um"
+
+msgctxt "#30683"
+msgid "Two days ago"
+msgstr "Vorgestern"
+
+msgctxt "#30684"
+msgid "Today at"
+msgstr "Heute um"

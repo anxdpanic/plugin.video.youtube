@@ -225,12 +225,12 @@ msgid "Confirm remove"
 msgstr "Confirmer la suppression"
 
 msgctxt "#30116"
-msgid "Delete "%s"?"
-msgstr "Supprimer "%s"?"
+msgid "Delete \"%s\"?"
+msgstr "Supprimer \"%s\"?"
 
 msgctxt "#30117"
-msgid "Remove "%s"?"
-msgstr "Supprimer "%s" ?"
+msgid "Remove \"%s\"?"
+msgstr "Supprimer \"%s\" ?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -550,7 +550,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer '%s' comme liste 'Regarder plus tar
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Êtes-vous sûr de vouloir remplacer votre liste 'Regarder plus tard' avec "%s" ?"
+msgstr "Êtes-vous sûr de vouloir remplacer votre liste 'Regarder plus tard' avec \"%s\" ?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -864,7 +864,7 @@ msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
 msgstr ""
 
-msgctxt "#30649
+msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
 msgstr ""
 
@@ -970,4 +970,40 @@ msgstr ""
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
+msgstr ""
+
+msgctxt "#30676"
+msgid "Just now"
+msgstr ""
+
+msgctxt "#30677"
+msgid "A minute ago"
+msgstr ""
+
+msgctxt "#30678"
+msgid "Recently"
+msgstr ""
+
+msgctxt "#30679"
+msgid "An hour ago"
+msgstr ""
+
+msgctxt "#30680"
+msgid "Two hours ago"
+msgstr ""
+
+msgctxt "#30681"
+msgid "Three hours ago"
+msgstr ""
+
+msgctxt "#30682"
+msgid "Yesterday at"
+msgstr ""
+
+msgctxt "#30683"
+msgid "Two days ago"
+msgstr ""
+
+msgctxt "#30684"
+msgid "Today at"
 msgstr ""

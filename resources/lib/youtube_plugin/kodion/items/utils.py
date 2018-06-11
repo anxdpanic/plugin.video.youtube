@@ -1,3 +1,4 @@
+# coding=utf-8
 __author__ = 'bromix'
 
 from six import string_types

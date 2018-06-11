@@ -1,6 +1,7 @@
 __author__ = 'bromix'
 
 import re
+import time as _time
 from datetime import date, datetime, timedelta, time
 
 from ..exceptions import KodionException
@@ -73,3 +74,55 @@ def get_scheduled_start(datetime_object):
     start_date = start_date.replace(str(now.year), '').lstrip('-')
     start_date = start_date.replace('{:02d}'.format(now.month) + '-' + '{:02d}'.format(now.day), '')
     return start_date, start_time
+
+
+local_timezone_offset = None
+
+
+def utc_to_local(dt):
+    global local_timezone_offset
+    if local_timezone_offset is None:
+        now = _time.time()
+        local_timezone_offset = datetime.fromtimestamp(now) - datetime.utcfromtimestamp(now)
+
+    return dt + local_timezone_offset
+
+
+def datetime_to_since(dt, context):
+    now = datetime.now()
+    diff = now - dt
+    yesterday = now - timedelta(days=1)
+    yyesterday = now - timedelta(days=2)
+    use_yesterday = (now - yesterday).total_seconds() > 10800
+    seconds = diff.total_seconds()
+
+    if seconds > 0:
+        if seconds < 60:
+            return context.localize('30676')
+        elif 60 <= seconds < 120:
+            return context.localize('30677')
+        elif 120 <= seconds < 3600:
+            return context.localize('30678')
+        elif 3600 <= seconds < 7200:
+            return context.localize('30679')
+        elif 7200 <= seconds < 10800:
+            return context.localize('30680')
+        elif 10800 <= seconds < 14400:
+            return context.localize('30681')
+        elif use_yesterday and dt.date() == yesterday.date():
+            return u' '.join([context.localize('30682'), context.format_time(dt)])
+        elif dt.date() == yyesterday.date():
+            return context.localize('30683')
+        elif 5400 <= seconds < 86400:
+            return u' '.join([context.localize('30684'), context.format_time(dt)])
+        elif 86400 <= seconds < 172800:
+            return u' '.join([context.localize('30682'), context.format_time(dt)])
+    return u' '.join([context.format_date_short(dt), context.format_time(dt)])
+
+
+def strptime(s, fmt="%Y-%m-%dT%H:%M:%S.%fZ"):
+    try:
+        return datetime.strptime(s, fmt)
+    except TypeError:
+        # see https://forum.kodi.tv/showthread.php?tid=112916
+        return datetime(*_time.strptime(s, fmt)[:6])
