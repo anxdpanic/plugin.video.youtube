@@ -13,7 +13,9 @@ __RE_MATCH_PERIOD__ = re.compile(r'P((?P<years>\d+)Y)?((?P<months>\d+)M)?((?P<da
 __RE_MATCH_ABBREVIATED__ = re.compile(r'(\w+), (?P<day>\d+) (?P<month>\w+) (?P<year>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<second>\d+)')
 
 
-def parse(datetime_string):
+def parse(datetime_string, localize=True):
+    _utc_to_local = utc_to_local if localize else lambda x: x
+
     def _to_int(value):
         if value is None:
             return 0
@@ -22,26 +24,28 @@ def parse(datetime_string):
     # match time only '00:45:10'
     time_only_match = __RE_MATCH_TIME_ONLY__.match(datetime_string)
     if time_only_match:
-        return time(hour=_to_int(time_only_match.group('hour')),
-                    minute=_to_int(time_only_match.group('minute')),
-                    second=_to_int(time_only_match.group('second')))
+        return _utc_to_local(datetime.combine(date.today(),
+                                              time(hour=_to_int(time_only_match.group('hour')),
+                                                   minute=_to_int(time_only_match.group('minute')),
+                                                   second=_to_int(time_only_match.group('second'))))
+                             ).time()
 
     # match date only '2014-11-08'
     date_only_match = __RE_MATCH_DATE_ONLY__.match(datetime_string)
     if date_only_match:
-        return date(_to_int(date_only_match.group('year')),
-                    _to_int(date_only_match.group('month')),
-                    _to_int(date_only_match.group('day')))
+        return _utc_to_local(date(_to_int(date_only_match.group('year')),
+                                  _to_int(date_only_match.group('month')),
+                                  _to_int(date_only_match.group('day'))))
 
     # full date time
     date_time_match = __RE_MATCH_DATETIME__.match(datetime_string)
     if date_time_match:
-        return datetime(_to_int(date_time_match.group('year')),
-                        _to_int(date_time_match.group('month')),
-                        _to_int(date_time_match.group('day')),
-                        _to_int(date_time_match.group('hour')),
-                        _to_int(date_time_match.group('minute')),
-                        _to_int(date_time_match.group('second')))
+        return _utc_to_local(datetime(_to_int(date_time_match.group('year')),
+                                      _to_int(date_time_match.group('month')),
+                                      _to_int(date_time_match.group('day')),
+                                      _to_int(date_time_match.group('hour')),
+                                      _to_int(date_time_match.group('minute')),
+                                      _to_int(date_time_match.group('second'))))
 
     # period - at the moment we support only hours, minutes and seconds (e.g. videos and audio)
     period_match = __RE_MATCH_PERIOD__.match(datetime_string)
@@ -55,12 +59,12 @@ def parse(datetime_string):
     if abbreviated_match:
         month = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'June': 6, 'Jun': 6, 'July': 7, 'Jul': 7, 'Aug': 8,
                  'Sept': 9, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
-        return datetime(year=_to_int(abbreviated_match.group('year')),
-                        month=month[abbreviated_match.group('month')],
-                        day=_to_int(abbreviated_match.group('day')),
-                        hour=_to_int(abbreviated_match.group('hour')),
-                        minute=_to_int(abbreviated_match.group('minute')),
-                        second=_to_int(abbreviated_match.group('second')))
+        return _utc_to_local(datetime(year=_to_int(abbreviated_match.group('year')),
+                                      month=month[abbreviated_match.group('month')],
+                                      day=_to_int(abbreviated_match.group('day')),
+                                      hour=_to_int(abbreviated_match.group('hour')),
+                                      minute=_to_int(abbreviated_match.group('minute')),
+                                      second=_to_int(abbreviated_match.group('second'))))
 
     raise KodionException("Could not parse iso 8601 timestamp '%s'" % datetime_string)
 
