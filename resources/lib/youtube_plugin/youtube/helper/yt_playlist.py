@@ -15,11 +15,12 @@ def _process_add_video(provider, context, re_match):
     video_id = context.get_param('video_id', '')
     if not video_id:
         raise kodion.KodionException('Playlist/Remove: missing video_id')
-
-    json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
-    if not v3.handle_error(provider, context, json_data):
-        return False
-
+    if playlist_id != 'HL':
+        json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
+        if not v3.handle_error(provider, context, json_data):
+            return False
+    else:
+        context.log_debug('Cannot add to playlist id |%s|' % playlist_id)
     return True
 
 
@@ -36,13 +37,16 @@ def _process_remove_video(provider, context, re_match):
     if not video_name:
         raise kodion.KodionException('Playlist/Remove: missing video_name')
 
-    if context.get_ui().on_remove_content(video_name):
-        json_data = provider.get_client(context).remove_video_from_playlist(playlist_id=playlist_id,
-                                                                            playlist_item_id=video_id)
-        if not v3.handle_error(provider, context, json_data):
-            return False
+    if playlist_id != 'HL' and playlist_id != 'WL' and playlist_id != ' WL':
+        if context.get_ui().on_remove_content(video_name):
+            json_data = provider.get_client(context).remove_video_from_playlist(playlist_id=playlist_id,
+                                                                                playlist_item_id=video_id)
+            if not v3.handle_error(provider, context, json_data):
+                return False
 
-        context.get_ui().refresh_container()
+            context.get_ui().refresh_container()
+    else:
+        context.log_debug('Cannot remove from playlist id |%s|' % playlist_id)
     return True
 
 
@@ -138,17 +142,13 @@ def _watchlater_playlist_id_change(provider, context, re_match, method):
         raise kodion.KodionException('watchlater_list/%s: missing playlist_name' % method)
 
     if method == 'set':
-        current_pl_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
-        if current_pl_id:
-            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30570) % playlist_name):
-                context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id)
-            else:
-                return
+        if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30570) % playlist_name):
+            context.get_access_manager().set_watch_later_id(playlist_id)
         else:
-            context.get_settings().set_string('youtube.folder.watch_later.playlist', playlist_id)
+            return
     elif method == 'remove':
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30569) % playlist_name):
-            context.get_settings().set_string('youtube.folder.watch_later.playlist', '')
+            context.get_access_manager().set_watch_later_id(' WL')
         else:
             return
     else:
@@ -165,17 +165,13 @@ def _history_playlist_id_change(provider, context, re_match, method):
         raise kodion.KodionException('history_list/%s: missing playlist_name' % method)
 
     if method == 'set':
-        current_pl_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
-        if current_pl_id:
-            if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30574) % playlist_name):
-                context.get_settings().set_string('youtube.folder.history.playlist', playlist_id)
-            else:
-                return
+        if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30574) % playlist_name):
+            context.get_access_manager().set_watch_history_id(playlist_id)
         else:
-            context.get_settings().set_string('youtube.folder.history.playlist', playlist_id)
+            return
     elif method == 'remove':
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(30573) % playlist_name):
-            context.get_settings().set_string('youtube.folder.history.playlist', '')
+            context.get_access_manager().set_watch_history_id('HL')
         else:
             return
     else:

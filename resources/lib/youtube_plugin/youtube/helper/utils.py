@@ -102,10 +102,11 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
         return
 
     resource_manager = provider.get_resource_manager(context)
+    access_manager = context.get_access_manager()
     playlist_data = resource_manager.get_playlists(playlist_ids)
 
-    custom_watch_later_id = context.get_settings().get_string('youtube.folder.watch_later.playlist', '').strip()
-    custom_history_id = context.get_settings().get_string('youtube.folder.history.playlist', '').strip()
+    custom_watch_later_id = access_manager.get_watch_later_id()
+    custom_history_id = access_manager.get_watch_history_id()
 
     thumb_size = context.get_settings().use_thumbnail_size()
     for playlist_id in list(playlist_data.keys()):
@@ -174,10 +175,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
     resource_manager = provider.get_resource_manager(context)
     video_data = resource_manager.get_videos(video_ids, live_details=live_details)
-
-    my_playlists = {}
-    if provider.is_logged_in():
-        my_playlists = resource_manager.get_related_playlists(channel_id='mine')
 
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
@@ -317,12 +314,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         if provider.is_logged_in():
             # add 'Watch Later' only if we are not in my 'Watch Later' list
-            watch_later_playlist_id = my_playlists.get('watchLater', '')
-            if not watch_later_playlist_id or re.match('^\s*WL$', watch_later_playlist_id):
-                cplid = settings.get_string('youtube.folder.watch_later.playlist', ' WL').strip()
-                if re.match('^\s*(?:WL)*$', cplid):
-                    cplid = ' WL'
-                watch_later_playlist_id = cplid
+            watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
             yt_context_menu.append_watch_later(context_menu, provider, context, watch_later_playlist_id, video_id)
 
             # provide 'remove' for videos in my playlists
@@ -331,7 +323,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                 if playlist_match:
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
-                    if not playlist_id.startswith('HL'):
+                    if playlist_id != 'HL' and playlist_id != 'WL' and playlist_id != ' WL':
                         playlist_item_id = playlist_item_id_dict[video_id]
                         context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
                                              'RunPlugin(%s)' % context.create_uri(
