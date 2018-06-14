@@ -57,23 +57,21 @@ def play_video(provider, context, re_match):
         title = video_stream.get('meta', {}).get('video', {}).get('title', '')
         video_item = VideoItem(title, video_stream['url'])
 
-        video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream)
+        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        use_play_data = not screensaver and not incognito
+
+        video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream, use_play_data=use_play_data)
 
         # Trigger post play events
         if provider.is_logged_in():
             try:
-                if str(context.get_param('incognito', False)).lower() == 'true':
-                    command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id, 'refresh_only': 'true'})
-                elif screensaver:
-                    command = None
-                else:
+                if not screensaver:
                     command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
-                if command:
                     context.get_ui().set_home_window_property('post_play', command)
             except:
                 context.log_debug('Failed to set post play events.')
 
-        if settings.use_playback_history():
+        if not incognito and not screensaver and settings.use_playback_history():
             major_version = context.get_system_version().get_version()[0]
             if video_item.get_start_time() and video_item.use_dash() and major_version > 17:
                 context.get_ui().set_home_window_property('seek_time', video_item.get_start_time())
@@ -81,6 +79,7 @@ def play_video(provider, context, re_match):
             play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
             context.get_ui().set_home_window_property('play_count', str(play_count))
 
+        context.get_ui().set_home_window_property('playback_history', str(use_play_data).lower())
         context.get_ui().set_home_window_property('playing', str(video_id))
 
         return video_item

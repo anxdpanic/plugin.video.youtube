@@ -41,8 +41,10 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
 
             video_id_dict[video_id] = video_item
 
+    use_play_data = not incognito
+
     channel_item_dict = {}
-    utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict)
+    utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
     utils.update_fanarts(provider, context, channel_item_dict)
 
     # next page
@@ -83,8 +85,10 @@ def tv_videos_to_items(provider, context, json_data):
 
         video_id_dict[video_id] = video_item
 
+    use_play_data = not incognito
+
     channel_item_dict = {}
-    utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict)
+    utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
     utils.update_fanarts(provider, context, channel_item_dict)
 
     # next page

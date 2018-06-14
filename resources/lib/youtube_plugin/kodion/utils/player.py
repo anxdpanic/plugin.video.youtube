@@ -13,7 +13,8 @@ class YouTubePlayer(xbmc.Player):
         self.current_played_time = 0.0
 
     def reset(self):
-        properties = ['playing', 'post_play', 'license_url', 'license_token', 'seek_time', 'play_count']
+        properties = ['playing', 'post_play', 'license_url', 'license_token',
+                      'seek_time', 'play_count', 'playback_history']
         cleared = []
         for prop in properties:
             if self.ui.get_home_window_property(prop) is not None:
@@ -26,6 +27,7 @@ class YouTubePlayer(xbmc.Player):
     def post_play(self):
         is_playing = self.ui.get_home_window_property('playing')
         post_play_command = self.ui.get_home_window_property('post_play')
+        use_playback_history = self.ui.get_home_window_property('playback_history') == 'true'
 
         if is_playing is not None:
             current_played_percent = int(math.floor((self.current_played_time / self.current_video_total_time) * 100))
@@ -45,7 +47,7 @@ class YouTubePlayer(xbmc.Player):
                                                                                   {'video_id': is_playing,
                                                                                    'refresh_only': 'true'})
 
-            if self.context.get_settings().use_playback_history():
+            if use_playback_history and self.context.get_settings().use_playback_history():
                 self.context.get_playback_history().update(is_playing, play_count, self.current_video_total_time,
                                                            self.current_played_time, current_played_percent)
 
