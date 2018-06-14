@@ -17,6 +17,7 @@
 [fix] Signature function not found error for some users
 [fix] Context Menu -> More -> Related Videos w/ Kodi 18
 [fix] Sign In/Sign Out causing crash with Kodi 18 nightlies
+[fix] Channel 'mine' caching
 [lang] Spanish strings [roliverosc]
 [lang] Greek strings [twilight0]
 

@@ -6,7 +6,6 @@ import json
 import shutil
 import socket
 from base64 import b64decode
-from datetime import datetime
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
@@ -203,6 +202,8 @@ class Provider(kodion.AbstractProvider):
         self._client = None
 
     def get_client(self, context):
+        if self._client is not None:
+            return self._client
         # set the items per page (later)
         settings = context.get_settings()
         access_manager = context.get_access_manager()
@@ -365,11 +366,6 @@ class Provider(kodion.AbstractProvider):
 
         playlist_id = re_match.group('playlist_id')
         page_token = context.get_param('page_token', '')
-
-        if re.match('^\s*WL$', playlist_id):
-            watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
-            if watch_later_id:
-                playlist_id = watch_later_id
 
         # no caching
         json_data = client.get_playlist_items(playlist_id=playlist_id, page_token=page_token)
@@ -604,14 +600,14 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/watch_later/playlist_id/$')
     def _on_yt_get_watch_later_id(self, context, re_match):
         client = self.get_client(context)
-        settings = context.get_settings()
+        access_manager = context.get_access_manager()
         if self.is_logged_in():
             watch_later_id = None
             while not watch_later_id:
                 watch_later_id = client.get_watch_later_id()
 
                 if watch_later_id:
-                    settings.set_string('youtube.folder.watch_later.playlist', watch_later_id)
+                    access_manager.set_watch_later_id(watch_later_id)
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     break
                 else:
@@ -630,24 +626,24 @@ class Provider(kodion.AbstractProvider):
             if not refresh_only:
                 client = self.get_client(context)
                 settings = context.get_settings()
-
+                access_manager = context.get_access_manager()
                 if self.is_logged_in():
                     # first: update history
                     client.update_watch_history(video_id)
 
                     # second: remove video from 'Watch Later' playlist
                     if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
-                        watch_later_id = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
+                        watch_later_id = access_manager.get_watch_later_id()
 
-                        if watch_later_id:
+                        if watch_later_id and watch_later_id != ' WL':
                             playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
                             if playlist_item_id:
                                 json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
                                 if not v3.handle_error(self, context, json_data):
                                     return False
 
-                    history_playlist_id = settings.get_string('youtube.folder.history.playlist', '').strip()
-                    if history_playlist_id:
+                    history_playlist_id = access_manager.get_watch_history_id()
+                    if history_playlist_id and history_playlist_id != 'HL':
                         json_data = client.add_video_to_playlist(history_playlist_id, video_id)
                         if not v3.handle_error(self, context, json_data):
                             return False
@@ -664,7 +660,7 @@ class Provider(kodion.AbstractProvider):
                             yt_video.process('rate', self, context, rating_match)
 
             if context.get_settings().get_bool('youtube.post.play.refresh', False) and \
-                    xbmc.getInfoLabel('Container.FolderPath') != context.create_uri(['kodion', 'search', 'input']):
+                    not xbmc.getInfoLabel('Container.FolderPath').startswith(context.create_uri(['kodion', 'search', 'input'])):
                 # don't refresh search input it causes request for new input, (Container.Update in abstract_provider /kodion/search/input/
                 # would resolve this but doesn't work with Remotes(Yatse))
                 context.get_ui().refresh_container()
@@ -1163,9 +1159,7 @@ class Provider(kodion.AbstractProvider):
             return yt_old_actions.process_old_action(self, context, re_match)
 
         settings = context.get_settings()
-
-        self.get_client(context)
-        resource_manager = self.get_resource_manager(context)
+        client = self.get_client(context)  # required for self.is_logged_in()
 
         self.set_content_type(context, kodion.constants.content_type.FILES)
 
@@ -1245,13 +1239,7 @@ class Provider(kodion.AbstractProvider):
 
         # subscriptions
         if self.is_logged_in():
-            playlists = resource_manager.get_related_playlists(channel_id='mine')
-            if 'watchLater' in playlists:
-                cplid = settings.get_string('youtube.folder.watch_later.playlist', '').strip()
-                playlists['watchLater'] = cplid if cplid else ' WL'
-            if 'watchHistory' in playlists:
-                cplid = settings.get_string('youtube.folder.history.playlist', '').strip()
-                playlists['watchHistory'] = cplid if cplid else 'HL'
+            access_manager = context.get_access_manager()
 
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):
@@ -1273,28 +1261,32 @@ class Provider(kodion.AbstractProvider):
                 result.append(purchases_item)
 
             # watch later
-            if 'watchLater' in playlists and settings.get_bool('youtube.folder.watch_later.show', True):
+            if settings.get_bool('youtube.folder.watch_later.show', True):
+                watch_later_playlist_id = access_manager.get_watch_later_id()
                 watch_later_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.watch_later']),
                                                  context.create_uri(
-                                                     ['channel', 'mine', 'playlist', playlists['watchLater']]),
+                                                     ['channel', 'mine', 'playlist', watch_later_playlist_id]),
                                                  context.create_resource_path('media', 'watch_later.png'))
                 watch_later_item.set_fanart(self.get_fanart(context))
                 context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu, self, context, playlists['watchLater'])
+                yt_context_menu.append_play_all_from_playlist(context_menu, self, context, watch_later_playlist_id)
                 watch_later_item.set_context_menu(context_menu)
                 result.append(watch_later_item)
 
             # liked videos
-            if 'likes' in playlists and settings.get_bool('youtube.folder.liked_videos.show', True):
-                liked_videos_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.video.liked']),
-                                                  context.create_uri(
-                                                      ['channel', 'mine', 'playlist', playlists['likes']]),
-                                                  context.create_resource_path('media', 'likes.png'))
-                liked_videos_item.set_fanart(self.get_fanart(context))
-                context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu, self, context, playlists['likes'])
-                liked_videos_item.set_context_menu(context_menu)
-                result.append(liked_videos_item)
+            if settings.get_bool('youtube.folder.liked_videos.show', True):
+                resource_manager = self.get_resource_manager(context)
+                playlists = resource_manager.get_related_playlists(channel_id='mine')
+                if 'likes' in playlists:
+                    liked_videos_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.video.liked']),
+                                                      context.create_uri(
+                                                          ['channel', 'mine', 'playlist', playlists['likes']]),
+                                                      context.create_resource_path('media', 'likes.png'))
+                    liked_videos_item.set_fanart(self.get_fanart(context))
+                    context_menu = []
+                    yt_context_menu.append_play_all_from_playlist(context_menu, self, context, playlists['likes'])
+                    liked_videos_item.set_context_menu(context_menu)
+                    result.append(liked_videos_item)
 
             # disliked videos
             if settings.get_bool('youtube.folder.disliked_videos.show', True):
@@ -1305,8 +1297,9 @@ class Provider(kodion.AbstractProvider):
                 result.append(disliked_videos_item)
 
             # history
-            if 'watchHistory' in playlists and settings.get_bool('youtube.folder.history.show', False):
-                if playlists['watchHistory'] == 'HL':
+            if settings.get_bool('youtube.folder.history.show', False):
+                watch_history_playlist_id = access_manager.get_watch_history_id()
+                if watch_history_playlist_id == 'HL':
                     watch_history_item = DirectoryItem(
                         context.localize(self.LOCAL_MAP['youtube.history']),
                         context.create_uri(['special', 'watch_history_tv']),
@@ -1315,9 +1308,12 @@ class Provider(kodion.AbstractProvider):
                 else:
                     watch_history_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.history']),
                                                        context.create_uri(
-                                                           ['channel', 'mine', 'playlist', playlists['watchHistory']]),
+                                                           ['channel', 'mine', 'playlist', watch_history_playlist_id]),
                                                        context.create_resource_path('media', 'history.png'))
                     watch_history_item.set_fanart(self.get_fanart(context))
+                    context_menu = []
+                    yt_context_menu.append_play_all_from_playlist(context_menu, self, context, watch_history_playlist_id)
+                    watch_history_item.set_context_menu(context_menu)
                 result.append(watch_history_item)
 
             # (my) playlists

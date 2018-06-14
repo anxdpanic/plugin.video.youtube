@@ -105,9 +105,12 @@ class UrlToItemConverter(object):
         return result
 
     def get_video_items(self, provider, context):
+        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        use_play_data = not incognito
+
         if len(self._video_items) == 0:
             channel_id_dict = {}
-            utils.update_video_infos(provider, context, self._video_id_dict, None, channel_id_dict)
+            utils.update_video_infos(provider, context, self._video_id_dict, None, channel_id_dict, use_play_data=use_play_data)
             utils.update_fanarts(provider, context, channel_id_dict)
 
             for key in self._video_id_dict:

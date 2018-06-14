@@ -30,13 +30,21 @@ class ResourceManager(object):
 
         channel_ids_to_update = []
         function_cache = self._context.get_function_cache()
+
         for channel_id in channel_ids:
+            if channel_id == 'mine':
+                json_data = function_cache.get(FunctionCache.ONE_DAY, self._youtube_client.get_channel_by_username, channel_id)
+                items = json_data.get('items', [{'id': 'mine'}])
+                channel_id = items[0]['id']
+                self._context.log_debug('Channel id for mine: |%s|' % channel_id)
+                json_data = {}
+
             channel_data = function_cache.get_cached_only(self._get_channel_data, str(channel_id))
             if channel_data is None:
-                self._context.log_debug("No data for channel '%s' cached" % channel_id)
+                self._context.log_debug('No data for channel |%s| cached' % channel_id)
                 channel_ids_to_update.append(channel_id)
             else:
-                self._context.log_debug("Found cached data for channel '%s'" % channel_id)
+                self._context.log_debug('Found cached data for channel |%s|' % channel_id)
                 result[channel_id] = channel_data
 
         if len(channel_ids_to_update) > 0:
@@ -63,10 +71,10 @@ class ResourceManager(object):
         for video_id in video_ids:
             video_data = function_cache.get_cached_only(self._get_video_data, str(video_id))
             if video_data is None:
-                self._context.log_debug("No data for video '%s' cached" % video_id)
+                self._context.log_debug('No data for video |%s| cached' % video_id)
                 video_ids_to_update.append(video_id)
             else:
-                self._context.log_debug("Found cached data for video '%s'" % video_id)
+                self._context.log_debug('Found cached data for video |%s|' % video_id)
                 result[video_id] = video_data
 
         if len(video_ids_to_update) > 0:
@@ -150,9 +158,8 @@ class ResourceManager(object):
         if channel_id != 'mine':
             item = result.get(channel_id, {})
         else:
-            for key in result:
+            for key in list(result.keys()):
                 item = result[key]
-                break
 
         if item is None:
             return {}

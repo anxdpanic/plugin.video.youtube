@@ -232,9 +232,12 @@ def _process_list_response(provider, context, json_data):
         else:
             raise kodion.KodionException("Unknown kind '%s'" % yt_kind)
 
+    use_play_data = not incognito
+
     # this will also update the channel_id_dict with the correct channel id for each video.
     channel_items_dict = {}
-    utils.update_video_infos(provider, context, video_id_dict, playlist_item_id_dict, channel_items_dict, live_details=is_upcoming)
+    utils.update_video_infos(provider, context, video_id_dict, playlist_item_id_dict, channel_items_dict,
+                             live_details=is_upcoming, use_play_data=use_play_data)
     utils.update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict)
     utils.update_channel_infos(provider, context, channel_id_dict, subscription_id_dict, channel_items_dict)
     utils.update_fanarts(provider, context, channel_items_dict)

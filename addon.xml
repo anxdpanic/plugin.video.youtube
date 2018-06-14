@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.1.0~alpha7" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.1.0~alpha8" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -32,6 +32,7 @@
 [fix] Signature function not found error for some users
 [fix] Context Menu -&gt; More -&gt; Related Videos w/ Kodi 18
 [fix] Sign In/Sign Out causing crash with Kodi 18 nightlies
+[fix] Channel 'mine' caching
 [lang] Spanish strings [roliverosc]
 [lang] Greek strings [twilight0]
         </news>
