@@ -50,9 +50,10 @@ class AbstractContext(object):
         return self._cache_path
 
     def get_playback_history(self):
-        uuid = self.get_access_manager().get_current_user_id()
-        db_file = os.path.join(os.path.join(self.get_data_path(), 'playback'), str(uuid))
-        self._playback_history = PlaybackHistory(db_file)
+        if not self._playback_history:
+            uuid = self.get_access_manager().get_current_user_id()
+            db_file = os.path.join(os.path.join(self.get_data_path(), 'playback'), str(uuid))
+            self._playback_history = PlaybackHistory(db_file)
         return self._playback_history
 
     def get_function_cache(self):
