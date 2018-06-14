@@ -14,8 +14,7 @@ class FunctionCache(Storage):
 
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
-        max_item_count = max_file_size_mb * 250
-        Storage.__init__(self, filename, max_item_count=max_item_count, max_file_size_kb=max_file_size_kb)
+        Storage.__init__(self, filename, max_file_size_kb=max_file_size_kb)
 
         self._enabled = True
 
@@ -106,16 +105,4 @@ class FunctionCache(Storage):
         return cached_data
 
     def _optimize_item_count(self):
-        clear = False
-        self._open()
-        query = 'SELECT count(*) from %s' % self._table_name
-        result = self._execute(False, query)
-        if result is not None:
-            result_one = result.fetchone()
-            if result_one is not None:
-                count = result_one[0]
-                if count >= self._max_item_count:
-                    clear = True
-        self._close()
-        if clear:
-            self._clear()
+        pass
