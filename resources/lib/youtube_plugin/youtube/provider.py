@@ -660,7 +660,7 @@ class Provider(kodion.AbstractProvider):
                             yt_video.process('rate', self, context, rating_match)
 
             if context.get_settings().get_bool('youtube.post.play.refresh', False) and \
-                    xbmc.getInfoLabel('Container.FolderPath') != context.create_uri(['kodion', 'search', 'input']):
+                    not xbmc.getInfoLabel('Container.FolderPath').startswith(context.create_uri(['kodion', 'search', 'input'])):
                 # don't refresh search input it causes request for new input, (Container.Update in abstract_provider /kodion/search/input/
                 # would resolve this but doesn't work with Remotes(Yatse))
                 context.get_ui().refresh_container()
