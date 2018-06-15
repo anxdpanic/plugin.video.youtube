@@ -1,7 +1,7 @@
 __author__ = 'bromix'
 
 from six.moves import range
-from six import string_types
+from six import string_types, PY2
 from six.moves import urllib
 
 import re
@@ -956,9 +956,9 @@ class VideoInfo(object):
         filepath = '{base_path}{video_id}.mpd'.format(base_path=basepath, video_id=video_id)
         try:
             f = xbmcvfs.File(filepath, 'w')
-            try:
+            if PY2:
                 result = f.write(out.encode('utf-8'))
-            except TypeError:
+            else:
                 result = f.write(str(out))
             f.close()
             return 'http://{ipaddress}:{port}/{video_id}.mpd' \
