@@ -30,7 +30,10 @@ class YouTubePlayer(xbmc.Player):
         use_playback_history = self.ui.get_home_window_property('playback_history') == 'true'
 
         if is_playing is not None:
-            current_played_percent = int(math.floor((self.current_played_time / self.current_video_total_time) * 100))
+            try:
+                current_played_percent = int(math.floor((self.current_played_time / self.current_video_total_time) * 100))
+            except ZeroDivisionError:
+                current_played_percent = 0
             self.context.log_debug('Playback: Total time: |{total_time}| Played time: |{time}| Played percent: |{percent}|'
                                    .format(total_time=self.current_video_total_time, time=self.current_played_time,
                                            percent=current_played_percent))

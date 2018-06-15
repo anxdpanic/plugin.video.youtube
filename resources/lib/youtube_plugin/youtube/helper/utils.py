@@ -346,7 +346,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             # subscribe to the channel of the video
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
 
-        if use_play_data and not video_data[video_id].get('liveStreamingDetails') and play_data:
+        if use_play_data and not video_data[video_id].get('liveStreamingDetails'):
             if play_data.get('play_count') is None or int(play_data.get('play_count')) == 0:
                 yt_context_menu.append_mark_watched(context_menu, provider, context, video_id)
             else:

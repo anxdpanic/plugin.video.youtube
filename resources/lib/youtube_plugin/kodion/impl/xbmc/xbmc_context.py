@@ -279,7 +279,7 @@ class XbmcContext(AbstractContext):
                 capabilities.append('live')
             if ia_loose_version >= utils.loose_version('2.2.12'):
                 capabilities.append('drm')
-            if ia_loose_version >= utils.loose_version('2.2.0'):
+            if ia_loose_version >= utils.loose_version('9999.9.9'):
                 capabilities.append('webm')
             return capabilities
         elif capability == 'live':
@@ -287,6 +287,6 @@ class XbmcContext(AbstractContext):
         elif capability == 'drm':
             return '2.2.12'
         elif capability == 'webm':
-            return '2.2.0'
+            return '9999.9.9'  # can be included, but currently unsupported
         else:
             return None
