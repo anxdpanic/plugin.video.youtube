@@ -3,14 +3,21 @@
     - Switch User folder (default: on) Settings -> Folders
     - User management (Add, Remove, Rename, Switch) Settings - Users
     - Signed in users are green, Current user has an *
+[add/upd] add data cache and optimize caching
+    - add Settings -> Maintenance -> Clear data cache/Delete data cache
+    - increase allowed cache size
+    - database accesses per 50 videos: before: 70~100 after: 4~6
+    - load time of 50 videos w/ no cached videos: before: ~11.6 secs, after: ~3 secs
+    - load time of 50 videos w/ all cached videos: before: ~0.8 secs, after: ~0.7 secs
+    - cached size per 50 videos: before ~1MB, after ~550KB
 [add] Refresh after watching (default: off) Settings -> General
 [add] Completed Live folder (default: on) Settings -> Folders
 [add] Upcoming Live folder (default: on) Settings -> Folders
 [add] My Location folder (default: on) Settings -> Advanced -> Enable setup-wizard
 [add] Play count minimum percent (default: 85%) Settings -> General -> Play count minimum percent
 [add] Playback history (default: off) Settings -> Advanced -> Use playback history
-[add] Time since published for videos as item properties Property(PublishedSince), Property(PublishedLocal) [pannal]
-[upd] YouTube UTC datetimes to local timezone [pannal]
+[add] Time since published for videos as item properties Property(PublishedSince), Property(PublishedLocal) |contrib: pannal|
+[upd] YouTube UTC datetimes to local timezone |contrib: pannal|
 [upd] Localize API key errors, provide a more descriptive notification
 [fix] My Channel videos (Error 403)
 [fix] allow fallback to dash, when using Audio only
@@ -18,8 +25,8 @@
 [fix] Context Menu -> More -> Related Videos w/ Kodi 18
 [fix] Sign In/Sign Out causing crash with Kodi 18 nightlies
 [fix] Channel 'mine' caching
-[lang] Spanish strings [roliverosc]
-[lang] Greek strings [twilight0]
+[lang] Spanish strings |contrib: roliverosc|
+[lang] Greek strings |contrib: twilight0|
 
 6.0.2
 [fix] incorrectly raised 'Proxy is not running' error
