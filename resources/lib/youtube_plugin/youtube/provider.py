@@ -138,6 +138,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.mark.watched': 30670,
                  'youtube.mark.unwatched': 30669,
                  'youtube.reset.resume.point': 30674,
+                 'youtube.data.cache': 30687
                  }
 
     def __init__(self):
@@ -224,14 +225,14 @@ class Provider(kodion.AbstractProvider):
             dev_keys = dev_config.get('main')
             if api_last_origin != dev_config.get('origin'):
                 context.log_debug('API key origin changed, clearing cache. |%s|' % dev_config.get('origin'))
-                context.get_function_cache().clear()
+                self.get_resource_manager(context).clear()
                 access_manager.set_last_origin(dev_config.get('origin'))
             self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=dev_keys)
             self._client.set_log_error(context.log_error)
         else:
             if api_last_origin != 'plugin.video.youtube':
                 context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
-                context.get_function_cache().clear()
+                self.get_resource_manager(context).clear()
                 access_manager.set_last_origin('plugin.video.youtube')
 
             access_tokens = access_manager.get_access_token().split('|')
@@ -281,7 +282,7 @@ class Provider(kodion.AbstractProvider):
                             # reset access_token
                             access_manager.update_access_token('')
                             # we clear the cache, so none cached data of an old account will be displayed.
-                            context.get_function_cache().clear()
+                            self.get_resource_manager(context).clear()
 
                     # in debug log the login status
                     self._is_logged_in = len(access_tokens) == 2
@@ -694,7 +695,7 @@ class Provider(kodion.AbstractProvider):
             access_manager.set_user(_user, switch_to=True)
             ui.show_notification(context.localize(self.LOCAL_MAP['youtube.user.changed']) % _user_name,
                                  context.localize(self.LOCAL_MAP['youtube.switch.user']))
-            context.get_function_cache().clear()
+            self.get_resource_manager(context).clear()
             if refresh:
                 if context.get_system_version().get_version()[0] <= 17:
                     ui.refresh_container()  # causes lockup/crash with Kodi 18
@@ -987,6 +988,10 @@ class Provider(kodion.AbstractProvider):
                 if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.function.cache'])):
                     context.get_function_cache().clear()
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+            elif maint_type == 'data_cache':
+                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.data.cache'])):
+                    context.get_data_cache().clear()
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
             elif maint_type == 'search_cache':
                 if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.search.history'])):
                     context.get_search_history().clear()
@@ -1019,6 +1024,7 @@ class Provider(kodion.AbstractProvider):
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
+                            'data_cache': 'data_cache.sqlite',
                             'playback_history': 'playback_history',
                             'settings_xml': 'settings.xml',
                             'api_keys': 'api_keys.json',

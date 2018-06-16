@@ -15,6 +15,7 @@ class AbstractContext(object):
         self._cache_path = None
 
         self._function_cache = None
+        self._data_cache = None
         self._search_history = None
         self._playback_history = None
         self._favorite_list = None
@@ -56,9 +57,24 @@ class AbstractContext(object):
             self._playback_history = PlaybackHistory(db_file)
         return self._playback_history
 
+    def get_data_cache(self):
+        if not self._data_cache:
+            max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, -1)
+            if max_cache_size_mb <= 0:
+                max_cache_size_mb = 5
+            else:
+                max_cache_size_mb = max_cache_size_mb / 2.0
+            self._data_cache = DataCache(os.path.join(self._get_cache_path(), 'data_cache'),
+                                         max_file_size_mb=max_cache_size_mb)
+        return self._data_cache
+
     def get_function_cache(self):
         if not self._function_cache:
-            max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, 5)
+            max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, -1)
+            if max_cache_size_mb <= 0:
+                max_cache_size_mb = 5
+            else:
+                max_cache_size_mb = max_cache_size_mb / 2.0
             self._function_cache = FunctionCache(os.path.join(self._get_cache_path(), 'cache'),
                                                  max_file_size_mb=max_cache_size_mb)
         return self._function_cache

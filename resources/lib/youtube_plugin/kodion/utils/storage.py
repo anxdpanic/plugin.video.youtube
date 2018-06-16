@@ -41,8 +41,9 @@ class Storage(object):
             if not os.path.exists(path):
                 os.makedirs(path)
 
-            self._file = sqlite3.connect(self._filename, check_same_thread=False, detect_types=sqlite3.PARSE_DECLTYPES,
-                                         timeout=1)
+            self._file = sqlite3.connect(self._filename, check_same_thread=False,
+                                         detect_types=sqlite3.PARSE_DECLTYPES, timeout=1)
+
             self._file.isolation_level = None
             self._cursor = self._file.cursor()
             self._cursor.execute('PRAGMA journal_mode=MEMORY')
@@ -139,6 +140,9 @@ class Storage(object):
         query = 'DELETE FROM %s' % self._table_name
         self._execute(True, query)
         self._create_table()
+        self._close()
+        self._open()
+        self._execute(False, 'VACUUM')
         self._close()
 
     def _is_empty(self):

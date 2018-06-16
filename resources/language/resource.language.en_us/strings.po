@@ -1023,3 +1023,15 @@ msgstr ""
 msgctxt "#30684"
 msgid "Today at"
 msgstr ""
+
+msgctxt "#30685"
+msgid "Delete data cache database"
+msgstr ""
+
+msgctxt "#30686"
+msgid "Clear data cache"
+msgstr ""
+
+msgctxt "#30687"
+msgid "data cache"
+msgstr ""
