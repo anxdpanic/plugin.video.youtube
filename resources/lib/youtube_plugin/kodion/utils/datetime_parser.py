@@ -1,8 +1,9 @@
 __author__ = 'bromix'
 
 import re
-import time as _time
-from datetime import date, datetime, timedelta, time
+import time
+from datetime import date, datetime, timedelta
+from datetime import time as dt_time
 
 from ..exceptions import KodionException
 
@@ -25,9 +26,9 @@ def parse(datetime_string, localize=True):
     time_only_match = __RE_MATCH_TIME_ONLY__.match(datetime_string)
     if time_only_match:
         return _utc_to_local(datetime.combine(date.today(),
-                                              time(hour=_to_int(time_only_match.group('hour')),
-                                                   minute=_to_int(time_only_match.group('minute')),
-                                                   second=_to_int(time_only_match.group('second'))))
+                                              dt_time(hour=_to_int(time_only_match.group('hour')),
+                                                      minute=_to_int(time_only_match.group('minute')),
+                                                      second=_to_int(time_only_match.group('second'))))
                              ).time()
 
     # match date only '2014-11-08'
@@ -89,7 +90,7 @@ local_timezone_offset = None
 def utc_to_local(dt):
     global local_timezone_offset
     if local_timezone_offset is None:
-        now = _time.time()
+        now = time.time()
         local_timezone_offset = datetime.fromtimestamp(now) - datetime.utcfromtimestamp(now)
 
     return dt + local_timezone_offset
@@ -128,8 +129,9 @@ def datetime_to_since(dt, context):
 
 
 def strptime(s, fmt="%Y-%m-%dT%H:%M:%S.%fZ"):
+    import _strptime
     try:
-        return datetime.strptime(s, fmt)
-    except TypeError:
-        # see https://forum.kodi.tv/showthread.php?tid=112916
-        return datetime(*_time.strptime(s, fmt)[:6])
+        time.strptime('01 01 2012', '%d %m %Y')  # dummy call
+    except:
+        pass
+    return datetime(*time.strptime(s, fmt)[:6])
