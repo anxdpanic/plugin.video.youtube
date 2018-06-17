@@ -20,7 +20,7 @@ class XbmcPlaylist(AbstractPlaylist):
         self._playlist.clear()
 
     def add(self, base_item):
-        item = xbmc_items.to_item(self._context, base_item)
+        item = xbmc_items.to_playback_item(self._context, base_item)
         if item:
             self._playlist.add(base_item.get_uri(), listitem=item)
 

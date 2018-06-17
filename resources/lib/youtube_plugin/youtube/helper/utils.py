@@ -89,6 +89,16 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
 
         channel_item.set_context_menu(context_menu)
 
+        fanart = u''
+        fanart_images = yt_item.get('brandingSettings', {}).get('image', {})
+        banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl', 'bannerTvImageUrl']
+        for banner in banners:
+            fanart = fanart_images.get(banner, u'')
+            if fanart:
+                break
+
+        channel_item.set_fanart(fanart)
+
         # update channel mapping
         if channel_items_dict is not None:
             if not channel_id in channel_items_dict:

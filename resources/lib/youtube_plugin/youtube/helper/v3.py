@@ -240,7 +240,8 @@ def _process_list_response(provider, context, json_data):
                              live_details=is_upcoming, use_play_data=use_play_data)
     utils.update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict)
     utils.update_channel_infos(provider, context, channel_id_dict, subscription_id_dict, channel_items_dict)
-    utils.update_fanarts(provider, context, channel_items_dict)
+    if video_id_dict or playlist_id_dict:
+        utils.update_fanarts(provider, context, channel_items_dict)
     return result
 
 
