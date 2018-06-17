@@ -170,7 +170,6 @@ def _process_description_links(provider, context, re_match):
 
         _channel_item_dict = {}
         utils.update_channel_infos(provider, context, _channel_id_dict, channel_items_dict=_channel_item_dict)
-        utils.update_fanarts(provider, context, _channel_item_dict)
 
         # clean up - remove empty entries
         _result = []
