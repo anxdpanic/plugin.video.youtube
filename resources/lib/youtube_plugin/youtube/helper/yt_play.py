@@ -34,6 +34,7 @@ def play_video(provider, context, re_match):
             return False
 
         is_video = True if video_stream.get('video') else False
+        is_live = video_stream.get('Live') is True
 
         if is_video and video_stream['video'].get('rtmpe', False):
             message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
@@ -58,7 +59,7 @@ def play_video(provider, context, re_match):
         video_item = VideoItem(title, video_stream['url'])
 
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
-        use_play_data = not screensaver and not incognito
+        use_play_data = not is_live and not screensaver and not incognito
 
         video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream, use_play_data=use_play_data)
 
@@ -71,7 +72,7 @@ def play_video(provider, context, re_match):
             except:
                 context.log_debug('Failed to set post play events.')
 
-        if not incognito and not screensaver and settings.use_playback_history():
+        if use_play_data and settings.use_playback_history():
             major_version = context.get_system_version().get_version()[0]
             if video_item.get_start_time() and video_item.use_dash() and major_version > 17:
                 context.get_ui().set_home_window_property('seek_time', video_item.get_start_time())
