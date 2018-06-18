@@ -377,7 +377,7 @@ class VideoInfo(object):
         # === Live DASH adaptive
         '9998': {'container': 'mpd',
                  'Live': True,
-                 'sort': [1080, 0],
+                 'sort': [1080, 1],
                  'title': 'Live DASH',
                  'dash/audio': True,
                  'dash/video': True,
@@ -385,7 +385,7 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}},
         # === DASH adaptive
         '9999': {'container': 'mpd',
-                 'sort': [1080, 0],
+                 'sort': [1080, 1],
                  'title': 'DASH',
                  'dash/audio': True,
                  'dash/video': True,
