@@ -1258,7 +1258,7 @@ class Provider(kodion.AbstractProvider):
             # purchases
             if settings.get_bool('youtube.folder.purchases.show', False) and \
                     settings.use_dash() and \
-                    settings.use_dash_proxy() and \
+                    settings.use_dash_videos() and \
                     'drm' in context.inputstream_adaptive_capabilities():
                 purchases_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.purchases']),
                                                context.create_uri(['special', 'purchases']),

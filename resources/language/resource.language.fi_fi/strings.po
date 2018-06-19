@@ -753,7 +753,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods"
+msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
@@ -1018,4 +1018,16 @@ msgstr ""
 
 msgctxt "#30687"
 msgid "data cache"
+msgstr ""
+
+msgctxt "#30688"
+msgid "Use for videos"
+msgstr ""
+
+msgctxt "#30689"
+msgid "Use for live streams"
+msgstr ""
+
+msgctxt "#30690"
+msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
 msgstr ""

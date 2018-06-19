@@ -23,7 +23,9 @@ SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 
 ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
-DASH_PROXY = 'kodion.mpd.proxy'  # (bool)
+DASH_VIDEOS = 'kodion.mpd.videos'  # (bool)
+DASH_LIVE_STREAMS = 'kodion.mpd.live_streams'  # (bool)
+
 HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)
 HTTPD_LISTEN = 'kodion.http.listen'  # (string)
 HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (string)

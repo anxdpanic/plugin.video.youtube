@@ -103,19 +103,26 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
         else:
             context.log_debug('Select stream: Audio only, no audio only streams found')
 
-    if use_dash:
+    dash_live = settings.use_dash_live_streams() and 'live' in context.inputstream_adaptive_capabilities()
+    dash_videos = settings.use_dash_videos()
+
+    if use_dash and any([item['container'] == 'mpd' for item in stream_data_list]):
         use_dash = context.use_inputstream_adaptive()
-
-    live_dash_supported = 'live' in context.inputstream_adaptive_capabilities()
-
-    if not live_dash_supported:
-        stream_data_list = [item for item in stream_data_list
-                            if ((item['container'] != 'mpd') or
-                                ((item['container'] == 'mpd') and
-                                 (item.get('Live') is not True)))]
 
     if not use_dash:
         stream_data_list = [item for item in stream_data_list if (item['container'] != 'mpd')]
+    else:
+        if not dash_live:
+            stream_data_list = [item for item in stream_data_list
+                                if ((item['container'] != 'mpd') or
+                                    ((item['container'] == 'mpd') and
+                                     (item.get('Live') is not True)))]
+
+        if not dash_videos:
+            stream_data_list = [item for item in stream_data_list
+                                if ((item['container'] != 'mpd') or
+                                    ((item['container'] == 'mpd') and
+                                     (item.get('Live') is True)))]
 
     def _find_best_fit_video(_stream_data):
         if audio_only:
@@ -126,16 +133,18 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data, reverse=True)
 
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
+    log_streams = list()
     for sorted_stream_data in sorted_stream_data_list:
         log_data = copy.deepcopy(sorted_stream_data)
         if 'license_info' in log_data:
             log_data['license_info']['url'] = '[not shown]' if log_data['license_info'].get('url') else None
             log_data['license_info']['token'] = '[not shown]' if log_data['license_info'].get('token') else None
-        context.log_debug('selectable stream: %s' % log_data)
+        log_streams.append(log_data)
+    context.log_debug('selectable streams: \n%s' % '\n'.join(str(stream) for stream in log_streams))
 
     selected_stream_data = None
     if ask_for_quality and len(sorted_stream_data_list) > 1:
-        items = []
+        items = list()
         for sorted_stream_data in sorted_stream_data_list:
             items.append((sorted_stream_data['title'], sorted_stream_data))
 
