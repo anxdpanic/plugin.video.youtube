@@ -82,9 +82,8 @@ def _process_select_playlist(provider, context, re_match):
     resource_manager = provider.get_resource_manager(context)
     my_playlists = resource_manager.get_related_playlists(channel_id='mine')
     if 'watchLater' in my_playlists:
-        watch_later_playlist_id = my_playlists.get('watchLater', '')
-        items.append(
-            ('[B]' + context.localize(provider.LOCAL_MAP['youtube.watch_later']) + '[/B]', watch_later_playlist_id))
+        watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
+        items.append(('[B]' + context.localize(provider.LOCAL_MAP['youtube.watch_later']) + '[/B]', watch_later_playlist_id))
 
     for playlist in playlists:
         snippet = playlist.get('snippet', {})
