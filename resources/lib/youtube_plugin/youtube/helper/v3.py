@@ -232,7 +232,7 @@ def _process_list_response(provider, context, json_data):
         else:
             raise kodion.KodionException("Unknown kind '%s'" % yt_kind)
 
-    use_play_data = not incognito
+    use_play_data = not incognito and context.get_settings().use_playback_history()
 
     # this will also update the channel_id_dict with the correct channel id for each video.
     channel_items_dict = {}
