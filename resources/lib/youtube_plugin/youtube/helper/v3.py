@@ -296,7 +296,8 @@ def handle_error(provider, context, json_data):
     if json_data and 'error' in json_data:
         open_settings = False
         message_timeout = 5000
-        message = log_message = json_data['error'].get('message', '')
+        message = kodion.utils.strip_html_from_text(json_data['error'].get('message', ''))
+        log_message = kodion.utils.strip_html_from_text(json_data['error'].get('message', ''))
         reason = json_data['error']['errors'][0].get('reason', '')
         if reason == 'keyInvalid' and message == 'Bad Request':
             message = context.localize(provider.LOCAL_MAP['youtube.api.key.incorrect'])
