@@ -1,6 +1,6 @@
 __author__ = 'bromix'
 
-from ...kodion.utils import FunctionCache, DataCache
+from ...kodion.utils import FunctionCache, DataCache, strip_html_from_text
 
 
 class ResourceManager(object):
@@ -220,6 +220,7 @@ class ResourceManager(object):
         context = self._context
         if json_data and 'error' in json_data:
             message = json_data['error'].get('message', '')
+            message = strip_html_from_text(message)
             reason = json_data['error']['errors'][0].get('reason', '')
             title = '%s: %s' % (context.get_name(), reason)
             message_timeout = 5000

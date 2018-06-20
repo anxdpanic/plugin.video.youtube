@@ -201,7 +201,7 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-notification_data = {'use_httpd': (__settings.use_dash_proxy() and
+notification_data = {'use_httpd': (__settings.use_dash_videos() and
                                    __settings.use_dash()) or
                                   (__settings.api_config_page()),
                      'httpd_port': __settings.httpd_port(),

@@ -750,8 +750,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "%s port használatban van. Nem lehet elindítani a http kiszolgálót."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods"
-msgstr "Proxy szükséges az mpeg-dash formátumhoz"
+msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgstr "Proxy szükséges az mpeg-dash formátumhoz (lásd HTTP kiszolgáló)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -1015,4 +1015,16 @@ msgstr ""
 
 msgctxt "#30687"
 msgid "data cache"
+msgstr ""
+
+msgctxt "#30688"
+msgid "Use for videos"
+msgstr ""
+
+msgctxt "#30689"
+msgid "Use for live streams"
+msgstr ""
+
+msgctxt "#30690"
+msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
 msgstr ""

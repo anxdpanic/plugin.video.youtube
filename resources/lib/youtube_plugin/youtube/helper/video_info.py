@@ -377,7 +377,7 @@ class VideoInfo(object):
         # === Live DASH adaptive
         '9998': {'container': 'mpd',
                  'Live': True,
-                 'sort': [1080, 0],
+                 'sort': [1080, 1],
                  'title': 'Live DASH',
                  'dash/audio': True,
                  'dash/video': True,
@@ -385,7 +385,7 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}},
         # === DASH adaptive
         '9999': {'container': 'mpd',
-                 'sort': [1080, 0],
+                 'sort': [1080, 1],
                  'title': 'DASH',
                  'dash/audio': True,
                  'dash/video': True,
@@ -664,7 +664,7 @@ class VideoInfo(object):
             if url:
                 stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
 
-        httpd_is_live = self._context.get_settings().use_dash_proxy() and is_httpd_live(port=self._context.get_settings().httpd_port())
+        httpd_is_live = self._context.get_settings().use_dash_videos() and is_httpd_live(port=self._context.get_settings().httpd_port())
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         s_info = dict()
         if not mpd_url and not is_live and httpd_is_live:

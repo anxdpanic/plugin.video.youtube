@@ -232,7 +232,7 @@ def _process_list_response(provider, context, json_data):
         else:
             raise kodion.KodionException("Unknown kind '%s'" % yt_kind)
 
-    use_play_data = not incognito
+    use_play_data = not incognito and context.get_settings().use_playback_history()
 
     # this will also update the channel_id_dict with the correct channel id for each video.
     channel_items_dict = {}
@@ -296,7 +296,8 @@ def handle_error(provider, context, json_data):
     if json_data and 'error' in json_data:
         open_settings = False
         message_timeout = 5000
-        message = log_message = json_data['error'].get('message', '')
+        message = kodion.utils.strip_html_from_text(json_data['error'].get('message', ''))
+        log_message = kodion.utils.strip_html_from_text(json_data['error'].get('message', ''))
         reason = json_data['error']['errors'][0].get('reason', '')
         if reason == 'keyInvalid' and message == 'Bad Request':
             message = context.localize(provider.LOCAL_MAP['youtube.api.key.incorrect'])

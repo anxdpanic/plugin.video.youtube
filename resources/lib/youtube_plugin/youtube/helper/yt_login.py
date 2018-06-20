@@ -11,7 +11,7 @@ from ...youtube.youtube_exceptions import LoginException
 def process(mode, provider, context, re_match, sign_out_refresh=True):
     def _do_logout():
         # we clear the cache, so none cached data of an old account will be displayed.
-        context.get_function_cache().clear()
+        provider.get_resource_manager(context).clear()
 
         signout_access_manager = context.get_access_manager()
         if signout_access_manager.has_refresh_token():
@@ -116,7 +116,7 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         expires_in = min(expires_in_tv, expires_in_kodi)
 
         # we clear the cache, so none cached data of an old account will be displayed.
-        context.get_function_cache().clear()
+        provider.get_resource_manager(context).clear()
 
         provider.reset_client()
         context.get_access_manager().update_access_token(access_token, expires_in, refresh_token)

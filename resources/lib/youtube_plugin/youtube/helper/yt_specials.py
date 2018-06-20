@@ -53,13 +53,15 @@ def _process_browse_channels(provider, context, re_match):
 
     page_token = context.get_param('page_token', '')
     guide_id = context.get_param('guide_id', '')
+    client = provider.get_client(context)
+
     if guide_id:
-        json_data = provider.get_client(context).get_guide_category(guide_id)
+        json_data = client.get_guide_category(guide_id)
         if not v3.handle_error(provider, context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
     else:
-        json_data = provider.get_client(context).get_guide_categories()
+        json_data = context.get_function_cache().get(kodion.utils.FunctionCache.ONE_MONTH, client.get_guide_categories)
         if not v3.handle_error(provider, context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
@@ -105,11 +107,13 @@ def _process_description_links(provider, context, re_match):
 
     def _extract_urls(_video_id):
         provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        url_resolver = UrlResolver(context)
 
         result = []
 
-        progress_dialog = context.get_ui().create_progress_dialog(
-            heading=context.localize(kodion.constants.localize.COMMON_PLEASE_WAIT), background=False)
+        progress_dialog = \
+            context.get_ui().create_progress_dialog(heading=context.localize(kodion.constants.localize.COMMON_PLEASE_WAIT),
+                                                    background=False)
 
         resource_manager = provider.get_resource_manager(context)
 
@@ -118,11 +122,10 @@ def _process_description_links(provider, context, re_match):
         snippet = yt_item['snippet']  # crash if not conform
         description = kodion.utils.strip_html_from_text(snippet['description'])
 
-        urls = extract_urls(description)
+        urls = context.get_function_cache().get(kodion.utils.FunctionCache.ONE_WEEK, extract_urls, description)
 
         progress_dialog.set_total(len(urls))
 
-        url_resolver = UrlResolver(context)
         res_urls = []
         for url in urls:
             context.log_debug('Resolving url "%s"' % url)
@@ -289,10 +292,7 @@ def _process_new_uploaded_videos_tv_filtered(provider, context, re_match):
 
 
 def process(category, provider, context, re_match):
-    result = []
-
-    # we need a login
-    client = provider.get_client(context)
+    client = provider.get_client(context)  # required for provider.is_logged_in()
     if not provider.is_logged_in() and category in ['new_uploaded_videos_tv', 'new_uploaded_videos_tv_filtered', 'disliked_videos']:
         return UriItem(context.create_uri(['sign', 'in']))
 

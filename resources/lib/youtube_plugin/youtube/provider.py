@@ -9,7 +9,7 @@ from base64 import b64decode
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
-from ..kodion.utils import FunctionCache
+from ..kodion.utils import FunctionCache, strip_html_from_text
 from ..kodion.items import *
 from ..youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
@@ -1258,7 +1258,7 @@ class Provider(kodion.AbstractProvider):
             # purchases
             if settings.get_bool('youtube.folder.purchases.show', False) and \
                     settings.use_dash() and \
-                    settings.use_dash_proxy() and \
+                    settings.use_dash_videos() and \
                     'drm' in context.inputstream_adaptive_capabilities():
                 purchases_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.purchases']),
                                                context.create_uri(['special', 'purchases']),
@@ -1419,17 +1419,19 @@ class Provider(kodion.AbstractProvider):
             failed_refresh = False
             context.get_access_manager().update_access_token('')
 
-            msg = message = exception_to_handle.get_message()
+            message = exception_to_handle.get_message()
+            msg = exception_to_handle.get_message()
+            log_message = exception_to_handle.get_message()
+
             error = ''
             code = ''
-            log_message = message
             if isinstance(msg, dict):
                 if 'error_description' in msg:
-                    message = msg['error_description']
-                    log_message = message
+                    message = strip_html_from_text(msg['error_description'])
+                    log_message = strip_html_from_text(msg['error_description'])
                 elif 'message' in msg:
-                    message = msg['message']
-                    log_message = message
+                    message = strip_html_from_text(msg['message'])
+                    log_message = strip_html_from_text(msg['message'])
 
                 if 'error' in msg:
                     error = msg['error']
