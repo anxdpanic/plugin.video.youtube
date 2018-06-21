@@ -40,8 +40,9 @@
 [fix] Context Menu -&gt; More -&gt; Related Videos w/ Kodi 18
 [fix] Sign In/Sign Out causing crash with Kodi 18 nightlies
 [fix] Channel 'mine' caching
-[lang] Spanish strings |contrib: roliverosc|
-[lang] Greek strings |contrib: twilight0|
+[lang] es_es strings |contrib: roliverosc|
+[lang] el_gr strings |contrib: twilight0|
+[lang] nl_nl strings |contrib: Markman-B|
         </news>
         <assets>
             <icon>icon.png</icon>
