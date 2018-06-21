@@ -235,7 +235,7 @@ msgstr "Verwijder \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr "Wis"
+msgstr "Verwijder"
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -645,11 +645,11 @@ msgstr "Miniatuur formaat"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr "Medium"
+msgstr "Medium (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr "Hoog"
+msgstr "Hoog (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -753,11 +753,11 @@ msgstr "Gebruik MPEG Dash proxy"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr "Port"
+msgstr "Poort"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "Port %s al in gebruik. Kan de http server niet starten."
+msgstr "Poort %s al in gebruik. Kan de http server niet starten."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
@@ -849,99 +849,99 @@ msgstr "Verwijder access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Monitor op IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Selecteer monitor IP "
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Ververs na bekijken"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Aankomend Live"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Live Afgerond"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "API Sleutel is onjuist. Instellingen - API - API Sleutel"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "Client ID is onjuist. Instellingen - API - API ID"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "Client Geheim is onjuist. Instellingen - API - Geheim"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Locatie"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Straal locatie (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "Geoloactie uitvoeren? Gebruikt voor [B]Mijn Lokatie[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Mijn Lokatie"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Wissel van Gebruiker"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Nieuwe Gebruiker"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Zonder Naam"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Voer een naam in voor deze gebruiker"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Gebruiker is nu '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Gebruikers"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Gebruiker toevoegen"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Gebruiker verwijderen"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Gebruiker hernoemen"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Wissel van Gebruiker"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Verander naar '%s'?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "'%s' verwijderd"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
