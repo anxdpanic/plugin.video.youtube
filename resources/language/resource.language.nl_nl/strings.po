@@ -849,11 +849,11 @@ msgstr "Verwijder access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr "Monitor op IP"
+msgstr "Luister op IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr "Selecteer monitor IP "
+msgstr "Selecteer luister IP "
 
 msgctxt "#30645"
 msgid "Refresh after watching"
@@ -945,7 +945,7 @@ msgstr "'%s' verwijderd"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "'%s' hernoemd naar '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -953,19 +953,19 @@ msgstr ""
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Markeer als onbekeken"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Markeer als bekeken"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Wis afspeelgeschiedenis"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "Verwijder afspeelgeschiedenis"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -973,31 +973,31 @@ msgstr ""
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Reset afspelen hervatten"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Gebruik afspeelgeschiedenis (bekeken,hetvatten)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Alleen nu"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Een minuut geleden"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Onlangs"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Een uur geleden"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Twee uur geleden"
 
 msgctxt "#30681"
 msgid "Three hours ago"
@@ -1005,36 +1005,36 @@ msgstr ""
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Gisteren om"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Twee dagen geleden"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Vandaag om"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Verwijder datacache database"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Datacache wissen"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "datacache"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Gebruik voor video's"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Gebruik voor livestreams"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "InputStream Adaptive >=2.0.12 vereist voor livestreams"
