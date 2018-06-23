@@ -956,92 +956,92 @@ msgstr "Αλλαγή '%s' σε '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Ελάχιστο ποσοστό καταμέτρησης αναπαραγωγής"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Σημείωση ως μη προβεβλημένο"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Σημείωση ως προβεβλημένο"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Εκκαθάριση ιστορικού αναπαραγωγής"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "Διαγραφή ιστορικού αναπαραγωγής"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "ιστορικό αναπαραγωγής"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Επαναφορά σημείου συνέχισης"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Κάνε χρήση ιστορικού (προβληθέντα, συνέχιση παρακολούθησης)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Μόλις τώρα"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Ένα λεπτό πριν"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Πρόσφατα"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Μία ώρα πριν"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Δύο ώρες πριν"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Τρεις ώρες πριν"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Εχθές σε"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Δύο μέρες πριν"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Σήμερα σε"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Διαγραφή βάσης δεδομένων δεδομένων μνήμης"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Εκκαθάριση δεδομένων μνήμης"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "δεδομένα μνήμης"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Κάνε χρήση για βίντεο"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Κάνε χρήση για ζωντανές ροές"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "Απαιτείται InputStream Adaptive >= 2.0.12 για τις ζωντανές ροές"
