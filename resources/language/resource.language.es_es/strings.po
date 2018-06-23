@@ -108,7 +108,7 @@ msgstr "Tamaño historial de búsqueda"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr "Tamaño para cache de funciones (MB)"
+msgstr "Tamaño para caché de funciones (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -266,7 +266,7 @@ msgstr "API Key"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr "API Id"
+msgstr "API ID"
 
 msgctxt "#30203"
 msgid "API Secret"
@@ -337,7 +337,7 @@ msgstr "Explorar Canales"
 
 msgctxt "#30513"
 msgid "Popular right now"
-msgstr "Popular en YouTube"
+msgstr "Popular en este momento"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -345,7 +345,7 @@ msgstr "Vídeos relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto-eliminar de 'Ver más tarde'"
+msgstr "Auto-Eliminar de 'Ver más tarde'"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -441,7 +441,7 @@ msgstr "No me gustó el vídeo"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "En Directo"
+msgstr "En directo"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -453,11 +453,11 @@ msgstr "Mostrar nombre del canal en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "Los streams rtmpe no están soportados"
+msgstr "Los streams rtmpe no son compatibles"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr "Actualizar lista"
+msgstr "Refrescar lista"
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -465,7 +465,7 @@ msgstr "Enlaces en la descripción"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "No se encontraron enlaces"
+msgstr "No se encontraron enlaces."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
@@ -473,7 +473,7 @@ msgstr "Por favor, inicie sesión dos veces!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Para que el add-on YouTube funcione correctamente se deben habilitar dos sesiones."
+msgstr "Debe habilitar dos aplicaciones para que YouTube funcione correctamente."
 
 msgctxt "#30548"
 msgid "More..."
@@ -497,7 +497,7 @@ msgstr "Mantenimiento"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr "Eliminar base de datos para cache de funciones"
+msgstr "Eliminar base de datos para caché de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
@@ -513,7 +513,7 @@ msgstr "Limpiar historial de búsqueda"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr "cache para funciones"
+msgstr "caché para funciones"
 
 msgctxt "#30558"
 msgid "search history"
@@ -537,11 +537,11 @@ msgstr "Todos"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr "Ajustes"
+msgstr "Configuración"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr "Ajustes, Inglés"
+msgstr "Configuración, Inglés"
 
 msgctxt "#30565"
 msgid "English"
@@ -585,7 +585,7 @@ msgstr "¿Está seguro de que quiere remplazar su actual lista 'Historial' por '
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr "Realizado Correctamente"
+msgstr "Realizado correctamente"
 
 msgctxt "#30576"
 msgid "Failed"
@@ -693,7 +693,7 @@ msgstr "%s con %s como respaldo"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr "sin autogenerado"
+msgstr "Sin autogenerado"
 
 msgctxt "#30603"
 msgid "Age gate"
@@ -765,11 +765,11 @@ msgstr "Puerto"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servicio HTTP"
+msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr "Para VODs mpeg-dash es necesario proxy (ver Servidor HTTP)"
+msgstr "Para mpeg-dash VODs es necesario proxy (ver Servidor HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -785,7 +785,7 @@ msgstr "Es necesario Kodi 17 o superior"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr "InputStream Helper ya está instalado"
+msgstr "InputStream Helper ya está instalado."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
@@ -865,15 +865,15 @@ msgstr "Seleccionar IP a la escucha"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr "Actualizar después de ver"
+msgstr "Refrescar después de ver"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr "Próximamente en Directo"
+msgstr "En directo próximamente"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Emisiones en directo recientes"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
@@ -897,7 +897,7 @@ msgstr "Radio de ubicación (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "¿Desea usar la geolocalización? Sera usado para [B]Mi Ubicación[/B]"
+msgstr "¿Desea usar la geolocalización? Será usado para [B]Mi Ubicación[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -925,7 +925,7 @@ msgstr "El nombre de usuario es ahora '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr "usuarios"
+msgstr "Usuarios"
 
 msgctxt "#30661"
 msgid "Add a user"
@@ -933,7 +933,7 @@ msgstr "Añadir un usuario"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr "Suprimir un usuario"
+msgstr "Eliminar un usuario"
 
 msgctxt "#30663"
 msgid "Rename a user"
@@ -949,7 +949,7 @@ msgstr "¿Desea cambiar a '%s' ahora?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr "Suprimir '%s'"
+msgstr "Eliminado '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -957,92 +957,92 @@ msgstr "Renombrar '$s' a '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Porcentaje mínimo para conciderar reproducido"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Marcar como no visto"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Marcar como visto"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Limpiar historial de reproducción"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "Eliminar historial de reproducción"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "historial de reproducción"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Restablecer punto de reanudación"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Usar historial de reproducción (visto, punto de reanudación)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Justo ahora"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Hace un minuto"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Recientemente"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Hace una hora"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Hace dos horas"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Hace tres horas"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Ayer a las"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Hace dos días"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Hoy a las"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Eliminar base de datos para caché de datos"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Limpiar caché de datos"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "caché de datos"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Usar para vídeos"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Usar para streams en directo"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "Para emisiones en directo es necesario InputStream Adaptive 2.0.12 o superior"
