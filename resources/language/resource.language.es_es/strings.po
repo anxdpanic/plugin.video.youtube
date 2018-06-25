@@ -629,7 +629,7 @@ msgstr "Lista de canales filtrados (utilice comas como separador)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr "Lista Negra"
+msgstr "Lista negra"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
@@ -957,7 +957,7 @@ msgstr "Renombrar '$s' a '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr "Porcentaje mínimo para conciderar reproducido"
+msgstr "Porcentaje mínimo total para reproducir"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
@@ -985,7 +985,7 @@ msgstr "Restablecer punto de reanudación"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr "Usar historial de reproducción (visto, punto de reanudación)"
+msgstr "Usar historial de reproducción (visto, seguimiento de reanudación)"
 
 msgctxt "#30676"
 msgid "Just now"
