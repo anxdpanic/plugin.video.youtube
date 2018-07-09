@@ -852,7 +852,7 @@ class VideoInfo(object):
         out = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
               '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" ' + \
               'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" ' + \
-              'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration + 'S" type="static" availabilityStartTime="2001-12-17T09:40:57Z" profiles="urn:mpeg:dash:profile:isoff-main:2011">\n'
+              'minBufferTime="PT1.5S" mediaPresentationDuration="PT' + duration + 'S" type="static" profiles="urn:mpeg:dash:profile:isoff-main:2011">\n'
         out += '\t<Period>\n'
 
         n = 0
