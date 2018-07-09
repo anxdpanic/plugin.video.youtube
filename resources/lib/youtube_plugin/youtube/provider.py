@@ -1432,6 +1432,9 @@ class Provider(kodion.AbstractProvider):
                 elif 'message' in msg:
                     message = strip_html_from_text(msg['message'])
                     log_message = strip_html_from_text(msg['message'])
+                else:
+                    message = 'No error message'
+                    log_message = 'No error message'
 
                 if 'error' in msg:
                     error = msg['error']
