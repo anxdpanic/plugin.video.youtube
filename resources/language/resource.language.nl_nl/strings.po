@@ -937,7 +937,7 @@ msgstr "Wissel van Gebruiker"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr "Verander naar '%s'?"
+msgstr "Schakel nu om naar '%s'?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
@@ -949,7 +949,7 @@ msgstr "'%s' hernoemd naar '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Afspeel minimum percentage"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
@@ -969,11 +969,11 @@ msgstr "Verwijder afspeelgeschiedenis"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "Afspeelgeschiedenis"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr "Reset afspelen hervatten"
+msgstr "Afspeelpunt resetten"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
@@ -1001,7 +1001,7 @@ msgstr "Twee uur geleden"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Drie uur geleden"
 
 msgctxt "#30682"
 msgid "Yesterday at"
