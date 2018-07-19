@@ -12,6 +12,7 @@ class VideoItem(BaseItem):
         self._genre = None
         self._aired = None
         self._aired_utc = None
+        self._scheduled_start_utc = None
         self._duration = None
         self._director = None
         self._premiered = None
@@ -163,6 +164,12 @@ class VideoItem(BaseItem):
 
     def set_aired_from_datetime(self, date_time):
         self.set_aired(year=date_time.year, month=date_time.month, day=date_time.day)
+
+    def set_scheduled_start_utc(self, dt):
+        self._scheduled_start_utc = dt
+
+    def get_scheduled_start_utc(self):
+        return self._scheduled_start_utc
 
     def get_aired(self):
         return self._aired

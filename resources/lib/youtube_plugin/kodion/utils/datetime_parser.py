@@ -102,6 +102,8 @@ def datetime_to_since(dt, context):
     yesterday = now - timedelta(days=1)
     yyesterday = now - timedelta(days=2)
     use_yesterday = (now - yesterday).total_seconds() > 10800
+    today = now.date()
+    tomorrow = today + timedelta(days=1)
     seconds = diff.total_seconds()
 
     if seconds > 0:
@@ -125,6 +127,23 @@ def datetime_to_since(dt, context):
             return u' '.join([context.localize('30684'), context.format_time(dt)])
         elif 86400 <= seconds < 172800:
             return u' '.join([context.localize('30682'), context.format_time(dt)])
+    else:
+        seconds *= -1
+        if seconds < 60:
+            return context.localize('30691')
+        elif 60 <= seconds < 120:
+            return context.localize('30692')
+        elif 120 <= seconds < 3600:
+            return context.localize('30693')
+        elif 3600 <= seconds < 7200:
+            return context.localize('30694')
+        elif 7200 <= seconds < 10800:
+            return context.localize('30695')
+        elif dt.date() == today:
+            return u' '.join([context.localize('30696'), context.format_time(dt)])
+        elif dt.date() == tomorrow:
+            return u' '.join([context.localize('30697'), context.format_time(dt)])
+
     return u' '.join([context.format_date_short(dt), context.format_time(dt)])
 
 

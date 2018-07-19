@@ -105,9 +105,11 @@ def to_video_item(context, video_item):
 
     item.setProperty(u'IsPlayable', u'true')
 
-    publishedAt = video_item.get_aired_utc()
-    if publishedAt:
-        local_dt = utils.datetime_parser.utc_to_local(publishedAt)
+    published_at = video_item.get_aired_utc()
+    scheduled_start = video_item.get_scheduled_start_utc()
+    use_dt = scheduled_start or published_at
+    if use_dt:
+        local_dt = utils.datetime_parser.utc_to_local(use_dt)
         item.setProperty(u'PublishedSince',
                          utils.to_unicode(utils.datetime_parser.datetime_to_since(local_dt, context)))
         item.setProperty(u'PublishedLocal', str(local_dt))

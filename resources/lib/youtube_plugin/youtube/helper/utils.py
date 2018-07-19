@@ -228,6 +228,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         scheduled_start = video_data[video_id].get('liveStreamingDetails', {}).get('scheduledStartTime')
         if scheduled_start:
             datetime = utils.datetime_parser.parse(scheduled_start)
+            video_item.set_scheduled_start_utc(datetime)
             start_date, start_time = utils.datetime_parser.get_scheduled_start(datetime)
             if start_date:
                 title = u'({live} {date}@{time}) {title}' \
