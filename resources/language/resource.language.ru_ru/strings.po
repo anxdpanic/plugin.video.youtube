@@ -1038,3 +1038,31 @@ msgstr ""
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
 msgstr ""
+
+msgctxt "#30691"
+msgid "Airing now"
+msgstr ""
+
+msgctxt "#30692"
+msgid "In a minute"
+msgstr ""
+
+msgctxt "#30693"
+msgid "Airing soon"
+msgstr ""
+
+msgctxt "#30694"
+msgid "In over an hour"
+msgstr ""
+
+msgctxt "#30695"
+msgid "In over two hours"
+msgstr ""
+
+msgctxt "#30696"
+msgid "Airing today at"
+msgstr ""
+
+msgctxt "#30697"
+msgid "Tomorrow at"
+msgstr ""
