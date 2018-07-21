@@ -88,7 +88,7 @@ class XbmcContext(AbstractContext):
         if isinstance(_time_obj, datetime.time):
             _time_obj = datetime.time(_time_obj.hour, _time_obj.minute, _time_obj.second)
 
-        return _time_obj.strftime(time_format)
+        return _time_obj.strftime(time_format.replace("%H%H", "%H"))
 
     def get_language(self):
         """
