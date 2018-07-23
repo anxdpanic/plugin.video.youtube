@@ -33,6 +33,7 @@ class VideoItem(BaseItem):
         self._last_played = None
         self._start_percent = None
         self._start_time = None
+        self._live = False
         self.subtitles = None
         self._headers = None
         self.license_key = None
@@ -170,6 +171,14 @@ class VideoItem(BaseItem):
 
     def get_scheduled_start_utc(self):
         return self._scheduled_start_utc
+
+    @property
+    def live(self):
+        return self._live
+
+    @live.setter
+    def live(self, value):
+        self._live = value
 
     def get_aired(self):
         return self._aired
