@@ -195,7 +195,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         snippet = yt_item['snippet']  # crash if not conform
         play_data = yt_item['play_data']
-        is_live = True if snippet.get('liveBroadcastContent') == 'live' else False
+        is_live = video_item.live = True if snippet.get('liveBroadcastContent') == 'live' else False
 
         # set mediatype
         video_item.set_mediatype('video')  # using video
