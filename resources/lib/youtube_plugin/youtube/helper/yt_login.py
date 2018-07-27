@@ -9,21 +9,36 @@ from ...youtube.youtube_exceptions import LoginException
 
 
 def process(mode, provider, context, re_match, sign_out_refresh=True):
+    addon_id = context.get_param('addon_id', None)
+
     def _do_logout():
         # we clear the cache, so none cached data of an old account will be displayed.
         provider.get_resource_manager(context).clear()
 
         signout_access_manager = context.get_access_manager()
-        if signout_access_manager.has_refresh_token():
-            refresh_tokens = signout_access_manager.get_refresh_token().split('|')
-            refresh_tokens = list(set(refresh_tokens))
-            for _refresh_token in refresh_tokens:
-                provider.get_client(context).revoke(_refresh_token)
+        if addon_id:
+            if signout_access_manager.developer_has_refresh_token(addon_id):
+                refresh_tokens = signout_access_manager.get_dev_refresh_token(addon_id).split('|')
+                refresh_tokens = list(set(refresh_tokens))
+                for _refresh_token in refresh_tokens:
+                    provider.get_client(context).revoke(_refresh_token)
+        else:
+            if signout_access_manager.has_refresh_token():
+                refresh_tokens = signout_access_manager.get_refresh_token().split('|')
+                refresh_tokens = list(set(refresh_tokens))
+                for _refresh_token in refresh_tokens:
+                    provider.get_client(context).revoke(_refresh_token)
+
         provider.reset_client()
-        signout_access_manager.update_access_token(access_token='', refresh_token='')
+
+        if addon_id:
+            signout_access_manager.update_dev_access_token(addon_id, access_token='', refresh_token='')
+        else:
+            signout_access_manager.update_access_token(access_token='', refresh_token='')
 
     def _do_login(_for_tv=False):
         _client = provider.get_client(context)
+
         try:
             if _for_tv:
                 json_data = _client.request_device_and_user_code_tv()
@@ -32,6 +47,7 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         except LoginException:
             _do_logout()
             raise
+
         interval = int(json_data.get('interval', 5)) * 1000
         if interval > 60000:
             interval = 5000
@@ -89,6 +105,7 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         _do_logout()
         if sign_out_refresh:
             context.get_ui().refresh_container()
+
     elif mode == 'in':
         context.get_ui().on_ok(context.localize(provider.LOCAL_MAP['youtube.sign.twice.title']),
                                context.localize(provider.LOCAL_MAP['youtube.sign.twice.text']))
@@ -98,7 +115,10 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         context.log_debug('YouTube-TV Login: Access Token |%s| Refresh Token |%s| Expires |%s|' % (access_token_tv != '', refresh_token_tv != '', expires_in_tv))
         if not access_token_tv and not refresh_token_tv:
             provider.reset_client()
-            context.get_access_manager().update_access_token('')
+            if addon_id:
+                context.get_access_manager().update_dev_access_token(addon_id, '')
+            else:
+                context.get_access_manager().update_access_token('')
             context.get_ui().refresh_container()
             return
 
@@ -107,7 +127,10 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         context.log_debug('YouTube-Kodi Login: Access Token |%s| Refresh Token |%s| Expires |%s|' % (access_token_kodi != '', refresh_token_kodi != '', expires_in_kodi))
         if not access_token_kodi and not refresh_token_kodi:
             provider.reset_client()
-            context.get_access_manager().update_access_token('')
+            if addon_id:
+                context.get_access_manager().update_dev_access_token(addon_id, '')
+            else:
+                context.get_access_manager().update_access_token('')
             context.get_ui().refresh_container()
             return
 
@@ -119,5 +142,10 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         provider.get_resource_manager(context).clear()
 
         provider.reset_client()
-        context.get_access_manager().update_access_token(access_token, expires_in, refresh_token)
+
+        if addon_id:
+            context.get_access_manager().update_dev_access_token(addon_id, access_token, expires_in, refresh_token)
+        else:
+            context.get_access_manager().update_access_token(access_token, expires_in, refresh_token)
+
         context.get_ui().refresh_container()

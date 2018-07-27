@@ -2,7 +2,11 @@ from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 
 
-def get_core_components(addon_id=None):
+def __get_core_components(addon_id=None):
+    """
+    :param addon_id: addon id associated with developer keys to use for requests
+    :return: addon provider, context and client 
+    """
     provider = Provider()
     if addon_id is not None:
         context = Context(params={'addon_id': addon_id}, plugin_id='plugin.video.youtube')
@@ -30,7 +34,7 @@ def v3_request(method='GET', headers=None, path=None, post_data=None, params=Non
         :param addon_id: addon id associated with developer keys to use for requests
         :type addon_id: str
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
     return client._perform_v3_request(method=method, headers=headers, path=path, post_data=post_data, params=params, allow_redirects=allow_redirects)
 
 
@@ -52,7 +56,7 @@ def get_videos(video_id, addon_id=None):
                 see also https://developers.google.com/youtube/v3/docs/videos#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     json_data = client.get_videos(video_id)
     if not handle_error(context, json_data):
@@ -76,7 +80,7 @@ def get_activities(channel_id, page_token='', all_pages=False, addon_id=None):
              last item contains nextPageToken
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     items = []
 
@@ -117,7 +121,7 @@ def get_playlist_items(playlist_id, page_token='', all_pages=False, addon_id=Non
              last item contains nextPageToken
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     items = []
 
@@ -153,7 +157,7 @@ def get_channel_id(channel_name, addon_id=None):
                 see also https://developers.google.com/youtube/v3/docs/channels#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     json_data = client.get_channel_by_username(channel_name)
     if not handle_error(context, json_data):
@@ -173,7 +177,7 @@ def get_channels(channel_id, addon_id=None):
                 see also https://developers.google.com/youtube/v3/docs/channels#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     json_data = client.get_channels(channel_id)
     if not handle_error(context, json_data):
@@ -193,7 +197,7 @@ def get_channel_sections(channel_id, addon_id=None):
                 see also https://developers.google.com/youtube/v3/docs/channelSections#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     json_data = client.get_channel_sections(channel_id)
     if not handle_error(context, json_data):
@@ -218,7 +222,7 @@ def get_playlists_of_channel(channel_id, page_token='', all_pages=False, addon_i
              last item contains nextPageToken
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     items = []
 
@@ -254,7 +258,7 @@ def get_playlists(playlist_id, addon_id=None):
                 see also https://developers.google.com/youtube/v3/docs/playlists#resource
     :rtype: list of dict
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     json_data = client.get_playlists(playlist_id)
     if not handle_error(context, json_data):
@@ -278,7 +282,7 @@ def get_related_videos(video_id, page_token='', addon_id=None):
     :rtype: list of dict
     :note: this is a search api request with high cost
     """
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     items = []
 
@@ -328,7 +332,7 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
     :note: this is a search api request with high cost
     """
     search_type = search_type or ['video', 'channel', 'playlist']
-    provider, context, client = get_core_components(addon_id)
+    provider, context, client = __get_core_components(addon_id)
 
     items = []
 

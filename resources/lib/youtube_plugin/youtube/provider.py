@@ -162,7 +162,7 @@ class Provider(kodion.AbstractProvider):
         _dev_config = context.get_ui().get_home_window_property('configs')
         context.get_ui().clear_home_window_property('configs')
 
-        dev_config = None
+        dev_config = dict()
         if _dev_config is not None:
             context.log_debug('Using window property for developer keys is deprecated, instead use the youtube_registration module.')
             try:
@@ -172,7 +172,7 @@ class Provider(kodion.AbstractProvider):
         if not dev_config and addon_id and dev_configs:
             dev_config = dev_configs.get(addon_id)
 
-        if dev_config is not None and not context.get_settings().allow_dev_keys():
+        if dev_config and not context.get_settings().allow_dev_keys():
             context.log_debug('Developer config ignored')
             return None
         elif dev_config:
@@ -181,7 +181,7 @@ class Provider(kodion.AbstractProvider):
                     or not dev_config['main'].get('id') or not dev_config['main'].get('secret'):
                 context.log_error('Error loading developer config: |invalid structure| '
                                   'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
-                return None
+                return dict()
             else:
                 dev_origin = dev_config['origin']
                 dev_main = dev_config['main']
@@ -197,7 +197,7 @@ class Provider(kodion.AbstractProvider):
                 context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
                 return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
         else:
-            return None
+            return dict()
 
     def reset_client(self):
         self._client = None
@@ -221,88 +221,136 @@ class Provider(kodion.AbstractProvider):
         dev_id = context.get_param('addon_id', None)
         dev_configs = YouTube.CONFIGS.get('developer')
         dev_config = self.get_dev_config(context, dev_id, dev_configs)
+        dev_keys = dict()
         if dev_config:
             dev_keys = dev_config.get('main')
-            if api_last_origin != dev_config.get('origin'):
-                context.log_debug('API key origin changed, clearing cache. |%s|' % dev_config.get('origin'))
+
+        client = None
+        refresh_tokens = list()
+
+        if dev_id:
+            dev_origin = dev_config.get('origin') if dev_config.get('origin') else dev_id
+            if api_last_origin != dev_origin:
+                context.log_debug('API key origin changed, clearing cache. |%s|' % dev_origin)
+                access_manager.set_last_origin(dev_origin)
                 self.get_resource_manager(context).clear()
-                access_manager.set_last_origin(dev_config.get('origin'))
-            self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=dev_keys)
-            self._client.set_log_error(context.log_error)
         else:
             if api_last_origin != 'plugin.video.youtube':
                 context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
-                self.get_resource_manager(context).clear()
                 access_manager.set_last_origin('plugin.video.youtube')
+                self.get_resource_manager(context).clear()
 
+        if dev_id:
+            access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
+            if len(access_tokens) != 2 or access_manager.is_dev_access_token_expired(dev_id):
+                # reset access_token
+                access_manager.update_dev_access_token(dev_id, '')
+                access_tokens = list()
+        else:
             access_tokens = access_manager.get_access_token().split('|')
             if len(access_tokens) != 2 or access_manager.is_access_token_expired():
                 # reset access_token
                 access_manager.update_access_token('')
-                # we clear the cache, so none cached data of an old account will be displayed.
-                # context.get_function_cache().clear()
-                # reset the client
-                self._client = None
+                access_tokens = list()
 
-            if not self._client:
-                context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
+        if dev_id:
+            if dev_keys:
+                context.log_debug('Selecting YouTube developer config "%s"' % dev_id)
+            else:
+                context.log_debug('Selecting YouTube config "%s" w/ developer access tokens' % youtube_config['system'])
 
-                if access_manager.has_refresh_token():
-                    if YouTube.api_keys_changed:
-                        context.log_warning('API key set changed: Resetting client and updating access token')
-                        self.reset_client()
-                        access_manager.update_access_token(access_token='', refresh_token='')
-
-                    access_tokens = access_manager.get_access_token()
-                    if access_tokens:
-                        access_tokens = access_tokens.split('|')
-
-                    refresh_tokens = access_manager.get_refresh_token()
-                    if refresh_tokens:
-                        refresh_tokens = refresh_tokens.split('|')
-                    context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
-                    # create a new access_token
-                    client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
-                    if len(access_tokens) != 2 and len(refresh_tokens) == 2:
-                        try:
-
-                            access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
-
-                            access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
-
-                            access_tokens = [access_token_tv, access_token_kodi]
-
-                            access_token = '%s|%s' % (access_token_tv, access_token_kodi)
-                            expires_in = min(expires_in_tv, expires_in_kodi)
-
-                            access_manager.update_access_token(access_token, expires_in)
-                        except LoginException as ex:
-                            self.handle_exception(context, ex)
-                            access_tokens = ['', '']
-                            # reset access_token
-                            access_manager.update_access_token('')
-                            # we clear the cache, so none cached data of an old account will be displayed.
-                            self.get_resource_manager(context).clear()
-
-                    # in debug log the login status
-                    self._is_logged_in = len(access_tokens) == 2
-                    if self._is_logged_in:
-                        context.log_debug('User is logged in')
-                    else:
-                        context.log_debug('User is not logged in')
-
-                    if len(access_tokens) == 0:
-                        access_tokens = ['', '']
-                    client.set_access_token(access_token=access_tokens[1])
-                    client.set_access_token_tv(access_token_tv=access_tokens[0])
-                    self._client = client
-                    self._client.set_log_error(context.log_error)
+            if access_manager.developer_has_refresh_token(dev_id):
+                if dev_keys:
+                    keys_changed = access_manager.dev_keys_changed(dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret'])
                 else:
-                    self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config)
-                    self._client.set_log_error(context.log_error)
+                    keys_changed = access_manager.dev_keys_changed(dev_id, youtube_config['key'], youtube_config['id'], youtube_config['secret'])
 
-                    # in debug log the login status
-                    context.log_debug('User is not logged in')
+                if keys_changed:
+                    context.log_warning('API key set changed: Resetting client and updating access token')
+                    self.reset_client()
+                    access_manager.update_dev_access_token(dev_id, access_token='', refresh_token='')
+
+                access_tokens = access_manager.get_dev_access_token(dev_id)
+                if access_tokens:
+                    access_tokens = access_tokens.split('|')
+
+                refresh_tokens = access_manager.get_dev_refresh_token(dev_id)
+                if refresh_tokens:
+                    refresh_tokens = refresh_tokens.split('|')
+                context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
+                # create a new access_token
+
+            if dev_keys:
+                client = YouTube(language=language, region=region, items_per_page=items_per_page, config=dev_keys)
+            else:
+                client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
+
+        else:
+            context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
+
+            if access_manager.has_refresh_token():
+                if YouTube.api_keys_changed:
+                    context.log_warning('API key set changed: Resetting client and updating access token')
+                    self.reset_client()
+                    access_manager.update_access_token(access_token='', refresh_token='')
+
+                access_tokens = access_manager.get_access_token()
+                if access_tokens:
+                    access_tokens = access_tokens.split('|')
+
+                refresh_tokens = access_manager.get_refresh_token()
+                if refresh_tokens:
+                    refresh_tokens = refresh_tokens.split('|')
+                context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
+                # create a new access_token
+                client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
+
+        if client:
+            if len(access_tokens) != 2 and len(refresh_tokens) == 2:
+                try:
+
+                    access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
+
+                    access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
+
+                    access_tokens = [access_token_tv, access_token_kodi]
+
+                    access_token = '%s|%s' % (access_token_tv, access_token_kodi)
+                    expires_in = min(expires_in_tv, expires_in_kodi)
+                    if dev_id:
+                        access_manager.update_dev_access_token(dev_id, access_token, expires_in)
+                    else:
+                        access_manager.update_access_token(access_token, expires_in)
+                except LoginException as ex:
+                    self.handle_exception(context, ex)
+                    access_tokens = ['', '']
+                    # reset access_token
+                    if dev_id:
+                        access_manager.update_dev_access_token(dev_id, '')
+                    else:
+                        access_manager.update_access_token('')
+                    # we clear the cache, so none cached data of an old account will be displayed.
+                    self.get_resource_manager(context).clear()
+
+            # in debug log the login status
+            self._is_logged_in = len(access_tokens) == 2
+            if self._is_logged_in:
+                context.log_debug('User is logged in')
+            else:
+                context.log_debug('User is not logged in')
+
+            if len(access_tokens) == 0:
+                access_tokens = ['', '']
+            client.set_access_token(access_token=access_tokens[1])
+            client.set_access_token_tv(access_token_tv=access_tokens[0])
+            self._client = client
+            self._client.set_log_error(context.log_error)
+        else:
+            self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config)
+            self._client.set_log_error(context.log_error)
+
+            # in debug log the login status
+            context.log_debug('User is not logged in')
 
         return self._client
 

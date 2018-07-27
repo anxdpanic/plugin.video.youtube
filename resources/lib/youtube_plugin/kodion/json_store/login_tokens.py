@@ -37,6 +37,8 @@ class LoginTokenStore(JSONStore):
             data['access_manager']['current_user'] = '0'
         if 'last_origin' not in data['access_manager']:
             data['access_manager']['last_origin'] = 'plugin.video.youtube'
+        if 'developers' not in data['access_manager']:
+            data['access_manager']['developers'] = dict()
 
         # clean up
         if data['access_manager']['current_user'] == 'default':
