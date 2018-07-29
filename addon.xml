@@ -15,7 +15,7 @@
         <news>
 6.1.0
 [add] Multi-user support
-    - Switch User folder (default: on) Settings -&amp;gt; Folders
+    - Switch User folder (default: on) Settings -&gt; Folders
     - User management (Add, Remove, Rename, Switch) Settings - Users
     - Signed in users are green, Current user has an *
 [add/upd] add data cache and optimize caching
@@ -25,13 +25,16 @@
     - load time of 50 videos w/ no cached videos: before: ~11.6 secs, after: ~3 secs
     - load time of 50 videos w/ all cached videos: before: ~0.8 secs, after: ~0.7 secs
     - cached size per 50 videos: before ~1MB, after ~550KB
-[add] Refresh after watching (default: off) Settings -&amp;gt; General
-[add] Completed Live folder (default: on) Settings -&amp;gt; Folders
-[add] Upcoming Live folder (default: on) Settings -&amp;gt; Folders
+[add] Refresh after watching (default: off) Settings -&gt; General
+[add] Completed Live folder (default: on) Settings -&gt; Folders
+[add] Upcoming Live folder (default: on) Settings -&gt; Folders
 [add] My Location folder (default: on) Settings -&gt; Advanced -&gt; Enable setup-wizard
 [add] Play count minimum percent (default: 85%) Settings -&gt; General -&gt; Play count minimum percent
 [add] Playback history (default: off) Settings -&gt; Advanced -&gt; Use playback history
 [add] Time since published for videos as item properties Property(PublishedSince), Property(PublishedLocal) |contrib: pannal|
+[add] Check My IP, Settings -&gt; HTTP Server
+[add] Developer authentication, allowing add-ons to use their own access tokens
+    - see youtube_authentication.py, youtube_registration.py, youtube_requests.py, and youtube_resolver.py
 [upd] YouTube UTC datetimes to local timezone |contrib: pannal|
 [upd] Localize API key errors, provide a more descriptive notification
 [fix] My Channel videos (Error 403)
@@ -39,7 +42,7 @@
 [fix] Signature function not found error for some users
 [fix] Context Menu -&gt; More -&gt; Related Videos w/ Kodi 18
 [fix] Sign In/Sign Out causing crash with Kodi 18 nightlies
-[fix] Channel 'mine' caching
+[fix] Channel &#39;mine&#39; caching
 [fix] Time changing when playing generated dash
 [lang] es_es strings |contrib: roliverosc|
 [lang] el_gr strings |contrib: twilight0|

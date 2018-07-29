@@ -17,6 +17,9 @@
 [add] Play count minimum percent (default: 85%) Settings -> General -> Play count minimum percent
 [add] Playback history (default: off) Settings -> Advanced -> Use playback history
 [add] Time since published for videos as item properties Property(PublishedSince), Property(PublishedLocal) |contrib: pannal|
+[add] Check My IP, Settings -> HTTP Server
+[add] Developer authentication, allowing add-ons to use their own access tokens
+    - see youtube_authentication.py, youtube_registration.py, youtube_requests.py, and youtube_resolver.py
 [upd] YouTube UTC datetimes to local timezone |contrib: pannal|
 [upd] Localize API key errors, provide a more descriptive notification
 [fix] My Channel videos (Error 403)
