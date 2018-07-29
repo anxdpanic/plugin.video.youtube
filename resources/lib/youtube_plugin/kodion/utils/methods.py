@@ -139,6 +139,8 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
         if 'license_info' in log_data:
             log_data['license_info']['url'] = '[not shown]' if log_data['license_info'].get('url') else None
             log_data['license_info']['token'] = '[not shown]' if log_data['license_info'].get('token') else None
+        else:
+            log_data['url'] = re.sub(r'ip=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', 'ip=xxx.xxx.xxx.xxx', log_data['url'])
         log_streams.append(log_data)
     context.log_debug('selectable streams: \n%s' % '\n'.join(str(stream) for stream in log_streams))
 
