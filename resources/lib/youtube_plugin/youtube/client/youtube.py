@@ -49,7 +49,7 @@ class YouTube(LoginClient):
 
         return 'C%s%s%sAA' % (high[high_iteration], low[low_iteration], overflow_token)
 
-    def update_watch_history(self, video_id):
+    def update_watch_history(self, video_id, url):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
@@ -69,8 +69,6 @@ class YouTube(LoginClient):
                   'ps': 'leanback'}
         if self._access_token:
             params['access_token'] = self._access_token
-
-        url = 'https://www.youtube.com/user_watch'
 
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
 

@@ -22,6 +22,7 @@
     - see youtube_authentication.py, youtube_registration.py, youtube_requests.py, and youtube_resolver.py
 [upd] YouTube UTC datetimes to local timezone |contrib: pannal|
 [upd] Localize API key errors, provide a more descriptive notification
+[fix] Add to YouTube watch history
 [fix] My Channel videos (Error 403)
 [fix] allow fallback to dash, when using Audio only
 [fix] Signature function not found error for some users

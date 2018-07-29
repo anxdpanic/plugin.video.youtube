@@ -674,6 +674,10 @@ class Provider(kodion.AbstractProvider):
     def _on_post_play(self, context, re_match):
         video_id = context.get_param('video_id', '')
         refresh_only = context.get_param('refresh_only', 'false') == 'true'
+
+        video_stats_url = context.get_ui().get_home_window_property('video_stats_url')
+        context.get_ui().clear_home_window_property('video_stats_url')
+
         if video_id:
             if not refresh_only:
                 client = self.get_client(context)
@@ -681,7 +685,7 @@ class Provider(kodion.AbstractProvider):
                 access_manager = context.get_access_manager()
                 if self.is_logged_in():
                     # first: update history
-                    client.update_watch_history(video_id)
+                    client.update_watch_history(video_id, video_stats_url)
 
                     # second: remove video from 'Watch Later' playlist
                     if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):

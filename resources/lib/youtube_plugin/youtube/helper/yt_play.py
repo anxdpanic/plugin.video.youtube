@@ -16,6 +16,7 @@ def play_video(provider, context, re_match):
         client = provider.get_client(context)
         settings = context.get_settings()
 
+        dev_id = context.get_param('addon_id', None)
         ask_for_quality = None
         screensaver = False
         if context.get_param('screensaver', None) and str(context.get_param('screensaver')).lower() == 'true':
@@ -69,6 +70,9 @@ def play_video(provider, context, re_match):
                 if not screensaver:
                     command = 'RunPlugin(%s)' % context.create_uri(['events', 'post_play'], {'video_id': video_id})
                     context.get_ui().set_home_window_property('post_play', command)
+                    if dev_id:
+                        context.get_ui().set_home_window_property('addon_id', str(dev_id))
+                    context.get_ui().set_home_window_property('video_stats_url', video_stream.get('video_stats_url'))
             except:
                 context.log_debug('Failed to set post play events.')
 

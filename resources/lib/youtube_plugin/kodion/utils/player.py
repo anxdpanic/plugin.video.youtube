@@ -14,7 +14,7 @@ class YouTubePlayer(xbmc.Player):
 
     def reset(self):
         properties = ['playing', 'post_play', 'license_url', 'license_token',
-                      'seek_time', 'play_count', 'playback_history']
+                      'seek_time', 'play_count', 'playback_history', 'addon_id']
         cleared = []
         for prop in properties:
             if self.ui.get_home_window_property(prop) is not None:
@@ -46,9 +46,19 @@ class YouTubePlayer(xbmc.Player):
                 current_played_percent = 0
             else:
                 if post_play_command:
-                    post_play_command = 'RunPlugin(%s)' % self.context.create_uri(['events', 'post_play'],
-                                                                                  {'video_id': is_playing,
-                                                                                   'refresh_only': 'true'})
+                    addon_id = self.ui.get_home_window_property('addon_id')
+                    if addon_id:
+                        post_play_command = 'RunPlugin(%s)' % self.context.create_uri(['events', 'post_play'],
+                                                                                      {'video_id': is_playing,
+                                                                                       'addon_id': addon_id,
+                                                                                       'refresh_only': 'true'})
+                    else:
+                        post_play_command = 'RunPlugin(%s)' % self.context.create_uri(['events', 'post_play'],
+                                                                                      {'video_id': is_playing,
+                                                                                       'addon_id': addon_id,
+                                                                                       'refresh_only': 'true'})
+                else:
+                    self.ui.clear_home_window_property('video_stats_url')
 
             if use_playback_history and self.context.get_settings().use_playback_history():
                 self.context.get_playback_history().update(is_playing, play_count, self.current_video_total_time,
