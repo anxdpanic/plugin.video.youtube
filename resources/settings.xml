@@ -106,6 +106,7 @@
         <setting id="kodion.http.listen.select" type="action" label="30644" action="RunPlugin(plugin://$ID/config/listen_ip/)" option="close"/>
         <setting id="kodion.mpd.proxy.port" type="number" label="30619" default="50152" enable="true"/>
         <setting id="kodion.http.ip.whitelist" type="text" label="30629" enable="true"/>
+        <setting id="kodion.http.client.ip" type="action" label="30698" action="RunPlugin(plugin://$ID/show_client_ip/)"/>
     </category>
 
     <!-- personal api key -->

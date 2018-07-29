@@ -2,6 +2,7 @@ from six.moves import BaseHTTPServer
 from six.moves.urllib.parse import parse_qs, urlparse
 from six.moves import xrange
 
+import json
 import os
 import re
 import requests
@@ -31,6 +32,14 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         addon = xbmcaddon.Addon('plugin.video.youtube')
         dash_proxy_enabled = addon.getSetting('kodion.mpd.proxy') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
+
+        if self.path == '/client_ip':
+            client_json = json.dumps({"ip": "{ip}".format(ip=self.client_address[0])})
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', len(client_json))
+            self.end_headers()
+            self.wfile.write(client_json)
 
         if not self.client_address[0].startswith(self.local_ranges) and not self.client_address[0] in self.whitelist_ips:
             self.send_error(403)
@@ -437,3 +446,19 @@ def is_httpd_live(address=None, port=None):
     except:
         xbmc.log('[plugin.video.youtube] HTTPServer: Ping |{address}:{port}| |{response}|'.format(address=address, port=port, response='failed'), xbmc.LOGDEBUG)
         return False
+
+
+def get_client_ip_address(address=None, port=None):
+    addon = xbmcaddon.Addon('plugin.video.youtube')
+    address = address if address else addon.getSetting('kodion.http.listen')
+    address = '127.0.0.1' if address == '0.0.0.0' else address
+    address = address if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address) else '127.0.0.1'
+    port = int(port) if port else 50152
+    url = 'http://{address}:{port}/client_ip'.format(address=address, port=port)
+    response = requests.get(url)
+    ip_address = None
+    if response.status_code == 200:
+        response_json = response.json()
+        if response_json:
+            ip_address = response_json.get('ip')
+    return ip_address

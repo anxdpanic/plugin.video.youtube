@@ -9,7 +9,7 @@ from base64 import b64decode
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
-from ..kodion.utils import FunctionCache, strip_html_from_text
+from ..kodion.utils import FunctionCache, strip_html_from_text, get_client_ip_address, is_httpd_live
 from ..kodion.items import *
 from ..youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
@@ -138,7 +138,10 @@ class Provider(kodion.AbstractProvider):
                  'youtube.mark.watched': 30670,
                  'youtube.mark.unwatched': 30669,
                  'youtube.reset.resume.point': 30674,
-                 'youtube.data.cache': 30687
+                 'youtube.data.cache': 30687,
+                 'youtube.httpd.not.running': 30699,
+                 'youtube.client.ip': 30700,
+                 'youtube.client.ip.failed': 30701
                  }
 
     def __init__(self):
@@ -1170,6 +1173,19 @@ class Provider(kodion.AbstractProvider):
             settings.set_bool('youtube.api.enable', False)
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
+
+    @kodion.RegisterProviderPath('^/show_client_ip/$')
+    def show_client_ip(self, context, re_match):
+        port = context.get_settings().httpd_port()
+
+        if is_httpd_live(port=port):
+            client_ip = get_client_ip_address(port=port)
+            if client_ip:
+                context.get_ui().on_ok(context.get_name(), context.localize(self.LOCAL_MAP['youtube.client.ip']) % client_ip)
+            else:
+                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.client.ip.failed']))
+        else:
+            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.httpd.not.running']))
 
     @kodion.RegisterProviderPath('^/playback_history/$')
     def on_playback_history(self, context, re_match):

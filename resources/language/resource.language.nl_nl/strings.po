@@ -1066,3 +1066,19 @@ msgstr ""
 msgctxt "#30697"
 msgid "Tomorrow at"
 msgstr ""
+
+msgctxt "#30698"
+msgid "Check my IP"
+msgstr ""
+
+msgctxt "#30699"
+msgid "HTTP server is not running"
+msgstr ""
+
+msgctxt "#30700"
+msgid "Client IP is %s"
+msgstr ""
+
+msgctxt "#30701"
+msgid "Failed to obtain client IP"
+msgstr ""
