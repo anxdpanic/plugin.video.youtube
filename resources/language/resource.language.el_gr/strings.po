@@ -1048,44 +1048,44 @@ msgstr "Απαιτείται InputStream Adaptive >= 2.0.12 για τις ζων
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Σε ζωντανή μετάδοση"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Σε ένα λεπτό"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Σε επικείμενη μετάδοση"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Σε μία ώρα περίπου"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Σε δύο ώρες περίπου"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Μεταδίδονται σήμερα σε"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Αύριο σε"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Έλεγχος της διεύθυνσης IP μου"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "Ο εξυπηρετητής HTTP δεν εκτελείται"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "Η διεύθυνση πελάτη είναι %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Αποτυχία λήψης διεύθυνσης IP πελάτη"
