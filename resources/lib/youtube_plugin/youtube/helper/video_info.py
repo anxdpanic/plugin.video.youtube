@@ -6,6 +6,7 @@ from six.moves import urllib
 
 import re
 import json
+import random
 
 import requests
 from ...kodion.utils import is_httpd_live, make_dirs
@@ -401,6 +402,16 @@ class VideoInfo(object):
         self.region = context.get_settings().get_string('youtube.region', 'US')
         self._access_token = access_token
 
+    @staticmethod
+    def generate_cpn():
+        # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1381
+        # LICENSE: The Unlicense
+        # cpn generation algorithm is reverse engineered from base.js.
+        # In fact it works even with dummy cpn.
+        CPN_ALPHABET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_'
+        cpn = ''.join((CPN_ALPHABET[random.randint(0, 256) & 63] for _ in range(0, 16)))
+        return cpn
+
     def load_stream_infos(self, video_id=None, player_config=None, cookies=None):
         return self._method_get_video_info(video_id, player_config, cookies)
 
@@ -627,8 +638,6 @@ class VideoInfo(object):
                     image_url = image_url.replace('.jpg', '_live.jpg')
                 meta_info['images'][image_data['to']] = image_url
 
-        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
-
         if (params.get('status', '') == 'fail') or (playability_status.get('status', 'ok').lower() != 'ok'):
             if not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()):
                 reason = None
@@ -658,6 +667,11 @@ class VideoInfo(object):
                     reason = 'UNKNOWN'
 
                 raise YouTubeException(reason)
+
+        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
+
+        video_stats_url = params.get('videostats_playback_base_url', player_args.get('videostats_playback_base_url'))
+        video_stats_url += '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())
 
         if is_live:
             url = params.get('hlsvp', '')
@@ -705,7 +719,8 @@ class VideoInfo(object):
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info,
                                 'headers': curl_headers,
-                                'license_info': license_info}
+                                'license_info': license_info,
+                                'video_stats_url': video_stats_url}
 
                 if is_live:
                     video_stream['url'] += '&start_seq=$START_NUMBER$'

@@ -1,6 +1,8 @@
 import uuid
 import time
 
+from hashlib import md5
+
 from ..json_store import LoginTokenStore
 
 __author__ = 'bromix'
@@ -22,9 +24,10 @@ class AccessManager(object):
         self._json = self._jstore.get_data()
         return self._json['access_manager']['users'][self.get_user()]['id']
 
-    def get_new_user(self, user_name):
+    def get_new_user(self, user_name='', addon_id=''):
         """
         :param user_name: string, users name
+        :param addon_id: string, addon id
         :return: a new user dict
         """
         uuids = list()
@@ -196,6 +199,8 @@ class AccessManager(object):
         """
         Updates the old access token with the new one.
         :param access_token:
+        :param unix_timestamp:
+        :param refresh_token:
         :return:
         """
         self._json = self._jstore.get_data()
@@ -208,3 +213,127 @@ class AccessManager(object):
             self._json['access_manager']['users'][self._user]['refresh_token'] = refresh_token
 
         self._jstore.save(self._json)
+
+    def get_new_developer(self, addon_id):
+        """
+        :param addon_id: string, addon id
+        :return: a new developer dict
+        """
+
+        return {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': ''}
+
+    def get_developers(self):
+        """
+        Returns developers
+        :return: dict, developers
+        """
+        return self._json['access_manager'].get('developers', {})
+
+    def set_developers(self, developers):
+        """
+        Updates the users
+        :param developers: dict, developers
+        :return:
+        """
+        self._json = self._jstore.get_data()
+        self._json['access_manager']['developers'] = developers
+        self._jstore.save(self._json)
+
+    def get_dev_access_token(self, addon_id):
+        """
+        Returns the access token for some API
+        :param addon_id: addon id
+        :return: access_token
+        """
+        self._json = self._jstore.get_data()
+        return self._json['access_manager']['developers'].get(addon_id, {}).get('access_token', '')
+
+    def get_dev_refresh_token(self, addon_id):
+        """
+        Returns the refresh token
+        :return: refresh token
+        """
+        self._json = self._jstore.get_data()
+        return self._json['access_manager']['developers'].get(addon_id, {}).get('refresh_token', '')
+
+    def developer_has_refresh_token(self, addon_id):
+        return self.get_dev_refresh_token(addon_id) != ''
+
+    def is_dev_access_token_expired(self, addon_id):
+        """
+        Returns True if the access_token is expired otherwise False.
+        If no expiration date was provided and an access_token exists
+        this method will always return True
+        :return:
+        """
+        self._json = self._jstore.get_data()
+        access_token = self._json['access_manager']['developers'].get(addon_id, {}).get('access_token', '')
+        expires = int(self._json['access_manager']['developers'].get(addon_id, {}).get('token_expires', -1))
+
+        # with no access_token it must be expired
+        if not access_token:
+            return True
+
+        # in this case no expiration date was set
+        if expires == -1:
+            return False
+
+        now = int(time.time())
+        return expires <= now
+
+    def update_dev_access_token(self, addon_id, access_token, unix_timestamp=None, refresh_token=None):
+        """
+        Updates the old access token with the new one.
+        :param addon_id:
+        :param access_token:
+        :param unix_timestamp:
+        :param refresh_token:
+        :return:
+        """
+        self._json = self._jstore.get_data()
+        self._json['access_manager']['developers'][addon_id]['access_token'] = access_token
+
+        if unix_timestamp is not None:
+            self._json['access_manager']['developers'][addon_id]['token_expires'] = int(unix_timestamp)
+
+        if refresh_token is not None:
+            self._json['access_manager']['developers'][addon_id]['refresh_token'] = refresh_token
+
+        self._jstore.save(self._json)
+
+    def get_dev_last_key_hash(self, addon_id):
+        self._json = self._jstore.get_data()
+        return self._json['access_manager']['developers'][addon_id]['last_key_hash']
+
+    def set_dev_last_key_hash(self, addon_id, key_hash):
+        self._json = self._jstore.get_data()
+        self._json['access_manager']['developers'][addon_id]['last_key_hash'] = key_hash
+        self._jstore.save(self._json)
+
+    def dev_keys_changed(self, addon_id, api_key, client_id, client_secret):
+        self._json = self._jstore.get_data()
+        last_hash = self._json['access_manager']['developers'][addon_id]['last_key_hash']
+        current_hash = self.__calc_key_hash(api_key, client_id, client_secret)
+        if not last_hash and current_hash:
+            self.set_dev_last_key_hash(addon_id, current_hash)
+            return False
+        if last_hash != current_hash:
+            self.set_dev_last_key_hash(addon_id, current_hash)
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def __calc_key_hash(api_key, client_id, client_secret):
+
+        m = md5()
+        try:
+            m.update(api_key.encode('utf-8'))
+            m.update(client_id.encode('utf-8'))
+            m.update(client_secret.encode('utf-8'))
+        except:
+            m.update(api_key)
+            m.update(client_id)
+            m.update(client_secret)
+
+        return m.hexdigest()

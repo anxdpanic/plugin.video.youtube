@@ -195,13 +195,13 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         snippet = yt_item['snippet']  # crash if not conform
         play_data = yt_item['play_data']
-        is_live = video_item.live = True if snippet.get('liveBroadcastContent') == 'live' else False
+        video_item.live = True if snippet.get('liveBroadcastContent') == 'live' else False
 
         # set mediatype
         video_item.set_mediatype('video')  # using video
 
         # duration
-        if not is_live and use_play_data and play_data.get('total_time'):
+        if not video_item.live and use_play_data and play_data.get('total_time'):
             video_item.set_duration_from_seconds(float(play_data.get('total_time')))
         else:
             duration = yt_item.get('contentDetails', {}).get('duration', '')
@@ -209,7 +209,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             # we subtract 1 seconds because YouTube returns +1 second to much
             video_item.set_duration_from_seconds(duration.seconds - 1)
 
-        if not is_live and use_play_data:
+        if not video_item.live and use_play_data:
             # play count
             if play_data.get('play_count'):
                 video_item.set_play_count(int(play_data.get('play_count')))
@@ -222,7 +222,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
             if play_data.get('last_played'):
                 video_item.set_last_played(play_data.get('last_played'))
-        elif is_live:
+        elif video_item.live:
             video_item.set_play_count(0)
 
         scheduled_start = video_data[video_id].get('liveStreamingDetails', {}).get('scheduledStartTime')
@@ -360,7 +360,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             # subscribe to the channel of the video
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
 
-        if not is_live and use_play_data:
+        if not video_item.live and use_play_data:
             if play_data.get('play_count') is None or int(play_data.get('play_count')) == 0:
                 yt_context_menu.append_mark_watched(context_menu, provider, context, video_id)
             else:

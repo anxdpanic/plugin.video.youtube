@@ -22,6 +22,7 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     # then use your keys by appending an addon_id param to the plugin url
     xbmc.executebuiltin('RunPlugin(plugin://plugin.video.youtube/channel/UCaBf1a-dpIsw8OxqH4ki2Kg/?addon_id=plugin.video.example)')
     # addon_id will be passed to all following calls
+    # also see youtube_authentication.py and youtube_requests.py
     ---
 
     :param addon_id: id of the add-on being registered
@@ -39,6 +40,8 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     api_jstore = APIKeyStore()
     json_api = api_jstore.get_data()
 
+    access_manager = context.get_access_manager()
+
     jkeys = json_api['keys']['developer'].get(addon_id, {})
 
     api_keys = {'origin': addon_id, 'main': {'system': 'JSONStore', 'key': b64encode(api_key), 'id': b64encode(client_id), 'secret': b64encode(client_secret)}}
@@ -48,3 +51,9 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
         json_api['keys']['developer'][addon_id] = api_keys
         api_jstore.save(json_api)
         context.log_debug('Register API Keys: |%s| Keys registered' % addon_id)
+
+    developers = access_manager.get_developers()
+    if not developers.get(addon_id, None):
+        developers[addon_id] = access_manager.get_new_developer()
+        access_manager.set_developers(developers)
+        context.log_debug('Creating developer user: |%s|' % addon_id)
