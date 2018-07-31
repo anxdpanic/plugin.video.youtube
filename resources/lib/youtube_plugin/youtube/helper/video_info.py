@@ -485,7 +485,7 @@ class VideoInfo(object):
 
         return player_config
 
-    def _load_manifest(self, url, video_id, meta_info=None, curl_headers=''):
+    def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', video_stats_url=''):
         headers = {'Host': 'manifest.googlevideo.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -521,7 +521,8 @@ class VideoInfo(object):
                     height = int(re_match.group('height'))
                     video_stream = {'url': line,
                                     'meta': meta_info,
-                                    'headers': curl_headers
+                                    'headers': curl_headers,
+                                    'video_stats_url': video_stats_url
                                     }
                     video_stream.update(yt_format)
                     streams.append(video_stream)
@@ -670,19 +671,25 @@ class VideoInfo(object):
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
-        video_stats_url = params.get('videostats_playback_base_url', player_args.get('videostats_playback_base_url'))
-        video_stats_url += '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())
+        video_stats_url = params.get('videostats_playback_base_url', player_args.get('videostats_playback_base_url', ''))
+        if video_stats_url:
+            video_stats_url += '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())
 
         if is_live:
             url = params.get('hlsvp', '')
             if url:
-                stream_list = self._load_manifest(url, video_id, meta_info=meta_info, curl_headers=curl_headers)
-
+                stream_list = self._load_manifest(url,
+                                                  video_id,
+                                                  meta_info=meta_info,
+                                                  curl_headers=curl_headers,
+                                                  video_stats_url=video_stats_url)
         httpd_is_live = self._context.get_settings().use_dash_videos() and is_httpd_live(port=self._context.get_settings().httpd_port())
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         s_info = dict()
         if not mpd_url and not is_live and httpd_is_live:
-            mpd_url, s_info = self.generate_mpd(video_id, params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')), params.get('length_seconds', '0'), cipher)
+            mpd_url, s_info = self.generate_mpd(video_id,
+                                                params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')),
+                                                params.get('length_seconds', '0'), cipher)
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
@@ -768,7 +775,8 @@ class VideoInfo(object):
 
                     video_stream = {'url': url,
                                     'meta': meta_info,
-                                    'headers': curl_headers}
+                                    'headers': curl_headers,
+                                    'video_stats_url': video_stats_url}
                     video_stream.update(yt_format)
                     stream_list.append(video_stream)
                 elif conn:
@@ -781,7 +789,8 @@ class VideoInfo(object):
 
                     video_stream = {'url': url,
                                     'meta': meta_info,
-                                    'headers': curl_headers}
+                                    'headers': curl_headers,
+                                    'video_stats_url': video_stats_url}
                     video_stream.update(yt_format)
                     if video_stream:
                         stream_list.append(video_stream)

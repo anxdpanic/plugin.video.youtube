@@ -685,7 +685,8 @@ class Provider(kodion.AbstractProvider):
                 access_manager = context.get_access_manager()
                 if self.is_logged_in():
                     # first: update history
-                    client.update_watch_history(video_id, video_stats_url)
+                    if video_stats_url:
+                        client.update_watch_history(video_id, video_stats_url)
 
                     # second: remove video from 'Watch Later' playlist
                     if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):

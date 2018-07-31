@@ -55,7 +55,6 @@ class YouTubePlayer(xbmc.Player):
                     else:
                         post_play_command = 'RunPlugin(%s)' % self.context.create_uri(['events', 'post_play'],
                                                                                       {'video_id': is_playing,
-                                                                                       'addon_id': addon_id,
                                                                                        'refresh_only': 'true'})
                 else:
                     self.ui.clear_home_window_property('video_stats_url')
