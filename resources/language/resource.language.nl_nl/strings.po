@@ -1041,39 +1041,39 @@ msgstr "InputStream Adaptive >=2.0.12 vereist voor livestreams"
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Wordt nu uitgezonden"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Over een minuut"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Wordt binnenkort uitgezonden"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Binnen een uur"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Binnen twee uur"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Wordt vandaag uitgezonden om"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Morgen om"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Controleer mijn IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP Server is niet opgestart"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1081,4 +1081,4 @@ msgstr ""
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Verkrijgen client IP mislukt"
