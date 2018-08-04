@@ -104,7 +104,7 @@ msgstr "Elementos por página"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr "Tamaño historial de búsqueda"
+msgstr "Tamaño del historial de búsqueda"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
@@ -112,7 +112,7 @@ msgstr "Tamaño para caché de funciones (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
-msgstr "Habilitar asistente"
+msgstr "Habilitar asistente de configuración"
 
 msgctxt "#30026"
 msgid "Override view"
@@ -132,7 +132,7 @@ msgstr "Vista: Películas"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "¿Desea ejecutar el asistente?"
+msgstr "¿Desea ejecutar el asistente de configuración?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -179,7 +179,7 @@ msgstr "Añadir a favoritos del Add-on"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr "Buscar"
+msgstr "Búsqueda"
 
 msgctxt "#30103"
 msgid "Library"
@@ -211,15 +211,15 @@ msgstr "Últimos Vídeos"
 
 msgctxt "#30110"
 msgid "New Search"
-msgstr "Nueva Búsqueda"
+msgstr "Nueva búsqueda"
 
 msgctxt "#30111"
 msgid "Sign In"
-msgstr "Iniciar Sesión"
+msgstr "Iniciar sesión"
 
 msgctxt "#30112"
 msgid "Sign Out"
-msgstr "Cerrar Sesión"
+msgstr "Cerrar sesión"
 
 msgctxt "#30113"
 msgid "Rename"
@@ -453,7 +453,7 @@ msgstr "Mostrar nombre del canal en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "Los streams rtmpe no son compatibles"
+msgstr "Los streams rtmpe no estan soportados"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -549,7 +549,7 @@ msgstr "Inglés"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr "Disponibles"
+msgstr "Generados"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -1049,44 +1049,44 @@ msgstr "Para emisiones en directo es necesario InputStream Adaptive 2.0.12 o sup
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "En emisión ahora"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "En un minuto"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "En emisión pronto"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "En más de una hora"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "En más de dos horas"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "En emisión hoy en"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Mañana a"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Comprobar mi dirección IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "El Servidor HTTP no está funcionando"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "La IP del cliente es %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "No se pudo obtener la IP de cliente"
