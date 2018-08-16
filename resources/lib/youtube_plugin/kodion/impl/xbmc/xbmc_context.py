@@ -1,9 +1,10 @@
 from six.moves import urllib
 
-import sys
-import weakref
 import datetime
 import json
+import os
+import sys
+import weakref
 
 import xbmc
 import xbmcaddon
@@ -146,6 +147,13 @@ class XbmcContext(AbstractContext):
 
     def get_data_path(self):
         return self._data_path
+
+    def get_debug_path(self):
+        if not self._debug_path:
+            self._debug_path = os.path.join(self.get_data_path(), 'debug')
+            if not xbmcvfs.exists(self._debug_path):
+                xbmcvfs.mkdir(self._debug_path)
+        return self._debug_path
 
     def get_native_path(self):
         return self._native_path
