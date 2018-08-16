@@ -611,6 +611,9 @@ class Provider(kodion.AbstractProvider):
     def on_play(self, context, re_match):
         params = context.get_params()
         if 'video_id' in params and not 'playlist_id' in params:
+            resource_manager = self.get_resource_manager(context)
+            video = resource_manager.get_videos([params['video_id']])
+            context.set_param('embeddable', video.get(params['video_id'], {}).get('status', {}).get('embeddable', False))
             return yt_play.play_video(self, context, re_match)
         elif 'playlist_id' in params:
             return yt_play.play_playlist(self, context, re_match)

@@ -72,10 +72,10 @@ class YouTube(LoginClient):
 
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
 
-    def get_video_streams(self, context, video_id=None, player_config=None, cookies=None):
+    def get_video_streams(self, context, video_id=None, player_config=None, cookies=None, embeddable=False):
         video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
 
-        video_streams = video_info.load_stream_infos(video_id, player_config, cookies)
+        video_streams = video_info.load_stream_infos(video_id, player_config, cookies, embeddable)
 
         # update title
         for video_stream in video_streams:
@@ -236,7 +236,7 @@ class YouTube(LoginClient):
         return self._perform_v3_request(method='GET', path='guideCategories', params=params)
 
     def get_popular_videos(self, page_token=''):
-        params = {'part': 'snippet',
+        params = {'part': 'snippet,status',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
                   'hl': self._language,
@@ -246,7 +246,7 @@ class YouTube(LoginClient):
         return self._perform_v3_request(method='GET', path='videos', params=params)
 
     def get_video_category(self, video_category_id, page_token=''):
-        params = {'part': 'snippet,contentDetails',
+        params = {'part': 'snippet,contentDetails,status',
                   'maxResults': str(self._max_results),
                   'videoCategoryId': video_category_id,
                   'chart': 'mostPopular',
@@ -371,7 +371,7 @@ class YouTube(LoginClient):
             page_token = ''
 
         # prepare params
-        params = {'part': 'snippet',
+        params = {'part': 'snippet,status',
                   'myRating': 'dislike',
                   'maxResults': str(self._max_results)}
         if page_token:
@@ -389,7 +389,7 @@ class YouTube(LoginClient):
         if isinstance(video_id, list):
             video_id = ','.join(video_id)
 
-        part = 'snippet,contentDetails'
+        part = 'snippet,contentDetails,status'
         if live_details:
             part += ',liveStreamingDetails'
 

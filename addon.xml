@@ -14,6 +14,9 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.2.0
+Improve speed of playback starting and resolver
+    before: min: 1.5s max: 2.6s median: 1.7s
+    after:  min: 0.9s max: 2.6s median: 1.2s
 Localize confirmation
         </news>
         <assets>
