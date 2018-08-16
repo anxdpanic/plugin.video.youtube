@@ -1093,3 +1093,7 @@ msgstr "Αποτυχία λήψης διεύθυνσης IP πελάτη"
 msgctxt "#30702"
 msgid "Play with subtitles"
 msgstr ""
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr ""
