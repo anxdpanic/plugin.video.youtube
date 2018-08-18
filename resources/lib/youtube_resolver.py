@@ -119,7 +119,7 @@ def resolve(video_id, sort=True, addon_id=None):
         embeddable = video.get(video_id, {}).get('status', {}).get('embeddable', False)
         streams = client.get_video_streams(context=context, video_id=video_id, embeddable=embeddable)
     else:
-        url_patterns = ['(?:youtu.be/|/embed/|/v/|v=)(?P<video_id>[a-zA-Z0-9_\-]{11})']
+        url_patterns = ['(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
         for pattern in url_patterns:
             v_id = re.search(pattern, video_id)
             if v_id:
