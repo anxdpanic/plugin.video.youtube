@@ -1084,3 +1084,7 @@ msgstr ""
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
 msgstr ""
+
+msgctxt "#30702"
+msgid "Play with subtitles"
+msgstr ""

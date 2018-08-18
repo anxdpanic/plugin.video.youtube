@@ -85,7 +85,11 @@ class Subtitles(object):
         return text
 
     def get_subtitles(self):
-        languages = self.context.get_settings().subtitle_languages()
+        prompt_for_subtitles = self.context.get_param('prompt_for_subtitles')
+        if prompt_for_subtitles:
+            languages = self.LANG_PROMPT
+        else:
+            languages = self.context.get_settings().subtitle_languages()
         self.context.log_debug('Subtitle get_subtitles: for setting |%s|' % str(languages))
         if languages == self.LANG_NONE:
             return []
