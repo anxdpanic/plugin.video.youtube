@@ -1,8 +1,26 @@
 6.2.0
-Improve speed of playback starting and resolver
-    before: min: 1.5s max: 2.6s median: 1.7s
-    after:  min: 0.9s max: 2.6s median: 1.2s
-Localize confirmation
+[add] 'Settings -> Advanced -> Use YouTube website urls' for external/alternative players
+            eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
+            eg. playercorefactory.xml
+                <?xml version="1.0" encoding="UTF-8"?>
+                <playercorefactory>
+                    <players>
+                        <player name="MPC-BE" type="ExternalPlayer" audio="false" video="true">
+                            <filename>C:\Program Files\MPC-BE x64\mpc-be64.exe</filename>
+                            <args>"{1}" /fullscreen /close</args>
+                            <hidexbmc>true</hidexbmc>
+                            <hideconsole>true</hideconsole>
+                            <warpcursor>none</warpcursor>
+                        </player>
+                    </players>
+                    <rules action="prepend">
+                       <rule filename="(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*" player="MPC-BE" />
+                    </rules>
+                </playercorefactory>
+[upd] Improve speed of playback starting and resolver
+            before: min: 1.5s max: 2.6s median: 1.7s
+            after:  min: 0.9s max: 2.6s median: 1.2s
+[chg] Localize confirmation
 
 6.1.0
 [add] Multi-user support

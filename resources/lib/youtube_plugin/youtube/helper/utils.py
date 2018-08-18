@@ -406,6 +406,8 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     play_data = yt_item['play_data']
     video_item.live = snippet.get('liveBroadcastContent') == 'live'
 
+    video_item.video_id = video_id
+
     # set the title
     if not video_item.get_title():
         video_item.set_title(snippet['title'])

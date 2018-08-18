@@ -40,8 +40,16 @@ def to_play_item(context, play_item):
             play_item.get_headers() and play_item.get_uri().startswith('http'):
         play_item.set_uri(play_item.get_uri() + '|' + play_item.get_headers())
 
+    if settings.is_support_alternative_player_enabled():
+        if settings.alternative_player_web_urls():
+            play_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(video_id=play_item.video_id))
+
     list_item.setProperty('inputstreamaddon', '')
     list_item.setProperty('inputstream.adaptive.manifest_type', '')
+    list_item.setProperty('inputstream.adaptive.stream_headers', '')
+    list_item.setProperty('inputstream.adaptive.license_type', '')
+    list_item.setProperty('inputstream.adaptive.license_key', '')
+
     if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')

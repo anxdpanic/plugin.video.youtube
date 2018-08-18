@@ -1092,3 +1092,7 @@ msgstr ""
 msgctxt "#30703"
 msgid "Are you sure?"
 msgstr ""
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
+msgstr ""
