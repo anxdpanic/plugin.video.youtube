@@ -16,13 +16,13 @@ msgstr ""
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr "Πρόσθετο Youtube"
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Πρόσθετο Youtube"
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "Το Youtube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "Το Youtube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο"
 
 #Kodion Settings
 

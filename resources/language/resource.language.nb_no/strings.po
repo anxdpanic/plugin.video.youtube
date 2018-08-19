@@ -16,13 +16,13 @@ msgstr ""
 "Language: nb_NO\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr "Tillegg for YouTube"
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Tillegg for YouTube"
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "YouTube er en av verdens største nettsider for deling av videoer."
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube er en av verdens største nettsider for deling av videoer."
 
 #Kodion Settings
 
