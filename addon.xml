@@ -14,6 +14,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.2.0
+[add] Context menu -> 'Play with subtitles' |contrib: solarus|
 [add] 'Settings -&gt; Advanced -&gt; Use YouTube website urls' for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
 [upd] Improve speed of playback starting and resolver
