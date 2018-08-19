@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.1.0" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.1.1" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -13,6 +13,9 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+6.1.1
+[fix] http proxy using incorrect setting id causing 403 errors
+
 6.1.0
 [add] Multi-user support
     - Switch User folder (default: on) Settings -&gt; Folders
