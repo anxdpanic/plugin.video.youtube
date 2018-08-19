@@ -1089,3 +1089,7 @@ msgstr "Η διεύθυνση πελάτη είναι %s"
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
 msgstr "Αποτυχία λήψης διεύθυνσης IP πελάτη"
+
+msgctxt "#30702"
+msgid "Play with subtitles"
+msgstr ""

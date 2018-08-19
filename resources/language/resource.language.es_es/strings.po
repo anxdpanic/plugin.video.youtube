@@ -1090,3 +1090,7 @@ msgstr "La IP del cliente es %s"
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
 msgstr "No se pudo obtener la IP de cliente"
+
+msgctxt "#30702"
+msgid "Play with subtitles"
+msgstr ""

@@ -141,7 +141,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.data.cache': 30687,
                  'youtube.httpd.not.running': 30699,
                  'youtube.client.ip': 30700,
-                 'youtube.client.ip.failed': 30701
+                 'youtube.client.ip.failed': 30701,
+                 'youtube.video.play_with_subtitles': 30702
                  }
 
     def __init__(self):
