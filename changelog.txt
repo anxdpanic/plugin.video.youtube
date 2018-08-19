@@ -15,7 +15,7 @@
                         </player>
                     </players>
                     <rules action="prepend">
-                       <rule filename="(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*" player="MPC-BE" />
+                       <rule filename="(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))[a-zA-Z0-9_\-]{11}.*" player="MPC-BE" />
                     </rules>
                 </playercorefactory>
 [upd] Improve speed of playback starting and resolver
