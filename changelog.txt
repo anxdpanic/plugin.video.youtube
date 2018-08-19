@@ -23,6 +23,9 @@
             after:  min: 0.9s max: 2.6s median: 1.2s
 [chg] Localize confirmation
 
+6.1.1
+[fix] http proxy using incorrect setting id causing 403 errors
+
 6.1.0
 [add] Multi-user support
     - Switch User folder (default: on) Settings -> Folders
