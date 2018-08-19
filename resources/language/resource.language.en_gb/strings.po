@@ -16,13 +16,13 @@ msgstr ""
 "Language: en_GB\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr ""
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr ""
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr ""
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr ""
 
 #Kodion Settings
 
@@ -1093,4 +1093,12 @@ msgstr ""
 
 msgctxt "#30702"
 msgid "Play with subtitles"
+msgstr ""
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr ""
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
 msgstr ""

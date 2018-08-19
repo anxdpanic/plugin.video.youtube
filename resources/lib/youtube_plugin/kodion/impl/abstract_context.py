@@ -13,6 +13,7 @@ class AbstractContext(object):
             params = {}
 
         self._cache_path = None
+        self._debug_path = None
 
         self._function_cache = None
         self._data_cache = None

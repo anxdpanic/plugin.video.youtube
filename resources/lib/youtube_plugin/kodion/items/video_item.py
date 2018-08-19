@@ -37,6 +37,7 @@ class VideoItem(BaseItem):
         self.subtitles = None
         self._headers = None
         self.license_key = None
+        self._video_id = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count)
@@ -246,3 +247,11 @@ class VideoItem(BaseItem):
 
     def get_start_time(self):
         return self._start_time
+
+    @property
+    def video_id(self):
+        return self._video_id
+
+    @video_id.setter
+    def video_id(self, value):
+        self._video_id = value

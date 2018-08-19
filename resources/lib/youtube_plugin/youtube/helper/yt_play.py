@@ -13,6 +13,8 @@ from ...youtube.helper import utils, v3
 def play_video(provider, context, re_match):
     try:
         video_id = context.get_param('video_id')
+        embeddable = context.get_param('embeddable') is True
+
         client = provider.get_client(context)
         settings = context.get_settings()
 
@@ -23,7 +25,7 @@ def play_video(provider, context, re_match):
             ask_for_quality = False
             screensaver = True
 
-        video_streams = client.get_video_streams(context, video_id)
+        video_streams = client.get_video_streams(context, video_id, embeddable=embeddable)
         if len(video_streams) == 0:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
             context.get_ui().show_notification(message, time_milliseconds=5000)

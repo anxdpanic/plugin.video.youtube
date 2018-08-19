@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.1.0" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~alpha1" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -13,41 +13,14 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-6.1.0
-[add] Multi-user support
-    - Switch User folder (default: on) Settings -&gt; Folders
-    - User management (Add, Remove, Rename, Switch) Settings - Users
-    - Signed in users are green, Current user has an *
-[add/upd] add data cache and optimize caching
-    - add Settings -&gt; Maintenance -&gt; Clear data cache/Delete data cache
-    - increase allowed cache size
-    - database accesses per 50 videos: before: 70~100 after: 4~6
-    - load time of 50 videos w/ no cached videos: before: ~11.6 secs, after: ~3 secs
-    - load time of 50 videos w/ all cached videos: before: ~0.8 secs, after: ~0.7 secs
-    - cached size per 50 videos: before ~1MB, after ~550KB
-[add] Refresh after watching (default: off) Settings -&gt; General
-[add] Completed Live folder (default: on) Settings -&gt; Folders
-[add] Upcoming Live folder (default: on) Settings -&gt; Folders
-[add] My Location folder (default: on) Settings -&gt; Advanced -&gt; Enable setup-wizard
-[add] Play count minimum percent (default: 85%) Settings -&gt; General -&gt; Play count minimum percent
-[add] Playback history (default: off) Settings -&gt; Advanced -&gt; Use playback history
-[add] Time since published for videos as item properties Property(PublishedSince), Property(PublishedLocal) |contrib: pannal|
-[add] Check My IP, Settings -&gt; HTTP Server
-[add] Developer authentication, allowing add-ons to use their own access tokens
-    - see youtube_authentication.py, youtube_registration.py, youtube_requests.py, and youtube_resolver.py
-[upd] YouTube UTC datetimes to local timezone |contrib: pannal|
-[upd] Localize API key errors, provide a more descriptive notification
-[fix] Add to YouTube watch history
-[fix] My Channel videos (Error 403)
-[fix] allow fallback to dash, when using Audio only
-[fix] Signature function not found error for some users
-[fix] Context Menu -&gt; More -&gt; Related Videos w/ Kodi 18
-[fix] Sign In/Sign Out causing crash with Kodi 18 nightlies
-[fix] Channel &#39;mine&#39; caching
-[fix] Time changing when playing generated dash
-[lang] es_es strings |contrib: roliverosc|
-[lang] el_gr strings |contrib: twilight0|
-[lang] nl_nl strings |contrib: Markman-B|
+6.2.0
+[add] Context menu -> 'Play with subtitles' |contrib: solarus|
+[add] 'Settings -&gt; Advanced -&gt; Use YouTube website urls' for external/alternative players
+            eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
+[upd] Improve speed of playback starting and resolver
+            before: min: 1.5s max: 2.6s median: 1.7s
+            after:  min: 0.9s max: 2.6s median: 1.2s
+[chg] Localize confirmation
         </news>
         <assets>
             <icon>icon.png</icon>

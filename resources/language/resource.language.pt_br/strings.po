@@ -16,13 +16,13 @@ msgstr ""
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr "Plugin do YouTube"
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Plugin do YouTube"
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "Youtube é uma das maiores plataformas de vídeo online do mundo."
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "Youtube é uma das maiores plataformas de vídeo online do mundo."
 
 msgctxt "#30000"
 msgid "General"
@@ -1074,4 +1074,12 @@ msgstr ""
 
 msgctxt "#30702"
 msgid "Play with subtitles"
+msgstr ""
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr ""
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
 msgstr ""

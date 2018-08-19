@@ -84,6 +84,9 @@ class AbstractSettings(object):
     def is_support_alternative_player_enabled(self):
         return self.get_bool(constants.setting.SUPPORT_ALTERNATIVE_PLAYER, False)
 
+    def alternative_player_web_urls(self):
+        return self.get_bool(constants.setting.ALTERNATIVE_PLAYER_WEB_URLS, False)
+
     def use_dash(self):
         return self.get_bool(constants.setting.USE_DASH, False)
 

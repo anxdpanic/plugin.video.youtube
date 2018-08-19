@@ -17,13 +17,13 @@ msgstr ""
 "Last-Translator: Kardos László <lacesz at ox dot io>\n"
 "X-Generator: Poedit 2.0.4\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr "YouTube kiegészítő"
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "YouTube kiegészítő"
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "A YouTube a világ egyik legnagyobb videómegosztó weboldala."
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "A YouTube a világ egyik legnagyobb videómegosztó weboldala."
 
 msgctxt "#30000"
 msgid "General"
@@ -1075,4 +1075,12 @@ msgstr ""
 
 msgctxt "#30702"
 msgid "Play with subtitles"
+msgstr ""
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr ""
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
 msgstr ""

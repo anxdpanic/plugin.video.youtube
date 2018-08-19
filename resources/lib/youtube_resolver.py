@@ -18,7 +18,7 @@ def _get_core_components(addon_id=None):
     return provider, context, client
 
 
-def _get_config_and_cookies(client, url):
+def _get_config_and_cookies(client, url, embedded=False):
     headers = {'Host': 'www.youtube.com',
                'Connection': 'keep-alive',
                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -39,23 +39,35 @@ def _get_config_and_cookies(client, url):
     cookies = result.cookies
 
     _player_config = '{}'
-    lead = 'ytplayer.config = '
-    tail = ';ytplayer.load'
-    pos = html.find(lead)
-    if pos >= 0:
-        html2 = html[pos + len(lead):]
-        pos = html2.find(tail)
-        if pos:
-            _player_config = html2[:pos]
-
-    blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
-    if not blank_config:
+    if embedded:
         player_config = dict()
+
+        lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
+        tail = ',\'EXPERIMENT_FLAGS\':'
+        pos = html.find(lead)
+        if pos >= 0:
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
+            if pos:
+                _player_config = html2[:pos]
     else:
-        try:
-            player_config = json.loads(blank_config.group('player_config'))
-        except TypeError:
+        lead = 'ytplayer.config = '
+        tail = ';ytplayer.load'
+        pos = html.find(lead)
+        if pos >= 0:
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
+            if pos:
+                _player_config = html2[:pos]
+
+        blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+        if not blank_config:
             player_config = dict()
+        else:
+            try:
+                player_config = json.loads(blank_config.group('player_config'))
+            except TypeError:
+                player_config = dict()
 
     try:
         player_config.update(json.loads(_player_config))
@@ -99,25 +111,33 @@ def resolve(video_id, sort=True, addon_id=None):
     :rtype: list of dict
     """
     provider, context, client = _get_core_components(addon_id)
+    resource_manager = provider.get_resource_manager(context)
     streams = None
 
     if re.match('[a-zA-Z0-9_\-]{11}', video_id):
-        streams = client.get_video_streams(context=context, video_id=video_id)
+        video = resource_manager.get_videos([video_id])
+        embeddable = video.get(video_id, {}).get('status', {}).get('embeddable', False)
+        streams = client.get_video_streams(context=context, video_id=video_id, embeddable=embeddable)
     else:
-        url_patterns = ['(?:youtu.be/|/embed/|/v/|v=)(?P<video_id>[a-zA-Z0-9_\-]{11})']
+        url_patterns = ['(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
         for pattern in url_patterns:
             v_id = re.search(pattern, video_id)
             if v_id:
-                streams = client.get_video_streams(context=context, video_id=v_id.group('video_id'))
+                video_id = v_id.group('video_id')
+                video = resource_manager.get_videos([video_id])
+                embeddable = video.get(video_id, {}).get('status', {}).get('embeddable', False)
+                streams = client.get_video_streams(context=context, video_id=video_id, embeddable=embeddable)
                 break
 
         if streams is None:
-            result = _get_config_and_cookies(client, video_id)
+            video = resource_manager.get_videos([video_id])
+            embeddable = video.get(video_id, {}).get('status', {}).get('embeddable', False)
+            result = _get_config_and_cookies(client, video_id, embeddable)
             player_config = result.get('config')
             cookies = result.get('cookies')
-            streams = client.get_video_streams(context=context, player_config=player_config, cookies=cookies)
+            streams = client.get_video_streams(context=context, player_config=player_config, cookies=cookies, embeddable=embeddable)
 
-    if sort:
+    if sort and streams:
         streams = sorted(streams, key=lambda x: x.get('sort', 0), reverse=True)
 
     return streams

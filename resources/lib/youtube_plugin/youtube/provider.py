@@ -142,7 +142,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.httpd.not.running': 30699,
                  'youtube.client.ip': 30700,
                  'youtube.client.ip.failed': 30701,
-                 'youtube.video.play_with_subtitles': 30702
+                 'youtube.video.play_with_subtitles': 30702,
+                 'youtube.are.you.sure': 30703
                  }
 
     def __init__(self):
@@ -610,6 +611,9 @@ class Provider(kodion.AbstractProvider):
     def on_play(self, context, re_match):
         params = context.get_params()
         if 'video_id' in params and not 'playlist_id' in params:
+            resource_manager = self.get_resource_manager(context)
+            video = resource_manager.get_videos([params['video_id']])
+            context.set_param('embeddable', video.get(params['video_id'], {}).get('status', {}).get('embeddable', False))
             return yt_play.play_video(self, context, re_match)
         elif 'playlist_id' in params:
             return yt_play.play_playlist(self, context, re_match)
@@ -880,7 +884,7 @@ class Provider(kodion.AbstractProvider):
             yt_login.process('out', self, context, re_match, sign_out_refresh=False)
 
         if not sign_out_confirmed:
-            if (mode == 'out') and context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.sign.out']) + '?'):
+            if (mode == 'out') and context.get_ui().on_yes_no_input(context.localize(self.LOCAL_MAP['youtube.sign.out']), context.localize(self.LOCAL_MAP['youtube.are.you.sure'])):
                 sign_out_confirmed = True
 
         if (mode == 'in') or ((mode == 'out') and sign_out_confirmed):

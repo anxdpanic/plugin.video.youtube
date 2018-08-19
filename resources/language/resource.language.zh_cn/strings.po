@@ -16,13 +16,13 @@ msgstr ""
 "Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr "YouTube 附加元件"
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "YouTube 附加元件"
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "YouTube 是全球最大的一個影片分享網站。"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube 是全球最大的一個影片分享網站。"
 
 msgctxt "#30000"
 msgid "General"
@@ -1076,4 +1076,12 @@ msgstr ""
 
 msgctxt "#30702"
 msgid "Play with subtitles"
+msgstr ""
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr ""
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
 msgstr ""
