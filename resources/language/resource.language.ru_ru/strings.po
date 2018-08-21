@@ -1017,7 +1017,7 @@ msgstr "Сегодня в"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr "Удаить базу кеша данных"
+msgstr "Удалить базу кеша данных"
 
 msgctxt "#30686"
 msgid "Clear data cache"
