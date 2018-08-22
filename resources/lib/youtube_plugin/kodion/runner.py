@@ -3,13 +3,12 @@ __author__ = 'bromix'
 __all__ = ['run']
 
 import copy
-import json
-import os
 import timeit
 
 from .impl import Runner
 from .impl import Context
 
+from . import debug
 
 __DEBUG_RUNTIME = False
 __DEBUG_RUNTIME_SINGLE_FILE = False
@@ -56,34 +55,6 @@ def run(provider, context=None):
     elapsed = timeit.default_timer() - start_time
 
     if __DEBUG_RUNTIME:
-        if not __DEBUG_RUNTIME_SINGLE_FILE:
-            filename_path_part = context.get_path().lstrip('/').rstrip('/').replace('/', '_')
-            debug_file_name = 'runtime_%s-%s.json' % (filename_path_part, addon_version)
-            default_contents = {"runtimes": []}
-        else:
-            debug_file_name = 'runtime-%s.json' % addon_version
-            default_contents = {"runtimes": {}}
-
-        debug_file = os.path.join(context.get_debug_path(), debug_file_name)
-        with open(debug_file, 'a') as f:
-            pass  # touch
-
-        with open(debug_file, 'r') as f:
-            contents = f.read()
-
-        with open(debug_file, 'w') as f:
-            if not contents:
-                contents = default_contents
-            else:
-                contents = json.loads(contents)
-            if not __DEBUG_RUNTIME_SINGLE_FILE:
-                items = contents.get('runtimes', [])
-                items.append({"path": context.get_path(), "parameters": context.get_params(), "runtime": round(elapsed, 4)})
-                contents['runtimes'] = items
-            else:
-                items = contents.get('runtimes', {}).get(context.get_path(), [])
-                items.append({"parameters": context.get_params(), "runtime": round(elapsed, 4)})
-                contents['runtimes'][context.get_path()] = items
-            f.write(json.dumps(contents, indent=4))
+        debug.runtime(context, addon_version, elapsed, single_file=__DEBUG_RUNTIME_SINGLE_FILE)
 
     context.log_debug('Shutdown of Kodion after |%s| seconds' % str(round(elapsed, 4)))
