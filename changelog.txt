@@ -22,6 +22,10 @@
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s
 [chg] Localize confirmation
+
+6.1.2
+[fix] addon-check raised warning for services complex entry point
+[fix] codacy raised issue in http server (https://app.codacy.com/app/Kodi/repo-plugins/pullRequest?prid=2080401)
 [lang] ru_ru strings |contrib: Burgaduk|
 [lang] zh_tw strings |contrib: Zankio|
 
