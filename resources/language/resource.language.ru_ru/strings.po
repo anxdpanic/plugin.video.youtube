@@ -22,7 +22,7 @@ msgstr ""
 
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "Данное дополнение позволяет находить и смотреть видео на всеми любимом сайте."
+# msgstr "YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео."
 
 #Kodion Settings
 
@@ -485,7 +485,7 @@ msgstr "Рекомендации"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Обслуживание"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
@@ -509,27 +509,27 @@ msgstr ""
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "история поиска"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Удалить settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Язык субтитров"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Ничего"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Все"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Установка"
 
 msgctxt "#30564"
 msgid "Setting, English"
@@ -537,7 +537,7 @@ msgstr ""
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Английский"
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -545,19 +545,19 @@ msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Добавить в список Отложенного просмотра"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Удалить из списка Отложенного просмотра"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Вы уверены, что хотите удалить '%s' из списка Отложенного просмотра?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Вы уверены, что хотите заменить свой текущий список Отложенного просмотра на '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -577,23 +577,23 @@ msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Успешно"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Ошибка"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Настройки"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Принудительная проверка SSL сертификатов"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "В настройках YouTube MPEG-DASH включен, однако InputStream Adaptive выключен. Хотите включить InputStream Adaptive?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -609,11 +609,11 @@ msgstr ""
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматически"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Мои подписки (с фильтром)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
@@ -621,7 +621,7 @@ msgstr ""
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Черный список"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
@@ -641,31 +641,31 @@ msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Размер иконок"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Средний (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Большой (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Безопасный поиск"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Умеренный"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Строгий"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Обновлено: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
@@ -677,7 +677,7 @@ msgstr ""
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Настройка субтитров"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
@@ -697,15 +697,15 @@ msgstr ""
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Быстрый поиск"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Быстрый поиск (инкогнито)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Только аудио"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
@@ -713,19 +713,19 @@ msgstr ""
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Очистить историю просмотра"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Ваша история просмотров будет удалена со всех устройств. Отмена невозможна."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Сохраненные плейлисты"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Повтор"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
@@ -737,7 +737,7 @@ msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 msgctxt "#30616"
 msgid "Must be signed in."
@@ -749,47 +749,47 @@ msgstr ""
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Включить MPEG-DASH прокси"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Порт"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Порт %s уже используется. Ошибка запуска HTTP сервера."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr ""
+msgstr "Для MPEG-DASH vods необходим прокси (HTTP сервер)"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Покупки"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Установить InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Требуется Kodi 17+"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper уже установлен."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Удалить временные файлы"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Оценить видео после просмотра"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP сервер"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
@@ -797,11 +797,11 @@ msgstr ""
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Сохранить"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Успешно обновлено: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
@@ -837,15 +837,15 @@ msgstr ""
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Восстановить"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Удалить api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Удалить access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
@@ -881,7 +881,7 @@ msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Местонахождение"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
@@ -893,59 +893,59 @@ msgstr ""
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Мое местонахождение"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Смена пользователя"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Новый пользователь"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Безымянный"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Введите имя пользователя"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Текущий пользователь '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Пользователи"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Добавить пользователя"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Удалить пользователя"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Переименовать пользователя"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Смена пользователя"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Переключиться на '%s'?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "'%s' удален"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "'%s' переименован в '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -953,23 +953,23 @@ msgstr ""
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Отметить как не просмотренное"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Отметить как просмотренное"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Очистить историю просмотра"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "Удалить историю просмотра"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "история просмотра"
 
 msgctxt "#30674"
 msgid "Reset resume point"
@@ -977,67 +977,67 @@ msgstr ""
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Использовать историю просмотра (просмотренное, resume tracking)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Прямо сейчас"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Минуту назад"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Недавно"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Час назад"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Два часа назад"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Три часа назад"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Вчера в"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Два дня назад"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Сегодня в"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Удалить базу кеша данных"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Очистить кеш данных"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "кеш данных"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Использовать для видео"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Использовать для прямого эфира"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "Для прямого эфира требуется InputStream Adaptive >= 2.0.12"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1045,7 +1045,7 @@ msgstr ""
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Через минуту"
 
 msgctxt "#30693"
 msgid "Airing soon"
@@ -1053,11 +1053,11 @@ msgstr ""
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Больше часа"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Более двух часов"
 
 msgctxt "#30696"
 msgid "Airing today at"
@@ -1065,32 +1065,32 @@ msgstr ""
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Завтра в"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Проверить мой IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP сервер не запущен"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "IP клиента %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Ошибка получения IP клиента"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Воспроизвести с субтитрами"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Вы уверены?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "Использовать URLs сайта YouTube"
