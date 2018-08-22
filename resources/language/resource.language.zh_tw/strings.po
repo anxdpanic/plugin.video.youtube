@@ -1,0 +1,1102 @@
+# Kodi Media Center language file
+# Addon Name: YouTube
+# Addon id: plugin.video.youtube
+# Addon Provider: bromix
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2015-09-21 11:01+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_TW\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "YouTube 附加元件"
+
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube 是全球最大的一個影片分享網站。"
+
+#Kodion Settings
+
+msgctxt "#30000"
+msgid "General"
+msgstr "一般設定"
+
+msgctxt "#30001"
+msgid "Username"
+msgstr "帳戶"
+
+msgctxt "#30002"
+msgid "Password"
+msgstr "密碼"
+#empty strings from id 30003 to 30006
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "使用 MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr "設定 InputStream Adaptive"
+
+msgctxt "#30009"
+msgid "Always ask for the video quality"
+msgstr "每次詢問影片解像度"
+
+msgctxt "#30010"
+msgid "Video quality"
+msgstr "影片解像度"
+
+msgctxt "#30011"
+msgid "480p"
+msgstr "480p"
+
+msgctxt "#30012"
+msgid "720p (HD)"
+msgstr "720p (HD)"
+
+msgctxt "#30013"
+msgid "1080p (HD)"
+msgstr "1080p (HD)"
+
+msgctxt "#30014"
+msgid "2160p (4k)"
+msgstr "2160p (4k)"
+
+msgctxt "#30015"
+msgid "4320p (8k)"
+msgstr "4320p (8k)"
+
+msgctxt "#30016"
+msgid "240p"
+msgstr "240p"
+
+msgctxt "#30017"
+msgid "360p"
+msgstr "360p"
+
+msgctxt "#30018"
+msgid "1080p Live / 720p (HD)"
+msgstr "1080p 直播 / 720p (HD)"
+
+#empty strings 30019
+msgctxt "#30020"
+msgid "Allow 3D"
+msgstr "容許 3D 播放"
+
+msgctxt "#30021"
+msgid "Show fanart"
+msgstr "顯示背景圖片"
+
+msgctxt "#30022"
+msgid "Items per page"
+msgstr "每頁顯示行數"
+
+msgctxt "#30023"
+msgid "Search history size"
+msgstr "搜尋記錄大小"
+
+msgctxt "#30024"
+msgid "Cache size (MB)"
+msgstr "快取空間大小 (MB)"
+
+msgctxt "#30025"
+msgid "Enable setup-wizard"
+msgstr "啟用設定精靈"
+
+msgctxt "#30026"
+msgid "Override view"
+msgstr "強制預覽模式"
+
+msgctxt "#30027"
+msgid "View: Default"
+msgstr "預設預覽模式"
+
+msgctxt "#30028"
+msgid "View: Episodes"
+msgstr "情節預覽模式"
+
+msgctxt "#30029"
+msgid "View: Movies"
+msgstr "電影預覽模式"
+
+msgctxt "#30030"
+msgid "Execute setup-wizard?"
+msgstr "要執行設定精靈嗎？"
+
+msgctxt "#30031"
+msgid "Advanced"
+msgstr "進階設定"
+
+msgctxt "#30032"
+msgid "View: TV Shows"
+msgstr "電視預覽模式"
+
+msgctxt "#30033"
+msgid "View: Songs"
+msgstr "音樂預覽模式"
+
+msgctxt "#30034"
+msgid "View: Artists"
+msgstr "藝人預覽模式"
+
+msgctxt "#30035"
+msgid "View: Albums"
+msgstr "相簿預覽模式"
+
+msgctxt "#30036"
+msgid "Support alternative player"
+msgstr "支援使用其他播放器"
+
+msgctxt "#30037"
+msgid "Custom Watch Later playlist id"
+msgstr "自定稍後播放列表 ID"
+
+msgctxt "#30038"
+msgid "Custom History playlist id"
+msgstr "自定觀看歷史列表 ID"
+
+#Kodion Common
+#empty strings from id 30039 to 30099
+
+msgctxt "#30100"
+msgid "Favourites"
+msgstr "我的收藏"
+
+msgctxt "#30101"
+msgid "Add to addon favs"
+msgstr "我的最愛"
+
+msgctxt "#30102"
+msgid "Search"
+msgstr "搜尋"
+
+msgctxt "#30103"
+msgid "Library"
+msgstr "資料庫"
+
+msgctxt "#30104"
+msgid "Highlights"
+msgstr "標記"
+
+msgctxt "#30105"
+msgid "Archive"
+msgstr "封存"
+
+msgctxt "#30106"
+msgid "Next Page (%d)"
+msgstr "下一頁 (%d)"
+
+msgctxt "#30107"
+msgid "Watch Later"
+msgstr "稍後觀看"
+
+msgctxt "#30108"
+msgid "Remove"
+msgstr "移除"
+
+msgctxt "#30109"
+msgid "Latest Videos"
+msgstr "最新的影片"
+
+msgctxt "#30110"
+msgid "New Search"
+msgstr "重新搜尋"
+
+msgctxt "#30111"
+msgid "Sign In"
+msgstr "登入"
+
+msgctxt "#30112"
+msgid "Sign Out"
+msgstr "登出"
+
+msgctxt "#30113"
+msgid "Rename"
+msgstr "重新命名"
+
+msgctxt "#30114"
+msgid "Confirm delete"
+msgstr "確認刪除！"
+
+msgctxt "#30115"
+msgid "Confirm remove"
+msgstr "確認移除！"
+
+msgctxt "#30116"
+msgid "Delete \"%s\"?"
+msgstr "刪除 \"%s\"?"
+
+msgctxt "#30117"
+msgid "Remove \"%s\"?"
+msgstr "搬移 \"%s\"?"
+
+msgctxt "#30118"
+msgid "Delete"
+msgstr "刪除"
+
+msgctxt "#30119"
+msgid "Please wait..."
+msgstr "請梢候..."
+
+msgctxt "#30120"
+msgid "Clear"
+msgstr "清除"
+
+#YouTube
+#empty strings from id 30121 to 30199
+
+msgctxt "#30200"
+msgid "API"
+msgstr "API"
+
+msgctxt "#30201"
+msgid "API Key"
+msgstr "API 金鑰"
+
+msgctxt "#30202"
+msgid "API Id"
+msgstr "API ID"
+
+msgctxt "#30203"
+msgid "API Secret"
+msgstr "API Secret"
+
+msgctxt "#30204"
+msgid "Enable personal API keys"
+msgstr "啟用個人 API 金鑰"
+
+msgctxt "#30205"
+msgid "Use preset API key set"
+msgstr "使用預設的 API 金鑰"
+
+#YouTube
+#empty strings from id 30206 to 30499
+
+msgctxt "#30500"
+msgid "Channels"
+msgstr "頻道"
+
+msgctxt "#30501"
+msgid "Playlists"
+msgstr "播放清單"
+
+msgctxt "#30502"
+msgid "Go to %s"
+msgstr "前往 %s"
+
+msgctxt "#30503"
+msgid "Show channel fanart"
+msgstr "顯示頻道的背景圖片"
+
+msgctxt "#30504"
+msgid "Subscriptions"
+msgstr "訂閱"
+
+msgctxt "#30505"
+msgid "Unsubscribe"
+msgstr "取消訂閱"
+
+msgctxt "#30506"
+msgid "Subscribe"
+msgstr "訂閱"
+
+msgctxt "#30507"
+msgid "My Channel"
+msgstr "我的頻道"
+
+msgctxt "#30508"
+msgid "Liked Videos"
+msgstr "喜歡的影片"
+
+msgctxt "#30509"
+msgid "History"
+msgstr "瀏覽記錄"
+
+msgctxt "#30510"
+msgid "My Subscriptions"
+msgstr "我訂閱的影片"
+
+msgctxt "#30511"
+msgid "Queue video"
+msgstr "加入佇列"
+
+msgctxt "#30512"
+msgid "Browse Channels"
+msgstr "瀏覽頻道"
+
+msgctxt "#30513"
+msgid "Popular right now"
+msgstr "人氣影片"
+
+msgctxt "#30514"
+msgid "Related Videos"
+msgstr "相關影片"
+
+msgctxt "#30515"
+msgid "Auto-Remove from 'Watch Later'"
+msgstr "自動刪除「稍後觀看」的影片"
+
+msgctxt "#30516"
+msgid "Folders"
+msgstr "資料夾"
+
+msgctxt "#30517"
+msgid "Subscribe to %s"
+msgstr "訂閱 %s"
+
+msgctxt "#30518"
+msgid "Go to '%s'"
+msgstr "請使用瀏覽器開啟下列連結： '%s'"
+
+msgctxt "#30519"
+msgid "and enter the following code:"
+msgstr "然後輸入認證碼："
+
+msgctxt "#30520"
+msgid "Add to..."
+msgstr "新增至 ..."
+
+msgctxt "#30521"
+msgid "Select playlist"
+msgstr "選擇播放清單"
+
+msgctxt "#30522"
+msgid "New playlist..."
+msgstr "新播放清單..."
+
+msgctxt "#30523"
+msgid "Language"
+msgstr "語言"
+
+msgctxt "#30524"
+msgid "Select language"
+msgstr "選擇語言"
+
+msgctxt "#30525"
+msgid "Select region"
+msgstr "選擇區域"
+
+msgctxt "#30526"
+msgid "Adjust"
+msgstr "調整"
+
+msgctxt "#30527"
+msgid "Language and region?"
+msgstr "語言及地區域嗎？"
+
+msgctxt "#30528"
+msgid "Rate..."
+msgstr "評分..."
+
+msgctxt "#30529"
+msgid "I like this"
+msgstr "我喜歡這個"
+
+msgctxt "#30530"
+msgid "I dislike this"
+msgstr "不喜歡這個"
+
+msgctxt "#30531"
+msgid "Play all"
+msgstr "全部播放"
+
+msgctxt "#30532"
+msgid "Default"
+msgstr "預設"
+
+msgctxt "#30533"
+msgid "Reverse"
+msgstr "反向"
+
+msgctxt "#30534"
+msgid "Shuffle"
+msgstr "隨機"
+
+msgctxt "#30535"
+msgid "Select the order of the playlist"
+msgstr "選擇播放清單排序方式"
+
+msgctxt "#30536"
+msgid "Updating Playlist..."
+msgstr "正在更新播放清單 ..."
+
+msgctxt "#30537"
+msgid "Play from here"
+msgstr "從此處開始播放"
+
+msgctxt "#30538"
+msgid "Disliked Videos"
+msgstr "不喜歡的影片"
+
+msgctxt "#30539"
+msgid "Live"
+msgstr "直播"
+
+msgctxt "#30540"
+msgid "Play with..."
+msgstr "選擇其他播放器 ..."
+
+msgctxt "#30541"
+msgid "Show channel name in description"
+msgstr "在描述列顯示廣播頻道名稱"
+
+msgctxt "#30542"
+msgid "rtmpe streams are not supported"
+msgstr "不支援 RTMPE 格式"
+
+msgctxt "#30543"
+msgid "Refresh"
+msgstr "重新整理"
+
+msgctxt "#30544"
+msgid "More Links from the description"
+msgstr "符合此描述範圍的其他連結"
+
+msgctxt "#30545"
+msgid "No further links found."
+msgstr "沒有此範圍的其他連結。"
+
+msgctxt "#30546"
+msgid "Please log in twice!"
+msgstr "請登入兩次！"
+
+msgctxt "#30547"
+msgid "You must enable two applications so that YouTube is functioning properly."
+msgstr "您要啟用兩個應用，Youtube 才能發揮完整的功能。"
+
+msgctxt "#30548"
+msgid "More..."
+msgstr "更多選項 ..."
+
+msgctxt "#30549"
+msgid "No videos streams found"
+msgstr "沒有影片串流"
+
+msgctxt "#30550"
+msgid "Region"
+msgstr "地區"
+
+msgctxt "#30551"
+msgid "Recommendations"
+msgstr "推薦的影片"
+
+msgctxt "#30552"
+msgid "Maintenance"
+msgstr "維護"
+
+msgctxt "#30553"
+msgid "Delete function cache database"
+msgstr "刪除函數快取資料庫"
+
+msgctxt "#30554"
+msgid "Delete search history database"
+msgstr "刪除搜尋歷史資料庫"
+
+msgctxt "#30555"
+msgid "Clear function cache"
+msgstr "清除函數快取"
+
+msgctxt "#30556"
+msgid "Clear search history"
+msgstr "清除搜尋記錄"
+
+msgctxt "#30557"
+msgid "function cache"
+msgstr "函數快取"
+
+msgctxt "#30558"
+msgid "search history"
+msgstr "搜尋記錄"
+
+msgctxt "#30559"
+msgid "Delete settings.xml"
+msgstr "刪除 settings.xml"
+
+msgctxt "#30560"
+msgid "Subtitle language"
+msgstr "字幕語言"
+
+msgctxt "#30561"
+msgid "None"
+msgstr "無"
+
+msgctxt "#30562"
+msgid "All"
+msgstr "全部"
+
+msgctxt "#30563"
+msgid "Setting"
+msgstr "設定"
+
+msgctxt "#30564"
+msgid "Setting, English"
+msgstr "設定, 英文"
+
+msgctxt "#30565"
+msgid "English"
+msgstr "英文"
+
+msgctxt "#30566"
+msgid "Prompt"
+msgstr "提示"
+
+msgctxt "#30567"
+msgid "Set as Watch Later"
+msgstr "稍後播放"
+
+msgctxt "#30568"
+msgid "Remove as Watch Later"
+msgstr "從稍後播放移除"
+
+msgctxt "#30569"
+msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgstr "你確定要把 '%s' 從稍後播放移除?"
+
+msgctxt "#30570"
+msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgstr "你確定要用 '%s' 取代現有稍後播放列表?"
+
+msgctxt "#30571"
+msgid "Set as History"
+msgstr "設為歷史播放清單"
+
+msgctxt "#30572"
+msgid "Remove as History"
+msgstr "取消設為歷史播放清單"
+
+msgctxt "#30573"
+msgid "Are you sure you want to remove '%s' as your History list?"
+msgstr "你確定要取消 '%s' 做為歷史播放列表"
+
+msgctxt "#30574"
+msgid "Are you sure you want to replace your current History list with '%s'?"
+msgstr "你確定要用 '%s' 取代現有歷史播放列表?"
+
+msgctxt "#30575"
+msgid "Succeeded"
+msgstr "成功"
+
+msgctxt "#30576"
+msgid "Failed"
+msgstr "失敗"
+
+msgctxt "#30577"
+msgid "Settings"
+msgstr "設定"
+
+msgctxt "#30578"
+msgid "Force SSL certificate verification"
+msgstr "強制驗證 SSL 憑證"
+
+msgctxt "#30579"
+msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+msgstr "MPEG-DASH 已啟用，但 InputStream Adaptive 沒有啟用。 是否要啟用 InputStream Adaptive?"
+
+msgctxt "#30580"
+msgid "Reset access manager"
+msgstr "重設存取管理員"
+
+msgctxt "#30581"
+msgid "Are you sure you want to reset access manager?"
+msgstr "你確定要重設存取管理員?"
+
+msgctxt "#30582"
+msgid "Autoplay suggested videos"
+msgstr "自動播放建議影片"
+
+msgctxt "#30583"
+msgid "Automatic"
+msgstr "自動"
+
+msgctxt "#30584"
+msgid "My Subscriptions (Filtered)"
+msgstr "我的訂閱 (已過濾)"
+
+msgctxt "#30585"
+msgid "Filtered channel list (comma delimited)"
+msgstr "過濾頻道列表 (使用,分隔)"
+
+msgctxt "#30586"
+msgid "Blacklist"
+msgstr "黑名單"
+
+msgctxt "#30587"
+msgid "Add to My Subscriptions filter"
+msgstr "新增到我的過濾頻道列表"
+
+msgctxt "#30588"
+msgid "Remove from My Subscriptions filter"
+msgstr "從我的過濾頻道列表移除"
+
+msgctxt "#30589"
+msgid "Added to My Subscriptions filter"
+msgstr "已新增到我的過濾頻道列表"
+
+msgctxt "#30590"
+msgid "Removed from My Subscriptions filter"
+msgstr "已從我的過濾頻道列表移除"
+
+msgctxt "#30591"
+msgid "Thumbnail size"
+msgstr "縮圖大小"
+
+msgctxt "#30592"
+msgid "Medium (16:9)"
+msgstr "中 (16:9)"
+
+msgctxt "#30593"
+msgid "High (4:3)"
+msgstr "大 (4:3)"
+
+msgctxt "#30594"
+msgid "Safe search"
+msgstr "安全搜尋"
+
+msgctxt "#30595"
+msgid "Moderate"
+msgstr "中等"
+
+msgctxt "#30596"
+msgid "Strict"
+msgstr "嚴格"
+
+msgctxt "#30597"
+msgid "Updated: %s"
+msgstr "更新: %s"
+
+msgctxt "#30598"
+msgid "Personal API keys enabled"
+msgstr "個人 API 金鑰啟用"
+
+msgctxt "#30599"
+msgid "Failed to enable personal API keys. Missing: %s"
+msgstr "無法啟用個人 API 金鑰，缺少: %s"
+
+msgctxt "#30600"
+msgid "Configure subtitles"
+msgstr "設定字幕"
+
+msgctxt "#30601"
+msgid "%s with %s fallback"
+msgstr "沒有 %s 則使用 %s"
+
+msgctxt "#30602"
+msgid "No auto-generated"
+msgstr "非自動產生"
+
+msgctxt "#30603"
+msgid "Age gate"
+msgstr "年齡限制"
+
+msgctxt "#30604"
+msgid "Allow offensive content"
+msgstr "允許人反感的內容"
+
+msgctxt "#30605"
+msgid "Quick Search"
+msgstr "快速搜尋"
+
+msgctxt "#30606"
+msgid "Quick Search (Incognito)"
+msgstr "快速搜尋 (無痕)"
+
+msgctxt "#30607"
+msgid "Audio only"
+msgstr "只播放聲音"
+
+msgctxt "#30608"
+msgid "Allow developer keys"
+msgstr "使用開發者金鑰"
+
+msgctxt "#30609"
+msgid "Clear watch history"
+msgstr "清除觀看記錄"
+
+msgctxt "#30610"
+msgid "This will clear your account's watch history from all devices. You can't undo this."
+msgstr "這將會從所有裝置上清除你帳戶的觀看記錄，注意: 這無法還原。"
+
+msgctxt "#30611"
+msgid "Saved Playlists"
+msgstr "已儲存播放列表"
+
+msgctxt "#30612"
+msgid "Retry"
+msgstr "重試"
+
+msgctxt "#30613"
+msgid "Retrieve Watch Later playlist id"
+msgstr "取得稍後播放列表 ID"
+
+msgctxt "#30614"
+msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+msgstr "無法取得稍後播放列表ID，請從網頁或APP加入一些影片至稍後播放後重試。"
+
+msgctxt "#30615"
+msgid "Cancel"
+msgstr "取消"
+
+msgctxt "#30616"
+msgid "Must be signed in."
+msgstr "你必須登入"
+
+msgctxt "#30617"
+msgid "MPEG-DASH"
+msgstr "MPEG-DASH"
+
+msgctxt "#30618"
+msgid "Enable mpeg-dash proxy"
+msgstr "啟用 mpeg-dash 代理"
+
+msgctxt "#30619"
+msgid "Port"
+msgstr "Port"
+
+msgctxt "#30620"
+msgid "Port %s already in use. Cannot start http server."
+msgstr "Port %s 已經被使用. 無法啟動 HTTP 伺服器."
+
+msgctxt "#30621"
+msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgstr "mpeg-dash 隨選視訊需要設定代理 (請看 HTTP 伺服器)"
+
+msgctxt "#30622"
+msgid "Purchases"
+msgstr "已購買"
+
+msgctxt "#30623"
+msgid "Install InputStream Helper"
+msgstr "安裝 InputStream Helper"
+
+msgctxt "#30624"
+msgid "Requires Kodi 17+"
+msgstr "需要 Kodi 17 以上版本"
+
+msgctxt "#30625"
+msgid "InputStream Helper is already installed."
+msgstr "InputStream Helper 已經安裝"
+
+msgctxt "#30626"
+msgid "Delete temporary files"
+msgstr "刪除暫存檔案"
+
+msgctxt "#30627"
+msgid "Rate video after watching"
+msgstr "在觀看後評分"
+
+msgctxt "#30628"
+msgid "HTTP Server"
+msgstr "HTTP 伺服器"
+
+msgctxt "#30629"
+msgid "IP whitelist (comma delimited)"
+msgstr "IP 白名單 (使用,分隔)"
+
+msgctxt "#30630"
+msgid "Save"
+msgstr "儲存"
+
+msgctxt "#30631"
+msgid "Successfully updated: %s"
+msgstr "成功更新: %s"
+
+msgctxt "#30632"
+msgid "Enable API configuration page"
+msgstr "啟用 API 設定頁面"
+
+msgctxt "#30633"
+msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
+msgstr "http://<ipaddress>:<port>/api (請看 HTTP 伺服器)"
+
+msgctxt "#30634"
+msgid "YouTube Add-on API Configuration"
+msgstr "YouTube 附加元件 API 設定"
+
+msgctxt "#30635"
+msgid "No changes detected, API keys were not updated."
+msgstr "沒有改變, 沒有更新 APK 金鑰"
+
+msgctxt "#30636"
+msgid "Personal API keys are enabled."
+msgstr "啟用個人 API 金鑰"
+
+msgctxt "#30637"
+msgid "Personal API keys are disabled."
+msgstr "停用個人 API 金鑰"
+
+msgctxt "#30638"
+msgid "Bookmark this page to quickly add your keys in the future."
+msgstr "把此頁加入書簽以便未來加入金鑰"
+
+msgctxt "#30639"
+msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
+msgstr "在 api_keys.json 找到個人 API 金鑰，是否要還原? 選擇否則覆蓋現有金鑰"
+
+msgctxt "#30640"
+msgid "Restore"
+msgstr "還原"
+
+msgctxt "#30641"
+msgid "Delete api_keys.json"
+msgstr "刪除 api_keys.json"
+
+msgctxt "#30642"
+msgid "Delete access_manager.json"
+msgstr "刪除 access_manager.json"
+
+msgctxt "#30643"
+msgid "Listen on IP"
+msgstr "Listen IP"
+
+msgctxt "#30644"
+msgid "Select listen IP"
+msgstr "選擇 Listen IP"
+
+msgctxt "#30645"
+msgid "Refresh after watching"
+msgstr "觀看後重新整理"
+
+msgctxt "#30646"
+msgid "Upcoming Live"
+msgstr "即將直播"
+
+msgctxt "#30647"
+msgid "Completed Live"
+msgstr "已結束直播"
+
+msgctxt "#30648"
+msgid "API Key is incorrect. Settings - API - API Key"
+msgstr "API 金鑰錯誤。 設定 - API - API 金鑰"
+
+msgctxt "#30649"
+msgid "Client Id is incorrect. Settings - API - API Id"
+msgstr "客戶端 ID 錯誤。 設定 - API - API ID"
+
+msgctxt "#30650"
+msgid "Client Secret is incorrect. Settings - API - API Secret"
+msgstr "客戶端 Secret 錯誤。 設定 - API - API Secret"
+
+msgctxt "#30651"
+msgid "Location"
+msgstr "位置"
+
+msgctxt "#30652"
+msgid "Location radius (km)"
+msgstr "位置半徑"
+
+msgctxt "#30653"
+msgid "Perform geolocation? Used for [B]My Location[/B]"
+msgstr "進行地理定位? 用於[B]我的位置[/ B]"
+
+msgctxt "#30654"
+msgid "My Location"
+msgstr "我的位置"
+
+msgctxt "#30655"
+msgid "Switch User"
+msgstr "切換使用者"
+
+msgctxt "#30656"
+msgid "New user"
+msgstr "新使用者"
+
+msgctxt "#30657"
+msgid "Unnamed"
+msgstr "未命名"
+
+msgctxt "#30658"
+msgid "Enter a name for this user"
+msgstr "輸入使用者名稱"
+
+msgctxt "#30659"
+msgid "User is now '%s'"
+msgstr "使用者名稱為 '%s'"
+
+msgctxt "#30660"
+msgid "Users"
+msgstr "使用者"
+
+msgctxt "#30661"
+msgid "Add a user"
+msgstr "新增使用者"
+
+msgctxt "#30662"
+msgid "Remove a user"
+msgstr "移除使用者"
+
+msgctxt "#30663"
+msgid "Rename a user"
+msgstr "重新命名使用者"
+
+msgctxt "#30664"
+msgid "Switch user"
+msgstr "切換使用者"
+
+msgctxt "#30665"
+msgid "Switch to '%s' now?"
+msgstr "切換為 '%s' ?"
+
+msgctxt "#30666"
+msgid "Removed '%s'"
+msgstr "已移除 '%s'"
+
+msgctxt "#30667"
+msgid "Renamed '%s' to '%s'"
+msgstr "已重新命名 '%s' 為 '%s'"
+
+msgctxt "#30668"
+msgid "Play count minimum percent"
+msgstr "超過多少百分比記錄播放次數"
+
+msgctxt "#30669"
+msgid "Mark unwatched"
+msgstr "標記為未觀看"
+
+msgctxt "#30670"
+msgid "Mark watched"
+msgstr "標記為已觀看"
+
+msgctxt "#30671"
+msgid "Clear playback history"
+msgstr "清除播放歷史"
+
+msgctxt "#30672"
+msgid "Delete playback history"
+msgstr "刪除播放歷史"
+
+msgctxt "#30673"
+msgid "playback history"
+msgstr "播放歷史"
+
+msgctxt "#30674"
+msgid "Reset resume point"
+msgstr "重設繼續播放點"
+
+msgctxt "#30675"
+msgid "Use playback history (watched, resume tracking)"
+msgstr "啟用播放歷史 (已觀看, 繼續播放)"
+
+msgctxt "#30676"
+msgid "Just now"
+msgstr "只有現在"
+
+msgctxt "#30677"
+msgid "A minute ago"
+msgstr "一分鐘前"
+
+msgctxt "#30678"
+msgid "Recently"
+msgstr "最近"
+
+msgctxt "#30679"
+msgid "An hour ago"
+msgstr "一小時前"
+
+msgctxt "#30680"
+msgid "Two hours ago"
+msgstr "兩小時前"
+
+msgctxt "#30681"
+msgid "Three hours ago"
+msgstr "三小時前"
+
+msgctxt "#30682"
+msgid "Yesterday at"
+msgstr "昨天"
+
+msgctxt "#30683"
+msgid "Two days ago"
+msgstr "兩天前"
+
+msgctxt "#30684"
+msgid "Today at"
+msgstr "今天"
+
+msgctxt "#30685"
+msgid "Delete data cache database"
+msgstr "刪除資料快取資料庫"
+
+msgctxt "#30686"
+msgid "Clear data cache"
+msgstr "清除資料快取"
+
+msgctxt "#30687"
+msgid "data cache"
+msgstr "資料快取"
+
+msgctxt "#30688"
+msgid "Use for videos"
+msgstr "使用在影片"
+
+msgctxt "#30689"
+msgid "Use for live streams"
+msgstr "使用在直播串流"
+
+msgctxt "#30690"
+msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+msgstr "直播串流需要 InputStream Adaptive 2.0.12 以上版本"
+
+msgctxt "#30691"
+msgid "Airing now"
+msgstr "現在播放"
+
+msgctxt "#30692"
+msgid "In a minute"
+msgstr "一分鐘內"
+
+msgctxt "#30693"
+msgid "Airing soon"
+msgstr "即將播放"
+
+msgctxt "#30694"
+msgid "In over an hour"
+msgstr "一個多小時"
+
+msgctxt "#30695"
+msgid "In over two hours"
+msgstr "兩個多小時"
+
+msgctxt "#30696"
+msgid "Airing today at"
+msgstr "今天播放"
+
+msgctxt "#30697"
+msgid "Tomorrow at"
+msgstr "明天"
+
+msgctxt "#30698"
+msgid "Check my IP"
+msgstr "檢查我的 IP"
+
+msgctxt "#30699"
+msgid "HTTP server is not running"
+msgstr "沒有執行 HTTP 伺服器"
+
+msgctxt "#30700"
+msgid "Client IP is %s"
+msgstr "客戶端 IP 為 %s"
+
+msgctxt "#30701"
+msgid "Failed to obtain client IP"
+msgstr "無法取得客戶端 IP"
+
+msgctxt "#30702"
+msgid "Play with subtitles"
+msgstr "播放字幕"
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr "確定?"
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
+msgstr "使用 YouTube 網址"
