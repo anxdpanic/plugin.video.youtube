@@ -116,13 +116,17 @@ class AbstractSettings(object):
         return verify
 
     def allow_dev_keys(self):
-        return self.get_bool(constants.setting.ALLOW_DEV_KEYS, True)
+        return self.get_bool(constants.setting.ALLOW_DEV_KEYS, False)
 
     def use_dash_videos(self):
-        return self.get_bool(constants.setting.DASH_VIDEOS, True)
+        if not self.use_dash():
+            return False
+        return self.get_bool(constants.setting.DASH_VIDEOS, False)
 
     def use_dash_live_streams(self):
-        return self.get_bool(constants.setting.DASH_LIVE_STREAMS, True)
+        if not self.use_dash():
+            return False
+        return self.get_bool(constants.setting.DASH_LIVE_STREAMS, False)
 
     def httpd_port(self):
         return self.get_int(constants.setting.HTTPD_PORT, 50152)
