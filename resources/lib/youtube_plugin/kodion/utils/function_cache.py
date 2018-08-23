@@ -105,4 +105,6 @@ class FunctionCache(Storage):
         return cached_data
 
     def _optimize_item_count(self):
+        # override method from resources/lib/youtube_plugin/kodion/utils/storage.py
+        # for function cache do not optimize by item count, using database size.
         pass
