@@ -389,11 +389,11 @@ class YouTube(LoginClient):
         if isinstance(video_id, list):
             video_id = ','.join(video_id)
 
-        part = 'snippet,contentDetails,status'
+        parts = ['snippet,contentDetails,status']
         if live_details:
-            part += ',liveStreamingDetails'
+            parts.append(',liveStreamingDetails')
 
-        params = {'part': part,
+        params = {'part': ''.join(parts),
                   'id': video_id}
         return self._perform_v3_request(method='GET', path='videos', params=params)
 
@@ -776,7 +776,7 @@ class YouTube(LoginClient):
                     for _thumb in _thumbs:
                         _thumb_url = _thumb.get('url', '')
                         if _thumb_url.startswith('//'):
-                            _thumb_url = 'https:' + _thumb_url
+                            _thumb_url = ''.join(['https:', _thumb_url])
                         if _thumb_url.endswith('/default.jpg'):
                             _video_item['thumbnails']['default']['url'] = _thumb_url
                         elif _thumb_url.endswith('/mqdefault.jpg'):

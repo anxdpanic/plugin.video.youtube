@@ -528,13 +528,13 @@ class Provider(kodion.AbstractProvider):
             item_params.update({'addon_id': addon_id})
 
         if page == 1:
-            playlists_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
+            playlists_item = DirectoryItem(''.join(['[B]', context.localize(self.LOCAL_MAP['youtube.playlists']), '[/B]']),
                                            context.create_uri(['channel', channel_id, 'playlists'], item_params),
                                            image=context.create_resource_path('media', 'playlist.png'))
             playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
             result.append(playlists_item)
             search_live_id = mine_id if mine_id else channel_id
-            search_item = kodion.items.NewSearchItem(context, alt_name='[B]' + context.localize(self.LOCAL_MAP['youtube.search']) + '[/B]',
+            search_item = kodion.items.NewSearchItem(context, alt_name=''.join(['[B]', context.localize(self.LOCAL_MAP['youtube.search']), '[/B]']),
                                                      image=context.create_resource_path('media', 'search.png'),
                                                      fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
             result.append(search_item)
@@ -924,7 +924,7 @@ class Provider(kodion.AbstractProvider):
                 channel_params = {}
                 channel_params.update(context.get_params())
                 channel_params['search_type'] = 'channel'
-                channel_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.channels']) + '[/B]',
+                channel_item = DirectoryItem(''.join(['[B]', context.localize(self.LOCAL_MAP['youtube.channels']), '[/B]']),
                                              context.create_uri([context.get_path().replace('input', 'query')], channel_params),
                                              image=context.create_resource_path('media', 'channels.png'))
                 channel_item.set_fanart(self.get_fanart(context))
@@ -933,7 +933,7 @@ class Provider(kodion.AbstractProvider):
                 playlist_params = {}
                 playlist_params.update(context.get_params())
                 playlist_params['search_type'] = 'playlist'
-                playlist_item = DirectoryItem('[B]' + context.localize(self.LOCAL_MAP['youtube.playlists']) + '[/B]',
+                playlist_item = DirectoryItem(''.join(['[B]', context.localize(self.LOCAL_MAP['youtube.playlists']), '[/B]']),
                                               context.create_uri([context.get_path().replace('input', 'query')], playlist_params),
                                               image=context.create_resource_path('media', 'playlist.png'))
                 playlist_item.set_fanart(self.get_fanart(context))
@@ -1099,7 +1099,7 @@ class Provider(kodion.AbstractProvider):
                 elif maint_type == 'temp_files':
                     _file_w_path = _file
                 elif _file == 'playback_history':
-                    _file = str(context.get_access_manager().get_current_user_id()) + '.sqlite'
+                    _file = ''.join([str(context.get_access_manager().get_current_user_id()), '.sqlite'])
                     _file_w_path = os.path.join(os.path.join(context.get_data_path(), 'playback'), _file)
                 else:
                     _file_w_path = os.path.join(context._data_path, _file)
@@ -1256,7 +1256,7 @@ class Provider(kodion.AbstractProvider):
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
             my_subscriptions_item = DirectoryItem(
-                '[B]' + context.localize(self.LOCAL_MAP['youtube.my_subscriptions']) + '[/B]',
+                ''.join(['[B]', context.localize(self.LOCAL_MAP['youtube.my_subscriptions']), '[/B]']),
                 context.create_uri(['special', 'new_uploaded_videos_tv']),
                 context.create_resource_path('media', 'new_uploads.png'))
             my_subscriptions_item.set_fanart(self.get_fanart(context))

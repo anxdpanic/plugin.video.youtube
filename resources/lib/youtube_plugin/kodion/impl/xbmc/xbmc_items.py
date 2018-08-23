@@ -35,7 +35,7 @@ def to_play_item(context, play_item):
 
     if not play_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
             play_item.get_headers() and play_item.get_uri().startswith('http'):
-        play_item.set_uri(play_item.get_uri() + '|' + play_item.get_headers())
+        play_item.set_uri('|'.join([play_item.get_uri(), play_item.get_headers()]))
 
     if settings.is_support_alternative_player_enabled() and \
             settings.alternative_player_web_urls() and \

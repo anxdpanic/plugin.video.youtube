@@ -73,14 +73,14 @@ def parse(datetime_string, localize=True):
 def get_scheduled_start(datetime_object, localize=True):
     start_hour = '{:02d}'.format(datetime_object.hour)
     start_minute = '{:<02d}'.format(datetime_object.minute)
-    start_time = start_hour + ':' + start_minute
+    start_time = ':'.join([start_hour, start_minute])
     start_date = str(datetime_object.date())
     if localize:
         now = datetime.now()
     else:
         now = datetime.utcnow()
     start_date = start_date.replace(str(now.year), '').lstrip('-')
-    start_date = start_date.replace('{:02d}'.format(now.month) + '-' + '{:02d}'.format(now.day), '')
+    start_date = start_date.replace('-'.join(['{:02d}'.format(now.month), '{:02d}'.format(now.day)]), '')
     return start_date, start_time
 
 

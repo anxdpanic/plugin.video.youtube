@@ -29,7 +29,7 @@ import xbmc
 class JSONStore(object):
     def __init__(self, filename):
         self.base_path = 'special://profile/addon_data/plugin.video.youtube/'
-        self.filename = xbmc.translatePath(self.base_path + filename)
+        self.filename = xbmc.translatePath(''.join([self.base_path, filename]))
         self._data = None
         self.load()
         self.set_defaults()
@@ -62,7 +62,7 @@ class JSONStore(object):
 
     def make_dirs(self, path):
         if not path.endswith('/'):
-            path += '/'
+            path = ''.join([path, '/'])
         path = xbmc.translatePath(path)
         if not xbmcvfs.exists(path):
             try:

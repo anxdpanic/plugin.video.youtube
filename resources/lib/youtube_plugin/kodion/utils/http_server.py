@@ -31,17 +31,17 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         log_ip = 'unknown'
         if len(split_ip) == 4:
             log_ip = '%s.%s.' % (split_ip[0], split_ip[1])
-        log_line = '[plugin.video.youtube] HTTPServer: Connection from |%s|' % log_ip
+        log_lines = ['[plugin.video.youtube] HTTPServer: Connection from |%s|' % log_ip]
         conn_allowed = client_ip.startswith(self.local_ranges)
-        log_line += ' Local range: |%s|' % str(conn_allowed)
+        log_lines.append('Local range: |%s|' % str(conn_allowed))
         if not conn_allowed:
             conn_allowed = client_ip in self.whitelist_ips
-            log_line += ' Whitelisted: |%s|' % str(conn_allowed)
+            log_lines.append('Whitelisted: |%s|' % str(conn_allowed))
 
         if not conn_allowed:
             xbmc.log('[plugin.video.youtube] HTTPServer: Connection from |%s| not allowed' % log_ip, xbmc.LOGDEBUG)
         else:
-            xbmc.log(log_line, xbmc.LOGDEBUG)
+            xbmc.log(' '.join(log_lines), xbmc.LOGDEBUG)
         return conn_allowed
 
     def do_GET(self):
@@ -63,7 +63,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_error(403)
         else:
             if dash_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = xbmc.translatePath(self.base_path + self.path)
+                file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
                 file_chunk = True
                 xbmc.log('[plugin.video.youtube] HTTPServer: Request file path |{file_path}|'.format(file_path=file_path), xbmc.LOGDEBUG)
                 try:
@@ -153,7 +153,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             addon = xbmcaddon.Addon('plugin.video.youtube')
             dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true'
             if dash_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = xbmc.translatePath(self.base_path + self.path)
+                file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
                 if not os.path.isfile(file_path):
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path)
                     self.send_error(404, response)

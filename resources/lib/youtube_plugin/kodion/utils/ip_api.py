@@ -13,7 +13,7 @@ class Locator:
         return self._response
 
     def locate_requester(self):
-        request_url = self._base_url + '/json'
+        request_url = '/'.join([self._base_url, 'json'])
         response = requests.get(request_url)
         self._response = response.json()
 

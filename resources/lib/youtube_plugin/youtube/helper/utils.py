@@ -285,7 +285,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         if not image:
             image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         if image.endswith('_live.jpg'):
-            image += '?ct=' + thumb_stamp
+            image = ''.join([image, '?ct=', thumb_stamp])
         video_item.set_image(image)
 
         # set fanart
@@ -492,7 +492,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
     if video_item.live and image:
-        image += '?ct=' + get_thumb_timestamp()
+        image = ''.join([image, '?ct=', get_thumb_timestamp()])
     video_item.set_image(image)
 
     # set fanart

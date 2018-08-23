@@ -112,7 +112,7 @@ class CommonResolver(AbstractResolver, list):
 
                     # some server return 301 for HEAD requests
                     # we just compare the new location - if it's equal we can return the url
-                    if location == _url or location + '/' == _url or location == _url + '/':
+                    if location == _url or ''.join([location, '/']) == _url or location == ''.join([_url, '/']):
                         return _url
 
                     if location:

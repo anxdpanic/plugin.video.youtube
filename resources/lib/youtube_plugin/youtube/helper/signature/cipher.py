@@ -36,7 +36,7 @@ class Cipher(object):
             if not os.path.exists(self._cache_folder):
                 os.makedirs(self._cache_folder)
 
-            filename = md5_hash + '.jsonscript'
+            filename = ''.join([md5_hash, '.jsonscript'])
             filename = os.path.join(self._cache_folder, filename)
             with open(filename, 'w') as outfile:
                 json.dump(json_script, outfile, sort_keys=True, indent=4, ensure_ascii=False)
@@ -51,7 +51,7 @@ class Cipher(object):
 
         url = javascript_url
         if not url.startswith('http'):
-            url = 'http://' + url
+            url = ''.join(['http://', url])
 
         result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
         javascript = result.text
@@ -169,7 +169,7 @@ class Cipher(object):
         _object_body = _object_body.split('},')
         for _function in _object_body:
             if not _function.endswith('}'):
-                _function += '}'
+                _function = ''.join([_function, '}'])
             _function = _function.strip()
 
             match = re.match('(?P<name>[^:]*):function\((?P<parameter>[^)]*)\)\{(?P<body>[^}]+)\}', _function)
