@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.1.1" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.1.2" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -14,8 +14,12 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.1.2
+[fix] dash settings check and defaults
 [fix] addon-check raised warning for services complex entry point
 [fix] codacy raised issue in http server (https://app.codacy.com/app/Kodi/repo-plugins/pullRequest?prid=2080401)
+[chg] move seek to onPlayBackStarted, onAVStarted only in K18
+[chg] geolocation provider changed from ipstack to ip-api
+[del] frodo listitem art compatibility
 [lang] ru_ru strings |contrib: Burgaduk|
 [lang] zh_tw strings |contrib: Zankio|
 

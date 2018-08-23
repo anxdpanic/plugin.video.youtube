@@ -1,6 +1,10 @@
 6.1.2
+[fix] dash settings check and defaults
 [fix] addon-check raised warning for services complex entry point
 [fix] codacy raised issue in http server (https://app.codacy.com/app/Kodi/repo-plugins/pullRequest?prid=2080401)
+[chg] move seek to onPlayBackStarted, onAVStarted only in K18
+[chg] geolocation provider changed from ipstack to ip-api
+[del] frodo listitem art compatibility
 [lang] ru_ru strings |contrib: Burgaduk|
 [lang] zh_tw strings |contrib: Zankio|
 
