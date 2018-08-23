@@ -37,8 +37,6 @@ def to_play_item(context, play_item):
             play_item.get_headers() and play_item.get_uri().startswith('http'):
         play_item.set_uri(play_item.get_uri() + '|' + play_item.get_headers())
 
-    list_item.setProperty('inputstreamaddon', '')
-    list_item.setProperty('inputstream.adaptive.manifest_type', '')
     if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
