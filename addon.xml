@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~alpha2" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~alpha3" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -21,8 +21,6 @@
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s
 [chg] Localize confirmation
-[lang] ru_ru strings |contrib: Burgaduk|
-[lang] zh_tw strings |contrib: Zankio|
         </news>
         <assets>
             <icon>icon.png</icon>
