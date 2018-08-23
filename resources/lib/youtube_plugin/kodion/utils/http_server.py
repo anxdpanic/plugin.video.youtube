@@ -46,7 +46,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
-        dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true'
+        dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
 
         if self.path == '/client_ip':
@@ -151,7 +151,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_error(403)
         else:
             addon = xbmcaddon.Addon('plugin.video.youtube')
-            dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true'
+            dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
             if dash_proxy_enabled and self.path.endswith('.mpd'):
                 file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
                 if not os.path.isfile(file_path):
