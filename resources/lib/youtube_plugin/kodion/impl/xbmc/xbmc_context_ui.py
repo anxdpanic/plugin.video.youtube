@@ -147,3 +147,15 @@ class XbmcContextUI(AbstractContextUI):
     def clear_home_window_property(property_id):
         property_id = ''.join(['plugin.video.youtube-', property_id])
         xbmcgui.Window(10000).clearProperty(property_id)
+
+    @staticmethod
+    def bold(value):
+        return ''.join(['[B]', value, '[/B]'])
+
+    @staticmethod
+    def uppercase(value):
+        return ''.join(['[UPPERCASE]', value, '[/UPPERCASE]'])
+
+    @staticmethod
+    def color(color, value):
+        return ''.join(['[COLOR=', color.lower(), ']', value, '[/COLOR]'])

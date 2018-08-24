@@ -79,37 +79,37 @@ class YouTube(LoginClient):
 
         # update title
         for video_stream in video_streams:
-            title = '[B]%s[/B] (%s)' % (video_stream['title'], video_stream['container'])
+            title = '%s (%s)' % (context.get_ui().bold(video_stream['title']), video_stream['container'])
 
             if 'audio' in video_stream and 'video' in video_stream:
                 if video_stream['audio']['bitrate'] > 0 and video_stream['video']['encoding'] and \
                         video_stream['audio']['encoding']:
-                    title = '[B]%s[/B] (%s; %s / %s@%d)' % (video_stream['title'],
-                                                            video_stream['container'],
-                                                            video_stream['video']['encoding'],
-                                                            video_stream['audio']['encoding'],
-                                                            video_stream['audio']['bitrate'])
+                    title = '%s (%s; %s / %s@%d)' % (context.get_ui().bold(video_stream['title']),
+                                                     video_stream['container'],
+                                                     video_stream['video']['encoding'],
+                                                     video_stream['audio']['encoding'],
+                                                     video_stream['audio']['bitrate'])
 
                 elif video_stream['video']['encoding'] and video_stream['audio']['encoding']:
-                    title = '[B]%s[/B] (%s; %s / %s)' % (video_stream['title'],
-                                                         video_stream['container'],
-                                                         video_stream['video']['encoding'],
-                                                         video_stream['audio']['encoding'])
+                    title = '%s (%s; %s / %s)' % (context.get_ui().bold(video_stream['title']),
+                                                  video_stream['container'],
+                                                  video_stream['video']['encoding'],
+                                                  video_stream['audio']['encoding'])
             elif 'audio' in video_stream and 'video' not in video_stream:
                 if video_stream['audio']['encoding'] and video_stream['audio']['bitrate'] > 0:
-                    title = '[B]%s[/B] (%s; %s@%d)' % (video_stream['title'],
-                                                       video_stream['container'],
-                                                       video_stream['audio']['encoding'],
-                                                       video_stream['audio']['bitrate'])
+                    title = '%s (%s; %s@%d)' % (context.get_ui().bold(video_stream['title']),
+                                                video_stream['container'],
+                                                video_stream['audio']['encoding'],
+                                                video_stream['audio']['bitrate'])
 
             elif 'audio' in video_stream or 'video' in video_stream:
-                encoding =  video_stream.get('audio', dict()).get('encoding')
+                encoding = video_stream.get('audio', dict()).get('encoding')
                 if not encoding:
                     encoding = video_stream.get('video', dict()).get('encoding')
                 if encoding:
-                    title = '[B]%s[/B] (%s; %s)' % (video_stream['title'],
-                                                    video_stream['container'],
-                                                    encoding)
+                    title = '%s (%s; %s)' % (context.get_ui().bold(video_stream['title']),
+                                             video_stream['container'],
+                                             encoding)
 
             video_stream['title'] = title
 

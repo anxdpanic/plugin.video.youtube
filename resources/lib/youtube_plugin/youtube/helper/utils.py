@@ -175,6 +175,7 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
 
 def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=None, channel_items_dict=None, live_details=False, use_play_data=True):
     settings = context.get_settings()
+    ui = context.get_ui()
 
     video_ids = list(video_id_dict.keys())
     if len(video_ids) == 0:
@@ -263,7 +264,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         channel_name = snippet.get('channelTitle', '')
         description = kodion.utils.strip_html_from_text(snippet['description'])
         if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
-            description = '[UPPERCASE][B]%s[/B][/UPPERCASE][CR][CR]%s' % (channel_name, description)
+            description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
         video_item.set_studio(channel_name)
         # video_item.add_cast(channel_name)
         video_item.add_artist(channel_name)
@@ -474,7 +475,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     channel_name = snippet.get('channelTitle', '')
     description = kodion.utils.strip_html_from_text(snippet['description'])
     if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
-        description = '[UPPERCASE][B]%s[/B][/UPPERCASE][CR][CR]%s' % (channel_name, description)
+        description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
     video_item.set_studio(channel_name)
     # video_item.add_cast(channel_name)
     video_item.add_artist(channel_name)
