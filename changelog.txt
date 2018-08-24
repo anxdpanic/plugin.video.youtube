@@ -1,3 +1,6 @@
+6.1.3
+[fix] timedelta.total_seconds python 2.6 compat.
+
 6.1.2
 [fix] dash settings check and defaults
 [fix] addon-check raised warning for services complex entry point

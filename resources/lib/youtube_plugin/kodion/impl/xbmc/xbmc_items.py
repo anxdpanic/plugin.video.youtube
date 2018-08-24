@@ -104,7 +104,7 @@ def to_video_item(context, video_item):
         if use_dt:
             local_dt = utils.datetime_parser.utc_to_local(use_dt)
             item.setProperty(u'PublishedSince',
-                             utils.to_unicode(utils.datetime_parser.datetime_to_since(local_dt, context)))
+                             utils.to_unicode(utils.datetime_parser.datetime_to_since(context, local_dt)))
             item.setProperty(u'PublishedLocal', str(local_dt))
     else:
         item.setProperty(u'PublishedSince', context.localize('30539'))
