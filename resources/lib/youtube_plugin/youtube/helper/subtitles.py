@@ -123,13 +123,13 @@ class Subtitles(object):
         return list(set(list_of_subs))
 
     def _prompt(self):
-        tracks = [(track.get('languageCode'), track.get('name', {}).get('simpleText')) for track in self.caption_tracks]
-        translations = [(track.get('languageCode'), track.get('languageName', {}).get('simpleText')) for track in self.translation_langs]
+        tracks = [(track.get('languageCode'), self._get_language_name(track)) for track in self.caption_tracks]
+        translations = [(track.get('languageCode'), self._get_language_name(track)) for track in self.translation_langs]
         languages = tracks + translations
         if languages:
             choice = self.context.get_ui().on_select(self.context.localize(30560), [language_name for language, language_name in languages])
             if choice != -1:
-                return self._get(language=languages[choice][0], simple_text=languages[choice][1])
+                return self._get(language=languages[choice][0], language_name=languages[choice][1])
             else:
                 self.context.log_debug('Subtitle selection cancelled')
                 return []
@@ -137,7 +137,7 @@ class Subtitles(object):
             self.context.log_debug('No subtitles found for prompt')
             return []
 
-    def _get(self, language='en', simple_text=None, no_asr=False):
+    def _get(self, language='en', language_name=None, no_asr=False):
         fname = self.srt_filename(language)
         if xbmcvfs.exists(fname):
             self.context.log_debug('Subtitle exists for: %s, filename: %s' % (language, fname))
@@ -148,8 +148,8 @@ class Subtitles(object):
         has_translation = False
         for track in self.caption_tracks:
             if language == track.get('languageCode'):
-                if simple_text is not None:
-                    if simple_text == track.get('name', {}).get('simpleText'):
+                if language_name is not None:
+                    if language_name == self._get_language_name(track):
                         caption_track = track
                         break
                 else:
@@ -198,3 +198,16 @@ class Subtitles(object):
         else:
             self.context.log_debug('No subtitles found for: %s' % language)
             return []
+
+    @staticmethod
+    def _get_language_name(track):
+        key = 'languageName' if 'languageName' in track else 'name'
+        lang_name = track.get(key, {}).get('simpleText')
+        if not lang_name:
+            track_name = track.get(key, {}).get('runs', [{}])
+            if isinstance(track_name, list) and len(track_name) >= 1:
+                return track_name[0].get('text')
+        else:
+            return lang_name
+
+        return None
