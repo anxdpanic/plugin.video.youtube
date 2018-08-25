@@ -141,7 +141,7 @@ class AbstractContext(object):
                     params[param] = str(params[param])
 
                 uri_params[param] = to_utf8(params[param])
-            uri += '?' + urllib.parse.urlencode(uri_params)
+            uri = '?'.join([uri, urllib.parse.urlencode(uri_params)])
 
         return uri
 

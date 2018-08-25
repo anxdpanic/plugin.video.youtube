@@ -15,7 +15,7 @@ class Storage(object):
         self._table_name = 'storage'
         self._filename = filename
         if not self._filename.endswith('.sqlite'):
-            self._filename += '.sqlite'
+            self._filename = ''.join([self._filename, '.sqlite'])
         self._file = None
         self._cursor = None
         self._max_item_count = max_item_count

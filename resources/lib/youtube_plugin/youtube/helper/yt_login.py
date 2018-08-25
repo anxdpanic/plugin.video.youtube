@@ -54,8 +54,9 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
         device_code = json_data['device_code']
         user_code = json_data['user_code']
 
-        text = context.localize(provider.LOCAL_MAP['youtube.sign.go_to']) % '[B]youtube.com/activate[/B]'
-        text += '[CR]%s [B]%s[/B]' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']), user_code)
+        text = [context.localize(provider.LOCAL_MAP['youtube.sign.go_to']) % context.get_ui().bold('youtube.com/activate'),
+                '[CR]%s %s' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']), context.get_ui().bold(user_code))]
+        text = ''.join(text)
         dialog = context.get_ui().create_progress_dialog(
             heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
 

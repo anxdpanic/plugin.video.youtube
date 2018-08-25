@@ -73,14 +73,14 @@ def parse(datetime_string, localize=True):
 def get_scheduled_start(datetime_object, localize=True):
     start_hour = '{:02d}'.format(datetime_object.hour)
     start_minute = '{:<02d}'.format(datetime_object.minute)
-    start_time = start_hour + ':' + start_minute
+    start_time = ':'.join([start_hour, start_minute])
     start_date = str(datetime_object.date())
     if localize:
         now = datetime.now()
     else:
         now = datetime.utcnow()
     start_date = start_date.replace(str(now.year), '').lstrip('-')
-    start_date = start_date.replace('{:02d}'.format(now.month) + '-' + '{:02d}'.format(now.day), '')
+    start_date = start_date.replace('-'.join(['{:02d}'.format(now.month), '{:02d}'.format(now.day)]), '')
     return start_date, start_time
 
 
@@ -96,15 +96,15 @@ def utc_to_local(dt):
     return dt + local_timezone_offset
 
 
-def datetime_to_since(dt, context):
+def datetime_to_since(context, dt):
     now = datetime.now()
     diff = now - dt
     yesterday = now - timedelta(days=1)
     yyesterday = now - timedelta(days=2)
-    use_yesterday = (now - yesterday).total_seconds() > 10800
+    use_yesterday = total_seconds(now - yesterday) > 10800
     today = now.date()
     tomorrow = today + timedelta(days=1)
-    seconds = diff.total_seconds()
+    seconds = total_seconds(diff)
 
     if seconds > 0:
         if seconds < 60:
@@ -154,3 +154,7 @@ def strptime(s, fmt="%Y-%m-%dT%H:%M:%S.%fZ"):
     except:
         pass
     return datetime(*time.strptime(s, fmt)[:6])
+
+
+def total_seconds(t_delta):  # required for python 2.6 which doesn't have datetime.timedelta.total_seconds
+    return 24 * 60 * 60 * t_delta.days + t_delta.seconds + (t_delta.microseconds // 1000000.)

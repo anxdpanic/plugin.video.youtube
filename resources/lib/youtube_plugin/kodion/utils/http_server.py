@@ -24,7 +24,6 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.chunk_size = 1024 * 64
         self.base_path = 'special://temp/plugin.video.youtube'
         BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
-        self.connection_allowed = self.connection_allowed()
 
     def connection_allowed(self):
         client_ip = self.client_address[0]
@@ -32,22 +31,22 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         log_ip = 'unknown'
         if len(split_ip) == 4:
             log_ip = '%s.%s.' % (split_ip[0], split_ip[1])
-        xbmc.log('[plugin.video.youtube] HTTPServer: Client IP starts with |%s|' % log_ip, xbmc.LOGDEBUG)
+        log_lines = ['[plugin.video.youtube] HTTPServer: Connection from |%s|' % log_ip]
         conn_allowed = client_ip.startswith(self.local_ranges)
-        if conn_allowed:
-            xbmc.log('[plugin.video.youtube] HTTPServer: IP address in local range', xbmc.LOGDEBUG)
-        else:
+        log_lines.append('Local range: |%s|' % str(conn_allowed))
+        if not conn_allowed:
             conn_allowed = client_ip in self.whitelist_ips
-            if conn_allowed:
-                xbmc.log('[plugin.video.youtube] HTTPServer: IP address in whitelist', xbmc.LOGDEBUG)
+            log_lines.append('Whitelisted: |%s|' % str(conn_allowed))
 
         if not conn_allowed:
-            xbmc.log('[plugin.video.youtube] HTTPServer: IP address not allowed', xbmc.LOGDEBUG)
+            xbmc.log('[plugin.video.youtube] HTTPServer: Connection from |%s| not allowed' % log_ip, xbmc.LOGDEBUG)
+        else:
+            xbmc.log(' '.join(log_lines), xbmc.LOGDEBUG)
         return conn_allowed
 
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
-        dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true'
+        dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
 
         if self.path == '/client_ip':
@@ -60,11 +59,11 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         xbmc.log('[plugin.video.youtube] HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path), xbmc.LOGDEBUG)
 
-        if not self.connection_allowed:
+        if not self.connection_allowed():
             self.send_error(403)
         else:
             if dash_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = xbmc.translatePath(self.base_path + self.path)
+                file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
                 file_chunk = True
                 xbmc.log('[plugin.video.youtube] HTTPServer: Request file path |{file_path}|'.format(file_path=file_path), xbmc.LOGDEBUG)
                 try:
@@ -148,13 +147,13 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_HEAD(self):
         xbmc.log('[plugin.video.youtube] HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path), xbmc.LOGDEBUG)
 
-        if not self.connection_allowed:
+        if not self.connection_allowed():
             self.send_error(403)
         else:
             addon = xbmcaddon.Addon('plugin.video.youtube')
-            dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true'
+            dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
             if dash_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = xbmc.translatePath(self.base_path + self.path)
+                file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
                 if not os.path.isfile(file_path):
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path)
                     self.send_error(404, response)
@@ -169,7 +168,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def do_POST(self):
         xbmc.log('[plugin.video.youtube] HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path), xbmc.LOGDEBUG)
 
-        if not self.connection_allowed:
+        if not self.connection_allowed():
             self.send_error(403)
         elif self.path.startswith('/widevine'):
             license_url = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_url')

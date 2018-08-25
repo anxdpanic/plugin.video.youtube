@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~alpha2" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~alpha3" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six"/>
@@ -41,7 +41,7 @@
         <description lang="es_es">YouTube es uno de los mayores sitios web de intercambio de vídeos del mundo.</description>
         <disclaimer lang="es_es">Este add-on no esta respaldado por Google</disclaimer>
         <summary lang="ru_ru">Видеодополнение YouTube</summary>
-        <description lang="ru_ru">Данное дополнение позволяет находить и смотреть видео на всеми любимом сайте.</description>
+        <description lang="ru_ru">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
         <summary lang="fr_fr">Plugin pour YouTube</summary>
         <description lang="fr_fr">YouTube est l'un des plus grands sites de partage vidéos du monde.</description>
         <summary lang="zh_cn">YouTube附加元件</summary>

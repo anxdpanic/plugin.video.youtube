@@ -72,18 +72,17 @@ class YouTubePlayer(xbmc.Player):
 
     def onPlayBackStarted(self):
         self.current_video_total_time = self.getTotalTime()
+        seek_time = self.ui.get_home_window_property('seek_time')
         while self.isPlaying():
             xbmc.sleep(500)
             if self.isPlaying():
+                if self.context.get_settings().use_playback_history():
+                    if seek_time and seek_time != '0.0':
+                        self.seekTime(float(seek_time))
+                        seek_time = None
                 self.current_played_time = self.getTime()
                 if self.current_video_total_time == 0.0:
                     self.current_video_total_time = self.getTotalTime()
-
-    def onAVStarted(self):
-        if self.context.get_settings().use_playback_history():
-            seek_time = self.ui.get_home_window_property('seek_time')
-            if seek_time and seek_time != '0.0':
-                self.seekTime(float(seek_time))
 
     def onPlayBackStopped(self):
         self.post_play()

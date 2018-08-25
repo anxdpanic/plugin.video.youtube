@@ -1,5 +1,5 @@
 __author__ = 'bromix'
-from ...kodion.utils import ipstack
+from ...kodion.utils import ip_api
 
 
 DEFAULT_LANGUAGES = {u'items': [{u'snippet': {u'name': u'Afrikaans', u'hl': u'af'}, u'id': u'af'}, {u'snippet': {u'name': u'Azerbaijani', u'hl': u'az'}, u'id': u'az'}, {u'snippet': {u'name': u'Indonesian', u'hl': u'id'}, u'id': u'id'}, {u'snippet': {u'name': u'Malay', u'hl': u'ms'}, u'id': u'ms'},
@@ -98,15 +98,11 @@ def _process_geo_location(provider, context):
     if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(provider.LOCAL_MAP['youtube.perform.geolocation'])):
         return
 
-    result = ipstack.locate_requester()
-    if 'error' in result:
-        context.log_error(result.get('error', ''))
-        return
-
-    if 'latitude' in result and 'longitude' in result:
-        settings.set_location('{lat},{long}'.format(lat=result['latitude'], long=result['longitude']))
-    else:
-        context.log_error('No coordinates returned.')
+    locator = ip_api.Locator(context)
+    locator.locate_requester()
+    coordinates = locator.coordinates()
+    if coordinates:
+        settings.set_location('{lat},{lon}'.format(lat=coordinates[0], lon=coordinates[1]))
 
 
 def process(provider, context):

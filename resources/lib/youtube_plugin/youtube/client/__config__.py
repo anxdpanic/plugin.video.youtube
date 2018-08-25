@@ -117,18 +117,18 @@ class APICheck(object):
             switch = '1'
         if switch == 'youtube-tv':
             api_key = b64decode(key_sets['youtube-tv']['key']).decode('utf-8'),
-            client_id = b64decode(key_sets['youtube-tv']['id']).decode('utf-8') + u'.apps.googleusercontent.com'
+            client_id = u''.join([b64decode(key_sets['youtube-tv']['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
             client_secret = b64decode(key_sets['youtube-tv']['secret']).decode('utf-8')
         elif switch == 'developer':
             self._json_api = self._api_jstore.get_data()
             return self._json_api['keys']['developer']
         elif switch == 'own':
             api_key = self._json_api['keys']['personal']['api_key']
-            client_id = self._json_api['keys']['personal']['client_id'] + u'.apps.googleusercontent.com'
+            client_id = u''.join([self._json_api['keys']['personal']['client_id'], u'.apps.googleusercontent.com'])
             client_secret = self._json_api['keys']['personal']['client_secret']
         else:
             api_key = b64decode(key_sets['provided'][switch]['key']).decode('utf-8')
-            client_id = b64decode(key_sets['provided'][switch]['id']).decode('utf-8') + u'.apps.googleusercontent.com'
+            client_id = u''.join([b64decode(key_sets['provided'][switch]['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
             client_secret = b64decode(key_sets['provided'][switch]['secret']).decode('utf-8')
         return api_key, client_id, client_secret
 

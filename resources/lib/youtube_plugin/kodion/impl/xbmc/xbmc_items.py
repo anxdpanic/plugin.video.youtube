@@ -27,10 +27,7 @@ def to_play_item(context, play_item):
 
     if play_item.get_fanart() and settings.show_fanart():
         fanart = play_item.get_fanart()
-    if major_version <= 12:
-        list_item.setIconImage(thumb)
-        list_item.setProperty("Fanart_Image", fanart)
-    elif major_version <= 15:
+    if major_version <= 15:
         list_item.setArt({'thumb': thumb, 'fanart': fanart})
         list_item.setIconImage(thumb)
     else:
@@ -38,18 +35,12 @@ def to_play_item(context, play_item):
 
     if not play_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
             play_item.get_headers() and play_item.get_uri().startswith('http'):
-        play_item.set_uri(play_item.get_uri() + '|' + play_item.get_headers())
+        play_item.set_uri('|'.join([play_item.get_uri(), play_item.get_headers()]))
 
     if settings.is_support_alternative_player_enabled() and \
             settings.alternative_player_web_urls() and \
             not play_item.get_license_key():
         play_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(video_id=play_item.video_id))
-
-    list_item.setProperty('inputstreamaddon', '')
-    list_item.setProperty('inputstream.adaptive.manifest_type', '')
-    list_item.setProperty('inputstream.adaptive.stream_headers', '')
-    list_item.setProperty('inputstream.adaptive.license_type', '')
-    list_item.setProperty('inputstream.adaptive.license_key', '')
 
     if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
         list_item.setContentLookup(False)
@@ -100,10 +91,7 @@ def to_video_item(context, video_item):
         item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if video_item.get_fanart() and settings.show_fanart():
         fanart = video_item.get_fanart()
-    if major_version <= 12:
-        item.setIconImage(thumb)
-        item.setProperty("Fanart_Image", fanart)
-    elif major_version <= 15:
+    if major_version <= 15:
         item.setArt({'thumb': thumb, 'fanart': fanart})
         item.setIconImage(thumb)
     else:
@@ -121,7 +109,7 @@ def to_video_item(context, video_item):
         if use_dt:
             local_dt = utils.datetime_parser.utc_to_local(use_dt)
             item.setProperty(u'PublishedSince',
-                             utils.to_unicode(utils.datetime_parser.datetime_to_since(local_dt, context)))
+                             utils.to_unicode(utils.datetime_parser.datetime_to_since(context, local_dt)))
             item.setProperty(u'PublishedLocal', str(local_dt))
     else:
         item.setProperty(u'PublishedSince', context.localize('30539'))
@@ -158,10 +146,7 @@ def to_audio_item(context, audio_item):
         item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if audio_item.get_fanart() and settings.show_fanart():
         fanart = audio_item.get_fanart()
-    if major_version <= 12:
-        item.setIconImage(thumb)
-        item.setProperty("Fanart_Image", fanart)
-    elif major_version <= 15:
+    if major_version <= 15:
         item.setArt({'thumb': thumb, 'fanart': fanart})
         item.setIconImage(thumb)
     else:

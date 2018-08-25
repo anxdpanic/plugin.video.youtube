@@ -46,7 +46,7 @@ class XbmcContext(AbstractContext):
             if len(sys.argv) > 2:
                 params = sys.argv[2][1:]
                 if len(params) > 0:
-                    self._uri = self._uri + '?' + params
+                    self._uri = '?'.join([self._uri, params])
 
                     self._params = {}
                     params = dict(urllib.parse.parse_qsl(params))

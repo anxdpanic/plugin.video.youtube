@@ -69,6 +69,7 @@ def _process_remove_playlist(provider, context, re_match):
 
 
 def _process_select_playlist(provider, context, re_match):
+    ui = context.get_ui()
     json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
                                                  provider.get_client(context).get_playlists_of_channel,
                                                  channel_id='mine')
@@ -76,14 +77,14 @@ def _process_select_playlist(provider, context, re_match):
 
     items = []
     # create playlist
-    items.append(('[B]' + context.localize(provider.LOCAL_MAP['youtube.playlist.create']) + '[/B]', 'playlist.create'))
+    items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.playlist.create'])), 'playlist.create'))
 
     # add the 'Watch Later' playlist
     resource_manager = provider.get_resource_manager(context)
     my_playlists = resource_manager.get_related_playlists(channel_id='mine')
     if 'watchLater' in my_playlists:
         watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
-        items.append(('[B]' + context.localize(provider.LOCAL_MAP['youtube.watch_later']) + '[/B]', watch_later_playlist_id))
+        items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.watch_later'])), watch_later_playlist_id))
 
     for playlist in playlists:
         snippet = playlist.get('snippet', {})
