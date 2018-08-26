@@ -610,6 +610,15 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         params = context.get_params()
+
+        if 'prompt_for_subtitles' in params:
+            prompt_subtitles = params['prompt_for_subtitles'] == '1'
+            del params['prompt_for_subtitles']
+            if prompt_subtitles and 'video_id' in params and not 'playlist_id' in params:
+                # redirect to playmedia after setting home window property, so playback url matches playable listitems
+                context.get_ui().set_home_window_property('prompt_for_subtitles', params['video_id'])
+                context.execute('PlayMedia(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))
+                return
         if 'video_id' in params and not 'playlist_id' in params:
             resource_manager = self.get_resource_manager(context)
             video = resource_manager.get_videos([params['video_id']])

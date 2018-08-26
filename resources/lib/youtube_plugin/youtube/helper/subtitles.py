@@ -56,6 +56,10 @@ class Subtitles(object):
                     except:
                         pass
 
+        ui = self.context.get_ui()
+        self.prompt_override = ui.get_home_window_property('prompt_for_subtitles') == video_id
+        ui.clear_home_window_property('prompt_for_subtitles')
+
     def srt_filename(self, sub_language):
         return self.SRT_FILE % (self.video_id, sub_language)
 
@@ -85,8 +89,7 @@ class Subtitles(object):
         return text
 
     def get_subtitles(self):
-        prompt_for_subtitles = self.context.get_param('prompt_for_subtitles')
-        if prompt_for_subtitles:
+        if self.prompt_override:
             languages = self.LANG_PROMPT
         else:
             languages = self.context.get_settings().subtitle_languages()
