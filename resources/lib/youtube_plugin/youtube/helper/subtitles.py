@@ -187,17 +187,19 @@ class Subtitles(object):
 
         if subtitle_url:
             self.context.log_debug('Subtitle url: %s' % subtitle_url)
-
-            result_auto = requests.get(subtitle_url, headers=self.headers,
-                                       verify=self._verify, allow_redirects=True)
-
-            if result_auto.text:
-                self.context.log_debug('Subtitle found for: %s' % language)
-                self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
-                return [fname]
+            if not self.context.get_settings().subtitle_download():
+                return [subtitle_url]
             else:
-                self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
-                return []
+                result_auto = requests.get(subtitle_url, headers=self.headers,
+                                           verify=self._verify, allow_redirects=True)
+
+                if result_auto.text:
+                    self.context.log_debug('Subtitle found for: %s' % language)
+                    self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
+                    return [fname]
+                else:
+                    self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
+                    return []
         else:
             self.context.log_debug('No subtitles found for: %s' % language)
             return []

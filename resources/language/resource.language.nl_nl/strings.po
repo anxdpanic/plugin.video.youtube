@@ -1094,3 +1094,11 @@ msgstr ""
 msgctxt "#30704"
 msgid "Use YouTube website urls"
 msgstr ""
+
+msgctxt "#30705"
+msgid "Download subtitles"
+msgstr ""
+
+msgctxt "#30706"
+msgid "Download subtitles before starting playback? (Default: No)"
+msgstr ""
