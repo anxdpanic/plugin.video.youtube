@@ -14,7 +14,8 @@ class YouTubePlayer(xbmc.Player):
 
     def reset(self):
         properties = ['playing', 'post_play', 'license_url', 'license_token',
-                      'seek_time', 'play_count', 'playback_history', 'addon_id']
+                      'seek_time', 'play_count', 'playback_history', 'addon_id',
+                      'prompt_for_subtitles']
         cleared = []
         for prop in properties:
             if self.ui.get_home_window_property(prop) is not None:

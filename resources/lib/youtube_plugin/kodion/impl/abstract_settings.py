@@ -93,11 +93,17 @@ class AbstractSettings(object):
     def subtitle_languages(self):
         return self.get_int(constants.setting.SUBTITLE_LANGUAGE, 0)
 
+    def subtitle_download(self):
+        return self.get_bool(constants.setting.SUBTITLE_DOWNLOAD, False)
+
     def audio_only(self):
         return self.get_bool(constants.setting.AUDIO_ONLY, False)
 
     def set_subtitle_languages(self, value):
         return self.set_int(constants.setting.SUBTITLE_LANGUAGE, value)
+
+    def set_subtitle_download(self, value):
+        return self.set_bool(constants.setting.SUBTITLE_DOWNLOAD, value)
 
     def use_thumbnail_size(self):
         size = self.get_int(constants.setting.THUMB_SIZE, 0)

@@ -97,6 +97,7 @@ class XbmcRunner(AbstractProviderRunner):
                                      replaceItems=directory_item.replace_context_menu())
 
         item.setInfo(type=u'video', infoLabels=info_labels.create_from_item(context, directory_item))
+        item.setPath(directory_item.get_uri())
 
         xbmcplugin.addDirectoryItem(handle=self.handle,
                                     url=directory_item.get_uri(),
@@ -106,7 +107,7 @@ class XbmcRunner(AbstractProviderRunner):
 
     def _add_video(self, context, video_item, item_count=0):
         item = xbmc_items.to_video_item(context, video_item)
-
+        item.setPath(video_item.get_uri())
         xbmcplugin.addDirectoryItem(handle=self.handle,
                                     url=video_item.get_uri(),
                                     listitem=item,
@@ -132,6 +133,7 @@ class XbmcRunner(AbstractProviderRunner):
 
         item.setInfo(type=u'picture', infoLabels=info_labels.create_from_item(context, image_item))
 
+        item.setPath(image_item.get_uri())
         xbmcplugin.addDirectoryItem(handle=self.handle,
                                     url=image_item.get_uri(),
                                     listitem=item,
@@ -139,7 +141,7 @@ class XbmcRunner(AbstractProviderRunner):
 
     def _add_audio(self, context, audio_item, item_count):
         item = xbmc_items.to_audio_item(context, audio_item)
-
+        item.setPath(audio_item.get_uri())
         xbmcplugin.addDirectoryItem(handle=self.handle,
                                     url=audio_item.get_uri(),
                                     listitem=item,

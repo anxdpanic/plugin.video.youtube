@@ -56,6 +56,10 @@ class Subtitles(object):
                     except:
                         pass
 
+        ui = self.context.get_ui()
+        self.prompt_override = ui.get_home_window_property('prompt_for_subtitles') == video_id
+        ui.clear_home_window_property('prompt_for_subtitles')
+
     def srt_filename(self, sub_language):
         return self.SRT_FILE % (self.video_id, sub_language)
 
@@ -85,8 +89,7 @@ class Subtitles(object):
         return text
 
     def get_subtitles(self):
-        prompt_for_subtitles = self.context.get_param('prompt_for_subtitles')
-        if prompt_for_subtitles:
+        if self.prompt_override:
             languages = self.LANG_PROMPT
         else:
             languages = self.context.get_settings().subtitle_languages()
@@ -184,17 +187,19 @@ class Subtitles(object):
 
         if subtitle_url:
             self.context.log_debug('Subtitle url: %s' % subtitle_url)
-
-            result_auto = requests.get(subtitle_url, headers=self.headers,
-                                       verify=self._verify, allow_redirects=True)
-
-            if result_auto.text:
-                self.context.log_debug('Subtitle found for: %s' % language)
-                self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
-                return [fname]
+            if not self.context.get_settings().subtitle_download():
+                return [subtitle_url]
             else:
-                self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
-                return []
+                result_auto = requests.get(subtitle_url, headers=self.headers,
+                                           verify=self._verify, allow_redirects=True)
+
+                if result_auto.text:
+                    self.context.log_debug('Subtitle found for: %s' % language)
+                    self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
+                    return [fname]
+                else:
+                    self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
+                    return []
         else:
             self.context.log_debug('No subtitles found for: %s' % language)
             return []

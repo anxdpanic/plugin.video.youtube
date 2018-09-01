@@ -7,7 +7,6 @@ import xbmcgui
 from ...items import VideoItem, AudioItem, UriItem
 from ... import utils
 from . import info_labels
-from ...items import utils as item_utils
 
 
 def to_play_item(context, play_item):

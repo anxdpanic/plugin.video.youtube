@@ -1100,3 +1100,11 @@ msgstr "確定?"
 msgctxt "#30704"
 msgid "Use YouTube website urls"
 msgstr "使用 YouTube 網址"
+
+msgctxt "#30705"
+msgid "Download subtitles"
+msgstr ""
+
+msgctxt "#30706"
+msgid "Download subtitles before starting playback? (Default: No)"
+msgstr ""

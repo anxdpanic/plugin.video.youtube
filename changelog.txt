@@ -1,5 +1,6 @@
 6.2.0
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
+[add] Option to download subtitles before playback in Settings -> General -> Configure subtitles
 [add] 'Settings -> Advanced -> Use YouTube website urls' for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
             eg. playercorefactory.xml

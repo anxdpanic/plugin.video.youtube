@@ -143,7 +143,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.client.ip': 30700,
                  'youtube.client.ip.failed': 30701,
                  'youtube.video.play_with_subtitles': 30702,
-                 'youtube.are.you.sure': 30703
+                 'youtube.are.you.sure': 30703,
+                 'youtube.subtitles.download': 30705,
+                 'youtube.pre.download.subtitles': 30706
                  }
 
     def __init__(self):
@@ -610,6 +612,15 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         params = context.get_params()
+
+        if 'prompt_for_subtitles' in params:
+            prompt_subtitles = params['prompt_for_subtitles'] == '1'
+            del params['prompt_for_subtitles']
+            if prompt_subtitles and 'video_id' in params and not 'playlist_id' in params:
+                # redirect to playmedia after setting home window property, so playback url matches playable listitems
+                context.get_ui().set_home_window_property('prompt_for_subtitles', params['video_id'])
+                context.execute('PlayMedia(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))
+                return
         if 'video_id' in params and not 'playlist_id' in params:
             resource_manager = self.get_resource_manager(context)
             video = resource_manager.get_videos([params['video_id']])
@@ -996,9 +1007,15 @@ class Provider(kodion.AbstractProvider):
             sub_opts[sub_setting] = context.get_ui().bold(sub_opts[sub_setting])
 
             result = context.get_ui().on_select(context.localize(self.LOCAL_MAP['youtube.subtitle.language']), sub_opts)
-            if result == -1:
-                return False
-            context.get_settings().set_subtitle_languages(result)
+            if result > -1:
+                context.get_settings().set_subtitle_languages(result)
+
+            result = context.get_ui().on_yes_no_input(
+                context.localize(self.LOCAL_MAP['youtube.subtitles.download']),
+                context.localize(self.LOCAL_MAP['youtube.pre.download.subtitles'])
+            )
+            if result > -1:
+                context.get_settings().set_subtitle_download(result == 1)
         elif switch == 'listen_ip':
             local_ranges = ('10.', '172.16.', '192.168.')
             addresses = [iface[4][0] for iface in socket.getaddrinfo(socket.gethostname(), None) if iface[4][0].startswith(local_ranges)] + ['127.0.0.1', '0.0.0.0']
