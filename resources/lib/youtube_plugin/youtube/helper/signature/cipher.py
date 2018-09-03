@@ -2,11 +2,9 @@ __author__ = 'bromix'
 
 from six.moves import range
 
-import json
-import os
 import re
-
 import requests
+
 from ....kodion.utils import FunctionCache
 from .json_script_engine import JsonScriptEngine
 
@@ -30,16 +28,6 @@ class Cipher(object):
             return json_script_engine.execute(signature)
 
         return u''
-
-    def _cache_json_script(self, json_script, md5_hash):
-        if self._cache_folder:
-            if not os.path.exists(self._cache_folder):
-                os.makedirs(self._cache_folder)
-
-            filename = ''.join([md5_hash, '.jsonscript'])
-            filename = os.path.join(self._cache_folder, filename)
-            with open(filename, 'w') as outfile:
-                json.dump(json_script, outfile, sort_keys=True, indent=4, ensure_ascii=False)
 
     def _load_json_script(self, javascript_url):
         headers = {'Connection': 'keep-alive',

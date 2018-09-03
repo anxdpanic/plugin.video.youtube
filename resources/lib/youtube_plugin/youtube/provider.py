@@ -612,6 +612,8 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         params = context.get_params()
+        if context.get_ui().get_home_window_property('prompt_for_subtitles') != params.get('video_id'):
+            context.get_ui().clear_home_window_property('prompt_for_subtitles')
 
         if 'prompt_for_subtitles' in params:
             prompt_subtitles = params['prompt_for_subtitles'] == '1'
