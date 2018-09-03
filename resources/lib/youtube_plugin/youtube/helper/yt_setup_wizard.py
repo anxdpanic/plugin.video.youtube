@@ -61,10 +61,13 @@ def _process_language(provider, context):
     else:
         items = json_data['items']
     language_list = []
+    invalid_ids = [u'es-419']  # causes hl not a valid language error. Issue #418
     for item in items:
-        language_id = item['id']
+        if item['id'] in invalid_ids:
+            continue
         language_name = item['snippet']['name']
-        language_list.append((language_name, language_id))
+        hl = item['snippet']['hl']
+        language_list.append((language_name, hl))
     language_list = sorted(language_list, key=lambda x: x[0])
     language_id = context.get_ui().on_select(
         context.localize(provider.LOCAL_MAP['youtube.setup_wizard.select_language']), language_list)
@@ -78,9 +81,9 @@ def _process_language(provider, context):
         items = json_data['items']
     region_list = []
     for item in items:
-        region_id = item['id']
         region_name = item['snippet']['name']
-        region_list.append((region_name, region_id))
+        gl = item['snippet']['gl']
+        region_list.append((region_name, gl))
     region_list = sorted(region_list, key=lambda x: x[0])
     region_id = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.setup_wizard.select_region']),
                                            region_list)
