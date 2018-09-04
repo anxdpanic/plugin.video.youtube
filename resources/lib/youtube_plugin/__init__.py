@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 __author__ = 'bromix'
-__all__ = ['kodion', 'youtube', 'key_sets']
+__all__ = ['kodion', 'youtube', 'key_sets', 'refresh']
 
 key_sets = {
     'youtube-tv': {
