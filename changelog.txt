@@ -19,6 +19,7 @@
                        <rule filename="(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))[a-zA-Z0-9_\-]{11}.*" player="MPC-BE" />
                     </rules>
                 </playercorefactory>
+[fix] Mark as watched in Kodi 18
 [upd] Improve speed of playback starting and resolver
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s

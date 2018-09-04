@@ -18,6 +18,7 @@
 [add] Option to download subtitles before playback in Settings -&gt; General -&gt; Configure subtitles
 [add] 'Settings -&gt; Advanced -&gt; Use YouTube website urls' for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
+[fix] Mark as watched in Kodi 18
 [upd] Improve speed of playback starting and resolver
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s

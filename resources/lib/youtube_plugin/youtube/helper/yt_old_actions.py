@@ -10,13 +10,15 @@ def _process_play_video(provider, context, re_match):
     video_id = context.get_param('videoid', '')
     if not video_id:
         raise kodion.KodionException('old_actions/play_video: missing video_id')
+    if context.get_system_version().get_version()[0] < 18:
+        context.log_warning('DEPRECATED "%s"' % context.get_uri())
+        context.log_warning('USE INSTEAD "plugin://%s/play/?video_id=%s"' % (context.get_id(), video_id))
+    else:
+        # Using old_actions/play_video to temporarily workaround http://trac.kodi.tv/ticket/17947
+        context.log_warning('USE INSTEAD "plugin://%s/play/?video_id=%s"' % (context.get_id(), video_id))
 
-    context.log_warning('DEPRECATED "%s"' % context.get_uri())
-    context.log_warning('USE INSTEAD "plugin://%s/play/?video_id=%s"' % (context.get_id(), video_id))
-    new_params = {'video_id': video_id}
-    new_path = '/play/'
-    new_context = context.clone(new_path=new_path, new_params=new_params)
-    return provider.on_play(new_context, re_match)
+    context.set_param('video_id', video_id)
+    return provider.on_play(context, re_match)
 
 
 def _process_play_all(provider, context, re_match):
