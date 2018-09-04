@@ -1,13 +1,32 @@
 __author__ = 'bromix'
 
-import xbmc
+from six.moves import map
+from six import string_types
+from six import python_2_unicode_compatible
+
 import json
-from ..abstract_system_version import AbstractSystemVersion
+
+import xbmc
 
 
-class XbmcSystemVersion(AbstractSystemVersion):
+@python_2_unicode_compatible
+class SystemVersion(object):
     def __init__(self, version, releasename, appname):
-        super(XbmcSystemVersion, self).__init__(version, releasename, appname)
+        if not isinstance(version, tuple):
+            self._version = (0, 0, 0, 0)
+        else:
+            self._version = version
+
+        if not releasename or not isinstance(releasename, string_types):
+            self._releasename = 'UNKNOWN'
+        else:
+            self._releasename = releasename
+
+        if not appname or not isinstance(appname, string_types):
+            self._appname = 'UNKNOWN'
+        else:
+            self._appname = appname
+
         try:
             json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Application.GetProperties", '
                                              '"params": {"properties": ["version", "name"]}, "id": 1 }')
@@ -36,3 +55,16 @@ class XbmcSystemVersion(AbstractSystemVersion):
             self._releasename = 'Gotham'
         elif self._version >= (12, 0):
             self._releasename = 'Frodo'
+
+    def __str__(self):
+        obj_str = "%s (%s-%s)" % (self._releasename, self._appname, '.'.join(map(str, self._version)))
+        return obj_str
+
+    def get_release_name(self):
+        return self._releasename
+
+    def get_version(self):
+        return self._version
+
+    def get_app_name(self):
+        return self._appname
