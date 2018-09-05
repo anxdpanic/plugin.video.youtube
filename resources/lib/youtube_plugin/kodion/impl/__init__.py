@@ -1,6 +1,6 @@
 __author__ = 'bromix'
 
-__all__ = ['Settings', 'Context', 'Logger', 'ContextUI', 'Runner']
+__all__ = ['Settings', 'Context', 'ContextUI', 'Runner']
 
 from .xbmc.xbmc_plugin_settings import XbmcPluginSettings as Settings
 from .xbmc.xbmc_context import XbmcContext as Context
