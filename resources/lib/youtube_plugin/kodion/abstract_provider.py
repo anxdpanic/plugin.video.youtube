@@ -203,6 +203,7 @@ class AbstractProvider(object):
                 try:
                     if not incognito and not channel_id:
                         search_history.update(query)
+                    context.set_path('/kodion/search/query/')
                     return self.on_search(query, context, re_match)
                 except:
                     return list()
