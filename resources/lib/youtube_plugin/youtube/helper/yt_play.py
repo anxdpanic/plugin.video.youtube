@@ -186,6 +186,7 @@ def play_playlist(provider, context, re_match):
 
     if (context.get_param('play', '') == '1') and (context.get_handle() == -1):
         player.play(playlist_index=playlist_position)
+        return
     elif context.get_param('play', '') == '1':
         return videos[playlist_position]
 
