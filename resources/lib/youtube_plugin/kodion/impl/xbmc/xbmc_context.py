@@ -218,7 +218,7 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            xbmc.log(error, xbmc.LOGDEBUG)
+            self.log_debug(error)
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
@@ -235,7 +235,7 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            xbmc.log(error, xbmc.LOGDEBUG)
+            self.log_debug(error)
             return False
 
     def send_notification(self, method, data):
