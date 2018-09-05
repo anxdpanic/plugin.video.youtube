@@ -3,7 +3,7 @@ from six.moves import urllib
 import os
 
 from .. import constants
-from ..logging import log
+from .. import logger
 from ..utils import *
 
 
@@ -11,6 +11,8 @@ class AbstractContext(object):
     def __init__(self, path=u'/', params=None, plugin_name=u'', plugin_id=u''):
         if not params:
             params = {}
+
+        self._system_version = None
 
         self._cache_path = None
         self._debug_path = None
@@ -118,17 +120,35 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     def get_system_version(self):
-        raise NotImplementedError()
+        if not self._system_version:
+            self._system_version = SystemVersion(version='', releasename='', appname='')
+
+        return self._system_version
 
     def create_uri(self, path=u'/', params=None):
         if not params:
             params = {}
 
-        uri = create_uri_path(path)
-        if uri:
-            uri = "%s://%s%s" % ('plugin', str(self._plugin_id), uri)
+        if self.get_system_version().get_version()[0] >= 18 \
+                and isinstance(path, list) \
+                and 'play' in path \
+                and params.get('video_id') \
+                and not params.get('playlist_id') \
+                and not params.get('channel_id'):
+            # temporarily workaround http://trac.kodi.tv/ticket/17947
+            # if expected route is plugin://plugin.video.youtube/play/?video_id=<video_id>
+            # instead build and return old_action/play_video
+            # plugin://plugin.video.youtube/?action=play_video&videoid=<video_id>
+            uri = 'plugin://%s/' % str(self._plugin_id)
+            params['action'] = 'play_video'
+            params['videoid'] = params['video_id']
+            del params['video_id']
         else:
-            uri = "%s://%s/" % ('plugin', str(self._plugin_id))
+            uri = create_uri_path(path)
+            if uri:
+                uri = 'plugin://%s%s' % (str(self._plugin_id), uri)
+            else:
+                uri = 'plugin://%s/' % str(self._plugin_id)
 
         if len(params) > 0:
             # make a copy of the map
@@ -210,24 +230,23 @@ class AbstractContext(object):
     def add_sort_method(self, *sort_methods):
         raise NotImplementedError()
 
-    def log(self, text, log_level=constants.log.NOTICE):
-        log_line = '[%s] %s' % (self.get_id(), text)
-        log(log_line, log_level)
+    def log(self, text, log_level=logger.NOTICE):
+        logger.log(text, log_level, self.get_id())
 
     def log_warning(self, text):
-        self.log(text, constants.log.WARNING)
+        self.log(text, logger.WARNING)
 
     def log_error(self, text):
-        self.log(text, constants.log.ERROR)
+        self.log(text, logger.ERROR)
 
     def log_notice(self, text):
-        self.log(text, constants.log.NOTICE)
+        self.log(text, logger.NOTICE)
 
     def log_debug(self, text):
-        self.log(text, constants.log.DEBUG)
+        self.log(text, logger.DEBUG)
 
     def log_info(self, text):
-        self.log(text, constants.log.INFO)
+        self.log(text, logger.INFO)
 
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()

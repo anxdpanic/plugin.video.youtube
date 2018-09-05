@@ -40,6 +40,7 @@ def _process_list_response(provider, context, json_data):
                 item_params.update({'addon_id': addon_id})
             item_uri = context.create_uri(['play'], item_params)
             video_item = items.VideoItem(title, item_uri, image=image)
+            video_item.video_id = video_id
             if incognito:
                 video_item.set_play_count(0)
             video_item.set_fanart(provider.get_fanart(context))
@@ -134,6 +135,7 @@ def _process_list_response(provider, context, json_data):
                 item_params.update({'addon_id': addon_id})
             item_uri = context.create_uri(['play'], item_params)
             video_item = items.VideoItem(title, item_uri, image=image)
+            video_item.video_id = video_id
             if incognito:
                 video_item.set_play_count(0)
             video_item.set_fanart(provider.get_fanart(context))
@@ -163,6 +165,7 @@ def _process_list_response(provider, context, json_data):
                 item_params.update({'addon_id': addon_id})
             item_uri = context.create_uri(['play'], item_params)
             video_item = items.VideoItem(title, item_uri, image=image)
+            video_item.video_id = video_id
             if incognito:
                 video_item.set_play_count(0)
             video_item.set_fanart(provider.get_fanart(context))
@@ -185,6 +188,7 @@ def _process_list_response(provider, context, json_data):
                     item_params.update({'addon_id': addon_id})
                 item_uri = context.create_uri(['play'], item_params)
                 video_item = items.VideoItem(title, item_uri, image=image)
+                video_item.video_id = video_id
                 if incognito:
                     video_item.set_play_count(0)
                 video_item.set_fanart(provider.get_fanart(context))

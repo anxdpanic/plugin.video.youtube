@@ -4,17 +4,19 @@ import json
 import shutil
 import threading
 
-from ..utils import get_http_server, is_httpd_live
-
 import xbmc
 import xbmcaddon
 import xbmcvfs
+
+from ..utils import get_http_server, is_httpd_live
+from .. import logger
 
 
 class YouTubeMonitor(xbmc.Monitor):
 
     def __init__(self, *args, **kwargs):
-        addon = xbmcaddon.Addon('plugin.video.youtube')
+        self.addon_id = 'plugin.video.youtube'
+        addon = xbmcaddon.Addon(self.addon_id)
         self._whitelist = addon.getSetting('kodion.http.ip.whitelist')
         self._httpd_port = int(addon.getSetting('kodion.mpd.proxy.port'))
         self._old_httpd_port = self._httpd_port
@@ -32,7 +34,7 @@ class YouTubeMonitor(xbmc.Monitor):
         if sender == 'plugin.video.youtube' and method.endswith('.check_settings'):
             data = json.loads(data)
             data = json.loads(unquote(data[0]))
-            xbmc.log('[plugin.video.youtube] onNotification: |check_settings| -> |%s|' % json.dumps(data), xbmc.LOGDEBUG)
+            logger.log_debug('onNotification: |check_settings| -> |%s|' % json.dumps(data))
 
             _use_httpd = data.get('use_httpd')
             _httpd_port = data.get('httpd_port')
@@ -68,7 +70,7 @@ class YouTubeMonitor(xbmc.Monitor):
                 self.shutdown_httpd()
 
         elif sender == 'plugin.video.youtube':
-            xbmc.log('[plugin.video.youtube] onNotification: |unknown method|', xbmc.LOGDEBUG)
+            logger.log_debug('onNotification: |unknown method|')
 
     def use_httpd(self):
         return self._use_httpd
@@ -90,7 +92,8 @@ class YouTubeMonitor(xbmc.Monitor):
 
     def start_httpd(self):
         if not self.httpd:
-            xbmc.log('[plugin.video.youtube] HTTPServer: Starting |{ip}:{port}|'.format(ip=self.httpd_address(), port=str(self.httpd_port())), xbmc.LOGDEBUG)
+            logger.log_debug('HTTPServer: Starting |{ip}:{port}|'.format(ip=self.httpd_address(),
+                                                                         port=str(self.httpd_port())))
             self.httpd_port_sync()
             self.httpd = get_http_server(address=self.httpd_address(), port=self.httpd_port())
             if self.httpd:
@@ -98,11 +101,13 @@ class YouTubeMonitor(xbmc.Monitor):
                 self.httpd_thread.daemon = True
                 self.httpd_thread.start()
                 sock_name = self.httpd.socket.getsockname()
-                xbmc.log('[plugin.video.youtube] HTTPServer: Serving on |{ip}:{port}|'.format(ip=str(sock_name[0]), port=str(sock_name[1])), xbmc.LOGDEBUG)
+                logger.log_debug('HTTPServer: Serving on |{ip}:{port}|'.format(ip=str(sock_name[0]),
+                                                                               port=str(sock_name[1])))
 
     def shutdown_httpd(self):
         if self.httpd:
-            xbmc.log('[plugin.video.youtube] HTTPServer: Shutting down |{ip}:{port}|'.format(ip=self.old_httpd_address(), port=str(self.old_httpd_port())), xbmc.LOGDEBUG)
+            logger.log_debug('HTTPServer: Shutting down |{ip}:{port}|'.format(ip=self.old_httpd_address(),
+                                                                              port=str(self.old_httpd_port())))
             self.httpd_port_sync()
             self.httpd.shutdown()
             self.httpd.socket.close()
@@ -111,17 +116,17 @@ class YouTubeMonitor(xbmc.Monitor):
             self.httpd = None
 
     def restart_httpd(self):
-        xbmc.log('[plugin.video.youtube] HTTPServer: Restarting... |{old_ip}:{old_port}| -> |{ip}:{port}|'
-                 .format(old_ip=self.old_httpd_address(), old_port=str(self.old_httpd_port()), ip=self.httpd_address(), port=str(self.httpd_port())), xbmc.LOGDEBUG)
+        logger.log_debug('HTTPServer: Restarting... |{old_ip}:{old_port}| -> |{ip}:{port}|'
+                         .format(old_ip=self.old_httpd_address(), old_port=str(self.old_httpd_port()),
+                                 ip=self.httpd_address(), port=str(self.httpd_port())))
         self.shutdown_httpd()
         self.start_httpd()
 
     def ping_httpd(self):
         return is_httpd_live(port=self.httpd_port())
 
-    @staticmethod
-    def remove_temp_dir():
-        temp_path = 'special://temp/plugin.video.youtube/'
+    def remove_temp_dir(self):
+        temp_path = 'special://temp/%s/' % self.addon_id
         path = xbmc.translatePath(temp_path)
         try:
             xbmcvfs.rmdir(path, force=True)
@@ -133,7 +138,7 @@ class YouTubeMonitor(xbmc.Monitor):
             except:
                 pass
         if xbmcvfs.exists(path):
-            xbmc.log('Failed to remove directory: {dir}'.format(dir=path), xbmc.LOGDEBUG)
+            logger.log_debug('Failed to remove directory: {dir}'.format(dir=path))
             return False
         else:
             return True

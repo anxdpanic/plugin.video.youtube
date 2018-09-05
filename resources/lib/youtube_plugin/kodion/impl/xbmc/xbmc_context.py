@@ -14,7 +14,6 @@ import xbmcvfs
 from ..abstract_context import AbstractContext
 from .xbmc_plugin_settings import XbmcPluginSettings
 from .xbmc_context_ui import XbmcContextUI
-from .xbmc_system_version import XbmcSystemVersion
 from .xbmc_playlist import XbmcPlaylist
 from .xbmc_player import XbmcPlayer
 from ... import utils
@@ -28,8 +27,6 @@ class XbmcContext(AbstractContext):
             self._addon = xbmcaddon.Addon(id=plugin_id)
         else:
             self._addon = xbmcaddon.Addon(id='plugin.video.youtube')
-
-        self._system_version = None
 
         """
         I don't know what xbmc/kodi is doing with a simple uri, but we have to extract the information from the
@@ -110,12 +107,6 @@ class XbmcContext(AbstractContext):
             self.log_error('Failed to get system language (%s)', ex.__str__())
             return 'en-US'
         """
-
-    def get_system_version(self):
-        if not self._system_version:
-            self._system_version = XbmcSystemVersion(version='', releasename='', appname='')
-
-        return self._system_version
 
     def get_video_playlist(self):
         if not self._video_playlist:
@@ -227,7 +218,7 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            xbmc.log(error, xbmc.LOGDEBUG)
+            self.log_debug(error)
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
@@ -244,7 +235,7 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            xbmc.log(error, xbmc.LOGDEBUG)
+            self.log_debug(error)
             return False
 
     def send_notification(self, method, data):

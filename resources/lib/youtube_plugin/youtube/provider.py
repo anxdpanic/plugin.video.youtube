@@ -933,8 +933,6 @@ class Provider(kodion.AbstractProvider):
         location = str(context.get_param('location', False)).lower() == 'true'
 
         context.set_param('q', search_text)
-        if context.get_path() == '/kodion/search/input/':
-            context.set_path('/kodion/search/query/')
 
         if search_type == 'video':
             self.set_content_type(context, kodion.constants.content_type.VIDEOS)
@@ -947,7 +945,7 @@ class Provider(kodion.AbstractProvider):
                 channel_params.update(context.get_params())
                 channel_params['search_type'] = 'channel'
                 channel_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.channels'])),
-                                             context.create_uri([context.get_path().replace('input', 'query')], channel_params),
+                                             context.create_uri([context.get_path()], channel_params),
                                              image=context.create_resource_path('media', 'channels.png'))
                 channel_item.set_fanart(self.get_fanart(context))
                 result.append(channel_item)
@@ -956,7 +954,7 @@ class Provider(kodion.AbstractProvider):
                 playlist_params.update(context.get_params())
                 playlist_params['search_type'] = 'playlist'
                 playlist_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.playlists'])),
-                                              context.create_uri([context.get_path().replace('input', 'query')], playlist_params),
+                                              context.create_uri([context.get_path()], playlist_params),
                                               image=context.create_resource_path('media', 'playlist.png'))
                 playlist_item.set_fanart(self.get_fanart(context))
                 result.append(playlist_item)

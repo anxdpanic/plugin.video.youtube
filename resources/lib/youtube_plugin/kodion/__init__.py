@@ -1,4 +1,4 @@
-__all__ = ['KodionException', 'RegisterProviderPath', 'AbstractProvider', 'Context', 'utils', 'json_store']
+__all__ = ['KodionException', 'RegisterProviderPath', 'AbstractProvider', 'Context', 'utils', 'json_store', 'logger']
 
 __version__ = '1.5.4'
 
@@ -15,3 +15,5 @@ from .abstract_provider import AbstractProvider
 from .impl import Context
 
 from .constants import *
+
+from . import logger

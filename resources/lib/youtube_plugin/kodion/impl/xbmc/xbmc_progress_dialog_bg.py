@@ -23,7 +23,7 @@ class XbmcProgressDialogBG(AbstractProgressDialog):
 
     def update(self, steps=1, text=None):
         self._position += steps
-        position = int(float((100.0 // self._total)) * self._position)
+        position = int((100.0 / float(self._total)) * float(self._position))
 
         if isinstance(text, string_types):
             self._dialog.update(percent=position, message=text)

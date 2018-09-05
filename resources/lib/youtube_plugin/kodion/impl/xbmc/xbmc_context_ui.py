@@ -129,9 +129,9 @@ class XbmcContextUI(AbstractContextUI):
     def open_settings(self):
         self._xbmc_addon.openSettings()
 
-    @staticmethod
-    def refresh_container():
-        xbmc.executebuiltin("Container.Refresh")
+    def refresh_container(self):
+        script_uri = 'special://home/addons/%s/resources/lib/youtube_plugin/refresh.py' % self._context.get_id()
+        xbmc.executebuiltin('RunScript(%s)' % script_uri)
 
     @staticmethod
     def set_home_window_property(property_id, value):
