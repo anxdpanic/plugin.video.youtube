@@ -1089,24 +1089,24 @@ msgstr "La IP del cliente es %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr "No se pudo obtener la IP de cliente"
+msgstr "No se pudo obtener la IP del cliente"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Reproducir con subtítulos"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "¿Estás seguro?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "Usar urls del sitio web YouTube"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Descargar subtítulos"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "¿Desea descargar los subtítulos antes de comenzar la reproducción? (Por defecto: No)"
