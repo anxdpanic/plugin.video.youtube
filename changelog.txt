@@ -27,6 +27,7 @@
             after:  min: 0.9s max: 2.6s median: 1.2s
 [chg] refactor logging and system version
 [chg] Localize confirmation
+[lang] es_es strings |contrib: roliverosc|
 
 6.1.3
 [fix] timedelta.total_seconds python 2.6 compat.
