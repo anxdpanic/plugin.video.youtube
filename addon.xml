@@ -27,6 +27,7 @@
 [chg] refactor logging and system version
 [chg] Localize confirmation
 [lang] es_es strings |contrib: roliverosc|
+[lang] el_gr strings |contrib: twilight0|
         </news>
         <assets>
             <icon>icon.png</icon>
