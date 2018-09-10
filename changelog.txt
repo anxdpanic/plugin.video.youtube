@@ -28,6 +28,7 @@
 [chg] refactor logging and system version
 [chg] Localize confirmation
 [lang] es_es strings |contrib: roliverosc|
+[lang] el_gr strings |contrib: twilight0|
 
 6.1.4
 [fix] Signature function not found
