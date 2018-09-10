@@ -1092,20 +1092,20 @@ msgstr "Αποτυχία λήψης διεύθυνσης IP πελάτη"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Αναπαραγωγή με υπότιτλους"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Είστε σίγουροι;"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "Χρησιμοποίησε urls από το site του Youtube"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Μεταφόρτωση υποτίτλων"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Μεταφόρτωση υποτίτλων πριν την αναπαραγωγή; (Εξ'ορισμού: Όχι)"
