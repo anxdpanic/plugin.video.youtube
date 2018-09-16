@@ -713,7 +713,7 @@ msgstr "Ontwikkelaarsleutels toestaan"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr "Kijkgeschiedenis opschonen"
+msgstr "Wissen Kijkgeschiedenis"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
@@ -861,7 +861,7 @@ msgstr "Ververs na bekijken"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr "Aankomend Live"
+msgstr "Binnenkort Live"
 
 msgctxt "#30647"
 msgid "Completed Live"
@@ -1021,7 +1021,7 @@ msgstr "Verwijder datacache database"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr "Datacache wissen"
+msgstr "Wissen datacache"
 
 msgctxt "#30687"
 msgid "data cache"
@@ -1085,20 +1085,20 @@ msgstr "Verkrijgen client IP mislukt"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Afspelen met ondertiteling"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Weet je dat zeker?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "Gebruik YouTube website url's"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Download ondertiteling"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Ondertiteling downloaden voor dat afspelen begint?"
