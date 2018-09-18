@@ -29,6 +29,7 @@
 [chg] Localize confirmation
 [lang] es_es strings |contrib: roliverosc|
 [lang] el_gr strings |contrib: twilight0|
+[lang] nl_nl strings |contrib: Markman-B|
 
 6.1.4
 [fix] Signature function not found
