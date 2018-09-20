@@ -1,6 +1,7 @@
 6.2.0
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
 [add] Option to download subtitles before playback in Settings -> General -> Configure subtitles
+[add] Refresh context menu to all videos/live streams
 [add] 'Settings -> Advanced -> Use YouTube website urls' for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
             eg. playercorefactory.xml
@@ -19,7 +20,6 @@
                        <rule filename="(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))[a-zA-Z0-9_\-]{11}.*" player="MPC-BE" />
                     </rules>
                 </playercorefactory>
-[fix] Mark as watched in Kodi 18
 [fix] Reported background progress dialog percentage
 [fix] Playlist items, use video_items instead of playback_items
 [upd] Improve speed of playback starting and resolver
@@ -29,6 +29,7 @@
 [chg] Localize confirmation
 [lang] es_es strings |contrib: roliverosc|
 [lang] el_gr strings |contrib: twilight0|
+[lang] nl_nl strings |contrib: Markman-B|
 
 6.1.4
 [fix] Signature function not found
