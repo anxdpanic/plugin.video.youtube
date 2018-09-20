@@ -129,26 +129,11 @@ class AbstractContext(object):
         if not params:
             params = {}
 
-        if self.get_system_version().get_version()[0] >= 18 \
-                and isinstance(path, list) \
-                and 'play' in path \
-                and params.get('video_id') \
-                and not params.get('playlist_id') \
-                and not params.get('channel_id'):
-            # temporarily workaround http://trac.kodi.tv/ticket/17947
-            # if expected route is plugin://plugin.video.youtube/play/?video_id=<video_id>
-            # instead build and return old_action/play_video
-            # plugin://plugin.video.youtube/?action=play_video&videoid=<video_id>
-            uri = 'plugin://%s/' % str(self._plugin_id)
-            params['action'] = 'play_video'
-            params['videoid'] = params['video_id']
-            del params['video_id']
+        uri = create_uri_path(path)
+        if uri:
+            uri = "%s://%s%s" % ('plugin', str(self._plugin_id), uri)
         else:
-            uri = create_uri_path(path)
-            if uri:
-                uri = 'plugin://%s%s' % (str(self._plugin_id), uri)
-            else:
-                uri = 'plugin://%s/' % str(self._plugin_id)
+            uri = "%s://%s/" % ('plugin', str(self._plugin_id))
 
         if len(params) > 0:
             # make a copy of the map

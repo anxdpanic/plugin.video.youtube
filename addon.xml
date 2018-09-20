@@ -19,7 +19,6 @@
 [add] Refresh context menu to all videos/live streams
 [add] 'Settings -&gt; Advanced -&gt; Use YouTube website urls' for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
-[fix] Mark as watched in Kodi 18
 [fix] Reported background progress dialog percentage
 [fix] Playlist items, use video_items instead of playback_items
 [upd] Improve speed of playback starting and resolver
