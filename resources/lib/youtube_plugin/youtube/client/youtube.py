@@ -70,7 +70,10 @@ class YouTube(LoginClient):
         if self._access_token:
             params['access_token'] = self._access_token
 
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        try:
+            result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        except:
+            context.log_error('Failed to update watch history')
 
     def get_video_streams(self, context, video_id=None, player_config=None, cookies=None, embeddable=False):
         video_info = VideoInfo(context, access_token=self._access_token, language=self._language)

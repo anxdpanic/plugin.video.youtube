@@ -1095,3 +1095,7 @@ msgstr ""
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
 msgstr ""
+
+msgctxt "#30707"
+msgid "Untitled"
+msgstr ""

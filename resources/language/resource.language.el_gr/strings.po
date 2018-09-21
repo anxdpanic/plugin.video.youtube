@@ -1109,3 +1109,7 @@ msgstr "Μεταφόρτωση υποτίτλων"
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
 msgstr "Μεταφόρτωση υποτίτλων πριν την αναπαραγωγή; (Εξ'ορισμού: Όχι)"
+
+msgctxt "#30707"
+msgid "Untitled"
+msgstr ""

@@ -1102,3 +1102,7 @@ msgstr "Download ondertiteling"
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
 msgstr "Ondertiteling downloaden voor dat afspelen begint?"
+
+msgctxt "#30707"
+msgid "Untitled"
+msgstr ""
