@@ -128,15 +128,18 @@ class YouTubeMonitor(xbmc.Monitor):
     def remove_temp_dir(self):
         temp_path = 'special://temp/%s/' % self.addon_id
         path = xbmc.translatePath(temp_path)
-        try:
-            xbmcvfs.rmdir(path, force=True)
-        except:
-            pass
+
+        if xbmcvfs.exists(path):
+            try:
+                xbmcvfs.rmdir(path, force=True)
+            except:
+                pass
         if xbmcvfs.exists(path):
             try:
                 shutil.rmtree(path)
             except:
                 pass
+
         if xbmcvfs.exists(path):
             logger.log_debug('Failed to remove directory: {dir}'.format(dir=path))
             return False
