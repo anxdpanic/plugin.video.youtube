@@ -145,7 +145,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.video.play_with_subtitles': 30702,
                  'youtube.are.you.sure': 30703,
                  'youtube.subtitles.download': 30705,
-                 'youtube.pre.download.subtitles': 30706
+                 'youtube.pre.download.subtitles': 30706,
+                 'youtube.untitled': 30707
                  }
 
     def __init__(self):
