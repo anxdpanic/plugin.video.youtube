@@ -1,7 +1,10 @@
 __author__ = 'bromix'
 
 import copy
+import traceback
+
 import requests
+
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ..helper.utils import get_shelf_index_by_title
@@ -73,7 +76,7 @@ class YouTube(LoginClient):
         try:
             result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         except:
-            context.log_error('Failed to update watch history')
+            context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
     def get_video_streams(self, context, video_id=None, player_config=None, cookies=None, embeddable=False):
         video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
