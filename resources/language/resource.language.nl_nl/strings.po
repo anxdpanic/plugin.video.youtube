@@ -100,7 +100,7 @@ msgstr "Zoekhistorie grootte"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr "Cache Grootte (MB)"
+msgstr "Cacheomvang (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -243,7 +243,7 @@ msgstr "Geduld AUB..."
 
 msgctxt "#30120"
 msgid "Clear"
-msgstr "Schoon op"
+msgstr "Opschonen"
 
 #YouTube
 #empty strings from id 30121 to 30199
@@ -489,7 +489,7 @@ msgstr "Onderhoud"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr "Verwijder functie cache database"
+msgstr "Verwijder functiecache database"
 
 msgctxt "#30554"
 msgid "Delete search history database"
@@ -497,11 +497,11 @@ msgstr "Verwijder zoekhistorie database"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr "Wis functie cache"
+msgstr "Opschonen functie cache"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr "Wis zoekhistorie"
+msgstr "Opschonen zoekhistorie"
 
 msgctxt "#30557"
 msgid "function cache"
@@ -713,7 +713,7 @@ msgstr "Ontwikkelaarsleutels toestaan"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr "Wissen Kijkgeschiedenis"
+msgstr "Opschonen Kijkgeschiedenis"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
@@ -1021,7 +1021,7 @@ msgstr "Verwijder datacache database"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr "Wissen datacache"
+msgstr "Opschonen datacache"
 
 msgctxt "#30687"
 msgid "data cache"
@@ -1105,4 +1105,4 @@ msgstr "Ondertiteling downloaden voor dat afspelen begint?"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Naamloos"
