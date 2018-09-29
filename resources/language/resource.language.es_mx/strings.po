@@ -22,7 +22,7 @@ msgstr "Plugin para YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "YouTube es uno de los mayores sitios web de intercambio de vídeos del mundo."
+msgstr "YouTube es uno de los mayores sitios web de intercambio de videos del mundo."
 
 #Kodion Settings
 
@@ -50,11 +50,11 @@ msgstr "Configurar InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr "Preguntar siempre por calidad de vídeo"
+msgstr "Preguntar siempre por calidad de video"
 
 msgctxt "#30010"
 msgid "Video quality"
-msgstr "Calidad de vídeo"
+msgstr "Calidad de video"
 
 msgctxt "#30011"
 msgid "480p"
@@ -207,7 +207,7 @@ msgstr "Suprimir"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr "Últimos Vídeos"
+msgstr "Últimos Videos"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -317,7 +317,7 @@ msgstr "Mi Canal"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr "Me gustó el vídeo"
+msgstr "Me gustó el video"
 
 msgctxt "#30509"
 msgid "History"
@@ -341,7 +341,7 @@ msgstr "Popular en este momento"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr "Vídeos relacionados"
+msgstr "Videos relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
@@ -437,7 +437,7 @@ msgstr "Reproducir desde aquí"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr "No me gustó el vídeo"
+msgstr "No me gustó el video"
 
 msgctxt "#30539"
 msgid "Live"
@@ -481,7 +481,7 @@ msgstr "Más..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr "No se han encontrados vídeos"
+msgstr "No se han encontrados videos"
 
 msgctxt "#30550"
 msgid "Region"
@@ -613,7 +613,7 @@ msgstr "¿Está seguro de que desea restablecer las credenciales de acceso?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr "Reproducir vídeos sugeridos automáticamente"
+msgstr "Reproducir videos sugeridos automáticamente"
 
 msgctxt "#30583"
 msgid "Automatic"
@@ -741,7 +741,7 @@ msgstr "Recuperar ID para lista de reproducción 'Ver más tarde'"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "¡Vaya! Algo ha fallado al recuperar la ID para la lista de reproducción 'Ver más tarde'. Agregue algunos vídeos a 'Ver más tarde' a través de la aplicación web / Android y vuelva a intentarlo."
+msgstr "¡Vaya! Algo ha fallado al recuperar la ID para la lista de reproducción 'Ver más tarde'. Agregue algunos videos a 'Ver más tarde' a través de la aplicación web / Android y vuelva a intentarlo."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -793,7 +793,7 @@ msgstr "Eliminar archivos temporales"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr "Calificar vídeo después de ver"
+msgstr "Calificar video después de ver"
 
 msgctxt "#30628"
 msgid "HTTP Server"
@@ -1037,7 +1037,7 @@ msgstr "caché de datos"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr "Usar para vídeos"
+msgstr "Usar para videos"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1090,3 +1090,27 @@ msgstr "La IP del cliente es %s"
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
 msgstr "No se pudo obtener la IP de cliente"
+
+msgctxt "#30702"
+msgid "Play with subtitles"
+msgstr "Reproducir con subtítulos"
+
+msgctxt "#30703"
+msgid "Are you sure?"
+msgstr "¿Estás seguro?"
+
+msgctxt "#30704"
+msgid "Use YouTube website urls"
+msgstr "Usar urls de Youtube"
+
+msgctxt "#30705"
+msgid "Download subtitles"
+msgstr "Descargar subtítulos"
+
+msgctxt "#30706"
+msgid "Download subtitles before starting playback? (Default: No)"
+msgstr "¿Descargar subtítulos antes de iniciar la reproducción? (Por defecto: No)"
+
+msgctxt "#30707"
+msgid "Untitled"
+msgstr "Sin título"
