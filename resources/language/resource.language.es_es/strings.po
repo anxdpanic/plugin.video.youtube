@@ -22,7 +22,7 @@ msgstr ""
 
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "YouTube es uno de los mayores sitios web de intercambio de vídeos del mundo."
+# msgstr "YouTube es uno de los sitios web más grandes para compartir videos del mundo."
 
 #Kodion Settings
 
@@ -1113,4 +1113,4 @@ msgstr "¿Desea descargar los subtítulos antes de comenzar la reproducción? (P
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Sin título"
