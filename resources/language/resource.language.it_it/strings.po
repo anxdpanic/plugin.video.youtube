@@ -23,7 +23,10 @@ msgstr ""
 # msgstr "Plugin per YouTube"
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "YouTube è uno dei siti web di video-sharing più grandi del mondo"
+# msgstr "YouTube è uno dei siti di video-sharing più grandi del mondo"
+# msgstr ""
+
+#Kodion Settings
 msgctxt "#30000"
 msgid "General"
 msgstr "Generale"
@@ -35,6 +38,16 @@ msgstr "Nome utente"
 msgctxt "#30002"
 msgid "Password"
 msgstr "Password"
+
+#empty strings from id 30003 to 30006
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -75,6 +88,8 @@ msgstr "360p"
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p Live/720p (HD)"
+
+#empty strings 30019
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -151,6 +166,9 @@ msgstr "Playlist ID Guarda Dopo personalizzata"
 msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Playlist ID Storica personalizzata"
+
+#Kodion Common
+#empty strings from id 30039 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -236,8 +254,8 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Pulisci"
 
-# YouTube
-# empty strings from id 30121 to 30199
+#YouTube
+#empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API Key"
 msgstr "API Key"
@@ -262,8 +280,8 @@ msgctxt "#30205"
 msgid "Use preset API key set"
 msgstr "Usa set di API Key preimpostate"
 
-# YouTube
-# empty strings from id 30206 to 30499
+#YouTube
+#empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Canali"
@@ -462,7 +480,7 @@ msgstr "Più..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr "Nessun Stream Video trovato"
+msgstr "Nessun flusso video trovato"
 
 msgctxt "#30550"
 msgid "Region"
@@ -482,7 +500,7 @@ msgstr "Cancella il database della function cache"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr "Cancella il database delle ricerche storiche"
+msgstr "Cancella il database delle ricerche passate"
 
 msgctxt "#30555"
 msgid "Clear function cache"
@@ -694,7 +712,7 @@ msgstr "Ricerca rapida (Anonima)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr "Solo Audio"
+msgstr "Solo sonoro"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
@@ -702,7 +720,7 @@ msgstr "Permetti API Keys Developers"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr "Resetta Storico Visti"
+msgstr "Resetta storico visti"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
@@ -738,7 +756,7 @@ msgstr "MPEG-Dash"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr "Attiva mpeg-dash proxy"
+msgstr "Attiva proxy mpeg-dash"
 
 msgctxt "#30619"
 msgid "Port"
@@ -746,7 +764,7 @@ msgstr "Porta"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "La porta %s è già in uso. Non posso avviare il Server http."
+msgstr "La porta %s è già in uso. Non posso avviare il server http."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
@@ -767,7 +785,6 @@ msgstr "È richiesto Kodi 17 o successivo"
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
 msgstr ""
-
 msgctxt "#30626"
 msgid "Delete temporary files"
 msgstr "Eliminare file temporanei"
@@ -1091,3 +1108,7 @@ msgstr "Scarica sottotitoli"
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
 msgstr "Scaricare i sottotitoli prima di iniziare la riproduzione? (default: no)"
+
+msgctxt "#30707"
+msgid "Untitled"
+msgstr "Senza titolo"
