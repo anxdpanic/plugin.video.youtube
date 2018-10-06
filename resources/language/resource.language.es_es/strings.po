@@ -235,11 +235,11 @@ msgstr "Confirmación para suprimir"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "¿Esta seguro de que desea eliminar \"%s\"?"
+msgstr "¿Está seguro de que desea eliminar \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "¿Esta seguro de que desea suprimir \"%s\"?"
+msgstr "¿Está seguro de que desea suprimir \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -1097,7 +1097,7 @@ msgstr "Reproducir con subtítulos"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr "¿Estás seguro?"
+msgstr "¿Está seguro?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
