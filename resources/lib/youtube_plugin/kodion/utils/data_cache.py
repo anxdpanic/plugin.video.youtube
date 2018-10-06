@@ -66,7 +66,7 @@ class DataCache(Storage):
         return result
 
     def set(self, content_id, item):
-        self.set(content_id, item)
+        self._set(content_id, item)
 
     def set_all(self, items):
         self._set_all(items)

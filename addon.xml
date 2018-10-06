@@ -26,8 +26,10 @@
             after:  min: 0.9s max: 2.6s median: 1.2s
 [chg] refactor logging and system version
 [chg] Localize confirmation
-[lang] es_es strings |contrib: roliverosc|
 [lang] el_gr strings |contrib: twilight0|
+[lang] es_es strings |contrib: roliverosc|
+[lang] es_mx strings |contrib: Intel11|
+[lang] it_it strings |contrib: SebastianoPistore|
 [lang] nl_nl strings |contrib: Markman-B|
         </news>
         <assets>
@@ -67,7 +69,6 @@
         <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>
         <summary lang="nb_NO">Tillegg for YouTube</summary>
         <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
-        <language></language>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
         <forum>https://forum.kodi.tv/showthread.php?tid=325740</forum>
