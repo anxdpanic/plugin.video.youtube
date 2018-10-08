@@ -15,7 +15,9 @@ class SearchHistory(Storage):
         result = []
 
         keys = self._get_ids(oldest_first=False)
-        for key in keys:
+        for i, key in enumerate(keys):
+            if i >= self._max_item_count:
+                break
             item = self._get(key)
             result.append(item[0])
 
