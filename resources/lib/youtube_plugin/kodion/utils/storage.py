@@ -115,25 +115,28 @@ class Storage(object):
         def _encode(obj):
             return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
-        self._open()
-        now = datetime.datetime.now()
-        if not now.microsecond:  # now is to the second
-            now += datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
-        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
-        self._execute(True, query, values=[item_id, now, _encode(item)])
-        self._close()
-        self._optimize_item_count()
+        if self._max_file_size_kb < 1 and self._max_item_count < 1:
+            self._optimize_item_count()
+        else:
+            self._open()
+            now = datetime.datetime.now() + datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
+            query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
+            self._execute(True, query, values=[item_id, now, _encode(item)])
+            self._close()
+            self._optimize_item_count()
 
     def _optimize_item_count(self):
         if self._max_item_count < 1:
-            return
-        self._open()
-        query = 'SELECT key FROM %s ORDER BY time DESC LIMIT -1 OFFSET %d' % (self._table_name, self._max_item_count)
-        result = self._execute(False, query)
-        if result is not None:
-            for item in result:
-                self._remove(item[0])
-        self._close()
+            if not self._is_empty():
+                self._clear()
+        else:
+            self._open()
+            query = 'SELECT key FROM %s ORDER BY time DESC LIMIT -1 OFFSET %d' % (self._table_name, self._max_item_count)
+            result = self._execute(False, query)
+            if result is not None:
+                for item in result:
+                    self._remove(item[0])
+            self._close()
 
     def _clear(self):
         self._open()
