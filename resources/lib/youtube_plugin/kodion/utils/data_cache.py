@@ -1,11 +1,13 @@
 from six import PY2
 from six.moves import cPickle as pickle
 
-import datetime
 import json
 import sqlite3
 
+from datetime import datetime, timedelta
+
 from .storage import Storage
+from .. import logger
 
 
 class DataCache(Storage):
@@ -33,18 +35,23 @@ class DataCache(Storage):
                 obj = str(obj)
             return pickle.loads(obj)
 
-        self._open()
-        now = datetime.datetime.now()
+        current_time = datetime.now()
         placeholders = ','.join(['?' for item in content_ids])
         keys = [str(item) for item in content_ids]
         query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
+
+        self._open()
+
         query_result = self._execute(False, query, keys)
         result = {}
         if query_result:
             for item in query_result:
                 cached_time = item[1]
+                if cached_time is None:
+                    logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(content_id=str(item[0])))
+                    cached_time = current_time
                 # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-                diff_seconds = self._seconds_difference(cached_time, now)
+                diff_seconds = self._seconds_difference(cached_time, current_time)
                 if diff_seconds <= seconds:
                     result[str(item[0])] = json.loads(_decode(item[2]))
 
@@ -56,10 +63,13 @@ class DataCache(Storage):
         query_result = self._get(content_id)
         result = {}
         if query_result:
+            current_time = datetime.now()
             cached_time = query_result[1]
-            now = datetime.datetime.now()
+            if cached_time is None:
+                logger.log_error('Data Cache [get]: cached_time is None while getting {content_id}'.format(content_id=content_id))
+                cached_time = current_time
             # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-            diff_seconds = self._seconds_difference(cached_time, now)
+            diff_seconds = self._seconds_difference(cached_time, current_time)
             if diff_seconds <= seconds:
                 result[content_id] = json.loads(query_result[0])
 
@@ -87,29 +97,34 @@ class DataCache(Storage):
         def _encode(obj):
             return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
-        self._open()
-        now = datetime.datetime.now()
-        if not now.microsecond:  # now is to the second
-            now += datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
+        current_time = datetime.now() + timedelta(microseconds=1)
+        if current_time is None:
+            logger.log_error('Data Cache [set]: current_time is None while adding {content_id}'.format(content_id=content_id))
+            current_time = datetime.now() + timedelta(microseconds=1)
+
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
-        self._execute(True, query, values=[content_id, now, _encode(item)])
+
+        self._open()
+        self._execute(True, query, values=[content_id, current_time, _encode(item)])
         self._close()
 
     def _set_all(self, items):
         def _encode(obj):
             return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
-        self._open()
-
         needs_commit = True
-        now = datetime.datetime.now()
-        if not now.microsecond:  # now is to the second
-            now += datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
+        current_time = datetime.now() + timedelta(microseconds=1)
+
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
 
+        self._open()
+
         for key in list(items.keys()):
+            if current_time is None:
+                logger.log_error('Data Cache [set_all]: current_time is None while adding {content_id}'.format(content_id=key))
+                current_time = datetime.now() + timedelta(microseconds=1)
             item = items[key]
-            self._execute(needs_commit, query, values=[key, now, _encode(json.dumps(item))])
+            self._execute(needs_commit, query, values=[key, current_time, _encode(json.dumps(item))])
             needs_commit = False
 
         self._close()
