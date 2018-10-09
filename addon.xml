@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~beta1" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.2.0~beta2" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon='script.module.six' version='1.11.0'/>
@@ -15,13 +15,14 @@
         <news>
 6.2.0
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
-[add] Option to download subtitles before playback in Settings -&gt; General -&gt; Configure subtitles
+[add] Option to download subtitles before playback in Settings -&amp;gt; General -&amp;gt; Configure subtitles
 [add] Refresh context menu to all videos/live streams
-[add] 'Settings -&gt; Advanced -&gt; Use YouTube website urls' for external/alternative players
+[add] &#39;Settings -&amp;gt; Advanced -&amp;gt; Use YouTube website urls&#39; for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
 [fix] Reported background progress dialog percentage
 [fix] Playlist items, use video_items instead of playback_items
 [fix] search history size
+[fix] remove Spanish (Latin America)|es-419 from, causing invalidLanguage and invalidRelevanceLanguage errors
 [upd] Improve speed of playback starting and resolver
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s
