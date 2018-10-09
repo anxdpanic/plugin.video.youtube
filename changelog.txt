@@ -23,6 +23,7 @@
 [fix] Reported background progress dialog percentage
 [fix] Playlist items, use video_items instead of playback_items
 [fix] search history size
+[fix] remove Spanish (Latin America)|es-419 from, causing invalidLanguage and invalidRelevanceLanguage errors
 [upd] Improve speed of playback starting and resolver
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s
