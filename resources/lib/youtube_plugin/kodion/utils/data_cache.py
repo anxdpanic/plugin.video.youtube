@@ -23,7 +23,6 @@ class DataCache(Storage):
 
     @staticmethod
     def _seconds_difference(_first, _last):
-        # 'total_seconds' not available in python 2.6
         _delta = _last - _first
         return 24 * 60 * 60 * _delta.days + _delta.seconds + (_delta.microseconds // 1000000.)
 
@@ -36,77 +35,43 @@ class DataCache(Storage):
                 obj = str(obj)
             return pickle.loads(obj)
 
-        failed_ids = []
         current_time = datetime.now()
         placeholders = ','.join(['?' for item in content_ids])
+        keys = [str(item) for item in content_ids]
         query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
 
         self._open()
 
-        query_result = self._execute(False, query, content_ids)
+        query_result = self._execute(False, query, keys)
         result = {}
         if query_result:
             for item in query_result:
                 cached_time = item[1]
                 if cached_time is None:
-                    failed_ids.append(item[0])
-                    continue
-                diff_seconds = self._seconds_difference(cached_time, current_time)
-                if diff_seconds <= seconds:
-                    result[item[0]] = json.loads(_decode(item[2]))
-
-        self._close()
-
-        if failed_ids:
-            placeholders = ','.join(['?' for item in failed_ids])
-            query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
-
-            self._open()
-
-            query_result = self._execute(False, query, failed_ids)
-            result = {}
-            if query_result:
-                for item in query_result:
-                    cached_time = item[1]
-                    if cached_time is None:
-                        logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(content_id=item[0]))
-                        cached_time = current_time
-                    diff_seconds = self._seconds_difference(cached_time, current_time)
-                    if diff_seconds <= seconds:
-                        result[item[0]] = json.loads(_decode(item[2]))
-
-            self._close()
-
-        return result
-
-    def get_item(self, seconds, content_id):
-        current_time = datetime.now()
-        failed = False
-        query_result = self._get(content_id)
-        result = {}
-
-        if query_result:
-            cached_time = query_result[1]
-            if cached_time is not None:
-                # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-                diff_seconds = self._seconds_difference(cached_time, current_time)
-                if diff_seconds <= seconds:
-                    result[content_id] = json.loads(query_result[0])
-            else:
-                failed = True
-
-        if failed:
-            query_result = self._get(content_id)
-            result = {}
-            if query_result:
-                cached_time = query_result[1]
-                if cached_time is None:
-                    logger.log_error('Data Cache [get]: cached_time is None while getting {content_id}'.format(content_id=content_id))
+                    logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(content_id=str(item[0])))
                     cached_time = current_time
                 # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
                 diff_seconds = self._seconds_difference(cached_time, current_time)
                 if diff_seconds <= seconds:
-                    result[content_id] = json.loads(query_result[0])
+                    result[str(item[0])] = json.loads(_decode(item[2]))
+
+        self._close()
+        return result
+
+    def get_item(self, seconds, content_id):
+        content_id = str(content_id)
+        query_result = self._get(content_id)
+        result = {}
+        if query_result:
+            current_time = datetime.now()
+            cached_time = query_result[1]
+            if cached_time is None:
+                logger.log_error('Data Cache [get]: cached_time is None while getting {content_id}'.format(content_id=content_id))
+                cached_time = current_time
+            # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
+            diff_seconds = self._seconds_difference(cached_time, current_time)
+            if diff_seconds <= seconds:
+                result[content_id] = json.loads(query_result[0])
 
         return result
 
