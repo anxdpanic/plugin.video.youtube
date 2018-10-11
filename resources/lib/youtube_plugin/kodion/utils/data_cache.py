@@ -98,10 +98,6 @@ class DataCache(Storage):
             return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
         current_time = datetime.now() + timedelta(microseconds=1)
-        if current_time is None:
-            logger.log_error('Data Cache [set]: current_time is None while adding {content_id}'.format(content_id=content_id))
-            current_time = datetime.now() + timedelta(microseconds=1)
-
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
 
         self._open()
@@ -120,9 +116,6 @@ class DataCache(Storage):
         self._open()
 
         for key in list(items.keys()):
-            if current_time is None:
-                logger.log_error('Data Cache [set_all]: current_time is None while adding {content_id}'.format(content_id=key))
-                current_time = datetime.now() + timedelta(microseconds=1)
             item = items[key]
             self._execute(needs_commit, query, values=[key, current_time, _encode(json.dumps(item))])
             needs_commit = False
