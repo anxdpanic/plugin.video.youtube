@@ -17,12 +17,14 @@
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
 [add] Option to download subtitles before playback in Settings -&amp;gt; General -&amp;gt; Configure subtitles
 [add] Refresh context menu to all videos/live streams
+[add] &amp;strm=true parameter for strm files in Kodi 18 |contrib: vlmaksime|
+    - use description from library and set watched status
 [add] &#39;Settings -&amp;gt; Advanced -&amp;gt; Use YouTube website urls&#39; for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
 [fix] Reported background progress dialog percentage
 [fix] Playlist items, use video_items instead of playback_items
 [fix] search history size
-[fix] remove Spanish (Latin America)|es-419 from, causing invalidLanguage and invalidRelevanceLanguage errors
+[fix] remove Spanish (Latin America)|es-419 from the setup wizard, causing invalidLanguage and invalidRelevanceLanguage errors
 [upd] Improve speed of playback starting and resolver
             before: min: 1.5s max: 2.6s median: 1.7s
             after:  min: 0.9s max: 2.6s median: 1.2s
@@ -33,6 +35,7 @@
 [lang] es_mx strings |contrib: Intel11|
 [lang] it_it strings |contrib: SebastianoPistore|
 [lang] nl_nl strings |contrib: Markman-B|
+[lang] ru_ru strings |contrib: vlmaksime|
         </news>
         <assets>
             <icon>icon.png</icon>
