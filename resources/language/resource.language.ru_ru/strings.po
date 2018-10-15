@@ -38,7 +38,15 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Пароль"
 
-#empty strings from id 30003 to 30008
+#empty strings from id 30003 to 30006
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Использовать MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr "Настроить InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -78,7 +86,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Прямой эфир / 720p (HD)"
 
 #empty strings 30019
 
@@ -159,10 +167,10 @@ msgid "Custom History playlist id"
 msgstr ""
 
 #Kodion Common
-#empty strings from id 30037 to 30099
+#empty strings from id 30039 to 30099
 
 msgctxt "#30100"
-msgid "Favorites"
+msgid "Favourites"
 msgstr "Избранное"
 
 msgctxt "#30101"
@@ -249,8 +257,8 @@ msgstr "Очистить"
 #empty strings from id 30121 to 30199
 
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API Key"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -270,7 +278,7 @@ msgstr "Использовать персональный API Key"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Использовать предустановленный API Key"
 
 #YouTube
 #empty strings from id 30206 to 30499
@@ -489,23 +497,23 @@ msgstr "Обслуживание"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Удалить базу данных функционального кеша"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Удалить базу данных истории поиска"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Очистить функциональный кеш"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Очистить историю поиска"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "функциональный кеш"
 
 msgctxt "#30558"
 msgid "search history"
@@ -533,7 +541,7 @@ msgstr "Установка"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Установка, Английский"
 
 msgctxt "#30565"
 msgid "English"
@@ -597,15 +605,15 @@ msgstr "В настройках YouTube MPEG-DASH включен, однако I
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "Сбросить диспетчер доступа"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Вы действительно хотите сбросить диспетчер доступа?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Воспроизводить предлагаемые видео"
 
 msgctxt "#30583"
 msgid "Automatic"
@@ -669,11 +677,11 @@ msgstr "Обновлено: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Включен персональный API Key"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Ошибка включения персонального API Key. Отсутствует: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
@@ -689,7 +697,7 @@ msgstr ""
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Возрастной контроль"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
@@ -709,7 +717,7 @@ msgstr "Только аудио"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Разрешить ключи разработчика"
 
 msgctxt "#30609"
 msgid "Clear watch history"
@@ -793,7 +801,7 @@ msgstr "HTTP сервер"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "Белый список IP (разделен запятыми)"
 
 msgctxt "#30630"
 msgid "Save"
@@ -805,27 +813,27 @@ msgstr "Успешно обновлено: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Включить страницу настроек API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (смотрите HTTP сервер)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Настройка API дополнения YouTube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Изменения не обнаружены, API Keys не обновлены."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Включены персональные API Keys."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Включены персональные API Keys."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
@@ -833,7 +841,7 @@ msgstr ""
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Обнаружены персональные API Keys в api_keys.json, восстановить их? Отмена перезатрет их."
 
 msgctxt "#30640"
 msgid "Restore"
@@ -849,35 +857,35 @@ msgstr "Удалить access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Слушать IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Выбрать IP для прослушивания"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Обновить после просмотра"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Предстоящий прямой эфир"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Завершенный прямой эфир"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "Неподходящий API Key. Настройки - API - API Key"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "Неподходящий Client Id. Настройки - API - API Id"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "Неподходящий Client Secret. Настройки - API - API Secret"
 
 msgctxt "#30651"
 msgid "Location"
@@ -885,11 +893,11 @@ msgstr "Местонахождение"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Радиус местонахождения (км)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "Выполнять геолокацию? Используется для [B]Мое местонахождение[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -949,7 +957,7 @@ msgstr "'%s' переименован в '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Минимальный процент отметки просмотра"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
@@ -1041,7 +1049,7 @@ msgstr "Для прямого эфира требуется InputStream Adaptive
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Сейчас в эфире"
 
 msgctxt "#30692"
 msgid "In a minute"
@@ -1049,7 +1057,7 @@ msgstr "Через минуту"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Скоро в эфире"
 
 msgctxt "#30694"
 msgid "In over an hour"
@@ -1061,7 +1069,7 @@ msgstr "Более двух часов"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Эфир сегодня в"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
@@ -1097,12 +1105,12 @@ msgstr "Использовать URLs сайта YouTube"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Загрузить субтитры"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Загружать субтитры перед началом воспроизведения? (По умолчанию: Нет)"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Без названия"
