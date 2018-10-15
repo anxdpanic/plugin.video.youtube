@@ -2,6 +2,8 @@
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
 [add] Option to download subtitles before playback in Settings -> General -> Configure subtitles
 [add] Refresh context menu to all videos/live streams
+[add] &strm=true parameter for strm files in Kodi 18 |contrib: vlmaksime|
+    - use description from library and set watched status
 [add] 'Settings -> Advanced -> Use YouTube website urls' for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
             eg. playercorefactory.xml
@@ -34,6 +36,7 @@
 [lang] es_mx strings |contrib: Intel11|
 [lang] it_it strings |contrib: SebastianoPistore|
 [lang] nl_nl strings |contrib: Markman-B|
+[lang] ru_ru strings |contrib: vlmaksime|
 
 6.1.4
 [fix] Signature function not found

@@ -17,6 +17,8 @@
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
 [add] Option to download subtitles before playback in Settings -&amp;gt; General -&amp;gt; Configure subtitles
 [add] Refresh context menu to all videos/live streams
+[add] &amp;strm=true parameter for strm files in Kodi 18 |contrib: vlmaksime|
+    - use description from library and set watched status
 [add] &#39;Settings -&amp;gt; Advanced -&amp;gt; Use YouTube website urls&#39; for external/alternative players
             eg. Player: MPC-BE, URL: https://www.youtube.com/watch?v=C0NyvxTJGcQ
 [fix] Reported background progress dialog percentage
@@ -33,6 +35,7 @@
 [lang] es_mx strings |contrib: Intel11|
 [lang] it_it strings |contrib: SebastianoPistore|
 [lang] nl_nl strings |contrib: Markman-B|
+[lang] ru_ru strings |contrib: vlmaksime|
         </news>
         <assets>
             <icon>icon.png</icon>
