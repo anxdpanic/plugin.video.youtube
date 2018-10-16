@@ -44,11 +44,13 @@ def _get_config_and_cookies(client, url, embedded=False):
 
         lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
         tail = ',\'EXPERIMENT_FLAGS\':'
+        if html.find(tail) == -1:
+            tail = '});'
         pos = html.find(lead)
         if pos >= 0:
             html2 = html[pos + len(lead):]
             pos = html2.find(tail)
-            if pos:
+            if pos >= 0:
                 _player_config = html2[:pos]
     else:
         lead = 'ytplayer.config = '
@@ -57,7 +59,7 @@ def _get_config_and_cookies(client, url, embedded=False):
         if pos >= 0:
             html2 = html[pos + len(lead):]
             pos = html2.find(tail)
-            if pos:
+            if pos >= 0:
                 _player_config = html2[:pos]
 
         blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
