@@ -1,3 +1,7 @@
+6.2.1
+[fix] some streams reporting as Unavailable
+[lang] sk_sk strings |contrib: jose1711|
+
 6.2.0
 [add] Context menu -> 'Play with subtitles' |contrib: solarus|
 [add] Option to download subtitles before playback in Settings -> General -> Configure subtitles
