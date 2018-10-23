@@ -74,7 +74,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Live / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -94,7 +94,7 @@ msgstr "Veľkosť histórie vyhľadávania"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr "Veľikosť cache(MB)"
+msgstr "Veľkosť cache (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -106,19 +106,19 @@ msgstr "Vynútiť zobrazenie"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr "Zobrazit: Štandardné"
+msgstr "Zobraziť: Štandardné"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr "Zobrazit: Epizódy"
+msgstr "Zobraziť: Epizódy"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr "Zobrazit: Filmy"
+msgstr "Zobraziť: Filmy"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Spustit sprievodcu nastavením?"
+msgstr "Spustiť sprievodcu nastavením?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -130,15 +130,15 @@ msgstr "Zobraziť: TV Show"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr "Zobrazit: Skladby"
+msgstr "Zobraziť: Skladby"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr "Zobrazit: Umelci"
+msgstr "Zobraziť: Umelci"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr "Zobrazit: Albumy"
+msgstr "Zobraziť: Albumy"
 
 msgctxt "#30036"
 msgid "Support alternative player"
@@ -178,7 +178,7 @@ msgstr "Archív"
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
-msgstr "Ďalša strana (%d)"
+msgstr "Ďalšia strana (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
@@ -210,19 +210,19 @@ msgstr "Premenovať"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "Potvrdiť zmazanie"
+msgstr "Potvrdiť vymazanie"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr "Potvrdit presunutie"
+msgstr "Potvrdiť odstránenie"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "Zmazať \"%s\"?"
+msgstr "Vymazať \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "Presunúť \"%s\"?"
+msgstr "Odstrániť \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -241,23 +241,23 @@ msgstr "Vyčistiť"
 
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "API kľúč"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API kľúč"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API Id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API Tajomstvo"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr ""
+msgstr "Povoliť osobné API kľúče"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
@@ -292,7 +292,7 @@ msgstr "Odhlásiť odber"
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr "Přihlásiť k odberu"
+msgstr "Prihlásiť k odberu"
 
 msgctxt "#30507"
 msgid "My Channel"
@@ -316,7 +316,7 @@ msgstr "Pridať video do fronty"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr "Prechádzať kanály"
+msgstr "Listovať kanálmi"
 
 msgctxt "#30513"
 msgid "Popular right now"
@@ -328,11 +328,11 @@ msgstr "Súvisiace videá"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Automaticky odstraniť zo 'Sledovať neskôr'"
+msgstr "Automaticky odstrániť zo 'Sledovať neskôr'"
 
 msgctxt "#30516"
 msgid "Folders"
-msgstr "Zložky"
+msgstr "Priečinky"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
@@ -388,7 +388,7 @@ msgstr "Páči sa mi to"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr "Nepáčí sa mi to"
+msgstr "Nepáči sa mi to"
 
 msgctxt "#30531"
 msgid "Play all"
@@ -420,7 +420,7 @@ msgstr "Prehrať odtiaľto"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr "Videa, ktoré sa mi nepáčia"
+msgstr "Videá, ktoré sa mi nepáčia"
 
 msgctxt "#30539"
 msgid "Live"
@@ -436,7 +436,7 @@ msgstr "Zobraziť názov kanálu v popise"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "rtmpe stream nieje podporovaný"
+msgstr "rtmpe stream nie je podporovaný"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -476,7 +476,7 @@ msgstr "Odporúčania"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Údržba"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
@@ -492,7 +492,7 @@ msgstr ""
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Vyčistiť históriu vyhľadávania"
 
 msgctxt "#30557"
 msgid "function cache"
@@ -500,39 +500,39 @@ msgstr ""
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "história vyhľadávania"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Vymazať settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Jazyk titulkov"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Žiaden"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Všetky"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Nastavenie"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Nastavenie, Angličtina"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Angličtina"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Spýtať sa"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -568,19 +568,19 @@ msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Úspech"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Neúspech"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Nastavenia"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Vynútiť overenie SSL certifikátu"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
@@ -596,23 +596,23 @@ msgstr ""
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Automaticky prehrávať navrhované videá"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Automaticky"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Moje odbery (filtrovane)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "Filtrovaný zoznam kanálov (oddelený čiarkami)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Zakázať"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
@@ -632,35 +632,35 @@ msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Veľkosť náhľadov"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Stredná (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Vysoká (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Bezpečné výsledky vyhľadávania"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Mierne"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Prísne"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Aktualizované: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Osobné API kľúče povolené"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
@@ -668,7 +668,7 @@ msgstr ""
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Nastaviť titulky"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
@@ -676,7 +676,7 @@ msgstr ""
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Nie automaticky generované"
 
 msgctxt "#30603"
 msgid "Age gate"
@@ -684,19 +684,19 @@ msgstr ""
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Povoliť urážlivý obsah"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Rýchle vyhľadávanie"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Rýchle vyhľadávanie (inkognito)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Iba audio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
@@ -716,7 +716,7 @@ msgstr ""
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Opakovať"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
@@ -728,7 +728,7 @@ msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Zrušiť"
 
 msgctxt "#30616"
 msgid "Must be signed in."
@@ -744,11 +744,11 @@ msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Port %s už je používaný. Nepodarilo sa spustiť http server."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
@@ -756,7 +756,7 @@ msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Nákupy"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
@@ -764,7 +764,7 @@ msgstr ""
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Vyžaduje Kodi 17+"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -872,7 +872,7 @@ msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Miesto"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
@@ -888,51 +888,51 @@ msgstr ""
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Prepnúť používateľa"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Nový používateľ"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Bez mena"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Zadajte meno používateľa"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Používateľ je teraz '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Používatelia"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Pridať používateľa"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Odstrániť používateľa"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Premenovať používateľa"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Prepnúť používateľa"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Prepnúť na '%s' teraz?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "Odstránený '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -976,35 +976,35 @@ msgstr ""
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Pred minútou"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Nedávno"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Pred hodinou"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Pred dvomi hodinami"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Pred tromi hodinami"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Včera o"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Pred dvoma dňami"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Dnes o"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
@@ -1016,15 +1016,15 @@ msgstr ""
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "dátová keš"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Použiť pre videá"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Použit pre živé vysielanie"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
@@ -1032,31 +1032,31 @@ msgstr ""
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Vo vysielaní"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "O minútu"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "O chvíľu sa vysiela"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "O viac ako hodinu"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "O viac ako dve hodiny"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Vysielané dnes o"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Zajtra o"
 
 msgctxt "#30698"
 msgid "Check my IP"
@@ -1088,7 +1088,7 @@ msgstr ""
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Stiahnuť titulky"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
