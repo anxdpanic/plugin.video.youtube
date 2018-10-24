@@ -13,6 +13,10 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+6.2.1
+[fix] some streams reporting as Unavailable
+[lang] sk_sk strings |contrib: jose1711|
+
 6.2.0
 [add] Context menu -&gt; &#39;Play with subtitles&#39; |contrib: solarus|
 [add] Option to download subtitles before playback in Settings -&gt; General -&gt; Configure subtitles
@@ -74,6 +78,7 @@
         <disclaimer lang="el_GR">Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google</disclaimer>
         <summary lang="nb_NO">Tillegg for YouTube</summary>
         <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
+        <language></language>
         <platform>all</platform>
         <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
         <forum>https://forum.kodi.tv/showthread.php?tid=325740</forum>
