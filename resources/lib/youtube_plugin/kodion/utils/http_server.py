@@ -25,7 +25,10 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.whitelist_ips = whitelist_ips.split(',')
         self.local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
         self.chunk_size = 1024 * 64
-        self.base_path = 'special://temp/%s' % self.addon_id
+        try:
+            self.base_path = xbmc.translatePath('special://temp/%s' % self.addon_id).decode('utf-8')
+        except AttributeError:
+            self.base_path = xbmc.translatePath('special://temp/%s' % self.addon_id)
         BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
     def connection_allowed(self):
@@ -66,9 +69,9 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_error(403)
         else:
             if dash_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
+                file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 file_chunk = True
-                logger.log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path))
+                logger.log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path.encode('utf-8')))
                 try:
                     with open(file_path, 'rb') as f:
                         self.send_response(200)
@@ -80,7 +83,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                             if file_chunk:
                                 self.wfile.write(file_chunk)
                 except IOError:
-                    response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path)
+                    response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
                     self.send_error(404, response)
             elif api_config_enabled and self.path == '/api':
                 html = self.api_config_page()
@@ -156,9 +159,9 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             addon = xbmcaddon.Addon('plugin.video.youtube')
             dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
             if dash_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = xbmc.translatePath(''.join([self.base_path, self.path]))
+                file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 if not os.path.isfile(file_path):
-                    response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path)
+                    response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
                     self.send_error(404, response)
                 else:
                     self.send_response(200)

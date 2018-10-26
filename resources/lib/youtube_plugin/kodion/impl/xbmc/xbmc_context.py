@@ -66,9 +66,11 @@ class XbmcContext(AbstractContext):
         """
         Set the data path for this addon and create the folder
         """
-        self._data_path = xbmc.translatePath('special://profile/addon_data/%s' % self._plugin_id)
-        if isinstance(self._data_path, str):
-            self._data_path = self._data_path
+        try:
+            self._data_path = xbmc.translatePath(self._addon.getAddonInfo('profile')).decode('utf-8')
+        except AttributeError:
+            self._data_path = xbmc.translatePath(self._addon.getAddonInfo('profile'))
+
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
 
