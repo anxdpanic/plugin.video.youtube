@@ -15,6 +15,7 @@
         <news>
 6.2.1
 [fix] some streams reporting as Unavailable
+[fix] utf-8 file paths
 [lang] sk_sk strings |contrib: jose1711|
 
 6.2.0
