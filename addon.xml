@@ -16,7 +16,7 @@
 6.2.1
 [fix] some streams reporting as Unavailable
 [fix] utf-8 file paths
-[fix] switching user causing perpetual busy dialog on Kodi 18
+[fix] settings, and switch user causing perpetual busy dialog on Kodi 18
 [lang] sk_sk strings |contrib: jose1711|
 
 6.2.0
