@@ -982,6 +982,7 @@ class Provider(kodion.AbstractProvider):
         settings = context.get_settings()
         if switch == 'youtube':
             context._addon.openSettings()
+            context.get_ui().refresh_container()
         elif switch == 'mpd':
             use_dash = context.use_inputstream_adaptive()
             if use_dash:
