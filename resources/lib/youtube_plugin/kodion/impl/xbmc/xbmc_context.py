@@ -249,7 +249,7 @@ class XbmcContext(AbstractContext):
     def use_inputstream_adaptive(self):
         addon_enabled = self.addon_enabled('inputstream.adaptive')
         if self._settings.use_dash() and not addon_enabled:
-            if self._ui.on_yes_no_input(self.get_name(), self.localize(30579)):
+            if self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):
                 use_dash = self.set_addon_enabled('inputstream.adaptive')
             else:
                 use_dash = False
