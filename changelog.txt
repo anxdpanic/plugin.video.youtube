@@ -1,3 +1,6 @@
+6.2.2
+[fix] signature function not found on some videos
+
 6.2.1
 [fix] some streams reporting as Unavailable
 [fix] utf-8 file paths

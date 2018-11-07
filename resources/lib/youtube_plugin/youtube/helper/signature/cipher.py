@@ -123,7 +123,8 @@ class Cipher(object):
         match_patterns = [r'(["\'])signature\1\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
                           r'\.sig\|\|(?P<name>[a-zA-Z0-9$]+)\(',
                           r'yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*c\s*&&\s*d\.set\([^,]+\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
-                          r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(']
+                          r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
+                          r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<name>[a-zA-Z0-9$]+)\(']
 
         for pattern in match_patterns:
             match = re.search(pattern, javascript)
