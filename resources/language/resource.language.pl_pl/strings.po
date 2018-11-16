@@ -1096,3 +1096,7 @@ msgstr "Pobieraj napisy przed startem odtwarzania? (Domyślnie: Nie)"
 msgctxt "#30707"
 msgid "Untitled"
 msgstr "Nienazwany"
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""

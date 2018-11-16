@@ -1113,3 +1113,7 @@ msgstr "Μεταφόρτωση υποτίτλων πριν την αναπαρα
 msgctxt "#30707"
 msgid "Untitled"
 msgstr "Χωρίς τίτλο"
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""

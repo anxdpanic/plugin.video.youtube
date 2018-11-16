@@ -73,7 +73,7 @@ def find_best_fit(data, compare_method=None):
     return result
 
 
-def select_stream(context, stream_data_list, quality_map_override=None, ask_for_quality=None):
+def select_stream(context, stream_data_list, quality_map_override=None, ask_for_quality=None, audio_only=None):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
         return _stream_data.get('sort', 0)
@@ -82,9 +82,15 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     use_dash = settings.use_dash()
     ask_for_quality = context.get_settings().ask_for_video_quality() if ask_for_quality is None else ask_for_quality
     video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
-    audio_only = False if ask_for_quality else settings.audio_only()  # don't filter streams to audio only if we're asking for quality
+    audio_only = audio_only if audio_only is not None else settings.audio_only()
 
-    if audio_only:  # check for live stream, audio only not supported
+    if not ask_for_quality:
+        stream_data_list = [item for item in stream_data_list
+                            if ((item['container'] != 'mpd') or
+                                ((item['container'] == 'mpd') and
+                                 (item.get('dash/video', False))))]
+
+    if not ask_for_quality and audio_only:  # check for live stream, audio only not supported
         context.log_debug('Select stream: Audio only')
         for item in stream_data_list:
             if item.get('Live', False):
@@ -92,7 +98,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
                 audio_only = False
                 break
 
-    if audio_only:
+    if not ask_for_quality and audio_only:
         audio_stream_data_list = [item for item in stream_data_list
                                   if (item.get('dash/audio', False) and
                                       not item.get('dash/video', False))]

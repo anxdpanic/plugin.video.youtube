@@ -1114,3 +1114,7 @@ msgstr "¿Desea descargar los subtítulos antes de comenzar la reproducción? (P
 msgctxt "#30707"
 msgid "Untitled"
 msgstr "Sin título"
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""

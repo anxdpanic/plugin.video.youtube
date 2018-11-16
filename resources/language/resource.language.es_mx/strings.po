@@ -16,13 +16,13 @@ msgstr ""
 "Language: es_MX\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
-msgctxt "Addon Summary"
-msgid "Plugin for YouTube"
-msgstr "Plugin para YouTube"
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Plugin para YouTube"
 
-msgctxt "Addon Description"
-msgid "YouTube is a one of the biggest video-sharing websites of the world."
-msgstr "YouTube es uno de los mayores sitios web de intercambio de videos del mundo."
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube es uno de los mayores sitios web de intercambio de videos del mundo."
 
 #Kodion Settings
 
@@ -1114,3 +1114,7 @@ msgstr "¿Descargar subtítulos antes de iniciar la reproducción? (Por defecto:
 msgctxt "#30707"
 msgid "Untitled"
 msgstr "Sin título"
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""

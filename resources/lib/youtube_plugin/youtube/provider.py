@@ -23,6 +23,7 @@ import xbmcvfs
 
 class Provider(kodion.AbstractProvider):
     LOCAL_MAP = {'youtube.search': 30102,
+                 'youtube.next_page': 30106,
                  'youtube.watch_later': 30107,
                  'youtube.video.rate.none': 30108,
                  'youtube.remove': 30108,
@@ -146,7 +147,8 @@ class Provider(kodion.AbstractProvider):
                  'youtube.are.you.sure': 30703,
                  'youtube.subtitles.download': 30705,
                  'youtube.pre.download.subtitles': 30706,
-                 'youtube.untitled': 30707
+                 'youtube.untitled': 30707,
+                 'youtube.video.play_audio_only': 30708
                  }
 
     def __init__(self):
