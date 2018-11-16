@@ -18,6 +18,8 @@
 [add] icon and description to playlists in 'More...' -> 'Add to...' context menu on Kodi 17+
 [fix] generated dash with no supported video streams(audio only) being played when Audio only not enabled
 [fix] potential RuntimeError when retrieving total time of playing content if player is stopped immediately
+[lang] pl_pl strings |contrib: xulek|
+[lang] sk_sk strings |contrib: jose1711|
 
 6.2.2
 [fix] signature function not found on some videos
@@ -26,7 +28,6 @@
 [fix] some streams reporting as Unavailable
 [fix] utf-8 file paths
 [fix] settings, and switch user causing perpetual busy dialog on Kodi 18
-[lang] sk_sk strings |contrib: jose1711|
         </news>
         <assets>
             <icon>icon.png</icon>
