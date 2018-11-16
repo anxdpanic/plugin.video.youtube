@@ -87,13 +87,25 @@ class XbmcContextUI(AbstractContextUI):
         return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_DELETE), text)
 
     def on_select(self, title, items=[]):
+        major_version = self._context.get_system_version().get_version()[0]
+        if isinstance(items[0], tuple) and len(items[0]) == 4 and major_version <= 16:
+            items = [(item[0], item[2]) for item in items]
+
+        use_details = (isinstance(items[0], tuple) and len(items[0]) == 4 and major_version > 16)
+
         _dict = {}
         _items = []
         i = 0
         for item in items:
             if isinstance(item, tuple):
-                _dict[i] = item[1]
-                _items.append(item[0])
+                if use_details:
+                    new_item = xbmcgui.ListItem(label=item[0], label2=item[1])
+                    new_item.setArt({'icon': item[3], 'thumb': item[3]})
+                    _items.append(new_item)
+                    _dict[i] = item[2]
+                else:
+                    _dict[i] = item[1]
+                    _items.append(item[0])
             else:
                 _dict[i] = i
                 _items.append(item)
@@ -101,7 +113,11 @@ class XbmcContextUI(AbstractContextUI):
             i += 1
 
         dialog = xbmcgui.Dialog()
-        result = dialog.select(title, _items)
+        if use_details:
+            result = dialog.select(title, _items, useDetails=use_details)
+        else:
+            result = dialog.select(title, _items)
+
         return _dict.get(result, -1)
 
     def show_notification(self, message, header='', image_uri='', time_milliseconds=5000):

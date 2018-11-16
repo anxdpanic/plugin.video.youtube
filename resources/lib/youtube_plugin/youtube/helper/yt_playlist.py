@@ -70,51 +70,78 @@ def _process_remove_playlist(provider, context, re_match):
 
 def _process_select_playlist(provider, context, re_match):
     ui = context.get_ui()
-    json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
-                                                 provider.get_client(context).get_playlists_of_channel,
-                                                 channel_id='mine')
-    playlists = json_data.get('items', [])
+    page_token = ''
+    current_page = 0
 
-    items = []
-    # create playlist
-    items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.playlist.create'])), 'playlist.create'))
+    while True:
+        current_page += 1
+        if not page_token:
+            json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
+                                                         provider.get_client(context).get_playlists_of_channel,
+                                                         channel_id='mine')
+        else:
+            json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
+                                                         provider.get_client(context).get_playlists_of_channel,
+                                                         channel_id='mine', page_token=page_token)
 
-    # add the 'Watch Later' playlist
-    resource_manager = provider.get_resource_manager(context)
-    my_playlists = resource_manager.get_related_playlists(channel_id='mine')
-    if 'watchLater' in my_playlists:
-        watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
-        items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.watch_later'])), watch_later_playlist_id))
+        playlists = json_data.get('items', [])
+        page_token = json_data.get('nextPageToken', False)
 
-    for playlist in playlists:
-        snippet = playlist.get('snippet', {})
-        title = snippet.get('title', '')
-        playlist_id = playlist.get('id', '')
-        if title and playlist_id:
-            items.append((title, playlist_id))
+        items = []
+        if current_page == 1:
+            # create playlist
+            items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.playlist.create'])), '',
+                          'playlist.create', context.create_resource_path('media', 'playlist.png')))
 
-    result = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.playlist.select']), items)
-    if result == 'playlist.create':
-        result, text = context.get_ui().on_keyboard_input(
-            context.localize(provider.LOCAL_MAP['youtube.playlist.create']))
-        if result and text:
-            json_data = provider.get_client(context).create_playlist(title=text)
-            if not v3.handle_error(provider, context, json_data):
-                return
+            # add the 'Watch Later' playlist
+            resource_manager = provider.get_resource_manager(context)
+            my_playlists = resource_manager.get_related_playlists(channel_id='mine')
+            if 'watchLater' in my_playlists:
+                watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
+                items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.watch_later'])), '',
+                              watch_later_playlist_id, context.create_resource_path('media', 'watch_later.png')))
 
-            playlist_id = json_data.get('id', '')
-            if playlist_id:
-                new_params = {}
-                new_params.update(context.get_params())
-                new_params['playlist_id'] = playlist_id
-                new_context = context.clone(new_params=new_params)
-                _process_add_video(provider, new_context, re_match)
-    elif result != -1:
-        new_params = {}
-        new_params.update(context.get_params())
-        new_params['playlist_id'] = result
-        new_context = context.clone(new_params=new_params)
-        _process_add_video(provider, new_context, re_match)
+        for playlist in playlists:
+            snippet = playlist.get('snippet', {})
+            title = snippet.get('title', '')
+            description = snippet.get('description', '')
+            thumbnail = snippet.get('thumbnails', {}).get('default', {}).get('url', context.create_resource_path('media', 'playlist.png'))
+            playlist_id = playlist.get('id', '')
+            if title and playlist_id:
+                items.append((title, description, playlist_id, thumbnail))
+
+        if page_token:
+            items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.next_page'])).replace('%d', str(current_page + 1)), '',
+                          'playlist.next', 'DefaultFolder.png'))
+
+        result = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.playlist.select']), items)
+        if result == 'playlist.create':
+            result, text = context.get_ui().on_keyboard_input(
+                context.localize(provider.LOCAL_MAP['youtube.playlist.create']))
+            if result and text:
+                json_data = provider.get_client(context).create_playlist(title=text)
+                if not v3.handle_error(provider, context, json_data):
+                    break
+
+                playlist_id = json_data.get('id', '')
+                if playlist_id:
+                    new_params = {}
+                    new_params.update(context.get_params())
+                    new_params['playlist_id'] = playlist_id
+                    new_context = context.clone(new_params=new_params)
+                    _process_add_video(provider, new_context, re_match)
+            break
+        elif result == 'playlist.next':
+            continue
+        elif result != -1:
+            new_params = {}
+            new_params.update(context.get_params())
+            new_params['playlist_id'] = result
+            new_context = context.clone(new_params=new_params)
+            _process_add_video(provider, new_context, re_match)
+            break
+        else:
+            break
 
 
 def _process_rename_playlist(provider, context, re_match):
