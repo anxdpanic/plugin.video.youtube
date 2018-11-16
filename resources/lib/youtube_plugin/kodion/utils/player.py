@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import math
+
 import xbmc
 
 
@@ -72,11 +73,18 @@ class YouTubePlayer(xbmc.Player):
                     self.ui.show_notification('Failed to execute post play events.', time_milliseconds=5000)
 
     def onPlayBackStarted(self):
-        self.current_video_total_time = self.getTotalTime()
+        def set_total_time():
+            if self.current_video_total_time == 0.0:
+                try:
+                    self.current_video_total_time = self.getTotalTime()
+                except RuntimeError:
+                    pass
+
         seek_time = self.ui.get_home_window_property('seek_time')
         while self.isPlaying():
             xbmc.sleep(500)
             if self.isPlaying():
+                set_total_time()
                 if self.context.get_settings().use_playback_history():
                     if seek_time and seek_time != '0.0':
                         self.seekTime(float(seek_time))
