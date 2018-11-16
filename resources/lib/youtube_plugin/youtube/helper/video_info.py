@@ -399,6 +399,12 @@ class VideoInfo(object):
                 'title': 'opus@160',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
+        # === DASH adaptive audio only
+        '9997': {'container': 'mpd',
+                 'sort': [-1, 0],
+                 'title': 'DASH Audio',
+                 'dash/audio': True,
+                 'audio': {'bitrate': 0, 'encoding': ''}},
         # === Live DASH adaptive
         '9998': {'container': 'mpd',
                  'Live': True,
@@ -820,15 +826,22 @@ class VideoInfo(object):
                     video_stream['url'] = ''.join([video_stream['url'], '&start_seq=$START_NUMBER$'])
                     video_stream.update(self.FORMAT.get('9998'))
                 else:
-                    video_stream.update(self.FORMAT.get('9999'))
                     if s_info:
-                        video_stream['video']['height'] = s_info['video']['height']
-                        video_stream['video']['encoding'] = s_info['video']['codec']
+                        has_video = (s_info['video']['codec'] != '') and (int(s_info['video']['bandwidth']) > 0)
+                        if has_video:
+                            video_stream.update(self.FORMAT.get('9999'))
+                            video_stream['video']['height'] = s_info['video']['height']
+                            video_stream['video']['encoding'] = s_info['video']['codec']
+                        else:
+                            video_stream.update(self.FORMAT.get('9997'))
                         video_stream['audio']['encoding'] = s_info['audio']['codec']
                         if s_info['video']['quality_label']:
                             video_stream['title'] = s_info['video']['quality_label']
                         else:
-                            video_stream['title'] = '%sp%s' % (s_info['video']['height'], s_info['video']['fps'])
+                            if has_video:
+                                video_stream['title'] = '%sp%s' % (s_info['video']['height'], s_info['video']['fps'])
+                            else:
+                                video_stream['title'] = '%s@%s' % (s_info['audio']['codec'], str(s_info['audio'].get('bitrate', 0)))
                         if int(s_info['audio'].get('bitrate', 0)) > 0:
                             video_stream['audio']['bitrate'] = int(s_info['audio'].get('bitrate', 0))
                 stream_list.append(video_stream)
@@ -904,6 +917,7 @@ class VideoInfo(object):
         if not make_dirs(basepath):
             self._context.log_debug('Failed to create directories: %s' % basepath)
             return None
+        has_video_stream = False
         ipaddress = self._context.get_settings().httpd_listen()
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
@@ -994,6 +1008,7 @@ class VideoInfo(object):
                                                  '">\n']))
                         out_list.append('\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n')
                     else:
+                        has_video_stream = True
                         if int(data[mime][i]['bandwidth']) > int(stream_info['video']['bandwidth']):
                             stream_info['video']['height'] = str(data[mime][i]['height'])
                             stream_info['video']['fps'] = str(data[mime][i]['frameRate'])
@@ -1066,6 +1081,9 @@ class VideoInfo(object):
         if discarded_streams:
             discarded_streams = sorted(discarded_streams, key=lambda k: k.get('audio', k.get('video', {}))['bandwidth'], reverse=True)
             self._context.log_debug('Generated MPD unsupported streams: \n%s' % '\n'.join(str(stream) for stream in discarded_streams))
+
+        if not has_video_stream:
+            self._context.log_debug('Generated MPD no supported video streams found')
 
         filepath = '{base_path}{video_id}.mpd'.format(base_path=basepath, video_id=video_id)
         try:
