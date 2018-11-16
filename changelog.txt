@@ -1,3 +1,6 @@
+6.2.3
+[fix] generated dash with no supported video streams(audio only) being played when Audio only not enabled
+
 6.2.2
 [fix] signature function not found on some videos
 
