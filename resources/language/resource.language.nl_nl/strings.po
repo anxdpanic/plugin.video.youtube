@@ -1106,3 +1106,7 @@ msgstr "Ondertiteling downloaden voor dat afspelen begint?"
 msgctxt "#30707"
 msgid "Untitled"
 msgstr "Naamloos"
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""

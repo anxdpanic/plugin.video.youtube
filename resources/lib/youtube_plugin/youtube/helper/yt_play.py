@@ -25,13 +25,18 @@ def play_video(provider, context, re_match):
             ask_for_quality = False
             screensaver = True
 
+        audio_only = None
+        if context.get_param('audio_only', '0') == '1':
+            ask_for_quality = False
+            audio_only = True
+
         video_streams = client.get_video_streams(context, video_id, embeddable=embeddable)
         if len(video_streams) == 0:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
-        video_stream = kodion.utils.select_stream(context, video_streams, ask_for_quality=ask_for_quality)
+        video_stream = kodion.utils.select_stream(context, video_streams, ask_for_quality=ask_for_quality, audio_only=audio_only)
 
         if video_stream is None:
             return False

@@ -194,3 +194,10 @@ def append_play_with_subtitles(context_menu, provider, context, video_id):
                          'RunPlugin(%s)' % context.create_uri(['play'],
                                                               {'video_id': video_id,
                                                                'prompt_for_subtitles': '1'})))
+
+
+def append_play_audio_only(context_menu, provider, context, video_id):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.video.play_audio_only']),
+                         'PlayMedia(%s)' % context.create_uri(['play'],
+                                                              {'video_id': video_id,
+                                                               'audio_only': '1'})))

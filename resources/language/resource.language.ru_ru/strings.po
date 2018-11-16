@@ -1114,3 +1114,7 @@ msgstr "Загружать субтитры перед началом воспр
 msgctxt "#30707"
 msgid "Untitled"
 msgstr "Без названия"
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""

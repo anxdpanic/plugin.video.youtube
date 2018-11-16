@@ -1114,3 +1114,7 @@ msgstr ""
 msgctxt "#30707"
 msgid "Untitled"
 msgstr ""
+
+msgctxt "#30708"
+msgid "Play audio only"
+msgstr ""
