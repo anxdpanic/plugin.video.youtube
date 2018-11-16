@@ -1,6 +1,7 @@
 6.2.3
 [add] Next Page to 'More...' -> 'Add to...' context menu
 [add] icon and description to playlists in 'More...' -> 'Add to...' context menu on Kodi 17+
+[add] 'Play audio only' context menu item
 [fix] generated dash with no supported video streams(audio only) being played when Audio only not enabled
 [fix] potential RuntimeError when retrieving total time of playing content if player is stopped immediately
 [lang] pl_pl strings |contrib: xulek|
