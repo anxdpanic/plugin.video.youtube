@@ -23,6 +23,7 @@ import xbmcvfs
 
 class Provider(kodion.AbstractProvider):
     LOCAL_MAP = {'youtube.search': 30102,
+                 'youtube.next_page': 30106,
                  'youtube.watch_later': 30107,
                  'youtube.video.rate.none': 30108,
                  'youtube.remove': 30108,
