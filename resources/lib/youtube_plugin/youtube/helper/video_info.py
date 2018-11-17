@@ -826,7 +826,9 @@ class VideoInfo(object):
                     video_stream['url'] = ''.join([video_stream['url'], '&start_seq=$START_NUMBER$'])
                     video_stream.update(self.FORMAT.get('9998'))
                 else:
-                    if s_info:
+                    if not s_info:
+                        video_stream.update(self.FORMAT.get('9999'))
+                    else:
                         has_video = (s_info['video']['codec'] != '') and (int(s_info['video']['bandwidth']) > 0)
                         if has_video:
                             video_stream.update(self.FORMAT.get('9999'))
