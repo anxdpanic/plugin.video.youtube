@@ -19,7 +19,9 @@
 [add] 'Play audio only' context menu item
 [fix] generated dash with no supported video streams(audio only) being played when Audio only not enabled
 [fix] potential RuntimeError when retrieving total time of playing content if player is stopped immediately
+[lang] nl_nl strings |contrib: Markman-B|
 [lang] pl_pl strings |contrib: xulek|
+[lang] pl_pl strings |contrib: drrak|
 [lang] sk_sk strings |contrib: jose1711|
 
 6.2.2
