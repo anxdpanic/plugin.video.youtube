@@ -8,6 +8,8 @@
 [lang] pl_pl strings |contrib: xulek|
 [lang] pl_pl strings |contrib: drrak|
 [lang] sk_sk strings |contrib: jose1711|
+[lang] el_gr strings |contrib: twilight0|
+[lang] es_es strings |contrib: roliverosc|
 
 6.2.2
 [fix] signature function not found on some videos

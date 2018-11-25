@@ -318,42 +318,42 @@ class VideoInfo(object):
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 144, 'encoding': 'vp9'}},
+                'video': {'height': 144, 'encoding': 'vp9.2'}},
         '331': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 240, 'encoding': 'vp9'}},
+                'video': {'height': 240, 'encoding': 'vp9.2'}},
         '332': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 360, 'encoding': 'vp9'}},
+                'video': {'height': 360, 'encoding': 'vp9.2'}},
         '333': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 480, 'encoding': 'vp9'}},
+                'video': {'height': 480, 'encoding': 'vp9.2'}},
         '334': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 720, 'encoding': 'vp9'}},
+                'video': {'height': 720, 'encoding': 'vp9.2'}},
         '335': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 1080, 'encoding': 'vp9'}},
+                'video': {'height': 1080, 'encoding': 'vp9.2'}},
         '336': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 1440, 'encoding': 'vp9'}},
+                'video': {'height': 1440, 'encoding': 'vp9.2'}},
         '337': {'container': 'webm',
                 'dash/video': True,
                 'fps': 60,
                 'hdr': True,
-                'video': {'height': 2160, 'encoding': 'vp9'}},
+                'video': {'height': 2160, 'encoding': 'vp9.2'}},
         '394': {'container': 'mp4',
                 'dash/video': True,
                 'fps': 30,
@@ -955,17 +955,56 @@ class VideoInfo(object):
         return stream_list
 
     def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
+        def get_discarded_audio(fmt, mime, itag, stream):
+            _discarded_stream = dict()
+            _discarded_stream['audio'] = dict()
+            _discarded_stream['audio']['itag'] = str(itag)
+            _discarded_stream['audio']['mime'] = str(mime)
+            _discarded_stream['audio']['codec'] = str(stream['codecs'])
+            if fmt:
+                bitrate = int(fmt.get('audio', {}).get('bitrate', 0))
+                if bitrate > 0:
+                    _discarded_stream['audio']['bitrate'] = bitrate
+            match = re.search('codecs="(?P<codec>[^"]+)"', _discarded_stream['audio']['codec'])
+            if match:
+                _discarded_stream['audio']['codec'] = match.group('codec')
+            _discarded_stream['audio']['bandwidth'] = int(stream['bandwidth'])
+            return _discarded_stream
+
+        def get_discarded_video(mime, itag, stream):
+            _discarded_stream = dict()
+            _discarded_stream['video'] = dict()
+            _discarded_stream['video']['itag'] = str(itag)
+            _discarded_stream['video']['width'] = str(stream['width'])
+            _discarded_stream['video']['height'] = str(stream['height'])
+            if stream.get('quality_label'):
+                _discarded_stream['video']['quality_label'] = str(stream['quality_label'])
+            _discarded_stream['video']['fps'] = str(stream['frameRate'])
+            _discarded_stream['video']['codec'] = str(stream['codecs'])
+            _discarded_stream['video']['mime'] = str(mime)
+            match = re.search('codecs="(?P<codec>[^"]+)"', _discarded_stream['video']['codec'])
+            if match:
+                _discarded_stream['video']['codec'] = match.group('codec')
+            _discarded_stream['video']['bandwidth'] = int(stream['bandwidth'])
+            return _discarded_stream
+
         basepath = 'special://temp/plugin.video.youtube/'
         if not make_dirs(basepath):
             self._context.log_debug('Failed to create directories: %s' % basepath)
             return None
+
         has_video_stream = False
+        ia_capabilities = self._context.inputstream_adaptive_capabilities()
+
         ipaddress = self._context.get_settings().httpd_listen()
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
+
         supported_mime_types = ['audio/mp4', 'video/mp4']
-        if 'webm' in self._context.inputstream_adaptive_capabilities():
-            supported_mime_types.extend(['video/webm', 'audio/webm'])
+        if 'vp9' in ia_capabilities or 'vp9.2' in ia_capabilities:
+            supported_mime_types.append('video/webm')
+        if 'vorbis' in ia_capabilities or 'opus' in ia_capabilities:
+            supported_mime_types.append('audio/webm')
 
         stream_info = {'video': {'height': '0', 'fps': '0', 'codec': '', 'mime': '', 'quality_label': '', 'bandwidth': 0},
                        'audio': {'bitrate': '0', 'codec': '', 'mime': '', 'bandwidth': 0}}
@@ -1030,18 +1069,27 @@ class VideoInfo(object):
                 for i in data[mime]:
                     stream_format = self.FORMAT.get(i, {})
                     if 'audio' in mime:
+                        audio_codec = str(data[mime][i]['codecs'])
+                        match = re.search('codecs="(?P<codec>[^"]+)"', audio_codec)
+                        if match:
+                            audio_codec = match.group('codec')
+
+                        if 'opus' == audio_codec.lower() and 'opus' not in ia_capabilities:
+                            discarded_streams.append(get_discarded_audio(stream_format, mime, i, data[mime][i]))
+                            continue
+                        elif 'vorbis' == audio_codec.lower() and 'vorbis' not in ia_capabilities:
+                            discarded_streams.append(get_discarded_audio(stream_format, mime, i, data[mime][i]))
+                            continue
+
                         if int(data[mime][i]['bandwidth']) > int(stream_info['audio']['bandwidth']):
                             stream_info['audio']['mime'] = str(mime)
                             if stream_format:
-                                stream_info['audio']['codec'] = stream_format.get('audio', {}).get('encoding')
                                 bitrate = int(stream_format.get('audio', {}).get('bitrate', 0))
                                 if bitrate > 0:
                                     stream_info['audio']['bitrate'] = bitrate
+                                stream_info['audio']['codec'] = stream_format.get('audio', {}).get('encoding')
                             if not stream_info['audio'].get('codec'):
-                                stream_info['audio']['codec'] = str(data[mime][i]['codecs'])
-                                match = re.search('codecs="(?P<codec>[^"]+)"', stream_info['audio']['codec'])
-                                if match:
-                                    stream_info['audio']['codec'] = match.group('codec').split('.')[0]
+                                stream_info['audio']['codec'] = audio_codec
                             stream_info['audio']['bandwidth'] = int(data[mime][i]['bandwidth'])
 
                         out_list.append(''.join(['\t\t\t<Representation id="',
@@ -1050,22 +1098,38 @@ class VideoInfo(object):
                                                  '">\n']))
                         out_list.append('\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n')
                     else:
+                        video_codec = str(data[mime][i]['codecs'])
+                        match = re.search('codecs="(?P<codec>[^"]+)"', video_codec)
+                        if match:
+                            video_codec = match.group('codec')
+
+                        if 'vp9.2' == video_codec.lower() and 'vp9.2' not in ia_capabilities:
+                            discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
+                            continue
+                        elif 'vp9' == video_codec.lower() and 'vp9' not in ia_capabilities:
+                            discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
+                            continue
+
                         has_video_stream = True
                         if int(data[mime][i]['bandwidth']) > int(stream_info['video']['bandwidth']):
                             stream_info['video']['height'] = str(data[mime][i]['height'])
                             stream_info['video']['fps'] = str(data[mime][i]['frameRate'])
-                            stream_info['video']['codec'] = str(data[mime][i]['codecs'])
                             stream_info['video']['mime'] = str(mime)
-                            if stream_format:
-                                stream_info['video']['codec'] = stream_format.get('video', {}).get('encoding')
-                            if not stream_info['video'].get('codec'):
-                                match = re.search('codecs="(?P<codec>[^"]+)"', stream_info['video']['codec'])
-                                if match:
-                                    stream_info['video']['codec'] = match.group('codec').split('.')[0]
+                            stream_info['video']['codec'] = video_codec
                             stream_info['video']['bandwidth'] = int(data[mime][i]['bandwidth'])
                             if data[mime][i].get('quality_label'):
                                 stream_info['video']['quality_label'] = str(data[mime][i]['quality_label'])
-                        out_list.append(''.join(['\t\t\t<Representation id="', i, '" ', data[mime][i]['codecs'],
+                            if stream_format:
+                                stream_info['video']['codec'] = stream_format.get('video', {}).get('encoding')
+                            if not stream_info['video'].get('codec'):
+                                stream_info['video']['codec'] = video_codec
+
+                        video_codec = data[mime][i]['codecs']
+                        # video_codec = video_codec.lower().replace('vp9.2', 'vp09.02.51.10.01.09.09.09')
+                        # video_codec = video_codec.lower().replace('vp9', 'vp09.00.41.08.01.09.09.09')
+                        video_codec = video_codec.lower().replace('vp9.2', 'vp09.02.51.10')
+                        video_codec = video_codec.lower().replace('vp9', 'vp09.00.51.08')
+                        out_list.append(''.join(['\t\t\t<Representation id="', i, '" ', video_codec,
                                                  ' startWithSAP="1" bandwidth="', data[mime][i]['bandwidth'],
                                                  '" width="', data[mime][i]['width'], '" height="',
                                                  data[mime][i]['height'], '" frameRate="', data[mime][i]['frameRate'],
@@ -1081,39 +1145,10 @@ class VideoInfo(object):
             else:
                 for i in data[mime]:
                     stream_format = self.FORMAT.get(i, {})
-                    discarded_stream = dict()
                     if 'audio' in mime:
-                        discarded_stream['audio'] = dict()
-                        discarded_stream['audio']['itag'] = str(i)
-                        discarded_stream['audio']['mime'] = str(mime)
-                        discarded_stream['audio']['codec'] = str(data[mime][i]['codecs'])
-                        if stream_format:
-                            discarded_stream['audio']['codec'] = stream_format.get('audio', {}).get('encoding')
-                            bitrate = int(stream_format.get('audio', {}).get('bitrate', 0))
-                            if bitrate > 0:
-                                discarded_stream['audio']['bitrate'] = bitrate
-                        if not discarded_stream['audio'].get('codec'):
-                            match = re.search('codecs="(?P<codec>[^"]+)"', discarded_stream['audio']['codec'])
-                            if match:
-                                discarded_stream['audio']['codec'] = match.group('codec').split('.')[0]
-                        discarded_stream['audio']['bandwidth'] = int(data[mime][i]['bandwidth'])
+                        discarded_stream = get_discarded_audio(stream_format, mime, i, data[mime][i])
                     else:
-                        discarded_stream['video'] = dict()
-                        discarded_stream['video']['itag'] = str(i)
-                        discarded_stream['video']['width'] = str(data[mime][i]['width'])
-                        discarded_stream['video']['height'] = str(data[mime][i]['height'])
-                        if data[mime][i].get('quality_label'):
-                            discarded_stream['video']['quality_label'] = str(data[mime][i]['quality_label'])
-                        discarded_stream['video']['fps'] = str(data[mime][i]['frameRate'])
-                        discarded_stream['video']['codec'] = str(data[mime][i]['codecs'])
-                        discarded_stream['video']['mime'] = str(mime)
-                        if stream_format:
-                            discarded_stream['video']['codec'] = stream_format.get('video', {}).get('encoding')
-                        if not discarded_stream['video'].get('codec'):
-                            match = re.search('codecs="(?P<codec>[^"]+)"', discarded_stream['video']['codec'])
-                            if match:
-                                discarded_stream['video']['codec'] = match.group('codec').split('.')[0]
-                        discarded_stream['video']['bandwidth'] = int(data[mime][i]['bandwidth'])
+                        discarded_stream = get_discarded_video(mime, i, data[mime][i])
                     discarded_streams.append(discarded_stream)
 
         out_list.append('\t</Period>\n</MPD>\n')

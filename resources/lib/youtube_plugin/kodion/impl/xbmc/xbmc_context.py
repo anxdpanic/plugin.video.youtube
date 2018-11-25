@@ -268,6 +268,15 @@ class XbmcContext(AbstractContext):
         if not use_dash and capability is None:
             return []
 
+        capability_map = {
+            'live': '2.0.12',
+            'drm': '2.2.12',
+            'vp9': None,
+            'vp9.2': None,
+            'vorbis': None,
+            'opus': None,
+        }
+
         if capability is None:
             try:
                 inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
@@ -276,18 +285,11 @@ class XbmcContext(AbstractContext):
 
             capabilities = []
             ia_loose_version = utils.loose_version(inputstream_version)
-            if ia_loose_version >= utils.loose_version('2.0.12'):
-                capabilities.append('live')
-            if ia_loose_version >= utils.loose_version('2.2.12'):
-                capabilities.append('drm')
-            if ia_loose_version >= utils.loose_version('9999.9.9'):
-                capabilities.append('webm')
+
+            for key in list(capability_map.keys()):
+                if capability_map[key] and (ia_loose_version >= utils.loose_version(capability_map[key])):
+                    capabilities.append(key)
+
             return capabilities
-        elif capability == 'live':
-            return '2.0.12'
-        elif capability == 'drm':
-            return '2.2.12'
-        elif capability == 'webm':
-            return '9999.9.9'  # can be included, but currently unsupported
         else:
-            return None
+            return capability_map[capability] if capability_map.get(capability) else None
