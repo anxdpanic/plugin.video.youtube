@@ -713,7 +713,7 @@ class Provider(kodion.AbstractProvider):
                     if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
                         watch_later_id = access_manager.get_watch_later_id()
 
-                        if watch_later_id and watch_later_id != ' WL':
+                        if watch_later_id and watch_later_id.strip().lower() != 'wl':
                             playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
                             if playlist_item_id:
                                 json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
