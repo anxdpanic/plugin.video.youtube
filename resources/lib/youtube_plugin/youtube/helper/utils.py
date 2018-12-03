@@ -338,7 +338,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
                     if playlist_id:
-                        if playlist_id != 'HL' and playlist_id.strip().lower() == 'wl':
+                        if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
                             playlist_item_id = playlist_item_id_dict[video_id]
                             context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
                                                  'RunPlugin(%s)' % context.create_uri(
