@@ -37,7 +37,7 @@ def _process_remove_video(provider, context, re_match):
     if not video_name:
         raise kodion.KodionException('Playlist/Remove: missing video_name')
 
-    if playlist_id != 'HL' and playlist_id.strip().lower() == 'wl':
+    if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
         if context.get_ui().on_remove_content(video_name):
             json_data = provider.get_client(context).remove_video_from_playlist(playlist_id=playlist_id,
                                                                                 playlist_item_id=video_id)

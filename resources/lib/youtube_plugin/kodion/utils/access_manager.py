@@ -92,10 +92,10 @@ class AccessManager(object):
         settings_playlist_id = self._settings.get_string('youtube.folder.watch_later.playlist', '').strip()
         if settings_playlist_id.lower() == 'wl':
             settings_playlist_id = ' WL'
-        if settings_playlist_id and (current_playlist_id != settings_playlist_id):
-            self._json['access_manager']['users'][self._user]['watch_later'] = settings_playlist_id
-            self._jstore.save(self._json)
         if settings_playlist_id:
+            if current_playlist_id != settings_playlist_id:
+                self._json['access_manager']['users'][self._user]['watch_later'] = settings_playlist_id
+                self._jstore.save(self._json)
             self._settings.set_string('youtube.folder.watch_later.playlist', '')
         return self._json['access_manager']['users'].get(self._user, {}).get('watch_later', ' WL')
 
