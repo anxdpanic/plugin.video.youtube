@@ -1109,6 +1109,9 @@ class VideoInfo(object):
                         elif 'vp9' == video_codec.lower() and 'vp9' not in ia_capabilities:
                             discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
                             continue
+                        elif video_codec.lower().startswith(('av01', 'av1')) and 'av1' not in ia_capabilities:
+                            discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
+                            continue
 
                         has_video_stream = True
                         if int(data[mime][i]['bandwidth']) > int(stream_info['video']['bandwidth']):
