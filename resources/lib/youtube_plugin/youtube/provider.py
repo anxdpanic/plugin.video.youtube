@@ -158,6 +158,9 @@ class Provider(kodion.AbstractProvider):
         self._client = None
         self._is_logged_in = False
 
+        self._v3_handle_error = v3.handle_error
+        self._yt_video = yt_video
+
     def get_wizard_supported_views(self):
         return ['default', 'episodes']
 
