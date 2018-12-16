@@ -8,6 +8,7 @@ import requests
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ..helper.utils import get_shelf_index_by_title
+from ...kodion import constants
 from ...kodion import Context
 
 context = Context(plugin_id='plugin.video.youtube')
@@ -963,38 +964,51 @@ class YouTube(LoginClient):
 
             return self._perform_v1_tv_request(method='POST', path='browse', post_data=post_data)
 
-        json_data = _get_items()
-        pages = 5
+        current_page = 1
+        pages = 30  # 28 seems to be page limit, add a couple page padding, loop will break when there is no next page data
 
-        while pages > 0:
-            contents = json_data.get('contents', json_data.get('continuationContents', {}))
-            section = contents.get('sectionListRenderer', contents.get('sectionListContinuation', {}))
-            contents = section.get('contents', [{}])
+        progress_dialog = context.get_ui().create_progress_dialog(context.get_name(),
+                                                                  context.localize(constants.localize.COMMON_PLEASE_WAIT),
+                                                                  background=True)
+        progress_dialog.set_total(pages)
+        progress_dialog.update(steps=1, text=context.localize(constants.localize.WATCH_LATER_RETRIEVAL_PAGE) % str(current_page))
 
-            for shelf in contents:
-                renderer = shelf.get('shelfRenderer', {})
-                endpoint = renderer.get('endpoint', {})
-                browse_endpoint = endpoint.get('browseEndpoint', {})
-                browse_id = browse_endpoint.get('browseId', '')
-                title = renderer.get('title', {})
-                title_runs = title.get('runs', [{}])[0]
-                title_text = title_runs.get('text', '')
-                if (title_text.lower() == 'watch later') and (browse_id.startswith('VLPL') or browse_id.startswith('PL')):
-                    watch_later_id = browse_id.lstrip('VL')
+        try:
+            json_data = _get_items()
+
+            while current_page < pages:
+                contents = json_data.get('contents', json_data.get('continuationContents', {}))
+                section = contents.get('sectionListRenderer', contents.get('sectionListContinuation', {}))
+                contents = section.get('contents', [{}])
+
+                for shelf in contents:
+                    renderer = shelf.get('shelfRenderer', {})
+                    endpoint = renderer.get('endpoint', {})
+                    browse_endpoint = endpoint.get('browseEndpoint', {})
+                    browse_id = browse_endpoint.get('browseId', '')
+                    title = renderer.get('title', {})
+                    title_runs = title.get('runs', [{}])[0]
+                    title_text = title_runs.get('text', '')
+                    if (title_text.lower() == 'watch later') and (browse_id.startswith('VLPL') or browse_id.startswith('PL')):
+                        watch_later_id = browse_id.lstrip('VL')
+                        break
+
+                if watch_later_id:
                     break
 
-            if watch_later_id:
-                break
+                continuations = section.get('continuations', [{}])[0]
+                next_continuation_data = continuations.get('nextContinuationData', {})
+                continuation = next_continuation_data.get('continuation', '')
 
-            continuations = section.get('continuations', [{}])[0]
-            next_continuation_data = continuations.get('nextContinuationData', {})
-            continuation = next_continuation_data.get('continuation', '')
-
-            if continuation:
-                pages -= 1
-                json_data = _get_items(continuation)
-            else:
-                break
+                if continuation:
+                    current_page += 1
+                    progress_dialog.update(steps=1, text=context.localize(constants.localize.WATCH_LATER_RETRIEVAL_PAGE) % str(current_page))
+                    json_data = _get_items(continuation)
+                    continue
+                else:
+                    break
+        finally:
+            progress_dialog.close()
 
         return watch_later_id
 
