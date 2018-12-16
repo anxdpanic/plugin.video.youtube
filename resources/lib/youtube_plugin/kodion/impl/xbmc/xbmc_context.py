@@ -282,6 +282,7 @@ class XbmcContext(AbstractContext):
             'vp9.2': None,
             'vorbis': None,
             'opus': None,
+            'av1': None,
         }
 
         if capability is None:
