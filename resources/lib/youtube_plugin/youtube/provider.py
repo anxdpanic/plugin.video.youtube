@@ -148,7 +148,9 @@ class Provider(kodion.AbstractProvider):
                  'youtube.subtitles.download': 30705,
                  'youtube.pre.download.subtitles': 30706,
                  'youtube.untitled': 30707,
-                 'youtube.video.play_audio_only': 30708
+                 'youtube.video.play_audio_only': 30708,
+                 'youtube.failed.watch_later.retry.2': 30709,
+                 'youtube.failed.watch_later.retry.3': 30710,
                  }
 
     def __init__(self):
@@ -157,6 +159,9 @@ class Provider(kodion.AbstractProvider):
 
         self._client = None
         self._is_logged_in = False
+
+        self._v3_handle_error = v3.handle_error
+        self._yt_video = yt_video
 
     def get_wizard_supported_views(self):
         return ['default', 'episodes']
@@ -676,7 +681,9 @@ class Provider(kodion.AbstractProvider):
         access_manager = context.get_access_manager()
         if self.is_logged_in():
             watch_later_id = None
+            count = 0
             while not watch_later_id:
+                count += 1
                 watch_later_id = client.get_watch_later_id()
 
                 if watch_later_id:
@@ -684,10 +691,20 @@ class Provider(kodion.AbstractProvider):
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     break
                 else:
-                    if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry']),
-                                                            nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
-                                                            yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
+                    if count == 1:
+                        if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry']),
+                                                                nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
+                                                                yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
+                            break
+                    elif count == 2:
+                        if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry.2']),
+                                                                nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
+                                                                yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
+                            break
+                    else:
+                        _ = context.get_ui().on_ok(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry.3']))
                         break
+
         else:
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.must.be.signed.in']))
 

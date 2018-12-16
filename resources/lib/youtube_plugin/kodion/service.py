@@ -4,7 +4,7 @@ from datetime import datetime
 import time
 
 from .impl import Context
-from .utils import YouTubeMonitor, YouTubePlayer
+from .utils import YouTubeMonitor
 
 
 def strptime(stamp, stamp_fmt):
@@ -45,7 +45,6 @@ def run():
     version = context.get_system_version().get_version()
     settings = context.get_settings()
 
-    player = YouTubePlayer(context=context)
     monitor = YouTubeMonitor()
 
     monitor.remove_temp_dir()

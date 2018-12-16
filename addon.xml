@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.2.0" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.3.0~alpha1" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -13,26 +13,10 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-6.2.3
-[add] Next Page to 'More...' -> 'Add to...' context menu
-[add] icon and description to playlists in 'More...' -> 'Add to...' context menu on Kodi 17+
-[add] 'Play audio only' context menu item
-[fix] generated dash with no supported video streams(audio only) being played when Audio only not enabled
-[fix] potential RuntimeError when retrieving total time of playing content if player is stopped immediately
-[lang] nl_nl strings |contrib: Markman-B|
-[lang] pl_pl strings |contrib: xulek|
-[lang] pl_pl strings |contrib: drrak|
-[lang] sk_sk strings |contrib: jose1711|
-[lang] el_gr strings |contrib: twilight0|
-[lang] es_es strings |contrib: roliverosc|
-
-6.2.2
-[fix] signature function not found on some videos
-
-6.2.1
-[fix] some streams reporting as Unavailable
-[fix] utf-8 file paths
-[fix] settings, and switch user causing perpetual busy dialog on Kodi 18
+6.3.0
+[fix] fix add-ons playback history not saving
+[fix] playback monitoring/post play events triggering for the wrong videos in some cases
+[upd] improve watch later playlist id retrieval and feedback
         </news>
         <assets>
             <icon>icon.png</icon>

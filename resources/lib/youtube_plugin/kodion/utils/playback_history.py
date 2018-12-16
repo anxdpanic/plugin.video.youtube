@@ -1,3 +1,6 @@
+import datetime
+import sqlite3
+
 from six import PY2
 from six.moves import cPickle as pickle
 
@@ -53,6 +56,16 @@ class PlaybackHistory(Storage):
     def update(self, video_id, play_count, total_time, played_time, played_percent):
         item = ','.join([str(play_count), str(total_time), str(played_time), str(played_percent)])
         self._set(str(video_id), item)
+
+    def _set(self, item_id, item):
+        def _encode(obj):
+            return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
+
+        self._open()
+        now = datetime.datetime.now() + datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
+        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
+        self._execute(True, query, values=[item_id, now, _encode(item)])
+        self._close()
 
     def _optimize_item_count(self):
         pass
