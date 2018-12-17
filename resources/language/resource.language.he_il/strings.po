@@ -1118,7 +1118,7 @@ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of re
 msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow."
+msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
 msgstr ""
 
 msgctxt "#30711"
