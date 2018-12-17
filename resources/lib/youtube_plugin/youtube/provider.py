@@ -1302,6 +1302,7 @@ class Provider(kodion.AbstractProvider):
             sign_in_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.sign.in'])),
                                          context.create_uri(['sign', 'in']),
                                          image=context.create_resource_path('media', 'sign_in.png'))
+            sign_in_item.set_action(True)
             sign_in_item.set_fanart(self.get_fanart(context))
             result.append(sign_in_item)
 
@@ -1509,6 +1510,7 @@ class Provider(kodion.AbstractProvider):
             switch_user_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.switch.user']),
                                              context.create_uri(['users', 'switch']),
                                              image=context.create_resource_path('media', 'channel.png'))
+            switch_user_item.set_action(True)
             switch_user_item.set_fanart(self.get_fanart(context))
             result.append(switch_user_item)
 
@@ -1517,6 +1519,7 @@ class Provider(kodion.AbstractProvider):
             sign_out_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.sign.out']),
                                           context.create_uri(['sign', 'out']),
                                           image=context.create_resource_path('media', 'sign_out.png'))
+            sign_out_item.set_action(True)
             sign_out_item.set_fanart(self.get_fanart(context))
             result.append(sign_out_item)
 
@@ -1524,6 +1527,7 @@ class Provider(kodion.AbstractProvider):
             settings_menu_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.settings']),
                                                context.create_uri(['config', 'youtube']),
                                                image=context.create_resource_path('media', 'settings.png'))
+            settings_menu_item.set_action(True)
             settings_menu_item.set_fanart(self.get_fanart(context))
             result.append(settings_menu_item)
 

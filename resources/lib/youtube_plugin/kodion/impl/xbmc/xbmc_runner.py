@@ -107,10 +107,15 @@ class XbmcRunner(AbstractProviderRunner):
         item.setInfo(type=u'video', infoLabels=info_labels.create_from_item(context, directory_item))
         item.setPath(directory_item.get_uri())
 
+        is_folder = True
+        if directory_item.is_action():
+            is_folder = False
+            item.setProperty('isPlayable', 'false')
+
         xbmcplugin.addDirectoryItem(handle=self.handle,
                                     url=directory_item.get_uri(),
                                     listitem=item,
-                                    isFolder=True,
+                                    isFolder=is_folder,
                                     totalItems=item_count)
 
     def _add_video(self, context, video_item, item_count=0):
