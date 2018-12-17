@@ -1,4 +1,12 @@
-__author__ = 'bromix'
+# -*- coding: utf-8 -*-
+"""
+
+    Copyright (C) 2014-2016 bromix (plugin.video.youtube)
+    Copyright (C) 2016-2018 plugin.video.youtube
+
+    SPDX-License-Identifier: GPL-2.0-only
+    See LICENSES/GPL-2.0-only for more information.
+"""
 
 import xbmcgui
 import xbmcplugin
@@ -99,10 +107,15 @@ class XbmcRunner(AbstractProviderRunner):
         item.setInfo(type=u'video', infoLabels=info_labels.create_from_item(context, directory_item))
         item.setPath(directory_item.get_uri())
 
+        is_folder = True
+        if directory_item.is_action():
+            is_folder = False
+            item.setProperty('isPlayable', 'false')
+
         xbmcplugin.addDirectoryItem(handle=self.handle,
                                     url=directory_item.get_uri(),
                                     listitem=item,
-                                    isFolder=True,
+                                    isFolder=is_folder,
                                     totalItems=item_count)
 
     def _add_video(self, context, video_item, item_count=0):

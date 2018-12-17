@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+"""
+
+    Copyright (C) 2017-2018 plugin.video.youtube
+
+    SPDX-License-Identifier: GPL-2.0-only
+    See LICENSES/GPL-2.0-only for more information.
+"""
 
 from base64 import b64decode
 from hashlib import md5

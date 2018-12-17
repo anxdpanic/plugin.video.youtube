@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+
+    Copyright (C) 2018-2018 plugin.video.youtube
+
+    SPDX-License-Identifier: GPL-2.0-only
+    See LICENSES/GPL-2.0-only for more information.
+"""
+
 from base64 import b64encode
 from youtube_plugin.kodion.json_store import APIKeyStore
 from youtube_plugin.kodion.impl import Context
