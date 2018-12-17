@@ -1,3 +1,11 @@
+"""
+
+    Copyright (C) 2018-2018 plugin.video.youtube
+
+    SPDX-License-Identifier: GPL-2.0-only
+    See LICENSES/GPL-2.0-only for more information.
+"""
+
 from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 from youtube_plugin.youtube.helper import yt_login

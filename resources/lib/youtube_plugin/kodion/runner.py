@@ -1,6 +1,11 @@
-__author__ = 'bromix'
+"""
 
-__all__ = ['run']
+    Copyright (C) 2014-2016 bromix (plugin.video.youtube)
+    Copyright (C) 2016-2018 plugin.video.youtube
+
+    SPDX-License-Identifier: GPL-2.0-only
+    See LICENSES/GPL-2.0-only for more information.
+"""
 
 import copy
 import timeit
@@ -9,6 +14,8 @@ from .impl import Runner
 from .impl import Context
 
 from . import debug
+
+__all__ = ['run']
 
 __DEBUG_RUNTIME = False
 __DEBUG_RUNTIME_SINGLE_FILE = False

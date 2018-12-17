@@ -57,7 +57,7 @@
         <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
         <language></language>
         <platform>all</platform>
-        <license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+        <license>GPL-2.0-only</license>
         <forum>https://forum.kodi.tv/showthread.php?tid=325740</forum>
         <website>https://www.youtube.com</website>
         <email>ytplugin at datanet dot ws</email>

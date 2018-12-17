@@ -1,7 +1,11 @@
-__author__ = 'bromix'
+"""
 
-__all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_unicode', 'select_stream', 'make_dirs']
+    Copyright (C) 2014-2016 bromix (plugin.video.youtube)
+    Copyright (C) 2016-2018 plugin.video.youtube
+
+    SPDX-License-Identifier: GPL-2.0-only
+    See LICENSES/GPL-2.0-only for more information.
+"""
 
 from six.moves import urllib
 from six import next
@@ -16,6 +20,10 @@ from ..constants import localize
 import xbmc
 import xbmcaddon
 import xbmcvfs
+
+
+__all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
+           'to_unicode', 'select_stream', 'make_dirs']
 
 
 def loose_version(v):
