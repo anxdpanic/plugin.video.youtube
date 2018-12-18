@@ -640,9 +640,6 @@ class Provider(kodion.AbstractProvider):
                 context.execute('PlayMedia(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))
                 return
         if 'video_id' in params and not 'playlist_id' in params:
-            resource_manager = self.get_resource_manager(context)
-            video = resource_manager.get_videos([params['video_id']])
-            context.set_param('embeddable', video.get(params['video_id'], {}).get('status', {}).get('embeddable', False))
             return yt_play.play_video(self, context, re_match)
         elif 'playlist_id' in params:
             return yt_play.play_playlist(self, context, re_match)
@@ -715,61 +712,6 @@ class Provider(kodion.AbstractProvider):
 
         else:
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.must.be.signed.in']))
-
-    @kodion.RegisterProviderPath('^/events/post_play/$')
-    def _on_post_play(self, context, re_match):
-        video_id = context.get_param('video_id', '')
-        refresh_only = context.get_param('refresh_only', 'false') == 'true'
-
-        video_stats_url = context.get_ui().get_home_window_property('video_stats_url')
-        context.get_ui().clear_home_window_property('video_stats_url')
-
-        if video_id:
-            if not refresh_only:
-                client = self.get_client(context)
-                settings = context.get_settings()
-                access_manager = context.get_access_manager()
-                if self.is_logged_in():
-                    # first: update history
-                    if video_stats_url:
-                        client.update_watch_history(video_id, video_stats_url)
-
-                    # second: remove video from 'Watch Later' playlist
-                    if context.get_settings().get_bool('youtube.playlist.watchlater.autoremove', True):
-                        watch_later_id = access_manager.get_watch_later_id()
-
-                        if watch_later_id and watch_later_id.strip().lower() != 'wl':
-                            playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
-                            if playlist_item_id:
-                                json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
-                                if not v3.handle_error(self, context, json_data):
-                                    return False
-
-                    history_playlist_id = access_manager.get_watch_history_id()
-                    if history_playlist_id and history_playlist_id != 'HL':
-                        json_data = client.add_video_to_playlist(history_playlist_id, video_id)
-                        if not v3.handle_error(self, context, json_data):
-                            return False
-
-                    # rate video
-                    if context.get_settings().get_bool('youtube.post.play.rate', False):
-                        json_data = client.get_video_rating(video_id)
-                        if not v3.handle_error(self, context, json_data):
-                            return False
-                        items = json_data.get('items', [{'rating': 'none'}])
-                        rating = items[0].get('rating', 'none')
-                        if rating == 'none':
-                            rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
-                            yt_video.process('rate', self, context, rating_match)
-
-            if context.get_settings().get_bool('youtube.post.play.refresh', False) and \
-                    not xbmc.getInfoLabel('Container.FolderPath').startswith(context.create_uri(['kodion', 'search', 'input'])):
-                # don't refresh search input it causes request for new input, (Container.Update in abstract_provider /kodion/search/input/
-                # would resolve this but doesn't work with Remotes(Yatse))
-                context.get_ui().refresh_container()
-        else:
-            context.log_warning('Missing video ID for post play event')
-        return True
 
     @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):

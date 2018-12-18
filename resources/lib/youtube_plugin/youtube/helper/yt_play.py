@@ -25,7 +25,6 @@ from ...youtube.helper import utils, v3
 def play_video(provider, context, re_match):
     try:
         video_id = context.get_param('video_id')
-        embeddable = context.get_param('embeddable') is True
 
         client = provider.get_client(context)
         settings = context.get_settings()
@@ -41,7 +40,7 @@ def play_video(provider, context, re_match):
             ask_for_quality = False
             audio_only = True
 
-        video_streams = client.get_video_streams(context, video_id, embeddable=embeddable)
+        video_streams = client.get_video_streams(context, video_id)
         if len(video_streams) == 0:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
@@ -84,7 +83,7 @@ def play_video(provider, context, re_match):
 
         seek_time = None
         play_count = 0
-        video_stats_url = video_stream.get('video_stats_url')
+        playback_stats = video_stream.get('playback_stats')
 
         if use_history:
             major_version = context.get_system_version().get_version()[0]
@@ -97,7 +96,7 @@ def play_video(provider, context, re_match):
         xbmcplugin.setResolvedUrl(context.get_handle(), succeeded=True, listitem=item)
 
         playback_monitor(provider=provider, context=context, video_id=video_id, play_count=play_count,
-                         use_history=use_history, video_stats_url=video_stats_url, seek_time=seek_time,
+                         use_history=use_history, playback_stats=playback_stats, seek_time=seek_time,
                          refresh_only=screensaver)
     except YouTubeException as ex:
         message = ex.get_message()
