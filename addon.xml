@@ -14,6 +14,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.3.0
+[fix] post play add to watch history
 [fix] fix add-ons playback history not saving
 [fix] playback monitoring/post play events triggering for the wrong videos in some cases
 [upd] sign in/out, switch user, and settings ListItems to isFolder=False and isPlayable=False
