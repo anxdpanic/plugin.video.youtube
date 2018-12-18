@@ -14,9 +14,9 @@ import xbmc
 
 def playback_monitor(provider, context, video_id, play_count=0, use_history=False,
                      playback_stats=None, seek_time=None, refresh_only=False):
-
     client = provider.get_client(context)
     access_manager = context.get_access_manager()
+    is_logged_in = provider.is_logged_in()
 
     monitor = xbmc.Monitor()
     player = xbmc.Player()
@@ -30,11 +30,19 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
     total_time = 0.0
     current_time = 0.0
+    played_time = -1.0
     percent_complete = 0
+
+    state = 'playing'
+    last_state = 'playing'
 
     np_wait_time = 0.2
     np_waited = 0.0
     p_wait_time = 0.5
+    p_waited = 0.0
+
+    report_interval = 10.0
+    first_report = True
 
     while not player.isPlaying() and not monitor.abortRequested():
         context.log_debug('Waiting for playback to start')
@@ -44,10 +52,14 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
         np_waited += np_wait_time
 
+    if is_logged_in and playback_stats.get('playback_url', ''):
+        client.update_watch_history(video_id, playback_stats.get('playback_url'))
+        context.log_debug('Playback start reported: |%s|' % video_id)
+
     while player.isPlaying() and not monitor.abortRequested():
         try:
-            current_time = int(player.getTime())
-            total_time = int(player.getTotalTime())
+            current_time = float(player.getTime())
+            total_time = float(player.getTotalTime())
         except RuntimeError:
             pass
 
@@ -59,29 +71,73 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
         if seek_time and seek_time != '0.0':
             try:
                 player.seekTime(float(seek_time))
+                current_time = float(seek_time)
             except ValueError:
                 pass
             seek_time = None
 
+        if p_waited >= 10.0:
+            if current_time == played_time:
+                last_state = state
+                state = 'paused'
+            else:
+                last_state = state
+                state = 'playing'
+
+            played_time = current_time
+
+        if is_logged_in:
+            if playback_stats.get('watchtime_url', '') and (first_report or p_waited >= 10.0):
+                first_report = False
+                p_waited = 0.0
+
+                segment_start = float(current_time)
+
+                if state == 'playing':
+                    segment_end = segment_start + report_interval
+                else:
+                    segment_end = segment_start
+
+                if segment_end > float(total_time):
+                    segment_end = float(total_time)
+
+                if state == 'playing' or last_state == 'playing':  # only report state='paused' once
+                    client.update_watch_history(video_id, playback_stats.get('watchtime_url')
+                                                .format(st=format(segment_start, '.3f'), et=format(segment_end, '.3f'), state=state))
+                    context.log_debug('Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
+                                      (video_id, format(segment_start, '.3f'), format(segment_end, '.3f'), percent_complete, state))
+
         if monitor.waitForAbort(p_wait_time):
             break
 
-    context.log_debug('Playback stopped [%s]: %s secs of %s @ %s%%' % (video_id, current_time, total_time, percent_complete))
+        p_waited += p_wait_time
+
+    context.log_debug('Playback stopped [%s]: %s secs of %s @ %s%%' % (video_id, format(current_time, '.3f'), format(total_time, '.3f'), percent_complete))
+    state = 'stopped'
 
     if percent_complete >= settings.get_play_count_min_percent():
         play_count = '1'
         current_time = 0.0
+        if is_logged_in and playback_stats.get('watchtime_url', ''):
+            client.update_watch_history(video_id, playback_stats.get('watchtime_url')
+                                        .format(st=format(total_time, '.3f'), et=format(total_time, '.3f'), state=state))
+            context.log_debug('Playback reported [%s] @ 100%% state=%s' % (video_id, state))
+
     else:
+        if is_logged_in and playback_stats.get('watchtime_url', ''):
+            if is_logged_in and playback_stats.get('watchtime_url', ''):
+                client.update_watch_history(video_id, playback_stats.get('watchtime_url')
+                                            .format(st=format(current_time, '.3f'), et=format(current_time, '.3f'), state=state))
+                context.log_debug('Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
+                                  (video_id, format(current_time, '.3f'), format(current_time, '.3f'), percent_complete, state))
+
         refresh_only = True
 
     if use_history:
         context.get_playback_history().update(video_id, play_count, total_time, current_time, percent_complete)
 
     if not refresh_only:
-        if provider.is_logged_in():
-
-            if playback_stats.get('playback_url', ''):
-                client.update_watch_history(video_id, playback_stats.get('playback_url'))
+        if is_logged_in:
 
             if settings.get_bool('youtube.playlist.watchlater.autoremove', True):
                 watch_later_id = access_manager.get_watch_later_id()
