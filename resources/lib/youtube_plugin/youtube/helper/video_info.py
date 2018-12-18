@@ -672,7 +672,6 @@ class VideoInfo(object):
         player_args = player_config.get('args', {})
         player_response = player_args.get('player_response', {})
         playability_status = player_response.get('playabilityStatus', {})
-        playback_tracking = player_response.get('playbackTracking', {})
         js = player_assets.get('js')
 
         if video_id is None:
@@ -718,6 +717,8 @@ class VideoInfo(object):
         if not player_response:
             player_response = json.loads(params.get('player_response', '{}'))
             playability_status = player_response.get('playabilityStatus', {})
+
+        playback_tracking = player_response.get('playbackTracking', {})
 
         captions = player_response.get('captions', {})
         is_live = params.get('live_playback', '0') == '1'
@@ -783,14 +784,27 @@ class VideoInfo(object):
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
         playback_stats = {
-            'playback_url': playback_tracking.get('videostatsPlaybackUrl', {}).get('baseUrl', ''),
-            'watchtime_url': playback_tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl', '')
+            'playback_url': '',
+            'watchtime_url': ''
         }
 
-        if playback_stats.get('playback_url'):
-            playback_stats['playback_url'] = ''.join([playback_stats.get('playback_url'), '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())])
-        if playback_stats.get('watchtime_url'):
-            playback_stats['watchtime_url'] = ''.join([playback_stats.get('watchtime_url'), '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())])
+        playback_url = playback_tracking.get('videostatsPlaybackUrl', {}).get('baseUrl', '')
+        watchtime_url = playback_tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl', '')
+
+        if playback_url and playback_url.startswith('http'):
+            playback_stats['playback_url'] = ''.join([
+                playback_url,
+                '&ver=2&fs=0&volume=100&muted=0',
+                '&cpn={cpn}'.format(cpn=self.generate_cpn())
+            ])
+
+        if watchtime_url and watchtime_url.startswith('http'):
+            playback_stats['watchtime_url'] = ''.join([
+                watchtime_url,
+                '&ver=2&fs=0&volume=100&muted=0',
+                '&cpn={cpn}'.format(cpn=self.generate_cpn()),
+                '&st={st}&et={et}&state={state}'
+            ])
 
         if is_live:
             url = params.get('hlsvp', '')
