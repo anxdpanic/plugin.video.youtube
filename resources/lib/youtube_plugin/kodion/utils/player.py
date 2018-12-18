@@ -13,12 +13,18 @@ import xbmc
 
 
 def playback_monitor(provider, context, video_id, play_count=0, use_history=False,
-                     video_stats_url='', seek_time=None, refresh_only=False):
+                     playback_stats=None, seek_time=None, refresh_only=False):
+
+    client = provider.get_client(context)
+    access_manager = context.get_access_manager()
 
     monitor = xbmc.Monitor()
     player = xbmc.Player()
     settings = context.get_settings()
     ui = context.get_ui()
+
+    if playback_stats is None:
+        playback_stats = {}
 
     play_count = str(play_count)
 
@@ -65,7 +71,6 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
     if percent_complete >= settings.get_play_count_min_percent():
         play_count = '1'
         current_time = 0.0
-        total_time = 0.0
     else:
         refresh_only = True
 
@@ -73,14 +78,11 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
         context.get_playback_history().update(video_id, play_count, total_time, current_time, percent_complete)
 
     if not refresh_only:
-        client = provider.get_client(context)
-        access_manager = context.get_access_manager()
         if provider.is_logged_in():
-            # first: update history
-            if video_stats_url:
-                client.update_watch_history(video_id, video_stats_url)
 
-            # second: remove video from 'Watch Later' playlist
+            if playback_stats.get('playback_url', ''):
+                client.update_watch_history(video_id, playback_stats.get('playback_url'))
+
             if settings.get_bool('youtube.playlist.watchlater.autoremove', True):
                 watch_later_id = access_manager.get_watch_later_id()
 

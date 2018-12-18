@@ -490,8 +490,8 @@ class VideoInfo(object):
         cpn = ''.join((CPN_ALPHABET[random.randint(0, 256) & 63] for _ in range(0, 16)))
         return cpn
 
-    def load_stream_infos(self, video_id=None, player_config=None, cookies=None, embeddable=False):
-        return self._method_get_video_info(video_id, player_config, cookies, embeddable)
+    def load_stream_infos(self, video_id=None, player_config=None, cookies=None):
+        return self._method_get_video_info(video_id, player_config, cookies)
 
     def get_watch_page(self, video_id):
         headers = {'Host': 'www.youtube.com',
@@ -536,39 +536,26 @@ class VideoInfo(object):
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         return {'html': result.text, 'cookies': result.cookies}
 
-    def get_player_config(self, html, embedded=False):
+    def get_player_config(self, html):
         _player_config = '{}'
-        if embedded:
+
+        lead = 'ytplayer.config = '
+        tail = ';ytplayer.load'
+        pos = html.find(lead)
+        if pos >= 0:
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
+            if pos >= 0:
+                _player_config = html2[:pos]
+
+        blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+        if not blank_config:
             player_config = dict()
-
-            lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
-            tail = ',\'EXPERIMENT_FLAGS\':'
-            if html.find(tail) == -1:
-                tail = '});'
-            pos = html.find(lead)
-            if pos >= 0:
-                html2 = html[pos + len(lead):]
-                pos = html2.find(tail)
-                if pos >= 0:
-                    _player_config = html2[:pos]
         else:
-            lead = 'ytplayer.config = '
-            tail = ';ytplayer.load'
-            pos = html.find(lead)
-            if pos >= 0:
-                html2 = html[pos + len(lead):]
-                pos = html2.find(tail)
-                if pos >= 0:
-                    _player_config = html2[:pos]
-
-            blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
-            if not blank_config:
+            try:
+                player_config = json.loads(blank_config.group('player_config'))
+            except TypeError:
                 player_config = dict()
-            else:
-                try:
-                    player_config = json.loads(blank_config.group('player_config'))
-                except TypeError:
-                    player_config = dict()
 
         try:
             player_config.update(json.loads(_player_config))
@@ -598,7 +585,7 @@ class VideoInfo(object):
 
         return player_config
 
-    def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', video_stats_url=''):
+    def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', playback_stats=None):
         headers = {'Host': 'manifest.googlevideo.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -607,8 +594,13 @@ class VideoInfo(object):
                    'Referer': 'https://www.youtube.com/watch?v=%s' % video_id,
                    'Accept-Encoding': 'gzip, deflate',
                    'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+
+        if playback_stats is None:
+            playback_stats = {}
+
         result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
         lines = result.text.splitlines()
+
         _meta_info = {'video': {},
                       'channel': {},
                       'images': {},
@@ -635,13 +627,13 @@ class VideoInfo(object):
                     video_stream = {'url': line,
                                     'meta': meta_info,
                                     'headers': curl_headers,
-                                    'video_stats_url': video_stats_url
+                                    'playback_stats': playback_stats
                                     }
                     video_stream.update(yt_format)
                     streams.append(video_stream)
         return streams
 
-    def _method_get_video_info(self, video_id=None, player_config=None, cookies=None, embeddable=False):
+    def _method_get_video_info(self, video_id=None, player_config=None, cookies=None):
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -659,95 +651,76 @@ class VideoInfo(object):
                        'ssl_stream': '1',
                        'html5': '1'}
 
-        for i in range(2):
-            self._context.log_debug('Is embeddable: {0}'.format(str(embeddable)))
+        if player_config is None:
+            page_result = self.get_watch_page(video_id)
+            html = page_result.get('html')
+            player_config = self.get_player_config(html)
+            cookies = page_result.get('cookies')
 
-            if player_config is None:
-                if embeddable:
-                    page_result = self.get_embed_page(video_id)
-                    html = page_result.get('html')
-                    player_config = self.get_player_config(html, embedded=embeddable)
-                else:
-                    page_result = self.get_watch_page(video_id)
-                    html = page_result.get('html')
-                    player_config = self.get_player_config(html, embedded=embeddable)
-                cookies = page_result.get('cookies')
+        curl_headers = ''
+        if cookies:
+            cookies_list = list()
+            for c in cookies:
+                cookies_list.append('{0}={1};'.format(c.name, c.value))
+            if cookies_list:
+                curl_headers = 'Cookie={cookies}' \
+                    .format(cookies=urllib.parse.quote(' '.join(cookies_list)))
+        else:
+            cookies = dict()
 
-            curl_headers = ''
-            if cookies:
-                cookies_list = list()
-                for c in cookies:
-                    cookies_list.append('{0}={1};'.format(c.name, c.value))
-                if cookies_list:
-                    curl_headers = 'Cookie={cookies}' \
-                        .format(cookies=urllib.parse.quote(' '.join(cookies_list)))
-            else:
-                cookies = dict()
+        player_assets = player_config.get('assets', {})
+        player_args = player_config.get('args', {})
+        player_response = player_args.get('player_response', {})
+        playability_status = player_response.get('playabilityStatus', {})
+        playback_tracking = player_response.get('playbackTracking', {})
+        js = player_assets.get('js')
 
-            player_assets = player_config.get('assets', {})
-            player_args = player_config.get('args', {})
-            player_response = player_args.get('player_response', {})
-            playability_status = player_response.get('playabilityStatus', {})
-            js = player_assets.get('js')
+        if video_id is None:
+            if 'video_id' in player_args:
+                video_id = player_args['video_id']
 
-            if video_id is None:
-                if 'video_id' in player_args:
-                    video_id = player_args['video_id']
+        if video_id:
+            http_params['video_id'] = video_id
+            http_params['eurl'] = ''.join(['https://youtube.googleapis.com/v/', video_id])
+        else:
+            raise YouTubeException('_method_get_video_info: no video_id')
 
-            if video_id:
-                http_params['video_id'] = video_id
-                http_params['eurl'] = ''.join(['https://youtube.googleapis.com/v/', video_id])
-            else:
-                raise YouTubeException('_method_get_video_info: no video_id')
+        cipher = None
+        if js:
+            if not js.startswith('http'):
+                js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
+            self._context.log_debug('Cipher: js player: |%s|' % js)
+            cipher = Cipher(self._context, javascript_url=js)
 
-            cipher = None
-            if js:
-                if not js.startswith('http'):
-                    js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
-                self._context.log_debug('Cipher: js player: |%s|' % js)
-                cipher = Cipher(self._context, javascript_url=js)
+        http_params['sts'] = player_config.get('sts', '')
+        http_params['t'] = player_args.get('t', '')
+        http_params['c'] = player_args.get('c', 'WEB')
+        http_params['cver'] = player_args.get('cver', '1.20170712')
+        http_params['cplayer'] = player_args.get('cplayer', 'UNIPLAYER')
+        http_params['cbr'] = player_args.get('cbr', 'Chrome')
+        http_params['cbrver'] = player_args.get('cbrver', '53.0.2785.143')
+        http_params['cos'] = player_args.get('cos', 'Windows')
+        http_params['cosver'] = player_args.get('cosver', '10.0')
 
-            http_params['sts'] = player_config.get('sts', '')
-            http_params['t'] = player_args.get('t', '')
-            http_params['c'] = player_args.get('c', 'WEB')
-            http_params['cver'] = player_args.get('cver', '1.20170712')
-            http_params['cplayer'] = player_args.get('cplayer', 'UNIPLAYER')
-            http_params['cbr'] = player_args.get('cbr', 'Chrome')
-            http_params['cbrver'] = player_args.get('cbrver', '53.0.2785.143')
-            http_params['cos'] = player_args.get('cos', 'Windows')
-            http_params['cosver'] = player_args.get('cosver', '10.0')
+        url = 'https://www.youtube.com/get_video_info'
+        el_values = ['detailpage', 'embedded']
 
-            url = 'https://www.youtube.com/get_video_info'
+        params = dict()
 
-            if embeddable:
-                el_values = ['embedded', 'detailpage']
-            else:
-                el_values = ['detailpage', 'embedded']
-
-            params = dict()
-
-            for el in el_values:
-                http_params['el'] = el
-                result = requests.get(url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
-                data = result.text
-                params = dict(urllib.parse.parse_qsl(data))
-                if params.get('url_encoded_fmt_stream_map') or params.get('live_playback', '0') == '1':
-                    break
-
-            if not player_response:
-                player_response = json.loads(params.get('player_response', '{}'))
-                playability_status = player_response.get('playabilityStatus', {})
-
-            captions = player_response.get('captions', {})
-            is_live = params.get('live_playback', '0') == '1'
-
-            if embeddable and playability_status.get('status') == 'UNPLAYABLE':
-                # some videos that report as embeddable aren't playable from the /embed/ page, retry as not embeddable
-                embeddable = False
-                player_config = None
-                continue
-            else:
+        for el in el_values:
+            http_params['el'] = el
+            result = requests.get(url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
+            data = result.text
+            params = dict(urllib.parse.parse_qsl(data))
+            if params.get('url_encoded_fmt_stream_map') or params.get('live_playback', '0') == '1':
                 break
+
+        if not player_response:
+            player_response = json.loads(params.get('player_response', '{}'))
+            playability_status = player_response.get('playabilityStatus', {})
+
+        captions = player_response.get('captions', {})
+        is_live = params.get('live_playback', '0') == '1'
 
         stream_list = []
 
@@ -809,9 +782,15 @@ class VideoInfo(object):
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
 
-        video_stats_url = params.get('videostats_playback_base_url', player_args.get('videostats_playback_base_url', ''))
-        if video_stats_url:
-            video_stats_url = ''.join([video_stats_url, '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())])
+        playback_stats = {
+            'playback_url': playback_tracking.get('videostatsPlaybackUrl', {}).get('baseUrl', ''),
+            'watchtime_url': playback_tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl', '')
+        }
+
+        if playback_stats.get('playback_url'):
+            playback_stats['playback_url'] = ''.join([playback_stats.get('playback_url'), '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())])
+        if playback_stats.get('watchtime_url'):
+            playback_stats['watchtime_url'] = ''.join([playback_stats.get('watchtime_url'), '&ver=2&cpn={cpn}'.format(cpn=self.generate_cpn())])
 
         if is_live:
             url = params.get('hlsvp', '')
@@ -820,7 +799,7 @@ class VideoInfo(object):
                                                   video_id,
                                                   meta_info=meta_info,
                                                   curl_headers=curl_headers,
-                                                  video_stats_url=video_stats_url)
+                                                  playback_stats=playback_stats)
         httpd_is_live = self._context.get_settings().use_dash_videos() and is_httpd_live(port=self._context.get_settings().httpd_port())
         mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
         s_info = dict()
@@ -868,7 +847,7 @@ class VideoInfo(object):
                                 'meta': meta_info,
                                 'headers': curl_headers,
                                 'license_info': license_info,
-                                'video_stats_url': video_stats_url}
+                                'playback_stats': playback_stats}
 
                 if is_live:
                     video_stream['url'] = ''.join([video_stream['url'], '&start_seq=$START_NUMBER$'])
@@ -926,7 +905,7 @@ class VideoInfo(object):
                     video_stream = {'url': url,
                                     'meta': meta_info,
                                     'headers': curl_headers,
-                                    'video_stats_url': video_stats_url}
+                                    'playback_stats': playback_stats}
                     video_stream.update(yt_format)
                     stream_list.append(video_stream)
                 elif conn:
@@ -940,7 +919,7 @@ class VideoInfo(object):
                     video_stream = {'url': url,
                                     'meta': meta_info,
                                     'headers': curl_headers,
-                                    'video_stats_url': video_stats_url}
+                                    'playback_stats': playback_stats}
                     video_stream.update(yt_format)
                     if video_stream:
                         stream_list.append(video_stream)
