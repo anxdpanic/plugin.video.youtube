@@ -627,11 +627,11 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
+        listitem_path = xbmc.getInfoLabel('Container.ListItem(0).FileNameAndPath')
         params = context.get_params()
 
         if 'video_id' not in params and 'playlist_id' not in params and \
                 'channel_id' not in params and 'live' not in params:
-            listitem_path = xbmc.getInfoLabel('Container.ListItem(0).FileNameAndPath')
             if listitem_path.startswith('plugin://%s/play/' % context._plugin_id):
                 match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', listitem_path)
                 if match:
