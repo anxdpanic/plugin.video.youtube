@@ -628,18 +628,33 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         params = context.get_params()
+
+        if 'video_id' not in params and 'playlist_id' not in params and \
+                'channel_id' not in params and 'live' not in params:
+            listitem_path = xbmc.getInfoLabel('Container.ListItem(0).FileNameAndPath')
+            if listitem_path.startswith('plugin://%s/play/' % context._plugin_id):
+                match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', listitem_path)
+                if match:
+                    context.set_param('video_id', match.group('video_id'))
+                    params = context.get_params()
+                else:
+                    return False
+            else:
+                return False
+
         if context.get_ui().get_home_window_property('prompt_for_subtitles') != params.get('video_id'):
             context.get_ui().clear_home_window_property('prompt_for_subtitles')
 
         if 'prompt_for_subtitles' in params:
             prompt_subtitles = params['prompt_for_subtitles'] == '1'
             del params['prompt_for_subtitles']
-            if prompt_subtitles and 'video_id' in params and not 'playlist_id' in params:
+            if prompt_subtitles and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to playmedia after setting home window property, so playback url matches playable listitems
                 context.get_ui().set_home_window_property('prompt_for_subtitles', params['video_id'])
                 context.execute('PlayMedia(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))
                 return
-        if 'video_id' in params and not 'playlist_id' in params:
+
+        if 'video_id' in params and 'playlist_id' not in params:
             return yt_play.play_video(self, context, re_match)
         elif 'playlist_id' in params:
             return yt_play.play_playlist(self, context, re_match)
