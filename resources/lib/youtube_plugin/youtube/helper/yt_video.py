@@ -22,24 +22,20 @@ def _process_rate_video(provider, context, re_match):
 
     rating_param = context.get_param('rating', '')
     if rating_param:
-        rating_param = rating_param.lower()
+        rating_param = rating_param.lower() if rating_param.lower() in ratings else ''
 
     video_id = context.get_param('video_id', '')
     if not video_id:
         try:
             video_id = re_match.group('video_id')
         except IndexError:
-            if rating_param in ratings:
-                if listitem_path.startswith('plugin://%s/play/' % context._plugin_id):
-                    match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', listitem_path)
-                    if match:
-                        video_id = match.group('video_id')
+            if listitem_path.startswith('plugin://%s/play/' % context._plugin_id):
+                match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', listitem_path)
+                if match:
+                    video_id = match.group('video_id')
 
             if not video_id:
                 raise kodion.KodionException('video/rate/: missing video_id')
-
-            if not rating_param:
-                raise kodion.KodionException('video/rate/: missing rating')
 
     try:
         current_rating = re_match.group('rating')
