@@ -30,4 +30,4 @@ __all__ = ['SearchHistory', 'FavoriteList', 'WatchLaterList', 'FunctionCache', '
            'strip_html_from_text', 'create_path', 'create_uri_path', 'find_best_fit', 'to_unicode', 'to_utf8',
            'datetime_parser', 'select_stream', 'get_http_server', 'is_httpd_live', 'YouTubeMonitor', 'playback_monitor',
            'make_dirs', 'loose_version', 'ip_api', 'PlaybackHistory', 'DataCache', 'get_client_ip_address',
-           'SystemVersion']
+           'SystemVersion', 'find_video_id']

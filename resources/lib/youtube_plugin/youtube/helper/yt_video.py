@@ -8,16 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
-
-import xbmc
-
 from ... import kodion
 from ...youtube.helper import v3
 
 
 def _process_rate_video(provider, context, re_match):
-    listitem_path = xbmc.getInfoLabel('Container.ListItem(0).FileNameAndPath')
+    listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
     ratings = ['like', 'dislike', 'none']
 
     rating_param = context.get_param('rating', '')
@@ -29,10 +25,8 @@ def _process_rate_video(provider, context, re_match):
         try:
             video_id = re_match.group('video_id')
         except IndexError:
-            if listitem_path.startswith('plugin://%s/play/' % context._plugin_id):
-                match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', listitem_path)
-                if match:
-                    video_id = match.group('video_id')
+            if context.is_plugin_path(listitem_path, 'play'):
+                video_id = kodion.utils.find_video_id(listitem_path)
 
             if not video_id:
                 raise kodion.KodionException('video/rate/: missing video_id')
