@@ -146,6 +146,9 @@ def to_video_item(context, video_item):
 
     if video_item.get_channel_id():  # make channel_id property available for keymapping
         item.setProperty('channel_id', video_item.get_channel_id())
+
+    if video_item.get_subscription_id():  # make subscription_id property available for keymapping
+        item.setProperty('subscription_id', video_item.get_subscription_id())
     return item
 
 

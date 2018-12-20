@@ -49,6 +49,7 @@ class VideoItem(BaseItem):
         self.license_key = None
         self._video_id = None
         self._channel_id = None
+        self._subscription_id = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count)
@@ -272,3 +273,9 @@ class VideoItem(BaseItem):
 
     def set_channel_id(self, value):
         self._channel_id = value
+
+    def get_subscription_id(self):
+        return self._subscription_id
+
+    def set_subscription_id(self, value):
+        self._subscription_id = value
