@@ -158,6 +158,10 @@ class XbmcContextUI(AbstractContextUI):
         xbmc.executebuiltin('RunScript(%s)' % script_uri)
 
     @staticmethod
+    def get_info_label(value):
+        return xbmc.getInfoLabel(value)
+
+    @staticmethod
     def set_home_window_property(property_id, value):
         property_id = ''.join(['plugin.video.youtube-', property_id])
         xbmcgui.Window(10000).setProperty(property_id, value)

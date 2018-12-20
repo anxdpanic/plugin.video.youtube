@@ -9,7 +9,6 @@
 """
 
 import os
-import re
 import json
 import shutil
 import socket
@@ -17,7 +16,7 @@ from base64 import b64decode
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
-from ..kodion.utils import FunctionCache, strip_html_from_text, get_client_ip_address, is_httpd_live
+from ..kodion.utils import FunctionCache, strip_html_from_text, get_client_ip_address, is_httpd_live, find_video_id
 from ..kodion.items import *
 from ..youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
@@ -627,15 +626,15 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
-        listitem_path = xbmc.getInfoLabel('Container.ListItem(0).FileNameAndPath')
+        listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
         params = context.get_params()
 
         if 'video_id' not in params and 'playlist_id' not in params and \
                 'channel_id' not in params and 'live' not in params:
-            if listitem_path.startswith('plugin://%s/play/' % context._plugin_id):
-                match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', listitem_path)
-                if match:
-                    context.set_param('video_id', match.group('video_id'))
+            if context.is_plugin_path(listitem_path, 'play'):
+                video_id = find_video_id(listitem_path)
+                if video_id:
+                    context.set_param('video_id', video_id)
                     params = context.get_params()
                 else:
                     return False

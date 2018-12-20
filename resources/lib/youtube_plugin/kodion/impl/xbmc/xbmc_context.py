@@ -84,6 +84,9 @@ class XbmcContext(AbstractContext):
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
 
+    def is_plugin_path(self, uri, uri_path):
+        return uri.startswith('plugin://%s/%s/' % (self.get_id(), uri_path))
+
     def format_date_short(self, date_obj):
         date_format = xbmc.getRegion('dateshort')
         _date_obj = date_obj

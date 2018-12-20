@@ -24,7 +24,7 @@ import xbmcvfs
 
 
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_unicode', 'select_stream', 'make_dirs']
+           'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
 
 
 def loose_version(v):
@@ -250,3 +250,10 @@ def make_dirs(path):
         return xbmcvfs.exists(path)
 
     return True
+
+
+def find_video_id(plugin_path):
+    match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', plugin_path)
+    if match:
+        return match.group('video_id')
+    return ''
