@@ -653,6 +653,9 @@ class Provider(kodion.AbstractProvider):
         if context.get_ui().get_home_window_property('prompt_for_subtitles') != params.get('video_id'):
             context.get_ui().clear_home_window_property('prompt_for_subtitles')
 
+        if context.get_ui().get_home_window_property('audio_only') != params.get('video_id'):
+            context.get_ui().clear_home_window_property('audio_only')
+
         if 'prompt_for_subtitles' in params:
             prompt_subtitles = params['prompt_for_subtitles'] == '1'
             del params['prompt_for_subtitles']
@@ -660,6 +663,15 @@ class Provider(kodion.AbstractProvider):
                 # redirect to playmedia after setting home window property, so playback url matches playable listitems
                 context.get_ui().set_home_window_property('prompt_for_subtitles', params['video_id'])
                 context.execute('PlayMedia(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))
+                return
+
+        if 'audio_only' in params:
+            audio_only = params['audio_only'] == '1'
+            del params['audio_only']
+            if audio_only and 'video_id' in params and 'playlist_id' not in params:
+                # redirect to runplugin after setting home window property, so playback url matches playable listitems
+                context.get_ui().set_home_window_property('audio_only', params['video_id'])
+                context.execute('RunPlugin(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))  # PlayMedia crashes Kodi 18
                 return
 
         if 'video_id' in params and 'playlist_id' not in params:

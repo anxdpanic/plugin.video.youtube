@@ -36,9 +36,10 @@ def play_video(provider, context, re_match):
             screensaver = True
 
         audio_only = None
-        if context.get_param('audio_only', '0') == '1':
+        if video_id and context.get_ui().get_home_window_property('audio_only') == video_id:
             ask_for_quality = False
             audio_only = True
+        context.get_ui().clear_home_window_property('audio_only')
 
         video_streams = client.get_video_streams(context, video_id)
         if len(video_streams) == 0:
