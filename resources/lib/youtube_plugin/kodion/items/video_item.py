@@ -48,6 +48,10 @@ class VideoItem(BaseItem):
         self._headers = None
         self.license_key = None
         self._video_id = None
+        self._channel_id = None
+        self._subscription_id = None
+        self._playlist_id = None
+        self._playlist_item_id = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count)
@@ -265,3 +269,27 @@ class VideoItem(BaseItem):
     @video_id.setter
     def video_id(self, value):
         self._video_id = value
+
+    def get_channel_id(self):
+        return self._channel_id
+
+    def set_channel_id(self, value):
+        self._channel_id = value
+
+    def get_subscription_id(self):
+        return self._subscription_id
+
+    def set_subscription_id(self, value):
+        self._subscription_id = value
+
+    def get_playlist_id(self):
+        return self._playlist_id
+
+    def set_playlist_id(self, value):
+        self._playlist_id = value
+
+    def get_playlist_item_id(self):
+        return self._playlist_item_id
+
+    def set_playlist_item_id(self, value):
+        self._playlist_item_id = value

@@ -81,6 +81,7 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         # -- unsubscribe from channel
         subscription_id = subscription_id_dict.get(channel_id, '')
         if subscription_id:
+            channel_item.set_channel_subscription_id(subscription_id)
             yt_context_menu.append_unsubscribe_from_channel(context_menu, provider, context, subscription_id)
         # -- subscribe to the channel
         if provider.is_logged_in() and context.get_path() != '/subscriptions/list/':
@@ -349,6 +350,8 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                     if playlist_id:
                         if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
                             playlist_item_id = playlist_item_id_dict[video_id]
+                            video_item.set_playlist_id(playlist_id)
+                            video_item.set_playlist_item_id(playlist_item_id)
                             context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
                                                  'RunPlugin(%s)' % context.create_uri(
                                                      ['playlist', 'remove', 'video'],
@@ -363,10 +366,12 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         if channel_id and channel_name:
             # only if we are not directly in the channel provide a jump to the channel
             if kodion.utils.create_path('channel', channel_id) != context.get_path():
+                video_item.set_channel_id(channel_id)
                 yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
 
         if provider.is_logged_in():
             # subscribe to the channel of the video
+            video_item.set_subscription_id(channel_id)
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
 
         if not video_item.live and use_play_data:
