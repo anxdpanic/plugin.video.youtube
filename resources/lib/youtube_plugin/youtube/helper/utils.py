@@ -349,6 +349,8 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                     if playlist_id:
                         if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
                             playlist_item_id = playlist_item_id_dict[video_id]
+                            video_item.set_playlist_id(playlist_id)
+                            video_item.set_playlist_item_id(playlist_item_id)
                             context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
                                                  'RunPlugin(%s)' % context.create_uri(
                                                      ['playlist', 'remove', 'video'],

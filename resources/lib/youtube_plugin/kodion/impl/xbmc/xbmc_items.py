@@ -149,6 +149,13 @@ def to_video_item(context, video_item):
 
     if video_item.get_subscription_id():  # make subscription_id property available for keymapping
         item.setProperty('subscription_id', video_item.get_subscription_id())
+
+    if video_item.get_playlist_id():  # make playlist_id property available for keymapping
+        item.setProperty('playlist_id', video_item.get_playlist_id())
+
+    if video_item.get_playlist_item_id():  # make playlist_item_id property available for keymapping
+        item.setProperty('playlist_item_id', video_item.get_playlist_item_id())
+
     return item
 
 

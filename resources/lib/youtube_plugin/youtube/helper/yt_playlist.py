@@ -42,17 +42,31 @@ def _process_add_video(provider, context, re_match):
 
 
 def _process_remove_video(provider, context, re_match):
+    listitem_playlist_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_id)')
+    listitem_playlist_item_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_item_id)')
+    listitem_title = context.get_ui().get_info_label('Container.ListItem(0).Title')
+
     playlist_id = context.get_param('playlist_id', '')
+    video_id = context.get_param('video_id', '')
+    video_name = context.get_param('video_name', '')
+
+    if not playlist_id and not video_id:  # keymap support
+        if listitem_playlist_id and listitem_playlist_id.startswith('PL') \
+                and listitem_playlist_item_id and listitem_playlist_item_id.startswith('UE'):
+            playlist_id = listitem_playlist_id
+            video_id = listitem_playlist_item_id
+
     if not playlist_id:
         raise kodion.KodionException('Playlist/Remove: missing playlist_id')
 
-    video_id = context.get_param('video_id', '')
     if not video_id:
         raise kodion.KodionException('Playlist/Remove: missing video_id')
 
-    video_name = context.get_param('video_name', '')
     if not video_name:
-        raise kodion.KodionException('Playlist/Remove: missing video_name')
+        if listitem_title:
+            video_name = listitem_title
+        else:
+            raise kodion.KodionException('Playlist/Remove: missing video_name')
 
     if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
         if context.get_ui().on_remove_content(video_name):
