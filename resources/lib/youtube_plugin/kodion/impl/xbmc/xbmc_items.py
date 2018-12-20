@@ -143,6 +143,9 @@ def to_video_item(context, video_item):
         item.addStreamInfo('video', {'duration': duration})
 
     item.setInfo(type=u'video', infoLabels=_info_labels)
+
+    if video_item.get_channel_id():  # make channel_id property available for keymapping
+        item.setProperty('channel_id', video_item.get_channel_id())
     return item
 
 

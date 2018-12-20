@@ -499,15 +499,24 @@ class Provider(kodion.AbstractProvider):
 
     @kodion.RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
+        listitem_channel_id = context.get_ui().get_info_label('Container.ListItem(0).Property(channel_id)')
+
+        method = re_match.group('method')
+        channel_id = re_match.group('channel_id')
+
+        if method == 'channel' and channel_id and channel_id.lower() == 'property':
+            if listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc')):
+                context.execute('Container.Update(%s)' % context.create_uri(['channel', listitem_channel_id]))  # redirect if keymap, without redirect results in 'invalid handle -1'
+
+        if method == 'channel' and not channel_id:
+            return False
+
         self.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
         resource_manager = self.get_resource_manager(context)
 
-        result = []
-
-        method = re_match.group('method')
-        channel_id = re_match.group('channel_id')
         mine_id = ''
+        result = []
 
         """
         This is a helper routine if we only have the username of a channel. This will retrieve the correct channel id
