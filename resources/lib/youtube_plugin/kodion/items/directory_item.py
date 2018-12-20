@@ -16,6 +16,7 @@ class DirectoryItem(BaseItem):
         BaseItem.__init__(self, name, uri, image, fanart)
         self._plot = name
         self._is_action = False
+        self._channel_subscription_id = None
 
     def set_name(self, name):
         self._name = name
@@ -32,3 +33,9 @@ class DirectoryItem(BaseItem):
     def set_action(self, value):
         if isinstance(value, bool):
             self._is_action = value
+
+    def get_channel_subscription_id(self):
+        return self._channel_subscription_id
+
+    def set_channel_subscription_id(self, value):
+        self._channel_subscription_id = value

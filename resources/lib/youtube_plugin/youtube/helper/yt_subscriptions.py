@@ -42,7 +42,12 @@ def _process_add(provider, context, re_match):
 
 
 def _process_remove(provider, context, re_match):
+    listitem_subscription_id = context.get_ui().get_info_label('Container.ListItem(0).Property(channel_subscription_id)')
+
     subscription_id = context.get_param('subscription_id', '')
+    if not subscription_id and listitem_subscription_id:
+        subscription_id = listitem_subscription_id
+
     if subscription_id:
         json_data = provider.get_client(context).unsubscribe(subscription_id)
         if not v3.handle_error(provider, context, json_data):
