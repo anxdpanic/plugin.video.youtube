@@ -15,14 +15,23 @@ from ...youtube.helper import v3
 
 
 def _process_add_video(provider, context, re_match):
+    listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
     client = provider.get_client(context)
 
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
-        raise kodion.KodionException('Playlist/Remove: missing playlist_id')
+        raise kodion.KodionException('Playlist/Add: missing playlist_id')
+
+    if playlist_id.lower() == 'watch_later':
+        playlist_id = context.get_access_manager().get_watch_later_id()
+
     video_id = context.get_param('video_id', '')
     if not video_id:
-        raise kodion.KodionException('Playlist/Remove: missing video_id')
+        if context.is_plugin_path(listitem_path, 'play'):
+            video_id = kodion.utils.find_video_id(listitem_path)
+        if not video_id:
+            raise kodion.KodionException('Playlist/Add: missing video_id')
+
     if playlist_id != 'HL':
         json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
         if not v3.handle_error(provider, context, json_data):
@@ -77,9 +86,19 @@ def _process_remove_playlist(provider, context, re_match):
 
 
 def _process_select_playlist(provider, context, re_match):
+    listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')  # do this asap, relies on listitems focus
     ui = context.get_ui()
     page_token = ''
     current_page = 0
+
+    video_id = context.get_param('video_id', '')
+    if not video_id:
+        if context.is_plugin_path(listitem_path, 'play'):
+            video_id = kodion.utils.find_video_id(listitem_path)
+            if video_id:
+                context.set_param('video_id', video_id)
+        if not video_id:
+            raise kodion.KodionException('Playlist/Select: missing video_id')
 
     while True:
         current_page += 1
