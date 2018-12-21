@@ -16,12 +16,6 @@ class AbstractContextUI(object):
     def create_progress_dialog(self, heading, text=None, background=False):
         raise NotImplementedError()
 
-    def set_view_mode(self, view_mode):
-        raise NotImplementedError()
-
-    def get_view_mode(self):
-        raise NotImplementedError()
-
     def get_skin_id(self):
         raise NotImplementedError()
 
