@@ -11,6 +11,7 @@ import datetime
 import sqlite3
 
 from six import PY2
+# noinspection PyPep8Naming
 from six.moves import cPickle as pickle
 
 from .storage import Storage

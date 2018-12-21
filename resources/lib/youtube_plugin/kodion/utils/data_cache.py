@@ -9,6 +9,7 @@
 """
 
 from six import PY2
+# noinspection PyPep8Naming
 from six.moves import cPickle as pickle
 
 import json

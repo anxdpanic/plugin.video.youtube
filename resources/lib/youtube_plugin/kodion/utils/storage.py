@@ -10,6 +10,7 @@
 
 from six import PY2
 from six.moves import range
+# noinspection PyPep8Naming
 from six.moves import cPickle as pickle
 
 import datetime

@@ -59,6 +59,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             logger.log_debug(' '.join(log_lines))
         return conn_allowed
 
+    # noinspection PyPep8Naming
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
         dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
@@ -159,6 +160,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             else:
                 self.send_error(501)
 
+    # noinspection PyPep8Naming
     def do_HEAD(self):
         logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
@@ -180,6 +182,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             else:
                 self.send_error(501)
 
+    # noinspection PyPep8Naming
     def do_POST(self):
         logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 

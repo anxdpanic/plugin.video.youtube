@@ -155,12 +155,12 @@ def _process_list_response(provider, context, json_data):
         elif yt_kind == 'youtube#activity':
             snippet = yt_item['snippet']
             details = yt_item['contentDetails']
-            actType = snippet['type']
+            activity_type = snippet['type']
 
             # recommendations
-            if actType == 'recommendation':
+            if activity_type == 'recommendation':
                 video_id = details['recommendation']['resourceId']['videoId']
-            elif actType == 'upload':
+            elif activity_type == 'upload':
                 video_id = details['upload']['videoId']
             else:
                 continue
