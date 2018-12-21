@@ -84,6 +84,9 @@ class XbmcContext(AbstractContext):
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
 
+    def get_region(self):
+        pass  # implement from abstract
+
     def addon(self):
         return self._addon
 

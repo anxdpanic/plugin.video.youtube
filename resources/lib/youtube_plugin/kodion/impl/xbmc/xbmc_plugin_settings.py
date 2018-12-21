@@ -22,3 +22,6 @@ class XbmcPluginSettings(AbstractSettings):
 
     def set_string(self, setting_id, value):
         self._xbmc_addon.setSetting(setting_id, value)
+
+    def open_settings(self):
+        self._xbmc_addon.openSetting()
