@@ -548,7 +548,7 @@ class VideoInfo(object):
             if pos >= 0:
                 _player_config = html2[:pos]
 
-        blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+        blank_config = re.search(r'var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
         if not blank_config:
             player_config = dict()
         else:
