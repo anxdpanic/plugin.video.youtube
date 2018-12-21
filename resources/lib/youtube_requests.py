@@ -40,6 +40,12 @@ def handle_error(context, json_data):
 def v3_request(method='GET', headers=None, path=None, post_data=None, params=None, allow_redirects=True, addon_id=None):
     """
         https://developers.google.com/youtube/v3/docs/
+        :param method:
+        :param headers:
+        :param path:
+        :param post_data:
+        :param params:
+        :param allow_redirects:
         :param addon_id: addon id associated with developer keys to use for requests
         :type addon_id: str
     """

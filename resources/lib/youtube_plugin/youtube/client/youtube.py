@@ -428,6 +428,7 @@ class YouTube(LoginClient):
         :param event_type: one of: 'live', 'completed', 'upcoming'
         :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
         :param page_token:
+        :param location: bool, use geolocation
         :return:
         """
         # prepare page token
@@ -472,7 +473,8 @@ class YouTube(LoginClient):
 
         return self._perform_v3_request(method='GET', path='search', params=params)
 
-    def search(self, q, search_type=['video', 'channel', 'playlist'], event_type='', channel_id='', order='relevance', safe_search='moderate', page_token='', location=False):
+    def search(self, q, search_type=['video', 'channel', 'playlist'], event_type='', channel_id='',
+               order='relevance', safe_search='moderate', page_token='', location=False):
         """
         Returns a collection of search results that match the query parameters specified in the API request. By default,
         a search result set identifies matching video, channel, and playlist resources, but you can also configure
@@ -484,6 +486,7 @@ class YouTube(LoginClient):
         :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
         :param safe_search: one of: 'moderate', 'none', 'strict'
         :param page_token: can be ''
+        :param location: bool, use geolocation
         :return:
         """
 
