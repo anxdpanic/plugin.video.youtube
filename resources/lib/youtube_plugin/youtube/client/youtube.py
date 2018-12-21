@@ -19,7 +19,7 @@ from ..helper.utils import get_shelf_index_by_title
 from ...kodion import constants
 from ...kodion import Context
 
-context = Context(plugin_id='plugin.video.youtube')
+_context = Context(plugin_id='plugin.video.youtube')
 
 
 class YouTube(LoginClient):
@@ -85,7 +85,7 @@ class YouTube(LoginClient):
         try:
             _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         except:
-            context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
+            _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
     def get_video_streams(self, context, video_id=None, player_config=None, cookies=None):
         video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
@@ -444,10 +444,10 @@ class YouTube(LoginClient):
                   'maxResults': str(self._max_results)}
 
         if location:
-            location = context.get_settings().get_location()
+            location = _context.get_settings().get_location()
             if location:
                 params['location'] = location
-                params['locationRadius'] = context.get_settings().get_location_radius()
+                params['locationRadius'] = _context.get_settings().get_location_radius()
 
         if page_token:
             params['pageToken'] = page_token
@@ -526,10 +526,10 @@ class YouTube(LoginClient):
                 break
 
         if params['type'] == 'video' and location:
-            location = context.get_settings().get_location()
+            location = _context.get_settings().get_location()
             if location:
                 params['location'] = location
-                params['locationRadius'] = context.get_settings().get_location_radius()
+                params['locationRadius'] = _context.get_settings().get_location_radius()
 
         return self._perform_v3_request(method='GET', path='search', params=params)
 
@@ -651,7 +651,7 @@ class YouTube(LoginClient):
                 _contents = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
 
                 if _shelf_index is None:
-                    _shelf_index = get_shelf_index_by_title(context, _json_data, shelf_title)
+                    _shelf_index = get_shelf_index_by_title(_context, _json_data, shelf_title)
 
                 if _shelf_index is not None:
                     _data = _contents[_shelf_index].get('shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
@@ -719,7 +719,7 @@ class YouTube(LoginClient):
             }
 
             json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=_en_post_data)
-            shelf_index = get_shelf_index_by_title(context, json_data, shelf_title)
+            shelf_index = get_shelf_index_by_title(_context, json_data, shelf_title)
 
         result = _perform(_page_token=page_token, _offset=offset, _result=result, _shelf_index=shelf_index)
 
@@ -763,7 +763,7 @@ class YouTube(LoginClient):
                 _contents = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
 
                 if _shelf_index is None:
-                    _shelf_index = get_shelf_index_by_title(context, _json_data, shelf_title)
+                    _shelf_index = get_shelf_index_by_title(_context, _json_data, shelf_title)
 
                 if _shelf_index is not None:
                     _data = _contents[_shelf_index].get('shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
@@ -848,7 +848,7 @@ class YouTube(LoginClient):
             }
 
             json_data = self._perform_v1_tv_request(method='POST', path='browse', post_data=_en_post_data)
-            shelf_index = get_shelf_index_by_title(context, json_data, shelf_title)
+            shelf_index = get_shelf_index_by_title(_context, json_data, shelf_title)
 
         result = _perform(_page_token=page_token, _offset=offset, _result=result, _shelf_index=shelf_index)
 
@@ -976,11 +976,11 @@ class YouTube(LoginClient):
         current_page = 1
         pages = 30  # 28 seems to be page limit, add a couple page padding, loop will break when there is no next page data
 
-        progress_dialog = context.get_ui().create_progress_dialog(context.get_name(),
-                                                                  context.localize(constants.localize.COMMON_PLEASE_WAIT),
-                                                                  background=True)
+        progress_dialog = _context.get_ui().create_progress_dialog(_context.get_name(),
+                                                                   _context.localize(constants.localize.COMMON_PLEASE_WAIT),
+                                                                   background=True)
         progress_dialog.set_total(pages)
-        progress_dialog.update(steps=1, text=context.localize(constants.localize.WATCH_LATER_RETRIEVAL_PAGE) % str(current_page))
+        progress_dialog.update(steps=1, text=_context.localize(constants.localize.WATCH_LATER_RETRIEVAL_PAGE) % str(current_page))
 
         try:
             json_data = _get_items()
@@ -1011,7 +1011,7 @@ class YouTube(LoginClient):
 
                 if continuation:
                     current_page += 1
-                    progress_dialog.update(steps=1, text=context.localize(constants.localize.WATCH_LATER_RETRIEVAL_PAGE) % str(current_page))
+                    progress_dialog.update(steps=1, text=_context.localize(constants.localize.WATCH_LATER_RETRIEVAL_PAGE) % str(current_page))
                     json_data = _get_items(continuation)
                     continue
                 else:
@@ -1050,7 +1050,7 @@ class YouTube(LoginClient):
         log_params = copy.deepcopy(params)
         if 'location' in log_params:
             log_params['location'] = 'xx.xxxx,xx.xxxx'
-        context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
+        _context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
         if method == 'GET':
             result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
         elif method == 'POST':
@@ -1100,7 +1100,7 @@ class YouTube(LoginClient):
 
         result = None
 
-        context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
+        _context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
         if method == 'GET':
             result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
         elif method == 'POST':

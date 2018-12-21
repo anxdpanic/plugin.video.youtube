@@ -62,9 +62,9 @@ class YouTubeResolver(AbstractResolver):
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
                 response = requests.get(url, headers=headers, verify=self._verify)
                 if response.status_code == 200:
-                    re_match = re.search(r'<meta itemprop="channelId" content="(?P<channel_id>.+)">', response.text)
-                    if re_match:
-                        channel_id = re_match.group('channel_id')
+                    match = re.search(r'<meta itemprop="channelId" content="(?P<channel_id>.+)">', response.text)
+                    if match:
+                        channel_id = match.group('channel_id')
                         return 'https://www.youtube.com/channel/%s' % channel_id
             except:
                 # do nothing

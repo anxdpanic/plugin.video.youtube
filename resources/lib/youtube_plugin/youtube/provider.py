@@ -762,8 +762,8 @@ class Provider(kodion.AbstractProvider):
             if not _new_user_name.strip():
                 _new_user_name = context.localize(self.LOCAL_MAP['youtube.user.unnamed'])
             _new_users = {}
-            for i, u in enumerate(list(_access_manager_users.keys())):
-                _new_users[str(i)] = _access_manager_users[u]
+            for idx, key in enumerate(list(_access_manager_users.keys())):
+                _new_users[str(idx)] = _access_manager_users[key]
             _new_users[str(len(_new_users))] = access_manager.get_new_user(_new_user_name)
             access_manager.set_users(_new_users)
             return str(len(_new_users) - 1)

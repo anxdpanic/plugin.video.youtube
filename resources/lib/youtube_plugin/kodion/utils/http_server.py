@@ -251,6 +251,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             self.send_error(501)
 
+    # noinspection PyShadowingBuiltins
     def log_message(self, format, *args):
         return
 
