@@ -787,8 +787,7 @@ class YouTube(LoginClient):
                     _video_item = {'id': _item['playlistId'],
                                    'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
                                    'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', ''),
-                                   'channel_id': _item.get('shortBylineText', {}).get('runs', [{}])[0]
-                                       .get('navigationEndpoint', {}).get('browseEndpoint', {}).get('browseId', ''),
+                                   'channel_id': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('navigationEndpoint', {}).get('browseEndpoint', {}).get('browseId', ''),
                                    'thumbnails': {'default': {'url': ''}, 'medium': {'url': ''}, 'high': {'url': ''}}}
 
                     _thumbs = _item.get('thumbnail', {}).get('thumbnails', [{}])

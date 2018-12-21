@@ -28,7 +28,8 @@ def strptime(stamp, stamp_fmt):
 def get_stamp_diff(current_stamp):
     stamp_format = '%Y-%m-%d %H:%M:%S.%f'
     current_datetime = datetime.now()
-    if not current_stamp: return 86400  # 24 hrs
+    if not current_stamp:
+        return 86400  # 24 hrs
     try:
         stamp_datetime = datetime(*(strptime(current_stamp, stamp_format)[0:6]))
     except ValueError:  # current_stamp has no microseconds

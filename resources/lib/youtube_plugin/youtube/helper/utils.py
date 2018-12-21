@@ -22,7 +22,6 @@ try:
 except ImportError:
     inputstreamhelper = None
 
-
 __RE_SEASON_EPISODE_MATCHES__ = [re.compile(r'Part (?P<episode>\d+)'),
                                  re.compile(r'#(?P<episode>\d+)'),
                                  re.compile(r'Ep.[^\w]?(?P<episode>\d+)'),
@@ -384,8 +383,9 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                 yt_context_menu.append_reset_resume_point(context_menu, provider, context, video_id)
 
         # more...
-        refresh_container = context.get_path().startswith('/channel/mine/playlist/LL') or \
-                            context.get_path() == '/special/disliked_videos/'
+        refresh_container = \
+            context.get_path().startswith('/channel/mine/playlist/LL') or \
+            context.get_path() == '/special/disliked_videos/'
         yt_context_menu.append_more_for_video(context_menu, provider, context, video_id,
                                               is_logged_in=provider.is_logged_in(),
                                               refresh_container=refresh_container)

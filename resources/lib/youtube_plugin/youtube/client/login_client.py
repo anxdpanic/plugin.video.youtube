@@ -275,7 +275,14 @@ class LoginClient(object):
                      # 'google_play_services_version': '6188034',
                      'accountType': 'HOSTED_OR_GOOGLE',
                      'Email': username.encode('utf-8'),
-                     'service': 'oauth2:https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/emeraldsea.mobileapps.doritos.cookie https://www.googleapis.com/auth/plus.stream.read https://www.googleapis.com/auth/plus.stream.write https://www.googleapis.com/auth/plus.pages.manage https://www.googleapis.com/auth/identity.plus.page.impersonation',
+                     'service': 'oauth2:https://www.googleapis.com/auth/youtube '
+                                'https://www.googleapis.com/auth/youtube.force-ssl '
+                                'https://www.googleapis.com/auth/plus.me '
+                                'https://www.googleapis.com/auth/emeraldsea.mobileapps.doritos.cookie '
+                                'https://www.googleapis.com/auth/plus.stream.read '
+                                'https://www.googleapis.com/auth/plus.stream.write '
+                                'https://www.googleapis.com/auth/plus.pages.manage '
+                                'https://www.googleapis.com/auth/identity.plus.page.impersonation',
                      'source': 'android',
                      'androidId': '38c6ee9a82b8b10a',
                      'app': 'com.google.android.youtube',

@@ -850,10 +850,11 @@ class VideoInfo(object):
                             li_ipaddress = self._context.get_settings().httpd_listen()
                             if li_ipaddress == '0.0.0.0':
                                 li_ipaddress = '127.0.0.1'
-                            proxy_addr = ['http://{ipaddress}:{port}/widevine'
-                                              .format(ipaddress=li_ipaddress,
-                                                      port=self._context.get_settings().httpd_port()),
-                                          '||R{SSM}|']
+                            proxy_addr = \
+                                ['http://{ipaddress}:{port}/widevine'.format(
+                                    ipaddress=li_ipaddress,
+                                    port=self._context.get_settings().httpd_port()
+                                ), '||R{SSM}|']
                             license_info['proxy'] = ''.join(proxy_addr)
                             license_info['token'] = self._access_token
                             break
@@ -1173,7 +1174,10 @@ class VideoInfo(object):
             else:
                 _ = f.write(str(out))
             f.close()
-            return 'http://{ipaddress}:{port}/{video_id}.mpd' \
-                       .format(ipaddress=ipaddress, port=self._context.get_settings().httpd_port(), video_id=video_id), stream_info
+            return 'http://{ipaddress}:{port}/{video_id}.mpd'.format(
+                ipaddress=ipaddress,
+                port=self._context.get_settings().httpd_port(),
+                video_id=video_id
+            ), stream_info
         except:
             return None, None

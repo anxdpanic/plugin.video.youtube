@@ -20,8 +20,7 @@ def to_play_item(context, play_item):
 
     major_version = context.get_system_version().get_version()[0]
 
-    is_strm = str(context.get_param('strm', False)).lower() == 'true' \
-                 and major_version >= 18
+    is_strm = str(context.get_param('strm', False)).lower() == 'true' and major_version >= 18
 
     thumb = play_item.get_image() if play_item.get_image() else u'DefaultVideo.png'
     title = play_item.get_title() if play_item.get_title() else play_item.get_name()
@@ -36,7 +35,7 @@ def to_play_item(context, play_item):
 
     if not is_strm:
         list_item.setProperty(u'IsPlayable', u'true')
-    
+
         if play_item.get_fanart() and settings.show_fanart():
             fanart = play_item.get_fanart()
         if major_version <= 15:
@@ -44,7 +43,7 @@ def to_play_item(context, play_item):
             list_item.setIconImage(thumb)
         else:
             list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
-    
+
     if not play_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
             play_item.get_headers() and play_item.get_uri().startswith('http'):
         play_item.set_uri('|'.join([play_item.get_uri(), play_item.get_headers()]))
@@ -72,21 +71,21 @@ def to_play_item(context, play_item):
         if play_item.get_play_count() == 0:
             if play_item.get_start_percent():
                 list_item.setProperty('StartPercent', play_item.get_start_percent())
-    
+
             if play_item.get_start_time():
                 list_item.setProperty('StartOffset', play_item.get_start_time())
-    
+
         if play_item.subtitles:
             list_item.setSubtitles(play_item.subtitles)
-    
+
         _info_labels = info_labels.create_from_item(context, play_item)
-    
+
         # This should work for all versions of XBMC/KODI.
         if 'duration' in _info_labels:
             duration = _info_labels['duration']
             del _info_labels['duration']
             list_item.addStreamInfo('video', {'duration': duration})
-    
+
         list_item.setInfo(type=u'video', infoLabels=_info_labels)
     return list_item
 
