@@ -13,7 +13,7 @@ from ... import kodion
 from ...youtube.helper import v3
 
 
-def _process_list(provider, context, re_match):
+def _process_list(provider, context):
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -26,7 +26,7 @@ def _process_list(provider, context, re_match):
     return result
 
 
-def _process_add(provider, context, re_match):
+def _process_add(provider, context):
     listitem_subscription_id = context.get_ui().get_info_label('Container.ListItem(0).Property(subscription_id)')
 
     subscription_id = context.get_param('subscription_id', '')
@@ -41,7 +41,7 @@ def _process_add(provider, context, re_match):
     return True
 
 
-def _process_remove(provider, context, re_match):
+def _process_remove(provider, context):
     listitem_subscription_id = context.get_ui().get_info_label('Container.ListItem(0).Property(channel_subscription_id)')
 
     subscription_id = context.get_param('subscription_id', '')
@@ -57,7 +57,7 @@ def _process_remove(provider, context, re_match):
     return True
 
 
-def process(method, provider, context, re_match):
+def process(method, provider, context):
     result = []
 
     # we need a login
@@ -66,11 +66,11 @@ def process(method, provider, context, re_match):
         return UriItem(context.create_uri(['sign', 'in']))
 
     if method == 'list':
-        result.extend(_process_list(provider, context, re_match))
+        result.extend(_process_list(provider, context))
     elif method == 'add':
-        return _process_add(provider, context, re_match)
+        return _process_add(provider, context)
     elif method == 'remove':
-        return _process_remove(provider, context, re_match)
+        return _process_remove(provider, context)
     else:
         raise kodion.KodionException("Unknown subscriptions method '%s'" % method)
 

@@ -59,14 +59,14 @@ def __auth(addon_id, mode=SIGN_IN):
             return True
         else:
             provider.reset_client()
-            yt_login.process(mode, provider, context, re_match=None, sign_out_refresh=False)
+            yt_login.process(mode, provider, context, sign_out_refresh=False)
     elif mode == SIGN_OUT:
         if not logged_in:
             return True
         else:
             provider.reset_client()
             try:
-                yt_login.process(mode, provider, context, re_match=None, sign_out_refresh=False)
+                yt_login.process(mode, provider, context, sign_out_refresh=False)
             except:
                 reset_access_tokens(addon_id)
     else:

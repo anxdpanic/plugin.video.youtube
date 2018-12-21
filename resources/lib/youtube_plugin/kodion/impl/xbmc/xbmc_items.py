@@ -78,7 +78,7 @@ def to_play_item(context, play_item):
         if play_item.subtitles:
             list_item.setSubtitles(play_item.subtitles)
 
-        _info_labels = info_labels.create_from_item(context, play_item)
+        _info_labels = info_labels.create_from_item(play_item)
 
         # This should work for all versions of XBMC/KODI.
         if 'duration' in _info_labels:
@@ -126,7 +126,7 @@ def to_video_item(context, video_item):
     else:
         item.setProperty('PublishedSince', context.localize('30539'))
 
-    _info_labels = info_labels.create_from_item(context, video_item)
+    _info_labels = info_labels.create_from_item(video_item)
 
     if video_item.get_play_count() == 0:
         if video_item.get_start_percent():
@@ -182,7 +182,7 @@ def to_audio_item(context, audio_item):
 
     item.setProperty('IsPlayable', 'true')
 
-    item.setInfo(type='music', infoLabels=info_labels.create_from_item(context, audio_item))
+    item.setInfo(type='music', infoLabels=info_labels.create_from_item(audio_item))
     return item
 
 

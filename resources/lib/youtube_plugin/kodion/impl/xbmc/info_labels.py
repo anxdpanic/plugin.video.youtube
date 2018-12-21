@@ -81,7 +81,7 @@ def _process_last_played(info_labels, name, param):
         info_labels[name] = param.strftime('%Y-%m-%d %H:%M:%S')
 
 
-def create_from_item(context, base_item):
+def create_from_item(base_item):
     info_labels = {}
 
     # 'date' = '09.03.1982'

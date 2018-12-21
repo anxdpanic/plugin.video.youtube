@@ -16,7 +16,7 @@ import time
 from ...youtube.youtube_exceptions import LoginException
 
 
-def process(mode, provider, context, re_match, sign_out_refresh=True):
+def process(mode, provider, context, sign_out_refresh=True):
     addon_id = context.get_param('addon_id', None)
 
     def _do_logout():

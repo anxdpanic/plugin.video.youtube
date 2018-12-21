@@ -22,7 +22,7 @@ from ...youtube.youtube_exceptions import YouTubeException
 from ...youtube.helper import utils, v3
 
 
-def play_video(provider, context, re_match):
+def play_video(provider, context):
     try:
         video_id = context.get_param('video_id')
 
@@ -112,7 +112,7 @@ def play_video(provider, context, re_match):
         context.get_ui().show_notification(message, time_milliseconds=15000)
 
 
-def play_playlist(provider, context, re_match):
+def play_playlist(provider, context):
     videos = []
 
     def _load_videos(_page_token='', _progress_dialog=None):
@@ -209,7 +209,7 @@ def play_playlist(provider, context, re_match):
     return True
 
 
-def play_channel_live(provider, context, re_match):
+def play_channel_live(provider, context):
     channel_id = context.get_param('channel_id')
     index = int(context.get_param('live')) - 1
     if index < 0:

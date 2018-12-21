@@ -104,7 +104,7 @@ class XbmcRunner(AbstractProviderRunner):
             item.addContextMenuItems(directory_item.get_context_menu(),
                                      replaceItems=directory_item.replace_context_menu())
 
-        item.setInfo(type='video', infoLabels=info_labels.create_from_item(context, directory_item))
+        item.setInfo(type='video', infoLabels=info_labels.create_from_item(directory_item))
         item.setPath(directory_item.get_uri())
 
         is_folder = True
@@ -147,7 +147,7 @@ class XbmcRunner(AbstractProviderRunner):
         if image_item.get_context_menu() is not None:
             item.addContextMenuItems(image_item.get_context_menu(), replaceItems=image_item.replace_context_menu())
 
-        item.setInfo(type='picture', infoLabels=info_labels.create_from_item(context, image_item))
+        item.setInfo(type='picture', infoLabels=info_labels.create_from_item(image_item))
 
         item.setPath(image_item.get_uri())
         xbmcplugin.addDirectoryItem(handle=self.handle,
