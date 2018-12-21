@@ -825,13 +825,13 @@ class VideoInfo(object):
         if mpd_url:
             mpd_sig_deciphered = True
             if mpd_url.startswith('http'):
-                if (use_cipher_signature or re.search('/s/[0-9A-F\.]+', mpd_url)) and (not re.search('/signature/[0-9A-F\.]+', mpd_url)):
+                if (use_cipher_signature or re.search('/s/[0-9A-F.]+', mpd_url)) and (not re.search('/signature/[0-9A-F.]+', mpd_url)):
                     mpd_sig_deciphered = False
                     if cipher:
-                        sig = re.search('/s/(?P<sig>[0-9A-F\.]+)', mpd_url)
+                        sig = re.search('/s/(?P<sig>[0-9A-F.]+)', mpd_url)
                         if sig:
                             signature = cipher.get_signature(sig.group('sig'))
-                            mpd_url = re.sub('/s/[0-9A-F\.]+', ''.join(['/signature/', signature]), mpd_url)
+                            mpd_url = re.sub('/s/[0-9A-F.]+', ''.join(['/signature/', signature]), mpd_url)
                             mpd_sig_deciphered = True
                     else:
                         raise YouTubeException('Cipher: Not Found')

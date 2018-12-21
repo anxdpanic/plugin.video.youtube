@@ -79,7 +79,7 @@ class Cipher(object):
 
             # real object functions
             cipher_match = re.match(
-                r'(?P<object_name>[\$a-zA-Z0-9]+)\.?\[?"?(?P<function_name>[\$a-zA-Z0-9]+)"?\]?\((?P<parameter>[^)]+)\)',
+                r'(?P<object_name>[$a-zA-Z0-9]+)\.?\[?"?(?P<function_name>[$a-zA-Z0-9]+)"?\]?\((?P<parameter>[^)]+)\)',
                 line)
             if cipher_match:
                 object_name = cipher_match.group('object_name')
@@ -145,7 +145,7 @@ class Cipher(object):
     def _find_function_body(function_name, javascript):
         # normalize function name
         function_name = function_name.replace('$', '\$')
-        match = re.search(r'\s?%s=function\((?P<parameter>[^)]+)\)\s?\{\s?(?P<body>[^}]+)\s?\}' % function_name, javascript)
+        match = re.search(r'\s?%s=function\((?P<parameter>[^)]+)\)\s?{\s?(?P<body>[^}]+)\s?\}' % function_name, javascript)
         if match:
             return match.group('parameter'), match.group('body')
 
@@ -173,7 +173,7 @@ class Cipher(object):
                 _function = ''.join([_function, '}'])
             _function = _function.strip()
 
-            match = re.match('(?P<name>[^:]*):function\((?P<parameter>[^)]*)\)\{(?P<body>[^}]+)\}', _function)
+            match = re.match(r'(?P<name>[^:]*):function\((?P<parameter>[^)]*)\){(?P<body>[^}]+)}', _function)
             if match:
                 name = match.group('name').replace('"', '')
                 parameter = match.group('parameter')
