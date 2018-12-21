@@ -95,14 +95,7 @@ def play_video(provider, context):
         item = to_playback_item(context, video_item)
         item.setPath(video_item.get_uri())
 
-        handle = context.get_handle()
-        if handle != -1:
-            xbmcplugin.setResolvedUrl(handle=handle, succeeded=True, listitem=item)
-        else:  # likely that plugin was called from keymaps
-            player = context.get_video_player()
-            player.stop()
-            player.play(list_item=item)
-
+        xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=True, listitem=item)
         playback_monitor(provider=provider, context=context, video_id=video_id, play_count=play_count,
                          use_history=use_history, playback_stats=playback_stats, seek_time=seek_time,
                          refresh_only=screensaver)
