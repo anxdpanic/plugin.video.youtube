@@ -1030,7 +1030,7 @@ class YouTube(LoginClient):
         return watch_later_id
 
     def perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                            allow_redirects=True):
+                           allow_redirects=True):
 
         yt_config = self._config
 
@@ -1080,7 +1080,7 @@ class YouTube(LoginClient):
             return result.json()
 
     def perform_v1_tv_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                               allow_redirects=True):
+                              allow_redirects=True):
         # params
         if not params:
             params = {}
