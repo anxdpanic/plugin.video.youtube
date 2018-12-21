@@ -167,8 +167,8 @@ class Provider(kodion.AbstractProvider):
         self._client = None
         self._is_logged_in = False
 
-        self._v3_handle_error = v3.handle_error
-        self._yt_video = yt_video
+        self.v3_handle_error = v3.handle_error
+        self.yt_video = yt_video
 
     def get_wizard_supported_views(self):
         return ['default', 'episodes']
@@ -984,7 +984,7 @@ class Provider(kodion.AbstractProvider):
         switch = re_match.group('switch')
         settings = context.get_settings()
         if switch == 'youtube':
-            context._addon.openSettings()
+            context.addon().openSettings()
             context.get_ui().refresh_container()
         elif switch == 'mpd':
             use_dash = context.use_inputstream_adaptive()
@@ -1123,14 +1123,14 @@ class Provider(kodion.AbstractProvider):
             success = False
             if _file:
                 if 'sqlite' in _file:
-                    _file_w_path = os.path.join(context._get_cache_path(), _file)
+                    _file_w_path = os.path.join(context.get_cache_path(), _file)
                 elif maint_type == 'temp_files':
                     _file_w_path = _file
                 elif _file == 'playback_history':
                     _file = ''.join([str(context.get_access_manager().get_current_user_id()), '.sqlite'])
                     _file_w_path = os.path.join(os.path.join(context.get_data_path(), 'playback'), _file)
                 else:
-                    _file_w_path = os.path.join(context._data_path, _file)
+                    _file_w_path = os.path.join(context.get_data_path(), _file)
                 if context.get_ui().on_delete_content(_file):
                     if maint_type == 'temp_files':
                         _trans_path = xbmc.translatePath(_file_w_path)

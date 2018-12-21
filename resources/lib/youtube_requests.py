@@ -50,7 +50,7 @@ def v3_request(method='GET', headers=None, path=None, post_data=None, params=Non
         :type addon_id: str
     """
     provider, context, client = __get_core_components(addon_id)
-    return client._perform_v3_request(method=method, headers=headers, path=path, post_data=post_data, params=params, allow_redirects=allow_redirects)
+    return client.perform_v3_request(method=method, headers=headers, path=path, post_data=post_data, params=params, allow_redirects=allow_redirects)
 
 
 def _append_missing_page_token(items):

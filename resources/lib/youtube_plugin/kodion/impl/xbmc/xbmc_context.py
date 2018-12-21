@@ -84,6 +84,9 @@ class XbmcContext(AbstractContext):
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
 
+    def addon(self):
+        return self._addon
+
     def is_plugin_path(self, uri, uri_path):
         return uri.startswith('plugin://%s/%s/' % (self.get_id(), uri_path))
 

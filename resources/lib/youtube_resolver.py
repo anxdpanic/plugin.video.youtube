@@ -37,13 +37,13 @@ def _get_config_and_cookies(client, url):
                'Accept-Encoding': 'gzip, deflate',
                'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-    params = {'hl': client._language,
-              'gl': client._region}
+    params = {'hl': client.get_language(),
+              'gl': client.get_region()}
 
-    if client._access_token:
-        params['access_token'] = client._access_token
+    if client.get_access_token():
+        params['access_token'] = client.get_access_token()
 
-    result = requests.get(url, params=params, headers=headers, verify=client._verify, allow_redirects=True)
+    result = requests.get(url, params=params, headers=headers, verify=client.verify(), allow_redirects=True)
     html = result.text
     cookies = result.cookies
 

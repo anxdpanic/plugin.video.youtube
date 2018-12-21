@@ -63,6 +63,9 @@ class LoginClient(object):
         else:
             print(text)
 
+    def verify(self):
+        return self._verify
+
     def set_access_token(self, access_token=''):
         self._access_token = access_token
 

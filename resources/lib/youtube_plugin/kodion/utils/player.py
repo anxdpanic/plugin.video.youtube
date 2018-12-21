@@ -146,25 +146,25 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
                     playlist_item_id = client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=video_id)
                     if playlist_item_id:
                         json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
-                        if not provider._v3_handle_error(provider, context, json_data):
+                        if not provider.v3_handle_error(provider, context, json_data):
                             return False
 
             history_playlist_id = access_manager.get_watch_history_id()
             if history_playlist_id and history_playlist_id != 'HL':
                 json_data = client.add_video_to_playlist(history_playlist_id, video_id)
-                if not provider._v3_handle_error(provider, context, json_data):
+                if not provider.v3_handle_error(provider, context, json_data):
                     return False
 
             # rate video
             if settings.get_bool('youtube.post.play.rate', False):
                 json_data = client.get_video_rating(video_id)
-                if not provider._v3_handle_error(provider, context, json_data):
+                if not provider.v3_handle_error(provider, context, json_data):
                     return False
                 items = json_data.get('items', [{'rating': 'none'}])
                 rating = items[0].get('rating', 'none')
                 if rating == 'none':
                     rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
-                    provider._yt_video.process('rate', provider, context, rating_match)
+                    provider.yt_video.process('rate', provider, context, rating_match)
 
     if settings.get_bool('youtube.post.play.refresh', False) and \
             not xbmc.getInfoLabel('Container.FolderPath').startswith(context.create_uri(['kodion', 'search', 'input'])):
