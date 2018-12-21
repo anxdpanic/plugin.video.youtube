@@ -60,7 +60,8 @@ class JSONStore(object):
     def get_data(self):
         return deepcopy(self._data)
 
-    def make_dirs(self, path):
+    @staticmethod
+    def make_dirs(path):
         if not path.endswith('/'):
             path = ''.join([path, '/'])
         path = xbmc.translatePath(path)

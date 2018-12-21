@@ -45,7 +45,8 @@ class FunctionCache(Storage):
         """
         self._enabled = False
 
-    def _create_id_from_func(self, partial_func):
+    @staticmethod
+    def _create_id_from_func(partial_func):
         """
         Creats an id from the given function
         :param partial_func:

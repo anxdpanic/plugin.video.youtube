@@ -36,7 +36,8 @@ class SearchHistory(Storage):
     def clear(self):
         self._clear()
 
-    def _make_id(self, search_text):
+    @staticmethod
+    def _make_id(search_text):
         m = hashlib.md5()
         m.update(to_utf8(search_text))
         return m.hexdigest()

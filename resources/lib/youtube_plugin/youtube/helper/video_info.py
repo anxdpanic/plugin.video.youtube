@@ -536,7 +536,8 @@ class VideoInfo(object):
         result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         return {'html': result.text, 'cookies': result.cookies}
 
-    def get_player_config(self, html):
+    @staticmethod
+    def get_player_config(html):
         _player_config = '{}'
 
         lead = 'ytplayer.config = '

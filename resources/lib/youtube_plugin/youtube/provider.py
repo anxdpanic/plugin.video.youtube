@@ -385,7 +385,8 @@ class Provider(kodion.AbstractProvider):
     def get_alternative_fanart(self, context):
         return self.get_fanart(context)
 
-    def get_fanart(self, context):
+    @staticmethod
+    def get_fanart(context):
         return context.create_resource_path('media', 'fanart.jpg')
 
     @kodion.RegisterProviderPath('^/uri2addon/$')
@@ -1508,7 +1509,8 @@ class Provider(kodion.AbstractProvider):
 
         return result
 
-    def set_content_type(self, context, content_type):
+    @staticmethod
+    def set_content_type(context, content_type):
         context.set_content_type(content_type)
         if content_type == kodion.constants.content_type.VIDEOS:
             context.add_sort_method(kodion.constants.sort_method.UNSORTED,

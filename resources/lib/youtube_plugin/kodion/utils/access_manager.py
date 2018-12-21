@@ -227,7 +227,8 @@ class AccessManager(object):
 
         self._jstore.save(self._json)
 
-    def get_new_developer(self):
+    @staticmethod
+    def get_new_developer():
         """
         :return: a new developer dict
         """

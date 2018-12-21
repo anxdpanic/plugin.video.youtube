@@ -101,7 +101,8 @@ class AbstractProvider(object):
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
-    def on_extra_fanart(self, context, re_match):
+    @staticmethod
+    def on_extra_fanart(context, re_match):
         """
         The implementation of the provider can override this behavior.
         :param context:
@@ -127,7 +128,8 @@ class AbstractProvider(object):
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
 
-    def _internal_favorite(self, context, re_match):
+    @staticmethod
+    def _internal_favorite(context, re_match):
         context.add_sort_method(constants.sort_method.LABEL_IGNORE_THE)
 
         params = context.get_params()

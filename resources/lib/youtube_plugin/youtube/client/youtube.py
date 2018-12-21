@@ -38,7 +38,8 @@ class YouTube(LoginClient):
     def get_region(self):
         return self._region
 
-    def calculate_next_page_token(self, page, max_result):
+    @staticmethod
+    def calculate_next_page_token(page, max_result):
         page -= 1
         low = 'AEIMQUYcgkosw048'
         high = 'ABCDEFGHIJKLMNOP'
