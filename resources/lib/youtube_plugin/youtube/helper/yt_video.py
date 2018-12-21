@@ -59,7 +59,7 @@ def _process_rate_video(provider, context, re_match):
             result = -1
 
     if result != -1:
-        client = provider.get_client(context).rate_video(video_id, result)
+        _ = provider.get_client(context).rate_video(video_id, result)
 
         # this will be set if we are in the 'Liked Video' playlist
         if context.get_param('refresh_container', '0') == '1':

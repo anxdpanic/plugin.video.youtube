@@ -31,7 +31,7 @@ class PlaybackHistory(Storage):
             return pickle.loads(obj)
 
         self._open()
-        placeholders = ','.join(['?' for item in keys])
+        placeholders = ','.join(['?' for _ in keys])
         keys = [str(item) for item in keys]
         query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
         query_result = self._execute(False, query, keys)

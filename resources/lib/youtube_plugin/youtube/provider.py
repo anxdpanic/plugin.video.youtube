@@ -432,7 +432,6 @@ class Provider(kodion.AbstractProvider):
     def _on_channel_playlist(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.VIDEOS)
         client = self.get_client(context)
-        settings = context.get_settings()
         result = []
 
         playlist_id = re_match.group('playlist_id')
@@ -781,7 +780,6 @@ class Provider(kodion.AbstractProvider):
         if action == 'switch':
             access_manager_users = access_manager.get_users()
             current_user = access_manager.get_user()
-            user = None
             users = [ui.bold(context.localize(self.LOCAL_MAP['youtube.user.new']))]
             user_index_map = []
             for k in list(access_manager_users.keys()):
@@ -1268,7 +1266,7 @@ class Provider(kodion.AbstractProvider):
             return yt_old_actions.process_old_action(self, context, re_match)
 
         settings = context.get_settings()
-        client = self.get_client(context)  # required for self.is_logged_in()
+        _ = self.get_client(context)  # required for self.is_logged_in()
 
         self.set_content_type(context, kodion.constants.content_type.FILES)
 

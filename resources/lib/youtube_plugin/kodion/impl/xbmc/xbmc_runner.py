@@ -26,7 +26,7 @@ class XbmcRunner(AbstractProviderRunner):
         self.settings = None
 
     def run(self, provider, context=None):
-        results = None
+
         try:
             results = provider.navigate(context)
         except KodionException as ex:

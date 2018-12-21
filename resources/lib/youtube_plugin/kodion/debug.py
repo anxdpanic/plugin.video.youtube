@@ -36,7 +36,7 @@ def runtime(context, addon_version, elapsed, single_file=True):
         default_contents = {"runtimes": {}}
 
     debug_file = os.path.join(context.get_debug_path(), debug_file_name)
-    with open(debug_file, 'a') as f:
+    with open(debug_file, 'a') as _:
         pass  # touch
 
     with open(debug_file, 'r') as f:

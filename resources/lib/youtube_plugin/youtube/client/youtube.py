@@ -83,7 +83,7 @@ class YouTube(LoginClient):
             params['access_token'] = self._access_token
 
         try:
-            result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         except:
             context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
@@ -195,6 +195,7 @@ class YouTube(LoginClient):
                                                 'videoId': video_id}}}
         return self._perform_v3_request(method='POST', path='playlistItems', params=params, post_data=post_data)
 
+    # noinspection PyUnusedLocal
     def remove_video_from_playlist(self, playlist_id, playlist_item_id):
         params = {'id': playlist_item_id}
         return self._perform_v3_request(method='DELETE', path='playlistItems', params=params)
@@ -378,7 +379,7 @@ class YouTube(LoginClient):
             params['id'] = channel_id
         else:
             params['mine'] = 'true'
-        return self._perform_v3_request(method='GET', path='channels', params=params, quota_optimized=False)
+        return self._perform_v3_request(method='GET', path='channels', params=params)
 
     def get_disliked_videos(self, page_token=''):
         # prepare page token
@@ -451,7 +452,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self._perform_v3_request(method='GET', path='search', params=params, quota_optimized=True)
+        return self._perform_v3_request(method='GET', path='search', params=params)
 
     def get_related_videos(self, video_id, page_token=''):
         # prepare page token
@@ -468,7 +469,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self._perform_v3_request(method='GET', path='search', params=params, quota_optimized=True)
+        return self._perform_v3_request(method='GET', path='search', params=params)
 
     def search(self, q, search_type=['video', 'channel', 'playlist'], event_type='', channel_id='', order='relevance', safe_search='moderate', page_token='', location=False):
         """
@@ -530,7 +531,7 @@ class YouTube(LoginClient):
                 params['location'] = location
                 params['locationRadius'] = context.get_settings().get_location_radius()
 
-        return self._perform_v3_request(method='GET', path='search', params=params, quota_optimized=False)
+        return self._perform_v3_request(method='GET', path='search', params=params)
 
     def get_my_subscriptions(self, page_token=None, offset=0):
         if not page_token:
@@ -1021,14 +1022,9 @@ class YouTube(LoginClient):
         return watch_later_id
 
     def _perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                            allow_redirects=True, quota_optimized=True):
+                            allow_redirects=True):
 
-        # first set the config for the corresponding system (Frodo, Gotham, Helix, ...)
         yt_config = self._config
-        # in any case of these APIs we change the config to a common key to save some quota
-        # if quota_optimized and path in ['channels', 'search']:
-        #    yt_config = self.CONFIGS['youtube-for-kodi-quota']
-        #
 
         # params
         if not params:

@@ -59,7 +59,7 @@ def _process_popular_right_now(provider, context, re_match):
 def _process_browse_channels(provider, context, re_match):
     result = []
 
-    page_token = context.get_param('page_token', '')
+    # page_token = context.get_param('page_token', '')
     guide_id = context.get_param('guide_id', '')
     client = provider.get_client(context)
 
@@ -300,7 +300,7 @@ def _process_new_uploaded_videos_tv_filtered(provider, context, re_match):
 
 
 def process(category, provider, context, re_match):
-    client = provider.get_client(context)  # required for provider.is_logged_in()
+    _ = provider.get_client(context)  # required for provider.is_logged_in()
     if not provider.is_logged_in() and category in ['new_uploaded_videos_tv', 'new_uploaded_videos_tv_filtered', 'disliked_videos']:
         return UriItem(context.create_uri(['sign', 'in']))
 

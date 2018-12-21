@@ -214,7 +214,7 @@ def _process_list_response(provider, context, json_data):
                 # if the path directs to a playlist of our own, we correct the channel id to 'mine'
                 if context.get_path() == '/channel/mine/playlists/':
                     channel_id = 'mine'
-                channel_name = snippet.get('channelTitle', '')
+                # channel_name = snippet.get('channelTitle', '')
                 item_params = {}
                 if incognito:
                     item_params.update({'incognito': incognito})

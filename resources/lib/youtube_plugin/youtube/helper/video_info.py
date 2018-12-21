@@ -622,8 +622,8 @@ class VideoInfo(object):
                         self._context.log_debug('unknown yt_format for itag "%s"' % itag)
                         continue
 
-                    width = int(re_match.group('width'))
-                    height = int(re_match.group('height'))
+                    # width = int(re_match.group('width'))
+                    # height = int(re_match.group('height'))
                     video_stream = {'url': line,
                                     'meta': meta_info,
                                     'headers': curl_headers,
@@ -1168,9 +1168,9 @@ class VideoInfo(object):
         try:
             f = xbmcvfs.File(filepath, 'w')
             if PY2:
-                result = f.write(out.encode('utf-8'))
+                _ = f.write(out.encode('utf-8'))
             else:
-                result = f.write(str(out))
+                _ = f.write(str(out))
             f.close()
             return 'http://{ipaddress}:{port}/{video_id}.mpd' \
                        .format(ipaddress=ipaddress, port=self._context.get_settings().httpd_port(), video_id=video_id), stream_info

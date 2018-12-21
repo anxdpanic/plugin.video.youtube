@@ -51,8 +51,6 @@ def run():
     context = Context(plugin_id='plugin.video.youtube')
 
     context.log_debug('YouTube service initialization...')
-    version = context.get_system_version().get_version()
-    settings = context.get_settings()
 
     monitor = YouTubeMonitor()
 

@@ -96,13 +96,12 @@ class LoginClient(object):
             context.log_error('Revoke failed: Code: |%s| Response dump: |%s|' % (str(result.status_code), response_dump))
             raise LoginException('Logout Failed')
 
-    def refresh_token_tv(self, refresh_token, grant_type=''):
+    def refresh_token_tv(self, refresh_token):
         client_id = str(self.CONFIGS['youtube-tv']['id'])
         client_secret = str(self.CONFIGS['youtube-tv']['secret'])
-        return self.refresh_token(refresh_token, client_id=client_id,
-                                  client_secret=client_secret, grant_type=grant_type)
+        return self.refresh_token(refresh_token, client_id=client_id, client_secret=client_secret)
 
-    def refresh_token(self, refresh_token, client_id='', client_secret='', grant_type=''):
+    def refresh_token(self, refresh_token, client_id='', client_secret=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
         headers = {'Host': 'www.googleapis.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',
@@ -149,12 +148,12 @@ class LoginClient(object):
 
         return '', ''
 
-    def request_access_token_tv(self, code, client_id='', client_secret='', grant_type=''):
+    def request_access_token_tv(self, code, client_id='', client_secret=''):
         client_id = client_id or self.CONFIGS['youtube-tv']['id']
         client_secret = client_secret or self.CONFIGS['youtube-tv']['secret']
-        return self.request_access_token(code, client_id=client_id, client_secret=client_secret, grant_type=grant_type)
+        return self.request_access_token(code, client_id=client_id, client_secret=client_secret)
 
-    def request_access_token(self, code, client_id='', client_secret='', grant_type=''):
+    def request_access_token(self, code, client_id='', client_secret=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
         headers = {'Host': 'www.googleapis.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36',

@@ -61,7 +61,7 @@ def process(method, provider, context, re_match):
     result = []
 
     # we need a login
-    client = provider.get_client(context)
+    _ = provider.get_client(context)
     if not provider.is_logged_in():
         return UriItem(context.create_uri(['sign', 'in']))
 

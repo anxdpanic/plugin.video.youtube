@@ -52,7 +52,7 @@ def __auth(addon_id, mode=SIGN_IN):
     provider = Provider()
     context = Context(params=params, plugin_id='plugin.video.youtube')
 
-    client = provider.get_client(context=context)  # NOQA
+    _ = provider.get_client(context=context)  # NOQA
     logged_in = provider.is_logged_in()
     if mode == SIGN_IN:
         if logged_in:
@@ -72,7 +72,7 @@ def __auth(addon_id, mode=SIGN_IN):
     else:
         raise Exception('Unknown mode: |%s|' % mode)
 
-    client = provider.get_client(context=context)  # NOQA
+    _ = provider.get_client(context=context)  # NOQA
     if mode == SIGN_IN:
         return provider.is_logged_in()
     else:

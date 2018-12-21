@@ -24,6 +24,7 @@ from .. import logger
 
 class YouTubeMonitor(xbmc.Monitor):
 
+    # noinspection PyUnusedLocal
     def __init__(self, *args, **kwargs):
         self.addon_id = 'plugin.video.youtube'
         addon = xbmcaddon.Addon(self.addon_id)
