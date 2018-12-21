@@ -29,7 +29,8 @@ class AbstractSettings(object):
 
     def get_int(self, setting_id, default_value, converter=None):
         if not converter:
-            converter = lambda x: x
+            def converter(x):
+                return x
 
         value = self.get_string(setting_id)
         if value is None or value == '':
