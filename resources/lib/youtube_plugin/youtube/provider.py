@@ -389,6 +389,7 @@ class Provider(kodion.AbstractProvider):
     def get_fanart(context):
         return context.create_resource_path('media', 'fanart.jpg')
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/uri2addon/$')
     def on_uri2addon(self, context, re_match):
         uri = context.get_param('uri', '')
@@ -583,6 +584,7 @@ class Provider(kodion.AbstractProvider):
 
         return result
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/location/mine/$')
     def _on_my_location(self, context, re_match):
         self.set_content_type(context, kodion.constants.content_type.FILES)
@@ -633,6 +635,7 @@ class Provider(kodion.AbstractProvider):
         live = index of live stream if channel has multiple live streams
     """
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
@@ -708,6 +711,7 @@ class Provider(kodion.AbstractProvider):
             self.set_content_type(context, kodion.constants.content_type.FILES)
         return yt_specials.process(category, self, context, re_match)
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/history/clear/$')
     def _on_yt_clear_history(self, context, re_match):
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.clear_history_confirmation'])):
@@ -715,6 +719,7 @@ class Provider(kodion.AbstractProvider):
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/watch_later/playlist_id/$')
     def _on_yt_get_watch_later_id(self, context, re_match):
         client = self.get_client(context)
@@ -1029,6 +1034,7 @@ class Provider(kodion.AbstractProvider):
         else:
             return False
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/my_subscriptions/filter/$')
     def manage_my_subscription_filter(self, context, re_match):
         params = context.get_params()
@@ -1161,6 +1167,7 @@ class Provider(kodion.AbstractProvider):
                 else:
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.requires.krypton']))
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/api/update/$')
     def api_key_update(self, context, re_match):
         settings = context.get_settings()
@@ -1212,6 +1219,7 @@ class Provider(kodion.AbstractProvider):
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/show_client_ip/$')
     def show_client_ip(self, context, re_match):
         port = context.get_settings().httpd_port()
@@ -1225,6 +1233,7 @@ class Provider(kodion.AbstractProvider):
         else:
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.httpd.not.running']))
 
+    # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/playback_history/$')
     def on_playback_history(self, context, re_match):
         params = context.get_params()

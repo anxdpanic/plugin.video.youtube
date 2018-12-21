@@ -101,6 +101,7 @@ class AbstractProvider(object):
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
+    # noinspection PyUnusedLocal
     @staticmethod
     def on_extra_fanart(context, re_match):
         """
