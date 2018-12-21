@@ -21,6 +21,7 @@ def debug_here(host='localhost'):
             sys.path.append(pydevd_path)
             break
 
+    # noinspection PyUnresolvedReferences,PyPackageRequirements
     import pydevd
     pydevd.settrace(host, stdoutToServer=True, stderrToServer=True)
 

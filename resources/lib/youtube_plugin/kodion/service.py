@@ -16,6 +16,7 @@ from .utils import YouTubeMonitor
 
 
 def strptime(stamp, stamp_fmt):
+    # noinspection PyUnresolvedReferences
     import _strptime
     try:
         time.strptime('01 01 2012', '%d %m %Y')  # dummy call
