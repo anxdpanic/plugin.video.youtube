@@ -885,7 +885,7 @@ msgstr "La ID de cliente es incorrecta. Ajustes - API - API ID"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "La ID Secreta es incorrecta. Ajustes - API - API Secret"
+msgstr "La API Secreta es incorrecta. Ajustes - API - API Secret"
 
 msgctxt "#30651"
 msgid "Location"
@@ -1025,7 +1025,7 @@ msgstr "Hoy a las"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr "Eliminar base de datos para caché de datos"
+msgstr "Eliminar la base de datos para caché de datos"
 
 msgctxt "#30686"
 msgid "Clear data cache"
@@ -1081,7 +1081,7 @@ msgstr "Comprobar mi dirección IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr "El Servidor HTTP no está funcionando"
+msgstr "El Servidor HTTP no está arrancado"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1089,7 +1089,7 @@ msgstr "La IP del cliente es %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr "No se pudo obtener la IP del cliente"
+msgstr "Error al obtener IP del cliente"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
@@ -1121,12 +1121,12 @@ msgstr "Reproducir solo audio"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Error al recuperar la id para la lista de reproducción Ver más tarde. Para aumentar las posibilidades de recuperación, agregue 8-10 vídeos a Ver más tarde a través de la web/aplicación y vuelva a intentarlo."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Error al recuperar la id para la lista de reproducción Ver más tarde. Inténtalo de nuevo mañana sin quitar ninguno de los vídeos."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "Buscando para Ver más tarde... Página %s"
