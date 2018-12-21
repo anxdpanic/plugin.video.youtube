@@ -11,6 +11,7 @@ from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 from youtube_plugin.youtube.helper import yt_login
 
+# noinspection PyUnresolvedReferences
 from youtube_plugin.youtube.youtube_exceptions import LoginException  # NOQA
 
 

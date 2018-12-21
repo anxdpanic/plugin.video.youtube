@@ -156,6 +156,7 @@ def datetime_to_since(context, dt):
 
 
 def strptime(s, fmt="%Y-%m-%dT%H:%M:%S.%fZ"):
+    # noinspection PyUnresolvedReferences
     import _strptime
     try:
         time.strptime('01 01 2012', '%d %m %Y')  # dummy call

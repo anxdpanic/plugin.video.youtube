@@ -9,7 +9,9 @@
 """
 
 import sys
+
 from .. import constants
+from ..logger import log_debug
 
 
 class AbstractSettings(object):
@@ -36,9 +38,7 @@ class AbstractSettings(object):
         try:
             return converter(int(value))
         except Exception as ex:
-            from . import log
-
-            log("Failed to get setting '%s' as 'int' (%s)" % setting_id, ex.__str__())
+            log_debug("Failed to get setting '%s' as 'int' (%s)" % setting_id, ex.__str__())
 
         return default_value
 

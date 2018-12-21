@@ -353,7 +353,7 @@ class YouTube(LoginClient):
     def get_channel_by_username(self, username):
         """
         Returns a collection of zero or more channel resources that match the request criteria.
-        :param channel_id: list or comma-separated list of the YouTube channel ID(s)
+        :param username: retrieve channel_id for username
         :return:
         """
         params = {'part': 'id'}

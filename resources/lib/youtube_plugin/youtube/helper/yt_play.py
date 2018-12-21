@@ -116,13 +116,13 @@ def play_playlist(provider, context, re_match):
     videos = []
 
     def _load_videos(_page_token='', _progress_dialog=None):
-        if not _progress_dialog:
+        if _progress_dialog is None:
             _progress_dialog = context.get_ui().create_progress_dialog(
                 context.localize(provider.LOCAL_MAP['youtube.playlist.progress.updating']),
                 context.localize(constants.localize.COMMON_PLEASE_WAIT), background=True)
         json_data = client.get_playlist_items(playlist_id, page_token=_page_token)
         if not v3.handle_error(provider, context, json_data):
-            return False
+            return None
         _progress_dialog.set_total(int(json_data.get('pageInfo', {}).get('totalResults', 0)))
 
         result = v3.response_to_items(provider, context, json_data, process_next_page=False)

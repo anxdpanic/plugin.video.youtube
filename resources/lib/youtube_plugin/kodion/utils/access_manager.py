@@ -153,8 +153,7 @@ class AccessManager(object):
     def set_last_origin(self, origin):
         """
         Updates the origin
-        :param user: string, origin
-        :param switch_to: boolean, change last origin
+        :param origin: string, origin
         :return:
         """
         self._last_origin = origin

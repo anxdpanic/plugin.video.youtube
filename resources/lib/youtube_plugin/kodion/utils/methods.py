@@ -19,7 +19,6 @@ import re
 from ..constants import localize
 
 import xbmc
-import xbmcaddon
 import xbmcvfs
 
 
