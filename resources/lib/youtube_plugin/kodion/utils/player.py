@@ -14,9 +14,7 @@ import xbmc
 
 def playback_monitor(provider, context, video_id, play_count=0, use_history=False,
                      playback_stats=None, seek_time=None, refresh_only=False):
-    client = provider.get_client(context)
     access_manager = context.get_access_manager()
-    is_logged_in = provider.is_logged_in()
 
     monitor = xbmc.Monitor()
     player = xbmc.Player()
@@ -52,6 +50,9 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
         np_waited += np_wait_time
 
+    client = provider.get_client(context)
+    is_logged_in = provider.is_logged_in()
+
     if is_logged_in and playback_stats.get('playback_url', ''):
         client.update_watch_history(video_id, playback_stats.get('playback_url'))
         context.log_debug('Playback start reported: |%s|' % video_id)
@@ -77,6 +78,10 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
             seek_time = None
 
         if p_waited >= 10.0:
+            provider.reset_client()  # refresh client, tokens may need refreshing
+            client = provider.get_client(context)
+            is_logged_in = provider.is_logged_in()
+
             if current_time == played_time:
                 last_state = state
                 state = 'paused'
@@ -113,7 +118,11 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
         p_waited += p_wait_time
 
     context.log_debug('Playback stopped [%s]: %s secs of %s @ %s%%' % (video_id, format(current_time, '.3f'), format(total_time, '.3f'), percent_complete))
+
     state = 'stopped'
+    provider.reset_client()  # refresh client, tokens may need refreshing
+    client = provider.get_client(context)
+    is_logged_in = provider.is_logged_in()
 
     if percent_complete >= settings.get_play_count_min_percent():
         play_count = '1'
