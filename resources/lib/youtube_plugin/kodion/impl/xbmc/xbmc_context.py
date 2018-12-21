@@ -107,9 +107,8 @@ class XbmcContext(AbstractContext):
         """
         The xbmc.getLanguage() method is fucked up!!! We always return 'en-US' for now
         """
-        return 'en-US'
 
-        """
+        '''
         if self.get_system_version().get_release_name() == 'Frodo':
             return 'en-US'
 
@@ -121,7 +120,9 @@ class XbmcContext(AbstractContext):
         except Exception, ex:
             self.log_error('Failed to get system language (%s)', ex.__str__())
             return 'en-US'
-        """
+        '''
+
+        return 'en-US'
 
     def get_video_playlist(self):
         if not self._video_playlist:

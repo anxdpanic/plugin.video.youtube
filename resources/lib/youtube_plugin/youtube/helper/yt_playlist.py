@@ -264,5 +264,3 @@ def process(method, category, provider, context, re_match):
         return _history_playlist_id_change(provider, context, re_match, method)
     else:
         raise kodion.KodionException("Unknown category '%s' or method '%s'" % (category, method))
-
-    return True

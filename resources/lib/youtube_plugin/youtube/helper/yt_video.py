@@ -105,5 +105,3 @@ def process(method, provider, context, re_match):
         return _process_more_for_video(provider, context, re_match)
     else:
         raise kodion.KodionException("Unknown method '%s'" % method)
-
-    return True
