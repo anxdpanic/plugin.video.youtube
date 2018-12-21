@@ -160,7 +160,7 @@ class Cipher(object):
         return ''
 
     def _get_object_function(self, object_name, function_name, javascript):
-        if not object_name in self._object_cache:
+        if object_name not in self._object_cache:
             self._object_cache[object_name] = {}
         else:
             if function_name in self._object_cache[object_name]:

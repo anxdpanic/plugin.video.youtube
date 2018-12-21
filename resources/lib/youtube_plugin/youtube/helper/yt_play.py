@@ -150,7 +150,7 @@ def play_playlist(provider, context, re_match):
             items.append((context.localize(provider.LOCAL_MAP['youtube.playlist.play.%s' % order]), order))
 
         order = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.playlist.play.select']), items)
-        if not order in order_list:
+        if order not in order_list:
             return False
 
     player = context.get_video_player()

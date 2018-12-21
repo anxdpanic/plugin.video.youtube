@@ -111,7 +111,7 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
 
         # update channel mapping
         if channel_items_dict is not None:
-            if not channel_id in channel_items_dict:
+            if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(channel_item)
 
@@ -178,7 +178,7 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
 
         # update channel mapping
         if channel_items_dict is not None:
-            if not channel_id in channel_items_dict:
+            if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(playlist_item)
 
@@ -305,7 +305,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         # update channel mapping
         channel_id = snippet.get('channelId', '')
         if channel_items_dict is not None:
-            if not channel_id in channel_items_dict:
+            if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(video_item)
 
