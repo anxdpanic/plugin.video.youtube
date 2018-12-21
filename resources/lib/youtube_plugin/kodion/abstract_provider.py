@@ -33,13 +33,13 @@ class AbstractProvider(object):
         self._dict_path = {}
 
         # register some default paths
-        self.register_path('^/$', '_internal_root')
-        self.register_path(''.join(['^/', constants.paths.WATCH_LATER, '/(?P<command>add|remove|list)/?$']),
+        self.register_path(r'^/$', '_internal_root')
+        self.register_path(r''.join(['^/', constants.paths.WATCH_LATER, '/(?P<command>add|remove|list)/?$']),
                            '_internal_watch_later')
-        self.register_path(''.join(['^/', constants.paths.FAVORITES, '/(?P<command>add|remove|list)/?$']), '_internal_favorite')
-        self.register_path(''.join(['^/', constants.paths.SEARCH, '/(?P<command>input|query|list|remove|clear|rename)/?$']),
+        self.register_path(r''.join(['^/', constants.paths.FAVORITES, '/(?P<command>add|remove|list)/?$']), '_internal_favorite')
+        self.register_path(r''.join(['^/', constants.paths.SEARCH, '/(?P<command>input|query|list|remove|clear|rename)/?$']),
                            '_internal_search')
-        self.register_path('(?P<path>.*\/)extrafanart\/([\?#].+)?$', '_internal_on_extra_fanart')
+        self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$', '_internal_on_extra_fanart')
 
         """
         Test each method of this class for the appended attribute '_re_match' by the

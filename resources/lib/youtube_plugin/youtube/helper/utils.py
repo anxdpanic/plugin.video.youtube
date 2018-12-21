@@ -34,7 +34,7 @@ __RE_SEASON_EPISODE_MATCHES__ = [re.compile(r'Part (?P<episode>\d+)'),
 def extract_urls(text):
     result = []
 
-    re_url = re.compile('(https?://[^\s]+)')
+    re_url = re.compile(r'(https?://[^\s]+)')
     matches = re_url.findall(text)
     result = matches or result
 

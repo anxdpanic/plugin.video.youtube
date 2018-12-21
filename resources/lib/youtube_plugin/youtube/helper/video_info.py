@@ -575,7 +575,7 @@ class VideoInfo(object):
 
         player_config['args']['player_response'] = dict()
 
-        result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
+        result = re.search(r'window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
         if result:
             try:
                 player_config['args']['player_response'] = json.loads(result.group('player_response'))

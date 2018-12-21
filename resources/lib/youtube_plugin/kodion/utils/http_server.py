@@ -219,7 +219,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             response_body = content_split[1]
             response_length = len(response_body)
 
-            match = re.search('^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', response_header, re.MULTILINE)
+            match = re.search(r'^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', response_header, re.MULTILINE)
             if match:
                 authorized_types = match.group('authorized_types').split(',')
                 logger.log_debug('HTTPServer: Found authorized formats |{authorized_fmts}|'.format(authorized_fmts=authorized_types))
