@@ -23,7 +23,9 @@ _context = Context(plugin_id='plugin.video.youtube')
 
 
 class YouTube(LoginClient):
-    def __init__(self, config={}, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
+    def __init__(self, config=None, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
+        if config is None:
+            config = {}
         LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
                              access_token_tv=access_token_tv)
 
@@ -473,7 +475,7 @@ class YouTube(LoginClient):
 
         return self._perform_v3_request(method='GET', path='search', params=params)
 
-    def search(self, q, search_type=['video', 'channel', 'playlist'], event_type='', channel_id='',
+    def search(self, q, search_type=None, event_type='', channel_id='',
                order='relevance', safe_search='moderate', page_token='', location=False):
         """
         Returns a collection of search results that match the query parameters specified in the API request. By default,
@@ -489,6 +491,9 @@ class YouTube(LoginClient):
         :param location: bool, use geolocation
         :return:
         """
+
+        if search_type is None:
+            search_type = ['video', 'channel', 'playlist']
 
         # prepare search type
         if not search_type:

@@ -60,7 +60,9 @@ class Storage(object):
             # self._cursor.execute('PRAGMA synchronous=OFF')
             self._create_table()
 
-    def _execute(self, needs_commit, query, values=[]):
+    def _execute(self, needs_commit, query, values=None):
+        if values is None:
+            values = []
         if not self._needs_commit and needs_commit:
             self._needs_commit = True
             self._cursor.execute('BEGIN')

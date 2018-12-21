@@ -94,7 +94,9 @@ class XbmcContextUI(AbstractContextUI):
         text = self._context.localize(constants.localize.DELETE_CONTENT) % utils.to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_DELETE), text)
 
-    def on_select(self, title, items=[]):
+    def on_select(self, title, items=None):
+        if items is None:
+            items = []
         major_version = self._context.get_system_version().get_version()[0]
         if isinstance(items[0], tuple) and len(items[0]) == 4 and major_version <= 16:
             items = [(item[0], item[2]) for item in items]

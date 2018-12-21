@@ -45,7 +45,10 @@ def get_thumb_timestamp(minutes=15):
     return str(time.mktime(time.gmtime(minutes * 60 * (round(time.time() / (minutes * 60))))))
 
 
-def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict={}, channel_items_dict=None):
+def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict=None, channel_items_dict=None):
+    if subscription_id_dict is None:
+        subscription_id_dict = {}
+
     channel_ids = list(channel_id_dict.keys())
     if len(channel_ids) == 0:
         return
