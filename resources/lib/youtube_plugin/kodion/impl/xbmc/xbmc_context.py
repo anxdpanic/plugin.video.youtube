@@ -30,7 +30,7 @@ from ... import utils
 
 
 class XbmcContext(AbstractContext):
-    def __init__(self, path='/', params=None, plugin_name=u'', plugin_id=u'', override=True):
+    def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
         AbstractContext.__init__(self, path, params, plugin_name, plugin_id)
 
         if plugin_id:
