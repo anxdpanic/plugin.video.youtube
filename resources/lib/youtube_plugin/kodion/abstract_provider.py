@@ -33,13 +33,13 @@ class AbstractProvider(object):
         self._dict_path = {}
 
         # register some default paths
-        self.register_path('^/$', '_internal_root')
-        self.register_path(''.join(['^/', constants.paths.WATCH_LATER, '/(?P<command>add|remove|list)/?$']),
+        self.register_path(r'^/$', '_internal_root')
+        self.register_path(r''.join(['^/', constants.paths.WATCH_LATER, '/(?P<command>add|remove|list)/?$']),
                            '_internal_watch_later')
-        self.register_path(''.join(['^/', constants.paths.FAVORITES, '/(?P<command>add|remove|list)/?$']), '_internal_favorite')
-        self.register_path(''.join(['^/', constants.paths.SEARCH, '/(?P<command>input|query|list|remove|clear|rename)/?$']),
+        self.register_path(r''.join(['^/', constants.paths.FAVORITES, '/(?P<command>add|remove|list)/?$']), '_internal_favorite')
+        self.register_path(r''.join(['^/', constants.paths.SEARCH, '/(?P<command>input|query|list|remove|clear|rename)/?$']),
                            '_internal_search')
-        self.register_path('(?P<path>.*\/)extrafanart\/([\?#].+)?$', '_internal_on_extra_fanart')
+        self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$', '_internal_on_extra_fanart')
 
         """
         Test each method of this class for the appended attribute '_re_match' by the
@@ -101,7 +101,9 @@ class AbstractProvider(object):
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
-    def on_extra_fanart(self, context, re_match):
+    # noinspection PyUnusedLocal
+    @staticmethod
+    def on_extra_fanart(context, re_match):
         """
         The implementation of the provider can override this behavior.
         :param context:
@@ -127,7 +129,8 @@ class AbstractProvider(object):
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
 
-    def _internal_favorite(self, context, re_match):
+    @staticmethod
+    def _internal_favorite(context, re_match):
         context.add_sort_method(constants.sort_method.LABEL_IGNORE_THE)
 
         params = context.get_params()

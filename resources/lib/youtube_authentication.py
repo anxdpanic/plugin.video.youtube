@@ -11,6 +11,7 @@ from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 from youtube_plugin.youtube.helper import yt_login
 
+# noinspection PyUnresolvedReferences
 from youtube_plugin.youtube.youtube_exceptions import LoginException  # NOQA
 
 
@@ -51,27 +52,27 @@ def __auth(addon_id, mode=SIGN_IN):
     provider = Provider()
     context = Context(params=params, plugin_id='plugin.video.youtube')
 
-    client = provider.get_client(context=context)  # NOQA
+    _ = provider.get_client(context=context)  # NOQA
     logged_in = provider.is_logged_in()
     if mode == SIGN_IN:
         if logged_in:
             return True
         else:
             provider.reset_client()
-            yt_login.process(mode, provider, context, re_match=None, sign_out_refresh=False)
+            yt_login.process(mode, provider, context, sign_out_refresh=False)
     elif mode == SIGN_OUT:
         if not logged_in:
             return True
         else:
             provider.reset_client()
             try:
-                yt_login.process(mode, provider, context, re_match=None, sign_out_refresh=False)
+                yt_login.process(mode, provider, context, sign_out_refresh=False)
             except:
                 reset_access_tokens(addon_id)
     else:
         raise Exception('Unknown mode: |%s|' % mode)
 
-    client = provider.get_client(context=context)  # NOQA
+    _ = provider.get_client(context=context)  # NOQA
     if mode == SIGN_IN:
         return provider.is_logged_in()
     else:

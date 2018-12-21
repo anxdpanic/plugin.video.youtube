@@ -66,20 +66,20 @@ class Cipher(object):
         json_script = {'actions': []}
         for line in function_body:
             # list of characters
-            split_match = re.match('%s\s?=\s?%s.split\(""\)' % (function_parameter[0], function_parameter[0]), line)
+            split_match = re.match(r'%s\s?=\s?%s.split\(""\)' % (function_parameter[0], function_parameter[0]), line)
             if split_match:
                 json_script['actions'].append({'func': 'list',
                                                'params': ['%SIG%']})
 
             # return
-            return_match = re.match('return\s+%s.join\(""\)' % function_parameter[0], line)
+            return_match = re.match(r'return\s+%s.join\(""\)' % function_parameter[0], line)
             if return_match:
                 json_script['actions'].append({'func': 'join',
                                                'params': ['%SIG%']})
 
             # real object functions
             cipher_match = re.match(
-                r'(?P<object_name>[\$a-zA-Z0-9]+)\.?\[?"?(?P<function_name>[\$a-zA-Z0-9]+)"?\]?\((?P<parameter>[^)]+)\)',
+                r'(?P<object_name>[$a-zA-Z0-9]+)\.?\[?"?(?P<function_name>[$a-zA-Z0-9]+)"?\]?\((?P<parameter>[^)]+)\)',
                 line)
             if cipher_match:
                 object_name = cipher_match.group('object_name')
@@ -98,27 +98,27 @@ class Cipher(object):
                 _function = self._get_object_function(object_name, function_name, javascript)
 
                 # try to find known functions and convert them to our json_script
-                slice_match = re.match('[a-zA-Z]+.slice\((?P<a>\d+),[a-zA-Z]+\)', _function['body'][0])
+                slice_match = re.match(r'[a-zA-Z]+.slice\((?P<a>\d+),[a-zA-Z]+\)', _function['body'][0])
                 if slice_match:
                     a = int(slice_match.group('a'))
                     params = ['%SIG%', a, parameter[1]]
                     json_script['actions'].append({'func': 'slice',
                                                    'params': params})
 
-                splice_match = re.match('[a-zA-Z]+.splice\((?P<a>\d+),[a-zA-Z]+\)', _function['body'][0])
+                splice_match = re.match(r'[a-zA-Z]+.splice\((?P<a>\d+),[a-zA-Z]+\)', _function['body'][0])
                 if splice_match:
                     a = int(splice_match.group('a'))
                     params = ['%SIG%', a, parameter[1]]
                     json_script['actions'].append({'func': 'splice',
                                                    'params': params})
 
-                swap_match = re.match('var\s?[a-zA-Z]+=\s?[a-zA-Z]+\[0\]', _function['body'][0])
+                swap_match = re.match(r'var\s?[a-zA-Z]+=\s?[a-zA-Z]+\[0\]', _function['body'][0])
                 if swap_match:
                     params = ['%SIG%', parameter[1]]
                     json_script['actions'].append({'func': 'swap',
                                                    'params': params})
 
-                reverse_match = re.match('[a-zA-Z].reverse\(\)', _function['body'][0])
+                reverse_match = re.match(r'[a-zA-Z].reverse\(\)', _function['body'][0])
                 if reverse_match:
                     params = ['%SIG%']
                     json_script['actions'].append({'func': 'reverse',
@@ -144,8 +144,8 @@ class Cipher(object):
     @staticmethod
     def _find_function_body(function_name, javascript):
         # normalize function name
-        function_name = function_name.replace('$', '\$')
-        match = re.search(r'\s?%s=function\((?P<parameter>[^)]+)\)\s?\{\s?(?P<body>[^}]+)\s?\}' % function_name, javascript)
+        function_name = function_name.replace('$', '\\$')
+        match = re.search(r'\s?%s=function\((?P<parameter>[^)]+)\)\s?{\s?(?P<body>[^}]+)\s?\}' % function_name, javascript)
         if match:
             return match.group('parameter'), match.group('body')
 
@@ -153,14 +153,14 @@ class Cipher(object):
 
     @staticmethod
     def _find_object_body(object_name, javascript):
-        object_name = object_name.replace('$', '\$')
+        object_name = object_name.replace('$', '\\$')
         match = re.search(r'var %s={(?P<object_body>.*?})};' % object_name, javascript, re.S)
         if match:
             return match.group('object_body')
         return ''
 
     def _get_object_function(self, object_name, function_name, javascript):
-        if not object_name in self._object_cache:
+        if object_name not in self._object_cache:
             self._object_cache[object_name] = {}
         else:
             if function_name in self._object_cache[object_name]:
@@ -173,7 +173,7 @@ class Cipher(object):
                 _function = ''.join([_function, '}'])
             _function = _function.strip()
 
-            match = re.match('(?P<name>[^:]*):function\((?P<parameter>[^)]*)\)\{(?P<body>[^}]+)\}', _function)
+            match = re.match(r'(?P<name>[^:]*):function\((?P<parameter>[^)]*)\){(?P<body>[^}]+)}', _function)
             if match:
                 name = match.group('name').replace('"', '')
                 parameter = match.group('parameter')

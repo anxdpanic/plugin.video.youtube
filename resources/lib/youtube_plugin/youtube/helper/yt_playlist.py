@@ -14,7 +14,7 @@ from ... import kodion
 from ...youtube.helper import v3
 
 
-def _process_add_video(provider, context, re_match):
+def _process_add_video(provider, context):
     listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
     client = provider.get_client(context)
 
@@ -41,7 +41,7 @@ def _process_add_video(provider, context, re_match):
     return True
 
 
-def _process_remove_video(provider, context, re_match):
+def _process_remove_video(provider, context):
     listitem_playlist_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_id)')
     listitem_playlist_item_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_item_id)')
     listitem_title = context.get_ui().get_info_label('Container.ListItem(0).Title')
@@ -81,7 +81,7 @@ def _process_remove_video(provider, context, re_match):
     return True
 
 
-def _process_remove_playlist(provider, context, re_match):
+def _process_remove_playlist(provider, context):
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
         raise kodion.KodionException('Playlist/Remove: missing playlist_id')
@@ -99,7 +99,7 @@ def _process_remove_playlist(provider, context, re_match):
     return True
 
 
-def _process_select_playlist(provider, context, re_match):
+def _process_select_playlist(provider, context):
     listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')  # do this asap, relies on listitems focus
     ui = context.get_ui()
     page_token = ''
@@ -170,7 +170,7 @@ def _process_select_playlist(provider, context, re_match):
                     new_params.update(context.get_params())
                     new_params['playlist_id'] = playlist_id
                     new_context = context.clone(new_params=new_params)
-                    _process_add_video(provider, new_context, re_match)
+                    _process_add_video(provider, new_context)
             break
         elif result == 'playlist.next':
             continue
@@ -179,13 +179,13 @@ def _process_select_playlist(provider, context, re_match):
             new_params.update(context.get_params())
             new_params['playlist_id'] = result
             new_context = context.clone(new_params=new_params)
-            _process_add_video(provider, new_context, re_match)
+            _process_add_video(provider, new_context)
             break
         else:
             break
 
 
-def _process_rename_playlist(provider, context, re_match):
+def _process_rename_playlist(provider, context):
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
         raise kodion.KodionException('playlist/rename: missing playlist_id')
@@ -201,7 +201,7 @@ def _process_rename_playlist(provider, context, re_match):
         context.get_ui().refresh_container()
 
 
-def _watchlater_playlist_id_change(provider, context, re_match, method):
+def _watchlater_playlist_id_change(context, method):
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
         raise kodion.KodionException('watchlater_list/%s: missing playlist_id' % method)
@@ -224,7 +224,7 @@ def _watchlater_playlist_id_change(provider, context, re_match, method):
     context.get_ui().refresh_container()
 
 
-def _history_playlist_id_change(provider, context, re_match, method):
+def _history_playlist_id_change(context, method):
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
         raise kodion.KodionException('history_list/%s: missing playlist_id' % method)
@@ -247,22 +247,20 @@ def _history_playlist_id_change(provider, context, re_match, method):
     context.get_ui().refresh_container()
 
 
-def process(method, category, provider, context, re_match):
+def process(method, category, provider, context):
     if method == 'add' and category == 'video':
-        return _process_add_video(provider, context, re_match)
+        return _process_add_video(provider, context)
     elif method == 'remove' and category == 'video':
-        return _process_remove_video(provider, context, re_match)
+        return _process_remove_video(provider, context)
     elif method == 'remove' and category == 'playlist':
-        return _process_remove_playlist(provider, context, re_match)
+        return _process_remove_playlist(provider, context)
     elif method == 'select' and category == 'playlist':
-        return _process_select_playlist(provider, context, re_match)
+        return _process_select_playlist(provider, context)
     elif method == 'rename' and category == 'playlist':
-        return _process_rename_playlist(provider, context, re_match)
+        return _process_rename_playlist(provider, context)
     elif (method == 'set' or method == 'remove') and category == 'watchlater':
-        return _watchlater_playlist_id_change(provider, context, re_match, method)
+        return _watchlater_playlist_id_change(context, method)
     elif (method == 'set' or method == 'remove') and category == 'history':
-        return _history_playlist_id_change(provider, context, re_match, method)
+        return _history_playlist_id_change(context, method)
     else:
         raise kodion.KodionException("Unknown category '%s' or method '%s'" % (category, method))
-
-    return True

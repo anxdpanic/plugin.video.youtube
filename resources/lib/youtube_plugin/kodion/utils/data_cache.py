@@ -9,6 +9,7 @@
 """
 
 from six import PY2
+# noinspection PyPep8Naming
 from six.moves import cPickle as pickle
 
 import json
@@ -46,7 +47,7 @@ class DataCache(Storage):
             return pickle.loads(obj)
 
         current_time = datetime.now()
-        placeholders = ','.join(['?' for item in content_ids])
+        placeholders = ','.join(['?' for _ in content_ids])
         keys = [str(item) for item in content_ids]
         query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
 

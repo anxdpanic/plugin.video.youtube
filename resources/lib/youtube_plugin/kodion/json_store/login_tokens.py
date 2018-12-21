@@ -11,6 +11,7 @@ import uuid
 from . import JSONStore
 
 
+# noinspection PyTypeChecker
 class LoginTokenStore(JSONStore):
     def __init__(self):
         JSONStore.__init__(self, 'access_manager.json')
@@ -53,10 +54,11 @@ class LoginTokenStore(JSONStore):
             del data['access_manager']['default']
         # end clean up
 
-        if 'watch_later' not in data['access_manager']['users'][data['access_manager']['current_user']]:
-            data['access_manager']['users'][data['access_manager']['current_user']]['watch_later'] = ' WL'
-        if 'watch_history' not in data['access_manager']['users'][data['access_manager']['current_user']]:
-            data['access_manager']['users'][data['access_manager']['current_user']]['watch_history'] = 'HL'
+        current_user = data['access_manager']['current_user']
+        if 'watch_later' not in data['access_manager']['users'][current_user]:
+            data['access_manager']['users'][current_user]['watch_later'] = ' WL'
+        if 'watch_history' not in data['access_manager']['users'][current_user]:
+            data['access_manager']['users'][current_user]['watch_history'] = 'HL'
 
         # ensure all users have uuid
         uuids = list()

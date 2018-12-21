@@ -22,7 +22,6 @@ try:
 except ImportError:
     inputstreamhelper = None
 
-
 __RE_SEASON_EPISODE_MATCHES__ = [re.compile(r'Part (?P<episode>\d+)'),
                                  re.compile(r'#(?P<episode>\d+)'),
                                  re.compile(r'Ep.[^\w]?(?P<episode>\d+)'),
@@ -35,7 +34,7 @@ __RE_SEASON_EPISODE_MATCHES__ = [re.compile(r'Part (?P<episode>\d+)'),
 def extract_urls(text):
     result = []
 
-    re_url = re.compile('(https?://[^\s]+)')
+    re_url = re.compile(r'(https?://[^\s]+)')
     matches = re_url.findall(text)
     result = matches or result
 
@@ -46,7 +45,10 @@ def get_thumb_timestamp(minutes=15):
     return str(time.mktime(time.gmtime(minutes * 60 * (round(time.time() / (minutes * 60))))))
 
 
-def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict={}, channel_items_dict=None):
+def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict=None, channel_items_dict=None):
+    if subscription_id_dict is None:
+        subscription_id_dict = {}
+
     channel_ids = list(channel_id_dict.keys())
     if len(channel_ids) == 0:
         return
@@ -111,7 +113,7 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
 
         # update channel mapping
         if channel_items_dict is not None:
-            if not channel_id in channel_items_dict:
+            if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(channel_item)
 
@@ -178,7 +180,7 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
 
         # update channel mapping
         if channel_items_dict is not None:
-            if not channel_id in channel_items_dict:
+            if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(playlist_item)
 
@@ -305,7 +307,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         # update channel mapping
         channel_id = snippet.get('channelId', '')
         if channel_items_dict is not None:
-            if not channel_id in channel_items_dict:
+            if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(video_item)
 
@@ -384,8 +386,9 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                 yt_context_menu.append_reset_resume_point(context_menu, provider, context, video_id)
 
         # more...
-        refresh_container = context.get_path().startswith('/channel/mine/playlist/LL') or \
-                            context.get_path() == '/special/disliked_videos/'
+        refresh_container = \
+            context.get_path().startswith('/channel/mine/playlist/LL') or \
+            context.get_path() == '/special/disliked_videos/'
         yt_context_menu.append_more_for_video(context_menu, provider, context, video_id,
                                               is_logged_in=provider.is_logged_in(),
                                               refresh_container=refresh_container)

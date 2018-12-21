@@ -16,6 +16,7 @@ from .utils import YouTubeMonitor
 
 
 def strptime(stamp, stamp_fmt):
+    # noinspection PyUnresolvedReferences
     import _strptime
     try:
         time.strptime('01 01 2012', '%d %m %Y')  # dummy call
@@ -27,7 +28,8 @@ def strptime(stamp, stamp_fmt):
 def get_stamp_diff(current_stamp):
     stamp_format = '%Y-%m-%d %H:%M:%S.%f'
     current_datetime = datetime.now()
-    if not current_stamp: return 86400  # 24 hrs
+    if not current_stamp:
+        return 86400  # 24 hrs
     try:
         stamp_datetime = datetime(*(strptime(current_stamp, stamp_format)[0:6]))
     except ValueError:  # current_stamp has no microseconds
@@ -50,8 +52,6 @@ def run():
     context = Context(plugin_id='plugin.video.youtube')
 
     context.log_debug('YouTube service initialization...')
-    version = context.get_system_version().get_version()
-    settings = context.get_settings()
 
     monitor = YouTubeMonitor()
 

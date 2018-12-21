@@ -19,7 +19,6 @@ import re
 from ..constants import localize
 
 import xbmc
-import xbmcaddon
 import xbmcvfs
 
 
@@ -239,7 +238,7 @@ def make_dirs(path):
     path = xbmc.translatePath(path)
     if not xbmcvfs.exists(path):
         try:
-            r = xbmcvfs.mkdirs(path)
+            _ = xbmcvfs.mkdirs(path)
         except:
             pass
         if not xbmcvfs.exists(path):

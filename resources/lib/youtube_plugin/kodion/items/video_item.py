@@ -62,6 +62,7 @@ class VideoItem(BaseItem):
     def add_artist(self, artist):
         if self._artist is None:
             self._artist = []
+        # noinspection PyUnresolvedReferences
         self._artist.append(artist)
 
     def get_artist(self):
@@ -126,6 +127,7 @@ class VideoItem(BaseItem):
     def add_cast(self, cast):
         if self._cast is None:
             self._cast = []
+        # noinspection PyUnresolvedReferences
         self._cast.append(cast)
 
     def get_cast(self):

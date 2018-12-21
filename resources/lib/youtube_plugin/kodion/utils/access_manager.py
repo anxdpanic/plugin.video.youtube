@@ -34,10 +34,9 @@ class AccessManager(object):
         self._json = self._jstore.get_data()
         return self._json['access_manager']['users'][self.get_user()]['id']
 
-    def get_new_user(self, user_name='', addon_id=''):
+    def get_new_user(self, user_name=''):
         """
         :param user_name: string, users name
-        :param addon_id: string, addon id
         :return: a new user dict
         """
         uuids = list()
@@ -153,8 +152,7 @@ class AccessManager(object):
     def set_last_origin(self, origin):
         """
         Updates the origin
-        :param user: string, origin
-        :param switch_to: boolean, change last origin
+        :param origin: string, origin
         :return:
         """
         self._last_origin = origin
@@ -229,9 +227,9 @@ class AccessManager(object):
 
         self._jstore.save(self._json)
 
-    def get_new_developer(self, addon_id):
+    @staticmethod
+    def get_new_developer():
         """
-        :param addon_id: string, addon id
         :return: a new developer dict
         """
 

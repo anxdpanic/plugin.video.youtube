@@ -37,13 +37,13 @@ def _get_config_and_cookies(client, url):
                'Accept-Encoding': 'gzip, deflate',
                'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
 
-    params = {'hl': client._language,
-              'gl': client._region}
+    params = {'hl': client.get_language(),
+              'gl': client.get_region()}
 
-    if client._access_token:
-        params['access_token'] = client._access_token
+    if client.get_access_token():
+        params['access_token'] = client.get_access_token()
 
-    result = requests.get(url, params=params, headers=headers, verify=client._verify, allow_redirects=True)
+    result = requests.get(url, params=params, headers=headers, verify=client.verify(), allow_redirects=True)
     html = result.text
     cookies = result.cookies
 
@@ -57,7 +57,7 @@ def _get_config_and_cookies(client, url):
         if pos >= 0:
             _player_config = html2[:pos]
 
-    blank_config = re.search('var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
+    blank_config = re.search(r'var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
     if not blank_config:
         player_config = dict()
     else:
@@ -83,7 +83,7 @@ def _get_config_and_cookies(client, url):
 
     player_config['args']['player_response'] = dict()
 
-    result = re.search('window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
+    result = re.search(r'window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
     if result:
         try:
             player_config['args']['player_response'] = json.loads(result.group('player_response'))
@@ -110,10 +110,10 @@ def resolve(video_id, sort=True, addon_id=None):
     provider, context, client = _get_core_components(addon_id)
     streams = None
 
-    if re.match('[a-zA-Z0-9_\-]{11}', video_id):
+    if re.match(r'[a-zA-Z0-9_\-]{11}', video_id):
         streams = client.get_video_streams(context=context, video_id=video_id)
     else:
-        url_patterns = ['(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
+        url_patterns = [r'(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
         for pattern in url_patterns:
             v_id = re.search(pattern, video_id)
             if v_id:

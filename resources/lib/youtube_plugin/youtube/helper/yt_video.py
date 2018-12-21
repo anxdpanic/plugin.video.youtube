@@ -59,14 +59,14 @@ def _process_rate_video(provider, context, re_match):
             result = -1
 
     if result != -1:
-        client = provider.get_client(context).rate_video(video_id, result)
+        _ = provider.get_client(context).rate_video(video_id, result)
 
         # this will be set if we are in the 'Liked Video' playlist
         if context.get_param('refresh_container', '0') == '1':
             context.get_ui().refresh_container()
 
 
-def _process_more_for_video(provider, context, re_match):
+def _process_more_for_video(provider, context):
     video_id = context.get_param('video_id', '')
     if not video_id:
         raise kodion.KodionException('video/more/: missing video_id')
@@ -102,8 +102,6 @@ def process(method, provider, context, re_match):
     if method == 'rate':
         return _process_rate_video(provider, context, re_match)
     elif method == 'more':
-        return _process_more_for_video(provider, context, re_match)
+        return _process_more_for_video(provider, context)
     else:
         raise kodion.KodionException("Unknown method '%s'" % method)
-
-    return True

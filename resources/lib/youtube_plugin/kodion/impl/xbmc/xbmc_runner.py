@@ -26,7 +26,7 @@ class XbmcRunner(AbstractProviderRunner):
         self.settings = None
 
     def run(self, provider, context=None):
-        results = None
+
         try:
             results = provider.navigate(context)
         except KodionException as ex:
@@ -99,12 +99,12 @@ class XbmcRunner(AbstractProviderRunner):
         # only set fanart is enabled
 
         if directory_item.get_fanart() and self.settings.show_fanart():
-            item.setProperty(u'fanart_image', directory_item.get_fanart())
+            item.setProperty('fanart_image', directory_item.get_fanart())
         if directory_item.get_context_menu() is not None:
             item.addContextMenuItems(directory_item.get_context_menu(),
                                      replaceItems=directory_item.replace_context_menu())
 
-        item.setInfo(type=u'video', infoLabels=info_labels.create_from_item(context, directory_item))
+        item.setInfo(type='video', infoLabels=info_labels.create_from_item(directory_item))
         item.setPath(directory_item.get_uri())
 
         is_folder = True
@@ -143,11 +143,11 @@ class XbmcRunner(AbstractProviderRunner):
 
         # only set fanart is enabled
         if image_item.get_fanart() and self.settings.show_fanart():
-            item.setProperty(u'fanart_image', image_item.get_fanart())
+            item.setProperty('fanart_image', image_item.get_fanart())
         if image_item.get_context_menu() is not None:
             item.addContextMenuItems(image_item.get_context_menu(), replaceItems=image_item.replace_context_menu())
 
-        item.setInfo(type=u'picture', infoLabels=info_labels.create_from_item(context, image_item))
+        item.setInfo(type='picture', infoLabels=info_labels.create_from_item(image_item))
 
         item.setPath(image_item.get_uri())
         xbmcplugin.addDirectoryItem(handle=self.handle,

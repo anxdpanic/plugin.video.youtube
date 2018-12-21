@@ -16,7 +16,7 @@ import time
 from ...youtube.youtube_exceptions import LoginException
 
 
-def process(mode, provider, context, re_match, sign_out_refresh=True):
+def process(mode, provider, context, sign_out_refresh=True):
     addon_id = context.get_param('addon_id', None)
 
     def _do_logout():
@@ -88,7 +88,7 @@ def process(mode, provider, context, re_match, sign_out_refresh=True):
                 log_data['refresh_token'] = '<redacted>'
             context.log_debug('Requesting access token: |%s|' % json.dumps(log_data))
 
-            if not 'error' in json_data:
+            if 'error' not in json_data:
                 _access_token = json_data.get('access_token', '')
                 _expires_in = time.time() + int(json_data.get('expires_in', 3600))
                 _refresh_token = json_data.get('refresh_token', '')

@@ -121,7 +121,8 @@ class ResourceManager(object):
         if self.handle_error(json_data):
             return result
 
-    def _make_list_of_50(self, list_of_ids):
+    @staticmethod
+    def _make_list_of_50(list_of_ids):
         list_of_50 = []
         pos = 0
         while pos < len(list_of_ids):

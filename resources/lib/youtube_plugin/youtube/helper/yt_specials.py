@@ -14,7 +14,7 @@ from ...youtube.helper import v3, tv, extract_urls, UrlResolver, UrlToItemConver
 from . import utils
 
 
-def _process_related_videos(provider, context, re_match):
+def _process_related_videos(provider, context):
     result = []
 
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
@@ -30,7 +30,7 @@ def _process_related_videos(provider, context, re_match):
     return result
 
 
-def _process_recommendations(provider, context, re_match):
+def _process_recommendations(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
     result = []
 
@@ -42,7 +42,7 @@ def _process_recommendations(provider, context, re_match):
     return result
 
 
-def _process_popular_right_now(provider, context, re_match):
+def _process_popular_right_now(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
     result = []
@@ -56,10 +56,10 @@ def _process_popular_right_now(provider, context, re_match):
     return result
 
 
-def _process_browse_channels(provider, context, re_match):
+def _process_browse_channels(provider, context):
     result = []
 
-    page_token = context.get_param('page_token', '')
+    # page_token = context.get_param('page_token', '')
     guide_id = context.get_param('guide_id', '')
     client = provider.get_client(context)
 
@@ -77,7 +77,7 @@ def _process_browse_channels(provider, context, re_match):
     return result
 
 
-def _process_disliked_videos(provider, context, re_match):
+def _process_disliked_videos(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
     result = []
 
@@ -89,7 +89,7 @@ def _process_disliked_videos(provider, context, re_match):
     return result
 
 
-def _process_live_events(provider, context, re_match, event_type='live'):
+def _process_live_events(provider, context, event_type='live'):
     def _sort(x):
         return x.get_aired()
 
@@ -109,7 +109,7 @@ def _process_live_events(provider, context, re_match, event_type='live'):
     return result
 
 
-def _process_description_links(provider, context, re_match):
+def _process_description_links(provider, context):
     incognito = str(context.get_param('incognito', False)).lower() == 'true'
     addon_id = context.get_param('addon_id', '')
 
@@ -239,7 +239,7 @@ def _process_description_links(provider, context, re_match):
     return False
 
 
-def _process_saved_playlists_tv(provider, context, re_match):
+def _process_saved_playlists_tv(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.FILES)
 
     result = []
@@ -251,7 +251,7 @@ def _process_saved_playlists_tv(provider, context, re_match):
     return result
 
 
-def _process_watch_history_tv(provider, context, re_match):
+def _process_watch_history_tv(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
     result = []
@@ -263,7 +263,7 @@ def _process_watch_history_tv(provider, context, re_match):
     return result
 
 
-def _process_purchases_tv(provider, context, re_match):
+def _process_purchases_tv(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
     result = []
@@ -275,7 +275,7 @@ def _process_purchases_tv(provider, context, re_match):
     return result
 
 
-def _process_new_uploaded_videos_tv(provider, context, re_match):
+def _process_new_uploaded_videos_tv(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
     result = []
@@ -287,7 +287,7 @@ def _process_new_uploaded_videos_tv(provider, context, re_match):
     return result
 
 
-def _process_new_uploaded_videos_tv_filtered(provider, context, re_match):
+def _process_new_uploaded_videos_tv_filtered(provider, context):
     provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
 
     result = []
@@ -299,38 +299,38 @@ def _process_new_uploaded_videos_tv_filtered(provider, context, re_match):
     return result
 
 
-def process(category, provider, context, re_match):
-    client = provider.get_client(context)  # required for provider.is_logged_in()
+def process(category, provider, context):
+    _ = provider.get_client(context)  # required for provider.is_logged_in()
     if not provider.is_logged_in() and category in ['new_uploaded_videos_tv', 'new_uploaded_videos_tv_filtered', 'disliked_videos']:
         return UriItem(context.create_uri(['sign', 'in']))
 
     if category == 'related_videos':
-        return _process_related_videos(provider, context, re_match)
+        return _process_related_videos(provider, context)
     elif category == 'popular_right_now':
-        return _process_popular_right_now(provider, context, re_match)
+        return _process_popular_right_now(provider, context)
     elif category == 'recommendations':
-        return _process_recommendations(provider, context, re_match)
+        return _process_recommendations(provider, context)
     elif category == 'browse_channels':
-        return _process_browse_channels(provider, context, re_match)
+        return _process_browse_channels(provider, context)
     elif category == 'watch_history_tv':
-        return _process_watch_history_tv(provider, context, re_match)
+        return _process_watch_history_tv(provider, context)
     elif category == 'new_uploaded_videos_tv':
-        return _process_new_uploaded_videos_tv(provider, context, re_match)
+        return _process_new_uploaded_videos_tv(provider, context)
     elif category == 'new_uploaded_videos_tv_filtered':
-        return _process_new_uploaded_videos_tv_filtered(provider, context, re_match)
+        return _process_new_uploaded_videos_tv_filtered(provider, context)
     elif category == 'saved_playlists':
-        return _process_saved_playlists_tv(provider, context, re_match)
+        return _process_saved_playlists_tv(provider, context)
     elif category == 'purchases':
-        return _process_purchases_tv(provider, context, re_match)
+        return _process_purchases_tv(provider, context)
     elif category == 'disliked_videos':
-        return _process_disliked_videos(provider, context, re_match)
+        return _process_disliked_videos(provider, context)
     elif category == 'live':
-        return _process_live_events(provider, context, re_match)
+        return _process_live_events(provider, context)
     elif category == 'upcoming_live':
-        return _process_live_events(provider, context, re_match, event_type='upcoming')
+        return _process_live_events(provider, context, event_type='upcoming')
     elif category == 'completed_live':
-        return _process_live_events(provider, context, re_match, event_type='completed')
+        return _process_live_events(provider, context, event_type='completed')
     elif category == 'description_links':
-        return _process_description_links(provider, context, re_match)
+        return _process_description_links(provider, context)
     else:
         raise kodion.KodionException("YouTube special category '%s' not found" % category)

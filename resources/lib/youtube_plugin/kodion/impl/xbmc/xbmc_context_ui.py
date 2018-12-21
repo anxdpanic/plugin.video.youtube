@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import string_types
-
 import xbmc
 import xbmcgui
 
@@ -34,18 +32,6 @@ class XbmcContextUI(AbstractContextUI):
             return XbmcProgressDialogBG(heading, text)
 
         return XbmcProgressDialog(heading, text)
-
-    def set_view_mode(self, view_mode):
-        if isinstance(view_mode, string_types):
-            view_mode = self._context.get_settings().get_int(constants.setting.VIEW_X % view_mode, 50)
-
-        self._view_mode = view_mode
-
-    def get_view_mode(self):
-        if self._view_mode is not None:
-            return self._view_mode
-
-        return self._context.get_settings().get_int(constants.setting.VIEW_DEFAULT, 50)
 
     def get_skin_id(self):
         return xbmc.getSkinDir()
@@ -94,7 +80,9 @@ class XbmcContextUI(AbstractContextUI):
         text = self._context.localize(constants.localize.DELETE_CONTENT) % utils.to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_DELETE), text)
 
-    def on_select(self, title, items=[]):
+    def on_select(self, title, items=None):
+        if items is None:
+            items = []
         major_version = self._context.get_system_version().get_version()[0]
         if isinstance(items[0], tuple) and len(items[0]) == 4 and major_version <= 16:
             items = [(item[0], item[2]) for item in items]

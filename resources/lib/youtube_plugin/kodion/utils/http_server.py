@@ -59,6 +59,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             logger.log_debug(' '.join(log_lines))
         return conn_allowed
 
+    # noinspection PyPep8Naming
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
         dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
@@ -159,6 +160,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             else:
                 self.send_error(501)
 
+    # noinspection PyPep8Naming
     def do_HEAD(self):
         logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
@@ -180,6 +182,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             else:
                 self.send_error(501)
 
+    # noinspection PyPep8Naming
     def do_POST(self):
         logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
@@ -216,7 +219,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             response_body = content_split[1]
             response_length = len(response_body)
 
-            match = re.search('^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', response_header, re.MULTILINE)
+            match = re.search(r'^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', response_header, re.MULTILINE)
             if match:
                 authorized_types = match.group('authorized_types').split(',')
                 logger.log_debug('HTTPServer: Found authorized formats |{authorized_fmts}|'.format(authorized_fmts=authorized_types))
@@ -248,6 +251,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         else:
             self.send_error(501)
 
+    # noinspection PyShadowingBuiltins
     def log_message(self, format, *args):
         return
 

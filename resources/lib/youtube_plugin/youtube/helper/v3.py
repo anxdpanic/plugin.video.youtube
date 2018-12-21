@@ -155,12 +155,12 @@ def _process_list_response(provider, context, json_data):
         elif yt_kind == 'youtube#activity':
             snippet = yt_item['snippet']
             details = yt_item['contentDetails']
-            actType = snippet['type']
+            activity_type = snippet['type']
 
             # recommendations
-            if actType == 'recommendation':
+            if activity_type == 'recommendation':
                 video_id = details['recommendation']['resourceId']['videoId']
-            elif actType == 'upload':
+            elif activity_type == 'upload':
                 video_id = details['upload']['videoId']
             else:
                 continue
@@ -214,7 +214,7 @@ def _process_list_response(provider, context, json_data):
                 # if the path directs to a playlist of our own, we correct the channel id to 'mine'
                 if context.get_path() == '/channel/mine/playlists/':
                     channel_id = 'mine'
-                channel_name = snippet.get('channelTitle', '')
+                # channel_name = snippet.get('channelTitle', '')
                 item_params = {}
                 if incognito:
                     item_params.update({'incognito': incognito})
@@ -263,9 +263,9 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
 
     kind = json_data.get('kind', '')
     if kind == u'youtube#searchListResponse' or kind == u'youtube#playlistItemListResponse' or \
-                    kind == u'youtube#playlistListResponse' or kind == u'youtube#subscriptionListResponse' or \
-                    kind == u'youtube#guideCategoryListResponse' or kind == u'youtube#channelListResponse' or \
-                    kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse':
+            kind == u'youtube#playlistListResponse' or kind == u'youtube#subscriptionListResponse' or \
+            kind == u'youtube#guideCategoryListResponse' or kind == u'youtube#channelListResponse' or \
+            kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse':
         result.extend(_process_list_response(provider, context, json_data))
     else:
         raise kodion.KodionException("Unknown kind '%s'" % kind)

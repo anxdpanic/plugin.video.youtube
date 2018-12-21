@@ -22,7 +22,7 @@ from ...youtube.youtube_exceptions import YouTubeException
 from ...youtube.helper import utils, v3
 
 
-def play_video(provider, context, re_match):
+def play_video(provider, context):
     try:
         video_id = context.get_param('video_id')
 
@@ -112,17 +112,17 @@ def play_video(provider, context, re_match):
         context.get_ui().show_notification(message, time_milliseconds=15000)
 
 
-def play_playlist(provider, context, re_match):
+def play_playlist(provider, context):
     videos = []
 
     def _load_videos(_page_token='', _progress_dialog=None):
-        if not _progress_dialog:
+        if _progress_dialog is None:
             _progress_dialog = context.get_ui().create_progress_dialog(
                 context.localize(provider.LOCAL_MAP['youtube.playlist.progress.updating']),
                 context.localize(constants.localize.COMMON_PLEASE_WAIT), background=True)
         json_data = client.get_playlist_items(playlist_id, page_token=_page_token)
         if not v3.handle_error(provider, context, json_data):
-            return False
+            return None
         _progress_dialog.set_total(int(json_data.get('pageInfo', {}).get('totalResults', 0)))
 
         result = v3.response_to_items(provider, context, json_data, process_next_page=False)
@@ -150,7 +150,7 @@ def play_playlist(provider, context, re_match):
             items.append((context.localize(provider.LOCAL_MAP['youtube.playlist.play.%s' % order]), order))
 
         order = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.playlist.play.select']), items)
-        if not order in order_list:
+        if order not in order_list:
             return False
 
     player = context.get_video_player()
@@ -209,7 +209,7 @@ def play_playlist(provider, context, re_match):
     return True
 
 
-def play_channel_live(provider, context, re_match):
+def play_channel_live(provider, context):
     channel_id = context.get_param('channel_id')
     index = int(context.get_param('live')) - 1
     if index < 0:

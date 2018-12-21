@@ -30,7 +30,7 @@ from ... import utils
 
 
 class XbmcContext(AbstractContext):
-    def __init__(self, path='/', params=None, plugin_name=u'', plugin_id=u'', override=True):
+    def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
         AbstractContext.__init__(self, path, params, plugin_name, plugin_id)
 
         if plugin_id:
@@ -84,6 +84,12 @@ class XbmcContext(AbstractContext):
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)
 
+    def get_region(self):
+        pass  # implement from abstract
+
+    def addon(self):
+        return self._addon
+
     def is_plugin_path(self, uri, uri_path):
         return uri.startswith('plugin://%s/%s/' % (self.get_id(), uri_path))
 
@@ -107,9 +113,8 @@ class XbmcContext(AbstractContext):
         """
         The xbmc.getLanguage() method is fucked up!!! We always return 'en-US' for now
         """
-        return 'en-US'
 
-        """
+        '''
         if self.get_system_version().get_release_name() == 'Frodo':
             return 'en-US'
 
@@ -121,7 +126,9 @@ class XbmcContext(AbstractContext):
         except Exception, ex:
             self.log_error('Failed to get system language (%s)', ex.__str__())
             return 'en-US'
-        """
+        '''
+
+        return 'en-US'
 
     def get_video_playlist(self):
         if not self._video_playlist:
