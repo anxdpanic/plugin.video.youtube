@@ -639,6 +639,8 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
+
+        redirect = False
         params = context.get_params()
 
         if 'video_id' not in params and 'playlist_id' not in params and \
@@ -663,19 +665,26 @@ class Provider(kodion.AbstractProvider):
             prompt_subtitles = params['prompt_for_subtitles'] == '1'
             del params['prompt_for_subtitles']
             if prompt_subtitles and 'video_id' in params and 'playlist_id' not in params:
-                # redirect to playmedia after setting home window property, so playback url matches playable listitems
+                # redirect to builtin after setting home window property, so playback url matches playable listitems
                 context.get_ui().set_home_window_property('prompt_for_subtitles', params['video_id'])
-                context.execute('PlayMedia(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))
-                return
+                context.log_debug('Redirecting playback with subtitles')
+                redirect = True
 
-        if 'audio_only' in params:
+        elif 'audio_only' in params:
             audio_only = params['audio_only'] == '1'
             del params['audio_only']
             if audio_only and 'video_id' in params and 'playlist_id' not in params:
-                # redirect to runplugin after setting home window property, so playback url matches playable listitems
+                # redirect to builtin after setting home window property, so playback url matches playable listitems
                 context.get_ui().set_home_window_property('audio_only', params['video_id'])
-                context.execute('RunPlugin(%s)' % context.create_uri(['play'], {'video_id': params['video_id']}))  # PlayMedia crashes Kodi 18
-                return
+                context.log_debug('Redirecting audio only playback')
+                redirect = True
+
+        if context.get_handle() == -1 or redirect:
+            builtin = 'PlayMedia(%s)' if context.get_handle() == -1 else 'RunPlugin(%s)'
+            if not redirect:
+                context.log_debug('Redirecting playback, handle is -1')
+            context.execute(builtin % context.create_uri(['play'], {'video_id': params['video_id']}))
+            return
 
         if 'video_id' in params and 'playlist_id' not in params:
             return yt_play.play_video(self, context)
