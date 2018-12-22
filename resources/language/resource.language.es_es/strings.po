@@ -1130,3 +1130,7 @@ msgstr "Error al recuperar la id para la lista de reproducción Ver más tarde. 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
 msgstr "Buscando para Ver más tarde... Página %s"
+
+msgctxt "#30712"
+msgid "Rate videos in playlists"
+msgstr ""

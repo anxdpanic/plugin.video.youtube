@@ -166,14 +166,20 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
             # rate video
             if settings.get_bool('youtube.post.play.rate', False):
-                json_data = client.get_video_rating(video_id)
-                if not provider.v3_handle_error(provider, context, json_data):
-                    return False
-                items = json_data.get('items', [{'rating': 'none'}])
-                rating = items[0].get('rating', 'none')
-                if rating == 'none':
-                    rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
-                    provider.yt_video.process('rate', provider, context, rating_match)
+                do_rating = True
+                if not settings.get_bool('youtube.post.play.rate.playlists', False):
+                    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+                    do_rating = int(playlist.size()) < 2
+
+                if do_rating:
+                    json_data = client.get_video_rating(video_id)
+                    if not provider.v3_handle_error(provider, context, json_data):
+                        return False
+                    items = json_data.get('items', [{'rating': 'none'}])
+                    rating = items[0].get('rating', 'none')
+                    if rating == 'none':
+                        rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
+                        provider.yt_video.process('rate', provider, context, rating_match)
 
     if settings.get_bool('youtube.post.play.refresh', False) and \
             not xbmc.getInfoLabel('Container.FolderPath').startswith(context.create_uri(['kodion', 'search', 'input'])):

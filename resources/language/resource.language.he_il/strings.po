@@ -1124,3 +1124,7 @@ msgstr ""
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
 msgstr ""
+
+msgctxt "#30712"
+msgid "Rate videos in playlists"
+msgstr ""
