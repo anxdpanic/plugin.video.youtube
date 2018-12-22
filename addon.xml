@@ -14,7 +14,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.3.0
-[add] support for keymapping of some endpoints |TODO: wiki link|
+[add] support for keymapping of some endpoints, wiki: https://kodi.wiki/view/Add-on:YouTube#Keymaps
 [fix] post play add to watch history
 [fix] fix add-ons playback history not saving
 [fix] playback monitoring/post play events triggering for the wrong videos in some cases
