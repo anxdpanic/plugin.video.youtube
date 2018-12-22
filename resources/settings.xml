@@ -13,6 +13,7 @@
         <setting id="kodion.play_count.percent" type="slider" label="30668" enable="true" default="85" range="1,1,99" option="int"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true" />
         <setting id="youtube.post.play.rate" type="bool" label="30627" default="false" />
+        <setting id="youtube.post.play.rate.playlists" type="bool" label="30712" default="false" subsetting="true" enable="eq(-1,true)" />
         <setting id="youtube.post.play.refresh" type="bool" label="30645" default="false" />
         <setting type="sep" />
         <setting id="kodion.thumbnail.size" type="enum" label="30591" lvalues="30592|30593" default="1" />

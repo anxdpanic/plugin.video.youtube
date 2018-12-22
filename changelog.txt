@@ -1,5 +1,6 @@
 6.3.0
 [add] support for keymapping of some endpoints, wiki: https://kodi.wiki/view/Add-on:YouTube#Keymaps
+[add] 'Rate videos in playlists' setting to 'Settings - General - Rate after watching'
 [fix] post play add to watch history
 [fix] fix add-ons playback history not saving
 [fix] playback monitoring/post play events triggering for the wrong videos in some cases
@@ -8,6 +9,7 @@
 [upd] sign in/out, switch user, and settings ListItems to isFolder=False and isPlayable=False
 [upd] improve watch later playlist id retrieval and feedback
 [upd] Use SPDX license identifier
+[lang] es_es strings |contrib: roliverosc|
 
 6.2.3
 [add] Next Page to 'More...' -> 'Add to...' context menu
