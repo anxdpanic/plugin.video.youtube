@@ -24,6 +24,7 @@
 [upd] sign in/out, switch user, and settings ListItems to isFolder=False and isPlayable=False
 [upd] improve watch later playlist id retrieval and feedback
 [upd] Use SPDX license identifier
+[lang] es_es strings |contrib: roliverosc|
         </news>
         <assets>
             <icon>icon.png</icon>
