@@ -312,7 +312,7 @@ msgstr "Meine Abos"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr "Queue Video"
+msgstr "In Warteschlange einreihen"
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -484,7 +484,7 @@ msgstr ""
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Lösche Suchhistoriedatenbank"
 
 msgctxt "#30555"
 msgid "Clear function cache"
@@ -500,35 +500,35 @@ msgstr ""
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "Suchhistorie"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Lösche settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Untertitelsprache"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Keine"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Einstellung"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Einstellung, Englisch"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Englisch"
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -572,11 +572,11 @@ msgstr ""
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Fehlgeschlagen"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Einstellungen"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -600,7 +600,7 @@ msgstr ""
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisch"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -632,15 +632,15 @@ msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Vorschaubildgröße"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Mittel (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Hoch (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -656,7 +656,7 @@ msgstr ""
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "%s aktualisiert"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
@@ -668,7 +668,7 @@ msgstr ""
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Untertitel konfigurieren"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
@@ -696,7 +696,7 @@ msgstr ""
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Nur Audio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
@@ -712,11 +712,11 @@ msgstr ""
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Gespeicherte Wiedergabelisten"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Erneut versuchen"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
@@ -728,7 +728,7 @@ msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 msgctxt "#30616"
 msgid "Must be signed in."
@@ -748,7 +748,7 @@ msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Port %s wird bereits genutzt. Http Server kann nicht gestartet werden."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
@@ -764,19 +764,19 @@ msgstr ""
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Erfordert Kodi 17+"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper ist bereits installiert."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Temporäre Dateien löschen"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Video nach dem Ansehen bewerten"
 
 msgctxt "#30628"
 msgid "HTTP Server"
@@ -788,11 +788,11 @@ msgstr ""
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Speichern"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Erfolgreich aktualisiert: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
@@ -804,7 +804,7 @@ msgstr ""
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "YouTube Add-on API Konfiguration"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
@@ -828,7 +828,7 @@ msgstr ""
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Wiederherstellen"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
@@ -888,31 +888,31 @@ msgstr ""
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Benutzer wechseln"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Neuer Benutzer"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Unbenannt"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Gebe einen Namen für diesen Benutzer ein"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Der aktuelle Benutzer ist nun '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Benutzer"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Benutzer hinzufügen"
 
 msgctxt "#30662"
 msgid "Remove a user"
@@ -924,19 +924,19 @@ msgstr ""
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Benutzer wechseln"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Zu '%s' wechseln?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "'%s' entfernt"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "'%s' zu '%s' umbenannt"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -944,11 +944,11 @@ msgstr ""
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Als ungesehen markieren"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Als gesehen markieren"
 
 msgctxt "#30671"
 msgid "Clear playback history"
@@ -1028,7 +1028,7 @@ msgstr ""
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "Für Livestreams wird InputStream Adaptive >= 2.0.12 benötigt"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1036,7 +1036,7 @@ msgstr ""
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "In einer Minute"
 
 msgctxt "#30693"
 msgid "Airing soon"
@@ -1044,19 +1044,19 @@ msgstr ""
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "In über einer Stunde"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "In über zwei Stunden"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Ausstrahlung heute um"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Morgen um"
 
 msgctxt "#30698"
 msgid "Check my IP"
@@ -1076,15 +1076,15 @@ msgstr ""
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Abspielen mit Unteritel"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Bist du sicher?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "Nutze YouTube Website URLs"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1096,7 +1096,7 @@ msgstr ""
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Unbenannt"
 
 msgctxt "#30708"
 msgid "Play audio only"
