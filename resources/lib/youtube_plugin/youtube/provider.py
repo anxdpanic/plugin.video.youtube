@@ -158,6 +158,14 @@ class Provider(kodion.AbstractProvider):
                  'youtube.video.play_audio_only': 30708,
                  'youtube.failed.watch_later.retry.2': 30709,
                  'youtube.failed.watch_later.retry.3': 30710,
+                 'youtube.added.to.watch.later': 30713,
+                 'youtube.added.to.playlist': 30714,
+                 'youtube.removed.from.playlist': 30715,
+                 'youtube.liked.video': 30716,
+                 'youtube.disliked.video': 30717,
+                 'youtube.unrated.video': 30718,
+                 'youtube.subscribed.to.channel': 30719,
+                 'youtube.unsubscribed.from.channel': 30720,
                  }
 
     def __init__(self):

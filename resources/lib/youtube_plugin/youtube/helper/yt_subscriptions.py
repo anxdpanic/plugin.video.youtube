@@ -38,6 +38,13 @@ def _process_add(provider, context):
         json_data = provider.get_client(context).subscribe(subscription_id)
         if not v3.handle_error(provider, context, json_data):
             return False
+
+    context.get_ui().show_notification(
+        context.localize(provider.LOCAL_MAP['youtube.subscribed.to.channel']),
+        time_milliseconds=2500,
+        audible=False
+    )
+
     return True
 
 
@@ -54,6 +61,13 @@ def _process_remove(provider, context):
             return False
 
         context.get_ui().refresh_container()
+
+    context.get_ui().show_notification(
+        context.localize(provider.LOCAL_MAP['youtube.unsubscribed.from.channel']),
+        time_milliseconds=2500,
+        audible=False
+    )
+
     return True
 
 

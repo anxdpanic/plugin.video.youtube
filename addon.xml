@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.3.0~alpha4" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.3.0~alpha5" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -24,6 +24,7 @@
 [upd] sign in/out, switch user, and settings ListItems to isFolder=False and isPlayable=False
 [upd] improve watch later playlist id retrieval and feedback
 [upd] Use SPDX license identifier
+[lang] de_de strings |contrib: tobhor|
 [lang] es_es strings |contrib: roliverosc|
         </news>
         <assets>

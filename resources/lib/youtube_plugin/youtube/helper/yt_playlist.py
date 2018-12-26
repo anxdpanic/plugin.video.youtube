@@ -16,14 +16,16 @@ from ...youtube.helper import v3
 
 def _process_add_video(provider, context):
     listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
+
     client = provider.get_client(context)
+    watch_later_id = context.get_access_manager().get_watch_later_id()
 
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
         raise kodion.KodionException('Playlist/Add: missing playlist_id')
 
     if playlist_id.lower() == 'watch_later':
-        playlist_id = context.get_access_manager().get_watch_later_id()
+        playlist_id = watch_later_id
 
     video_id = context.get_param('video_id', '')
     if not video_id:
@@ -38,6 +40,18 @@ def _process_add_video(provider, context):
             return False
     else:
         context.log_debug('Cannot add to playlist id |%s|' % playlist_id)
+
+    if playlist_id == watch_later_id:
+        notify_message = context.localize(provider.LOCAL_MAP['youtube.added.to.watch.later'])
+    else:
+        notify_message = context.localize(provider.LOCAL_MAP['youtube.added.to.playlist'])
+
+    context.get_ui().show_notification(
+        message=notify_message,
+        time_milliseconds=2500,
+        audible=False
+    )
+
     return True
 
 
@@ -78,6 +92,13 @@ def _process_remove_video(provider, context):
             context.get_ui().refresh_container()
     else:
         context.log_debug('Cannot remove from playlist id |%s|' % playlist_id)
+
+    context.get_ui().show_notification(
+        message=context.localize(provider.LOCAL_MAP['youtube.removed.from.playlist']),
+        time_milliseconds=2500,
+        audible=False
+    )
+
     return True
 
 
