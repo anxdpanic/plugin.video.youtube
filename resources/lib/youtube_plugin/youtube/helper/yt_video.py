@@ -65,6 +65,21 @@ def _process_rate_video(provider, context, re_match):
         if context.get_param('refresh_container', '0') == '1':
             context.get_ui().refresh_container()
 
+        notify_message = ''
+        if result == 'none':
+            notify_message = context.localize(provider.LOCAL_MAP['youtube.unrated.video'])
+        elif result == 'like':
+            notify_message = context.localize(provider.LOCAL_MAP['youtube.liked.video'])
+        elif result == 'dislike':
+            notify_message = context.localize(provider.LOCAL_MAP['youtube.disliked.video'])
+
+        if notify_message:
+            context.get_ui().show_notification(
+                message=notify_message,
+                time_milliseconds=2500,
+                audible=False
+            )
+
 
 def _process_more_for_video(provider, context):
     video_id = context.get_param('video_id', '')

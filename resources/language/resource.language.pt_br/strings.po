@@ -1115,3 +1115,35 @@ msgstr ""
 msgctxt "#30712"
 msgid "Rate videos in playlists"
 msgstr ""
+
+msgctxt "#30713"
+msgid "Added to Watch Later"
+msgstr ""
+
+msgctxt "#30714"
+msgid "Added to playlist"
+msgstr ""
+
+msgctxt "#30715"
+msgid "Removed from playlist"
+msgstr ""
+
+msgctxt "#30716"
+msgid "Liked video"
+msgstr ""
+
+msgctxt "#30717"
+msgid "Disliked video"
+msgstr ""
+
+msgctxt "#30718"
+msgid "Rating removed"
+msgstr ""
+
+msgctxt "#30719"
+msgid "Subscribed to channel"
+msgstr ""
+
+msgctxt "#30720"
+msgid "Unsubscribed from channel"
+msgstr ""
