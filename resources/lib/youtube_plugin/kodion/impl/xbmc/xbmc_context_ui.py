@@ -116,7 +116,7 @@ class XbmcContextUI(AbstractContextUI):
 
         return _dict.get(result, -1)
 
-    def show_notification(self, message, header='', image_uri='', time_milliseconds=5000):
+    def show_notification(self, message, header='', image_uri='', time_milliseconds=5000, audible=True):
         _header = header
         if not _header:
             _header = self._context.get_name()
@@ -136,7 +136,8 @@ class XbmcContextUI(AbstractContextUI):
             _message = utils.to_unicode(_message)
             _header = utils.to_unicode(_header)
 
-        xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (_header, _message, time_milliseconds, _image))
+        #  xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (_header, _message, time_milliseconds, _image))
+        xbmcgui.Dialog().notification(_header, _message, _image, time_milliseconds, audible)
 
     def open_settings(self):
         self._xbmc_addon.openSettings()
