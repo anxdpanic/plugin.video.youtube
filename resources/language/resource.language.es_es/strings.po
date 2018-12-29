@@ -179,7 +179,7 @@ msgstr "Añadir a favoritos del Add-on"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr "Búsqueda"
+msgstr "Buscar"
 
 msgctxt "#30103"
 msgid "Library"
@@ -1133,31 +1133,31 @@ msgstr "Buscando para Ver más tarde... Página %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Calificar vídeos en listas de reproducción"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Añadido a Ver más tarde"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Añadido a lista de reproducción"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Eliminado de la lista de reproducción"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Me gusto el vídeo"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "No me gusto el vídeo"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Calificados eliminados"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
