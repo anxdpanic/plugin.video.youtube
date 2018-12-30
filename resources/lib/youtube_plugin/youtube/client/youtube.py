@@ -674,13 +674,29 @@ class YouTube(LoginClient):
                 _items = _items[_offset:]
             _result['offset'] = _new_offset
 
-            for _item in _items:
-                _item = _item.get('gridVideoRenderer', {})
+            for _listItem in _items:
+                _item = _listItem.get('gridVideoRenderer', {})
                 if _item:
                     _video_item = {'id': _item['videoId'],
                                    'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
                                    'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
                     _result['items'].append(_video_item)
+                _item = _listItem.get('gridPlaylistRenderer', {})
+                if _item:
+                    play_next_page_token = ''
+                    while True:
+                        json_playlist_data = self.get_playlist_items(_item['playlistId'], page_token=play_next_page_token)
+                        _playListItems = json_playlist_data.get('items', {})
+                        for _playListItem in _playListItems:
+                            _playListItem = _playListItem.get('snippet', {})
+                            if _playListItem:
+                                _video_item = {'id': _playListItem.get('resourceId', {}).get('videoId',''),
+                                               'title': _playListItem['title'],
+                                               'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
+                                _result['items'].append(_video_item)
+                        play_next_page_token = json_playlist_data.get('nextPageToken', '')
+                        if not play_next_page_token:
+                            break
 
             _continuations = _data.get('continuations', [{}])[0].get('nextContinuationData', {}).get('continuation', '')
             if _continuations and len(_result['items']) <= self._max_results:
