@@ -10,6 +10,7 @@
 
 import random
 import re
+import traceback
 
 import xbmcplugin
 
@@ -41,7 +42,13 @@ def play_video(provider, context):
             audio_only = True
         context.get_ui().clear_home_window_property('audio_only')
 
-        video_streams = client.get_video_streams(context, video_id)
+        try:
+            video_streams = client.get_video_streams(context, video_id)
+        except YouTubeException as e:
+            context.get_ui().show_notification(message=e.get_message())
+            context.log_error(traceback.print_exc())
+            return False
+
         if len(video_streams) == 0:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
