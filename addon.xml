@@ -20,6 +20,7 @@
 [fix] post play add to watch history
 [fix] fix add-ons playback history not saving
 [fix] playback monitoring/post play events triggering for the wrong videos in some cases
+[fix] call setResolvedUrl(False) if get_video_streams fails
 [upd] code cosmetics and resolve inspections
 [upd] improve watch history tracking, actively report watch times and state during playback
 [upd] sign in/out, switch user, and settings ListItems to isFolder=False and isPlayable=False
