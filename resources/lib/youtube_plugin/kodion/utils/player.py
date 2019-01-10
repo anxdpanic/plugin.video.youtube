@@ -21,6 +21,8 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
     settings = context.get_settings()
     ui = context.get_ui()
 
+    ui.set_home_window_property('video_id', video_id)
+
     if playback_stats is None:
         playback_stats = {}
 
@@ -57,7 +59,10 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
         client.update_watch_history(video_id, playback_stats.get('playback_url'))
         context.log_debug('Playback start reported: |%s|' % video_id)
 
-    while player.isPlaying() and not monitor.abortRequested():
+    while player.isPlaying():
+        if ui.get_home_window_property('video_id') != video_id:
+            break
+
         try:
             current_time = float(player.getTime())
             total_time = float(player.getTotalTime())
@@ -181,7 +186,10 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
                         rating_match = re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' % (video_id, rating))
                         provider.yt_video.process('rate', provider, context, rating_match)
 
-    if settings.get_bool('youtube.post.play.refresh', False) and \
+    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+    do_refresh = (int(playlist.size()) < 2) or (playlist.getposition() == -1)
+
+    if do_refresh and settings.get_bool('youtube.post.play.refresh', False) and \
             not xbmc.getInfoLabel('Container.FolderPath').startswith(context.create_uri(['kodion', 'search', 'input'])):
         # don't refresh search input it causes request for new input, (Container.Update in abstract_provider /kodion/search/input/
         # would resolve this but doesn't work with Remotes(Yatse))
