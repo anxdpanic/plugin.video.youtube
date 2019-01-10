@@ -13,6 +13,7 @@
 [upd] Use SPDX license identifier
 [lang] de_de strings |contrib: tobhor|
 [lang] es_es strings |contrib: roliverosc|
+[lang] nl_nl strings |contrib: Markman-B|
 
 6.2.3
 [add] Next Page to 'More...' -> 'Add to...' context menu
