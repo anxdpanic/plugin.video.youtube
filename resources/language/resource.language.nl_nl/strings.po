@@ -1113,48 +1113,48 @@ msgstr "Alleen geluid afspelen"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Ophalen ID van Bekijk Later afspeellijst mislukt. Voeg minimaal 8 video's toe aan de de afspeellijst en probeer het opnieuw"
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Ophalen ID van Bekijk Later afspeellijst mislukt. Probeer het morgen opnieuw zonder een video van de afspeellijst te verwijderen"
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "Zoeken naar Bekijk Later...pagina %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Beoordeel video's in afspeellijsten"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Toegevoegd aan Bekijk Later"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Toegevoegd aan afspeellijst"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Verwijderd van afspeellijst"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Video is leuk"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Video is niet leuk"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Beoordeling verwijderd"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Geabonneerd"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Niet meer geabonneerd"
