@@ -2,6 +2,7 @@
 [add] support for keymapping of some endpoints, wiki: https://kodi.wiki/view/Add-on:YouTube#Keymaps
 [add] 'Rate videos in playlists' setting to 'Settings - General - Rate after watching'
 [add] Support for purchased collections |contrib: MisterD81|
+[fix] Live stream playback
 [fix] post play add to watch history
 [fix] fix add-ons playback history not saving
 [fix] playback monitoring/post play events triggering for the wrong videos in some cases
@@ -14,9 +15,6 @@
 [lang] de_de strings |contrib: tobhor|
 [lang] es_es strings |contrib: roliverosc|
 [lang] nl_nl strings |contrib: Markman-B|
-
-6.2.4
-[fix] Live stream playback
 
 6.2.3
 [add] Next Page to 'More...' -> 'Add to...' context menu
