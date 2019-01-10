@@ -15,6 +15,9 @@
 [lang] es_es strings |contrib: roliverosc|
 [lang] nl_nl strings |contrib: Markman-B|
 
+6.2.4
+[fix] Live stream playback
+
 6.2.3
 [add] Next Page to 'More...' -> 'Add to...' context menu
 [add] icon and description to playlists in 'More...' -> 'Add to...' context menu on Kodi 17+
