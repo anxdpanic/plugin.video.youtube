@@ -687,7 +687,7 @@ class Provider(kodion.AbstractProvider):
                 context.log_debug('Redirecting audio only playback')
                 redirect = True
 
-        if context.get_handle() == -1 or redirect:
+        if 'video_id' in params and (context.get_handle() == -1 or redirect):
             builtin = 'PlayMedia(%s)' if context.get_handle() == -1 else 'RunPlugin(%s)'
             if not redirect:
                 context.log_debug('Redirecting playback, handle is -1')
