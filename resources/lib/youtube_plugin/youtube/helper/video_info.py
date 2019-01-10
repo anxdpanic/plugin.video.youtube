@@ -808,7 +808,7 @@ class VideoInfo(object):
             ])
 
         if is_live:
-            live_url = params.get('hlsvp', '')
+            live_url = player_response.get('streamingData', {}).get('hlsManifestUrl', '') or params.get('hlsvp', '')
             if live_url:
                 stream_list = self._load_manifest(live_url,
                                                   video_id,
@@ -816,7 +816,7 @@ class VideoInfo(object):
                                                   curl_headers=curl_headers,
                                                   playback_stats=playback_stats)
         httpd_is_live = self._context.get_settings().use_dash_videos() and is_httpd_live(port=self._context.get_settings().httpd_port())
-        mpd_url = params.get('dashmpd', player_args.get('dashmpd'))
+        mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
         s_info = dict()
         if not mpd_url and not is_live and httpd_is_live:
             mpd_url, s_info = self.generate_mpd(video_id,
@@ -866,7 +866,7 @@ class VideoInfo(object):
                                 'playback_stats': playback_stats}
 
                 if is_live:
-                    video_stream['url'] = ''.join([video_stream['url'], '&start_seq=$START_NUMBER$'])
+                    # video_stream['url'] = ''.join([video_stream['url'], '&start_seq=$START_NUMBER$'])
                     video_stream.update(self.FORMAT.get('9998'))
                 else:
                     if not s_info:
