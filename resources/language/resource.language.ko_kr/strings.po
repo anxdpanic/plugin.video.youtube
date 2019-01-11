@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 2019-01-10 23:53+0900\n"
+"Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: LANGUAGE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -38,7 +38,7 @@ msgstr "비밀번호"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "동영상 품질 항상 확인"
 
 msgctxt "#30010"
 msgid "Video quality"
@@ -74,7 +74,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Live / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -138,7 +138,7 @@ msgstr "보기: 아티스트"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr "보기: 앨범s"
+msgstr "보기: 앨범"
 
 msgctxt "#30036"
 msgid "Support alternative player"
@@ -146,11 +146,11 @@ msgstr "다른 플레이어 지원"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "사용자가 나중에 볼 재생목록 id"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "사용자가 최근 본 재생목록 id"
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -182,7 +182,7 @@ msgstr "다음 페이지 (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "나중에 볼 동영상"
+msgstr "나중에 보기"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -206,7 +206,7 @@ msgstr "로그아웃"
 
 msgctxt "#30113"
 msgid "Rename"
-msgstr "이름 변경"
+msgstr "이름 바꾸기"
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -218,11 +218,11 @@ msgstr "제거 확인"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "\"%s\"를 삭제하겠습니까?"
+msgstr "\"%s\" 삭제할까요?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "\"%s\"를 제거하겠습니까?"
+msgstr "\"%s\" 제거할까요?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -234,34 +234,34 @@ msgstr "잠시만 기다리세요..."
 
 msgctxt "#30120"
 msgid "Clear"
-msgstr "Clear"
+msgstr "지우기"
 
 #YouTube
 #empty strings from id 30121 to 30199
 
 msgctxt "#30200"
 msgid "API Key"
-msgstr ""
+msgstr "API 키"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API 키"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API Id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr ""
+msgstr "개인 API 키 사용함"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "현재 API 키 세트 사용"
 
 #YouTube
 #empty strings from id 30206 to 30499
@@ -276,15 +276,15 @@ msgstr "재생목록"
 
 msgctxt "#30502"
 msgid "Go to %s"
-msgstr "가기: %s"
+msgstr "%s로 가기"
 
 msgctxt "#30503"
 msgid "Show channel fanart"
-msgstr "채널 팬아트 표시"
+msgstr "채널 팬아트 보기"
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr "구독정보"
+msgstr "구독 정보"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
@@ -308,11 +308,11 @@ msgstr "최근 본 동영상"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr "내 구독정보"
+msgstr "내 구독"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr "대기열 추가"
+msgstr "재생순서 추가"
 
 msgctxt "#30512"
 msgid "Browse Channels"
@@ -336,11 +336,11 @@ msgstr "폴더"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr "구독: %s"
+msgstr "%s에 구독"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr "가기: '%s'"
+msgstr "'%s'로 가기"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -372,7 +372,7 @@ msgstr "지역 선택"
 
 msgctxt "#30526"
 msgid "Adjust"
-msgstr "Adjust"
+msgstr "조정"
 
 msgctxt "#30527"
 msgid "Language and region?"
@@ -424,7 +424,7 @@ msgstr "싫어하는 동영상"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "라이브"
+msgstr "실시간"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -440,31 +440,31 @@ msgstr "rtmpe 스트림 지원 안 함"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr "Refresh"
+msgstr "새로 고침"
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "설명의 더 많은 링크"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "더 이상 링크가 없음."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr ""
+msgstr "두 번 로그인합니다!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "유튜브가 제대로 동작하기 위해서 두 개의 어플을 사용해야 합니다"
 
 msgctxt "#30548"
 msgid "More..."
-msgstr ""
+msgstr "더 보기..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "동영상 스트림이 없음"
 
 msgctxt "#30550"
 msgid "Region"
@@ -472,680 +472,680 @@ msgstr "지역"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "추천"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "관리"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "캐시 데이터베이스 삭제"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "검색 이력 데이터베이스 삭제"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "캐시 지우기"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "검색 이력 정리"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "캐시"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "검색 이력"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "settings.xml 삭제"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "자막 언어"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "안 함"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "전부"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "설정"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "설정, 영어"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "영어"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "프롬프트"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "나중에 보기 설정"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "나중에 보기 삭제"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "나중에 볼 재생목록에서 '%s' 지울까요?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "나중에 볼 재생목록을 '%s'로 바꿀까요?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "이력 설정"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "이력 삭제"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "이력에서 '%s' 지울까요?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "현재 이력을 '%s'로 바꿀까요?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "성공"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "실패"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "설정"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "SSL 보안 검증 강제함"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "유튜브 설정에서 MPEG-DASH를 사용하지만, InputStream Adaptive는 사용하지 않습니다. 지금 InputStream Adaptive를 사용할까요?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "접근 관리자 초기화"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "접근 관리자를 초기화할까요?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "추천 동영상 자동 재생"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "자동"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "내 구독 (필터)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "필터된 채널목록 (쉼표로 나눔)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "블랙리스트"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "내 구독 필터에 추가"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr ""
+msgstr "내 구독 필터에서 삭제"
 
 msgctxt "#30589"
 msgid "Added to My Subscriptions filter"
-msgstr ""
+msgstr "내 구독 필터에 추가함"
 
 msgctxt "#30590"
 msgid "Removed from My Subscriptions filter"
-msgstr ""
+msgstr "내 구독 필터에서 삭제함"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "섬네일 크기"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "중간 (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "큼 (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "안전 검색"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "중간"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "엄격"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "업데이트됨: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "개인 API 키 사용함"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "개인 API 키 사용 실패함. 없음: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "자막 설정"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s 에 %s 대비"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "자동 생성 안 함"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "나이 제한"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "폭력적인 컨텐트 허용"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "빠른 검색"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "빠른 검색 (익명)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "소리만"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "개발자 키 허용"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "재생 이력 지우기"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "계정의 재생이력을 모든 장치에서 지웁니다. 되돌릴 수 없습니다."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "재생목록 저장"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "다시 시도"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "나중에 볼 재생목록 id 가져오기"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "나중에 볼 재생목록을 가져 올 수 없습니다. 웹/앱에서 나중에 볼 동영상을 추가하고 다시 시도해야 합니다."
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "취소"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "기록해야 합니다."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "mpeg-dash 프록시 사용"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "포트"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "$s 포트는 이미 사용 중입니다. http 서버를 시작할 수 없습니다."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr ""
+msgstr "mpeg-dash vod에 프록시가 필요함 (HTTP 서버 참고)"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "구매"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "InputStream Helper 설치"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Kodi 17이상 필요"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper가 이미 설치됨."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "임시 파일 삭제"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "본 동영상 평가"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP 서버"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "IP 화이트리스트 (쉼표로 나눔)"
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "저장"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "업데이트 성공: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "API 설정 페이지 사용"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (HTTP 서버 참고)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "유튜브 애드온 API 설정"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "변경 사항이 없어서, API 키가 업데이트되지 않음."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "개인 API 키 사용함."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "개인 API 키 사용 안 함."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "다음에 키를 빠르게 추가하려면 이 페이지를 즐겨찾기에 추가합니다."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "api_keys.json에 개인 API 키가 있는데, 이를 복구할까요? 아니면 덮어씁니다."
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "복구"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "api_keys.json 지움"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "access_manager.json 지움"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "참조 IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "참조 IP 선택"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "재생 후에 다시 고침"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "다가올 실시간"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "지나간 실시간"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "API 키가 부정확합니다. 설정 - API - API 키"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "클라이언트 Id가 부정확합니다. 설정 - API - API Id"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "클라이언트 Secret가 부정확합니다. 설정 - API - API Secret"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "위치"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "위치 반경 (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "지리 위치를 실행할까요? [B]내 위치[/B]에 사용됨"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "내 위치"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "사용자 변경"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "새 사용자"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "이름 없음"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "사용자 이름을 입력합니다"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "지금 사용자는 '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "사용자"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "사용자 추가"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "사용자 삭제"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "사용자 이름 변경"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "사용자 변경"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "지금 '%s'로 변경할까요?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "'%s' 삭제됨"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "'%s'에서 '%s'로 이름 바뀜"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "최소 재생 비율 계산"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "재생 안 함 표시"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "재생 함 표시"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "재생 이력 지우기"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "재생 이력 삭제"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "재생 이력"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "이어 볼 지점 다시 설정"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "재생 이력 사용 (재생 함, 이어볼 지점)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "바로 지금"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "일 분 전"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "최근"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "한 시간 전"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "두 시간 전"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "세 시간 전"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "어제"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "2일 전"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "오늘"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "데이터 캐시 삭제"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "데이터 캐시 지움"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "데이터 캐시"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "동영상에 사용"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "실시간에 사용"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "InputStream Adaptive >= 실시간에는 2.0.12 필요함"
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "지금 방송 중"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "일 분 전"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "곧 방송"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "한 시간 후"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "두 시간 후"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "오늘 방송"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "내일"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "IP 확인"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP 서버가 실행되지 않음"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "클라이언트 IP는 %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "클라이언트 IP 가져오기 실패"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "자막 재생"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "확실합니까?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "유튜브 웹사이트 url 사용"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "자막 내려받기"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "재생 전에 자막을 내려받을까요? (기본: 아니오)"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "제목 없음"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "소리만 재생"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "나중에 볼 재생목록 id를 가져올 수 없습니다. 기회를 높이려면 웹/앱으로 나중에 볼 영상 8-10개를 추가하고 다시 시도합니다."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "나중에 볼 재생목록 id를 가져올 수 없습니다. 동영상을 삭제하지 말고 내일 다시 시도해 보시기 바랍니다."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "나중에 볼 동영상 찾기... $s 페이지"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "재생목록의 동영상 평가"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "나중에 볼 동영상에 추가"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "재생목록에 추가"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "재생목록에서 삭제"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "좋아하는 동영상"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "싫어하는 동영상"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "평가 삭제"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "채널 구독"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "채널 구독 취소"

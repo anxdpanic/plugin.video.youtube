@@ -176,3 +176,11 @@ class XbmcContextUI(AbstractContextUI):
     @staticmethod
     def color(color, value):
         return ''.join(['[COLOR=', color.lower(), ']', value, '[/COLOR]'])
+
+    def set_focus_next_item(self):
+        cid = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
+        try:
+            current_position = int(self.get_info_label('Container.Position')) + 1
+            self._context.execute('SetFocus(%s,%s)' % (cid, str(current_position)))
+        except ValueError:
+            pass

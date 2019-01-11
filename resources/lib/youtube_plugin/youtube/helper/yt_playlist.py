@@ -52,6 +52,8 @@ def _process_add_video(provider, context):
         audible=False
     )
 
+    context.get_ui().set_focus_next_item()
+
     return True
 
 
@@ -98,6 +100,8 @@ def _process_remove_video(provider, context):
         time_milliseconds=2500,
         audible=False
     )
+
+    context.get_ui().set_focus_next_item()
 
     return True
 
