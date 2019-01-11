@@ -866,7 +866,6 @@ class VideoInfo(object):
                                 'playback_stats': playback_stats}
 
                 if is_live:
-                    # video_stream['url'] = ''.join([video_stream['url'], '&start_seq=$START_NUMBER$'])
                     video_stream.update(self.FORMAT.get('9998'))
                 else:
                     if not s_info:

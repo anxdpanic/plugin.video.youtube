@@ -65,7 +65,8 @@ def to_play_item(context, play_item):
             list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
             list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
 
-        # item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
+        if play_item.live:
+            list_item.setProperty('inputstream.adaptive.manifest_update_parameter', '&start_seq=$START_NUMBER$')
 
     if not is_strm:
         if play_item.get_play_count() == 0:
