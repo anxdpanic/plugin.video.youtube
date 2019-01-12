@@ -14,7 +14,7 @@ from ... import kodion
 from ...youtube.helper import v3
 
 
-def _process_add_video(provider, context):
+def _process_add_video(provider, context, keymap_action=False):
     listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
 
     client = provider.get_client(context)
@@ -31,6 +31,7 @@ def _process_add_video(provider, context):
     if not video_id:
         if context.is_plugin_path(listitem_path, 'play'):
             video_id = kodion.utils.find_video_id(listitem_path)
+            keymap_action = True
         if not video_id:
             raise kodion.KodionException('Playlist/Add: missing video_id')
 
@@ -52,7 +53,8 @@ def _process_add_video(provider, context):
         audible=False
     )
 
-    context.get_ui().set_focus_next_item()
+    if keymap_action:
+        context.get_ui().set_focus_next_item()
 
     return True
 
@@ -61,6 +63,7 @@ def _process_remove_video(provider, context):
     listitem_playlist_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_id)')
     listitem_playlist_item_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_item_id)')
     listitem_title = context.get_ui().get_info_label('Container.ListItem(0).Title')
+    keymap_action = False
 
     playlist_id = context.get_param('playlist_id', '')
     video_id = context.get_param('video_id', '')
@@ -71,6 +74,7 @@ def _process_remove_video(provider, context):
                 and listitem_playlist_item_id and listitem_playlist_item_id.startswith('UE'):
             playlist_id = listitem_playlist_id
             video_id = listitem_playlist_item_id
+            keymap_action = True
 
     if not playlist_id:
         raise kodion.KodionException('Playlist/Remove: missing playlist_id')
@@ -101,7 +105,8 @@ def _process_remove_video(provider, context):
         audible=False
     )
 
-    context.get_ui().set_focus_next_item()
+    if keymap_action:
+        context.get_ui().set_focus_next_item()
 
     return True
 
@@ -126,6 +131,7 @@ def _process_remove_playlist(provider, context):
 
 def _process_select_playlist(provider, context):
     listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')  # do this asap, relies on listitems focus
+    keymap_action = False
     ui = context.get_ui()
     page_token = ''
     current_page = 0
@@ -136,6 +142,7 @@ def _process_select_playlist(provider, context):
             video_id = kodion.utils.find_video_id(listitem_path)
             if video_id:
                 context.set_param('video_id', video_id)
+                keymap_action = True
         if not video_id:
             raise kodion.KodionException('Playlist/Select: missing video_id')
 
@@ -195,7 +202,7 @@ def _process_select_playlist(provider, context):
                     new_params.update(context.get_params())
                     new_params['playlist_id'] = playlist_id
                     new_context = context.clone(new_params=new_params)
-                    _process_add_video(provider, new_context)
+                    _process_add_video(provider, new_context, keymap_action)
             break
         elif result == 'playlist.next':
             continue
@@ -204,7 +211,7 @@ def _process_select_playlist(provider, context):
             new_params.update(context.get_params())
             new_params['playlist_id'] = result
             new_context = context.clone(new_params=new_params)
-            _process_add_video(provider, new_context)
+            _process_add_video(provider, new_context, keymap_action)
             break
         else:
             break
