@@ -1120,48 +1120,48 @@ msgstr "Αναπαραγωγή μόνο του ήχου"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Αποτυχία λήψης αναγνωριστικού λίστας 'Παρακολουθήστε αργότερα'. Για να διευκολυνθεί η λήψη της προσθέστε 8-10 βίντεο σε αυτήν μέσω ιστοσελίδας ή εφαρμογής και ξαναπροσπαθήστε."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Αποτυχία λήψης αναγνωριστικού λίστας 'Παρακολουθήστε αργότερα'. Ξαναπροσπαθήστε αύριο χωρίς να αφαιρέστε κάποιο από τα βίντεο."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "Αναζήτηση λίστας 'Παρακολουθήστε αργότερα'... Σελίδα %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Βαθμολόγηση βίντεο σε λίστες αναπαραγωγής"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Προσθήκη στο 'Παρακολουθήστε αργότερα'"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Έγινε η προσθήκη σε λίστα αναπαραγωγής"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Αφαίρεση από λίστα αναπαραγωγής"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Αρεστό βίντεο"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Μη αρεστό βίντεο"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Βαθμολόγηση αφαιρέθηκε"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Εγγραφή στο κανάλι"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Απεγγραφή από κανάλι"
