@@ -13,6 +13,9 @@ import time
 from datetime import date, datetime, timedelta
 from datetime import time as dt_time
 
+from six import PY2
+from six import text_type
+
 from ..exceptions import KodionException
 
 __RE_MATCH_TIME_ONLY__ = re.compile(r'^(?P<hour>[0-9]{2})([:]?(?P<minute>[0-9]{2})([:]?(?P<second>[0-9]{2}))?)?$')
@@ -20,6 +23,14 @@ __RE_MATCH_DATE_ONLY__ = re.compile(r'^(?P<year>[0-9]{4})[-]?(?P<month>[0-9]{2})
 __RE_MATCH_DATETIME__ = re.compile(r'^(?P<year>[0-9]{4})[-]?(?P<month>[0-9]{2})[-]?(?P<day>[0-9]{2})["T ](?P<hour>[0-9]{2})[:]?(?P<minute>[0-9]{2})[:]?(?P<second>[0-9]{2})')
 __RE_MATCH_PERIOD__ = re.compile(r'P((?P<years>\d+)Y)?((?P<months>\d+)M)?((?P<days>\d+)D)?(T((?P<hours>\d+)H)?((?P<minutes>\d+)M)?((?P<seconds>\d+)S)?)?')
 __RE_MATCH_ABBREVIATED__ = re.compile(r'(\w+), (?P<day>\d+) (?P<month>\w+) (?P<year>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<second>\d+)')
+
+
+def py2_utf8(text):
+    result = text
+    if PY2 and isinstance(result, text_type):
+        return result.encode('utf-8', 'ignore')
+
+    return result
 
 
 def parse(datetime_string, localize=True):
@@ -116,43 +127,43 @@ def datetime_to_since(context, dt):
 
     if seconds > 0:
         if seconds < 60:
-            return context.localize('30676')
+            return py2_utf8(context.localize('30676'))
         elif 60 <= seconds < 120:
-            return context.localize('30677')
+            return py2_utf8(context.localize('30677'))
         elif 120 <= seconds < 3600:
-            return context.localize('30678')
+            return py2_utf8(context.localize('30678'))
         elif 3600 <= seconds < 7200:
-            return context.localize('30679')
+            return py2_utf8(context.localize('30679'))
         elif 7200 <= seconds < 10800:
-            return context.localize('30680')
+            return py2_utf8(context.localize('30680'))
         elif 10800 <= seconds < 14400:
-            return context.localize('30681')
+            return py2_utf8(context.localize('30681'))
         elif use_yesterday and dt.date() == yesterday.date():
-            return u' '.join([context.localize('30682'), context.format_time(dt)])
+            return ' '.join([py2_utf8(context.localize('30682')), context.format_time(dt)])
         elif dt.date() == yyesterday.date():
-            return context.localize('30683')
+            return py2_utf8(context.localize('30683'))
         elif 5400 <= seconds < 86400:
-            return u' '.join([context.localize('30684'), context.format_time(dt)])
+            return ' '.join([py2_utf8(context.localize('30684')), context.format_time(dt)])
         elif 86400 <= seconds < 172800:
-            return u' '.join([context.localize('30682'), context.format_time(dt)])
+            return ' '.join([py2_utf8(context.localize('30682')), context.format_time(dt)])
     else:
         seconds *= -1
         if seconds < 60:
-            return context.localize('30691')
+            return py2_utf8(context.localize('30691'))
         elif 60 <= seconds < 120:
-            return context.localize('30692')
+            return py2_utf8(context.localize('30692'))
         elif 120 <= seconds < 3600:
-            return context.localize('30693')
+            return py2_utf8(context.localize('30693'))
         elif 3600 <= seconds < 7200:
-            return context.localize('30694')
+            return py2_utf8(context.localize('30694'))
         elif 7200 <= seconds < 10800:
-            return context.localize('30695')
+            return py2_utf8(context.localize('30695'))
         elif dt.date() == today:
-            return u' '.join([context.localize('30696'), context.format_time(dt)])
+            return ' '.join([py2_utf8(context.localize('30696')), context.format_time(dt)])
         elif dt.date() == tomorrow:
-            return u' '.join([context.localize('30697'), context.format_time(dt)])
+            return ' '.join([py2_utf8(context.localize('30697')), context.format_time(dt)])
 
-    return u' '.join([context.format_date_short(dt), context.format_time(dt)])
+    return ' '.join([context.format_date_short(dt), context.format_time(dt)])
 
 
 def strptime(s, fmt="%Y-%m-%dT%H:%M:%S.%fZ"):
