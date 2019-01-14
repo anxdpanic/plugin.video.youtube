@@ -18,9 +18,9 @@ import weakref
 
 import xbmc
 import xbmcaddon
-
 import xbmcplugin
 import xbmcvfs
+
 from ..abstract_context import AbstractContext
 from .xbmc_plugin_settings import XbmcPluginSettings
 from .xbmc_context_ui import XbmcContextUI
@@ -175,6 +175,7 @@ class XbmcContext(AbstractContext):
         return self._settings
 
     def localize(self, text_id, default_text=u''):
+        result = None
         if isinstance(text_id, int):
             """
             We want to use all localization strings!
@@ -184,13 +185,20 @@ class XbmcContext(AbstractContext):
             if text_id >= 0 and (text_id < 30000 or text_id > 30999):
                 result = xbmc.getLocalizedString(text_id)
                 if result is not None and result:
-                    return utils.to_unicode(result)
+                    result = utils.to_unicode(result)
 
-        result = self._addon.getLocalizedString(int(text_id))
-        if result is not None and result:
-            return utils.to_unicode(result)
+        if not result:
+            try:
+                result = self._addon.getLocalizedString(int(text_id))
+                if result is not None and result:
+                    result = utils.to_unicode(result)
+            except ValueError:
+                pass
 
-        return utils.to_unicode(default_text)
+        if not result:
+            result = default_text
+
+        return result
 
     def set_content_type(self, content_type):
         self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
