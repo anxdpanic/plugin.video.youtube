@@ -16,7 +16,6 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
                      playback_stats=None, seek_time=None, refresh_only=False):
     access_manager = context.get_access_manager()
 
-    monitor = xbmc.Monitor()
     player = xbmc.Player()
     settings = context.get_settings()
     ui = context.get_ui()
@@ -47,10 +46,11 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
     report_url = playback_stats.get('playback_url', '')
 
-    while not player.isPlaying() and not monitor.abortRequested():
+    while not player.isPlaying() and not context.abort_requested():
         context.log_debug('Waiting for playback to start')
 
-        if np_waited >= 5 or monitor.waitForAbort(np_wait_time):
+        xbmc.sleep(int(np_wait_time * 1000))
+        if np_waited >= 5:
             return
 
         np_waited += np_wait_time
@@ -64,7 +64,7 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
     report_url = playback_stats.get('watchtime_url', '')
 
-    while player.isPlaying():
+    while player.isPlaying() and not context.abort_requested():
         if ui.get_home_window_property('video_id') != video_id:
             break
 
@@ -123,8 +123,7 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
                 segment_start = segment_end
 
-        if monitor.waitForAbort(p_wait_time):
-            break
+        xbmc.sleep(int(p_wait_time * 1000))
 
         p_waited += p_wait_time
 

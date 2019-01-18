@@ -323,3 +323,6 @@ class XbmcContext(AbstractContext):
             return capabilities
         else:
             return capability_map[capability] if capability_map.get(capability) else None
+
+    def abort_requested(self):
+        return str(self.get_ui().get_home_window_property('abort_requested')).lower() == 'true'
