@@ -586,6 +586,38 @@ class VideoInfo(object):
 
         return player_config
 
+    def get_player_js(self, video_id):
+        page_result = self.get_embed_page(video_id)
+        html = page_result.get('html')
+
+        if not html:
+            return ''
+
+        _player_config = '{}'
+        player_config = dict()
+
+        lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
+        tail = ',\'EXPERIMENT_FLAGS\':'
+        if html.find(tail) == -1:
+            tail = '});'
+        pos = html.find(lead)
+        if pos >= 0:
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
+            if pos >= 0:
+                _player_config = html2[:pos]
+
+        try:
+            player_config.update(json.loads(_player_config))
+        except TypeError:
+            pass
+        finally:
+            js = player_config.get('assets', {}).get('js', '')
+            if js and not js.startswith('http'):
+                js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
+            self._context.log_debug('Player JavaScript: |%s|' % js)
+            return js
+
     def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', playback_stats=None):
         headers = {'Host': 'manifest.googlevideo.com',
                    'Connection': 'keep-alive',
@@ -635,6 +667,10 @@ class VideoInfo(object):
         return streams
 
     def _method_get_video_info(self, video_id=None, player_config=None, cookies=None):
+        def requires_cipher(_fmts):
+            fl = _fmts.split(',')
+            return (len(fl) > 0) and ('s' in dict(urllib.parse.parse_qsl(fl[0])))
+
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
@@ -669,11 +705,9 @@ class VideoInfo(object):
         else:
             cookies = dict()
 
-        player_assets = player_config.get('assets', {})
         player_args = player_config.get('args', {})
         player_response = player_args.get('player_response', {})
         playability_status = player_response.get('playabilityStatus', {})
-        js = player_assets.get('js')
 
         if video_id is None:
             if 'video_id' in player_args:
@@ -684,13 +718,6 @@ class VideoInfo(object):
             http_params['eurl'] = ''.join(['https://youtube.googleapis.com/v/', video_id])
         else:
             raise YouTubeException('_method_get_video_info: no video_id')
-
-        cipher = None
-        if js:
-            if not js.startswith('http'):
-                js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
-            self._context.log_debug('Cipher: js player: |%s|' % js)
-            cipher = Cipher(self._context, javascript_url=js)
 
         http_params['sts'] = player_config.get('sts', '')
         http_params['t'] = player_args.get('t', '')
@@ -815,13 +842,26 @@ class VideoInfo(object):
                                                   meta_info=meta_info,
                                                   curl_headers=curl_headers,
                                                   playback_stats=playback_stats)
+
         httpd_is_live = self._context.get_settings().use_dash_videos() and is_httpd_live(port=self._context.get_settings().httpd_port())
-        mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
+
+        cipher = None
         s_info = dict()
+
+        adaptive_fmts = params.get('adaptive_fmts', player_args.get('adaptive_fmts', ''))
+        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', player_args.get('url_encoded_fmt_stream_map', ''))
+
+        mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
+
+        if requires_cipher(adaptive_fmts) or requires_cipher(url_encoded_fmt_stream_map):
+            js = self.get_player_js(video_id)
+            cipher = Cipher(self._context, javascript_url=js)
+
         if not mpd_url and not is_live and httpd_is_live:
             mpd_url, s_info = self.generate_mpd(video_id,
-                                                params.get('adaptive_fmts', player_args.get('adaptive_fmts', '')),
-                                                params.get('length_seconds', '0'), cipher)
+                                                adaptive_fmts,
+                                                params.get('length_seconds', '0'),
+                                                cipher)
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
             mpd_sig_deciphered = True
@@ -893,8 +933,9 @@ class VideoInfo(object):
             else:
                 raise YouTubeException('Failed to decipher signature')
 
-        def parse_to_stream_list(stream_map_list):
-            for item in stream_map_list:
+        def parse_to_stream_list(streams):
+            fmts_list = streams.split(',')
+            for item in fmts_list:
                 stream_map = dict(urllib.parse.parse_qsl(item))
 
                 url = stream_map.get('url', None)
@@ -941,14 +982,10 @@ class VideoInfo(object):
                         stream_list.append(stream)
 
         # extract streams from map
-        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', player_args.get('url_encoded_fmt_stream_map', ''))
         if url_encoded_fmt_stream_map:
-            url_encoded_fmt_stream_map = url_encoded_fmt_stream_map.split(',')
             parse_to_stream_list(url_encoded_fmt_stream_map)
 
-        adaptive_fmts = params.get('adaptive_fmts', player_args.get('adaptive_fmts', ''))
         if adaptive_fmts:
-            adaptive_fmts = adaptive_fmts.split(',')
             parse_to_stream_list(adaptive_fmts)
 
         # last fallback
