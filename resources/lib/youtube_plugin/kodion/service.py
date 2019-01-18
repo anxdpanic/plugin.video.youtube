@@ -57,6 +57,8 @@ def run():
 
     monitor.remove_temp_dir()
 
+    context.get_ui().set_home_window_property('abort_requested', 'false')
+
     while not monitor.abortRequested():
 
         ping_diff = get_stamp_diff(ping_timestamp)
@@ -73,4 +75,5 @@ def run():
         if monitor.waitForAbort(sleep_time):
             if monitor.httpd:
                 monitor.shutdown_httpd()
+            context.get_ui().set_home_window_property('abort_requested', 'true')
             break

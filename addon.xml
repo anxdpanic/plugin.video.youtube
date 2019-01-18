@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.3.0~beta4" provider-name="bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.3.0~beta5" provider-name="bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -17,6 +17,7 @@
 [add] support for keymapping of some endpoints, wiki: https://kodi.wiki/view/Add-on:YouTube#Keymaps
 [add] 'Rate videos in playlists' setting to 'Settings - General - Rate after watching'
 [add] Support for purchased collections |contrib: MisterD81|
+[fix] Playback of some videos (e.g. music videos)
 [fix] Live stream playback
 [fix] post play add to watch history
 [fix] fix add-ons playback history not saving

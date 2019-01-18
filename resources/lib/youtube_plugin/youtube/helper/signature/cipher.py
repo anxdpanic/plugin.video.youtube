@@ -130,8 +130,8 @@ class Cipher(object):
     def _find_signature_function_name(javascript):
         match_patterns = [r'(["\'])signature\1\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
                           r'\.sig\|\|(?P<name>[a-zA-Z0-9$]+)\(',
-                          r'yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*c\s*&&\s*d\.set\([^,]+\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
-                          r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
+                          r'yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*c\s*&&\s*d\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?(?P<name>[a-zA-Z0-9$]+)\(',
+                          r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<name>[a-zA-Z0-9$]+)\(',
                           r'\bc\s*&&\s*d\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<name>[a-zA-Z0-9$]+)\(']
 
         for pattern in match_patterns:
