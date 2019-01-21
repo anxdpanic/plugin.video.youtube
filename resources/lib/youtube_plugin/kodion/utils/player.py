@@ -12,15 +12,14 @@ import re
 import xbmc
 
 
-def playback_monitor(provider, context, video_id, play_count=0, use_history=False,
-                     playback_stats=None, seek_time=None, refresh_only=False):
+def playback_monitor(provider, context, video_id, playing_file, play_count=0,
+                     use_history=False, playback_stats=None, seek_time=None,
+                     refresh_only=False):
     access_manager = context.get_access_manager()
 
     player = xbmc.Player()
     settings = context.get_settings()
     ui = context.get_ui()
-
-    ui.set_home_window_property('video_id', video_id)
 
     if playback_stats is None:
         playback_stats = {}
@@ -64,9 +63,15 @@ def playback_monitor(provider, context, video_id, play_count=0, use_history=Fals
 
     report_url = playback_stats.get('watchtime_url', '')
 
+    plugin_play_path = 'plugin://plugin.video.youtube/play/?video_id=%s' % video_id
+
     while player.isPlaying() and not context.abort_requested():
-        if ui.get_home_window_property('video_id') != video_id:
-            break
+        try:
+            if player.getPlayingFile() != playing_file and \
+                    player.getPlayingFile() != plugin_play_path:
+                break
+        except RuntimeError:
+            pass
 
         try:
             current_time = float(player.getTime())
