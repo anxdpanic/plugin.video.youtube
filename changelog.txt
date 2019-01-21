@@ -1,3 +1,8 @@
+6.3.1
+[fix] ensure playback monitoring is monitoring the correct item
+[fix] check for abortRequested while processing purchased collections
+[upd] Use setArt instead of iconImage, thumbnailImage and setProperty('fanart_image')
+
 6.3.0
 [add] support for keymapping of some endpoints, wiki: https://kodi.wiki/view/Add-on:YouTube#Keymaps
 [add] 'Rate videos in playlists' setting to 'Settings - General - Rate after watching'
