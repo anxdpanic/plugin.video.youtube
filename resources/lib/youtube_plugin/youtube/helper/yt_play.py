@@ -103,9 +103,9 @@ def play_video(provider, context):
         item.setPath(video_item.get_uri())
 
         xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=True, listitem=item)
-        playback_monitor(provider=provider, context=context, video_id=video_id, play_count=play_count,
-                         use_history=use_history, playback_stats=playback_stats, seek_time=seek_time,
-                         refresh_only=screensaver)
+        playback_monitor(provider=provider, context=context, video_id=video_id, playing_file=video_item.get_uri(),
+                         play_count=play_count, use_history=use_history, playback_stats=playback_stats,
+                         seek_time=seek_time, refresh_only=screensaver)
     except YouTubeException as ex:
         message = ex.get_message()
         message = kodion.utils.strip_html_from_text(message)

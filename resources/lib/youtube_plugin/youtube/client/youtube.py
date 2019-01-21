@@ -695,7 +695,7 @@ class YouTube(LoginClient):
                                                'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
                                 _result['items'].append(_video_item)
                         play_next_page_token = json_playlist_data.get('nextPageToken', '')
-                        if not play_next_page_token:
+                        if not play_next_page_token or _context.abort_requested():
                             break
 
             _continuations = _data.get('continuations', [{}])[0].get('nextContinuationData', {}).get('continuation', '')
