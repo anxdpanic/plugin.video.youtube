@@ -60,7 +60,7 @@ def run():
     # wipe function cache on updates/restarts (fix cipher related issues on update, valid for one day otherwise)
     context.get_function_cache().clear()
 
-    context.get_ui().set_home_window_property('abort_requested', 'false')
+    context.get_ui().clear_home_window_property('abort_requested')
 
     while not monitor.abortRequested():
 
