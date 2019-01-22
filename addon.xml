@@ -13,6 +13,12 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+6.3.2
+[fix] some videos not playing when logged in
+[fix] reset function cache at restart/update to resolve issues persisting due to cached results
+[fix] service potentially not shutting down http server
+[upd] player javascript retrieval
+
 6.3.1
 [fix] ensure playback monitoring is monitoring the correct item
 [fix] check for abortRequested while processing purchased collections
