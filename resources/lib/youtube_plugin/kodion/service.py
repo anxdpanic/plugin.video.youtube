@@ -57,8 +57,13 @@ def run():
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     monitor.remove_temp_dir()
+
     # wipe function cache on updates/restarts (fix cipher related issues on update, valid for one day otherwise)
-    context.get_function_cache().clear()
+    try:
+        context.get_function_cache().clear()
+    except:
+        # prevent service to failing due to cache related issues
+        pass
 
     context.get_ui().clear_home_window_property('abort_requested')
 
