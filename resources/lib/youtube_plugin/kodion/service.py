@@ -55,7 +55,10 @@ def run():
 
     monitor = YouTubeMonitor()
 
+    # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     monitor.remove_temp_dir()
+    # wipe function cache on updates/restarts (fix cipher related issues on update, valid for one day otherwise)
+    context.get_function_cache().clear()
 
     context.get_ui().set_home_window_property('abort_requested', 'false')
 
