@@ -73,7 +73,9 @@ def run():
             first_run = False
 
         if monitor.waitForAbort(sleep_time):
-            if monitor.httpd:
-                monitor.shutdown_httpd()
-            context.get_ui().set_home_window_property('abort_requested', 'true')
             break
+
+    context.get_ui().set_home_window_property('abort_requested', 'true')
+
+    if monitor.httpd:
+        monitor.shutdown_httpd()
