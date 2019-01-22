@@ -586,37 +586,39 @@ class VideoInfo(object):
 
         return player_config
 
-    def get_player_js(self, video_id):
-        page_result = self.get_embed_page(video_id)
-        html = page_result.get('html')
+    def get_player_js(self, video_id, js=''):
+        if not js:
+            page_result = self.get_embed_page(video_id)
+            html = page_result.get('html')
 
-        if not html:
-            return ''
+            if not html:
+                return ''
 
-        _player_config = '{}'
-        player_config = dict()
+            _player_config = '{}'
+            player_config = dict()
 
-        lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
-        tail = ',\'EXPERIMENT_FLAGS\':'
-        if html.find(tail) == -1:
-            tail = '});'
-        pos = html.find(lead)
-        if pos >= 0:
-            html2 = html[pos + len(lead):]
-            pos = html2.find(tail)
+            lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
+            tail = ',\'EXPERIMENT_FLAGS\':'
+            if html.find(tail) == -1:
+                tail = '});'
+            pos = html.find(lead)
             if pos >= 0:
-                _player_config = html2[:pos]
+                html2 = html[pos + len(lead):]
+                pos = html2.find(tail)
+                if pos >= 0:
+                    _player_config = html2[:pos]
 
-        try:
-            player_config.update(json.loads(_player_config))
-        except TypeError:
-            pass
-        finally:
-            js = player_config.get('assets', {}).get('js', '')
-            if js and not js.startswith('http'):
-                js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
-            self._context.log_debug('Player JavaScript: |%s|' % js)
-            return js
+            try:
+                player_config.update(json.loads(_player_config))
+            except TypeError:
+                pass
+            finally:
+                js = player_config.get('assets', {}).get('js', '')
+
+        if js and not js.startswith('http'):
+            js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
+        self._context.log_debug('Player JavaScript: |%s|' % js)
+        return js
 
     def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', playback_stats=None):
         headers = {'Host': 'manifest.googlevideo.com',
@@ -854,7 +856,7 @@ class VideoInfo(object):
         mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
 
         if requires_cipher(adaptive_fmts) or requires_cipher(url_encoded_fmt_stream_map):
-            js = self.get_player_js(video_id)
+            js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
         if not mpd_url and not is_live and httpd_is_live:
