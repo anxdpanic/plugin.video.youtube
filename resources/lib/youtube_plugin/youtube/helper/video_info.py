@@ -586,37 +586,39 @@ class VideoInfo(object):
 
         return player_config
 
-    def get_player_js(self, video_id):
-        page_result = self.get_embed_page(video_id)
-        html = page_result.get('html')
+    def get_player_js(self, video_id, js=''):
+        if not js:
+            page_result = self.get_embed_page(video_id)
+            html = page_result.get('html')
 
-        if not html:
-            return ''
+            if not html:
+                return ''
 
-        _player_config = '{}'
-        player_config = dict()
+            _player_config = '{}'
+            player_config = dict()
 
-        lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
-        tail = ',\'EXPERIMENT_FLAGS\':'
-        if html.find(tail) == -1:
-            tail = '});'
-        pos = html.find(lead)
-        if pos >= 0:
-            html2 = html[pos + len(lead):]
-            pos = html2.find(tail)
+            lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
+            tail = ',\'EXPERIMENT_FLAGS\':'
+            if html.find(tail) == -1:
+                tail = '});'
+            pos = html.find(lead)
             if pos >= 0:
-                _player_config = html2[:pos]
+                html2 = html[pos + len(lead):]
+                pos = html2.find(tail)
+                if pos >= 0:
+                    _player_config = html2[:pos]
 
-        try:
-            player_config.update(json.loads(_player_config))
-        except TypeError:
-            pass
-        finally:
-            js = player_config.get('assets', {}).get('js', '')
-            if js and not js.startswith('http'):
-                js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
-            self._context.log_debug('Player JavaScript: |%s|' % js)
-            return js
+            try:
+                player_config.update(json.loads(_player_config))
+            except TypeError:
+                pass
+            finally:
+                js = player_config.get('assets', {}).get('js', '')
+
+        if js and not js.startswith('http'):
+            js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
+        self._context.log_debug('Player JavaScript: |%s|' % js)
+        return js
 
     def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', playback_stats=None):
         headers = {'Host': 'manifest.googlevideo.com',
@@ -854,7 +856,7 @@ class VideoInfo(object):
         mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
 
         if requires_cipher(adaptive_fmts) or requires_cipher(url_encoded_fmt_stream_map):
-            js = self.get_player_js(video_id)
+            js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
         if not mpd_url and not is_live and httpd_is_live:
@@ -869,11 +871,17 @@ class VideoInfo(object):
                 if (use_cipher_signature or re.search('/s/[0-9A-F.]+', mpd_url)) and (not re.search('/signature/[0-9A-F.]+', mpd_url)):
                     mpd_sig_deciphered = False
                     if cipher:
+                        sig_param = 'signature'
+                        sp = re.search('/sp/(?P<sig_param>[^/]+)', mpd_url)
+                        if sp:
+                            sig_param = sp.group('sig_param')
+
                         sig = re.search('/s/(?P<sig>[0-9A-F.]+)', mpd_url)
                         if sig:
                             signature = cipher.get_signature(sig.group('sig'))
-                            mpd_url = re.sub('/s/[0-9A-F.]+', ''.join(['/signature/', signature]), mpd_url)
+                            mpd_url = re.sub('/s/[0-9A-F.]+', ''.join(['/', sig_param, '/', signature]), mpd_url)
                             mpd_sig_deciphered = True
+
                     else:
                         raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
@@ -941,11 +949,15 @@ class VideoInfo(object):
                 url = stream_map.get('url', None)
                 conn = stream_map.get('conn', None)
                 if url:
+                    sig_param = '&signature='
+                    if 'sp' in stream_map:
+                        sig_param = '&%s=' % stream_map['sp']
+
                     if 'sig' in stream_map:
-                        url = ''.join([url, '&signature=', stream_map['sig']])
+                        url = ''.join([url, sig_param, stream_map['sig']])
                     elif 's' in stream_map:
                         if cipher:
-                            url = ''.join([url, '&signature=', cipher.get_signature(stream_map['s'])])
+                            url = ''.join([url, sig_param, cipher.get_signature(stream_map['s'])])
                         else:
                             raise YouTubeException('Cipher: Not Found')
 
@@ -1081,11 +1093,15 @@ class VideoInfo(object):
 
             url = urllib.parse.unquote(stream_map.get('url'))
 
+            sig_param = '&signature='
+            if 'sp' in stream_map:
+                sig_param = '&%s=' % stream_map['sp']
+
             if 'sig' in stream_map:
-                url = ''.join([url, '&signature=', stream_map['sig']])
+                url = ''.join([url, sig_param, stream_map['sig']])
             elif 's' in stream_map:
                 if cipher:
-                    url = ''.join([url, '&signature=', cipher.get_signature(stream_map['s'])])
+                    url = ''.join([url, sig_param, cipher.get_signature(stream_map['s'])])
                 else:
                     raise YouTubeException('Cipher: Not Found')
 

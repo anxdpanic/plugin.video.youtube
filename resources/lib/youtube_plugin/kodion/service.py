@@ -55,9 +55,17 @@ def run():
 
     monitor = YouTubeMonitor()
 
+    # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     monitor.remove_temp_dir()
 
-    context.get_ui().set_home_window_property('abort_requested', 'false')
+    # wipe function cache on updates/restarts (fix cipher related issues on update, valid for one day otherwise)
+    try:
+        context.get_function_cache().clear()
+    except:
+        # prevent service to failing due to cache related issues
+        pass
+
+    context.get_ui().clear_home_window_property('abort_requested')
 
     while not monitor.abortRequested():
 
@@ -73,7 +81,9 @@ def run():
             first_run = False
 
         if monitor.waitForAbort(sleep_time):
-            if monitor.httpd:
-                monitor.shutdown_httpd()
-            context.get_ui().set_home_window_property('abort_requested', 'true')
             break
+
+    context.get_ui().set_home_window_property('abort_requested', 'true')
+
+    if monitor.httpd:
+        monitor.shutdown_httpd()
