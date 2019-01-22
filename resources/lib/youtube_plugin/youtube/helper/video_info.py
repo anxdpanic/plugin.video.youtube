@@ -871,11 +871,17 @@ class VideoInfo(object):
                 if (use_cipher_signature or re.search('/s/[0-9A-F.]+', mpd_url)) and (not re.search('/signature/[0-9A-F.]+', mpd_url)):
                     mpd_sig_deciphered = False
                     if cipher:
+                        sig_param = 'signature'
+                        sp = re.search('/sp/(?P<sig_param>[^/]+)', mpd_url)
+                        if sp:
+                            sig_param = sp.group('sig_param')
+
                         sig = re.search('/s/(?P<sig>[0-9A-F.]+)', mpd_url)
                         if sig:
                             signature = cipher.get_signature(sig.group('sig'))
-                            mpd_url = re.sub('/s/[0-9A-F.]+', ''.join(['/signature/', signature]), mpd_url)
+                            mpd_url = re.sub('/s/[0-9A-F.]+', ''.join(['/', sig_param, '/', signature]), mpd_url)
                             mpd_sig_deciphered = True
+
                     else:
                         raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
@@ -943,11 +949,15 @@ class VideoInfo(object):
                 url = stream_map.get('url', None)
                 conn = stream_map.get('conn', None)
                 if url:
+                    sig_param = '&signature='
+                    if 'sp' in stream_map:
+                        sig_param = '&%s=' % stream_map['sp']
+
                     if 'sig' in stream_map:
-                        url = ''.join([url, '&signature=', stream_map['sig']])
+                        url = ''.join([url, sig_param, stream_map['sig']])
                     elif 's' in stream_map:
                         if cipher:
-                            url = ''.join([url, '&signature=', cipher.get_signature(stream_map['s'])])
+                            url = ''.join([url, sig_param, cipher.get_signature(stream_map['s'])])
                         else:
                             raise YouTubeException('Cipher: Not Found')
 
@@ -1083,11 +1093,15 @@ class VideoInfo(object):
 
             url = urllib.parse.unquote(stream_map.get('url'))
 
+            sig_param = '&signature='
+            if 'sp' in stream_map:
+                sig_param = '&%s=' % stream_map['sp']
+
             if 'sig' in stream_map:
-                url = ''.join([url, '&signature=', stream_map['sig']])
+                url = ''.join([url, sig_param, stream_map['sig']])
             elif 's' in stream_map:
                 if cipher:
-                    url = ''.join([url, '&signature=', cipher.get_signature(stream_map['s'])])
+                    url = ''.join([url, sig_param, cipher.get_signature(stream_map['s'])])
                 else:
                     raise YouTubeException('Cipher: Not Found')
 
