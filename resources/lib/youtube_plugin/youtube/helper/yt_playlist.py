@@ -39,24 +39,26 @@ def _process_add_video(provider, context, keymap_action=False):
         json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
         if not v3.handle_error(provider, context, json_data):
             return False
+
+        if playlist_id == watch_later_id:
+            notify_message = context.localize(provider.LOCAL_MAP['youtube.added.to.watch.later'])
+        else:
+            notify_message = context.localize(provider.LOCAL_MAP['youtube.added.to.playlist'])
+
+        context.get_ui().show_notification(
+            message=notify_message,
+            time_milliseconds=2500,
+            audible=False
+        )
+
+        if keymap_action:
+            context.get_ui().set_focus_next_item()
+
+        return True
     else:
         context.log_debug('Cannot add to playlist id |%s|' % playlist_id)
 
-    if playlist_id == watch_later_id:
-        notify_message = context.localize(provider.LOCAL_MAP['youtube.added.to.watch.later'])
-    else:
-        notify_message = context.localize(provider.LOCAL_MAP['youtube.added.to.playlist'])
-
-    context.get_ui().show_notification(
-        message=notify_message,
-        time_milliseconds=2500,
-        audible=False
-    )
-
-    if keymap_action:
-        context.get_ui().set_focus_next_item()
-
-    return True
+    return False
 
 
 def _process_remove_video(provider, context):
@@ -96,19 +98,21 @@ def _process_remove_video(provider, context):
                 return False
 
             context.get_ui().refresh_container()
+
+            context.get_ui().show_notification(
+                message=context.localize(provider.LOCAL_MAP['youtube.removed.from.playlist']),
+                time_milliseconds=2500,
+                audible=False
+            )
+
+            if keymap_action:
+                context.get_ui().set_focus_next_item()
+
+            return True
     else:
         context.log_debug('Cannot remove from playlist id |%s|' % playlist_id)
 
-    context.get_ui().show_notification(
-        message=context.localize(provider.LOCAL_MAP['youtube.removed.from.playlist']),
-        time_milliseconds=2500,
-        audible=False
-    )
-
-    if keymap_action:
-        context.get_ui().set_focus_next_item()
-
-    return True
+    return False
 
 
 def _process_remove_playlist(provider, context):

@@ -39,13 +39,15 @@ def _process_add(provider, context):
         if not v3.handle_error(provider, context, json_data):
             return False
 
-    context.get_ui().show_notification(
-        context.localize(provider.LOCAL_MAP['youtube.subscribed.to.channel']),
-        time_milliseconds=2500,
-        audible=False
-    )
+        context.get_ui().show_notification(
+            context.localize(provider.LOCAL_MAP['youtube.subscribed.to.channel']),
+            time_milliseconds=2500,
+            audible=False
+        )
 
-    return True
+        return True
+
+    return False
 
 
 def _process_remove(provider, context):
@@ -62,13 +64,15 @@ def _process_remove(provider, context):
 
         context.get_ui().refresh_container()
 
-    context.get_ui().show_notification(
-        context.localize(provider.LOCAL_MAP['youtube.unsubscribed.from.channel']),
-        time_milliseconds=2500,
-        audible=False
-    )
+        context.get_ui().show_notification(
+            context.localize(provider.LOCAL_MAP['youtube.unsubscribed.from.channel']),
+            time_milliseconds=2500,
+            audible=False
+        )
 
-    return True
+        return True
+
+    return False
 
 
 def process(method, provider, context):

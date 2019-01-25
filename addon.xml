@@ -17,6 +17,7 @@
 [fix] some videos not playing when logged in
 [fix] reset function cache at restart/update to resolve issues persisting due to cached results
 [fix] service potentially not shutting down http server
+[fix] added to playlist/subscriptions notifications
 [upd] player javascript retrieval
 
 6.3.1
