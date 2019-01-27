@@ -63,12 +63,15 @@ def playback_monitor(provider, context, video_id, playing_file, play_count=0,
 
     report_url = playback_stats.get('watchtime_url', '')
 
-    plugin_play_path = 'plugin://plugin.video.youtube/play/?video_id=%s' % video_id
+    plugin_play_path = 'plugin://plugin.video.youtube/play/'
+    video_id_param = 'video_id=%s' % video_id
 
     while player.isPlaying() and not context.abort_requested():
         try:
-            if player.getPlayingFile() != playing_file and \
-                    player.getPlayingFile() != plugin_play_path:
+            current_file = player.getPlayingFile()
+            if (current_file != playing_file and
+                    not (current_file.startswith(plugin_play_path) and
+                         video_id_param in current_file)):
                 break
         except RuntimeError:
             pass
@@ -78,6 +81,9 @@ def playback_monitor(provider, context, video_id, playing_file, play_count=0,
             total_time = float(player.getTotalTime())
         except RuntimeError:
             pass
+
+        if current_time < 0.0:
+            current_time = 0.0
 
         try:
             percent_complete = int(float(current_time) / float(total_time) * 100)
