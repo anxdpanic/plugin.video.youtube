@@ -1,0 +1,17 @@
+language: python
+python:
+  - "3.6"
+
+install:
+  - pip install kodi-addon-checker
+
+script:
+  - kodi-addon-checker . --branch=isengard --PR
+
+notifications:
+  webhooks: https://www.travisbuddy.com/
+  email:
+    on_failure: change
+
+travisBuddy:
+  successBuildLog: true
