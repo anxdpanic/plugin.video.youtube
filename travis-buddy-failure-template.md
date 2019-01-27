@@ -25,5 +25,3 @@ Please review the following log and resolve any issues.
 {{/jobs}}
 
 Thank you for your contribution.
-
-###### TravisBuddy Request Identifier: {{requestId}}
