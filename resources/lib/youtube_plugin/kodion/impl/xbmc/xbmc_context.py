@@ -306,11 +306,11 @@ class XbmcContext(AbstractContext):
         capability_map = {
             'live': '2.0.12',
             'drm': '2.2.12',
-            'vp9': None,
-            'vp9.2': None,
-            'vorbis': None,
-            'opus': None,
-            'av1': None,
+            'vp9': '2.3.13',
+            'vp9.2': '2.3.13',
+            'vorbis': '2.3.13',
+            'opus': '2.3.13',
+            'av1': '2.3.13',
         }
 
         if capability is None:
