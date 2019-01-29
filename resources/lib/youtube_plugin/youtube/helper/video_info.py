@@ -1184,8 +1184,6 @@ class VideoInfo(object):
                                 stream_info['video']['codec'] = video_codec
 
                         video_codec = data[mime][i]['codecs']
-                        video_codec = video_codec.lower().replace('vp9.2', 'vp09.02.51.10')
-                        video_codec = video_codec.lower().replace('vp9', 'vp09.00.51.08')
                         out_list.append(''.join(['\t\t\t<Representation id="', i, '" ', video_codec,
                                                  ' startWithSAP="1" bandwidth="', data[mime][i]['bandwidth'],
                                                  '" width="', data[mime][i]['width'], '" height="',
