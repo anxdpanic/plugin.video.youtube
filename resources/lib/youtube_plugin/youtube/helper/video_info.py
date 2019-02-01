@@ -859,7 +859,7 @@ class VideoInfo(object):
             js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
-        if not mpd_url and not is_live and httpd_is_live:
+        if not mpd_url and not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
                                                 params.get('length_seconds', '0'),
@@ -1048,6 +1048,10 @@ class VideoInfo(object):
         has_video_stream = False
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
 
+        # map frame rates to a more common representation to lessen the chance of double refresh changes
+        # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
+        fps_map = {'24': '23.976', '30': '29.97', '60': '59.94'}
+
         ipaddress = self._context.get_settings().httpd_listen()
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
@@ -1089,7 +1093,10 @@ class VideoInfo(object):
             data[mime][i]['quality_label'] = str(stream_map.get('quality_label'))
 
             data[mime][i]['bandwidth'] = stream_map.get('bitrate')
-            data[mime][i]['frameRate'] = stream_map.get('fps')
+
+            data[mime][i]['frameRate'] = fps_map.get(stream_map.get('fps'), stream_map.get('fps'))
+            if data[mime][i]['frameRate']:
+                data[mime][i]['frameRate'] = str(format(float(data[mime][i]['frameRate']), '.3f'))
 
             url = urllib.parse.unquote(stream_map.get('url'))
 
