@@ -859,7 +859,7 @@ class VideoInfo(object):
             js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
-        if not mpd_url and not is_live and httpd_is_live:
+        if not mpd_url and not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
                                                 params.get('length_seconds', '0'),
