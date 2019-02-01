@@ -24,27 +24,6 @@
 [fix] ensure playback monitoring is monitoring the correct item
 [fix] check for abortRequested while processing purchased collections
 [upd] Use setArt instead of iconImage, thumbnailImage and setProperty('fanart_image')
-
-6.3.0
-[add] support for keymapping of some endpoints, wiki: https://kodi.wiki/view/Add-on:YouTube#Keymaps
-[add] 'Rate videos in playlists' setting to 'Settings - General - Rate after watching'
-[add] Support for purchased collections |contrib: MisterD81|
-[fix] Playback of some videos (e.g. music videos)
-[fix] Live stream playback
-[fix] post play add to watch history
-[fix] fix add-ons playback history not saving
-[fix] playback monitoring/post play events triggering for the wrong videos in some cases
-[fix] call setResolvedUrl(False) if get_video_streams fails
-[upd] code cosmetics and resolve inspections
-[upd] improve watch history tracking, actively report watch times and state during playback
-[upd] sign in/out, switch user, and settings ListItems to isFolder=False and isPlayable=False
-[upd] improve watch later playlist id retrieval and feedback
-[upd] Use SPDX license identifier
-[lang] de_de strings |contrib: tobhor|
-[lang] el_gr strings |contrib: twilight0|
-[lang] es_es strings |contrib: roliverosc|
-[lang] ko_kr strings |contrib: parkmino|
-[lang] nl_nl strings |contrib: Markman-B|
         </news>
         <assets>
             <icon>icon.png</icon>
