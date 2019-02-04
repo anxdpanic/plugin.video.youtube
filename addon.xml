@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.3.2~alpha1" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.3.2~alpha2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -18,6 +18,9 @@
 [fix] reset function cache at restart/update to resolve issues persisting due to cached results
 [fix] service potentially not shutting down http server
 [fix] added to playlist/subscriptions notifications
+[fix] only generate mpeg-dash file if adaptive formats are available
+[fix] map frame rates to more common representation to lessen the chance of double refresh changes (applies only to generated mpeg-dash files)
+[fix] currently playing file check when playing file is a plugin:// url
 [upd] player javascript retrieval
 
 6.3.1
