@@ -17,13 +17,17 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-#other
-/.settings
-/.project
-/.pydevproject
-*.pyc
-*.pyo
-/.idea
+# other
+.idea/
+.settings/
+.project/
+.pydevproject/
+
+__pycache__/
+
+*.py[cod]
+
+*.log
 
 /resources/language/append_to_languages.py
 /resources/language/new_strings.txt
