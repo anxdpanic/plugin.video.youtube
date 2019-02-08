@@ -29,5 +29,5 @@ __pycache__/
 
 *.log
 
-/resources/language/append_to_languages.py
-/resources/language/new_strings.txt
+append_to_languages.py
+new_strings.txt
