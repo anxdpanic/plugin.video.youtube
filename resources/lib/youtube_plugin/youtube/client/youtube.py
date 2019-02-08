@@ -458,10 +458,12 @@ class YouTube(LoginClient):
 
         return self.perform_v3_request(method='GET', path='search', params=params)
 
-    def get_related_videos(self, video_id, page_token=''):
+    def get_related_videos(self, video_id, page_token='', max_results=0):
         # prepare page token
         if not page_token:
             page_token = ''
+
+        max_results = self._max_results if max_results <= 0 else max_results
 
         # prepare params
         params = {'relatedToVideoId': video_id,
@@ -469,7 +471,7 @@ class YouTube(LoginClient):
                   'type': 'video',
                   'regionCode': self._region,
                   'hl': self._language,
-                  'maxResults': str(self._max_results)}
+                  'maxResults': str(max_results)}
         if page_token:
             params['pageToken'] = page_token
 

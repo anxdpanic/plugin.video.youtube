@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+import json
+
 import xbmc
 from ..abstract_playlist import AbstractPlaylist
 from . import xbmc_items
@@ -37,3 +39,28 @@ class XbmcPlaylist(AbstractPlaylist):
 
     def unshuffle(self):
         self._playlist.unshuffle()
+
+    def size(self):
+        return self._playlist.size()
+
+    def get_items(self):
+        rpc_request = json.dumps(
+            {
+                "jsonrpc": "2.0",
+                "method": "Playlist.GetItems",
+                "params": {
+                    "properties": ["title", "file"],
+                    "playlistid": self._playlist.getPlayListId()
+                },
+                "id": 1
+            })
+
+        response = json.loads(xbmc.executeJSONRPC(rpc_request))
+        try:
+            return response['result']['items']
+        except KeyError:
+            message = response['error']['message']
+            code = response['error']['code']
+            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
+            self._context.log_debug(error)
+            return []

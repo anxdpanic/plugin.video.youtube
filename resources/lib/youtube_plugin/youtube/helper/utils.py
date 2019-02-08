@@ -570,3 +570,36 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
             shelf_index = None
 
     return shelf_index
+
+
+def add_related_video_to_playlist(provider, context, client, v3, video_id):
+    playlist = context.get_video_playlist()
+    if playlist.size() <= 999:
+        a = 0
+        add_item = None
+        max_results = 20
+        result_items = []
+        while not add_item and a <= 1:
+            a += 1
+            try:
+                json_data = client.get_related_videos(video_id, max_results=max_results)
+                result_items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+            except:
+                context.get_ui().show_notification('Failed to add a suggested video.', time_milliseconds=5000)
+
+            if result_items:
+                playlist_items = playlist.get_items()
+                add_item = next((
+                    item for item in result_items
+                    if not any((item.get_uri() == pitem.get('file') or
+                                item.get_title() == pitem.get('title'))
+                               for pitem in playlist_items)),
+                    None)
+
+                if not add_item:
+                    max_results *= 2
+                    continue
+
+                if add_item:
+                    playlist.add(add_item)
+                    break

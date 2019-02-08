@@ -67,19 +67,9 @@ def play_video(provider, context):
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
-        suggested_param = str(context.get_param('suggested', True)).lower() == 'true'
-        play_suggested = settings.get_bool('youtube.suggested_videos', False) and suggested_param
-        items = None
+        play_suggested = settings.get_bool('youtube.suggested_videos', False)
         if play_suggested and not screensaver:
-            try:
-                json_data = client.get_related_videos(video_id)
-                items = v3.response_to_items(provider, context, json_data, process_next_page=False)
-            except:
-                context.get_ui().show_notification('Failed to add suggested videos.', time_milliseconds=5000)
-        if items:
-            playlist = context.get_video_playlist()
-            for i in items:
-                playlist.add(i)
+            utils.add_related_video_to_playlist(provider, context, client, v3, video_id)
 
         title = video_stream.get('meta', {}).get('video', {}).get('title', '')
         video_item = VideoItem(title, video_stream['url'])
