@@ -6,7 +6,11 @@ install:
   - pip install kodi-addon-checker
 
 script:
-  - kodi-addon-checker . --branch=isengard
+  - |
+    printf "\n"
+    rm -rf LICENSES/
+    cd $HOME
+    kodi-addon-checker $TRAVIS_BUILD_DIR --branch=isengard
 
 notifications:
   webhooks: https://www.travisbuddy.com/
