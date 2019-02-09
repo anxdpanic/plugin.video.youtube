@@ -7,7 +7,6 @@ install:
 
 script:
   - |
-    printf "\n"
     rm -rf LICENSES/
     cd $HOME
     kodi-addon-checker $TRAVIS_BUILD_DIR --branch=isengard
