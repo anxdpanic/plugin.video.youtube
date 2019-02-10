@@ -2,8 +2,14 @@ language: python
 python:
   - "3.6"
 
+before_install:
+  - |
+    cd $HOME
+    git clone https://github.com/xbmc/addon-check
+    cd $TRAVIS_BUILD_DIR
+
 install:
-  - pip install kodi-addon-checker
+  - pip install $HOME/addon-check/
 
 before_script:
   - |
@@ -12,11 +18,3 @@ before_script:
 
 script:
   - kodi-addon-checker $TRAVIS_BUILD_DIR --branch=isengard
-
-notifications:
-  webhooks: https://www.travisbuddy.com/
-  email:
-    on_failure: change
-
-travisBuddy:
-  successBuildLog: true
