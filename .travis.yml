@@ -18,11 +18,3 @@ before_script:
 
 script:
   - kodi-addon-checker $TRAVIS_BUILD_DIR --branch=isengard
-
-notifications:
-  webhooks: https://www.travisbuddy.com/
-  email:
-    on_failure: change
-
-travisBuddy:
-  successBuildLog: true
