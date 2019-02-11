@@ -293,15 +293,13 @@ class XbmcContext(AbstractContext):
         capabilities = []
 
         use_dash = self.use_inputstream_adaptive()
-        if not use_dash and capability is not None:
-            return None
-        if not use_dash and capability is None:
-            return capabilities
-
         try:
             inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
         except RuntimeError:
-            return capabilities
+            inputstream_version = ''
+
+        if not use_dash or not inputstream_version:
+            return None if capability is not None else capabilities
 
         capability_map = {
             'live': '2.0.12',
