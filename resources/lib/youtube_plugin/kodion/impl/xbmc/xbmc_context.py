@@ -304,8 +304,8 @@ class XbmcContext(AbstractContext):
         capability_map = {
             'live': '2.0.12',
             'drm': '2.2.12',
-            'vp9': None,
-            'vp9.2': None,
+            'vp9': '2.3.14',
+            'vp9.2': '2.3.14',
             'vorbis': None,
             'opus': None,
             'av1': None,

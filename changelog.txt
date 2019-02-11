@@ -1,4 +1,6 @@
 6.3.2
+[add] 4K videos with InputStream Adaptive >= v2.3.14
+        - Thanks to @peak3d
 [fix] some videos not playing when logged in
 [fix] reset function cache at restart/update to resolve issues persisting due to cached results
 [fix] service potentially not shutting down http server
