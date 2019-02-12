@@ -24,7 +24,7 @@ msgstr ""
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube is een van de grootste sites ter wereld om video's te delen."
 
-#Kodion Settings
+# Kodion Settings
 
 msgctxt "#30000"
 msgid "General"
@@ -38,7 +38,7 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Wachtwoord"
 
-#empty strings from id 30003 to 30008
+# empty strings from id 30003 to 30008
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -80,7 +80,7 @@ msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr ""
 
-#empty strings 30019
+# empty strings 30019
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -158,8 +158,8 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Aangepast Geschiedenis afspeellijst ID"
 
-#Kodion Common
-#empty strings from id 30037 to 30099
+# Kodion Common
+# empty strings from id 30037 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -245,8 +245,8 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Opschonen"
 
-#YouTube
-#empty strings from id 30121 to 30199
+# YouTube
+# empty strings from id 30121 to 30199
 
 msgctxt "#30200"
 msgid "API Key"
@@ -272,8 +272,8 @@ msgctxt "#30205"
 msgid "Use preset API key set"
 msgstr "Gebruik vooraf ingestelde API sleutel set"
 
-#YouTube
-#empty strings from id 30206 to 30499
+# YouTube
+# empty strings from id 30206 to 30499
 
 msgctxt "#30500"
 msgid "Channels"

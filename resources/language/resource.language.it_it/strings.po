@@ -26,7 +26,7 @@ msgstr ""
 # msgstr "YouTube è uno dei siti di video-sharing più grandi del mondo"
 # msgstr ""
 
-#Kodion Settings
+# Kodion Settings
 msgctxt "#30000"
 msgid "General"
 msgstr "Generale"
@@ -39,7 +39,7 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Password"
 
-#empty strings from id 30003 to 30006
+# empty strings from id 30003 to 30006
 
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
@@ -89,7 +89,7 @@ msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p Live/720p (HD)"
 
-#empty strings 30019
+# empty strings 30019
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -167,8 +167,8 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Playlist ID Storica personalizzata"
 
-#Kodion Common
-#empty strings from id 30039 to 30099
+# Kodion Common
+# empty strings from id 30039 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -254,8 +254,8 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Pulisci"
 
-#YouTube
-#empty strings from id 30121 to 30199
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API Key"
 msgstr "API Key"
@@ -280,8 +280,8 @@ msgctxt "#30205"
 msgid "Use preset API key set"
 msgstr "Usa set di API Key preimpostate"
 
-#YouTube
-#empty strings from id 30206 to 30499
+# YouTube
+# empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Canali"

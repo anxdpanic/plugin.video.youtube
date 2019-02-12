@@ -236,8 +236,8 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "지우기"
 
-#YouTube
-#empty strings from id 30121 to 30199
+# YouTube
+# empty strings from id 30121 to 30199
 
 msgctxt "#30200"
 msgid "API Key"
@@ -263,8 +263,8 @@ msgctxt "#30205"
 msgid "Use preset API key set"
 msgstr "현재 API 키 세트 사용"
 
-#YouTube
-#empty strings from id 30206 to 30499
+# YouTube
+# empty strings from id 30206 to 30499
 
 msgctxt "#30500"
 msgid "Channels"
