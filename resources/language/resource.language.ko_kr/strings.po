@@ -1149,3 +1149,7 @@ msgstr "채널 구독"
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
 msgstr "채널 구독 취소"
+
+msgctxt "#30721"
+msgid "Default to WEBM adaptation set (4K)"
+msgstr ""

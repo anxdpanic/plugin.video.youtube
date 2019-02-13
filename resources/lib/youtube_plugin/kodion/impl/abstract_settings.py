@@ -141,6 +141,9 @@ class AbstractSettings(object):
             return False
         return self.get_bool(constants.setting.DASH_VIDEOS, False)
 
+    def use_webm_adaptation_set(self):
+        return self.get_bool(constants.setting.DASH_USE_WEBM, False)
+
     def use_dash_live_streams(self):
         if not self.use_dash():
             return False

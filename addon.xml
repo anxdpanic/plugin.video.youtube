@@ -13,6 +13,10 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+6.4.1
+[add] add Settings - MPEG-DASH - Default to WEBM adaptation set
+        - required for 4k stream automatic selection
+
 6.4.0
 [add] 4K videos with InputStream Adaptive >= v2.3.14
         - Thanks to @peak3d

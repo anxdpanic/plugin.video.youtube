@@ -34,6 +34,7 @@ ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web.urls'  # (bool)
 ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
 DASH_VIDEOS = 'kodion.mpd.videos'  # (bool)
+DASH_USE_WEBM = 'kodion.mpd.webm'  # (bool)
 DASH_LIVE_STREAMS = 'kodion.mpd.live_streams'  # (bool)
 
 HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)

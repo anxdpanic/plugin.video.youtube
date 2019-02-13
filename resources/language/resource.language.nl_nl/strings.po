@@ -1158,3 +1158,7 @@ msgstr "Geabonneerd"
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
 msgstr "Niet meer geabonneerd"
+
+msgctxt "#30721"
+msgid "Default to WEBM adaptation set (4K)"
+msgstr ""

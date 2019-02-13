@@ -1165,3 +1165,7 @@ msgstr "Εγγραφή στο κανάλι"
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
 msgstr "Απεγγραφή από κανάλι"
+
+msgctxt "#30721"
+msgid "Default to WEBM adaptation set (4K)"
+msgstr ""
