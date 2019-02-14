@@ -1056,12 +1056,6 @@ class VideoInfo(object):
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
 
-        supported_mime_types = ['audio/mp4', 'video/mp4']
-        if 'vp9' in ia_capabilities or 'vp9.2' in ia_capabilities:
-            supported_mime_types.append('video/webm')
-        if 'vorbis' in ia_capabilities or 'opus' in ia_capabilities:
-            supported_mime_types.append('audio/webm')
-
         stream_info = {'video': {'height': '0', 'fps': '0', 'codec': '', 'mime': '', 'quality_label': '', 'bandwidth': 0},
                        'audio': {'bitrate': '0', 'codec': '', 'mime': '', 'bandwidth': 0}}
 
@@ -1118,6 +1112,19 @@ class VideoInfo(object):
             data[mime][i]['indexRange'] = stream_map.get('index')
             data[mime][i]['init'] = stream_map.get('init')
 
+        default_mime_type = 'mp4'
+        supported_mime_types = ['audio/mp4', 'video/mp4']
+
+        if ('vp9' in ia_capabilities or 'vp9.2' in ia_capabilities) and any(m for m in data if m == 'video/webm'):
+            supported_mime_types.append('video/webm')
+
+        if ('vorbis' in ia_capabilities or 'opus' in ia_capabilities) and any(m for m in data if m == 'audio/webm'):
+            supported_mime_types.append('audio/webm')
+
+        if (any(m for m in supported_mime_types if m == 'video/webm') and
+                self._context.get_settings().use_webm_adaptation_set()):
+            default_mime_type = 'webm'
+
         out_list = ['<?xml version="1.0" encoding="UTF-8"?>\n'
                     '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" '
                     'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" '
@@ -1127,7 +1134,11 @@ class VideoInfo(object):
         n = 0
         for mime in data:
             if mime in supported_mime_types:
-                out_list.append(''.join(['\t\t<AdaptationSet id="', str(n), '" mimeType="', mime, '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true">\n']))
+                default = False
+                if mime.endswith(default_mime_type):
+                    default = True
+
+                out_list.append(''.join(['\t\t<AdaptationSet id="', str(n), '" mimeType="', mime, '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true" default="', str(default).lower(), '">\n']))
                 out_list.append('\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n')
                 for i in data[mime]:
                     stream_format = self.FORMAT.get(i, {})

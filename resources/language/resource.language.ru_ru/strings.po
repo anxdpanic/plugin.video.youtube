@@ -24,7 +24,7 @@ msgstr ""
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео."
 
-#Kodion Settings
+# Kodion Settings
 
 msgctxt "#30000"
 msgid "General"
@@ -38,7 +38,7 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Пароль"
 
-#empty strings from id 30003 to 30006
+# empty strings from id 30003 to 30006
 
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
@@ -88,7 +88,7 @@ msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p Прямой эфир / 720p (HD)"
 
-#empty strings 30019
+# empty strings 30019
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -166,8 +166,8 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr ""
 
-#Kodion Common
-#empty strings from id 30039 to 30099
+# Kodion Common
+# empty strings from id 30039 to 30099
 
 msgctxt "#30100"
 msgid "Favourites"
@@ -253,8 +253,8 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Очистить"
 
-#YouTube
-#empty strings from id 30121 to 30199
+# YouTube
+# empty strings from id 30121 to 30199
 
 msgctxt "#30200"
 msgid "API"
@@ -280,8 +280,8 @@ msgctxt "#30205"
 msgid "Use preset API key set"
 msgstr "Использовать предустановленный API Key"
 
-#YouTube
-#empty strings from id 30206 to 30499
+# YouTube
+# empty strings from id 30206 to 30499
 
 msgctxt "#30500"
 msgid "Channels"
@@ -1165,4 +1165,8 @@ msgstr ""
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
+msgstr ""
+
+msgctxt "#30721"
+msgid "Default to WEBM adaptation set (4K)"
 msgstr ""

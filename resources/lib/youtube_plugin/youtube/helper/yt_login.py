@@ -61,9 +61,11 @@ def process(mode, provider, context, sign_out_refresh=True):
             interval = 5000
         device_code = json_data['device_code']
         user_code = json_data['user_code']
+        verification_url = json_data.get('verification_url', 'youtube.com/activate').lstrip('https://www.')
 
-        text = [context.localize(provider.LOCAL_MAP['youtube.sign.go_to']) % context.get_ui().bold('youtube.com/activate'),
-                '[CR]%s %s' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']), context.get_ui().bold(user_code))]
+        text = [context.localize(provider.LOCAL_MAP['youtube.sign.go_to']) % context.get_ui().bold(verification_url),
+                '[CR]%s %s' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']),
+                               context.get_ui().bold(user_code))]
         text = ''.join(text)
         dialog = context.get_ui().create_progress_dialog(
             heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
@@ -121,7 +123,8 @@ def process(mode, provider, context, sign_out_refresh=True):
 
         access_token_tv, expires_in_tv, refresh_token_tv = _do_login(_for_tv=True)
         # abort tv login
-        context.log_debug('YouTube-TV Login: Access Token |%s| Refresh Token |%s| Expires |%s|' % (access_token_tv != '', refresh_token_tv != '', expires_in_tv))
+        context.log_debug('YouTube-TV Login: Access Token |%s| Refresh Token |%s| Expires |%s|' %
+                          (access_token_tv != '', refresh_token_tv != '', expires_in_tv))
         if not access_token_tv and not refresh_token_tv:
             provider.reset_client()
             if addon_id:
@@ -133,7 +136,8 @@ def process(mode, provider, context, sign_out_refresh=True):
 
         access_token_kodi, expires_in_kodi, refresh_token_kodi = _do_login(_for_tv=False)
         # abort kodi login
-        context.log_debug('YouTube-Kodi Login: Access Token |%s| Refresh Token |%s| Expires |%s|' % (access_token_kodi != '', refresh_token_kodi != '', expires_in_kodi))
+        context.log_debug('YouTube-Kodi Login: Access Token |%s| Refresh Token |%s| Expires |%s|' %
+                          (access_token_kodi != '', refresh_token_kodi != '', expires_in_kodi))
         if not access_token_kodi and not refresh_token_kodi:
             provider.reset_client()
             if addon_id:

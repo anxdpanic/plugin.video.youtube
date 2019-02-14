@@ -236,8 +236,8 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr ""
 
-#YouTube
-#empty strings from id 30121 to 30199
+# YouTube
+# empty strings from id 30121 to 30199
 
 msgctxt "#30200"
 msgid "API Key"
@@ -263,8 +263,8 @@ msgctxt "#30205"
 msgid "Use preset API key set"
 msgstr ""
 
-#YouTube
-#empty strings from id 30206 to 30499
+# YouTube
+# empty strings from id 30206 to 30499
 
 msgctxt "#30500"
 msgid "Channels"
@@ -1148,4 +1148,8 @@ msgstr ""
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
+msgstr ""
+
+msgctxt "#30721"
+msgid "Default to WEBM adaptation set (4K)"
 msgstr ""
