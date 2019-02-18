@@ -1177,7 +1177,8 @@ class VideoInfo(object):
                         if match:
                             video_codec = match.group('codec')
 
-                        if 'vp9.2' == video_codec.lower() and 'vp9.2' not in ia_capabilities:
+                        if 'vp9.2' == video_codec.lower() and ('vp9.2' not in ia_capabilities or
+                                                               not self._context.get_settings().include_hdr()):
                             discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
                             continue
                         elif 'vp9' == video_codec.lower() and 'vp9' not in ia_capabilities:

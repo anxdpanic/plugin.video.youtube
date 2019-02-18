@@ -35,6 +35,7 @@ ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
 DASH_VIDEOS = 'kodion.mpd.videos'  # (bool)
 DASH_USE_WEBM = 'kodion.mpd.webm'  # (bool)
+DASH_INCL_HDR = 'kodion.mpd.hdr'  # (bool)
 DASH_LIVE_STREAMS = 'kodion.mpd.live_streams'  # (bool)
 
 HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)

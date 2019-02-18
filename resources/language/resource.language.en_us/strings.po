@@ -1171,3 +1171,7 @@ msgstr ""
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
 msgstr ""
+
+msgctxt "#30722"
+msgid "Include VP9.2 (HDR)"
+msgstr ""
