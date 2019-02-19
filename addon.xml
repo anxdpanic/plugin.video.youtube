@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.4.1~alpha1" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.4.1~alpha2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -17,6 +17,9 @@
 [upd] Use the activation url provided by the authentication request
 [add] add Settings - MPEG-DASH - Default to WEBM adaptation set
         - required for 4k stream automatic selection
+[add] add Settings - MPEG-DASH - Include VP9.2
+        - includes HDR content in the manifest
+[fix] fix playback of Purchases
 
 6.4.0
 [add] 4K videos with InputStream Adaptive >= v2.3.14

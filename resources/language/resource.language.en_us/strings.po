@@ -1171,3 +1171,11 @@ msgstr ""
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
 msgstr ""
+
+msgctxt "#30722"
+msgid "Include VP9.2 (HDR)"
+msgstr ""
+
+msgctxt "#30723"
+msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]WEBM and VP9.2 requires InputStream Adaptive >= 2.3.14"
+msgstr ""

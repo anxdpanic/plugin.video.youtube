@@ -886,12 +886,11 @@ class VideoInfo(object):
                         raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
                 license_info = {'url': None, 'proxy': None, 'token': None}
-                pa_li_info = player_args.get('license_info', params.get('license_info', '')).split(',')
+                pa_li_info = player_response.get('streamingData', {}).get('licenseInfos', [])
                 if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
                     raise YouTubeException('Proxy is not running')
                 for li_info in pa_li_info:
-                    li_info = dict(urllib.parse.parse_qsl(li_info))
-                    if li_info.get('family') == 'widevine':
+                    if li_info.get('drmFamily') == 'WIDEVINE':
                         license_info['url'] = li_info.get('url', None)
                         if license_info['url']:
                             self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
@@ -1177,7 +1176,8 @@ class VideoInfo(object):
                         if match:
                             video_codec = match.group('codec')
 
-                        if 'vp9.2' == video_codec.lower() and 'vp9.2' not in ia_capabilities:
+                        if 'vp9.2' == video_codec.lower() and ('vp9.2' not in ia_capabilities or
+                                                               not self._context.get_settings().include_hdr()):
                             discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
                             continue
                         elif 'vp9' == video_codec.lower() and 'vp9' not in ia_capabilities:

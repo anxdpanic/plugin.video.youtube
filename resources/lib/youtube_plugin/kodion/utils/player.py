@@ -45,6 +45,8 @@ def playback_monitor(provider, context, video_id, playing_file, play_count=0,
 
     report_url = playback_stats.get('playback_url', '')
 
+    ui.set_home_window_property('video_id', video_id)
+
     while not player.isPlaying() and not context.abort_requested():
         context.log_debug('Waiting for playback to start')
 
@@ -66,7 +68,10 @@ def playback_monitor(provider, context, video_id, playing_file, play_count=0,
     plugin_play_path = 'plugin://plugin.video.youtube/play/'
     video_id_param = 'video_id=%s' % video_id
 
-    while player.isPlaying() and not context.abort_requested():
+    while (player.isPlaying() and
+           not context.abort_requested() and
+           ui.get_home_window_property('video_id') == video_id):
+
         try:
             current_file = player.getPlayingFile()
             if (current_file != playing_file and
