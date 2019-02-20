@@ -948,12 +948,14 @@ class Provider(kodion.AbstractProvider):
         result = []
 
         channel_id = context.get_param('channel_id', '')
+        event_type = context.get_param('event_type', '')
+        hide_folders = str(context.get_param('hide_folders', False)).lower() == 'true'
+        location = str(context.get_param('location', False)).lower() == 'true'
+        page = int(context.get_param('page', 1))
         page_token = context.get_param('page_token', '')
         search_type = context.get_param('search_type', 'video')
-        event_type = context.get_param('event_type', '')
+
         safe_search = context.get_settings().safe_search()
-        page = int(context.get_param('page', 1))
-        location = str(context.get_param('location', False)).lower() == 'true'
 
         context.set_param('q', search_text)
 
@@ -962,7 +964,7 @@ class Provider(kodion.AbstractProvider):
         else:
             self.set_content_type(context, kodion.constants.content_type.FILES)
 
-        if page == 1 and search_type == 'video' and not event_type:
+        if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
                 channel_params = {}
                 channel_params.update(context.get_params())

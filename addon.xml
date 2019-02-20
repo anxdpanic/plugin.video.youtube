@@ -19,6 +19,8 @@
         - required for 4k stream automatic selection
 [add] add Settings - MPEG-DASH - Include VP9.2
         - includes HDR content in the manifest
+[add] add support for &amp;hide_folders=true parameter in search query urls
+        - when added to the url it will hide the Playlists, Channels, and Live folders
 [fix] fix playback of Purchases
 [fix] mpeg-dash frame rate representation
 
