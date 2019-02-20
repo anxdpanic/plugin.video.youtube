@@ -1047,10 +1047,6 @@ class VideoInfo(object):
         has_video_stream = False
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
 
-        # map frame rates to a more common representation to lessen the chance of double refresh changes
-        # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
-        fps_map = {'24': '23.976', '30': '29.97', '60': '59.94'}
-
         ipaddress = self._context.get_settings().httpd_listen()
         if ipaddress == '0.0.0.0':
             ipaddress = '127.0.0.1'
@@ -1087,9 +1083,16 @@ class VideoInfo(object):
 
             data[mime][i]['bandwidth'] = stream_map.get('bitrate')
 
-            data[mime][i]['frameRate'] = fps_map.get(stream_map.get('fps'), stream_map.get('fps'))
-            if data[mime][i]['frameRate']:
-                data[mime][i]['frameRate'] = str(format(float(data[mime][i]['frameRate']), '.3f'))
+            # map frame rates to a more common representation to lessen the chance of double refresh changes
+            # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
+            frame_rate = None
+            fps_scale_map = {24: 1001, 30: 1001, 60: 1001}
+            if 'fps' in stream_map:
+                fps = int(stream_map.get('fps'))
+                scale = fps_scale_map.get(fps) if fps_scale_map.get(fps) else 1000
+                frame_rate = '%d/%d' % (fps * 1000, scale)
+
+            data[mime][i]['frameRate'] = frame_rate
 
             url = urllib.parse.unquote(stream_map.get('url'))
 
