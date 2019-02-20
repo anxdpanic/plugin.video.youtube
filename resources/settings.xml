@@ -32,7 +32,7 @@
         <setting type="lsep" label="30723"/>
         <setting id="kodion.mpd.videos" type="bool" label="30688" default="true" enable="eq(-3,true)"/>
         <setting id="kodion.mpd.webm" type="bool" label="30721" default="false" enable="eq(-1,true)" subsetting="true"/>
-        <setting id="kodion.mpd.hdr" type="bool" label="30722" default="true" enable="eq(-2,true)" subsetting="true"/>
+        <setting id="kodion.mpd.hdr" type="bool" label="30722" default="false" enable="eq(-2,true)" subsetting="true"/>
         <setting type="lsep" label="30690"/>
         <setting id="kodion.mpd.live_streams" type="bool" label="30689" default="true" enable="eq(-5,true)"/>
         <setting type="sep"/>

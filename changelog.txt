@@ -5,6 +5,7 @@
 [add] add Settings - MPEG-DASH - Include VP9.2
         - includes HDR content in the manifest
 [fix] fix playback of Purchases
+[fix] mpeg-dash frame rate representation
 
 6.4.0
 [add] 4K videos with InputStream Adaptive >= v2.3.14
