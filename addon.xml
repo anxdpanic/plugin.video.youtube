@@ -23,25 +23,6 @@
         - when added to the url it will hide the Playlists, Channels, and Live folders
 [fix] fix playback of Purchases
 [fix] mpeg-dash frame rate representation
-
-6.4.0
-[add] 4K videos with InputStream Adaptive >= v2.3.14
-        - Thanks to @peak3d
-[fix] some videos not playing when logged in
-[fix] reset function cache at restart/update to resolve issues persisting due to cached results
-[fix] service potentially not shutting down http server
-[fix] added to playlist/subscriptions notifications
-[fix] only generate mpeg-dash file if adaptive formats are available
-[fix] map frame rates to more common representation to lessen the chance of double refresh changes (applies only to generated mpeg-dash files)
-[fix] currently playing file check when playing file is a plugin:// url
-[chg] Settings - General - Autoplay suggested videos
-        - limit playlist size to 1000 videos
-        - request less relevant videos at one time
-        - old behavior: add 50 most relevant videos for each video played, repeats allowed
-            - result: a lot of barely relevant videos in groups of 50
-        - new behavior: add single most relevant video, no repeats
-            - result: next video is always the most relevant video to the last video played
-[upd] player javascript retrieval
         </news>
         <assets>
             <icon>icon.png</icon>
