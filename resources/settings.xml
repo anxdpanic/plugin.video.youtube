@@ -7,7 +7,7 @@
         <setting id="kodion.audio_only" type="bool" label="30607" enable="eq(1,false)" default="false"/>
         <setting id="kodion.video.quality.ask" type="bool" label="30009" default="false"/>
         <setting id="kodion.subtitle.configure" type="action" label="30600" enable="true" visible="true" option="close" action="RunPlugin(plugin://$ID/config/subtitles/)"/>
-        <setting id="kodion.subtitle.languages.num" type="number" value="0" visible="false"/>
+        <setting id="kodion.subtitle.languages.num" type="number" default="0" visible="false"/>
         <setting id="kodion.subtitle.download" type="bool" default="false" visible="false"/>
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
         <setting id="kodion.play_count.percent" type="slider" label="30668" enable="true" default="85" range="1,1,99" option="int"/>
