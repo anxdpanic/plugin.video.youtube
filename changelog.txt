@@ -7,6 +7,7 @@
 [add] add support for &hide_folders=true parameter in search query urls
         - when added to the url it will hide the Playlists, Channels, and Live folders
 [fix] fix playback of Purchases
+[fix] fixed saved playlists that don't belong to a channel
 [fix] mpeg-dash frame rate representation
 
 6.4.0
