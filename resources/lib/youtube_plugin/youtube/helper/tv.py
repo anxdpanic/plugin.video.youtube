@@ -135,7 +135,11 @@ def saved_playlists_to_items(provider, context, json_data):
         if incognito:
             item_params.update({'incognito': incognito})
 
-        item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
+        if channel_id:
+            item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
+        else:
+            item_uri = context.create_uri(['playlist', playlist_id], item_params)
+
         playlist_item = kodion.items.DirectoryItem(title, item_uri, image=image)
         playlist_item.set_fanart(provider.get_fanart(context))
         result.append(playlist_item)

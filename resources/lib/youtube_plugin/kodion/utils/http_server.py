@@ -9,7 +9,7 @@
 
 from six.moves import BaseHTTPServer
 from six.moves.urllib.parse import parse_qs, urlparse
-from six.moves import xrange
+from six.moves import range
 
 import json
 import os
@@ -256,7 +256,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         return
 
     def get_chunks(self, data):
-        for i in xrange(0, len(data), self.chunk_size):
+        for i in range(0, len(data), self.chunk_size):
             yield data[i:i + self.chunk_size]
 
     @staticmethod
