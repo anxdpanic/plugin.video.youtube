@@ -17,4 +17,4 @@ before_script:
     cd $HOME
 
 script:
-  - kodi-addon-checker $TRAVIS_BUILD_DIR --branch=krypton
+  - kodi-addon-checker $TRAVIS_BUILD_DIR --branch=isengard
