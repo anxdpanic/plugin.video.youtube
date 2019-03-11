@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from six.moves import cPickle as pickle
+
 import random
 import re
 import traceback
@@ -18,7 +20,6 @@ from ... import kodion
 from ...kodion import constants
 from ...kodion.items import VideoItem
 from ...kodion.impl.xbmc.xbmc_items import to_playback_item
-from ...kodion.utils import playback_monitor
 from ...youtube.youtube_exceptions import YouTubeException
 from ...youtube.helper import utils, v3
 
@@ -92,10 +93,20 @@ def play_video(provider, context):
         item = to_playback_item(context, video_item)
         item.setPath(video_item.get_uri())
 
+        playback_dict = {
+            'video_id': video_id,
+            'playing_file': video_item.get_uri(),
+            'play_count': play_count,
+            'use_history': use_history,
+            'playback_stats': playback_stats,
+            'seek_time': seek_time,
+            'refresh_only': screensaver
+        }
+
+        context.get_ui().set_home_window_property('playback_dict', pickle.dumps(playback_dict))
+
         xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=True, listitem=item)
-        playback_monitor(provider=provider, context=context, video_id=video_id, playing_file=video_item.get_uri(),
-                         play_count=play_count, use_history=use_history, playback_stats=playback_stats,
-                         seek_time=seek_time, refresh_only=screensaver)
+
     except YouTubeException as ex:
         message = ex.get_message()
         message = kodion.utils.strip_html_from_text(message)

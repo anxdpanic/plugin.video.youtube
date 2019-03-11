@@ -48,3 +48,6 @@ class XbmcPlayer(AbstractPlayer):
 
     def pause(self):
         xbmc.Player().pause()
+
+    def is_playing(self):
+        return xbmc.Player().isPlaying()

@@ -12,7 +12,9 @@ from datetime import datetime
 import time
 
 from .impl import Context
+from ..youtube.provider import Provider
 from .utils import YouTubeMonitor
+from .utils import YouTubePlayer
 
 
 def strptime(stamp, stamp_fmt):
@@ -54,6 +56,7 @@ def run():
     context.log_debug('YouTube service initialization...')
 
     monitor = YouTubeMonitor()
+    player = YouTubePlayer(provider=Provider(), context=context)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     monitor.remove_temp_dir()
@@ -85,5 +88,7 @@ def run():
 
     context.get_ui().set_home_window_property('abort_requested', 'true')
 
+    player.thread_clean_up(only_ended=False)  # clean up any/all playback monitoring threads
+
     if monitor.httpd:
-        monitor.shutdown_httpd()
+        monitor.shutdown_httpd()  # shutdown http server
