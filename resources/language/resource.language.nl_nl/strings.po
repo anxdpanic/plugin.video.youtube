@@ -1141,11 +1141,11 @@ msgstr "Verwijderd van afspeellijst"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr "Video is leuk"
+msgstr "Leuk"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr "Video is niet leuk"
+msgstr "Niet Leuk"
 
 msgctxt "#30718"
 msgid "Rating removed"
@@ -1161,12 +1161,12 @@ msgstr "Niet meer geabonneerd"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Standaard naar WEBM (4K)"
 
 msgctxt "#30722"
 msgid "Include VP9.2 (HDR)"
-msgstr ""
+msgstr "Inclusief VP9.2 (HDR)"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]WEBM and VP9.2 requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Proxy vereist voor mpeg-dasg vods (zie HTTP server).WEBM en VP9.2 vereisen InputStream Adaptive vanaf versie 2.3.14 "

@@ -25,6 +25,7 @@
 [fix] fixed saved playlists that don't belong to a channel
 [fix] mpeg-dash frame rate representation
 [fix] playback monitor when quickly changing videos
+[lang] nl_nl strings |contrib: MB1968|
         </news>
         <assets>
             <icon>icon.png</icon>
