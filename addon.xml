@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.4.1~alpha4" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.4.1~alpha5" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -24,6 +24,8 @@
 [fix] fix playback of Purchases
 [fix] fixed saved playlists that don't belong to a channel
 [fix] mpeg-dash frame rate representation
+[fix] playback monitor when quickly changing videos
+[lang] nl_nl strings |contrib: MB1968|
         </news>
         <assets>
             <icon>icon.png</icon>

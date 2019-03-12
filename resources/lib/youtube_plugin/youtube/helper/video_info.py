@@ -362,6 +362,16 @@ class VideoInfo(object):
                 'fps': 60,
                 'hdr': True,
                 'video': {'height': 2160, 'encoding': 'vp9.2'}},
+        '400': {'container': 'mp4',
+                'dash/video': True,
+                'fps': 60,
+                'hdr': True,
+                'video': {'height': 1440, 'encoding': 'av1'}},
+        '401': {'container': 'mp4',
+                'dash/video': True,
+                'fps': 60,
+                'hdr': True,
+                'video': {'height': 2160, 'encoding': 'av1'}},
         '394': {'container': 'mp4',
                 'dash/video': True,
                 'fps': 30,
@@ -1123,9 +1133,30 @@ class VideoInfo(object):
         if ('vorbis' in ia_capabilities or 'opus' in ia_capabilities) and any(m for m in data if m == 'audio/webm'):
             supported_mime_types.append('audio/webm')
 
-        if (any(m for m in supported_mime_types if m == 'video/webm') and
-                self._context.get_settings().use_webm_adaptation_set()):
+        if 'video/webm' in supported_mime_types and self._context.get_settings().use_webm_adaptation_set():
             default_mime_type = 'webm'
+
+        if ('video/webm' in supported_mime_types and
+                'vp9.2' in ia_capabilities and
+                self._context.get_settings().include_hdr() and
+                self._context.inputstream_adaptive_auto_stream_selection() and
+                any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs'])):
+            # when hdr enabled and inputstream adaptive stream selection is set to automatic
+            # replace vp9 streams with vp9.2 (hdr) of the same resolution
+            webm_streams = {}
+
+            for key in list(data['video/webm'].keys()):
+                if '"vp9.2"' in data['video/webm'][key]['codecs']:
+                    webm_streams[key] = data['video/webm'][key]
+                elif '"vp9"' in data['video/webm'][key]['codecs']:
+                    if not any(k for k in list(data['video/webm'].keys())
+                               if '"vp9.2"' in data['video/webm'][k]['codecs'] and
+                                  data['video/webm'][key]['height'] == data['video/webm'][k]['height'] and
+                                  data['video/webm'][key]['width'] == data['video/webm'][k]['width']):
+                        webm_streams[key] = data['video/webm'][key]
+
+            if webm_streams:
+                data['video/webm'] = webm_streams
 
         out_list = ['<?xml version="1.0" encoding="UTF-8"?>\n'
                     '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" '

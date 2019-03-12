@@ -322,5 +322,11 @@ class XbmcContext(AbstractContext):
         else:
             return capability_map[capability] if capability_map.get(capability) else None
 
+    def inputstream_adaptive_auto_stream_selection(self):
+        try:
+            return xbmcaddon.Addon('inputstream.adaptive').getSetting('STREAMSELECTION') == '0'
+        except RuntimeError:
+            return False
+
     def abort_requested(self):
         return str(self.get_ui().get_home_window_property('abort_requested')).lower() == 'true'
