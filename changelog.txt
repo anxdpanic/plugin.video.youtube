@@ -9,6 +9,7 @@
 [fix] fix playback of Purchases
 [fix] fixed saved playlists that don't belong to a channel
 [fix] mpeg-dash frame rate representation
+[fix] playback monitor when quickly changing videos
 
 6.4.0
 [add] 4K videos with InputStream Adaptive >= v2.3.14
