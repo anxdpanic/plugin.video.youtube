@@ -26,11 +26,27 @@ class PlaybackMonitorThread(threading.Thread):
         self.provider = provider
         self.ui = self.context.get_ui()
 
+        self.player = xbmc.Player()
+
         self.playback_dict = playback_dict
         self.video_id = self.playback_dict.get('video_id')
 
+        self.total_time = 0.0
+        self.current_time = 0.0
+        self.segment_start = 0.0
+        self.percent_complete = 0
+
         self.daemon = True
         self.start()
+
+    def update_times(self, total_time, current_time, segment_start, percent_complete):
+        self.total_time = total_time
+        self.current_time = current_time
+        self.segment_start = segment_start
+        self.percent_complete = percent_complete
+
+    def abort_now(self):
+        return not self.player.isPlaying() or self.context.abort_requested() or self.stopped()
 
     def run(self):
         playing_file = self.playback_dict.get('playing_file')
@@ -40,7 +56,7 @@ class PlaybackMonitorThread(threading.Thread):
         seek_time = self.playback_dict.get('seek_time')
         refresh_only = self.playback_dict.get('refresh_only', False)
 
-        player = xbmc.Player()
+        player = self.player
 
         self.context.log_debug('PlaybackMonitorThread[%s]: Starting...' % self.video_id)
         access_manager = self.context.get_access_manager()
@@ -52,11 +68,7 @@ class PlaybackMonitorThread(threading.Thread):
 
         play_count = str(play_count)
 
-        total_time = 0.0
-        current_time = 0.0
-        segment_start = 0.0
         played_time = -1.0
-        percent_complete = 0
 
         state = 'playing'
         last_state = 'playing'
@@ -94,6 +106,10 @@ class PlaybackMonitorThread(threading.Thread):
         video_id_param = 'video_id=%s' % self.video_id
 
         while player.isPlaying() and not self.context.abort_requested() and not self.stopped():
+            last_total_time = self.total_time
+            last_current_time = self.current_time
+            last_segment_start = self.segment_start
+            last_percent_complete = self.percent_complete
 
             try:
                 current_file = player.getPlayingFile()
@@ -105,27 +121,43 @@ class PlaybackMonitorThread(threading.Thread):
             except RuntimeError:
                 pass
 
+            if self.abort_now():
+                self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
+                break
+
             try:
-                current_time = float(player.getTime())
-                total_time = float(player.getTotalTime())
+                self.current_time = float(player.getTime())
+                self.total_time = float(player.getTotalTime())
             except RuntimeError:
                 pass
 
-            if current_time < 0.0:
-                current_time = 0.0
+            if self.current_time < 0.0:
+                self.current_time = 0.0
+
+            if self.abort_now():
+                self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
+                break
 
             try:
-                percent_complete = int(float(current_time) / float(total_time) * 100)
+                self.percent_complete = int(float(self.current_time) / float(self.total_time) * 100)
             except ZeroDivisionError:
-                percent_complete = 0
+                self.percent_complete = 0
+
+            if self.abort_now():
+                self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
+                break
 
             if seek_time and seek_time != '0.0':
                 try:
                     player.seekTime(float(seek_time))
-                    current_time = float(seek_time)
+                    self.current_time = float(seek_time)
                 except ValueError:
                     pass
                 seek_time = None
+
+            if self.abort_now():
+                self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
+                break
 
             if p_waited >= report_interval:
                 if is_logged_in:
@@ -133,46 +165,59 @@ class PlaybackMonitorThread(threading.Thread):
                     client = self.provider.get_client(self.context)
                     is_logged_in = self.provider.is_logged_in()
 
-                if current_time == played_time:
+                if self.current_time == played_time:
                     last_state = state
                     state = 'paused'
                 else:
                     last_state = state
                     state = 'playing'
 
-                played_time = current_time
+                played_time = self.current_time
+
+            if self.abort_now():
+                self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
+                break
 
             if is_logged_in and report_url:
                 if first_report or (p_waited >= report_interval):
-                    first_report = False
+                    if first_report:
+                        first_report = False
+                        self.segment_start = 0.0
+                        self.current_time = 0.0
+                        self.percent_complete = 0
+
                     p_waited = 0.0
 
+                    if self.segment_start < 0.0:
+                        self.segment_start = 0.0
+
                     if state == 'playing':
-                        segment_end = current_time
+                        segment_end = self.current_time
                     else:
-                        segment_end = segment_start
+                        segment_end = self.segment_start
 
-                    if segment_start > segment_end:
-                        segment_start = segment_end - 10.0
-                        if segment_start < 0.0:
-                            segment_start = 0.0
+                    if segment_end > float(self.total_time):
+                        segment_end = float(self.total_time)
 
-                    if segment_end > float(total_time):
-                        segment_end = float(total_time)
+                    if self.segment_start > segment_end:
+                        segment_end = self.segment_start + 10.0
 
                     if state == 'playing' or last_state == 'playing':  # only report state='paused' once
                         client.update_watch_history(self.video_id, report_url
-                                                    .format(st=format(segment_start, '.3f'),
+                                                    .format(st=format(self.segment_start, '.3f'),
                                                             et=format(segment_end, '.3f'),
                                                             state=state))
                         self.context.log_debug(
                             'Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
                             (self.video_id,
-                             format(segment_start, '.3f'),
+                             format(self.segment_start, '.3f'),
                              format(segment_end, '.3f'),
-                             percent_complete, state))
+                             self.percent_complete, state))
 
-                    segment_start = segment_end
+                    self.segment_start = segment_end
+
+            if self.abort_now():
+                break
 
             xbmc.sleep(int(p_wait_time * 1000))
 
@@ -180,18 +225,18 @@ class PlaybackMonitorThread(threading.Thread):
 
         if is_logged_in and report_url:
             client.update_watch_history(self.video_id, report_url
-                                        .format(st=format(segment_start, '.3f'),
-                                                et=format(current_time, '.3f'),
+                                        .format(st=format(self.segment_start, '.3f'),
+                                                et=format(self.current_time, '.3f'),
                                                 state=state))
             self.context.log_debug('Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
                                    (self.video_id,
-                                    format(segment_start, '.3f'),
-                                    format(current_time, '.3f'),
-                                    percent_complete, state))
+                                    format(self.segment_start, '.3f'),
+                                    format(self.current_time, '.3f'),
+                                    self.percent_complete, state))
 
         self.context.log_debug('Playback stopped [%s]: %s secs of %s @ %s%%' %
-                               (self.video_id, format(current_time, '.3f'),
-                                format(total_time, '.3f'), percent_complete))
+                               (self.video_id, format(self.current_time, '.3f'),
+                                format(self.total_time, '.3f'), self.percent_complete))
 
         state = 'stopped'
         if is_logged_in:
@@ -199,32 +244,32 @@ class PlaybackMonitorThread(threading.Thread):
             client = self.provider.get_client(self.context)
             is_logged_in = self.provider.is_logged_in()
 
-        if percent_complete >= settings.get_play_count_min_percent():
+        if self.percent_complete >= settings.get_play_count_min_percent():
             play_count = '1'
-            current_time = 0.0
+            self.current_time = 0.0
             if is_logged_in and report_url:
                 client.update_watch_history(self.video_id, report_url
-                                            .format(st=format(total_time, '.3f'),
-                                                    et=format(total_time, '.3f'),
+                                            .format(st=format(self.total_time, '.3f'),
+                                                    et=format(self.total_time, '.3f'),
                                                     state=state))
                 self.context.log_debug('Playback reported [%s] @ 100%% state=%s' % (self.video_id, state))
 
         else:
             if is_logged_in and report_url:
                 client.update_watch_history(self.video_id, report_url
-                                            .format(st=format(current_time, '.3f'),
-                                                    et=format(current_time, '.3f'),
+                                            .format(st=format(self.current_time, '.3f'),
+                                                    et=format(self.current_time, '.3f'),
                                                     state=state))
                 self.context.log_debug('Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
-                                       (self.video_id, format(current_time, '.3f'),
-                                        format(current_time, '.3f'),
-                                        percent_complete, state))
+                                       (self.video_id, format(self.current_time, '.3f'),
+                                        format(self.current_time, '.3f'),
+                                        self.percent_complete, state))
 
             refresh_only = True
 
         if use_history:
-            self.context.get_playback_history().update(self.video_id, play_count, total_time,
-                                                       current_time, percent_complete)
+            self.context.get_playback_history().update(self.video_id, play_count, self.total_time,
+                                                       self.current_time, self.percent_complete)
 
         if not refresh_only:
             if is_logged_in:
@@ -298,16 +343,23 @@ class YouTubePlayer(xbmc.Player):
         self.ui = self.context.get_ui()
         self.threads = []
 
-    def reset(self):
-        properties = ['playback_dict']
-        for prop in properties:
-            if self.ui.get_home_window_property(prop) is not None:
-                self.context.log_debug('Clearing home window property: {property}'.format(property=prop))
-                self.ui.clear_home_window_property(prop)
+    def stop_threads(self):
+        for thread in self.threads:
+            if thread.ended():
+                continue
 
-        self.thread_clean_up()
+            if not thread.stopped():
+                self.context.log_debug('PlaybackMonitorThread[%s]: stopping...' % thread.video_id)
+                thread.stop()
 
-    def thread_clean_up(self, only_ended=True):
+        for thread in self.threads:
+            if thread.stopped() and not thread.ended():
+                try:
+                    thread.join()
+                except RuntimeError:
+                    pass
+
+    def cleanup_threads(self, only_ended=True):
         active_threads = []
         for thread in self.threads:
             if only_ended and not thread.ended():
@@ -318,7 +370,8 @@ class YouTubePlayer(xbmc.Player):
                 self.context.log_debug('PlaybackMonitorThread[%s]: clean up...' % thread.video_id)
             else:
                 self.context.log_debug('PlaybackMonitorThread[%s]: stopping...' % thread.video_id)
-                thread.stop()
+                if not thread.stopped():
+                    thread.stop()
             try:
                 thread.join()
             except RuntimeError:
@@ -331,17 +384,16 @@ class YouTubePlayer(xbmc.Player):
     def onPlayBackStarted(self):
         if self.ui.get_home_window_property('playback_dict'):
             playback_dict = pickle.loads(self.ui.get_home_window_property('playback_dict'))
+            self.ui.clear_home_window_property('playback_dict')
+            self.cleanup_threads()
             self.threads.append(PlaybackMonitorThread(self.provider, self.context, playback_dict))
-            self.reset()
-
-    def onAVChange(self):
-        self.reset()
 
     def onPlayBackEnded(self):
-        self.onAVChange()
+        self.stop_threads()
+        self.cleanup_threads()
 
     def onPlayBackStopped(self):
-        self.onAVChange()
+        self.onPlayBackEnded()
 
     def onPlayBackError(self):
-        self.onAVChange()
+        self.onPlayBackEnded()

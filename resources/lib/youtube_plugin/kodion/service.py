@@ -88,7 +88,7 @@ def run():
 
     context.get_ui().set_home_window_property('abort_requested', 'true')
 
-    player.thread_clean_up(only_ended=False)  # clean up any/all playback monitoring threads
+    player.cleanup_threads(only_ended=False)  # clean up any/all playback monitoring threads
 
     if monitor.httpd:
         monitor.shutdown_httpd()  # shutdown http server
