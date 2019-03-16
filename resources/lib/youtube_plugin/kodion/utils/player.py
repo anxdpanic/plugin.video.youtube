@@ -53,8 +53,11 @@ class PlaybackMonitorThread(threading.Thread):
         play_count = self.playback_dict.get('play_count', 0)
         use_history = self.playback_dict.get('use_history', False)
         playback_stats = self.playback_dict.get('playback_stats')
-        seek_time = self.playback_dict.get('seek_time')
         refresh_only = self.playback_dict.get('refresh_only', False)
+        try:
+            seek_time = float(self.playback_dict.get('seek_time'))
+        except (ValueError, TypeError):
+            seek_time = None
 
         player = self.player
 
@@ -147,13 +150,14 @@ class PlaybackMonitorThread(threading.Thread):
                 self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
                 break
 
-            if seek_time and seek_time != '0.0':
+            if seek_time and seek_time != 0.0:
+                player.seekTime(seek_time)
                 try:
-                    player.seekTime(float(seek_time))
-                    self.current_time = float(seek_time)
-                except ValueError:
+                    self.current_time = float(player.getTime())
+                except RuntimeError:
                     pass
-                seek_time = None
+                if self.current_time >= seek_time:
+                    seek_time = None
 
             if self.abort_now():
                 self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
