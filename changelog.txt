@@ -6,6 +6,7 @@
         - includes HDR content in the manifest
 [add] add support for &hide_folders=true parameter in search query urls
         - when added to the url it will hide the Playlists, Channels, and Live folders
+[add] &seek=<time_in_seconds> to play urls
 [fix] fix playback of Purchases
 [fix] fixed saved playlists that don't belong to a channel
 [fix] mpeg-dash frame rate representation

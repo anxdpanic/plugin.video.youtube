@@ -93,6 +93,13 @@ def play_video(provider, context):
         item = to_playback_item(context, video_item)
         item.setPath(video_item.get_uri())
 
+        try:
+            seek = float(context.get_param('seek', None))
+            if seek:
+                seek_time = seek
+        except (ValueError, TypeError):
+            pass
+
         playback_dict = {
             'video_id': video_id,
             'playing_file': video_item.get_uri(),
