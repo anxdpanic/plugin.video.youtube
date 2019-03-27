@@ -504,7 +504,7 @@ msgstr "Διαγραφή βάσης δεδομένων ιστορικού ανα
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr "Λειτουργία διαγραφής προσωρινής μνήμης"
+msgstr "Διαγραφή προσωρινής μνήμης λειτουργιών"
 
 msgctxt "#30556"
 msgid "Clear search history"
@@ -1168,12 +1168,12 @@ msgstr "Απεγγραφή από κανάλι"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Εξ ορισμού σε σετ προσαρμογής WEBM (4Κ)"
 
 msgctxt "#30722"
 msgid "Include VP9.2 (HDR)"
-msgstr ""
+msgstr "Συμπερίληψη του VP9.2 (HDR)"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]WEBM and VP9.2 requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Απαιτείται μεσολαβητής για ροές κατ'απαίτηση mpeg-dash (βλ. Μεσολαβητής HTTP)[CR]Τα WEBM και VP9.2 απαιτούν το InputStream Adaptive >= 2.3.14"
