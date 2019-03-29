@@ -1157,24 +1157,24 @@ msgstr "No me gusto el vídeo"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr "Calificados eliminados"
+msgstr "Valoración eliminada"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Suscrito al canal"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Desuscrito del canal"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Establecer por defecto WEBM adaptativo (4K)"
 
 msgctxt "#30722"
 msgid "Include VP9.2 (HDR)"
-msgstr ""
+msgstr "Incluir VP9.2 (HDR)"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]WEBM and VP9.2 requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]WEBM y VP9.2 requieren InputStream Adaptive 2.3.14 o superior"
