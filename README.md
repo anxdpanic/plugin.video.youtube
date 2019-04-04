@@ -12,9 +12,5 @@
 * [Support thread](http://forum.kodi.tv/showthread.php?tid=325740)
 * [Wiki](https://github.com/jdf76/plugin.video.youtube/wiki)
 
-## Images
+![](https://i.imgur.com/fzPmDDJ.gif)
 
-![](https://i.imgur.com/WvJRshc.png)
-![](https://i.imgur.com/imNpGdh.png)
-![](https://i.imgur.com/xpKkCs9.png)
-![](https://i.imgur.com/B3nCDSe.png)
