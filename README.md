@@ -12,5 +12,7 @@
 * [Support thread](http://forum.kodi.tv/showthread.php?tid=325740)
 * [Wiki](https://github.com/jdf76/plugin.video.youtube/wiki)
 
+---
+
 ![](https://i.imgur.com/fzPmDDJ.gif)
 
