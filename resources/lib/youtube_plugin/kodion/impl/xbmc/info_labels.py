@@ -13,7 +13,7 @@ from ...items import *
 
 
 def _process_date(info_labels, param):
-    if param is not None and param:
+    if param:
         datetime = utils.datetime_parser.parse(param)
         datetime = '%02d.%02d.%04d' % (datetime.day, datetime.month, datetime.year)
         info_labels['date'] = datetime
@@ -61,7 +61,7 @@ def _process_video_rating(info_labels, param):
 
 
 def _process_date_value(info_labels, name, param):
-    if param is not None:
+    if param:
         date = utils.datetime_parser.parse(param)
         date = '%04d-%02d-%02d' % (date.year, date.month, date.day)
         info_labels[name] = date
