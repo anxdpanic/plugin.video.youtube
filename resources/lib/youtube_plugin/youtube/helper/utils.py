@@ -218,9 +218,10 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             video_item.set_duration_from_seconds(float(play_data.get('total_time')))
         else:
             duration = yt_item.get('contentDetails', {}).get('duration', '')
-            duration = utils.datetime_parser.parse(duration)
-            # we subtract 1 seconds because YouTube returns +1 second to much
-            video_item.set_duration_from_seconds(duration.seconds - 1)
+            if duration:
+                duration = utils.datetime_parser.parse(duration)
+                # we subtract 1 seconds because YouTube returns +1 second to much
+                video_item.set_duration_from_seconds(duration.seconds - 1)
 
         if not video_item.live and use_play_data:
             # play count
@@ -283,7 +284,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         video_item.set_plot(description)
 
         # date time
-        if not datetime and 'publishedAt' in snippet:
+        if not datetime and 'publishedAt' in snippet and snippet['publishedAt']:
             datetime = utils.datetime_parser.parse(snippet['publishedAt'])
             video_item.set_aired_utc(utils.datetime_parser.strptime(snippet['publishedAt']))
 
@@ -451,9 +452,10 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
         video_item.set_duration_from_seconds(float(play_data.get('total_time')))
     else:
         duration = yt_item.get('contentDetails', {}).get('duration', '')
-        duration = utils.datetime_parser.parse(duration)
-        # we subtract 1 seconds because YouTube returns +1 second to much
-        video_item.set_duration_from_seconds(duration.seconds - 1)
+        if duration:
+            duration = utils.datetime_parser.parse(duration)
+            # we subtract 1 seconds because YouTube returns +1 second to much
+            video_item.set_duration_from_seconds(duration.seconds - 1)
 
     if not video_item.live and use_play_data:
         # play count
@@ -499,7 +501,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     video_item.set_plot(description)
 
     # date time
-    if 'publishedAt' in snippet:
+    if 'publishedAt' in snippet and snippet['publishedAt']:
         date_time = utils.datetime_parser.parse(snippet['publishedAt'])
         video_item.set_year_from_datetime(date_time)
         video_item.set_aired_from_datetime(date_time)
