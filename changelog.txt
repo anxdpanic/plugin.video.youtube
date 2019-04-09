@@ -13,6 +13,7 @@
 [fix] datetime parsing if no datetime string is available
 [chg] handle playback monitoring in threads
 [lang] nl_nl strings |contrib: MB1968|
+[lang] el_gr strings |contrib: twilight0|
 
 6.4.0
 [add] 4K videos with InputStream Adaptive >= v2.3.14

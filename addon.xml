@@ -28,6 +28,7 @@
 [fix] datetime parsing if no datetime string is available
 [chg] handle playback monitoring in threads
 [lang] nl_nl strings |contrib: MB1968|
+[lang] el_gr strings |contrib: twilight0|
         </news>
         <assets>
             <icon>icon.png</icon>
