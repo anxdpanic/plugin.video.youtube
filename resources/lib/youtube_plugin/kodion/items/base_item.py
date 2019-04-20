@@ -10,6 +10,7 @@
 
 from six import python_2_unicode_compatible
 from six import string_types
+from six.moves import html_parser
 
 import hashlib
 import datetime
@@ -22,7 +23,12 @@ class BaseItem(object):
 
     def __init__(self, name, uri, image=u'', fanart=u''):
         self._version = BaseItem.VERSION
-        self._name = name
+
+        try:
+            self._name = html_parser.HTMLParser().unescape(name)
+        except html_parser.HTMLParseError as _:
+            self._name = name
+
         self._uri = uri
 
         self._image = u''
