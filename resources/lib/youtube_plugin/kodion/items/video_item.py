@@ -11,6 +11,8 @@
 import re
 import datetime
 
+from six.moves import html_parser
+
 from .base_item import BaseItem
 
 __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?')
@@ -30,7 +32,7 @@ class VideoItem(BaseItem):
         self._season = None
         self._year = None
         self._plot = None
-        self._title = name
+        self._title = self.get_name()
         self._imdb_id = None
         self._cast = None
         self._rating = None
@@ -75,6 +77,10 @@ class VideoItem(BaseItem):
         return self._studio
 
     def set_title(self, title):
+        try:
+            title = html_parser.HTMLParser().unescape(title)
+        except html_parser.HTMLParseError as _:
+            pass
         self._title = title
         self._name = self._title
 
@@ -107,6 +113,10 @@ class VideoItem(BaseItem):
         return self._premiered
 
     def set_plot(self, plot):
+        try:
+            plot = html_parser.HTMLParser().unescape(plot)
+        except html_parser.HTMLParseError as _:
+            pass
         self._plot = plot
 
     def get_plot(self):

@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from six.moves import html_parser
+
 from .base_item import BaseItem
 
 
@@ -20,7 +22,7 @@ class AudioItem(BaseItem):
         self._genre = None
         self._album = None
         self._artist = None
-        self._title = name
+        self._title = self.get_name()
         self._rating = None
 
     def set_rating(self, rating):
@@ -30,6 +32,10 @@ class AudioItem(BaseItem):
         return self._rating
 
     def set_title(self, title):
+        try:
+            title = html_parser.HTMLParser().unescape(title)
+        except html_parser.HTMLParseError as _:
+            pass
         self._title = title
 
     def get_title(self):
