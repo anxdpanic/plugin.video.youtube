@@ -13,22 +13,9 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-6.4.1
-[upd] Use the activation url provided by the authentication request
-[add] add Settings - MPEG-DASH - Default to WEBM adaptation set
-        - required for 4k stream automatic selection
-[add] add Settings - MPEG-DASH - Include VP9.2
-        - includes HDR content in the manifest
-[add] add support for &amp;hide_folders=true parameter in search query urls
-        - when added to the url it will hide the Playlists, Channels, and Live folders
-[add] &amp;seek=&lt;time_in_seconds&gt; to play urls
-[fix] fix playback of Purchases
-[fix] fixed saved playlists that don't belong to a channel
-[fix] mpeg-dash frame rate representation
-[fix] datetime parsing if no datetime string is available
-[chg] handle playback monitoring in threads
-[lang] nl_nl strings |contrib: MB1968|
-[lang] el_gr strings |contrib: twilight0|
+6.4.2
+[fix] unescape html entities in title and plot
+[lang] es_es strings |contrib: roliverosc|
         </news>
         <assets>
             <icon>icon.png</icon>
