@@ -12,7 +12,7 @@ from six.moves import urllib
 
 import time
 import requests
-from ...youtube.youtube_exceptions import LoginException
+from ...youtube.youtube_exceptions import InvalidGrant, LoginException
 from ...kodion import Context
 from .__config__ import api, youtube_tv, developer_keys, keys_changed
 
@@ -132,6 +132,8 @@ class LoginClient(object):
             if 'error' in json_data:
                 context.log_error('Refresh Failed: Code: |%s| JSON: |%s|' % (str(result.status_code), json_data))
                 json_data.update({'code': str(result.status_code)})
+                if json_data['error'] == 'invalid_grant' and json_data['code'] == '400':
+                    raise InvalidGrant(json_data)
                 raise LoginException(json_data)
         except ValueError:
             json_data = None

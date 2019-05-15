@@ -17,3 +17,7 @@ class LoginException(kodion.KodionException):
 
 class YouTubeException(kodion.KodionException):
     pass
+
+
+class InvalidGrant(kodion.KodionException):
+    pass

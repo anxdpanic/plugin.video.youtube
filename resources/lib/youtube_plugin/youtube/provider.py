@@ -21,7 +21,7 @@ from ..kodion.items import *
 from ..youtube.client import YouTube
 from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
     yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
-from .youtube_exceptions import LoginException
+from .youtube_exceptions import InvalidGrant, LoginException
 
 import xbmc
 import xbmcaddon
@@ -351,14 +351,20 @@ class Provider(kodion.AbstractProvider):
                         access_manager.update_dev_access_token(dev_id, access_token, expires_in)
                     else:
                         access_manager.update_access_token(access_token, expires_in)
-                except LoginException as ex:
+                except (InvalidGrant, LoginException) as ex:
                     self.handle_exception(context, ex)
                     access_tokens = ['', '']
                     # reset access_token
-                    if dev_id:
-                        access_manager.update_dev_access_token(dev_id, '')
+                    if isinstance(ex, InvalidGrant):
+                        if dev_id:
+                            access_manager.update_dev_access_token(dev_id, access_token='', refresh_token='')
+                        else:
+                            access_manager.update_access_token(access_token='', refresh_token='')
                     else:
-                        access_manager.update_access_token('')
+                        if dev_id:
+                            access_manager.update_dev_access_token(dev_id, '')
+                        else:
+                            access_manager.update_access_token('')
                     # we clear the cache, so none cached data of an old account will be displayed.
                     self.get_resource_manager(context).clear()
 
@@ -1549,10 +1555,10 @@ class Provider(kodion.AbstractProvider):
                                     kodion.constants.sort_method.DATE)
 
     def handle_exception(self, context, exception_to_handle):
-        if isinstance(exception_to_handle, LoginException):
+        if (isinstance(exception_to_handle, InvalidGrant) or
+                isinstance(exception_to_handle, LoginException)):
             message_timeout = 5000
             failed_refresh = False
-            context.get_access_manager().update_access_token('')
 
             message = exception_to_handle.get_message()
             msg = exception_to_handle.get_message()
