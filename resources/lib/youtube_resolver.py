@@ -108,21 +108,24 @@ def resolve(video_id, sort=True, addon_id=None):
     :rtype: list of dict
     """
     provider, context, client = _get_core_components(addon_id)
+    matched_id = None
     streams = None
 
-    if re.match(r'[a-zA-Z0-9_\-]{11}', video_id):
-        streams = client.get_video_streams(context=context, video_id=video_id)
-    else:
-        url_patterns = [r'(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
-        for pattern in url_patterns:
-            v_id = re.search(pattern, video_id)
-            if v_id:
-                video_id = v_id.group('video_id')
-                streams = client.get_video_streams(context=context, video_id=video_id)
-                break
+    patterns = [r'(?P<video_id>[a-zA-Z0-9_\-]{11})',
+                r'(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be/|be\.com/'
+                r'(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
+
+    for pattern in patterns:
+        v_id = re.search(pattern, video_id)
+        if v_id:
+            matched_id = v_id.group('video_id')
+            break
+
+    if matched_id:
+        streams = client.get_video_streams(context=context, video_id=matched_id)
 
         if streams is None:
-            result = _get_config_and_cookies(client, video_id)
+            result = _get_config_and_cookies(client, matched_id)
             player_config = result.get('config')
             cookies = result.get('cookies')
             streams = client.get_video_streams(context=context, player_config=player_config, cookies=cookies)
