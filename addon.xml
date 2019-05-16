@@ -15,6 +15,10 @@
         <news>
 6.4.2
 [fix] unescape html entities in title and plot
+[fix] handling of invalid grant when refreshing access token
+[fix] adding suggested videos when played from some widgets
+[fix] http server /client_ip using Python 3 |contrib: t6|
+[upd] refactor youtube_resolver.resolve
 [lang] es_es strings |contrib: roliverosc|
         </news>
         <assets>
