@@ -1099,7 +1099,7 @@ class VideoInfo(object):
             fps_scale_map = {24: 1001, 30: 1001, 60: 1001}
             if 'fps' in stream_map:
                 fps = int(stream_map.get('fps'))
-                scale = fps_scale_map.get(fps) if fps_scale_map.get(fps) else 1000
+                scale = fps_scale_map.get(fps, 1000)
                 frame_rate = '%d/%d' % (fps * 1000, scale)
 
             data[mime][i]['frameRate'] = frame_rate
