@@ -865,11 +865,32 @@ class VideoInfo(object):
 
         mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
 
+        license_info = {'url': None, 'proxy': None, 'token': None}
+        pa_li_info = player_response.get('streamingData', {}).get('licenseInfos', [])
+        if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
+            raise YouTubeException('Proxy is not running')
+        for li_info in pa_li_info:
+            if li_info.get('drmFamily') == 'WIDEVINE':
+                license_info['url'] = li_info.get('url', None)
+                if license_info['url']:
+                    self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
+                    li_ipaddress = self._context.get_settings().httpd_listen()
+                    if li_ipaddress == '0.0.0.0':
+                        li_ipaddress = '127.0.0.1'
+                    proxy_addr = \
+                        ['http://{ipaddress}:{port}/widevine'.format(
+                            ipaddress=li_ipaddress,
+                            port=self._context.get_settings().httpd_port()
+                        ), '||R{SSM}|']
+                    license_info['proxy'] = ''.join(proxy_addr)
+                    license_info['token'] = self._access_token
+                    break
+
         if requires_cipher(adaptive_fmts) or requires_cipher(url_encoded_fmt_stream_map):
             js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
-        if not mpd_url and not is_live and httpd_is_live and adaptive_fmts:
+        if not license_info.get('url') and not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
                                                 params.get('length_seconds', '0'),
@@ -895,27 +916,6 @@ class VideoInfo(object):
                     else:
                         raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
-                license_info = {'url': None, 'proxy': None, 'token': None}
-                pa_li_info = player_response.get('streamingData', {}).get('licenseInfos', [])
-                if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
-                    raise YouTubeException('Proxy is not running')
-                for li_info in pa_li_info:
-                    if li_info.get('drmFamily') == 'WIDEVINE':
-                        license_info['url'] = li_info.get('url', None)
-                        if license_info['url']:
-                            self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
-                            li_ipaddress = self._context.get_settings().httpd_listen()
-                            if li_ipaddress == '0.0.0.0':
-                                li_ipaddress = '127.0.0.1'
-                            proxy_addr = \
-                                ['http://{ipaddress}:{port}/widevine'.format(
-                                    ipaddress=li_ipaddress,
-                                    port=self._context.get_settings().httpd_port()
-                                ), '||R{SSM}|']
-                            license_info['proxy'] = ''.join(proxy_addr)
-                            license_info['token'] = self._access_token
-                            break
-
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info,
                                 'headers': curl_headers,
