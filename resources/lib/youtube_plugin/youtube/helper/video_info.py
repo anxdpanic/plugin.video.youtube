@@ -1270,7 +1270,7 @@ class VideoInfo(object):
         self._context.log_debug('Generated MPD highest supported quality found: |%s|' % str(stream_info))
         if discarded_streams:
             discarded_streams = sorted(discarded_streams, key=lambda k: k.get('audio', k.get('video', {}))['bandwidth'], reverse=True)
-            self._context.log_debug('Generated MPD unsupported streams: \n%s' % '\n'.join(str(stream) for stream in discarded_streams))
+            self._context.log_debug('Generated MPD discarded streams: \n%s' % '\n'.join(str(stream) for stream in discarded_streams))
 
         if not has_video_stream:
             self._context.log_debug('Generated MPD no supported video streams found')
