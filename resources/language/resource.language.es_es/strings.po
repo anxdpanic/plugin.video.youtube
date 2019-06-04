@@ -1182,3 +1182,7 @@ msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]WEBM y VP9.2 requieren InputS
 msgctxt "#30724"
 msgid "Limit to 30fps"
 msgstr ""
+
+msgctxt "#30725"
+msgid "1440p (HD)"
+msgstr ""

@@ -203,8 +203,9 @@ class AbstractSettings(object):
             2: 480,
             3: 720,
             4: 1080,
-            5: 2160,
-            6: 4320
+            5: 1440,
+            6: 2160,
+            7: 4320
         }
 
     def get_mpd_quality(self):

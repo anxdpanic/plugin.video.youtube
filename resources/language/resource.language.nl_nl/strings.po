@@ -1174,3 +1174,7 @@ msgstr "Proxy vereist voor mpeg-dasg vods (zie HTTP server).WEBM en VP9.2 vereis
 msgctxt "#30724"
 msgid "Limit to 30fps"
 msgstr ""
+
+msgctxt "#30725"
+msgid "1440p (HD)"
+msgstr ""

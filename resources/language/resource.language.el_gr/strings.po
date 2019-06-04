@@ -1181,3 +1181,7 @@ msgstr "Απαιτείται μεσολαβητής για ροές κατ'απ�
 msgctxt "#30724"
 msgid "Limit to 30fps"
 msgstr ""
+
+msgctxt "#30725"
+msgid "1440p (HD)"
+msgstr ""
