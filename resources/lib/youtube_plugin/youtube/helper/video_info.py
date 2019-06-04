@@ -1017,7 +1017,7 @@ class VideoInfo(object):
         return stream_list
 
     def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
-        def get_discarded_audio(fmt, mime_type, itag, stream):
+        def get_discarded_audio(fmt, mime_type, itag, stream, reason='unsupported'):
             _discarded_stream = dict()
             _discarded_stream['audio'] = dict()
             _discarded_stream['audio']['itag'] = str(itag)
@@ -1031,9 +1031,10 @@ class VideoInfo(object):
             if codec_match:
                 _discarded_stream['audio']['codec'] = codec_match.group('codec')
             _discarded_stream['audio']['bandwidth'] = int(stream['bandwidth'])
+            _discarded_stream['reason'] = reason
             return _discarded_stream
 
-        def get_discarded_video(mime_type, itag, stream):
+        def get_discarded_video(mime_type, itag, stream, reason='unsupported'):
             _discarded_stream = dict()
             _discarded_stream['video'] = dict()
             _discarded_stream['video']['itag'] = str(itag)
@@ -1048,6 +1049,7 @@ class VideoInfo(object):
             if codec_match:
                 _discarded_stream['video']['codec'] = codec_match.group('codec')
             _discarded_stream['video']['bandwidth'] = int(stream['bandwidth'])
+            _discarded_stream['reason'] = reason
             return _discarded_stream
 
         def filter_qualities(stream_data, mime_type, sorted_qualities):
@@ -1064,7 +1066,10 @@ class VideoInfo(object):
 
             if discard_mime in data_copy:
                 for itag in list(data_copy[discard_mime].keys()):
-                    discarded_streams.append(get_discarded_video(discard_mime, itag, data_copy[discard_mime][itag]))
+                    discarded_streams.append(get_discarded_video(discard_mime,
+                                                                 itag,
+                                                                 data_copy[discard_mime][itag],
+                                                                 'filtered mime type'))
                     del data_copy[discard_mime][itag]
                 del data_copy[discard_mime]
 
@@ -1087,7 +1092,10 @@ class VideoInfo(object):
             if itag_match:
                 for itag in list(data_copy[mime_type].keys()):
                     if itag != itag_match:
-                        discarded_streams.append(get_discarded_video(mime_type, itag, data_copy[mime_type][itag]))
+                        discarded_streams.append(get_discarded_video(mime_type,
+                                                                     itag,
+                                                                     data_copy[mime_type][itag],
+                                                                     'filtered quality'))
                         del data_copy[mime_type][itag]
 
                 return data_copy
@@ -1205,8 +1213,10 @@ class VideoInfo(object):
             discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
                             if i in data['video/webm']]
             for d in discard_webm:
-                discarded_streams.append(get_discarded_video('video/webm', d['id'],
-                                                             data['video/webm'][d['id']]))
+                discarded_streams.append(get_discarded_video('video/webm',
+                                                             d['id'],
+                                                             data['video/webm'][d['id']],
+                                                             'replaced by hdr'))
 
             if webm_streams:
                 data['video/webm'] = webm_streams
@@ -1279,7 +1289,10 @@ class VideoInfo(object):
 
                         if 'vp9.2' == video_codec.lower() and ('vp9.2' not in ia_capabilities or
                                                                not self._context.get_settings().include_hdr()):
-                            discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
+                            if not self._context.get_settings().include_hdr() and 'vp9.2' in ia_capabilities:
+                                discarded_streams.append(get_discarded_video(mime, i, data[mime][i], 'hdr not selected'))
+                            else:
+                                discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
                             continue
                         elif 'vp9' == video_codec.lower() and 'vp9' not in ia_capabilities:
                             discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
