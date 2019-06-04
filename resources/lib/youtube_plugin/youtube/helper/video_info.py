@@ -1155,6 +1155,12 @@ class VideoInfo(object):
                                   data['video/webm'][key]['width'] == data['video/webm'][k]['width']):
                         webm_streams[key] = data['video/webm'][key]
 
+            discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
+                            if i in data['video/webm']]
+            for d in discard_webm:
+                discarded_streams.append(get_discarded_video('video/webm', d['id'],
+                                                             data['video/webm'][d['id']]))
+
             if webm_streams:
                 data['video/webm'] = webm_streams
 
