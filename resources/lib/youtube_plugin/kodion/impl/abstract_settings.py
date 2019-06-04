@@ -141,9 +141,6 @@ class AbstractSettings(object):
             return False
         return self.get_bool(constants.setting.DASH_VIDEOS, False)
 
-    def use_webm_adaptation_set(self):
-        return self.get_bool(constants.setting.DASH_USE_WEBM, False)
-
     def include_hdr(self):
         return self.get_bool(constants.setting.DASH_INCL_HDR, False)
 
@@ -197,3 +194,30 @@ class AbstractSettings(object):
 
     def use_playback_history(self):
         return self.get_bool(constants.setting.USE_PLAYBACK_HISTORY, False)
+
+    @staticmethod
+    def __get_mpd_quality_map():
+        return {
+            0: 240,
+            1: 360,
+            2: 480,
+            3: 720,
+            4: 1080,
+            5: 2160,
+            6: 4320
+        }
+
+    def get_mpd_quality(self):
+        quality_map = self.__get_mpd_quality_map()
+        quality_enum = self.get_int(constants.setting.MPD_QUALITY_SELECTION, 4)
+        return quality_map.get(quality_enum, 1080)
+
+    def mpd_video_qualities(self):
+        if not self.use_dash_videos():
+            return None
+
+        quality = self.get_mpd_quality()
+        quality_map = self.__get_mpd_quality_map()
+        qualities = sorted([x for x in list(quality_map.values()) if x <= quality], reverse=True)
+
+        return qualities

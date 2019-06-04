@@ -12,6 +12,7 @@ from six.moves import range
 from six import string_types, PY2
 from six.moves import urllib
 
+import copy
 import re
 import json
 import random
@@ -1049,6 +1050,50 @@ class VideoInfo(object):
             _discarded_stream['video']['bandwidth'] = int(stream['bandwidth'])
             return _discarded_stream
 
+        def filter_qualities(stream_data, mime_type, sorted_qualities):
+
+            data_copy = copy.deepcopy(stream_data)
+            itag_match = None
+
+            if mime_type == 'video/mp4':
+                discard_mime = 'video/webm'
+            elif mime_type == 'video/webm':
+                discard_mime = 'video/mp4'
+            else:
+                return None
+
+            if discard_mime in data_copy:
+                for itag in list(data_copy[discard_mime].keys()):
+                    discarded_streams.append(get_discarded_video(discard_mime, itag, data_copy[discard_mime][itag]))
+                    del data_copy[discard_mime][itag]
+                del data_copy[discard_mime]
+
+            for idx, q in enumerate(sorted_qualities):
+                if any(itag for itag in list(data_copy[mime_type].keys())
+                       if int(data_copy[mime_type][itag].get('height', 0)) == q):
+                    itag_match = next(itag for itag in list(data_copy[mime_type].keys())
+                                      if int(data_copy[mime_type][itag].get('height', 0)) == q)
+                    break
+
+                if idx != len(sorted_qualities) - 1:
+                    if any(itag for itag in list(data_copy[mime_type].keys())
+                           if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
+                               (int(data_copy[mime_type][itag].get('height', 0)) > sorted_qualities[idx + 1]))):
+                        itag_match = next(itag for itag in list(data_copy[mime_type].keys())
+                                          if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
+                                              (int(data_copy[mime_type][itag].get('height', 0)) > sorted_qualities[idx + 1])))
+                        break
+
+            if itag_match:
+                for itag in list(data_copy[mime_type].keys()):
+                    if itag != itag_match:
+                        discarded_streams.append(get_discarded_video(mime_type, itag, data_copy[mime_type][itag]))
+                        del data_copy[mime_type][itag]
+
+                return data_copy
+
+            return None
+
         basepath = 'special://temp/plugin.video.youtube/'
         if not make_dirs(basepath):
             self._context.log_debug('Failed to create directories: %s' % basepath)
@@ -1133,7 +1178,9 @@ class VideoInfo(object):
         if ('vorbis' in ia_capabilities or 'opus' in ia_capabilities) and any(m for m in data if m == 'audio/webm'):
             supported_mime_types.append('audio/webm')
 
-        if 'video/webm' in supported_mime_types and self._context.get_settings().use_webm_adaptation_set():
+        if ('video/webm' in supported_mime_types and
+                (self._context.get_settings().get_mpd_quality() > 1080 or
+                 self._context.get_settings().include_hdr())):
             default_mime_type = 'webm'
 
         if ('video/webm' in supported_mime_types and
@@ -1163,6 +1210,20 @@ class VideoInfo(object):
 
             if webm_streams:
                 data['video/webm'] = webm_streams
+
+        if self._context.inputstream_adaptive_auto_stream_selection():
+            # filter streams only if InputStream Adaptive - Stream selection is set to Auto
+            limit_qualities = self._context.get_settings().mpd_video_qualities()
+            if limit_qualities:
+                if default_mime_type == 'mp4':
+                    filtered_data = filter_qualities(data, 'video/mp4', limit_qualities)
+                    if filtered_data:
+                        data = filtered_data
+
+                elif default_mime_type == 'webm':
+                    filtered_data = filter_qualities(data, 'video/webm', limit_qualities)
+                    if filtered_data:
+                        data = filtered_data
 
         out_list = ['<?xml version="1.0" encoding="UTF-8"?>\n'
                     '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" '
