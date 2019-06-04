@@ -221,3 +221,8 @@ class AbstractSettings(object):
         qualities = sorted([x for x in list(quality_map.values()) if x <= quality], reverse=True)
 
         return qualities
+
+    def mpd_30fps_limit(self):
+        if self.include_hdr():
+            return False
+        return self.get_bool(constants.setting.MPD_30FPS_LIMIT, False)

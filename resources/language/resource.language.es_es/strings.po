@@ -1178,3 +1178,7 @@ msgstr "Incluir VP9.2 (HDR)"
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]WEBM and VP9.2 requires InputStream Adaptive >= 2.3.14"
 msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]WEBM y VP9.2 requieren InputStream Adaptive 2.3.14 o superior"
+
+msgctxt "#30724"
+msgid "Limit to 30fps"
+msgstr ""
