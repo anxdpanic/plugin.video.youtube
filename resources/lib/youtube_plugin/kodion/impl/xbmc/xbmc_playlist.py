@@ -56,11 +56,17 @@ class XbmcPlaylist(AbstractPlaylist):
             })
 
         response = json.loads(xbmc.executeJSONRPC(rpc_request))
-        try:
-            return response['result']['items']
-        except KeyError:
-            message = response['error']['message']
-            code = response['error']['code']
-            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
+
+        if 'result' in response:
+            if 'items' in response['result']:
+                return response['result']['items']
+            return []
+        else:
+            if 'error' in response:
+                message = response['error']['message']
+                code = response['error']['code']
+                error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
+            else:
+                error = 'Requested |%s| received error |%s|' % (rpc_request, str(response))
             self._context.log_debug(error)
             return []

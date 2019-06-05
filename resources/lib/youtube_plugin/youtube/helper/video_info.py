@@ -12,6 +12,7 @@ from six.moves import range
 from six import string_types, PY2
 from six.moves import urllib
 
+import copy
 import re
 import json
 import random
@@ -865,11 +866,32 @@ class VideoInfo(object):
 
         mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
 
+        license_info = {'url': None, 'proxy': None, 'token': None}
+        pa_li_info = player_response.get('streamingData', {}).get('licenseInfos', [])
+        if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
+            raise YouTubeException('Proxy is not running')
+        for li_info in pa_li_info:
+            if li_info.get('drmFamily') == 'WIDEVINE':
+                license_info['url'] = li_info.get('url', None)
+                if license_info['url']:
+                    self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
+                    li_ipaddress = self._context.get_settings().httpd_listen()
+                    if li_ipaddress == '0.0.0.0':
+                        li_ipaddress = '127.0.0.1'
+                    proxy_addr = \
+                        ['http://{ipaddress}:{port}/widevine'.format(
+                            ipaddress=li_ipaddress,
+                            port=self._context.get_settings().httpd_port()
+                        ), '||R{SSM}|']
+                    license_info['proxy'] = ''.join(proxy_addr)
+                    license_info['token'] = self._access_token
+                    break
+
         if requires_cipher(adaptive_fmts) or requires_cipher(url_encoded_fmt_stream_map):
             js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
-        if not mpd_url and not is_live and httpd_is_live and adaptive_fmts:
+        if not license_info.get('url') and not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
                                                 params.get('length_seconds', '0'),
@@ -895,27 +917,6 @@ class VideoInfo(object):
                     else:
                         raise YouTubeException('Cipher: Not Found')
             if mpd_sig_deciphered:
-                license_info = {'url': None, 'proxy': None, 'token': None}
-                pa_li_info = player_response.get('streamingData', {}).get('licenseInfos', [])
-                if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
-                    raise YouTubeException('Proxy is not running')
-                for li_info in pa_li_info:
-                    if li_info.get('drmFamily') == 'WIDEVINE':
-                        license_info['url'] = li_info.get('url', None)
-                        if license_info['url']:
-                            self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
-                            li_ipaddress = self._context.get_settings().httpd_listen()
-                            if li_ipaddress == '0.0.0.0':
-                                li_ipaddress = '127.0.0.1'
-                            proxy_addr = \
-                                ['http://{ipaddress}:{port}/widevine'.format(
-                                    ipaddress=li_ipaddress,
-                                    port=self._context.get_settings().httpd_port()
-                                ), '||R{SSM}|']
-                            license_info['proxy'] = ''.join(proxy_addr)
-                            license_info['token'] = self._access_token
-                            break
-
                 video_stream = {'url': mpd_url,
                                 'meta': meta_info,
                                 'headers': curl_headers,
@@ -1016,7 +1017,9 @@ class VideoInfo(object):
         return stream_list
 
     def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
-        def get_discarded_audio(fmt, mime_type, itag, stream):
+        discarded_streams = list()
+
+        def get_discarded_audio(fmt, mime_type, itag, stream, reason='unsupported'):
             _discarded_stream = dict()
             _discarded_stream['audio'] = dict()
             _discarded_stream['audio']['itag'] = str(itag)
@@ -1030,9 +1033,10 @@ class VideoInfo(object):
             if codec_match:
                 _discarded_stream['audio']['codec'] = codec_match.group('codec')
             _discarded_stream['audio']['bandwidth'] = int(stream['bandwidth'])
+            _discarded_stream['reason'] = reason
             return _discarded_stream
 
-        def get_discarded_video(mime_type, itag, stream):
+        def get_discarded_video(mime_type, itag, stream, reason='unsupported'):
             _discarded_stream = dict()
             _discarded_stream['video'] = dict()
             _discarded_stream['video']['itag'] = str(itag)
@@ -1047,7 +1051,74 @@ class VideoInfo(object):
             if codec_match:
                 _discarded_stream['video']['codec'] = codec_match.group('codec')
             _discarded_stream['video']['bandwidth'] = int(stream['bandwidth'])
+            _discarded_stream['reason'] = reason
             return _discarded_stream
+
+        def filter_qualities(stream_data, mime_type, sorted_qualities):
+
+            data_copy = copy.deepcopy(stream_data)
+            itag_match = None
+
+            if mime_type == 'video/mp4':
+                discard_mime = 'video/webm'
+            elif mime_type == 'video/webm':
+                discard_mime = 'video/mp4'
+            else:
+                return None
+
+            if discard_mime in data_copy:
+                for itag in list(data_copy[discard_mime].keys()):
+                    discarded_streams.append(get_discarded_video(discard_mime,
+                                                                 itag,
+                                                                 data_copy[discard_mime][itag],
+                                                                 'filtered mime type'))
+                    del data_copy[discard_mime][itag]
+                del data_copy[discard_mime]
+
+            for idx, q in enumerate(sorted_qualities):
+                if any(itag for itag in list(data_copy[mime_type].keys())
+                       if int(data_copy[mime_type][itag].get('height', 0)) == q):
+                    itag_match = next(itag for itag in list(data_copy[mime_type].keys())
+                                      if int(data_copy[mime_type][itag].get('height', 0)) == q)
+                    break
+
+                if idx != len(sorted_qualities) - 1:
+                    if any(itag for itag in list(data_copy[mime_type].keys())
+                           if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
+                               (int(data_copy[mime_type][itag].get('height', 0)) > sorted_qualities[idx + 1]))):
+                        itag_match = next(itag for itag in list(data_copy[mime_type].keys())
+                                          if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
+                                              (int(data_copy[mime_type][itag].get('height', 0)) > sorted_qualities[idx + 1])))
+                        break
+
+            if itag_match:
+                for itag in list(data_copy[mime_type].keys()):
+                    if itag != itag_match:
+                        discarded_streams.append(get_discarded_video(mime_type,
+                                                                     itag,
+                                                                     data_copy[mime_type][itag],
+                                                                     'filtered quality'))
+                        del data_copy[mime_type][itag]
+
+                return data_copy
+
+            return None
+
+        def filter_fps(stream_data, mime_type):
+            data_copy = None
+            if mime_type in stream_data:
+                data_copy = copy.deepcopy(stream_data)
+                if any(k for k in list(data_copy[mime_type].keys())
+                       if data_copy[mime_type][k]['fps'] <= 30):
+                    for k in list(data_copy[mime_type].keys()):
+                        if data_copy[mime_type][k]['fps'] > 30:
+                            discarded_streams.append(get_discarded_video(mime_type,
+                                                                         k,
+                                                                         data_copy[mime_type][k],
+                                                                         'frame rate limit'))
+                            del data_copy[mime_type][k]
+
+            return data_copy
 
         basepath = 'special://temp/plugin.video.youtube/'
         if not make_dirs(basepath):
@@ -1063,8 +1134,6 @@ class VideoInfo(object):
 
         stream_info = {'video': {'height': '0', 'fps': '0', 'codec': '', 'mime': '', 'quality_label': '', 'bandwidth': 0},
                        'audio': {'bitrate': '0', 'codec': '', 'mime': '', 'bandwidth': 0}}
-
-        discarded_streams = list()
 
         fmts_list = adaptive_fmts.split(',')
         data = dict()
@@ -1099,7 +1168,8 @@ class VideoInfo(object):
             fps_scale_map = {24: 1001, 30: 1001, 60: 1001}
             if 'fps' in stream_map:
                 fps = int(stream_map.get('fps'))
-                scale = fps_scale_map.get(fps) if fps_scale_map.get(fps) else 1000
+                data[mime][i]['fps'] = fps
+                scale = fps_scale_map.get(fps, 1000)
                 frame_rate = '%d/%d' % (fps * 1000, scale)
 
             data[mime][i]['frameRate'] = frame_rate
@@ -1133,30 +1203,62 @@ class VideoInfo(object):
         if ('vorbis' in ia_capabilities or 'opus' in ia_capabilities) and any(m for m in data if m == 'audio/webm'):
             supported_mime_types.append('audio/webm')
 
-        if 'video/webm' in supported_mime_types and self._context.get_settings().use_webm_adaptation_set():
+        if ('video/webm' in supported_mime_types and
+                (self._context.get_settings().get_mpd_quality() > 1080 or
+                 self._context.get_settings().include_hdr())):
             default_mime_type = 'webm'
 
-        if ('video/webm' in supported_mime_types and
-                'vp9.2' in ia_capabilities and
-                self._context.get_settings().include_hdr() and
-                self._context.inputstream_adaptive_auto_stream_selection() and
-                any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs'])):
-            # when hdr enabled and inputstream adaptive stream selection is set to automatic
-            # replace vp9 streams with vp9.2 (hdr) of the same resolution
-            webm_streams = {}
+        if self._context.inputstream_adaptive_auto_stream_selection():
+            # filter streams only if InputStream Adaptive - Stream selection is set to Auto
+            if self._context.get_settings().mpd_30fps_limit():
+                filtered_data = filter_fps(data, 'video/mp4')
+                if filtered_data:
+                    data = filtered_data
 
-            for key in list(data['video/webm'].keys()):
-                if '"vp9.2"' in data['video/webm'][key]['codecs']:
-                    webm_streams[key] = data['video/webm'][key]
-                elif '"vp9"' in data['video/webm'][key]['codecs']:
-                    if not any(k for k in list(data['video/webm'].keys())
-                               if '"vp9.2"' in data['video/webm'][k]['codecs'] and
-                                  data['video/webm'][key]['height'] == data['video/webm'][k]['height'] and
-                                  data['video/webm'][key]['width'] == data['video/webm'][k]['width']):
+                filtered_data = filter_fps(data, 'video/webm')
+                if filtered_data:
+                    data = filtered_data
+
+            if ('video/webm' in supported_mime_types and
+                    'vp9.2' in ia_capabilities and
+                    self._context.get_settings().include_hdr() and
+                    any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs'])):
+                # when hdr enabled and inputstream adaptive stream selection is set to automatic
+                # replace vp9 streams with vp9.2 (hdr) of the same resolution
+                webm_streams = {}
+
+                for key in list(data['video/webm'].keys()):
+                    if '"vp9.2"' in data['video/webm'][key]['codecs']:
                         webm_streams[key] = data['video/webm'][key]
+                    elif '"vp9"' in data['video/webm'][key]['codecs']:
+                        if not any(k for k in list(data['video/webm'].keys())
+                                   if '"vp9.2"' in data['video/webm'][k]['codecs'] and
+                                      data['video/webm'][key]['height'] == data['video/webm'][k]['height'] and
+                                      data['video/webm'][key]['width'] == data['video/webm'][k]['width']):
+                            webm_streams[key] = data['video/webm'][key]
 
-            if webm_streams:
-                data['video/webm'] = webm_streams
+                discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
+                                if i in data['video/webm']]
+                for d in discard_webm:
+                    discarded_streams.append(get_discarded_video('video/webm',
+                                                                 d['id'],
+                                                                 data['video/webm'][d['id']],
+                                                                 'replaced by hdr'))
+
+                if webm_streams:
+                    data['video/webm'] = webm_streams
+
+            limit_qualities = self._context.get_settings().mpd_video_qualities()
+            if limit_qualities:
+                if default_mime_type == 'mp4':
+                    filtered_data = filter_qualities(data, 'video/mp4', limit_qualities)
+                    if filtered_data:
+                        data = filtered_data
+
+                elif default_mime_type == 'webm':
+                    filtered_data = filter_qualities(data, 'video/webm', limit_qualities)
+                    if filtered_data:
+                        data = filtered_data
 
         out_list = ['<?xml version="1.0" encoding="UTF-8"?>\n'
                     '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" '
@@ -1212,7 +1314,10 @@ class VideoInfo(object):
 
                         if 'vp9.2' == video_codec.lower() and ('vp9.2' not in ia_capabilities or
                                                                not self._context.get_settings().include_hdr()):
-                            discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
+                            if not self._context.get_settings().include_hdr() and 'vp9.2' in ia_capabilities:
+                                discarded_streams.append(get_discarded_video(mime, i, data[mime][i], 'hdr not selected'))
+                            else:
+                                discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
                             continue
                         elif 'vp9' == video_codec.lower() and 'vp9' not in ia_capabilities:
                             discarded_streams.append(get_discarded_video(mime, i, data[mime][i]))
@@ -1264,7 +1369,7 @@ class VideoInfo(object):
         self._context.log_debug('Generated MPD highest supported quality found: |%s|' % str(stream_info))
         if discarded_streams:
             discarded_streams = sorted(discarded_streams, key=lambda k: k.get('audio', k.get('video', {}))['bandwidth'], reverse=True)
-            self._context.log_debug('Generated MPD unsupported streams: \n%s' % '\n'.join(str(stream) for stream in discarded_streams))
+            self._context.log_debug('Generated MPD discarded streams: \n%s' % '\n'.join(str(stream) for stream in discarded_streams))
 
         if not has_video_stream:
             self._context.log_debug('Generated MPD no supported video streams found')

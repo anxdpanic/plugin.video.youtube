@@ -31,12 +31,13 @@
         <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)" option="close" action="RunPlugin(plugin://$ID/config/mpd/)"/>
         <setting type="lsep" label="30723"/>
         <setting id="kodion.mpd.videos" type="bool" label="30688" default="true" enable="eq(-3,true)"/>
-        <setting id="kodion.mpd.webm" type="bool" label="30721" default="false" enable="eq(-1,true)" subsetting="true"/>
-        <setting id="kodion.mpd.hdr" type="bool" label="30722" default="false" enable="eq(-2,true)" subsetting="true"/>
+        <setting id="kodion.mpd.hdr" type="bool" label="30722" default="false" enable="eq(-1,true)" subsetting="true"/>
+        <setting id="kodion.mpd.limit.30" type="bool" label="30724" default="false" enable="eq(-2,true)+eq(-1,false)" subsetting="true"/>
+        <setting id="kodion.mpd.quality.selection" type="enum" label="30010" default="4" lvalues="30016|30017|30011|30012|30013|30725|30014|30015" enable="eq(-3,true)" subsetting="true"/>
         <setting type="lsep" label="30690"/>
-        <setting id="kodion.mpd.live_streams" type="bool" label="30689" default="true" enable="eq(-7,true)"/>
+        <setting id="kodion.mpd.live_streams" type="bool" label="30689" default="true" enable="eq(-8,true)"/>
         <setting type="sep"/>
-        <setting id="kodion.install.inputstreamhelper" type="action" label="30623" action="RunPlugin(plugin://$ID/maintain/inputstreamhelper/install/)" enable="eq(-9,true)"/>
+        <setting id="kodion.install.inputstreamhelper" type="action" label="30623" action="RunPlugin(plugin://$ID/maintain/inputstreamhelper/install/)" enable="eq(-10,true)"/>
     </category>
 
     <!-- folders -->
