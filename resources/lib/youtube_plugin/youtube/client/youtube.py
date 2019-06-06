@@ -477,6 +477,28 @@ class YouTube(LoginClient):
 
         return self.perform_v3_request(method='GET', path='search', params=params)
 
+    def get_channel_videos(self, channel_id, page_token=''):
+        """
+        Returns a collection of video search results for the specified channel_id
+        """
+
+        params = {'part': 'snippet',
+                  'hl': self._language,
+                  'maxResults': str(self._max_results),
+                  'type': 'video',
+                  'safeSearch': 'none',
+                  'order': 'date'}
+
+        if channel_id == 'mine':
+            params['forMine'] = 'true'
+        else:
+            params['channelId'] = channel_id
+
+        if page_token:
+            params['pageToken'] = page_token
+
+        return self.perform_v3_request(method='GET', path='search', params=params)
+
     def search(self, q, search_type=None, event_type='', channel_id='',
                order='relevance', safe_search='moderate', page_token='', location=False):
         """
