@@ -1185,3 +1185,7 @@ msgstr ""
 msgctxt "#30725"
 msgid "1440p (HD)"
 msgstr ""
+
+msgctxt "#30726"
+msgid "Uploads"
+msgstr ""
