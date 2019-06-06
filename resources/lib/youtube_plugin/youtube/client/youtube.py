@@ -714,7 +714,7 @@ class YouTube(LoginClient):
                         for _playListItem in _playListItems:
                             _playListItem = _playListItem.get('snippet', {})
                             if _playListItem:
-                                _video_item = {'id': _playListItem.get('resourceId', {}).get('videoId',''),
+                                _video_item = {'id': _playListItem.get('resourceId', {}).get('videoId', ''),
                                                'title': _playListItem['title'],
                                                'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
                                 _result['items'].append(_video_item)
