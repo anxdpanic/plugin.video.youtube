@@ -166,6 +166,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.unrated.video': 30718,
                  'youtube.subscribed.to.channel': 30719,
                  'youtube.unsubscribed.from.channel': 30720,
+                 'youtube.uploads': 30726,
                  }
 
     def __init__(self):
@@ -474,6 +475,25 @@ class Provider(kodion.AbstractProvider):
 
         channel_id = re_match.group('channel_id')
         page_token = context.get_param('page_token', '')
+
+        resource_manager = self.get_resource_manager(context)
+
+        item_params = {}
+        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        addon_id = context.get_param('addon_id', '')
+        if incognito:
+            item_params.update({'incognito': incognito})
+        if addon_id:
+            item_params.update({'addon_id': addon_id})
+
+        playlists = resource_manager.get_related_playlists(channel_id)
+        uploads_playlist = playlists.get('uploads', '')
+        if uploads_playlist:
+            uploads_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.uploads'])),
+                                         context.create_uri(['channel', channel_id, 'playlist', uploads_playlist],
+                                                            item_params),
+                                         image=context.create_resource_path('media', 'playlist.png'))
+            result.append(uploads_item)
 
         # no caching
         json_data = self.get_client(context).get_playlists_of_channel(channel_id, page_token)

@@ -1,6 +1,7 @@
 6.5.0
 [add] Video quality selection to Settings - MPEG-DASH
 [add] Limit to 30fps to Settings - MPEG-DASH
+[add] Uploads playlist to channel playlists
 [fix] unescape html entities in title and plot
 [fix] handling of invalid grant when refreshing access token
 [fix] adding suggested videos when played from some widgets
