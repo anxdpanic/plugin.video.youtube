@@ -1194,6 +1194,14 @@ class VideoInfo(object):
             data[mime][i]['indexRange'] = stream_map.get('index')
             data[mime][i]['init'] = stream_map.get('init')
 
+            if (not stream_map.get('index') or not stream_map.get('init') or
+                    (stream_map.get('index') == '0-0' and stream_map.get('init') == '0-0')):
+                if mime.startswith('video'):
+                    discarded_streams.append(get_discarded_video(mime, i, data[mime][i], 'no init or index'))
+                else:
+                    discarded_streams.append(get_discarded_audio(mime, i, data[mime][i], 'no init or index'))
+                del data[mime][i]
+
         default_mime_type = 'mp4'
         supported_mime_types = ['audio/mp4', 'video/mp4']
 
@@ -1208,9 +1216,18 @@ class VideoInfo(object):
                  self._context.get_settings().include_hdr())):
             default_mime_type = 'webm'
 
-        if self._context.inputstream_adaptive_auto_stream_selection():
+        apply_filters = self._context.inputstream_adaptive_auto_stream_selection()
+        limit_qualities = self._context.get_settings().mpd_video_qualities()
+        limit_30fps = self._context.get_settings().mpd_30fps_limit()
+        self._context.log_debug('Generating MPD: Apply filters |{apply_filters}| '
+                                'Quality selection |{quality}| Limit 30FPS |{limit_fps}|'
+                                .format(apply_filters=str(apply_filters),
+                                        quality=str(next(iter(limit_qualities), None)),
+                                        limit_fps=str(limit_30fps)))
+
+        if apply_filters:
             # filter streams only if InputStream Adaptive - Stream selection is set to Auto
-            if self._context.get_settings().mpd_30fps_limit():
+            if limit_30fps:
                 filtered_data = filter_fps(data, 'video/mp4')
                 if filtered_data:
                     data = filtered_data
@@ -1248,7 +1265,6 @@ class VideoInfo(object):
                 if webm_streams:
                     data['video/webm'] = webm_streams
 
-            limit_qualities = self._context.get_settings().mpd_video_qualities()
             if limit_qualities:
                 if default_mime_type == 'mp4':
                     filtered_data = filter_qualities(data, 'video/mp4', limit_qualities)

@@ -215,7 +215,7 @@ class AbstractSettings(object):
 
     def mpd_video_qualities(self):
         if not self.use_dash_videos():
-            return None
+            return []
 
         quality = self.get_mpd_quality()
         quality_map = self.__get_mpd_quality_map()
