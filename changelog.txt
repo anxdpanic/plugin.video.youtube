@@ -9,6 +9,7 @@
 [fix] http server /client_ip using Python 3 |contrib: t6|
 [upd] refactor youtube_resolver.resolve
 [lang] es_es strings |contrib: roliverosc|
+[lang] ko_kr strings |contrib: parkmino|
 
 6.4.1
 [upd] Use the activation url provided by the authentication request
