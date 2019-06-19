@@ -24,6 +24,7 @@
 [fix] adding suggested videos when played from some widgets
 [fix] http server /client_ip using Python 3 |contrib: t6|
 [upd] refactor youtube_resolver.resolve
+[lang] el_gr strings |contrib: twilight0|
 [lang] es_es strings |contrib: roliverosc|
 [lang] ko_kr strings |contrib: parkmino|
         </news>
