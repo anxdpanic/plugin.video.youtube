@@ -1160,11 +1160,11 @@ msgstr "Βαθμολόγηση αφαιρέθηκε"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr "Εγγραφή στο κανάλι"
+msgstr "Έγινε εγγραφή στο κανάλι"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr "Απεγγραφή από κανάλι"
+msgstr "Έγινε διαγραφή από το κανάλι"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
@@ -1180,12 +1180,12 @@ msgstr "Απαιτείται μεσολαβητής για ροές κατ'απ�
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr ""
+msgstr "Περιορισμός στα 30κ/δ"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (ΥΕ)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Απεσταλμένα"
