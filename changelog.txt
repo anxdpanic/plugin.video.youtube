@@ -3,6 +3,7 @@
 [add] Limit to 30fps to Settings - MPEG-DASH
 [add] Uploads playlist to channel playlists
 [chg] Use search for channel videos instead of the Uploads playlist
+[fix] Playback monitoring using Python 3
 [fix] unescape html entities in title and plot
 [fix] handling of invalid grant when refreshing access token
 [fix] adding suggested videos when played from some widgets
