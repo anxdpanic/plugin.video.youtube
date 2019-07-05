@@ -13,21 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-6.5.0
-[add] Video quality selection to Settings - MPEG-DASH
-[add] Limit to 30fps to Settings - MPEG-DASH
-[add] Uploads playlist to channel playlists
-[chg] Use search for channel videos instead of the Uploads playlist
-[fix] Signature cipher, some videos unplayable (ie. music videos)
-[fix] Playback monitoring using Python 3
-[fix] unescape html entities in title and plot
-[fix] handling of invalid grant when refreshing access token
-[fix] adding suggested videos when played from some widgets
-[fix] http server /client_ip using Python 3 |contrib: t6|
-[upd] refactor youtube_resolver.resolve
-[lang] el_gr strings |contrib: twilight0|
-[lang] es_es strings |contrib: roliverosc|
-[lang] ko_kr strings |contrib: parkmino|
+6.5.1
+[add] get_live to youtube_requests module to retrieve live stream info for a channel
         </news>
         <assets>
             <icon>icon.png</icon>
