@@ -15,6 +15,7 @@
         <news>
 6.5.1
 [add] get_live to youtube_requests module to retrieve live stream info for a channel
+[fix] live stream playback
         </news>
         <assets>
             <icon>icon.png</icon>
