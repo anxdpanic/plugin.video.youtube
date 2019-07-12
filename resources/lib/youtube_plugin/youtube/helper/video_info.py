@@ -762,7 +762,7 @@ class VideoInfo(object):
         playback_tracking = player_response.get('playbackTracking', {})
 
         captions = player_response.get('captions', {})
-        is_live = params.get('live_playback', '0') == '1'
+        is_live = player_response.get('videoDetails', {}).get('isLiveContent') is True
 
         stream_list = []
 

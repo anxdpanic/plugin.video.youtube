@@ -7,6 +7,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+import re
+
 from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context
 
@@ -369,3 +371,78 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
     items = _append_missing_page_token(items)
 
     return items
+
+
+def get_live(channel_id=None, user=None, url=None, addon_id=None):
+    """
+
+    :param channel_id: a channel id
+        One of channel_id, user, or url required
+        ex. UCLA_DiR1FfKNvjuUpBHmylQ
+    :param user: a channel username
+        One of channel_id, user, or url required
+        ex. NASAtelevision
+    :param url: a channel url
+        One of channel_id, channel_id, or url required
+        ex.
+        https://www.youtube.com/channel/UCLA_DiR1FfKNvjuUpBHmylQ
+        https://www.youtube.com/channel/UCLA_DiR1FfKNvjuUpBHmylQ/live
+        https://www.youtube.com/user/NASAtelevision
+        https://www.youtube.com/user/NASAtelevision/live
+    :param addon_id: addon id associated with developer keys to use for requests
+    :type channel_id: str, optional
+    :type user: str, optional
+    :type url: str, optional
+    :type addon_id: str, optional
+    :return: all live stream items for the given channel
+    :rtype: list of dicts, or None
+    """
+
+    if not channel_id and not user and not url:
+        return None
+
+    matched_id = None
+    matched_type = None
+    live_content = []
+
+    if channel_id:
+        matched_id = channel_id
+        matched_type = 'channel'
+
+    elif user:
+        matched_id = user
+        matched_type = 'user'
+
+    elif url:
+        patterns = [r'^(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be|be\.com)/'
+                    r'(?P<type>channel|user)/(?P<channel_id>[^/]+)(?:/live)*$']
+
+        for pattern in patterns:
+            match = re.search(pattern, url)
+            if match:
+                matched_id = match.group('channel_id')
+                matched_type = match.group('type')
+                break
+
+    if not matched_id or not matched_type:
+        return None
+
+    if matched_type == 'user':
+        items = get_channel_id(matched_id, addon_id=addon_id)
+        if not items or not isinstance(items, list):
+            return None
+
+        matched_id = items[0]['id']
+
+    search_results = get_search(q='', search_type='video', event_type='live',
+                                channel_id=matched_id, safe_search='none', addon_id=addon_id)
+
+    if not search_results:
+        return None
+
+    for search_result in search_results:
+        if 'id' in search_result and 'videoId' in search_result['id'] and 'snippet' in search_result:
+            search_result['snippet']['videoId'] = search_result['id']['videoId']
+            live_content.append(search_result['snippet'])
+
+    return live_content
