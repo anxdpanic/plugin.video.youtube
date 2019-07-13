@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2019 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -51,7 +51,7 @@ class Storage(object):
                 os.makedirs(path)
 
             self._file = sqlite3.connect(self._filename, check_same_thread=False,
-                                         detect_types=sqlite3.PARSE_DECLTYPES, timeout=1)
+                                         detect_types=0, timeout=1)
 
             self._file.isolation_level = None
             self._cursor = self._file.cursor()
@@ -215,3 +215,30 @@ class Storage(object):
         self._open()
         query = 'DELETE FROM %s WHERE key = ?' % self._table_name
         self._execute(True, query, [item_id])
+
+    @staticmethod
+    def strptime(stamp, stamp_fmt):
+        # noinspection PyUnresolvedReferences
+        import _strptime
+        try:
+            time.strptime('01 01 2012', '%d %m %Y')  # dummy call
+        except:
+            pass
+        return time.strptime(stamp, stamp_fmt)
+
+    def get_seconds_diff(self, current_stamp):
+        stamp_format = '%Y-%m-%d %H:%M:%S.%f'
+        current_datetime = datetime.datetime.now()
+        if not current_stamp:
+            return 86400  # 24 hrs
+        try:
+            stamp_datetime = datetime.datetime(*(self.strptime(current_stamp, stamp_format)[0:6]))
+        except ValueError:  # current_stamp has no microseconds
+            stamp_format = '%Y-%m-%d %H:%M:%S'
+            stamp_datetime = datetime.datetime(*(self.strptime(current_stamp, stamp_format)[0:6]))
+
+        time_delta = current_datetime - stamp_datetime
+        total_seconds = 0
+        if time_delta:
+            total_seconds = ((time_delta.seconds + time_delta.days * 24 * 3600) * 10 ** 6) // (10 ** 6)
+        return total_seconds

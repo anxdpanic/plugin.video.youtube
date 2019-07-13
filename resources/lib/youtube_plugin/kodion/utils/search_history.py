@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2019 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -29,7 +29,9 @@ class SearchHistory(Storage):
             if i >= self._max_item_count:
                 break
             item = self._get(key)
-            result.append(item[0])
+
+            if item:
+                result.append(item[0])
 
         return result
 

@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2019 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -32,11 +32,6 @@ class DataCache(Storage):
         max_file_size_kb = max_file_size_mb * 1024
         Storage.__init__(self, filename, max_file_size_kb=max_file_size_kb)
 
-    @staticmethod
-    def _seconds_difference(_first, _last):
-        _delta = _last - _first
-        return 24 * 60 * 60 * _delta.days + _delta.seconds + (_delta.microseconds // 1000000.)
-
     def is_empty(self):
         return self._is_empty()
 
@@ -62,7 +57,7 @@ class DataCache(Storage):
                     logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(content_id=str(item[0])))
                     cached_time = current_time
                 # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-                diff_seconds = self._seconds_difference(cached_time, current_time)
+                diff_seconds = self.get_seconds_diff(cached_time)
                 if diff_seconds <= seconds:
                     result[str(item[0])] = json.loads(_decode(item[2]))
 
@@ -80,7 +75,7 @@ class DataCache(Storage):
                 logger.log_error('Data Cache [get]: cached_time is None while getting {content_id}'.format(content_id=content_id))
                 cached_time = current_time
             # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-            diff_seconds = self._seconds_difference(cached_time, current_time)
+            diff_seconds = self.get_seconds_diff(cached_time)
             if diff_seconds <= seconds:
                 result[content_id] = json.loads(query_result[0])
 

@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-2019 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -10,7 +10,6 @@
 
 from functools import partial
 import hashlib
-import datetime
 
 from .storage import Storage
 
@@ -78,10 +77,6 @@ class FunctionCache(Storage):
         return None
 
     def get(self, seconds, func, *args, **keywords):
-        def _seconds_difference(_first, _last):
-            _delta = _last - _first
-            return 24 * 60 * 60 * _delta.days + _delta.seconds + (_delta.microseconds // 1000000.)
-
         """
         Returns the cached data of the given function.
         :param partial_func: function to cache
@@ -104,10 +99,10 @@ class FunctionCache(Storage):
             cached_time = data[1]
 
         diff_seconds = 0
-        now = datetime.datetime.now()
+
         if cached_time is not None:
             # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-            diff_seconds = _seconds_difference(cached_time, now)
+            diff_seconds = self.get_seconds_diff(cached_time)
 
         if cached_data is None or diff_seconds > seconds:
             cached_data = partial_func()
