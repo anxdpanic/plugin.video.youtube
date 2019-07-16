@@ -15,6 +15,7 @@
         <news>
 6.5.1
 [add] get_live to youtube_requests module to retrieve live stream info for a channel
+[add] Adaptive (MP4) and Adaptive (WEBM) to MPEG-DASH - Video quality
 [fix] live stream playback
 [fix] sqlite requests breaking when another add-on/module uses sqlite3.register_converter(..)
         </news>
