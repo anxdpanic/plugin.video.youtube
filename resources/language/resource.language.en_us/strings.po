@@ -1173,7 +1173,7 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr ""
 
 msgctxt "#30722"
-msgid "Include VP9.2 (HDR)"
+msgid "HDR"
 msgstr ""
 
 msgctxt "#30723"
@@ -1190,4 +1190,12 @@ msgstr ""
 
 msgctxt "#30726"
 msgid "Uploads"
+msgstr ""
+
+msgctxt "#30727"
+msgid "Adaptive (MP4/H264)"
+msgstr ""
+
+msgctxt "#30728"
+msgid "Adaptive (WEBM/VP9)"
 msgstr ""

@@ -1155,8 +1155,8 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr "기본으로 WEBM 적응 설정 (4K)"
 
 msgctxt "#30722"
-msgid "Include VP9.2 (HDR)"
-msgstr "VP9.2 (HDR) 포함"
+msgid "HDR"
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
@@ -1173,3 +1173,11 @@ msgstr "1440p (HD)"
 msgctxt "#30726"
 msgid "Uploads"
 msgstr "올리기"
+
+msgctxt "#30727"
+msgid "Adaptive (MP4/H264)"
+msgstr ""
+
+msgctxt "#30728"
+msgid "Adaptive (WEBM/VP9)"
+msgstr ""

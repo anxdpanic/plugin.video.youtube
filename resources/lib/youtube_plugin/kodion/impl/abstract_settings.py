@@ -142,6 +142,8 @@ class AbstractSettings(object):
         return self.get_bool(constants.setting.DASH_VIDEOS, False)
 
     def include_hdr(self):
+        if self.get_mpd_quality() == 'mp4':
+            return False
         return self.get_bool(constants.setting.DASH_INCL_HDR, False)
 
     def use_dash_live_streams(self):
@@ -205,25 +207,32 @@ class AbstractSettings(object):
             4: 1080,
             5: 1440,
             6: 2160,
-            7: 4320
+            7: 4320,
+            8: 'mp4',
+            9: 'webm'
         }
 
     def get_mpd_quality(self):
         quality_map = self.__get_mpd_quality_map()
-        quality_enum = self.get_int(constants.setting.MPD_QUALITY_SELECTION, 4)
-        return quality_map.get(quality_enum, 1080)
+        quality_enum = self.get_int(constants.setting.MPD_QUALITY_SELECTION, 8)
+        return quality_map.get(quality_enum, 'mp4')
 
     def mpd_video_qualities(self):
         if not self.use_dash_videos():
             return []
 
         quality = self.get_mpd_quality()
+
+        if not isinstance(quality, int):
+            return quality
+
         quality_map = self.__get_mpd_quality_map()
-        qualities = sorted([x for x in list(quality_map.values()) if x <= quality], reverse=True)
+        qualities = sorted([x for x in list(quality_map.values())
+                            if isinstance(x, int) and x <= quality], reverse=True)
 
         return qualities
 
     def mpd_30fps_limit(self):
-        if self.include_hdr():
+        if self.include_hdr() or isinstance(self.get_mpd_quality(), str):
             return False
         return self.get_bool(constants.setting.MPD_30FPS_LIMIT, False)

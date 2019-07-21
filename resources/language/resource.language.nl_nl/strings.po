@@ -1164,8 +1164,8 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr "Standaard naar WEBM (4K)"
 
 msgctxt "#30722"
-msgid "Include VP9.2 (HDR)"
-msgstr "Inclusief VP9.2 (HDR)"
+msgid "HDR"
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
@@ -1181,4 +1181,12 @@ msgstr ""
 
 msgctxt "#30726"
 msgid "Uploads"
+msgstr ""
+
+msgctxt "#30727"
+msgid "Adaptive (MP4/H264)"
+msgstr ""
+
+msgctxt "#30728"
+msgid "Adaptive (WEBM/VP9)"
 msgstr ""

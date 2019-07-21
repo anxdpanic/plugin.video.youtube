@@ -1202,6 +1202,9 @@ class VideoInfo(object):
                     discarded_streams.append(get_discarded_audio(mime, i, data[mime][i], 'no init or index'))
                 del data[mime][i]
 
+        mpd_quality = self._context.get_settings().get_mpd_quality()
+        hdr = self._context.get_settings().include_hdr() and 'vp9.2' in ia_capabilities
+
         default_mime_type = 'mp4'
         supported_mime_types = ['audio/mp4', 'video/mp4']
 
@@ -1212,18 +1215,41 @@ class VideoInfo(object):
             supported_mime_types.append('audio/webm')
 
         if ('video/webm' in supported_mime_types and
-                (self._context.get_settings().get_mpd_quality() > 1080 or
-                 self._context.get_settings().include_hdr())):
+                ((isinstance(mpd_quality, str) and mpd_quality == 'webm') or
+                 (isinstance(mpd_quality, int) and mpd_quality > 1080) or
+                 hdr)):
             default_mime_type = 'webm'
 
-        apply_filters = self._context.inputstream_adaptive_auto_stream_selection()
+        apply_filters = isinstance(mpd_quality, int)
         limit_qualities = self._context.get_settings().mpd_video_qualities()
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
         self._context.log_debug('Generating MPD: Apply filters |{apply_filters}| '
-                                'Quality selection |{quality}| Limit 30FPS |{limit_fps}|'
+                                'Quality selection |{quality}| Limit 30FPS |{limit_fps}| HDR |{hdr}|'
                                 .format(apply_filters=str(apply_filters),
                                         quality=str(next(iter(limit_qualities), None)),
-                                        limit_fps=str(limit_30fps)))
+                                        limit_fps=str(limit_30fps),
+                                        hdr=str(hdr)))
+
+        if ('video/webm' in supported_mime_types and hdr and
+                any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs'])):
+            # when hdr enabled and available replace vp9 streams with vp9.2 (hdr)
+            webm_streams = {}
+
+            for key in list(data['video/webm'].keys()):
+                if '"vp9.2"' in data['video/webm'][key]['codecs']:
+                    webm_streams[key] = data['video/webm'][key]
+
+            discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
+                            if i in data['video/webm']]
+
+            for d in discard_webm:
+                discarded_streams.append(get_discarded_video('video/webm',
+                                                             d['id'],
+                                                             data['video/webm'][d['id']],
+                                                             'replaced by hdr'))
+
+            if webm_streams:
+                data['video/webm'] = webm_streams
 
         if apply_filters:
             # filter streams only if InputStream Adaptive - Stream selection is set to Auto
@@ -1236,36 +1262,7 @@ class VideoInfo(object):
                 if filtered_data:
                     data = filtered_data
 
-            if ('video/webm' in supported_mime_types and
-                    'vp9.2' in ia_capabilities and
-                    self._context.get_settings().include_hdr() and
-                    any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs'])):
-                # when hdr enabled and inputstream adaptive stream selection is set to automatic
-                # replace vp9 streams with vp9.2 (hdr) of the same resolution
-                webm_streams = {}
-
-                for key in list(data['video/webm'].keys()):
-                    if '"vp9.2"' in data['video/webm'][key]['codecs']:
-                        webm_streams[key] = data['video/webm'][key]
-                    elif '"vp9"' in data['video/webm'][key]['codecs']:
-                        if not any(k for k in list(data['video/webm'].keys())
-                                   if '"vp9.2"' in data['video/webm'][k]['codecs'] and
-                                      data['video/webm'][key]['height'] == data['video/webm'][k]['height'] and
-                                      data['video/webm'][key]['width'] == data['video/webm'][k]['width']):
-                            webm_streams[key] = data['video/webm'][key]
-
-                discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
-                                if i in data['video/webm']]
-                for d in discard_webm:
-                    discarded_streams.append(get_discarded_video('video/webm',
-                                                                 d['id'],
-                                                                 data['video/webm'][d['id']],
-                                                                 'replaced by hdr'))
-
-                if webm_streams:
-                    data['video/webm'] = webm_streams
-
-            if limit_qualities:
+            if isinstance(limit_qualities, list):
                 if default_mime_type == 'mp4':
                     filtered_data = filter_qualities(data, 'video/mp4', limit_qualities)
                     if filtered_data:
