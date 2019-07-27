@@ -27,15 +27,17 @@ class XbmcRunner(AbstractProviderRunner):
 
     def run(self, provider, context=None):
 
+        self.handle = context.get_handle()
+
         try:
             results = provider.navigate(context)
         except KodionException as ex:
             if provider.handle_exception(context, ex):
                 context.log_error(ex.__str__())
                 xbmcgui.Dialog().ok("Exception in ContentProvider", ex.__str__())
+            xbmcplugin.endOfDirectory(self.handle, succeeded=False)
             return
 
-        self.handle = context.get_handle()
         self.settings = context.get_settings()
 
         result = results[0]
