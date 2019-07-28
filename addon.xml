@@ -18,6 +18,7 @@
 [add] Adaptive (MP4) and Adaptive (WEBM) to MPEG-DASH - Video quality
 [fix] live stream playback
 [fix] sqlite requests breaking when another add-on/module uses sqlite3.register_converter(..)
+[fix] signal endofdirectory in case of a provider navigation exception |contrib: enen92|
         </news>
         <assets>
             <icon>icon.png</icon>
