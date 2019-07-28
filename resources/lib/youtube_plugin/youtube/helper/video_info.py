@@ -1054,69 +1054,81 @@ class VideoInfo(object):
             _discarded_stream['reason'] = reason
             return _discarded_stream
 
-        def filter_qualities(stream_data, mime_type, sorted_qualities):
+        def filter_qualities(stream_data, container, sorted_qualities, fps_limit):
 
             data_copy = copy.deepcopy(stream_data)
-            itag_match = None
 
-            if mime_type == 'video/mp4':
+            if container == 'mp4':
                 discard_mime = 'video/webm'
-            elif mime_type == 'video/webm':
+                mime_type = 'video/mp4'
+            elif container == 'webm':
                 discard_mime = 'video/mp4'
+                mime_type = 'video/webm'
             else:
-                return None
-
-            if discard_mime in data_copy:
-                for itag in list(data_copy[discard_mime].keys()):
-                    discarded_streams.append(get_discarded_video(discard_mime,
-                                                                 itag,
-                                                                 data_copy[discard_mime][itag],
-                                                                 'filtered mime type'))
-                    del data_copy[discard_mime][itag]
-                del data_copy[discard_mime]
-
-            for idx, q in enumerate(sorted_qualities):
-                if any(itag for itag in list(data_copy[mime_type].keys())
-                       if int(data_copy[mime_type][itag].get('height', 0)) == q):
-                    itag_match = next(itag for itag in list(data_copy[mime_type].keys())
-                                      if int(data_copy[mime_type][itag].get('height', 0)) == q)
-                    break
-
-                if idx != len(sorted_qualities) - 1:
-                    if any(itag for itag in list(data_copy[mime_type].keys())
-                           if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
-                               (int(data_copy[mime_type][itag].get('height', 0)) > sorted_qualities[idx + 1]))):
-                        itag_match = next(itag for itag in list(data_copy[mime_type].keys())
-                                          if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
-                                              (int(data_copy[mime_type][itag].get('height', 0)) > sorted_qualities[idx + 1])))
-                        break
-
-            if itag_match:
-                for itag in list(data_copy[mime_type].keys()):
-                    if itag != itag_match:
-                        discarded_streams.append(get_discarded_video(mime_type,
-                                                                     itag,
-                                                                     data_copy[mime_type][itag],
-                                                                     'filtered quality'))
-                        del data_copy[mime_type][itag]
-
                 return data_copy
 
-            return None
-
-        def filter_fps(stream_data, mime_type):
-            data_copy = None
-            if mime_type in stream_data:
-                data_copy = copy.deepcopy(stream_data)
+            if fps_limit and mime_type in stream_data:
+                # if 30 fps limit enabled, discard streams that are greater than 30fps
                 if any(k for k in list(data_copy[mime_type].keys())
                        if data_copy[mime_type][k]['fps'] <= 30):
                     for k in list(data_copy[mime_type].keys()):
                         if data_copy[mime_type][k]['fps'] > 30:
-                            discarded_streams.append(get_discarded_video(mime_type,
-                                                                         k,
+                            discarded_streams.append(get_discarded_video(mime_type, k,
                                                                          data_copy[mime_type][k],
-                                                                         'frame rate limit'))
+                                                                         'frame rate'))
                             del data_copy[mime_type][k]
+
+            if discard_mime in data_copy:
+                # discard streams with unwanted mime type
+                for itag in list(data_copy[discard_mime].keys()):
+                    discarded_streams.append(get_discarded_video(discard_mime, itag,
+                                                                 data_copy[discard_mime][itag],
+                                                                 'mime type'))
+                    del data_copy[discard_mime][itag]
+                del data_copy[discard_mime]
+
+            itag_matches = []
+            itag_match = None
+
+            for idx, q in enumerate(sorted_qualities):
+                # find all streams with matching height
+                if any(itag for itag in list(data_copy[mime_type].keys())
+                       if int(data_copy[mime_type][itag].get('height', 0)) == q):
+                    i_matches = [itag for itag in list(data_copy[mime_type].keys())
+                                 if int(data_copy[mime_type][itag].get('height', 0)) == q]
+                    itag_matches.extend(i_matches)
+                    break
+
+            if not itag_matches:
+                # find best match for quality if there were no exact height candidates
+                for idx, q in enumerate(sorted_qualities):
+                    if idx != len(sorted_qualities) - 1:
+                        if any(itag for itag in list(data_copy[mime_type].keys())
+                               if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
+                                   (int(data_copy[mime_type][itag].get('height', 0)) >= sorted_qualities[idx + 1]))):
+                            i_match = next(itag for itag in list(data_copy[mime_type].keys())
+                                           if ((int(data_copy[mime_type][itag].get('height', 0)) < q) and
+                                               (int(data_copy[mime_type][itag].get('height', 0)) >=
+                                                sorted_qualities[idx + 1])))
+                            itag_matches.append(i_match)
+                            break
+
+            for itag in list(data_copy[mime_type].keys()):
+                # find highest fps and bandwidth itag out of all candidates
+                if itag in itag_matches:
+                    if (not itag_match or itag_match.get('fps') < data_copy[mime_type][itag].get('fps') or
+                            (itag_match.get('fps') == data_copy[mime_type][itag].get('fps') and
+                             itag_match.get('bandwidth') < data_copy[mime_type][itag].get('bandwidth'))):
+                        itag_match = data_copy[mime_type][itag]
+
+            if itag_match:
+                for itag in list(data_copy[mime_type].keys()):
+                    # discard all streams except the best match
+                    if itag != itag_match.get('id'):
+                        discarded_streams.append(get_discarded_video(mime_type, itag,
+                                                                     data_copy[mime_type][itag],
+                                                                     'quality'))
+                        del data_copy[mime_type][itag]
 
             return data_copy
 
@@ -1204,6 +1216,7 @@ class VideoInfo(object):
 
         mpd_quality = self._context.get_settings().get_mpd_quality()
         hdr = self._context.get_settings().include_hdr() and 'vp9.2' in ia_capabilities
+        limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
         default_mime_type = 'mp4'
         supported_mime_types = ['audio/mp4', 'video/mp4']
@@ -1217,12 +1230,12 @@ class VideoInfo(object):
         if ('video/webm' in supported_mime_types and
                 ((isinstance(mpd_quality, str) and mpd_quality == 'webm') or
                  (isinstance(mpd_quality, int) and mpd_quality > 1080) or
-                 hdr)):
+                 hdr or not limit_30fps)):
             default_mime_type = 'webm'
 
-        apply_filters = isinstance(mpd_quality, int)
         limit_qualities = self._context.get_settings().mpd_video_qualities()
-        limit_30fps = self._context.get_settings().mpd_30fps_limit()
+        apply_filters = isinstance(mpd_quality, int) and isinstance(limit_qualities, list)
+
         self._context.log_debug('Generating MPD: Apply filters |{apply_filters}| '
                                 'Quality selection |{quality}| Limit 30FPS |{limit_fps}| HDR |{hdr}|'
                                 .format(apply_filters=str(apply_filters),
@@ -1230,48 +1243,42 @@ class VideoInfo(object):
                                         limit_fps=str(limit_30fps),
                                         hdr=str(hdr)))
 
-        if ('video/webm' in supported_mime_types and hdr and
-                any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs'])):
-            # when hdr enabled and available replace vp9 streams with vp9.2 (hdr)
+        if 'video/webm' in supported_mime_types:
             webm_streams = {}
+            if hdr and any(k for k in list(data['video/webm'].keys()) if '"vp9.2"' in data['video/webm'][k]['codecs']):
+                # when hdr enabled and available replace vp9 streams with vp9.2 (hdr)
+                for key in list(data['video/webm'].keys()):
+                    if '"vp9.2"' in data['video/webm'][key]['codecs']:
+                        webm_streams[key] = data['video/webm'][key]
 
-            for key in list(data['video/webm'].keys()):
-                if '"vp9.2"' in data['video/webm'][key]['codecs']:
-                    webm_streams[key] = data['video/webm'][key]
+                discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
+                                if i in data['video/webm']]
 
-            discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
-                            if i in data['video/webm']]
+                for d in discard_webm:
+                    discarded_streams.append(get_discarded_video('video/webm',
+                                                                 d['id'],
+                                                                 data['video/webm'][d['id']],
+                                                                 'replaced by hdr'))
+            elif not hdr:
+                # when hdr disabled and remove vp9.2 (hdr) streams
+                for key in list(data['video/webm'].keys()):
+                    if '"vp9"' in data['video/webm'][key]['codecs']:
+                        webm_streams[key] = data['video/webm'][key]
 
-            for d in discard_webm:
-                discarded_streams.append(get_discarded_video('video/webm',
-                                                             d['id'],
-                                                             data['video/webm'][d['id']],
-                                                             'replaced by hdr'))
+                discard_webm = [data['video/webm'][i] for i in (set(data['video/webm']) - set(webm_streams))
+                                if i in data['video/webm']]
+
+                for d in discard_webm:
+                    discarded_streams.append(get_discarded_video('video/webm',
+                                                                 d['id'],
+                                                                 data['video/webm'][d['id']],
+                                                                 'hdr disabled'))
 
             if webm_streams:
                 data['video/webm'] = webm_streams
 
         if apply_filters:
-            # filter streams only if InputStream Adaptive - Stream selection is set to Auto
-            if limit_30fps:
-                filtered_data = filter_fps(data, 'video/mp4')
-                if filtered_data:
-                    data = filtered_data
-
-                filtered_data = filter_fps(data, 'video/webm')
-                if filtered_data:
-                    data = filtered_data
-
-            if isinstance(limit_qualities, list):
-                if default_mime_type == 'mp4':
-                    filtered_data = filter_qualities(data, 'video/mp4', limit_qualities)
-                    if filtered_data:
-                        data = filtered_data
-
-                elif default_mime_type == 'webm':
-                    filtered_data = filter_qualities(data, 'video/webm', limit_qualities)
-                    if filtered_data:
-                        data = filtered_data
+            data = filter_qualities(data, default_mime_type, limit_qualities, limit_30fps)
 
         out_list = ['<?xml version="1.0" encoding="UTF-8"?>\n'
                     '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" '
