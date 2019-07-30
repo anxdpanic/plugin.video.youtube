@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.5.1~alpha2" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.5.1~beta1" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -17,6 +17,8 @@
 [add] get_live to youtube_requests module to retrieve live stream info for a channel
 [add] Adaptive (MP4) and Adaptive (WEBM) to MPEG-DASH - Video quality
 [fix] live stream playback
+[fix] unable to seek when using mpeg-dash
+[fix] mpeg-dash video quality selection
 [fix] sqlite requests breaking when another add-on/module uses sqlite3.register_converter(..)
 [fix] signal endofdirectory in case of a provider navigation exception |contrib: enen92|
         </news>
