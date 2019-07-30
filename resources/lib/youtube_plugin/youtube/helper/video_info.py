@@ -1230,7 +1230,7 @@ class VideoInfo(object):
         if ('video/webm' in supported_mime_types and
                 ((isinstance(mpd_quality, str) and mpd_quality == 'webm') or
                  (isinstance(mpd_quality, int) and mpd_quality > 1080) or
-                 hdr or not limit_30fps)):
+                 hdr)):
             default_mime_type = 'webm'
 
         limit_qualities = self._context.get_settings().mpd_video_qualities()
@@ -1239,7 +1239,8 @@ class VideoInfo(object):
         self._context.log_debug('Generating MPD: Apply filters |{apply_filters}| '
                                 'Quality selection |{quality}| Limit 30FPS |{limit_fps}| HDR |{hdr}|'
                                 .format(apply_filters=str(apply_filters),
-                                        quality=str(next(iter(limit_qualities), None)),
+                                        quality=(limit_qualities if isinstance(limit_qualities, str)
+                                                 else str(next(iter(limit_qualities), None))),
                                         limit_fps=str(limit_30fps),
                                         hdr=str(hdr)))
 
@@ -1347,18 +1348,19 @@ class VideoInfo(object):
                             continue
 
                         has_video_stream = True
-                        if int(data[mime][i]['bandwidth']) > int(stream_info['video']['bandwidth']):
-                            stream_info['video']['height'] = str(data[mime][i]['height'])
-                            stream_info['video']['fps'] = str(data[mime][i]['frameRate'])
-                            stream_info['video']['mime'] = str(mime)
-                            stream_info['video']['codec'] = video_codec
-                            stream_info['video']['bandwidth'] = int(data[mime][i]['bandwidth'])
-                            if data[mime][i].get('quality_label'):
-                                stream_info['video']['quality_label'] = str(data[mime][i]['quality_label'])
-                            if stream_format:
-                                stream_info['video']['codec'] = stream_format.get('video', {}).get('encoding')
-                            if not stream_info['video'].get('codec'):
+                        if default:
+                            if int(data[mime][i]['bandwidth']) > int(stream_info['video']['bandwidth']):
+                                stream_info['video']['height'] = str(data[mime][i]['height'])
+                                stream_info['video']['fps'] = str(data[mime][i]['frameRate'])
+                                stream_info['video']['mime'] = str(mime)
                                 stream_info['video']['codec'] = video_codec
+                                stream_info['video']['bandwidth'] = int(data[mime][i]['bandwidth'])
+                                if data[mime][i].get('quality_label'):
+                                    stream_info['video']['quality_label'] = str(data[mime][i]['quality_label'])
+                                if stream_format:
+                                    stream_info['video']['codec'] = stream_format.get('video', {}).get('encoding')
+                                if not stream_info['video'].get('codec'):
+                                    stream_info['video']['codec'] = video_codec
 
                         video_codec = data[mime][i]['codecs']
                         out_list.append(''.join(['\t\t\t<Representation id="', i, '" ', video_codec,

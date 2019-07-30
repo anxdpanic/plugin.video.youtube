@@ -78,7 +78,10 @@ def _process_mediatype(info_labels, name, param):
 
 def _process_last_played(info_labels, name, param):
     if param:
-        info_labels[name] = param.strftime('%Y-%m-%d %H:%M:%S')
+        try:
+            info_labels[name] = param.strftime('%Y-%m-%d %H:%M:%S')
+        except AttributeError:
+            info_labels[name] = param
 
 
 def create_from_item(base_item):
