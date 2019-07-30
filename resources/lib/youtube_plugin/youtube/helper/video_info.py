@@ -894,7 +894,7 @@ class VideoInfo(object):
         if not license_info.get('url') and not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
-                                                params.get('length_seconds', '0'),
+                                                player_response.get('videoDetails', {}).get('lengthSeconds', '0'),
                                                 cipher)
         use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
         if mpd_url:
