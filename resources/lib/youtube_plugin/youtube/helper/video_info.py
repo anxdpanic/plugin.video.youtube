@@ -762,7 +762,10 @@ class VideoInfo(object):
         playback_tracking = player_response.get('playbackTracking', {})
 
         captions = player_response.get('captions', {})
-        is_live = player_response.get('videoDetails', {}).get('isLiveContent') is True
+
+        is_live_content = player_response.get('videoDetails', {}).get('isLiveContent') is True
+        live_url = player_response.get('streamingData', {}).get('hlsManifestUrl', '') or params.get('hlsvp', '')
+        is_live = is_live_content and live_url
 
         stream_list = []
 
@@ -848,15 +851,13 @@ class VideoInfo(object):
             ])
 
         if is_live:
-            live_url = player_response.get('streamingData', {}).get('hlsManifestUrl', '') or params.get('hlsvp', '')
-            if live_url:
-                stream_list = self._load_manifest(live_url,
-                                                  video_id,
-                                                  meta_info=meta_info,
-                                                  curl_headers=curl_headers,
-                                                  playback_stats=playback_stats)
+            stream_list = self._load_manifest(live_url, video_id,
+                                              meta_info=meta_info,
+                                              curl_headers=curl_headers,
+                                              playback_stats=playback_stats)
 
-        httpd_is_live = self._context.get_settings().use_dash_videos() and is_httpd_live(port=self._context.get_settings().httpd_port())
+        httpd_is_live = (self._context.get_settings().use_dash_videos() and
+                         is_httpd_live(port=self._context.get_settings().httpd_port()))
 
         cipher = None
         s_info = dict()

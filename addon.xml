@@ -13,14 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-6.5.1
-[add] get_live to youtube_requests module to retrieve live stream info for a channel
-[add] Adaptive (MP4) and Adaptive (WEBM) to MPEG-DASH - Video quality
-[fix] live stream playback
-[fix] unable to seek when using mpeg-dash
-[fix] mpeg-dash video quality selection
-[fix] sqlite requests breaking when another add-on/module uses sqlite3.register_converter(..)
-[fix] signal endofdirectory in case of a provider navigation exception |contrib: enen92|
+6.5.2
+[fix] ended live streams not using mpeg-dash when enabled
         </news>
         <assets>
             <icon>icon.png</icon>
