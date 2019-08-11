@@ -15,6 +15,7 @@
         <news>
 6.5.2
 [fix] ended live streams not using mpeg-dash when enabled
+[fix] check for and convert unexpected timestamp format
         </news>
         <assets>
             <icon>icon.png</icon>
