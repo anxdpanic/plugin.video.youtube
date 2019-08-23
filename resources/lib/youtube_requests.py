@@ -414,7 +414,7 @@ def get_live(channel_id=None, user=None, url=None, addon_id=None):
         matched_type = 'user'
 
     elif url:
-        patterns = [r'^(?:http)*s*:*[/]{0,2}(?:www\.)*youtu(?:\.be|be\.com)/'
+        patterns = [r'^(?:http)*s*:*[/]{0,2}(?:w{3}\.|m\.)*youtu(?:\.be|be\.com)/'
                     r'(?P<type>channel|user)/(?P<channel_id>[^/]+)(?:/live)*$']
 
         for pattern in patterns:
