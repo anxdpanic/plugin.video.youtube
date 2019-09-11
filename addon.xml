@@ -14,6 +14,8 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.5.2
+[fix] playback (No streams found)
+[fix] missing metadata
 [fix] ended live streams not using mpeg-dash when enabled
 [fix] check for and convert unexpected timestamp format
         </news>
