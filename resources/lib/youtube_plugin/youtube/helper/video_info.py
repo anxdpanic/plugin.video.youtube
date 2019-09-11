@@ -719,7 +719,7 @@ class VideoInfo(object):
                 cookies_list.append('{0}={1};'.format(c.name, c.value))
             if cookies_list:
                 curl_headers = 'Cookie={cookies}' \
-                    .format(cookies=urllib.parse.quote(' '.join(cookies_list)))
+                    .format(cookies=urllib.parse.quote(''.join(cookies_list)))
         else:
             cookies = dict()
 
