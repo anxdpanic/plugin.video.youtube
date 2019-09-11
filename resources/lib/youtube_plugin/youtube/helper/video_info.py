@@ -775,16 +775,19 @@ class VideoInfo(object):
                      'channel': {},
                      'images': {},
                      'subtitles': []}
-        meta_info['video']['id'] = params.get('vid', params.get('video_id', ''))
-        meta_info['video']['title'] = player_args.get('title', params.get('title', ''))
-        meta_info['channel']['author'] = player_args.get('author', params.get('author', ''))
+
+        video_details = player_response.get('videoDetails', {})
+
+        meta_info['video']['id'] = video_details.get('videoId', video_id)
+        meta_info['video']['title'] = video_details.get('title', '')
+        meta_info['channel']['author'] = video_details.get('author', '')
         try:
             meta_info['video']['title'] = meta_info['video']['title'].encode('utf-8', 'ignore').decode('utf-8')
             meta_info['channel']['author'] = meta_info['channel']['author'].encode('utf-8', 'ignore').decode('utf-8')
         except:
             pass
 
-        meta_info['channel']['id'] = params.get('ucid', '')
+        meta_info['channel']['id'] = video_details.get('channelId', '')
         image_data_list = [
             {'from': 'iurlhq', 'to': 'high', 'image': 'hqdefault.jpg'},
             {'from': 'iurlmq', 'to': 'medium', 'image': 'mqdefault.jpg'},
