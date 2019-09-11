@@ -681,7 +681,12 @@ class VideoInfo(object):
 
     def _method_get_video_info(self, video_id=None, player_config=None, cookies=None):
         def requires_cipher(_fmts):
-            fl = _fmts.split(',')
+            fl = []
+            if len(_fmts) > 0:
+                try:
+                    fl = _fmts[0].get('cipher').split(',')
+                except AttributeError:
+                    fl = _fmts[0].get('url', '').split('&')
             return (len(fl) > 0) and ('s' in dict(urllib.parse.parse_qsl(fl[0])))
 
         headers = {'Host': 'www.youtube.com',
@@ -714,13 +719,11 @@ class VideoInfo(object):
                 cookies_list.append('{0}={1};'.format(c.name, c.value))
             if cookies_list:
                 curl_headers = 'Cookie={cookies}' \
-                    .format(cookies=urllib.parse.quote(' '.join(cookies_list)))
+                    .format(cookies=urllib.parse.quote(''.join(cookies_list)))
         else:
             cookies = dict()
 
         player_args = player_config.get('args', {})
-        player_response = player_args.get('player_response', {})
-        playability_status = player_response.get('playabilityStatus', {})
 
         if video_id is None:
             if 'video_id' in player_args:
@@ -746,19 +749,18 @@ class VideoInfo(object):
         el_values = ['detailpage', 'embedded']
 
         params = dict()
+        player_response = dict()
 
         for el in el_values:
             http_params['el'] = el
             result = requests.get(video_info_url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
-            if params.get('url_encoded_fmt_stream_map') or params.get('live_playback', '0') == '1':
+            player_response = json.loads(params.get('player_response', '{}'))
+            if player_response.get('streamingData', {}).get('formats', []) or params.get('live_playback', '0') == '1':
                 break
 
-        if not player_response:
-            player_response = json.loads(params.get('player_response', '{}'))
-            playability_status = player_response.get('playabilityStatus', {})
-
+        playability_status = player_response.get('playabilityStatus', {})
         playback_tracking = player_response.get('playbackTracking', {})
 
         captions = player_response.get('captions', {})
@@ -773,16 +775,19 @@ class VideoInfo(object):
                      'channel': {},
                      'images': {},
                      'subtitles': []}
-        meta_info['video']['id'] = params.get('vid', params.get('video_id', ''))
-        meta_info['video']['title'] = player_args.get('title', params.get('title', ''))
-        meta_info['channel']['author'] = player_args.get('author', params.get('author', ''))
+
+        video_details = player_response.get('videoDetails', {})
+
+        meta_info['video']['id'] = video_details.get('videoId', video_id)
+        meta_info['video']['title'] = video_details.get('title', '')
+        meta_info['channel']['author'] = video_details.get('author', '')
         try:
             meta_info['video']['title'] = meta_info['video']['title'].encode('utf-8', 'ignore').decode('utf-8')
             meta_info['channel']['author'] = meta_info['channel']['author'].encode('utf-8', 'ignore').decode('utf-8')
         except:
             pass
 
-        meta_info['channel']['id'] = params.get('ucid', '')
+        meta_info['channel']['id'] = video_details.get('channelId', '')
         image_data_list = [
             {'from': 'iurlhq', 'to': 'high', 'image': 'hqdefault.jpg'},
             {'from': 'iurlmq', 'to': 'medium', 'image': 'mqdefault.jpg'},
@@ -862,8 +867,8 @@ class VideoInfo(object):
         cipher = None
         s_info = dict()
 
-        adaptive_fmts = params.get('adaptive_fmts', player_args.get('adaptive_fmts', ''))
-        url_encoded_fmt_stream_map = params.get('url_encoded_fmt_stream_map', player_args.get('url_encoded_fmt_stream_map', ''))
+        adaptive_fmts = player_response.get('streamingData', {}).get('adaptiveFormats', [])
+        std_fmts = player_response.get('streamingData', {}).get('formats', [])
 
         mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
 
@@ -888,7 +893,7 @@ class VideoInfo(object):
                     license_info['token'] = self._access_token
                     break
 
-        if requires_cipher(adaptive_fmts) or requires_cipher(url_encoded_fmt_stream_map):
+        if requires_cipher(adaptive_fmts) or requires_cipher(std_fmts):
             js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
@@ -953,12 +958,15 @@ class VideoInfo(object):
                 raise YouTubeException('Failed to decipher signature')
 
         def parse_to_stream_list(streams):
-            fmts_list = streams.split(',')
-            for item in fmts_list:
-                stream_map = dict(urllib.parse.parse_qsl(item))
+            for item in streams:
+                stream_map = item
+                stream_map.update(dict(urllib.parse.parse_qsl(item.get('cipher', ''))))
 
                 url = stream_map.get('url', None)
                 conn = stream_map.get('conn', None)
+
+                stream_map['itag'] = str(stream_map['itag'])
+
                 if url:
                     sig_param = '&signature='
                     if 'sp' in stream_map:
@@ -1005,8 +1013,8 @@ class VideoInfo(object):
                         stream_list.append(stream)
 
         # extract streams from map
-        if url_encoded_fmt_stream_map:
-            parse_to_stream_list(url_encoded_fmt_stream_map)
+        if std_fmts:
+            parse_to_stream_list(std_fmts)
 
         if adaptive_fmts:
             parse_to_stream_list(adaptive_fmts)
@@ -1148,12 +1156,13 @@ class VideoInfo(object):
         stream_info = {'video': {'height': '0', 'fps': '0', 'codec': '', 'mime': '', 'quality_label': '', 'bandwidth': 0},
                        'audio': {'bitrate': '0', 'codec': '', 'mime': '', 'bandwidth': 0}}
 
-        fmts_list = adaptive_fmts.split(',')
         data = dict()
-        for item in fmts_list:
-            stream_map = dict(urllib.parse.parse_qsl(item))
+        for item in adaptive_fmts:
+            stream_map = item
+            stream_map.update(dict(urllib.parse.parse_qsl(item.get('cipher', ''))))
+            stream_map['itag'] = str(stream_map.get('itag'))
 
-            t = stream_map.get('type')
+            t = stream_map.get('mimeType')
             t = urllib.parse.unquote(t)
             t = t.split(';')
             mime = t[0]
@@ -1165,13 +1174,10 @@ class VideoInfo(object):
             data[mime][i]['codecs'] = t[1][1:]
             data[mime][i]['id'] = i
 
-            s = stream_map.get('size')
-            if s:
-                s = s.split('x')
-                data[mime][i]['width'] = s[0]
-                data[mime][i]['height'] = s[1]
+            data[mime][i]['width'] = stream_map.get('width')
+            data[mime][i]['height'] = stream_map.get('height')
 
-            data[mime][i]['quality_label'] = str(stream_map.get('quality_label'))
+            data[mime][i]['quality_label'] = str(stream_map.get('qualityLabel'))
 
             data[mime][i]['bandwidth'] = stream_map.get('bitrate')
 
@@ -1204,11 +1210,15 @@ class VideoInfo(object):
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
             data[mime][i]['baseUrl'] = url
 
-            data[mime][i]['indexRange'] = stream_map.get('index')
-            data[mime][i]['init'] = stream_map.get('init')
-
-            if (not stream_map.get('index') or not stream_map.get('init') or
-                    (stream_map.get('index') == '0-0' and stream_map.get('init') == '0-0')):
+            data[mime][i]['indexRange'] = '0-0'
+            data[mime][i]['initRange'] = '0-0'
+            if 'indexRange' in stream_map and 'initRange' in stream_map:
+                data[mime][i]['indexRange'] = '-'.join([stream_map.get('indexRange').get('start'),
+                                                        stream_map.get('indexRange').get('end')])
+                data[mime][i]['init'] = '-'.join([stream_map.get('initRange').get('start'),
+                                                  stream_map.get('initRange').get('end')])
+            if ('indexRange' not in stream_map or 'initRange' not in stream_map or
+                    data[mime][i].get('indexRange') == '0-0' and data[mime][i].get('initRange') == '0-0'):
                 if mime.startswith('video'):
                     discarded_streams.append(get_discarded_video(mime, i, data[mime][i], 'no init or index'))
                 else:
@@ -1325,7 +1335,7 @@ class VideoInfo(object):
 
                         out_list.append(''.join(['\t\t\t<Representation id="',
                                                  i, '" ', data[mime][i]['codecs'],
-                                                 ' bandwidth="', data[mime][i]['bandwidth'],
+                                                 ' bandwidth="', str(data[mime][i]['bandwidth']),
                                                  '">\n']))
                         out_list.append('\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n')
                     else:
@@ -1365,9 +1375,9 @@ class VideoInfo(object):
 
                         video_codec = data[mime][i]['codecs']
                         out_list.append(''.join(['\t\t\t<Representation id="', i, '" ', video_codec,
-                                                 ' startWithSAP="1" bandwidth="', data[mime][i]['bandwidth'],
-                                                 '" width="', data[mime][i]['width'], '" height="',
-                                                 data[mime][i]['height'], '" frameRate="', data[mime][i]['frameRate'],
+                                                 ' startWithSAP="1" bandwidth="', str(data[mime][i]['bandwidth']),
+                                                 '" width="', str(data[mime][i]['width']), '" height="',
+                                                 str(data[mime][i]['height']), '" frameRate="', str(data[mime][i]['frameRate']),
                                                  '">\n']))
 
                     out_list.append(''.join(['\t\t\t\t<BaseURL>', data[mime][i]['baseUrl'], '</BaseURL>\n']))

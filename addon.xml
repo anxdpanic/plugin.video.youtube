@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.5.2~beta1" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.5.2~beta2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -14,7 +14,10 @@
     <extension point="xbmc.addon.metadata">
         <news>
 6.5.2
+[fix] playback (No streams found)
+[fix] missing metadata
 [fix] ended live streams not using mpeg-dash when enabled
+[fix] check for and convert unexpected timestamp format
         </news>
         <assets>
             <icon>icon.png</icon>
