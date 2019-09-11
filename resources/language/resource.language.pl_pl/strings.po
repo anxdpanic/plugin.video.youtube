@@ -951,7 +951,7 @@ msgstr "Oznacz obejrzane"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr "Wyczyść histowie odtwarzania"
+msgstr "Wyczyść historię odtwarzania"
 
 msgctxt "#30672"
 msgid "Delete playback history"
