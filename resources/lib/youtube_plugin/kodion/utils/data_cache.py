@@ -14,7 +14,6 @@ from six.moves import cPickle as pickle
 
 import json
 import sqlite3
-import time
 
 from datetime import datetime, timedelta
 
@@ -105,11 +104,6 @@ class DataCache(Storage):
             return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
         current_time = datetime.now() + timedelta(microseconds=1)
-        if isinstance(current_time, int) or isinstance(current_time, float):
-            try:
-                current_time = time.strftime('%Y-%m-%d %H:%M:%S.%f', time.localtime(current_time))
-            except ValueError:  # current_time has no microseconds
-                current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
 
         self._open()
@@ -122,11 +116,7 @@ class DataCache(Storage):
 
         needs_commit = True
         current_time = datetime.now() + timedelta(microseconds=1)
-        if isinstance(current_time, int) or isinstance(current_time, float):
-            try:
-                current_time = time.strftime('%Y-%m-%d %H:%M:%S.%f', time.localtime(current_time))
-            except ValueError:  # current_time has no microseconds
-                current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(current_time))
+
         query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
 
         self._open()
