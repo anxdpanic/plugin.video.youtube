@@ -604,15 +604,17 @@ class Provider(kodion.AbstractProvider):
                                       image=context.create_resource_path('media', 'live.png'))
             result.append(live_item)
 
-        json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10,
-                                                     self.get_client(context).get_channel_videos,
-                                                     channel_id=channel_id,
-                                                     page_token=page_token)
+        playlists = resource_manager.get_related_playlists(channel_id)
+        upload_playlist = playlists.get('uploads', '')
+        if upload_playlist:
+            json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 5,
+                                                         self.get_client(context).get_playlist_items, upload_playlist,
+                                                         page_token=page_token)
+            if not v3.handle_error(self, context, json_data):
+                return False
 
-        if not v3.handle_error(self, context, json_data):
-            return False
-
-        result.extend(v3.response_to_items(self, context, json_data))
+            result.extend(
+                v3.response_to_items(self, context, json_data, sort=lambda x: x.get_aired(), reverse_sort=True))
 
         return result
 
