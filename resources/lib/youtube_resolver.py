@@ -113,7 +113,7 @@ def resolve(video_id, sort=True, addon_id=None):
 
     patterns = [r'(?P<video_id>[\w-]{11})',
                 r'(?:http)*s*:*[/]{0,2}(?:w{3}\.|m\.)*youtu(?:\.be/|be\.com/'
-                r'(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[a-zA-Z0-9_\-]{11}).*']
+                r'(?:embed/|watch/|v/|.*?[?&/]v=))(?P<video_id>[\w-]{11}).*']
 
     for pattern in patterns:
         v_id = re.search(pattern, video_id)
