@@ -19,6 +19,7 @@
 [fix] ended live streams not using mpeg-dash when enabled
 [fix] check for and convert unexpected timestamp format
 [fix] subscriptions not showing latest videos
+[upd] simplify youtube_resolver regex |contrib: Twilight0|
         </news>
         <assets>
             <icon>icon.png</icon>
