@@ -825,12 +825,18 @@ class VideoInfo(object):
                         if reason_text:
                             reason = ''.join(reason_text)
                 else:
-                    reason = params.get('reason')
-                    if not reason and 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
-                        reason = playability_status['errorScreen']['playerErrorMessageRenderer'].get('reason', {}).get('simpleText', 'UNKNOWN')
-                    if not reason:
-                        reason = playability_status.get('reason')
+                    reason = playability_status.get('reason')
 
+                    if 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
+                        status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
+                        descript_reason = status_renderer.get('subreason', {}).get('simpleText')
+                        if descript_reason:
+                            reason = descript_reason
+                        else:
+                            general_reason = status_renderer.get('reason', {}).get('simpleText')
+                            if general_reason:
+                                reason = general_reason
+                            
                 if not reason:
                     reason = 'UNKNOWN'
 
