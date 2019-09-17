@@ -724,6 +724,8 @@ class VideoInfo(object):
             cookies = dict()
 
         player_args = player_config.get('args', {})
+        player_response = player_args.get('player_response', {})
+        playability_status = player_response.get('playabilityStatus', {})
 
         if video_id is None:
             if 'video_id' in player_args:
@@ -749,18 +751,20 @@ class VideoInfo(object):
         el_values = ['detailpage', 'embedded']
 
         params = dict()
-        player_response = dict()
 
         for el in el_values:
             http_params['el'] = el
             result = requests.get(video_info_url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
-            player_response = json.loads(params.get('player_response', '{}'))
-            if player_response.get('streamingData', {}).get('formats', []) or params.get('live_playback', '0') == '1':
+            response_check = json.loads(params.get('player_response', '{}'))
+            if response_check.get('streamingData', {}).get('formats', []) or params.get('live_playback', '0') == '1':
                 break
 
-        playability_status = player_response.get('playabilityStatus', {})
+        if not player_response:
+            player_response = json.loads(params.get('player_response', '{}'))
+            playability_status = player_response.get('playabilityStatus', {})
+
         playback_tracking = player_response.get('playbackTracking', {})
 
         captions = player_response.get('captions', {})
@@ -776,8 +780,7 @@ class VideoInfo(object):
                      'images': {},
                      'subtitles': []}
 
-        video_details = player_args.get('player_response', {}).get('videoDetails',
-                                                                   player_response.get('videoDetails', {}))
+        video_details = player_response.get('videoDetails', {})
 
         meta_info['video']['id'] = video_details.get('videoId', video_id)
         meta_info['video']['title'] = video_details.get('title', '')
