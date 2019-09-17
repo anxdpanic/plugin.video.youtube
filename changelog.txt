@@ -2,7 +2,8 @@
 [fix] playback (No streams found)
 [fix] missing metadata
 [fix] ended live streams not using mpeg-dash when enabled
-[fix] check for and convert unexpected timestamp format
+[fix] subscriptions not showing latest videos
+[upd] simplify youtube_resolver regex |contrib: Twilight0|
 
 6.5.1
 [add] get_live to youtube_requests module to retrieve live stream info for a channel

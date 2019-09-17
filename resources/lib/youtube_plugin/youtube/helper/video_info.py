@@ -724,6 +724,8 @@ class VideoInfo(object):
             cookies = dict()
 
         player_args = player_config.get('args', {})
+        player_response = player_args.get('player_response', {})
+        playability_status = player_response.get('playabilityStatus', {})
 
         if video_id is None:
             if 'video_id' in player_args:
@@ -749,24 +751,30 @@ class VideoInfo(object):
         el_values = ['detailpage', 'embedded']
 
         params = dict()
-        player_response = dict()
+        fallback_player_response = dict()
 
         for el in el_values:
             http_params['el'] = el
             result = requests.get(video_info_url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
-            player_response = json.loads(params.get('player_response', '{}'))
-            if player_response.get('streamingData', {}).get('formats', []) or params.get('live_playback', '0') == '1':
+            fallback_player_response = json.loads(params.get('player_response', '{}'))
+            if fallback_player_response.get('streamingData', {}).get('formats', []) or \
+                    fallback_player_response.get('streamingData', {}).get('hlsManifestUrl', ''):
                 break
 
-        playability_status = player_response.get('playabilityStatus', {})
+        if not player_response:
+            player_response = fallback_player_response
+            playability_status = player_response.get('playabilityStatus', {})
+
         playback_tracking = player_response.get('playbackTracking', {})
-
         captions = player_response.get('captions', {})
+        video_details = player_response.get('videoDetails', {})
+        is_live_content = video_details.get('isLiveContent') is True
+        streaming_data = player_response.get('streamingData', {})
 
-        is_live_content = player_response.get('videoDetails', {}).get('isLiveContent') is True
-        live_url = player_response.get('streamingData', {}).get('hlsManifestUrl', '') or params.get('hlsvp', '')
+        live_url = streaming_data.get('hlsManifestUrl', '') or \
+                   fallback_player_response.get('streamingData', {}).get('hlsManifestUrl', '')
         is_live = is_live_content and live_url
 
         stream_list = []
@@ -775,8 +783,6 @@ class VideoInfo(object):
                      'channel': {},
                      'images': {},
                      'subtitles': []}
-
-        video_details = player_response.get('videoDetails', {})
 
         meta_info['video']['id'] = video_details.get('videoId', video_id)
         meta_info['video']['title'] = video_details.get('title', '')
@@ -794,7 +800,7 @@ class VideoInfo(object):
             {'from': 'iurlsd', 'to': 'standard', 'image': 'sddefault.jpg'},
             {'from': 'thumbnail_url', 'to': 'default', 'image': 'default.jpg'}]
         for image_data in image_data_list:
-            image_url = params.get(image_data['from'], 'https://i.ytimg.com/vi/{video_id}/{image}'.format(video_id=video_id, image=image_data['image']))
+            image_url = 'https://i.ytimg.com/vi/{video_id}/{image}'.format(video_id=video_id, image=image_data['image'])
             if image_url:
                 if is_live:
                     image_url = image_url.replace('.jpg', '_live.jpg')
@@ -819,12 +825,18 @@ class VideoInfo(object):
                         if reason_text:
                             reason = ''.join(reason_text)
                 else:
-                    reason = params.get('reason')
-                    if not reason and 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
-                        reason = playability_status['errorScreen']['playerErrorMessageRenderer'].get('reason', {}).get('simpleText', 'UNKNOWN')
-                    if not reason:
-                        reason = playability_status.get('reason')
+                    reason = playability_status.get('reason')
 
+                    if 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
+                        status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
+                        descript_reason = status_renderer.get('subreason', {}).get('simpleText')
+                        if descript_reason:
+                            reason = descript_reason
+                        else:
+                            general_reason = status_renderer.get('reason', {}).get('simpleText')
+                            if general_reason:
+                                reason = general_reason
+                            
                 if not reason:
                     reason = 'UNKNOWN'
 
@@ -867,13 +879,13 @@ class VideoInfo(object):
         cipher = None
         s_info = dict()
 
-        adaptive_fmts = player_response.get('streamingData', {}).get('adaptiveFormats', [])
-        std_fmts = player_response.get('streamingData', {}).get('formats', [])
-
-        mpd_url = player_response.get('streamingData', {}).get('dashManifestUrl') or params.get('dashmpd', player_args.get('dashmpd'))
+        adaptive_fmts = streaming_data.get('adaptiveFormats', [])
+        std_fmts = streaming_data.get('formats', [])
+        mpd_url = streaming_data.get('dashManifestUrl') or \
+                  fallback_player_response.get('streamingData', {}).get('dashManifestUrl', '')
 
         license_info = {'url': None, 'proxy': None, 'token': None}
-        pa_li_info = player_response.get('streamingData', {}).get('licenseInfos', [])
+        pa_li_info = streaming_data.get('licenseInfos', [])
         if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
             raise YouTubeException('Proxy is not running')
         for li_info in pa_li_info:
@@ -900,13 +912,13 @@ class VideoInfo(object):
         if not license_info.get('url') and not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
-                                                player_response.get('videoDetails', {}).get('lengthSeconds', '0'),
+                                                video_details.get('lengthSeconds', '0'),
                                                 cipher)
-        use_cipher_signature = 'True' == params.get('use_cipher_signature', None)
+
         if mpd_url:
             mpd_sig_deciphered = True
             if mpd_url.startswith('http'):
-                if (use_cipher_signature or re.search('/s/[0-9A-F.]+', mpd_url)) and (not re.search('/signature/[0-9A-F.]+', mpd_url)):
+                if (re.search('/s/[0-9A-F.]+', mpd_url)) and (not re.search('/signature/[0-9A-F.]+', mpd_url)):
                     mpd_sig_deciphered = False
                     if cipher:
                         sig_param = 'signature'
