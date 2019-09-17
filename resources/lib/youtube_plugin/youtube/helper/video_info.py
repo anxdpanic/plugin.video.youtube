@@ -776,7 +776,8 @@ class VideoInfo(object):
                      'images': {},
                      'subtitles': []}
 
-        video_details = player_response.get('videoDetails', {})
+        video_details = player_args.get('player_response', {}).get('videoDetails',
+                                                                   player_response.get('videoDetails', {}))
 
         meta_info['video']['id'] = video_details.get('videoId', video_id)
         meta_info['video']['title'] = video_details.get('title', '')
