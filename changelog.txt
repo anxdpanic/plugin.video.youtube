@@ -4,6 +4,9 @@
 [fix] ended live streams not using mpeg-dash when enabled
 [fix] subscriptions not showing latest videos
 [upd] simplify youtube_resolver regex |contrib: Twilight0|
+[lang] de_de strings |contrib: TehTux|
+[lang] pl_pl strings |contrib: drrak|
+[lang] nl_nl strings |contrib: Markman-B|
 
 6.5.1
 [add] get_live to youtube_requests module to retrieve live stream info for a channel
