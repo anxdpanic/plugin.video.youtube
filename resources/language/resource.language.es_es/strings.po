@@ -1181,20 +1181,20 @@ msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]> 1080p y HDR requieren Input
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr ""
+msgstr "Limitar a 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Subidas"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptativo (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptativo (WEBM/VP9)"
