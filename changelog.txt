@@ -1,3 +1,5 @@
+[fix] playback of some videos with no adaptive video streams
+
 6.5.2
 [fix] playback (No streams found)
 [fix] missing metadata
