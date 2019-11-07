@@ -836,7 +836,7 @@ class VideoInfo(object):
                             general_reason = status_renderer.get('reason', {}).get('simpleText')
                             if general_reason:
                                 reason = general_reason
-                            
+
                 if not reason:
                     reason = 'UNKNOWN'
 
@@ -1237,17 +1237,29 @@ class VideoInfo(object):
                     discarded_streams.append(get_discarded_audio(mime, i, data[mime][i], 'no init or index'))
                 del data[mime][i]
 
+        if not data.get('video/mp4') and not data.get('video/webm'):
+            self._context.log_debug('Generate MPD: No video mime-types found')
+            return None, None
+
         mpd_quality = self._context.get_settings().get_mpd_quality()
         hdr = self._context.get_settings().include_hdr() and 'vp9.2' in ia_capabilities
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
+        supported_mime_types = []
         default_mime_type = 'mp4'
-        supported_mime_types = ['audio/mp4', 'video/mp4']
+        if data.get('video/mp4'):
+            supported_mime_types.append('video/mp4')
+        if data.get('audio/mp4'):
+            supported_mime_types.append('audio/mp4')
 
-        if ('vp9' in ia_capabilities or 'vp9.2' in ia_capabilities) and any(m for m in data if m == 'video/webm'):
+        if (('vp9' in ia_capabilities or 'vp9.2' in ia_capabilities) and
+                any(m for m in data if m == 'video/webm') and
+                data.get('video/webm')):
             supported_mime_types.append('video/webm')
 
-        if ('vorbis' in ia_capabilities or 'opus' in ia_capabilities) and any(m for m in data if m == 'audio/webm'):
+        if (('vorbis' in ia_capabilities or 'opus' in ia_capabilities) and
+                any(m for m in data if m == 'audio/webm') and
+                data.get('audio/webm')):
             supported_mime_types.append('audio/webm')
 
         if ('video/webm' in supported_mime_types and
