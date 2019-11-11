@@ -75,7 +75,8 @@ def play_video(provider, context):
         video_item = VideoItem(title, video_stream['url'])
 
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
-        use_history = not is_live and not screensaver and not incognito and settings.use_playback_history()
+        use_history = not is_live and not screensaver and not incognito
+        playback_history = use_history and settings.use_playback_history()
 
         video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream, use_play_data=use_history)
 
@@ -104,6 +105,7 @@ def play_video(provider, context):
             "playing_file": video_item.get_uri(),
             "play_count": play_count,
             "use_history": use_history,
+            "playback_history": playback_history,
             "playback_stats": playback_stats,
             "seek_time": seek_time,
             "refresh_only": screensaver
