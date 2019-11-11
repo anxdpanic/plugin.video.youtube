@@ -78,7 +78,8 @@ def play_video(provider, context):
         use_history = not is_live and not screensaver and not incognito
         playback_history = use_history and settings.use_playback_history()
 
-        video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream, use_play_data=use_history)
+        video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream,
+                                            use_play_data=playback_history)
 
         seek_time = None
         play_count = 0

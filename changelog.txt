@@ -1,4 +1,5 @@
 [fix] playback of some videos with no adaptive video streams
+[fix] don't update watch history when incognito/screensaver/live |contrib: regseb|
 
 6.5.2
 [fix] playback (No streams found)
