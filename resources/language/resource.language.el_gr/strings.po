@@ -1192,8 +1192,8 @@ msgstr "Απεσταλμένα"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Προσαρμοζόμενη (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Προσαρμοζόμενη (WEBM/VP9)"
