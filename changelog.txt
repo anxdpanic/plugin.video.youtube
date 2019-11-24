@@ -1,5 +1,8 @@
 [fix] playback of some videos with no adaptive video streams
 [fix] don't update watch history when incognito/screensaver/live |contrib: regseb|
+[lang] el_gr strings |contrib: twilight0|
+[lang] es_es strings |contrib: roliverosc|
+[lang] pt_br strings |contrib: MediaBrasil|
 
 6.5.2
 [fix] playback (No streams found)
