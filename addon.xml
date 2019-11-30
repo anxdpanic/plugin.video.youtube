@@ -18,6 +18,7 @@
 [lang] el_gr strings |contrib: twilight0|
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_br strings |contrib: MediaBrasil|
+[lang] cs_cz strings |contrib: llzn.cz|
         </news>
         <assets>
             <icon>icon.png</icon>
@@ -58,6 +59,9 @@
         <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
         <summary lang="ko_KR">유튜브 플러그인</summary>
         <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>
+        <summary lang="cs_CZ">Plugin pro YouTube</summary>
+        <description lang="cs_CZ">YouTube je jedna z největších webových stránek světa sdílející video.</description>
+        <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>        
         <language></language>
         <platform>all</platform>
         <license>GPL-2.0-only</license>
