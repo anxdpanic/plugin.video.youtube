@@ -74,7 +74,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Živě / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -118,7 +118,7 @@ msgstr "Zobrazit: Filmy"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Spustit průvodce nastavením?"
+msgstr "Chcete spustit průvodce nastavením?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -146,11 +146,11 @@ msgstr "Podpora alternativního přehrávače"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr "Vlastní ID playlist 'Shlédnout později'"
+msgstr "Vlastní ID seznam 'Shlédnout později'"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr "Vlastní historie ID playlistu"
+msgstr "Vlastní historie ID seznamu"
 
 msgctxt "#30100"
 msgid "Favorites"
@@ -230,7 +230,7 @@ msgstr "Smazat"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr "Prosím čekejte..."
+msgstr "Čekejte..."
 
 msgctxt "#30120"
 msgid "Clear"
@@ -272,7 +272,7 @@ msgstr "Kanály"
 
 msgctxt "#30501"
 msgid "Playlists"
-msgstr "Seznamy"
+msgstr "Seznamy přehrávání"
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -340,7 +340,7 @@ msgstr "Odebírat od %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr "Přejít na '%s'"
+msgstr "Přejděte na '%s'"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -352,11 +352,11 @@ msgstr "Přidat do..."
 
 msgctxt "#30521"
 msgid "Select playlist"
-msgstr "Vyberte seznam"
+msgstr "Vyberte seznam přehrávání"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr "Nový seznam..."
+msgstr "Nový seznam přehrávání..."
 
 msgctxt "#30523"
 msgid "Language"
@@ -376,7 +376,7 @@ msgstr "Přizpůsobit"
 
 msgctxt "#30527"
 msgid "Language and region?"
-msgstr "Vybrat jazyk a region?"
+msgstr "Chcete vybrat jazyk a region?"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -408,11 +408,11 @@ msgstr "Náhodně"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr "Vyberte pořadí seznamu"
+msgstr "Vyberte pořadí seznamu přehrávání"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr "Obnovuji seznam..."
+msgstr "Obnovuji seznam přehrávání..."
 
 msgctxt "#30537"
 msgid "Play from here"
@@ -452,7 +452,7 @@ msgstr "Žádné další odkazy nenalezeny"
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Prosím přihlaste se dvakrát!"
+msgstr "Přihlaste se dvakrát!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
@@ -544,7 +544,7 @@ msgstr "Odstranit 'Shlédnout později'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Chcete odstranit '%s' ze seznamu 'Shlédnout později'"
+msgstr "Chcete odstranit '%s' ze seznamu 'Shlédnout později'?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
@@ -580,7 +580,7 @@ msgstr "Nastavení"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr "Ověřovací certifikát Force SSL"
+msgstr "Certifikát ověření Force SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
@@ -612,7 +612,7 @@ msgstr "Filtr seznamu kanálů"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr "Černá listina"
+msgstr "Černý seznam"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
@@ -708,11 +708,11 @@ msgstr "Smazat historii sledování"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr "Tímto smažete historii sledování Vašeho účtu ze všech zařízení. Tento úkon nelze vzít zpět."
+msgstr "Tímto úkonem smažete historii sledování Vašeho účtu ze všech zařízení. Tento úkon nelze vzít zpět."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr "Uložit playlisty"
+msgstr "Uložit seznamy přehrávání"
 
 msgctxt "#30612"
 msgid "Retry"
@@ -720,11 +720,11 @@ msgstr "Opakovat"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr "Obnovit ID playlist 'Shlédnout později'"
+msgstr "Obnovit ID seznamu 'Shlédnout později'"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Chyba obnovení ID playlistu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
+msgstr "Chyba obnovení ID seznamu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -748,7 +748,7 @@ msgstr "Port"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr "Port %s je již použiván. Nelze spustit HTTP Server"
+msgstr "Port %s je již použiván. Nelze spustit HTTP Server."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
@@ -764,7 +764,7 @@ msgstr "Instalovat InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr "Vyžadován Kodi 17 a vyšší"
+msgstr "Vyžadován Kodi 17 a novější"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -784,7 +784,7 @@ msgstr "HTTP Server"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr "IP bílé listiny"
+msgstr "IP bílého seznamu (vymezeno čárkou)"
 
 msgctxt "#30630"
 msgid "Save"
@@ -820,7 +820,7 @@ msgstr "Osobní API KEY jsou zakázané"
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr "Záložka této stránky pro rychlé přidání vašeho klíče."
+msgstr "Záložka této stránky pro rychlé přidání Vašeho klíče."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
@@ -832,19 +832,19 @@ msgstr "Obnovit"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr "Smazat api_keys.json"
+msgstr "Odstranit api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr "Smazat access_manager.json"
+msgstr "Odstranit access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr "Poslech na IP"
+msgstr "Poslech z IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr "Vybrat poslech IP"
+msgstr "Vybrat poslech z IP"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
@@ -880,7 +880,7 @@ msgstr "Poloměr polohy (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "Využíváte geolokaci? Použijte pro [B]Moje poloha[/B]"
+msgstr "Využíváte geolokaci? Použijte ji pro [B]Moje poloha[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -936,7 +936,7 @@ msgstr "Odstraněn '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr "Přejmenován '%s' na '%s"
+msgstr "Přejmenován z '%s' na '%s"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1064,7 +1064,7 @@ msgstr "Kontrola IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr "HTTP Server není zpuštěný"
+msgstr "HTTP Server není spuštěný"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1104,11 +1104,11 @@ msgstr "Přehrát pouze zvuk"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "Chyba získání ID playlistu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
+msgstr "Chyba získání ID seznamu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "Chyba získání ID playlistu 'Shlédnout později'. Zkuste to zítra bez odstranění videa."
+msgstr "Chyba získání ID seznamu 'Shlédnout později'. Zkuste to zítra bez odstranění videa."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
