@@ -24,6 +24,8 @@ msgstr ""
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube je jedna z největších webových stránek světa sdílející video."
 
+# Kodion Settings
+
 msgctxt "#30000"
 msgid "General"
 msgstr "Obecné"
@@ -35,6 +37,16 @@ msgstr "Jméno"
 msgctxt "#30002"
 msgid "Password"
 msgstr "Heslo"
+
+# empty strings from id 30003 to 30006
+
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Použít MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr "Konfigurovat InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -75,6 +87,8 @@ msgstr "360p"
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p Živě / 720p (HD)"
+
+# empty strings 30019
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -151,6 +165,9 @@ msgstr "Vlastní ID seznam 'Shlédnout později'"
 msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Vlastní historie ID seznamu"
+
+# Kodion Common
+# empty strings from id 30039 to 30099
 
 msgctxt "#30100"
 msgid "Favorites"
