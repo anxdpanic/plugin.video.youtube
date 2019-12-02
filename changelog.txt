@@ -3,6 +3,7 @@
 [lang] el_gr strings |contrib: twilight0|
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_br strings |contrib: MediaBrasil|
+[lang] cs_cz strings |contrib: llzn.cz|
 
 6.5.2
 [fix] playback (No streams found)
