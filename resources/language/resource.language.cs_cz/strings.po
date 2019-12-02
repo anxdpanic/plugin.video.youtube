@@ -182,7 +182,7 @@ msgstr "Další strana (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "Sledovat později"
+msgstr "Shlédnout později"
 
 msgctxt "#30108"
 msgid "Remove"
