@@ -4,6 +4,7 @@
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_br strings |contrib: MediaBrasil|
 [lang] cs_cz strings |contrib: llzn.cz|
+[lang] it_it strings |contrib: SebastianoPistore|
 
 6.5.2
 [fix] playback (No streams found)
