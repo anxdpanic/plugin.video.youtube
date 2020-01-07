@@ -836,7 +836,7 @@ msgstr "Τα προσωπικά κλειδιά API έχουν απενεργοπ
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Αποθηκεύστε αυτήν την σελίδα στους σελιδοδείκτες ώστε να μπορειτε να προσθέστε τα κλειδιά σας στο μέλλον"
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
