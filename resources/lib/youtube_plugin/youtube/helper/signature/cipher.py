@@ -129,12 +129,13 @@ class Cipher(object):
     @staticmethod
     def _find_signature_function_name(javascript):
         # match_patterns source is youtube-dl
-        # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1313
+        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1344
         # LICENSE: The Unlicense
 
         match_patterns = [
             r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<name>[a-zA-Z0-9$]+)\(',
             r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<name>[a-zA-Z0-9$]+)\(',
+            r'\b(?P<name>[a-zA-Z0-9$]{2})\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',
             r'(?P<name>[a-zA-Z0-9$]+)\s*=\s*function\(\s*a\s*\)\s*{\s*a\s*=\s*a\.split\(\s*""\s*\)',
             r'(["\'])signature\1\s*,\s*(?P<name>[a-zA-Z0-9$]+)\(',
             r'\.sig\|\|(?P<name>[a-zA-Z0-9$]+)\(',

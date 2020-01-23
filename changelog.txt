@@ -1,3 +1,5 @@
+6.5.3
+[fix] playback for some videos (ie. music videos)
 [fix] playback of some videos with no adaptive video streams
 [fix] don't update watch history when incognito/screensaver/live |contrib: regseb|
 [lang] el_gr strings |contrib: twilight0|
