@@ -13,6 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[add] hide_folders, hide_playlists, hide_search, and hide_live to /channel/&lt;channel_id&gt;/ end-point
+    - ie. plugin://plugin.video.youtube/channel/UC4PooiX37Pld1T8J5SYT-SQ/?hide_folders=true will hide all folders(Playlists, Search, and Live) in the channel listing
 [fix] playback for some videos (ie. music videos)
 [fix] playback of some videos with no adaptive video streams
 [fix] don't update watch history when incognito/screensaver/live |contrib: regseb|
