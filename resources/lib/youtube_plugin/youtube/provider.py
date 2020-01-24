@@ -588,21 +588,32 @@ class Provider(kodion.AbstractProvider):
         if addon_id:
             item_params.update({'addon_id': addon_id})
 
-        if page == 1:
-            playlists_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.playlists'])),
-                                           context.create_uri(['channel', channel_id, 'playlists'], item_params),
-                                           image=context.create_resource_path('media', 'playlist.png'))
-            playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
-            result.append(playlists_item)
+        hide_folders = str(context.get_param('hide_folders', False)).lower() == 'true'
+
+        if page == 1 and not hide_folders:
+            hide_playlists = str(context.get_param('hide_playlists', False)).lower() == 'true'
+            hide_search = str(context.get_param('hide_search', False)).lower() == 'true'
+            hide_live = str(context.get_param('hide_live', False)).lower() == 'true'
+
+            if not hide_playlists:
+                playlists_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.playlists'])),
+                                               context.create_uri(['channel', channel_id, 'playlists'], item_params),
+                                               image=context.create_resource_path('media', 'playlist.png'))
+                playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
+                result.append(playlists_item)
+
             search_live_id = mine_id if mine_id else channel_id
-            search_item = kodion.items.NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
-                                                     image=context.create_resource_path('media', 'search.png'),
-                                                     fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
-            result.append(search_item)
-            live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
-                                      context.create_uri(['channel', search_live_id, 'live'], item_params),
-                                      image=context.create_resource_path('media', 'live.png'))
-            result.append(live_item)
+            if not hide_search:
+                search_item = kodion.items.NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
+                                                         image=context.create_resource_path('media', 'search.png'),
+                                                         fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
+                result.append(search_item)
+
+            if not hide_live:
+                live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
+                                          context.create_uri(['channel', search_live_id, 'live'], item_params),
+                                          image=context.create_resource_path('media', 'live.png'))
+                result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
