@@ -1198,3 +1198,7 @@ msgstr "Adaptativo (MP4/H264)"
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
 msgstr "Adaptativo (WEBM/VP9)"
+
+msgctxt "#30729"
+msgid "Remote friendly search"
+msgstr ""

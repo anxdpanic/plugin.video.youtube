@@ -1192,3 +1192,7 @@ msgstr ""
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
 msgstr ""
+
+msgctxt "#30729"
+msgid "Remote friendly search"
+msgstr ""

@@ -236,3 +236,6 @@ class AbstractSettings(object):
         if self.include_hdr() or isinstance(self.get_mpd_quality(), str):
             return False
         return self.get_bool(constants.setting.MPD_30FPS_LIMIT, False)
+
+    def remote_friendly_search(self):
+        return self.get_bool(constants.setting.REMOTE_FRIENDLY_SEARCH, False)

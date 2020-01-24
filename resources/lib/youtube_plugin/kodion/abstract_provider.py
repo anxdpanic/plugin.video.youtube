@@ -10,6 +10,8 @@
 
 import re
 
+import xbmcplugin
+
 from .exceptions import KodionException
 from . import items
 from . import constants
@@ -207,19 +209,35 @@ class AbstractProvider(object):
             context.get_ui().refresh_container()
             return True
         elif command == 'input':
+            if '/query/' in context.get_ui().get_info_label('Container.FolderPath'):
+                #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
+                return False
+
             result, query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
+            addon_id = context.get_param('addon_id', '')
+            item_params = {'q': query}
+            if addon_id:
+                item_params.update({'addon_id': addon_id})
+            if incognito:
+                item_params.update({'incognito': incognito})
+            if channel_id:
+                item_params.update({'channel_id': channel_id})
+
             if result:
-                # context.execute('Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], item_params))
-                # Container.Update doesn't work with Remotes(Yatse)
-                try:
-                    if not incognito and not channel_id:
-                        search_history.update(query)
-                    context.set_path('/kodion/search/query/')
-                    return self.on_search(query, context, re_match)
-                except:
-                    return list()
+                if not context.get_settings().remote_friendly_search():
+                    xbmcplugin.endOfDirectory(context.get_handle(), succeeded=True)
+                    context.execute('Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], item_params))
+                else:
+                    try:
+                        if not incognito and not channel_id:
+                            search_history.update(query)
+                        context.set_path('/kodion/search/query/')
+                        return self.on_search(query, context, re_match)
+                    except:
+                        return list()
+
             return True
         elif command == 'query':
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
