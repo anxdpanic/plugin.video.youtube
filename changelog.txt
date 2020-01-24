@@ -4,6 +4,7 @@
 [fix] playback for some videos (ie. music videos)
 [fix] playback of some videos with no adaptive video streams
 [fix] don't update watch history when incognito/screensaver/live |contrib: regseb|
+[fix] search prompting for input after video playback or refresh
 [lang] el_gr strings |contrib: twilight0|
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_br strings |contrib: MediaBrasil|
