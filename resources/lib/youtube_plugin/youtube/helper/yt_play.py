@@ -31,6 +31,10 @@ def play_video(provider, context):
         settings = context.get_settings()
 
         ask_for_quality = None
+        if video_id and context.get_ui().get_home_window_property('ask_for_quality') == video_id:
+            ask_for_quality = True
+        context.get_ui().clear_home_window_property('ask_for_quality')
+
         screensaver = False
         if context.get_param('screensaver', None) and str(context.get_param('screensaver')).lower() == 'true':
             ask_for_quality = False

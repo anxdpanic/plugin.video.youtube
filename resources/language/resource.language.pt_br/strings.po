@@ -1183,3 +1183,7 @@ msgstr "Adaptivo (WEBM/VP9)"
 msgctxt "#30729"
 msgid "Remote friendly search"
 msgstr ""
+
+msgctxt "#30730"
+msgid "Play (Ask for quality)"
+msgstr ""

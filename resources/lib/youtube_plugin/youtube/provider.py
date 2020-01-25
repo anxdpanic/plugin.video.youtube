@@ -167,6 +167,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.subscribed.to.channel': 30719,
                  'youtube.unsubscribed.from.channel': 30720,
                  'youtube.uploads': 30726,
+                 'youtube.video.play_ask_for_quality': 30730,
                  }
 
     def __init__(self):
@@ -706,6 +707,9 @@ class Provider(kodion.AbstractProvider):
         if context.get_ui().get_home_window_property('audio_only') != params.get('video_id'):
             context.get_ui().clear_home_window_property('audio_only')
 
+        if context.get_ui().get_home_window_property('ask_for_quality') != params.get('video_id'):
+            context.get_ui().clear_home_window_property('ask_for_quality')
+
         if 'prompt_for_subtitles' in params:
             prompt_subtitles = params['prompt_for_subtitles'] == '1'
             del params['prompt_for_subtitles']
@@ -721,6 +725,15 @@ class Provider(kodion.AbstractProvider):
             if audio_only and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
                 context.get_ui().set_home_window_property('audio_only', params['video_id'])
+                context.log_debug('Redirecting audio only playback')
+                redirect = True
+
+        elif 'ask_for_quality' in params:
+            ask_for_quality = params['ask_for_quality'] == '1'
+            del params['ask_for_quality']
+            if ask_for_quality and 'video_id' in params and 'playlist_id' not in params:
+                # redirect to builtin after setting home window property, so playback url matches playable listitems
+                context.get_ui().set_home_window_property('ask_for_quality', params['video_id'])
                 context.log_debug('Redirecting audio only playback')
                 redirect = True
 
