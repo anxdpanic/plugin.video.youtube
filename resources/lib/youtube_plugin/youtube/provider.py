@@ -8,8 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import os
 import json
+import os
+import re
 import shutil
 import socket
 from base64 import b64decode
@@ -994,8 +995,26 @@ class Provider(kodion.AbstractProvider):
 
         return self.on_search(query, context, re_match)
 
-    def on_search(self, search_text, context, re_match):
+    def _search_channel_or_playlist(self, context, id_string):
+        json_data = {}
         result = []
+
+        if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', id_string):
+            json_data = self.get_client(context).get_channels(id_string)
+
+        elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', id_string):
+            json_data = self.get_client(context).get_playlists(id_string)
+
+        if not json_data or not v3.handle_error(self, context, json_data):
+            return []
+
+        result.extend(v3.response_to_items(self, context, json_data))
+        return result
+
+    def on_search(self, search_text, context, re_match):
+        result = self._search_channel_or_playlist(context, search_text)
+        if result:  # found a channel or playlist matching search_text
+            return result
 
         channel_id = context.get_param('channel_id', '')
         event_type = context.get_param('event_type', '')
