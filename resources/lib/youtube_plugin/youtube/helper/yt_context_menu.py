@@ -208,3 +208,10 @@ def append_play_audio_only(context_menu, provider, context, video_id):
                          'RunPlugin(%s)' % context.create_uri(['play'],
                                                               {'video_id': video_id,
                                                                'audio_only': '1'})))
+
+
+def append_play_ask_for_quality(context_menu, provider, context, video_id):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.video.play_ask_for_quality']),
+                         'RunPlugin(%s)' % context.create_uri(['play'],
+                                                              {'video_id': video_id,
+                                                               'ask_for_quality': '1'})))
