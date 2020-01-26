@@ -1201,8 +1201,8 @@ msgstr "Adaptive (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Fernbedienungsfreundliche Suche"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Abspielen (nach Qualität fragen)"
