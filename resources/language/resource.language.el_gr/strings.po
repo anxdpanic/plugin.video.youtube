@@ -1200,8 +1200,8 @@ msgstr "Προσαρμοζόμενη (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Αναζήτηση φιλική για χειριστήριο"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Αναπαραγωγή (Ερώτηση για ποιότητα)"
