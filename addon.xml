@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.5.3~beta1" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.6.0" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -26,6 +26,7 @@
 [lang] pt_br strings |contrib: MediaBrasil|
 [lang] cs_cz strings |contrib: llzn.cz|
 [lang] it_it strings |contrib: SebastianoPistore|
+[lang] de_de strings |contrib: tweimer|
         </news>
         <assets>
             <icon>icon.png</icon>
