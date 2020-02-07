@@ -610,6 +610,37 @@
                 </setting>
             </group>
             <group id="3">
+                <setting help="" id="kodion.view.override" label="30026" type="boolean">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting help="" id="kodion.view.default" label="30027" type="integer">
+                    <level>0</level>
+                    <default>50</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition operator="is" setting="kodion.view.override">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control format="integer" type="edit">
+                        <heading>30027</heading>
+                    </control>
+                </setting>
+                <setting help="" id="kodion.view.episodes" label="30028" type="integer">
+                    <level>0</level>
+                    <default>50</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition operator="is" setting="kodion.view.override">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control format="integer" type="edit">
+                        <heading>30028</heading>
+                    </control>
+                </setting>
+            </group>
+            <group id="4">
                 <setting help="" id="kodion.cache.size" label="30024" type="integer">
                     <level>0</level>
                     <default>10</default>
@@ -628,7 +659,7 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="4">
+            <group id="5">
                 <setting help="" id="youtube.language" label="30523" type="string">
                     <level>0</level>
                     <default>en-US</default>
