@@ -208,6 +208,7 @@ class XbmcContext(AbstractContext):
     def set_content_type(self, content_type):
         self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
         xbmcplugin.setContent(self._plugin_handle, content_type)
+        self.get_ui().set_view_mode(content_type)
 
     def add_sort_method(self, *sort_methods):
         for sort_method in sort_methods:
