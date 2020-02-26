@@ -8,6 +8,7 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from ..youtube_exceptions import YouTubeException
 from ...kodion.utils import FunctionCache, DataCache, strip_html_from_text
 
 
@@ -80,7 +81,7 @@ class ResourceManager(object):
 
         return result
 
-    def _update_videos(self, video_ids, live_details=False):
+    def _update_videos(self, video_ids, live_details=False, suppress_errors=False):
         result = dict()
         json_data = dict()
         video_ids_to_update = list()
@@ -118,7 +119,7 @@ class ResourceManager(object):
         for k in list(result.keys()):
             result[k]['play_data'] = played_items.get(k, dict())
 
-        if self.handle_error(json_data):
+        if self.handle_error(json_data, suppress_errors) or suppress_errors:
             return result
 
     @staticmethod
@@ -130,12 +131,12 @@ class ResourceManager(object):
             pos += 50
         return list_of_50
 
-    def get_videos(self, video_ids, live_details=False):
+    def get_videos(self, video_ids, live_details=False, suppress_errors=False):
         list_of_50s = self._make_list_of_50(video_ids)
 
         result = {}
         for list_of_50 in list_of_50s:
-            result.update(self._update_videos(list_of_50, live_details))
+            result.update(self._update_videos(list_of_50, live_details, suppress_errors))
         return result
 
     def _update_playlists(self, playlists_ids):
@@ -225,18 +226,35 @@ class ResourceManager(object):
 
         return result
 
-    def handle_error(self, json_data):
+    def handle_error(self, json_data, suppress_errors=False):
         context = self._context
         if json_data and 'error' in json_data:
+            ok_dialog = False
+            message_timeout = 5000
             message = json_data['error'].get('message', '')
             message = strip_html_from_text(message)
             reason = json_data['error']['errors'][0].get('reason', '')
             title = '%s: %s' % (context.get_name(), reason)
-            message_timeout = 5000
+            error_message = 'Error reason: |%s| with message: |%s|' % (reason, message)
+
+            context.log_error(error_message)
+
+            if reason == 'accessNotConfigured':
+                message = context.localize(30731)
+                ok_dialog = True
+
             if reason == 'quotaExceeded' or reason == 'dailyLimitExceeded':
                 message_timeout = 7000
-            context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
-            error_message = 'Error reason: |%s| with message: |%s|' % (reason, message)
-            raise Exception(error_message)
+
+            if not suppress_errors:
+                if ok_dialog:
+                    context.get_ui().on_ok(title, message)
+                else:
+                    context.get_ui().show_notification(message, title,
+                                                       time_milliseconds=message_timeout)
+
+                raise YouTubeException(error_message)
+
+            return False
 
         return True

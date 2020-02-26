@@ -108,7 +108,13 @@ class PlaybackMonitorThread(threading.Thread):
         plugin_play_path = 'plugin://plugin.video.youtube/play/'
         video_id_param = 'video_id=%s' % self.video_id
 
+        notification_sent = False
+
         while player.isPlaying() and not self.context.abort_requested() and not self.stopped():
+            if not notification_sent:
+                notification_sent = True
+                self.context.send_notification('PlaybackStarted', {'video_id': self.video_id})
+
             last_total_time = self.total_time
             last_current_time = self.current_time
             last_segment_start = self.segment_start

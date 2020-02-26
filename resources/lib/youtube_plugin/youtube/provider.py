@@ -169,6 +169,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.unsubscribed.from.channel': 30720,
                  'youtube.uploads': 30726,
                  'youtube.video.play_ask_for_quality': 30730,
+                 'youtube.key.requirement.notification': 30731,
                  }
 
     def __init__(self):
@@ -1620,8 +1621,8 @@ class Provider(kodion.AbstractProvider):
     def handle_exception(self, context, exception_to_handle):
         if (isinstance(exception_to_handle, InvalidGrant) or
                 isinstance(exception_to_handle, LoginException)):
+            ok_dialog = False
             message_timeout = 5000
-            failed_refresh = False
 
             message = exception_to_handle.get_message()
             msg = exception_to_handle.get_message()
@@ -1646,8 +1647,19 @@ class Provider(kodion.AbstractProvider):
                 if 'code' in msg:
                     code = msg['code']
 
-                if message == u'Unauthorized' and error == u'unauthorized_client':
-                    failed_refresh = True
+            if error and code:
+                title = '%s: [%s] %s' % ('LoginException', code, error)
+            elif error:
+                title = '%s: %s' % ('LoginException', error)
+            else:
+                title = 'LoginException'
+
+            context.log_error('%s: %s' % (title, log_message))
+
+            if error == 'deleted_client':
+                message = context.localize(self.LOCAL_MAP['youtube.key.requirement.notification'])
+                context.get_access_manager().update_access_token(access_token='', refresh_token='')
+                ok_dialog = True
 
             if error == 'invalid_client':
                 if message == 'The OAuth client was not found.':
@@ -1657,17 +1669,11 @@ class Provider(kodion.AbstractProvider):
                     message = context.localize(self.LOCAL_MAP['youtube.client.secret.incorrect'])
                     message_timeout = 7000
 
-            if error and code:
-                title = '%s: [%s] %s' % ('LoginException', code, error)
-            elif error:
-                title = '%s: %s' % ('LoginException', error)
+            if ok_dialog:
+                context.get_ui().on_ok(title, message)
             else:
-                title = 'LoginException'
+                context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
 
-            context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
-            context.log_error('%s: %s' % (title, log_message))
-            if not failed_refresh:
-                context.get_ui().open_settings()
             return False
 
         return True

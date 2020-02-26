@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.6.0" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.7.0~alpha1" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -13,20 +13,13 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[add] 'Play (Ask for quality)' context menu
-[add] search by channel or playlist id
-[add] hide_folders, hide_playlists, hide_search, and hide_live to /channel/&lt;channel_id&gt;/ end-point
-    - ie. plugin://plugin.video.youtube/channel/UC4PooiX37Pld1T8J5SYT-SQ/?hide_folders=true will hide all folders(Playlists, Search, and Live) in the channel listing
-[fix] playback for some videos (ie. music videos)
-[fix] playback of some videos with no adaptive video streams
-[fix] don't update watch history when incognito/screensaver/live |contrib: regseb|
-[fix] search prompting for input after video playback or refresh
-[lang] el_gr strings |contrib: twilight0|
-[lang] es_es strings |contrib: roliverosc|
-[lang] pt_br strings |contrib: MediaBrasil|
-[lang] cs_cz strings |contrib: llzn.cz|
-[lang] it_it strings |contrib: SebastianoPistore|
-[lang] de_de strings |contrib: tweimer|
+[add] send PlaybackStarted notification containing video_id of the playing video
+[fix] allow playback regardless of API status
+    - fixes playback for strm, playlists, other add-ons, and sharing videos from devices
+[fix] fix possible loop due to invalid keys and login information
+[fix] fix playback of mpeg-dash streams if HTTP Server - Listen on IP is blank
+[upd] use a dialog to notify users of API key requirements with link to wiki
+    - https://ytaddon.page.link/keys
         </news>
         <assets>
             <icon>icon.png</icon>

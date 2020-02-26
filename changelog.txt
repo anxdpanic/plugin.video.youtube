@@ -1,3 +1,12 @@
+6.7.0
+[add] send PlaybackStarted notification containing video_id of the playing video
+[fix] allow playback regardless of API status
+    - fixes playback for strm, playlists, other add-ons, and sharing videos from devices
+[fix] fix possible loop due to invalid keys and login information
+[fix] fix playback of mpeg-dash streams if HTTP Server - Listen on IP is blank
+[upd] use a dialog to notify users of API key requirements with link to wiki
+    - https://ytaddon.page.link/keys
+
 6.6.0
 [add] 'Play (Ask for quality)' context menu
 [add] search by channel or playlist id
