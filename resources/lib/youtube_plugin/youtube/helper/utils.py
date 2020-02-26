@@ -408,11 +408,14 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     settings = context.get_settings()
     ui = context.get_ui()
     resource_manager = provider.get_resource_manager(context)
-    video_data = resource_manager.get_videos([video_id])
+
+    video_data = resource_manager.get_videos([video_id], suppress_errors=True)
 
     meta_data = video_stream.get('meta', None)
     thumb_size = settings.use_thumbnail_size()
     image = None
+
+    video_item.video_id = video_id
 
     if meta_data:
         video_item.set_subtitles(meta_data.get('subtitles', None))
@@ -420,18 +423,6 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
 
     if 'headers' in video_stream:
         video_item.set_headers(video_stream['headers'])
-
-    yt_item = video_data[video_id]
-
-    snippet = yt_item['snippet']  # crash if not conform
-    play_data = yt_item['play_data']
-    video_item.live = snippet.get('liveBroadcastContent') == 'live'
-
-    video_item.video_id = video_id
-
-    # set the title
-    if not video_item.get_title():
-        video_item.set_title(snippet['title'])
 
     # set uses_dash
     video_item.set_use_dash(settings.use_dash())
@@ -448,6 +439,48 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     video_item.set_license_key(license_info.get('proxy'))
     ui.set_home_window_property('license_url', license_info.get('url'))
     ui.set_home_window_property('license_token', license_info.get('token'))
+
+    """
+    This is experimental. We try to get the most information out of the title of a video.
+    This is not based on any language. In some cases this won't work at all.
+    TODO: via language and settings provide the regex for matching episode and season.
+    """
+
+    for regex in __RE_SEASON_EPISODE_MATCHES__:
+        re_match = regex.search(video_item.get_name())
+        if re_match:
+            if 'season' in re_match.groupdict():
+                video_item.set_season(int(re_match.group('season')))
+
+            if 'episode' in re_match.groupdict():
+                video_item.set_episode(int(re_match.group('episode')))
+            break
+
+    if video_item.live:
+        video_item.set_play_count(0)
+
+    if image:
+        if video_item.live:
+            image = ''.join([image, '?ct=', get_thumb_timestamp()])
+        video_item.set_image(image)
+
+    # set fanart
+    video_item.set_fanart(provider.get_fanart(context))
+
+    if not video_data:
+        return video_item
+
+    # requires API
+    # ===============
+    yt_item = video_data[video_id]
+
+    snippet = yt_item['snippet']  # crash if not conform
+    play_data = yt_item['play_data']
+    video_item.live = snippet.get('liveBroadcastContent') == 'live'
+
+    # set the title
+    if not video_item.get_title():
+        video_item.set_title(snippet['title'])
 
     # duration
     if not video_item.live and use_play_data and play_data.get('total_time'):
@@ -472,25 +505,6 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
 
         if play_data.get('last_played'):
             video_item.set_last_played(play_data.get('last_played'))
-    elif video_item.live:
-        video_item.set_play_count(0)
-
-    """
-    This is experimental. We try to get the most information out of the title of a video.
-    This is not based on any language. In some cases this won't work at all.
-    TODO: via language and settings provide the regex for matching episode and season.
-    """
-    # video_item.set_season(1)
-    # video_item.set_episode(1)
-    for regex in __RE_SEASON_EPISODE_MATCHES__:
-        re_match = regex.search(video_item.get_name())
-        if re_match:
-            if 'season' in re_match.groupdict():
-                video_item.set_season(int(re_match.group('season')))
-
-            if 'episode' in re_match.groupdict():
-                video_item.set_episode(int(re_match.group('episode')))
-            break
 
     # plot
     channel_name = snippet.get('channelTitle', '')
@@ -513,12 +527,9 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     if not image:
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
-    if video_item.live and image:
-        image = ''.join([image, '?ct=', get_thumb_timestamp()])
-    video_item.set_image(image)
-
-    # set fanart
-    video_item.set_fanart(provider.get_fanart(context))
+        if video_item.live and image:
+            image = ''.join([image, '?ct=', get_thumb_timestamp()])
+        video_item.set_image(image)
 
     return video_item
 
