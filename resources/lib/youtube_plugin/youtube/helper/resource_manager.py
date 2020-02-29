@@ -48,9 +48,17 @@ class ResourceManager(object):
             if channel_id == 'mine':
                 json_data = function_cache.get(FunctionCache.ONE_DAY, self._youtube_client.get_channel_by_username, channel_id)
                 items = json_data.get('items', [{'id': 'mine'}])
-                channel_id = items[0]['id']
+
+                try:
+                    channel_id = items[0]['id']
+                except IndexError:
+                    self._context.log_debug('Channel "mine" not found: %s' % json_data)
+                    channel_id = None
+
                 json_data = dict()
-            updated_channel_ids.append(channel_id)
+
+            if channel_id:
+                updated_channel_ids.append(channel_id)
 
         channel_ids = updated_channel_ids
 
