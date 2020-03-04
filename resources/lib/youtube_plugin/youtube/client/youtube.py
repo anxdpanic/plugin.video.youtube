@@ -1074,6 +1074,15 @@ class YouTube(LoginClient):
 
         yt_config = self._config
 
+        if not yt_config.get('key'):
+            return {
+                'error':
+                    {
+                        'errors': [{'reason': 'accessNotConfigured'}],
+                        'message': 'No API keys provided'
+                    }
+            }
+
         # params
         if not params:
             params = {}

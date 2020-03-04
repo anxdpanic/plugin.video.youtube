@@ -135,10 +135,8 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 if addon.getSetting('youtube.api.key') and addon.getSetting('youtube.api.id') and \
                         addon.getSetting('youtube.api.secret'):
                     enabled = i18n(30636)
-                    addon.setSetting('youtube.api.enable', 'true')
                 else:
                     enabled = i18n(30637)
-                    addon.setSetting('youtube.api.enable', 'false')
                 if not updated:
                     updated = i18n(30635)
                 else:

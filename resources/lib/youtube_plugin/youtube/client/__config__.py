@@ -64,7 +64,6 @@ class APICheck(object):
             self._settings.set_string('youtube.api.key', j_key)
             self._settings.set_string('youtube.api.id', j_id)
             self._settings.set_string('youtube.api.secret', j_secret)
-            self._settings.set_bool('youtube.api.enable', True)
 
         switch = self.get_current_switch()
         user = self.get_current_user()
@@ -102,7 +101,7 @@ class APICheck(object):
             self._context.log_debug('User: |%s| Using API key set: |%s|' % (user, switch))
 
     def get_current_switch(self):
-        return 'own' if self.has_own_api_keys() else self._settings.get_string('youtube.api.key.switch', str(DEFAULT_SWITCH))
+        return 'own'
 
     def get_current_user(self):
         self._json_am = self._am_jstore.get_data()
@@ -115,13 +114,10 @@ class APICheck(object):
         own_secret = self._json_api['keys']['personal']['client_secret']
         return False if not own_key or \
                         not own_id or \
-                        not own_secret or \
-                        not self._settings.get_string('youtube.api.enable') == 'true' else True
+                        not own_secret else True
 
     def get_api_keys(self, switch):
         self._json_api = self._api_jstore.get_data()
-        if not switch or (switch == 'own' and not self.has_own_api_keys()):
-            switch = '1'
         if switch == 'youtube-tv':
             api_key = b64decode(key_sets['youtube-tv']['key']).decode('utf-8'),
             client_id = u''.join([b64decode(key_sets['youtube-tv']['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
@@ -141,8 +137,6 @@ class APICheck(object):
 
     def _api_keys_changed(self, switch):
         self._json_am = self._am_jstore.get_data()
-        if not switch or (switch == 'own' and not self.has_own_api_keys()):
-            switch = '1'
         user = self.get_current_user()
         last_set_hash = self._json_am['access_manager']['users'].get(user, {}).get('last_key_hash', '')
         current_set_hash = self._get_key_set_hash(switch)
@@ -154,8 +148,6 @@ class APICheck(object):
             return None
 
     def _get_key_set_hash(self, switch, old=False):
-        if not switch or (switch == 'own' and not self.has_own_api_keys()):
-            switch = '1'
         api_key, client_id, client_secret = self.get_api_keys(switch)
         if old and switch == 'own':
             client_id = client_id.replace(u'.apps.googleusercontent.com', u'')

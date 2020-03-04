@@ -1291,7 +1291,6 @@ class Provider(kodion.AbstractProvider):
         log_list = []
 
         if enable and client_id and client_secret and api_key:
-            settings.set_bool('youtube.api.enable', True)
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.enabled']))
             context.log_debug('Personal API keys enabled')
         elif enable:
@@ -1304,7 +1303,6 @@ class Provider(kodion.AbstractProvider):
             if not client_secret:
                 missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
                 log_list.append('Secret')
-            settings.set_bool('youtube.api.enable', False)
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
