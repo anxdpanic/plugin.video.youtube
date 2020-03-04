@@ -117,7 +117,7 @@ def play_video(provider, context):
         }
 
         context.get_ui().set_home_window_property('playback_json', json.dumps(playback_json))
-
+        context.send_notification('PlaybackInit', {'video_id': video_id})
         xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=True, listitem=item)
 
     except YouTubeException as ex:

@@ -244,6 +244,7 @@ class PlaybackMonitorThread(threading.Thread):
                                     format(self.current_time, '.3f'),
                                     self.percent_complete, state))
 
+        self.context.send_notification('PlaybackStopped', {'video_id': self.video_id})
         self.context.log_debug('Playback stopped [%s]: %s secs of %s @ %s%%' %
                                (self.video_id, format(self.current_time, '.3f'),
                                 format(self.total_time, '.3f'), self.percent_complete))
