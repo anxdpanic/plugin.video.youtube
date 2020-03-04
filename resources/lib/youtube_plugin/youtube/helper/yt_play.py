@@ -75,7 +75,9 @@ def play_video(provider, context):
         if play_suggested and not screensaver:
             utils.add_related_video_to_playlist(provider, context, client, v3, video_id)
 
-        title = video_stream.get('meta', {}).get('video', {}).get('title', '')
+        metadata = video_stream.get('meta', {})
+
+        title = metadata.get('video', {}).get('title', '')
         video_item = VideoItem(title, video_stream['url'])
 
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
@@ -107,6 +109,7 @@ def play_video(provider, context):
 
         playback_json = {
             "video_id": video_id,
+            "channel_id": metadata.get('channel', {}).get('id', ''),
             "playing_file": video_item.get_uri(),
             "play_count": play_count,
             "use_history": use_history,
@@ -117,7 +120,10 @@ def play_video(provider, context):
         }
 
         context.get_ui().set_home_window_property('playback_json', json.dumps(playback_json))
-        context.send_notification('PlaybackInit', {'video_id': video_id})
+        context.send_notification('PlaybackInit', {
+            'video_id': video_id,
+            'channel_id': playback_json.get('channel_id', '')
+        })
         xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=True, listitem=item)
 
     except YouTubeException as ex:
