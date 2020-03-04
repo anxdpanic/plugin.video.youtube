@@ -197,21 +197,24 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         playlist_item_id_dict = {}
 
     resource_manager = provider.get_resource_manager(context)
-    video_data = resource_manager.get_videos(video_ids, live_details=live_details)
-
+    video_data = resource_manager.get_videos(video_ids, live_details=live_details,
+                                             suppress_errors=True)
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
     for video_id in list(video_data.keys()):
         datetime = None
-        yt_item = video_data[video_id]
+        yt_item = video_data.get(video_id)
         video_item = video_id_dict[video_id]
+
+        # set mediatype
+        video_item.set_mediatype('video')  # using video
+
+        if not yt_item:
+            continue
 
         snippet = yt_item['snippet']  # crash if not conform
         play_data = yt_item['play_data']
         video_item.live = snippet.get('liveBroadcastContent') == 'live'
-
-        # set mediatype
-        video_item.set_mediatype('video')  # using video
 
         # duration
         if not video_item.live and use_play_data and play_data.get('total_time'):
