@@ -1208,4 +1208,4 @@ msgstr "Αναπαραγωγή (Ερώτηση για ποιότητα)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "Το πρόσθετο Youtube πλέον απαιτεί δικά σας κλειδιά API για την χρήση του.[CR]Για περισσότερες πληροφορίες δείτε εδώ στην wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Συγγνώμη για την ταλαιπωρία."
