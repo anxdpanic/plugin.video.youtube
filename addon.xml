@@ -13,7 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[add] send PlaybackStarted notification containing video_id of the playing video
+[add] send PlaybackInit, PlaybackStarted, PlaybackStopped notifications containing video_id of the playing video
 [fix] allow playback regardless of API status
     - fixes playback for strm, playlists, other add-ons, and sharing videos from devices
 [fix] fix possible loop due to invalid keys and login information

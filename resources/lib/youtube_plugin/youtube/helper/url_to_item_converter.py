@@ -76,7 +76,7 @@ class UrlToItemConverter(object):
         for url in urls:
             self.add_url(url, provider, context)
 
-    def get_items(self, provider, context):
+    def get_items(self, provider, context, title_required=True):
         result = []
 
         if self._flatten and len(self._channel_ids) > 0:
@@ -108,11 +108,11 @@ class UrlToItemConverter(object):
             result.extend(self.get_playlist_items(provider, context))
 
         # add videos
-        result.extend(self.get_video_items(provider, context))
+        result.extend(self.get_video_items(provider, context, title_required))
 
         return result
 
-    def get_video_items(self, provider, context):
+    def get_video_items(self, provider, context, title_required=True):
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
         use_play_data = not incognito
 
@@ -123,7 +123,7 @@ class UrlToItemConverter(object):
 
             for key in self._video_id_dict:
                 video_item = self._video_id_dict[key]
-                if video_item.get_title():
+                if not title_required or (title_required and video_item.get_title()):
                     self._video_items.append(video_item)
 
         return self._video_items
