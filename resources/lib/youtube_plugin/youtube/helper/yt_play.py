@@ -110,6 +110,7 @@ def play_video(provider, context):
         playback_json = {
             "video_id": video_id,
             "channel_id": metadata.get('channel', {}).get('id', ''),
+            "video_status": metadata.get('video', {}).get('status', {}),
             "playing_file": video_item.get_uri(),
             "play_count": play_count,
             "use_history": use_history,
@@ -122,7 +123,8 @@ def play_video(provider, context):
         context.get_ui().set_home_window_property('playback_json', json.dumps(playback_json))
         context.send_notification('PlaybackInit', {
             'video_id': video_id,
-            'channel_id': playback_json.get('channel_id', '')
+            'channel_id': playback_json.get('channel_id', ''),
+            'status': playback_json.get('video_status', {})
         })
         xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=True, listitem=item)
 

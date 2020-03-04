@@ -806,6 +806,15 @@ class VideoInfo(object):
                     image_url = image_url.replace('.jpg', '_live.jpg')
                 meta_info['images'][image_data['to']] = image_url
 
+        microformat = player_response.get('microformat', {}).get('playerMicroformatRenderer', {})
+        meta_info['video']['status'] = {
+            'unlisted': microformat.get('isUnlisted', False),
+            'private': video_details.get('isPrivate', False),
+            'crawlable': video_details.get('isCrawlable', False),
+            'family_safe': microformat.get('isFamilySafe', False),
+            'live': is_live,
+        }
+
         if (params.get('status', '') == 'fail') or (playability_status.get('status', 'ok').lower() != 'ok'):
             if not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()):
                 reason = None
