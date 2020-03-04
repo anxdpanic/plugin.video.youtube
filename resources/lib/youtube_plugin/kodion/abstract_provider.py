@@ -10,6 +10,7 @@
 
 import re
 
+import xbmc
 import xbmcplugin
 
 from .exceptions import KodionException
@@ -228,6 +229,7 @@ class AbstractProvider(object):
             if result:
                 if not context.get_settings().remote_friendly_search():
                     xbmcplugin.endOfDirectory(context.get_handle(), succeeded=True)
+                    xbmc.sleep(500)
                     context.execute('Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], item_params))
                 else:
                     try:
