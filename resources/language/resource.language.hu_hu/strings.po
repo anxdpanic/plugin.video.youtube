@@ -7,24 +7,22 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2017-11-28 16:00+0200\n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2020-03-06 20:09+0100\n"
+"Language-Team: Hungarian Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu_HU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: Kardos László <lacesz at ox dot io>\n"
-"X-Generator: Poedit 2.0.4\n"
+"Last-Translator: Laszlo Kardos <echo bEBsYWNlc3ouYmxvZw== | base64 -d>\n"
+"X-Generator: Poedit 2.3\n"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube kiegészítő"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "A YouTube a világ egyik legnagyobb videómegosztó weboldala."
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Általános"
@@ -355,7 +353,7 @@ msgstr "Lejátszási lista kiválasztása"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr "Új lejátszási lista"
+msgstr "Új lejátszási lista..."
 
 msgctxt "#30523"
 msgid "Language"
@@ -435,7 +433,7 @@ msgstr "A csatorna nevének megjelenítése a leírásban"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "Az rtmpe streamek nem támogatottak"
+msgstr "az rtmpe streamek nem támogatottak"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -495,7 +493,7 @@ msgstr "Keresési előzmények törlése"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr "Funkció gyorsítótár"
+msgstr "funkció gyorsítótár"
 
 msgctxt "#30558"
 msgid "search history"
@@ -503,7 +501,7 @@ msgstr "keresési előzmények"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr "settings.xml törlése"
+msgstr "Az settings.xml törlése"
 
 msgctxt "#30560"
 msgid "Subtitle language"
@@ -731,7 +729,7 @@ msgstr "Mégse"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr "Jelentkezzen be"
+msgstr "Jelentkezzen be."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
@@ -803,19 +801,19 @@ msgstr "http://<ipaddress>:<port>/api (lásd HTTP kiszolgáló)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "YouTube kiegészítő API beállítások"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Nem lett észlelve változás, az API kulcsok nem kerültek frissítésre."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "A személyes API kulcsok engedélyezve vannak."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "A személyes API kulcsok tiltva vannak."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
@@ -827,15 +825,15 @@ msgstr ""
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Helyreállítás"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Az api_keys.json törlése"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Az access_manager.json törlése"
 
 msgctxt "#30643"
 msgid "Listen on IP"
@@ -871,7 +869,7 @@ msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Hely"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
@@ -887,15 +885,15 @@ msgstr ""
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Felhasználóváltás"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Új felhasználó"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Névtelen"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
@@ -907,23 +905,23 @@ msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Felhasználók"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Felhasználó hozzáadása"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Felhasználó eltávolítása"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Felhasználó átnevezése"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Felhasználó váltás"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
@@ -931,7 +929,7 @@ msgstr ""
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "'%s' törölve"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -943,19 +941,19 @@ msgstr ""
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Megjelölés nem megtekintettként"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Megjelölés megtekintettként"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Lejátszási előzmények tisztítása"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "Lejátszási előzmények törlése"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1063,7 +1061,7 @@ msgstr ""
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP kiszolgáló nem fut"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1079,7 +1077,7 @@ msgstr ""
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Biztos benne?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
@@ -1087,7 +1085,7 @@ msgstr ""
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Feliratok letöltése"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
@@ -1095,7 +1093,7 @@ msgstr ""
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Névtelen"
 
 msgctxt "#30708"
 msgid "Play audio only"
@@ -1127,19 +1125,19 @@ msgstr ""
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Eltávolítva a lejátszási listáról"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Kedvelt video"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Nem kedvelt video"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Értékelés törölve"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1155,7 +1153,7 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
@@ -1167,11 +1165,11 @@ msgstr ""
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Feltöltések"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
