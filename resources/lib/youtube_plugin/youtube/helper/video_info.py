@@ -571,7 +571,7 @@ class VideoInfo(object):
 
         try:
             player_config.update(json.loads(_player_config))
-        except TypeError:
+        except (TypeError, ValueError):
             pass
 
         if 'args' not in player_config:
