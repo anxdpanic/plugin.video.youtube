@@ -22,8 +22,10 @@
 [upd] use a dialog to notify users of API key requirements with link to wiki
     - https://ytaddon.page.link/keys
 [rem] remove provided api keys
-[lang] pl_pl strings |contrib: drrak|
 [lang] de_de strings |contrib: tweimer|
+[lang] el_gr strings |contrib: twilight0|
+[lang] hu_hu strings |contrib: thelacesz|
+[lang] pl_pl strings |contrib: drrak|
         </news>
         <assets>
             <icon>icon.png</icon>
