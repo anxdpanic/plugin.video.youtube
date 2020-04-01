@@ -1201,12 +1201,12 @@ msgstr "Adaptativo (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Búsqueda remota"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Reproducir (Seleccionar calidad)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "El complemento YouTube ahora requiere que use sus propias claves API.[CR]Para obtener más información, consulte la wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Lo siento por las molestias."
