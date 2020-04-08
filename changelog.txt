@@ -1,3 +1,6 @@
+[lang] es_es strings |contrib: roliverosc|
+[lang] pt_pt strings |contrib: daniel3x|
+
 6.7.0
 [add] send PlaybackInit, PlaybackStarted, PlaybackStopped notifications containing video id, channel id, and the status of the playing video
 [fix] allow playback regardless of API status
