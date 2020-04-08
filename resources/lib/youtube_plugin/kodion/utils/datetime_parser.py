@@ -166,8 +166,12 @@ def datetime_to_since(context, dt):
     return ' '.join([context.format_date_short(dt), context.format_time(dt)])
 
 
-def strptime(s, fmt="%Y-%m-%dT%H:%M:%S.%fZ"):
+def strptime(s, fmt='%Y-%m-%dT%H:%M:%S.%fZ'):
     # noinspection PyUnresolvedReferences
+
+    if fmt == '%Y-%m-%dT%H:%M:%S.%fZ' and '.' not in s[-5:-1]:
+        fmt = '%Y-%m-%dT%H:%M:%SZ'
+
     import _strptime
     try:
         time.strptime('01 01 2012', '%d %m %Y')  # dummy call

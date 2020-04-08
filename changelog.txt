@@ -1,3 +1,5 @@
+6.7.1
+[fix] error caused by timestamp formatting
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_pt strings |contrib: daniel3x|
 
