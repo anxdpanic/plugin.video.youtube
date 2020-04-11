@@ -880,7 +880,7 @@ class VideoInfo(object):
                 '&st={st}&et={et}&state={state}'
             ])
 
-        if is_live:
+        if live_url:
             stream_list = self._load_manifest(live_url, video_id,
                                               meta_info=meta_info,
                                               curl_headers=curl_headers,
@@ -1247,7 +1247,8 @@ class VideoInfo(object):
                 if mime.startswith('video'):
                     discarded_streams.append(get_discarded_video(mime, i, data[mime][i], 'no init or index'))
                 else:
-                    discarded_streams.append(get_discarded_audio(mime, i, data[mime][i], 'no init or index'))
+                    stream_format = self.FORMAT.get(i, {})
+                    discarded_streams.append(get_discarded_audio(stream_format, mime, i, data[mime][i], 'no init or index'))
                 del data[mime][i]
 
         if not data.get('video/mp4') and not data.get('video/webm'):
