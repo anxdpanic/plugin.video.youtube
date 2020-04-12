@@ -9,7 +9,7 @@
 ## Links
 
 * [YouTube](http://www.youtube.com)
-* [Support thread](https://forum.kodi.tv/showthread.php?tid=348464)
+* [Support thread](https://ytaddon.page.link/forum)
 * [Wiki](https://github.com/jdf76/plugin.video.youtube/wiki)
 
 ---
