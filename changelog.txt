@@ -1,5 +1,6 @@
 6.7.1
 [fix] error caused by timestamp formatting
+[fix] fix Premiere's exiting after 5 seconds |contrib: jpfox156|
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_pt strings |contrib: daniel3x|
 
