@@ -1204,7 +1204,7 @@ class VideoInfo(object):
 
             data[mime][i]['quality_label'] = str(stream_map.get('qualityLabel'))
 
-            data[mime][i]['bandwidth'] = stream_map.get('bitrate')
+            data[mime][i]['bandwidth'] = stream_map.get('bitrate', 0)
 
             # map frame rates to a more common representation to lessen the chance of double refresh changes
             # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
