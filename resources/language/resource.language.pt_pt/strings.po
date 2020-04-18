@@ -1193,3 +1193,19 @@ msgstr "Reproduzir (Perguntar por qualidade)"
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
 msgstr "O add-on Youtube agora necessita que você use as suas próprias chaves API.[CR]Para mais informações visite a wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Pedimos desculpa pelo inconveniente."
+
+msgctxt "#30732"
+msgid "Comments"
+msgstr ""
+
+msgctxt "#30733"
+msgid "Likes"
+msgstr ""
+
+msgctxt "#30734"
+msgid "Replies"
+msgstr ""
+
+msgctxt "#30735"
+msgid "Edited"
+msgstr ""
