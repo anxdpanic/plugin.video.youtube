@@ -1,4 +1,5 @@
 6.7.1
+[add] support for video comments, Comments in the More... dialog |contrib: doko-desuka|
 [fix] error caused by timestamp formatting
 [fix] fix Premiere's exiting after 5 seconds |contrib: jpfox156|
 [lang] es_es strings |contrib: roliverosc|
