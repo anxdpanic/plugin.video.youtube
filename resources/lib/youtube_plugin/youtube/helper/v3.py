@@ -152,6 +152,7 @@ def _process_list_response(provider, context, json_data):
             video_item.set_track_number(snippet['position'] + 1)
             result.append(video_item)
             video_id_dict[video_id] = video_item
+            
         elif yt_kind == 'youtube#activity':
             snippet = yt_item['snippet']
             details = yt_item['contentDetails']
@@ -180,6 +181,21 @@ def _process_list_response(provider, context, json_data):
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
+            
+        elif yt_kind == 'youtube#commentThread':
+            thread_snippet = yt_item['snippet']
+            total_replies = thread_snippet['totalReplyCount']
+            snippet = thread_snippet['topLevelComment']['snippet']
+            item_params = {'parent_id': yt_item['id']}
+            if total_replies:
+                item_uri = context.create_uri(['special', 'child_comments'], item_params)
+            else:
+                item_uri = ''
+            result.append(utils.make_comment_item(context, provider, snippet, item_uri, total_replies))
+        
+        elif yt_kind == 'youtube#comment':
+            result.append(utils.make_comment_item(context, provider, yt_item['snippet'], uri=''))
+            
         elif yt_kind == 'youtube#searchResult':
             yt_kind = yt_item.get('id', {}).get('kind', '')
 
@@ -265,7 +281,8 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     if kind == u'youtube#searchListResponse' or kind == u'youtube#playlistItemListResponse' or \
             kind == u'youtube#playlistListResponse' or kind == u'youtube#subscriptionListResponse' or \
             kind == u'youtube#guideCategoryListResponse' or kind == u'youtube#channelListResponse' or \
-            kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse':
+            kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse' or \
+            kind == u'youtube#commentThreadListResponse' or kind == u'youtube#commentListResponse':
         result.extend(_process_list_response(provider, context, json_data))
     else:
         raise kodion.KodionException("Unknown kind '%s'" % kind)

@@ -94,9 +94,12 @@ def _process_more_for_video(provider, context):
         items.append((context.localize(provider.LOCAL_MAP['youtube.video.add_to_playlist']),
                       'RunPlugin(%s)' % context.create_uri(['playlist', 'select', 'playlist'], {'video_id': video_id})))
 
+
     # default items
     items.extend([(context.localize(provider.LOCAL_MAP['youtube.related_videos']),
                    'Container.Update(%s)' % context.create_uri(['special', 'related_videos'], {'video_id': video_id})),
+                  (context.localize(provider.LOCAL_MAP['youtube.video.comments']),
+                   'Container.Update(%s)' % context.create_uri(['special', 'parent_comments'], {'video_id': video_id})),
                   (context.localize(provider.LOCAL_MAP['youtube.video.description.links']),
                    'Container.Update(%s)' % context.create_uri(['special', 'description_links'],
                                                                {'video_id': video_id}))])

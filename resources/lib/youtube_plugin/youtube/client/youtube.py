@@ -476,6 +476,33 @@ class YouTube(LoginClient):
             params['pageToken'] = page_token
 
         return self.perform_v3_request(method='GET', path='search', params=params)
+        
+    def get_parent_comments(self, video_id, page_token='', max_results=0):
+        max_results = self._max_results if max_results <= 0 else max_results
+
+        # prepare params
+        params = {'part': 'snippet',
+                  'videoId': video_id,
+                  'order': 'relevance',
+                  'textFormat': 'plainText',
+                  'maxResults': str(max_results)}
+        if page_token:
+            params['pageToken'] = page_token
+        
+        return self.perform_v3_request(method='GET', path='commentThreads', params=params)
+            
+    def get_child_comments(self, parent_id, page_token='', max_results=0):
+        max_results = self._max_results if max_results <= 0 else max_results
+
+        # prepare params
+        params = {'part': 'snippet',
+                  'parentId': parent_id,
+                  'textFormat': 'plainText',
+                  'maxResults': str(max_results)}
+        if page_token:
+            params['pageToken'] = page_token
+        
+        return self.perform_v3_request(method='GET', path='comments', params=params)
 
     def get_channel_videos(self, channel_id, page_token=''):
         """

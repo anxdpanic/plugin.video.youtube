@@ -170,6 +170,10 @@ class Provider(kodion.AbstractProvider):
                  'youtube.uploads': 30726,
                  'youtube.video.play_ask_for_quality': 30730,
                  'youtube.key.requirement.notification': 30731,
+                 'youtube.video.comments': 30732,
+                 'youtube.video.comments.likes': 30733,
+                 'youtube.video.comments.replies': 30734,
+                 'youtube.video.comments.edited': 30735,
                  }
 
     def __init__(self):
@@ -776,8 +780,6 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
     def _on_yt_specials(self, context, re_match):
         category = re_match.group('category')
-        if category == 'browse_channels':
-            self.set_content_type(context, kodion.constants.content_type.FILES)
         return yt_specials.process(category, self, context)
 
     # noinspection PyUnusedLocal

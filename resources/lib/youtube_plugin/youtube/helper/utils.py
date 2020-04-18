@@ -45,6 +45,57 @@ def get_thumb_timestamp(minutes=15):
     return str(time.mktime(time.gmtime(minutes * 60 * (round(time.time() / (minutes * 60))))))
 
 
+def make_comment_item(context, provider, snippet, uri, total_replies=0):
+    author = '[B]{}[/B]'.format(kodion.utils.to_utf8(snippet['authorDisplayName']))
+    body = kodion.utils.to_utf8(snippet['textOriginal'])
+
+    label_props = None
+    plot_props = None
+    is_edited = (snippet['publishedAt'] != snippet['updatedAt'])
+    
+    str_likes = ('%.1fK' % (snippet['likeCount'] / 1000.0)) if snippet['likeCount'] > 1000 else str(snippet['likeCount'])
+    str_replies = ('%.1fK' % (total_replies / 1000.0)) if total_replies > 1000 else str(total_replies)
+
+    if snippet['likeCount'] and total_replies:
+        label_props = '[COLOR lime][B]+%s[/B][/COLOR]|[COLOR cyan][B]%s[/B][/COLOR]' % (str_likes, str_replies)
+        plot_props = '[COLOR lime][B]%s %s[/B][/COLOR]|[COLOR cyan][B]%s %s[/B][/COLOR]' % (str_likes,
+                     context.localize(provider.LOCAL_MAP['youtube.video.comments.likes']), str_replies,
+                     context.localize(provider.LOCAL_MAP['youtube.video.comments.replies']))
+    elif snippet['likeCount']:
+        label_props = '[COLOR lime][B]+%s[/B][/COLOR]' % str_likes
+        plot_props = '[COLOR lime][B]%s %s[/B][/COLOR]' % (str_likes,
+                     context.localize(provider.LOCAL_MAP['youtube.video.comments.likes']))
+    elif total_replies:
+        label_props = '[COLOR cyan][B]%s[/B][/COLOR]' % str_replies
+        plot_props = '[COLOR cyan][B]%s %s[/B][/COLOR]' % (str_replies,
+                     context.localize(provider.LOCAL_MAP['youtube.video.comments.replies']))
+    else:
+        pass # The comment has no likes or replies.
+
+    # Format the label of the comment item.
+    edited = '[B]*[/B]' if is_edited else ''
+    if label_props:
+        label = '{author} ({props}){edited} {body}'.format(author=author, props=label_props, edited=edited,
+                                                             body=body.replace('\n', ' '))
+    else:
+        label = '{author}{edited} {body}'.format(author=author, edited=edited, body=body.replace('\n', ' '))
+
+    # Format the plot of the comment item.
+    edited = ' (%s)' % context.localize(provider.LOCAL_MAP['youtube.video.comments.edited']) if is_edited else ''
+    if plot_props:
+        plot = '{author} ({props}){edited}[CR][CR]{body}'.format(author=author, props=plot_props,
+                                                               edited=edited, body=body)
+    else:
+        plot = '{author}{edited}[CR][CR]{body}'.format(author=author, edited=edited, body=body)
+
+    comment_item = kodion.items.DirectoryItem(label, uri)
+    comment_item.set_plot(plot)
+    comment_item.set_date_from_datetime(utils.datetime_parser.parse(snippet['publishedAt']))
+    if not uri:
+        comment_item.set_action(True) # Cosmetic, makes the item not a folder.
+    return comment_item
+
+
 def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict=None, channel_items_dict=None):
     if subscription_id_dict is None:
         subscription_id_dict = {}
