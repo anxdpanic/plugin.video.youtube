@@ -1213,16 +1213,16 @@ msgstr "El complemento YouTube ahora requiere que use sus propias claves API.[CR
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Comentarios"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Me gusta"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Respuestas"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Editado"
