@@ -54,9 +54,13 @@ def to_play_item(context, play_item):
         play_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(video_id=play_item.video_id))
 
     if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
+        inputstream_property = 'inputstream'
+        if major_version < 19:
+            inputstream_property += 'addon'
+
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
-        list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')
+        list_item.setProperty(inputstream_property, 'inputstream.adaptive')
         list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if play_item.get_headers():
             list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
