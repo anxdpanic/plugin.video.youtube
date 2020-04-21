@@ -1213,16 +1213,16 @@ msgstr "Das YouTube-Addon erfordert nun, dass Sie Ihre eigenen API-Schlüssel ve
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Kommentare"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Likes"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Antworten"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Bearbeitet"
