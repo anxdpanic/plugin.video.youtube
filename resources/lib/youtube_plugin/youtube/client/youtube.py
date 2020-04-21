@@ -9,7 +9,10 @@
 """
 
 import copy
+import json
+import threading
 import traceback
+from datetime import datetime
 
 import requests
 
@@ -18,6 +21,7 @@ from ..helper.video_info import VideoInfo
 from ..helper.utils import get_shelf_index_by_title
 from ...kodion import constants
 from ...kodion import Context
+from ...kodion.utils import datetime_parser
 
 _context = Context(plugin_id='plugin.video.youtube')
 
@@ -291,7 +295,127 @@ class YouTube(LoginClient):
                   'regionCode': self._region,
                   'hl': self._language}
         if channel_id == 'home':
-            params['home'] = 'true'
+            # YouTube has deprecated this API, so use history and related items to form
+            # a recommended set. We cache aggressively because searches incur a high
+            # quota cost of 100 on the YouTube API.
+            # Note this is a first stab attempt and can be refined a lot more.
+            cache = _context.get_data_cache()
+
+            # Do we have a cached result?
+            cache_home_key = 'get-activities-home'
+            cached = cache.get_item(cache.ONE_HOUR * 4, cache_home_key)
+            if cache_home_key in cached:
+                return cached[cache_home_key]
+
+            # Fetch existing list of items, if any
+            items = []
+            cache_items_key = 'get-activities-home-items'
+            cached = cache.get_item(cache.ONE_WEEK * 2, cache_items_key)
+            if cache_items_key in cached:
+                items = cached[cache_items_key]
+
+            # Fetch history and recommended items. Use threads for faster execution.
+            def helper(video_id, responses):
+                _context.log_debug(
+                    'Method get_activities: doing expensive API fetch for related'
+                    'items for video %s' % video_id
+                )
+                di = self.get_related_videos(video_id, max_results=10)
+                if 'items' in di:
+                    # Record for which video we fetched the items
+                    for item in di['items']:
+                        item['plugin_fetched_for'] = video_id
+                    responses.extend(di['items'])
+
+            history = self.get_watch_history()
+            result = {'kind': 'youtube#activityListResponse', 'items': []}
+            threads = []
+            candidates = []
+            already_fetched_for_video_ids = [item['plugin_fetched_for'] for item in items]
+            # TODO:
+            # It would be nice to make this 8 user configurable
+            for item in history['items'][:8]:
+                video_id = item['id']
+                if video_id not in already_fetched_for_video_ids:
+                    thread = threading.Thread(target=helper, args=(video_id, candidates))
+                    threads.append(thread)
+                    thread.start()
+            for thread in threads:
+                thread.join()
+
+            # Prepend new candidates to items
+            seen = [item['id']['videoId'] for item in items]
+            for candidate in candidates:
+                vid = candidate['id']['videoId']
+                if vid not in seen:
+                    candidate['plugin_created_date'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                    items.insert(0, candidate)
+
+            # Truncate items to keep it manageable, and cache
+            items = items[:500]
+            cache.set(cache_items_key, json.dumps(items))
+
+            # Build the result set
+            items.sort(
+                key=lambda a: datetime_parser.parse(a['plugin_created_date']),
+                reverse=True
+            )
+            sorted_items = []
+            counter = 0
+            items_count = len(items)
+            channel_counts = {}
+            while items:
+                counter += 1
+
+                # Hard stop on iteration. Good enough for our purposes.
+                if counter >= 1000:
+                    break
+
+                # Reset channel counts on a new page
+                if counter % 50 == 0:
+                    channel_counts = {}
+
+                # Ensure a single channel isn't hogging the page
+                item = items.pop()
+                channel_id = item['snippet']['channelId']
+                channel_counts.setdefault(channel_id, 0)
+                if channel_counts[channel_id] <= 3:
+                    # Use the item
+                    channel_counts[channel_id] = channel_counts[channel_id] + 1
+                    item["page_number"] = counter // 50
+                    sorted_items.append(item)
+                else:
+                    # Move the item to the end of the list
+                    items.append(item)
+
+            # Finally sort items per page by date for a better distribution
+            now = datetime.now()
+            sorted_items.sort(
+                 key=lambda a: (
+                    a['page_number'],
+                    datetime_parser.total_seconds(
+                        now - datetime_parser.parse(a['snippet']['publishedAt'])
+                    )
+                ),
+            )
+
+            # Finalize result
+            result['items'] = sorted_items
+            result['pageInfo'] = {
+                'resultsPerPage': 50,
+                'totalResults': len(sorted_items)
+            }
+
+            # Update cache
+            cache.set(cache_home_key, json.dumps(result))
+
+            # If there are no sorted_items we fall back to default API behaviour
+            if sorted_items:
+                return result
+
+            else:
+                params['home'] = 'true'
+
         elif channel_id == 'mine':
             params['mine'] = 'true'
         else:
