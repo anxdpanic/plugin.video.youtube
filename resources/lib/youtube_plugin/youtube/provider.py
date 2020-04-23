@@ -27,6 +27,8 @@ from .youtube_exceptions import InvalidGrant, LoginException
 import xbmc
 import xbmcaddon
 import xbmcvfs
+import xbmcgui
+import xbmcplugin
 
 
 class Provider(kodion.AbstractProvider):
@@ -748,6 +750,13 @@ class Provider(kodion.AbstractProvider):
             if not redirect:
                 context.log_debug('Redirecting playback, handle is -1')
             context.execute(builtin % context.create_uri(['play'], {'video_id': params['video_id']}))
+            return
+    
+        if 'playlist_id' in params and (context.get_handle() != -1):
+            builtin = 'RunPlugin(%s)'
+            stream_url = context.create_uri(['play'], params)
+            xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=False, listitem=xbmcgui.ListItem(path=stream_url))
+            context.execute(builtin % context.create_uri(['play'], params))
             return
 
         if 'video_id' in params and 'playlist_id' not in params:
