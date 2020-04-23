@@ -17,6 +17,7 @@
 [add] simulate deprecated recommended home API |contrib: hedleyroos|
 [fix] error caused by timestamp formatting
 [fix] fix Premiere's exiting after 5 seconds |contrib: jpfox156|
+[fix] playlists over json-rpc |contrib: JasperE84|
 [lang] de_de strings |contrib: tweimer|
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_pt strings |contrib: daniel3x|
