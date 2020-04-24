@@ -1212,16 +1212,16 @@ msgstr "Το πρόσθετο Youtube πλέον απαιτεί δικά σας 
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Σχόλια"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Αρεσκείες"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Απαντήσεις"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Επεξεργασμένο"
