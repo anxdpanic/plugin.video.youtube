@@ -40,6 +40,15 @@ class APICheck(object):
         j_id = self._json_api['keys']['personal'].get('client_id', '')
         j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
+        if j_key and j_id and j_secret:
+            # users are now pasting keys into api_keys.json
+            # try stripping whitespace and .apps.googleusercontent.com from keys and saving the result if they differ
+            stripped_key, stripped_id, stripped_secret = self._strip_api_keys(j_key, j_id, j_secret)
+            if stripped_key and stripped_id and stripped_secret:
+                if (j_key != stripped_key) or (j_id != stripped_id) or (j_secret != stripped_secret):
+                    self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
+                    self._api_jstore.save(self._json_api)
+
         original_key = self._settings.get_string('youtube.api.key')
         original_id = self._settings.get_string('youtube.api.id')
         original_secret = self._settings.get_string('youtube.api.secret')
