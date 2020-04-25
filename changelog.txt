@@ -5,6 +5,7 @@
 [fix] fix Premiere's exiting after 5 seconds |contrib: jpfox156|
 [fix] playlists over json-rpc |contrib: JasperE84|
 [lang] de_de strings |contrib: tweimer|
+[lang] el_gr strings |contrib: twilight0|
 [lang] es_es strings |contrib: roliverosc|
 [lang] pt_pt strings |contrib: daniel3x|
 
