@@ -1195,16 +1195,16 @@ msgstr "Dodatek YouTube wymaga teraz używania własnych kluczy API.[CR]Szczegó
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Komentarze"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Polubione"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Odpowiedzi"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Edytowane"
