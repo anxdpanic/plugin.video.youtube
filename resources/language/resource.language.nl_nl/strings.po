@@ -1173,7 +1173,7 @@ msgstr "Proxy vereist voor mpeg-dasg vods (zie HTTP server)[CR]> 1080p en HDR ve
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr "Begrens tot 30fps"
+msgstr "Limiteer tot 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
@@ -1197,24 +1197,24 @@ msgstr ""
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Afspelen (Naar kwaliteit vragen)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "De YouTube addon vereist vanaf nu, dat je een persoonlijke API sleutel gebruikt. [CR]Voor meer informatie, zie wiki:[B]https://ytaddon.page.link/keys[/B][CR][CR] "
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Reacties"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Leuk gevonden"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Antwoorden"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Aangepast"
