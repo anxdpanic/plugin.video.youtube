@@ -613,7 +613,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
         
-        return self.perform_v3_request(method='GET', path='commentThreads', params=params)
+        return self.perform_v3_request(method='GET', path='commentThreads', params=params, no_login=True)
             
     def get_child_comments(self, parent_id, page_token='', max_results=0):
         max_results = self._max_results if max_results <= 0 else max_results
@@ -626,7 +626,7 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
         
-        return self.perform_v3_request(method='GET', path='comments', params=params)
+        return self.perform_v3_request(method='GET', path='comments', params=params, no_login=True)
 
     def get_channel_videos(self, channel_id, page_token=''):
         """
@@ -1221,7 +1221,7 @@ class YouTube(LoginClient):
         return watch_later_id
 
     def perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                           allow_redirects=True):
+                           allow_redirects=True, no_login=False):
 
         yt_config = self._config
 
@@ -1247,7 +1247,7 @@ class YouTube(LoginClient):
                     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
                     'Accept-Encoding': 'gzip, deflate'}
         # a config can decide if a token is allowed
-        if self._access_token and yt_config.get('token-allowed', True):
+        if self._access_token and yt_config.get('token-allowed', True) and not no_login:
             _headers['Authorization'] = 'Bearer %s' % self._access_token
         _headers.update(headers)
 
