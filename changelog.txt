@@ -1,6 +1,8 @@
 6.8.1
 [fix] playback failing
 [fix] viewing comments when logged in
+[lang] pl_pl strings |contrib: drrak|
+[lang] nl_nl strings |contrib: Markman-B|
 
 6.8.0
 [add] support for video comments, Comments in the More... dialog |contrib: doko-desuka|
