@@ -1,5 +1,6 @@
 6.8.1
 [fix] playback failing
+[fix] viewing comments when logged in
 
 6.8.0
 [add] support for video comments, Comments in the More... dialog |contrib: doko-desuka|
