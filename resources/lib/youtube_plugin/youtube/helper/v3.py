@@ -282,7 +282,8 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
             kind == u'youtube#playlistListResponse' or kind == u'youtube#subscriptionListResponse' or \
             kind == u'youtube#guideCategoryListResponse' or kind == u'youtube#channelListResponse' or \
             kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse' or \
-            kind == u'youtube#commentThreadListResponse' or kind == u'youtube#commentListResponse':
+            kind == u'youtube#commentThreadListResponse' or kind == u'youtube#commentListResponse' or \
+            kind == u'youtube#SubscriptionListResponse':
         result.extend(_process_list_response(provider, context, json_data))
     else:
         raise kodion.KodionException("Unknown kind '%s'" % kind)

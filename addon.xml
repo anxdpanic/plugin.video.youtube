@@ -15,6 +15,7 @@
         <news>
 [fix] playback failing
 [fix] viewing comments when logged in
+[fix] intermittent issue with Subscriptions
 [lang] pl_pl strings |contrib: drrak|
 [lang] nl_nl strings |contrib: Markman-B|
         </news>
