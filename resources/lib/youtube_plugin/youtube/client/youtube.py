@@ -406,11 +406,14 @@ class YouTube(LoginClient):
 
             # Finalize result
             result['items'] = sorted_items
+            """
+            # TODO:
+            # Enable pagination
             result['pageInfo'] = {
                 'resultsPerPage': 50,
                 'totalResults': len(sorted_items)
             }
-
+            """
             # Update cache
             cache.set(cache_home_key, json.dumps(result))
 
