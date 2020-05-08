@@ -328,6 +328,9 @@ class YouTube(LoginClient):
 
             history = self.get_watch_history()
             result = {'kind': 'youtube#activityListResponse', 'items': []}
+            if not history.get('items'):
+                return result
+
             threads = []
             candidates = []
             already_fetched_for_video_ids = [item['plugin_fetched_for'] for item in items]
