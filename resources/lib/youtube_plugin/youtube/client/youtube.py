@@ -365,7 +365,6 @@ class YouTube(LoginClient):
             )
             sorted_items = []
             counter = 0
-            items_count = len(items)
             channel_counts = {}
             while items:
                 counter += 1
