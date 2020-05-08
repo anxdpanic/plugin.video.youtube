@@ -144,6 +144,11 @@
         <setting id="kodion.maintain.delete.api_keys" type="action" label="30641" action="RunPlugin(plugin://$ID/maintain/api_keys/delete/)"/>
         <setting id="kodion.maintain.delete.access_manager" type="action" label="30642" action="RunPlugin(plugin://$ID/maintain/access_manager/delete/)"/>
         <setting id="kodion.maintain.delete.temp" type="action" label="30626" action="RunPlugin(plugin://$ID/maintain/temp_files/delete/)"/>
+        <!-- Placeholders for deprecated settings, to be removed in a future version -->
+        <setting id="kodion.access_token" type="text" label="" default="" visible="false"/>
+        <setting id="kodion.refresh_token" type="text" label="" default="" visible="false"/>
+        <setting id="kodion.access_token.expires" type="number" label="" default="" visible="false"/>
+        <setting id="youtube.api.last.hash" type="text" label="" default="" visible="false"/>
     </category>
 
 </settings>
