@@ -12,7 +12,6 @@ import copy
 import json
 import threading
 import traceback
-from datetime import datetime
 
 import requests
 
@@ -348,7 +347,7 @@ class YouTube(LoginClient):
             for candidate in candidates:
                 vid = candidate['id']['videoId']
                 if vid not in seen:
-                    candidate['plugin_created_date'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                    candidate['plugin_created_date'] = datetime_parser.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                     items.insert(0, candidate)
 
             # Truncate items to keep it manageable, and cache
@@ -389,7 +388,7 @@ class YouTube(LoginClient):
                     items.append(item)
 
             # Finally sort items per page by date for a better distribution
-            now = datetime.now()
+            now = datetime_parser.now()
             sorted_items.sort(
                  key=lambda a: (
                     a['page_number'],
