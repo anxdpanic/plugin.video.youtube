@@ -347,6 +347,7 @@ class YouTube(LoginClient):
             for candidate in candidates:
                 vid = candidate['id']['videoId']
                 if vid not in seen:
+                    seen.append(vid)
                     candidate['plugin_created_date'] = datetime_parser.now().strftime('%Y-%m-%dT%H:%M:%SZ')
                     items.insert(0, candidate)
 
