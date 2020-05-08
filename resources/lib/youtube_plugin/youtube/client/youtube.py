@@ -10,6 +10,7 @@
 
 import copy
 import json
+import re
 import threading
 import traceback
 
@@ -334,9 +335,11 @@ class YouTube(LoginClient):
             threads = []
             candidates = []
             already_fetched_for_video_ids = [item['plugin_fetched_for'] for item in items]
+            history_items = [item for item in history['items']
+                             if re.match(r'(?P<video_id>[\w-]{11})', item['id'])]
             # TODO:
             # It would be nice to make this 8 user configurable
-            for item in history['items'][:8]:
+            for item in history_items[:8]:
                 video_id = item['id']
                 if video_id not in already_fetched_for_video_ids:
                     thread = threading.Thread(target=helper, args=(video_id, candidates))
