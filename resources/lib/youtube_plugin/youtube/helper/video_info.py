@@ -853,6 +853,11 @@ class VideoInfo(object):
                 if not reason:
                     reason = 'UNKNOWN'
 
+                try:
+                    reason = reason.encode('raw_unicode_escape').decode('utf-8')
+                except:
+                    pass
+
                 raise YouTubeException(reason)
 
         meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
