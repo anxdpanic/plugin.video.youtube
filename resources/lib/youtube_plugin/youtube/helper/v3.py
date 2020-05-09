@@ -35,8 +35,13 @@ def _process_list_response(provider, context, json_data):
     addon_id = context.get_param('addon_id', '')
 
     for yt_item in yt_items:
-        yt_kind = yt_item.get('kind', '')
-        if yt_kind == u'youtube#video':
+
+        is_youtube, kind = _parse_kind(yt_item)
+        if not is_youtube or not kind:
+            context.log_debug('v3 response: Item discarded, is_youtube=False')
+            continue
+
+        if kind == 'video':
             video_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
@@ -54,7 +59,7 @@ def _process_list_response(provider, context, json_data):
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
-        elif yt_kind == u'youtube#channel':
+        elif kind == 'channel':
             channel_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
@@ -75,7 +80,7 @@ def _process_list_response(provider, context, json_data):
                 channel_item.set_context_menu(context_menu)
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
-        elif yt_kind == u'youtube#guideCategory':
+        elif kind == 'guidecategory':
             guide_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
@@ -88,7 +93,7 @@ def _process_list_response(provider, context, json_data):
             guide_item = items.DirectoryItem(title, item_uri)
             guide_item.set_fanart(provider.get_fanart(context))
             result.append(guide_item)
-        elif yt_kind == u'youtube#subscription':
+        elif kind == 'subscription':
             snippet = yt_item['snippet']
             title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
@@ -107,7 +112,7 @@ def _process_list_response(provider, context, json_data):
 
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
-        elif yt_kind == u'youtube#playlist':
+        elif kind == 'playlist':
             playlist_id = yt_item['id']
             snippet = yt_item['snippet']
             title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
@@ -128,7 +133,7 @@ def _process_list_response(provider, context, json_data):
             playlist_item.set_fanart(provider.get_fanart(context))
             result.append(playlist_item)
             playlist_id_dict[playlist_id] = playlist_item
-        elif yt_kind == u'youtube#playlistItem':
+        elif kind == 'playlistitem':
             snippet = yt_item['snippet']
             video_id = snippet['resourceId']['videoId']
 
@@ -153,7 +158,7 @@ def _process_list_response(provider, context, json_data):
             result.append(video_item)
             video_id_dict[video_id] = video_item
             
-        elif yt_kind == 'youtube#activity':
+        elif kind == 'activity':
             snippet = yt_item['snippet']
             details = yt_item['contentDetails']
             activity_type = snippet['type']
@@ -182,7 +187,7 @@ def _process_list_response(provider, context, json_data):
             result.append(video_item)
             video_id_dict[video_id] = video_item
             
-        elif yt_kind == 'youtube#commentThread':
+        elif kind == 'commentthread':
             thread_snippet = yt_item['snippet']
             total_replies = thread_snippet['totalReplyCount']
             snippet = thread_snippet['topLevelComment']['snippet']
@@ -193,14 +198,14 @@ def _process_list_response(provider, context, json_data):
                 item_uri = ''
             result.append(utils.make_comment_item(context, provider, snippet, item_uri, total_replies))
         
-        elif yt_kind == 'youtube#comment':
+        elif kind == 'comment':
             result.append(utils.make_comment_item(context, provider, yt_item['snippet'], uri=''))
             
-        elif yt_kind == 'youtube#searchResult':
-            yt_kind = yt_item.get('id', {}).get('kind', '')
+        elif kind == 'searchresult':
+            _, kind = _parse_kind(yt_item.get('id', {}))
 
             # video
-            if yt_kind == 'youtube#video':
+            if kind == 'video':
                 video_id = yt_item['id']['videoId']
                 snippet = yt_item['snippet']
                 is_upcoming = snippet.get('liveBroadcastContent', '').lower() == 'upcoming'
@@ -220,7 +225,7 @@ def _process_list_response(provider, context, json_data):
                 result.append(video_item)
                 video_id_dict[video_id] = video_item
             # playlist
-            elif yt_kind == 'youtube#playlist':
+            elif kind == 'playlist':
                 playlist_id = yt_item['id']['playlistId']
                 snippet = yt_item['snippet']
                 title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
@@ -241,7 +246,7 @@ def _process_list_response(provider, context, json_data):
                 playlist_item.set_fanart(provider.get_fanart(context))
                 result.append(playlist_item)
                 playlist_id_dict[playlist_id] = playlist_item
-            elif yt_kind == 'youtube#channel':
+            elif kind == 'channel':
                 channel_id = yt_item['id']['channelId']
                 snippet = yt_item['snippet']
                 title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
@@ -257,9 +262,9 @@ def _process_list_response(provider, context, json_data):
                 result.append(channel_item)
                 channel_id_dict[channel_id] = channel_item
             else:
-                raise kodion.KodionException("Unknown kind '%s'" % yt_kind)
+                raise kodion.KodionException("Unknown kind '%s'" % kind)
         else:
-            raise kodion.KodionException("Unknown kind '%s'" % yt_kind)
+            raise kodion.KodionException("Unknown kind '%s'" % kind)
 
     use_play_data = not incognito and context.get_settings().use_playback_history()
 
@@ -277,13 +282,15 @@ def _process_list_response(provider, context, json_data):
 def response_to_items(provider, context, json_data, sort=None, reverse_sort=False, process_next_page=True):
     result = []
 
-    kind = json_data.get('kind', '')
-    if kind == u'youtube#searchListResponse' or kind == u'youtube#playlistItemListResponse' or \
-            kind == u'youtube#playlistListResponse' or kind == u'youtube#subscriptionListResponse' or \
-            kind == u'youtube#guideCategoryListResponse' or kind == u'youtube#channelListResponse' or \
-            kind == u'youtube#videoListResponse' or kind == u'youtube#activityListResponse' or \
-            kind == u'youtube#commentThreadListResponse' or kind == u'youtube#commentListResponse' or \
-            kind == u'youtube#SubscriptionListResponse':
+    is_youtube, kind = _parse_kind(json_data)
+    if not is_youtube:
+        context.log_debug('v3 response: Response discarded, is_youtube=False')
+        return result
+
+    if kind in ['searchlistresponse', 'playlistitemlistresponse', 'playlistlistresponse',
+                'subscriptionlistresponse', 'guidecategorylistresponse', 'channellistresponse',
+                'videolistresponse', 'activitylistresponse', 'commentthreadlistresponse',
+                'commentlistresponse']:
         result.extend(_process_list_response(provider, context, json_data))
     else:
         raise kodion.KodionException("Unknown kind '%s'" % kind)
@@ -354,3 +361,26 @@ def handle_error(provider, context, json_data):
         return False
 
     return True
+
+
+def _parse_kind(item):
+    kind = item.get('kind', '').split('#')
+
+    if len(kind) < 1:
+        return False, ''
+
+    if len(kind) < 2:
+        try:
+            _ = kind.index('youtube')
+            return True, ''
+        except ValueError:
+            return False, str(kind[0]).lower()
+
+    try:
+        idx = kind.index('youtube')
+        if idx == 0:
+            return True, str(kind[1]).lower()
+    except ValueError:
+        pass
+
+    return False, str(kind[1]).lower()
