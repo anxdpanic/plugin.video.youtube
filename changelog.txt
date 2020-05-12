@@ -4,6 +4,7 @@
 [fix] intermittent issue with Subscriptions
 [fix] encoding of video unavailable messages
 [upd] updates to recommendations
+[lang] fr_fr strings |contrib: alan7000|
 [lang] pl_pl strings |contrib: drrak|
 [lang] nl_nl strings |contrib: Markman-B|
 
