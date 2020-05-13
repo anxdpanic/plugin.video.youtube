@@ -74,13 +74,22 @@ class ResourceManager(object):
 
         if len(channel_ids_to_update) > 0:
             self._context.log_debug('No data for channels |%s| cached' % ', '.join(channel_ids_to_update))
-            json_data = self._youtube_client.get_channels(channel_ids_to_update)
+
+            data = []
+            list_of_50s = self._make_list_of_50(channel_ids_to_update)
+            for list_of_50 in list_of_50s:
+                data.append(self._youtube_client.get_channels(list_of_50))
+
             channel_data = dict()
-            yt_items = json_data.get('items', [])
+            yt_items = []
+            for response in data:
+                yt_items += response.get('items', [])
+
             for yt_item in yt_items:
                 channel_id = str(yt_item['id'])
                 channel_data[channel_id] = yt_item
                 result[channel_id] = yt_item
+
             data_cache.set_all(channel_data)
             self._context.log_debug('Cached data for channels |%s|' % ', '.join(list(channel_data.keys())))
 
