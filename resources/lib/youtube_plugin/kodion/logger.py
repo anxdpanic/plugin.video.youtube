@@ -11,14 +11,14 @@
 import xbmc
 import xbmcaddon
 
-DEBUG = 0
-INFO = 2
-NOTICE = 2
-WARNING = 3
-ERROR = 4
-SEVERE = 5
-FATAL = 6
-NONE = 7
+DEBUG = xbmc.LOGDEBUG
+INFO = xbmc.LOGINFO
+NOTICE = INFO
+WARNING = xbmc.LOGWARNING
+ERROR = xbmc.LOGERROR
+FATAL = xbmc.LOGFATAL
+SEVERE = FATAL
+NONE = xbmc.LOGNONE
 
 _ADDON_ID = 'plugin.video.youtube'
 
