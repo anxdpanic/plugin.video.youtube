@@ -14,6 +14,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [fix] fix rating videos causing and error even though it succeeded
+[upd] cache javascript player url for 4 hours, reduces http requests per play by 1
         </news>
         <assets>
             <icon>icon.png</icon>

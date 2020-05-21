@@ -18,7 +18,7 @@ import json
 import random
 
 import requests
-from ...kodion.utils import is_httpd_live, make_dirs
+from ...kodion.utils import is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
@@ -485,6 +485,7 @@ class VideoInfo(object):
 
     def __init__(self, context, access_token='', language='en-US'):
         self._context = context
+        self._data_cache = self._context.get_data_cache()
         self._verify = context.get_settings().verify_ssl()
         self._language = language.replace('-', '_')
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
@@ -602,38 +603,50 @@ class VideoInfo(object):
         return player_config
 
     def get_player_js(self, video_id, js=''):
-        if not js:
-            page_result = self.get_embed_page(video_id)
-            html = page_result.get('html')
+        def _normalize(javascript_url):
+            if javascript_url and not javascript_url.startswith('http'):
+                javascript_url = 'https://www.youtube.com/%s' % \
+                                 javascript_url.lstrip('/').replace('www.youtube.com/', '')
+            if javascript_url:
+                self._data_cache.set('player_javascript', json.dumps({'url': javascript_url}))
+            self._context.log_debug('Player JavaScript: |%s|' % javascript_url)
+            return javascript_url
 
-            if not html:
-                return ''
+        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, 'player_javascript')
+        if cached_js and cached_js.get('player_javascript', {}).get('url'):
+            return cached_js.get('player_javascript', {}).get('url')
 
-            _player_config = '{}'
-            player_config = dict()
+        if js:
+            return _normalize(js)
 
-            lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
-            tail = ',\'EXPERIMENT_FLAGS\':'
-            if html.find(tail) == -1:
-                tail = '});'
-            pos = html.find(lead)
+        page_result = self.get_embed_page(video_id)
+        html = page_result.get('html')
+
+        if not html:
+            return ''
+
+        _player_config = '{}'
+        player_config = dict()
+
+        lead = 'yt.setConfig({\'PLAYER_CONFIG\': '
+        tail = ',\'EXPERIMENT_FLAGS\':'
+        if html.find(tail) == -1:
+            tail = '});'
+        pos = html.find(lead)
+        if pos >= 0:
+            html2 = html[pos + len(lead):]
+            pos = html2.find(tail)
             if pos >= 0:
-                html2 = html[pos + len(lead):]
-                pos = html2.find(tail)
-                if pos >= 0:
-                    _player_config = html2[:pos]
+                _player_config = html2[:pos]
 
-            try:
-                player_config.update(json.loads(_player_config))
-            except TypeError:
-                pass
-            finally:
-                js = player_config.get('assets', {}).get('js', '')
+        try:
+            player_config.update(json.loads(_player_config))
+        except TypeError:
+            pass
+        finally:
+            js = player_config.get('assets', {}).get('js', '')
 
-        if js and not js.startswith('http'):
-            js = 'https://www.youtube.com/%s' % js.lstrip('/').replace('www.youtube.com/', '')
-        self._context.log_debug('Player JavaScript: |%s|' % js)
-        return js
+        return _normalize(js)
 
     def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', playback_stats=None):
         headers = {'Host': 'manifest.googlevideo.com',
