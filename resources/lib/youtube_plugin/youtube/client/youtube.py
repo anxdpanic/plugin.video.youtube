@@ -1287,11 +1287,21 @@ class YouTube(LoginClient):
             result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
                                      allow_redirects=allow_redirects)
 
+        _context.log_debug('[data] v3 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
+
         if result is None:
             return {}
 
         if result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+            try:
+                return result.json()
+            except ValueError:
+                return {
+                    'status_code': result.status_code,
+                    'payload': result.text
+                }
+
+        return {}
 
     def perform_v1_tv_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
                               allow_redirects=True):

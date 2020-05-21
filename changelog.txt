@@ -1,3 +1,6 @@
+6.8.3
+[fix] fix rating videos causing and error even though it succeeded
+
 6.8.2
 [fixup] recommendations with > 50 channels
 

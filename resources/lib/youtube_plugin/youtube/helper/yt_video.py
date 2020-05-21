@@ -59,19 +59,24 @@ def _process_rate_video(provider, context, re_match):
             result = -1
 
     if result != -1:
-        _ = provider.get_client(context).rate_video(video_id, result)
-
-        # this will be set if we are in the 'Liked Video' playlist
-        if context.get_param('refresh_container', '0') == '1':
-            context.get_ui().refresh_container()
-
         notify_message = ''
-        if result == 'none':
-            notify_message = context.localize(provider.LOCAL_MAP['youtube.unrated.video'])
-        elif result == 'like':
-            notify_message = context.localize(provider.LOCAL_MAP['youtube.liked.video'])
-        elif result == 'dislike':
-            notify_message = context.localize(provider.LOCAL_MAP['youtube.disliked.video'])
+
+        response = provider.get_client(context).rate_video(video_id, result)
+
+        if response.get('status_code') != 204:
+            notify_message = context.localize(provider.LOCAL_MAP['youtube.failed'])
+
+        elif response.get('status_code') == 204:
+            # this will be set if we are in the 'Liked Video' playlist
+            if context.get_param('refresh_container', '0') == '1':
+                context.get_ui().refresh_container()
+
+            if result == 'none':
+                notify_message = context.localize(provider.LOCAL_MAP['youtube.unrated.video'])
+            elif result == 'like':
+                notify_message = context.localize(provider.LOCAL_MAP['youtube.liked.video'])
+            elif result == 'dislike':
+                notify_message = context.localize(provider.LOCAL_MAP['youtube.disliked.video'])
 
         if notify_message:
             context.get_ui().show_notification(
