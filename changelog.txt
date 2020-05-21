@@ -1,3 +1,7 @@
+6.8.3
+[fix] fix rating videos causing and error even though it succeeded
+[upd] cache javascript player url for4 hours, reduces http requests per play by 1
+
 6.8.2
 [fixup] recommendations with > 50 channels
 
