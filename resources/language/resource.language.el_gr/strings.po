@@ -107,7 +107,7 @@ msgstr "Μέγεθος ιστορικού αναζήτησης"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr "Λανθάνουσα μνήμη σε (MB)"
+msgstr "Προσωρινή μνήμη σε (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
@@ -1024,15 +1024,15 @@ msgstr "Σήμερα σε"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr "Διαγραφή βάσης δεδομένων δεδομένων μνήμης"
+msgstr "Διαγραφή βάσης δεδομένων προσωρινής μνήμης"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr "Εκκαθάριση δεδομένων μνήμης"
+msgstr "Εκκαθάριση δεδομένων προσωρινής μνήμης"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr "δεδομένα μνήμης"
+msgstr "δεδομένα προσωρινής μνήμης"
 
 msgctxt "#30688"
 msgid "Use for videos"
