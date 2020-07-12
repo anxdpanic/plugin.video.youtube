@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2020-03-06 20:09+0100\n"
+"PO-Revision-Date: 2020-07-08 23:14+0200\n"
 "Language-Team: Hungarian Team\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: hu_HU\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Last-Translator: Laszlo Kardos <echo bEBsYWNlc3ouYmxvZw== | base64 -d>\n"
-"X-Generator: Poedit 2.3\n"
+"Last-Translator: The Lacesz <<echo dGhlbGFjZXN6QGdtYWlsLmNvbQ== | base64 -d>>\n"
+"X-Generator: Poedit 2.3.1\n"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -145,7 +145,7 @@ msgstr "Alternatív lejátszás támogatás"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr "Későbbi lejátszási lista egyedi megtekintés azonosító"
+msgstr "Megnézendő videók lista egyedi megtekintés azonosító"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
@@ -817,11 +817,11 @@ msgstr "A személyes API kulcsok tiltva vannak."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Jelölje meg ezt az oldalt könyvjelzővel, hogy a jövőben gyorsan hozzá tudja adni a kulcsokat."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Személyes API-kulcsok találhatók az api_keys.json fájlban. Szeretné visszaállítani őket? A nem választása felülírja őket."
 
 msgctxt "#30640"
 msgid "Restore"
@@ -837,35 +837,35 @@ msgstr "Az access_manager.json törlése"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "IP cím figyelése"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "IP cím kiválasztás"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Megtekintés után frissítés"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Közelgő élő közvetítés"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Befejezett élő közvetítés"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "Az API kulcs helytelen. Beállítások - API - API kulcs"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "Az Ügyfél azonosító helytelen. Beállítások - API - API azonosító"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "Az Ügyfél titkos kulcs helytelen. Beállítások - API - API titkos kulcs"
 
 msgctxt "#30651"
 msgid "Location"
@@ -873,15 +873,15 @@ msgstr "Hely"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Tartózkodási hely sugara (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "Szeretne Földrajzi helymeghatározás használni? [B]Tartózkodási helyem[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Tartózkodási helyem"
 
 msgctxt "#30655"
 msgid "Switch User"
@@ -897,11 +897,11 @@ msgstr "Névtelen"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Adja meg a felhasználónevét"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Jelenlegi felhasználó  '%s'"
 
 msgctxt "#30660"
 msgid "Users"
@@ -925,7 +925,7 @@ msgstr "Felhasználó váltás"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Felhasználóváltás '%s' most?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
@@ -933,11 +933,11 @@ msgstr "'%s' törölve"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "Átnevezve  '%s' - '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Lejátszások száma minimum százalék"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
@@ -957,107 +957,107 @@ msgstr "Lejátszási előzmények törlése"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "lejátszási előzmények"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Folytatási pont visszaállítása"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Használja a lejátszási előzményeket (megnézte, folytatja a követést)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Pont most"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Egy perccel ezelőtt"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Mostanában"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Egy órája"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Kettő órával ezelőtt"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Három órával ezelőtt"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Tegnap"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Két napja"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Ma"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Adat gyorsítótár adatbázis kiürítése"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Adat gyorsítótár kiürítése"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "adat gyorsítótár"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Használja videókhoz"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Használja élő közvetítésekhez"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "InputStream Adaptive >= 2.0.12 szükséges az élő közvetítésekhez"
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Sugárzás most"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Egy percen belül"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Sugárzás később"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Több mint egy óra múlva"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Több mint két órán belül"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Sugárzás ma"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Holnap"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "IP címem ellenőrzése"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
@@ -1065,15 +1065,15 @@ msgstr "HTTP kiszolgáló nem fut"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "Az ügyfél IP címe %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Nem sikerült beszerezni az ügyfél IP címét"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Lejátszás felirattal"
 
 msgctxt "#30703"
 msgid "Are you sure?"
@@ -1081,7 +1081,7 @@ msgstr "Biztos benne?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "YouTube weboldal hivatkozás használata"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1089,7 +1089,7 @@ msgstr "Feliratok letöltése"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Feliratok letöltése a lejátszás megkezdése előtt? (Alapértelmezés: Nem)"
 
 msgctxt "#30707"
 msgid "Untitled"
@@ -1097,31 +1097,31 @@ msgstr "Névtelen"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "Csak hang lejátszás"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Nem sikerült lekérni a Megnézendő videók lejátszási lista azonosítóját. A letöltés esélyének növelése érdekében adjon hozzá 8-10 videót a Megtekintés később az interneten/alkalmazáson keresztül, és próbálkozzon újra."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Nem sikerült lekérni a Megnézendő videók lejátszási lista azonosítóját. Próbálkozzon újra holnap anélkül, hogy eltávolította volna a videókat."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "Keresés a megtekintendő videók között... %s oldal"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Videók értékelése a lejátszási listákban"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Hozzáadva a megnézendő videókhoz"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Hozzáadva a lejátszási listához"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
@@ -1141,15 +1141,15 @@ msgstr "Értékelés törölve"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Feliratkozott a csatornára"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Leiratkozott a csatornáról"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Alapértelmezés a WEBM adaptációs készlethez (4K)"
 
 msgctxt "#30722"
 msgid "HDR"
@@ -1157,11 +1157,11 @@ msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "A Proxyra van szükség az mpeg-dash vod esetén (lásd a HTTP szervert) [CR]> 1080p, és a HDR-hez pedig az InputStream Adaptive kiegészítő szükséges >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr ""
+msgstr "Legfeljebb 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
@@ -1173,36 +1173,36 @@ msgstr "Feltöltések"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptív (Változó MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptív (Változó WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Külső barátságos keresés"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Lejátszás (Kérdezze meg a minőséget)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "A YouTube kiegészítő mostantól megköveteli az API Kulcsok használatát. [CR]További részletek a Wiki oldalon: [B]https://ytaddon.page.link/keys[/B][CR][CR]Elnézést a kellemetlenségért."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Hozzászólások"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Kedvelések"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Válaszok"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Szerkesztve"
