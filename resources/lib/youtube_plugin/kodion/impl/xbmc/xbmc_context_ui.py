@@ -126,7 +126,7 @@ class XbmcContextUI(AbstractContextUI):
         if not _image:
             _image = self._context.get_icon()
 
-        _message = utils.to_utf8(message)
+        _message = utils.to_utf8(message.decode('unicode-escape'))
         try:
             _message = _message.replace(',', ' ')
             _message = _message.replace('\n', ' ')
