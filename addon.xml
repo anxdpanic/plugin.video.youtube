@@ -13,6 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[fix] notifications for some languages |contrib: Mutronics|
 [fix] fix rating videos causing and error even though it succeeded
 [upd] cache javascript player url for 4 hours, reduces http requests per play by 1
 [upd] use new settings format on Kodi 19
