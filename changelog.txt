@@ -1,4 +1,6 @@
 6.8.3
+[fix] playback of some videos
+[fix] notifications for some languages |contrib: Mutronics|
 [fix] fix rating videos causing and error even though it succeeded
 [upd] cache javascript player url for4 hours, reduces http requests per play by 1
 [upd] use new settings format on Kodi 19
