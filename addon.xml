@@ -13,6 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[fix] searching, no longer require remote safe search
 [fix] notifications for some languages
         </news>
         <assets>
