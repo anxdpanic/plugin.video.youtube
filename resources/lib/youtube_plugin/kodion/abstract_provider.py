@@ -20,6 +20,7 @@ from . import constants
 
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
+    RESULT_UPDATE_LISTING = 'update_listing'
 
     def __init__(self):
         self._local_map = {
