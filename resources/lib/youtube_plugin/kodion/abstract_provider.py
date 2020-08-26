@@ -8,10 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+import json
 import re
 
-import xbmc
-import xbmcplugin
+from six.moves.urllib_parse import quote
+from six.moves.urllib_parse import unquote
 
 from .exceptions import KodionException
 from . import items
@@ -20,6 +21,7 @@ from . import constants
 
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
+    RESULT_UPDATE_LISTING = 'update_listing'
 
     def __init__(self):
         self._local_map = {
@@ -34,6 +36,8 @@ class AbstractProvider(object):
 
         # map for regular expression (path) to method (names)
         self._dict_path = {}
+
+        self._data_cache = None
 
         # register some default paths
         self.register_path(r'^/$', '_internal_root')
@@ -187,6 +191,15 @@ class AbstractProvider(object):
             # do something
             pass
 
+    @property
+    def data_cache(self):
+        return self._data_cache
+
+    @data_cache.setter
+    def data_cache(self, context):
+        if not self._data_cache:
+            self._data_cache = context.get_data_cache()
+
     def _internal_search(self, context, re_match):
         params = context.get_params()
 
@@ -210,47 +223,44 @@ class AbstractProvider(object):
             context.get_ui().refresh_container()
             return True
         elif command == 'input':
-            if '/query/' in context.get_ui().get_info_label('Container.FolderPath'):
+            self.data_cache = context
+            query = None
+            if re.match('.+/(?:query|input)/.*', context.get_ui().get_info_label('Container.FolderPath')):
+                cached_query = self.data_cache.get_item(self.data_cache.ONE_DAY, 'search_query')
                 #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
-                return False
+                if cached_query and cached_query.get('search_query', {}).get('query'):
+                    query = unquote(cached_query.get('search_query', {}).get('query'))
+                else:
+                    return False
+            else:
+                result, input_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
+                if result:
+                    query = input_query
 
-            result, query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
-            addon_id = context.get_param('addon_id', '')
-            item_params = {'q': query}
-            if addon_id:
-                item_params.update({'addon_id': addon_id})
-            if incognito:
-                item_params.update({'incognito': incognito})
-            if channel_id:
-                item_params.update({'channel_id': channel_id})
 
-            if result:
-                if not context.get_settings().remote_friendly_search():
-                    xbmcplugin.endOfDirectory(context.get_handle(), succeeded=True)
-                    xbmc.sleep(500)
-                    context.execute('Container.Update(%s)' % context.create_uri([constants.paths.SEARCH, 'query'], item_params))
-                else:
+            if query:
+                self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
+                if not incognito and not channel_id:
                     try:
-                        if not incognito and not channel_id:
-                            search_history.update(query)
-                        context.set_path('/kodion/search/query/')
-                        return self.on_search(query, context, re_match)
+                        search_history.update(query)
                     except:
-                        return list()
+                        pass
+                context.set_path('/kodion/search/query/')
+                return self.on_search(query, context, re_match)
 
             return True
         elif command == 'query':
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
-            try:
-                query = params['q']
-                if not incognito and not channel_id:
+            query = params['q']
+            if not incognito and not channel_id:
+                try:
                     search_history.update(query)
-                return self.on_search(query, context, re_match)
-            except:
-                return list()
+                except:
+                    pass
+            return self.on_search(query, context, re_match)
         else:
             context.set_content_type(constants.content_type.FILES)
             result = []

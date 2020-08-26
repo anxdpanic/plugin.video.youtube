@@ -64,6 +64,7 @@ class XbmcRunner(AbstractProviderRunner):
 
             xbmcplugin.endOfDirectory(
                 self.handle, succeeded=True,
+                updateListing=options.get(AbstractProvider.RESULT_UPDATE_LISTING, False),
                 cacheToDisc=options.get(AbstractProvider.RESULT_CACHE_TO_DISC, True))
         else:
             # handle exception
