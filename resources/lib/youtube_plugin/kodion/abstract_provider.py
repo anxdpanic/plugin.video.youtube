@@ -224,8 +224,11 @@ class AbstractProvider(object):
             return True
         elif command == 'input':
             self.data_cache = context
+
+            folder_path = context.get_ui().get_info_label('Container.FolderPath')
             query = None
-            if re.match('.+/(?:query|input)/.*', context.get_ui().get_info_label('Container.FolderPath')):
+            if (folder_path.startswith('plugin://%s' % context.get_id()) and 
+                    re.match('.+/(?:query|input)/.*', folder_path)):
                 cached_query = self.data_cache.get_item(self.data_cache.ONE_DAY, 'search_query')
                 #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
                 if cached_query and cached_query.get('search_query', {}).get('query'):
