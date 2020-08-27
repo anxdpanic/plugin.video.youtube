@@ -227,33 +227,32 @@ class AbstractProvider(object):
 
             folder_path = context.get_ui().get_info_label('Container.FolderPath')
             query = None
-            if (folder_path.startswith('plugin://%s' % context.get_id()) and 
+            if (folder_path.startswith('plugin://%s' % context.get_id()) and
                     re.match('.+/(?:query|input)/.*', folder_path)):
                 cached_query = self.data_cache.get_item(self.data_cache.ONE_DAY, 'search_query')
                 #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
                 if cached_query and cached_query.get('search_query', {}).get('query'):
                     query = unquote(cached_query.get('search_query', {}).get('query'))
-                else:
-                    return False
             else:
                 result, input_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
                 if result:
                     query = input_query
 
+            if not query:
+                return False
+
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
 
-            if query:
-                self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
-                if not incognito and not channel_id:
-                    try:
-                        search_history.update(query)
-                    except:
-                        pass
-                context.set_path('/kodion/search/query/')
-                return self.on_search(query, context, re_match)
+            self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
+            if not incognito and not channel_id:
+                try:
+                    search_history.update(query)
+                except:
+                    pass
+            context.set_path('/kodion/search/query/')
+            return self.on_search(query, context, re_match)
 
-            return True
         elif command == 'query':
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
