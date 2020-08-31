@@ -13,6 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[fix] next page now ignores sorting, remains at the end of the directory
 [fix] searching, no longer require remote safe search
 [fix] notifications for some languages
 [chg] only log http server ping failures

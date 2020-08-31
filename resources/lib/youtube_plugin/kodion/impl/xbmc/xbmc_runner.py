@@ -120,6 +120,9 @@ class XbmcRunner(AbstractProviderRunner):
             is_folder = False
             item.setProperty('isPlayable', 'false')
 
+        if directory_item.next_page:
+            item.setProperty('specialSort', 'bottom')
+
         if directory_item.get_channel_subscription_id():  # make channel_subscription_id property available for keymapping
             item.setProperty('channel_subscription_id', directory_item.get_channel_subscription_id())
 
