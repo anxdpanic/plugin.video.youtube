@@ -26,3 +26,5 @@ class NextPageItem(DirectoryItem):
             self.set_fanart(fanart)
         else:
             self.set_fanart(context.get_fanart())
+
+        self.next_page = True
