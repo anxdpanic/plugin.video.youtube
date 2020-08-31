@@ -1,6 +1,7 @@
 6.8.4
 [fix] searching, no longer require remote safe search
 [fix] notifications for some languages
+[chg] only log http server ping failures
 
 6.8.3
 [fix] playback of some videos
