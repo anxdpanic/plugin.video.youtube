@@ -15,6 +15,7 @@
         <news>
 [fix] searching, no longer require remote safe search
 [fix] notifications for some languages
+[chg] only log http server ping failures
         </news>
         <assets>
             <icon>icon.png</icon>

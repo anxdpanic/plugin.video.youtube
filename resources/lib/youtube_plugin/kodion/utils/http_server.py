@@ -476,8 +476,10 @@ def is_httpd_live(address=None, port=None):
     url = 'http://{address}:{port}/ping'.format(address=address, port=port)
     try:
         response = requests.get(url)
-        logger.log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'.format(address=address, port=port, response=response.status_code))
-        return response.status_code == 204
+        result = response.status_code == 204
+        if not result:
+            logger.log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'.format(address=address, port=port, response=response.status_code))
+        return result
     except:
         logger.log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'.format(address=address, port=port, response='failed'))
         return False
