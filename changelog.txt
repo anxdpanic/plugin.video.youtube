@@ -3,6 +3,7 @@
 [fix] searching, no longer require remote safe search
 [fix] notifications for some languages
 [chg] only log http server ping failures
+[lang] zh_cn strings |contrib: yureng, xiaojun|
 
 6.8.3
 [fix] playback of some videos
