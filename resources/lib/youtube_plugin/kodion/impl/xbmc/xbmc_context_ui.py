@@ -128,7 +128,7 @@ class XbmcContextUI(AbstractContextUI):
 
         try:
             _message = utils.to_utf8(message.decode('unicode-escape'))
-        except UnicodeEncodeError:
+        except (AttributeError, UnicodeEncodeError):
             _message = utils.to_utf8(message)
 
         try:
