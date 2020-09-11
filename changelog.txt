@@ -1,3 +1,5 @@
+[upd] use xbmcvfs.translatePath if available, clean up for Kodi 19
+
 6.8.4
 [fix] next page now ignores sorting, remains at the end of the directory
 [fix] searching, no longer require remote safe search

@@ -25,6 +25,11 @@ import xbmcvfs
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
            'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
 
+try:
+    xbmc.translatePath = xbmcvfs.translatePath
+except AttributeError:
+    pass
+
 
 def loose_version(v):
     filled = []

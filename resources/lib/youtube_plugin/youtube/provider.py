@@ -30,6 +30,11 @@ import xbmcvfs
 import xbmcgui
 import xbmcplugin
 
+try:
+    xbmc.translatePath = xbmcvfs.translatePath
+except AttributeError:
+    pass
+
 
 class Provider(kodion.AbstractProvider):
     LOCAL_MAP = {'youtube.search': 30102,

@@ -20,9 +20,14 @@ import socket
 import xbmc
 import xbmcaddon
 import xbmcgui
+import xbmcvfs
 
 from .. import logger
 
+try:
+    xbmc.translatePath = xbmcvfs.translatePath
+except AttributeError:
+    pass
 
 class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 

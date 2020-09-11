@@ -21,6 +21,11 @@ import xbmcvfs
 from ..utils import get_http_server, is_httpd_live
 from .. import logger
 
+try:
+    xbmc.translatePath = xbmcvfs.translatePath
+except AttributeError:
+    pass
+
 
 class YouTubeMonitor(xbmc.Monitor):
 

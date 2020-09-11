@@ -17,6 +17,11 @@ import xbmc
 
 from .. import logger
 
+try:
+    xbmc.translatePath = xbmcvfs.translatePath
+except AttributeError:
+    pass
+
 
 class JSONStore(object):
     def __init__(self, filename):
