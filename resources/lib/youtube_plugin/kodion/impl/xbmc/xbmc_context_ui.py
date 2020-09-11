@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from six import PY3
+
 import xbmc
 import xbmcgui
 
@@ -125,6 +127,9 @@ class XbmcContextUI(AbstractContextUI):
         _image = image_uri
         if not _image:
             _image = self._context.get_icon()
+
+        if PY3 and isinstance(message, str):
+            message = message.encode('utf-8')
 
         try:
             _message = utils.to_utf8(message.decode('unicode-escape'))

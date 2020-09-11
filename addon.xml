@@ -13,6 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[fix] notifications for some languages on Kodi 19
 [upd] use xbmcvfs.translatePath if available, clean up for Kodi 19
         </news>
         <assets>

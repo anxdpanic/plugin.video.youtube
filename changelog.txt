@@ -1,3 +1,4 @@
+[fix] notifications for some languages on Kodi 19
 [upd] use xbmcvfs.translatePath if available, clean up for Kodi 19
 
 6.8.4
