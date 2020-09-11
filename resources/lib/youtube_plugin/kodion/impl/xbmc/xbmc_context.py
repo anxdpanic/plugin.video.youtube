@@ -28,6 +28,11 @@ from .xbmc_playlist import XbmcPlaylist
 from .xbmc_player import XbmcPlayer
 from ... import utils
 
+try:
+    xbmc.translatePath = xbmcvfs.translatePath
+except AttributeError:
+    pass
+
 
 class XbmcContext(AbstractContext):
     def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
