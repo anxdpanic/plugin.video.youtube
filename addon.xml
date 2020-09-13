@@ -15,6 +15,7 @@
         <news>
 [fix] notifications for some languages on Kodi 19
 [fix] searching for some languages
+[fix] loading on some versions of python 3
 [upd] use xbmcvfs.translatePath if available, clean up for Kodi 19
         </news>
         <assets>
