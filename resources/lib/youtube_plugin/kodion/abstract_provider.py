@@ -17,6 +17,7 @@ from six.moves.urllib_parse import unquote
 from .exceptions import KodionException
 from . import items
 from . import constants
+from . import utils
 
 
 class AbstractProvider(object):
@@ -232,7 +233,9 @@ class AbstractProvider(object):
                 cached_query = self.data_cache.get_item(self.data_cache.ONE_DAY, 'search_query')
                 #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
                 if cached_query and cached_query.get('search_query', {}).get('query'):
-                    query = unquote(cached_query.get('search_query', {}).get('query'))
+                    query = cached_query.get('search_query', {}).get('query')
+                    query = utils.to_unicode(query)
+                    query = unquote(query)
             else:
                 result, input_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
                 if result:
@@ -244,24 +247,32 @@ class AbstractProvider(object):
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
 
+            query = utils.to_utf8(query)
             self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
+
             if not incognito and not channel_id:
                 try:
                     search_history.update(query)
                 except:
                     pass
             context.set_path('/kodion/search/query/')
+            if isinstance(query, bytes):
+                query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
         elif command == 'query':
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
             query = params['q']
+            query = utils.to_unicode(query)
+
             if not incognito and not channel_id:
                 try:
                     search_history.update(query)
                 except:
                     pass
+            if isinstance(query, bytes):
+                query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
         else:
             context.set_content_type(constants.content_type.FILES)
