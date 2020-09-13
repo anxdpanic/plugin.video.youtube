@@ -1,3 +1,4 @@
+6.8.5
 [fix] notifications for some languages on Kodi 19
 [fix] searching for some languages
 [fix] loading on some versions of python 3
