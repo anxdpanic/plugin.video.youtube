@@ -26,7 +26,7 @@ class BaseItem(object):
 
         try:
             self._name = html_parser.HTMLParser().unescape(name)
-        except html_parser.HTMLParseError as _:
+        except:
             self._name = name
 
         self._uri = uri
