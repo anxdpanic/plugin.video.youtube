@@ -950,11 +950,12 @@ class VideoInfo(object):
             js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
             cipher = Cipher(self._context, javascript_url=js)
 
-        if not license_info.get('url') and not is_live and httpd_is_live and adaptive_fmts:
+        if not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
                                                 video_details.get('lengthSeconds', '0'),
-                                                cipher)
+                                                cipher,
+                                                license_info.get('url'))
 
         if mpd_url:
             mpd_sig_deciphered = True
@@ -1078,7 +1079,7 @@ class VideoInfo(object):
 
         return stream_list
 
-    def generate_mpd(self, video_id, adaptive_fmts, duration, cipher):
+    def generate_mpd(self, video_id, adaptive_fmts, duration, cipher,license_url):
         discarded_streams = list()
 
         def get_discarded_audio(fmt, mime_type, itag, stream, reason='unsupported'):
@@ -1372,6 +1373,9 @@ class VideoInfo(object):
                     default = True
 
                 out_list.append(''.join(['\t\t<AdaptationSet id="', str(n), '" mimeType="', mime, '" subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true" default="', str(default).lower(), '">\n']))
+                if license_url is not None:
+                    license_url=license_url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+                    out_list.append(''.join(['\t\t\t<ContentProtection schemeIdUri="http://youtube.com/drm/2012/10/10">\n','\t\t\t\t<yt:SystemURL type="widevine">',license_url,'</yt:SystemURL>\n','\t\t\t</ContentProtection>\n']))
                 out_list.append('\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n')
                 for i in data[mime]:
                     stream_format = self.FORMAT.get(i, {})
