@@ -11,9 +11,16 @@
 import re
 import datetime
 
-from six.moves import html_parser
-
 from .base_item import BaseItem
+
+try:
+    from six.moves import html_parser
+
+    unescape = html_parser.HTMLParser().unescape
+except AttributeError:
+    import html
+
+    unescape = html.unescape
 
 __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?')
 
@@ -78,8 +85,8 @@ class VideoItem(BaseItem):
 
     def set_title(self, title):
         try:
-            title = html_parser.HTMLParser().unescape(title)
-        except html_parser.HTMLParseError as _:
+            title = unescape(title)
+        except:
             pass
         self._title = title
         self._name = self._title
@@ -114,8 +121,8 @@ class VideoItem(BaseItem):
 
     def set_plot(self, plot):
         try:
-            plot = html_parser.HTMLParser().unescape(plot)
-        except html_parser.HTMLParseError as _:
+            plot = unescape(plot)
+        except:
             pass
         self._plot = plot
 

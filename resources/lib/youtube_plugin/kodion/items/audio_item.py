@@ -8,9 +8,16 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import html_parser
-
 from .base_item import BaseItem
+
+try:
+    from six.moves import html_parser
+
+    unescape = html_parser.HTMLParser().unescape
+except AttributeError:
+    import html
+
+    unescape = html.unescape
 
 
 class AudioItem(BaseItem):
@@ -33,8 +40,8 @@ class AudioItem(BaseItem):
 
     def set_title(self, title):
         try:
-            title = html_parser.HTMLParser().unescape(title)
-        except html_parser.HTMLParseError as _:
+            title = unescape(title)
+        except:
             pass
         self._title = title
 

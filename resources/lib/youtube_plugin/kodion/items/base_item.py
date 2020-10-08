@@ -10,10 +10,18 @@
 
 from six import python_2_unicode_compatible
 from six import string_types
-from six.moves import html_parser
 
 import hashlib
 import datetime
+
+try:
+    from six.moves import html_parser
+
+    unescape = html_parser.HTMLParser().unescape
+except AttributeError:
+    import html
+
+    unescape = html.unescape
 
 
 @python_2_unicode_compatible
@@ -25,7 +33,7 @@ class BaseItem(object):
         self._version = BaseItem.VERSION
 
         try:
-            self._name = html_parser.HTMLParser().unescape(name)
+            self._name = unescape(name)
         except:
             self._name = name
 
