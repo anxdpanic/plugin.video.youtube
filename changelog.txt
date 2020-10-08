@@ -1,3 +1,7 @@
+6.8.6
+[fix] searching in some instances with encoding issues |contrib: tsaklidis|
+[fix] support python 3.9 html.unescape |contrib: asavah|
+
 6.8.5
 [fix] playback of purchased movies |contrib: MisterD81|
 [fix] notifications for some languages on Kodi 19
