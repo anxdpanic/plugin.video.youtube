@@ -7,11 +7,18 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import html_parser
-
 import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
+
+try:
+    from six.moves import html_parser
+
+    unescape = html_parser.HTMLParser().unescape
+except AttributeError:
+    import html
+
+    unescape = html.unescape
 
 
 class Subtitles(object):
@@ -90,7 +97,7 @@ class Subtitles(object):
         except:
             self.context.log_debug('Subtitle unescape: failed to decode utf-8')
         try:
-            text = html_parser.HTMLParser().unescape(text)
+            text = unescape(text)
         except:
             self.context.log_debug('Subtitle unescape: failed to unescape text')
         return text
