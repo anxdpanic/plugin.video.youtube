@@ -94,10 +94,10 @@ class YouTube(LoginClient):
         except:
             _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
-    def get_video_streams(self, context, video_id=None, player_config=None, cookies=None):
+    def get_video_streams(self, context, video_id):
         video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
 
-        video_streams = video_info.load_stream_infos(video_id, player_config, cookies)
+        video_streams = video_info.load_stream_infos(video_id)
 
         # update title
         for video_stream in video_streams:

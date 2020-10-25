@@ -27,74 +27,6 @@ def _get_core_components(addon_id=None):
     return provider, context, client
 
 
-def _get_config_and_cookies(client, url):
-    headers = {'Host': 'www.youtube.com',
-               'Connection': 'keep-alive',
-               'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-               'Accept': '*/*',
-               'DNT': '1',
-               'Referer': 'https://www.youtube.com',
-               'Accept-Encoding': 'gzip, deflate',
-               'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-
-    params = {'hl': client.get_language(),
-              'gl': client.get_region()}
-
-    if client.get_access_token():
-        params['access_token'] = client.get_access_token()
-
-    result = requests.get(url, params=params, headers=headers, verify=client.verify(), allow_redirects=True)
-    html = result.text
-    cookies = result.cookies
-
-    _player_config = '{}'
-    lead = 'ytplayer.config = '
-    tail = ';ytplayer.load'
-    pos = html.find(lead)
-    if pos >= 0:
-        html2 = html[pos + len(lead):]
-        pos = html2.find(tail)
-        if pos >= 0:
-            _player_config = html2[:pos]
-
-    blank_config = re.search(r'var blankSwfConfig\s*=\s*(?P<player_config>{.+?});\s*var fillerData', html)
-    if not blank_config:
-        player_config = dict()
-    else:
-        try:
-            player_config = json.loads(blank_config.group('player_config'))
-        except TypeError:
-            player_config = dict()
-
-    try:
-        player_config.update(json.loads(_player_config))
-    except TypeError:
-        pass
-
-    if 'args' not in player_config:
-        player_config['args'] = dict()
-
-    player_response = player_config['args'].get('player_response', dict())
-    if isinstance(player_response, string_types):
-        try:
-            player_response = json.loads(player_response)
-        except TypeError:
-            player_response = dict()
-
-    player_config['args']['player_response'] = dict()
-
-    result = re.search(r'window\["ytInitialPlayerResponse"\]\s*=\s*\(\s*(?P<player_response>{.+?})\s*\);', html)
-    if result:
-        try:
-            player_config['args']['player_response'] = json.loads(result.group('player_response'))
-        except TypeError:
-            pass
-
-    player_config['args']['player_response'].update(player_response)
-
-    return {'config': player_config, 'cookies': cookies}
-
-
 def resolve(video_id, sort=True, addon_id=None):
     """
 
@@ -123,12 +55,6 @@ def resolve(video_id, sort=True, addon_id=None):
 
     if matched_id:
         streams = client.get_video_streams(context=context, video_id=matched_id)
-
-        if streams is None:
-            result = _get_config_and_cookies(client, matched_id)
-            player_config = result.get('config')
-            cookies = result.get('cookies')
-            streams = client.get_video_streams(context=context, player_config=player_config, cookies=cookies)
 
     if sort and streams:
         streams = sorted(streams, key=lambda x: x.get('sort', 0), reverse=True)
