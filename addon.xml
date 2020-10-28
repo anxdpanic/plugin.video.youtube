@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.6" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.7" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -13,9 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] some videos failing to play with an Invalid URL exception
-[fix] searching in some instances with encoding issues |contrib: tsaklidis|
-[fix] support python 3.9 html.unescape |contrib: asavah|
+[fixup] encoding of titles and authors during playback
         </news>
         <assets>
             <icon>icon.png</icon>

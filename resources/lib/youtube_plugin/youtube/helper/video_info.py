@@ -9,8 +9,17 @@
 """
 
 from six.moves import range
-from six import string_types, PY2
+from six import PY2
 from six.moves import urllib
+
+try:
+    from six.moves import html_parser
+
+    unescape = html_parser.HTMLParser().unescape
+except AttributeError:
+    import html
+
+    unescape = html.unescape
 
 import copy
 import re
@@ -746,13 +755,23 @@ class VideoInfo(object):
                      'subtitles': []}
 
         meta_info['video']['id'] = video_details.get('videoId', video_id)
+
         meta_info['video']['title'] = video_details.get('title', '')
         meta_info['channel']['author'] = video_details.get('author', '')
-        try:
-            meta_info['video']['title'] = meta_info['video']['title'].encode('utf-8', 'ignore').decode('utf-8')
-            meta_info['channel']['author'] = meta_info['channel']['author'].encode('utf-8', 'ignore').decode('utf-8')
-        except:
-            pass
+
+        meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape')
+        meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape')
+
+        if PY2:
+            meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+            meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
+
+        else:
+            meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
+            meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
+
+        meta_info['video']['title'] = unescape(meta_info['video']['title'])
+        meta_info['channel']['author'] = unescape(meta_info['channel']['author'])
 
         meta_info['channel']['id'] = video_details.get('channelId', '')
         image_data_list = [
