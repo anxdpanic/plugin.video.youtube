@@ -11,6 +11,7 @@ import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
 
+from six import PY2
 try:
     from six.moves import html_parser
 
@@ -218,15 +219,27 @@ class Subtitles(object):
             self.context.log_debug('No subtitles found for: %s' % language)
             return []
 
-    @staticmethod
-    def _get_language_name(track):
+    def _get_language_name(self, track):
         key = 'languageName' if 'languageName' in track else 'name'
         lang_name = track.get(key, {}).get('simpleText')
         if not lang_name:
             track_name = track.get(key, {}).get('runs', [{}])
             if isinstance(track_name, list) and len(track_name) >= 1:
-                return track_name[0].get('text')
-        else:
-            return lang_name
+                lang_name = track_name[0].get('text')
+
+        if lang_name:
+            return self._decode_language_name(lang_name)
 
         return None
+
+    @staticmethod
+    def _decode_language_name(language_name):
+        language_name = language_name.encode('raw_unicode_escape')
+
+        if PY2:
+            language_name = language_name.decode('utf-8')
+
+        else:
+            language_name = language_name.decode('raw_unicode_escape')
+
+        return language_name
