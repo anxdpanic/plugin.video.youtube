@@ -1,3 +1,6 @@
+6.8.8
+[fixup] encoding of subtitle track names
+
 6.8.7
 [fixup] encoding of titles and authors during playback
 
