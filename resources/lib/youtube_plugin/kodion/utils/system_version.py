@@ -49,7 +49,13 @@ class SystemVersion(object):
             self._appname = 'Unknown Application'
 
         self._releasename = 'Unknown Release'
-        if (19, 0) > self._version >= (18, 0):
+        if self._version >= (21, 0):
+            self._releasename = 'O*****'
+        elif self._version >= (20, 0):
+            self._releasename = 'N*****'
+        elif self._version >= (19, 0):
+            self._releasename = 'Matrix'
+        elif self._version >= (18, 0):
             self._releasename = 'Leia'
         elif self._version >= (17, 0):
             self._releasename = 'Krypton'
