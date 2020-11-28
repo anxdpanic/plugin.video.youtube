@@ -345,6 +345,7 @@ class YouTube(LoginClient):
                 thread = threading.Thread(target=helper, args=(video_id, candidates))
                 threads.append(thread)
                 thread.start()
+
         for thread in threads:
             thread.join()
 
@@ -810,15 +811,31 @@ class YouTube(LoginClient):
                     'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
                 }
 
-                for channel_id in sub_channel_ids:
-                    url = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + channel_id
+                responses = []
 
+                def fetch_xml(_url, _responses):
                     try:
-                        response = requests.get(url, {}, headers=headers, verify=self._verify, allow_redirects=True)
+                        _response = requests.get(_url, {}, headers=headers, verify=self._verify, allow_redirects=True)
                     except:
-                        response = None
+                        _response = None
                         _context.log_error('Failed |%s|' % traceback.print_exc())
 
+                    _responses.append(_response)
+
+                threads = []
+                for channel_id in sub_channel_ids:
+                    thread = threading.Thread(
+                        target=fetch_xml,
+                        args=('https://www.youtube.com/feeds/videos.xml?channel_id=' + channel_id,
+                              responses)
+                    )
+                    threads.append(thread)
+                    thread.start()
+
+                for thread in threads:
+                    thread.join()
+
+                for response in responses:
                     if response:
                         response.encoding = 'utf-8'
                         xml_data = response.content.replace('\n', '')
