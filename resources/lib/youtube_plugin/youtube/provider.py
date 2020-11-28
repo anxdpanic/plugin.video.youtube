@@ -1396,6 +1396,12 @@ class Provider(kodion.AbstractProvider):
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
+            
+            #clear cache
+            cache = context.get_data_cache()
+            cache_items_key = 'my-subscriptions-items'
+            cache.set(cache_items_key, '[]')
+            
             my_subscriptions_item = DirectoryItem(
                 context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.my_subscriptions'])),
                 context.create_uri(['special', 'new_uploaded_videos_tv']),

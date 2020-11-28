@@ -12,7 +12,9 @@ import copy
 import json
 import re
 import threading
+import time
 import traceback
+import xml.etree.ElementTree as ET
 
 import requests
 
@@ -732,70 +734,135 @@ class YouTube(LoginClient):
         return self.perform_v3_request(method='GET', path='search', params=params)
 
     def get_my_subscriptions(self, page_token=None, offset=0):
+        """
+        modified by PureHemp, using YouTube RSS for fetching latest videos
+        """
+
         if not page_token:
             page_token = ''
 
-        result = {'items': [],
-                  'next_page_token': page_token,
-                  'offset': offset}
+        result = {
+            'items': [],
+            'next_page_token': page_token,
+            'offset': offset
+        }
 
         def _perform(_page_token, _offset, _result):
-            _post_data = {
-                'context': {
-                    'client': {
-                        'clientName': 'TVHTML5',
-                        'clientVersion': '5.20150304',
-                        'theme': 'CLASSIC',
-                        'acceptRegion': '%s' % self._region,
-                        'acceptLanguage': '%s' % self._language.replace('_', '-')
-                    },
-                    'user': {
-                        'enableSafetyMode': False
-                    }
-                },
-                'browseId': 'FEsubscriptions'
-            }
-            if _page_token:
-                _post_data['continuation'] = _page_token
 
-            _json_data = self.perform_v1_tv_request(method='POST', path='browse', post_data=_post_data)
-            _data = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])[0].get(
-                'shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
-            if not _data:
-                _data = _json_data.get('continuationContents', {}).get('horizontalListContinuation', {})
-            _items = _data.get('items', [])
             if not _result:
-                _result = {'items': []}
+                _result = {
+                    'items': []
+                }
 
-            _new_offset = self._max_results - len(_result['items']) + _offset
-            if _offset > 0:
-                _items = _items[_offset:]
-            _result['offset'] = _new_offset
+            cache = _context.get_data_cache()
 
-            for _item in _items:
-                _item = _item.get('gridVideoRenderer', {})
-                if _item:
-                    _video_item = {'id': _item['videoId'],
-                                   'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
-                                   'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', '')}
-                    _result['items'].append(_video_item)
+            # if new uploads is cached
+            cache_items_key = 'my-subscriptions-items'
+            cached = cache.get_item(cache.ONE_HOUR, cache_items_key)
+            if cache_items_key in cached:
+                _result['items'] = cached[cache_items_key]
 
-            _continuations = _data.get('continuations', [{}])[0].get('nextContinuationData', {}).get('continuation', '')
-            if _continuations and len(_result['items']) <= self._max_results:
-                _result['next_page_token'] = _continuations
+            """ no cache, get uploads data from web """
+            if len(_result['items']) == 0:
+                # get all subscriptions channel ids
+                sub_page_token = True
+                sub_channel_ids = []
 
-                if len(_result['items']) < self._max_results:
-                    _result = _perform(_page_token=_continuations, _offset=0, _result=_result)
+                while sub_page_token:
+                    if sub_page_token is True:
+                        sub_page_token = ''
+
+                    params = {
+                        'part': 'snippet',
+                        'maxResults': '50',
+                        'order': 'alphabetical',
+                        'mine': 'true'
+                    }
+
+                    if sub_page_token:
+                        params['pageToken'] = sub_page_token
+
+                    sub_json_data = self.perform_v3_request(method='GET', path='subscriptions', params=params)
+
+                    if not sub_json_data:
+                        sub_json_data = {}
+
+                    items = sub_json_data.get('items', [])
+
+                    for item in items:
+                        item = item.get('snippet', {}).get('resourceId', {}).get('channelId', '')
+                        sub_channel_ids.append(item)
+
+                    # get next token if exists
+                    sub_page_token = sub_json_data.get('nextPageToken', '')
+
+                    # terminate loop when last page
+                    if not sub_page_token:
+                        break
+
+                headers = {
+                    'Host': 'www.youtube.com',
+                    'Connection': 'keep-alive',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36',
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                    'DNT': '1',
+                    'Accept-Encoding': 'gzip, deflate',
+                    'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
+                }
+
+                for channel_id in sub_channel_ids:
+                    url = 'https://www.youtube.com/feeds/videos.xml?channel_id=' + channel_id
+
+                    try:
+                        response = requests.get(url, {}, headers=headers, verify=self._verify, allow_redirects=True)
+                    except:
+                        response = None
+                        _context.log_error('Failed |%s|' % traceback.print_exc())
+
+                    if response:
+                        response.encoding = 'utf-8'
+                        xml_data = response.content.replace('\n', '')
+                        root = ET.fromstring(xml_data)
+
+                        ns = '{http://www.w3.org/2005/Atom}'
+                        yt_ns = '{http://www.youtube.com/xml/schemas/2015}'
+                        media_ns = '{http://search.yahoo.com/mrss/}'
+
+                        for entry in root.findall(ns + "entry"):
+                            # empty news dictionary 
+                            entry_data = {
+                                'id': entry.find(yt_ns + 'videoId').text,
+                                'title': entry.find(media_ns + "group").find(media_ns + 'title').text,
+                                'channel': entry.find(ns + "author").find(ns + "name").text,
+                                'published': entry.find(ns + 'published').text,
+                            }
+                            # append items list 
+                            _result['items'].append(entry_data)
+
+                # sorting by publish date
+                def _sort_by_date_time(e):
+                    return time.mktime(datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S").timetuple())
+
+                _result['items'].sort(reverse=True, key=_sort_by_date_time)
+
+                # Update cache
+                cache.set(cache_items_key, json.dumps(_result['items']))
+            """ no cache, get uploads data from web """
 
             # trim result
-            if len(_result['items']) > self._max_results:
-                _items = _result['items']
-                _items = _items[:self._max_results]
-                _result['items'] = _items
-                _result['continue'] = True
+            if not _page_token:
+                _page_token = 0
 
-            if 'offset' in _result and _result['offset'] >= 100:
-                _result['offset'] -= 100
+            _page_token = int(_page_token)
+
+            if len(_result['items']) > self._max_results:
+                _index_start = _page_token * self._max_results
+                _index_end = _index_start + self._max_results
+
+                _items = _result['items']
+                _items = _items[_index_start:_index_end]
+                _result['items'] = _items
+                _result['next_page_token'] = _page_token + 1
 
             if len(_result['items']) < self._max_results:
                 if 'continue' in _result:
@@ -806,6 +873,7 @@ class YouTube(LoginClient):
 
                 if 'offset' in _result:
                     del _result['offset']
+
             return _result
 
         return _perform(_page_token=page_token, _offset=offset, _result=result)

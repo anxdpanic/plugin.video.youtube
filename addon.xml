@@ -13,7 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fixup] encoding of subtitle track names
+[fix] my subscriptions section using YouTube RSS |contrib: PureHemp|
         </news>
         <assets>
             <icon>icon.png</icon>
