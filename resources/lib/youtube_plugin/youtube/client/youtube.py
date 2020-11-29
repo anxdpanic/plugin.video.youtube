@@ -17,6 +17,7 @@ import traceback
 import xml.etree.ElementTree as ET
 
 import requests
+from six import PY3
 
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
@@ -24,6 +25,7 @@ from ..helper.utils import get_shelf_index_by_title
 from ...kodion import constants
 from ...kodion import Context
 from ...kodion.utils import datetime_parser
+from ...kodion.utils import to_unicode
 
 _context = Context(plugin_id='plugin.video.youtube')
 
@@ -838,7 +840,11 @@ class YouTube(LoginClient):
                 for response in responses:
                     if response:
                         response.encoding = 'utf-8'
-                        xml_data = response.content.replace('\n', '')
+                        if PY3:
+                            xml_data = to_unicode(response.content).replace('\n', '')
+                        else:
+                            xml_data = response.content.replace('\n', '')
+
                         root = ET.fromstring(xml_data)
 
                         ns = '{http://www.w3.org/2005/Atom}'
