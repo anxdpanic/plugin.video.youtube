@@ -1396,6 +1396,12 @@ class Provider(kodion.AbstractProvider):
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
+            
+            #clear cache
+            cache = context.get_data_cache()
+            cache_items_key = 'my-subscriptions-items'
+            cache.set(cache_items_key, '[]')
+            
             my_subscriptions_item = DirectoryItem(
                 context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.my_subscriptions'])),
                 context.create_uri(['special', 'new_uploaded_videos_tv']),
@@ -1471,6 +1477,7 @@ class Provider(kodion.AbstractProvider):
                 result.append(my_channel_item)
 
             # purchases
+            """
             if settings.get_bool('youtube.folder.purchases.show', False) and \
                     settings.use_dash() and \
                     settings.use_dash_videos() and \
@@ -1480,6 +1487,7 @@ class Provider(kodion.AbstractProvider):
                                                image=context.create_resource_path('media', 'popular.png'))
                 purchases_item.set_fanart(self.get_fanart(context))
                 result.append(purchases_item)
+            """
 
             # watch later
             if settings.get_bool('youtube.folder.watch_later.show', True):
@@ -1546,12 +1554,14 @@ class Provider(kodion.AbstractProvider):
                 result.append(playlists_item)
 
             # saved playlists
+            """
             if settings.get_bool('youtube.folder.saved.playlists.show', True):
                 playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.saved.playlists']),
                                                context.create_uri(['special', 'saved_playlists']),
                                                context.create_resource_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
+            """
 
             # subscriptions
             if settings.get_bool('youtube.folder.subscriptions.show', True):
