@@ -287,13 +287,13 @@ class Provider(kodion.AbstractProvider):
 
         if dev_id:
             access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
-            if len(access_tokens) != 2 or access_manager.is_dev_access_token_expired(dev_id):
+            if len(access_tokens) < 1 or access_manager.is_dev_access_token_expired(dev_id):
                 # reset access_token
                 access_manager.update_dev_access_token(dev_id, '')
                 access_tokens = list()
         else:
             access_tokens = access_manager.get_access_token().split('|')
-            if len(access_tokens) != 2 or access_manager.is_access_token_expired():
+            if len(access_tokens) < 1 or access_manager.is_access_token_expired():
                 # reset access_token
                 access_manager.update_access_token('')
                 access_tokens = list()
@@ -351,24 +351,21 @@ class Provider(kodion.AbstractProvider):
                 client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
 
         if client:
-            if len(access_tokens) != 2 and len(refresh_tokens) == 2:
+            if len(access_tokens) < 1 <= len(refresh_tokens):
                 try:
+                    index = 1 if len(refresh_tokens) > 1 else 0
+                    access_token, expires_in = client.refresh_token(refresh_tokens[index])
+                    access_tokens = [access_token]
 
-                    access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
-
-                    access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
-
-                    access_tokens = [access_token_tv, access_token_kodi]
-
-                    access_token = '%s|%s' % (access_token_tv, access_token_kodi)
-                    expires_in = min(expires_in_tv, expires_in_kodi)
                     if dev_id:
                         access_manager.update_dev_access_token(dev_id, access_token, expires_in)
                     else:
                         access_manager.update_access_token(access_token, expires_in)
+
                 except (InvalidGrant, LoginException) as ex:
                     self.handle_exception(context, ex)
-                    access_tokens = ['', '']
+                    access_tokens = ['']
+
                     # reset access_token
                     if isinstance(ex, InvalidGrant):
                         if dev_id:
@@ -384,16 +381,18 @@ class Provider(kodion.AbstractProvider):
                     self.get_resource_manager(context).clear()
 
             # in debug log the login status
-            self._is_logged_in = len(access_tokens) == 2
+            self._is_logged_in = len(access_tokens) == 1
             if self._is_logged_in:
                 context.log_debug('User is logged in')
             else:
                 context.log_debug('User is not logged in')
 
             if len(access_tokens) == 0:
-                access_tokens = ['', '']
-            client.set_access_token(access_token=access_tokens[1])
-            client.set_access_token_tv(access_token_tv=access_tokens[0])
+                access_tokens = ['']
+
+            index = 1 if len(access_tokens) > 1 else 0
+            client.set_access_token(access_token=access_tokens[index])
+
             self._client = client
             self._client.set_log_error(context.log_error)
         else:
@@ -803,41 +802,6 @@ class Provider(kodion.AbstractProvider):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
-
-    # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/watch_later/playlist_id/$')
-    def _on_yt_get_watch_later_id(self, context, re_match):
-        client = self.get_client(context)
-        access_manager = context.get_access_manager()
-        if self.is_logged_in():
-            watch_later_id = None
-            count = 0
-            while not watch_later_id:
-                count += 1
-                watch_later_id = client.get_watch_later_id()
-
-                if watch_later_id:
-                    access_manager.set_watch_later_id(watch_later_id)
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
-                    break
-                else:
-                    if count == 1:
-                        if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry']),
-                                                                nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
-                                                                yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
-                            break
-                    elif count == 2:
-                        if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry.2']),
-                                                                nolabel=context.localize(self.LOCAL_MAP['youtube.cancel']),
-                                                                yeslabel=context.localize(self.LOCAL_MAP['youtube.retry'])):
-                            break
-                    else:
-                        _ = context.get_ui().on_ok(context.get_name(), context.localize(self.LOCAL_MAP['youtube.failed.watch_later.retry.3']))
-                        break
-
-        else:
-            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.must.be.signed.in']))
-
     @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
@@ -1476,19 +1440,6 @@ class Provider(kodion.AbstractProvider):
                 my_channel_item.set_fanart(self.get_fanart(context))
                 result.append(my_channel_item)
 
-            # purchases
-            """
-            if settings.get_bool('youtube.folder.purchases.show', False) and \
-                    settings.use_dash() and \
-                    settings.use_dash_videos() and \
-                    'drm' in context.inputstream_adaptive_capabilities():
-                purchases_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.purchases']),
-                                               context.create_uri(['special', 'purchases']),
-                                               image=context.create_resource_path('media', 'popular.png'))
-                purchases_item.set_fanart(self.get_fanart(context))
-                result.append(purchases_item)
-            """
-
             # watch later
             if settings.get_bool('youtube.folder.watch_later.show', True):
                 watch_later_playlist_id = access_manager.get_watch_later_id()
@@ -1528,13 +1479,7 @@ class Provider(kodion.AbstractProvider):
             # history
             if settings.get_bool('youtube.folder.history.show', False):
                 watch_history_playlist_id = access_manager.get_watch_history_id()
-                if watch_history_playlist_id == 'HL':
-                    watch_history_item = DirectoryItem(
-                        context.localize(self.LOCAL_MAP['youtube.history']),
-                        context.create_uri(['special', 'watch_history_tv']),
-                        context.create_resource_path('media', 'history.png'))
-                    watch_history_item.set_fanart(self.get_fanart(context))
-                else:
+                if watch_history_playlist_id != 'HL':
                     watch_history_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.history']),
                                                        context.create_uri(
                                                            ['channel', 'mine', 'playlist', watch_history_playlist_id]),
@@ -1543,7 +1488,8 @@ class Provider(kodion.AbstractProvider):
                     context_menu = []
                     yt_context_menu.append_play_all_from_playlist(context_menu, self, context, watch_history_playlist_id)
                     watch_history_item.set_context_menu(context_menu)
-                result.append(watch_history_item)
+
+                    result.append(watch_history_item)
 
             # (my) playlists
             if settings.get_bool('youtube.folder.playlists.show', True):
@@ -1552,16 +1498,6 @@ class Provider(kodion.AbstractProvider):
                                                context.create_resource_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
-
-            # saved playlists
-            """
-            if settings.get_bool('youtube.folder.saved.playlists.show', True):
-                playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.saved.playlists']),
-                                               context.create_uri(['special', 'saved_playlists']),
-                                               context.create_resource_path('media', 'playlist.png'))
-                playlists_item.set_fanart(self.get_fanart(context))
-                result.append(playlists_item)
-            """
 
             # subscriptions
             if settings.get_bool('youtube.folder.subscriptions.show', True):

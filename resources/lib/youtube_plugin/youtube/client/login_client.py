@@ -51,7 +51,6 @@ class LoginClient(object):
         self._language = language
         self._region = region
         self._access_token = access_token
-        self._access_token_tv = access_token_tv
         self._log_error_callback = None
 
     def set_log_error(self, callback):
@@ -68,9 +67,6 @@ class LoginClient(object):
 
     def set_access_token(self, access_token=''):
         self._access_token = access_token
-
-    def set_access_token_tv(self, access_token_tv=''):
-        self._access_token_tv = access_token_tv
 
     def revoke(self, refresh_token):
         # https://developers.google.com/youtube/v3/guides/auth/devices
@@ -98,11 +94,6 @@ class LoginClient(object):
             response_dump = self._get_response_dump(result, json_data)
             context.log_error('Revoke failed: Code: |%s| Response dump: |%s|' % (str(result.status_code), response_dump))
             raise LoginException('Logout Failed')
-
-    def refresh_token_tv(self, refresh_token):
-        client_id = str(self.CONFIGS['youtube-tv']['id'])
-        client_secret = str(self.CONFIGS['youtube-tv']['secret'])
-        return self.refresh_token(refresh_token, client_id=client_id, client_secret=client_secret)
 
     def refresh_token(self, refresh_token, client_id='', client_secret=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
@@ -152,11 +143,6 @@ class LoginClient(object):
             return access_token, expires_in
 
         return '', ''
-
-    def request_access_token_tv(self, code, client_id='', client_secret=''):
-        client_id = client_id or self.CONFIGS['youtube-tv']['id']
-        client_secret = client_secret or self.CONFIGS['youtube-tv']['secret']
-        return self.request_access_token(code, client_id=client_id, client_secret=client_secret)
 
     def request_access_token(self, code, client_id='', client_secret=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
@@ -210,10 +196,6 @@ class LoginClient(object):
             context.log_error('Requesting access token: Config: |%s| Client id [:5]: |%s| Client secret [:5]: |%s| Code: |%s| Response dump |%s|' %
                               (config_type, client_id[:5], client_secret[:5], str(result.status_code), response_dump))
             raise LoginException('Login Failed: Unknown response')
-
-    def request_device_and_user_code_tv(self):
-        client_id = str(self.CONFIGS['youtube-tv']['id'])
-        return self.request_device_and_user_code(client_id=client_id)
 
     def request_device_and_user_code(self, client_id=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
