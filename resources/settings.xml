@@ -95,6 +95,10 @@
         <setting type="sep"/>
         <setting id="kodion.playback.history" type="bool" label="30675" default="false"/>
         <setting type="sep"/>
+        <setting id="kodion.view.override" type="bool" label="30026" default="false"/>
+        <setting id="kodion.view.default" type="number" label="30027" enable="eq(-1,true)" default="50"/>
+        <setting id="kodion.view.episodes" type="number" label="30028" enable="eq(-2,true)" default="50"/>
+        <setting type="sep"/>
         <setting id="kodion.cache.size" type="slider" label="30024" default="10" range="5,1,100" option="int"/>
         <setting id="kodion.setup_wizard" type="bool" label="30025" default="true"/>
         <setting type="sep"/>

@@ -90,6 +90,9 @@ class AbstractSettings(object):
     def is_setup_wizard_enabled(self):
         return self.get_bool(constants.setting.SETUP_WIZARD, False)
 
+    def is_override_view_enabled(self):
+        return self.get_bool(constants.setting.VIEW_OVERRIDE, False)
+
     def is_support_alternative_player_enabled(self):
         return self.get_bool(constants.setting.SUPPORT_ALTERNATIVE_PLAYER, False)
 

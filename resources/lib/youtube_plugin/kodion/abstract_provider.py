@@ -73,10 +73,29 @@ class AbstractProvider(object):
         self._dict_path[re_path] = method_name
 
     def _process_wizard(self, context):
+        def _setup_views(_context, _view):
+            view_manager = utils.ViewManager(_context)
+            if not view_manager.update_view_mode(_context.localize(self._local_map['kodion.wizard.view.%s' % _view]),
+                                                 _view):
+                return
+
+            _context.get_settings().set_bool(constants.setting.VIEW_OVERRIDE, True)
+
         # start the setup wizard
         wizard_steps = []
         if context.get_settings().is_setup_wizard_enabled():
             context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
+            if utils.ViewManager(context).has_supported_views():
+                views = self.get_wizard_supported_views()
+                for view in views:
+                    if view in utils.ViewManager.SUPPORTED_VIEWS:
+                        wizard_steps.append((_setup_views, [context, view]))
+                    else:
+                        context.log_warning('[Setup-Wizard] Unsupported view "%s"' % view)
+            else:
+                skin_id = context.get_ui().get_skin_id()
+                context.log("ViewManager: Unknown skin id '%s'" % skin_id)
+
             wizard_steps.extend(self.get_wizard_steps(context))
 
         if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
@@ -279,7 +298,7 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
         else:
-            context.set_content_type(constants.content_type.FILES)
+            context.set_content_type(constants.content_type.VIDEOS)
             result = []
 
             location = str(context.get_param('location', False)).lower() == 'true'

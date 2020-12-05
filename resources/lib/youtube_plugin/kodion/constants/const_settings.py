@@ -35,6 +35,10 @@ HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web.urls'  # (bool)
 
+VIEW_OVERRIDE = 'kodion.view.override'  # (bool)
+VIEW_DEFAULT = 'kodion.view.default'  # (int)
+VIEW_X = 'kodion.view.%s'  # (int)
+
 ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
 DASH_VIDEOS = 'kodion.mpd.videos'  # (bool)
