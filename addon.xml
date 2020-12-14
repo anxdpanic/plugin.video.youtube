@@ -14,6 +14,8 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [fix] my subscriptions section using YouTube RSS |contrib: PureHemp|
+[fix] items per page settings on Kodi 19
+[chg] recommendations only available for users with custom history playlist id configured
 [rem] remove usage of discontinued api and dual login (no longer required)
         </news>
         <assets>
