@@ -1382,14 +1382,18 @@ class Provider(kodion.AbstractProvider):
             my_subscriptions_filtered_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_filtered_item)
 
+        access_manager = context.get_access_manager()
+
         # Recommendations
         if self.is_logged_in() and settings.get_bool('youtube.folder.recommendations.show', True):
-            recommendations_item = DirectoryItem(
-                context.localize(self.LOCAL_MAP['youtube.recommendations']),
-                context.create_uri(['special', 'recommendations']),
-                context.create_resource_path('media', 'popular.png'))
-            recommendations_item.set_fanart(self.get_fanart(context))
-            result.append(recommendations_item)
+            watch_history_playlist_id = access_manager.get_watch_history_id()
+            if watch_history_playlist_id != 'HL':
+                recommendations_item = DirectoryItem(
+                    context.localize(self.LOCAL_MAP['youtube.recommendations']),
+                    context.create_uri(['special', 'recommendations']),
+                    context.create_resource_path('media', 'popular.png'))
+                recommendations_item.set_fanart(self.get_fanart(context))
+                result.append(recommendations_item)
 
         # what to watch
         if settings.get_bool('youtube.folder.popular_right_now.show', True):
@@ -1430,8 +1434,6 @@ class Provider(kodion.AbstractProvider):
 
         # subscriptions
         if self.is_logged_in():
-            access_manager = context.get_access_manager()
-
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):
                 my_channel_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.my_channel']),

@@ -298,6 +298,15 @@ class YouTube(LoginClient):
         # a recommended set. We cache aggressively because searches incur a high
         # quota cost of 100 on the YouTube API.
         # Note this is a first stab attempt and can be refined a lot more.
+        payload = {
+            'kind': 'youtube#activityListResponse',
+            'items': []
+        }
+
+        watch_history_id = _context.get_access_manager().get_watch_history_id()
+        if not watch_history_id or watch_history_id == 'HL':
+            return payload
+
         cache = _context.get_data_cache()
 
         # Do we have a cached result?
@@ -326,23 +335,22 @@ class YouTube(LoginClient):
                     item['plugin_fetched_for'] = video_id
                 responses.extend(di['items'])
 
-        history = self.get_watch_history()
-        result = {
-            'kind': 'youtube#activityListResponse',
-            'items': []
-        }
+        history = self.get_playlist_items(watch_history_id, max_results=50)
+
         if not history.get('items'):
-            return result
+            return payload
 
         threads = []
         candidates = []
         already_fetched_for_video_ids = [item['plugin_fetched_for'] for item in items]
         history_items = [item for item in history['items']
-                         if re.match(r'(?P<video_id>[\w-]{11})', item['id'])]
+                         if re.match(r'(?P<video_id>[\w-]{11})',
+                                     item['snippet']['resourceId']['videoId'])]
+
         # TODO:
         # It would be nice to make this 8 user configurable
         for item in history_items[:8]:
-            video_id = item['id']
+            video_id = item['snippet']['resourceId']['videoId']
             if video_id not in already_fetched_for_video_ids:
                 thread = threading.Thread(target=helper, args=(video_id, candidates))
                 threads.append(thread)
@@ -385,7 +393,10 @@ class YouTube(LoginClient):
 
             # Ensure a single channel isn't hogging the page
             item = items.pop()
-            channel_id = item['snippet']['channelId']
+            channel_id = item.get('snippet', {}).get('channelId')
+            if not channel_id:
+                continue
+
             channel_counts.setdefault(channel_id, 0)
             if channel_counts[channel_id] <= 3:
                 # Use the item
@@ -408,20 +419,20 @@ class YouTube(LoginClient):
         )
 
         # Finalize result
-        result['items'] = sorted_items
+        payload['items'] = sorted_items
         """
         # TODO:
         # Enable pagination
-        result['pageInfo'] = {
+        payload['pageInfo'] = {
             'resultsPerPage': 50,
             'totalResults': len(sorted_items)
         }
         """
         # Update cache
-        cache.set(cache_home_key, json.dumps(result))
+        cache.set(cache_home_key, json.dumps(payload))
 
         # If there are no sorted_items we fall back to default API behaviour
-        return result
+        return payload
 
     def get_activities(self, channel_id, page_token=''):
         params = {'part': 'snippet,contentDetails',
