@@ -16,6 +16,7 @@
 [fix] my subscriptions section using YouTube RSS |contrib: PureHemp|
 [fix] items per page settings on Kodi 19
 [chg] recommendations only available for users with custom history playlist id configured
+[chg] no longer show watch later unless custom watch later playlist is configured
 [rem] remove usage of discontinued api and dual login (no longer required)
         </news>
         <assets>

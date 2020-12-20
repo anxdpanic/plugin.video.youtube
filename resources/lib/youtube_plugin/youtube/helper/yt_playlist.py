@@ -175,8 +175,9 @@ def _process_select_playlist(provider, context):
             my_playlists = resource_manager.get_related_playlists(channel_id='mine')
             if 'watchLater' in my_playlists:
                 watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
-                items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.watch_later'])), '',
-                              watch_later_playlist_id, context.create_resource_path('media', 'watch_later.png')))
+                if watch_later_playlist_id:
+                    items.append((ui.bold(context.localize(provider.LOCAL_MAP['youtube.watch_later'])), '',
+                                  watch_later_playlist_id, context.create_resource_path('media', 'watch_later.png')))
 
         for playlist in playlists:
             snippet = playlist.get('snippet', {})

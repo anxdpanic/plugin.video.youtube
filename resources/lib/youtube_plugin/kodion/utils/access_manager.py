@@ -97,16 +97,27 @@ class AccessManager(object):
         """
 
         self._json = self._jstore.get_data()
-        current_playlist_id = self._json['access_manager']['users'].get(self._user, {}).get('watch_later', ' WL')
+        current_playlist_id = self._json['access_manager']['users'].get(self._user, {}).get('watch_later', '')
         settings_playlist_id = self._settings.get_string('youtube.folder.watch_later.playlist', '').strip()
-        if settings_playlist_id.lower() == 'wl':
-            settings_playlist_id = ' WL'
-        if settings_playlist_id:
-            if current_playlist_id != settings_playlist_id:
-                self._json['access_manager']['users'][self._user]['watch_later'] = settings_playlist_id
-                self._jstore.save(self._json)
+
+        if settings_playlist_id.lower().startswith(('wl', ' wl')):
             self._settings.set_string('youtube.folder.watch_later.playlist', '')
-        return self._json['access_manager']['users'].get(self._user, {}).get('watch_later', ' WL')
+            settings_playlist_id = ''
+
+        if current_playlist_id.lower().startswith(('wl', ' wl')):
+            self._json['access_manager']['users'][self._user]['watch_later'] = settings_playlist_id
+            self._jstore.save(self._json)
+
+            self._settings.set_string('youtube.folder.watch_later.playlist', '')
+            settings_playlist_id = ''
+
+        if settings_playlist_id and current_playlist_id != settings_playlist_id:
+            self._json['access_manager']['users'][self._user]['watch_later'] = settings_playlist_id
+            self._jstore.save(self._json)
+
+            self._settings.set_string('youtube.folder.watch_later.playlist', '')
+
+        return self._json['access_manager']['users'].get(self._user, {}).get('watch_later', '')
 
     def set_watch_later_id(self, playlist_id):
         """
@@ -114,9 +125,9 @@ class AccessManager(object):
         :param playlist_id: string, watch later playlist id
         :return:
         """
+        if playlist_id.lower() == 'wl' or playlist_id.lower() == ' wl':
+            playlist_id = ''
 
-        if playlist_id.strip().lower() == 'wl':
-            playlist_id = ' WL'
         self._json = self._jstore.get_data()
         self._json['access_manager']['users'][self._user]['watch_later'] = playlist_id
         self._settings.set_string('youtube.folder.watch_later.playlist', '')
