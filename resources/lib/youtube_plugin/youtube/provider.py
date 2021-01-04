@@ -1443,8 +1443,8 @@ class Provider(kodion.AbstractProvider):
                 result.append(my_channel_item)
 
             # watch later
-            if settings.get_bool('youtube.folder.watch_later.show', True):
-                watch_later_playlist_id = access_manager.get_watch_later_id()
+            watch_later_playlist_id = access_manager.get_watch_later_id()
+            if settings.get_bool('youtube.folder.watch_later.show', True) and watch_later_playlist_id:
                 watch_later_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.watch_later']),
                                                  context.create_uri(
                                                      ['channel', 'mine', 'playlist', watch_later_playlist_id]),
