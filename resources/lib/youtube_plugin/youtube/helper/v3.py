@@ -207,7 +207,7 @@ def _process_list_response(provider, context, json_data):
             # video
             if kind == 'video':
                 video_id = yt_item['id']['videoId']
-                snippet = yt_item['snippet']
+                snippet = yt_item.get('snippet', {})
                 is_upcoming = snippet.get('liveBroadcastContent', '').lower() == 'upcoming'
                 title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
