@@ -1,3 +1,7 @@
+6.8.10
+[fix] fix javascript player retrieval and playback of some videos for affected users |contrib: thomazz-nl|
+    - Invalid URL 'http://': No host supplied
+
 6.8.9
 [fix] my subscriptions section using YouTube RSS |contrib: PureHemp|
 [fix] items per page settings on Kodi 19
