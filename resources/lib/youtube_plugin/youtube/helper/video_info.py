@@ -605,12 +605,18 @@ class VideoInfo(object):
             return _normalize(javascript_url)
 
         page_result = self.get_embed_page(video_id)
-        html = page_result.get('html').encode('ascii', 'ignore').decode('ascii')
+        html = page_result.get('html')
+        html = html.encode('utf8', 'ignore')
+        html = html.decode('utf8')
 
         if not html:
             return ''
 
-        found = re.search(r'<script src="(?P<url>[^"]+?player_[^"]+?/base\.js)"\s*>\s*</script\s*>', html)
+        found = re.search(
+            r'<script src="(?P<url>[^"]+?)"\s*name="player_[^/]+?/base"\s*>\s*</script\s*>', html
+        )
+        if not found:
+            found = re.search(r'<script src="(?P<url>[^"]+?player_[^"]+?/base\.js)"\s*>\s*</script\s*>', html)
 
         if found:
             javascript_url = found.group('url')
