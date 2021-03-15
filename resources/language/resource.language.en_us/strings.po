@@ -1227,3 +1227,83 @@ msgstr ""
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+msgctxt "#30900"
+msgid "Subscriptions groups"
+msgstr ""
+
+msgctxt "#30901"
+msgid "Add to group"
+msgstr ""
+
+msgctxt "#30902"
+msgid "Remove from group"
+msgstr ""
+
+msgctxt "#30903"
+msgid "Delete group"
+msgstr ""
+
+msgctxt "#30904"
+msgid "Create new group"
+msgstr ""
+
+msgctxt "#30905"
+msgid "Enter a name for new group"
+msgstr ""
+
+msgctxt "#30906"
+msgid "Group '%s' created"
+msgstr ""
+
+msgctxt "#30907"
+msgid "Are you sure you want to remove group '%s'?"
+msgstr ""
+
+msgctxt "#30908"
+msgid "Group '%s' removed"
+msgstr ""
+
+msgctxt "#30909"
+msgid "Select new group for channel '%s'"
+msgstr ""
+
+msgctxt "#30910"
+msgid "Сhannel '%s' added to group '%s'"
+msgstr ""
+
+msgctxt "#30911"
+msgid "Are you sure you want remove channel '%s' from group '%s'?"
+msgstr ""
+
+msgctxt "#30912"
+msgid "Сhannel '%s' removed from group '%s'"
+msgstr ""
+
+msgctxt "#30913"
+msgid "[Without groups]"
+msgstr ""
+
+msgctxt "#30914"
+msgid "Move to other group"
+msgstr ""
+
+msgctxt "#30915"
+msgid "Select new group for channel '%s' from group '%s'"
+msgstr ""
+
+msgctxt "#30916"
+msgid "Сhannel '%s' moved from group '%s' to group '%s'"
+msgstr ""
+
+msgctxt "#30917"
+msgid "Rename group"
+msgstr ""
+
+msgctxt "#30918"
+msgid "Enter a new name for group"
+msgstr ""
+
+msgctxt "#30919"
+msgid "Group '%s' renamed to '%s'"
+msgstr ""

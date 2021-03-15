@@ -119,6 +119,45 @@ def append_add_my_subscriptions_filter(context_menu, provider, context, channel_
                                                                    'action': 'add'})))
 
 
+def append_remove_tag(context_menu, provider, context, channel_id, tag):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove.tag']),
+                         'RunPlugin(%s)' % context.create_uri(['tags', 'edit'],
+                                                              {'channel_id': channel_id,
+                                                               'tag': tag,
+                                                               'action': 'remove'})))
+
+
+def append_add_tag(context_menu, provider, context, channel_id):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.add.tag']),
+                         'RunPlugin(%s)' % context.create_uri(['tags', 'edit'],
+                                                              {'channel_id': channel_id,
+                                                               'action': 'add'})))
+
+
+def append_delete_tag(context_menu, provider, context, tag):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.delete.tag']),
+                         'RunPlugin(%s)' % context.create_uri(['tags', 'edit'],
+                                                              {'tag': tag,
+                                                               'action': 'delete'})))
+
+def append_move_tag(context_menu, provider, context, channel_id, tag):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.move.tag']),
+                         'RunPlugin(%s)' % context.create_uri(['tags', 'edit'],
+                                                              {'channel_id': channel_id,
+                                                               'tag': tag,
+                                                               'action': 'move'})))
+
+def append_new_tag(context_menu, provider, context):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.new.tag']),
+                         'RunPlugin(%s)' % context.create_uri(['tags', 'edit'],
+                                                              {'action': 'new'})))
+
+def append_rename_tag(context_menu, provider, context, tag):
+    context_menu.append((context.localize(provider.LOCAL_MAP['youtube.rename.tag']),
+                         'RunPlugin(%s)' % context.create_uri(['tags', 'edit'],
+                                                              {'tag': tag,
+                                                               'action': 'rename'})))
+
 def append_rate_video(context_menu, provider, context, video_id, refresh_container=False):
     if refresh_container:
         refresh_container = '1'

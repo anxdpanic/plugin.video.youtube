@@ -633,7 +633,7 @@ msgstr "Черный список"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "Добавить в фильтр подписок"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
@@ -1226,3 +1226,83 @@ msgstr ""
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+msgctxt "#30900"
+msgid "Subscriptions groups"
+msgstr "Группы подписок"
+
+msgctxt "#30901"
+msgid "Add to group"
+msgstr "Добавить в группу"
+
+msgctxt "#30902"
+msgid "Remove from group"
+msgstr "Удалить из группы"
+
+msgctxt "#30903"
+msgid "Delete group"
+msgstr "Удалить группу"
+
+msgctxt "#30904"
+msgid "Create new group"
+msgstr "Создать группу"
+
+msgctxt "#30905"
+msgid "Enter a name for new group"
+msgstr "Введите название новой группы"
+
+msgctxt "#30906"
+msgid "Group '%s' created"
+msgstr "Группа '%s' создана"
+
+msgctxt "#30907"
+msgid "Are you sure you want to remove group '%s'?"
+msgstr "Вы уверены, что хотите удалить группу '%s'?"
+
+msgctxt "#30908"
+msgid "Group '%s' removed"
+msgstr "Группа '%s' удалена"
+
+msgctxt "#30909"
+msgid "Select new group for channel '%s'"
+msgstr "Выберете новую группу для канала '%s'"
+
+msgctxt "#30910"
+msgid "Сhannel '%s' added to group '%s'"
+msgstr "Канал '%s' добавлен в группу '%s'"
+
+msgctxt "#30911"
+msgid "Are you sure you want remove channel '%s' from group '%s'?"
+msgstr "Вы уверены, что хотите удалить канал '%s' из группы '%s'?"
+
+msgctxt "#30912"
+msgid "Сhannel '%s' removed from group '%s'"
+msgstr "Канал '%s' удален из группы '%s'"
+
+msgctxt "#30913"
+msgid "[Without groups]"
+msgstr "[Без групп]"
+
+msgctxt "#30914"
+msgid "Move to other group"
+msgstr "Переместить в другую группу"
+
+msgctxt "#30915"
+msgid "Select new group for channel '%s' from group '%s'"
+msgstr "Выберете новую группу для канала '%s' из группы '%s'"
+
+msgctxt "#30916"
+msgid "Сhannel '%s' moved from group '%s' to group '%s'"
+msgstr "Канал '%s' перемещен из группы '%s' в группу '%s'"
+
+msgctxt "#30917"
+msgid "Rename group"
+msgstr "Переименовать группу"
+
+msgctxt "#30918"
+msgid "Enter a new name for group"
+msgstr "Введите новое название группы"
+
+msgctxt "#30919"
+msgid "Group '%s' renamed to '%s'"
+msgstr "Группа '%s' переименована в '%s'"

@@ -16,6 +16,7 @@ import time
 from ... import kodion
 from ...kodion import utils
 from ...youtube.helper import yt_context_menu
+from ...youtube.helper import tags
 
 try:
     import inputstreamhelper
@@ -113,6 +114,8 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         filter_string = filter_string.replace(', ', ',')
         filter_list = filter_string.split(',')
         filter_list = [x.lower() for x in filter_list]
+        
+    tags_count = len(tags.get_tags())
 
     thumb_size = context.get_settings().use_thumbnail_size()
     for channel_id in list(channel_data.keys()):
@@ -149,6 +152,8 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
                 yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
             else:
                 yt_context_menu.append_add_my_subscriptions_filter(context_menu, provider, context, title)
+            if tags_count > 0:
+                yt_context_menu.append_add_tag(context_menu, provider, context, channel_id)
 
         channel_item.set_context_menu(context_menu)
 
@@ -327,16 +332,6 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                     video_item.set_episode(int(re_match.group('episode')))
                 break
 
-        # plot
-        channel_name = snippet.get('channelTitle', '')
-        description = kodion.utils.strip_html_from_text(snippet['description'])
-        if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
-            description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
-        video_item.set_studio(channel_name)
-        # video_item.add_cast(channel_name)
-        video_item.add_artist(channel_name)
-        video_item.set_plot(description)
-
         # date time
         if not datetime and 'publishedAt' in snippet and snippet['publishedAt']:
             datetime = utils.datetime_parser.parse(snippet['publishedAt'])
@@ -348,6 +343,17 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             video_item.set_premiered_from_datetime(datetime)
             video_item.set_date_from_datetime(datetime)
 
+        # plot
+        channel_name = snippet.get('channelTitle', '')
+        description = kodion.utils.strip_html_from_text(snippet['description'])
+        if datetime:
+            description = '[' + datetime.strftime("%Y-%m-%d") + '][CR]' + description
+        if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
+            description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
+        video_item.set_studio(channel_name)
+        # video_item.add_cast(channel_name)
+        video_item.add_artist(channel_name)
+        video_item.set_plot(description)
         # try to find a better resolution for the image
         image = video_item.get_image()
         if not image:
