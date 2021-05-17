@@ -875,7 +875,9 @@ class YouTube(LoginClient):
 
                 # sorting by publish date
                 def _sort_by_date_time(e):
-                    return time.mktime(datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S").timetuple())
+                    return datetime_parser.since_epoch(
+                        datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S")
+                    )
 
                 _result['items'].sort(reverse=True, key=_sort_by_date_time)
 
