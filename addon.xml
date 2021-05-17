@@ -13,8 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] fix javascript player retrieval and playback of some videos for affected users |contrib: thomazz-nl|
-    - Invalid URL &#39;http://&#39;: No host supplied
+[fix] encoding issues in search history |contrib: dreznichuk|
         </news>
         <assets>
             <icon>icon.png</icon>
