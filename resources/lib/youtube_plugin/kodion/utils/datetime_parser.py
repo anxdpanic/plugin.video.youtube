@@ -187,3 +187,7 @@ def strptime(s, fmt='%Y-%m-%dT%H:%M:%S.%fZ'):
 
 def total_seconds(t_delta):  # required for python 2.6 which doesn't have datetime.timedelta.total_seconds
     return 24 * 60 * 60 * t_delta.days + t_delta.seconds + (t_delta.microseconds // 1000000.)
+
+
+def since_epoch(dt_object):
+    return total_seconds(dt_object - datetime(1970, 1, 1))

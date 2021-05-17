@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.10" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.11" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -13,8 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] fix javascript player retrieval and playback of some videos for affected users |contrib: thomazz-nl|
-    - Invalid URL &#39;http://&#39;: No host supplied
+[fix] mktime overflow when loading My Subscriptions
+[fix] encoding issues in search history |contrib: dreznichuk|
         </news>
         <assets>
             <icon>icon.png</icon>
