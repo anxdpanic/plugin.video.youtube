@@ -196,8 +196,9 @@ class Storage(object):
     def _get(self, item_id):
         def _decode(obj):
             if PY2:
-                obj = str(obj)
-            return pickle.loads(obj)
+                return pickle.loads(str(obj))
+            else:
+                return pickle.loads(obj, encoding='utf-8')
 
         self._open()
         query = 'SELECT time, value FROM %s WHERE key=?' % self._table_name

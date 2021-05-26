@@ -1,3 +1,7 @@
+6.8.11
+[fix] mktime overflow when loading My Subscriptions
+[fix] encoding issues in search history |contrib: dreznichuk|
+
 6.8.10
 [fix] fix javascript player retrieval and playback of some videos for affected users |contrib: thomazz-nl|
     - Invalid URL 'http://': No host supplied
