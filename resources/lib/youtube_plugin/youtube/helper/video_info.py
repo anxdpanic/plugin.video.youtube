@@ -769,9 +769,12 @@ class VideoInfo(object):
         meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape')
 
         if PY2:
-            meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
-            meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
-
+            try:
+                meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+                meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
+            except UnicodeDecodeError:
+                meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
+                meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
         else:
             meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
             meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
