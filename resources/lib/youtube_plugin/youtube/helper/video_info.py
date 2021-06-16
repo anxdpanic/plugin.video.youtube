@@ -576,7 +576,7 @@ class VideoInfo(object):
 
     @staticmethod
     def get_player_response(html):
-        response = None
+        response = {}
 
         found = re.search(
                 r'ytInitialPlayerResponse\s*=\s*(?P<response>{.+?})\s*;\s*(?:var\s+meta|</script|\n)', html
