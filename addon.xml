@@ -13,6 +13,11 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+6.8.14
+[fixup] playback of some streams due to encoding issues
+[fixup] default player response type
+
+6.8.13
 [fix] player config and client discovery
 [fix] No Streams Found |contrib: 14mRh4X0r|
 [fix] capability map to contain unversioned capabilities |contrib: jmbreuer|
