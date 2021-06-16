@@ -740,7 +740,6 @@ class VideoInfo(object):
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
             player_response = json.loads(params.get('player_response', '{}'))
-            break
 
         playability_status = player_response.get('playabilityStatus', {})
 
