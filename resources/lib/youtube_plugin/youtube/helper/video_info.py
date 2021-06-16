@@ -581,6 +581,18 @@ class VideoInfo(object):
 
         return config
 
+    @staticmethod
+    def get_player_response(html):
+        response = None
+
+        found = re.search(
+                r'ytInitialPlayerResponse\s*=\s*(?P<response>{.+?})\s*;\s*(?:var\s+meta|</script|\n)', html
+        )
+        if found:
+            response = json.loads(found.group('response'))
+
+        return response
+
     def get_player_js(self, video_id, javascript_url=''):
         def _normalize(url):
             if url in ['http://', 'https://']:
@@ -704,6 +716,7 @@ class VideoInfo(object):
 
         player_config = self.get_player_config(html)
         player_client = self.get_player_client(html)
+        player_response = self.get_player_response(html)
 
         http_params = {
             'hl': self.language,
@@ -724,17 +737,16 @@ class VideoInfo(object):
         el_values = ['detailpage', 'embedded']
 
         params = dict()
-        player_response = dict()
 
         for el in el_values:
+            if player_response.get('streamingData', {}).get('formats', []) or \
+                    player_response.get('streamingData', {}).get('hlsManifestUrl', ''):
+                break
             http_params['el'] = el
             result = requests.get(video_info_url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
             player_response = json.loads(params.get('player_response', '{}'))
-            if player_response.get('streamingData', {}).get('formats', []) or \
-                    player_response.get('streamingData', {}).get('hlsManifestUrl', ''):
-                break
 
         playability_status = player_response.get('playabilityStatus', {})
 
