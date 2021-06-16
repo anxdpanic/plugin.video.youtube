@@ -13,8 +13,10 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] mktime overflow when loading My Subscriptions
-[fix] encoding issues in search history |contrib: dreznichuk|
+[fix] player config and client discovery
+[fix] No Streams Found |contrib: 14mRh4X0r|
+[fix] capability map to contain unversioned capabilities |contrib: jmbreuer|
+[lang] zh_tw strings |contrib: JuenTingShie|
         </news>
         <assets>
             <icon>icon.png</icon>
