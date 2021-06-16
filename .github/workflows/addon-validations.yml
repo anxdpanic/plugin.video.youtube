@@ -1,0 +1,29 @@
+name: Add-on Validations
+
+on:
+  push:
+    branches: [ master, main ]
+
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  addon-validations:
+    runs-on: ubuntu-latest
+    name: Add-on Validations
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Clean-up Add-on Folder
+      run: |
+        rm -rf LICENSES/
+
+    - name: Kodi Add-on Checker
+      id: kodi-addon-checker
+      uses: xbmc/action-kodi-addon-checker@v1.2
+      with:
+        kodi-version: isengard
+        is-pr: false
+        addon-id: ${{ github.event.repository.name }}
