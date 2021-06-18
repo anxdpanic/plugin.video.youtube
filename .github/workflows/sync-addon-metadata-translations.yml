@@ -9,7 +9,7 @@ on:
 
 jobs:
   default:
-    if: github.repository == 'anxdpanic/plug.video.youtube'
+    if: github.repository == 'anxdpanic/plugin.video.youtube'
 
     runs-on: ubuntu-latest
 
