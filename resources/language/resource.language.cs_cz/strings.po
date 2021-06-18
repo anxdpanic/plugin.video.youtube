@@ -16,6 +16,18 @@ msgstr ""
 "Language: cs_CZ\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Plugin pro YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube je jedna z největších webových stránek světa sdílející video."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "Tento plugin není schválen společností Google"
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Plugin pro YouTube"

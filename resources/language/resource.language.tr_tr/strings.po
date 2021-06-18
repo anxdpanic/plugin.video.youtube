@@ -16,6 +16,18 @@ msgstr ""
 "Language: tr_TR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "YouTube için eklenti"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir"
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "Bu eklenti Google tarafından üretilmemiştir"
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""

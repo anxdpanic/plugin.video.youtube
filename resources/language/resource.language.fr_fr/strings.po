@@ -17,6 +17,18 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.0.6\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Plugin pour YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube est l'un des plus grands sites de partage vidéos du monde."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr ""
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Plugin pour YouTube"
