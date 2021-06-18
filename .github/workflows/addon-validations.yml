@@ -13,17 +13,28 @@ jobs:
     name: Add-on Validations
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout Add-on
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.event.repository.name }}
 
-    - name: Clean-up Add-on Folder
-      run: |
-        rm -rf LICENSES/
+      - name: Checkout kodi-addon-checker
+        uses: actions/checkout@v2
+        with:
+          repository: xbmc/addon-check
+          path: addon-check
 
-    - name: Kodi Add-on Checker
-      id: kodi-addon-checker
-      uses: xbmc/action-kodi-addon-checker@v1.2
-      with:
-        kodi-version: isengard
-        is-pr: false
-        addon-id: ${{ github.event.repository.name }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install addon-check/
+
+      - name: Staging
+        run: |
+          rm -rf LICENSES/
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Kodi Add-on Checker
+        id: kodi-addon-checker
+        run: |
+          kodi-addon-checker ${{ github.event.repository.name }} --branch=isengard
