@@ -16,6 +16,18 @@ msgstr ""
 "Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "YouTube附加元件"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "「Youtube」是全世界最大的影片分享網站"
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "此附加元件未由Google支持"
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube 附加元件"

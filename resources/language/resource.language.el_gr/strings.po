@@ -16,6 +16,18 @@ msgstr ""
 "Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Πρόσθετο YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google"
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Πρόσθετο Youtube"

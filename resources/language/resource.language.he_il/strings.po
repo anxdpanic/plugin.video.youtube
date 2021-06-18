@@ -16,6 +16,18 @@ msgstr ""
 "Language: he_IL\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "תוסף עבור YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr ""
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "תוסף עבור-YouTube"

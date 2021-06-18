@@ -17,6 +17,18 @@ msgstr ""
 "Last-Translator: The Lacesz <<echo dGhlbGFjZXN6QGdtYWlsLmNvbQ== | base64 -d>>\n"
 "X-Generator: Poedit 2.3.1\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "YouTube kiegészítő"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "A YouTube világ egyik legnagyobb videómegosztó weboldala."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr ""
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube kiegészítő"

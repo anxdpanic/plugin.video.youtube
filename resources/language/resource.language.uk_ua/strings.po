@@ -16,6 +16,18 @@ msgstr ""
 "Language: uk_UA\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
 
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr ""
+
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
