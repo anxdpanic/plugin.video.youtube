@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2017-03-15 21:00+0200\n"
+"POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2017-03-23 14:00+0200\n"
 "Last-Translator: \n"
 "Language-Team: teemue\n"
@@ -31,11 +31,9 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube-lisäosa"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube on yksi suurimmista videonjakosivustoista maailmassa."
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Yleistä"
@@ -172,9 +170,11 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Valinnainen historialistan ID"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "Suosikit"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -256,9 +256,11 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Tyhjennä"
 
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API"
+msgid "API"
+msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
@@ -1223,3 +1225,11 @@ msgstr ""
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Suosikit"
+
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API"

@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
+"Language: de_DE\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de_DE\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "Addon Summary"
@@ -31,13 +31,10 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Plugin für YouTube"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube ist eines der größten Video-Sharing-Websites der Welt."
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Allgemein"
@@ -51,7 +48,6 @@ msgid "Password"
 msgstr "Passwort"
 
 # empty strings from id 30003 to 30006
-
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr "MPEG-DASH verwenden"
@@ -101,7 +97,6 @@ msgid "1080p Live / 720p (HD)"
 msgstr "1080p Live / 720p (HD)"
 
 # empty strings 30019
-
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "3D erlauben"
@@ -180,10 +175,9 @@ msgstr "Eigene Verlaufs-Wiedergabeliste-ID"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "Favoriten"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -267,7 +261,6 @@ msgstr "Leeren"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr "API"
@@ -294,7 +287,6 @@ msgstr "Vordefinierte API-Schlüssel verwenden"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Kanäle"
@@ -1238,3 +1230,9 @@ msgstr "Antworten"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "Bearbeitet"
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Favoriten"

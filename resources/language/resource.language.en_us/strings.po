@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
+"Language: en_US\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en_US\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 
 msgctxt "Addon Summary"
@@ -31,13 +31,10 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr ""
@@ -51,7 +48,6 @@ msgid "Password"
 msgstr ""
 
 # empty strings from id 30003 to 30006
-
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr ""
@@ -101,7 +97,6 @@ msgid "1080p Live / 720p (HD)"
 msgstr ""
 
 # empty strings 30019
-
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr ""
@@ -180,7 +175,6 @@ msgstr ""
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
 msgid "Favourites"
 msgstr "Favorites"
@@ -267,7 +261,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr ""
@@ -294,7 +287,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr ""
@@ -798,7 +790,6 @@ msgstr ""
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
 msgstr ""
-
 
 msgctxt "#30626"
 msgid "Delete temporary files"

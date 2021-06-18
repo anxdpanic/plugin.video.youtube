@@ -171,9 +171,11 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Personnaliser l'ID historique de la liste de lecture"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "Favoris"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -255,9 +257,11 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Nettoyer"
 
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
-msgid "API Key"
-msgstr "Clé de l’API"
+msgid "API"
+msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
@@ -1224,3 +1228,11 @@ msgstr "Réponses"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "Édité"
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Favoris"
+
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "Clé de l’API"
