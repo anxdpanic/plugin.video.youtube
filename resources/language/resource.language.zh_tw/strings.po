@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: 2021-06-12 13:33+0800\n"
 "Last-Translator: Juentingshie t104340042@ntut.org.tw\n"
 "Language-Team: LANGUAGE\n"
+"Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_TW\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 msgctxt "Addon Summary"
@@ -31,13 +31,10 @@ msgstr "此附加元件未由Google支持"
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube 附加元件"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube 是全球最大的一個影片分享網站。"
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "一般設定"
@@ -49,8 +46,8 @@ msgstr "帳戶"
 msgctxt "#30002"
 msgid "Password"
 msgstr "密碼"
-# empty strings from id 30003 to 30006
 
+# empty strings from id 30003 to 30006
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr "使用 MPEG-DASH"
@@ -178,7 +175,6 @@ msgstr "自定觀看歷史列表 ID"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
 msgid "Favourites"
 msgstr "我的收藏"
@@ -265,7 +261,6 @@ msgstr "清除"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr "API"
@@ -292,7 +287,6 @@ msgstr "使用預設的 API 金鑰"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "頻道"

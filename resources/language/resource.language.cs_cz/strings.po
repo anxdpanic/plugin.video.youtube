@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
+"Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs_CZ\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
 
 msgctxt "Addon Summary"
@@ -31,13 +31,10 @@ msgstr "Tento plugin není schválen společností Google"
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Plugin pro YouTube"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube je jedna z největších webových stránek světa sdílející video."
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Obecné"
@@ -51,7 +48,6 @@ msgid "Password"
 msgstr "Heslo"
 
 # empty strings from id 30003 to 30006
-
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr "Použít MPEG-DASH"
@@ -101,7 +97,6 @@ msgid "1080p Live / 720p (HD)"
 msgstr "1080p Živě / 720p (HD)"
 
 # empty strings 30019
-
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "Povolit 3D"
@@ -180,10 +175,9 @@ msgstr "Vlastní historie ID seznamu"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "Oblíbené"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -267,10 +261,9 @@ msgstr "Vyčistit"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API"
+msgid "API"
+msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
@@ -294,7 +287,6 @@ msgstr "Použít předvolbu nastavení API KEY"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Kanály"
@@ -1238,3 +1230,15 @@ msgstr ""
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Oblíbené"
+
+# YouTube
+# empty strings from id 30121 to 30199
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API"

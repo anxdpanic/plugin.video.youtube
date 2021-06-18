@@ -10,10 +10,10 @@ msgstr ""
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_CN\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 
 msgctxt "Addon Summary"
@@ -31,11 +31,9 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube 插件"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube 是全世界最大的视频分享网站。"
-
 msgctxt "#30000"
 msgid "General"
 msgstr "常规"
@@ -47,6 +45,15 @@ msgstr "账号"
 msgctxt "#30002"
 msgid "Password"
 msgstr "密码"
+
+# empty strings from id 30003 to 30006
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr ""
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -164,9 +171,11 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "定制 “历史记录” 播放列表 ID"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "我的收藏"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -250,10 +259,9 @@ msgstr "清除"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API 密钥"
+msgid "API"
+msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
@@ -277,7 +285,6 @@ msgstr "使用预设的 API 密钥设置"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "频道"
@@ -1221,3 +1228,13 @@ msgstr "回复"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "已编辑"
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "我的收藏"
+
+# YouTube
+# empty strings from id 30121 to 30199
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API 密钥"
