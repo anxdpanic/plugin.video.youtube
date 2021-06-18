@@ -320,7 +320,7 @@ class XbmcContext(AbstractContext):
             ia_loose_version = utils.loose_version(inputstream_version)
 
             for key in list(capability_map.keys()):
-                if capability_map[key] is None or (ia_loose_version >= utils.loose_version(capability_map[key])):
+                if capability_map[key] and (ia_loose_version >= utils.loose_version(capability_map[key])):
                     capabilities.append(key)
 
             return capabilities
