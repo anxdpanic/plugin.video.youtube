@@ -27,6 +27,7 @@
             <icon>icon.png</icon>
             <fanart>fanart.jpg</fanart>
         </assets>
+        <platform>all</platform>
         <summary lang="en_GB">Plugin for YouTube</summary>
         <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>
         <disclaimer lang="en_GB">This plugin is not endorsed by Google</disclaimer>
@@ -68,7 +69,6 @@
         <summary lang="tr_TR">YouTube için eklenti</summary>
         <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir</description>
         <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
-        <platform>all</platform>
         <license>GPL-2.0-only</license>
         <forum>https://ytaddon.panicked.xyz/forum</forum>
         <website>https://www.youtube.com</website>
