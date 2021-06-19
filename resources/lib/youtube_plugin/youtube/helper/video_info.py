@@ -747,7 +747,9 @@ class VideoInfo(object):
             result = requests.get(video_info_url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
-            player_response = json.loads(params.get('player_response', '{}'))
+            p_response = json.loads(params.get('player_response', '{}'))
+            if p_response:
+                player_response = p_response
 
         playability_status = player_response.get('playabilityStatus', {})
 
