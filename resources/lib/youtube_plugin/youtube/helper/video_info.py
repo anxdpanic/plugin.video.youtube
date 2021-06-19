@@ -551,12 +551,14 @@ class VideoInfo(object):
         params = {'hl': self.language,
                   'gl': self.region}
 
+        cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
+
         if self._access_token:
             params['access_token'] = self._access_token
 
         url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
 
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        result = requests.get(url, params=params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
         return {'html': result.text, 'cookies': result.cookies}
 
     @staticmethod
@@ -701,6 +703,10 @@ class VideoInfo(object):
 
         curl_headers = ''
         cookies = page_result.get('cookies', {})
+        cookies.update({
+            'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'
+        })
+
         if cookies:
             cookies_list = list()
             for c in cookies:
