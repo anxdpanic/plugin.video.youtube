@@ -551,12 +551,14 @@ class VideoInfo(object):
         params = {'hl': self.language,
                   'gl': self.region}
 
+        cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
+
         if self._access_token:
             params['access_token'] = self._access_token
 
         url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
 
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        result = requests.get(url, params=params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
         return {'html': result.text, 'cookies': result.cookies}
 
     @staticmethod
@@ -701,6 +703,10 @@ class VideoInfo(object):
 
         curl_headers = ''
         cookies = page_result.get('cookies', {})
+        cookies.update({
+            'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'
+        })
+
         if cookies:
             cookies_list = list()
             for c in cookies:
@@ -741,7 +747,9 @@ class VideoInfo(object):
             result = requests.get(video_info_url, params=http_params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
             data = result.text
             params = dict(urllib.parse.parse_qsl(data))
-            player_response = json.loads(params.get('player_response', '{}'))
+            p_response = json.loads(params.get('player_response', '{}'))
+            if p_response:
+                player_response = p_response
 
         playability_status = player_response.get('playabilityStatus', {})
 
@@ -772,8 +780,12 @@ class VideoInfo(object):
 
         if PY2:
             try:
-                meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
-                meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
+                if r'\u' not in meta_info['video']['title']:
+                    meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+                    meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
+                else:
+                    meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
+                    meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
             except UnicodeDecodeError:
                 meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
                 meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')

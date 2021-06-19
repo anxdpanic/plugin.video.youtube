@@ -1,3 +1,9 @@
+6.8.15
+[fixup] No streams found, consent cookies |contrib: jaylinski|
+[fixup] Age gate detection, show age gate error instead of 'No streams found'
+[fixup] encoding of some titles/authors - ie. russian
+[lang] translation updates from Weblate
+
 6.8.14
 [fixup] playback of some streams due to encoding issues
 [fixup] default player response type
