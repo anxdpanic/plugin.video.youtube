@@ -528,12 +528,14 @@ class VideoInfo(object):
                   'hl': self.language,
                   'gl': self.region}
 
+        cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
+
         if self._access_token:
             params['access_token'] = self._access_token
 
         url = 'https://www.youtube.com/watch'
 
-        result = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+        result = requests.get(url, params=params, headers=headers, cookies=cookies, verify=self._verify, allow_redirects=True)
         return {'html': result.text, 'cookies': result.cookies}
 
     def get_embed_page(self, video_id):
