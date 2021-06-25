@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: ru_RU\n"
+"PO-Revision-Date: 2021-06-25 01:29+0000\n"
+"Last-Translator: Dmitry Petrov <dimakrm361@gmail.com>\n"
+"Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ru_ru/>\n"
+"Language: ru_ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.7\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -26,7 +27,7 @@ msgstr "YouTube - популярнейший видеохостинговый с
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Плагин не поддерживается Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -167,11 +168,11 @@ msgstr "Поддержка альтернативного проигрывате
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "ID плейлиста для отложенного просмотра"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "ID плейлиста для истории"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
@@ -553,7 +554,7 @@ msgstr "Английский"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Спрашивать"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -573,19 +574,19 @@ msgstr "Вы уверены, что хотите заменить свой те�
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Установить как История"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Отвязать от истории"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Вы уверены, что хотите отвязать '%s' от истории просмотра?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Вы уверены, что хотите заменить текущий плейлист История на '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -693,11 +694,11 @@ msgstr "Настройка субтитров"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s с альтернативой %s"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Не сегенерировано автоматически"
 
 msgctxt "#30603"
 msgid "Age gate"
@@ -705,7 +706,7 @@ msgstr "Возрастной контроль"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Разрешить оскорбительный контент"
 
 msgctxt "#30605"
 msgid "Quick Search"
@@ -757,7 +758,7 @@ msgstr ""
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
@@ -1121,7 +1122,7 @@ msgstr "Без названия"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "Воспроизвести аудио"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
@@ -1137,7 +1138,7 @@ msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Оценивать видео в плейлистах"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
@@ -1145,11 +1146,11 @@ msgstr ""
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Добавлен в плейлист"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Убран из плейлиста"
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1165,11 +1166,11 @@ msgstr ""
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Подписан на канал"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Отписан от канала"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
@@ -1177,31 +1178,31 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Прокси требуется для mpeg-dash видео (см. HTTP сервер)[CR]>Для 1080p и HDR требуется InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr ""
+msgstr "Лимит в 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Загрузки"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptive (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptive (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1209,24 +1210,24 @@ msgstr ""
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Воспроизвести (Выбрать качество)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "Для дополнения YouTube требуется использовать свою ключ API.[CR]Для подробной информации смотрите: [B]https://ytaddon.page.link/keys[/B][CR][CR]Извините за предоставленные неудобства."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Комментарии"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Лайки"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Ответы"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Изменен"
