@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2017-10-13 22:46+0200\n"
-"Last-Translator: xulek\n"
-"Language-Team: Polish (Poland) (http://www.transifex.com/teamxbmc/kodi-main/language/pl_PL/)\n"
-"Language: pl_PL\n"
+"PO-Revision-Date: 2021-07-12 13:36+0000\n"
+"Last-Translator: Marek Adamski <fevbew@wp.pl>\n"
+"Language-Team: Polish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pl_pl/>\n"
+"Language: pl_pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 2.0.4\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.7.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -27,7 +27,7 @@ msgstr "YouTube jest jednym z największych na świecie serwisów udostępniania
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Ta wtyczka nie jest zatwierdzona przez Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -50,11 +50,11 @@ msgstr "Hasło"
 # empty strings from id 30003 to 30006
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
-msgstr ""
+msgstr "Używaj MPEG-DASH"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
-msgstr ""
+msgstr "Skonfiguruj InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -110,7 +110,7 @@ msgstr "Pozycji na stronę"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr "Liczba pozycji na liście Historia"
+msgstr "Rozmiar historii wyszukiwania"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
@@ -170,13 +170,13 @@ msgstr "Identyfikator niestandardowej listy Do obejrzenia"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr "Identyfikator niestandardowej listy Historii"
+msgstr "Identyfikator niestandardowej listy Historia"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Favourites"
-msgstr ""
+msgstr "Ulubione"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -262,11 +262,11 @@ msgstr "Wyczyść"
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr "Klucz dostępu API"
+msgstr "Klucz API"
 
 msgctxt "#30202"
 msgid "API Id"
@@ -274,7 +274,7 @@ msgstr "Identyfikator API"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr "Klucz szyfrowania API"
+msgstr "Sekret API"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
@@ -448,7 +448,7 @@ msgstr "Na żywo"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr "Odtwarzaj używając..."
+msgstr "Odtwarzaj za pomocą..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
@@ -544,7 +544,7 @@ msgstr "Ustawienie"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr "Ustawienie, Angielski"
+msgstr "Ustawienie, angielski"
 
 msgctxt "#30565"
 msgid "English"
@@ -732,7 +732,7 @@ msgstr "To wyczyści twoją historię oglądania ze wszystkich urządzeń. Nie m
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr "Zapisane Playlisty"
+msgstr "Zapisane listy"
 
 msgctxt "#30612"
 msgid "Retry"
@@ -760,7 +760,7 @@ msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr "Włącz mpeg-dash proxy"
+msgstr "Włącz serwer proxy mpeg-dash"
 
 msgctxt "#30619"
 msgid "Port"
@@ -772,7 +772,7 @@ msgstr "Port %s jest aktualnie w użyciu. Nie można uruchomić serwera http."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr "Proxy jest wymagane do mpeg-dash vods (zobacz HTTP Server)"
+msgstr "Serwer proxy jest wymagany do vod-ów mpeg-dash (zobacz serwer HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -800,7 +800,7 @@ msgstr "Oceń wideo po obejrzeniu"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr "HTTP Server"
+msgstr "Serwer HTTP"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
@@ -820,11 +820,11 @@ msgstr "Włącz stronę konfiguracji API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ipaddress>:<port>/api (zobacz HTTP Server)"
+msgstr "http://<ipaddress>:<port>/api (zobacz serwer HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr "YouTube Add-on API Konfiguracja"
+msgstr "Konfiguracja API dodatku YouTube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
@@ -872,23 +872,23 @@ msgstr "Odświeżaj po obejrzeniu"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr "Nadchodzące Transmisje"
+msgstr "Nadchodzące transmisje"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr "Zakończone Transmisje"
+msgstr "Zakończone transmisje"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "Klucz Api jest niepoprawny. Ustawienia - API - API Key"
+msgstr "Klucz API jest niepoprawny. Ustawienia - API - Klucz API"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "ID Klienta jest niepoprawne. Ustawnienia - API - API ID"
+msgstr "Identyfikator klienta jest niepoprawny. Ustawnienia - API - Identyfikator API"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "'Secret' Klienta jest niepoprawny. Ustawienia - API - API Secret"
+msgstr "Sekret klienta jest niepoprawny. Ustawienia - API - Sekret API"
 
 msgctxt "#30651"
 msgid "Location"
@@ -900,11 +900,11 @@ msgstr "Zasięg lokalizacji (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "Zastosować geolokalizację? Używane do [B]Moja Lokalizacja[/B]"
+msgstr "Zastosować geolokalizację? Używane do [B]Moja lokalizacja[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr "Moja Lokalizacja"
+msgstr "Moja lokalizacja"
 
 msgctxt "#30655"
 msgid "Switch User"
@@ -1036,7 +1036,7 @@ msgstr "Usuń dane podręczne"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr "dane podręczne"
+msgstr "pamięć podręczna danych"
 
 msgctxt "#30688"
 msgid "Use for videos"
@@ -1124,91 +1124,91 @@ msgstr "Odtwarzaj tylko dźwięk"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Nie udało się pobrać identyfikatora listy Do obejrzenia. Aby zwiększyć szanse na pobieranie, dodaj 8-10 filmów do Do obejrzenia poprzez przeglądarkę lub aplikację i spróbuj ponownie."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Nie udało się pobrać identyfikatora listy Do obejrzenia. Spróbuj ponownie jutro, nie usuwając żadnego z filmów."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "Wyszukiwanie Do obejrzenia... Strona %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Oceń wideo na listach"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Dodano do Do obejrzenia"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Dodano do listy"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Usunięto z listy"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Polubiono"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Nie polubiono"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Usunięto ocenę"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Subskrybowano kanał"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Anulowano subskrypcję kanału"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Domyślnie do zestawu adaptacyjnego WEBM (4K)"
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Serwer proxy jest wymagany do vod-ów mpeg-dash (patrz serwer HTTP)[CR]> 1080p, a HDR wymaga InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr ""
+msgstr "Ograniczaj do 30 fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Przesłane"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptacyjna (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptacyjna (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Zdalne wyszukiwanie przyjazne"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr "Odtwórz (Pytaj o jakość)"
+msgstr "Odtwórz (pytaj o jakość)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
