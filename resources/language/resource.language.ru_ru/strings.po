@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2021-07-03 12:29+0000\n"
-"Last-Translator: Dmitry Petrov <dimakrm361@gmail.com>\n"
+"PO-Revision-Date: 2021-07-25 18:29+0000\n"
+"Last-Translator: vdkbsd <valexgus@gmail.com>\n"
 "Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ru_ru/>\n"
 "Language: ru_ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.7.1\n"
+"X-Generator: Weblate 4.7.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -268,23 +268,23 @@ msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr "API Key"
+msgstr "Ключ API (Key)"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr "API Id"
+msgstr "Идентификатор клиента (API Id)"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr "API Secret"
+msgstr "Секретный код клиента (API Secret)"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr "Использовать персональный API Key"
+msgstr "Использовать персональный ключ API"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr "Использовать предустановленный API Key"
+msgstr "Использовать предустановленный ключ API"
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -742,11 +742,11 @@ msgstr "Повтор"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Получить идентификатор списка воспроизведения \"Смотреть позже\""
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Не удалось получить идентификатор для списка воспроизведения \"Смотреть позже\". Добавьте несколько видео в список через веб-приложение и повторите попытку."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -754,7 +754,7 @@ msgstr "Отмена"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Должен быть зарегистрирован."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
@@ -986,7 +986,7 @@ msgstr "история просмотра"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Сброс точки возобновления"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
@@ -1126,11 +1126,11 @@ msgstr "Воспроизвести аудио"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Не удалось получить идентификатор списка воспроизведения \"Смотреть позже\". Чтобы увеличить шансы на получение, добавьте 8-10 видео в список через веб-приложение и повторите попытку."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Не удалось получить идентификатор списка воспроизведения \"Смотреть позже\". Повторите попытку завтра, не удаляя ни одного видео."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
@@ -1142,7 +1142,7 @@ msgstr "Оценивать видео в плейлистах"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Добавлено в список \"Смотреть позже\""
 
 msgctxt "#30714"
 msgid "Added to playlist"
@@ -1154,11 +1154,11 @@ msgstr "Убран из плейлиста"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Понравилось видео"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Не понравившееся видео"
 
 msgctxt "#30718"
 msgid "Rating removed"
@@ -1174,7 +1174,7 @@ msgstr "Отписан от канала"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "По умолчанию установлено значение адаптации WEBM (4K)"
 
 msgctxt "#30722"
 msgid "HDR"
@@ -1206,7 +1206,7 @@ msgstr "Adaptive (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Удалённый удобный поиск"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
