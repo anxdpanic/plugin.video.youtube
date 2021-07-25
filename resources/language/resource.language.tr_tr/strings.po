@@ -5,16 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2019-12-22 11:35+0300\n"
-"Last-Translator: vejetaryenvampir <vejetaryenvampir@cock.li>\n"
-"Language-Team: LANGUAGE\n"
-"Language: tr_TR\n"
+"PO-Revision-Date: 2021-07-25 18:29+0000\n"
+"Last-Translator: queeup <queeup@zoho.com>\n"
+"Language-Team: Turkish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/tr_tr/>\n"
+"Language: tr_tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.7.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -22,7 +23,7 @@ msgstr "YouTube için eklenti"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr "YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir"
+msgstr "YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
@@ -66,31 +67,31 @@ msgstr "Video kalitesi"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (HD)"
-msgstr ""
+msgstr "1080p (HD)"
 
 msgctxt "#30014"
 msgid "2160p (4k)"
-msgstr ""
+msgstr "2160p (4k)"
 
 msgctxt "#30015"
 msgid "4320p (8k)"
-msgstr ""
+msgstr "4320p (8k)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
@@ -167,11 +168,11 @@ msgstr "Alternatif bir oynatıcıyı destekle"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "Özel Daha Sonra İzle çalma listesi kodu"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "Özel Geçmiş çalma listesi kodu"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
@@ -263,27 +264,27 @@ msgstr "Temizle"
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API Anahtarı"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API Kodu"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API Gizli Anahtarı"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr ""
+msgstr "Kişisel API anahtarlarını etkinleştir"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Önceden ayarlanmış API anahtar setini kullan"
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -357,11 +358,11 @@ msgstr "Dizinler"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr "\"%s\" kanalına abone ol"
+msgstr "%s kanalına abone ol"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr "Git %s"
+msgstr "Git: '%s'"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -473,11 +474,11 @@ msgstr "Daha fazla bağlantı bulunamadı."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Lütfen iki kere giriş yapın"
+msgstr "Lütfen iki kere giriş yapın!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "İki uygulamayı da etkinleştirmelisiniz ki YouTube doğru bir şekilde çalışsın"
+msgstr "İki uygulamayı da etkinleştirmelisiniz ki YouTube doğru bir şekilde çalışsın."
 
 msgctxt "#30548"
 msgid "More..."
@@ -565,11 +566,11 @@ msgstr "Daha Sonra İzle'den kaldır"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "\"%s\" ögesi Daha Sonra İzle listesinden kaldırılacak, emin misiniz?"
+msgstr "'%s' ögesi Daha Sonra İzle listesinden kaldırılacak, emin misiniz?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Şimdiki Daha Sonra İzle listeniz \"%s\" ile değiştirilecek, emin misiniz?"
+msgstr "Şimdiki Daha Sonra İzle listeniz '%s' ile değiştirilecek, emin misiniz?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -581,11 +582,11 @@ msgstr "Geçmişten kaldır"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "\"%s\" ögesi Geçmiş listesinizden kaldırılacak, emin misiniz?"
+msgstr "'%s' ögesi Geçmiş listesinizden kaldırılacak, emin misiniz?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Şimdiki Geçmiş listeniz, \"%s\" ile değiştirilecek, emin misiniz?"
+msgstr "Şimdiki Geçmiş listeniz, '%s' ile değiştirilecek, emin misiniz?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -681,11 +682,11 @@ msgstr "Güncellendi: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Kişisel API anahtarları etkinleştirildi"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Kişisel API anahtarları etkinleştirilemedi. Eksik: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
@@ -721,7 +722,7 @@ msgstr "Yalnızca ses olarak oynat"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Geliştirici anahtarlarına izin ver"
 
 msgctxt "#30609"
 msgid "Clear watch history"
@@ -741,11 +742,11 @@ msgstr "Yeniden Dene"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Daha Sonra İzle oynatma listesi kodunu al"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Web veya uygulama aracılığıyla Daha Sonra İzle'ye birkaç video ekleyin ve yeniden deneyin."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -753,11 +754,11 @@ msgstr "İptal Et"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr "Giriş yapmış olmanız gerekiyor"
+msgstr "Giriş yapmış olmanız gerekiyor."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
@@ -765,15 +766,15 @@ msgstr "mpeg-dash proxy'sini etkinleştir"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Bağlantı Noktası"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "%s bağlantı noktası zaten kullanılıyor.Http sunucusu başlatılamıyor."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr ""
+msgstr "mpeg-dash vod'ları için proxy gereklidir (bkz. HTTP Sunucusu)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -789,7 +790,7 @@ msgstr "Kodi 17+ gerektirir"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr "InputStream Helper önceden kurulmuş"
+msgstr "InputStream Helper önceden kurulmuş."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
@@ -801,7 +802,7 @@ msgstr "İzledikten sonra videoyu değerlendir"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP Sunucusu"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
@@ -817,35 +818,35 @@ msgstr "Başarılı bir şekilde güncellendi: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "API yapılandırma sayfasını etkinleştir"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (bkz. HTTP Sunucusu)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "YouTube Eklentisi API Yapılandırması"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Değişiklik algılanmadı, API anahtarları güncellenmedi."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Kişisel API anahtarları etkinleştirildi."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Kişisel API anahtarları devre dışı bırakıldı."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Anahtarlarınızı gelecekte hızlı bir şekilde eklemek için bu sayfayı yer imlerine ekleyin."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "api_keys.json dosyasında kişisel API anahtarları bulundu. Bunları geri yüklemek ister misiniz? Hayırı seçmek bunların üzerine yazacaktır."
 
 msgctxt "#30640"
 msgid "Restore"
@@ -865,7 +866,7 @@ msgstr ""
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Dinleme IP'sini seçin"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
@@ -881,15 +882,15 @@ msgstr "Bitmiş canlı yayınlar"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "API Anahtarı yanlış. Ayarlar - API - API Anahtarı"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "İstemci Kodu yanlış. Ayarlar - API - API Kodu"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "İstemci Gizli Anahtarı yanlış. Ayarlar - API - API Gizli Anahtarı"
 
 msgctxt "#30651"
 msgid "Location"
@@ -901,7 +902,7 @@ msgstr "Konum yarıçapı (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "Konum belirtilsin mi? [B]Konumum[B] için kullanılır."
+msgstr "Konum belirtilsin mi? [B]Konumum[/B] için kullanılır"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -925,7 +926,7 @@ msgstr "Bu kullanıcı için bir ad gir"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr "Kullanıcı şu anda \"%s\""
+msgstr "Kullanıcı şu anda '%s'"
 
 msgctxt "#30660"
 msgid "Users"
@@ -949,15 +950,15 @@ msgstr "Kullanıcı değiştir"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr "\"%s\" kullanıcısına geçilsin mi?"
+msgstr "'%s' kullanıcısına geçilsin mi?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr "Kaldırıldı: %s"
+msgstr "Kaldırıldı: '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr "Kullanıcının adı, \"%s\" adından \"%s\" adına değiştirildi"
+msgstr "Kullanıcının adı, '%s' adından '%s' adına değiştirildi"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1085,7 +1086,7 @@ msgstr "IP adresimi kontrol et"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP sunucusu çalışmıyor"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1093,7 +1094,7 @@ msgstr "IP adresiniz: %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "İstemci IP'si alınamadı"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
@@ -1125,11 +1126,11 @@ msgstr "Yalnızca ses olarak oynat"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Geri alma şansını artırmak için web veya uygulama aracılığıyla 8-10 videoyu Daha Sonra İzle'ye ekleyin ve yeniden deneyin."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Videoların hiçbirini kaldırmadan yarın tekrar deneyin."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
@@ -1173,15 +1174,15 @@ msgstr "Kanalın aboneliğinden ayrılıldı"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Varsayılan olarak WEBM uyarlama seti (4K)"
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "mpeg-dash vod'lar için proxy gereklidir (bkz. HTTP Sunucusu)[CR]> 1080p ve HDR için InputStream Adaptive >= 2.3.14 gerekir"
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
@@ -1189,7 +1190,7 @@ msgstr "30fps ayarına sabitle"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1197,36 +1198,36 @@ msgstr "Yüklenenler"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Uyarlamalı (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Uyarlamalı (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Uzaktan kumanda uyumlu arama"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Oynat (Kaliteyi sor)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "YouTube eklentisi artık kendi API anahtarlarınızı kullanmanızı gerektiriyor.[CR]Daha fazla bilgi için wiki sayfasına bakın: [B]https://ytaddon.page.link/keys[/B][CR][CR]Bu durumdan dolayı üzgünüz."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Yorumlar"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Beğeniler"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Yanıtlar"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Düzenlendi"
