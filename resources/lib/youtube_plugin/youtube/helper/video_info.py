@@ -525,6 +525,7 @@ class VideoInfo(object):
             new_n = self._calculate_n.calculate_n(initial_n)
             if new_n:
                 parsed_query['n'] = new_n
+                parsed_query['ratebypass'] = 'yes'
                 parsed_url = urllib.parse.urlsplit(url)
                 url = '%s://%s%s?%s' % \
                       (parsed_url.scheme, parsed_url.netloc,
