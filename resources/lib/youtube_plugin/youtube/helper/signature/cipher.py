@@ -133,7 +133,7 @@ class Cipher(object):
         for pattern in match_patterns:
             match = re.search(pattern, javascript)
             if match:
-                return match.group('name')
+                return re.escape(match.group('name'))
 
         return ''
 
@@ -141,7 +141,8 @@ class Cipher(object):
     def _find_function_body(function_name, javascript):
         # normalize function name
         function_name = function_name.replace('$', '\\$')
-        match = re.search(r'\s?%s=function\((?P<parameter>[^)]+)\)\s?{\s?(?P<body>[^}]+)\s?\}' % function_name, javascript)
+        pattern = r'%s=function\((?P<parameter>\w)\){(?P<body>[a-z=\.\("\)]*;(.*);(?:.+))}' % function_name
+        match = re.search(pattern, javascript)
         if match:
             return match.group('parameter'), match.group('body')
 
