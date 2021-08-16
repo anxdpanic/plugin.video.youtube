@@ -5,28 +5,29 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-08-16 15:29+0000\n"
+"Last-Translator: Nguyễn Trung Hậu <trunghau1712@gmail.com>\n"
+"Language-Team: Vietnamese <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/vi_vn/>\n"
 "Language: vi_vn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.7.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Plugin dành cho YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr ""
+msgstr "YouTube là một trong những trang web chia sẻ video lớn nhất trên thế giới."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Plugin này không được xác nhận bởi Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -37,15 +38,15 @@ msgstr ""
 # Kodion Settings
 msgctxt "#30000"
 msgid "General"
-msgstr ""
+msgstr "Chung"
 
 msgctxt "#30001"
 msgid "Username"
-msgstr ""
+msgstr "Tên người dùng"
 
 msgctxt "#30002"
 msgid "Password"
-msgstr ""
+msgstr "Mật khẩu"
 
 # empty strings from id 30003 to 30006
 msgctxt "#30007"
@@ -62,44 +63,44 @@ msgstr ""
 
 msgctxt "#30010"
 msgid "Video quality"
-msgstr ""
+msgstr "Chất lượng video"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (HD)"
-msgstr ""
+msgstr "1080p (HD)"
 
 msgctxt "#30014"
 msgid "2160p (4k)"
-msgstr ""
+msgstr "2160p (4k)"
 
 msgctxt "#30015"
 msgid "4320p (8k)"
-msgstr ""
+msgstr "4320p (8k)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Trực tiếp / 720p (HD)"
 
 # empty strings 30019
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr ""
+msgstr "Cho phép 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
