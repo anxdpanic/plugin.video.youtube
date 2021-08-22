@@ -1,7 +1,11 @@
+6.8.17
+[upd] Fix comments on Kodi 19+ |contrib: ramateur|
+[upd] Update icon and fanart |contrib: papercore-dev|
+[lang] translation updates from Weblate
+
 6.8.16
 [fix] Fix playback of some content (ie. Music videos)
 [fix] Calcuate n parameter to enable ratebypass
-[lang] translation updates from Weblate
 
 6.8.15
 [fixup] No streams found, consent cookies |contrib: jaylinski|
