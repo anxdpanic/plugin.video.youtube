@@ -42,6 +42,7 @@
         <summary lang="pl_PL">Wtyczka YouTube</summary>
         <summary lang="ru_RU">Видеодополнение YouTube</summary>
         <summary lang="tr_TR">YouTube için eklenti</summary>
+        <summary lang="vi_VN">Plugin dành cho YouTube</summary>
         <summary lang="zh_CN">YouTube附加元件</summary>
         <summary lang="zh_TW">YouTube附加元件</summary>
         <description lang="bg_BG">YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят.</description>
@@ -59,6 +60,7 @@
         <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
         <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
         <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir.</description>
+        <description lang="vi_VN">YouTube là một trong những trang web chia sẻ video lớn nhất trên thế giới.</description>
         <description lang="zh_CN">「Youtube」是全世界最大的影片分享網站</description>
         <description lang="zh_TW">「Youtube」是全世界最大的影片分享網站</description>
         <disclaimer lang="cs_CZ">Tento plugin není schválen společností Google</disclaimer>
@@ -70,6 +72,7 @@
         <disclaimer lang="pl_PL">Ta wtyczka nie jest zatwierdzona przez Google</disclaimer>
         <disclaimer lang="ru_RU">Плагин не поддерживается Google</disclaimer>
         <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
+        <disclaimer lang="vi_VN">Plugin này không được xác nhận bởi Google</disclaimer>
         <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
     </extension>
 </addon>
