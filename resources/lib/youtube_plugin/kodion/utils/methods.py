@@ -9,8 +9,10 @@
 """
 
 from six.moves import urllib
+from six import PY2
 from six import next
 from six import string_types
+from six import text_type
 
 import os
 import copy
@@ -36,6 +38,15 @@ def loose_version(v):
     for point in v.split("."):
         filled.append(point.zfill(8))
     return tuple(filled)
+
+
+def to_str(text):
+    if isinstance(text, bytes):
+        return text.decode('utf-8', 'ignore')
+    if PY2 and isinstance(text, text_type):
+        return text.encode('utf-8', 'ignore')
+
+    return text
 
 
 def to_utf8(text):
