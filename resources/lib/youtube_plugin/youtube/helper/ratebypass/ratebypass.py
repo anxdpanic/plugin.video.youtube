@@ -162,6 +162,8 @@ def get_throttling_function_code(js):
     pattern_start = r"%s=function\(\w\)" % name
     regex = re.compile(pattern_start)
     match = regex.search(js)
+    if not match:
+        return ''
 
     # Extract the code within curly braces for the function itself, and merge any split lines
     code_lines_list = find_object_from_startpoint(js, match.span()[1]).split('\n')
@@ -185,6 +187,8 @@ def get_throttling_function_array(raw_code):
     array_start = r",c=\["
     array_regex = re.compile(array_start)
     match = array_regex.search(raw_code)
+    if not match:
+        return []
 
     array_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
     str_array = throttling_array_split(array_raw)
@@ -253,6 +257,8 @@ def get_throttling_plan(raw_code):
     transform_start = r"try{"
     plan_regex = re.compile(transform_start)
     match = plan_regex.search(raw_code)
+    if not match:
+        return []
 
     transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
 
@@ -470,6 +476,9 @@ def throttling_array_split(js_array):
         if curr_substring.startswith('function'):
             # Handle functions separately. These can contain commas
             match = func_regex.search(curr_substring)
+            if not match:
+                return []
+
             match_start, match_end = match.span()
 
             function_text = find_object_from_startpoint(curr_substring, match.span()[1])
@@ -478,6 +487,8 @@ def throttling_array_split(js_array):
             curr_substring = curr_substring[len(full_function_def) + 1:]
         else:
             match = comma_regex.search(curr_substring)
+            if not match:
+                return []
 
             # Try-catch to capture end of array
             try:
