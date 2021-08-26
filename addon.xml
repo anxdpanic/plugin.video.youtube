@@ -13,7 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[upd] Fix comments on Kodi 19+ |contrib: ramateur|
+[fix] Fix comments on Kodi 19+ |contrib: ramateur|
+[fix] Fix ratebypass |contrib: ramateur|
 [upd] Update icon and fanart |contrib: papercore-dev|
 [lang] translation updates from Weblate
         </news>
