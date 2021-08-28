@@ -415,8 +415,8 @@ class CalculateN:
                     continue
 
             # Probably the single "b" references (references to the initial 'n'
-            # value as a MUTABLE list of characters). Append the function sent
-            # by the caller.
+            # value as a MUTABLE list of characters). Append a reference to the
+            # list sent by the caller.
             converted_array.append(initial_n_list)
 
         return converted_array
