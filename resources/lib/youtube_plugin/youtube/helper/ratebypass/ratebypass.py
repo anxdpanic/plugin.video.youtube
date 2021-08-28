@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """
-
     Copyright (C) 2012-2021 https://github.com/pytube/pytube/
     SPDX-License-Identifier: Unlicense
 
@@ -13,267 +12,13 @@
 import re
 from copy import copy
 
-from ....kodion import logger
-
-
-class CalculateN:
-    def __init__(self, js):
-        raw_code = get_throttling_function_code(js)
-        self.throttling_plan = get_throttling_plan(raw_code)
-        self.throttling_array = get_throttling_function_array(raw_code)
-
-        self.calculated_n = None
-
-    def calculate_n(self, initial_n):
-        """Converts n to the correct value to prevent throttling."""
-        if self.calculated_n:
-            logger.log_debug('`n` already calculated: {calculated_n}. returning early...'
-                             .format(calculated_n=self.calculated_n))
-            return self.calculated_n
-
-        if not self.throttling_plan or not self.throttling_array:
-            return ''
-
-        logger.log_debug('Attempting to calculate `n` from initial: {initial_n}'
-                         .format(initial_n=''.join(initial_n)))
-
-        # First, update all instances of 'b' with the list(initial_n)
-        for i in range(len(self.throttling_array)):
-            if self.throttling_array[i] == 'b':
-                self.throttling_array[i] = initial_n
-
-        for step in self.throttling_plan:
-            curr_func = self.throttling_array[int(step[0])]
-            if not callable(curr_func):
-                logger.log_debug('{curr_func} is not callable.'.format(curr_func=curr_func))
-                logger.log_debug('Throttling array:\n{throttling_array}\n'
-                                 .format(throttling_array=self.throttling_array))
-                return None
-            first_arg = self.throttling_array[int(step[1])]
-
-            if len(step) == 2:
-                curr_func(first_arg)
-            elif len(step) == 3:
-                second_arg = self.throttling_array[int(step[2])]
-                curr_func(first_arg, second_arg)
-
-        self.calculated_n = ''.join(initial_n)
-        logger.log_debug('Calculated `n`: {calculated_n}'
-                         .format(calculated_n=self.calculated_n))
-        return self.calculated_n
-
-
-def find_object_from_startpoint(html, start_point):
-    """Parses input html to find the end of a JavaScript object.
-    :param str html:
-        HTML to be parsed for an object.
-    :param int start_point:
-        Index of where the object starts.
-    :rtype dict:
-    :returns:
-        A dict created from parsing the object.
-    """
-    html = html[start_point:]
-    if html[0] not in ['{', '[']:
-        logger.log_debug('Invalid start point. Start of HTML:\n{html_start}'
-                         .format(html_start=html[:20]))
-        return ''
-
-    # First letter MUST be a open brace, so we put that in the stack,
-    # and skip the first character.
-    stack = [html[0]]
-    i = 1
-
-    context_closers = {
-        '{': '}',
-        '[': ']',
-        '"': '"'
-    }
-
-    while i < len(html):
-        if len(stack) == 0:
-            break
-        curr_char = html[i]
-        curr_context = stack[-1]
-
-        # If we've reached a context closer, we can remove an element off the stack
-        if curr_char == context_closers[curr_context]:
-            stack.pop()
-            i += 1
-            continue
-
-        # Strings require special context handling because they can contain
-        #  context openers *and* closers
-        if curr_context == '"':
-            # If there's a backslash in a string, we skip a character
-            if curr_char == '\\':
-                i += 2
-                continue
-        else:
-            # Non-string contexts are when we need to look for context openers.
-            if curr_char in context_closers.keys():
-                stack.append(curr_char)
-
-        i += 1
-
-    full_obj = html[:i]
-    return full_obj  # noqa: R504
-
-
-def get_throttling_function_name(js):
-    """Extract the name of the function that computes the throttling parameter.
-    :param str js:
-        The contents of the base.js asset file.
-    :rtype
-    :returns:
-        The name of the function used to compute the throttling parameter.
-    """
-    function_patterns = [
-        # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-865985377
-        # a.C&&(b=a.get("n"))&&(b=Dea(b),a.set("n",b))}};
-        # In above case, `Dea` is the relevant function name
-        r'a\.C&&\(b=a\.get\("n"\)\)&&\(b=([^(]+)\(b\),a\.set\("n",b\)\)}};',
-    ]
-    logger.log_debug('Finding throttling function name')
-    for pattern in function_patterns:
-        regex = re.compile(pattern)
-        function_match = regex.search(js)
-        if function_match:
-            logger.log_debug("finished regex search, matched: %s" % pattern)
-            return function_match.group(1)
-
-    return ''
-
-
-def get_throttling_function_code(js):
-    """Extract the raw code for the throttling function.
-    :param str js:
-        The contents of the base.js asset file.
-    :rtype
-    :returns:
-        The name of the function used to compute the throttling parameter.
-    """
-    # Begin by extracting the correct function name
-    name = re.escape(get_throttling_function_name(js))
-    if not name:
-        return ''
-
-    # Identify where the function is defined
-    pattern_start = r"%s=function\(\w\)" % name
-    regex = re.compile(pattern_start)
-    match = regex.search(js)
-    if not match:
-        return ''
-
-    # Extract the code within curly braces for the function itself, and merge any split lines
-    code_lines_list = find_object_from_startpoint(js, match.span()[1]).split('\n')
-    if not code_lines_list:
-        return ''
-
-    joined_lines = "".join(code_lines_list)
-
-    # Prepend function definition (e.g. `Dea=function(a)`)
-    return match.group(0) + joined_lines
-
-
-def get_throttling_function_array(raw_code):
-    """Extract the "c" array.
-    :param str raw_code:
-        The response from get_throttling_function_code(js).
-    :returns:
-        The array of various integers, arrays, and functions.
-    """
-
-    array_start = r",c=\["
-    array_regex = re.compile(array_start)
-    match = array_regex.search(raw_code)
-    if not match:
-        return []
-
-    array_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
-    str_array = throttling_array_split(array_raw)
-
-    converted_array = []
-    for el in str_array:
-        try:
-            converted_array.append(int(el))
-            continue
-        except ValueError:
-            # Not an integer value.
-            pass
-
-        if el == 'null':
-            converted_array.append(None)
-            continue
-
-        if el.startswith('"') and el.endswith('"'):
-            # Convert e.g. '"abcdef"' to string without quotation marks, 'abcdef'
-            converted_array.append(el[1:-1])
-            continue
-
-        if el.startswith('function'):
-            mapper = (
-                (r"{for\(\w=\(\w%\w\.length\+\w\.length\)%\w\.length;\w--;\)\w\.unshift\(\w.pop\(\)\)}", throttling_unshift),  # noqa:E501
-                (r"{\w\.reverse\(\)}", throttling_reverse),
-                (r"{\w\.push\(\w\)}", throttling_push),
-                (r";var\s\w=\w\[0\];\w\[0\]=\w\[\w\];\w\[\w\]=\w}", throttling_swap),
-                (r"case\s\d+", throttling_cipher_function),
-                (r"\w\.splice\(0,1,\w\.splice\(\w,1,\w\[0\]\)\[0\]\)", throttling_nested_splice),  # noqa:E501
-                (r";\w\.splice\(\w,1\)}", js_splice),
-                (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),  # noqa:E501
-                (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse),  # noqa:E501
-            )
-
-            found = False
-            for pattern, fn in mapper:
-                if re.search(pattern, el):
-                    converted_array.append(fn)
-                    found = True
-            if found:
-                continue
-
-        converted_array.append(el)
-
-    # Replace null elements with array itself
-    for i in range(len(converted_array)):
-        if converted_array[i] is None:
-            converted_array[i] = converted_array
-
-    return converted_array
-
-
-def get_throttling_plan(raw_code):
-    """Extract the "throttling plan".
-    The "throttling plan" is a list of tuples used for calling functions
-    in the c array. The first element of the tuple is the index of the
-    function to call, and any remaining elements of the tuple are arguments
-    to pass to that function.
-    :param str raw_code:
-        The response from get_throttling_function_code(js).
-    :returns:
-        The full function code for computing the throttling parameter.
-    """
-
-    transform_start = r"try{"
-    plan_regex = re.compile(transform_start)
-    match = plan_regex.search(raw_code)
-    if not match:
-        return []
-
-    transform_plan_raw = find_object_from_startpoint(raw_code, match.span()[1] - 1)
-
-    # Steps are either c[x](c[y]) or c[x](c[y],c[z])
-    step_start = r"c\[(\d+)\]\(c\[(\d+)\](,c(\[(\d+)\]))?\)"
-    step_regex = re.compile(step_start)
-    matches = step_regex.findall(transform_plan_raw)
-    transform_steps = []
-    for match in matches:
-        if match[4] != '':
-            transform_steps.append((match[0], match[1], match[4]))
-        else:
-            transform_steps.append((match[0], match[1]))
-
-    return transform_steps
+try:
+    from ....kodion import logger
+except:
+    class logger:
+        @staticmethod
+        def log_debug(txt):
+            print(txt)
 
 
 def throttling_reverse(arr):
@@ -457,48 +202,248 @@ def js_splice(arr, start, delete_count=None, *items):
     return deleted_elements
 
 
-def throttling_array_split(js_array):
-    """Parses the throttling array into a python list of strings.
-    Expects input to begin with `[` and close with `]`.
-    :param str js_array:
-        The javascript array, as a string.
-    :rtype:
-    :returns:
-        A list of strings representing splits on `,` in the throttling array.
+def throttling_splice(d, e):
+    """Splices array 'd' with remapped start index e.
+    From this code: function(d,e){e=(e%d.length+d.length)%d.length;d.splice(e,1)}
     """
-    results = []
-    curr_substring = js_array[1:]
+    e = throttling_mod_func(d, e)
+    return js_splice(d, e, 1)
 
-    comma_regex = re.compile(r",")
-    func_regex = re.compile(r"function\([^)]+\)")
 
-    while len(curr_substring) > 0:
-        if curr_substring.startswith('function'):
-            # Handle functions separately. These can contain commas
-            match = func_regex.search(curr_substring)
-            if not match:
-                return []
+class CalculateN:
+    # References:
+    # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-894619419
+    # https://github.com/pytube/pytube/blob/fc9aec5c35829f2ebb4ef8dd599b14a666850d20/pytube/cipher.py
 
-            match_start, match_end = match.span()
+    # To maintainers: it might be necessary to add more function patterns (and implementations)
+    # in the future as the "base.js" player code gets changed and updated.
+    MAPPING_FUNC_PATTERNS = (
+        (r"{for\(\w=\(\w%\w\.length\+\w\.length\)%\w\.length;\w--;\)\w\.unshift\(\w.pop\(\)\)}", throttling_unshift),  # noqa:E501
+        (r"{\w\.reverse\(\)}", throttling_reverse),
+        (r"{\w\.push\(\w\)}", throttling_push),
+        (r";var\s\w=\w\[0\];\w\[0\]=\w\[\w\];\w\[\w\]=\w}", throttling_swap),
+        (r"case\s\d+", throttling_cipher_function),
+        (r"\w\.splice\(0,1,\w\.splice\(\w,1,\w\[0\]\)\[0\]\)", throttling_nested_splice),  # noqa:E501
+        (r";\w\.splice\(\w,1\)}", throttling_splice),
+        (r"\w\.splice\(-\w\)\.reverse\(\)\.forEach\(function\(\w\){\w\.unshift\(\w\)}\)", throttling_prepend),  # noqa:E501
+        (r"for\(var \w=\w\.length;\w;\)\w\.push\(\w\.splice\(--\w,1\)\[0\]\)}", throttling_reverse),  # noqa:E501
+    )
 
-            function_text = find_object_from_startpoint(curr_substring, match.span()[1])
-            full_function_def = curr_substring[:match_end + len(function_text)]
-            results.append(full_function_def)
-            curr_substring = curr_substring[len(full_function_def) + 1:]
+    def __init__(self, js):
+        self.initial_n_list = [ ]
+
+        raw_code = self.get_throttling_function_code(js).replace('\n', '')
+        self.throttling_plan = self.get_throttling_plan(raw_code)
+        self.throttling_array = self.get_throttling_function_array(self.initial_n_list, raw_code)
+
+
+    @staticmethod
+    def get_throttling_function_code(js):
+        """Extract the raw code for the throttling function.
+        :param str js:
+            The contents of the base.js asset file.
+        :rtype
+        :returns:
+            The full string code of the function, in the form "...=function(...){...};"
+            Note: might include whitespace in the body of the function.
+        """
+
+        # Only present in the throttle function code.
+        fiduciary_index = js.find('enhanced_except_')
+        if fiduciary_index == -1:
+            logger.log_debug('ratebypass: fiduciary_index not found')
+            return ''
+
+        start_index = js.rfind('=function(', 0, fiduciary_index)
+        start_index = js.rfind(';', 0, start_index)
+        if start_index == -1:
+            logger.log_debug('ratebypass: function code start not found')
+            return ''
         else:
-            match = comma_regex.search(curr_substring)
-            if not match:
-                return []
+            # Skip the semicolon that this index points to.
+            start_index += 1
 
-            # Try-catch to capture end of array
+        end_pattern = '};'
+        end_index = js.find(end_pattern, fiduciary_index)
+        if end_index == -1:
+            logger.log_debug('ratebypass: function code end not found')
+            return ''
+        else:
+            # Skip ahead to include the end pattern in the output string.
+            end_index += len(end_pattern)
+
+        return js[start_index:end_index].strip()
+
+
+    @staticmethod
+    def get_throttling_plan(raw_code):
+        """Extract the "throttling plan".
+        The "throttling plan" is the list of commands executed to unscramble the n value.
+        These commands reference items from the "c" array.
+        :param str raw_code:
+            The response from get_throttling_function_code(js).
+        :returns:
+            A list of tuples, where the first element of each tuple is the
+            index of the function to call, the remaining elements are arguments to
+            pass to that function.
+        """
+
+        plan_start_pattern = r"try{"
+        plan_start_index = raw_code.find(plan_start_pattern)
+        if plan_start_index == -1:
+            logger.log_debug('ratebypass: command block start not found')
+            return
+        else:
+            # Skip the whole start pattern, it's not needed.
+            plan_start_index += len(plan_start_pattern)
+
+        plan_end_pattern = '}'
+        plan_end_index = raw_code.find(plan_end_pattern, plan_start_index)
+        if plan_end_index == -1:
+            logger.log_debug('ratebypass: command block end not found')
+            return
+
+        plan_raw = raw_code[plan_start_index:plan_end_index]
+
+        # So far, these commands are either c[x](c[y]) or c[x](c[y],c[z]).
+        return [
+            # The following will split a single command of the form
+            # "c[x](c[y], c[z], ...)" into ['x', 'y', 'z', ...], then convert it
+            # to a tuple of ints.
+            tuple(map(int, command[:-1].replace('c[', '').replace(']', '')
+                           .replace('(', ',').split(',')))
+            for command in plan_raw.split('),')
+        ]
+
+
+    @staticmethod
+    def array_reverse_split_gen(raw_array):
+        """ Iterates the comma-split pieces of the stringified list in reverse,
+            joining pieces that are part of the same longer object that might
+            have comma characters inside.
+        :param str raw_array:
+            The "c" array string, without enclosing brackets.
+        :returns:
+            Generates the elements of the stringified array in REVERSE order.
+            The caller is responsible for reversing it back to normal.
+        """
+        accumulator = None
+        for piece in reversed(raw_array.split(',')):
+            if piece.startswith('function') or piece[0] == '"' or piece[0] == "'":
+                # When the piece starts with "function" or a quote char, yield
+                # what has been accumulated so far, if anything.
+                if accumulator:
+                    yield piece + ',' + accumulator
+                    accumulator = None
+                else:
+                    yield piece
+            elif piece.endswith('}') or piece[-1] == '"' or piece[-1] == "'":
+                # When the piece ends with a curly bracket or quote char but
+                # didn't start with "function" or a quote char, start
+                # accumulating with the next pieces until it's closed.
+                accumulator = piece
+            else:
+                if accumulator:
+                    accumulator = piece + ',' + accumulator
+                else:
+                    yield piece
+
+
+    @classmethod
+    def get_throttling_function_array(cls, initial_n_list, raw_code):
+        """Extract the "c" array that comes with values and functions
+        used to unscramble the initial n value.
+        :param list initial_list_func:
+            MUTABLE list of the characters of the "initial n" parameter.
+        :param str raw_code:
+            The response from get_throttling_function_code(js).
+        :returns:
+            The array of various integers, arrays, and functions.
+        """
+
+        array_start_pattern = ",c=["
+        array_start_index = raw_code.find(array_start_pattern)
+        if array_start_index == -1:
+            logger.log_debug('ratebypass: "c" array pattern not found')
+            return [ ]
+        else:
+            array_start_index += len(array_start_pattern)
+
+        array_end_pattern = '];'
+        array_end_index = raw_code.rfind(array_end_pattern)
+        if array_end_index == -1:
+            logger.log_debug('ratebypass: "c" array end not found')
+            return [ ]
+
+        raw_array = raw_code[array_start_index:array_end_index]
+        str_array = tuple(cls.array_reverse_split_gen(raw_array))[::-1]
+
+        #logger.log_debug('STR_ARRAY:\n' + '\n'.join(str(i)+' >'+c+'<' for i,c in enumerate(str_array))+'\n\n')
+
+        converted_array = [ ]
+
+        for tempindex, el in enumerate(str_array):
             try:
-                match_start, match_end = match.span()
-            except AttributeError:
-                match_start = len(curr_substring) - 1
-                match_end = match_start + 1
+                converted_array.append(int(el))
+                continue
+            except ValueError:
+                # Not an integer value.
+                pass
 
-            curr_el = curr_substring[:match_start]
-            results.append(curr_el)
-            curr_substring = curr_substring[match_end:]
+            if el == 'null':
+                # As per the JavaScript, replace null elements in this array
+                # with a reference to the array itself.
+                converted_array.append(converted_array)
+                continue
 
-    return results
+            if el[0] == '"' and el[-1] == '"':
+                # Convert e.g. '"abcdef"' to string without quotation marks, 'abcdef'
+                converted_array.append(el.strip('\'"'))
+                continue
+
+            if el.startswith('function'):
+                found = False
+                for pattern, fn in cls.MAPPING_FUNC_PATTERNS:
+                    if re.search(pattern, el):
+                        converted_array.append(fn)
+                        found = True
+                        break
+                else:
+                    logger.log_debug('ratebypass: mapping function not yet listed: {unknown_func}'
+                                     .format(unknown_func=el))
+                if found:
+                    continue
+
+            # Probably the single "b" references (references to the initial 'n'
+            # value as a MUTABLE list of characters). Append the function sent
+            # by the caller.
+            converted_array.append(initial_n_list)
+
+        return converted_array
+
+
+    def calculate_n(self, initial_n):
+        if not self.throttling_plan or not self.throttling_array:
+            return ''
+
+        logger.log_debug('Attempting to calculate `n` from initial: {initial_n}'
+                         .format(initial_n=''.join(initial_n)))
+
+        # Clear (in-place) and refill this list with the characters from 'initial_n'.
+        # Note that references to this list is already in self.throttling_array.
+        del self.initial_n_list[:] # https://stackoverflow.com/a/30087221
+        self.initial_n_list.extend(initial_n)
+
+        # For each step in the plan, get the first item of the step as the
+        # index of the function to call, and use the remaining items as
+        # arguments.
+        for step in self.throttling_plan:
+            step_iter = iter(step)
+            curr_func = self.throttling_array[next(step_iter)]
+            args = (self.throttling_array[i] for i in step_iter)
+            curr_func(*args)
+
+        calculated_n = ''.join(self.initial_n_list)
+        logger.log_debug('Calculated `n`: {calculated_n}'
+                         .format(calculated_n=calculated_n))
+        return calculated_n
