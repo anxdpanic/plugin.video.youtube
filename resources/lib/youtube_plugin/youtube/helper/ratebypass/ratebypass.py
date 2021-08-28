@@ -230,11 +230,12 @@ class CalculateN:
     )
 
     def __init__(self, js):
-        self.initial_n_list = [ ]
+        self.calculated_n = None
+        self.mutable_n_list = []
 
         raw_code = self.get_throttling_function_code(js).replace('\n', '')
         self.throttling_plan = self.get_throttling_plan(raw_code)
-        self.throttling_array = self.get_throttling_function_array(self.initial_n_list, raw_code)
+        self.throttling_array = self.get_throttling_function_array(self.mutable_n_list, raw_code)
 
 
     @staticmethod
@@ -350,11 +351,11 @@ class CalculateN:
 
 
     @classmethod
-    def get_throttling_function_array(cls, initial_n_list, raw_code):
+    def get_throttling_function_array(cls, mutable_n_list, raw_code):
         """Extract the "c" array that comes with values and functions
         used to unscramble the initial n value.
-        :param list initial_list_func:
-            MUTABLE list of the characters of the "initial n" parameter.
+        :param list mutable_n_list:
+            Mutable list with the characters of the "initial n" value.
         :param str raw_code:
             The response from get_throttling_function_code(js).
         :returns:
@@ -377,12 +378,11 @@ class CalculateN:
 
         raw_array = raw_code[array_start_index:array_end_index]
         str_array = tuple(cls.array_reverse_split_gen(raw_array))[::-1]
-
         #logger.log_debug('STR_ARRAY:\n' + '\n'.join(str(i)+' >'+c+'<' for i,c in enumerate(str_array))+'\n\n')
 
         converted_array = [ ]
 
-        for tempindex, el in enumerate(str_array):
+        for el in str_array:
             try:
                 converted_array.append(int(el))
                 continue
@@ -392,7 +392,7 @@ class CalculateN:
 
             if el == 'null':
                 # As per the JavaScript, replace null elements in this array
-                # with a reference to the array itself.
+                # with a reference to itself.
                 converted_array.append(converted_array)
                 continue
 
@@ -414,36 +414,60 @@ class CalculateN:
                 if found:
                     continue
 
-            # Probably the single "b" references (references to the initial 'n'
-            # value as a MUTABLE list of characters). Append a reference to the
-            # list sent by the caller.
-            converted_array.append(initial_n_list)
+            # Probably the single "b" references (references to a list with the
+            # initial 'n' characters).
+            converted_array.append(mutable_n_list)
 
         return converted_array
 
 
-    def calculate_n(self, initial_n):
+    def calculate_n(self, initial_n_list):
+        """Converts n to the correct value to prevent throttling.
+        :param list initial_n_list:
+            A list with the characters of the initial "n" string.
+        :returns:
+            The new value of "n" as a string, to replace the initial "n" in the
+            video stream URL.
+        """
+        if self.calculated_n:
+            logger.log_debug('`n` already calculated: {calculated_n}. returning early...'
+                             .format(calculated_n=self.calculated_n))
+            return self.calculated_n
+
         if not self.throttling_plan or not self.throttling_array:
-            return ''
+            return None
 
+        initial_n_string = ''.join(initial_n_list)
         logger.log_debug('Attempting to calculate `n` from initial: {initial_n}'
-                         .format(initial_n=''.join(initial_n)))
+                         .format(initial_n=initial_n_string))
 
-        # Clear (in-place) and refill this list with the characters from 'initial_n'.
-        # Note that references to this list is already in self.throttling_array.
-        del self.initial_n_list[:] # https://stackoverflow.com/a/30087221
-        self.initial_n_list.extend(initial_n)
+        # Clear (in-place) and refill this list with the characters from 'initial_n_list'.
+        # Note that references to this list are already in self.throttling_array.
+        del self.mutable_n_list[:] # https://stackoverflow.com/a/30087221
+        self.mutable_n_list.extend(initial_n_list)
 
         # For each step in the plan, get the first item of the step as the
-        # index of the function to call, and use the remaining items as
-        # arguments.
-        for step in self.throttling_plan:
-            step_iter = iter(step)
-            curr_func = self.throttling_array[next(step_iter)]
-            args = (self.throttling_array[i] for i in step_iter)
-            curr_func(*args)
+        # index of the function to call, and then call that function using
+        # the throttling array elements indexed by the remaining step items.
+        try:
+            for step in self.throttling_plan:
+                step_iter = iter(step)
+                curr_func = self.throttling_array[next(step_iter)]
+                if not callable(curr_func):
+                    logger.log_debug('{curr_func} is not callable.'.format(curr_func=curr_func))
+                    logger.log_debug('Throttling array:\n{throttling_array}\n'
+                                     .format(throttling_array=self.throttling_array))
+                    return None
+                # Execute the command function.
+                args = (self.throttling_array[i] for i in step_iter)
+                curr_func(*args)
 
-        calculated_n = ''.join(self.initial_n_list)
+            self.calculated_n = ''.join(self.mutable_n_list)
+        except:
+            logger.log_debug('Error calculating new `n`, reusing input')
+            return initial_n_string
+
+        self.calculated_n = ''.join(self.mutable_n_list)
         logger.log_debug('Calculated `n`: {calculated_n}'
-                         .format(calculated_n=calculated_n))
-        return calculated_n
+                         .format(calculated_n=self.calculated_n))
+        return self.calculated_n
