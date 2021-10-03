@@ -97,7 +97,7 @@ def throttling_cipher_function_a(d, e):
 
 def throttling_cipher_function_b(d, e):
     # Variant function that uses a different 'h' base string.
-    # This is identifiable from the "case 64:" pattern in the function body.
+    # This is identifiable from the "case 65" pattern in the function body.
     h = list('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_')
     throttling_cipher_helper(d, e, h)
 
