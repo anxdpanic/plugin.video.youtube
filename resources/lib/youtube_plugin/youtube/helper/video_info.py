@@ -515,6 +515,7 @@ class VideoInfo(object):
 
     def calculate_n(self, url):
         if not self._calculate_n:
+            self._context.log_debug('`n` was not calculated for %s' % url)
             return url
 
         parsed_query = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query))
