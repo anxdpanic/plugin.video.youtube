@@ -515,6 +515,7 @@ class VideoInfo(object):
 
     def calculate_n(self, url):
         if not self._calculate_n:
+            self._context.log_debug('`n` was not calculated for %s' % url)
             return url
 
         parsed_query = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query))
@@ -764,12 +765,8 @@ class VideoInfo(object):
             'video_id': video_id,
             'eurl': ''.join(['https://youtube.googleapis.com/v/', video_id]),
             'sts': player_config.get('STS', ''),
-            'c': player_client.get('clientName', 'WEB'),
-            'cver': player_client.get('clientVersion', '2.20200923.01.00'),
-            'cbr': player_client.get('browserName', 'Chrome'),
-            'cbrver': player_client.get('browserVersion', '53.0.2785.143'),
-            'cos': player_client.get('osName', 'Windows'),
-            'cosver': player_client.get('osVersion', '10.0')
+            'c': 'ANDROID_EMBEDDED_PLAYER',
+            'cver': '16.20',
         }
 
         video_info_url = 'https://www.youtube.com/get_video_info'
