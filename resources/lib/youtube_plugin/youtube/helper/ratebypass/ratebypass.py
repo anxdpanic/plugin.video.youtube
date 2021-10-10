@@ -245,7 +245,6 @@ class CalculateN:
         self.calculated_n = None
         self.throttling_function_code = self.get_throttling_function_code(js)
 
-
     @staticmethod
     def get_throttling_function_code(js):
         """Extract the raw code for the throttling function.
@@ -272,7 +271,6 @@ class CalculateN:
             return None
 
         return js[start_index:end_index].replace('\n', '')
-
 
     @staticmethod
     def get_throttling_plan_gen(raw_code):
@@ -314,10 +312,9 @@ class CalculateN:
         # "c[x](c[y])" -> ('x', 'y')
         # "c[x](c[y],c[z])" -> ('x', 'y', 'z')
         for command in (plan_code.strip('c)').replace('[', '')
-                        .replace(']', '').replace('(', ',')
-                        .replace('c', '').split('),')):
+                .replace(']', '').replace('(', ',')
+                .replace('c', '').split('),')):
             yield command.split(',')
-
 
     @staticmethod
     def array_reverse_split_gen(array_code):
@@ -351,7 +348,6 @@ class CalculateN:
                 else:
                     yield piece
 
-
     @classmethod
     def get_throttling_function_array(cls, mutable_n_list, raw_code):
         """Extract the 'c' array that comes with values and functions
@@ -379,7 +375,7 @@ class CalculateN:
 
         array_code = raw_code[array_start_index:array_end_index]
 
-        converted_array = [ ]
+        converted_array = []
         for el in cls.array_reverse_split_gen(array_code):
             try:
                 converted_array.append(int(el))
@@ -420,7 +416,6 @@ class CalculateN:
         converted_array.reverse()
         return converted_array
 
-
     def calculate_n(self, mutable_n_list):
         """Converts n to the correct value to prevent throttling.
         :param list mutable_n_list:
@@ -447,8 +442,8 @@ class CalculateN:
         # the throttling array elements indexed by the remaining step items.
         try:
             throttling_array = self.get_throttling_function_array(
-                                    mutable_n_list,
-                                    self.throttling_function_code)
+                mutable_n_list,
+                self.throttling_function_code)
             for step in self.get_throttling_plan_gen(self.throttling_function_code):
                 curr_func = throttling_array[int(step[0])]
                 if not callable(curr_func):
