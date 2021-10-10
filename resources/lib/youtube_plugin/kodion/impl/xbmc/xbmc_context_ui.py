@@ -129,7 +129,7 @@ class XbmcContextUI(AbstractContextUI):
             _image = self._context.get_icon()
 
         if PY3 and isinstance(message, str):
-            message = message.encode('utf-8')
+            message = utils.to_unicode(message)
 
         try:
             _message = utils.to_utf8(message.decode('unicode-escape'))
