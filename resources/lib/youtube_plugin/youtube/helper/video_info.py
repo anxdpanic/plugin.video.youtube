@@ -707,13 +707,15 @@ class VideoInfo(object):
 
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = '*/*'
+        if self._access_token:
+            headers['Authorization'] = 'Bearer %s' % self._access_token
 
         # Make a set of URL-quoted headers to be sent to Kodi.
         curl_headers = ''
-        # Cookies don't seem to be used by the YT player.
+        # Cookies don't seem to be used by the YT player when requesting media.
         #if cookies:
-        #    curl_headers = 'Cookie={cookies}'.format(
-        #        cookies = urllib.parse.quote(
+        #    curl_headers = 'Cookie={allCookies}'.format(
+        #        allCookies = urllib.parse.quote(
         #            '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
         #        )
         #    )
