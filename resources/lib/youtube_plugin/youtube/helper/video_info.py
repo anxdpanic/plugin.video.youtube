@@ -549,7 +549,6 @@ class VideoInfo(object):
         headers = self.MOBILE_HEADERS
         if self._access_token:
             headers = headers.copy()
-            headers['access_token'] = self._access_token
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
         url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
@@ -561,7 +560,6 @@ class VideoInfo(object):
         headers = self.MOBILE_HEADERS
         if self._access_token:
             headers = headers.copy()
-            headers['access_token'] = self._access_token
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
         url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
@@ -573,13 +571,13 @@ class VideoInfo(object):
     def get_player_client(config):
         return config.get('INNERTUBE_CONTEXT', {}).get('client', {})
 
-    @staticmethod
-    def get_player_key(html):
+    def get_player_key(self, html):
         pattern = 'INNERTUBE_API_KEY":"'
         start_index = html.find(pattern)
         if start_index != -1:
             start_index += len(pattern)
             end_index = html.find('"', start_index)
+            self._context.log_debug('Player key found')
             return html[start_index:end_index]
         else:
             return None
@@ -704,8 +702,6 @@ class VideoInfo(object):
 
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = '*/*'
-        if self._access_token:
-            headers['Authorization'] = 'Bearer %s' % self._access_token
 
         # Make a set of URL-quoted headers to be sent to Kodi.
         curl_headers = ''
