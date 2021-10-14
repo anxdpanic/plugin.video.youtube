@@ -72,8 +72,8 @@ def to_play_item(context, play_item):
         uri = play_item.get_uri()
         if 'mime=' in uri:
             try:
-                mimeType = uri.split('mime=', 1)[-1].split('&', 1)[0].replace('%2F', '/', 1)
-                list_item.setMimeType(mimeType)
+                mime_type = uri.split('mime=', 1)[-1].split('&', 1)[0].replace('%2F', '/', 1)
+                list_item.setMimeType(mime_type)
                 list_item.setContentLookup(False)
             except:
                 pass
