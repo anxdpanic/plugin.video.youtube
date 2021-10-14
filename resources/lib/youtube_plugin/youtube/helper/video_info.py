@@ -17,20 +17,17 @@ try:
 
     unescape = html_parser.HTMLParser().unescape
 except AttributeError:
-    import html
-
-    unescape = html.unescape
+    from html import unescape
 
 import copy
 import re
 import json
 import random
+import traceback
 
 import requests
 from ...kodion.utils import is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
-#from .ratebypass import ratebypass
-#from .signature.cipher import Cipher
 from .subtitles import Subtitles
 
 import xbmcvfs
@@ -548,14 +545,13 @@ class VideoInfo(object):
     def load_stream_infos(self, video_id):
         return self._method_get_video_info(video_id)
 
-    def get_watch_page(self, path, video_id):
+    def get_watch_page(self, video_id):
         headers = self.MOBILE_HEADERS
         if self._access_token:
-            params['access_token'] = self._access_token
             headers = headers.copy()
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
-        url = url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
+        url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
 
         result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
         return {'html': result.text, 'cookies': result.cookies}
@@ -563,7 +559,6 @@ class VideoInfo(object):
     def get_embed_page(self, video_id):
         headers = self.MOBILE_HEADERS
         if self._access_token:
-            params['access_token'] = self._access_token
             headers = headers.copy()
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
@@ -576,14 +571,14 @@ class VideoInfo(object):
     def get_player_client(config):
         return config.get('INNERTUBE_CONTEXT', {}).get('client', {})
 
-    @staticmethod
-    def get_player_key(html):
+    def get_player_key(self, html):
         pattern = 'INNERTUBE_API_KEY":"'
-        startIndex = html.find(pattern)
-        if startIndex != -1:
-            startIndex += len(pattern)
-            endIndex = html.find('"', startIndex)
-            return html[startIndex:endIndex]
+        start_index = html.find(pattern)
+        if start_index != -1:
+            start_index += len(pattern)
+            end_index = html.find('"', start_index)
+            self._context.log_debug('Player key found')
+            return html[start_index:end_index]
         else:
             return None
 
@@ -652,7 +647,7 @@ class VideoInfo(object):
 
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = '*/*'
-        result = requests.get(javascript_url, headers=headers, verify=False, cookies=cookie, allow_redirects=True)
+        result = requests.get(javascript_url, headers=headers, verify=False, allow_redirects=True)
         javascript = result.text
 
         self._data_cache.set(javascript_url, cache_key)
@@ -707,13 +702,11 @@ class VideoInfo(object):
 
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = '*/*'
-        if self._access_token:
-            headers['Authorization'] = 'Bearer %s' % self._access_token
 
         # Make a set of URL-quoted headers to be sent to Kodi.
         curl_headers = ''
         # Cookies don't seem to be used by the YT player when requesting media.
-        #if cookies:
+        # if cookies:
         #    curl_headers = 'Cookie={allCookies}'.format(
         #        allCookies = urllib.parse.quote(
         #            '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
@@ -724,15 +717,15 @@ class VideoInfo(object):
         # Used in function to_play_item() of 'xbmc_items.py'.
         if curl_headers:
             curl_headers += '&'
-        curl_headers += ('User-Agent={userAgent}&Accept={accept}').format(
-                         userAgent = urllib.parse.quote(headers['User-Agent']),
-                         accept = urllib.parse.quote(headers['Accept']))
+        curl_headers += 'User-Agent={userAgent}&Accept={accept}'.format(
+            userAgent=urllib.parse.quote(headers['User-Agent']),
+            accept=urllib.parse.quote(headers['Accept']))
 
         html = page_result.get('html')
 
-        playerKey = self.get_player_key(html)
-        if playerKey:
-            params = {'key': playerKey}
+        player_key = self.get_player_key(html)
+        if player_key:
+            params = {'key': player_key}
 
             video_info_url = 'https://youtubei.googleapis.com/youtubei/v1/player'
             payload = {'videoId': video_id,
@@ -746,14 +739,13 @@ class VideoInfo(object):
                 r.raise_for_status()
                 player_response = r.json()
             except:
-                import traceback
-                errorMessage = 'Failed to get player response for video_id "%s"' % video_id
-                self._context.log_error(errorMessage + '\n' + traceback.format_exc())
-                raise YouTubeException(errorMessage)
+                error_message = 'Failed to get player response for video_id "%s"' % video_id
+                self._context.log_error(error_message + '\n' + traceback.format_exc())
+                raise YouTubeException(error_message)
         else:
-            errorMessage = 'Failed to find the INNERTUBE_API_KEY for video_id "{id}"'.format(id=video_id)
-            self._context.log_error(errorMessage)
-            raise YouTubeException(errorMessage)
+            error_message = 'Failed to find the INNERTUBE_API_KEY for video_id "{id}"'.format(id=video_id)
+            self._context.log_error(error_message)
+            raise YouTubeException(error_message)
 
         playability_status = player_response.get('playabilityStatus', {})
 
@@ -820,7 +812,7 @@ class VideoInfo(object):
             'live': is_live,
         }
 
-        if (playability_status.get('status', 'ok').lower() != 'ok'):
+        if playability_status.get('status', 'ok').lower() != 'ok':
             if not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate()):
                 reason = None
                 if playability_status.get('status') == 'LIVE_STREAM_OFFLINE':
@@ -1163,7 +1155,7 @@ class VideoInfo(object):
             mime = key = t[0]
             i = stream_map.get('itag')
             if 'audioTrack' in stream_map:
-                key = '_'.join([mime,stream_map.get('audioTrack').get('id')[0:2]])
+                key = '_'.join([mime, stream_map.get('audioTrack').get('id')[0:2]])
 
             if key not in data:
                 data[key] = {}
@@ -1315,11 +1307,11 @@ class VideoInfo(object):
                 if lang is not None:
                     # Avoid default language selection as it confuses the language selection in Kodi
                     default = False
-                    out_list.append(''.join(['lang="',lang,'" ']))
+                    out_list.append(''.join(['lang="', lang, '" ']))
                 out_list.append(''.join(['subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true" default="', str(default).lower(), '">\n']))
                 if license_url is not None:
-                    license_url=license_url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
-                    out_list.append(''.join(['\t\t\t<ContentProtection schemeIdUri="http://youtube.com/drm/2012/10/10">\n','\t\t\t\t<yt:SystemURL type="widevine">',license_url,'</yt:SystemURL>\n','\t\t\t</ContentProtection>\n']))
+                    license_url = license_url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+                    out_list.append(''.join(['\t\t\t<ContentProtection schemeIdUri="http://youtube.com/drm/2012/10/10">\n', '\t\t\t\t<yt:SystemURL type="widevine">', license_url, '</yt:SystemURL>\n', '\t\t\t</ContentProtection>\n']))
                 out_list.append('\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n')
                 for i in data[key]:
                     stream_format = self.FORMAT.get(i, {})
