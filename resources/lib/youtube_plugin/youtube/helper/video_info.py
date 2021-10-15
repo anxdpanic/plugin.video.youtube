@@ -501,7 +501,7 @@ class VideoInfo(object):
         'Accept-Language': 'en-US,en;q=0.5'
     }
 
-    def __init__(self, context, access_token='', language='en-US'):
+    def __init__(self, context, access_token='', api_key='', language='en-US'):
         self._context = context
         self._data_cache = self._context.get_data_cache()
         self._verify = context.get_settings().verify_ssl()
@@ -509,6 +509,7 @@ class VideoInfo(object):
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
         self.region = context.get_settings().get_string('youtube.region', 'US')
         self._access_token = access_token
+        self._api_key = api_key
         self._calculate_n = None
 
     @staticmethod
@@ -649,8 +650,8 @@ class VideoInfo(object):
     def make_curl_headers(headers, cookies=None):
         output = ''
         if cookies:
-            output += 'Cookie={allCookies}'.format(
-                allCookies = urllib.parse.quote(
+            output += 'Cookie={all_cookies}'.format(
+                all_cookies=urllib.parse.quote(
                     '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
                 )
             )
@@ -687,7 +688,7 @@ class VideoInfo(object):
         # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
         # a small default stream with itag 133 (240p) and can be ignored.
         # Capture the URL of a .m3u8 playlist and the itag value from that URL.
-        re_playlist_data = re.compile('#EXT-X-STREAM-INF[^#]+(?P<url>http[^\s]+/itag/(?P<itag>\d+)[^\s]+)')
+        re_playlist_data = re.compile(r'#EXT-X-STREAM-INF[^#]+(?P<url>http[^\s]+/itag/(?P<itag>\d+)[^\s]+)')
         for match in re_playlist_data.finditer(result.text):
             playlist_url = match.group('url')
             itag = match.group('itag')
@@ -708,7 +709,6 @@ class VideoInfo(object):
 
     def _method_get_video_info(self, video_id):
         page_result = self.get_embed_page(video_id)
-        html = page_result['html']
         cookies = page_result.get('cookies', None)
 
         headers = self.MOBILE_HEADERS.copy()
@@ -718,14 +718,9 @@ class VideoInfo(object):
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
         else:
-            playerKey = self.get_player_key(html)
-            if playerKey:
-                params = {'key': playerKey}
-            else:
-                errorMessage = 'Failed to find the INNERTUBE_API_KEY for video_id "{id}"'.format(id=video_id)
-                self._context.log_error(errorMessage)
-                raise YouTubeException(errorMessage)
-
+            params = {
+                'key': self._api_key
+            }
         video_info_url = 'https://youtubei.googleapis.com/youtubei/v1/player'
         payload = {'videoId': video_id,
                    'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
@@ -737,14 +732,14 @@ class VideoInfo(object):
             r.raise_for_status()
             player_response = r.json()
         except:
-            errorMessage = 'Failed to get player response for video_id "%s"' % video_id
-            self._context.log_error(errorMessage + '\n' + traceback.format_exc())
-            raise YouTubeException(errorMessage)
+            error_message = 'Failed to get player response for video_id "%s"' % video_id
+            self._context.log_error(error_message + '\n' + traceback.format_exc())
+            raise YouTubeException(error_message)
 
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
-        #curl_headers = self.make_curl_headers(headers, cookies)
+        # curl_headers = self.make_curl_headers(headers, cookies)
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
         playability_status = player_response.get('playabilityStatus', {})
@@ -878,7 +873,7 @@ class VideoInfo(object):
                 '&st={st}&et={et}&state={state}'
             ])
 
-        stream_list = [ ]
+        stream_list = []
 
         if live_url:
             stream_list.extend(self._load_manifest(live_url, video_id,
