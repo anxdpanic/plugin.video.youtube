@@ -547,21 +547,13 @@ class VideoInfo(object):
 
     def get_watch_page(self, video_id):
         headers = self.MOBILE_HEADERS
-        if self._access_token:
-            headers = headers.copy()
-            headers['Authorization'] = 'Bearer %s' % self._access_token
-
         url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
 
         result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
-        return {'html': result.text, 'cookies': result.cookies}
+        return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
     def get_embed_page(self, video_id):
         headers = self.MOBILE_HEADERS
-        if self._access_token:
-            headers = headers.copy()
-            headers['Authorization'] = 'Bearer %s' % self._access_token
-
         url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
 
         result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
@@ -653,16 +645,38 @@ class VideoInfo(object):
         self._data_cache.set(javascript_url, cache_key)
         return javascript
 
-    def _load_manifest(self, url, video_id, meta_info=None, curl_headers='', playback_stats=None):
+    @staticmethod
+    def make_curl_headers(headers, cookies=None):
+        output = ''
+        if cookies:
+            output += 'Cookie={allCookies}'.format(
+                allCookies = urllib.parse.quote(
+                    '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
+                )
+            )
+            output += '&'
+        # Headers to be used in function 'to_play_item' of 'xbmc_items.py'.
+        output += '&'.join('{0}={1}'.format(key, urllib.parse.quote(headers[key]))
+                           for key in headers)
+        return output
+
+    def _load_manifest(self, url, video_id, meta_info=None, playback_stats=None):
         headers = self.MOBILE_HEADERS.copy()
-        headers['Referer'] = 'https://www.youtube.com/watch?v=%s' % video_id,
+        headers['Referer'] = 'https://www.youtube.com/watch?v=%s' % video_id
+        headers['Origin'] = 'https://www.youtube.com'
         headers['Accept'] = '*/*'
+
+        curl_headers = self.make_curl_headers(headers, cookies=None)
 
         if playback_stats is None:
             playback_stats = {}
 
-        result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
-        lines = result.text.splitlines()
+        try:
+            result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
+            result.raise_for_status()
+        except:
+            # Failed to get the M3U8 playlist file. Add a log debug in this case?
+            return ()
 
         _meta_info = {'video': {},
                       'channel': {},
@@ -670,82 +684,68 @@ class VideoInfo(object):
                       'subtitles': []}
         meta_info = meta_info if meta_info else _meta_info
         streams = []
-        re_line = re.compile(r'RESOLUTION=(?P<width>\d+)x(?P<height>\d+)')
-        re_itag = re.compile(r'/itag/(?P<itag>\d+)')
-        for i in range(len(lines)):
-            re_match = re.search(re_line, lines[i])
-            if re_match:
-                line = lines[i + 1]
+        # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
+        # a small default stream with itag 133 (240p) and can be ignored.
+        # Capture the URL of a .m3u8 playlist and the itag value from that URL.
+        re_playlist_data = re.compile('#EXT-X-STREAM-INF[^#]+(?P<url>http[^\s]+/itag/(?P<itag>\d+)[^\s]+)')
+        for match in re_playlist_data.finditer(result.text):
+            playlist_url = match.group('url')
+            itag = match.group('itag')
 
-                re_itag_match = re.search(re_itag, line)
-                if re_itag_match:
-                    itag = re_itag_match.group('itag')
-                    yt_format = self.FORMAT.get(itag, None)
-                    if not yt_format:
-                        self._context.log_debug('unknown yt_format for itag "%s"' % itag)
-                        continue
+            yt_format = self.FORMAT.get(itag, None)
+            if not yt_format:
+                self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                continue
 
-                    # width = int(re_match.group('width'))
-                    # height = int(re_match.group('height'))
-                    video_stream = {'url': line,
-                                    'meta': meta_info,
-                                    'headers': curl_headers,
-                                    'playback_stats': playback_stats
-                                    }
-                    video_stream.update(yt_format)
-                    streams.append(video_stream)
+            video_stream = {'url': playlist_url,
+                            'meta': meta_info,
+                            'headers': curl_headers,
+                            'playback_stats': playback_stats
+                            }
+            video_stream.update(yt_format)
+            streams.append(video_stream)
         return streams
 
     def _method_get_video_info(self, video_id):
         page_result = self.get_embed_page(video_id)
-        cookies = page_result.get('cookies', {})
+        html = page_result['html']
+        cookies = page_result.get('cookies', None)
 
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = '*/*'
 
-        # Make a set of URL-quoted headers to be sent to Kodi.
-        curl_headers = ''
-        # Cookies don't seem to be used by the YT player when requesting media.
-        # if cookies:
-        #    curl_headers = 'Cookie={allCookies}'.format(
-        #        allCookies = urllib.parse.quote(
-        #            '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
-        #        )
-        #    )
-        # These extra headers don't affect streaming, but we need to send at
-        # least the User-Agent to Kodi so that it doesn't reveal itself.
-        # Used in function to_play_item() of 'xbmc_items.py'.
-        if curl_headers:
-            curl_headers += '&'
-        curl_headers += 'User-Agent={userAgent}&Accept={accept}'.format(
-            userAgent=urllib.parse.quote(headers['User-Agent']),
-            accept=urllib.parse.quote(headers['Accept']))
-
-        html = page_result.get('html')
-
-        player_key = self.get_player_key(html)
-        if player_key:
-            params = {'key': player_key}
-
-            video_info_url = 'https://youtubei.googleapis.com/youtubei/v1/player'
-            payload = {'videoId': video_id,
-                       'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
-                                              'clientName': 'ANDROID', 'hl': self.language}}}
-            try:
-                r = requests.post(video_info_url, params=params, json=payload,
-                                  headers=headers, verify=self._verify, cookies=cookies,
-                                  allow_redirects=True)
-
-                r.raise_for_status()
-                player_response = r.json()
-            except:
-                error_message = 'Failed to get player response for video_id "%s"' % video_id
-                self._context.log_error(error_message + '\n' + traceback.format_exc())
-                raise YouTubeException(error_message)
+        params = None
+        if self._access_token:
+            headers['Authorization'] = 'Bearer %s' % self._access_token
         else:
-            error_message = 'Failed to find the INNERTUBE_API_KEY for video_id "{id}"'.format(id=video_id)
-            self._context.log_error(error_message)
-            raise YouTubeException(error_message)
+            playerKey = self.get_player_key(html)
+            if playerKey:
+                params = {'key': playerKey}
+            else:
+                errorMessage = 'Failed to find the INNERTUBE_API_KEY for video_id "{id}"'.format(id=video_id)
+                self._context.log_error(errorMessage)
+                raise YouTubeException(errorMessage)
+
+        video_info_url = 'https://youtubei.googleapis.com/youtubei/v1/player'
+        payload = {'videoId': video_id,
+                   'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
+                                          'clientName': 'ANDROID', 'hl': self.language}}}
+        try:
+            r = requests.post(video_info_url, params=params, json=payload,
+                              headers=headers, verify=self._verify, cookies=cookies,
+                              allow_redirects=True)
+            r.raise_for_status()
+            player_response = r.json()
+        except:
+            errorMessage = 'Failed to get player response for video_id "%s"' % video_id
+            self._context.log_error(errorMessage + '\n' + traceback.format_exc())
+            raise YouTubeException(errorMessage)
+
+        # Make a set of URL-quoted headers to be sent to Kodi when requesting
+        # the stream during playback. The YT player doesn't seem to use any
+        # cookies when doing that, so for now cookies are ignored.
+        #curl_headers = self.make_curl_headers(headers, cookies)
+        curl_headers = self.make_curl_headers(headers, cookies=None)
 
         playability_status = player_response.get('playabilityStatus', {})
 
@@ -756,8 +756,6 @@ class VideoInfo(object):
         live_url = streaming_data.get('hlsManifestUrl', '') or \
                    player_response.get('streamingData', {}).get('hlsManifestUrl', '')
         is_live = is_live_content and live_url
-
-        stream_list = []
 
         meta_info = {'video': {},
                      'channel': {},
@@ -880,11 +878,12 @@ class VideoInfo(object):
                 '&st={st}&et={et}&state={state}'
             ])
 
+        stream_list = [ ]
+
         if live_url:
-            stream_list = self._load_manifest(live_url, video_id,
-                                              meta_info=meta_info,
-                                              curl_headers=curl_headers,
-                                              playback_stats=playback_stats)
+            stream_list.extend(self._load_manifest(live_url, video_id,
+                                                   meta_info=meta_info,
+                                                   playback_stats=playback_stats))
 
         httpd_is_live = (self._context.get_settings().use_dash_videos() and
                          is_httpd_live(port=self._context.get_settings().httpd_port()))
