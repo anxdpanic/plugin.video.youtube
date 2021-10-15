@@ -12,7 +12,6 @@ import copy
 import json
 import re
 import threading
-import time
 import traceback
 import xml.etree.ElementTree as ET
 
@@ -21,8 +20,6 @@ from six import PY3
 
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
-from ..helper.utils import get_shelf_index_by_title
-from ...kodion import constants
 from ...kodion import Context
 from ...kodion.utils import datetime_parser
 from ...kodion.utils import to_unicode
@@ -99,7 +96,8 @@ class YouTube(LoginClient):
             _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
     def get_video_streams(self, context, video_id):
-        video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
+        video_info = VideoInfo(context, access_token=self._access_token_tv,
+                               api_key=self._config_tv['key'], language=self._language)
 
         video_streams = video_info.load_stream_infos(video_id)
 

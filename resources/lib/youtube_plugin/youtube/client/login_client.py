@@ -51,6 +51,7 @@ class LoginClient(object):
         self._language = language
         self._region = region
         self._access_token = access_token
+        self._access_token_tv = access_token_tv
         self._log_error_callback = None
 
     def set_log_error(self, callback):
