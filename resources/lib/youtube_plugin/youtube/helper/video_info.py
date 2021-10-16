@@ -548,16 +548,28 @@ class VideoInfo(object):
 
     def get_watch_page(self, video_id):
         headers = self.MOBILE_HEADERS
-        url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
+        if self._access_token:
+            headers['Authorization'] = 'Bearer %s' % self._access_token
 
-        result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
+        url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
+        cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
+
+        result = requests.get(url, headers=headers, verify=self._verify,
+                              cookies=cookies, allow_redirects=True)
+
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
     def get_embed_page(self, video_id):
         headers = self.MOBILE_HEADERS
-        url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
+        if self._access_token:
+            headers['Authorization'] = 'Bearer %s' % self._access_token
 
-        result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
+        url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
+        cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
+
+        result = requests.get(url, headers=headers, verify=self._verify,
+                              cookies=cookies, allow_redirects=True)
+
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
     @staticmethod
@@ -740,7 +752,7 @@ class VideoInfo(object):
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self.make_curl_headers(headers, cookies)
-        curl_headers = self.make_curl_headers(headers, cookies=None)
+        curl_headers = self.make_curl_headers(headers, cookies=cookies)
 
         playability_status = player_response.get('playabilityStatus', {})
 

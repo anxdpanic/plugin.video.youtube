@@ -980,3 +980,54 @@ class YouTube(LoginClient):
                 }
 
         return {}
+
+    def perform_v1_tv_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
+                              allow_redirects=True):
+        # params
+        if not params:
+            params = {}
+        _params = {'key': self._config_tv['key']}
+        _params.update(params)
+
+        # headers
+        if not headers:
+            headers = {}
+        _headers = {
+            'User-Agent': ('Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M;'
+                           ' wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0'
+                           ' Chrome/67.0.3396.87 Mobile Safari/537.36'),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'DNT': '1',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en-US,en;q=0.5',
+        }
+
+        if self._access_token_tv:
+            _headers['Authorization'] = 'Bearer %s' % self._access_token_tv
+        _headers.update(headers)
+
+        # url
+        _url = 'https://www.googleapis.com/youtubei/v1/%s' % path.strip('/')
+
+        result = None
+
+        _context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
+        if method == 'GET':
+            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
+        elif method == 'POST':
+            _headers['content-type'] = 'application/json'
+            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
+                                   allow_redirects=allow_redirects)
+        elif method == 'PUT':
+            _headers['content-type'] = 'application/json'
+            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
+                                  allow_redirects=allow_redirects)
+        elif method == 'DELETE':
+            result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
+                                     allow_redirects=allow_redirects)
+
+        if result is None:
+            return {}
+
+        if result.headers.get('content-type', '').startswith('application/json'):
+            return result.json()
