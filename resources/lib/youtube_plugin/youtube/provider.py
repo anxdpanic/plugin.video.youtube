@@ -287,13 +287,13 @@ class Provider(kodion.AbstractProvider):
 
         if dev_id:
             access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
-            if len(access_tokens) < 1 or access_manager.is_dev_access_token_expired(dev_id):
+            if len(access_tokens) != 2 or access_manager.is_dev_access_token_expired(dev_id):
                 # reset access_token
                 access_manager.update_dev_access_token(dev_id, '')
                 access_tokens = list()
         else:
             access_tokens = access_manager.get_access_token().split('|')
-            if len(access_tokens) < 1 or access_manager.is_access_token_expired():
+            if len(access_tokens) != 2 or access_manager.is_access_token_expired():
                 # reset access_token
                 access_manager.update_access_token('')
                 access_tokens = list()
@@ -351,21 +351,24 @@ class Provider(kodion.AbstractProvider):
                 client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
 
         if client:
-            if len(access_tokens) < 1 <= len(refresh_tokens):
+            if len(access_tokens) != 2 and len(refresh_tokens) == 2:
                 try:
-                    index = 1 if len(refresh_tokens) > 1 else 0
-                    access_token, expires_in = client.refresh_token(refresh_tokens[index])
-                    access_tokens = [access_token]
 
+                    access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
+
+                    access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
+
+                    access_tokens = [access_token_tv, access_token_kodi]
+
+                    access_token = '%s|%s' % (access_token_tv, access_token_kodi)
+                    expires_in = min(expires_in_tv, expires_in_kodi)
                     if dev_id:
                         access_manager.update_dev_access_token(dev_id, access_token, expires_in)
                     else:
                         access_manager.update_access_token(access_token, expires_in)
-
                 except (InvalidGrant, LoginException) as ex:
                     self.handle_exception(context, ex)
-                    access_tokens = ['']
-
+                    access_tokens = ['', '']
                     # reset access_token
                     if isinstance(ex, InvalidGrant):
                         if dev_id:
@@ -381,18 +384,16 @@ class Provider(kodion.AbstractProvider):
                     self.get_resource_manager(context).clear()
 
             # in debug log the login status
-            self._is_logged_in = len(access_tokens) == 1
+            self._is_logged_in = len(access_tokens) == 2
             if self._is_logged_in:
                 context.log_debug('User is logged in')
             else:
                 context.log_debug('User is not logged in')
 
             if len(access_tokens) == 0:
-                access_tokens = ['']
-
-            index = 1 if len(access_tokens) > 1 else 0
-            client.set_access_token(access_token=access_tokens[index])
-
+                access_tokens = ['', '']
+            client.set_access_token(access_token=access_tokens[1])
+            client.set_access_token_tv(access_token_tv=access_tokens[0])
             self._client = client
             self._client.set_log_error(context.log_error)
         else:

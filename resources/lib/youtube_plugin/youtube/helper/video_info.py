@@ -740,7 +740,7 @@ class VideoInfo(object):
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self.make_curl_headers(headers, cookies)
-        curl_headers = self.make_curl_headers(headers, cookies=None)
+        curl_headers = self.make_curl_headers(headers, cookies=cookies)
 
         playability_status = player_response.get('playabilityStatus', {})
 
