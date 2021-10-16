@@ -720,9 +720,6 @@ class VideoInfo(object):
         return streams
 
     def _method_get_video_info(self, video_id):
-        page_result = self.get_embed_page(video_id)
-        cookies = page_result.get('cookies', None)
-
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = '*/*'
 
@@ -739,7 +736,7 @@ class VideoInfo(object):
                                           'clientName': 'ANDROID', 'hl': self.language}}}
         try:
             r = requests.post(video_info_url, params=params, json=payload,
-                              headers=headers, verify=self._verify, cookies=cookies,
+                              headers=headers, verify=self._verify, cookies=None,
                               allow_redirects=True)
             r.raise_for_status()
             player_response = r.json()
@@ -752,7 +749,7 @@ class VideoInfo(object):
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self.make_curl_headers(headers, cookies)
-        curl_headers = self.make_curl_headers(headers, cookies=cookies)
+        curl_headers = self.make_curl_headers(headers, cookies=None)
 
         playability_status = player_response.get('playabilityStatus', {})
 
