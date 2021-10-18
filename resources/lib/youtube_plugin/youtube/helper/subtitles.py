@@ -259,7 +259,7 @@ class Subtitles(object):
             _milliseconds_to_srt = cls._milliseconds_to_srt
             text_pattern = r'''<text\s*t=['"](\d+)[^>]+d=['"](\d+)[^>]+>([^<]+)</text>'''
             for index, match in enumerate(re.finditer(text_pattern, content),
-                                            start=1):
+                                          start=1):
                 text_time, text_duration, text_content = match.groups()
 
                 text_time = int(text_time)
