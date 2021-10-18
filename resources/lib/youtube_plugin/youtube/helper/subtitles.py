@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-
-    Copyright (C) 2017-2018 plugin.video.youtube
+    Copyright (C) 2017-2021 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
 """
 
+import re
 import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
@@ -14,11 +14,9 @@ from ...kodion.utils import make_dirs
 from six import PY2
 try:
     from six.moves import html_parser
-
     unescape = html_parser.HTMLParser().unescape
 except AttributeError:
     import html
-
     unescape = html.unescape
 
 
@@ -32,20 +30,12 @@ class Subtitles(object):
     BASE_PATH = 'special://temp/plugin.video.youtube/'
     SRT_FILE = ''.join([BASE_PATH, '%s.%s.srt'])
 
-    def __init__(self, context, video_id, captions):
+    def __init__(self, context, headers, video_id, captions):
         self.context = context
         self._verify = context.get_settings().verify_ssl()
         self.video_id = video_id
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('_', '-')
-        self.headers = {'Host': 'www.youtube.com',
-                        'Connection': 'keep-alive',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 '
-                                      '(KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-                        'Accept': '*/*',
-                        'DNT': '1',
-                        'Referer': 'https://www.youtube.com/tv',
-                        'Accept-Encoding': 'gzip, deflate',
-                        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+        self.headers = headers.copy()
 
         self.caption_track = {}
         self.renderer = captions.get('playerCaptionsTracklistRenderer', {})
@@ -210,7 +200,8 @@ class Subtitles(object):
 
                 if result_auto.text:
                     self.context.log_debug('Subtitle found for: %s' % language)
-                    self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
+                    content = self._cleanup_srt(result_auto.text.encode('utf8', 'ignore'))
+                    self._write_file(fname, bytearray(self._unescape(content), encoding='utf8', errors='ignore'))
                     return [fname]
                 else:
                     self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
@@ -243,3 +234,44 @@ class Subtitles(object):
             language_name = language_name.decode('raw_unicode_escape')
 
         return language_name
+
+    @staticmethod
+    def _milliseconds_to_srt(ms):
+        # This could also be done using divmod(), but doing it manually
+        # like below had better timings.
+        total_seconds = ms // 1000
+        total_minutes = total_seconds // 60
+        total_hours = total_minutes // 60
+
+        milliseconds = ms - (total_seconds * 1000)
+        seconds = total_seconds - (total_minutes * 60)
+        minutes = total_minutes - (total_hours * 60)
+        # Done with string arithmetic rather than formatting, for a big
+        # difference in speed.
+        return (str(total_hours) + ':' + str(minutes) + ':'
+                + str(seconds) + ',' + str(milliseconds))
+
+    @classmethod
+    def _cleanup_srt(cls, content):
+        # If necessary, convert from YouTube's <timedtext> XML to SRT.
+        if content.startswith('<?xml') and '<timedtext>' in content:
+            parsed_content = ''
+            _milliseconds_to_srt = cls._milliseconds_to_srt
+            text_pattern = r'''<text\s*t=['"](\d+)[^>]+d=['"](\d+)[^>]+>([^<]+)</text>'''
+            for index, match in enumerate(re.finditer(text_pattern, content),
+                                            start=1):
+                text_time, text_duration, text_content = match.groups()
+
+                text_time = int(text_time)
+                text_duration = int(text_duration)
+
+                srt_piece = '{index}\n{start} --> {end}\n{content}\n\n'.format(
+                    index=index,
+                    start=_milliseconds_to_srt(text_time),
+                    end=_milliseconds_to_srt(text_time + text_duration),
+                    content=text_content
+                )
+                parsed_content += srt_piece
+            content = parsed_content
+
+        return content

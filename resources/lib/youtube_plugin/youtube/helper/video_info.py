@@ -495,7 +495,7 @@ class VideoInfo(object):
         'User-Agent': ('Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M;'
                        ' wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0'
                        ' Chrome/67.0.3396.87 Mobile Safari/537.36'),
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept': '*/*',
         'DNT': '1',
         'Accept-Encoding': 'gzip, deflate',
         'Accept-Language': 'en-US,en;q=0.5'
@@ -547,7 +547,8 @@ class VideoInfo(object):
         return self._method_get_video_info(video_id)
 
     def get_watch_page(self, video_id):
-        headers = self.MOBILE_HEADERS
+        headers = self.MOBILE_HEADERS.copy()
+        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
@@ -560,7 +561,8 @@ class VideoInfo(object):
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
     def get_embed_page(self, video_id):
-        headers = self.MOBILE_HEADERS
+        headers = self.MOBILE_HEADERS.copy()
+        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
@@ -651,7 +653,6 @@ class VideoInfo(object):
             return cached_js
 
         headers = self.MOBILE_HEADERS.copy()
-        headers['Accept'] = '*/*'
         result = requests.get(javascript_url, headers=headers, verify=False, allow_redirects=True)
         javascript = result.text
 
@@ -677,7 +678,6 @@ class VideoInfo(object):
         headers = self.MOBILE_HEADERS.copy()
         headers['Referer'] = 'https://www.youtube.com/watch?v=%s' % video_id
         headers['Origin'] = 'https://www.youtube.com'
-        headers['Accept'] = '*/*'
 
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
@@ -721,7 +721,6 @@ class VideoInfo(object):
 
     def _method_get_video_info(self, video_id):
         headers = self.MOBILE_HEADERS.copy()
-        headers['Accept'] = '*/*'
 
         params = None
         if self._access_token:
@@ -856,7 +855,8 @@ class VideoInfo(object):
                 raise YouTubeException(reason)
 
         captions = player_response.get('captions', {})
-        meta_info['subtitles'] = Subtitles(self._context, video_id, captions).get_subtitles()
+        meta_info['subtitles'] = Subtitles(self._context, self.MOBILE_HEADERS,
+                                           video_id, captions).get_subtitles()
 
         playback_stats = {
             'playback_url': '',
