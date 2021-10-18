@@ -547,7 +547,8 @@ class VideoInfo(object):
         return self._method_get_video_info(video_id)
 
     def get_watch_page(self, video_id):
-        headers = self.MOBILE_HEADERS
+        headers = self.MOBILE_HEADERS.copy()
+        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
@@ -560,7 +561,8 @@ class VideoInfo(object):
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
     def get_embed_page(self, video_id):
-        headers = self.MOBILE_HEADERS
+        headers = self.MOBILE_HEADERS.copy()
+        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
