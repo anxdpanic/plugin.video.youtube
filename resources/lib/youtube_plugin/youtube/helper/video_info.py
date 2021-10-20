@@ -730,19 +730,35 @@ class VideoInfo(object):
                 'key': self._api_key
             }
         video_info_url = 'https://youtubei.googleapis.com/youtubei/v1/player'
+        # payload = {'videoId': video_id,
+        #            'context': {'client': {'clientVersion': '1.20210909.07.00', 'gl': self.region,
+        #                                   'clientName': 'WEB_CREATOR', 'hl': self.language}}}
+
+        # payload = {'videoId': video_id,
+        #            'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
+        #                                   'clientName': 'ANDROID', 'clientScreen': 'EMBED',
+        #                                   'hl': self.language}}}
+
         payload = {'videoId': video_id,
                    'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
                                           'clientName': 'ANDROID', 'hl': self.language}}}
-        try:
-            r = requests.post(video_info_url, params=params, json=payload,
-                              headers=headers, verify=self._verify, cookies=None,
-                              allow_redirects=True)
-            r.raise_for_status()
-            player_response = r.json()
-        except:
-            error_message = 'Failed to get player response for video_id "%s"' % video_id
-            self._context.log_error(error_message + '\n' + traceback.format_exc())
-            raise YouTubeException(error_message)
+
+        player_response = {}
+        for attempt in range(2):
+            try:
+                r = requests.post(video_info_url, params=params, json=payload,
+                                  headers=headers, verify=self._verify, cookies=None,
+                                  allow_redirects=True)
+                r.raise_for_status()
+                player_response = r.json()
+                if player_response.get('playabilityStatus', {}).get('status', 'OK') == 'AGE_CHECK_REQUIRED' \
+                        and attempt == 0:
+                    payload['context']['client']['clientScreen'] = 'EMBED'
+                    continue
+            except:
+                error_message = 'Failed to get player response for video_id "%s"' % video_id
+                self._context.log_error(error_message + '\n' + traceback.format_exc())
+                raise YouTubeException(error_message)
 
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
         # the stream during playback. The YT player doesn't seem to use any
