@@ -6,17 +6,24 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
 import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
 
+from six.moves.urllib_parse import parse_qs
+from six.moves.urllib_parse import urlencode
+from six.moves.urllib_parse import urlsplit
+from six.moves.urllib_parse import urlunsplit
+
 from six import PY2
+
 try:
     from six.moves import html_parser
+
     unescape = html_parser.HTMLParser().unescape
 except AttributeError:
     import html
+
     unescape = html.unescape
 
 
@@ -184,13 +191,15 @@ class Subtitles(object):
         if (caption_track is None) and has_translation:
             base_url = self.caption_track.get('baseUrl')
             if base_url:
-                subtitle_url = ''.join([base_url, '&fmt=vtt&type=track&tlang=', language])
+                subtitle_url = self.set_query_param(base_url, 'type', 'track')
+                subtitle_url = self.set_query_param(base_url, 'tlang', language)
         elif caption_track is not None:
             base_url = caption_track.get('baseUrl')
             if base_url:
-                subtitle_url = ''.join([base_url, '&fmt=vtt&type=track'])
+                subtitle_url = self.set_query_param(base_url, 'type', 'track')
 
         if subtitle_url:
+            subtitle_url = self.set_query_param(subtitle_url, 'fmt', 'vtt')
             self.context.log_debug('Subtitle url: %s' % subtitle_url)
             if not self.context.get_settings().subtitle_download():
                 return [subtitle_url]
@@ -200,8 +209,7 @@ class Subtitles(object):
 
                 if result_auto.text:
                     self.context.log_debug('Subtitle found for: %s' % language)
-                    content = self._cleanup_srt(result_auto.text.encode('utf8', 'ignore'))
-                    self._write_file(fname, bytearray(self._unescape(content), encoding='utf8', errors='ignore'))
+                    self._write_file(fname, bytearray(self._unescape(result_auto.text), encoding='utf8', errors='ignore'))
                     return [fname]
                 else:
                     self.context.log_debug('Failed to retrieve subtitles for: %s' % language)
@@ -236,42 +244,13 @@ class Subtitles(object):
         return language_name
 
     @staticmethod
-    def _milliseconds_to_srt(ms):
-        # This could also be done using divmod(), but doing it manually
-        # like below had better timings.
-        total_seconds = ms // 1000
-        total_minutes = total_seconds // 60
-        total_hours = total_minutes // 60
+    def set_query_param(url, name, value):
+        scheme, netloc, path, query_string, fragment = urlsplit(url)
+        query_params = parse_qs(query_string)
 
-        milliseconds = ms - (total_seconds * 1000)
-        seconds = total_seconds - (total_minutes * 60)
-        minutes = total_minutes - (total_hours * 60)
-        # Done with string arithmetic rather than formatting, for a big
-        # difference in speed.
-        return (str(total_hours) + ':' + str(minutes) + ':'
-                + str(seconds) + ',' + str(milliseconds))
+        query_params[name] = [value]
+        new_query_string = urlencode(query_params, doseq=True)
+        if isinstance(scheme, bytes):
+            new_query_string = new_query_string.encode('utf-8')
 
-    @classmethod
-    def _cleanup_srt(cls, content):
-        # If necessary, convert from YouTube's <timedtext> XML to SRT.
-        if content.startswith('<?xml') and '<timedtext>' in content:
-            parsed_content = ''
-            _milliseconds_to_srt = cls._milliseconds_to_srt
-            text_pattern = r'''<text\s*t=['"](\d+)[^>]+d=['"](\d+)[^>]+>([^<]+)</text>'''
-            for index, match in enumerate(re.finditer(text_pattern, content),
-                                          start=1):
-                text_time, text_duration, text_content = match.groups()
-
-                text_time = int(text_time)
-                text_duration = int(text_duration)
-
-                srt_piece = '{index}\n{start} --> {end}\n{content}\n\n'.format(
-                    index=index,
-                    start=_milliseconds_to_srt(text_time),
-                    end=_milliseconds_to_srt(text_time + text_duration),
-                    content=text_content
-                )
-                parsed_content += srt_piece
-            content = parsed_content
-
-        return content
+        return urlunsplit((scheme, netloc, path, new_query_string, fragment))
