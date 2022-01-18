@@ -5,16 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: pt_BR\n"
+"PO-Revision-Date: 2021-12-14 15:13+0000\n"
+"Last-Translator: Fabio <fabioihle+kodi@alunos.utfpr.edu.br>\n"
+"Language-Team: Portuguese (Brazil) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pt_br/>\n"
+"Language: pt_br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.9.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -136,7 +137,7 @@ msgstr "Visualização: Filmes"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Executar assistente de configuração"
+msgstr "Executar assistente de configuração?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -202,7 +203,7 @@ msgstr "Próxima Página (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "Assistir Depois"
+msgstr "Assistir mais tarde"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -344,7 +345,7 @@ msgstr "Vídeos Relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Autoremover de 'Assistir Depois'"
+msgstr "Autoremover de 'Assistir mais tarde'"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -464,11 +465,11 @@ msgstr "Mais links da descrição"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "Nenhum outro link encontrado"
+msgstr "Nenhum outro link encontrado."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Por favor logue-se 2 vezes"
+msgstr "Por favor inicie sessão duas vezes!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
@@ -548,23 +549,23 @@ msgstr "Inglês"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr "Prompt"
+msgstr "Perguntar"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr "Setar para assistir depois"
+msgstr "Marcar para Assistir mais tarde"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr "Remover de assistir depois"
+msgstr "Remover de Assistir mais tarde"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Tem certeza que deseja remover '%s' de sua lista para assistir depois"
+msgstr "Tem certeza que deseja remover '%s' de sua lista Assistir mais tarde?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Tem certeza que deseja substituir sua lista de assistir depois atual com '%s'?"
+msgstr "Tem certeza que deseja substituir sua lista de Assistir mais tarde atual com '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -736,7 +737,7 @@ msgstr "Tentar novamente"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr "ID da lista de reprodução Recuperar assistir mais tarde"
+msgstr "Recuperar ID da lista de reprodução Assistir mais tarde"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
@@ -1128,7 +1129,7 @@ msgstr "Falha ao recuperar o ID da lista de reprodução Assistir mais tarde. Te
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr "Procurando por Assistir Depois ... Página %s"
+msgstr "Procurando por Assistir mais tarde... Página %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1136,7 +1137,7 @@ msgstr "Avaliar vídeos na lista de reprodução"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr "Adicionado para Assistir Posteriormente"
+msgstr "Adicionado para Assistir mais tarde"
 
 msgctxt "#30714"
 msgid "Added to playlist"

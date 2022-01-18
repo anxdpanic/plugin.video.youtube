@@ -5,28 +5,29 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2021-12-30 13:13+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Danish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/da_dk/>\n"
 "Language: da_dk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.10.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Plugin til YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr ""
+msgstr "YouTube er et af verdens største videodelingswebsteder."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Dette plugin er ikke godkendt af Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -37,603 +38,603 @@ msgstr ""
 # Kodion Settings
 msgctxt "#30000"
 msgid "General"
-msgstr ""
+msgstr "Generel"
 
 msgctxt "#30001"
 msgid "Username"
-msgstr ""
+msgstr "Brugernavn"
 
 msgctxt "#30002"
 msgid "Password"
-msgstr ""
+msgstr "Adgangskode"
 
 # empty strings from id 30003 to 30006
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
-msgstr ""
+msgstr "Brug MPEG-DASH"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
-msgstr ""
+msgstr "Konfigurer InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Spørg altid efter videokvaliteten"
 
 msgctxt "#30010"
 msgid "Video quality"
-msgstr ""
+msgstr "Videokvalitet"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (HD)"
-msgstr ""
+msgstr "1080p (HD)"
 
 msgctxt "#30014"
 msgid "2160p (4k)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8k)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p direkte / 720p (HD)"
 
 # empty strings 30019
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr ""
+msgstr "Tillad 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr ""
+msgstr "Vis fankunst"
 
 msgctxt "#30022"
 msgid "Items per page"
-msgstr ""
+msgstr "Emner per side"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr ""
+msgstr "Størrelse på søgehistorik"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr ""
+msgstr "Størrelse på cache (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
-msgstr ""
+msgstr "Aktiver opsætningsguide"
 
 msgctxt "#30026"
 msgid "Override view"
-msgstr ""
+msgstr "Overskriv visning"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr ""
+msgstr "Visning: Standard"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr ""
+msgstr "Visning: Afsnit"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr ""
+msgstr "Visning: Film"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr ""
+msgstr "Udfør opsætningsguide?"
 
 msgctxt "#30031"
 msgid "Advanced"
-msgstr ""
+msgstr "Avanceret"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr ""
+msgstr "Visning: Tv-serier"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr ""
+msgstr "Visning: Sange"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr ""
+msgstr "Visning: Kunstnere"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr ""
+msgstr "Visning: Albummer"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr ""
+msgstr "Understøt alternativ afspiller"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "Brugerdefineret Se senere playliste-id"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "Brugerdefineret Historik playliste-id"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Favourites"
-msgstr ""
+msgstr "Favoritter"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr ""
+msgstr "Føj til add-on-favoritter"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr ""
+msgstr "Søg"
 
 msgctxt "#30103"
 msgid "Library"
-msgstr ""
+msgstr "Bibliotek"
 
 msgctxt "#30104"
 msgid "Highlights"
-msgstr ""
+msgstr "Højdepunkter"
 
 msgctxt "#30105"
 msgid "Archive"
-msgstr ""
+msgstr "Arkiv"
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
-msgstr ""
+msgstr "Næste side (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr ""
+msgstr "Se senere"
 
 msgctxt "#30108"
 msgid "Remove"
-msgstr ""
+msgstr "Fjern"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr ""
+msgstr "Seneste videoer"
 
 msgctxt "#30110"
 msgid "New Search"
-msgstr ""
+msgstr "Ny søgning"
 
 msgctxt "#30111"
 msgid "Sign In"
-msgstr ""
+msgstr "Log ind"
 
 msgctxt "#30112"
 msgid "Sign Out"
-msgstr ""
+msgstr "Log ud"
 
 msgctxt "#30113"
 msgid "Rename"
-msgstr ""
+msgstr "Omdøb"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr ""
+msgstr "Bekræft sletning"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr ""
+msgstr "Bekræft fjernelse"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr ""
+msgstr "Slet \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr ""
+msgstr "Fjern \"(%s)\"?"
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr ""
+msgstr "Slet"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr ""
+msgstr "Vent venligst..."
 
 msgctxt "#30120"
 msgid "Clear"
-msgstr ""
+msgstr "Ryd"
 
 # YouTube
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API-nøgle"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "API-id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API-hemmelighed"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr ""
+msgstr "Aktiver personlige API-nøgler"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Brug forudindstillet API-nøglesæt"
 
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
-msgstr ""
+msgstr "Kanaler"
 
 msgctxt "#30501"
 msgid "Playlists"
-msgstr ""
+msgstr "Playlister"
 
 msgctxt "#30502"
 msgid "Go to %s"
-msgstr ""
+msgstr "Gå til %s"
 
 msgctxt "#30503"
 msgid "Show channel fanart"
-msgstr ""
+msgstr "Vis kanalens fankunst"
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr ""
+msgstr "Abonnementer"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Opsig abonnement"
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr ""
+msgstr "Abonner"
 
 msgctxt "#30507"
 msgid "My Channel"
-msgstr ""
+msgstr "Min kanal"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr ""
+msgstr "Videoer du synes godt om"
 
 msgctxt "#30509"
 msgid "History"
-msgstr ""
+msgstr "Historie"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr ""
+msgstr "Mine abonnementer"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr ""
+msgstr "Sæt video i kø"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr ""
+msgstr "Gennemse kanaler"
 
 msgctxt "#30513"
 msgid "Popular right now"
-msgstr ""
+msgstr "Populært lige nu"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr ""
+msgstr "Lignende videoer"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr ""
+msgstr "Fjern automatisk fra 'Se senere'"
 
 msgctxt "#30516"
 msgid "Folders"
-msgstr ""
+msgstr "Mapper"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr ""
+msgstr "Abonner på %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr ""
+msgstr "Gå til %s"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr ""
+msgstr "og indtast følgende kode:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr ""
+msgstr "Tilføj til..."
 
 msgctxt "#30521"
 msgid "Select playlist"
-msgstr ""
+msgstr "Vælg playliste"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr ""
+msgstr "Ny playliste..."
 
 msgctxt "#30523"
 msgid "Language"
-msgstr ""
+msgstr "Sprog"
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr ""
+msgstr "Vælg sprog"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr ""
+msgstr "Vælg område"
 
 msgctxt "#30526"
 msgid "Adjust"
-msgstr ""
+msgstr "Juster"
 
 msgctxt "#30527"
 msgid "Language and region?"
-msgstr ""
+msgstr "Sprog og område?"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr ""
+msgstr "Bedøm..."
 
 msgctxt "#30529"
 msgid "I like this"
-msgstr ""
+msgstr "Jeg kan lide dette"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr ""
+msgstr "Jeg kan ikke lide dette"
 
 msgctxt "#30531"
 msgid "Play all"
-msgstr ""
+msgstr "Afspil alle"
 
 msgctxt "#30532"
 msgid "Default"
-msgstr ""
+msgstr "Standard"
 
 msgctxt "#30533"
 msgid "Reverse"
-msgstr ""
+msgstr "Omvendt"
 
 msgctxt "#30534"
 msgid "Shuffle"
-msgstr ""
+msgstr "Bland"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr ""
+msgstr "Vælg playlistens rækkefølge"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr ""
+msgstr "Opdaterer playliste..."
 
 msgctxt "#30537"
 msgid "Play from here"
-msgstr ""
+msgstr "Afspil herfra"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr ""
+msgstr "Videoer du ikke synes godt om"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr ""
+msgstr "Direkte"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr ""
+msgstr "Afspil med..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
-msgstr ""
+msgstr "Vis kanalnavn i beskrivelse"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr ""
+msgstr "rtmpe-streams understøttes ikke"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr ""
+msgstr "Opdater"
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "Flere links fra beskrivelsen"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "Ingen yderligere links fundet."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr ""
+msgstr "Log venligst ind to gange!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "Du skal aktivere to applikationer, så YouTube fungerer korrekt."
 
 msgctxt "#30548"
 msgid "More..."
-msgstr ""
+msgstr "Mere..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "Ingen videostreams fundet"
 
 msgctxt "#30550"
 msgid "Region"
-msgstr ""
+msgstr "Område"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Anbefalinger"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Vedligeholdelse"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Slet database for funktionscache"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Slet database for søgehistorik"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Ryd functionscache"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Ryd søgehistorik"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "funktionscache"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "søgehistorik"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Slet settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Undertekstsprog"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Ingen"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Alle"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Indstilling"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Indstilling, engelsk"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Engelsk"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Forespørg"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Marker som 'Se senere'"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Fjern fra 'Se senere'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Er du sikker på, at du vil fjerne '%s' som din 'Se senere'-liste?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Er du sikker på, at du vil erstatte din nuværende 'Se senere'-liste med '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Marker som 'Historie'"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Fjern fra 'Historie'"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Er du sikker på, at du vil fjerne '%s' som din 'Historie'-liste?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Er du sikker på, at du vil erstatte din nuværende 'Historie'-liste med '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Lykkedes"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Mislykkedes"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Indstillinger"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Gennemtving bekræftelse af SSL-certifikat"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "MPEG-DASH er aktiveret i YouTube-indstillingerne, men InputStream Adaptive ser ud til at være deaktiveret. Vil du aktivere InputStream Adaptive nu?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "Nulstil adgangsadministrering"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Er du sikker på, at du vil nulstille adgangsadministrering?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Automatisk afspilning af foreslåede videoer"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisk"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Mine abonnementer (filtreret)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "Filtreret kanalliste (kommasepareret)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Sortliste"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
