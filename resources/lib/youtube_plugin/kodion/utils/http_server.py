@@ -468,7 +468,7 @@ def get_http_server(address=None, port=None):
     except socket.error as e:
         logger.log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'.format(address=address, port=port, response=str(e)))
         xbmcgui.Dialog().notification(addon.getAddonInfo('name'), str(e),
-                                      xbmc.translatePath('special://home/addons/{0!s}/icon.png'.format(addon.getAddonInfo('id'))),
+                                      "{}/icon.png".format(addon.getAddonInfo('path')),
                                       5000, False)
         return None
 
