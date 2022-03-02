@@ -34,7 +34,7 @@ class UrlToItemConverter(object):
 
     def add_url(self, url, provider, context):
         url_components = urllib.parse.urlparse(url)
-        if url_components.hostname.lower() == 'youtube.com' or url_components.hostname.lower() == 'www.youtube.com':
+        if url_components.hostname.lower() in ('youtube.com', 'www.youtube.com', 'm.youtube.com'):
             params = dict(urllib.parse.parse_qsl(url_components.query))
             if url_components.path.lower() == '/watch':
                 video_id = params.get('v', '')
