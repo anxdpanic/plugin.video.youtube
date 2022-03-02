@@ -14,6 +14,7 @@
     <extension point="xbmc.addon.metadata">
         <news>
 [fix] /uri2addon/ endpoint for playback of youtube.com urls
+[fix] Don't assume addon is installed in home directory |contrib: jfly|
 [lang] translation updates from Weblate
         </news>
         <assets>
