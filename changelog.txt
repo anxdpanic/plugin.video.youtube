@@ -1,3 +1,8 @@
+6.8.18
+[fix] /uri2addon/ endpoint for playback of youtube.com urls
+[fix] Don't assume addon is installed in home directory |contrib: jfly|
+[lang] translation updates from Weblate
+
 6.8.17
 [fix] Fix comments on Kodi 19+ |contrib: ramateur|
 [fix] Fix ratebypass

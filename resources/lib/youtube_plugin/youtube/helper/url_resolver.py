@@ -105,7 +105,7 @@ class CommonResolver(AbstractResolver, list):
                            'DNT': '1',
                            'Accept-Encoding': 'gzip, deflate',
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=False)
+                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=True)
                 if response.status_code == 304:
                     return url
 

@@ -13,8 +13,8 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] Fix to_str |contrib: RNavega|
-[fix] Fix playback buffering |contrib: RNavega|
+[fix] /uri2addon/ endpoint for playback of youtube.com urls
+[fix] Don't assume addon is installed in home directory |contrib: jfly|
 [lang] translation updates from Weblate
         </news>
         <assets>
