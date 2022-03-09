@@ -105,7 +105,7 @@ class CommonResolver(AbstractResolver, list):
                            'DNT': '1',
                            'Accept-Encoding': 'gzip, deflate',
                            'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=True)
+                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=False)
                 if response.status_code == 304:
                     return url
 
@@ -130,6 +130,13 @@ class CommonResolver(AbstractResolver, list):
                     location = headers.get('Location', '')
                     if location:
                         return _loop(location, tries=tries - 1)
+
+                if response.status_code == 200:
+                    _url_components = urllib.parse.urlparse(_url)
+                    if _url_components.path == '/supported_browsers':
+                        _next_url = urllib.parse.parse_qs(_url_components.query)['next_url'][0]
+                        return _next_url
+
             except:
                 # do nothing
                 pass
