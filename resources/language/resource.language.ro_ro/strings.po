@@ -5,16 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: ro_RO\n"
+"PO-Revision-Date: 2022-03-09 20:53+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Romanian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ro_ro/>\n"
+"Language: ro_ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1))\n"
+"Plural-Forms: nplurals=3; plural=n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2;\n"
+"X-Generator: Weblate 4.11.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -491,11 +492,11 @@ msgstr "Regiune"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Recomandări"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Mentenanță"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
@@ -507,7 +508,7 @@ msgstr ""
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Golește cache-ul funcției"
 
 msgctxt "#30556"
 msgid "Clear search history"
@@ -527,11 +528,11 @@ msgstr ""
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Limba subtitrării"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Nici una"
 
 msgctxt "#30562"
 msgid "All"
@@ -551,15 +552,15 @@ msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Prompt"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Adaugă la 'Vezi mai târziu'"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Șterge din 'Vezi mai târziu'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
@@ -571,11 +572,11 @@ msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Adaugă la istoric"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Șterge din istoric"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
@@ -595,7 +596,7 @@ msgstr ""
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Setări"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -687,15 +688,15 @@ msgstr ""
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Configurează subtitrare"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "%s cu rezervă %s"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Fără subtitrări auto-generate"
 
 msgctxt "#30603"
 msgid "Age gate"
@@ -1031,7 +1032,7 @@ msgstr ""
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Golește cache de date"
 
 msgctxt "#30687"
 msgid "data cache"
@@ -1147,7 +1148,7 @@ msgstr ""
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Șters din listă"
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1159,7 +1160,7 @@ msgstr ""
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Evaluare ștearsă"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
@@ -1175,7 +1176,7 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
@@ -1191,15 +1192,15 @@ msgstr ""
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Încărcări"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptiv (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptiv (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1215,15 +1216,15 @@ msgstr ""
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Comentarii"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Aprecieri"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Răspunsuri"
 
 msgctxt "#30735"
 msgid "Edited"
