@@ -740,8 +740,10 @@ class VideoInfo(object):
         #                                   'hl': self.language}}}
 
         payload = {'videoId': video_id,
-                   'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
-                                          'clientName': 'ANDROID', 'hl': self.language}}}
+                   'context': {'client': {'clientVersion': '16.49', 'gl': self.region,
+                                          'clientName': 'ANDROID', 'hl': self.language}},
+                   'thirdParty': {'embedUrl': 'https://google.com'}
+        }
 
         player_response = {}
         for attempt in range(2):
