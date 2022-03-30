@@ -227,19 +227,14 @@ class Subtitles(object):
                 lang_name = track_name[0].get('text')
 
         if lang_name:
-            return self._decode_language_name(lang_name)
+            return self._recode_language_name(lang_name)
 
         return None
 
     @staticmethod
-    def _decode_language_name(language_name):
-        language_name = language_name.encode('raw_unicode_escape')
-
+    def _recode_language_name(language_name):
         if PY2:
-            language_name = language_name.decode('utf-8')
-
-        else:
-            language_name = language_name.decode('raw_unicode_escape')
+            language_name = language_name.encode('utf-8')
 
         return language_name
 

@@ -15,6 +15,7 @@
         <news>
 [fix] /uri2addon/ endpoint for playback of youtube.com urls
 [fix] Don't assume addon is installed in home directory |contrib: jfly|
+[fix] Subtitle language names
 [lang] translation updates from Weblate
         </news>
         <assets>
