@@ -5,16 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: en_US\n"
+"PO-Revision-Date: 2022-03-09 20:53+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: English (United States) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/en_us/>\n"
+"Language: en_us\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.11.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -37,15 +38,15 @@ msgstr ""
 # Kodion Settings
 msgctxt "#30000"
 msgid "General"
-msgstr ""
+msgstr "General"
 
 msgctxt "#30001"
 msgid "Username"
-msgstr ""
+msgstr "Username"
 
 msgctxt "#30002"
 msgid "Password"
-msgstr ""
+msgstr "Password"
 
 # empty strings from id 30003 to 30006
 msgctxt "#30007"
@@ -143,7 +144,7 @@ msgstr ""
 
 msgctxt "#30031"
 msgid "Advanced"
-msgstr ""
+msgstr "Advanced"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -185,7 +186,7 @@ msgstr ""
 
 msgctxt "#30102"
 msgid "Search"
-msgstr ""
+msgstr "Search"
 
 msgctxt "#30103"
 msgid "Library"
@@ -289,7 +290,7 @@ msgstr ""
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
-msgstr ""
+msgstr "Channels"
 
 msgctxt "#30501"
 msgid "Playlists"
@@ -533,7 +534,7 @@ msgstr ""
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "None"
 
 msgctxt "#30562"
 msgid "All"
@@ -597,7 +598,7 @@ msgstr ""
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Settings"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -765,7 +766,7 @@ msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."

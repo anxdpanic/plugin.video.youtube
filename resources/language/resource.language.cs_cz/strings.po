@@ -5,16 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: cs_CZ\n"
+"PO-Revision-Date: 2022-03-29 14:00+0000\n"
+"Last-Translator: Kryštof Černý <cleverline1mc@gmail.com>\n"
+"Language-Team: Czech <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/cs_cz/>\n"
+"Language: cs_cz\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"X-Generator: Weblate 4.11.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -177,7 +178,7 @@ msgstr "Vlastní historie ID seznamu"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Favourites"
-msgstr ""
+msgstr "Oblíbené"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -263,7 +264,7 @@ msgstr "Vyčistit"
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -469,7 +470,7 @@ msgstr "Více odkazů z popisku"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "Žádné další odkazy nenalezeny"
+msgstr "Žádné další odkazy nenalezeny."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
@@ -753,7 +754,7 @@ msgstr "Zrušit"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr "Musíte být přihlášen"
+msgstr "Musíte být přihlášen."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
@@ -789,7 +790,7 @@ msgstr "Vyžadován Kodi 17 a novější"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr "InputStream Helper je již nainstalován"
+msgstr "InputStream Helper je již nainstalován."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
@@ -833,11 +834,11 @@ msgstr "Žádné změny. API KEY nebyl aktualizován."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr "Osobní API KEY jsou povolené"
+msgstr "Osobní API klíče jsou povolené."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr "Osobní API KEY jsou zakázané"
+msgstr "Osobní API klíče jsou zakázané."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
@@ -1205,31 +1206,31 @@ msgstr "Adaptivní (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Vyhledávání uzpůsobené pro dálkové ovladače"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Přehrát (zeptat se na kvalitu)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "Doplněk YouTube nyní vyžaduje, abyste použil své vlastní API klíče. [CR]Pro více informací navštivte wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Omlouváme se za nepříjemnosti."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Komentáře"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Líbí se"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Odpovědi"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Upraveno"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
