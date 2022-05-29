@@ -54,7 +54,7 @@ class JSONStore(object):
                 json.dump(self._data, jsonfile, indent=4, sort_keys=True)
 
     def load(self):
-        if xbmcvfs.exists(self.filename):
+        if xbmcvfs.exists(self.filename) and xbmcvfs.Stat(self.filename).st_size() > 0:
             with open(self.filename, 'r') as jsonfile:
                 data = json.load(jsonfile)
                 self._data = data
