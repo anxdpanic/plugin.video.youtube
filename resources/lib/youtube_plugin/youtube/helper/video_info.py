@@ -865,10 +865,10 @@ class VideoInfo(object):
                 if not reason:
                     reason = 'UNKNOWN'
 
-                try:
+                '''try:
                     reason = reason.encode('raw_unicode_escape').decode('utf-8')
                 except:
-                    pass
+                    pass'''
 
                 raise YouTubeException(reason)
 
