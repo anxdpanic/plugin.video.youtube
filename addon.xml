@@ -36,7 +36,7 @@
         <summary lang="en_GB">Plugin for YouTube</summary>
         <summary lang="es_ES">Plugin para YouTube</summary>
         <summary lang="es_MX">Complemento para YouTube</summary>
-        <summary lang="fi_FI">YouTube lisäosa</summary>
+        <summary lang="fi_FI">YouTube-lisäosa</summary>
         <summary lang="fr_FR">Plugin pour YouTube</summary>
         <summary lang="he_IL">תוסף עבור YouTube</summary>
         <summary lang="hr_HR">Dodatak za YouTube</summary>
@@ -60,7 +60,7 @@
         <description lang="en_GB">YouTube is one of the biggest video-sharing websites of the world.</description>
         <description lang="es_ES">YouTube es uno de los sitios web más grande del mundo para compartir vídeos.</description>
         <description lang="es_MX">YouTube es uno de los más grandes sitios web de intercambio de videos del mundo.</description>
-        <description lang="fi_FI">YouTube on yksi maailman suurimmista videonjakosivustoista.</description>
+        <description lang="fi_FI">YouTube on yksi maailman suurimmista videoiden jakosivustoista.</description>
         <description lang="fr_FR">YouTube est l&apos;un des plus grands sites de partage vidéos du monde.</description>
         <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>
         <description lang="hr_HR">YouTube je jedna od najvećih stranica za dijeljenje video sadržaja na svijetu.</description>
@@ -68,6 +68,7 @@
         <description lang="it_IT">YouTube è uno dei più grandi siti web di condivisione video del mondo.</description>
         <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>
         <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
+        <description lang="nl_NL">YouTube is een van de grootste videodelenwebsite in de hele wereld.</description>
         <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
         <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
         <description lang="sk_SK">YouTube je jednou z najväčších stránok na zdieľanie videa na svete.</description>
@@ -85,8 +86,9 @@
         <disclaimer lang="fi_FI">Google ei tue tätä lisäosaa</disclaimer>
         <disclaimer lang="fr_FR">Ce module n&apos;est pas validé par Google</disclaimer>
         <disclaimer lang="hr_HR">Ovaj dodatak nije podržan od strane Googlea</disclaimer>
-        <disclaimer lang="it_IT">Questo plugin non è promosso da Google</disclaimer>
+        <disclaimer lang="it_IT">Questo plugin non è approvato da Google</disclaimer>
         <disclaimer lang="ko_KR">이 플러그인은 Google의 허가를 받지 않았습니다</disclaimer>
+        <disclaimer lang="nl_NL">Deze plug-in wordt niet door Google ondersteund</disclaimer>
         <disclaimer lang="pl_PL">Ta wtyczka nie jest zatwierdzona przez Google</disclaimer>
         <disclaimer lang="ru_RU">Плагин не поддерживается Google</disclaimer>
         <disclaimer lang="sk_SK">Tento doplnok nie je schválený spoločnosťou Google</disclaimer>
