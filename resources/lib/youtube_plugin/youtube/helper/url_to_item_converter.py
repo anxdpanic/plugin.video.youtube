@@ -17,6 +17,7 @@ from . import utils
 
 class UrlToItemConverter(object):
     RE_CHANNEL_ID = re.compile(r'^/channel/(?P<channel_id>.+)$')
+    RE_SHORTS_VID = re.compile(r'^/shorts/(?P<video_id>.+)$')
 
     def __init__(self, flatten=True):
         self._flatten = flatten
@@ -60,6 +61,12 @@ class UrlToItemConverter(object):
                         playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
                         playlist_item.set_fanart(provider.get_fanart(context))
                         self._playlist_id_dict[playlist_id] = playlist_item
+            elif self.RE_SHORTS_VID.match(url_components.path):
+                re_match = self.RE_SHORTS_VID.match(url_components.path)
+                video_id = re_match.group('video_id')
+                plugin_uri = context.create_uri(['play'], {'video_id': video_id})
+                video_item = VideoItem('', plugin_uri)
+                self._video_id_dict[video_id] = video_item
             elif self.RE_CHANNEL_ID.match(url_components.path):
                 re_match = self.RE_CHANNEL_ID.match(url_components.path)
                 channel_id = re_match.group('channel_id')
