@@ -1230,3 +1230,7 @@ msgstr ""
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""

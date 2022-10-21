@@ -1231,6 +1231,10 @@ msgctxt "#30735"
 msgid "Edited"
 msgstr "Επεξεργασμένο"
 
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
 # Kodion Common
 # empty strings from id 30037 to 30099
 #~ msgctxt "#30100"
