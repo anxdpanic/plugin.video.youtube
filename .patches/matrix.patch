@@ -1,26 +1,31 @@
-From 555b8e2c8d1c1ac76a3b48ce333b7369ad38c5cf Mon Sep 17 00:00:00 2001
+From 038e48b633e6b1b14fbecfd60222b75e74def90a Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
-Subject: [PATCH] matrix patch
+Subject: [PATCH] =?UTF-8?q?=EF=BB=BFmatrix=20patch?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 ---
  addon.xml                                     |    4 +-
  .../kodion/impl/abstract_settings.py          |    2 +-
- resources/settings.xml                        | 1102 ++++++++++++++---
- 3 files changed, 956 insertions(+), 152 deletions(-)
+ resources/settings.xml                        | 1108 ++++++++++++++---
+ 3 files changed, 961 insertions(+), 153 deletions(-)
 
 diff --git a/addon.xml b/addon.xml
-index d1cc52b..58e88d1 100644
+index 5f9e503..92e0e87 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -3,5 +3,5 @@
+@@ -1,7 +1,7 @@
+ <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+ <addon id="plugin.video.youtube" name="YouTube" version="6.8.21~alpha2" provider-name="anxdpanic, bromix">
      <requires>
 -        <import addon="xbmc.python" version="2.20.0"/>
 +        <import addon="xbmc.python" version="3.0.0"/>
          <import addon="script.module.six" version="1.11.0"/>
          <import addon="script.module.requests" version="2.12.4"/>
          <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
-@@ -9,6 +9,6 @@
+@@ -9,7 +9,7 @@
      <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
          <provides>video</provides>
      </extension>
@@ -28,8 +33,9 @@ index d1cc52b..58e88d1 100644
 +    <extension point="xbmc.service" library="resources/lib/startup.py"/>
      <extension point="xbmc.python.module" library="resources/lib/"/>
      <extension point="xbmc.addon.metadata">
+         <news>
 diff --git a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
-index a73b064..c4143a3 100644
+index 1a6e82c..b79c3b0 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 @@ -63,7 +63,7 @@ class AbstractSettings(object):
@@ -42,10 +48,10 @@ index a73b064..c4143a3 100644
      def get_video_quality(self, quality_map_override=None):
          vq_dict = {0: 240,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index 86cd25f..feab99e 100644
+index dd1d769..147d257 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -1,150 +1,954 @@
+@@ -1,151 +1,959 @@
 -<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 -<settings>
 -
@@ -58,6 +64,7 @@ index 86cd25f..feab99e 100644
 -        <setting id="kodion.subtitle.languages.num" type="number" default="0" visible="false"/>
 -        <setting id="kodion.subtitle.download" type="bool" default="false" visible="false"/>
 -        <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
+-        <setting id="youtube.hide_shorts" type="bool" label="30736" default="false"/>
 -        <setting id="kodion.play_count.percent" type="slider" label="30668" enable="true" default="85" range="1,1,99" option="int"/>
 -        <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true"/>
 -        <setting id="youtube.post.play.rate" type="bool" label="30627" default="false"/>
@@ -275,6 +282,11 @@ index 86cd25f..feab99e 100644
 +                    <control type="toggle"/>
 +                </setting>
 +                <setting help="" id="youtube.suggested_videos" label="30582" type="boolean">
++                    <level>0</level>
++                    <default>false</default>
++                    <control type="toggle"/>
++                </setting>
++                <setting help="" id="youtube.hide_shorts" label="30736" type="boolean">
 +                    <level>0</level>
 +                    <default>false</default>
 +                    <control type="toggle"/>
@@ -1150,5 +1162,5 @@ index 86cd25f..feab99e 100644
 +    </section>
  </settings>
 -- 
-2.26.2.windows.1
+2.33.0.windows.2
 

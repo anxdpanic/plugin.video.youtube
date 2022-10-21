@@ -1,4 +1,4 @@
-From 4cf7f18d3dbd4fa831fe390463e0f876082a7cbf Mon Sep 17 00:00:00 2001
+From c862b96ed1404ec622057b728c1732d4950f7ba1 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@users.noreply.github.com>
 Date: Fri, 4 Dec 2020 20:32:12 -0500
 Subject: [PATCH] unofficial patch
@@ -22,10 +22,11 @@ Subject: [PATCH] unofficial patch
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index d1cc52b..6498f10 100644
+index 5f9e503..d46a4bd 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -72,2 +72,3 @@
+@@ -97,3 +97,4 @@
+         <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
      </extension>
  </addon>
 +<!-- unofficial -->
@@ -73,10 +74,10 @@ index 7069da6..f49e2e2 100644
  
              location = str(context.get_param('location', False)).lower() == 'true'
 diff --git a/resources/lib/youtube_plugin/kodion/constants/const_settings.py b/resources/lib/youtube_plugin/kodion/constants/const_settings.py
-index eb3d85f..46b252e 100644
+index dfeeace..e797928 100644
 --- a/resources/lib/youtube_plugin/kodion/constants/const_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/constants/const_settings.py
-@@ -34,6 +34,10 @@ REMOTE_FRIENDLY_SEARCH = 'youtube.search.remote.friendly'  # (bool)
+@@ -35,6 +35,10 @@ HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
  SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
  ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web.urls'  # (bool)
  
@@ -105,7 +106,7 @@ index 7ed3fef..46eabf2 100644
          raise NotImplementedError()
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
-index a73b064..39c98d9 100644
+index 1a6e82c..aba36e6 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 @@ -90,6 +90,9 @@ class AbstractSettings(object):
@@ -131,7 +132,7 @@ index 6542331..fc98931 100644
      def add_sort_method(self, *sort_methods):
          for sort_method in sort_methods:
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
-index b5ab9b4..3f1ed5d 100644
+index 49c9507..6aece7b 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
 @@ -9,6 +9,7 @@
@@ -381,7 +382,7 @@ index 0000000..9a5fe5a
 +
 +        return False
 diff --git a/resources/lib/youtube_plugin/youtube/helper/utils.py b/resources/lib/youtube_plugin/youtube/helper/utils.py
-index 2987e23..a7e6790 100644
+index b434984..292f576 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/utils.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/utils.py
 @@ -258,7 +258,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
@@ -479,10 +480,10 @@ index 1e91ddc..1cf558c 100644
      result = []
      next_page_token = context.get_param('next_page_token', '')
 diff --git a/resources/lib/youtube_plugin/youtube/provider.py b/resources/lib/youtube_plugin/youtube/provider.py
-index 1b760a9..71ebb79 100644
+index 08f5887..c2ee51c 100644
 --- a/resources/lib/youtube_plugin/youtube/provider.py
 +++ b/resources/lib/youtube_plugin/youtube/provider.py
-@@ -436,7 +436,7 @@ class Provider(kodion.AbstractProvider):
+@@ -437,7 +437,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/playlist/(?P<playlist_id>[^/]+)/$')
      def _on_playlist(self, context, re_match):
@@ -491,7 +492,7 @@ index 1b760a9..71ebb79 100644
  
          result = []
  
-@@ -460,7 +460,7 @@ class Provider(kodion.AbstractProvider):
+@@ -461,7 +461,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
      def _on_channel_playlist(self, context, re_match):
@@ -500,7 +501,7 @@ index 1b760a9..71ebb79 100644
          client = self.get_client(context)
          result = []
  
-@@ -483,7 +483,7 @@ class Provider(kodion.AbstractProvider):
+@@ -484,7 +484,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
      def _on_channel_playlists(self, context, re_match):
@@ -509,7 +510,7 @@ index 1b760a9..71ebb79 100644
          result = []
  
          channel_id = re_match.group('channel_id')
-@@ -524,7 +524,7 @@ class Provider(kodion.AbstractProvider):
+@@ -525,7 +525,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
      def _on_channel_live(self, context, re_match):
@@ -518,7 +519,7 @@ index 1b760a9..71ebb79 100644
          result = []
  
          channel_id = re_match.group('channel_id')
-@@ -559,7 +559,7 @@ class Provider(kodion.AbstractProvider):
+@@ -560,7 +560,7 @@ class Provider(kodion.AbstractProvider):
          if method == 'channel' and not channel_id:
              return False
  
@@ -527,7 +528,7 @@ index 1b760a9..71ebb79 100644
  
          resource_manager = self.get_resource_manager(context)
  
-@@ -645,7 +645,7 @@ class Provider(kodion.AbstractProvider):
+@@ -646,7 +646,7 @@ class Provider(kodion.AbstractProvider):
      # noinspection PyUnusedLocal
      @kodion.RegisterProviderPath('^/location/mine/$')
      def _on_my_location(self, context, re_match):
@@ -536,7 +537,7 @@ index 1b760a9..71ebb79 100644
  
          settings = context.get_settings()
          result = list()
-@@ -787,7 +787,7 @@ class Provider(kodion.AbstractProvider):
+@@ -788,7 +788,7 @@ class Provider(kodion.AbstractProvider):
      def _on_subscriptions(self, context, re_match):
          method = re_match.group('method')
          if method == 'list':
@@ -545,7 +546,7 @@ index 1b760a9..71ebb79 100644
          return yt_subscriptions.process(method, self, context)
  
      @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
-@@ -1010,9 +1010,9 @@ class Provider(kodion.AbstractProvider):
+@@ -1011,9 +1011,9 @@ class Provider(kodion.AbstractProvider):
          context.set_param('q', search_text)
  
          if search_type == 'video':
@@ -557,7 +558,7 @@ index 1b760a9..71ebb79 100644
  
          if page == 1 and search_type == 'video' and not event_type and not hide_folders:
              if not channel_id and not location:
-@@ -1345,7 +1345,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1346,7 +1346,7 @@ class Provider(kodion.AbstractProvider):
          settings = context.get_settings()
          _ = self.get_client(context)  # required for self.is_logged_in()
  
@@ -566,7 +567,7 @@ index 1b760a9..71ebb79 100644
  
          result = []
  
-@@ -1572,7 +1572,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1573,7 +1573,7 @@ class Provider(kodion.AbstractProvider):
      @staticmethod
      def set_content_type(context, content_type):
          context.set_content_type(content_type)
@@ -576,10 +577,10 @@ index 1b760a9..71ebb79 100644
                                      kodion.constants.sort_method.VIDEO_RUNTIME,
                                      kodion.constants.sort_method.DATE_ADDED,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index 86cd25f..ee9602d 100644
+index dd1d769..ff1e8ce 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -94,6 +94,10 @@
+@@ -95,6 +95,10 @@
          <setting type="sep"/>
          <setting id="kodion.playback.history" type="bool" label="30675" default="false"/>
          <setting type="sep"/>
@@ -591,5 +592,5 @@ index 86cd25f..ee9602d 100644
          <setting id="kodion.setup_wizard" type="bool" label="30025" default="true"/>
          <setting type="sep"/>
 -- 
-2.26.2.windows.1
+2.33.0.windows.2
 
