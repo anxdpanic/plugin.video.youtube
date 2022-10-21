@@ -10,6 +10,7 @@
         <setting id="kodion.subtitle.languages.num" type="number" default="0" visible="false"/>
         <setting id="kodion.subtitle.download" type="bool" default="false" visible="false"/>
         <setting id="youtube.suggested_videos" type="bool" label="30582" default="false"/>
+        <setting id="youtube.hide_shorts" type="bool" label="30736" default="false"/>
         <setting id="kodion.play_count.percent" type="slider" label="30668" enable="true" default="85" range="1,1,99" option="int"/>
         <setting id="youtube.playlist.watchlater.autoremove" type="bool" label="30515" default="true"/>
         <setting id="youtube.post.play.rate" type="bool" label="30627" default="false"/>
