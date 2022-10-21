@@ -246,3 +246,6 @@ class AbstractSettings(object):
 
     def remote_friendly_search(self):
         return self.get_bool(constants.setting.REMOTE_FRIENDLY_SEARCH, False)
+
+    def hide_short_videos(self):
+        return self.get_bool(constants.setting.HIDE_SHORT_VIDEOS, False)
