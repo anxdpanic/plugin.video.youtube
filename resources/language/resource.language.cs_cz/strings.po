@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2022-03-29 14:00+0000\n"
 "Last-Translator: Kryštof Černý <cleverline1mc@gmail.com>\n"
@@ -1231,6 +1231,10 @@ msgstr "Odpovědi"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "Upraveno"
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
 
 # Kodion Common
 # empty strings from id 30039 to 30099

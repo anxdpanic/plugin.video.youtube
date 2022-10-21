@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2022-03-09 20:53+0000\n"
 "Last-Translator: Christian Gade <gade@kodi.tv>\n"
@@ -1230,4 +1230,8 @@ msgstr ""
 
 msgctxt "#30735"
 msgid "Edited"
+msgstr ""
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
 msgstr ""
