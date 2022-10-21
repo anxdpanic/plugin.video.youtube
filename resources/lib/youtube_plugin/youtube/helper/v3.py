@@ -301,7 +301,7 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     if context.get_settings().hide_short_videos():
         shorts_filtered = []
         for item in result:
-            if item.get_duration() <= 60:
+            if hasattr(item, '_duration') and (0 < item.get_duration() <= 60):
                 continue
             shorts_filtered += [item]
         result = shorts_filtered
