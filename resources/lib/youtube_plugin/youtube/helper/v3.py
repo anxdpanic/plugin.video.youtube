@@ -298,13 +298,7 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     if sort is not None:
         result = sorted(result, key=sort, reverse=reverse_sort)
 
-    if context.get_settings().hide_short_videos():
-        shorts_filtered = []
-        for item in result:
-            if hasattr(item, '_duration') and (0 < item.get_duration() <= 60):
-                continue
-            shorts_filtered += [item]
-        result = shorts_filtered
+    result = utils.filter_short_videos(context, result)
 
     # no processing of next page item
     if not process_next_page:
