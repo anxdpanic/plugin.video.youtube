@@ -192,7 +192,7 @@ class Subtitles(object):
             base_url = self.caption_track.get('baseUrl')
             if base_url:
                 subtitle_url = self.set_query_param(base_url, 'type', 'track')
-                subtitle_url = self.set_query_param(base_url, 'tlang', language)
+                subtitle_url = self.set_query_param(subtitle_url, 'tlang', language)
         elif caption_track is not None:
             base_url = caption_track.get('baseUrl')
             if base_url:
