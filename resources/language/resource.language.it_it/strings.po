@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2022-10-21 16:02+0000\n"
+"PO-Revision-Date: 2022-10-24 14:04+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/it_it/>\n"
 "Language: it_it\n"
@@ -1236,7 +1236,7 @@ msgstr "Modificato"
 
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
-msgstr ""
+msgstr "Nascondi video brevi (1 minuto o meno)"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
