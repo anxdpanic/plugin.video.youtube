@@ -234,7 +234,7 @@ class ResourceManager(object):
             # set an empty url
             result[key] = u''
             images = item.get('brandingSettings', {}).get('image', {})
-            banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl', 'bannerTvImageUrl']
+            banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl', 'bannerTvImageUrl', 'bannerExternalUrl']
             for banner in banners:
                 image = images.get(banner, '')
                 if image:
