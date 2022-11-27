@@ -49,6 +49,7 @@ jobs:
         run: |
           git reset
           git checkout .
+          git restore .
           git clean -fdx
           mv .git ..
           rm -rf .??*
@@ -66,6 +67,7 @@ jobs:
         run: |
           git reset
           git checkout .
+          git restore .
           git clean -fdx
           git apply .patches/unofficial.patch
           mv .git ..
@@ -84,6 +86,7 @@ jobs:
         run: |
           git reset
           git checkout .
+          git restore .
           git clean -fdx
           git apply .patches/matrix.patch
           mv .git ..
@@ -104,6 +107,7 @@ jobs:
         run: |
           git reset
           git checkout .
+          git restore .
           git clean -fdx
           git apply .patches/matrix-unofficial.patch
           mv .git ..
