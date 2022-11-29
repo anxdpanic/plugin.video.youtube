@@ -621,12 +621,14 @@ class Provider(kodion.AbstractProvider):
                 search_item = kodion.items.NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
                                                          image=context.create_resource_path('media', 'search.png'),
                                                          fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
+                search_item.set_fanart(self.get_fanart(context))
                 result.append(search_item)
 
             if not hide_live:
                 live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
                                           context.create_uri(['channel', search_live_id, 'live'], item_params),
                                           image=context.create_resource_path('media', 'live.png'))
+                live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
@@ -1056,6 +1058,7 @@ class Provider(kodion.AbstractProvider):
                 live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
                                           context.create_uri([context.get_path().replace('input', 'query')], live_params),
                                           image=context.create_resource_path('media', 'live.png'))
+                live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,

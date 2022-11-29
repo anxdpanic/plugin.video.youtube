@@ -17,6 +17,7 @@
 [add] Add support for /shorts/video_id format links |contrib: jmbreuer|
 [add] Add Fanart to Subscriptions
 [fix] Display of channel fanart
+[fix] Misc missing fanart
 [lang] translation updates from Weblate
         </news>
         <assets>
