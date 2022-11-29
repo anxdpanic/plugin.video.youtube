@@ -787,9 +787,20 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
+        resource_manager = self.get_resource_manager(context)
+        subscriptions = yt_subscriptions.process(method, self, context)
+
         if method == 'list':
             self.set_content_type(context, kodion.constants.content_type.FILES)
-        return yt_subscriptions.process(method, self, context)
+            channel_ids = []
+            for subscription in subscriptions:
+                channel_ids.append(subscription.get_channel_id())
+            channel_fanarts = resource_manager.get_fanarts(channel_ids)
+            for subscription in subscriptions:
+                if channel_fanarts.get(subscription.get_channel_id()):
+                    subscription.set_fanart(channel_fanarts.get(subscription.get_channel_id()))
+
+        return subscriptions
 
     @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
     def _on_yt_specials(self, context, re_match):
@@ -803,6 +814,7 @@ class Provider(kodion.AbstractProvider):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+
     @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
