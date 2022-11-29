@@ -1,7 +1,10 @@
-From c862b96ed1404ec622057b728c1732d4950f7ba1 Mon Sep 17 00:00:00 2001
+From d63c02d7c6b5c44e53798cd2101cff9375a54368 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@users.noreply.github.com>
 Date: Fri, 4 Dec 2020 20:32:12 -0500
-Subject: [PATCH] unofficial patch
+Subject: [PATCH] =?UTF-8?q?=EF=BB=BFunofficial=20patch?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 ---
  addon.xml                                     |   1 +
@@ -22,10 +25,10 @@ Subject: [PATCH] unofficial patch
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index 5f9e503..d46a4bd 100644
+index 34d16a0..9881f76 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -97,3 +97,4 @@
+@@ -100,3 +100,4 @@
          <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
      </extension>
  </addon>
@@ -382,7 +385,7 @@ index 0000000..9a5fe5a
 +
 +        return False
 diff --git a/resources/lib/youtube_plugin/youtube/helper/utils.py b/resources/lib/youtube_plugin/youtube/helper/utils.py
-index b434984..292f576 100644
+index 88a7fb7..5fc6e37 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/utils.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/utils.py
 @@ -258,7 +258,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
@@ -480,7 +483,7 @@ index 1e91ddc..1cf558c 100644
      result = []
      next_page_token = context.get_param('next_page_token', '')
 diff --git a/resources/lib/youtube_plugin/youtube/provider.py b/resources/lib/youtube_plugin/youtube/provider.py
-index 08f5887..c2ee51c 100644
+index 883cf94..03e9153 100644
 --- a/resources/lib/youtube_plugin/youtube/provider.py
 +++ b/resources/lib/youtube_plugin/youtube/provider.py
 @@ -437,7 +437,7 @@ class Provider(kodion.AbstractProvider):
@@ -528,7 +531,7 @@ index 08f5887..c2ee51c 100644
  
          resource_manager = self.get_resource_manager(context)
  
-@@ -646,7 +646,7 @@ class Provider(kodion.AbstractProvider):
+@@ -648,7 +648,7 @@ class Provider(kodion.AbstractProvider):
      # noinspection PyUnusedLocal
      @kodion.RegisterProviderPath('^/location/mine/$')
      def _on_my_location(self, context, re_match):
@@ -537,16 +540,16 @@ index 08f5887..c2ee51c 100644
  
          settings = context.get_settings()
          result = list()
-@@ -788,7 +788,7 @@ class Provider(kodion.AbstractProvider):
-     def _on_subscriptions(self, context, re_match):
-         method = re_match.group('method')
+@@ -793,7 +793,7 @@ class Provider(kodion.AbstractProvider):
+         subscriptions = yt_subscriptions.process(method, self, context)
+ 
          if method == 'list':
 -            self.set_content_type(context, kodion.constants.content_type.FILES)
 +            self.set_content_type(context, kodion.constants.content_type.VIDEOS)
-         return yt_subscriptions.process(method, self, context)
- 
-     @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
-@@ -1011,9 +1011,9 @@ class Provider(kodion.AbstractProvider):
+             channel_ids = []
+             for subscription in subscriptions:
+                 channel_ids.append(subscription.get_channel_id())
+@@ -1025,9 +1025,9 @@ class Provider(kodion.AbstractProvider):
          context.set_param('q', search_text)
  
          if search_type == 'video':
@@ -558,7 +561,7 @@ index 08f5887..c2ee51c 100644
  
          if page == 1 and search_type == 'video' and not event_type and not hide_folders:
              if not channel_id and not location:
-@@ -1346,7 +1346,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1361,7 +1361,7 @@ class Provider(kodion.AbstractProvider):
          settings = context.get_settings()
          _ = self.get_client(context)  # required for self.is_logged_in()
  
@@ -567,7 +570,7 @@ index 08f5887..c2ee51c 100644
  
          result = []
  
-@@ -1573,7 +1573,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1588,7 +1588,7 @@ class Provider(kodion.AbstractProvider):
      @staticmethod
      def set_content_type(context, content_type):
          context.set_content_type(content_type)

@@ -1,4 +1,4 @@
-From 038e48b633e6b1b14fbecfd60222b75e74def90a Mon Sep 17 00:00:00 2001
+From 68a7eb6c602acbc1d096e063c8c3886d948cae48 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
 Subject: [PATCH] =?UTF-8?q?=EF=BB=BFmatrix=20patch?=
@@ -13,7 +13,7 @@ Content-Transfer-Encoding: 8bit
  3 files changed, 961 insertions(+), 153 deletions(-)
 
 diff --git a/addon.xml b/addon.xml
-index 5f9e503..92e0e87 100644
+index 34d16a0..c107cd4 100644
 --- a/addon.xml
 +++ b/addon.xml
 @@ -3,5 +3,5 @@
@@ -1162,7 +1162,7 @@ index dd1d769..147d257 100644
 -- 
 2.33.0.windows.2
 
-From 81cb3bebcbf07b2e2106cbcf8efa5ad11ad4b7c0 Mon Sep 17 00:00:00 2001
+From c16973defb38be2eadc0d741b02e0646321601be Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
 Subject: [PATCH] =?UTF-8?q?=EF=BB=BFmatrix=20patch?=
@@ -1189,10 +1189,10 @@ Content-Transfer-Encoding: 8bit
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index 92e0e87..f45257b 100644
+index c107cd4..a9db7f3 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -97,3 +97,4 @@
+@@ -100,3 +100,4 @@
          <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
      </extension>
  </addon>
@@ -1549,7 +1549,7 @@ index 0000000..9a5fe5a
 +
 +        return False
 diff --git a/resources/lib/youtube_plugin/youtube/helper/utils.py b/resources/lib/youtube_plugin/youtube/helper/utils.py
-index b434984..292f576 100644
+index 88a7fb7..5fc6e37 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/utils.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/utils.py
 @@ -258,7 +258,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
@@ -1647,7 +1647,7 @@ index 1e91ddc..1cf558c 100644
      result = []
      next_page_token = context.get_param('next_page_token', '')
 diff --git a/resources/lib/youtube_plugin/youtube/provider.py b/resources/lib/youtube_plugin/youtube/provider.py
-index 08f5887..c2ee51c 100644
+index 883cf94..03e9153 100644
 --- a/resources/lib/youtube_plugin/youtube/provider.py
 +++ b/resources/lib/youtube_plugin/youtube/provider.py
 @@ -437,7 +437,7 @@ class Provider(kodion.AbstractProvider):
@@ -1695,7 +1695,7 @@ index 08f5887..c2ee51c 100644
  
          resource_manager = self.get_resource_manager(context)
  
-@@ -646,7 +646,7 @@ class Provider(kodion.AbstractProvider):
+@@ -648,7 +648,7 @@ class Provider(kodion.AbstractProvider):
      # noinspection PyUnusedLocal
      @kodion.RegisterProviderPath('^/location/mine/$')
      def _on_my_location(self, context, re_match):
@@ -1704,16 +1704,16 @@ index 08f5887..c2ee51c 100644
  
          settings = context.get_settings()
          result = list()
-@@ -788,7 +788,7 @@ class Provider(kodion.AbstractProvider):
-     def _on_subscriptions(self, context, re_match):
-         method = re_match.group('method')
+@@ -793,7 +793,7 @@ class Provider(kodion.AbstractProvider):
+         subscriptions = yt_subscriptions.process(method, self, context)
+ 
          if method == 'list':
 -            self.set_content_type(context, kodion.constants.content_type.FILES)
 +            self.set_content_type(context, kodion.constants.content_type.VIDEOS)
-         return yt_subscriptions.process(method, self, context)
- 
-     @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
-@@ -1011,9 +1011,9 @@ class Provider(kodion.AbstractProvider):
+             channel_ids = []
+             for subscription in subscriptions:
+                 channel_ids.append(subscription.get_channel_id())
+@@ -1025,9 +1025,9 @@ class Provider(kodion.AbstractProvider):
          context.set_param('q', search_text)
  
          if search_type == 'video':
@@ -1725,7 +1725,7 @@ index 08f5887..c2ee51c 100644
  
          if page == 1 and search_type == 'video' and not event_type and not hide_folders:
              if not channel_id and not location:
-@@ -1346,7 +1346,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1361,7 +1361,7 @@ class Provider(kodion.AbstractProvider):
          settings = context.get_settings()
          _ = self.get_client(context)  # required for self.is_logged_in()
  
@@ -1734,7 +1734,7 @@ index 08f5887..c2ee51c 100644
  
          result = []
  
-@@ -1573,7 +1573,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1588,7 +1588,7 @@ class Provider(kodion.AbstractProvider):
      @staticmethod
      def set_content_type(context, content_type):
          context.set_content_type(content_type)
