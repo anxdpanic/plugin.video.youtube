@@ -621,12 +621,14 @@ class Provider(kodion.AbstractProvider):
                 search_item = kodion.items.NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
                                                          image=context.create_resource_path('media', 'search.png'),
                                                          fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
+                search_item.set_fanart(self.get_fanart(context))
                 result.append(search_item)
 
             if not hide_live:
                 live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
                                           context.create_uri(['channel', search_live_id, 'live'], item_params),
                                           image=context.create_resource_path('media', 'live.png'))
+                live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
@@ -787,9 +789,20 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
+        resource_manager = self.get_resource_manager(context)
+        subscriptions = yt_subscriptions.process(method, self, context)
+
         if method == 'list':
             self.set_content_type(context, kodion.constants.content_type.FILES)
-        return yt_subscriptions.process(method, self, context)
+            channel_ids = []
+            for subscription in subscriptions:
+                channel_ids.append(subscription.get_channel_id())
+            channel_fanarts = resource_manager.get_fanarts(channel_ids)
+            for subscription in subscriptions:
+                if channel_fanarts.get(subscription.get_channel_id()):
+                    subscription.set_fanart(channel_fanarts.get(subscription.get_channel_id()))
+
+        return subscriptions
 
     @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
     def _on_yt_specials(self, context, re_match):
@@ -803,6 +816,7 @@ class Provider(kodion.AbstractProvider):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+
     @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
@@ -1044,6 +1058,7 @@ class Provider(kodion.AbstractProvider):
                 live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
                                           context.create_uri([context.get_path().replace('input', 'query')], live_params),
                                           image=context.create_resource_path('media', 'live.png'))
+                live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,

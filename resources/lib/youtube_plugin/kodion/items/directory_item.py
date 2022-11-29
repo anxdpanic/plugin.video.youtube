@@ -17,6 +17,7 @@ class DirectoryItem(BaseItem):
         self._plot = self.get_name()
         self._is_action = False
         self._channel_subscription_id = None
+        self._channel_id = None
 
     def set_name(self, name):
         self._name = name
@@ -39,3 +40,9 @@ class DirectoryItem(BaseItem):
 
     def set_channel_subscription_id(self, value):
         self._channel_subscription_id = value
+
+    def set_channel_id(self, value):
+        self._channel_id = value
+
+    def get_channel_id(self):
+        return self._channel_id

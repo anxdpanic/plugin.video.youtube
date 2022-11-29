@@ -106,7 +106,7 @@ def _process_list_response(provider, context, json_data):
             item_uri = context.create_uri(['channel', channel_id], item_params)
             channel_item = items.DirectoryItem(title, item_uri, image=image)
             channel_item.set_fanart(provider.get_fanart(context))
-
+            channel_item.set_channel_id(channel_id)
             # map channel id with subscription id - we need it for the unsubscription
             subscription_id_dict[channel_id] = yt_item['id']
 

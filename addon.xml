@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.21~alpha4" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.21~alpha5" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
@@ -15,7 +15,9 @@
         <news>
 [add] Add setting General - Hide short videos (1 minute or less)
 [add] Add support for /shorts/video_id format links |contrib: jmbreuer|
+[add] Add Fanart to Subscriptions
 [fix] Display of channel fanart
+[fix] Misc missing fanart
 [lang] translation updates from Weblate
         </news>
         <assets>
