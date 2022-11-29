@@ -13,6 +13,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[chg] Icons and Fanart updated |contrib: papercore-dev|
 [add] Add setting General - Hide short videos (1 minute or less)
 [add] Add support for /shorts/video_id format links |contrib: jmbreuer|
 [add] Add Fanart to Subscriptions
