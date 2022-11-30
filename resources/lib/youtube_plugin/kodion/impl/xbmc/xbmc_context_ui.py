@@ -129,7 +129,7 @@ class XbmcContextUI(AbstractContextUI):
             _image = self._context.get_icon()
 
         if PY3 and isinstance(message, str):
-            message = message.encode('utf-8')
+            message = utils.to_unicode(message)
 
         try:
             _message = utils.to_utf8(message.decode('unicode-escape'))
@@ -152,7 +152,7 @@ class XbmcContextUI(AbstractContextUI):
         self._xbmc_addon.openSettings()
 
     def refresh_container(self):
-        script_uri = 'special://home/addons/%s/resources/lib/youtube_plugin/refresh.py' % self._context.get_id()
+        script_uri = "{}/resources/lib/youtube_plugin/refresh.py".format(self._xbmc_addon.getAddonInfo('path'))
         xbmc.executebuiltin('RunScript(%s)' % script_uri)
 
     @staticmethod

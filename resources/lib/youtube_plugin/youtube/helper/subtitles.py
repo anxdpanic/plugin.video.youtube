@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-
-    Copyright (C) 2017-2018 plugin.video.youtube
+    Copyright (C) 2017-2021 plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -11,7 +10,13 @@ import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
 
+from six.moves.urllib_parse import parse_qs
+from six.moves.urllib_parse import urlencode
+from six.moves.urllib_parse import urlsplit
+from six.moves.urllib_parse import urlunsplit
+
 from six import PY2
+
 try:
     from six.moves import html_parser
 
@@ -32,20 +37,12 @@ class Subtitles(object):
     BASE_PATH = 'special://temp/plugin.video.youtube/'
     SRT_FILE = ''.join([BASE_PATH, '%s.%s.srt'])
 
-    def __init__(self, context, video_id, captions):
+    def __init__(self, context, headers, video_id, captions):
         self.context = context
         self._verify = context.get_settings().verify_ssl()
         self.video_id = video_id
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('_', '-')
-        self.headers = {'Host': 'www.youtube.com',
-                        'Connection': 'keep-alive',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 '
-                                      '(KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36',
-                        'Accept': '*/*',
-                        'DNT': '1',
-                        'Referer': 'https://www.youtube.com/tv',
-                        'Accept-Encoding': 'gzip, deflate',
-                        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
+        self.headers = headers.copy()
 
         self.caption_track = {}
         self.renderer = captions.get('playerCaptionsTracklistRenderer', {})
@@ -194,13 +191,15 @@ class Subtitles(object):
         if (caption_track is None) and has_translation:
             base_url = self.caption_track.get('baseUrl')
             if base_url:
-                subtitle_url = ''.join([base_url, '&fmt=vtt&type=track&tlang=', language])
+                subtitle_url = self.set_query_param(base_url, 'type', 'track')
+                subtitle_url = self.set_query_param(subtitle_url, 'tlang', language)
         elif caption_track is not None:
             base_url = caption_track.get('baseUrl')
             if base_url:
-                subtitle_url = ''.join([base_url, '&fmt=vtt&type=track'])
+                subtitle_url = self.set_query_param(base_url, 'type', 'track')
 
         if subtitle_url:
+            subtitle_url = self.set_query_param(subtitle_url, 'fmt', 'vtt')
             self.context.log_debug('Subtitle url: %s' % subtitle_url)
             if not self.context.get_settings().subtitle_download():
                 return [subtitle_url]
@@ -228,18 +227,25 @@ class Subtitles(object):
                 lang_name = track_name[0].get('text')
 
         if lang_name:
-            return self._decode_language_name(lang_name)
+            return self._recode_language_name(lang_name)
 
         return None
 
     @staticmethod
-    def _decode_language_name(language_name):
-        language_name = language_name.encode('raw_unicode_escape')
-
+    def _recode_language_name(language_name):
         if PY2:
-            language_name = language_name.decode('utf-8')
-
-        else:
-            language_name = language_name.decode('raw_unicode_escape')
+            language_name = language_name.encode('utf-8')
 
         return language_name
+
+    @staticmethod
+    def set_query_param(url, name, value):
+        scheme, netloc, path, query_string, fragment = urlsplit(url)
+        query_params = parse_qs(query_string)
+
+        query_params[name] = [value]
+        new_query_string = urlencode(query_params, doseq=True)
+        if isinstance(scheme, bytes):
+            new_query_string = new_query_string.encode('utf-8')
+
+        return urlunsplit((scheme, netloc, path, new_query_string, fragment))

@@ -12,7 +12,6 @@ import copy
 import json
 import re
 import threading
-import time
 import traceback
 import xml.etree.ElementTree as ET
 
@@ -21,8 +20,6 @@ from six import PY3
 
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
-from ..helper.utils import get_shelf_index_by_title
-from ...kodion import constants
 from ...kodion import Context
 from ...kodion.utils import datetime_parser
 from ...kodion.utils import to_unicode
@@ -99,7 +96,8 @@ class YouTube(LoginClient):
             _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
     def get_video_streams(self, context, video_id):
-        video_info = VideoInfo(context, access_token=self._access_token, language=self._language)
+        video_info = VideoInfo(context, access_token=self._access_token_tv,
+                               api_key=self._config_tv['key'], language=self._language)
 
         video_streams = video_info.load_stream_infos(video_id)
 
@@ -875,7 +873,9 @@ class YouTube(LoginClient):
 
                 # sorting by publish date
                 def _sort_by_date_time(e):
-                    return time.mktime(datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S").timetuple())
+                    return datetime_parser.since_epoch(
+                        datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S")
+                    )
 
                 _result['items'].sort(reverse=True, key=_sort_by_date_time)
 
@@ -980,3 +980,54 @@ class YouTube(LoginClient):
                 }
 
         return {}
+
+    def perform_v1_tv_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
+                              allow_redirects=True):
+        # params
+        if not params:
+            params = {}
+        _params = {'key': self._config_tv['key']}
+        _params.update(params)
+
+        # headers
+        if not headers:
+            headers = {}
+        _headers = {
+            'User-Agent': ('Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M;'
+                           ' wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0'
+                           ' Chrome/67.0.3396.87 Mobile Safari/537.36'),
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'DNT': '1',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Language': 'en-US,en;q=0.5',
+        }
+
+        if self._access_token_tv:
+            _headers['Authorization'] = 'Bearer %s' % self._access_token_tv
+        _headers.update(headers)
+
+        # url
+        _url = 'https://www.googleapis.com/youtubei/v1/%s' % path.strip('/')
+
+        result = None
+
+        _context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
+        if method == 'GET':
+            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
+        elif method == 'POST':
+            _headers['content-type'] = 'application/json'
+            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
+                                   allow_redirects=allow_redirects)
+        elif method == 'PUT':
+            _headers['content-type'] = 'application/json'
+            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
+                                  allow_redirects=allow_redirects)
+        elif method == 'DELETE':
+            result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
+                                     allow_redirects=allow_redirects)
+
+        if result is None:
+            return {}
+
+        if result.headers.get('content-type', '').startswith('application/json'):
+            return result.json()

@@ -7,15 +7,27 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2020-05-11 09:57+0200\n"
-"Last-Translator: Ludovic Jozeau <federandink@gmail.com>\n"
-"Language-Team: Guilouz\n"
-"Language: fr_FR\n"
+"PO-Revision-Date: 2022-06-03 14:14+0000\n"
+"Last-Translator: skypichat <skypichat@hotmail.fr>\n"
+"Language-Team: French (France) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/fr_fr/>\n"
+"Language: fr_fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 2.0.6\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.12.2\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Plugin pour YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube est l'un des plus grands sites de partage vidéos du monde."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "Ce module n'est pas validé par Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -159,8 +171,10 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "Personnaliser l'ID historique de la liste de lecture"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
+msgid "Favourites"
 msgstr "Favoris"
 
 msgctxt "#30101"
@@ -225,7 +239,7 @@ msgstr "Confirmer la suppression"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "Supprimer \"%s\"?"
+msgstr "Supprimer \"%s\" ?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
@@ -243,9 +257,11 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Nettoyer"
 
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
-msgid "API Key"
-msgstr "Clé de l’API"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -425,7 +441,7 @@ msgstr "Vidéos que vous n'aimez pas"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "Live"
+msgstr "En direct"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -593,7 +609,7 @@ msgstr "Réinitialiser le gestionnaire d'accès"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès?"
+msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès ?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
@@ -641,7 +657,7 @@ msgstr "Moyennes (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr "Hautes (4: 3)"
+msgstr "Hautes (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -665,7 +681,7 @@ msgstr "Clés API personnelles activées"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr "Impossible d'activer les clés API personnelles. Disparu: %s"
+msgstr "Impossible d'activer les clés API personnelles. Disparu : %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
@@ -793,7 +809,7 @@ msgstr "Sauvegarder"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr "Mise à jour réussie: %s"
+msgstr "Mise à jour réussie : %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
@@ -939,10 +955,9 @@ msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
 msgstr "'%s' renommer en '%s'"
 
-#, fuzzy
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr "Pourcentage minimum pour compter comme vu"
+msgstr "Pourcentage minimum du nombre de lectures"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
@@ -1095,7 +1110,7 @@ msgstr "Télécharger les sous-titres"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr "Télécharger les sous-titres avant le démarrage de la lecture ? (Défaut: Non)"
+msgstr "Télécharger les sous-titres avant le démarrage de la lecture ? (Défaut : Non)"
 
 msgctxt "#30707"
 msgid "Untitled"
@@ -1212,3 +1227,15 @@ msgstr "Réponses"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "Édité"
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Favoris"
+
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "Clé de l’API"

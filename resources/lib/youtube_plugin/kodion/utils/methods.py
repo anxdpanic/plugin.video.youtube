@@ -9,8 +9,10 @@
 """
 
 from six.moves import urllib
+from six import PY2
 from six import next
 from six import string_types
+from six import text_type
 
 import os
 import copy
@@ -23,7 +25,7 @@ import xbmcvfs
 
 
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
+           'to_str', 'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
 
 try:
     xbmc.translatePath = xbmcvfs.translatePath
@@ -36,6 +38,15 @@ def loose_version(v):
     for point in v.split("."):
         filled.append(point.zfill(8))
     return tuple(filled)
+
+
+def to_str(text):
+    if isinstance(text, bytes):
+        return text.decode('utf-8', 'ignore')
+    if PY2 and isinstance(text, text_type):
+        return text.encode('utf-8', 'ignore')
+
+    return text
 
 
 def to_utf8(text):

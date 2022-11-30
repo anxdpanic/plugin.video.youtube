@@ -7,23 +7,34 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2021-11-05 19:30+0000\n"
+"Last-Translator: wwj <wwj402@sina.com>\n"
+"Language-Team: Chinese (China) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/zh_cn/>\n"
+"Language: zh_cn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: zh_CN\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.8.1\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "油管插件"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "油管是世界上最大的视频分享网站之一。"
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "此插件未被谷歌认可"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "YouTube 插件"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube 是全世界最大的视频分享网站。"
-
 msgctxt "#30000"
 msgid "General"
 msgstr "常规"
@@ -35,6 +46,15 @@ msgstr "账号"
 msgctxt "#30002"
 msgid "Password"
 msgstr "密码"
+
+# empty strings from id 30003 to 30006
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "使用 MPEG-DASH"
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr "配置 InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -152,9 +172,11 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "定制 “历史记录” 播放列表 ID"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "我的收藏"
+msgid "Favourites"
+msgstr "收藏夹"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -210,11 +232,11 @@ msgstr "重命名"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "确认删除！"
+msgstr "确认删除"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr "确认移除！"
+msgstr "确认移除"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
@@ -238,10 +260,9 @@ msgstr "清除"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API 密钥"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -265,7 +286,6 @@ msgstr "使用预设的 API 密钥设置"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "频道"
@@ -528,7 +548,7 @@ msgstr "设置, English"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "英语"
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -736,7 +756,7 @@ msgstr "必需先登录。"
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
@@ -752,7 +772,7 @@ msgstr "端口 %s 已经被占用，无法启动 HTTP 服务。"
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr ""
+msgstr "MPEG-DASH 视频点播（VODS）需要代理（请参阅 HTTP 服务器）"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -800,7 +820,7 @@ msgstr "允许 API 配置页面"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (请参阅 HTTP 服务器)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -1152,15 +1172,15 @@ msgstr "从频道取消订阅"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "默认为 WEBM 适配集（4K）"
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "MPEG-DASH 视频点播（VODS）需要代理（请参阅 HTTP 服务器）[CR]> 1080p 和 HDR 需要 InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
@@ -1168,7 +1188,7 @@ msgstr "限制为 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440P (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1176,11 +1196,11 @@ msgstr "上传"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "自适应 (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "自适应（WEBM/VP9）"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1209,3 +1229,17 @@ msgstr "回复"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "已编辑"
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "我的收藏"
+
+# YouTube
+# empty strings from id 30121 to 30199
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API 密钥"

@@ -6,26 +6,36 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2016-06-08 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"POT-Creation-Date: 2015-09-21 11:01+0000\n"
+"PO-Revision-Date: 2022-03-09 20:53+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Norwegian Bokmål <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/nb_no/>\n"
+"Language: nb_no\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nb_NO\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.11.2\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Tillegg for YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube er en av verdens største nettsider for videodeling."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr ""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Tillegg for YouTube"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube er en av verdens største nettsider for deling av videoer."
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Generelt"
@@ -39,7 +49,6 @@ msgid "Password"
 msgstr "Passord"
 
 # empty strings from id 30003 to 30008
-
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr "Bruk MPEG-DASH"
@@ -89,7 +98,6 @@ msgid "1080p Live / 720p (HD)"
 msgstr ""
 
 # empty strings 30019
-
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "Tillat 3D"
@@ -167,10 +175,9 @@ msgid "Custom History playlist id"
 msgstr ""
 
 # Kodion Common
-# empty strings from id 30038 to 30099
-
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
+msgid "Favourites"
 msgstr "Favoritter"
 
 msgctxt "#30101"
@@ -255,10 +262,9 @@ msgstr "Rens"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API-nøkkel (Key)"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -282,7 +288,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30204 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Kanaler"
@@ -593,7 +598,7 @@ msgstr ""
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Innstillinger"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -761,7 +766,7 @@ msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -1189,7 +1194,7 @@ msgstr ""
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Opplastninger"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
@@ -1226,3 +1231,19 @@ msgstr ""
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30038 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Favoritter"
+
+# YouTube
+# empty strings from id 30121 to 30199
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API-nøkkel (Key)"

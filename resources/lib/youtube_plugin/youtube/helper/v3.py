@@ -118,7 +118,7 @@ def _process_list_response(provider, context, json_data):
             item_uri = context.create_uri(['channel', channel_id], item_params)
             channel_item = items.DirectoryItem(title, item_uri, image=image)
             channel_item.set_fanart(provider.get_fanart(context))
-
+            channel_item.set_channel_id(channel_id)
             # map channel id with subscription id - we need it for the unsubscription
             subscription_id_dict[channel_id] = yt_item['id']
 
@@ -325,6 +325,8 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
 
     if sort is not None:
         result = sorted(result, key=sort, reverse=reverse_sort)
+
+    result = utils.filter_short_videos(context, result)
 
     # no processing of next page item
     if not process_next_page:

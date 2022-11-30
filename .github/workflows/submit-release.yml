@@ -1,0 +1,89 @@
+name: Submit Release
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    if: github.repository == 'anxdpanic/plugin.video.youtube'
+
+    name: Submit Release
+    runs-on: ubuntu-latest
+
+    strategy:
+
+      fail-fast: false
+      matrix:
+        python-version: [ 3.9 ]
+
+    steps:
+      - name: Checkout Add-on
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install libxml2-utils xmlstarlet
+          python -m pip install --upgrade pip
+          python -m pip install git+https://github.com/romanvm/kodi-addon-submitter.git
+
+      - name: Configure git
+        run: |
+          git config --global user.name "anxdpanic"
+          git config --global user.email "anxdpanic@users.noreply.github.com"
+
+      - name: Staging for Official Repository (Isengard)
+        id: stage-isengard
+        run: |
+          mv .git ..
+          rm -rf .??*
+          mv ../.git .
+          rm *.md
+          git add .
+          git commit -m "Kodi 15 Patch"
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Submit to Official Repository (Isengard)
+        id: submit-isengard
+        run: |
+          submit-addon -r repo-plugins -b isengard --pull-request ${{ github.event.repository.name }}
+        working-directory: ${{ github.event.repository.name }}
+        env:
+          GH_USERNAME: anxdpanic
+          GH_TOKEN: ${{ secrets.ADDON_SUBMISSION_TOKEN }}
+          EMAIL: anxdpanic@users.noreply.github.com
+
+      - name: Staging for Official Repository (Matrix)
+        id: stage-matrix
+        run: |
+          git reset --hard ${{ github.sha }}
+          git checkout .
+          git clean -fdx
+          git apply .patches/matrix.patch
+          mv .git ..
+          rm -rf .??*
+          mv ../.git .
+          rm *.md
+          rm changelog.txt
+          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.1" addon.xml
+          git add .
+          git commit -m "Kodi 19 Patch"
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Submit to Official Repository (Matrix)
+        id: submit-matrix
+        run: |
+          submit-addon -r repo-plugins -b matrix --pull-request ${{ github.event.repository.name }}
+        working-directory: ${{ github.event.repository.name }}
+        env:
+          GH_USERNAME: anxdpanic
+          GH_TOKEN: ${{ secrets.ADDON_SUBMISSION_TOKEN }}
+          EMAIL: anxdpanic@users.noreply.github.com

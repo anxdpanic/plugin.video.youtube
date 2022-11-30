@@ -1,0 +1,41 @@
+name: Add-on Validations
+
+on:
+  push:
+    branches: [ master, main ]
+
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  addon-validations:
+    if: github.repository == 'anxdpanic/plugin.video.youtube'
+
+    name: Add-on Validations
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Add-on
+        uses: actions/checkout@v2
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install git+https://github.com/xbmc/addon-check.git
+
+      - name: Kodi Add-on Checker (Isengard)
+        id: kodi-addon-checker-isengard
+        run: |
+          kodi-addon-checker ${{ github.event.repository.name }} --branch=isengard
+
+      - name: Staging for Matrix
+        run: |
+          git apply .patches/matrix-kodi-addon-checker.patch
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Kodi Add-on Checker (Matrix)
+        id: kodi-addon-checker-matrix
+        run: |
+          kodi-addon-checker ${{ github.event.repository.name }} --branch=matrix

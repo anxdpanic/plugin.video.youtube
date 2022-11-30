@@ -1,3 +1,38 @@
+6.8.18
+[fix] /uri2addon/ endpoint for playback of youtube.com urls
+[fix] Don't assume addon is installed in home directory |contrib: jfly|
+[lang] translation updates from Weblate
+
+6.8.17
+[fix] Fix comments on Kodi 19+ |contrib: ramateur|
+[fix] Fix ratebypass
+[upd] Update icon and fanart |contrib: papercore-dev|
+[lang] translation updates from Weblate
+
+6.8.16
+[fix] Fix playback of some content (ie. Music videos)
+[fix] Calcuate n parameter to enable ratebypass
+
+6.8.15
+[fixup] No streams found, consent cookies |contrib: jaylinski|
+[fixup] Age gate detection, show age gate error instead of 'No streams found'
+[fixup] encoding of some titles/authors - ie. russian
+[lang] translation updates from Weblate
+
+6.8.14
+[fixup] playback of some streams due to encoding issues
+[fixup] default player response type
+
+6.8.13
+[fix] player config and client discovery
+[fix] No Streams Found |contrib: 14mRh4X0r|
+[fix] capability map to contain unversioned capabilities |contrib: jmbreuer|
+[lang] zh_tw strings |contrib: JuenTingShie|
+
+6.8.11
+[fix] mktime overflow when loading My Subscriptions
+[fix] encoding issues in search history |contrib: dreznichuk|
+
 6.8.10
 [fix] fix javascript player retrieval and playback of some videos for affected users |contrib: thomazz-nl|
     - Invalid URL 'http://': No host supplied

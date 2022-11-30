@@ -5,25 +5,36 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2019-06-17 23:44+0900\n"
+"PO-Revision-Date: 2022-11-20 05:15+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
-"Language-Team: LANGUAGE\n"
+"Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
+"Language: ko_kr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: ko_KR\n"
-"Plural-Forms: nplurals=1; plural=0\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.14.2\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "유튜브 플러그인"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "이 플러그인은 Google의 허가를 받지 않았습니다"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
-
 msgctxt "#30000"
 msgid "General"
 msgstr "일반"
@@ -35,6 +46,15 @@ msgstr "사용자명"
 msgctxt "#30002"
 msgid "Password"
 msgstr "비밀번호"
+
+# empty strings from id 30003 to 30006
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "MPEG-DASH 사용"
+
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr "InputStream Adaptive 설정"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -74,7 +94,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr "1080p Live / 720p (HD)"
+msgstr "1080p 라이브 / 720p (HD)"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -152,8 +172,10 @@ msgctxt "#30038"
 msgid "Custom History playlist id"
 msgstr "사용자가 최근 본 재생목록 id"
 
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
+msgid "Favourites"
 msgstr "즐겨찾기"
 
 msgctxt "#30101"
@@ -238,10 +260,9 @@ msgstr "지우기"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API 키"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -253,7 +274,7 @@ msgstr "API Id"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr "API Secret"
+msgstr "API 비밀"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
@@ -265,7 +286,6 @@ msgstr "현재 API 키 세트 사용"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "채널"
@@ -456,7 +476,7 @@ msgstr "두 번 로그인합니다!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "유튜브가 제대로 동작하기 위해서 두 개의 어플을 사용해야 합니다"
+msgstr "YouTube가 제대로 작동하려면 두 개의 애플리케이션을 활성화해야 합니다."
 
 msgctxt "#30548"
 msgid "More..."
@@ -1172,40 +1192,54 @@ msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr "올리기"
+msgstr "업로드한 동영상"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "적응형 (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "적용형 (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "원격 친화적 검색"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "재생(품질 확인)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "이제 YouTube 부가기능을 사용하려면 고유한 API 키를 사용해야 합니다.[CR]자세한 내용은 다음 위키를 참조하세요. [B]https://ytaddon.page.link/keys[/B][CR][CR]불편을 양해바랍니다."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "설명"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "좋아요"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "답글"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "수정됨"
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr "짧은 동영상 숨기기(1분 이하)"
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "즐겨찾기"
+
+# YouTube
+# empty strings from id 30121 to 30199
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API 키"

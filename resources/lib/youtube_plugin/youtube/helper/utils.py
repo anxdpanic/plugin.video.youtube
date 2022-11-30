@@ -47,8 +47,8 @@ def get_thumb_timestamp(minutes=15):
 
 
 def make_comment_item(context, provider, snippet, uri, total_replies=0):
-    author = '[B]{}[/B]'.format(kodion.utils.to_utf8(snippet['authorDisplayName']))
-    body = kodion.utils.to_utf8(snippet['textOriginal'])
+    author = '[B]{}[/B]'.format(kodion.utils.to_str(snippet['authorDisplayName']))
+    body = kodion.utils.to_str(snippet['textOriginal'])
 
     label_props = None
     plot_props = None
@@ -685,3 +685,17 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
 
             if not page_token:
                 break
+
+
+def filter_short_videos(context, items):
+    if context.get_settings().hide_short_videos():
+        shorts_filtered = []
+
+        for item in items:
+            if hasattr(item, '_duration') and (0 < item.get_duration() <= 60):
+                continue
+            shorts_filtered += [item]
+
+        return shorts_filtered
+
+    return items

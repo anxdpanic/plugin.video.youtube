@@ -6,26 +6,36 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2016-05-26 16:38+0000\n"
-"PO-Revision-Date: 2016-05-26 16:38+0000\n"
-"Last-Translator: MB1968 de allergoeistuh <EMAIL@ADDRESS>\n"
-"Language-Team: Dutch\n"
+"POT-Creation-Date: 2015-09-21 11:01+0000\n"
+"PO-Revision-Date: 2022-06-12 22:14+0000\n"
+"Last-Translator: Pander <pander@users.sourceforge.net>\n"
+"Language-Team: Dutch <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/nl_nl/>\n"
+"Language: nl_nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: nl_NL\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.12.2\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Plugin voor YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "YouTube is een van de grootste videodelenwebsite in de hele wereld."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "Deze plug-in wordt niet door Google ondersteund"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Plugin voor YouTube"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "YouTube is een van de grootste sites ter wereld om video's te delen."
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Algemeen"
@@ -38,8 +48,16 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Wachtwoord"
 
-# empty strings from id 30003 to 30008
+# empty strings from id 30003 to 30006
+msgctxt "#30007"
+msgid "Use MPEG-DASH"
+msgstr "Gebruik MPEG-DASH"
 
+msgctxt "#30008"
+msgid "Configure InputStream Adaptive"
+msgstr "Configureer adaptieve inputstream"
+
+# empty strings from id 30003 to 30008
 msgctxt "#30009"
 msgid "Always ask for the video quality"
 msgstr "Vraag altijd naar video kwaliteit"
@@ -78,10 +96,9 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Live / 720p (HD)"
 
 # empty strings 30019
-
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "Sta 3D Toe"
@@ -159,10 +176,9 @@ msgid "Custom History playlist id"
 msgstr "Aangepast Geschiedenis afspeellijst ID"
 
 # Kodion Common
-# empty strings from id 30037 to 30099
-
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
+msgid "Favourites"
 msgstr "Favorieten"
 
 msgctxt "#30101"
@@ -247,10 +263,9 @@ msgstr "Opschonen"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
-msgid "API Key"
-msgstr "API Sleutel"
+msgid "API"
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
@@ -274,7 +289,6 @@ msgstr "Gebruik vooraf ingestelde API sleutel set"
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Kanalen"
@@ -296,8 +310,8 @@ msgid "Subscriptions"
 msgstr "Abonnementen"
 
 msgctxt "#30505"
-msgid "Afmelden"
-msgstr "Afmelden"
+msgid "Unsubscribe"
+msgstr "Meld af"
 
 msgctxt "#30506"
 msgid "Subscribe"
@@ -625,7 +639,7 @@ msgstr "Zwarte lijst"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr "Toevoegen aan Mijn Abonnementen filter "
+msgstr "Toevoegen aan Mijn Abonnementen filter"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
@@ -701,7 +715,7 @@ msgstr "Snelzoeken"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr "Snelzoeken  (Incognito)"
+msgstr "Snelzoeken (Incognito)"
 
 msgctxt "#30607"
 msgid "Audio only"
@@ -733,7 +747,7 @@ msgstr "Bekijk Later afspeellijst-id ophalen"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Ophalen afspeellijst-id mislukt. Voeg een aantal video's toe aan Bekijk Later via internet/app en probeer nogmaals. "
+msgstr "Ophalen afspeellijst-id mislukt. Voeg een aantal video's toe aan Bekijk Later via internet/app en probeer nogmaals."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -789,7 +803,7 @@ msgstr "Video beoordelen na bekijken"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP-server"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
@@ -809,7 +823,7 @@ msgstr "API instellingen pagina inschakelen"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (zie HTTP-server)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -853,7 +867,7 @@ msgstr "Luister op IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr "Selecteer luister IP "
+msgstr "Selecteer luister IP"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
@@ -1077,7 +1091,7 @@ msgstr "HTTP Server is niet opgestart"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "Cliënt-IP is %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
@@ -1177,23 +1191,23 @@ msgstr "Limiteer tot 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p (HD)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Uploads"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptief (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptief (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Afstandvriendelijk zoeken"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
@@ -1201,7 +1215,7 @@ msgstr "Afspelen (Naar kwaliteit vragen)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr "De YouTube addon vereist vanaf nu, dat je een persoonlijke API sleutel gebruikt. [CR]Voor meer informatie, zie wiki:[B]https://ytaddon.page.link/keys[/B][CR][CR] "
+msgstr "De YouTube addon vereist vanaf nu, dat je een persoonlijke API sleutel gebruikt. [CR]Voor meer informatie, zie wiki:[B]https://ytaddon.page.link/keys[/B][CR][CR]"
 
 msgctxt "#30732"
 msgid "Comments"
@@ -1218,3 +1232,23 @@ msgstr "Antwoorden"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "Aangepast"
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30037 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Favorieten"
+
+# YouTube
+# empty strings from id 30121 to 30199
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "API Sleutel"
+
+#~ msgctxt "#30505"
+#~ msgid "Afmelden"
+#~ msgstr "Afmelden"

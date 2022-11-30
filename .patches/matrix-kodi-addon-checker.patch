@@ -1,0 +1,30 @@
+From 555b8e2c8d1c1ac76a3b48ce333b7369ad38c5cf Mon Sep 17 00:00:00 2001
+From: anxdpanic <anxdpanic@gmail.com>
+Date: Fri, 7 Feb 2020 16:44:38 -0500
+Subject: [PATCH] matrix patch
+
+---
+ addon.xml                                     |    4 +-
+ .../kodion/impl/abstract_settings.py          |    2 +-
+ resources/settings.xml                        | 1102 ++++++++++++++---
+ 3 files changed, 956 insertions(+), 152 deletions(-)
+
+diff --git a/addon.xml b/addon.xml
+index d1cc52b..58e88d1 100644
+--- a/addon.xml
++++ b/addon.xml
+@@ -3,5 +3,5 @@
+     <requires>
+-        <import addon="xbmc.python" version="2.20.0"/>
++        <import addon="xbmc.python" version="3.0.0"/>
+         <import addon="script.module.six" version="1.11.0"/>
+         <import addon="script.module.requests" version="2.12.4"/>
+         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
+@@ -9,6 +9,6 @@
+     <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
+         <provides>video</provides>
+     </extension>
+-    <extension point="xbmc.service" library="resources/lib/startup.py" start="login"/>
++    <extension point="xbmc.service" library="resources/lib/startup.py"/>
+     <extension point="xbmc.python.module" library="resources/lib/"/>
+     <extension point="xbmc.addon.metadata">

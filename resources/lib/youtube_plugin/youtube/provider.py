@@ -310,13 +310,13 @@ class Provider(kodion.AbstractProvider):
 
         if dev_id:
             access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
-            if len(access_tokens) < 1 or access_manager.is_dev_access_token_expired(dev_id):
+            if len(access_tokens) != 2 or access_manager.is_dev_access_token_expired(dev_id):
                 # reset access_token
                 access_manager.update_dev_access_token(dev_id, '')
                 access_tokens = list()
         else:
             access_tokens = access_manager.get_access_token().split('|')
-            if len(access_tokens) < 1 or access_manager.is_access_token_expired():
+            if len(access_tokens) != 2 or access_manager.is_access_token_expired():
                 # reset access_token
                 access_manager.update_access_token('')
                 access_tokens = list()
@@ -374,21 +374,24 @@ class Provider(kodion.AbstractProvider):
                 client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
 
         if client:
-            if len(access_tokens) < 1 <= len(refresh_tokens):
+            if len(access_tokens) != 2 and len(refresh_tokens) == 2:
                 try:
-                    index = 1 if len(refresh_tokens) > 1 else 0
-                    access_token, expires_in = client.refresh_token(refresh_tokens[index])
-                    access_tokens = [access_token]
 
+                    access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
+
+                    access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
+
+                    access_tokens = [access_token_tv, access_token_kodi]
+
+                    access_token = '%s|%s' % (access_token_tv, access_token_kodi)
+                    expires_in = min(expires_in_tv, expires_in_kodi)
                     if dev_id:
                         access_manager.update_dev_access_token(dev_id, access_token, expires_in)
                     else:
                         access_manager.update_access_token(access_token, expires_in)
-
                 except (InvalidGrant, LoginException) as ex:
                     self.handle_exception(context, ex)
-                    access_tokens = ['']
-
+                    access_tokens = ['', '']
                     # reset access_token
                     if isinstance(ex, InvalidGrant):
                         if dev_id:
@@ -404,18 +407,16 @@ class Provider(kodion.AbstractProvider):
                     self.get_resource_manager(context).clear()
 
             # in debug log the login status
-            self._is_logged_in = len(access_tokens) == 1
+            self._is_logged_in = len(access_tokens) == 2
             if self._is_logged_in:
                 context.log_debug('User is logged in')
             else:
                 context.log_debug('User is not logged in')
 
             if len(access_tokens) == 0:
-                access_tokens = ['']
-
-            index = 1 if len(access_tokens) > 1 else 0
-            client.set_access_token(access_token=access_tokens[index])
-
+                access_tokens = ['', '']
+            client.set_access_token(access_token=access_tokens[1])
+            client.set_access_token_tv(access_token_tv=access_tokens[0])
             self._client = client
             self._client.set_log_error(context.log_error)
         else:
@@ -643,12 +644,14 @@ class Provider(kodion.AbstractProvider):
                 search_item = kodion.items.NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
                                                          image=context.create_resource_path('media', 'search.png'),
                                                          fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
+                search_item.set_fanart(self.get_fanart(context))
                 result.append(search_item)
 
             if not hide_live:
                 live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
                                           context.create_uri(['channel', search_live_id, 'live'], item_params),
                                           image=context.create_resource_path('media', 'live.png'))
+                live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
@@ -809,9 +812,20 @@ class Provider(kodion.AbstractProvider):
     @kodion.RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
+        resource_manager = self.get_resource_manager(context)
+        subscriptions = yt_subscriptions.process(method, self, context)
+
         if method == 'list':
             self.set_content_type(context, kodion.constants.content_type.FILES)
-        return yt_subscriptions.process(method, self, context)
+            channel_ids = []
+            for subscription in subscriptions:
+                channel_ids.append(subscription.get_channel_id())
+            channel_fanarts = resource_manager.get_fanarts(channel_ids)
+            for subscription in subscriptions:
+                if channel_fanarts.get(subscription.get_channel_id()):
+                    subscription.set_fanart(channel_fanarts.get(subscription.get_channel_id()))
+
+        return subscriptions
 
     @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
     def _on_yt_specials(self, context, re_match):
@@ -856,6 +870,7 @@ class Provider(kodion.AbstractProvider):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+
     @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
@@ -1097,6 +1112,7 @@ class Provider(kodion.AbstractProvider):
                 live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
                                           context.create_uri([context.get_path().replace('input', 'query')], live_params),
                                           image=context.create_resource_path('media', 'live.png'))
+                live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,

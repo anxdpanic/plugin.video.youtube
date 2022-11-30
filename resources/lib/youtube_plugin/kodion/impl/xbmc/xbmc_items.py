@@ -57,7 +57,7 @@ def to_play_item(context, play_item):
         inputstream_property = 'inputstream'
         if major_version < 19:
             inputstream_property += 'addon'
-
+       
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
         list_item.setProperty(inputstream_property, 'inputstream.adaptive')
@@ -68,6 +68,15 @@ def to_play_item(context, play_item):
         if play_item.get_license_key():
             list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
             list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
+    else:
+        uri = play_item.get_uri()
+        if 'mime=' in uri:
+            try:
+                mime_type = uri.split('mime=', 1)[-1].split('&', 1)[0].replace('%2F', '/', 1)
+                list_item.setMimeType(mime_type)
+                list_item.setContentLookup(False)
+            except:
+                pass
 
     if not is_strm:
         if play_item.get_play_count() == 0:

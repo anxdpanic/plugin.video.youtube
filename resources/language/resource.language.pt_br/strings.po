@@ -7,23 +7,34 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
+"PO-Revision-Date: 2022-03-09 20:53+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Portuguese (Brazil) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pt_br/>\n"
+"Language: pt_br\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt_BR\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.11.2\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr ""
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr ""
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr ""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Plugin do YouTube"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "Youtube é uma das maiores plataformas de vídeo online do mundo."
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Geral"
@@ -43,7 +54,7 @@ msgstr "Usar Mpeg-Dash"
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
 msgstr "Configurar o addon inputstream.adaptive"
- 
+
 msgctxt "#30009"
 msgid "Always ask for the video quality"
 msgstr "Sempre perguntar pela qualidade do vídeo"
@@ -126,7 +137,7 @@ msgstr "Visualização: Filmes"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr "Executar assistente de configuração"
+msgstr "Executar assistente de configuração?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -156,9 +167,15 @@ msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
 msgstr "ID do Playlist Assistir Depois Custom"
 
+msgctxt "#30038"
+msgid "Custom History playlist id"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "Favoritos"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -186,7 +203,7 @@ msgstr "Próxima Página (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "Assistir Depois"
+msgstr "Assistir mais tarde"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -240,9 +257,11 @@ msgctxt "#30120"
 msgid "Clear"
 msgstr "Limpar"
 
+# YouTube
+# empty strings from id 30121 to 30199
 msgctxt "#30200"
-msgid "API Key"
-msgstr "Chave API"
+msgid "API"
+msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
@@ -261,8 +280,8 @@ msgid "Enable personal API keys"
 msgstr "Ativar chave API pessoal"
 
 msgctxt "#30205"
-msgid "Autologin on Error enable"
-msgstr "Ativação de login automático com erro"
+msgid "Use preset API key set"
+msgstr ""
 
 msgctxt "#30500"
 msgid "Channels"
@@ -326,7 +345,7 @@ msgstr "Vídeos Relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Autoremover de 'Assistir Depois'"
+msgstr "Autoremover de 'Assistir mais tarde'"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -446,11 +465,11 @@ msgstr "Mais links da descrição"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "Nenhum outro link encontrado"
+msgstr "Nenhum outro link encontrado."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Por favor logue-se 2 vezes"
+msgstr "Por favor inicie sessão duas vezes!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
@@ -530,23 +549,23 @@ msgstr "Inglês"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr "Prompt"
+msgstr "Perguntar"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr "Setar para assistir depois"
+msgstr "Marcar para Assistir mais tarde"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr "Remover de assistir depois"
+msgstr "Remover de Assistir mais tarde"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Tem certeza que deseja remover '%s' de sua lista para assistir depois"
+msgstr "Tem certeza que deseja remover '%s' de sua lista Assistir mais tarde?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Tem certeza que deseja substituir sua lista de assistir depois atual com '%s'?"
+msgstr "Tem certeza que deseja substituir sua lista de Assistir mais tarde atual com '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -718,7 +737,7 @@ msgstr "Tentar novamente"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr "ID da lista de reprodução Recuperar assistir mais tarde"
+msgstr "Recuperar ID da lista de reprodução Assistir mais tarde"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
@@ -1110,7 +1129,7 @@ msgstr "Falha ao recuperar o ID da lista de reprodução Assistir mais tarde. Te
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr "Procurando por Assistir Depois ... Página %s"
+msgstr "Procurando por Assistir mais tarde... Página %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1118,7 +1137,7 @@ msgstr "Avaliar vídeos na lista de reprodução"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr "Adicionado para Assistir Posteriormente"
+msgstr "Adicionado para Assistir mais tarde"
 
 msgctxt "#30714"
 msgid "Added to playlist"
@@ -1194,16 +1213,32 @@ msgstr ""
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Comentários"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Curtidos"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Respostas"
 
 msgctxt "#30735"
 msgid "Edited"
 msgstr ""
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Favoritos"
+
+#~ msgctxt "#30200"
+#~ msgid "API Key"
+#~ msgstr "Chave API"
+
+#~ msgctxt "#30205"
+#~ msgid "Autologin on Error enable"
+#~ msgstr "Ativação de login automático com erro"

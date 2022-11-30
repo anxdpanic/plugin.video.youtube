@@ -6,26 +6,35 @@ msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
-"POT-Creation-Date: 2016-04-04 11:01+0000\n"
+"POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE\n"
+"Language: el_GR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: el_GR\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "Addon Summary"
+msgid "Plugin for YouTube"
+msgstr "Πρόσθετο YouTube"
+
+msgctxt "Addon Description"
+msgid "YouTube is one of the biggest video-sharing websites of the world."
+msgstr "Το YouTube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο."
+
+msgctxt "Addon Disclaimer"
+msgid "This plugin is not endorsed by Google"
+msgstr "Η παρούσα μικροεφαρμογή δεν έχει υϊοθετηθεί από την Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr "Πρόσθετο Youtube"
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr "Το Youtube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο"
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "Γενικά"
@@ -88,7 +97,6 @@ msgid "1080p Live / 720p (HD)"
 msgstr "1080p Ζωντανά / 720p (ΥΕ)"
 
 # empty strings 30019
-
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr "Επιτρέψτε το 3Δ"
@@ -166,11 +174,10 @@ msgid "Custom History playlist id"
 msgstr "Τροποποιημένο ID λίστας αναπαραγωγής"
 
 # Kodion Common
-# empty strings from id 30037 to 30099
-
+# empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favorites"
-msgstr "Αγαπημένα"
+msgid "Favourites"
+msgstr ""
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -254,7 +261,6 @@ msgstr "Καθαρισμός"
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr "API"
@@ -281,7 +287,6 @@ msgstr "Χρησιμοποίησε το προκαθορισμένο σετ κλ
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Κανάλια"
@@ -1225,3 +1230,13 @@ msgstr "Απαντήσεις"
 msgctxt "#30735"
 msgid "Edited"
 msgstr "Επεξεργασμένο"
+
+msgctxt "#30736"
+msgid "Hide short videos (1 minute or less)"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30037 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favorites"
+#~ msgstr "Αγαπημένα"
