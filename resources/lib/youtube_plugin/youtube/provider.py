@@ -13,8 +13,11 @@ import os
 import re
 import shutil
 import socket
+import hashlib
+from datetime import datetime
 from base64 import b64decode
 
+from ..youtube.helper import tags
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
 from ..kodion.utils import FunctionCache, strip_html_from_text, get_client_ip_address, is_httpd_live, find_video_id
@@ -53,6 +56,26 @@ class Provider(kodion.AbstractProvider):
                  'youtube.playlists': 30501,
                  'youtube.go_to_channel': 30502,
                  'youtube.subscriptions': 30504,
+                 'youtube.tags': 30900,
+                 'youtube.add.tag': 30901,
+                 'youtube.remove.tag': 30902,
+                 'youtube.delete.tag': 30903,
+                 'youtube.new.tag': 30904,
+                 'youtube.inputnew.tag': 30905,
+                 'youtube.created.tag': 30906,
+                 'youtube.questiondelete.tag': 30907,
+                 'youtube.deleted.tag': 30908,
+                 'youtube.selectadd.tag': 30909,
+                 'youtube.added.tag': 30910,
+                 'youtube.questionremove.tag': 30911,
+                 'youtube.removed.tag': 30912,
+                 'youtube.empty.tag': 30913,
+                 'youtube.move.tag': 30914,
+                 'youtube.selectmove.tag': 30915,
+                 'youtube.moved.tag': 30916,
+                 'youtube.rename.tag': 30917,
+                 'youtube.inputrename.tag': 30918,
+                 'youtube.renamed.tag': 30919,
                  'youtube.unsubscribe': 30505,
                  'youtube.subscribe': 30506,
                  'youtube.my_channel': 30507,
@@ -809,6 +832,37 @@ class Provider(kodion.AbstractProvider):
         category = re_match.group('category')
         return yt_specials.process(category, self, context)
 
+    @kodion.RegisterProviderPath('^/tag/(?P<tag>[^/]+)/$')
+    def _on_yt_tags(self, context, re_match):
+        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        addon_id = context.get_param('addon_id', '')
+        result = []
+        tag = re_match.group('tag')
+        if tag == '-empty-':
+            all_channels = tags.get_empty_channels()
+        else:
+            all_channels = tags.get_channels(tag)
+        for channel in all_channels:
+            item_params = {}
+            if incognito:
+                item_params.update({'incognito': incognito})
+            if addon_id:
+                item_params.update({'addon_id': addon_id})
+            channel_id = channel[0]
+            title = channel[1]
+            image = channel[3]
+            item_uri = context.create_uri(['channel', channel_id], item_params)
+            context_menu = []
+            channel_item = DirectoryItem(title, item_uri, image=image)
+            channel_item.set_fanart(self.get_fanart(context))
+            yt_context_menu.append_add_tag(context_menu, self, context, channel_id)
+            if tag != '-empty-':
+                yt_context_menu.append_move_tag(context_menu, self, context, channel_id, tag)
+                yt_context_menu.append_remove_tag(context_menu, self, context, channel_id, tag)
+            channel_item.set_context_menu(context_menu)
+            result.append(channel_item)
+        return result
+
     # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/history/clear/$')
     def _on_yt_clear_history(self, context, re_match):
@@ -1157,6 +1211,85 @@ class Provider(kodion.AbstractProvider):
                 message = context.localize(self.LOCAL_MAP['youtube.removed.my_subscriptions.filter'])
             if message:
                 context.get_ui().show_notification(message=message)
+        context.get_ui().refresh_container()
+
+    @kodion.RegisterProviderPath('^/tags/edit/$')
+    def manage_my_subscription_filter(self, context, re_match):
+        #import web_pdb; web_pdb.set_trace()
+        params = context.get_params()
+        action = params.get('action')
+        if not action:
+            return
+        if action == 'new':
+            keyboard = xbmc.Keyboard("", context.localize(self.LOCAL_MAP['youtube.inputnew.tag']))
+            keyboard.doModal()
+            if (keyboard.isConfirmed()):
+                title = keyboard.getText()
+                m = hashlib.md5()
+                nowdatetime = datetime.now()
+                m.update(nowdatetime.strftime("%d%m%Y%H%M%S%f"))
+                m.update(title)
+                tag_id = m.hexdigest()
+                title = title.decode("utf-8")
+                tags.create_tag(tag_id, title)
+                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.created.tag']) % title)
+        if action == 'delete':
+            tag_id = params.get('tag')
+            tag_name = tags.get_tag_name(tag_id)
+            dialog = xbmcgui.Dialog()
+            if dialog.yesno(context.get_name(), context.localize(self.LOCAL_MAP['youtube.questiondelete.tag']) % tag_name):
+                tags.delete_tag(tag_id)
+                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.deleted.tag']) % tag_name)
+        if action == 'add':
+            channel_id = params.get('channel_id')
+            channel_name = tags.get_channel_name(channel_id)
+            dialog = xbmcgui.Dialog()
+            tags_all = tags.get_tags_add(channel_id)
+            tags_id = []
+            tags_title = []
+            for tag in tags_all:
+                tags_id.append(tag[0])
+                tags_title.append(tag[1])
+            selectedtag = dialog.select(context.localize(self.LOCAL_MAP['youtube.selectadd.tag']) % channel_name, tags_title)
+            if (not selectedtag == -1 ):
+                tags.add_channel_tag(channel_id, tags_id[selectedtag])
+                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.added.tag']) % (channel_name, tags_title[selectedtag]))
+        if action == 'remove':
+            channel_id = params.get('channel_id')
+            channel_name = tags.get_channel_name(channel_id)
+            tag_id = params.get('tag')
+            tag_name = tags.get_tag_name(tag_id)
+            dialog = xbmcgui.Dialog()
+            if dialog.yesno(context.get_name(), context.localize(self.LOCAL_MAP['youtube.questionremove.tag']) % (channel_name, tag_name)):
+                tags.delete_channel_tag(channel_id, tag_id)
+                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.removed.tag']) % (channel_name, tag_name))
+        if action == 'rename':
+            tag_id = params.get('tag')
+            tag_name = tags.get_tag_name(tag_id)
+            keyboard = xbmc.Keyboard(tag_name, context.localize(self.LOCAL_MAP['youtube.inputrename.tag']))
+            keyboard.doModal()
+            if (keyboard.isConfirmed()):
+                new_name = keyboard.getText()
+                new_name = new_name.decode("utf-8")
+                tags.rename_tag(tag_id, new_name)
+                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.renamed.tag']) % (tag_name, new_name))
+        if action == 'move':
+            channel_id = params.get('channel_id')
+            channel_name = tags.get_channel_name(channel_id)
+            tag_id = params.get('tag')
+            tag_name = tags.get_tag_name(tag_id)
+            dialog = xbmcgui.Dialog()
+            tags_all = tags.get_tags_add(channel_id)
+            tags_id = []
+            tags_title = []
+            for tag in tags_all:
+                tags_id.append(tag[0])
+                tags_title.append(tag[1])
+            selectedtag = dialog.select(context.localize(self.LOCAL_MAP['youtube.selectmove.tag']) % (channel_name, tag_name), tags_title)
+            if (not selectedtag == -1 ):
+                tags.add_channel_tag(channel_id, tags_id[selectedtag])
+                tags.delete_channel_tag(channel_id, tag_id)
+                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.moved.tag']) % (channel_name, tags_title, tags_title[selectedtag]))
         context.get_ui().refresh_container()
 
     @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
@@ -1516,6 +1649,14 @@ class Provider(kodion.AbstractProvider):
                                                context.create_resource_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
+
+            # tags
+            if settings.get_bool('youtube.folder.tags.show', True) and (len(tags.get_channels(''))>0):
+                tags_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.tags']),
+                                                   context.create_uri(['special', 'tags']),
+                                                   image=context.create_resource_path('media', 'channels.png'))
+                tags_item.set_fanart(self.get_fanart(context))
+                result.append(tags_item)
 
             # subscriptions
             if settings.get_bool('youtube.folder.subscriptions.show', True):
