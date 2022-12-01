@@ -395,5 +395,7 @@ def process(category, provider, context):
         return _process_child_comments(provider, context)
     elif category == 'tags':
         return _process_tags(provider, context)
+    elif category == 'saved_playlists':
+        return _process_saved_playlists_tv(provider, context)
     else:
         raise kodion.KodionException("YouTube special category '%s' not found" % category)

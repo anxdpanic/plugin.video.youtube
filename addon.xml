@@ -17,6 +17,7 @@
 [add] Add setting General - Hide short videos (1 minute or less)
 [add] Add support for /shorts/video_id format links |contrib: jmbreuer|
 [add] Add Fanart to Subscriptions
+[add] Access to Saved Playlists
 [fix] Display of channel fanart
 [fix] Misc missing fanart
 [lang] translation updates from Weblate
