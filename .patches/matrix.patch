@@ -1,19 +1,16 @@
-From 038e48b633e6b1b14fbecfd60222b75e74def90a Mon Sep 17 00:00:00 2001
+From e2c0cc9933edca74ed020115ea1bcfebdd05ac76 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
-Subject: [PATCH] =?UTF-8?q?=EF=BB=BFmatrix=20patch?=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH] matrix patch
 
 ---
  addon.xml                                     |    4 +-
  .../kodion/impl/abstract_settings.py          |    2 +-
- resources/settings.xml                        | 1108 ++++++++++++++---
- 3 files changed, 961 insertions(+), 153 deletions(-)
+ resources/settings.xml                        | 1123 ++++++++++++++---
+ 3 files changed, 975 insertions(+), 154 deletions(-)
 
 diff --git a/addon.xml b/addon.xml
-index 5f9e503..92e0e87 100644
+index 056f2ac..d4c69e5 100644
 --- a/addon.xml
 +++ b/addon.xml
 @@ -3,5 +3,5 @@
@@ -46,10 +43,10 @@ index 1a6e82c..b79c3b0 100644
      def get_video_quality(self, quality_map_override=None):
          vq_dict = {0: 240,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index dd1d769..147d257 100644
+index 0fbfce6..30dc0b0 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -1,151 +1,959 @@
+@@ -1,152 +1,973 @@
 -<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 -<settings>
 -
@@ -121,6 +118,7 @@ index dd1d769..147d257 100644
 -        <setting id="youtube.folder.playlists.show" type="bool" label="30501" default="true"/>
 -        <setting id="youtube.folder.saved.playlists.show" type="bool" label="30611" default="true" visible="false"/>
 -        <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
+-        <setting id="youtube.folder.tags.show" type="bool" label="30900" default="true"/>                                                                                 
 -        <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
 -        <setting id="youtube.folder.completed.live.show" type="bool" label="30647" default="true"/>
 -        <setting id="youtube.folder.upcoming.live.show" type="bool" label="30646" default="true"/>
@@ -361,11 +359,20 @@ index dd1d769..147d257 100644
 +                </setting>
 +                <setting help="" id="kodion.content.max_per_page" label="30022" type="integer">
 +                    <level>0</level>
-+                    <default>50</default>
++                    <default>9</default>
 +                    <constraints>
-+                        <minimum>5</minimum>
-+                        <step>5</step>
-+                        <maximum>50</maximum>
++                        <options>
++                            <option label="5">0</option>
++                            <option label="10">1</option>
++                            <option label="15">2</option>
++                            <option label="20">3</option>
++                            <option label="25">4</option>
++                            <option label="30">5</option>
++                            <option label="35">6</option>
++                            <option label="40">7</option>
++                            <option label="45">8</option>
++                            <option label="50">9</option>
++                        </options>
 +                    </constraints>
 +                    <control format="string" type="spinner"/>
 +                </setting>
@@ -685,6 +692,11 @@ index dd1d769..147d257 100644
 +                    <control type="toggle"/>
 +                </setting>
 +                <setting help="" id="youtube.folder.subscriptions.show" label="30504" type="boolean">
++                    <level>0</level>
++                    <default>true</default>
++                    <control type="toggle"/>
++                </setting>
++                <setting help="" id="youtube.folder.tags.show" label="30900" type="boolean">
 +                    <level>0</level>
 +                    <default>true</default>
 +                    <control type="toggle"/>
