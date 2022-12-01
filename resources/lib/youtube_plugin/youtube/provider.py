@@ -1685,6 +1685,14 @@ class Provider(kodion.AbstractProvider):
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
 
+            # saved playlists
+            if settings.get_bool('youtube.folder.saved.playlists.show', True):
+                playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.saved.playlists']),
+                                               context.create_uri(['special', 'saved_playlists']),
+                                               context.create_resource_path('media', 'playlist.png'))
+                playlists_item.set_fanart(self.get_fanart(context))
+                result.append(playlists_item)
+
             # tags
             if settings.get_bool('youtube.folder.tags.show', True) and (len(tags.get_channels('')) > 0):
                 tags_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.tags']),

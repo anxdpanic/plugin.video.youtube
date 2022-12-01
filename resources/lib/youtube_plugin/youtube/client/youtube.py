@@ -91,7 +91,8 @@ class YouTube(LoginClient):
             params['access_token'] = self._access_token
 
         try:
-            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+            # _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
+            pass
         except:
             _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
@@ -911,6 +912,135 @@ class YouTube(LoginClient):
             return _result
 
         return _perform(_page_token=page_token, _offset=offset, _result=result)
+
+    def get_saved_playlists(self, page_token, offset):
+        if not page_token:
+            page_token = ''
+
+        result = {'items': [],
+                  'next_page_token': page_token,
+                  'offset': offset}
+
+        def _perform(_playlist_idx, _page_token, _offset, _result):
+            _post_data = {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5',
+                        'clientVersion': '5.20150304',
+                        'theme': 'CLASSIC',
+                        'acceptRegion': '%s' % self._region,
+                        'acceptLanguage': '%s' % self._language.replace('_', '-')
+                    },
+                    'user': {
+                        'enableSafetyMode': False
+                    }
+                }
+            }
+            if _page_token:
+                _post_data['continuation'] = _page_token
+            else:
+                _post_data['browseId'] = 'FEmy_youtube'
+
+            _json_data = self.perform_v1_tv_request(method='POST', path='browse', post_data=_post_data)
+            _data = {}
+            if 'continuationContents' in _json_data:
+                _data = _json_data.get('continuationContents', {}).get('horizontalListContinuation', {})
+            elif 'contents' in _json_data:
+                _data = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])[_playlist_idx].get(
+                    'shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
+
+            _items = _data.get('items', [])
+            if not _result:
+                _result = {'items': []}
+
+            _new_offset = self._max_results - len(_result['items']) + _offset
+            if _offset > 0:
+                _items = _items[_offset:]
+            _result['offset'] = _new_offset
+
+            for _item in _items:
+                _item = _item.get('gridPlaylistRenderer', {})
+                if _item:
+                    _video_item = {'id': _item['playlistId'],
+                                   'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
+                                   'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', ''),
+                                   'channel_id': _item.get('shortBylineText', {}).get('runs', [{}])[0]
+                                       .get('navigationEndpoint', {}).get('browseEndpoint', {}).get('browseId', ''),
+                                   'thumbnails': {'default': {'url': ''}, 'medium': {'url': ''}, 'high': {'url': ''}}}
+
+                    _thumbs = _item.get('thumbnail', {}).get('thumbnails', [{}])
+
+                    for _thumb in _thumbs:
+                        _thumb_url = _thumb.get('url', '')
+                        if _thumb_url.startswith('//'):
+                            _thumb_url = 'https:' + _thumb_url
+                        if _thumb_url.endswith('/default.jpg'):
+                            _video_item['thumbnails']['default']['url'] = _thumb_url
+                        elif _thumb_url.endswith('/mqdefault.jpg'):
+                            _video_item['thumbnails']['medium']['url'] = _thumb_url
+                        elif _thumb_url.endswith('/hqdefault.jpg'):
+                            _video_item['thumbnails']['high']['url'] = _thumb_url
+
+                    _result['items'].append(_video_item)
+
+            _continuations = _data.get('continuations', [{}])[0].get('nextContinuationData', {}).get('continuation', '')
+            if _continuations and len(_result['items']) <= self._max_results:
+                _result['next_page_token'] = _continuations
+
+                if len(_result['items']) < self._max_results:
+                    _result = _perform(_playlist_idx=playlist_index, _page_token=_continuations, _offset=0, _result=_result)
+
+            # trim result
+            if len(_result['items']) > self._max_results:
+                _items = _result['items']
+                _items = _items[:self._max_results]
+                _result['items'] = _items
+                _result['continue'] = True
+
+            if len(_result['items']) < self._max_results:
+                if 'continue' in _result:
+                    del _result['continue']
+
+                if 'next_page_token' in _result:
+                    del _result['next_page_token']
+
+                if 'offset' in _result:
+                    del _result['offset']
+
+            return _result
+
+        _en_post_data = {
+            'context': {
+                'client': {
+                    'clientName': 'TVHTML5',
+                    'clientVersion': '5.20150304',
+                    'theme': 'CLASSIC',
+                    'acceptRegion': 'US',
+                    'acceptLanguage': 'en-US'
+                },
+                'user': {
+                    'enableSafetyMode': False
+                }
+            },
+            'browseId': 'FEmy_youtube'
+        }
+
+        playlist_index = None
+        json_data = self.perform_v1_tv_request(method='POST', path='browse', post_data=_en_post_data)
+        contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+
+        for idx, shelf in enumerate(contents):
+            title = shelf.get('shelfRenderer', {}).get('title', {}).get('runs', [{}])[0].get('text', '')
+            if title.lower() == 'saved playlists':
+                playlist_index = idx
+                break
+
+        if playlist_index is not None:
+            contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+            if 0 <= playlist_index < len(contents):
+                result = _perform(_playlist_idx=playlist_index, _page_token=page_token, _offset=offset, _result=result)
+
+        return result
 
     def perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
                            allow_redirects=True, no_login=False):
