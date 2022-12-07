@@ -12,11 +12,11 @@ jobs:
     if: github.repository == 'anxdpanic/plugin.video.youtube'
 
     name: Add-on Validations
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Checkout Add-on
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: ${{ github.event.repository.name }}
 

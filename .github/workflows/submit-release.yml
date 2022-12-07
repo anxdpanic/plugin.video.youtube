@@ -9,7 +9,7 @@ jobs:
     if: github.repository == 'anxdpanic/plugin.video.youtube'
 
     name: Submit Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     strategy:
 
