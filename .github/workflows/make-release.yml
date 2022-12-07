@@ -11,7 +11,7 @@ jobs:
     if: github.repository == 'anxdpanic/plugin.video.youtube'
 
     name: Make Release
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - name: Release Status
