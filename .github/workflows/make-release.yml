@@ -20,13 +20,13 @@ jobs:
           version=${GITHUB_REF/refs\/tags\//}
           if [[ $version == *-dev ]] ;
           then
-            echo ::set-output name=pre-release::true
+            echo "pre-release=true" >> $GITHUB_OUTPUT
           else
-            echo ::set-output name=pre-release::false
+            echo "pre-release=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Checkout Add-on
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: ${{ github.event.repository.name }}
 
@@ -41,7 +41,7 @@ jobs:
           changes="${changes//'%'/'%25'}"
           changes="${changes//$'\n'/'%0A'}"
           changes="${changes//$'\r'/'%0D'}"
-          echo ::set-output name=changes::$changes
+          echo "changes=$changes" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
       - name: Create Zip (Isengard)
@@ -55,7 +55,7 @@ jobs:
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
-          echo ::set-output name=filename::$filename
+          echo "filename=$filename" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
       - name: Create Zip (Isengard-Unofficial)
@@ -73,7 +73,7 @@ jobs:
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
-          echo ::set-output name=filename::$filename
+          echo "filename=$filename" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
       - name: Remove Repository
@@ -82,7 +82,7 @@ jobs:
           rm -rf ${{ github.event.repository.name }}
 
       - name: Checkout Add-on
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: ${{ github.event.repository.name }}
 
@@ -100,7 +100,7 @@ jobs:
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
-          echo ::set-output name=filename::$filename
+          echo "filename=$filename" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
       - name: Create Zip (Matrix-Unofficial)
@@ -120,7 +120,7 @@ jobs:
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
-          echo ::set-output name=filename::$filename
+          echo "filename=$filename" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
       - name: Create Release
