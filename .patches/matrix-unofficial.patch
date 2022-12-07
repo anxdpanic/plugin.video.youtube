@@ -1,4 +1,4 @@
-From b127d10638712e0588c381d13e80f741b90b7033 Mon Sep 17 00:00:00 2001
+From 2a0358e5ebee7763e199228cfb5844a17ffddde7 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
 Subject: [PATCH] matrix patch
@@ -17,8 +17,8 @@ Subject: [PATCH] matrix patch
  .../youtube_plugin/youtube/helper/utils.py    |    2 +-
  .../youtube/helper/yt_specials.py             |   18 +-
  .../lib/youtube_plugin/youtube/provider.py    |   22 +-
- resources/settings.xml                        | 1154 ++++++++++++++---
- 14 files changed, 1251 insertions(+), 177 deletions(-)
+ resources/settings.xml                        | 1147 ++++++++++++++---
+ 14 files changed, 1244 insertions(+), 177 deletions(-)
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
@@ -602,10 +602,10 @@ index 5769073..95f8ea4 100644
                                      kodion.constants.sort_method.VIDEO_RUNTIME,
                                      kodion.constants.sort_method.DATE_ADDED,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index 0fbfce6..097514b 100644
+index 0fbfce6..da4ac7a 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -1,152 +1,1004 @@
+@@ -1,152 +1,997 @@
 -<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 -<settings>
 -
@@ -918,22 +918,15 @@ index 0fbfce6..097514b 100644
 +                </setting>
 +                <setting help="" id="kodion.content.max_per_page" label="30022" type="integer">
 +                    <level>0</level>
-+                    <default>9</default>
++                    <default>50</default>
 +                    <constraints>
-+                        <options>
-+                            <option label="5">0</option>
-+                            <option label="10">1</option>
-+                            <option label="15">2</option>
-+                            <option label="20">3</option>
-+                            <option label="25">4</option>
-+                            <option label="30">5</option>
-+                            <option label="35">6</option>
-+                            <option label="40">7</option>
-+                            <option label="45">8</option>
-+                            <option label="50">9</option>
-+                        </options>
++                        <minimum>5</minimum>
++                        <step>5</step>
++                        <maximum>50</maximum>
 +                    </constraints>
-+                    <control format="string" type="spinner"/>
++                    <control format="integer" type="slider">
++                        <popup>false</popup>
++                    </control>
 +                </setting>
 +                <setting help="" id="kodion.search.size" label="30023" type="integer">
 +                    <level>0</level>

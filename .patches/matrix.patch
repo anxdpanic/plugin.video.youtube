@@ -1,4 +1,4 @@
-From e2c0cc9933edca74ed020115ea1bcfebdd05ac76 Mon Sep 17 00:00:00 2001
+From 518b73c349e8ea7ac7fecaa3053eb6fdb3357074 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
 Subject: [PATCH] matrix patch
@@ -6,8 +6,8 @@ Subject: [PATCH] matrix patch
 ---
  addon.xml                                     |    4 +-
  .../kodion/impl/abstract_settings.py          |    2 +-
- resources/settings.xml                        | 1123 ++++++++++++++---
- 3 files changed, 975 insertions(+), 154 deletions(-)
+ resources/settings.xml                        | 1116 ++++++++++++++---
+ 3 files changed, 968 insertions(+), 154 deletions(-)
 
 diff --git a/addon.xml b/addon.xml
 index 056f2ac..d4c69e5 100644
@@ -43,10 +43,10 @@ index 1a6e82c..b79c3b0 100644
      def get_video_quality(self, quality_map_override=None):
          vq_dict = {0: 240,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index 0fbfce6..30dc0b0 100644
+index 0fbfce6..081e490 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -1,152 +1,973 @@
+@@ -1,152 +1,966 @@
 -<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 -<settings>
 -
@@ -359,22 +359,15 @@ index 0fbfce6..30dc0b0 100644
 +                </setting>
 +                <setting help="" id="kodion.content.max_per_page" label="30022" type="integer">
 +                    <level>0</level>
-+                    <default>9</default>
++                    <default>50</default>
 +                    <constraints>
-+                        <options>
-+                            <option label="5">0</option>
-+                            <option label="10">1</option>
-+                            <option label="15">2</option>
-+                            <option label="20">3</option>
-+                            <option label="25">4</option>
-+                            <option label="30">5</option>
-+                            <option label="35">6</option>
-+                            <option label="40">7</option>
-+                            <option label="45">8</option>
-+                            <option label="50">9</option>
-+                        </options>
++                        <minimum>5</minimum>
++                        <step>5</step>
++                        <maximum>50</maximum>
 +                    </constraints>
-+                    <control format="string" type="spinner"/>
++                    <control format="integer" type="slider">
++                        <popup>false</popup>
++                    </control>
 +                </setting>
 +                <setting help="" id="kodion.search.size" label="30023" type="integer">
 +                    <level>0</level>
