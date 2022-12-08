@@ -30,6 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update
           sudo apt-get install libxml2-utils xmlstarlet
           python -m pip install --upgrade pip
           python -m pip install git+https://github.com/romanvm/kodi-addon-submitter.git
