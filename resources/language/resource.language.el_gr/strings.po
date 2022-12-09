@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: el_GR\n"
+"PO-Revision-Date: 2022-12-09 20:12+0000\n"
+"Last-Translator: Paradigm Shifter <twilight0@vivaldi.net>\n"
+"Language-Team: Greek <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/el_gr/>\n"
+"Language: el_gr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.14.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -177,7 +178,7 @@ msgstr "Τροποποιημένο ID λίστας αναπαραγωγής"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Favourites"
-msgstr ""
+msgstr "Αγαπημένα"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
@@ -1233,86 +1234,6 @@ msgstr "Επεξεργασμένο"
 
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
-msgstr ""
-
-msgctxt "#30900"
-msgid "Subscriptions groups"
-msgstr ""
-
-msgctxt "#30901"
-msgid "Add to group"
-msgstr ""
-
-msgctxt "#30902"
-msgid "Remove from group"
-msgstr ""
-
-msgctxt "#30903"
-msgid "Delete group"
-msgstr ""
-
-msgctxt "#30904"
-msgid "Create new group"
-msgstr ""
-
-msgctxt "#30905"
-msgid "Enter a name for new group"
-msgstr ""
-
-msgctxt "#30906"
-msgid "Group '%s' created"
-msgstr ""
-
-msgctxt "#30907"
-msgid "Are you sure you want to remove group '%s'?"
-msgstr ""
-
-msgctxt "#30908"
-msgid "Group '%s' removed"
-msgstr ""
-
-msgctxt "#30909"
-msgid "Select new group for channel '%s'"
-msgstr ""
-
-msgctxt "#30910"
-msgid "Сhannel '%s' added to group '%s'"
-msgstr ""
-
-msgctxt "#30911"
-msgid "Are you sure you want remove channel '%s' from group '%s'?"
-msgstr ""
-
-msgctxt "#30912"
-msgid "Сhannel '%s' removed from group '%s'"
-msgstr ""
-
-msgctxt "#30913"
-msgid "[Without groups]"
-msgstr ""
-
-msgctxt "#30914"
-msgid "Move to other group"
-msgstr ""
-
-msgctxt "#30915"
-msgid "Select new group for channel '%s' from group '%s'"
-msgstr ""
-
-msgctxt "#30916"
-msgid "Сhannel '%s' moved from group '%s' to group '%s'"
-msgstr ""
-
-msgctxt "#30917"
-msgid "Rename group"
-msgstr ""
-
-msgctxt "#30918"
-msgid "Enter a new name for group"
-msgstr ""
-
-msgctxt "#30919"
-msgid "Group '%s' renamed to '%s'"
 msgstr ""
 
 # Kodion Common
