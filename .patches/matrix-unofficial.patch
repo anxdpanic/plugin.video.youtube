@@ -1,4 +1,4 @@
-From 2a0358e5ebee7763e199228cfb5844a17ffddde7 Mon Sep 17 00:00:00 2001
+From e4872a2c400e30dc2ddbe828b0bdc6657a344ca9 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
 Subject: [PATCH] matrix patch
@@ -17,12 +17,12 @@ Subject: [PATCH] matrix patch
  .../youtube_plugin/youtube/helper/utils.py    |    2 +-
  .../youtube/helper/yt_specials.py             |   18 +-
  .../lib/youtube_plugin/youtube/provider.py    |   22 +-
- resources/settings.xml                        | 1147 ++++++++++++++---
- 14 files changed, 1244 insertions(+), 177 deletions(-)
+ resources/settings.xml                        | 1141 ++++++++++++++---
+ 14 files changed, 1239 insertions(+), 176 deletions(-)
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index 056f2ac..6d65fcf 100644
+index cd39f4a..d3e9ef9 100644
 --- a/addon.xml
 +++ b/addon.xml
 @@ -3,5 +3,5 @@
@@ -407,10 +407,10 @@ index 0000000..9a5fe5a
 +
 +        return False
 diff --git a/resources/lib/youtube_plugin/youtube/helper/utils.py b/resources/lib/youtube_plugin/youtube/helper/utils.py
-index d6cad29..8c3a232 100644
+index 88a7fb7..5fc6e37 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/utils.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/utils.py
-@@ -263,7 +263,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
+@@ -258,7 +258,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
          video_item = video_id_dict[video_id]
  
          # set mediatype
@@ -420,10 +420,10 @@ index d6cad29..8c3a232 100644
          if not yt_item:
              continue
 diff --git a/resources/lib/youtube_plugin/youtube/helper/yt_specials.py b/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
-index e56728d..e19d27a 100644
+index 89ad2b1..c5c8fec 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
-@@ -50,7 +50,7 @@ def _process_tags(provider, context):
+@@ -15,7 +15,7 @@ from . import utils
  
  
  def _process_related_videos(provider, context):
@@ -432,7 +432,7 @@ index e56728d..e19d27a 100644
      result = []
  
      page_token = context.get_param('page_token', '')
-@@ -95,7 +95,7 @@ def _process_child_comments(provider, context):
+@@ -60,7 +60,7 @@ def _process_child_comments(provider, context):
  
  
  def _process_recommendations(provider, context):
@@ -441,7 +441,7 @@ index e56728d..e19d27a 100644
      result = []
  
      page_token = context.get_param('page_token', '')
-@@ -107,7 +107,7 @@ def _process_recommendations(provider, context):
+@@ -72,7 +72,7 @@ def _process_recommendations(provider, context):
  
  
  def _process_popular_right_now(provider, context):
@@ -450,7 +450,7 @@ index e56728d..e19d27a 100644
      result = []
  
      page_token = context.get_param('page_token', '')
-@@ -120,7 +120,7 @@ def _process_popular_right_now(provider, context):
+@@ -85,7 +85,7 @@ def _process_popular_right_now(provider, context):
  
  
  def _process_browse_channels(provider, context):
@@ -459,7 +459,7 @@ index e56728d..e19d27a 100644
      result = []
  
      # page_token = context.get_param('page_token', '')
-@@ -142,7 +142,7 @@ def _process_browse_channels(provider, context):
+@@ -107,7 +107,7 @@ def _process_browse_channels(provider, context):
  
  
  def _process_disliked_videos(provider, context):
@@ -468,7 +468,7 @@ index e56728d..e19d27a 100644
      result = []
  
      page_token = context.get_param('page_token', '')
-@@ -157,7 +157,7 @@ def _process_live_events(provider, context, event_type='live'):
+@@ -122,7 +122,7 @@ def _process_live_events(provider, context, event_type='live'):
      def _sort(x):
          return x.get_aired()
  
@@ -477,7 +477,7 @@ index e56728d..e19d27a 100644
      result = []
  
      # TODO: cache result
-@@ -177,7 +177,7 @@ def _process_description_links(provider, context):
+@@ -142,7 +142,7 @@ def _process_description_links(provider, context):
      addon_id = context.get_param('addon_id', '')
  
      def _extract_urls(_video_id):
@@ -486,7 +486,7 @@ index e56728d..e19d27a 100644
          url_resolver = UrlResolver(context)
  
          result = []
-@@ -339,7 +339,7 @@ def _process_purchases_tv(provider, context):
+@@ -304,7 +304,7 @@ def _process_purchases_tv(provider, context):
  
  
  def _process_new_uploaded_videos_tv(provider, context):
@@ -495,7 +495,7 @@ index e56728d..e19d27a 100644
  
      result = []
      next_page_token = context.get_param('next_page_token', '')
-@@ -351,7 +351,7 @@ def _process_new_uploaded_videos_tv(provider, context):
+@@ -316,7 +316,7 @@ def _process_new_uploaded_videos_tv(provider, context):
  
  
  def _process_new_uploaded_videos_tv_filtered(provider, context):
@@ -505,10 +505,10 @@ index e56728d..e19d27a 100644
      result = []
      next_page_token = context.get_param('next_page_token', '')
 diff --git a/resources/lib/youtube_plugin/youtube/provider.py b/resources/lib/youtube_plugin/youtube/provider.py
-index 5769073..95f8ea4 100644
+index fea2957..75c6780 100644
 --- a/resources/lib/youtube_plugin/youtube/provider.py
 +++ b/resources/lib/youtube_plugin/youtube/provider.py
-@@ -469,7 +469,7 @@ class Provider(kodion.AbstractProvider):
+@@ -437,7 +437,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/playlist/(?P<playlist_id>[^/]+)/$')
      def _on_playlist(self, context, re_match):
@@ -517,7 +517,7 @@ index 5769073..95f8ea4 100644
  
          result = []
  
-@@ -493,7 +493,7 @@ class Provider(kodion.AbstractProvider):
+@@ -461,7 +461,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
      def _on_channel_playlist(self, context, re_match):
@@ -526,7 +526,7 @@ index 5769073..95f8ea4 100644
          client = self.get_client(context)
          result = []
  
-@@ -516,7 +516,7 @@ class Provider(kodion.AbstractProvider):
+@@ -484,7 +484,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
      def _on_channel_playlists(self, context, re_match):
@@ -535,7 +535,7 @@ index 5769073..95f8ea4 100644
          result = []
  
          channel_id = re_match.group('channel_id')
-@@ -561,7 +561,7 @@ class Provider(kodion.AbstractProvider):
+@@ -525,7 +525,7 @@ class Provider(kodion.AbstractProvider):
  
      @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
      def _on_channel_live(self, context, re_match):
@@ -544,7 +544,7 @@ index 5769073..95f8ea4 100644
          result = []
  
          channel_id = re_match.group('channel_id')
-@@ -596,7 +596,7 @@ class Provider(kodion.AbstractProvider):
+@@ -560,7 +560,7 @@ class Provider(kodion.AbstractProvider):
          if method == 'channel' and not channel_id:
              return False
  
@@ -553,7 +553,7 @@ index 5769073..95f8ea4 100644
  
          resource_manager = self.get_resource_manager(context)
  
-@@ -688,7 +688,7 @@ class Provider(kodion.AbstractProvider):
+@@ -648,7 +648,7 @@ class Provider(kodion.AbstractProvider):
      # noinspection PyUnusedLocal
      @kodion.RegisterProviderPath('^/location/mine/$')
      def _on_my_location(self, context, re_match):
@@ -562,7 +562,7 @@ index 5769073..95f8ea4 100644
  
          settings = context.get_settings()
          result = list()
-@@ -841,7 +841,7 @@ class Provider(kodion.AbstractProvider):
+@@ -793,7 +793,7 @@ class Provider(kodion.AbstractProvider):
          subscriptions = yt_subscriptions.process(method, self, context)
  
          if method == 'list':
@@ -571,7 +571,7 @@ index 5769073..95f8ea4 100644
              channel_ids = []
              for subscription in subscriptions:
                  channel_ids.append(subscription.get_channel_id())
-@@ -1108,9 +1108,9 @@ class Provider(kodion.AbstractProvider):
+@@ -1025,9 +1025,9 @@ class Provider(kodion.AbstractProvider):
          context.set_param('q', search_text)
  
          if search_type == 'video':
@@ -583,7 +583,7 @@ index 5769073..95f8ea4 100644
  
          if page == 1 and search_type == 'video' and not event_type and not hide_folders:
              if not channel_id and not location:
-@@ -1529,7 +1529,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1361,7 +1361,7 @@ class Provider(kodion.AbstractProvider):
          settings = context.get_settings()
          _ = self.get_client(context)  # required for self.is_logged_in()
  
@@ -592,7 +592,7 @@ index 5769073..95f8ea4 100644
  
          result = []
  
-@@ -1772,7 +1772,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1596,7 +1596,7 @@ class Provider(kodion.AbstractProvider):
      @staticmethod
      def set_content_type(context, content_type):
          context.set_content_type(content_type)
@@ -602,10 +602,10 @@ index 5769073..95f8ea4 100644
                                      kodion.constants.sort_method.VIDEO_RUNTIME,
                                      kodion.constants.sort_method.DATE_ADDED,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index 0fbfce6..da4ac7a 100644
+index dd1d769..736c92d 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -1,152 +1,997 @@
+@@ -1,151 +1,992 @@
 -<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 -<settings>
 -
@@ -677,7 +677,6 @@ index 0fbfce6..da4ac7a 100644
 -        <setting id="youtube.folder.playlists.show" type="bool" label="30501" default="true"/>
 -        <setting id="youtube.folder.saved.playlists.show" type="bool" label="30611" default="true" visible="false"/>
 -        <setting id="youtube.folder.subscriptions.show" type="bool" label="30504" default="true"/>
--        <setting id="youtube.folder.tags.show" type="bool" label="30900" default="true"/>                                                                                 
 -        <setting id="youtube.folder.browse_channels.show" type="bool" label="30512" default="true"/>
 -        <setting id="youtube.folder.completed.live.show" type="bool" label="30647" default="true"/>
 -        <setting id="youtube.folder.upcoming.live.show" type="bool" label="30646" default="true"/>
@@ -1244,11 +1243,6 @@ index 0fbfce6..da4ac7a 100644
 +                    <control type="toggle"/>
 +                </setting>
 +                <setting help="" id="youtube.folder.subscriptions.show" label="30504" type="boolean">
-+                    <level>0</level>
-+                    <default>true</default>
-+                    <control type="toggle"/>
-+                </setting>
-+                <setting help="" id="youtube.folder.tags.show" label="30900" type="boolean">
 +                    <level>0</level>
 +                    <default>true</default>
 +                    <control type="toggle"/>
