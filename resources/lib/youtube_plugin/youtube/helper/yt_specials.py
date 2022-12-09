@@ -12,41 +12,6 @@ from ... import kodion
 from ...kodion.items import DirectoryItem, UriItem
 from ...youtube.helper import v3, tv, extract_urls, UrlResolver, UrlToItemConverter
 from . import utils
-from ...youtube.helper import yt_context_menu
-from ...youtube.helper import tags
-
-def _process_tags(provider, context):
-    result = []
-    
-    incognito = str(context.get_param('incognito', False)).lower() == 'true'
-    addon_id = context.get_param('addon_id', '')
-    #import web_pdb; web_pdb.set_trace()
-    all_tags = tags.get_tags()
-    for tag in all_tags:
-        item_params = {}
-        if incognito:
-            item_params.update({'incognito': incognito})
-        if addon_id:
-            item_params.update({'addon_id': addon_id})
-        tag_id = tag[0]
-        title = tag[1]
-        item_uri = context.create_uri(['tag', tag_id], item_params)
-        context_menu = []
-        tag_item = DirectoryItem(title, item_uri)
-        yt_context_menu.append_new_tag(context_menu, provider, context)
-        yt_context_menu.append_rename_tag(context_menu, provider, context, tag_id)
-        yt_context_menu.append_delete_tag(context_menu, provider, context, tag_id)
-        tag_item.set_context_menu(context_menu)
-        result.append(tag_item)
-    if not len(all_tags):
-        new_tag_uri = context.create_uri(['tags', 'edit'], {'action': 'new'})
-        new_tag_item = DirectoryItem(context.localize(provider.LOCAL_MAP['youtube.new.tag']), new_tag_uri)
-        result.append(new_tag_item)
-    else:
-        empty_tag_uri = context.create_uri(['tag', '-empty-'])
-        empty_tag_item = DirectoryItem(context.localize(provider.LOCAL_MAP['youtube.empty.tag']), empty_tag_uri)
-        result.append(empty_tag_item)
-    return result
 
 
 def _process_related_videos(provider, context):
@@ -393,8 +358,6 @@ def process(category, provider, context):
         return _process_parent_comments(provider, context)
     elif category == 'child_comments':
         return _process_child_comments(provider, context)
-    elif category == 'tags':
-        return _process_tags(provider, context)
     elif category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context)
     else:

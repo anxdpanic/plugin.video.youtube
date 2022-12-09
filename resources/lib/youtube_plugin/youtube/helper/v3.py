@@ -12,7 +12,6 @@ from ...youtube.helper import yt_context_menu
 from ... import kodion
 from ...kodion import items
 from . import utils
-from ...youtube.helper import tags
 
 
 def _process_list_response(provider, context, json_data):
@@ -79,17 +78,6 @@ def _process_list_response(provider, context, json_data):
                 context_menu = []
                 yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
                 channel_item.set_context_menu(context_menu)
-            
-            #default_language = yt_item['brandingSettings']['channel'].get('defaultLanguage')
-            #country = yt_item['brandingSettings']['channel'].get('country')
-            default_language = ''
-            country = ''
-            if not default_language:
-                default_language = ''
-            if not country:
-                country = ''
-            tags.create_channel(channel_id, title, item_uri, image, kind)                
-            
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
         elif kind == 'guidecategory':
@@ -122,14 +110,6 @@ def _process_list_response(provider, context, json_data):
             # map channel id with subscription id - we need it for the unsubscription
             subscription_id_dict[channel_id] = yt_item['id']
 
-            default_language = ''
-            country = ''
-            if not default_language:
-                default_language = ''
-            if not country:
-                country = ''
-            tags.create_channel(channel_id, title, item_uri, image, kind)
-            
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
         elif kind == 'playlist':
@@ -279,14 +259,6 @@ def _process_list_response(provider, context, json_data):
                 item_uri = context.create_uri(['channel', channel_id], item_params)
                 channel_item = items.DirectoryItem(title, item_uri, image=image)
                 channel_item.set_fanart(provider.get_fanart(context))
-                default_language = ''
-                country = ''
-                if not default_language:
-                    default_language = ''
-                if not country:
-                    country = ''
-                tags.create_channel(channel_id, title, item_uri, image, kind)                
-                
                 result.append(channel_item)
                 channel_id_dict[channel_id] = channel_item
             else:

@@ -13,11 +13,8 @@ import os
 import re
 import shutil
 import socket
-import hashlib
-from datetime import datetime
 from base64 import b64decode
 
-from ..youtube.helper import tags
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
 from ..kodion.utils import FunctionCache, strip_html_from_text, get_client_ip_address, is_httpd_live, find_video_id
@@ -40,172 +37,151 @@ except AttributeError:
 
 
 class Provider(kodion.AbstractProvider):
-    LOCAL_MAP = {
-        'youtube.search': 30102,
-        'youtube.next_page': 30106,
-        'youtube.watch_later': 30107,
-        'youtube.video.rate.none': 30108,
-        'youtube.remove': 30108,
-        'youtube.sign.in': 30111,
-        'youtube.sign.out': 30112,
-        'youtube.rename': 30113,
-        'youtube.delete': 30118,
-        'youtube.api.key': 30201,
-        'youtube.api.id': 30202,
-        'youtube.api.secret': 30203,
-        'youtube.channels': 30500,
-        'youtube.playlists': 30501,
-        'youtube.go_to_channel': 30502,
-        'youtube.subscriptions': 30504,
-        'youtube.tags': 30900,
-        'youtube.add.tag': 30901,
-        'youtube.remove.tag': 30902,
-        'youtube.delete.tag': 30903,
-        'youtube.new.tag': 30904,
-        'youtube.inputnew.tag': 30905,
-        'youtube.created.tag': 30906,
-        'youtube.questiondelete.tag': 30907,
-        'youtube.deleted.tag': 30908,
-        'youtube.selectadd.tag': 30909,
-        'youtube.added.tag': 30910,
-        'youtube.questionremove.tag': 30911,
-        'youtube.removed.tag': 30912,
-        'youtube.empty.tag': 30913,
-        'youtube.move.tag': 30914,
-        'youtube.selectmove.tag': 30915,
-        'youtube.moved.tag': 30916,
-        'youtube.rename.tag': 30917,
-        'youtube.inputrename.tag': 30918,
-        'youtube.renamed.tag': 30919,
-        'youtube.unsubscribe': 30505,
-        'youtube.subscribe': 30506,
-        'youtube.my_channel': 30507,
-        'youtube.video.liked': 30508,
-        'youtube.history': 30509,
-        'youtube.my_subscriptions': 30510,
-        'youtube.video.queue': 30511,
-        'youtube.browse_channels': 30512,
-        'youtube.popular_right_now': 30513,
-        'youtube.related_videos': 30514,
-        'youtube.setting.auto_remove_watch_later': 30515,
-        'youtube.subscribe_to': 30517,
-        'youtube.sign.go_to': 30518,
-        'youtube.sign.enter_code': 30519,
-        'youtube.video.add_to_playlist': 30520,
-        'youtube.playlist.select': 30521,
-        'youtube.playlist.create': 30522,
-        'youtube.setup_wizard.select_language': 30524,
-        'youtube.setup_wizard.select_region': 30525,
-        'youtube.setup_wizard.adjust': 30526,
-        'youtube.setup_wizard.adjust.language_and_region': 30527,
-        'youtube.video.rate': 30528,
-        'youtube.video.rate.like': 30529,
-        'youtube.video.rate.dislike': 30530,
-        'youtube.playlist.play.all': 30531,
-        'youtube.playlist.play.default': 30532,
-        'youtube.playlist.play.reverse': 30533,
-        'youtube.playlist.play.shuffle': 30534,
-        'youtube.playlist.play.select': 30535,
-        'youtube.playlist.progress.updating': 30536,
-        'youtube.playlist.play.from_here': 30537,
-        'youtube.video.disliked': 30538,
-        'youtube.live': 30539,
-        'youtube.video.play_with': 30540,
-        'youtube.error.rtmpe_not_supported': 30542,
-        'youtube.refresh': 30543,
-        'youtube.video.description.links': 30544,
-        'youtube.video.description.links.not_found': 30545,
-        'youtube.sign.twice.title': 30546,
-        'youtube.sign.twice.text': 30547,
-        'youtube.video.more': 30548,
-        'youtube.error.no_video_streams_found': 30549,
-        'youtube.recommendations': 30551,
-        'youtube.function.cache': 30557,
-        'youtube.search.history': 30558,
-        'youtube.subtitle.language': 30560,
-        'youtube.none': 30561,
-        'youtube.prompt': 30566,
-        'youtube.set.as.watchlater': 30567,
-        'youtube.remove.as.watchlater': 30568,
-        'youtube.set.as.history': 30571,
-        'youtube.remove.as.history': 30572,
-        'youtube.succeeded': 30575,
-        'youtube.failed': 30576,
-        'youtube.settings': 30577,
-        'youtube.dash.enable.confirm': 30579,
-        'youtube.reset.access.manager.confirm': 30581,
-        'youtube.my_subscriptions_filtered': 30584,
-        'youtube.add.my_subscriptions.filter': 30587,
-        'youtube.remove.my_subscriptions.filter': 30588,
-        'youtube.added.my_subscriptions.filter': 30589,
-        'youtube.removed.my_subscriptions.filter': 30590,
-        'youtube.updated_': 30597,
-        'youtube.api.personal.enabled': 30598,
-        'youtube.api.personal.failed': 30599,
-        'youtube.subtitle._with_fallback': 30601,
-        'youtube.subtitle.no.auto.generated': 30602,
-        'youtube.quick.search': 30605,
-        'youtube.quick.search.incognito': 30606,
-        'youtube.clear_history': 30609,
-        'youtube.clear_history_confirmation': 30610,
-        'youtube.saved.playlists': 30611,
-        'youtube.retry': 30612,
-        'youtube.failed.watch_later.retry': 30614,
-        'youtube.cancel': 30615,
-        'youtube.must.be.signed.in': 30616,
-        'youtube.select.listen.ip': 30644,
-        'youtube.purchases': 30622,
-        'youtube.requires.krypton': 30624,
-        'youtube.inputstreamhelper.is.installed': 30625,
-        'youtube.upcoming.live': 30646,
-        'youtube.completed.live': 30647,
-        'youtube.api.key.incorrect': 30648,
-        'youtube.client.id.incorrect': 30649,
-        'youtube.client.secret.incorrect': 30650,
-        'youtube.perform.geolocation': 30653,
-        'youtube.my_location': 30654,
-        'youtube.switch.user': 30655,
-        'youtube.user.new': 30656,
-        'youtube.user.unnamed': 30657,
-        'youtube.enter.user.name': 30658,
-        'youtube.user.changed': 30659,
-        'youtube.remove.a.user': 30662,
-        'youtube.rename.a.user': 30663,
-        'youtube.switch.user.now': 30665,
-        'youtube.removed': 30666,
-        'youtube.renamed': 30667,
-        'youtube.playback.history': 30673,
-        'youtube.mark.watched': 30670,
-        'youtube.mark.unwatched': 30669,
-        'youtube.reset.resume.point': 30674,
-        'youtube.data.cache': 30687,
-        'youtube.httpd.not.running': 30699,
-        'youtube.client.ip': 30700,
-        'youtube.client.ip.failed': 30701,
-        'youtube.video.play_with_subtitles': 30702,
-        'youtube.are.you.sure': 30703,
-        'youtube.subtitles.download': 30705,
-        'youtube.pre.download.subtitles': 30706,
-        'youtube.untitled': 30707,
-        'youtube.video.play_audio_only': 30708,
-        'youtube.failed.watch_later.retry.2': 30709,
-        'youtube.failed.watch_later.retry.3': 30710,
-        'youtube.added.to.watch.later': 30713,
-        'youtube.added.to.playlist': 30714,
-        'youtube.removed.from.playlist': 30715,
-        'youtube.liked.video': 30716,
-        'youtube.disliked.video': 30717,
-        'youtube.unrated.video': 30718,
-        'youtube.subscribed.to.channel': 30719,
-        'youtube.unsubscribed.from.channel': 30720,
-        'youtube.uploads': 30726,
-        'youtube.video.play_ask_for_quality': 30730,
-        'youtube.key.requirement.notification': 30731,
-        'youtube.video.comments': 30732,
-        'youtube.video.comments.likes': 30733,
-        'youtube.video.comments.replies': 30734,
-        'youtube.video.comments.edited': 30735,
-    }
+    LOCAL_MAP = {'youtube.search': 30102,
+                 'youtube.next_page': 30106,
+                 'youtube.watch_later': 30107,
+                 'youtube.video.rate.none': 30108,
+                 'youtube.remove': 30108,
+                 'youtube.sign.in': 30111,
+                 'youtube.sign.out': 30112,
+                 'youtube.rename': 30113,
+                 'youtube.delete': 30118,
+                 'youtube.api.key': 30201,
+                 'youtube.api.id': 30202,
+                 'youtube.api.secret': 30203,
+                 'youtube.channels': 30500,
+                 'youtube.playlists': 30501,
+                 'youtube.go_to_channel': 30502,
+                 'youtube.subscriptions': 30504,
+                 'youtube.unsubscribe': 30505,
+                 'youtube.subscribe': 30506,
+                 'youtube.my_channel': 30507,
+                 'youtube.video.liked': 30508,
+                 'youtube.history': 30509,
+                 'youtube.my_subscriptions': 30510,
+                 'youtube.video.queue': 30511,
+                 'youtube.browse_channels': 30512,
+                 'youtube.popular_right_now': 30513,
+                 'youtube.related_videos': 30514,
+                 'youtube.setting.auto_remove_watch_later': 30515,
+                 'youtube.subscribe_to': 30517,
+                 'youtube.sign.go_to': 30518,
+                 'youtube.sign.enter_code': 30519,
+                 'youtube.video.add_to_playlist': 30520,
+                 'youtube.playlist.select': 30521,
+                 'youtube.playlist.create': 30522,
+                 'youtube.setup_wizard.select_language': 30524,
+                 'youtube.setup_wizard.select_region': 30525,
+                 'youtube.setup_wizard.adjust': 30526,
+                 'youtube.setup_wizard.adjust.language_and_region': 30527,
+                 'youtube.video.rate': 30528,
+                 'youtube.video.rate.like': 30529,
+                 'youtube.video.rate.dislike': 30530,
+                 'youtube.playlist.play.all': 30531,
+                 'youtube.playlist.play.default': 30532,
+                 'youtube.playlist.play.reverse': 30533,
+                 'youtube.playlist.play.shuffle': 30534,
+                 'youtube.playlist.play.select': 30535,
+                 'youtube.playlist.progress.updating': 30536,
+                 'youtube.playlist.play.from_here': 30537,
+                 'youtube.video.disliked': 30538,
+                 'youtube.live': 30539,
+                 'youtube.video.play_with': 30540,
+                 'youtube.error.rtmpe_not_supported': 30542,
+                 'youtube.refresh': 30543,
+                 'youtube.video.description.links': 30544,
+                 'youtube.video.description.links.not_found': 30545,
+                 'youtube.sign.twice.title': 30546,
+                 'youtube.sign.twice.text': 30547,
+                 'youtube.video.more': 30548,
+                 'youtube.error.no_video_streams_found': 30549,
+                 'youtube.recommendations': 30551,
+                 'youtube.function.cache': 30557,
+                 'youtube.search.history': 30558,
+                 'youtube.subtitle.language': 30560,
+                 'youtube.none': 30561,
+                 'youtube.prompt': 30566,
+                 'youtube.set.as.watchlater': 30567,
+                 'youtube.remove.as.watchlater': 30568,
+                 'youtube.set.as.history': 30571,
+                 'youtube.remove.as.history': 30572,
+                 'youtube.succeeded': 30575,
+                 'youtube.failed': 30576,
+                 'youtube.settings': 30577,
+                 'youtube.dash.enable.confirm': 30579,
+                 'youtube.reset.access.manager.confirm': 30581,
+                 'youtube.my_subscriptions_filtered': 30584,
+                 'youtube.add.my_subscriptions.filter': 30587,
+                 'youtube.remove.my_subscriptions.filter': 30588,
+                 'youtube.added.my_subscriptions.filter': 30589,
+                 'youtube.removed.my_subscriptions.filter': 30590,
+                 'youtube.updated_': 30597,
+                 'youtube.api.personal.enabled': 30598,
+                 'youtube.api.personal.failed': 30599,
+                 'youtube.subtitle._with_fallback': 30601,
+                 'youtube.subtitle.no.auto.generated': 30602,
+                 'youtube.quick.search': 30605,
+                 'youtube.quick.search.incognito': 30606,
+                 'youtube.clear_history': 30609,
+                 'youtube.clear_history_confirmation': 30610,
+                 'youtube.saved.playlists': 30611,
+                 'youtube.retry': 30612,
+                 'youtube.failed.watch_later.retry': 30614,
+                 'youtube.cancel': 30615,
+                 'youtube.must.be.signed.in': 30616,
+                 'youtube.select.listen.ip': 30644,
+                 'youtube.purchases': 30622,
+                 'youtube.requires.krypton': 30624,
+                 'youtube.inputstreamhelper.is.installed': 30625,
+                 'youtube.upcoming.live': 30646,
+                 'youtube.completed.live': 30647,
+                 'youtube.api.key.incorrect': 30648,
+                 'youtube.client.id.incorrect': 30649,
+                 'youtube.client.secret.incorrect': 30650,
+                 'youtube.perform.geolocation': 30653,
+                 'youtube.my_location': 30654,
+                 'youtube.switch.user': 30655,
+                 'youtube.user.new': 30656,
+                 'youtube.user.unnamed': 30657,
+                 'youtube.enter.user.name': 30658,
+                 'youtube.user.changed': 30659,
+                 'youtube.remove.a.user': 30662,
+                 'youtube.rename.a.user': 30663,
+                 'youtube.switch.user.now': 30665,
+                 'youtube.removed': 30666,
+                 'youtube.renamed': 30667,
+                 'youtube.playback.history': 30673,
+                 'youtube.mark.watched': 30670,
+                 'youtube.mark.unwatched': 30669,
+                 'youtube.reset.resume.point': 30674,
+                 'youtube.data.cache': 30687,
+                 'youtube.httpd.not.running': 30699,
+                 'youtube.client.ip': 30700,
+                 'youtube.client.ip.failed': 30701,
+                 'youtube.video.play_with_subtitles': 30702,
+                 'youtube.are.you.sure': 30703,
+                 'youtube.subtitles.download': 30705,
+                 'youtube.pre.download.subtitles': 30706,
+                 'youtube.untitled': 30707,
+                 'youtube.video.play_audio_only': 30708,
+                 'youtube.failed.watch_later.retry.2': 30709,
+                 'youtube.failed.watch_later.retry.3': 30710,
+                 'youtube.added.to.watch.later': 30713,
+                 'youtube.added.to.playlist': 30714,
+                 'youtube.removed.from.playlist': 30715,
+                 'youtube.liked.video': 30716,
+                 'youtube.disliked.video': 30717,
+                 'youtube.unrated.video': 30718,
+                 'youtube.subscribed.to.channel': 30719,
+                 'youtube.unsubscribed.from.channel': 30720,
+                 'youtube.uploads': 30726,
+                 'youtube.video.play_ask_for_quality': 30730,
+                 'youtube.key.requirement.notification': 30731,
+                 'youtube.video.comments': 30732,
+                 'youtube.video.comments.likes': 30733,
+                 'youtube.video.comments.replies': 30734,
+                 'youtube.video.comments.edited': 30735,
+                 }
 
     def __init__(self):
         kodion.AbstractProvider.__init__(self)
@@ -264,15 +240,7 @@ class Provider(kodion.AbstractProvider):
                     dev_id = dev_main['id']
                     dev_secret = dev_main['secret']
                 context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
-                return {
-                    'origin': dev_origin,
-                    'main': {
-                        'id': dev_id,
-                        'secret': dev_secret,
-                        'key': dev_key,
-                        'system': dev_system
-                    }
-                }
+                return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
         else:
             return dict()
 
@@ -528,13 +496,9 @@ class Provider(kodion.AbstractProvider):
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
         addon_id = context.get_param('addon_id', '')
         if incognito:
-            item_params.update({
-                                   'incognito': incognito
-                               })
+            item_params.update({'incognito': incognito})
         if addon_id:
-            item_params.update({
-                                   'addon_id': addon_id
-                               })
+            item_params.update({'addon_id': addon_id})
 
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads_playlist = playlists.get('uploads', '')
@@ -634,13 +598,9 @@ class Provider(kodion.AbstractProvider):
         addon_id = context.get_param('addon_id', '')
         item_params = {}
         if incognito:
-            item_params.update({
-                                   'incognito': incognito
-                               })
+            item_params.update({'incognito': incognito})
         if addon_id:
-            item_params.update({
-                                   'addon_id': addon_id
-                               })
+            item_params.update({'addon_id': addon_id})
 
         hide_folders = str(context.get_param('hide_folders', False)).lower() == 'true'
 
@@ -701,9 +661,7 @@ class Provider(kodion.AbstractProvider):
         # completed live events
         if settings.get_bool('youtube.folder.completed.live.show', True):
             live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.completed.live']),
-                                             context.create_uri(['special', 'completed_live'], params={
-                                                 'location': True
-                                             }),
+                                             context.create_uri(['special', 'completed_live'], params={'location': True}),
                                              image=context.create_resource_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
@@ -711,18 +669,14 @@ class Provider(kodion.AbstractProvider):
         # upcoming live events
         if settings.get_bool('youtube.folder.upcoming.live.show', True):
             live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.upcoming.live']),
-                                             context.create_uri(['special', 'upcoming_live'], params={
-                                                 'location': True
-                                             }),
+                                             context.create_uri(['special', 'upcoming_live'], params={'location': True}),
                                              image=context.create_resource_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # live events
         live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.live']),
-                                         context.create_uri(['special', 'live'], params={
-                                             'location': True
-                                         }),
+                                         context.create_uri(['special', 'live'], params={'location': True}),
                                          image=context.create_resource_path('media', 'live.png'))
         live_events_item.set_fanart(self.get_fanart(context))
         result.append(live_events_item)
@@ -802,11 +756,9 @@ class Provider(kodion.AbstractProvider):
             builtin = 'PlayMedia(%s)' if context.get_handle() == -1 else 'RunPlugin(%s)'
             if not redirect:
                 context.log_debug('Redirecting playback, handle is -1')
-            context.execute(builtin % context.create_uri(['play'], {
-                'video_id': params['video_id']
-            }))
+            context.execute(builtin % context.create_uri(['play'], {'video_id': params['video_id']}))
             return
-
+    
         if 'playlist_id' in params and (context.get_handle() != -1):
             builtin = 'RunPlugin(%s)'
             stream_url = context.create_uri(['play'], params)
@@ -856,41 +808,6 @@ class Provider(kodion.AbstractProvider):
     def _on_yt_specials(self, context, re_match):
         category = re_match.group('category')
         return yt_specials.process(category, self, context)
-
-    @kodion.RegisterProviderPath('^/tag/(?P<tag>[^/]+)/$')
-    def _on_yt_tags(self, context, re_match):
-        incognito = str(context.get_param('incognito', False)).lower() == 'true'
-        addon_id = context.get_param('addon_id', '')
-        result = []
-        tag = re_match.group('tag')
-        if tag == '-empty-':
-            all_channels = tags.get_empty_channels()
-        else:
-            all_channels = tags.get_channels(tag)
-        for channel in all_channels:
-            item_params = {}
-            if incognito:
-                item_params.update({
-                                       'incognito': incognito
-                                   })
-            if addon_id:
-                item_params.update({
-                                       'addon_id': addon_id
-                                   })
-            channel_id = channel[0]
-            title = channel[1]
-            image = channel[3]
-            item_uri = context.create_uri(['channel', channel_id], item_params)
-            context_menu = []
-            channel_item = DirectoryItem(title, item_uri, image=image)
-            channel_item.set_fanart(self.get_fanart(context))
-            yt_context_menu.append_add_tag(context_menu, self, context, channel_id)
-            if tag != '-empty-':
-                yt_context_menu.append_move_tag(context_menu, self, context, channel_id, tag)
-                yt_context_menu.append_remove_tag(context_menu, self, context, channel_id, tag)
-            channel_item.set_context_menu(context_menu)
-            result.append(channel_item)
-        return result
 
     # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/history/clear/$')
@@ -1242,85 +1159,6 @@ class Provider(kodion.AbstractProvider):
                 context.get_ui().show_notification(message=message)
         context.get_ui().refresh_container()
 
-    @kodion.RegisterProviderPath('^/tags/edit/$')
-    def manage_my_subscription_filter(self, context, re_match):
-        # import web_pdb; web_pdb.set_trace()
-        params = context.get_params()
-        action = params.get('action')
-        if not action:
-            return
-        if action == 'new':
-            keyboard = xbmc.Keyboard("", context.localize(self.LOCAL_MAP['youtube.inputnew.tag']))
-            keyboard.doModal()
-            if (keyboard.isConfirmed()):
-                title = keyboard.getText()
-                m = hashlib.md5()
-                nowdatetime = datetime.now()
-                m.update(nowdatetime.strftime("%d%m%Y%H%M%S%f"))
-                m.update(title)
-                tag_id = m.hexdigest()
-                title = title.decode("utf-8")
-                tags.create_tag(tag_id, title)
-                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.created.tag']) % title)
-        if action == 'delete':
-            tag_id = params.get('tag')
-            tag_name = tags.get_tag_name(tag_id)
-            dialog = xbmcgui.Dialog()
-            if dialog.yesno(context.get_name(), context.localize(self.LOCAL_MAP['youtube.questiondelete.tag']) % tag_name):
-                tags.delete_tag(tag_id)
-                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.deleted.tag']) % tag_name)
-        if action == 'add':
-            channel_id = params.get('channel_id')
-            channel_name = tags.get_channel_name(channel_id)
-            dialog = xbmcgui.Dialog()
-            tags_all = tags.get_tags_add(channel_id)
-            tags_id = []
-            tags_title = []
-            for tag in tags_all:
-                tags_id.append(tag[0])
-                tags_title.append(tag[1])
-            selectedtag = dialog.select(context.localize(self.LOCAL_MAP['youtube.selectadd.tag']) % channel_name, tags_title)
-            if (not selectedtag == -1):
-                tags.add_channel_tag(channel_id, tags_id[selectedtag])
-                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.added.tag']) % (channel_name, tags_title[selectedtag]))
-        if action == 'remove':
-            channel_id = params.get('channel_id')
-            channel_name = tags.get_channel_name(channel_id)
-            tag_id = params.get('tag')
-            tag_name = tags.get_tag_name(tag_id)
-            dialog = xbmcgui.Dialog()
-            if dialog.yesno(context.get_name(), context.localize(self.LOCAL_MAP['youtube.questionremove.tag']) % (channel_name, tag_name)):
-                tags.delete_channel_tag(channel_id, tag_id)
-                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.removed.tag']) % (channel_name, tag_name))
-        if action == 'rename':
-            tag_id = params.get('tag')
-            tag_name = tags.get_tag_name(tag_id)
-            keyboard = xbmc.Keyboard(tag_name, context.localize(self.LOCAL_MAP['youtube.inputrename.tag']))
-            keyboard.doModal()
-            if (keyboard.isConfirmed()):
-                new_name = keyboard.getText()
-                new_name = new_name.decode("utf-8")
-                tags.rename_tag(tag_id, new_name)
-                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.renamed.tag']) % (tag_name, new_name))
-        if action == 'move':
-            channel_id = params.get('channel_id')
-            channel_name = tags.get_channel_name(channel_id)
-            tag_id = params.get('tag')
-            tag_name = tags.get_tag_name(tag_id)
-            dialog = xbmcgui.Dialog()
-            tags_all = tags.get_tags_add(channel_id)
-            tags_id = []
-            tags_title = []
-            for tag in tags_all:
-                tags_id.append(tag[0])
-                tags_title.append(tag[1])
-            selectedtag = dialog.select(context.localize(self.LOCAL_MAP['youtube.selectmove.tag']) % (channel_name, tag_name), tags_title)
-            if (not selectedtag == -1):
-                tags.add_channel_tag(channel_id, tags_id[selectedtag])
-                tags.delete_channel_tag(channel_id, tag_id)
-                context.get_ui().show_notification(message=context.localize(self.LOCAL_MAP['youtube.moved.tag']) % (channel_name, tags_title, tags_title[selectedtag]))
-        context.get_ui().refresh_container()
-
     @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
     def maintenance_actions(self, context, re_match):
         maint_type = re_match.group('maint_type')
@@ -1364,16 +1202,14 @@ class Provider(kodion.AbstractProvider):
                     except:
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
         elif action == 'delete':
-            _maint_files = {
-                'function_cache': 'cache.sqlite',
-                'search_cache': 'search.sqlite',
-                'data_cache': 'data_cache.sqlite',
-                'playback_history': 'playback_history',
-                'settings_xml': 'settings.xml',
-                'api_keys': 'api_keys.json',
-                'access_manager': 'access_manager.json',
-                'temp_files': 'special://temp/plugin.video.youtube/'
-            }
+            _maint_files = {'function_cache': 'cache.sqlite',
+                            'search_cache': 'search.sqlite',
+                            'data_cache': 'data_cache.sqlite',
+                            'playback_history': 'playback_history',
+                            'settings_xml': 'settings.xml',
+                            'api_keys': 'api_keys.json',
+                            'access_manager': 'access_manager.json',
+                            'temp_files': 'special://temp/plugin.video.youtube/'}
             _file = _maint_files.get(maint_type, '')
             success = False
             if _file:
@@ -1491,12 +1327,8 @@ class Provider(kodion.AbstractProvider):
         playback_history = context.get_playback_history()
         items = playback_history.get_items([video_id])
         if not items or not items.get(video_id):
-            item_dict = {
-                'play_count': '0',
-                'total_time': '0.0',
-                'played_time': '0.0',
-                'played_percent': '0'
-            }
+            item_dict = {'play_count': '0', 'total_time': '0.0',
+                         'played_time': '0.0', 'played_percent': '0'}
         else:
             item_dict = items.get(video_id)
         if action == 'mark_unwatched':
@@ -1544,12 +1376,12 @@ class Provider(kodion.AbstractProvider):
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
-
-            # clear cache
+            
+            #clear cache
             cache = context.get_data_cache()
             cache_items_key = 'my-subscriptions-items'
             cache.set(cache_items_key, '[]')
-
+            
             my_subscriptions_item = DirectoryItem(
                 context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.my_subscriptions'])),
                 context.create_uri(['special', 'new_uploaded_videos_tv']),
@@ -1692,14 +1524,6 @@ class Provider(kodion.AbstractProvider):
                                                context.create_resource_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
-
-            # tags
-            if settings.get_bool('youtube.folder.tags.show', True) and (len(tags.get_channels('')) > 0):
-                tags_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.tags']),
-                                          context.create_uri(['special', 'tags']),
-                                          image=context.create_resource_path('media', 'channels.png'))
-                tags_item.set_fanart(self.get_fanart(context))
-                result.append(tags_item)
 
             # subscriptions
             if settings.get_bool('youtube.folder.subscriptions.show', True):
