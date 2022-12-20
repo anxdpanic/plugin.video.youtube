@@ -754,7 +754,7 @@ class VideoInfo(object):
                 r.raise_for_status()
                 player_response = r.json()
                 if player_response.get('playabilityStatus', {}).get('status', 'OK') in \
-                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE') and attempt == 0:
+                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED') and attempt == 0:
                     payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
                     payload['context']['client']['clientVersion'] = '16.20'
                     continue
@@ -855,7 +855,14 @@ class VideoInfo(object):
 
                     if 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
                         status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
-                        descript_reason = status_renderer.get('subreason', {}).get('simpleText')
+                        status_reason = status_renderer.get('reason', {})
+                        main_text_runs = status_reason.get('runs', [{}])
+                        reason_text = []
+                        descript_reason = ''
+                        for text in main_text_runs:
+                            reason_text.append(text.get('text', ''))
+                        if reason_text:
+                            descript_reason = ''.join(reason_text)
                         if descript_reason:
                             reason = descript_reason
                         else:

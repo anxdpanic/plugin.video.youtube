@@ -91,8 +91,7 @@ class YouTube(LoginClient):
             params['access_token'] = self._access_token
 
         try:
-            # _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-            pass
+            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
         except:
             _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
 
