@@ -855,7 +855,14 @@ class VideoInfo(object):
 
                     if 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
                         status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
-                        descript_reason = status_renderer.get('subreason', {}).get('simpleText')
+                        status_reason = status_renderer.get('reason', {})
+                        main_text_runs = status_reason.get('runs', [{}])
+                        reason_text = []
+                        descript_reason = ''
+                        for text in main_text_runs:
+                            reason_text.append(text.get('text', ''))
+                        if reason_text:
+                            descript_reason = ''.join(reason_text)
                         if descript_reason:
                             reason = descript_reason
                         else:
