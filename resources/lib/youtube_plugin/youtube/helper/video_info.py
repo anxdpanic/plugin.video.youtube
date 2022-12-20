@@ -754,7 +754,7 @@ class VideoInfo(object):
                 r.raise_for_status()
                 player_response = r.json()
                 if player_response.get('playabilityStatus', {}).get('status', 'OK') in \
-                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE') and attempt == 0:
+                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED') and attempt == 0:
                     payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
                     payload['context']['client']['clientVersion'] = '16.20'
                     continue
