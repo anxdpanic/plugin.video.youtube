@@ -5,28 +5,29 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2022-12-27 12:15+0000\n"
+"Last-Translator: Nao3Line Prez <n.yazawa6932@gmail.com>\n"
+"Language-Team: Indonesian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/id_id/>\n"
 "Language: id_id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Weblate 4.15\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Pengaya untuk YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr ""
+msgstr "YouTube adalah salah satu situs web berbagi video terbesar di dunia."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Plugin ini tidak didukung oleh Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -37,1200 +38,1200 @@ msgstr ""
 # Kodion Settings
 msgctxt "#30000"
 msgid "General"
-msgstr ""
+msgstr "Umum"
 
 msgctxt "#30001"
 msgid "Username"
-msgstr ""
+msgstr "Nama pengguna"
 
 msgctxt "#30002"
 msgid "Password"
-msgstr ""
+msgstr "Katasandi"
 
 # empty strings from id 30003 to 30006
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
-msgstr ""
+msgstr "Gunakan MPEG-DASH"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
-msgstr ""
+msgstr "Konfigurasikan InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Selalu tanyakan kualitas video"
 
 msgctxt "#30010"
 msgid "Video quality"
-msgstr ""
+msgstr "Kualitas video"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p SD"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p HD"
 
 msgctxt "#30013"
 msgid "1080p (HD)"
-msgstr ""
+msgstr "1080p FHD (2K)"
 
 msgctxt "#30014"
 msgid "2160p (4k)"
-msgstr ""
+msgstr "2160p UHD (4k)"
 
 msgctxt "#30015"
 msgid "4320p (8k)"
-msgstr ""
+msgstr "4320p UHDTV (8k)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "Siaran Live 1080p / Video 720p"
 
 # empty strings 30019
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr ""
+msgstr "Izinkan 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr ""
+msgstr "Tampilkan fanart"
 
 msgctxt "#30022"
 msgid "Items per page"
-msgstr ""
+msgstr "Item per halaman"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr ""
+msgstr "Ukuran riwayat pencarian"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr ""
+msgstr "Ukuran chace (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
-msgstr ""
+msgstr "Aktifkan wizard awal"
 
 msgctxt "#30026"
 msgid "Override view"
-msgstr ""
+msgstr "Ganti tampilan"
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr ""
+msgstr "Lihat: Bawaan"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr ""
+msgstr "Lihat: Episode"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr ""
+msgstr "Lihat: Film"
 
 msgctxt "#30030"
 msgid "Execute setup-wizard?"
-msgstr ""
+msgstr "Jalankan wizard awal?"
 
 msgctxt "#30031"
 msgid "Advanced"
-msgstr ""
+msgstr "Lanjutan"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr ""
+msgstr "Lihat: Acara TV"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr ""
+msgstr "Lihat: Lagu"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr ""
+msgstr "Lihat: Artis"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr ""
+msgstr "Lihat: Album"
 
 msgctxt "#30036"
 msgid "Support alternative player"
-msgstr ""
+msgstr "Dukung pemutar alternatif"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "ID daftar putar Tonton Nanti Kustom"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "ID daftar putar Riwayat Kustom"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Favourites"
-msgstr ""
+msgstr "Favorit"
 
 msgctxt "#30101"
 msgid "Add to addon favs"
-msgstr ""
+msgstr "Tambahkan ke favorit pengaya"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr ""
+msgstr "Cari"
 
 msgctxt "#30103"
 msgid "Library"
-msgstr ""
+msgstr "Pustaka"
 
 msgctxt "#30104"
 msgid "Highlights"
-msgstr ""
+msgstr "Sorotan"
 
 msgctxt "#30105"
 msgid "Archive"
-msgstr ""
+msgstr "Arsip"
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
-msgstr ""
+msgstr "Selanjutnya (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr ""
+msgstr "Nonton Nanti"
 
 msgctxt "#30108"
 msgid "Remove"
-msgstr ""
+msgstr "Hapus"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr ""
+msgstr "Video Terakhir"
 
 msgctxt "#30110"
 msgid "New Search"
-msgstr ""
+msgstr "Pencarian Baru"
 
 msgctxt "#30111"
 msgid "Sign In"
-msgstr ""
+msgstr "Masuk"
 
 msgctxt "#30112"
 msgid "Sign Out"
-msgstr ""
+msgstr "Keluar"
 
 msgctxt "#30113"
 msgid "Rename"
-msgstr ""
+msgstr "Nama ulang"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr ""
+msgstr "Konfirmasi penghapusan"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr ""
+msgstr "Konfirmasi penghapusan"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr ""
+msgstr "Hapus \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr ""
+msgstr "Hapus \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr ""
+msgstr "Hapus"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr ""
+msgstr "Tunggu..."
 
 msgctxt "#30120"
 msgid "Clear"
-msgstr ""
+msgstr "Hapus"
 
 # YouTube
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "Kunci API"
 
 msgctxt "#30202"
 msgid "API Id"
-msgstr ""
+msgstr "ID API"
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "Secret API"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr ""
+msgstr "Aktifkan kunci API pribadi"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Gunakan kumpulan kunci API prasetel"
 
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
-msgstr ""
+msgstr "Saluran"
 
 msgctxt "#30501"
 msgid "Playlists"
-msgstr ""
+msgstr "Daftarputar"
 
 msgctxt "#30502"
 msgid "Go to %s"
-msgstr ""
+msgstr "Ke %s"
 
 msgctxt "#30503"
 msgid "Show channel fanart"
-msgstr ""
+msgstr "Tampilkan fanart saluran"
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr ""
+msgstr "Langganan"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Berhenti berlangganan"
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr ""
+msgstr "Berlangganan"
 
 msgctxt "#30507"
 msgid "My Channel"
-msgstr ""
+msgstr "Saluranku"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr ""
+msgstr "Video yang disukai"
 
 msgctxt "#30509"
 msgid "History"
-msgstr ""
+msgstr "Riwayat"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr ""
+msgstr "Langgananku"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr ""
+msgstr "Video antrian"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr ""
+msgstr "Jelajahi Saluran"
 
 msgctxt "#30513"
 msgid "Popular right now"
-msgstr ""
+msgstr "Sedang populer"
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr ""
+msgstr "Video Terkait"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr ""
+msgstr "Hapus Otomatis dari 'Tonton Nanti'"
 
 msgctxt "#30516"
 msgid "Folders"
-msgstr ""
+msgstr "Folder"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr ""
+msgstr "Berlangganan ke %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr ""
+msgstr "Ke '%s'"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr ""
+msgstr "dan masukkan kode berikut:"
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr ""
+msgstr "Tambahkan ke..."
 
 msgctxt "#30521"
 msgid "Select playlist"
-msgstr ""
+msgstr "Pilih daftar putar"
 
 msgctxt "#30522"
 msgid "New playlist..."
-msgstr ""
+msgstr "Daftar putar baru..."
 
 msgctxt "#30523"
 msgid "Language"
-msgstr ""
+msgstr "Bahasa"
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr ""
+msgstr "Pilih bahasa"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr ""
+msgstr "Pilih wilayah"
 
 msgctxt "#30526"
 msgid "Adjust"
-msgstr ""
+msgstr "Atur"
 
 msgctxt "#30527"
 msgid "Language and region?"
-msgstr ""
+msgstr "Bahasa dan wilayah?"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr ""
+msgstr "Nilai..."
 
 msgctxt "#30529"
 msgid "I like this"
-msgstr ""
+msgstr "Suka"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr ""
+msgstr "Tidak suka"
 
 msgctxt "#30531"
 msgid "Play all"
-msgstr ""
+msgstr "Putar semua"
 
 msgctxt "#30532"
 msgid "Default"
-msgstr ""
+msgstr "Bawaan"
 
 msgctxt "#30533"
 msgid "Reverse"
-msgstr ""
+msgstr "Balik"
 
 msgctxt "#30534"
 msgid "Shuffle"
-msgstr ""
+msgstr "Acak"
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
-msgstr ""
+msgstr "Pilih urutan daftar putar"
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr ""
+msgstr "Perbarui daftar putar..."
 
 msgctxt "#30537"
 msgid "Play from here"
-msgstr ""
+msgstr "Putar dari sini"
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr ""
+msgstr "Video yang tak disukai"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr ""
+msgstr "Langsung"
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr ""
+msgstr "Putar dengan..."
 
 msgctxt "#30541"
 msgid "Show channel name in description"
-msgstr ""
+msgstr "Tampilkan nama saluran dalam deskripsi"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr ""
+msgstr "aliran rtmpe tidak didukung"
 
 msgctxt "#30543"
 msgid "Refresh"
-msgstr ""
+msgstr "Segarkan"
 
 msgctxt "#30544"
 msgid "More Links from the description"
-msgstr ""
+msgstr "Lebih banyak Tautan dari deskripsi"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr ""
+msgstr "Tidak ada tautan lebih lanjut yang ditemukan."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr ""
+msgstr "Silakan masuk dua kali!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr ""
+msgstr "Anda harus mengaktifkan dua aplikasi agar YouTube berfungsi dengan baik."
 
 msgctxt "#30548"
 msgid "More..."
-msgstr ""
+msgstr "Lebih..."
 
 msgctxt "#30549"
 msgid "No videos streams found"
-msgstr ""
+msgstr "Aliran video tidak ditemukan"
 
 msgctxt "#30550"
 msgid "Region"
-msgstr ""
+msgstr "Wilayah"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Rekomendasi"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Pemeliharaan"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Hapus basis data cache fungsi"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Hapus basis data riwayat pencarian"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Hapus cache fungsi"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Hapus Riwayat Pencarian"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "cache fungsi"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "riwayat pencarian"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Hapus settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Bahasa takarir"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Nihil"
 
 msgctxt "#30562"
 msgid "All"
-msgstr ""
+msgstr "Semua"
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Pengaturan"
 
 msgctxt "#30564"
 msgid "Setting, English"
-msgstr ""
+msgstr "Pengaturan, Inggris"
 
 msgctxt "#30565"
 msgid "English"
-msgstr ""
+msgstr "Inggris"
 
 msgctxt "#30566"
 msgid "Prompt"
-msgstr ""
+msgstr "Perintah"
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Tetapkan sebagai Tonton Nanti"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Hapus sebagai Tonton Nanti"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Yakin ingin menghapus '%s' sebagai daftar Tonton Nanti?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Yakin ingin mengganti daftar Tonton Nanti Anda saat ini dengan '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Tetapkan sebagai Riwayat"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Hapus sebagai Riwayat"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Yakin ingin menghapus '%s' sebagai daftar Riwayat Anda?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr ""
+msgstr "Yakin ingin mengganti daftar Riwayat Anda saat ini dengan '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Sukses"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Gagal"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Pengaturan"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
-msgstr ""
+msgstr "Paksa verifikasi sertifikat SSL"
 
 msgctxt "#30579"
 msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "MPEG-DASH diaktifkan di pengaturan YouTube, namun Adaptive InputStream tampaknya dinonaktifkan. Apakah Anda ingin mengaktifkan InputStream Adaptive sekarang?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
-msgstr ""
+msgstr "Setel ulang pengelola akses"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr ""
+msgstr "Yakin ingin menyetel ulang pengelola akses?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Putar otomatis video yang disarankan"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Otomatis"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Langgananku (Difilter)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
-msgstr ""
+msgstr "Daftar saluran yang difilter (dipisahkan koma)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Daftar hitam"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
-msgstr ""
+msgstr "Tambahkan ke filter Langgananku"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr ""
+msgstr "Hapus dari filter Langgananku"
 
 msgctxt "#30589"
 msgid "Added to My Subscriptions filter"
-msgstr ""
+msgstr "Ditambahkan ke filter Langgananku"
 
 msgctxt "#30590"
 msgid "Removed from My Subscriptions filter"
-msgstr ""
+msgstr "Dihapus dari filter Langgananku"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Ukuran Thumbnail"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Sedang (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Tinggi (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Pencarian aman"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Normal"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Ketat"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Diperbarui: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
-msgstr ""
+msgstr "Kunci API pribadi diaktifkan"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr ""
+msgstr "Gagal mengaktifkan kunci API pribadi. Tidak ada: %s"
 
 msgctxt "#30600"
 msgid "Configure subtitles"
-msgstr ""
+msgstr "Konfigurasi takarir"
 
 msgctxt "#30601"
 msgid "%s with %s fallback"
-msgstr ""
+msgstr "Fallback %s dengan %s"
 
 msgctxt "#30602"
 msgid "No auto-generated"
-msgstr ""
+msgstr "Tidak ada yang secara otomatis"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr ""
+msgstr "Gerbang umur"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
-msgstr ""
+msgstr "Izinkan konten yang menyinggung"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Pencarian cepat"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Pencarian Cepat (Penyamaran)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Hanya audio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Izinkan kunci pengembang"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Hapus histori tontonan"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Tindakan ini akan menghapus histori tontonan akun Anda dari semua perangkat. Anda tidak dapat membatalkan ini."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Daftar Putar Tersimpan"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Coba lagi"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Ambil id daftar putar Tonton Nanti"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Gagal mengambil id daftar putar Tonton Nanti. Tambahkan beberapa video ke Tonton Nanti melalui web/aplikasi dan coba lagi."
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Batal"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Harus masuk."
 
 msgctxt "#30617"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30618"
 msgid "Enable mpeg-dash proxy"
-msgstr ""
+msgstr "Aktifkan proksi mpeg-dash"
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Port %s sudah digunakan. Tidak dapat memulai server http."
 
 msgctxt "#30621"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
-msgstr ""
+msgstr "Proksi diperlukan untuk mpeg-dash vods (lihat Server HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Pembelian"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Instal Pembantu InputStream"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
-msgstr ""
+msgstr "Membutuhkan Kodi 17 keatas"
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "Pembantu InputStream sudah diinstal."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Hapus file sementara"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Nilai video setelah menonton"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "Server HTTP"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
-msgstr ""
+msgstr "Daftar putih IP (dibatasi koma)"
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Simpan"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Berhasil diperbarui: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Aktifkan halaman konfigurasi API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr ""
+msgstr "http://<ipaddress>:<port>/api (lihat server HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Konfigurasi API Pengaya YouTube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Tidak ada perubahan yang terdeteksi, kunci API tidak diperbarui."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr ""
+msgstr "Kunci API pribadi diaktifkan."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr ""
+msgstr "Kunci API pribadi dinonaktifkan."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr ""
+msgstr "Tandai halaman ini untuk menambahkan kunci Anda dengan cepat di masa mendatang."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr ""
+msgstr "Menemukan kunci API pribadi di api_keys.json, apakah Anda ingin memulihkannya? Memilih tidak akan menimpanya."
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Pulihkan"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Hapus api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Hapus access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
-msgstr ""
+msgstr "Dengarkan di IP"
 
 msgctxt "#30644"
 msgid "Select listen IP"
-msgstr ""
+msgstr "Pilih mendengarkan IP"
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Segarkan setelah menonton"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Langsung Mendatang"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Live Selesai"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
-msgstr ""
+msgstr "Kunci API salah. Pengaturan - API - Kunci API"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr ""
+msgstr "Id klien salah. Pengaturan - API - Id API"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr ""
+msgstr "Secret Klien salah. Pengaturan - API - Secret API"
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Lokasi"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Radius Lokasi (km)"
 
 msgctxt "#30653"
 msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr ""
+msgstr "Lakukan geolokasi? Digunakan untuk [B]Lokasiku[/B]"
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Lokasiku"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Ganti pengguna"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Pengguna baru"
 
 msgctxt "#30657"
 msgid "Unnamed"
-msgstr ""
+msgstr "Tak bernama"
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Masukkan nama untuk pengguna ini"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Pengguna sekarang adalah '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Pengguna"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Tambahkan pengguna"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Hapus pengguna"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Nama ulang pengguna"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Ganti pengguna"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Beralih ke '%s' sekarang?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "Menghapus '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "Menamakan ulang '%s' ke '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Mainkan menghitung persentase minimum"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Tandai belum ditonton"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Tandai ditonton"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Hapus riwayat pemutaran"
 
 msgctxt "#30672"
 msgid "Delete playback history"
-msgstr ""
+msgstr "Hapus riwayat pemutaran"
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "riwayat pemutaran"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Setel ulang titik resume"
 
 msgctxt "#30675"
 msgid "Use playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Gunakan riwayat pemutaran (ditonton, lanjutkan pelacakan)"
 
 msgctxt "#30676"
 msgid "Just now"
-msgstr ""
+msgstr "Baru saja"
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Semenit yang lalu"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Baru saja"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Sejam yang lalu"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Dua jam yang lalu"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Tiga jam yang lalu"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Kemarin"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Dua hari yang lalu"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Hari ini"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Hapus basis data cache data"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Hapus cache data"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "data cache"
 
 msgctxt "#30688"
 msgid "Use for videos"
-msgstr ""
+msgstr "Gunakan untuk video"
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Gunakan untuk streaming langsung"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr ""
+msgstr "InputStream Adaptive >= 2.0.12 diperlukan untuk streaming langsung"
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Sedang tayang"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Dalam menit"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Tayang segera"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Dalam sejam"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Dalam dua jam"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Tayang hari ini"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Besok"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Cek IP saya"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "Server HTTP tidak berjalan"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
-msgstr ""
+msgstr "IP klien adalah %s"
 
 msgctxt "#30701"
 msgid "Failed to obtain client IP"
-msgstr ""
+msgstr "Gagal mendapatkan IP klien"
 
 msgctxt "#30702"
 msgid "Play with subtitles"
-msgstr ""
+msgstr "Bermain dengan takarir"
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Yakin?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls"
-msgstr ""
+msgstr "Gunakan url situs web YouTube"
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Unduh takarir"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Unduh takarir sebelum memulai pemutaran? (Bawaan: Tidak)"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Tak berjudul"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "Putar hanya audio"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Gagal mengambil id daftar putar Tonton Nanti. Untuk meningkatkan peluang pengambilan, tambahkan 8-10 video ke Tonton Nanti melalui web/aplikasi dan coba lagi."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr ""
+msgstr "Gagal mengambil id daftar putar Tonton Nanti. Coba lagi besok tanpa menghapus video apa pun."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
-msgstr ""
+msgstr "Mencari Tonton Nanti... Halaman %s"
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
-msgstr ""
+msgstr "Beri nilai video dalam daftar putar"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Ditambahkan ke Tonton Nanti"
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Ditambahkan ke daftar putar"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Dihapus dari daftar putar"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Video disukai"
 
 msgctxt "#30717"
 msgid "Disliked video"
-msgstr ""
+msgstr "Video tak disukai"
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Nilai dihapus"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Berlangganan saluran"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Berhenti berlangganan dari saluran"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
-msgstr ""
+msgstr "Default ke set adaptasi WEBM (4K)"
 
 msgctxt "#30722"
 msgid "HDR"
-msgstr ""
+msgstr "HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Proksi diperlukan untuk mpeg-dash vods (lihat HTTP Server)[CR]> 1080p dan HDR memerlukan InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Limit to 30fps"
-msgstr ""
+msgstr "Batasi 30fps"
 
 msgctxt "#30725"
 msgid "1440p (HD)"
-msgstr ""
+msgstr "1440p FHD+ (2K)"
 
 msgctxt "#30726"
 msgid "Uploads"
-msgstr ""
+msgstr "Unggahan"
 
 msgctxt "#30727"
 msgid "Adaptive (MP4/H264)"
-msgstr ""
+msgstr "Adaptif (MP4/H264)"
 
 msgctxt "#30728"
 msgid "Adaptive (WEBM/VP9)"
-msgstr ""
+msgstr "Adaptif (WEBM/VP9)"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
-msgstr ""
+msgstr "Pencarian ramah jarak jauh"
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Putar (dengan kualitas)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
-msgstr ""
+msgstr "Pengaya YouTube sekarang mengharuskan Anda menggunakan kunci API Anda sendiri.[CR]Untuk informasi lebih lanjut lihat wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Maaf untuk ketidaknyamanan ini."
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Komentar"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Suka"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Balasan"
 
 msgctxt "#30735"
 msgid "Edited"
-msgstr ""
+msgstr "Disunting"
 
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
-msgstr ""
+msgstr "Sembunyikan video pendek (1 menit atau kurang)"
