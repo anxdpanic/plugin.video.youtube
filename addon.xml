@@ -38,6 +38,7 @@
         <summary lang="he_IL">תוסף עבור YouTube</summary>
         <summary lang="hr_HR">Dodatak za YouTube</summary>
         <summary lang="hu_HU">YouTube kiegészítő</summary>
+        <summary lang="id_ID">Pengaya untuk YouTube</summary>
         <summary lang="it_IT">Plugin per YouTube</summary>
         <summary lang="ko_KR">유튜브 플러그인</summary>
         <summary lang="nb_NO">Tillegg for YouTube</summary>
@@ -62,6 +63,7 @@
         <description lang="he_IL">YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם.</description>
         <description lang="hr_HR">YouTube je jedna od najvećih stranica za dijeljenje video sadržaja na svijetu.</description>
         <description lang="hu_HU">A YouTube világ egyik legnagyobb videómegosztó weboldala.</description>
+        <description lang="id_ID">YouTube adalah salah satu situs web berbagi video terbesar di dunia.</description>
         <description lang="it_IT">YouTube è uno dei più grandi siti web di condivisione video del mondo.</description>
         <description lang="ko_KR">유튜브는 세상에서 가장 큰 동영상 공유 사이트 중의 하나입니다.</description>
         <description lang="nb_NO">YouTube er en av verdens største nettsider for videodeling.</description>
@@ -83,6 +85,7 @@
         <disclaimer lang="fi_FI">Google ei tue tätä lisäosaa</disclaimer>
         <disclaimer lang="fr_FR">Ce module n&apos;est pas validé par Google</disclaimer>
         <disclaimer lang="hr_HR">Ovaj dodatak nije podržan od strane Googlea</disclaimer>
+        <disclaimer lang="id_ID">Plugin ini tidak didukung oleh Google</disclaimer>
         <disclaimer lang="it_IT">Questo plugin non è approvato da Google</disclaimer>
         <disclaimer lang="ko_KR">이 플러그인은 Google의 허가를 받지 않았습니다</disclaimer>
         <disclaimer lang="nl_NL">Deze plug-in wordt niet door Google ondersteund</disclaimer>
