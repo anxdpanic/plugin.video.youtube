@@ -63,7 +63,7 @@ class AbstractSettings(object):
         return value == 'true'
 
     def get_items_per_page(self):
-        return self.get_int(constants.setting.ITEMS_PER_PAGE, 50, lambda x: (x + 1) * 5)
+        return self.get_int(constants.setting.ITEMS_PER_PAGE, 50)
 
     def get_video_quality(self, quality_map_override=None):
         vq_dict = {0: 240,
