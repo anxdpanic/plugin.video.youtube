@@ -101,7 +101,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 except IOError:
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
                     self.send_error(404, response)
-            elif api_config_enabled and stripped_path == '/api':
+            elif api_config_enabled and stripped_path.lower() == '/api':
                 html = self.api_config_page()
                 html = html.encode('utf-8')
                 self.send_response(200)
