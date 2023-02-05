@@ -97,6 +97,9 @@ class XbmcRunner(AbstractProviderRunner):
             item = xbmcgui.ListItem(label=directory_item.get_name(), offscreen=True)
         else:
             item = xbmcgui.ListItem(label=directory_item.get_name())
+        if major_version >= 20:
+            from infotagger.listitem import ListItemInfoTag
+            info_tag = ListItemInfoTag(item, tag_type='video')
 
         # only set fanart is enabled
         if directory_item.get_fanart() and self.settings.show_fanart():
@@ -111,8 +114,10 @@ class XbmcRunner(AbstractProviderRunner):
         if directory_item.get_context_menu() is not None:
             item.addContextMenuItems(directory_item.get_context_menu(),
                                      replaceItems=directory_item.replace_context_menu())
-
-        item.setInfo(type='video', infoLabels=info_labels.create_from_item(directory_item))
+        if major_version >= 20:
+            info_tag.set_info(info_labels.create_from_item(directory_item))
+        else:
+            item.setInfo(type='video', infoLabels=info_labels.create_from_item(directory_item))
         item.setPath(directory_item.get_uri())
 
         is_folder = True
