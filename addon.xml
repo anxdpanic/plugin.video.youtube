@@ -14,9 +14,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fixup] resolve playback history not being updated
-[add] add opus audio support
-[upd] use more descript reasons for failed playback
+[chg] make httpd /api url case insensitive due to skin choice of uppercase settings text
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>
