@@ -14,7 +14,9 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
+[fix] Nexus compatibility with InfoTagVideo |contrib: jurialmunkey|
 [chg] make httpd /api url case insensitive due to skin choice of uppercase settings text
+[chg] use listitem property for Inputstream Adaptive headers instead of url piped on Nexus+
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>
