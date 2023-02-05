@@ -48,7 +48,7 @@ def to_play_item(context, play_item):
             list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
 
     if not play_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
-            play_item.get_headers() and play_item.get_uri().startswith('http'):
+            play_item.get_headers() and play_item.get_uri().startswith('http') and major_version < 20:
         play_item.set_uri('|'.join([play_item.get_uri(), play_item.get_headers()]))
 
     if settings.is_support_alternative_player_enabled() and \
@@ -66,6 +66,7 @@ def to_play_item(context, play_item):
         list_item.setProperty(inputstream_property, 'inputstream.adaptive')
         list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if play_item.get_headers():
+            list_item.setProperty('inputstream.adaptive.manifest_headers', play_item.get_headers())
             list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
 
         if play_item.get_license_key():
