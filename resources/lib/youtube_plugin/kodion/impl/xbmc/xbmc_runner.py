@@ -11,6 +11,7 @@
 import xbmcgui
 import xbmcplugin
 
+from ....external.listitem import ListItemInfoTag
 from ..abstract_provider_runner import AbstractProviderRunner
 from ...exceptions import KodionException
 from ...items import *
@@ -98,7 +99,6 @@ class XbmcRunner(AbstractProviderRunner):
         else:
             item = xbmcgui.ListItem(label=directory_item.get_name())
         if major_version >= 20:
-            from infotagger.listitem import ListItemInfoTag
             info_tag = ListItemInfoTag(item, tag_type='video')
 
         # only set fanart is enabled

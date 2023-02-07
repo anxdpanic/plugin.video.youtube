@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="6.8.25~alpha1" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="6.8.25~alpha2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="2.20.0"/>
         <import addon="script.module.six" version="1.11.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
-        <import addon="script.module.infotagger" version="0.0.3" />
         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">

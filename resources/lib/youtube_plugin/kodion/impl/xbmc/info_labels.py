@@ -29,6 +29,11 @@ def _process_string_value(info_labels, name, param):
         info_labels[name] = param
 
 
+def _process_studios(info_labels, name, param):
+    if param is not None:
+        info_labels[name] = [param]
+
+
 def _process_audio_rating(info_labels, param):
     if param is not None:
         rating = int(param)
@@ -122,7 +127,7 @@ def create_from_item(base_item):
         _process_int_value(info_labels, 'playcount', base_item.get_play_count())
 
         # studio
-        _process_string_value(info_labels, 'studio', base_item.get_studio())
+        _process_studios(info_labels, 'studio', base_item.get_studio())
 
         # 'artist' = [] (list)
         _process_list_value(info_labels, 'artist', base_item.get_artist())
