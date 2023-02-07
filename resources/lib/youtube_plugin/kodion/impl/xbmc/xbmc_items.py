@@ -10,7 +10,6 @@
 
 import xbmcgui
 
-from ....external.listitem import ListItemInfoTag
 from ...items import VideoItem, AudioItem, UriItem
 from ... import utils
 from . import info_labels
@@ -34,6 +33,7 @@ def to_play_item(context, play_item):
     else:
         list_item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if major_version >= 20:
+        from ....external.listitem import ListItemInfoTag
         info_tag = ListItemInfoTag(list_item, tag_type='video')
 
     if not is_strm:
@@ -121,6 +121,7 @@ def to_video_item(context, video_item):
     else:
         item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if major_version >= 20:
+        from ....external.listitem import ListItemInfoTag
         info_tag = ListItemInfoTag(item, tag_type='video')
     if video_item.get_fanart() and settings.show_fanart():
         fanart = video_item.get_fanart()
@@ -195,6 +196,7 @@ def to_audio_item(context, audio_item):
     else:
         item = xbmcgui.ListItem(label=utils.to_unicode(title))
     if major_version >= 20:
+        from ....external.listitem import ListItemInfoTag
         info_tag = ListItemInfoTag(item, tag_type='music')
     if audio_item.get_fanart() and settings.show_fanart():
         fanart = audio_item.get_fanart()
