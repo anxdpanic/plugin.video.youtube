@@ -92,8 +92,7 @@ def play_video(provider, context):
         playback_stats = video_stream.get('playback_stats')
 
         if use_history:
-            major_version = context.get_system_version().get_version()[0]
-            if video_item.get_start_time() and video_item.use_dash() and major_version > 17:
+            if video_item.get_start_time() and video_item.use_dash():
                 seek_time = video_item.get_start_time()
             play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
 

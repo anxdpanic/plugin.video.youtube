@@ -20,9 +20,8 @@ from . import info_labels
 def to_play_item(context, play_item):
     context.log_debug('Converting PlayItem |%s|' % play_item.get_uri())
 
-    major_version = context.get_system_version().get_version()[0]
 
-    is_strm = str(context.get_param('strm', False)).lower() == 'true' and major_version >= 18
+    is_strm = str(context.get_param('strm', False)).lower() == 'true'
 
     thumb = play_item.get_image() if play_item.get_image() else u'DefaultVideo.png'
     title = play_item.get_title() if play_item.get_title() else play_item.get_name()
@@ -30,27 +29,18 @@ def to_play_item(context, play_item):
     settings = context.get_settings()
     if is_strm:
         list_item = xbmcgui.ListItem(offscreen=True)
-    elif major_version > 17:
-        list_item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
     else:
-        list_item = xbmcgui.ListItem(label=utils.to_unicode(title))
-    if major_version >= 20:
-        info_tag = ListItemInfoTag(list_item, tag_type='video')
+        list_item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
+
+    info_tag = ListItemInfoTag(list_item, tag_type='video')
 
     if not is_strm:
         list_item.setProperty('IsPlayable', 'true')
 
         if play_item.get_fanart() and settings.show_fanart():
             fanart = play_item.get_fanart()
-        if major_version <= 15:
-            list_item.setArt({'thumb': thumb, 'fanart': fanart})
-            list_item.setIconImage(thumb)
-        else:
-            list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
 
-    if not play_item.use_dash() and not settings.is_support_alternative_player_enabled() and \
-            play_item.get_headers() and play_item.get_uri().startswith('http') and major_version < 20:
-        play_item.set_uri('|'.join([play_item.get_uri(), play_item.get_headers()]))
+        list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
 
     if settings.is_support_alternative_player_enabled() and \
             settings.alternative_player_web_urls() and \
@@ -59,8 +49,6 @@ def to_play_item(context, play_item):
 
     if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
         inputstream_property = 'inputstream'
-        if major_version < 19:
-            inputstream_property += 'addon'
        
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
@@ -100,36 +88,27 @@ def to_play_item(context, play_item):
         if 'duration' in _info_labels:
             duration = _info_labels['duration']
             del _info_labels['duration']
-            func = info_tag.add_stream_info if major_version >= 20 else list_item.addStreamInfo
-            func('video', {'duration': duration})
+            info_tag.add_stream_info('video', {'duration': duration})
 
-        if major_version >= 20:
-            info_tag.set_info(_info_labels)
-        else:
-            list_item.setInfo(type='video', infoLabels=_info_labels)
+        info_tag.set_info(_info_labels)
+
     return list_item
 
 
 def to_video_item(context, video_item):
     context.log_debug('Converting VideoItem |%s|' % video_item.get_uri())
-    major_version = context.get_system_version().get_version()[0]
     thumb = video_item.get_image() if video_item.get_image() else u'DefaultVideo.png'
     title = video_item.get_title() if video_item.get_title() else video_item.get_name()
     fanart = ''
     settings = context.get_settings()
-    if major_version > 17:
-        item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
-    else:
-        item = xbmcgui.ListItem(label=utils.to_unicode(title))
-    if major_version >= 20:
-        info_tag = ListItemInfoTag(item, tag_type='video')
+
+    item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
+    info_tag = ListItemInfoTag(item, tag_type='video')
+
     if video_item.get_fanart() and settings.show_fanart():
         fanart = video_item.get_fanart()
-    if major_version <= 15:
-        item.setArt({'thumb': thumb, 'fanart': fanart})
-        item.setIconImage(thumb)
-    else:
-        item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
+
+    item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
 
     if video_item.get_context_menu() is not None:
         item.addContextMenuItems(video_item.get_context_menu(), replaceItems=video_item.replace_context_menu())
@@ -161,13 +140,9 @@ def to_video_item(context, video_item):
     if 'duration' in _info_labels:
         duration = _info_labels['duration']
         del _info_labels['duration']
-        func = info_tag.add_stream_info if major_version >= 20 else item.addStreamInfo
-        func('video', {'duration': duration})
+        info_tag.add_stream_info('video', {'duration': duration})
 
-    if major_version >= 20:
-        info_tag.set_info(_info_labels)
-    else:
-        item.setInfo(type='video', infoLabels=_info_labels)
+    info_tag.set_info(_info_labels)
 
     if video_item.get_channel_id():  # make channel_id property available for keymapping
         item.setProperty('channel_id', video_item.get_channel_id())
@@ -186,44 +161,30 @@ def to_video_item(context, video_item):
 
 def to_audio_item(context, audio_item):
     context.log_debug('Converting AudioItem |%s|' % audio_item.get_uri())
-    major_version = context.get_system_version().get_version()[0]
     thumb = audio_item.get_image() if audio_item.get_image() else u'DefaultAudio.png'
     title = audio_item.get_name()
     fanart = ''
     settings = context.get_settings()
-    if major_version > 17:
-        item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
-    else:
-        item = xbmcgui.ListItem(label=utils.to_unicode(title))
-    if major_version >= 20:
-        info_tag = ListItemInfoTag(item, tag_type='music')
+    item = xbmcgui.ListItem(label=utils.to_unicode(title), offscreen=True)
+
+    info_tag = ListItemInfoTag(item, tag_type='music')
     if audio_item.get_fanart() and settings.show_fanart():
         fanart = audio_item.get_fanart()
-    if major_version <= 15:
-        item.setArt({'thumb': thumb, 'fanart': fanart})
-        item.setIconImage(thumb)
-    else:
-        item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
+
+    item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
 
     if audio_item.get_context_menu() is not None:
         item.addContextMenuItems(audio_item.get_context_menu(), replaceItems=audio_item.replace_context_menu())
 
     item.setProperty('IsPlayable', 'true')
 
-    if major_version >= 20:
-        info_tag.set_info(info_labels.create_from_item(audio_item))
-    else:
-        item.setInfo(type='music', infoLabels=info_labels.create_from_item(audio_item))
+    info_tag.set_info(info_labels.create_from_item(audio_item))
     return item
 
 
 def to_uri_item(context, base_item):
     context.log_debug('Converting UriItem')
-    major_version = context.get_system_version().get_version()[0]
-    if major_version > 17:
-        item = xbmcgui.ListItem(path=base_item.get_uri(), offscreen=True)
-    else:
-        item = xbmcgui.ListItem(path=base_item.get_uri())
+    item = xbmcgui.ListItem(path=base_item.get_uri(), offscreen=True)
     item.setProperty('IsPlayable', 'true')
     return item
 
