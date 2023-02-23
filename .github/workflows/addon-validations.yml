@@ -25,17 +25,7 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install git+https://github.com/xbmc/addon-check.git
 
-      - name: Kodi Add-on Checker (Isengard)
-        id: kodi-addon-checker-isengard
+      - name: Kodi Add-on Checker (Nexus)
+        id: kodi-addon-checker-nexus
         run: |
-          kodi-addon-checker ${{ github.event.repository.name }} --branch=isengard
-
-      - name: Staging for Matrix
-        run: |
-          git apply .patches/matrix-kodi-addon-checker.patch
-        working-directory: ${{ github.event.repository.name }}
-
-      - name: Kodi Add-on Checker (Matrix)
-        id: kodi-addon-checker-matrix
-        run: |
-          kodi-addon-checker ${{ github.event.repository.name }} --branch=matrix
+          kodi-addon-checker ${{ github.event.repository.name }} --branch=nexus
