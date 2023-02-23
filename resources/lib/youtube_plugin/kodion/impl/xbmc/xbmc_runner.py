@@ -11,6 +11,8 @@
 import xbmcgui
 import xbmcplugin
 
+from infotagger.listitem import ListItemInfoTag
+
 from ..abstract_provider_runner import AbstractProviderRunner
 from ...exceptions import KodionException
 from ...items import *
@@ -88,36 +90,25 @@ class XbmcRunner(AbstractProviderRunner):
         """
 
     def _add_directory(self, context, directory_item, item_count=0):
-        major_version = context.get_system_version().get_version()[0]
-
         art = {'icon': 'DefaultFolder.png',
                'thumb': directory_item.get_image()}
 
-        if major_version > 17:
-            item = xbmcgui.ListItem(label=directory_item.get_name(), offscreen=True)
-        else:
-            item = xbmcgui.ListItem(label=directory_item.get_name())
-        if major_version >= 20:
-            from ....external.listitem import ListItemInfoTag
-            info_tag = ListItemInfoTag(item, tag_type='video')
+        item = xbmcgui.ListItem(label=directory_item.get_name(), offscreen=True)
+
+        info_tag = ListItemInfoTag(item, tag_type='video')
 
         # only set fanart is enabled
         if directory_item.get_fanart() and self.settings.show_fanart():
             art['fanart'] = directory_item.get_fanart()
 
-        if major_version <= 15:
-            item.setArt(art)
-            item.setIconImage(art['icon'])
-        else:
-            item.setArt(art)
+
+        item.setArt(art)
 
         if directory_item.get_context_menu() is not None:
             item.addContextMenuItems(directory_item.get_context_menu(),
                                      replaceItems=directory_item.replace_context_menu())
-        if major_version >= 20:
-            info_tag.set_info(info_labels.create_from_item(directory_item))
-        else:
-            item.setInfo(type='video', infoLabels=info_labels.create_from_item(directory_item))
+
+        info_tag.set_info(info_labels.create_from_item(directory_item))
         item.setPath(directory_item.get_uri())
 
         is_folder = True
@@ -146,24 +137,15 @@ class XbmcRunner(AbstractProviderRunner):
                                     totalItems=item_count)
 
     def _add_image(self, context, image_item, item_count):
-        major_version = context.get_system_version().get_version()[0]
-
         art = {'icon': 'DefaultPicture.png',
                'thumb': image_item.get_image()}
 
-        if major_version > 17:
-            item = xbmcgui.ListItem(label=image_item.get_name(), offscreen=True)
-        else:
-            item = xbmcgui.ListItem(label=image_item.get_name())
+        item = xbmcgui.ListItem(label=image_item.get_name(), offscreen=True)
 
         if image_item.get_fanart() and self.settings.show_fanart():
             art['fanart'] = image_item.get_fanart()
 
-        if major_version <= 15:
-            item.setArt(art)
-            item.setIconImage(art['icon'])
-        else:
-            item.setArt(art)
+        item.setArt(art)
 
         if image_item.get_context_menu() is not None:
             item.addContextMenuItems(image_item.get_context_menu(), replaceItems=image_item.replace_context_menu())

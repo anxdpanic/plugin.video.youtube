@@ -85,11 +85,8 @@ class XbmcContextUI(AbstractContextUI):
     def on_select(self, title, items=None):
         if items is None:
             items = []
-        major_version = self._context.get_system_version().get_version()[0]
-        if isinstance(items[0], tuple) and len(items[0]) == 4 and major_version <= 16:
-            items = [(item[0], item[2]) for item in items]
 
-        use_details = (isinstance(items[0], tuple) and len(items[0]) == 4 and major_version > 16)
+        use_details = (isinstance(items[0], tuple) and len(items[0]) == 4)
 
         _dict = {}
         _items = []
