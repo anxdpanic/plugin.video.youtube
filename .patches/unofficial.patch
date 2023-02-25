@@ -3,28 +3,6 @@ From: anxdpanic <anxdpanic@users.noreply.github.com>
 Date: Sat, 25 Feb 2023 14:57:44 -0500
 Subject: [PATCH] update changelog
 
----
- addon.xml | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/addon.xml b/addon.xml
-index 59009bb..4ecb584 100644
---- a/addon.xml
-+++ b/addon.xml
-@@ -14,7 +14,9 @@
-     <extension point="xbmc.python.module" library="resources/lib/"/>
-     <extension point="xbmc.addon.metadata">
-         <news>
--[chg] add-on is now Nexus+ compatible, removed compatibility with older versions of Kodi
-+[rem] support for versions of Kodi pre-Nexus v20
-+[rem] support for python 2
-+[rem] dependency on six
- [upd] Translations updated from Kodi Weblate
-         </news>
-         <assets>
--- 
-2.33.0.windows.2
-
 From b2c43a85accecd08471f0446ac587bbcf6539bbe Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
