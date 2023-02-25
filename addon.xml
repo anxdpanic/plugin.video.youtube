@@ -14,7 +14,9 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[chg] add-on is now Nexus+ compatible, removed compatibility with older versions of Kodi
+[rem] support for versions of Kodi pre-Nexus v20
+[rem] support for python 2
+[rem] dependency on six
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>
