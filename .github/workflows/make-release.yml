@@ -89,8 +89,8 @@ jobs:
           draft: false
           prerelease: ${{ steps.release.outputs.pre-release }}
 
-      - name: Upload Zip (Isengard)
-        id: upload-isengard
+      - name: Upload Zip (Nexus)
+        id: upload-nexus
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -100,8 +100,8 @@ jobs:
           asset_path: ${{ steps.zip-isengard.outputs.filename }}
           asset_content_type: application/zip
 
-      - name: Upload Zip (Isengard-Unofficial)
-        id: upload-unofficial-isengard
+      - name: Upload Zip (Nexus-Unofficial)
+        id: upload-unofficial-nexus
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -109,26 +109,4 @@ jobs:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_name: ${{ steps.zip-unofficial-isengard.outputs.filename }}
           asset_path: ${{ steps.zip-unofficial-isengard.outputs.filename }}
-          asset_content_type: application/zip
-
-      - name: Upload Zip (Matrix)
-        id: upload-matrix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-matrix.outputs.filename }}
-          asset_path: ${{ steps.zip-matrix.outputs.filename }}
-          asset_content_type: application/zip
-
-      - name: Upload Zip (Matrix-Unofficial)
-        id: upload-unofficial-matrix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-unofficial-matrix.outputs.filename }}
-          asset_path: ${{ steps.zip-unofficial-matrix.outputs.filename }}
           asset_content_type: application/zip

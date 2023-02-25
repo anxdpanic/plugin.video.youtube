@@ -13,9 +13,6 @@ import time
 from datetime import date, datetime, timedelta
 from datetime import time as dt_time
 
-from six import PY2
-from six import text_type
-
 from ..exceptions import KodionException
 
 __RE_MATCH_TIME_ONLY__ = re.compile(r'^(?P<hour>[0-9]{2})([:]?(?P<minute>[0-9]{2})([:]?(?P<second>[0-9]{2}))?)?$')
@@ -28,11 +25,7 @@ now = datetime.now
 
 
 def py2_utf8(text):
-    result = text
-    if PY2 and isinstance(result, text_type):
-        return result.encode('utf-8', 'ignore')
-
-    return result
+    return text
 
 
 def parse(datetime_string, localize=True):

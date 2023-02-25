@@ -13,14 +13,7 @@ import datetime
 
 from .base_item import BaseItem
 
-try:
-    from six.moves import html_parser
-
-    unescape = html_parser.HTMLParser().unescape
-except AttributeError:
-    import html
-
-    unescape = html.unescape
+from html import unescape
 
 __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?')
 

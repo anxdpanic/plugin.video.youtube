@@ -8,11 +8,8 @@
 """
 
 import datetime
+import pickle
 import sqlite3
-
-from six import PY2
-# noinspection PyPep8Naming
-from six.moves import cPickle as pickle
 
 from .storage import Storage
 
@@ -26,8 +23,6 @@ class PlaybackHistory(Storage):
 
     def get_items(self, keys):
         def _decode(obj):
-            if PY2:
-                obj = str(obj)
             return pickle.loads(obj)
 
         self._open()

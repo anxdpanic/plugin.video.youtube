@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import string_types
-
 import xbmcgui
 from ..abstract_progress_dialog import AbstractProgressDialog
 
@@ -33,7 +31,7 @@ class XbmcProgressDialogBG(AbstractProgressDialog):
         self._position += steps
         position = int((100.0 / float(self._total)) * float(self._position))
 
-        if isinstance(text, string_types):
+        if isinstance(text, str):
             self._dialog.update(percent=position, message=text)
         else:
             self._dialog.update(percent=position)

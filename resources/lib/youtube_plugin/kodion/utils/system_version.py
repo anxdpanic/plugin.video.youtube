@@ -8,16 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import map
-from six import string_types
-from six import python_2_unicode_compatible
-
 import json
 
 import xbmc
 
 
-@python_2_unicode_compatible
 class SystemVersion(object):
     def __init__(self, version, releasename, appname):
         if not isinstance(version, tuple):
@@ -25,12 +20,12 @@ class SystemVersion(object):
         else:
             self._version = version
 
-        if not releasename or not isinstance(releasename, string_types):
+        if not releasename or not isinstance(releasename, str):
             self._releasename = 'UNKNOWN'
         else:
             self._releasename = releasename
 
-        if not appname or not isinstance(appname, string_types):
+        if not appname or not isinstance(appname, str):
             self._appname = 'UNKNOWN'
         else:
             self._appname = appname

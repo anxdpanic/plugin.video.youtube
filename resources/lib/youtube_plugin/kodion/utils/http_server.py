@@ -7,15 +7,14 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import BaseHTTPServer
-from six.moves.urllib.parse import parse_qs, urlparse
-from six.moves import range
-
 import json
 import os
 import re
 import requests
 import socket
+from http import server as BaseHTTPServer
+from urllib.parse import parse_qs
+from urllib.parse import urlparse
 
 import xbmc
 import xbmcaddon

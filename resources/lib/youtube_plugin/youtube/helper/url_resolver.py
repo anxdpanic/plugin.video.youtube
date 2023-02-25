@@ -8,9 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import urllib
-
 import re
+from urllib.parse import parse_qsl
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+from urllib.parse import urlunsplit
+from urllib.parse import urlencode
 
 from ...kodion.utils import FunctionCache
 from ...kodion import Context as _Context
@@ -73,7 +76,7 @@ class YouTubeResolver(AbstractResolver):
             return _url
 
         if url_components.path.lower() == '/redirect':
-            params = dict(urllib.parse.parse_qsl(url_components.query))
+            params = dict(parse_qsl(url_components.query))
             return params['q']
 
         if url_components.path.lower().startswith('/user'):
@@ -114,7 +117,7 @@ class CommonResolver(AbstractResolver, list):
                     location = headers.get('location', '')
 
                     # validate the location - some server returned garbage
-                    _url_components = urllib.parse.urlparse(location)
+                    _url_components = urlparse(location)
                     if not _url_components.scheme and not _url_components.hostname:
                         return url
 
@@ -132,17 +135,17 @@ class CommonResolver(AbstractResolver, list):
                         return _loop(location, tries=tries - 1)
 
                 if response.status_code == 200:
-                    _url_components = urllib.parse.urlparse(_url)
+                    _url_components = urlparse(_url)
                     if _url_components.path == '/supported_browsers':
                         # "sometimes", we get a redirect through an URL of the form https://.../supported_browsers?next_url=<urlencoded_next_url>&further=paramaters&stuck=here
                         # put together query string from both what's encoded inside next_url and the remaining paramaters of this URL...
-                        _query = urllib.parse.parse_qs(_url_components.query) # top-level query string
-                        _nc = urllib.parse.urlparse(_query['next_url'][0]) # components of next_url
-                        _next_query = urllib.parse.parse_qs(_nc.query) # query string encoded inside next_url
+                        _query = parse_qs(_url_components.query) # top-level query string
+                        _nc = urlparse(_query['next_url'][0]) # components of next_url
+                        _next_query = parse_qs(_nc.query) # query string encoded inside next_url
                         del _query['next_url'] # remove next_url from top level query string
                         _next_query.update(_query) # add/overwrite all other params from top level query string
                         _next_query = dict(map(lambda kv : (kv[0], kv[1][0]), _next_query.items())) # flatten to only use first argument of each param
-                        _next_url = urllib.parse.urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urllib.parse.urlencode(_next_query), _nc.fragment)) # build new URL from these components
+                        _next_url = urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urlencode(_next_query), _nc.fragment)) # build new URL from these components
                         return _next_url
 
             except:
@@ -171,7 +174,7 @@ class UrlResolver(object):
 
     def _resolve(self, url):
         # try one of the resolver
-        url_components = urllib.parse.urlparse(url)
+        url_components = urlparse(url)
         for resolver in self._resolver:
             if resolver.supports_url(url, url_components):
                 resolved_url = resolver.resolve(url, url_components)
@@ -179,7 +182,7 @@ class UrlResolver(object):
 
                 # one last check...sometimes the resolved url is YouTube-specific and can be resolved again or
                 # simplified.
-                url_components = urllib.parse.urlparse(resolved_url)
+                url_components = urlparse(resolved_url)
                 if resolver is not self._youtube_resolver and self._youtube_resolver.supports_url(resolved_url, url_components):
                     return self._youtube_resolver.resolve(resolved_url, url_components)
 

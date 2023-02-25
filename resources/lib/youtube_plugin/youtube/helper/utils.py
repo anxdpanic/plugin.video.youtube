@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import PY2
-
 import re
 import time
 
@@ -143,8 +141,6 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         if context.get_path() == '/subscriptions/list/':
             channel = title.lower()
             channel = channel.replace(',', '')
-            if PY2:
-                channel = channel.encode('utf-8', 'ignore')
             if channel in filter_list:
                 yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
             else:

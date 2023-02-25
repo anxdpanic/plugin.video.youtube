@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import PY2
-
 from ... import kodion
 from ...youtube.helper import utils
 from ...kodion.items.video_item import VideoItem
@@ -34,8 +32,6 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     for item in items:
         channel = item['channel'].lower()
         channel = channel.replace(',', '')
-        if PY2:
-            channel = channel.encode('utf-8', 'ignore')
         if not do_filter or (do_filter and (not black_list) and (channel in filter_list)) or \
                 (do_filter and black_list and (channel not in filter_list)):
             video_id = item['id']

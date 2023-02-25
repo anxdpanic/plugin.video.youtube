@@ -6,25 +6,15 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from html import unescape
+from urllib.parse import parse_qs
+from urllib.parse import urlencode
+from urllib.parse import urlsplit
+from urllib.parse import urlunsplit
+
 import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
-
-from six.moves.urllib_parse import parse_qs
-from six.moves.urllib_parse import urlencode
-from six.moves.urllib_parse import urlsplit
-from six.moves.urllib_parse import urlunsplit
-
-from six import PY2
-
-try:
-    from six.moves import html_parser
-
-    unescape = html_parser.HTMLParser().unescape
-except AttributeError:
-    import html
-
-    unescape = html.unescape
 
 
 class Subtitles(object):
@@ -233,9 +223,6 @@ class Subtitles(object):
 
     @staticmethod
     def _recode_language_name(language_name):
-        if PY2:
-            language_name = language_name.encode('utf-8')
-
         return language_name
 
     @staticmethod

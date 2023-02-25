@@ -2,8 +2,8 @@
 <addon id="plugin.video.youtube" name="YouTube" version="7.0.0~alpha1" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
-        <import addon="script.module.six" version="1.11.0"/>
         <import addon="script.module.requests" version="2.12.4"/>
+        <import addon="inputstream.adaptive" version="20.3.1"/>
         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
         <import addon="script.module.infotagger" version="0.0.5"/>
     </requires>
@@ -18,8 +18,8 @@
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
+            <icon>resources/media/icon.png</icon>
+            <fanart>resources/media/fanart.jpg</fanart>
         </assets>
         <platform>all</platform>
         <license>GPL-2.0-only</license>

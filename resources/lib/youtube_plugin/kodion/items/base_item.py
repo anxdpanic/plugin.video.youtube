@@ -8,23 +8,13 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import python_2_unicode_compatible
-from six import string_types
 
 import hashlib
 import datetime
 
-try:
-    from six.moves import html_parser
-
-    unescape = html_parser.HTMLParser().unescape
-except AttributeError:
-    import html
-
-    unescape = html.unescape
+from html import unescape
 
 
-@python_2_unicode_compatible
 class BaseItem(object):
     VERSION = 3
     INFO_DATE = 'date'  # (string) iso 8601
@@ -74,7 +64,7 @@ class BaseItem(object):
         return self._name
 
     def set_uri(self, uri):
-        if isinstance(uri, string_types):
+        if isinstance(uri, str):
             self._uri = uri
         else:
             self._uri = ''

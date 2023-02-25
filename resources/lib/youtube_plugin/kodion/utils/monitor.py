@@ -7,12 +7,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves.urllib.parse import unquote
-
 import json
 import os
 import shutil
 import threading
+from urllib.parse import unquote
 
 import xbmc
 import xbmcaddon

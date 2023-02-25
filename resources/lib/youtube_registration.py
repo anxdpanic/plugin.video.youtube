@@ -7,7 +7,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import PY3, binary_type
 from base64 import b64encode
 from youtube_plugin.kodion.json_store import APIKeyStore
 from youtube_plugin.kodion.impl import Context
@@ -54,14 +53,9 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
 
     jkeys = json_api['keys']['developer'].get(addon_id, {})
 
-    if PY3:
-        api_key = b64encode(binary_type(api_key, 'utf-8')).decode('ascii')
-        client_id = b64encode(binary_type(client_id, 'utf-8')).decode('ascii')
-        client_secret = b64encode(binary_type(client_secret, 'utf-8')).decode('ascii')
-    else:
-        api_key = b64encode(api_key)
-        client_id = b64encode(client_id)
-        client_secret = b64encode(client_secret)
+    api_key = b64encode(bytes(api_key, 'utf-8')).decode('ascii')
+    client_id = b64encode(bytes(client_id, 'utf-8')).decode('ascii')
+    client_secret = b64encode(bytes(client_secret, 'utf-8')).decode('ascii')
 
     api_keys = {
         'origin': addon_id, 'main': {

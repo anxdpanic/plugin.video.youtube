@@ -7,10 +7,7 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import string_types
 import re
-import json
-import requests
 
 from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.impl import Context

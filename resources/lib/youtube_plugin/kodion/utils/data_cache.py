@@ -8,11 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import PY2
-# noinspection PyPep8Naming
-from six.moves import cPickle as pickle
-
 import json
+import pickle
 import sqlite3
 
 from datetime import datetime, timedelta
@@ -37,8 +34,6 @@ class DataCache(Storage):
 
     def get_items(self, seconds, content_ids):
         def _decode(obj):
-            if PY2:
-                obj = str(obj)
             return pickle.loads(obj)
 
         current_time = datetime.now()
