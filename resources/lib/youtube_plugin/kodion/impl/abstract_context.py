@@ -185,10 +185,10 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     def get_icon(self):
-        return os.path.join(self.get_native_path(), 'icon.png')
+        return self.create_resource_path('media/icon.png')
 
     def get_fanart(self):
-        return os.path.join(self.get_native_path(), 'fanart.jpg')
+        return self.create_resource_path('media/fanart.jpg')
 
     def create_resource_path(self, *args):
         path_comps = []
