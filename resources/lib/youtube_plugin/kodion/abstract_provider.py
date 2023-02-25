@@ -10,9 +10,8 @@
 
 import json
 import re
-
-from six.moves.urllib_parse import quote
-from six.moves.urllib_parse import unquote
+from urllib.parse import quote
+from urllib.parse import unquote
 
 from .exceptions import KodionException
 from . import items

@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import range
-
 import re
 
 from ....kodion.utils import FunctionCache

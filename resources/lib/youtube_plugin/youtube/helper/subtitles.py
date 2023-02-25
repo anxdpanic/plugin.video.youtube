@@ -6,23 +6,15 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from html import unescape
+from urllib.parse import parse_qs
+from urllib.parse import urlencode
+from urllib.parse import urlsplit
+from urllib.parse import urlunsplit
+
 import xbmcvfs
 import requests
 from ...kodion.utils import make_dirs
-
-from six.moves.urllib_parse import parse_qs
-from six.moves.urllib_parse import urlencode
-from six.moves.urllib_parse import urlsplit
-from six.moves.urllib_parse import urlunsplit
-
-try:
-    from six.moves import html_parser
-
-    unescape = html_parser.HTMLParser().unescape
-except AttributeError:
-    import html
-
-    unescape = html.unescape
 
 
 class Subtitles(object):

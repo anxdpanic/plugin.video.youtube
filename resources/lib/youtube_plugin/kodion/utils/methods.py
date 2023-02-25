@@ -8,13 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import urllib
-from six import next
-from six import string_types
-
 import os
 import copy
 import re
+from urllib.parse import quote
 
 from ..constants import localize
 
@@ -46,7 +43,7 @@ def to_str(text):
 
 def to_utf8(text):
     result = text
-    if isinstance(text, string_types):
+    if isinstance(text, str):
         try:
             result = text.encode('utf-8', 'ignore')
         except UnicodeDecodeError:
@@ -57,7 +54,7 @@ def to_utf8(text):
 
 def to_unicode(text):
     result = text
-    if isinstance(text, string_types) or isinstance(text, bytes):
+    if isinstance(text, str) or isinstance(text, bytes):
         try:
             result = text.decode('utf-8', 'ignore')
         except (AttributeError, UnicodeEncodeError):
@@ -216,7 +213,7 @@ def create_uri_path(*args):
 
     uri_path = '/'.join(comps)
     if uri_path:
-        return urllib.parse.quote('/%s/' % uri_path)
+        return quote('/%s/' % uri_path)
 
     return '/'
 

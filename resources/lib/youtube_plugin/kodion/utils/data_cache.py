@@ -8,10 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-# noinspection PyPep8Naming
-from six.moves import cPickle as pickle
-
 import json
+import pickle
 import sqlite3
 
 from datetime import datetime, timedelta

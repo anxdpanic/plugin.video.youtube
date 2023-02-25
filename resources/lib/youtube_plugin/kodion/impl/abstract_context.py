@@ -8,9 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import urllib
-
 import os
+from urllib.parse import urlencode
 
 from .. import constants
 from .. import logger
@@ -156,7 +155,7 @@ class AbstractContext(object):
                     params[param] = str(params[param])
 
                 uri_params[param] = to_utf8(params[param])
-            uri = '?'.join([uri, urllib.parse.urlencode(uri_params)])
+            uri = '?'.join([uri, urlencode(uri_params)])
 
         return uri
 

@@ -10,14 +10,7 @@
 
 from .base_item import BaseItem
 
-try:
-    from six.moves import html_parser
-
-    unescape = html_parser.HTMLParser().unescape
-except AttributeError:
-    import html
-
-    unescape = html.unescape
+from html import unescape
 
 
 class AudioItem(BaseItem):

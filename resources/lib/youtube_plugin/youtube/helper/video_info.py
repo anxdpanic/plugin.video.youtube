@@ -8,21 +8,17 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import range
-from six.moves import urllib
-
-try:
-    from six.moves import html_parser
-
-    unescape = html_parser.HTMLParser().unescape
-except AttributeError:
-    from html import unescape
-
 import copy
 import re
 import json
 import random
 import traceback
+from html import unescape
+from urllib.parse import parse_qsl
+from urllib.parse import urlsplit
+from urllib.parse import urlencode
+from urllib.parse import quote
+from urllib.parse import unquote
 
 import requests
 from ...kodion.utils import is_httpd_live, make_dirs, DataCache
@@ -526,7 +522,7 @@ class VideoInfo(object):
             self._context.log_debug('`n` was not calculated for %s' % url)
             return url
 
-        parsed_query = dict(urllib.parse.parse_qsl(urllib.parse.urlsplit(url).query))
+        parsed_query = dict(parse_qsl(urlsplit(url).query))
 
         if parsed_query.get('ratebypass', 'no') != 'yes' and 'n' in parsed_query:
             # Cipher n to get the updated value
@@ -535,10 +531,10 @@ class VideoInfo(object):
             if new_n:
                 parsed_query['n'] = new_n
                 parsed_query['ratebypass'] = 'yes'
-                parsed_url = urllib.parse.urlsplit(url)
+                parsed_url = urlsplit(url)
                 url = '%s://%s%s?%s' % \
                       (parsed_url.scheme, parsed_url.netloc,
-                       parsed_url.path, urllib.parse.urlencode(parsed_query))
+                       parsed_url.path, urlencode(parsed_query))
 
         return url
 
@@ -646,7 +642,7 @@ class VideoInfo(object):
                 javascript_url = found.group('url')
 
         javascript_url = _normalize(javascript_url)
-        cache_key = urllib.parse.quote(javascript_url)
+        cache_key = quote(javascript_url)
         cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key)
         if cached_js:
             return cached_js
@@ -663,13 +659,13 @@ class VideoInfo(object):
         output = ''
         if cookies:
             output += 'Cookie={all_cookies}'.format(
-                all_cookies=urllib.parse.quote(
+                all_cookies=quote(
                     '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
                 )
             )
             output += '&'
         # Headers to be used in function 'to_play_item' of 'xbmc_items.py'.
-        output += '&'.join('{0}={1}'.format(key, urllib.parse.quote(headers[key]))
+        output += '&'.join('{0}={1}'.format(key, quote(headers[key]))
                            for key in headers)
         return output
 
@@ -996,7 +992,7 @@ class VideoInfo(object):
                     stream.update(yt_format)
                     stream_list.append(stream)
                 elif conn:
-                    url = '%s?%s' % (conn, urllib.parse.unquote(stream_map['stream']))
+                    url = '%s?%s' % (conn, unquote(stream_map['stream']))
                     itag = stream_map['itag']
                     yt_format = self.FORMAT.get(itag, None)
                     if not yt_format:
@@ -1161,7 +1157,7 @@ class VideoInfo(object):
             stream_map['itag'] = str(stream_map.get('itag'))
 
             t = stream_map.get('mimeType')
-            t = urllib.parse.unquote(t)
+            t = unquote(t)
             t = t.split(';')
             mime = key = t[0]
             i = stream_map.get('itag')
@@ -1194,7 +1190,7 @@ class VideoInfo(object):
 
             data[key][i]['frameRate'] = frame_rate
 
-            url = urllib.parse.unquote(stream_map.get('url'))
+            url = unquote(stream_map.get('url'))
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
             data[key][i]['baseUrl'] = url

@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import range
-
 import copy
 import json
 import time

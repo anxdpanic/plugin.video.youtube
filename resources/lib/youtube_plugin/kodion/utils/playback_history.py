@@ -8,10 +8,8 @@
 """
 
 import datetime
+import pickle
 import sqlite3
-
-# noinspection PyPep8Naming
-from six.moves import cPickle as pickle
 
 from .storage import Storage
 

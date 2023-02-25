@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import string_types
-
 import json
 
 from .video_item import VideoItem
@@ -48,7 +46,7 @@ def from_json(json_data):
 
         return item
 
-    if isinstance(json_data, string_types):
+    if isinstance(json_data, str):
         json_data = json.loads(json_data)
     return _from_json(json_data)
 

@@ -8,12 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import range
-# noinspection PyPep8Naming
-from six.moves import cPickle as pickle
-
 import datetime
 import os
+import pickle
 import sqlite3
 import time
 import traceback

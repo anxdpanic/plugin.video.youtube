@@ -8,10 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six.moves import urllib
-
 import time
+from urllib.parse import parse_qsl
+
 import requests
+
 from ...youtube.youtube_exceptions import InvalidGrant, LoginException
 from ...kodion import Context
 from .__config__ import api, youtube_tv, developer_keys, keys_changed
@@ -304,7 +305,7 @@ class LoginClient(object):
             raise LoginException('Login Failed')
 
         lines = result.text.replace('\n', '&')
-        params = dict(urllib.parse.parse_qsl(lines))
+        params = dict(parse_qsl(lines))
         token = params.get('Auth', '')
         expires = int(params.get('Expiry', -1))
         if not token or expires == -1:
