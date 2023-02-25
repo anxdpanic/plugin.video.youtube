@@ -8,7 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from six import PY2
 from six.moves import range
 # noinspection PyPep8Naming
 from six.moves import cPickle as pickle
@@ -195,10 +194,7 @@ class Storage(object):
 
     def _get(self, item_id):
         def _decode(obj):
-            if PY2:
-                return pickle.loads(str(obj))
-            else:
-                return pickle.loads(obj, encoding='utf-8')
+            return pickle.loads(obj, encoding='utf-8')
 
         self._open()
         query = 'SELECT time, value FROM %s WHERE key=?' % self._table_name

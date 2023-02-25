@@ -16,7 +16,6 @@ import traceback
 import xml.etree.ElementTree as ET
 
 import requests
-from six import PY3
 
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
@@ -849,10 +848,7 @@ class YouTube(LoginClient):
                 for response in responses:
                     if response:
                         response.encoding = 'utf-8'
-                        if PY3:
-                            xml_data = to_unicode(response.content).replace('\n', '')
-                        else:
-                            xml_data = response.content.replace('\n', '')
+                        xml_data = to_unicode(response.content).replace('\n', '')
 
                         root = ET.fromstring(xml_data)
 

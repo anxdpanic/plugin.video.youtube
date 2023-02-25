@@ -9,7 +9,6 @@
 """
 
 from six.moves import range
-from six import PY2
 from six.moves import urllib
 
 try:
@@ -792,20 +791,8 @@ class VideoInfo(object):
         meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape')
         meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape')
 
-        if PY2:
-            try:
-                if r'\u' not in meta_info['video']['title']:
-                    meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
-                    meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
-                else:
-                    meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
-                    meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
-            except UnicodeDecodeError:
-                meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
-                meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
-        else:
-            meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
-            meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
+        meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
+        meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
 
         meta_info['video']['title'] = unescape(meta_info['video']['title'])
         meta_info['channel']['author'] = unescape(meta_info['channel']['author'])
@@ -872,12 +859,6 @@ class VideoInfo(object):
 
                 if not reason:
                     reason = 'UNKNOWN'
-
-                if PY2:
-                    try:
-                        reason = reason.encode('raw_unicode_escape').decode('utf-8')
-                    except:
-                        pass
 
                 raise YouTubeException(reason)
 
@@ -1447,10 +1428,7 @@ class VideoInfo(object):
         filepath = '{base_path}{video_id}.mpd'.format(base_path=basepath, video_id=video_id)
         try:
             f = xbmcvfs.File(filepath, 'w')
-            if PY2:
-                _ = f.write(out.encode('utf-8'))
-            else:
-                _ = f.write(str(out))
+            _ = f.write(str(out))
             f.close()
             return 'http://{ipaddress}:{port}/{video_id}.mpd'.format(
                 ipaddress=ipaddress,

@@ -15,8 +15,6 @@ from six.moves.urllib_parse import urlencode
 from six.moves.urllib_parse import urlsplit
 from six.moves.urllib_parse import urlunsplit
 
-from six import PY2
-
 try:
     from six.moves import html_parser
 
@@ -233,9 +231,6 @@ class Subtitles(object):
 
     @staticmethod
     def _recode_language_name(language_name):
-        if PY2:
-            language_name = language_name.encode('utf-8')
-
         return language_name
 
     @staticmethod
