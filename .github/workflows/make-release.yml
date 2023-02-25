@@ -96,8 +96,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-isengard.outputs.filename }}
-          asset_path: ${{ steps.zip-isengard.outputs.filename }}
+          asset_name: ${{ steps.zip-nexus.outputs.filename }}
+          asset_path: ${{ steps.zip-nexus.outputs.filename }}
           asset_content_type: application/zip
 
       - name: Upload Zip (Nexus-Unofficial)
@@ -107,6 +107,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-unofficial-isengard.outputs.filename }}
-          asset_path: ${{ steps.zip-unofficial-isengard.outputs.filename }}
+          asset_name: ${{ steps.zip-unofficial-nexus.outputs.filename }}
+          asset_path: ${{ steps.zip-unofficial-nexus.outputs.filename }}
           asset_content_type: application/zip
