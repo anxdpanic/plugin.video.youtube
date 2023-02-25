@@ -1,10 +1,34 @@
-From d63c02d7c6b5c44e53798cd2101cff9375a54368 Mon Sep 17 00:00:00 2001
+From 3376c5b8eef06d7022da535ac548fd9cc50f0589 Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@users.noreply.github.com>
-Date: Fri, 4 Dec 2020 20:32:12 -0500
-Subject: [PATCH] =?UTF-8?q?=EF=BB=BFunofficial=20patch?=
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Sat, 25 Feb 2023 14:57:44 -0500
+Subject: [PATCH] update changelog
+
+---
+ addon.xml | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/addon.xml b/addon.xml
+index 59009bb..4ecb584 100644
+--- a/addon.xml
++++ b/addon.xml
+@@ -14,7 +14,9 @@
+     <extension point="xbmc.python.module" library="resources/lib/"/>
+     <extension point="xbmc.addon.metadata">
+         <news>
+-[chg] add-on is now Nexus+ compatible, removed compatibility with older versions of Kodi
++[rem] support for versions of Kodi pre-Nexus v20
++[rem] support for python 2
++[rem] dependency on six
+ [upd] Translations updated from Kodi Weblate
+         </news>
+         <assets>
+-- 
+2.33.0.windows.2
+
+From b2c43a85accecd08471f0446ac587bbcf6539bbe Mon Sep 17 00:00:00 2001
+From: anxdpanic <anxdpanic@gmail.com>
+Date: Fri, 7 Feb 2020 16:44:38 -0500
+Subject: [PATCH] unofficial patch
 
 ---
  addon.xml                                     |   1 +
@@ -13,31 +37,31 @@ Content-Transfer-Encoding: 8bit
  .../kodion/impl/abstract_context_ui.py        |   6 +
  .../kodion/impl/abstract_settings.py          |   3 +
  .../kodion/impl/xbmc/xbmc_context.py          |   1 +
- .../kodion/impl/xbmc/xbmc_context_ui.py       |  13 ++
+ .../kodion/impl/xbmc/xbmc_context_ui.py       |  12 ++
  .../kodion/impl/xbmc/xbmc_runner.py           |   8 +
  .../youtube_plugin/kodion/utils/__init__.py   |   3 +-
  .../kodion/utils/view_manager.py              | 166 ++++++++++++++++++
  .../youtube_plugin/youtube/helper/utils.py    |   2 +-
  .../youtube/helper/yt_specials.py             |  18 +-
  .../lib/youtube_plugin/youtube/provider.py    |  22 +--
- resources/settings.xml                        |   4 +
- 14 files changed, 249 insertions(+), 23 deletions(-)
+ resources/settings.xml                        |  33 +++-
+ 14 files changed, 276 insertions(+), 24 deletions(-)
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index 34d16a0..9881f76 100644
+index 4ecb584..84e96ff 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -100,3 +100,4 @@
+@@ -102,3 +102,4 @@
          <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
      </extension>
  </addon>
 +<!-- unofficial -->
 diff --git a/resources/lib/youtube_plugin/kodion/abstract_provider.py b/resources/lib/youtube_plugin/kodion/abstract_provider.py
-index 7069da6..f49e2e2 100644
+index ff8ffd4..1306ca2 100644
 --- a/resources/lib/youtube_plugin/kodion/abstract_provider.py
 +++ b/resources/lib/youtube_plugin/kodion/abstract_provider.py
-@@ -73,10 +73,29 @@ class AbstractProvider(object):
+@@ -72,10 +72,29 @@ class AbstractProvider(object):
          self._dict_path[re_path] = method_name
  
      def _process_wizard(self, context):
@@ -67,7 +91,7 @@ index 7069da6..f49e2e2 100644
              wizard_steps.extend(self.get_wizard_steps(context))
  
          if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
-@@ -279,7 +298,7 @@ class AbstractProvider(object):
+@@ -278,7 +297,7 @@ class AbstractProvider(object):
                  query = query.decode('utf-8')
              return self.on_search(query, context, re_match)
          else:
@@ -109,7 +133,7 @@ index 7ed3fef..46eabf2 100644
          raise NotImplementedError()
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
-index 1a6e82c..aba36e6 100644
+index b79c3b0..591bec4 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 @@ -90,6 +90,9 @@ class AbstractSettings(object):
@@ -123,10 +147,10 @@ index 1a6e82c..aba36e6 100644
          return self.get_bool(constants.setting.SUPPORT_ALTERNATIVE_PLAYER, False)
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py
-index 6542331..fc98931 100644
+index bd6c44f..a165e0d 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py
-@@ -208,6 +208,7 @@ class XbmcContext(AbstractContext):
+@@ -210,6 +210,7 @@ class XbmcContext(AbstractContext):
      def set_content_type(self, content_type):
          self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
          xbmcplugin.setContent(self._plugin_handle, content_type)
@@ -135,23 +159,15 @@ index 6542331..fc98931 100644
      def add_sort_method(self, *sort_methods):
          for sort_method in sort_methods:
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
-index 49c9507..6aece7b 100644
+index 147d4e5..b83f101 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
-@@ -9,6 +9,7 @@
- """
- 
- from six import PY3
-+from six import string_types
- 
- import xbmc
- import xbmcgui
-@@ -35,6 +36,18 @@ class XbmcContextUI(AbstractContextUI):
+@@ -33,6 +33,18 @@ class XbmcContextUI(AbstractContextUI):
  
          return XbmcProgressDialog(heading, text)
  
 +    def set_view_mode(self, view_mode):
-+        if isinstance(view_mode, string_types):
++        if isinstance(view_mode, str):
 +            view_mode = self._context.get_settings().get_int(constants.setting.VIEW_X % view_mode, self._context.get_settings().get_int(constants.setting.VIEW_DEFAULT, 50))
 +
 +        self._view_mode = view_mode
@@ -166,7 +182,7 @@ index 49c9507..6aece7b 100644
          return xbmc.getSkinDir()
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py
-index e050639..3ee89b8 100644
+index 60e03bb..371f45f 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py
 @@ -8,6 +8,7 @@
@@ -177,7 +193,7 @@ index e050639..3ee89b8 100644
  import xbmcgui
  import xbmcplugin
  
-@@ -66,6 +67,13 @@ class XbmcRunner(AbstractProviderRunner):
+@@ -68,6 +69,13 @@ class XbmcRunner(AbstractProviderRunner):
                  self.handle, succeeded=True,
                  updateListing=options.get(AbstractProvider.RESULT_UPDATE_LISTING, False),
                  cacheToDisc=options.get(AbstractProvider.RESULT_CACHE_TO_DISC, True))
@@ -385,10 +401,10 @@ index 0000000..9a5fe5a
 +
 +        return False
 diff --git a/resources/lib/youtube_plugin/youtube/helper/utils.py b/resources/lib/youtube_plugin/youtube/helper/utils.py
-index 88a7fb7..5fc6e37 100644
+index 2fdd610..44a8ab9 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/utils.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/utils.py
-@@ -258,7 +258,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
+@@ -254,7 +254,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
          video_item = video_id_dict[video_id]
  
          # set mediatype
@@ -398,7 +414,7 @@ index 88a7fb7..5fc6e37 100644
          if not yt_item:
              continue
 diff --git a/resources/lib/youtube_plugin/youtube/helper/yt_specials.py b/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
-index 1e91ddc..1cf558c 100644
+index 89ad2b1..c5c8fec 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
 @@ -15,7 +15,7 @@ from . import utils
@@ -464,7 +480,7 @@ index 1e91ddc..1cf558c 100644
          url_resolver = UrlResolver(context)
  
          result = []
-@@ -268,7 +268,7 @@ def _process_description_links(provider, context):
+@@ -304,7 +304,7 @@ def _process_purchases_tv(provider, context):
  
  
  def _process_new_uploaded_videos_tv(provider, context):
@@ -473,7 +489,7 @@ index 1e91ddc..1cf558c 100644
  
      result = []
      next_page_token = context.get_param('next_page_token', '')
-@@ -280,7 +280,7 @@ def _process_new_uploaded_videos_tv(provider, context):
+@@ -316,7 +316,7 @@ def _process_new_uploaded_videos_tv(provider, context):
  
  
  def _process_new_uploaded_videos_tv_filtered(provider, context):
@@ -483,7 +499,7 @@ index 1e91ddc..1cf558c 100644
      result = []
      next_page_token = context.get_param('next_page_token', '')
 diff --git a/resources/lib/youtube_plugin/youtube/provider.py b/resources/lib/youtube_plugin/youtube/provider.py
-index 883cf94..03e9153 100644
+index fea2957..75c6780 100644
 --- a/resources/lib/youtube_plugin/youtube/provider.py
 +++ b/resources/lib/youtube_plugin/youtube/provider.py
 @@ -437,7 +437,7 @@ class Provider(kodion.AbstractProvider):
@@ -570,7 +586,7 @@ index 883cf94..03e9153 100644
  
          result = []
  
-@@ -1588,7 +1588,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1596,7 +1596,7 @@ class Provider(kodion.AbstractProvider):
      @staticmethod
      def set_content_type(context, content_type):
          context.set_content_type(content_type)
@@ -580,20 +596,56 @@ index 883cf94..03e9153 100644
                                      kodion.constants.sort_method.VIDEO_RUNTIME,
                                      kodion.constants.sort_method.DATE_ADDED,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index dd1d769..ff1e8ce 100644
+index 240043a..736c92d 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -95,6 +95,10 @@
-         <setting type="sep"/>
-         <setting id="kodion.playback.history" type="bool" label="30675" default="false"/>
-         <setting type="sep"/>
-+        <setting id="kodion.view.override" type="bool" label="30026" default="false"/>
-+        <setting id="kodion.view.default" type="number" label="30027" enable="eq(-1,true)" default="50"/>
-+        <setting id="kodion.view.episodes" type="number" label="30028" enable="eq(-2,true)" default="50"/>
-+        <setting type="sep"/>
-         <setting id="kodion.cache.size" type="slider" label="30024" default="10" range="5,1,100" option="int"/>
-         <setting id="kodion.setup_wizard" type="bool" label="30025" default="true"/>
-         <setting type="sep"/>
+@@ -598,6 +598,37 @@
+                 </setting>
+             </group>
+             <group id="3">
++                <setting help="" id="kodion.view.override" label="30026" type="boolean">
++                    <level>0</level>
++                    <default>false</default>
++                    <control type="toggle"/>
++                </setting>
++                <setting help="" id="kodion.view.default" label="30027" type="integer">
++                    <level>0</level>
++                    <default>50</default>
++                    <dependencies>
++                        <dependency type="enable">
++                            <condition operator="is" setting="kodion.view.override">true</condition>
++                        </dependency>
++                    </dependencies>
++                    <control format="integer" type="edit">
++                        <heading>30027</heading>
++                    </control>
++                </setting>
++                <setting help="" id="kodion.view.episodes" label="30028" type="integer">
++                    <level>0</level>
++                    <default>50</default>
++                    <dependencies>
++                        <dependency type="enable">
++                            <condition operator="is" setting="kodion.view.override">true</condition>
++                        </dependency>
++                    </dependencies>
++                    <control format="integer" type="edit">
++                        <heading>30028</heading>
++                    </control>
++                </setting>
++            </group>
++            <group id="4">
+                 <setting help="" id="kodion.cache.size" label="30024" type="integer">
+                     <level>0</level>
+                     <default>10</default>
+@@ -616,7 +647,7 @@
+                     <control type="toggle"/>
+                 </setting>
+             </group>
+-            <group id="4">
++            <group id="5">
+                 <setting help="" id="youtube.language" label="30523" type="string">
+                     <level>0</level>
+                     <default>en-US</default>
 -- 
 2.33.0.windows.2
 
