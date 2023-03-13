@@ -14,9 +14,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[rem] removed support for versions of Kodi pre-Nexus v20
-[rem] removed support for python 2
-[rem] removed dependency on six
+[fix] video duration not showing in lists
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>

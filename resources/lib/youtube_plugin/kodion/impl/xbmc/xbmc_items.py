@@ -87,7 +87,6 @@ def to_play_item(context, play_item):
         # This should work for all versions of XBMC/KODI.
         if 'duration' in _info_labels:
             duration = _info_labels['duration']
-            del _info_labels['duration']
             info_tag.add_stream_info('video', {'duration': duration})
 
         info_tag.set_info(_info_labels)
@@ -139,7 +138,6 @@ def to_video_item(context, video_item):
     # This should work for all versions of XBMC/KODI.
     if 'duration' in _info_labels:
         duration = _info_labels['duration']
-        del _info_labels['duration']
         info_tag.add_stream_info('video', {'duration': duration})
 
     info_tag.set_info(_info_labels)
