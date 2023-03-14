@@ -14,7 +14,7 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] video duration not showing in lists
+[fix] error when filtering short videos
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>
