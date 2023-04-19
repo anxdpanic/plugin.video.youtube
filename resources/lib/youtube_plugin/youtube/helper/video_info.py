@@ -740,13 +740,13 @@ class VideoInfo(object):
         #                                   'hl': self.language}}}
 
         payload = {'videoId': video_id,
-                   'context': {'client': {'clientVersion': '16.49', 'gl': self.region,
+                   'context': {'client': {'clientVersion': '18.05.40', 'gl': self.region,
                                           'clientName': 'ANDROID', 'hl': self.language}},
                    'thirdParty': {'embedUrl': 'https://google.com'}
         }
 
         player_response = {}
-        for attempt in range(2):
+        for attempt in range(4):
             try:
                 r = requests.post(video_info_url, params=params, json=payload,
                                   headers=headers, verify=self._verify, cookies=None,
@@ -754,10 +754,15 @@ class VideoInfo(object):
                 r.raise_for_status()
                 player_response = r.json()
                 if player_response.get('playabilityStatus', {}).get('status', 'OK') in \
-                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED') and attempt == 0:
-                    payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
-                    payload['context']['client']['clientVersion'] = '16.20'
-                    continue
+                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED'):
+                    if attempt == 0:
+                        payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
+                        continue
+                    if attempt == 1:
+                        payload['context']['client']['clientName'] = 'ANDROID'
+                        del headers['Authorization']
+                    if attempt == 2:
+                        payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
             except:
                 error_message = 'Failed to get player response for video_id "%s"' % video_id
                 self._context.log_error(error_message + '\n' + traceback.format_exc())
