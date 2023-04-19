@@ -682,9 +682,10 @@ def filter_short_videos(context, items):
         shorts_filtered = []
 
         for item in items:
-            item_duration = 0 if item.get_duration() is None else item.get_duration()
-            if hasattr(item, '_duration') and (0 < item_duration <= 60):
-                continue
+            if hasattr(item, '_duration'):
+                item_duration = 0 if item.get_duration() is None else item.get_duration()
+                if 0 < item_duration <= 60:
+                    continue
             shorts_filtered += [item]
 
         return shorts_filtered
