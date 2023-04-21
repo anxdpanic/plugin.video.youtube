@@ -739,11 +739,21 @@ class VideoInfo(object):
         #                                   'clientName': 'ANDROID', 'clientScreen': 'EMBED',
         #                                   'hl': self.language}}}
 
+        ANDROID_APP_VERSION = '18.14.41'
+        headers['User-Agent'] = 'com.google.android.youtube/%s ' \
+                                '(Linux; U; Android 12; US) gzip' % ANDROID_APP_VERSION
         payload = {'videoId': video_id,
-                   'context': {'client': {'clientVersion': '16.49', 'gl': self.region,
-                                          'clientName': 'ANDROID', 'hl': self.language}},
-                   'thirdParty': {'embedUrl': 'https://google.com'}
-        }
+                   'contentCheckOk': True,
+                   'racyCheckOk': True,
+                   'context': {'client': {'clientVersion': ANDROID_APP_VERSION,
+                                          'clientName': 'ANDROID',
+                                          'gl': self.region,
+                                          'hl': self.language,
+                                          'androidSdkVersion': 31,
+                                          'osName': 'Android',
+                                          'osVersion': '12',
+                                          'platform': 'MOBILE'}},
+                   }
 
         player_response = {}
         for attempt in range(2):
@@ -756,7 +766,6 @@ class VideoInfo(object):
                 if player_response.get('playabilityStatus', {}).get('status', 'OK') in \
                         ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED') and attempt == 0:
                     payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
-                    payload['context']['client']['clientVersion'] = '16.20'
                     continue
             except:
                 error_message = 'Failed to get player response for video_id "%s"' % video_id
