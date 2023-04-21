@@ -490,11 +490,11 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
-    # Headers from the "Galaxy S9/S9+" profile of the Firefox "Responsive Design Mode".
+    # Headers from the "Galaxy S20 Ultra"
     MOBILE_HEADERS = {
-        'User-Agent': ('Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M;'
-                       ' wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0'
-                       ' Chrome/67.0.3396.87 Mobile Safari/537.36'),
+        'User-Agent': ('Mozilla/5.0 (Linux; Android 12; SM-G981B)'
+                       ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                       ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
         'Accept': '*/*',
         'DNT': '1',
         'Accept-Encoding': 'gzip, deflate',
@@ -726,63 +726,74 @@ class VideoInfo(object):
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
         else:
-            params = {
-                'key': self._api_key
-            }
-        video_info_url = 'https://youtubei.googleapis.com/youtubei/v1/player'
-        # payload = {'videoId': video_id,
-        #            'context': {'client': {'clientVersion': '1.20210909.07.00', 'gl': self.region,
-        #                                   'clientName': 'WEB_CREATOR', 'hl': self.language}}}
+            params = {'key': self._api_key}
 
-        # payload = {'videoId': video_id,
-        #            'context': {'client': {'clientVersion': '16.05', 'gl': self.region,
-        #                                   'clientName': 'ANDROID', 'clientScreen': 'EMBED',
-        #                                   'hl': self.language}}}
+        video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
-        ANDROID_APP_VERSION = '18.14.41'
-        headers['User-Agent'] = 'com.google.android.youtube/%s ' \
-                                '(Linux; U; Android 12; US) gzip' % ANDROID_APP_VERSION
-        payload = {'videoId': video_id,
-                   'contentCheckOk': True,
-                   'racyCheckOk': True,
-                   'context': {'client': {'clientVersion': ANDROID_APP_VERSION,
-                                          'clientName': 'ANDROID',
-                                          'gl': self.region,
-                                          'hl': self.language,
-                                          'androidSdkVersion': 31,
-                                          'osName': 'Android',
-                                          'osVersion': '12',
-                                          'platform': 'MOBILE'}},
-                   }
+        clients = [
+            {'clientName': 'ANDROID', 'clientVersion': '18.15.35'},
+            {'clientName': 'TV_UNPLUGGED_ANDROID', 'clientVersion': '1.37'},
+        ]
 
+        payload = {
+            'contentCheckOk': True,
+            'context': {
+                'client': {
+                    'androidSdkVersion': 31,
+                    'gl': self.region,
+                    'hl': self.language,
+                    'osName': 'Android',
+                    'osVersion': '12',
+                    'platform': 'MOBILE',
+                }
+            },
+            'playbackContext': {
+                'contentPlaybackContext': {
+                    'html5Preference': 'HTML5_PREF_WANTS',
+                },
+            },
+            'racyCheckOk': True,
+            'thirdParty': {
+                'embedUrl': 'https://www.youtube.com/',
+            },
+            'user': {
+                'lockedSafetyMode': False
+            },
+            'videoId': video_id,
+        }
         player_response = {}
-        for attempt in range(2):
-            try:
-                r = requests.post(video_info_url, params=params, json=payload,
-                                  headers=headers, verify=self._verify, cookies=None,
-                                  allow_redirects=True)
-                r.raise_for_status()
-                player_response = r.json()
-                if player_response.get('playabilityStatus', {}).get('status', 'OK') in \
-                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED'):
-                    if attempt == 0:
-                        payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
-                        continue
+        for _ in range(2):
+            for client in clients:
+                payload['context']['client'].update(client)
 
-                ## if we get here then break out of loop as this attempt was successful
-                break
-            except:
-                error_message = 'Failed to get player response for video_id "%s"' % video_id
-                self._context.log_error(error_message + '\n' + traceback.format_exc())
-                raise YouTubeException(error_message)
+                try:
+                    r = requests.post(video_info_url, params=params, json=payload,
+                                      headers=headers, verify=self._verify, cookies=None,
+                                      allow_redirects=True)
+                    r.raise_for_status()
+                except Exception as error:
+                    error_message = 'Failed to get player response for video_id "%s"' % video_id
+                    self._context.log_error(error_message + '\n' + traceback.format_exc())
+                    raise YouTubeException(error_message) from error
+
+                player_response = r.json()
+                playability_status = player_response.get('playabilityStatus', {})
+
+                if (playability_status.get('status', 'OK') not in
+                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'ERROR')):
+                    break
+            else:
+                if self._access_token:
+                    del headers['Authorization']
+                    params = {'key': self._api_key}
+                    continue
+            break
 
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self.make_curl_headers(headers, cookies)
         curl_headers = self.make_curl_headers(headers, cookies=None)
-
-        playability_status = player_response.get('playabilityStatus', {})
 
         video_details = player_response.get('videoDetails', {})
         is_live_content = video_details.get('isLiveContent') is True
