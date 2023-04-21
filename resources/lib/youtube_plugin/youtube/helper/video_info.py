@@ -550,7 +550,8 @@ class VideoInfo(object):
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         if self._access_token:
-            headers['Authorization'] = 'Bearer %s' % self._access_token
+            #headers['Authorization'] = 'Bearer %s' % self._access_token
+            pass
 
         url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
@@ -739,10 +740,36 @@ class VideoInfo(object):
         #                                   'clientName': 'ANDROID', 'clientScreen': 'EMBED',
         #                                   'hl': self.language}}}
 
-        payload = {'videoId': video_id,
-                   'context': {'client': {'clientVersion': '18.05.40', 'gl': self.region,
-                                          'clientName': 'ANDROID', 'hl': self.language}},
-                   'thirdParty': {'embedUrl': 'https://google.com'}
+        #payload = {'videoId': video_id,
+        #           'context': {'client': {'clientVersion': '18.05.40', 'gl': self.region,
+        #                                  'clientName': 'ANDROID', 'hl': self.language}},
+        #           'thirdParty': {'embedUrl': 'https://google.com'}
+        #}
+        
+        payload = {
+            'contentCheckOk': True,
+            'videoId': video_id,
+            'context': {
+                'client': {
+                    'hl': 'en',
+                    'gl': 'US',
+                    'clientName': 'ANDROID_EMBEDDED_PLAYER', # Used to be 'ANDROID'.
+                    'clientVersion': '18.14.41',
+                    'androidSdkVersion': 31,
+                    'osName': 'Android',
+                    'osVersion': '12',
+                    'platform': 'MOBILE',
+                }
+            },
+            'racyCheckOk': True,
+            'user': {
+                'lockedSafetyMode': False
+            },
+            'playbackContext': {
+                'contentPlaybackContext': {
+                    'html5Preference': 'HTML5_PREF_WANTS'
+                }
+            }
         }
 
         player_response = {}
