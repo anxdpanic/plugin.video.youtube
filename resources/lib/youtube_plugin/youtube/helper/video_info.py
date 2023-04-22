@@ -734,9 +734,20 @@ class VideoInfo(object):
         #                                   'clientName': 'ANDROID', 'clientScreen': 'EMBED',
         #                                   'hl': self.language}}}
 
+        ANDROID_APP_VERSION = '18.14.41'
+        headers['User-Agent'] = 'com.google.android.youtube/%s ' \
+                                '(Linux; U; Android 12; US) gzip' % ANDROID_APP_VERSION
         payload = {'videoId': video_id,
-                   'context': {'client': {'clientVersion': '18.05.40', 'gl': self.region,
-                                          'clientName': 'ANDROID', 'hl': self.language}},
+                   'contentCheckOk': True,
+                   'racyCheckOk': True,
+                   'context': {'client': {'clientVersion': ANDROID_APP_VERSION,
+                                          'clientName': 'ANDROID',
+                                          'gl': self.region,
+                                          'hl': self.language,
+                                          'androidSdkVersion': 31,
+                                          'osName': 'Android',
+                                          'osVersion': '12',
+                                          'platform': 'MOBILE'}},
                    'thirdParty': {'embedUrl': 'https://google.com'}
         }
 
