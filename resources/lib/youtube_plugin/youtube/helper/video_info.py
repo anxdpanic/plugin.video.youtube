@@ -764,6 +764,9 @@ class VideoInfo(object):
                     if attempt == 0:
                         payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
                         continue
+
+                ## if we get here then break out of loop as this attempt was successful
+                break
             except:
                 error_message = 'Failed to get player response for video_id "%s"' % video_id
                 self._context.log_error(error_message + '\n' + traceback.format_exc())
