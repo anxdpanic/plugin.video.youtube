@@ -752,7 +752,7 @@ class VideoInfo(object):
         }
 
         player_response = {}
-        for attempt in range(4):
+        for attempt in range(2):
             try:
                 r = requests.post(video_info_url, params=params, json=payload,
                                   headers=headers, verify=self._verify, cookies=None,
@@ -764,11 +764,6 @@ class VideoInfo(object):
                     if attempt == 0:
                         payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
                         continue
-                    if attempt == 1:
-                        payload['context']['client']['clientName'] = 'ANDROID'
-                        del headers['Authorization']
-                    if attempt == 2:
-                        payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
             except:
                 error_message = 'Failed to get player response for video_id "%s"' % video_id
                 self._context.log_error(error_message + '\n' + traceback.format_exc())
