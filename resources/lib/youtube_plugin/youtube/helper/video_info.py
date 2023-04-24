@@ -550,8 +550,8 @@ class VideoInfo(object):
         headers = self.MOBILE_HEADERS.copy()
         headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
         if self._access_token:
-            #headers['Authorization'] = 'Bearer %s' % self._access_token
-            pass
+            headers['Authorization'] = 'Bearer %s' % self._access_token
+            #pass
 
         url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
@@ -746,34 +746,26 @@ class VideoInfo(object):
         #           'thirdParty': {'embedUrl': 'https://google.com'}
         #}
         
-        payload = {
-            'contentCheckOk': True,
-            'videoId': video_id,
-            'context': {
-                'client': {
-                    'hl': 'en',
-                    'gl': 'US',
-                    'clientName': 'ANDROID_EMBEDDED_PLAYER', # Used to be 'ANDROID'.
-                    'clientVersion': '18.14.41',
-                    'androidSdkVersion': 31,
-                    'osName': 'Android',
-                    'osVersion': '12',
-                    'platform': 'MOBILE',
-                }
-            },
-            'racyCheckOk': True,
-            'user': {
-                'lockedSafetyMode': False
-            },
-            'playbackContext': {
-                'contentPlaybackContext': {
-                    'html5Preference': 'HTML5_PREF_WANTS'
-                }
-            }
+        ANDROID_APP_VERSION = '18.14.41'
+        headers['User-Agent'] = 'com.google.android.youtube/%s ' \
+                                '(Linux; U; Android 12; US) gzip' % ANDROID_APP_VERSION
+        
+        payload = {'videoId': video_id,
+                   'contentCheckOk': True,
+                   'racyCheckOk': True,
+                   'context': {'client': {'clientVersion': ANDROID_APP_VERSION,
+                                          'clientName': 'ANDROID',
+                                          'gl': self.region,
+                                          'hl': self.language,
+                                          'androidSdkVersion': 31,
+                                          'osName': 'Android',
+                                          'osVersion': '12',
+                                          'platform': 'MOBILE'}},
+                   'thirdParty': {'embedUrl': 'https://google.com'}
         }
 
         player_response = {}
-        for attempt in range(4):
+        for attempt in range(2):
             try:
                 r = requests.post(video_info_url, params=params, json=payload,
                                   headers=headers, verify=self._verify, cookies=None,
@@ -785,11 +777,9 @@ class VideoInfo(object):
                     if attempt == 0:
                         payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
                         continue
-                    if attempt == 1:
-                        payload['context']['client']['clientName'] = 'ANDROID'
-                        del headers['Authorization']
-                    if attempt == 2:
-                        payload['context']['client']['clientName'] = 'ANDROID_EMBEDDED_PLAYER'
+
+                ## if we get here then break out of loop as this attempt was successful
+                break
             except:
                 error_message = 'Failed to get player response for video_id "%s"' % video_id
                 self._context.log_error(error_message + '\n' + traceback.format_exc())
