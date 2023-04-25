@@ -719,12 +719,23 @@ class VideoInfo(object):
         return streams
 
     @staticmethod
-    def _get_error_reasons(playability_status):
+    def _get_error_details(playability_status, details=None):
         if ('errorScreen' not in playability_status
                 or 'playerErrorMessageRenderer' not in playability_status['errorScreen']):
             return None
 
         status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
+
+        if details:
+            result = status_renderer
+            for key in details:
+                if isinstance(result, dict) and key not in result:
+                    return None
+                if isinstance(result, list) and (not isinstance(key, int) or len(result) <= key):
+                    return None
+                result = result[key]
+            return result
+
         status_reason = status_renderer.get('reason', {})
         status_reason_runs = status_reason.get('runs', [{}])
 
@@ -801,11 +812,12 @@ class VideoInfo(object):
                 status = playability_status.get('status', 'OK')
 
                 if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'ERROR'):
-                    if status == 'ERROR':
-                        reason = self._get_error_reasons(playability_status)
-                        if reason != 'The following content is not available on this app.':
-                            break
-                    continue
+                    if status != 'ERROR':
+                        continue
+                    url = self._get_error_details(playability_status,
+                                                  details=['learnMore', 'runs', 0, 'navigationEndpoint', 'urlEndpoint', 'url'])
+                    if url.startswith('//support.google.com/youtube/answer/12318250'):
+                        continue
                 break
             else:
                 if self._access_token:
@@ -900,7 +912,7 @@ class VideoInfo(object):
                     if reason_text:
                         reason = ''.join(reason_text)
             else:
-                reason = self._get_error_reasons(playability_status) or playability_status.get('reason')
+                reason = self._get_error_details(playability_status) or playability_status.get('reason')
 
             if not reason:
                 reason = 'UNKNOWN'
