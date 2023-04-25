@@ -490,7 +490,7 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
-    # Headers from the "Galaxy S20 Ultra"
+    # Headers from the "Galaxy S20 Ultra" from Chrome dev tools but running Android 12 to match client details
     MOBILE_HEADERS = {
         'User-Agent': ('Mozilla/5.0 (Linux; Android 12; SM-G981B)'
                        ' AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -816,16 +816,21 @@ class VideoInfo(object):
                 if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'ERROR'):
                     if status != 'ERROR':
                         continue
+                    # This is used to check if a "The following content is not available on this app." error occurs
+                    # Text will vary depending on Accept-Language and client hl so Youtube support url is checked instead
                     url = self._get_error_details(playability_status,
                                                   details=['learnMore', 'runs', 0, 'navigationEndpoint', 'urlEndpoint', 'url'])
                     if url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
                 break
+            # Only attempt to remove Authorization header if clients iterable was exhausted
+            # i.e. request attempted using all clients
             else:
                 if self._access_token:
                     del headers['Authorization']
                     params = {'key': self._api_key}
                     continue
+            # Otherwise skip retrying clients without Authorization header
             break
 
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
