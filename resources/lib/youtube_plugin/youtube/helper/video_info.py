@@ -713,6 +713,27 @@ class VideoInfo(object):
             streams.append(video_stream)
         return streams
 
+    @staticmethod
+    def _get_error_reasons(playability_status):
+        if ('errorScreen' not in playability_status
+                or 'playerErrorMessageRenderer' not in playability_status['errorScreen']):
+            return None
+
+        status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
+        status_reason = status_renderer.get('reason', {})
+        status_reason_runs = status_reason.get('runs', [{}])
+
+        status_reason_texts = [
+            text['text']
+            for text in status_reason_runs
+            if 'text' in text and text['text']
+        ]
+        if status_reason_texts:
+            return ''.join(status_reason_texts)
+        if 'simpleText' in status_reason:
+            return status_reason['simpleText']
+        return None
+
     def _method_get_video_info(self, video_id):
         headers = self.MOBILE_HEADERS.copy()
 
@@ -773,10 +794,15 @@ class VideoInfo(object):
 
                 player_response = r.json()
                 playability_status = player_response.get('playabilityStatus', {})
+                status = playability_status.get('status', 'OK')
 
-                if (playability_status.get('status', 'OK') not in
-                        ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'ERROR')):
-                    break
+                if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'ERROR'):
+                    if status == 'ERROR':
+                        reason = self._get_error_reasons(playability_status)
+                        if reason != 'The following content is not available on this app.':
+                            break
+                    continue
+                break
             else:
                 if self._access_token:
                     del headers['Authorization']
@@ -858,24 +884,7 @@ class VideoInfo(object):
                     if reason_text:
                         reason = ''.join(reason_text)
             else:
-                reason = playability_status.get('reason')
-
-                if 'errorScreen' in playability_status and 'playerErrorMessageRenderer' in playability_status['errorScreen']:
-                    status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
-                    status_reason = status_renderer.get('reason', {})
-                    main_text_runs = status_reason.get('runs', [{}])
-                    reason_text = []
-                    descript_reason = ''
-                    for text in main_text_runs:
-                        reason_text.append(text.get('text', ''))
-                    if reason_text:
-                        descript_reason = ''.join(reason_text)
-                    if descript_reason:
-                        reason = descript_reason
-                    else:
-                        general_reason = status_renderer.get('reason', {}).get('simpleText')
-                        if general_reason:
-                            reason = general_reason
+                reason = self._get_error_reasons(playability_status) or playability_status.get('reason')
 
             if not reason:
                 reason = 'UNKNOWN'
