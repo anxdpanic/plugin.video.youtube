@@ -814,7 +814,7 @@ class VideoInfo(object):
                 playability_status = player_response.get('playabilityStatus', {})
                 status = playability_status.get('status', 'OK')
 
-                if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'ERROR'):
+                if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'):
                     if status != 'ERROR':
                         continue
                     # This is used to check if a "The following content is not available on this app." error occurs
