@@ -829,7 +829,7 @@ class VideoInfo(object):
             # Only attempt to remove Authorization header if clients iterable was exhausted
             # i.e. request attempted using all clients
             else:
-                if self._access_token:
+                if 'Authorization' in headers:
                     del headers['Authorization']
                     params = {'key': self._api_key}
                     continue
