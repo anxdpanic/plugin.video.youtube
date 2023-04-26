@@ -1218,6 +1218,15 @@ class VideoInfo(object):
                 data[key] = {}
             data[key][i] = {}
 
+            url = stream_map.get('url')
+            if not url:
+                del data[key][i]
+                continue
+            url = unquote(url)
+            url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+            data[key][i]['baseUrl'] = url
+
             data[key][i]['codecs'] = t[1][1:]
             data[key][i]['id'] = i
 
@@ -1239,11 +1248,6 @@ class VideoInfo(object):
                 frame_rate = '%d/%d' % (fps * 1000, scale)
 
             data[key][i]['frameRate'] = frame_rate
-
-            url = unquote(stream_map.get('url'))
-            url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
-
-            data[key][i]['baseUrl'] = url
 
             data[key][i]['indexRange'] = '0-0'
             data[key][i]['initRange'] = '0-0'
