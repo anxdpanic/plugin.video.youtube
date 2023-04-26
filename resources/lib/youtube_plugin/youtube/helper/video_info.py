@@ -1234,6 +1234,15 @@ class VideoInfo(object):
                 data[key] = {}
             data[key][i] = {}
 
+            url = stream_map.get('url')
+            if not url:
+                del data[key][i]
+                continue
+            url = urllib.parse.unquote(url)
+            url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+            data[key][i]['baseUrl'] = url
+
             data[key][i]['codecs'] = t[1][1:]
             data[key][i]['id'] = i
 
