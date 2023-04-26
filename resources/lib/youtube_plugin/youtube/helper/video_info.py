@@ -762,8 +762,9 @@ class VideoInfo(object):
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         clients = [
-            {'clientName': 'ANDROID', 'clientVersion': '18.15.35'},
-            {'clientName': 'TV_UNPLUGGED_ANDROID', 'clientVersion': '1.37'},
+            {'clientName': 'ANDROID', 'clientVersion': '18.16.34', 'clientScreen': None},
+            {'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER', 'clientVersion': '2.0', 'clientScreen': 'WATCH'},
+            {'clientName': 'WEB_CREATOR', 'clientVersion': '1.20210909.07.00', 'clientScreen': None},
         ]
 
         payload = {
@@ -796,6 +797,8 @@ class VideoInfo(object):
         for _ in range(2):
             for client in clients:
                 payload['context']['client'].update(client)
+                if not client['clientScreen']:
+                    del payload['context']['client']['clientScreen']
 
                 try:
                     r = requests.post(video_info_url, params=params, json=payload,
