@@ -756,24 +756,44 @@ class VideoInfo(object):
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
-        clients = [
-            {'clientName': 'ANDROID', 'clientVersion': '18.16.34', 'clientScreen': None},
-            {'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER', 'clientVersion': '2.0', 'clientScreen': 'WATCH'},
-            {'clientName': 'WEB_CREATOR', 'clientVersion': '1.20210909.07.00', 'clientScreen': None},
-        ]
+        clients = [{
+            'clientName': 'ANDROID',
+            'clientVersion': '18.16.34',
+            'androidSdkVersion': 31,
+            'osName': 'Android',
+            'osVersion': '12',
+            'platform': 'MOBILE',
+            'gl': self.region,
+            'hl': self.language,
+        },
+        {
+            'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+            'clientVersion': '2.0',
+            'clientScreen': 'EMBED',
+            'gl': self.region,
+            'hl': self.language,
+        },
+        {
+            'clientName': 'ANDROID_EMBEDDED_PLAYER',
+            'clientVersion': '18.14.41',
+            'clientScreen': 'EMBED',
+            'androidSdkVersion': 31,
+            'osName': 'Android',
+            'osVersion': '12',
+            'platform': 'MOBILE',
+            'gl': self.region,
+            'hl': self.language,
+        },
+        {
+            'clientName': 'WEB_CREATOR',
+            'clientVersion': '1.20210909.07.00',
+            'gl': self.region,
+            'hl': self.language,
+        }]
 
         payload = {
             'contentCheckOk': True,
-            'context': {
-                'client': {
-                    'androidSdkVersion': 31,
-                    'gl': self.region,
-                    'hl': self.language,
-                    'osName': 'Android',
-                    'osVersion': '12',
-                    'platform': 'MOBILE',
-                }
-            },
+            'context': {},
             'playbackContext': {
                 'contentPlaybackContext': {
                     'html5Preference': 'HTML5_PREF_WANTS',
@@ -792,9 +812,7 @@ class VideoInfo(object):
         player_response = {}
         for _ in range(2):
             for client in clients:
-                payload['context']['client'].update(client)
-                if not client['clientScreen']:
-                    del payload['context']['client']['clientScreen']
+                payload['context']['client'] = client
 
                 try:
                     r = requests.post(video_info_url, params=params, json=payload,
