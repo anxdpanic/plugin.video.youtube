@@ -798,40 +798,45 @@ class VideoInfo(object):
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
-        clients = [{
-            'clientName': 'ANDROID',
-            'clientVersion': '18.16.34',
-            'androidSdkVersion': 31,
-            'osName': 'Android',
-            'osVersion': '12',
-            'platform': 'MOBILE',
-            'gl': self.region,
-            'hl': self.language,
-        },
-        {
-            'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-            'clientVersion': '2.0',
-            'clientScreen': 'EMBED',
-            'gl': self.region,
-            'hl': self.language,
-        },
-        {
-            'clientName': 'ANDROID_EMBEDDED_PLAYER',
-            'clientVersion': '18.14.41',
-            'clientScreen': 'EMBED',
-            'androidSdkVersion': 31,
-            'osName': 'Android',
-            'osVersion': '12',
-            'platform': 'MOBILE',
-            'gl': self.region,
-            'hl': self.language,
-        },
-        {
-            'clientName': 'WEB_CREATOR',
-            'clientVersion': '1.20210909.07.00',
-            'gl': self.region,
-            'hl': self.language,
-        }]
+        clients = [
+            {
+                'clientName': 'ANDROID',
+                'clientVersion': '18.16.34',
+                'androidSdkVersion': 31,
+                'osName': 'Android',
+                'osVersion': '12',
+                'platform': 'MOBILE',
+                'gl': self.region,
+                'hl': self.language,
+            }
+            if self._context.get_settings().use_alternative_client() else
+            {
+                'clientName': 'ANDROID_EMBEDDED_PLAYER',
+                'clientVersion': '18.14.41',
+                'clientScreen': 'EMBED',
+                'androidSdkVersion': 31,
+                'osName': 'Android',
+                'osVersion': '12',
+                'platform': 'MOBILE',
+                'gl': self.region,
+                'hl': self.language,
+            },
+            # Fallback for videos requiring age verification
+            {
+                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'clientVersion': '2.0',
+                'clientScreen': 'EMBED',
+                'gl': self.region,
+                'hl': self.language,
+            },
+            # Second fallback for restricted videos
+            {
+                'clientName': 'WEB_CREATOR',
+                'clientVersion': '1.20210909.07.00',
+                'gl': self.region,
+                'hl': self.language,
+            }
+        ]
 
         payload = {
             'contentCheckOk': True,

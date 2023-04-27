@@ -249,3 +249,6 @@ class AbstractSettings(object):
 
     def hide_short_videos(self):
         return self.get_bool(constants.setting.HIDE_SHORT_VIDEOS, False)
+
+    def use_alternative_client(self):
+        return self.get_bool(constants.setting.ALTERNATIVE_CLIENT, False)
