@@ -564,6 +564,11 @@
         </category>
         <category help="" id="advanced" label="30031">
             <group id="1">
+                <setting help="" id="youtube.client.alternative" label="30737" type="boolean">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting help="" id="simple.requests.ssl.verify" label="30578" type="boolean">
                     <level>0</level>
                     <default>true</default>
