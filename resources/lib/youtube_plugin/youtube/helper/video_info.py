@@ -753,6 +753,9 @@ class VideoInfo(object):
 
     def _method_get_video_info(self, video_id):
         headers = self.MOBILE_HEADERS.copy()
+        
+        ANDROID_APP_VERSION = '18.16.34'
+        headers['User-Agent'] = 'com.google.android.youtube/%s (Linux; U; Android 12; US) gzip' % ANDROID_APP_VERSION
 
         params = None
         if self._access_token:
@@ -823,7 +826,7 @@ class VideoInfo(object):
                     # Text will vary depending on Accept-Language and client hl so Youtube support url is checked instead
                     url = self._get_error_details(playability_status,
                                                   details=['learnMore', 'runs', 0, 'navigationEndpoint', 'urlEndpoint', 'url'])
-                    if url.startswith('//support.google.com/youtube/answer/12318250'):
+                    if not url is None and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
                 break
             # Only attempt to remove Authorization header if clients iterable was exhausted
