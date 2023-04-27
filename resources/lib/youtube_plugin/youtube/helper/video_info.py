@@ -14,7 +14,7 @@ import json
 import random
 import traceback
 from html import unescape
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qs
 from urllib.parse import urlsplit
 from urllib.parse import urlencode
 from urllib.parse import quote
@@ -24,6 +24,7 @@ import requests
 from ...kodion.utils import is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .subtitles import Subtitles
+from .signature.cipher import Cipher
 
 import xbmcvfs
 
@@ -522,7 +523,7 @@ class VideoInfo(object):
             self._context.log_debug('`n` was not calculated for %s' % url)
             return url
 
-        parsed_query = dict(parse_qsl(urlsplit(url).query))
+        parsed_query = parse_qs(urlsplit(url).query)
 
         if parsed_query.get('ratebypass', 'no') != 'yes' and 'n' in parsed_query:
             # Cipher n to get the updated value
@@ -647,7 +648,7 @@ class VideoInfo(object):
             return cached_js
 
         headers = self.MOBILE_HEADERS.copy()
-        result = requests.get(javascript_url, headers=headers, verify=False, allow_redirects=True)
+        result = requests.get(javascript_url, headers=headers, verify=self._verify, allow_redirects=True)
         javascript = result.text
 
         self._data_cache.set(javascript_url, cache_key)
@@ -995,11 +996,20 @@ class VideoInfo(object):
                     license_info['token'] = self._access_token
                     break
 
+        cipher = None
+        if ([True for fmt in adaptive_fmts if 'url' not in fmt and 'signatureCipher' in fmt]
+                or [True for fmt in std_fmts if 'url' not in fmt and 'signatureCipher' in fmt]):
+            watch_page_html = self.get_watch_page(video_id)['html']
+            player_config = self.get_player_config(watch_page_html)
+            player_js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
+            cipher = Cipher(self._context, javascript=player_js)
+
         if not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(video_id,
                                                 adaptive_fmts,
                                                 video_details.get('lengthSeconds', '0'),
-                                                license_info.get('url'))
+                                                license_info.get('url'),
+                                                cipher)
 
         if mpd_url:
             video_stream = {
@@ -1034,47 +1044,44 @@ class VideoInfo(object):
                     video_stream['audio']['bitrate'] = int(s_info['audio'].get('bitrate', 0))
             stream_list.append(video_stream)
 
-        def parse_to_stream_list(streams):
-            for item in streams:
-                stream_map = item
+        def parse_to_stream_list(streams, cipher=None):
+            for stream_map in streams:
+                url = stream_map.get('url')
+                conn = stream_map.get('conn')
 
-                url = stream_map.get('url', None)
-                conn = stream_map.get('conn', None)
-
-                stream_map['itag'] = str(stream_map['itag'])
-
-                if url:
-                    itag = stream_map['itag']
-                    yt_format = self.FORMAT.get(itag, None)
-                    if not yt_format:
-                        self._context.log_debug('unknown yt_format for itag "%s"' % itag)
-                        continue
-
-                    if yt_format.get('discontinued', False) or yt_format.get('unsupported', False) or \
-                            (yt_format.get('dash/video', False) and not yt_format.get('dash/audio', False)):
-                        continue
-
-                    stream = {'url': url,
-                              'meta': meta_info,
-                              'headers': curl_headers,
-                              'playback_stats': playback_stats}
-                    stream.update(yt_format)
-                    stream_list.append(stream)
-                elif conn:
+                if not url and conn:
                     url = '%s?%s' % (conn, unquote(stream_map['stream']))
-                    itag = stream_map['itag']
-                    yt_format = self.FORMAT.get(itag, None)
-                    if not yt_format:
-                        self._context.log_debug('unknown yt_format for itag "%s"' % itag)
-                        continue
+                elif not url and 'signatureCipher' in stream_map and cipher:
+                    signature_cipher = parse_qs(stream_map['signatureCipher'])
+                    url = signature_cipher.get('url', [None])[0]
+                    encrypted_signature = signature_cipher.get('s', [None])[0]
+                    query_var = signature_cipher.get('sp', ['signature'])[0]
 
-                    stream = {'url': url,
-                              'meta': meta_info,
-                              'headers': curl_headers,
-                              'playback_stats': playback_stats}
-                    stream.update(yt_format)
-                    if stream:
-                        stream_list.append(stream)
+                    signature = None
+                    if url and encrypted_signature:
+                        signature = cipher.get_signature(encrypted_signature)
+                    url = '{0}&{1}={2}'.format(url, query_var, signature) if signature else None
+
+                if not url:
+                    continue
+                url = self._add_range_param(url)
+
+                itag = str(stream_map['itag'])
+                stream_map['itag'] = itag
+                yt_format = self.FORMAT.get(itag)
+                if not yt_format:
+                    self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                    continue
+                if (yt_format.get('discontinued') or yt_format.get('unsupported')
+                        or (yt_format.get('dash/video') and not yt_format.get('dash/audio'))):
+                    continue
+
+                stream = {'url': url,
+                          'meta': meta_info,
+                          'headers': curl_headers,
+                          'playback_stats': playback_stats}
+                stream.update(yt_format)
+                stream_list.append(stream)
 
         # extract streams from map
         if std_fmts:
@@ -1089,7 +1096,7 @@ class VideoInfo(object):
 
         return stream_list
 
-    def generate_mpd(self, video_id, adaptive_fmts, duration, license_url):
+    def generate_mpd(self, video_id, adaptive_fmts, duration, license_url, cipher=None):
         discarded_streams = []
 
         def get_discarded_audio(fmt, mime_type, itag, stream, reason='unsupported'):
@@ -1237,6 +1244,18 @@ class VideoInfo(object):
             data[key][i] = {}
 
             url = stream_map.get('url')
+
+            if not url and cipher and 'signatureCipher' in stream_map:
+                signature_cipher = parse_qs(stream_map['signatureCipher'])
+                url = signature_cipher.get('url', [None])[0]
+                encrypted_signature = signature_cipher.get('s', [None])[0]
+                query_var = signature_cipher.get('sp', ['signature'])[0]
+
+                signature = None
+                if url and encrypted_signature:
+                    signature = cipher.get_signature(encrypted_signature)
+                url = '{0}&{1}={2}'.format(url, query_var, signature) if signature else None
+
             if not url:
                 del data[key][i]
                 continue
