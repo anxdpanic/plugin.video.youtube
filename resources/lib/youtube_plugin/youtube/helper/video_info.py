@@ -742,7 +742,7 @@ class VideoInfo(object):
         if 'range' in query:
             return url
 
-        content_length = query.get('clen', [0])[0]
+        content_length = query.get('clen', [''])[0]
         query['range'] = '0-{0}'.format(content_length)
 
         url = urlunsplit((parts.scheme,
