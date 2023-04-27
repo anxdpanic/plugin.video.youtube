@@ -813,7 +813,7 @@ class VideoInfo(object):
                 except requests.exceptions.RequestException as error:
                     error_message = 'Failed to get player response for video_id "%s"' % video_id
                     self._context.log_error(error_message + '\n' + traceback.format_exc())
-                    raise YouTubeException(error_message) from error
+                    raise YouTubeException(error_message)
 
                 player_response = r.json()
                 playability_status = player_response.get('playabilityStatus', {})
@@ -1250,7 +1250,7 @@ class VideoInfo(object):
             if not url:
                 del data[key][i]
                 continue
-            url = unquote(url)
+            url = urllib.parse.unquote(url)
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
             data[key][i]['baseUrl'] = url
@@ -1499,16 +1499,21 @@ class VideoInfo(object):
         filepath = '{base_path}{video_id}.mpd'.format(base_path=basepath, video_id=video_id)
 
         success = None
-        with xbmcvfs.File(filepath, 'w') as mpd_file:
+        
+        try:
+            f = xbmcvfs.File(filepath, 'w')
             if PY2:
-                success = mpd_file.write(str(out.encode('utf-8')))
+                success = f.write(str(out.encode('utf-8')))
             else:
-                success = mpd_file.write(str(out))
-            
-        if not success:
+                success = f.write(str(out))
+            f.close()
+            if not success:
+                return None, None
+            return 'http://{ipaddress}:{port}/{video_id}.mpd'.format(
+                ipaddress=ipaddress,
+                port=self._context.get_settings().httpd_port(),
+                video_id=video_id
+            ), stream_info
+        except:
             return None, None
-        return 'http://{ipaddress}:{port}/{video_id}.mpd'.format(
-            ipaddress=ipaddress,
-            port=self._context.get_settings().httpd_port(),
-            video_id=video_id
-        ), stream_info
+        
