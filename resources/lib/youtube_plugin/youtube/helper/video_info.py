@@ -732,6 +732,27 @@ class VideoInfo(object):
         return streams
 
     @staticmethod
+    def _add_range_param(url):
+        if not url:
+            return url
+
+        parts = urlsplit(url)
+        query = parse_qs(parts.query)
+
+        if 'range' in query:
+            return url
+
+        content_length = query.get('clen', [0])[0]
+        query['range'] = '0-{0}'.format(content_length)
+
+        url = urlunsplit((parts.scheme,
+                          parts.netloc,
+                          parts.path,
+                          urlencode(query, doseq=True),
+                          parts.fragment))
+        return url
+
+    @staticmethod
     def _get_error_details(playability_status, details=None):
         if ('errorScreen' not in playability_status
                 or 'playerErrorMessageRenderer' not in playability_status['errorScreen']):
@@ -1298,7 +1319,9 @@ class VideoInfo(object):
             if not url:
                 del data[key][i]
                 continue
-            url = urllib.parse.unquote(url)
+
+            url = unquote(url)
+            url = self._add_range_param(url)
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
             data[key][i]['baseUrl'] = url
