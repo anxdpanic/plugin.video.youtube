@@ -864,7 +864,7 @@ class VideoInfo(object):
                     # Text will vary depending on Accept-Language and client hl so Youtube support url is checked instead
                     url = self._get_error_details(playability_status,
                                                   details=['learnMore', 'runs', 0, 'navigationEndpoint', 'urlEndpoint', 'url'])
-                    if url.startswith('//support.google.com/youtube/answer/12318250'):
+                    if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
                 break
             # Only attempt to remove Authorization header if clients iterable was exhausted
