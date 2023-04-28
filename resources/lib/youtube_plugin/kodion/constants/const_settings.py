@@ -46,3 +46,5 @@ HTTPD_LISTEN = 'kodion.http.listen'  # (string)
 HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (string)
 
 API_CONFIG_PAGE = 'youtube.api.config.page'  # (bool)
+
+ALTERNATIVE_CLIENT = 'youtube.client.alternative'  # (bool)
