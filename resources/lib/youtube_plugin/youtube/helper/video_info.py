@@ -1019,8 +1019,8 @@ class VideoInfo(object):
                     break
 
         cipher = None
-        if ([True for fmt in adaptive_fmts if 'url' not in fmt and 'signatureCipher' in fmt]
-                or [True for fmt in std_fmts if 'url' not in fmt and 'signatureCipher' in fmt]):
+        if (any((True for fmt in adaptive_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))
+                or any((True for fmt in std_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))):
             watch_page_html = self.get_watch_page(video_id)['html']
             player_config = self.get_player_config(watch_page_html)
             player_js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
