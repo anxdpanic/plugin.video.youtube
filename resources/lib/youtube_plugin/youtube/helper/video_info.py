@@ -530,7 +530,6 @@ class VideoInfo(object):
             self._context.log_debug('`n` was not calculated for %s' % url)
             return url
 
-
         parsed_query = parse_qs(urlsplit(url).query)
 
         if parsed_query.get('ratebypass', 'no') != 'yes' and 'n' in parsed_query:
