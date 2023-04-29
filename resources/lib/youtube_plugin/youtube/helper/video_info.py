@@ -16,20 +16,16 @@ try:
     from six.moves import html_parser
 
     unescape = html_parser.HTMLParser().unescape
-    parse_qs = urllib.parse.parse_qs
-    urlsplit = urllib.parse.urlsplit   # urlsplit(url) = urllib.parse.urlsplit(url)
-    urlunsplit = urllib.parse.urlunsplit   # urlunsplit(url) = urllib.parse.urlunsplit(url)
-    urlencode = urllib.parse.urlencode  # urlencode(parsed_query) = urllib.parse.urlencode(parsed_query))
-    quote = urllib.parse.quote      # quote(javascript_url) = urllib.parse.quote(javascript_url)
-    unquote = urllib.parse.unquote    # unquote(stream_map['stream'] = urllib.parse.unquote(stream_map['stream']
+    parse_qs = urllib.parse.parse_qs        # parse_qs(url) = urllib.parse.parse_qs(url)
+    urlsplit = urllib.parse.urlsplit        # urlsplit(url) = urllib.parse.urlsplit(url)
+    urlunsplit = urllib.parse.urlunsplit    # urlunsplit(url) = urllib.parse.urlunsplit(url)
+    urlencode = urllib.parse.urlencode      # urlencode(parsed_query) = urllib.parse.urlencode(parsed_query))
+    quote = urllib.parse.quote              # quote(javascript_url) = urllib.parse.quote(javascript_url)
+    unquote = urllib.parse.unquote          # unquote(stream_map['stream'] = urllib.parse.unquote(stream_map['stream']
     
 except AttributeError:
     from html import unescape
-    from urllib.parse import parse_qs
-    from urllib.parse import urlsplit
-    from urllib.parse import urlencode
-    from urllib.parse import quote
-    from urllib.parse import unquote
+    from urllib.parse import parse_qs, urlsplit, urlunsplit, urlencode, quote, unquote
 
 import copy
 import re
@@ -549,10 +545,10 @@ class VideoInfo(object):
             if new_n:
                 parsed_query['n'] = new_n
                 parsed_query['ratebypass'] = 'yes'
-                parsed_url = urllib.parse.urlsplit(url)
+                parsed_url = urlsplit(url)
                 url = '%s://%s%s?%s' % \
                       (parsed_url.scheme, parsed_url.netloc,
-                       parsed_url.path, urllib.parse.urlencode(parsed_query))
+                       parsed_url.path, urlencode(parsed_query))
 
         return url
 
@@ -660,7 +656,7 @@ class VideoInfo(object):
                 javascript_url = found.group('url')
 
         javascript_url = _normalize(javascript_url)
-        cache_key = urllib.parse.quote(javascript_url)
+        cache_key = quote(javascript_url)
         cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key)
         if cached_js:
             return cached_js
@@ -677,13 +673,13 @@ class VideoInfo(object):
         output = ''
         if cookies:
             output += 'Cookie={all_cookies}'.format(
-                all_cookies=urllib.parse.quote(
+                all_cookies=quote(
                     '; '.join('{0}={1}'.format(c.name, c.value) for c in cookies)
                 )
             )
             output += '&'
         # Headers to be used in function 'to_play_item' of 'xbmc_items.py'.
-        output += '&'.join('{0}={1}'.format(key, urllib.parse.quote(headers[key]))
+        output += '&'.join('{0}={1}'.format(key, quote(headers[key]))
                            for key in headers)
         return output
 
@@ -1298,7 +1294,7 @@ class VideoInfo(object):
             stream_map['itag'] = str(stream_map.get('itag'))
 
             t = stream_map.get('mimeType')
-            t = urllib.parse.unquote(t)
+            t = unquote(t)
             t = t.split(';')
             mime = key = t[0]
             i = stream_map.get('itag')
