@@ -18,6 +18,7 @@ try:
     unescape = html_parser.HTMLParser().unescape
     parse_qs = urllib.parse.parse_qs
     urlsplit = urllib.parse.urlsplit   # urlsplit(url) = urllib.parse.urlsplit(url)
+    urlunsplit = urllib.parse.urlunsplit   # urlunsplit(url) = urllib.parse.urlunsplit(url)
     urlencode = urllib.parse.urlencode  # urlencode(parsed_query) = urllib.parse.urlencode(parsed_query))
     quote = urllib.parse.quote      # quote(javascript_url) = urllib.parse.quote(javascript_url)
     unquote = urllib.parse.unquote    # unquote(stream_map['stream'] = urllib.parse.unquote(stream_map['stream']
