@@ -511,7 +511,6 @@ class VideoInfo(object):
                 'osVersion': '12',
                 'platform': 'MOBILE',
             },
-            'disabled': False,
         },
         # Connection to stream URL closes after 30s
         # Subsequent attempts to connect result in 403 Forbidden error
@@ -525,7 +524,11 @@ class VideoInfo(object):
                 'osVersion': '12',
                 'platform': 'MOBILE',
             },
-            'disabled': True,
+            'headers': {
+                'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
         },
         # Only for videos that allow embedding
         # Limited to 720p on some videos
@@ -540,10 +543,14 @@ class VideoInfo(object):
                 'osVersion': '12',
                 'platform': 'MOBILE',
             },
-            'disabled': True,
+            'headers': {
+                'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
         },
         # Fallback for videos requiring age verification
-        # Requires nsig handling to overcome throttling (TODO)
+        # Requires handling of nsig to overcome throttling (TODO)
         'tv': {
             'id': 85,
             'details': {
@@ -551,57 +558,41 @@ class VideoInfo(object):
                 'clientVersion': '2.0',
                 'platform': 'TV',
             },
-            'disabled': True,
+            'headers': {
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
         },
         # Second fallback for restricted videos
-        # Requires signatureCipher handling
+        # Requires handling of signatureCipher and nsig (TODD)
         'web': {
             'id': 62,
             'details': {
                 'clientName': 'WEB_CREATOR',
                 'clientVersion': '1.20210909.07.00',
-                'platform': 'MOBILE',
             },
-            'disabled': False,
+            # Headers from the "Galaxy S20 Ultra" from Chrome dev tools device emulation
+            'headers': {
+                'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                               ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
+            },
         },
         '_common': {
             'gl': None,
             'hl': None,
         },
-    }
-
-    HEADERS = {
-        # Headers from the "Galaxy S20 Ultra" from Chrome dev tools device emulation
-        'web': {
-            'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
-                           ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                           ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
-        },
-        'android': {
-            'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
-            'X-YouTube-Client-Name': '{id}',
-            'X-YouTube-Client-Version': '{details[clientVersion]}',
-        },
-        'android_embedded': {
-            'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
-            'X-YouTube-Client-Name': '{id}',
-            'X-YouTube-Client-Version': '{details[clientVersion]}',
-        },
-        'tv': {
-            'X-YouTube-Client-Name': '{id}',
-            'X-YouTube-Client-Version': '{details[clientVersion]}',
-        },
-        '_common': {
-            'Accept': '*/*',
+        '_headers': {
             'Origin': 'https://www.youtube.com',
             'Referer': 'https://www.youtube.com/',
             'Accept-Encoding': 'gzip, deflate',
             'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
             'Accept-Language': 'en-us,en;q=0.5',
-            'X-Origin': 'https://www.youtube.com',
         },
     }
+
+    PRIORITISED_CLIENTS = None
 
     def __init__(self, context, access_token='', api_key='', language='en-US'):
         self.video_id = None
@@ -614,11 +605,16 @@ class VideoInfo(object):
         self._player_js = None
         self._calculate_n = True
         self._cipher = None
-        self._headers = None
-        
+
         if self._context.get_settings().use_alternative_client():
-            self.CLIENTS['android_embedded']['disabled'] = False
-            self.CLIENTS['android_testsuite']['disabled'] = True
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
+                                        self.CLIENTS['android_testsuite'],
+                                        self.CLIENTS['web'])
+        else:
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_testsuite'],
+                                        self.CLIENTS['android_embedded'],
+                                        self.CLIENTS['web'])
+
         self.CLIENTS['_common']['hl'] = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
         self.CLIENTS['_common']['gl'] = context.get_settings().get_string('youtube.region', 'US')
 
@@ -637,8 +633,8 @@ class VideoInfo(object):
         return self._method_get_video_info()
 
     def get_watch_page(self):
-        headers = self.HEADERS['web'].copy()
-        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
             #pass
@@ -652,8 +648,8 @@ class VideoInfo(object):
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
     def get_embed_page(self):
-        headers = self.HEADERS['web'].copy()
-        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
@@ -750,7 +746,8 @@ class VideoInfo(object):
         if cached_js:
             return cached_js
 
-        headers = (self._headers or self.HEADERS['web']).copy()
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
         result = requests.get(js_url, headers=headers, verify=self._verify, allow_redirects=True)
         javascript = result.text
 
@@ -773,9 +770,9 @@ class VideoInfo(object):
         return output
 
     def _load_manifest(self, url, meta_info=None, playback_stats=None):
-        headers = self.HEADERS['web'].copy()
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
         headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
-        headers['Origin'] = 'https://www.youtube.com'
 
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
@@ -930,17 +927,16 @@ class VideoInfo(object):
 
         player_response = {}
         for _ in range(2):
-            for client_type, client in self.CLIENTS.items():
-                if not 'id' in client or client['disabled']:
-                    continue
+            for client in self.PRIORITISED_CLIENTS:
                 client['details'].update(self.CLIENTS['_common'])
                 payload['context']['client'] = client['details']
-                headers = (self.HEADERS.get(client_type) or self.HEADERS['web']).copy()
+
+                headers = (client.get('headers') or self.CLIENTS['web']['headers']).copy()
                 for name, value in headers.items():
                     headers[name] = value.format(**client)
                 if auth_header:
                     headers['Authorization'] = auth_header
-                headers.update(self.HEADERS['_common'])
+                headers.update(self.CLIENTS['_headers'])
 
                 try:
                     r = requests.post(video_info_url, params=params, json=payload,
@@ -985,7 +981,6 @@ class VideoInfo(object):
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self.make_curl_headers(headers, cookies)
-        self._headers = headers
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
         video_details = player_response.get('videoDetails', {})
@@ -1084,7 +1079,9 @@ class VideoInfo(object):
             raise YouTubeException(reason)
 
         captions = player_response.get('captions', {})
-        meta_info['subtitles'] = Subtitles(self._context, self.HEADERS['web'],
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
+        meta_info['subtitles'] = Subtitles(self._context, headers,
                                            self.video_id, captions).get_subtitles()
 
         playback_stats = {
