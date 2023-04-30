@@ -838,6 +838,7 @@ class VideoInfo(object):
         if 'n' in query and query.get('ratebypass', [None])[0] != 'yes' and self._calculate_n:
             self._player_js = self._player_js or self.get_player_js()
             if self._calculate_n is True:
+                self._context.log_debug('nsig detected')
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
@@ -846,6 +847,7 @@ class VideoInfo(object):
                 new_query['n'] = new_n
                 new_query['ratebypass'] = 'yes'
             else:
+                self._context.log_debug('nsig handling failed')
                 self._calculate_n = False
 
         if 'range' not in query:
@@ -937,17 +939,17 @@ class VideoInfo(object):
                 headers.update(self.CLIENTS['_headers'])
 
                 try:
-                    r = requests.post(video_info_url, params=params, json=payload,
+                    result = requests.post(video_info_url, params=params, json=payload,
                                       headers=headers, verify=self._verify, cookies=None,
                                       allow_redirects=True)
-                    r.raise_for_status()
+                    result.raise_for_status()
                 except requests.exceptions.RequestException as error:
                     self._context.log_debug(error.response.text)
                     error_message = 'Failed to get player response for video_id "{0}"'.format(self.video_id)
                     self._context.log_error(error_message + '\n' + traceback.format_exc())
                     raise YouTubeException(error_message) from error
 
-                player_response = r.json()
+                player_response = result.json()
                 playability_status = player_response.get('playabilityStatus', {})
                 status = playability_status.get('status', 'OK')
 
@@ -1139,6 +1141,7 @@ class VideoInfo(object):
 
         if (any((True for fmt in adaptive_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))
                 or any((True for fmt in std_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))):
+            self._context.log_debug('signatureCipher detected')
             self._player_js = self.get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
