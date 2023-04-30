@@ -25,7 +25,8 @@ import json
 import random
 import traceback
 from html import unescape
-from urllib.parse import parse_qs, urlsplit, urlunsplit, urlencode, quote, unquote
+from urllib.parse import (parse_qs, urlsplit, urlunsplit, urlencode, urljoin,
+                          quote, unquote)
 
 import requests
 from ...kodion.utils import is_httpd_live, make_dirs, DataCache
@@ -670,16 +671,15 @@ class VideoInfo(object):
 
     @staticmethod
     def get_player_config(html):
-        config = {}
-
-        found = re.search(
-            r'window\.ytplayer\s*=\s*{}\s*;\s*ytcfg\.set\((?P<config>.+?)\)\s*;\s*(?:ytcfg|var setMessage\s*=\s*)', html
-        )
+        # pattern source is from youtube-dl
+        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
+        # LICENSE: The Unlicense
+        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', html)
 
         if found:
-            config = json.loads(found.group('config'))
-
-        return config
+            config = json.loads(found.group(1))
+            return config
+        return {}
 
     @staticmethod
     def get_player_response(html):
@@ -695,47 +695,43 @@ class VideoInfo(object):
 
     def get_player_js(self):
         def _normalize(url):
-            if url in ['http://', 'https://']:
+            if not url:
                 url = ''
+            elif url.startswith(('http://', 'https://')):
+                pass
+            elif url.startswith('//'):
+                url = urljoin('https:', url)
+            elif url.startswith('/'):
+                url = urljoin('https://www.youtube.com', url)
 
-            if url and not url.startswith('http'):
-                url = 'https://www.youtube.com/%s' % \
-                      url.lstrip('/').replace('www.youtube.com/', '')
-
-            if url:
-                self._data_cache.set('player_js_url', json.dumps({'url': url}))
-
+            self._data_cache.set('player_js_url', json.dumps({'url': url}))
             return url
 
         js_url = None
-        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, 'player_js_url')
-        if cached_js and cached_js.get('player_js_url', {}).get('url'):
-            cached_url = cached_js.get('player_js_url', {}).get('url')
-            if cached_url not in ['http://', 'https://']:
-                js_url = cached_url
+        cached_url = self._data_cache.get_item(DataCache.ONE_HOUR * 4, 'player_js_url').get('url', '')
+        if cached_url not in ['', 'http://', 'https://']:
+            js_url = cached_url
 
         if not js_url:
             html = self.get_watch_page()['html']
             player_config = self.get_player_config(html)
-            js_assets = player_config.get('assets', {}).get('js', '')
-
-            js_assets = js_assets.encode('utf8', 'ignore')
-            js_assets = js_assets.decode('utf8')
-            if not js_assets:
+            if not player_config:
                 return ''
 
-            found = re.search(r'"jsUrl":"(?P<url>[^"]*base.js)"', js_assets)
-            if not found:
-                return ''
-
-            js_url = found.group('url')
+            if 'PLAYER_JS_URL' in player_config:
+                js_url = player_config['PLAYER_JS_URL']
+            elif 'WEB_PLAYER_CONTEXT_CONFIGS' in player_config:
+                for configs in player_config['WEB_PLAYER_CONTEXT_CONFIGS'].values():
+                    if 'jsUrl' in configs:
+                        js_url = configs['jsUrl']
+                        break
 
         if not js_url:
             return ''
 
         js_url = _normalize(js_url)
         cache_key = quote(js_url)
-        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key)
+        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key).get('js')
         if cached_js:
             return cached_js
 
@@ -744,7 +740,7 @@ class VideoInfo(object):
         result = requests.get(js_url, headers=headers, verify=self._verify, allow_redirects=True)
         javascript = result.text
 
-        self._data_cache.set(cache_key, javascript)
+        self._data_cache.set(cache_key, json.dumps({'js': javascript}))
         return javascript
 
     @staticmethod
@@ -813,9 +809,19 @@ class VideoInfo(object):
         encrypted_signature = signature_cipher.get('s', [None])[0]
         query_var = signature_cipher.get('sp', ['signature'])[0]
 
-        signature = None
-        if url and encrypted_signature:
-            signature = self._cipher.get_signature(encrypted_signature)
+        if not url or not encrypted_signature:
+            return None
+
+        signature = self._data_cache.get_item(DataCache.ONE_HOUR * 4, encrypted_signature).get('sig')
+        if not signature:
+            try:
+                signature = self._cipher.get_signature(encrypted_signature)
+            except Exception as error:
+                self._context.log_debug('{0}: {1}\n{2}'.format(error, encrypted_signature, traceback.format_exc()))
+                self._context.log_error('Stream URL unable to be extracted from signatureCipher')
+                return None
+            self._data_cache.set(encrypted_signature, json.dumps({'sig': signature}))
+
         if signature:
             url = '{0}&{1}={2}'.format(url, query_var, signature)
             return url
