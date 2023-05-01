@@ -564,10 +564,17 @@
         </category>
         <category help="" id="advanced" label="30031">
             <group id="1">
-                <setting help="" id="youtube.client.alternative" label="30737" type="boolean">
+                <setting help="" id="youtube.client.selection" label="30737" type="integer">
                     <level>0</level>
-                    <default>false</default>
-                    <control type="toggle"/>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="30532">0</option>
+                            <option label="30738">1</option>
+                            <option label="30739">2</option>
+                        </options>
+                    </constraints>
+                    <control format="string" type="spinner"/>
                 </setting>
                 <setting help="" id="simple.requests.ssl.verify" label="30578" type="boolean">
                     <level>0</level>

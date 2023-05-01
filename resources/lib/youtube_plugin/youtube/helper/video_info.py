@@ -579,10 +579,12 @@ class VideoInfo(object):
     PRIORITISED_CLIENTS = None
 
     def __init__(self, context, access_token='', api_key='', language='en-US'):
+        settings = context.get_settings()
+
         self.video_id = None
         self._context = context
         self._data_cache = self._context.get_data_cache()
-        self._verify = context.get_settings().verify_ssl()
+        self._verify = settings.verify_ssl()
         self._language = language.replace('-', '_')
         self._access_token = access_token
         self._api_key = api_key
@@ -590,17 +592,25 @@ class VideoInfo(object):
         self._calculate_n = True
         self._cipher = None
 
-        if self._context.get_settings().use_alternative_client():
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
+        client_selection = settings.client_selection()
+        # Alternate #1
+        if client_selection == 1:
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android'],
                                         self.CLIENTS['android_testsuite'],
                                         self.CLIENTS['web'])
+        # Alternate #1
+        elif client_selection == 2:
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
+                                        self.CLIENTS['tv'],
+                                        self.CLIENTS['web'])
+        # Default
         else:
             self.PRIORITISED_CLIENTS = (self.CLIENTS['android_testsuite'],
                                         self.CLIENTS['android_embedded'],
                                         self.CLIENTS['web'])
 
-        self.CLIENTS['_common']['hl'] = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
-        self.CLIENTS['_common']['gl'] = context.get_settings().get_string('youtube.region', 'US')
+        self.CLIENTS['_common']['hl'] = settings.get_string('youtube.language', 'en_US').replace('-', '_')
+        self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
 
     @staticmethod
     def generate_cpn():
