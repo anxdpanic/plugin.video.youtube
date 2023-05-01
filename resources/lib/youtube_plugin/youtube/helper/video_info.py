@@ -1059,11 +1059,14 @@ class VideoInfo(object):
 
             raise YouTubeException(reason)
 
-        captions = player_response.get('captions', {})
-        headers = self.CLIENTS['web']['headers'].copy()
-        headers.update(self.CLIENTS['_headers'])
-        meta_info['subtitles'] = Subtitles(self._context, headers,
-                                           self.video_id, captions).get_subtitles()
+        captions = player_response.get('captions')
+        if captions:
+            headers = self.CLIENTS['web']['headers'].copy()
+            headers.update(self.CLIENTS['_headers'])
+            meta_info['subtitles'] = Subtitles(self._context, headers,
+                                               self.video_id, captions).get_subtitles()
+        else:
+            meta_info['subtitles'] = []
 
         playback_stats = {
             'playback_url': '',
