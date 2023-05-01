@@ -14,12 +14,14 @@ import json
 import random
 import traceback
 from html import unescape
-from urllib.parse import parse_qs, urlsplit, urlunsplit, urlencode, quote, unquote
+from urllib.parse import (parse_qs, urlsplit, urlunsplit, urlencode, urljoin,
+                          quote, unquote)
 
 import requests
 from ...kodion.utils import is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .subtitles import Subtitles
+from .ratebypass import ratebypass
 from .signature.cipher import Cipher
 
 import xbmcvfs
@@ -482,27 +484,123 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
-    # Headers from the "Galaxy S20 Ultra" from Chrome dev tools but running Android 12 to match client details
-    MOBILE_HEADERS = {
-        'User-Agent': ('Mozilla/5.0 (Linux; Android 12; SM-G981B)'
-                       ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                       ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
-        'Accept': '*/*',
-        'DNT': '1',
-        'Accept-Encoding': 'gzip, deflate',
-        'Accept-Language': 'en-US,en;q=0.5'
+    CLIENTS = {
+        'android_testsuite': {
+            'id': 30,
+            'details': {
+                'clientName': 'ANDROID_TESTSUITE',
+                'clientVersion': '1.9',
+                'androidSdkVersion': '31',
+                'osName': 'Android',
+                'osVersion': '12',
+                'platform': 'MOBILE',
+            },
+        },
+        # Connection to stream URL closes after 30s
+        # Subsequent attempts to connect result in 403 Forbidden error
+        'android': {
+            'id': 3,
+            'details': {
+                'clientName': 'ANDROID',
+                'clientVersion': '17.36.4',
+                'androidSdkVersion': '31',
+                'osName': 'Android',
+                'osVersion': '12',
+                'platform': 'MOBILE',
+            },
+            'headers': {
+                'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
+        },
+        # Only for videos that allow embedding
+        # Limited to 720p on some videos
+        'android_embedded': {
+            'id': 55,
+            'details': {
+                'clientName': 'ANDROID_EMBEDDED_PLAYER',
+                'clientVersion': '17.36.4',
+                'clientScreen': 'EMBED',
+                'androidSdkVersion': '31',
+                'osName': 'Android',
+                'osVersion': '12',
+                'platform': 'MOBILE',
+            },
+            'headers': {
+                'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
+        },
+        # Fallback for videos requiring age verification
+        # Requires handling of nsig to overcome throttling (TODO)
+        'tv': {
+            'id': 85,
+            'details': {
+                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'clientVersion': '2.0',
+                'platform': 'TV',
+            },
+            'headers': {
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
+        },
+        # Second fallback for restricted videos
+        # Requires handling of signatureCipher and nsig (TODD)
+        'web': {
+            'id': 62,
+            'details': {
+                'clientName': 'WEB_CREATOR',
+                'clientVersion': '1.20210909.07.00',
+            },
+            # Headers from the "Galaxy S20 Ultra" from Chrome dev tools device emulation
+            'headers': {
+                'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                               ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
+            },
+        },
+        '_common': {
+            'gl': None,
+            'hl': None,
+        },
+        '_headers': {
+            'Origin': 'https://www.youtube.com',
+            'Referer': 'https://www.youtube.com/',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-us,en;q=0.5',
+        },
     }
 
+    PRIORITISED_CLIENTS = None
+
     def __init__(self, context, access_token='', api_key='', language='en-US'):
+        self.video_id = None
         self._context = context
         self._data_cache = self._context.get_data_cache()
         self._verify = context.get_settings().verify_ssl()
         self._language = language.replace('-', '_')
-        self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
-        self.region = context.get_settings().get_string('youtube.region', 'US')
         self._access_token = access_token
         self._api_key = api_key
-        self._calculate_n = None
+        self._player_js = None
+        self._calculate_n = True
+        self._cipher = None
+
+        if self._context.get_settings().use_alternative_client():
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
+                                        self.CLIENTS['android_testsuite'],
+                                        self.CLIENTS['web'])
+        else:
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_testsuite'],
+                                        self.CLIENTS['android_embedded'],
+                                        self.CLIENTS['web'])
+
+        self.CLIENTS['_common']['hl'] = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
+        self.CLIENTS['_common']['gl'] = context.get_settings().get_string('youtube.region', 'US')
 
     @staticmethod
     def generate_cpn():
@@ -514,37 +612,17 @@ class VideoInfo(object):
         cpn = ''.join((cpn_alphabet[random.randint(0, 256) & 63] for _ in range(0, 16)))
         return cpn
 
-    def calculate_n(self, url):
-        if not self._calculate_n:
-            self._context.log_debug('`n` was not calculated for %s' % url)
-            return url
-
-        parsed_query = parse_qs(urlsplit(url).query)
-
-        if parsed_query.get('ratebypass', 'no') != 'yes' and 'n' in parsed_query:
-            # Cipher n to get the updated value
-            initial_n = list(parsed_query['n'])
-            new_n = self._calculate_n.calculate_n(initial_n)
-            if new_n:
-                parsed_query['n'] = new_n
-                parsed_query['ratebypass'] = 'yes'
-                parsed_url = urlsplit(url)
-                url = '%s://%s%s?%s' % \
-                      (parsed_url.scheme, parsed_url.netloc,
-                       parsed_url.path, urlencode(parsed_query))
-
-        return url
-
     def load_stream_infos(self, video_id):
-        return self._method_get_video_info(video_id)
+        self.video_id = video_id
+        return self._method_get_video_info()
 
-    def get_watch_page(self, video_id):
-        headers = self.MOBILE_HEADERS.copy()
-        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    def get_watch_page(self):
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
-        url = 'https://www.youtube.com/watch?v={video_id}'.format(video_id=video_id)
+        url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
         result = requests.get(url, headers=headers, verify=self._verify,
@@ -552,13 +630,13 @@ class VideoInfo(object):
 
         return {'url': result.url, 'html': result.text, 'cookies': result.cookies}
 
-    def get_embed_page(self, video_id):
-        headers = self.MOBILE_HEADERS.copy()
-        headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'
+    def get_embed_page(self):
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
         if self._access_token:
             headers['Authorization'] = 'Bearer %s' % self._access_token
 
-        url = 'https://www.youtube.com/embed/{video_id}'.format(video_id=video_id)
+        url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
         result = requests.get(url, headers=headers, verify=self._verify,
@@ -582,16 +660,15 @@ class VideoInfo(object):
 
     @staticmethod
     def get_player_config(html):
-        config = {}
-
-        found = re.search(
-            r'window\.ytplayer\s*=\s*{}\s*;\s*ytcfg\.set\((?P<config>.+?)\)\s*;\s*(?:ytcfg|var setMessage\s*=\s*)', html
-        )
+        # pattern source is from youtube-dl
+        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
+        # LICENSE: The Unlicense
+        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', html)
 
         if found:
-            config = json.loads(found.group('config'))
-
-        return config
+            config = json.loads(found.group(1))
+            return config
+        return {}
 
     @staticmethod
     def get_player_response(html):
@@ -605,49 +682,54 @@ class VideoInfo(object):
 
         return response
 
-    def get_player_js(self, html, javascript_url=''):
+    def get_player_js(self):
         def _normalize(url):
-            if url in ['http://', 'https://']:
+            if not url:
                 url = ''
+            elif url.startswith(('http://', 'https://')):
+                pass
+            elif url.startswith('//'):
+                url = urljoin('https:', url)
+            elif url.startswith('/'):
+                url = urljoin('https://www.youtube.com', url)
 
-            if url and not url.startswith('http'):
-                url = 'https://www.youtube.com/%s' % \
-                      url.lstrip('/').replace('www.youtube.com/', '')
-
-            if url:
-                self._data_cache.set('player_javascript', json.dumps({'url': url}))
-
+            self._data_cache.set('player_js_url', json.dumps({'url': url}))
             return url
 
-        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, 'player_javascript')
-        if cached_js and cached_js.get('player_javascript', {}).get('url'):
-            cached_url = cached_js.get('player_javascript', {}).get('url')
-            if cached_url not in ['http://', 'https://']:
-                javascript_url = cached_url
+        js_url = None
+        cached_url = self._data_cache.get_item(DataCache.ONE_HOUR * 4, 'player_js_url').get('url', '')
+        if cached_url not in ['', 'http://', 'https://']:
+            js_url = cached_url
 
-        if not javascript_url:
-            html = html.encode('utf8', 'ignore')
-            html = html.decode('utf8')
-
-            if not html:
+        if not js_url:
+            html = self.get_watch_page()['html']
+            player_config = self.get_player_config(html)
+            if not player_config:
                 return ''
 
-            found = re.search(r'"jsUrl":"(?P<url>[^"]*base.js)"', html)
+            if 'PLAYER_JS_URL' in player_config:
+                js_url = player_config['PLAYER_JS_URL']
+            elif 'WEB_PLAYER_CONTEXT_CONFIGS' in player_config:
+                for configs in player_config['WEB_PLAYER_CONTEXT_CONFIGS'].values():
+                    if 'jsUrl' in configs:
+                        js_url = configs['jsUrl']
+                        break
 
-            if found:
-                javascript_url = found.group('url')
+        if not js_url:
+            return ''
 
-        javascript_url = _normalize(javascript_url)
-        cache_key = quote(javascript_url)
-        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key)
+        js_url = _normalize(js_url)
+        cache_key = quote(js_url)
+        cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key).get('js')
         if cached_js:
             return cached_js
 
-        headers = self.MOBILE_HEADERS.copy()
-        result = requests.get(javascript_url, headers=headers, verify=self._verify, allow_redirects=True)
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
+        result = requests.get(js_url, headers=headers, verify=self._verify, allow_redirects=True)
         javascript = result.text
 
-        self._data_cache.set(javascript_url, cache_key)
+        self._data_cache.set(cache_key, json.dumps({'js': javascript}))
         return javascript
 
     @staticmethod
@@ -665,10 +747,10 @@ class VideoInfo(object):
                            for key in headers)
         return output
 
-    def _load_manifest(self, url, video_id, meta_info=None, playback_stats=None):
-        headers = self.MOBILE_HEADERS.copy()
-        headers['Referer'] = 'https://www.youtube.com/watch?v=%s' % video_id
-        headers['Origin'] = 'https://www.youtube.com'
+    def _load_manifest(self, url, meta_info=None, playback_stats=None):
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
+        headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
 
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
@@ -710,19 +792,61 @@ class VideoInfo(object):
             streams.append(video_stream)
         return streams
 
-    @staticmethod
-    def _add_range_param(url):
+    def _process_signature_cipher(self, stream_map):
+        signature_cipher = parse_qs(stream_map['signatureCipher'])
+        url = signature_cipher.get('url', [None])[0]
+        encrypted_signature = signature_cipher.get('s', [None])[0]
+        query_var = signature_cipher.get('sp', ['signature'])[0]
+
+        if not url or not encrypted_signature:
+            return None
+
+        signature = self._data_cache.get_item(DataCache.ONE_HOUR * 4, encrypted_signature).get('sig')
+        if not signature:
+            try:
+                signature = self._cipher.get_signature(encrypted_signature)
+            except Exception as error:
+                self._context.log_debug('{0}: {1}\n{2}'.format(error, encrypted_signature, traceback.format_exc()))
+                self._context.log_error('Stream URL unable to be extracted from signatureCipher')
+                return None
+            self._data_cache.set(encrypted_signature, json.dumps({'sig': signature}))
+
+        if signature:
+            url = '{0}&{1}={2}'.format(url, query_var, signature)
+            return url
+        return None
+
+    def _process_url_params(self, url):
         if not url:
             return url
 
         parts = urlsplit(url)
         query = parse_qs(parts.query)
+        new_query = {}
 
-        if 'range' in query:
+        if 'n' in query and query.get('ratebypass', [None])[0] != 'yes' and self._calculate_n:
+            self._player_js = self._player_js or self.get_player_js()
+            if self._calculate_n is True:
+                self._context.log_debug('nsig detected')
+                self._calculate_n = ratebypass.CalculateN(self._player_js)
+
+            # Cipher n to get the updated value
+            new_n = self._calculate_n.calculate_n(query['n'])
+            if new_n:
+                new_query['n'] = new_n
+                new_query['ratebypass'] = 'yes'
+            else:
+                self._context.log_debug('nsig handling failed')
+                self._calculate_n = False
+
+        if 'range' not in query:
+            content_length = query.get('clen', [''])[0]
+            new_query['range'] = '0-{0}'.format(content_length)
+
+        if new_query:
+            query.update(new_query)
+        else:
             return url
-
-        content_length = query.get('clen', [''])[0]
-        query['range'] = '0-{0}'.format(content_length)
 
         url = urlunsplit((parts.scheme,
                           parts.netloc,
@@ -763,56 +887,15 @@ class VideoInfo(object):
             return status_reason['simpleText']
         return None
 
-    def _method_get_video_info(self, video_id):
-        headers = self.MOBILE_HEADERS.copy()
-
-        params = None
+    def _method_get_video_info(self):
         if self._access_token:
-            headers['Authorization'] = 'Bearer %s' % self._access_token
+            auth_header = 'Bearer %s' % self._access_token
+            params = None
         else:
+            auth_header = None
             params = {'key': self._api_key}
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
-
-        clients = [
-            {
-                'clientName': 'ANDROID',
-                'clientVersion': '18.16.34',
-                'androidSdkVersion': 31,
-                'osName': 'Android',
-                'osVersion': '12',
-                'platform': 'MOBILE',
-                'gl': self.region,
-                'hl': self.language,
-            }
-            if self._context.get_settings().use_alternative_client() else
-            {
-                'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                'clientVersion': '18.14.41',
-                'clientScreen': 'EMBED',
-                'androidSdkVersion': 31,
-                'osName': 'Android',
-                'osVersion': '12',
-                'platform': 'MOBILE',
-                'gl': self.region,
-                'hl': self.language,
-            },
-            # Fallback for videos requiring age verification
-            {
-                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                'clientVersion': '2.0',
-                'clientScreen': 'EMBED',
-                'gl': self.region,
-                'hl': self.language,
-            },
-            # Second fallback for restricted videos
-            {
-                'clientName': 'WEB_CREATOR',
-                'clientVersion': '1.20210909.07.00',
-                'gl': self.region,
-                'hl': self.language,
-            }
-        ]
 
         payload = {
             'contentCheckOk': True,
@@ -829,43 +912,56 @@ class VideoInfo(object):
             'user': {
                 'lockedSafetyMode': False
             },
-            'videoId': video_id,
+            'videoId': self.video_id,
         }
 
         player_response = {}
         for _ in range(2):
-            for client in clients:
-                payload['context']['client'] = client
+            for client in self.PRIORITISED_CLIENTS:
+                client['details'].update(self.CLIENTS['_common'])
+                payload['context']['client'] = client['details']
+
+                headers = (client.get('headers') or self.CLIENTS['web']['headers']).copy()
+                for name, value in headers.items():
+                    headers[name] = value.format(**client)
+                if auth_header:
+                    headers['Authorization'] = auth_header
+                headers.update(self.CLIENTS['_headers'])
 
                 try:
-                    r = requests.post(video_info_url, params=params, json=payload,
+                    result = requests.post(video_info_url, params=params, json=payload,
                                       headers=headers, verify=self._verify, cookies=None,
                                       allow_redirects=True)
-                    r.raise_for_status()
+                    result.raise_for_status()
                 except requests.exceptions.RequestException as error:
-                    error_message = 'Failed to get player response for video_id "%s"' % video_id
+                    self._context.log_debug(error.response.text)
+                    error_message = 'Failed to get player response for video_id "{0}"'.format(self.video_id)
                     self._context.log_error(error_message + '\n' + traceback.format_exc())
                     raise YouTubeException(error_message) from error
 
-                player_response = r.json()
+                player_response = result.json()
                 playability_status = player_response.get('playabilityStatus', {})
                 status = playability_status.get('status', 'OK')
 
-                if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'):
+                if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED',
+                              'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'):
                     if status != 'ERROR':
                         continue
-                    # This is used to check if a "The following content is not available on this app." error occurs
-                    # Text will vary depending on Accept-Language and client hl so Youtube support url is checked instead
+                    # This is used to check if a "The following content is not available on this app."
+                    # error occurs. Text will vary depending on Accept-Language and client hl so
+                    # Youtube support url is checked instead
                     url = self._get_error_details(playability_status,
-                                                  details=['learnMore', 'runs', 0, 'navigationEndpoint', 'urlEndpoint', 'url'])
+                                                  details=['learnMore', 'runs', 0,
+                                                           'navigationEndpoint',
+                                                           'urlEndpoint', 'url'])
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
                 break
             # Only attempt to remove Authorization header if clients iterable was exhausted
             # i.e. request attempted using all clients
             else:
-                if 'Authorization' in headers:
-                    del headers['Authorization']
+                if auth_header:
+                    auth_header = None
                     params = {'key': self._api_key}
                     continue
             # Otherwise skip retrying clients without Authorization header
@@ -890,7 +986,7 @@ class VideoInfo(object):
                      'images': {},
                      'subtitles': []}
 
-        meta_info['video']['id'] = video_details.get('videoId', video_id)
+        meta_info['video']['id'] = video_details.get('videoId', self.video_id)
 
         meta_info['video']['title'] = video_details.get('title', '')
         meta_info['channel']['author'] = video_details.get('author', '')
@@ -911,7 +1007,7 @@ class VideoInfo(object):
             {'from': 'iurlsd', 'to': 'standard', 'image': 'sddefault.jpg'},
             {'from': 'thumbnail_url', 'to': 'default', 'image': 'default.jpg'}]
         for image_data in image_data_list:
-            image_url = 'https://i.ytimg.com/vi/{video_id}/{image}'.format(video_id=video_id, image=image_data['image'])
+            image_url = 'https://i.ytimg.com/vi/{0}/{1}'.format(self.video_id, image_data['image'])
             if image_url:
                 if is_live:
                     image_url = image_url.replace('.jpg', '_live.jpg')
@@ -927,7 +1023,8 @@ class VideoInfo(object):
         }
 
         if (playability_status.get('status', 'ok').lower() != 'ok'
-                and not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1) and not self._context.get_settings().age_gate())):
+                and not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1)
+                and not self._context.get_settings().age_gate())):
             reason = None
             if playability_status.get('status') == 'LIVE_STREAM_OFFLINE':
                 if playability_status.get('reason'):
@@ -953,8 +1050,10 @@ class VideoInfo(object):
             raise YouTubeException(reason)
 
         captions = player_response.get('captions', {})
-        meta_info['subtitles'] = Subtitles(self._context, self.MOBILE_HEADERS,
-                                           video_id, captions).get_subtitles()
+        headers = self.CLIENTS['web']['headers'].copy()
+        headers.update(self.CLIENTS['_headers'])
+        meta_info['subtitles'] = Subtitles(self._context, headers,
+                                           self.video_id, captions).get_subtitles()
 
         playback_stats = {
             'playback_url': '',
@@ -983,7 +1082,7 @@ class VideoInfo(object):
         stream_list = []
 
         if live_url:
-            stream_list.extend(self._load_manifest(live_url, video_id,
+            stream_list.extend(self._load_manifest(live_url,
                                                    meta_info=meta_info,
                                                    playback_stats=playback_stats))
 
@@ -1018,20 +1117,16 @@ class VideoInfo(object):
                     license_info['token'] = self._access_token
                     break
 
-        cipher = None
-        if ([True for fmt in adaptive_fmts if 'url' not in fmt and 'signatureCipher' in fmt]
-                or [True for fmt in std_fmts if 'url' not in fmt and 'signatureCipher' in fmt]):
-            watch_page_html = self.get_watch_page(video_id)['html']
-            player_config = self.get_player_config(watch_page_html)
-            player_js = self.get_player_js(video_id, player_config.get('assets', {}).get('js', ''))
-            cipher = Cipher(self._context, javascript=player_js)
+        if (any((True for fmt in adaptive_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))
+                or any((True for fmt in std_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))):
+            self._context.log_debug('signatureCipher detected')
+            self._player_js = self.get_player_js()
+            self._cipher = Cipher(self._context, javascript=self._player_js)
 
         if not is_live and httpd_is_live and adaptive_fmts:
-            mpd_url, s_info = self.generate_mpd(video_id,
-                                                adaptive_fmts,
+            mpd_url, s_info = self.generate_mpd(adaptive_fmts,
                                                 video_details.get('lengthSeconds', '0'),
-                                                license_info.get('url'),
-                                                cipher)
+                                                license_info.get('url'))
 
         if mpd_url:
             video_stream = {
@@ -1066,27 +1161,19 @@ class VideoInfo(object):
                     video_stream['audio']['bitrate'] = int(s_info['audio'].get('bitrate', 0))
             stream_list.append(video_stream)
 
-        def parse_to_stream_list(streams, cipher=None):
+        def parse_to_stream_list(streams):
             for stream_map in streams:
                 url = stream_map.get('url')
                 conn = stream_map.get('conn')
 
                 if not url and conn:
                     url = '%s?%s' % (conn, unquote(stream_map['stream']))
-                elif not url and 'signatureCipher' in stream_map and cipher:
-                    signature_cipher = parse_qs(stream_map['signatureCipher'])
-                    url = signature_cipher.get('url', [None])[0]
-                    encrypted_signature = signature_cipher.get('s', [None])[0]
-                    query_var = signature_cipher.get('sp', ['signature'])[0]
-
-                    signature = None
-                    if url and encrypted_signature:
-                        signature = cipher.get_signature(encrypted_signature)
-                    url = '{0}&{1}={2}'.format(url, query_var, signature) if signature else None
+                elif not url and self._cipher and 'signatureCipher' in stream_map:
+                    url = self._process_signature_cipher(stream_map)
 
                 if not url:
                     continue
-                url = self._add_range_param(url)
+                url = self._process_url_params(url)
 
                 itag = str(stream_map['itag'])
                 stream_map['itag'] = itag
@@ -1118,7 +1205,7 @@ class VideoInfo(object):
 
         return stream_list
 
-    def generate_mpd(self, video_id, adaptive_fmts, duration, license_url, cipher=None):
+    def generate_mpd(self, adaptive_fmts, duration, license_url):
         discarded_streams = []
 
         def get_discarded_audio(fmt, mime_type, itag, stream, reason='unsupported'):
@@ -1267,22 +1354,14 @@ class VideoInfo(object):
 
             url = stream_map.get('url')
 
-            if not url and cipher and 'signatureCipher' in stream_map:
-                signature_cipher = parse_qs(stream_map['signatureCipher'])
-                url = signature_cipher.get('url', [None])[0]
-                encrypted_signature = signature_cipher.get('s', [None])[0]
-                query_var = signature_cipher.get('sp', ['signature'])[0]
-
-                signature = None
-                if url and encrypted_signature:
-                    signature = cipher.get_signature(encrypted_signature)
-                url = '{0}&{1}={2}'.format(url, query_var, signature) if signature else None
+            if not url and self._cipher and 'signatureCipher' in stream_map:
+                url = self._process_signature_cipher(stream_map)
 
             if not url:
                 del data[key][i]
                 continue
             url = unquote(url)
-            url = self._add_range_param(url)
+            url = self._process_url_params(url)
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
             data[key][i]['baseUrl'] = url
@@ -1528,14 +1607,14 @@ class VideoInfo(object):
         if not has_video_stream:
             self._context.log_debug('Generated MPD no supported video streams found')
 
-        filepath = '{base_path}{video_id}.mpd'.format(base_path=basepath, video_id=video_id)
+        filepath = '{0}{1}.mpd'.format(basepath, self.video_id)
         success = None
         with xbmcvfs.File(filepath, 'w') as mpd_file:
             success = mpd_file.write(str(out))
         if not success:
             return None, None
-        return 'http://{ipaddress}:{port}/{video_id}.mpd'.format(
-            ipaddress=ipaddress,
-            port=self._context.get_settings().httpd_port(),
-            video_id=video_id
+        return 'http://{0}:{1}/{2}.mpd'.format(
+            ipaddress,
+            self._context.get_settings().httpd_port(),
+            self.video_id
         ), stream_info
