@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2023-05-01 00:24+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
@@ -1241,6 +1241,14 @@ msgstr "Nascondi video brevi (1 minuto o meno)"
 msgctxt "#30737"
 msgid "Use alternate client details"
 msgstr "Usa dettagli alternativi del cliente"
+
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
 
 #~ msgctxt "#30900"
 #~ msgid "Subscriptions groups"

@@ -1238,6 +1238,14 @@ msgctxt "#30737"
 msgid "Use alternate client details"
 msgstr ""
 
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
+
 #~ msgctxt "#30100"
 #~ msgid "Favorites"
 #~ msgstr "Obľúbené"

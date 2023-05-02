@@ -1239,3 +1239,11 @@ msgstr "Sakrij kratke video snimke (1 minuta ii manje)"
 msgctxt "#30737"
 msgid "Use alternate client details"
 msgstr ""
+
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
