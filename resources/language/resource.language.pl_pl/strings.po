@@ -1238,6 +1238,14 @@ msgctxt "#30737"
 msgid "Use alternate client details"
 msgstr "Użyj danych klienta alternatywnego"
 
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
+
 #~ msgctxt "#30900"
 #~ msgid "Subscriptions groups"
 #~ msgstr "Grupy subskrypcji"
