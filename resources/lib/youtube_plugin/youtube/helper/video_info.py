@@ -485,27 +485,35 @@ class VideoInfo(object):
     }
 
     CLIENTS = {
+        # 4k no VP9 HDR
         'android_testsuite': {
             'id': 30,
+            'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             'details': {
                 'clientName': 'ANDROID_TESTSUITE',
                 'clientVersion': '1.9',
-                'androidSdkVersion': '31',
+                'androidSdkVersion': '29',
                 'osName': 'Android',
-                'osVersion': '12',
+                'osVersion': '10',
                 'platform': 'MOBILE',
+            },
+            'headers': {
+                'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
         # Connection to stream URL closes after 30s
         # Subsequent attempts to connect result in 403 Forbidden error
         'android': {
             'id': 3,
+            'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             'details': {
                 'clientName': 'ANDROID',
-                'clientVersion': '17.36.4',
-                'androidSdkVersion': '31',
+                'clientVersion': '17.31.35',
+                'androidSdkVersion': '29',
                 'osName': 'Android',
-                'osVersion': '12',
+                'osVersion': '10',
                 'platform': 'MOBILE',
             },
             'headers': {
@@ -518,13 +526,14 @@ class VideoInfo(object):
         # Limited to 720p on some videos
         'android_embedded': {
             'id': 55,
+            'api_key': 'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
             'details': {
                 'clientName': 'ANDROID_EMBEDDED_PLAYER',
                 'clientVersion': '17.36.4',
                 'clientScreen': 'EMBED',
-                'androidSdkVersion': '31',
+                'androidSdkVersion': '29',
                 'osName': 'Android',
-                'osVersion': '12',
+                'osVersion': '10',
                 'platform': 'MOBILE',
             },
             'headers': {
@@ -533,27 +542,33 @@ class VideoInfo(object):
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
-        # Fallback for videos requiring age verification
-        # Requires handling of nsig to overcome throttling (TODO)
-        'tv': {
-            'id': 85,
+        # 4k with HDR
+        # Some videos block this client, may also require embedding enabled
+        'android_youtube_tv': {
+            'id': 29,
+            'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             'details': {
-                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                'clientVersion': '2.0',
-                'platform': 'TV',
+                'clientName': 'ANDROID_UNPLUGGED',
+                'clientVersion': '6.36',
+                'androidSdkVersion': '29',
+                'osName': 'Android',
+                'osVersion': '10',
+                'platform': 'MOBILE',
             },
             'headers': {
+                'User-Agent': 'com.google.android.apps.youtube.unplugged/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
-        # Second fallback for restricted videos
-        # Requires handling of signatureCipher and nsig (TODD)
+        # Used for misc api requests by default
+        # Requires handling of nsig to overcome throttling (TODO)
         'web': {
-            'id': 62,
+            'id': 1,
+            'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
             'details': {
-                'clientName': 'WEB_CREATOR',
-                'clientVersion': '1.20210909.07.00',
+                'clientName': 'WEB',
+                'clientVersion': '2.20220801.00.00',
             },
             # Headers from the "Galaxy S20 Ultra" from Chrome dev tools device emulation
             'headers': {
@@ -579,10 +594,12 @@ class VideoInfo(object):
     PRIORITISED_CLIENTS = None
 
     def __init__(self, context, access_token='', api_key='', language='en-US'):
+        settings = context.get_settings()
+
         self.video_id = None
         self._context = context
         self._data_cache = self._context.get_data_cache()
-        self._verify = context.get_settings().verify_ssl()
+        self._verify = settings.verify_ssl()
         self._language = language.replace('-', '_')
         self._access_token = access_token
         self._api_key = api_key
@@ -590,17 +607,25 @@ class VideoInfo(object):
         self._calculate_n = True
         self._cipher = None
 
-        if self._context.get_settings().use_alternative_client():
+        client_selection = settings.client_selection()
+        # Alternate #1
+        if client_selection == 1:
             self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['web'])
+                                        self.CLIENTS['android_youtube_tv'],
+                                        self.CLIENTS['android_testsuite'])
+        # Alternate #2
+        elif client_selection == 2:
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android'],
+                                        self.CLIENTS['android_youtube_tv'],
+                                        self.CLIENTS['android_testsuite'])
+        # Default
         else:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['web'])
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_youtube_tv'],
+                                        self.CLIENTS['android_testsuite'],
+                                        self.CLIENTS['android_embedded'])
 
-        self.CLIENTS['_common']['hl'] = context.get_settings().get_string('youtube.language', 'en_US').replace('-', '_')
-        self.CLIENTS['_common']['gl'] = context.get_settings().get_string('youtube.region', 'US')
+        self.CLIENTS['_common']['hl'] = settings.get_string('youtube.language', 'en_US').replace('-', '_')
+        self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
 
     @staticmethod
     def generate_cpn():
@@ -836,7 +861,7 @@ class VideoInfo(object):
                 new_query['n'] = new_n
                 new_query['ratebypass'] = 'yes'
             else:
-                self._context.log_debug('nsig handling failed')
+                self._context.log_error('nsig handling failed')
                 self._calculate_n = False
 
         if 'range' not in query:
@@ -890,10 +915,8 @@ class VideoInfo(object):
     def _method_get_video_info(self):
         if self._access_token:
             auth_header = 'Bearer %s' % self._access_token
-            params = None
         else:
             auth_header = None
-            params = {'key': self._api_key}
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
@@ -926,6 +949,9 @@ class VideoInfo(object):
                     headers[name] = value.format(**client)
                 if auth_header:
                     headers['Authorization'] = auth_header
+                    params = None
+                else:
+                    params = {'key': client['api_key'] or self._api_key}
                 headers.update(self.CLIENTS['_headers'])
 
                 try:
@@ -962,10 +988,11 @@ class VideoInfo(object):
             else:
                 if auth_header:
                     auth_header = None
-                    params = {'key': self._api_key}
                     continue
             # Otherwise skip retrying clients without Authorization header
             break
+        self._context.log_debug('Requested video info with client: {0} (logged {1})'.format(
+            client['details']['clientName'], 'in' if auth_header else 'out'))
 
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
         # the stream during playback. The YT player doesn't seem to use any
@@ -1049,11 +1076,14 @@ class VideoInfo(object):
 
             raise YouTubeException(reason)
 
-        captions = player_response.get('captions', {})
-        headers = self.CLIENTS['web']['headers'].copy()
-        headers.update(self.CLIENTS['_headers'])
-        meta_info['subtitles'] = Subtitles(self._context, headers,
-                                           self.video_id, captions).get_subtitles()
+        captions = player_response.get('captions')
+        if captions:
+            headers = self.CLIENTS['web']['headers'].copy()
+            headers.update(self.CLIENTS['_headers'])
+            meta_info['subtitles'] = Subtitles(self._context, headers,
+                                               self.video_id, captions).get_subtitles()
+        else:
+            meta_info['subtitles'] = []
 
         playback_stats = {
             'playback_url': '',
