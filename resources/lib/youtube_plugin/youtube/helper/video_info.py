@@ -863,7 +863,7 @@ class VideoInfo(object):
         if 'n' in query and query.get('ratebypass', [None])[0] != 'yes' and self._calculate_n:
             self._player_js = self._player_js or self.get_player_js()
             if self._calculate_n is True:
-                self._context.log_debug('nsig detected')
+                self._context.log_notice('nsig detected')
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
@@ -872,7 +872,7 @@ class VideoInfo(object):
                 new_query['n'] = new_n
                 new_query['ratebypass'] = 'yes'
             else:
-                self._context.log_debug('nsig handling failed')
+                self._context.log_error('nsig handling failed')
                 self._calculate_n = False
 
         if 'range' not in query:
@@ -1171,7 +1171,7 @@ class VideoInfo(object):
 
         if (any((True for fmt in adaptive_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))
                 or any((True for fmt in std_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))):
-            self._context.log_debug('signatureCipher detected')
+            self._context.log_notice('signatureCipher detected')
             self._player_js = self.get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
