@@ -485,16 +485,22 @@ class VideoInfo(object):
     }
 
     CLIENTS = {
+        # 4k no VP9 HDR
         'android_testsuite': {
             'id': 30,
             'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             'details': {
                 'clientName': 'ANDROID_TESTSUITE',
                 'clientVersion': '1.9',
-                'androidSdkVersion': '31',
+                'androidSdkVersion': '29',
                 'osName': 'Android',
-                'osVersion': '12',
+                'osVersion': '10',
                 'platform': 'MOBILE',
+            },
+            'headers': {
+                'User-Agent': 'com.google.android.youtube/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
+                'X-YouTube-Client-Name': '{id}',
+                'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
         # Connection to stream URL closes after 30s
@@ -504,10 +510,10 @@ class VideoInfo(object):
             'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             'details': {
                 'clientName': 'ANDROID',
-                'clientVersion': '17.36.4',
-                'androidSdkVersion': '31',
+                'clientVersion': '17.31.35',
+                'androidSdkVersion': '29',
                 'osName': 'Android',
-                'osVersion': '12',
+                'osVersion': '10',
                 'platform': 'MOBILE',
             },
             'headers': {
@@ -525,9 +531,9 @@ class VideoInfo(object):
                 'clientName': 'ANDROID_EMBEDDED_PLAYER',
                 'clientVersion': '17.36.4',
                 'clientScreen': 'EMBED',
-                'androidSdkVersion': '31',
+                'androidSdkVersion': '29',
                 'osName': 'Android',
-                'osVersion': '12',
+                'osVersion': '10',
                 'platform': 'MOBILE',
             },
             'headers': {
@@ -536,33 +542,27 @@ class VideoInfo(object):
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
-        # Fallback for videos requiring age verification
-        # Requires handling of nsig to overcome throttling (TODO)
-        'tv_embedded': {
-            'id': 85,
-            'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+        # 4k with HDR
+        # Some videos block this client, may also require embedding enabled
+        'android_youtube_tv': {
+            'id': 29,
+            'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             'details': {
-                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                'clientVersion': '2.0',
-                'platform': 'TV',
+                'clientName': 'ANDROID_UNPLUGGED',
+                'clientVersion': '6.36',
+                'androidSdkVersion': '29',
+                'osName': 'Android',
+                'osVersion': '10',
+                'platform': 'MOBILE',
             },
             'headers': {
+                'User-Agent': 'com.google.android.apps.youtube.unplugged/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
-        # Second fallback for restricted videos
-        # Requires handling of signatureCipher
-        # Requires handling of nsig to overcome throttling (TODO)
-        'web_creator': {
-            'id': 62,
-            'api_key': 'AIzaSyBUPetSUmoZL-OhlxA7wSac5XinrygCqMo',
-            'details': {
-                'clientName': 'WEB_CREATOR',
-                'clientVersion': '1.20220726.00.00',
-            },
-        },
         # Used for misc api requests by default
+        # Requires handling of nsig to overcome throttling (TODO)
         'web': {
             'id': 1,
             'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
@@ -610,19 +610,19 @@ class VideoInfo(object):
         client_selection = settings.client_selection()
         # Alternate #1
         if client_selection == 1:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android'],
-                                        self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android_testsuite'])
-        # Alternate #1
-        elif client_selection == 2:
             self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['android'])
+                                        self.CLIENTS['android_youtube_tv'],
+                                        self.CLIENTS['android_testsuite'])
+        # Alternate #2
+        elif client_selection == 2:
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android'],
+                                        self.CLIENTS['android_youtube_tv'],
+                                        self.CLIENTS['android_testsuite'])
         # Default
         else:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['web_creator'])
+            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_youtube_tv'],
+                                        self.CLIENTS['android_testsuite'],
+                                        self.CLIENTS['android_embedded'])
 
         self.CLIENTS['_common']['hl'] = settings.get_string('youtube.language', 'en_US').replace('-', '_')
         self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
