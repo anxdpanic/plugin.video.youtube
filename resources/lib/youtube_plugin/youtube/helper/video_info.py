@@ -540,7 +540,7 @@ class VideoInfo(object):
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
-            'disableDash': True,
+            'disableDash': False,
         },
         # Only for videos that allow embedding
         # Limited to 720p on some videos
@@ -632,22 +632,28 @@ class VideoInfo(object):
         client_selection = settings.client_selection()
         # Alternate #1
         if client_selection == 1:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android'],
-                                        self.CLIENTS['android_youtube_tv'],
-                                        self.CLIENTS['android_testsuite'])
+            self.PRIORITISED_CLIENTS = (
+                self.CLIENTS['android_embedded'],
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android'],
+            )
         # Alternate #2
         elif client_selection == 2:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['android_youtube_tv'],
-                                        self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android'])
+            self.PRIORITISED_CLIENTS = (
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android'],
+                self.CLIENTS['android_embedded'],
+            )
         # Default
         else:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_youtube_tv'],
-                                        self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android'])
+            self.PRIORITISED_CLIENTS = (
+                self.CLIENTS['android'],
+                self.CLIENTS['android_embedded'],
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+            )
 
         self.CLIENTS['_common']['hl'] = settings.get_string('youtube.language', 'en_US').replace('-', '_')
         self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
@@ -950,6 +956,7 @@ class VideoInfo(object):
         payload = {
             'contentCheckOk': True,
             'context': {},
+            'params': '8AEB',
             'playbackContext': {
                 'contentPlaybackContext': {
                     'html5Preference': 'HTML5_PREF_WANTS',
