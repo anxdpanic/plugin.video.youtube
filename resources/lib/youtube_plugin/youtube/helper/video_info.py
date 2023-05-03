@@ -783,19 +783,6 @@ class VideoInfo(object):
         return response
 
     def get_player_js(self):
-        def _normalize(url):
-            if not url:
-                url = ''
-            elif url.startswith(('http://', 'https://')):
-                pass
-            elif url.startswith('//'):
-                url = urljoin('https:', url)
-            elif url.startswith('/'):
-                url = urljoin('https://www.youtube.com', url)
-
-            self._data_cache.set('player_js_url', json.dumps({'url': url}))
-            return url
-
         js_url = None
         cached_url = self._data_cache.get_item(DataCache.ONE_HOUR * 4, 'player_js_url').get('url', '')
         if cached_url not in ['', 'http://', 'https://']:
@@ -818,7 +805,8 @@ class VideoInfo(object):
         if not js_url:
             return ''
 
-        js_url = _normalize(js_url)
+        js_url = self._normalize_url(js_url)
+        self._data_cache.set('player_js_url', json.dumps({'url': js_url}))
         cache_key = quote(js_url)
         cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key).get('js')
         if cached_js:
@@ -846,6 +834,18 @@ class VideoInfo(object):
         output += '&'.join('{0}={1}'.format(key, quote(headers[key]))
                            for key in headers)
         return output
+
+    @staticmethod
+    def _normalize_url(url):
+        if not url:
+            url = ''
+        elif url.startswith(('http://', 'https://')):
+            pass
+        elif url.startswith('//'):
+            url = urljoin('https:', url)
+        elif url.startswith('/'):
+            url = urljoin('https://www.youtube.com', url)
+        return url
 
     def _load_manifest(self, url, meta_info=None, playback_stats=None):
         headers = self.CLIENTS['web']['headers'].copy()
