@@ -486,6 +486,7 @@ class VideoInfo(object):
 
     CLIENTS = {
         # 4k no VP9 HDR
+        # Limited subtitle availability
         'android_testsuite': {
             'id': 30,
             'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
@@ -503,8 +504,9 @@ class VideoInfo(object):
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
-        # Connection to stream URL closes after 30s
+        # Connection to stream URL closes after 30s when using adaptive streams
         # Subsequent attempts to connect result in 403 Forbidden error
+        # Used as a backup using non-adaptive formats only (max 720p)
         'android': {
             'id': 3,
             'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
@@ -521,6 +523,7 @@ class VideoInfo(object):
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
+            'disableDash': False,
         },
         # Only for videos that allow embedding
         # Limited to 720p on some videos
@@ -544,6 +547,7 @@ class VideoInfo(object):
         },
         # 4k with HDR
         # Some videos block this client, may also require embedding enabled
+        # Limited subtitle availability
         'android_youtube_tv': {
             'id': 29,
             'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
@@ -607,22 +611,32 @@ class VideoInfo(object):
         self._calculate_n = True
         self._cipher = None
 
+        self._selected_client = None
         client_selection = settings.client_selection()
         # Alternate #1
         if client_selection == 1:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_embedded'],
-                                        self.CLIENTS['android_youtube_tv'],
-                                        self.CLIENTS['android_testsuite'])
+            self.PRIORITISED_CLIENTS = (
+                self.CLIENTS['android_embedded'],
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android'],
+            )
         # Alternate #2
         elif client_selection == 2:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android'],
-                                        self.CLIENTS['android_youtube_tv'],
-                                        self.CLIENTS['android_testsuite'])
+            self.PRIORITISED_CLIENTS = (
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android'],
+                self.CLIENTS['android_embedded'],
+            )
         # Default
         else:
-            self.PRIORITISED_CLIENTS = (self.CLIENTS['android_youtube_tv'],
-                                        self.CLIENTS['android_testsuite'],
-                                        self.CLIENTS['android_embedded'])
+            self.PRIORITISED_CLIENTS = (
+                self.CLIENTS['android'],
+                self.CLIENTS['android_embedded'],
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+            )
 
         self.CLIENTS['_common']['hl'] = settings.get_string('youtube.language', 'en_US').replace('-', '_')
         self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
@@ -848,6 +862,7 @@ class VideoInfo(object):
         parts = urlsplit(url)
         query = parse_qs(parts.query)
         new_query = {}
+        update_url = False
 
         if 'n' in query and query.get('ratebypass', [None])[0] != 'yes' and self._calculate_n:
             self._player_js = self._player_js or self.get_player_js()
@@ -870,7 +885,7 @@ class VideoInfo(object):
 
         if new_query:
             query.update(new_query)
-        else:
+        elif not update_url:
             return url
 
         url = urlunsplit((parts.scheme,
@@ -923,6 +938,7 @@ class VideoInfo(object):
         payload = {
             'contentCheckOk': True,
             'context': {},
+            'params': '8AEB',
             'playbackContext': {
                 'contentPlaybackContext': {
                     'html5Preference': 'HTML5_PREF_WANTS',
@@ -993,7 +1009,10 @@ class VideoInfo(object):
             break
         self._context.log_debug('Requested video info with client: {0} (logged {1})'.format(
             client['details']['clientName'], 'in' if auth_header else 'out'))
+        self._selected_client = client
 
+        if 'Authorization' in headers:
+            del headers['Authorization']
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
@@ -1153,7 +1172,7 @@ class VideoInfo(object):
             self._player_js = self.get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        if not is_live and httpd_is_live and adaptive_fmts:
+        if not is_live and httpd_is_live and adaptive_fmts and not client.get('disableDash'):
             mpd_url, s_info = self.generate_mpd(adaptive_fmts,
                                                 video_details.get('lengthSeconds', '0'),
                                                 license_info.get('url'))
