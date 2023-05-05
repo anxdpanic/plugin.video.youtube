@@ -92,7 +92,7 @@ def find_best_fit(data, compare_method=None):
 def select_stream(context, stream_data_list, quality_map_override=None, ask_for_quality=None, audio_only=None):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
-        return _stream_data.get('sort', 0)
+        return _stream_data.get('sort', [0, 0])
 
     settings = context.get_settings()
     use_dash = settings.use_dash()

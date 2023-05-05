@@ -297,8 +297,6 @@ class XbmcContext(AbstractContext):
     def inputstream_adaptive_capabilities(self, capability=None):
         # return a list inputstream.adaptive capabilities, if capability set return version required
 
-        capabilities = []
-
         use_dash = self.use_inputstream_adaptive()
         try:
             inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
@@ -306,7 +304,7 @@ class XbmcContext(AbstractContext):
             inputstream_version = ''
 
         if not use_dash or not inputstream_version:
-            return None if capability is not None else capabilities
+            return frozenset() if capability is None else None
 
         capability_map = {
             'live': '2.0.12',
@@ -320,14 +318,10 @@ class XbmcContext(AbstractContext):
 
         if capability is None:
             ia_loose_version = utils.loose_version(inputstream_version)
-
-            for key in list(capability_map.keys()):
-                if capability_map[key] and (ia_loose_version >= utils.loose_version(capability_map[key])):
-                    capabilities.append(key)
-
+            capabilities = frozenset(key for key, version in capability_map.items()
+                                     if version and ia_loose_version >= utils.loose_version(version))
             return capabilities
-        else:
-            return capability_map[capability] if capability_map.get(capability) else None
+        return capability_map.get(capability)
 
     def inputstream_adaptive_auto_stream_selection(self):
         try:
