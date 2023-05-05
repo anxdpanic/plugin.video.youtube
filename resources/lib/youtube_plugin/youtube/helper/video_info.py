@@ -1050,6 +1050,9 @@ class VideoInfo(object):
 
                 if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED',
                               'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'):
+                    if (status == 'UNPLAYABLE' and
+                            playability_status.get('reason', '') == 'The uploader has not made this video available in your country'):
+                        break
                     if status != 'ERROR':
                         continue
                     # This is used to check if a "The following content is not available on this app."
