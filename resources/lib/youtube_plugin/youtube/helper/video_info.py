@@ -547,9 +547,6 @@ class VideoInfo(object):
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
         },
-        # Connection to stream URL closes after 30s when using adaptive streams
-        # Subsequent attempts to connect result in 403 Forbidden error
-        # Used as a backup using non-adaptive formats only (max 720p)
         'android': {
             'id': 3,
             'api_key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
@@ -638,8 +635,6 @@ class VideoInfo(object):
         },
     }
 
-    PRIORITISED_CLIENTS = None
-
     def __init__(self, context, access_token='', api_key='', language='en-US'):
         settings = context.get_settings()
 
@@ -657,24 +652,31 @@ class VideoInfo(object):
         self._selected_client = None
         client_selection = settings.client_selection()
         # Alternate #1
+        # Will play almost all videos with available subtitles at full resolution with HDR
+        # Some very small minority of videos won't show available subtitles
         if client_selection == 1:
-            self.PRIORITISED_CLIENTS = (
-                self.CLIENTS['android_embedded'],
+            self._prioritised_clients = (
+                self.CLIENTS['android'],
                 self.CLIENTS['android_youtube_tv'],
                 self.CLIENTS['android_testsuite'],
-                self.CLIENTS['android'],
+                self.CLIENTS['android_embedded'],
             )
         # Alternate #2
+        # Will play almost all videos at full resolution with HDR
+        # Most videos wont show available subtitles
+        # Useful for testing AV1 HDR
         elif client_selection == 2:
-            self.PRIORITISED_CLIENTS = (
-                self.CLIENTS['android_youtube_tv'],
+            self._prioritised_clients = (
                 self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android_youtube_tv'],
                 self.CLIENTS['android'],
                 self.CLIENTS['android_embedded'],
             )
         # Default
+        # Will play almost all videos with available subtitles at full resolution with HDR
+        # Some very small minority of videos may only play at 720p
         else:
-            self.PRIORITISED_CLIENTS = (
+            self._prioritised_clients = (
                 self.CLIENTS['android'],
                 self.CLIENTS['android_embedded'],
                 self.CLIENTS['android_youtube_tv'],
@@ -999,7 +1001,7 @@ class VideoInfo(object):
 
         player_response = {}
         for _ in range(2):
-            for client in self.PRIORITISED_CLIENTS:
+            for client in self._prioritised_clients:
                 client['details'].update(self.CLIENTS['_common'])
                 payload['context']['client'] = client['details']
 
