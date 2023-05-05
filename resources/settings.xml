@@ -88,6 +88,7 @@
 
     <!-- advanced -->
     <category label="30031">
+        <setting id="youtube.client.selection" type="enum" label="30737" lvalues="30532|30738|30739" default="0"/>
         <setting id="simple.requests.ssl.verify" type="bool" label="30578" default="true"/>
         <setting id="kodion.support.alternative_player" type="bool" label="30036" default="false"/>
         <setting id="kodion.alternative_player.web.urls" type="bool" label="30704" default="false" subsetting="true" enable="eq(-1,true)"/>
