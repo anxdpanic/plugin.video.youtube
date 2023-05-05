@@ -8,7 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import copy
 import re
 import json
 import random
@@ -1187,7 +1186,6 @@ class VideoInfo(object):
                          is_httpd_live(port=self._context.get_settings().httpd_port()))
 
         s_info = {}
-
         adaptive_fmts = streaming_data.get('adaptiveFormats', [])
         std_fmts = streaming_data.get('formats', [])
         mpd_url = streaming_data.get('dashManifestUrl') or \
@@ -1324,11 +1322,11 @@ class VideoInfo(object):
         for stream_map in adaptive_fmts:
             mime_type = stream_map.get('mimeType')
             if not mime_type:
-                 continue
+                continue
 
             itag = str(stream_map.get('itag', ''))
             if not itag:
-                 continue
+                continue
 
             index_range = stream_map.get('indexRange')
             if not index_range:
@@ -1336,7 +1334,7 @@ class VideoInfo(object):
 
             init_range = stream_map.get('initRange')
             if not init_range:
-                 continue
+                continue
 
             url = stream_map.get('url')
             if not url and self._cipher and 'signatureCipher' in stream_map:
