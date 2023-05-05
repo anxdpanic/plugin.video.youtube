@@ -1405,6 +1405,7 @@ class VideoInfo(object):
                 frame_rate = None
 
             data[key][itag] = {
+                'mime_type': mime_type,
                 'baseUrl': url,
                 'codecs': codecs,
                 'codec': codec,
@@ -1424,98 +1425,120 @@ class VideoInfo(object):
             return None, None
 
         mpd_quality = self._context.get_settings().get_mpd_quality()
+        quality_type = isinstance(mpd_quality, str) and mpd_quality or ''
+        quality_height = isinstance(mpd_quality, int) and mpd_quality or 0
         hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
-        out_list = ['<?xml version="1.0" encoding="UTF-8"?>\n'
-                    '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink" '
-                    'xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd" '
-                    'minBufferTime="PT1.5S" mediaPresentationDuration="PT', duration, 'S" type="static" profiles="urn:mpeg:dash:profile:isoff-main:2011">\n',
-                    '\t<Period>\n']
-        set_id = 0
+        def _audio_sort(stream):
+            return stream['bandwidth']
 
-        default_mime_type = None
-        supported_mime_types = set()
+        def _video_sort(stream):
+            return (stream['height'],
+                    stream['fps'],
+                    hdr and ('HDR' in stream['quality_label']))
+
+        out_list = [
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:xlink="http://www.w3.org/1999/xlink"'
+                ' xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"'
+                ' minBufferTime="PT1.5S" mediaPresentationDuration="PT', duration, 'S" type="static" profiles="urn:mpeg:dash:profile:isoff-main:2011">\n'
+            '\t<Period>\n'
+        ]
+        set_id = 0
         stream_info = {}
+
         for mime_type, streams in data.items():
             if '_' in mime_type:
                 mime_type, language = mime_type.split('_')
             else:
-                 language = None
+                language = ''
             media, container = mime_type.split('/')
 
-            filtered_streams = []
-            default = False
+            if quality_type and container != quality_type:
+                continue
+
             if media == 'video':
-                if (container == 'webm' and (mpd_quality == 'mp4'
-                        or not {'vp9', 'vp9.2'} & ia_capabilities)):
+                if container == 'webm' and not {'vp9', 'vp9.2'} & ia_capabilities:
                     continue
-                if container == 'mp4' and mpd_quality == 'webm':
-                    continue
-                if isinstance(mpd_quality, str) and container == mpd_quality:
-                    default = True
-                elif container == 'webm' and hdr:
-                    default = True
-                elif container == 'mp4':
-                    default = True
-                else:
-                    default = True
-                for stream in streams.values():
-                    if not hdr and re.search(r'vp9\.2|av0?1', stream['codecs']):
-                        continue
-                    if limit_30fps and stream['fps'] > 30:
-                        continue
-                    if isinstance(mpd_quality, int) and stream['height'] > mpd_quality:
-                        continue
-                    filtered_streams.append(stream)
-                filtered_streams.sort(reverse=True,
-                                      key=lambda stream: (stream['height'],
-                                                          stream['fps'],
-                                                          hdr == ('HDR' in stream['quality_label']),
-                                                          stream['bandwidth']))
+                filtered_streams = sorted((stream for stream in streams.values()
+                    if not (
+                        not hdr and stream['codec'] in {'vp9.2', 'av01', 'av1'}
+                    ) and not (
+                        'av1' not in ia_capabilities and stream['codec'] in {'av01', 'av1'}
+                    ) and not (
+                        limit_30fps and stream['fps'] > 30
+                    ) and not (
+                        0 < quality_height < stream['height']
+                    )), reverse=True, key=_video_sort)
             elif media == 'audio':
-                if (container == 'webm' and (mpd_quality == 'mp4'
-                        or not {'vorbis', 'opus'} & ia_capabilities)):
+                if container == 'webm' and not {'vorbis', 'opus'} & ia_capabilities:
                     continue
-                if container == 'mp4' and mpd_quality == 'webm':
-                    continue
-                for stream in streams.values():
-                    filtered_streams.append(stream)
-                filtered_streams.sort(reverse=True, key=lambda stream: stream['bandwidth'])
+                filtered_streams = sorted(streams.values(), reverse=True, key=_audio_sort)
+            else:
+                continue
 
             selected_stream = filtered_streams[0]
             if not selected_stream:
                 continue
-            if default and hdr and 'HDR' not in selected_stream['quality_label']:
-                default = False
-            stream_info[media] = selected_stream
 
-            out_list.append('\t\t<AdaptationSet id="{0}" mimeType="{1}" '.format(set_id, mime_type))
-            if language is not None:
-                # Avoid default language selection as it confuses the language selection in Kodi
-                default = False
-                out_list.append('lang="{0}" '.format(language))
-            out_list.append('subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true" default="{0}">\n'.format(str(default).lower()))
-            if license_url is not None:
+            default = False
+            if media not in stream_info:
+                stream_info[media] = selected_stream
+            elif not quality_type:
+                if media == 'video' and _video_sort(selected_stream) > _video_sort(stream_info[media]):
+                    default = True
+                    stream_info[media] = selected_stream
+                elif media == 'audio':
+                    if 'video' in stream_info and container in stream_info['video']['mime_type']:
+                        stream_info[media] = selected_stream
+                    elif 'video' not in stream_info and _audio_sort(selected_stream) > _audio_sort(stream_info[media]):
+                        stream_info[media] = selected_stream
+            elif media == 'video':
+                default = True
+
+            out_list.extend((
+                '\t\t<AdaptationSet subsegmentAlignment="true" subsegmentStartsWithSAP="1" bitstreamSwitching="true"'
+                    ' id="', str(set_id), '"'
+                    ' mimeType="', mime_type, '"'
+                    ' lang="', language, '"'
+                    ' default="', str(default).lower(), '">\n'
+                '\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="', 'main' if default else '', '"/>\n'
+            ))
+
+            if license_url:
                 license_url = license_url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
-                out_list.append('\t\t\t<ContentProtection schemeIdUri="http://youtube.com/drm/2012/10/10">\n\t\t\t\t<yt:SystemURL type="widevine">{0}</yt:SystemURL>\n\t\t\t</ContentProtection>\n'.format(license_url))
-            out_list.append('\t\t\t<Role schemeIdUri="urn:mpeg:DASH:role:2011" value="main"/>\n')
+                out_list.extend((
+                    '\t\t\t<ContentProtection schemeIdUri="http://youtube.com/drm/2012/10/10">\n'
+                    '\t\t\t\t<yt:SystemURL type="widevine">', license_url, '</yt:SystemURL>\n'
+                    '\t\t\t</ContentProtection>\n'
+                ))
 
-            for stream in filtered_streams:
-                stream_format = self.FORMAT.get(stream['id'], {})
+            if media == 'audio':
+                out_list.extend(((
+                    '\t\t\t<Representation id="{id}" {codecs} bandwidth="{bandwidth}">\n'
+                    '\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
+                    '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
+                    '\t\t\t\t</SegmentBase>\n'
+                    '\t\t\t</Representation>\n'
+                ).format(**stream) for stream in filtered_streams))
+            elif media == 'video':
+                out_list.extend(((
+                    '\t\t\t<Representation id="{id}" {codecs} startWithSAP="1" bandwidth="{bandwidth}" width="{width}" height="{height}" frameRate="{frameRate}">\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
+                    '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
+                    '\t\t\t\t</SegmentBase>\n'
+                    '\t\t\t</Representation>\n'
+                ).format(**stream) for stream in filtered_streams))
 
-                if media == 'audio':
-                    out_list.append('\t\t\t<Representation id="{id}" {codecs} bandwidth="{bandwidth}">\n'.format(**stream))
-                    out_list.append('\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="2"/>\n')
-                elif media == 'video':
-                    out_list.append('\t\t\t<Representation id="{id}" {codecs} startWithSAP="1" bandwidth="{bandwidth}" width="{width}" height="{height}" frameRate="{frameRate}">\n'.format(**stream))
-
-                out_list.append('\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n\t\t\t\t<SegmentBase indexRange="{indexRange}">\n\t\t\t\t\t\t<Initialization range="{initRange}"/>\n\t\t\t\t</SegmentBase>\n'.format(**stream))
-                out_list.append('\t\t\t</Representation>\n')
             out_list.append('\t\t</AdaptationSet>\n')
             set_id += 1
 
-        out_list.append('\t</Period>\n</MPD>\n')
+        out_list.append('\t</Period>\n'
+                        '</MPD>\n')
         out = ''.join(out_list)
 
         filepath = '{0}{1}.mpd'.format(basepath, self.video_id)
