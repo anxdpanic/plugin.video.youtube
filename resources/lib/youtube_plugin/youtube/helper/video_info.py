@@ -1089,8 +1089,7 @@ class VideoInfo(object):
         is_live_content = video_details.get('isLiveContent') is True
         streaming_data = player_response.get('streamingData', {})
 
-        live_url = streaming_data.get('hlsManifestUrl', '') or \
-                   player_response.get('streamingData', {}).get('hlsManifestUrl', '')
+        live_url = streaming_data.get('hlsManifestUrl', '')
         is_live = is_live_content and live_url
 
         meta_info = {'video': {},
@@ -1226,8 +1225,7 @@ class VideoInfo(object):
         s_info = {}
         adaptive_fmts = streaming_data.get('adaptiveFormats', [])
         std_fmts = streaming_data.get('formats', [])
-        mpd_url = streaming_data.get('dashManifestUrl') or \
-                  player_response.get('streamingData', {}).get('dashManifestUrl', '')
+        mpd_url = streaming_data.get('dashManifestUrl', '')
 
         license_info = {'url': None, 'proxy': None, 'token': None}
         pa_li_info = streaming_data.get('licenseInfos', [])
