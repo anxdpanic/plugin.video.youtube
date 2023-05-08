@@ -627,7 +627,7 @@ class YouTube(LoginClient):
             params['pageToken'] = page_token
 
         return self.perform_v3_request(method='GET', path='search', params=params)
-        
+
     def get_parent_comments(self, video_id, page_token='', max_results=0):
         max_results = self._max_results if max_results <= 0 else max_results
 
@@ -639,9 +639,9 @@ class YouTube(LoginClient):
                   'maxResults': str(max_results)}
         if page_token:
             params['pageToken'] = page_token
-        
+
         return self.perform_v3_request(method='GET', path='commentThreads', params=params, no_login=True)
-            
+
     def get_child_comments(self, parent_id, page_token='', max_results=0):
         max_results = self._max_results if max_results <= 0 else max_results
 
@@ -652,7 +652,7 @@ class YouTube(LoginClient):
                   'maxResults': str(max_results)}
         if page_token:
             params['pageToken'] = page_token
-        
+
         return self.perform_v3_request(method='GET', path='comments', params=params, no_login=True)
 
     def get_channel_videos(self, channel_id, page_token=''):
@@ -821,11 +821,17 @@ class YouTube(LoginClient):
                     'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
                 }
 
+                session = requests.Session()
+                session.headers = headers
+                session.verify = self._verify
+                adapter = requests.adapters.HTTPAdapter(pool_maxsize=5, pool_block=True)
+                session.mount("https://", adapter)
+
                 responses = []
 
                 def fetch_xml(_url, _responses):
                     try:
-                        _response = requests.get(_url, {}, headers=headers, verify=self._verify, allow_redirects=True)
+                        _response = session.get(_url)
                     except:
                         _response = None
                         _context.log_error('Failed |%s|' % traceback.print_exc())
@@ -857,14 +863,14 @@ class YouTube(LoginClient):
                         media_ns = '{http://search.yahoo.com/mrss/}'
 
                         for entry in root.findall(ns + "entry"):
-                            # empty news dictionary 
+                            # empty news dictionary
                             entry_data = {
                                 'id': entry.find(yt_ns + 'videoId').text,
                                 'title': entry.find(media_ns + "group").find(media_ns + 'title').text,
                                 'channel': entry.find(ns + "author").find(ns + "name").text,
                                 'published': entry.find(ns + 'published').text,
                             }
-                            # append items list 
+                            # append items list
                             _result['items'].append(entry_data)
 
                 # sorting by publish date
