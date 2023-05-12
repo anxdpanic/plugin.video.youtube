@@ -1547,6 +1547,7 @@ class VideoInfo(object):
                 original = audio_type == 'main'
                 if stream_info[media_type] == main_stream:
                     default = True
+
                 # Use main audio stream with same container format as video stream
                 # as fallback selection for default audio stream
                 elif (not stream_info[media_type] and original
