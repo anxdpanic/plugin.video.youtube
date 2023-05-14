@@ -33,7 +33,7 @@ class PlaybackHistory(Storage):
         self._open()
         placeholders = ','.join(['?' for _ in keys])
         keys = [str(item) for item in keys]
-        query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
+        query = 'SELECT * FROM %s WHERE `key` IN (%s)' % (self._table_name, placeholders)
         query_result = self._execute(False, query, keys)
         result = {}
         if query_result:
@@ -68,13 +68,20 @@ class PlaybackHistory(Storage):
         self._set(str(video_id), item)
 
     def _set(self, item_id, item):
-        def _encode(obj):
-            return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
+#        def _encode(obj):
+#            return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
         self._open()
+#        enc = pickle.dumps(item, protocol=pickle.HIGHEST_PROTOCOL)
         now = datetime.datetime.now() + datetime.timedelta(microseconds=1)  # add 1 microsecond, required for dbapi2
-        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
-        self._execute(True, query, values=[item_id, now, _encode(item)])
+        if self._dbname != 'cache_search':
+          query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
+          enc = pickle.dumps(item, protocol=pickle.HIGHEST_PROTOCOL)
+          self._execute(True, query, values=[item_id, now, sqlite3.Binary(enc)])
+        else:
+          query = ''.join(['REPLACE INTO ', self._table_name, ' VALUES(%s, %s, %s)'])
+          enc = pickle.dumps(item, protocol=pickle.HIGHEST_PROTOCOL)
+          self._execute(True, query, values=[item_id, now, enc])
         self._close()
 
     def _optimize_item_count(self):
