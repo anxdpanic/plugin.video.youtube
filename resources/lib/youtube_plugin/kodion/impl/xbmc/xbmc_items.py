@@ -98,7 +98,7 @@ def to_play_item(context, play_item):
         # This should work for all versions of XBMC/KODI.
         if 'duration' in _info_labels:
             duration = _info_labels['duration']
-            del _info_labels['duration']  # comment this not needed for older Kodi https://github.com/anxdpanic/plugin.video.youtube/commit/1781f8477b73c89feee78ec846d3d4301132027b [fix] video duration not showing in lists
+            del _info_labels['duration']
             func = info_tag.add_stream_info if major_version >= 20 else list_item.addStreamInfo
             func('video', {'duration': duration})
 

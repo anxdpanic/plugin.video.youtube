@@ -1236,6 +1236,22 @@ msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
 msgstr "Kurze Video ausblenden (1 Minute oder kürzer)"
 
+msgctxt "#30737"
+msgid "Use alternate client details"
+msgstr ""
+
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
+
+msgctxt "#30740"
+msgid "Alternate #3"
+msgstr ""
+
 #~ msgctxt "#30900"
 #~ msgid "Subscriptions groups"
 #~ msgstr "Abo-Gruppen"

@@ -14,7 +14,6 @@ from six.moves.urllib_parse import parse_qs
 from six.moves.urllib_parse import urlencode
 from six.moves.urllib_parse import urlsplit
 from six.moves.urllib_parse import urlunsplit
-from six.moves.urllib_parse import urljoin
 
 from six import PY2
 
