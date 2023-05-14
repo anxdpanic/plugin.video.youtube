@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2022-12-27 12:15+0000\n"
 "Last-Translator: Nao3Line Prez <n.yazawa6932@gmail.com>\n"
@@ -1235,3 +1235,19 @@ msgstr "Disunting"
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
 msgstr "Sembunyikan video pendek (1 menit atau kurang)"
+
+msgctxt "#30737"
+msgid "Use alternate client details"
+msgstr ""
+
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
+
+msgctxt "#30740"
+msgid "Alternate #3"
+msgstr ""

@@ -69,7 +69,11 @@ class Cipher(object):
                 parameter = cipher_match.group('parameter').split(',')
                 for i in range(len(parameter)):
                     param = parameter[i].strip()
-                    param = '%SIG%' if i == 0 else int(param)
+                    if i == 0:
+                        param = '%SIG%'
+                    else:
+                        param = int(param)
+
                     parameter[i] = param
 
                 # get function from object
@@ -106,11 +110,11 @@ class Cipher(object):
 
     @staticmethod
     def _find_signature_function_name(javascript):
-        # match_patterns source is from youtube-dl
+        # match_patterns source is youtube-dl
         # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1553
         # LICENSE: The Unlicense
 
-        match_patterns = (
+        match_patterns = [
             r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',
             r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*encodeURIComponent\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\(',
             r'\bm=(?P<sig>[a-zA-Z0-9$]{2,})\(decodeURIComponent\(h\.s\)\)',
@@ -124,7 +128,7 @@ class Cipher(object):
             r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
             r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
              r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\('
-        )
+        ]
 
         for pattern in match_patterns:
             match = re.search(pattern, javascript)

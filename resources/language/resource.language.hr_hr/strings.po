@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2023-01-04 21:15+0000\n"
 "Last-Translator: gogogogi <trebelnik2@gmail.com>\n"
@@ -1235,3 +1235,19 @@ msgstr "Uređeno"
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
 msgstr "Sakrij kratke video snimke (1 minuta ii manje)"
+
+msgctxt "#30737"
+msgid "Use alternate client details"
+msgstr ""
+
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr ""
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr ""
+
+msgctxt "#30740"
+msgid "Alternate #3"
+msgstr ""

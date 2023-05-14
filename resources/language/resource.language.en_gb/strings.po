@@ -1254,3 +1254,7 @@ msgstr ""
 msgctxt "#30739"
 msgid "Alternate #2"
 msgstr ""
+
+msgctxt "#30740"
+msgid "Alternate #3"
+msgstr ""

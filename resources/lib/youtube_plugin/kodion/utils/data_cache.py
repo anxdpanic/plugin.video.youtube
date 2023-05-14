@@ -44,7 +44,7 @@ class DataCache(Storage):
         current_time = datetime.now()
         placeholders = ','.join(['?' for _ in content_ids])
         keys = [str(item) for item in content_ids]
-        query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
+        query = 'SELECT * FROM %s WHERE `key` IN (%s)' % (self._table_name, placeholders)
 
         self._open()
 
@@ -100,17 +100,20 @@ class DataCache(Storage):
         pass
 
     def _set(self, content_id, item):
-        def _encode(obj):
-            return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
-
         current_time = datetime.now() + timedelta(microseconds=1)
-        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
-
         self._open()
-        self._execute(True, query, values=[content_id, current_time, _encode(item)])
+        if self._dbname != 'cache_search':
+          query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
+          enc = pickle.dumps(item, protocol=pickle.HIGHEST_PROTOCOL)
+          self._execute(True, query, values=[content_id, current_time, sqlite3.Binary(enc)])
+#        self._execute(True, query, values=[content_id, current_time, sqlite3.Binary(pickle.dumps(item, protocol=pickle.HIGHEST_PROTOCOL))])
+        else:
+          query = ''.join(['REPLACE INTO ', self._table_name, ' VALUES(%s, %s, %s)'])
+          enc = pickle.dumps(item, protocol=pickle.HIGHEST_PROTOCOL)
+          self._execute(True, query, values=[content_id, current_time, enc])
         self._close()
 
-    def _set_all(self, items):
+    def _set_all_old(self, items):
         def _encode(obj):
             return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
 
@@ -124,6 +127,28 @@ class DataCache(Storage):
         for key in list(items.keys()):
             item = items[key]
             self._execute(needs_commit, query, values=[key, current_time, _encode(json.dumps(item))])
+            needs_commit = False
+
+        self._close()
+
+    def _set_all(self, items):
+        needs_commit = True
+        current_time = datetime.now() + timedelta(microseconds=1)
+        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
+#        query = ''.join(['REPLACE INTO ', self._table_name, ' VALUES(%s, %s, %s)'])
+        self._open()
+
+        for key in list(items.keys()):
+            item = items[key]
+
+            if self._dbname != 'cache_search':
+              enc = pickle.dumps(json.dumps(item), protocol=pickle.HIGHEST_PROTOCOL)
+              self._execute(True, query, values=[key, current_time, sqlite3.Binary(enc)])
+            else:
+              query = ''.join(['REPLACE INTO ', self._table_name, ' VALUES(%s, %s, %s)'])
+              enc = pickle.dumps(json.dumps(item), protocol=pickle.HIGHEST_PROTOCOL)
+              self._execute(True, query, values=[key, current_time, enc])
+#            self._cur.execute("REPLACE INTO storage (`key`,time,value) VALUES(key, current_time, enc)")
             needs_commit = False
 
         self._close()

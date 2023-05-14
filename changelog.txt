@@ -1,3 +1,10 @@
+6.8.27
+[add] multiroom support: WTFThatPerson
+6.8.26
+[fix] fix playback |contrib: MoojMidge|
+[chg] Kodi Leia adaptation: WTFThatPerson
+[lang] Translations updated from Kodi Weblate
+
 6.8.18
 [fix] /uri2addon/ endpoint for playback of youtube.com urls
 [fix] Don't assume addon is installed in home directory |contrib: jfly|
