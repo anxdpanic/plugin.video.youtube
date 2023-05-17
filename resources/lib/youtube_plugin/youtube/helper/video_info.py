@@ -1058,7 +1058,7 @@ class VideoInfo(object):
                                       allow_redirects=True)
                     result.raise_for_status()
                 except requests.exceptions.RequestException as error:
-                    self._context.log_debug(error.response.text)
+                    self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
                     error_message = 'Failed to get player response for video_id "{0}"'.format(self.video_id)
                     self._context.log_error(error_message + '\n' + traceback.format_exc())
                     raise YouTubeException(error_message)
