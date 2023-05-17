@@ -545,6 +545,7 @@ class VideoInfo(object):
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
+            'query_subtitles': True,
         },
         'android': {
             'id': 3,
@@ -562,7 +563,7 @@ class VideoInfo(object):
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
-            'disableDash': False,
+            'disable_dash': False,
         },
         # Only for videos that allow embedding
         # Limited to 720p on some videos
@@ -602,6 +603,22 @@ class VideoInfo(object):
                 'User-Agent': 'com.google.android.apps.youtube.unplugged/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
+            'query_subtitles': True,
+        },
+        # Used to requests captions for clients that don't provide them 
+        # Requires handling of nsig to overcome throttling (TODO)
+        'smarttv_embedded': {
+            'id': 85,
+            'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+            'details': {
+                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'clientVersion': '2.0',
+                'clientScreen': 'EMBED',
+            },
+            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
+            'headers': {
+                'User-Agent': 'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5) AppleWebKit/537.36 (KHTML, like Gecko) 85.0.4183.93/6.5 TV Safari/537.36',
             },
         },
         # Used for misc api requests by default
@@ -653,13 +670,13 @@ class VideoInfo(object):
         client_selection = settings.client_selection()
         # Alternate #1
         # Will play almost all videos with available subtitles at full resolution with HDR
-        # Some very small minority of videos won't show available subtitles
+        # Some very small minority of videos may only play at 720p
         if client_selection == 1:
             self._prioritised_clients = (
                 self.CLIENTS['android'],
+                self.CLIENTS['android_embedded'],
                 self.CLIENTS['android_youtube_tv'],
                 self.CLIENTS['android_testsuite'],
-                self.CLIENTS['android_embedded'],
             )
         # Alternate #2
         # Will play almost all videos at full resolution with HDR
@@ -674,13 +691,13 @@ class VideoInfo(object):
             )
         # Default
         # Will play almost all videos with available subtitles at full resolution with HDR
-        # Some very small minority of videos may only play at 720p
+        # Some very small minority of videos require additional requests to fetch subtitles
         else:
             self._prioritised_clients = (
                 self.CLIENTS['android'],
-                self.CLIENTS['android_embedded'],
                 self.CLIENTS['android_youtube_tv'],
                 self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android_embedded'],
             )
 
         self.CLIENTS['_common']['hl'] = self._language
@@ -1143,10 +1160,29 @@ class VideoInfo(object):
 
             raise YouTubeException(reason)
 
-        captions = player_response.get('captions')
-        if captions:
-            headers = self.CLIENTS['web']['headers'].copy()
+        if self._selected_client.get('query_subtitles'):
+            client = self.CLIENTS['smarttv_embedded']
+            payload['context']['client'] = client['details']
+            headers = client['headers'].copy()
             headers.update(self.CLIENTS['_headers'])
+            params = {'key': client['api_key']}
+
+            try:
+                result = requests.post(video_info_url, params=params, json=payload,
+                                  headers=headers, verify=self._verify, cookies=None,
+                                  allow_redirects=True)
+                result.raise_for_status()
+            except requests.exceptions.RequestException as error:
+                self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
+                error_message = 'Caption request failed. Failed to get player response for video_id "{0}"'.format(self.video_id)
+                self._context.log_error(error_message + '\n' + traceback.format_exc())
+                captions = None
+            else:
+                captions = result.json().get('captions')
+        else:
+            captions = player_response.get('captions')
+
+        if captions:
             meta_info['subtitles'] = Subtitles(self._context, headers,
                                                self.video_id, captions).get_subtitles()
         else:
@@ -1218,7 +1254,7 @@ class VideoInfo(object):
             self._player_js = self.get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        if not is_live and httpd_is_live and adaptive_fmts and not client.get('disableDash'):
+        if not is_live and httpd_is_live and adaptive_fmts and not self._selected_client.get('disable_dash'):
             mpd_url, s_info = self.generate_mpd(adaptive_fmts,
                                                 video_details.get('lengthSeconds', '0'),
                                                 license_info.get('url'))
