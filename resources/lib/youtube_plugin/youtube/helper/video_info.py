@@ -1057,7 +1057,8 @@ class VideoInfo(object):
             break
         self._context.log_debug('Requested video info with client: {0} (logged {1})'.format(
             client['details']['clientName'], 'in' if auth_header else 'out'))
-        self._selected_client = client
+        self._selected_client = client.copy()
+        self._selected_client['headers'] = headers.copy()
 
         if 'Authorization' in headers:
             del headers['Authorization']
