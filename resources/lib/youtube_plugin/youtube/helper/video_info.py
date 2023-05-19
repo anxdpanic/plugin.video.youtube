@@ -1086,8 +1086,10 @@ class VideoInfo(object):
 
                 if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED',
                               'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'):
-                    if (status == 'UNPLAYABLE' and
-                            playability_status.get('reason', '') == 'The uploader has not made this video available in your country'):
+                    # Geo-blocked video with error reasons like:
+                    # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
+                    # "The uploader has not made this video available in your country"
+                    if status == 'UNPLAYABLE' and 'country' in playability_status.get('reason', ''):
                         break
                     if status != 'ERROR':
                         continue
