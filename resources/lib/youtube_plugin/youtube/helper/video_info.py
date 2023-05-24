@@ -488,7 +488,7 @@ class VideoInfo(object):
                 'dash/audio': True,
                 'audio': {'bitrate': 192, 'encoding': 'aac'}},
         '258': {'container': 'mp4',
-                'title': 'aac-LC@384',
+                'title': 'aac-lc@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'aac'}},
         '325': {'container': 'mp4',
