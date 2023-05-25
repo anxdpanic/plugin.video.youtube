@@ -306,13 +306,17 @@ class XbmcContext(AbstractContext):
         if not use_dash or not inputstream_version:
             return frozenset() if capability is None else None
 
+        # Values of capability map can be any of the following:
+        # - required version number as string for comparison with actual installed InputStream.Adaptive version
+        # - any Falsey value to exclude capability regardless of version
+        # - True to include capability regardless of version
         capability_map = {
             'live': '2.0.12',
             'dts': '2.1.15',
             'drm': '2.2.12',
             'vp9': '2.3.14',
             'vp9.2': '2.3.14',
-            'vorbis': None,
+            'vorbis': '2.3.14',
             'opus': '19.0.7',
             'av1': '20.3.0',
         }
@@ -320,7 +324,8 @@ class XbmcContext(AbstractContext):
         if capability is None:
             ia_loose_version = utils.loose_version(inputstream_version)
             capabilities = frozenset(key for key, version in capability_map.items()
-                                     if version and ia_loose_version >= utils.loose_version(version))
+                                     if version is True
+                                     or version and ia_loose_version >= utils.loose_version(version))
             return capabilities
         return capability_map.get(capability)
 
