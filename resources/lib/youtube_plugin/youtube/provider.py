@@ -1077,8 +1077,7 @@ class Provider(kodion.AbstractProvider):
             context.addon().openSettings()
             context.get_ui().refresh_container()
         elif switch == 'mpd':
-            use_dash = context.use_inputstream_adaptive()
-            if use_dash:
+            if context.use_inputstream_adaptive():
                 xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
             else:
                 settings.set_bool('kodion.video.quality.mpd', False)

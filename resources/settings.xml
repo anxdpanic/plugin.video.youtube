@@ -290,15 +290,38 @@
                 </setting>
             </group>
             <group id="3" label="30690">
-                <setting help="" id="kodion.mpd.live_streams" label="30689" type="boolean">
+                <setting help="" id="kodion.video.live_stream.selection.1" label="30689" type="integer">
                     <level>0</level>
-                    <default>true</default>
+                    <default>2</default>
+                    <constraints>
+                        <options>
+                            <option label="30740">0</option>
+                            <option label="30741">1</option>
+                            <option label="30742">2</option>
+                        </options>
+                    </constraints>
+                    <control format="string" type="spinner"/>
                     <dependencies>
-                        <dependency type="enable">
+                        <dependency type="visible">
                             <condition operator="is" setting="kodion.video.quality.mpd">true</condition>
                         </dependency>
                     </dependencies>
-                    <control type="toggle"/>
+                </setting>
+                <setting help="" id="kodion.video.live_stream.selection.2" label="30689" type="integer">
+                    <level>0</level>
+                    <default>2</default>
+                    <constraints>
+                        <options>
+                            <option label="30740">0</option>
+                            <option label="30742">2</option>
+                        </options>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition operator="is" setting="kodion.video.quality.mpd">false</condition>
+                        </dependency>
+                    </dependencies>
+                    <control format="string" type="spinner"/>
                 </setting>
             </group>
             <group id="4">
@@ -310,7 +333,10 @@
                     </constraints>
                     <dependencies>
                         <dependency type="enable">
-                            <condition operator="is" setting="kodion.video.quality.mpd">true</condition>
+                            <or>
+                                <condition operator="is" setting="kodion.video.quality.mpd">true</condition>
+                                <condition operator="!is" setting="kodion.video.quality.live_streams">0</condition>
+                            </or>
                         </dependency>
                     </dependencies>
                     <control format="action" type="button"/>

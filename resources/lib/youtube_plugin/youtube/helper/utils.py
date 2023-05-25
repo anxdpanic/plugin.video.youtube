@@ -476,7 +476,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
         video_item.set_headers(video_stream['headers'])
 
     # set uses_dash
-    video_item.set_use_dash(settings.use_dash())
+    video_item.set_use_dash_video(settings.use_dash_videos())
 
     license_info = video_stream.get('license_info', {})
 

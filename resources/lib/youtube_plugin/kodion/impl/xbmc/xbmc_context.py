@@ -282,28 +282,26 @@ class XbmcContext(AbstractContext):
         self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
 
     def use_inputstream_adaptive(self):
-        addon_enabled = self.addon_enabled('inputstream.adaptive')
-        if self._settings.use_dash() and not addon_enabled:
-            if self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):
-                use_dash = self.set_addon_enabled('inputstream.adaptive')
+        if self._settings.use_dash_videos() or self._settings.use_adaptive_live_streams():
+            if self.addon_enabled('inputstream.adaptive'):
+                success = True
+            elif self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):
+                success = self.set_addon_enabled('inputstream.adaptive')
             else:
-                use_dash = False
-        elif self._settings.use_dash() and addon_enabled:
-            use_dash = True
+                success = False
         else:
-            use_dash = False
-        return use_dash
+            success = False
+        return success
 
     def inputstream_adaptive_capabilities(self, capability=None):
         # return a list inputstream.adaptive capabilities, if capability set return version required
 
-        use_dash = self.use_inputstream_adaptive()
         try:
             inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
         except RuntimeError:
             inputstream_version = ''
 
-        if not use_dash or not inputstream_version:
+        if not self.use_inputstream_adaptive() or not inputstream_version:
             return frozenset() if capability is None else None
 
         # Values of capability map can be any of the following:

@@ -137,17 +137,27 @@ class AbstractSettings(object):
         return self.get_bool(constants.setting.ALLOW_DEV_KEYS, False)
 
     def use_dash_videos(self):
-        if not self.use_dash():
-            return False
-        return self.get_bool(constants.setting.DASH_VIDEOS, False)
+        if self.use_dash():
+            return self.get_bool(constants.setting.DASH_VIDEOS, False)
+        return False
 
     def include_hdr(self):
         return self.get_bool(constants.setting.DASH_INCL_HDR, False)
 
+    def use_adaptive_live_streams(self):
+        if self.use_dash():
+            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 2) != 0
+        return self.get_int(constants.setting.LIVE_STREAMS + '.2', 2) != 0
+
     def use_dash_live_streams(self):
-        if not self.use_dash():
-            return False
-        return self.get_bool(constants.setting.DASH_LIVE_STREAMS, False)
+        if self.use_dash():
+            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 2) == 1
+        return False
+
+    def use_adaptive_hls_live_streams(self):
+        if self.use_dash():
+            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 2) == 2
+        return self.get_int(constants.setting.LIVE_STREAMS + '.2', 2) == 2
 
     def httpd_port(self):
         return self.get_int(constants.setting.HTTPD_PORT, 50152)
