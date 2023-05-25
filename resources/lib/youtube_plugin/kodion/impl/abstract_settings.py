@@ -142,8 +142,6 @@ class AbstractSettings(object):
         return self.get_bool(constants.setting.DASH_VIDEOS, False)
 
     def include_hdr(self):
-        if self.get_mpd_quality() == 'mp4':
-            return False
         return self.get_bool(constants.setting.DASH_INCL_HDR, False)
 
     def use_dash_live_streams(self):

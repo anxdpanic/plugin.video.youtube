@@ -268,10 +268,7 @@
                     <default>false</default>
                     <dependencies>
                         <dependency type="enable">
-                            <and>
-                                <condition operator="is" setting="kodion.mpd.videos">true</condition>
-                                <condition operator="!is" setting="kodion.mpd.quality.selection">8</condition>
-                            </and>
+                            <condition operator="is" setting="kodion.mpd.videos">true</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
