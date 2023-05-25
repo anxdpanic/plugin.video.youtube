@@ -528,6 +528,15 @@ class VideoInfo(object):
                 'title': 'opus@160',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
+        '338': {'container': 'webm',
+                'sort': [141, 0],
+                'title': 'opus@480',
+                'dash/audio': True,
+                'audio': {'bitrate': 480, 'encoding': 'opus'}},
+        '380': {'container': 'mp4',
+                'title': 'ac-3@384',
+                'dash/audio': True,
+                'audio': {'bitrate': 384, 'encoding': 'ac-3'}},
         # === Live HLS
         '9995': {'container': 'hls',
                  'Live': True,
@@ -650,7 +659,7 @@ class VideoInfo(object):
             },
             'query_subtitles': True,
         },
-        # Used to requests captions for clients that don't provide them 
+        # Used to requests captions for clients that don't provide them
         # Requires handling of nsig to overcome throttling (TODO)
         'smarttv_embedded': {
             'id': 85,
@@ -902,7 +911,6 @@ class VideoInfo(object):
             headers = self.CLIENTS['web']['headers'].copy()
             headers.update(self.CLIENTS['_headers'])
             headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
-
         try:
             result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
             result.raise_for_status()
@@ -949,9 +957,9 @@ class VideoInfo(object):
                 continue
 
             stream = {'url': playlist_url,
-                            'meta': meta_info,
-                            'headers': curl_headers,
-                            'playback_stats': playback_stats}
+                      'meta': meta_info,
+                      'headers': curl_headers,
+                      'playback_stats': playback_stats}
             stream.update(yt_format)
             stream_list.append(stream)
         return stream_list
@@ -1393,9 +1401,9 @@ class VideoInfo(object):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         if not is_live and httpd_is_live and adaptive_fmts:
-            mpd_url, s_info = self.generate_mpd(adaptive_fmts,
-                                                video_details.get('lengthSeconds', '0'),
-                                                license_info.get('url'))
+            manifest_url, s_info = self._generate_mpd_manifest(adaptive_fmts,
+                                                               video_details.get('lengthSeconds', '0'),
+                                                               license_info.get('url'))
 
         if manifest_url:
             video_stream = {
