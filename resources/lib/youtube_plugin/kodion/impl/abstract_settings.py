@@ -152,14 +152,14 @@ class AbstractSettings(object):
     def httpd_port(self):
         return self.get_int(constants.setting.HTTPD_PORT, 50152)
 
-    def httpd_listen(self):
-        ip_address = self.get_string(constants.setting.HTTPD_LISTEN, '0.0.0.0')
+    def httpd_listen(self, default='0.0.0.0'):
+        ip_address = self.get_string(constants.setting.HTTPD_LISTEN, default)
         try:
             ip_address = ip_address.strip()
         except AttributeError:
             pass
         if not ip_address:
-            ip_address = '0.0.0.0'
+            ip_address = default
         return ip_address
 
     def set_httpd_listen(self, value):
