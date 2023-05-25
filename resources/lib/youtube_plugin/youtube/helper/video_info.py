@@ -1377,12 +1377,9 @@ class VideoInfo(object):
                 license_info['url'] = li_info.get('url', None)
                 if license_info['url']:
                     self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
-                    li_ipaddress = self._context.get_settings().httpd_listen()
-                    if li_ipaddress == '0.0.0.0':
-                        li_ipaddress = '127.0.0.1'
                     proxy_addr = \
                         ['http://{ipaddress}:{port}/widevine'.format(
-                            ipaddress=li_ipaddress,
+                            ipaddress=self._context.get_settings().httpd_listen(default='127.0.0.1'),
                             port=self._context.get_settings().httpd_port()
                         ), '||R{SSM}|']
                     license_info['proxy'] = ''.join(proxy_addr)
@@ -1480,10 +1477,6 @@ class VideoInfo(object):
         quality_height = isinstance(mpd_quality, int) and mpd_quality or 0
         hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
-
-        ipaddress = self._context.get_settings().httpd_listen()
-        if ipaddress == '0.0.0.0':
-            ipaddress = '127.0.0.1'
 
         fps_scale_map = {
             24: 1001,
@@ -1746,3 +1739,8 @@ class VideoInfo(object):
             ), stream_info
         except:
             return None, None
+        return 'http://{0}:{1}/{2}.mpd'.format(
+            self._context.get_settings().httpd_listen(default='127.0.0.1'),
+            self._context.get_settings().httpd_port(),
+            self.video_id
+        ), stream_info
