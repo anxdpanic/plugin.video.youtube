@@ -1048,7 +1048,7 @@ msgid "Use for live streams"
 msgstr ""
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1245,4 +1245,16 @@ msgstr ""
 
 msgctxt "#30739"
 msgid "Alternate #2"
+msgstr ""
+
+msgctxt "#30740"
+msgid "HLS"
+msgstr ""
+
+msgctxt "#30741"
+msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30742"
+msgid "Adaptive HLS"
 msgstr ""

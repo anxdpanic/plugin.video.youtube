@@ -227,10 +227,10 @@ class VideoItem(BaseItem):
     def get_date(self):
         return self._date
 
-    def set_use_dash(self, value=True):
+    def set_use_dash_video(self, value=True):
         self._uses_dash = value
 
-    def use_dash(self):
+    def use_dash_video(self):
         return self._uses_dash is True and ('manifest/dash' in self.get_uri() or self.get_uri().endswith('.mpd'))
 
     def set_mediatype(self, mediatype):

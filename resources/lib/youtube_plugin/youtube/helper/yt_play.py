@@ -92,7 +92,7 @@ def play_video(provider, context):
         playback_stats = video_stream.get('playback_stats')
 
         if use_history:
-            if video_item.get_start_time() and video_item.use_dash():
+            if video_item.get_start_time() and video_item.use_dash_video():
                 seek_time = video_item.get_start_time()
             play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
 
