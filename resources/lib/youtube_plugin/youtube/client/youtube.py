@@ -827,16 +827,16 @@ class YouTube(LoginClient):
                 session.verify = self._verify
                 adapter = requests.adapters.HTTPAdapter(pool_maxsize=5, pool_block=True)
                 session.mount("https://", adapter)
-
                 responses = []
 
                 def fetch_xml(_url, _responses):
                     try:
-                        _response = session.get(_url)
-                    except:
-                        _response = None
+                        _response = session.get(_url, {}, headers=headers, verify=self._verify, allow_redirects=True)
+                        _response.raise_for_status()
+                    except requests.exceptions.RequestException as error:
+                        _context.log_debug('Response: {0}'.format(error.response and error.response.text))
                         _context.log_error('Failed |%s|' % traceback.print_exc())
-
+                        return
                     _responses.append(_response)
 
                 threads = []
@@ -850,7 +850,8 @@ class YouTube(LoginClient):
                     thread.start()
 
                 for thread in threads:
-                    thread.join()
+                    thread.join(30)
+                session.close()
 
                 for response in responses:
                     if response:
