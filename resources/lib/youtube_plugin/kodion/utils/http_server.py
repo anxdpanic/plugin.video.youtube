@@ -79,7 +79,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(client_json.encode('utf-8'))
 
         if stripped_path != '/ping':
-            logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+            logger.log_debug('HTTPServer: GET Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -166,7 +166,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+        logger.log_debug('HTTPServer: HEAD Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
