@@ -56,15 +56,14 @@ def to_play_item(context, play_item):
             not play_item.get_license_key():
         play_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(video_id=play_item.video_id))
 
-    if play_item.use_dash() and context.addon_enabled('inputstream.adaptive'):
-        inputstream_property = 'inputstream'
-        if major_version < 19:
-            inputstream_property += 'addon'
-       
+    ia_enabled = context.addon_enabled('inputstream.adaptive')
+
+    if ia_enabled and play_item.use_dash_video() and not play_item.live:
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
-        list_item.setProperty(inputstream_property, 'inputstream.adaptive')
+        list_item.setProperty('inputstream', 'inputstream.adaptive')
         list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
+
         if play_item.get_headers():
             list_item.setProperty('inputstream.adaptive.manifest_headers', play_item.get_headers())
             list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
@@ -72,6 +71,31 @@ def to_play_item(context, play_item):
         if play_item.get_license_key():
             list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
             list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
+
+    elif ia_enabled and play_item.live and settings.use_adaptive_live_streams():
+        if settings.use_dash_live_streams():
+            manifest_type = 'mpd'
+            mime_type = 'application/xml+dash'
+            # MPD manifest update is currently broken
+            # Following line will force a full update but restart live stream from start
+            # list_item.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
+        else:
+            manifest_type = 'hls'
+            mime_type = 'application/x-mpegURL'
+
+        list_item.setContentLookup(False)
+        list_item.setMimeType(mime_type)
+        list_item.setProperty('inputstream', 'inputstream.adaptive')
+        list_item.setProperty('inputstream.adaptive.manifest_type', manifest_type)
+
+        if play_item.get_headers():
+            list_item.setProperty('inputstream.adaptive.manifest_headers', play_item.get_headers())
+            list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
+
+        if play_item.get_license_key():
+            list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
+            list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
+
     else:
         uri = play_item.get_uri()
         if 'mime=' in uri:

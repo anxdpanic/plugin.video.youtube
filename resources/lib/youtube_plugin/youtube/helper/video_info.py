@@ -528,15 +528,24 @@ class VideoInfo(object):
                 'title': 'opus@160',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
-        '338': {'container': 'webm',
-                'sort': [141, 0],
-                'title': 'opus@480',
-                'dash/audio': True,
-                'audio': {'bitrate': 480, 'encoding': 'opus'}},
-        '380': {'container': 'mp4',
-                'title': 'ac-3@384',
-                'dash/audio': True,
-                'audio': {'bitrate': 384, 'encoding': 'ac-3'}},
+        # === Live HLS
+        '9995': {'container': 'hls',
+                 'Live': True,
+                 'sort': [1080, 1],
+                 'title': 'Live HLS',
+                 'hls/audio': True,
+                 'hls/video': True,
+                 'audio': {'bitrate': 0, 'encoding': 'aac'},
+                 'video': {'height': 0, 'encoding': 'h.264'}},
+        # === Live HLS adaptive
+        '9996': {'container': 'hls',
+                 'Live': True,
+                 'sort': [1080, 1],
+                 'title': 'Live HLS Adaptive',
+                 'hls/audio': True,
+                 'hls/video': True,
+                 'audio': {'bitrate': 0, 'encoding': 'aac'},
+                 'video': {'height': 0, 'encoding': 'h.264'}},
         # === DASH adaptive audio only
         '9997': {'container': 'mpd',
                  'sort': [-1, 0],
@@ -885,29 +894,48 @@ class VideoInfo(object):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _load_manifest(self, url, meta_info=None, playback_stats=None):
-        headers = self.CLIENTS['web']['headers'].copy()
-        headers.update(self.CLIENTS['_headers'])
-        headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
-
-        curl_headers = self.make_curl_headers(headers, cookies=None)
-
-        if playback_stats is None:
-            playback_stats = {}
+    def _load_hls_manifest(self, url, meta_info=None, headers=None, playback_stats=None):
+        if headers:
+            headers = headers.copy()
+        elif self._selected_client:
+            headers = self._selected_client['headers'].copy()
+        else:
+            headers = self.CLIENTS['web']['headers'].copy()
+            headers.update(self.CLIENTS['_headers'])
+            headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
 
         try:
             result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
             result.raise_for_status()
-        except requests.exceptions.RequestException:
-            # Failed to get the M3U8 playlist file. Add a log debug in this case?
+        except requests.exceptions.RequestException as error:
+            self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
+            error_message = 'Failed to get manifest for video_id "{0}"'.format(self.video_id)
+            self._context.log_error(error_message + '\n' + traceback.format_exc())
             return ()
 
-        _meta_info = {'video': {},
-                      'channel': {},
-                      'images': {},
-                      'subtitles': []}
-        meta_info = meta_info if meta_info else _meta_info
-        streams = []
+        if 'Authorization' in headers:
+            del headers['Authorization']
+        curl_headers = self.make_curl_headers(headers, cookies=None)
+
+        if meta_info is None:
+            meta_info = {'video': {},
+                         'channel': {},
+                         'images': {},
+                         'subtitles': []}
+        if playback_stats is None:
+            playback_stats = {}
+
+        if self._context.get_settings().use_adaptive_hls_live_streams():
+            yt_format = self.FORMAT['9996']
+        else:
+            yt_format = self.FORMAT['9995']
+        stream = {'url': url,
+                        'meta': meta_info,
+                        'headers': curl_headers,
+                        'playback_stats': playback_stats}
+        stream.update(yt_format)
+        stream_list = [stream]
+
         # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
         # a small default stream with itag 133 (240p) and can be ignored.
         # Capture the URL of a .m3u8 playlist and the itag value from that URL.
@@ -916,19 +944,72 @@ class VideoInfo(object):
             playlist_url = match.group('url')
             itag = match.group('itag')
 
-            yt_format = self.FORMAT.get(itag, None)
+            yt_format = self.FORMAT.get(itag)
             if not yt_format:
                 self._context.log_debug('unknown yt_format for itag "%s"' % itag)
                 continue
 
-            video_stream = {'url': playlist_url,
+            stream = {'url': playlist_url,
                             'meta': meta_info,
                             'headers': curl_headers,
-                            'playback_stats': playback_stats
-                            }
-            video_stream.update(yt_format)
-            streams.append(video_stream)
-        return streams
+                            'playback_stats': playback_stats}
+            stream.update(yt_format)
+            stream_list.append(stream)
+        return stream_list
+
+    def _parse_to_stream_list(self, streams, meta_info=None, headers=None, playback_stats=None ):
+        if headers:
+            headers = headers.copy()
+        elif self._selected_client:
+            headers = self._selected_client['headers'].copy()
+        else:
+            headers = self.CLIENTS['web']['headers'].copy()
+            headers.update(self.CLIENTS['_headers'])
+            headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
+
+        if 'Authorization' in headers:
+            del headers['Authorization']
+        curl_headers = self.make_curl_headers(headers, cookies=None)
+
+        if meta_info is None:
+            meta_info = {'video': {},
+                         'channel': {},
+                         'images': {},
+                         'subtitles': []}
+        if playback_stats is None:
+            playback_stats = {}
+
+        stream_list = []
+        for stream_map in streams:
+            url = stream_map.get('url')
+            conn = stream_map.get('conn')
+
+            if not url and conn:
+                url = '%s?%s' % (conn, unquote(stream_map['stream']))
+            elif not url and self._cipher and 'signatureCipher' in stream_map:
+                url = self._process_signature_cipher(stream_map)
+
+            if not url:
+                continue
+            url = self._process_url_params(url)
+
+            itag = str(stream_map['itag'])
+            stream_map['itag'] = itag
+            yt_format = self.FORMAT.get(itag)
+            if not yt_format:
+                self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                continue
+            if (yt_format.get('discontinued') or yt_format.get('unsupported')
+                    or (yt_format.get('dash/video') and not yt_format.get('dash/audio'))):
+                continue
+
+            stream = {'url': url,
+                      'meta': meta_info,
+                      'headers': curl_headers,
+                      'playback_stats': playback_stats}
+            stream.update(yt_format)
+            stream_list.append(stream)
+        return stream_list
 
     def _process_signature_cipher(self, stream_map):
         signature_cipher = parse_qs(stream_map['signatureCipher'])
@@ -1128,8 +1209,11 @@ class VideoInfo(object):
         is_live_content = video_details.get('isLiveContent') is True
         streaming_data = player_response.get('streamingData', {})
 
-        live_url = streaming_data.get('hlsManifestUrl', '')
-        is_live = is_live_content and live_url
+        if self._context.get_settings().use_dash_live_streams():
+            manifest_url = streaming_data.get('dashManifestUrl', '')
+        else:
+            manifest_url = streaming_data.get('hlsManifestUrl', '')
+        is_live = is_live_content and manifest_url
 
         meta_info = {'video': {},
                      'channel': {},
@@ -1272,18 +1356,18 @@ class VideoInfo(object):
 
         stream_list = []
 
-        if live_url:
-            stream_list.extend(self._load_manifest(live_url,
-                                                   meta_info=meta_info,
-                                                   playback_stats=playback_stats))
+        if is_live and not self._context.get_settings().use_dash_live_streams():
+            stream_list.extend(self._load_hls_manifest(manifest_url,
+                                                       meta_info=meta_info,
+                                                       playback_stats=playback_stats))
+            manifest_url = None
 
-        httpd_is_live = (self._context.get_settings().use_dash_videos() and
+        httpd_is_live = (self._context.get_settings().use_dash() and
                          is_httpd_live(port=self._context.get_settings().httpd_port()))
 
         s_info = {}
         adaptive_fmts = streaming_data.get('adaptiveFormats', [])
         std_fmts = streaming_data.get('formats', [])
-        mpd_url = streaming_data.get('dashManifestUrl', '')
 
         license_info = {'url': None, 'proxy': None, 'token': None}
         pa_li_info = streaming_data.get('licenseInfos', [])
@@ -1313,13 +1397,13 @@ class VideoInfo(object):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         if not is_live and httpd_is_live and adaptive_fmts and not self._selected_client.get('disable_dash'):
-            mpd_url, s_info = self.generate_mpd(adaptive_fmts,
-                                                video_details.get('lengthSeconds', '0'),
-                                                license_info.get('url'))
+            manifest_url, s_info = self._generate_mpd_manifest(adaptive_fmts,
+                                                               video_details.get('lengthSeconds', '0'),
+                                                               license_info.get('url'))
 
-        if mpd_url:
+        if manifest_url:
             video_stream = {
-                'url': mpd_url,
+                'url': manifest_url,
                 'meta': meta_info,
                 'headers': curl_headers,
                 'license_info': license_info,
@@ -1327,8 +1411,12 @@ class VideoInfo(object):
             }
 
             if is_live:
-                video_stream['url'] = '&'.join([video_stream['url'], 'start_seq=$START_NUMBER$'])
-                video_stream.update(self.FORMAT.get('9998'))
+                if self._context.get_settings().use_dash_live_streams():
+                    # MPD structure has segments with additional attributes
+                    # and url has changed from using a query string to using url params
+                    # This breaks the InputStream.Adaptive partial manifest update
+                    video_stream['url'] = ''.join([video_stream['url'], '?start_seq=$START_NUMBER$'])
+                    video_stream.update(self.FORMAT.get('9998'))
             elif not s_info:
                 video_stream.update(self.FORMAT.get('9999'))
             else:
@@ -1364,43 +1452,16 @@ class VideoInfo(object):
                 video_stream.update(stream_details)
             stream_list.append(video_stream)
 
-        def parse_to_stream_list(streams):
-            for stream_map in streams:
-                url = stream_map.get('url')
-                conn = stream_map.get('conn')
-
-                if not url and conn:
-                    url = '%s?%s' % (conn, unquote(stream_map['stream']))
-                elif not url and self._cipher and 'signatureCipher' in stream_map:
-                    url = self._process_signature_cipher(stream_map)
-
-                if not url:
-                    continue
-                url = self._process_url_params(url)
-
-                itag = str(stream_map['itag'])
-                stream_map['itag'] = itag
-                yt_format = self.FORMAT.get(itag)
-                if not yt_format:
-                    self._context.log_debug('unknown yt_format for itag "%s"' % itag)
-                    continue
-                if (yt_format.get('discontinued') or yt_format.get('unsupported')
-                        or (yt_format.get('dash/video') and not yt_format.get('dash/audio'))):
-                    continue
-
-                stream = {'url': url,
-                          'meta': meta_info,
-                          'headers': curl_headers,
-                          'playback_stats': playback_stats}
-                stream.update(yt_format)
-                stream_list.append(stream)
-
         # extract streams from map
         if std_fmts:
-            parse_to_stream_list(std_fmts)
+            stream_list.extend(self._parse_to_stream_list(std_fmts,
+                                                          meta_info=meta_info,
+                                                          playback_stats=playback_stats))
 
         if adaptive_fmts:
-            parse_to_stream_list(adaptive_fmts)
+            stream_list.extend(self._parse_to_stream_list(adaptive_fmts,
+                                                          meta_info=meta_info,
+                                                          playback_stats=playback_stats))
 
         # last fallback
         if not stream_list:
@@ -1408,7 +1469,7 @@ class VideoInfo(object):
 
         return stream_list
 
-    def generate_mpd(self, adaptive_fmts, duration, license_url):
+    def _generate_mpd_manifest(self, adaptive_fmts, duration, license_url):
         basepath = 'special://temp/plugin.video.youtube/'
         if not make_dirs(basepath):
             self._context.log_debug('Failed to create directories: %s' % basepath)
