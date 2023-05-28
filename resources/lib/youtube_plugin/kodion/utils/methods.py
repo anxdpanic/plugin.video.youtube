@@ -107,6 +107,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     ask_for_quality = context.get_settings().ask_for_video_quality() if ask_for_quality is None else ask_for_quality
     video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
     audio_only = audio_only if audio_only is not None else settings.audio_only()
+    adaptive_live = settings.use_adaptive_live_streams() and 'live' in context.inputstream_adaptive_capabilities()
 
     if not ask_for_quality:
         stream_data_list = [item for item in stream_data_list
@@ -134,22 +135,13 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
         else:
             context.log_debug('Select stream: Audio only, no audio only streams found')
 
-    adaptive_live = settings.use_adaptive_live_streams() and 'live' in context.inputstream_adaptive_capabilities()
-    dash_videos = settings.use_dash_videos()
-
-    if not use_adaptive:
+    if not adaptive_live:
+        stream_data_list = [item for item in stream_data_list
+                            if (item['container'] != 'mpd' or
+                                not item.get('Live'))]
+    elif not use_adaptive:
         stream_data_list = [item for item in stream_data_list
                             if item['container'] != 'mpd']
-    else:
-        if not adaptive_live:
-            stream_data_list = [item for item in stream_data_list
-                                if (item['container'] != 'mpd' or
-                                    not item.get('Live'))]
-
-        if not dash_videos:
-            stream_data_list = [item for item in stream_data_list
-                                if (item['container'] != 'mpd' or
-                                    item.get('Live'))]
 
     def _find_best_fit_video(_stream_data):
         if audio_only:
