@@ -146,20 +146,27 @@ class AbstractSettings(object):
             return False
         return self.get_bool(constants.setting.DASH_INCL_HDR, False)
 
+    def get_live_stream_type(self):
+        stream_type_map = {0: 'mpegts',
+                           1: 'hls',
+                           2: 'ia_hls',
+                           3: 'ia_mpd'}
+
+        if self.use_dash():
+            stream_type = self.get_int(constants.setting.LIVE_STREAMS + '.1', 0)
+        else:
+            stream_type = self.get_int(constants.setting.LIVE_STREAMS + '.2', 0)
+        return stream_type_map.get(stream_type) or stream_type_map[0]
+
     def use_adaptive_live_streams(self):
         if self.use_dash():
-            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 2) != 0
-        return self.get_int(constants.setting.LIVE_STREAMS + '.2', 2) != 0
+            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 0) > 1
+        return self.get_int(constants.setting.LIVE_STREAMS + '.2', 0) > 1
 
     def use_dash_live_streams(self):
         if self.use_dash():
-            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 2) == 1
+            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 0) == 3
         return False
-
-    def use_adaptive_hls_live_streams(self):
-        if self.use_dash():
-            return self.get_int(constants.setting.LIVE_STREAMS + '.1', 2) == 2
-        return self.get_int(constants.setting.LIVE_STREAMS + '.2', 2) == 2
 
     def httpd_port(self):
         return self.get_int(constants.setting.HTTPD_PORT, 50152)

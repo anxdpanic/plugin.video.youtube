@@ -514,7 +514,7 @@ class VideoInfo(object):
         '9996': {'container': 'hls',
                  'Live': True,
                  'sort': [1080, 1],
-                 'title': 'Live HLS Adaptive',
+                 'title': 'Adaptive Live HLS',
                  'hls/audio': True,
                  'hls/video': True,
                  'audio': {'bitrate': 0, 'encoding': 'aac'},
@@ -849,7 +849,7 @@ class VideoInfo(object):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _load_hls_manifest(self, url, meta_info=None, headers=None, playback_stats=None):
+    def _load_hls_manifest(self, url, stream_type=None, meta_info=None, headers=None, playback_stats=None):
         if headers:
             headers = headers.copy()
         elif self._selected_client:
@@ -877,19 +877,26 @@ class VideoInfo(object):
                          'channel': {},
                          'images': {},
                          'subtitles': []}
+
         if playback_stats is None:
             playback_stats = {}
 
-        if self._context.get_settings().use_adaptive_hls_live_streams():
-            yt_format = self.FORMAT['9996']
+        if stream_type is None:
+            stream_type = self._context.get_settings().get_live_stream_type()
+
+        if 'hls' in stream_type:
+            if stream_type == 'hls':
+                yt_format = self.FORMAT['9995']
+            else:
+                yt_format = self.FORMAT['9996']
+            stream = {'url': url,
+                      'meta': meta_info,
+                      'headers': curl_headers,
+                      'playback_stats': playback_stats}
+            stream.update(yt_format)
+            stream_list = [stream]
         else:
-            yt_format = self.FORMAT['9995']
-        stream = {'url': url,
-                        'meta': meta_info,
-                        'headers': curl_headers,
-                        'playback_stats': playback_stats}
-        stream.update(yt_format)
-        stream_list = [stream]
+            stream_list = []
 
         # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
         # a small default stream with itag 133 (240p) and can be ignored.
@@ -1161,11 +1168,13 @@ class VideoInfo(object):
         is_live_content = video_details.get('isLiveContent') is True
         streaming_data = player_response.get('streamingData', {})
 
-        if self._context.get_settings().use_dash_live_streams():
+        live_stream_type = self._context.get_settings().get_live_stream_type()
+        if live_stream_type == 'ia_mpd':
             manifest_url = streaming_data.get('dashManifestUrl', '')
         else:
-            manifest_url = streaming_data.get('hlsManifestUrl', '')
-        is_live = is_live_content and manifest_url
+            manifest_url = ''
+        hls_manifest_url = streaming_data.get('hlsManifestUrl', '')
+        is_live = is_live_content and hls_manifest_url
 
         meta_info = {'video': {},
                      'channel': {},
@@ -1270,11 +1279,11 @@ class VideoInfo(object):
 
         stream_list = []
 
-        if is_live and not self._context.get_settings().use_dash_live_streams():
-            stream_list.extend(self._load_hls_manifest(manifest_url,
+        if is_live:
+            stream_list.extend(self._load_hls_manifest(hls_manifest_url,
+                                                       stream_type=live_stream_type,
                                                        meta_info=meta_info,
                                                        playback_stats=playback_stats))
-            manifest_url = None
 
         httpd_is_live = (self._context.get_settings().use_dash() and
                          is_httpd_live(port=self._context.get_settings().httpd_port()))
@@ -1310,7 +1319,7 @@ class VideoInfo(object):
             self._player_js = self.get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        if not is_live and httpd_is_live and adaptive_fmts and not self._selected_client.get('disable_dash'):
+        if not is_live and httpd_is_live and adaptive_fmts:
             manifest_url, s_info = self._generate_mpd_manifest(adaptive_fmts,
                                                                video_details.get('lengthSeconds', '0'),
                                                                license_info.get('url'))
@@ -1325,12 +1334,11 @@ class VideoInfo(object):
             }
 
             if is_live:
-                if self._context.get_settings().use_dash_live_streams():
-                    # MPD structure has segments with additional attributes
-                    # and url has changed from using a query string to using url params
-                    # This breaks the InputStream.Adaptive partial manifest update
-                    video_stream['url'] = ''.join([video_stream['url'], '?start_seq=$START_NUMBER$'])
-                    video_stream.update(self.FORMAT.get('9998'))
+                # MPD structure has segments with additional attributes
+                # and url has changed from using a query string to using url params
+                # This breaks the InputStream.Adaptive partial manifest update
+                video_stream['url'] = ''.join([video_stream['url'], '?start_seq=$START_NUMBER$'])
+                video_stream.update(self.FORMAT.get('9998'))
             elif not s_info:
                 video_stream.update(self.FORMAT.get('9999'))
             else:

@@ -41,7 +41,6 @@ MPD_QUALITY_SELECTION = 'kodion.mpd.quality.selection'  # (int)
 DASH_INCL_HDR = 'kodion.mpd.hdr'  # (bool)
 MPD_30FPS_LIMIT = 'kodion.mpd.limit.30'  # (bool)
 
-
 HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)
 HTTPD_LISTEN = 'kodion.http.listen'  # (string)
 HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (string)

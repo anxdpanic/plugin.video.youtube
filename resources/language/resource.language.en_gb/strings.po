@@ -1260,9 +1260,13 @@ msgid "HLS"
 msgstr ""
 
 msgctxt "#30741"
-msgid "MPEG-DASH"
+msgid "Multi-stream HLS"
 msgstr ""
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
+msgstr ""
+
+msgctxt "#30743"
+msgid "MPEG-DASH"
 msgstr ""

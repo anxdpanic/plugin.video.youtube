@@ -295,12 +295,13 @@
             <group id="3" label="30690">
                 <setting help="" id="kodion.video.live_stream.selection.1" label="30689" type="integer">
                     <level>0</level>
-                    <default>2</default>
+                    <default>0</default>
                     <constraints>
                         <options>
                             <option label="30740">0</option>
                             <option label="30741">1</option>
                             <option label="30742">2</option>
+                            <option label="30743">3</option>
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>
@@ -312,11 +313,12 @@
                 </setting>
                 <setting help="" id="kodion.video.live_stream.selection.2" label="30689" type="integer">
                     <level>0</level>
-                    <default>2</default>
+                    <default>0</default>
                     <constraints>
                         <options>
                             <option label="30740">0</option>
-                            <option label="30742">2</option>
+                            <option label="30741">1</option>
+                            <option label="30743">3</option>
                         </options>
                     </constraints>
                     <dependencies>
@@ -338,7 +340,8 @@
                         <dependency type="enable">
                             <or>
                                 <condition operator="is" setting="kodion.video.quality.mpd">true</condition>
-                                <condition operator="!is" setting="kodion.video.quality.live_streams">0</condition>
+                                <condition operator="gt" setting="kodion.video.live_stream.selection.1">1</condition>
+                                <condition operator="gt" setting="kodion.video.live_stream.selection.2">1</condition>
                             </or>
                         </dependency>
                     </dependencies>
