@@ -1313,7 +1313,6 @@ class VideoInfo(object):
             'live': is_live,
         }
 
-
         if self._selected_client.get('query_subtitles'):
             client = self.CLIENTS['smarttv_embedded']
             payload['context']['client'] = client['details']
