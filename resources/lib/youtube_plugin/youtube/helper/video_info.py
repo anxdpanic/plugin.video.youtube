@@ -859,6 +859,10 @@ class VideoInfo(object):
             headers.update(self.CLIENTS['_headers'])
             headers['Referer'] = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
 
+        if 'Authorization' in headers:
+            del headers['Authorization']
+        curl_headers = self.make_curl_headers(headers, cookies=None)
+
         try:
             result = requests.get(url, headers=headers, verify=self._verify, allow_redirects=True)
             result.raise_for_status()
@@ -867,10 +871,6 @@ class VideoInfo(object):
             error_message = 'Failed to get manifest for video_id "{0}"'.format(self.video_id)
             self._context.log_error(error_message + '\n' + traceback.format_exc())
             return ()
-
-        if 'Authorization' in headers:
-            del headers['Authorization']
-        curl_headers = self.make_curl_headers(headers, cookies=None)
 
         if meta_info is None:
             meta_info = {'video': {},
