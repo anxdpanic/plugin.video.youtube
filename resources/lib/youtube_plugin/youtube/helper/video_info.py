@@ -1089,6 +1089,18 @@ class VideoInfo(object):
                     continue
             # Otherwise skip retrying clients without Authorization header
             break
+
+        if status != 'OK':
+            reason = playability_status.get('reason')
+            if status == 'LIVE_STREAM_OFFLINE':
+                if not reason:
+                    reason = self._get_error_details(playability_status, details=(
+                        'liveStreamability', 'liveStreamabilityRenderer', 'offlineSlate',
+                        'liveStreamOfflineSlateRenderer', 'mainText'))
+            elif not reason:
+                reason = self._get_error_details(playability_status) or 'UNKNOWN'
+            raise YouTubeException(reason)
+
         self._context.log_debug('Requested video info with client: {0} (logged {1})'.format(
             client['details']['clientName'], 'in' if auth_header else 'out'))
         self._selected_client = client.copy()
@@ -1149,18 +1161,6 @@ class VideoInfo(object):
             'family_safe': microformat.get('isFamilySafe', False),
             'live': is_live,
         }
-
-        if status != 'OK':
-            reason = playability_status.get('reason')
-            if status == 'LIVE_STREAM_OFFLINE':
-                if not reason:
-                    reason = self._get_error_details(playability_status, details=(
-                        'liveStreamability', 'liveStreamabilityRenderer', 'offlineSlate',
-                        'liveStreamOfflineSlateRenderer', 'mainText'))
-            elif not reason:
-                reason = self._get_error_details(playability_status) or 'UNKNOWN'
-
-            raise YouTubeException(reason)
 
         if self._selected_client.get('query_subtitles'):
             client = self.CLIENTS['smarttv_embedded']
