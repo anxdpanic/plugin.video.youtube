@@ -1453,11 +1453,44 @@ class VideoInfo(object):
                         stream_details['audio']['bitrate'] = bitrate
                     if not video_info:
                         stream_details['title'] = '{0}@{1}'.format(codec, bitrate)
-                    if audio_info['lang']:
+                    if audio_info['lang'] not in {'', 'und'}:
                         stream_details['title'] += ' Multi-language'
 
                 video_stream.update(stream_details)
             stream_list.append(video_stream)
+
+        def parse_to_stream_list(streams):
+            for stream_map in streams:
+                url = stream_map.get('url')
+                conn = stream_map.get('conn')
+
+                if not url and conn:
+                    url = '%s?%s' % (conn, unquote(stream_map['stream']))
+                elif not url and self._cipher and 'signatureCipher' in stream_map:
+                    url = self._process_signature_cipher(stream_map)
+
+                if not url:
+                    continue
+                url = self._process_url_params(url)
+
+                itag = str(stream_map['itag'])
+                stream_map['itag'] = itag
+                yt_format = self.FORMAT.get(itag)
+                if not yt_format:
+                    self._context.log_debug('unknown yt_format for itag "%s"' % itag)
+                    continue
+                if (yt_format.get('discontinued') or yt_format.get('unsupported')
+                        or (yt_format.get('dash/video') and not yt_format.get('dash/audio'))):
+                    continue
+
+                stream = {'url': url,
+                          'meta': meta_info,
+                          'headers': curl_headers,
+                          'playback_stats': playback_stats}
+                stream.update(yt_format)
+                if 'audioTrack' in stream_map:
+                    stream['title'] = '{0} {1}'.format(stream['title'], stream_map['audioTrack']['displayName'])
+                stream_list.append(stream)
 
         # extract streams from map
         if std_fmts:
@@ -1534,7 +1567,7 @@ class VideoInfo(object):
 
             if 'audioTrack' in stream_map:
                 audio_track = stream_map['audioTrack']
-                language_code = audio_track.get('id', '')[0:2]
+                language_code = audio_track.get('id', '')[0:2] or 'und'
                 label = audio_track.get('displayName', '')
                 audio_type = 'main' if audio_track.get('audioIsDefault') else 'dub'
                 height = None
@@ -1543,8 +1576,8 @@ class VideoInfo(object):
                 if language_code == self._language_base:
                     preferred_audio = '_'+language_code
             elif media_type == 'audio':
-                language_code = ''
-                label = ''
+                language_code = 'und'
+                label = stream_map.get('audioQuality', '')
                 audio_type = 'main'
                 height = None
                 width = None
