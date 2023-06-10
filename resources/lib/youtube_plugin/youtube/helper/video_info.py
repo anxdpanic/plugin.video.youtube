@@ -1025,6 +1025,8 @@ class VideoInfo(object):
                       'headers': curl_headers,
                       'playback_stats': playback_stats}
             stream.update(yt_format)
+            if 'audioTrack' in stream_map:
+                stream['title'] = '{0} {1}'.format(stream['title'], stream_map['audioTrack']['displayName'])
             stream_list.append(stream)
         return stream_list
 
