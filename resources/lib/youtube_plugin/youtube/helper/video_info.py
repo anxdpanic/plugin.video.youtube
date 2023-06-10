@@ -1531,7 +1531,11 @@ class VideoInfo(object):
         }
 
         data = {}
-        preferred_audio = ''
+        preferred_audio = {
+            'id': '',
+            'language_code': None,
+            'audio_type': 0,
+        }
         for stream_map in adaptive_fmts:
             mime_type = stream_map.get('mimeType')
             if not mime_type:
@@ -1569,25 +1573,50 @@ class VideoInfo(object):
 
             if 'audioTrack' in stream_map:
                 audio_track = stream_map['audioTrack']
-                language_code = audio_track.get('id', '')[0:2] or 'und'
+                language = audio_track.get('id', '')
+                if '.' in language:
+                    language_code, audio_type = language.split('.')
+                    audio_type = int(audio_type)
+                else:
+                    language_code = language or 'und'
+                    audio_type = 4
                 label = audio_track.get('displayName', '')
-                audio_type = 'main' if audio_track.get('audioIsDefault') else 'dub'
+                if audio_type == 4 or audio_track.get('audioIsDefault'):
+                    audio_role = 'main'
+                elif audio_type == 3:
+                    audio_role = 'dub'
+                elif audio_type == 2:
+                    audio_role = 'description'
+                # Unsure of what other audio types are actually available
+                # Role set to "alternate" as default fallback
+                else:
+                    audio_role = 'alternate'
                 height = None
                 width = None
-                key = '{0}_{1}'.format(mime_type, language_code)
-                if language_code == self._language_base:
-                    preferred_audio = '_'+language_code
+                key = '{0}_{1}'.format(mime_type, language)
+                if (language_code == self._language_base and (
+                        not preferred_audio['id']
+                        or audio_role == 'main'
+                        or audio_type > preferred_audio['audio_type']
+                    )):
+                    preferred_audio = {
+                        'id': '_'+language,
+                        'language_code': language_code,
+                        'audio_type': audio_type,
+                    }
             elif media_type == 'audio':
                 language_code = 'und'
                 label = stream_map.get('audioQuality', '')
-                audio_type = 'main'
+                audio_role = 'main'
                 height = None
                 width = None
                 key = mime_type
             else:
+                # Could use "zxx" language code for Non-Linguistic, Not Applicable
+                # but that is too verbose
                 language_code = ''
                 label = stream_map.get('qualityLabel', '')
-                audio_type = None
+                audio_role = None
                 height = stream_map.get('height')
                 width = stream_map.get('width')
                 key = mime_type
@@ -1628,7 +1657,7 @@ class VideoInfo(object):
                 'indexRange': '{start}-{end}'.format(**index_range),
                 'initRange': '{start}-{end}'.format(**init_range),
                 'lang': language_code,
-                'audioType': audio_type,
+                'audioRole': audio_role,
                 'sampleRate': int(stream_map.get('audioSampleRate', '0'), 10),
                 'channels': stream_map.get('audioChannels'),
             }
@@ -1668,8 +1697,8 @@ class VideoInfo(object):
         else:
             stream_info['video'] = data['video/webm'][0]
 
-        mp4_audio = data.get('audio/mp4'+preferred_audio, [None])[0]
-        webm_audio = data.get('audio/webm'+preferred_audio, [None])[0]
+        mp4_audio = data.get('audio/mp4'+preferred_audio['id'], [None])[0]
+        webm_audio = data.get('audio/webm'+preferred_audio['id'], [None])[0]
         if _stream_sort(mp4_audio) > _stream_sort(webm_audio):
             stream_info['audio'] = mp4_audio
         else:
@@ -1687,21 +1716,24 @@ class VideoInfo(object):
         for streams in data.values():
             default = False
             original = False
+            impaired = False
+            label = ''
             main_stream = streams[0]
             media_type = main_stream['mediaType']
             if media_type == 'video':
-                # InputStream.Adaptive seems to mark any video AdaptationSet as default
-                # regardless of Role or default attribute
                 if stream_info[media_type] == main_stream:
                     default = True
-                    video_type = 'main'
+                    role = 'main'
                 else:
-                    video_type = 'alternate'
+                    role = 'alternate'
                 original = ''
             elif media_type == 'audio':
                 label = main_stream['label']
-                audio_type = main_stream['audioType']
-                original = audio_type == 'main'
+                role = main_stream['audioRole']
+                if role == 'main':
+                    original = True
+                elif role == 'description':
+                    impaired = True
                 if stream_info[media_type] == main_stream:
                     default = True
 
@@ -1717,8 +1749,16 @@ class VideoInfo(object):
                     ' id="', str(set_id), '"'
                     ' mimeType="', main_stream['mimeType'], '"'
                     ' lang="', main_stream['lang'], '"'
+                    # name attribute is ISA specific and does not exist in the MPD spec
+                    # Should be a child Label element instead
+                    ' name="', label, '"'
+                    # original, default and impaired are ISA specific attributes
                     ' original="', str(original).lower(), '"'
-                    ' default="', str(default).lower(), '">\n'
+                    ' default="', str(default).lower(), '"'
+                    ' impaired="', str(impaired).lower(), '">\n'
+                # AdaptationSet Label element not currently used by ISA
+                '\t\t\t<Label>', label, '</Label>\n'
+                '\t\t\t<Role schemeIdUri="urn:mpeg:dash:role:2011" value="', role, '"/>\n'
             ))
 
             if license_url:
@@ -1729,35 +1769,36 @@ class VideoInfo(object):
                     '\t\t\t</ContentProtection>\n'
                 ))
 
+            num_streams = len(streams)
             if media_type == 'audio':
-                # InputStream.Adaptive seems to mark any AdaptationSet with a Role as default
-                # regardless of what the role is. Omit Role as a workaround
-                # out_list.extend((
-                    # '\t\t\t<Label>', label, '</Label>\n',
-                    # '\t\t\t<Role schemeIdUri="urn:mpeg:dash:role:2011" value="', audio_type, '"/>\n'
-                # ))
                 out_list.extend(((
-                    '\t\t\t<Representation id="{id}" {codecs} bandwidth="{bitrate}" sampleRate="{sampleRate}" numChannels="{channels}">\n'
+                    '\t\t\t<Representation id="{id}" {codecs}'
+                        ' bandwidth="{bitrate}" sampleRate="{sampleRate}" numChannels="{channels}"'
+                        # quality and priority attributes not currently used by ISA
+                        ' qualityRanking="{quality}" selectionPriority="{priority}">\n'
                     '\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="{channels}"/>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
-                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
-                    '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
-                    '\t\t\t\t</SegmentBase>\n'
-                    '\t\t\t</Representation>\n'
-                ).format(**stream) for stream in streams))
-            elif media_type == 'video':
-                out_list.extend((
-                    '\t\t\t<Role schemeIdUri="urn:mpeg:dash:role:2011" value="', video_type, '"/>\n'
-                ))
-                out_list.extend(((
-                    '\t\t\t<Representation id="{id}" {codecs} startWithSAP="1" bandwidth="{bitrate}" width="{width}" height="{height}" frameRate="{frameRate}">\n'
+                    # Representation Label element not currently used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
                     '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
-                ).format(**stream) for stream in streams))
+                ).format(quality=(idx + 1), priority=(num_streams - idx), **stream) for idx, stream in enumerate(streams)))
+            elif media_type == 'video':
+                out_list.extend(((
+                    '\t\t\t<Representation id="{id}" {codecs} startWithSAP="1"'
+                        ' bandwidth="{bitrate}" width="{width}" height="{height}" frameRate="{frameRate}"'
+                        # quality and priority attributes not currently used by ISA
+                        ' qualityRanking="{quality}" selectionPriority="{priority}">\n'
+                    # Representation Label element not currently used by ISA
+                    '\t\t\t\t<Label>{label}</Label>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
+                    '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
+                    '\t\t\t\t</SegmentBase>\n'
+                    '\t\t\t</Representation>\n'
+                ).format(quality=(idx + 1), priority=(num_streams - idx), **stream) for idx, stream in enumerate(streams)))
 
             out_list.append('\t\t</AdaptationSet>\n')
             set_id += 1
