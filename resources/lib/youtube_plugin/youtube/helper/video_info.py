@@ -1281,7 +1281,7 @@ class VideoInfo(object):
                         stream_details['audio']['bitrate'] = bitrate
                     if not video_info:
                         stream_details['title'] = '{0}@{1}'.format(codec, bitrate)
-                    if audio_info['lang']:
+                    if audio_info['lang'] not in {'', 'und'}:
                         stream_details['title'] += ' Multi-language'
 
                 video_stream.update(stream_details)
@@ -1316,6 +1316,8 @@ class VideoInfo(object):
                           'headers': curl_headers,
                           'playback_stats': playback_stats}
                 stream.update(yt_format)
+                if 'audioTrack' in stream_map:
+                    stream['title'] = '{0} {1}'.format(stream['title'], stream_map['audioTrack']['displayName'])
                 stream_list.append(stream)
 
         # extract streams from map
@@ -1393,7 +1395,7 @@ class VideoInfo(object):
 
             if 'audioTrack' in stream_map:
                 audio_track = stream_map['audioTrack']
-                language_code = audio_track.get('id', '')[0:2]
+                language_code = audio_track.get('id', '')[0:2] or 'und'
                 label = audio_track.get('displayName', '')
                 audio_type = 'main' if audio_track.get('audioIsDefault') else 'dub'
                 height = None
@@ -1402,8 +1404,8 @@ class VideoInfo(object):
                 if language_code == self._language_base:
                     preferred_audio = '_'+language_code
             elif media_type == 'audio':
-                language_code = ''
-                label = ''
+                language_code = 'und'
+                label = stream_map.get('audioQuality', '')
                 audio_type = 'main'
                 height = None
                 width = None
