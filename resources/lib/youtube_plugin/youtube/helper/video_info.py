@@ -1457,7 +1457,7 @@ class VideoInfo(object):
         mpd_quality = self._context.get_settings().get_mpd_quality()
         quality_type = isinstance(mpd_quality, str) and mpd_quality or ''
         quality_height = isinstance(mpd_quality, int) and mpd_quality or 0
-        hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
+        include_hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
         fps_scale_map = {
@@ -1507,67 +1507,76 @@ class VideoInfo(object):
                     or (codec.startswith('dts') and 'dts' not in ia_capabilities)):
                 continue
 
-            if 'audioTrack' in stream_map:
-                audio_track = stream_map['audioTrack']
-                language = audio_track.get('id', '')
-                if '.' in language:
-                    language_code, audio_type = language.split('.')
-                    audio_type = int(audio_type)
+            if media_type == 'audio':
+                if 'audioTrack' in stream_map:
+                    audio_track = stream_map['audioTrack']
+                    language = audio_track.get('id', '')
+                    if '.' in language:
+                        language_code, audio_type = language.split('.')
+                        audio_type = int(audio_type)
+                    else:
+                        language_code = language or 'und'
+                        audio_type = 4
+                    if audio_type == 4 or audio_track.get('audioIsDefault'):
+                        role = 'main'
+                        label = 'Original'
+                    elif audio_type == 3:
+                        role = 'dub'
+                        label = 'Dubbed'
+                    elif audio_type == 2:
+                        role = 'description'
+                        label = 'Descriptive'
+                    # Unsure of what other audio types are actually available
+                    # Role set to "alternate" as default fallback
+                    else:
+                        role = 'alternate'
+                        label = 'Alternate'
+                    label = '{0} - {1:.0f} kbps'.format(label,
+                                                        stream_map.get('averageBitrate', 0) / 1000)
+                    key = '{0}_{1}'.format(mime_type, language)
+                    if (language_code == self._language_base and (
+                            not preferred_audio['id']
+                            or role == 'main'
+                            or audio_type > preferred_audio['audio_type']
+                        )):
+                        preferred_audio = {
+                            'id': '_'+language,
+                            'language_code': language_code,
+                            'audio_type': audio_type,
+                        }
                 else:
-                    language_code = language or 'und'
-                    audio_type = 4
-                label = audio_track.get('displayName', '')
-                if audio_type == 4 or audio_track.get('audioIsDefault'):
-                    audio_role = 'main'
-                elif audio_type == 3:
-                    audio_role = 'dub'
-                elif audio_type == 2:
-                    audio_role = 'description'
-                # Unsure of what other audio types are actually available
-                # Role set to "alternate" as default fallback
-                else:
-                    audio_role = 'alternate'
-                height = None
-                width = None
-                key = '{0}_{1}'.format(mime_type, language)
-                if (language_code == self._language_base and (
-                        not preferred_audio['id']
-                        or audio_role == 'main'
-                        or audio_type > preferred_audio['audio_type']
-                    )):
-                    preferred_audio = {
-                        'id': '_'+language,
-                        'language_code': language_code,
-                        'audio_type': audio_type,
-                    }
-            elif media_type == 'audio':
-                language_code = 'und'
-                label = stream_map.get('audioQuality', '')
-                audio_role = 'main'
-                height = None
-                width = None
-                key = mime_type
+                    language_code = 'und'
+                    role = 'main'
+                    label = 'Original - {0:.0f} kbps'.format(stream_map.get('averageBitrate', 0) / 1000)
+                    key = mime_type
+                sample_rate = int(stream_map.get('audioSampleRate', '0'), 10)
+                channels = stream_map.get('audioChannels', 2)
+                height = width = fps = frame_rate = hdr = None
             else:
                 # Could use "zxx" language code for Non-Linguistic, Not Applicable
                 # but that is too verbose
                 language_code = ''
-                label = stream_map.get('qualityLabel', '')
-                audio_role = None
                 height = stream_map.get('height')
+                if 0 < quality_height < height:
+                    continue
                 width = stream_map.get('width')
+                # map frame rates to a more common representation to lessen the chance of double refresh changes
+                # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
+                fps = stream_map.get('fps', 0)
+                if limit_30fps and fps > 30:
+                    continue
+                if fps:
+                    frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
+                else:
+                    frame_rate = None
+                hdr = 'HDR' in stream_map.get('qualityLabel', '')
+                if hdr and not include_hdr:
+                    continue
+                label = '{0}p{1}{2}'.format(height,
+                                            fps if fps > 30 else '',
+                                            ' HDR' if hdr else '')
                 key = mime_type
-
-            # map frame rates to a more common representation to lessen the chance of double refresh changes
-            # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
-            fps = stream_map.get('fps', 0)
-            if fps:
-                frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
-            else:
-                frame_rate = None
-
-            if ((not hdr and 'HDR' in label) or (limit_30fps and fps > 30)
-                    or (height and 0 < quality_height < height)):
-                continue
+                role = sample_rate = channels = None
 
             if key not in data:
                 data[key] = {}
@@ -1590,12 +1599,13 @@ class VideoInfo(object):
                 'bitrate': stream_map.get('bitrate', 0),
                 'fps': fps,
                 'frameRate': frame_rate,
+                'hdr': hdr,
                 'indexRange': '{start}-{end}'.format(**index_range),
                 'initRange': '{start}-{end}'.format(**init_range),
                 'lang': language_code,
-                'audioRole': audio_role,
-                'sampleRate': int(stream_map.get('audioSampleRate', '0'), 10),
-                'channels': stream_map.get('audioChannels'),
+                'role': role,
+                'sampleRate': sample_rate,
+                'channels': channels,
             }
 
         if 'video/mp4' not in data and 'video/webm' not in data:
@@ -1608,7 +1618,7 @@ class VideoInfo(object):
             return (
                 stream['height'],
                 stream['fps'],
-                hdr and ('HDR' in stream['label']),
+                stream['hdr'],
                 # Prefer lower bitrate for video streams
                 # Used to preference more advanced codecs
                 -stream['bitrate'],
@@ -1665,7 +1675,7 @@ class VideoInfo(object):
                 original = ''
             elif media_type == 'audio':
                 label = main_stream['label']
-                role = main_stream['audioRole']
+                role = main_stream['role']
                 if role == 'main':
                     original = True
                 elif role == 'description':
