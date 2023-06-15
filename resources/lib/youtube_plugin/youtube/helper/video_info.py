@@ -1454,9 +1454,14 @@ class VideoInfo(object):
             return None
 
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
-        mpd_quality = self._context.get_settings().get_mpd_quality()
-        quality_type = isinstance(mpd_quality, str) and mpd_quality or ''
-        quality_height = isinstance(mpd_quality, int) and mpd_quality or 0
+        qualities = self._context.get_settings().get_mpd_video_qualities()
+        if isinstance(qualities, str):
+            max_quality = None
+            selected_container = qualities
+            qualities = self._context.get_settings().get_mpd_video_qualities(list_all=True)
+        else:
+            max_quality = qualities[-2]
+            selected_container = None
         include_hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
@@ -1477,7 +1482,7 @@ class VideoInfo(object):
             if not mime_type:
                 continue
 
-            itag = str(stream_map.get('itag', ''))
+            itag = stream_map.get('itag')
             if not itag:
                 continue
 
@@ -1500,7 +1505,7 @@ class VideoInfo(object):
             if codec:
                 codec = codec.group(1)
             media_type, container = mime_type.split('/')
-            if ((quality_type and container != quality_type)
+            if ((selected_container and container != selected_container)
                     or (mime_type == 'video/webm' and not {'vp9', 'vp9.2'} & ia_capabilities)
                     or (mime_type == 'audio/webm' and not {'vorbis', 'opus'} & ia_capabilities)
                     or (codec in {'av01', 'av1'} and 'av1' not in ia_capabilities)
@@ -1557,24 +1562,33 @@ class VideoInfo(object):
                 # but that is too verbose
                 language_code = ''
                 height = stream_map.get('height')
-                if 0 < quality_height < height:
-                    continue
                 width = stream_map.get('width')
-                # map frame rates to a more common representation to lessen the chance of double refresh changes
-                # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
+                if height > width:
+                    compare_width = height
+                    compare_height = width
+                else:
+                    compare_width = width
+                    compare_height = height
+                if max_quality and compare_width > max_quality['width']:
+                    continue
                 fps = stream_map.get('fps', 0)
                 if limit_30fps and fps > 30:
                     continue
+                hdr = 'HDR' in stream_map.get('qualityLabel', '')
+                if hdr and not include_hdr:
+                    continue
+                # map frame rates to a more common representation to lessen the chance of double refresh changes
+                # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
                 if fps:
                     frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
                 else:
                     frame_rate = None
-                hdr = 'HDR' in stream_map.get('qualityLabel', '')
-                if hdr and not include_hdr:
-                    continue
-                label = '{0}p{1}{2}'.format(height,
-                                            fps if fps > 30 else '',
-                                            ' HDR' if hdr else '')
+                for quality in qualities:
+                    if compare_width <= quality['width'] and compare_height >= quality['height']:
+                        break
+                label = quality['label'].format(fps if fps > 30 else '',
+                                                ' HDR' if hdr else '',
+                                                compare_height)
                 key = mime_type
                 role = sample_rate = channels = None
 
