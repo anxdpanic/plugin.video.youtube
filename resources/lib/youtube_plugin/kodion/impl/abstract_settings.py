@@ -202,39 +202,36 @@ class AbstractSettings(object):
     def use_playback_history(self):
         return self.get_bool(constants.setting.USE_PLAYBACK_HISTORY, False)
 
-    @staticmethod
-    def __get_mpd_quality_map():
-        return {
-            0: 240,
-            1: 360,
-            2: 480,
-            3: 720,
-            4: 1080,
-            5: 1440,
-            6: 2160,
-            7: 4320,
-            8: 'mp4',
-            9: 'webm'
-        }
+    # Selections based on max width and min height at common (utra-)wide aspect ratios
+    # 8K and 4K at 32:9, 2K at 8:3, remainder at 22:9 (2.444...)
+                                                                                          # MPD_QUALITY_SELECTION value
+    _QUALITY_SELECTIONS = ['mp4',                                                         # 8 (default)
+                           'webm',                                                        # 9
+                           {'width': 256, 'height': 105, 'label': '144p{0}{1}'},          # No setting
+                           {'width': 426, 'height': 175, 'label': '240p{0}{1}'},          # 0
+                           {'width': 640, 'height': 263, 'label': '360p{0}{1}'},          # 1
+                           {'width': 854, 'height': 350, 'label': '480p{0}{1}'},          # 2
+                           {'width': 1280, 'height': 525, 'label': '720p{0} (HD){1}'},    # 3
+                           {'width': 1920, 'height': 787, 'label': '1080p{0} (FHD){1}'},  # 4
+                           {'width': 2560, 'height': 984, 'label': '1440p{0} (2K){1}'},   # 5
+                           {'width': 3840, 'height': 1080, 'label': '2160p{0} (4K){1}'},  # 6
+                           {'width': 7680, 'height': 3148, 'label': '4320p{0} (8K){1}'},  # 7
+                           {'width': 0, 'height': 0, 'label': '{2}p{0}{1}'}]              # Unknown quality
 
-    def get_mpd_quality(self):
-        quality_map = self.__get_mpd_quality_map()
-        quality_enum = self.get_int(constants.setting.MPD_QUALITY_SELECTION, 8)
-        return quality_map.get(quality_enum, 'mp4')
-
-    def mpd_video_qualities(self):
+    def get_mpd_video_qualities(self, list_all=False):
         if not self.use_dash_videos():
             return []
-
-        quality = self.get_mpd_quality()
-
-        if not isinstance(quality, int):
-            return quality
-
-        quality_map = self.__get_mpd_quality_map()
-        qualities = sorted([x for x in list(quality_map.values())
-                            if isinstance(x, int) and x <= quality], reverse=True)
-
+        if list_all:
+            # to be converted to selection index 2
+            selected = 7
+        else:
+            selected = self.get_int(constants.setting.MPD_QUALITY_SELECTION, 8)
+        if 8 <= selected <= 9:
+            # converted to selection index 0 or 1
+            return self._QUALITY_SELECTIONS[selected - 8]
+        # converted to selection index starting from 2
+        qualities = self._QUALITY_SELECTIONS[2:]
+        del qualities[2 + selected:-1]
         return qualities
 
     def mpd_30fps_limit(self):
