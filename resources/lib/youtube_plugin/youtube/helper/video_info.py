@@ -1353,6 +1353,7 @@ class VideoInfo(object):
         else:
             max_quality = qualities[-2]
             selected_container = None
+        qualities = list(enumerate(qualities))
  
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
         include_hdr = self._context.get_settings().include_hdr()
@@ -1479,8 +1480,10 @@ class VideoInfo(object):
                     frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
                 else:
                     frame_rate = None
-                for quality in qualities:
-                    if compare_width <= quality['width'] and compare_height >= quality['height']:
+                for idx, quality in qualities:
+                    if compare_width <= quality['width']:
+                        if compare_height < quality['height']:
+                            quality = qualities[idx - 1][1]
                         break
                 label = quality['label'].format(fps if fps > 30 else '',
                                                 ' HDR' if hdr else '',
