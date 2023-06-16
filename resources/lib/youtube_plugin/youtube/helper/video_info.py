@@ -1369,6 +1369,21 @@ class VideoInfo(object):
             60: 1001
         }
 
+        bitrate_bias_map = {
+            # video - order based on comparative compression ratio
+            'av01': 1,
+            'vp9': 0.75,
+            'vp8': 0.55,
+            'avc1': 0.5,
+            # audio - order based on preference
+            'vorbis': 0.75,
+            'mp4a': 0.9,
+            'opus': 1,
+            'ac-3': 1.1,
+            'ec-3': 1.2,
+            'dts': 1.3,
+        }
+
         data = {}
         preferred_audio = {
             'id': '',
@@ -1498,6 +1513,9 @@ class VideoInfo(object):
             url = self._process_url_params(url)
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
+            bitrate = stream_map.get('bitrate', 0)
+            biased_bitrate = bitrate * bitrate_bias_map.get(codec, 1)
+
             data[key][itag] = {
                 'mimeType': mime_type,
                 'baseUrl': url,
@@ -1509,7 +1527,8 @@ class VideoInfo(object):
                 'width': width,
                 'height': height,
                 'label': label,
-                'bitrate': stream_map.get('bitrate', 0),
+                'bitrate': bitrate,
+                'biasedBitrate': biased_bitrate,
                 'fps': fps,
                 'frameRate': frame_rate,
                 'hdr': hdr,
@@ -1532,13 +1551,11 @@ class VideoInfo(object):
                 stream['height'],
                 stream['fps'],
                 stream['hdr'],
-                # Prefer lower bitrate for video streams
-                # Used to preference more advanced codecs
-                -stream['bitrate'],
+                stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
                 stream['channels'],
                 stream['sampleRate'],
-                stream['bitrate'],
+                stream['biasedBitrate'],
             )
 
         data = {
