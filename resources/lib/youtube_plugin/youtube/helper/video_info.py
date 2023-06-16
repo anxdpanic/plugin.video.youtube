@@ -1345,7 +1345,6 @@ class VideoInfo(object):
             self._context.log_debug('Failed to create directories: %s' % basepath)
             return None
 
-        ia_capabilities = self._context.inputstream_adaptive_capabilities()
         qualities = self._context.get_settings().get_mpd_video_qualities()
         if isinstance(qualities, str):
             max_quality = None
@@ -1354,7 +1353,9 @@ class VideoInfo(object):
         else:
             max_quality = qualities[-2]
             selected_container = None
-        include_hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
+ 
+        ia_capabilities = self._context.inputstream_adaptive_capabilities()
+        include_hdr = self._context.get_settings().include_hdr()
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
         ipaddress = self._context.get_settings().httpd_listen()
@@ -1397,15 +1398,14 @@ class VideoInfo(object):
                 continue
 
             mime_type, codecs = unquote(mime_type).split('; ')
-            codec = re.match(r'codecs="([a-z0-9]+)', codecs)
+            codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
             if codec:
                 codec = codec.group(1)
+                if codec.startswith('dts'):
+                    codec = 'dts'
             media_type, container = mime_type.split('/')
             if ((selected_container and container != selected_container)
-                    or (mime_type == 'video/webm' and not {'vp9', 'vp9.2'} & ia_capabilities)
-                    or (mime_type == 'audio/webm' and not {'vorbis', 'opus'} & ia_capabilities)
-                    or (codec in {'av01', 'av1'} and 'av1' not in ia_capabilities)
-                    or (codec.startswith('dts') and 'dts' not in ia_capabilities)):
+                    or codec not in ia_capabilities):
                 continue
 
             if media_type == 'audio':

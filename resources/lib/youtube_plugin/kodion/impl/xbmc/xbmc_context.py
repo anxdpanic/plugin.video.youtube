@@ -312,13 +312,20 @@ class XbmcContext(AbstractContext):
         # - True to include capability regardless of version
         capability_map = {
             'live': '2.0.12',
-            'dts': '2.1.15',
             'drm': '2.2.12',
-            'vp9': '2.3.14',
-            'vp9.2': '2.3.14',
+            # audio
             'vorbis': '2.3.14',
             'opus': '19.0.7',
-            'av1': '20.3.0',
+            'mp4a': True,
+            'ac-3': '2.1.15',
+            'ec-3': '2.1.15',
+            'dts': '2.1.15',
+            # video
+            'avc1': True,
+            'av01': '20.3.0',
+            'vp8': False,
+            'vp9': '2.3.14',
+            'vp9.2': '2.3.14',
         }
 
         if capability is None:
