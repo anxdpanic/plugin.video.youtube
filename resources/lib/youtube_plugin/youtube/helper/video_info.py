@@ -451,71 +451,77 @@ class VideoInfo(object):
                 'video': {'height': 4320, 'encoding': 'av1'}},
         # === Dash (audio only)
         '139': {'container': 'mp4',
-                'sort': [48, 0],
+                'sort': [0, 48 * 0.9],
                 'title': 'he-aac@48',
                 'dash/audio': True,
                 'audio': {'bitrate': 48, 'encoding': 'aac'}},
         '140': {'container': 'mp4',
-                'sort': [129, 0],
+                'sort': [0, 128 * 0.9],
                 'title': 'aac-lc@128',
                 'dash/audio': True,
                 'audio': {'bitrate': 128, 'encoding': 'aac'}},
         '141': {'container': 'mp4',
-                'sort': [143, 0],
+                'sort': [0, 256 * 0.9],
                 'title': 'aac-lc@256',
                 'dash/audio': True,
                 'audio': {'bitrate': 256, 'encoding': 'aac'}},
         '256': {'container': 'mp4',
+                'sort': [0, 192 * 0.9],
                 'title': 'he-aac@192',
                 'dash/audio': True,
                 'audio': {'bitrate': 192, 'encoding': 'aac'}},
         '258': {'container': 'mp4',
+                'sort': [0, 384 * 0.9],
                 'title': 'aac-lc@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'aac'}},
         '325': {'container': 'mp4',
+                'sort': [0, 384 * 1.3],
                 'title': 'dtse@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'dtse'}},
         '327': {'container': 'mp4',
+                'sort': [0, 256 * 0.9],
                 'title': 'aac-lc@256',
                 'dash/audio': True,
                 'audio': {'bitrate': 256, 'encoding': 'aac'}},
         '328': {'container': 'mp4',
+                'sort': [0, 384 * 1.2],
                 'title': 'ec-3@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'ec-3'}},
         '171': {'container': 'webm',
-                'sort': [128, 0],
+                'sort': [0, 128 * 0.75],
                 'title': 'vorbis@128',
                 'dash/audio': True,
                 'audio': {'bitrate': 128, 'encoding': 'vorbis'}},
         '172': {'container': 'webm',
-                'sort': [142, 0],
+                'sort': [0, 192 * 0.75],
                 'title': 'vorbis@192',
                 'dash/audio': True,
                 'audio': {'bitrate': 192, 'encoding': 'vorbis'}},
         '249': {'container': 'webm',
-                'sort': [50, 0],
+                'sort': [0, 50],
                 'title': 'opus@50',
                 'dash/audio': True,
                 'audio': {'bitrate': 50, 'encoding': 'opus'}},
         '250': {'container': 'webm',
-                'sort': [70, 0],
+                'sort': [0, 70],
                 'title': 'opus@70',
                 'dash/audio': True,
                 'audio': {'bitrate': 70, 'encoding': 'opus'}},
         '251': {'container': 'webm',
-                'sort': [141, 0],
+                'sort': [0, 160],
                 'title': 'opus@160',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
         '338': {'container': 'webm',
-                'sort': [141, 0],
+                'sort': [0, 480],
                 'title': 'opus@480',
                 'dash/audio': True,
                 'audio': {'bitrate': 480, 'encoding': 'opus'}},
         '380': {'container': 'mp4',
+                'sort': [0, 384 * 1.1],
                 'title': 'ac-3@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'ac-3'}},
@@ -1453,7 +1459,6 @@ class VideoInfo(object):
             self._context.log_debug('Failed to create directories: %s' % basepath)
             return None
 
-        ia_capabilities = self._context.inputstream_adaptive_capabilities()
         qualities = self._context.get_settings().get_mpd_video_qualities()
         if isinstance(qualities, str):
             max_quality = None
@@ -1462,13 +1467,31 @@ class VideoInfo(object):
         else:
             max_quality = qualities[-2]
             selected_container = None
-        include_hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
+        qualities = list(enumerate(qualities))
+ 
+        ia_capabilities = self._context.inputstream_adaptive_capabilities()
+        include_hdr = self._context.get_settings().include_hdr()
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
         fps_scale_map = {
             24: 1001,
             30: 1001,
             60: 1001
+        }
+
+        bitrate_bias_map = {
+            # video - order based on comparative compression ratio
+            'av01': 1,
+            'vp9': 0.75,
+            'vp8': 0.55,
+            'avc1': 0.5,
+            # audio - order based on preference
+            'vorbis': 0.75,
+            'mp4a': 0.9,
+            'opus': 1,
+            'ac-3': 1.1,
+            'ec-3': 1.2,
+            'dts': 1.3,
         }
 
         data = {}
@@ -1501,15 +1524,14 @@ class VideoInfo(object):
                 continue
 
             mime_type, codecs = unquote(mime_type).split('; ')
-            codec = re.match(r'codecs="([a-z0-9]+)', codecs)
+            codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
             if codec:
                 codec = codec.group(1)
+                if codec.startswith('dts'):
+                    codec = 'dts'
             media_type, container = mime_type.split('/')
             if ((selected_container and container != selected_container)
-                    or (mime_type == 'video/webm' and not {'vp9', 'vp9.2'} & ia_capabilities)
-                    or (mime_type == 'audio/webm' and not {'vorbis', 'opus'} & ia_capabilities)
-                    or (codec in {'av01', 'av1'} and 'av1' not in ia_capabilities)
-                    or (codec.startswith('dts') and 'dts' not in ia_capabilities)):
+                    or codec not in ia_capabilities):
                 continue
 
             if media_type == 'audio':
@@ -1583,8 +1605,10 @@ class VideoInfo(object):
                     frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
                 else:
                     frame_rate = None
-                for quality in qualities:
-                    if compare_width <= quality['width'] and compare_height >= quality['height']:
+                for idx, quality in qualities:
+                    if compare_width <= quality['width']:
+                        if compare_height < quality['height']:
+                            quality = qualities[idx - 1][1]
                         break
                 label = quality['label'].format(fps if fps > 30 else '',
                                                 ' HDR' if hdr else '',
@@ -1599,6 +1623,9 @@ class VideoInfo(object):
             url = self._process_url_params(url)
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
 
+            bitrate = stream_map.get('bitrate', 0)
+            biased_bitrate = bitrate * bitrate_bias_map.get(codec, 1)
+
             data[key][itag] = {
                 'mimeType': mime_type,
                 'baseUrl': url,
@@ -1610,7 +1637,8 @@ class VideoInfo(object):
                 'width': width,
                 'height': height,
                 'label': label,
-                'bitrate': stream_map.get('bitrate', 0),
+                'bitrate': bitrate,
+                'biasedBitrate': biased_bitrate,
                 'fps': fps,
                 'frameRate': frame_rate,
                 'hdr': hdr,
@@ -1633,13 +1661,11 @@ class VideoInfo(object):
                 stream['height'],
                 stream['fps'],
                 stream['hdr'],
-                # Prefer lower bitrate for video streams
-                # Used to preference more advanced codecs
-                -stream['bitrate'],
+                stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
                 stream['channels'],
                 stream['sampleRate'],
-                stream['bitrate'],
+                stream['biasedBitrate'],
             )
 
         data = {
