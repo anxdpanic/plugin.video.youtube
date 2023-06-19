@@ -96,8 +96,8 @@ class AbstractSettings(object):
     def alternative_player_web_urls(self):
         return self.get_bool(constants.setting.ALTERNATIVE_PLAYER_WEB_URLS, False)
 
-    def use_dash(self):
-        return self.get_bool(constants.setting.USE_DASH, False)
+    def use_mpd(self):
+        return self.get_bool(constants.setting.USE_MPD, False)
 
     def subtitle_languages(self):
         return self.get_int(constants.setting.SUBTITLE_LANGUAGE, 0)
@@ -136,9 +136,9 @@ class AbstractSettings(object):
     def allow_dev_keys(self):
         return self.get_bool(constants.setting.ALLOW_DEV_KEYS, False)
 
-    def use_dash_videos(self):
-        if self.use_dash():
-            return self.get_bool(constants.setting.DASH_VIDEOS, False)
+    def use_mpd_videos(self):
+        if self.use_mpd():
+            return self.get_bool(constants.setting.MPD_VIDEOS, False)
         return False
 
     def include_hdr(self):
@@ -150,19 +150,19 @@ class AbstractSettings(object):
                            2: 'ia_hls',
                            3: 'ia_mpd'}
 
-        if self.use_dash():
+        if self.use_mpd():
             stream_type = self.get_int(constants.setting.LIVE_STREAMS + '.1', 0)
         else:
             stream_type = self.get_int(constants.setting.LIVE_STREAMS + '.2', 0)
         return stream_type_map.get(stream_type) or stream_type_map[0]
 
     def use_adaptive_live_streams(self):
-        if self.use_dash():
+        if self.use_mpd():
             return self.get_int(constants.setting.LIVE_STREAMS + '.1', 0) > 1
         return self.get_int(constants.setting.LIVE_STREAMS + '.2', 0) > 1
 
-    def use_dash_live_streams(self):
-        if self.use_dash():
+    def use_mpd_live_streams(self):
+        if self.use_mpd():
             return self.get_int(constants.setting.LIVE_STREAMS + '.1', 0) == 3
         return False
 
@@ -236,7 +236,7 @@ class AbstractSettings(object):
                            {'width': 0, 'height': 0, 'label': '{2}p{0}{1}'}]              # Unknown quality
 
     def get_mpd_video_qualities(self, list_all=False):
-        if not self.use_dash_videos():
+        if not self.use_mpd_videos():
             return []
         if list_all:
             # to be converted to selection index 2

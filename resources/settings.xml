@@ -285,7 +285,7 @@
                 </setting>
             </group>
             <group id="3" label="30690">
-                <setting help="" id="kodion.video.live_stream.selection.1" label="30689" type="integer">
+                <setting id="kodion.mpd.live_stream.selection.1" type="integer" label="30689" help="">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
@@ -303,7 +303,7 @@
                         </dependency>
                     </dependencies>
                 </setting>
-                <setting help="" id="kodion.video.live_stream.selection.2" label="30689" type="integer">
+                <setting id="kodion.mpd.live_stream.selection.2" type="integer" label="30689" help="">
                     <level>0</level>
                     <default>0</default>
                     <constraints>
@@ -332,8 +332,8 @@
                         <dependency type="enable">
                             <or>
                                 <condition operator="is" setting="kodion.video.quality.mpd">true</condition>
-                                <condition operator="gt" setting="kodion.video.live_stream.selection.1">1</condition>
-                                <condition operator="gt" setting="kodion.video.live_stream.selection.2">1</condition>
+                                <condition setting="kodion.mpd.live_stream.selection.1" operator="gt">1</condition>
+                                <condition setting="kodion.mpd.live_stream.selection.2" operator="gt">1</condition>
                             </or>
                         </dependency>
                     </dependencies>

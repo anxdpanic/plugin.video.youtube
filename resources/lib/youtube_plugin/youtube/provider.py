@@ -108,7 +108,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.succeeded': 30575,
                  'youtube.failed': 30576,
                  'youtube.settings': 30577,
-                 'youtube.dash.enable.confirm': 30579,
+                 'youtube.mpd.enable.confirm': 30579,
                  'youtube.reset.access.manager.confirm': 30581,
                  'youtube.my_subscriptions_filtered': 30584,
                  'youtube.add.my_subscriptions.filter': 30587,
