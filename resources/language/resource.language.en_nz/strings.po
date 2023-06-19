@@ -34,7 +34,9 @@ msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
+
 # Kodion Settings
+
 msgctxt "#30000"
 msgid "General"
 msgstr ""
@@ -48,6 +50,7 @@ msgid "Password"
 msgstr ""
 
 # empty strings from id 30003 to 30006
+
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr ""
@@ -61,7 +64,7 @@ msgid "Always ask for the video quality"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Video quality"
+msgid "Maximum video quality"
 msgstr ""
 
 msgctxt "#30011"
@@ -73,15 +76,15 @@ msgid "720p (HD)"
 msgstr ""
 
 msgctxt "#30013"
-msgid "1080p (HD)"
+msgid "1080p (FHD)"
 msgstr ""
 
 msgctxt "#30014"
-msgid "2160p (4k)"
+msgid "2160p (4K)"
 msgstr ""
 
 msgctxt "#30015"
-msgid "4320p (8k)"
+msgid "4320p (8K)"
 msgstr ""
 
 msgctxt "#30016"
@@ -96,7 +99,10 @@ msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr ""
 
-# empty strings 30019
+msgctxt "#30019"
+msgid "144p"
+msgstr ""
+
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr ""
@@ -1261,4 +1267,72 @@ msgstr ""
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30744"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30745"
+msgid "Dubbed"
+msgstr ""
+
+msgctxt "#30746"
+msgid "Descriptive"
+msgstr ""
+
+msgctxt "#30747"
+msgid "Alternate"
+msgstr ""
+
+msgctxt "#30748"
+msgid "Stream features"
+msgstr ""
+
+msgctxt "#30749"
+msgid "Enable AV1 video"
+msgstr ""
+
+msgctxt "#30750"
+msgid "Enable Vorbis audio"
+msgstr ""
+
+msgctxt "#30751"
+msgid "Enable Opus audio"
+msgstr ""
+
+msgctxt "#30752"
+msgid "Enable AAC audio"
+msgstr ""
+
+msgctxt "#30753"
+msgid "Enable surround sound audio"
+msgstr ""
+
+msgctxt "#30754"
+msgid "Enable AC-3 audio"
+msgstr ""
+
+msgctxt "#30755"
+msgid "Enable EAC-3 audio"
+msgstr ""
+
+msgctxt "#30756"
+msgid "Enable DTS audio"
+msgstr ""
+
+msgctxt "#30757"
+msgid "Remove similar/duplicate streams"
+msgstr ""
+
+msgctxt "#30758"
+msgid "Stream selection"
+msgstr ""
+
+msgctxt "#30759"
+msgid "Quality selection"
+msgstr ""
+
+msgctxt "#30760"
+msgid "Automatic + Quality selection"
 msgstr ""
