@@ -280,7 +280,7 @@ class XbmcContext(AbstractContext):
         self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
 
     def use_inputstream_adaptive(self):
-        if self._settings.use_dash_videos() or self._settings.use_adaptive_live_streams():
+        if self._settings.use_mpd_videos() or self._settings.use_adaptive_live_streams():
             if self.addon_enabled('inputstream.adaptive'):
                 success = True
             elif self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):

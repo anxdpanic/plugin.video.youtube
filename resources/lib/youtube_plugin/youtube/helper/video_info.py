@@ -1381,7 +1381,7 @@ class VideoInfo(object):
                                                        meta_info=meta_info,
                                                        playback_stats=playback_stats))
 
-        httpd_is_live = (self._context.get_settings().use_dash() and
+        httpd_is_live = (self._context.get_settings().use_mpd() and
                          is_httpd_live(port=self._context.get_settings().httpd_port()))
 
         s_info = {}

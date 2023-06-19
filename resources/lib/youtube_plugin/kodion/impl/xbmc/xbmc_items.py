@@ -58,7 +58,7 @@ def to_play_item(context, play_item):
 
     ia_enabled = context.addon_enabled('inputstream.adaptive')
 
-    if ia_enabled and play_item.use_dash_video() and not play_item.live:
+    if ia_enabled and play_item.use_mpd_video() and not play_item.live:
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
         list_item.setProperty('inputstream', 'inputstream.adaptive')
@@ -73,7 +73,7 @@ def to_play_item(context, play_item):
             list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
 
     elif ia_enabled and play_item.live and settings.use_adaptive_live_streams():
-        if settings.use_dash_live_streams():
+        if settings.use_mpd_live_streams():
             manifest_type = 'mpd'
             mime_type = 'application/xml+dash'
             # MPD manifest update is currently broken
