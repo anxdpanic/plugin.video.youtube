@@ -107,7 +107,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     ask_for_quality = context.get_settings().ask_for_video_quality() if ask_for_quality is None else ask_for_quality
     video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
     audio_only = audio_only if audio_only is not None else settings.audio_only()
-    adaptive_live = settings.use_adaptive_live_streams() and 'live' in context.inputstream_adaptive_capabilities()
+    adaptive_live = settings.use_adaptive_live_streams() and context.inputstream_adaptive_capabilities('live')
 
     if not ask_for_quality:
         stream_data_list = [item for item in stream_data_list
