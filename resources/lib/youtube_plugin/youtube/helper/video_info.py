@@ -1595,7 +1595,7 @@ class VideoInfo(object):
                 language = self._context.get_language_name(language_code)
                 label = '{0} ({1:.0f} kbps)'.format(label,
                                                     stream_map.get('averageBitrate', 0) / 1000)
-                if channels > 2:
+                if channels > 2 or 'auto' not in stream_select:
                     quality_group = '{0}_{1}_{2}.{3}'.format(container, codec, language_code, role_type)
                 else:
                     quality_group = mime_group
@@ -1750,7 +1750,7 @@ class VideoInfo(object):
                 skip_group = (
                     new_stream['height'] == previous_stream['height']
                 ) if media_type == 'video' else (
-                    2 == new_stream['channels'] <= previous_stream['channels']
+                    2 == new_stream['channels'] == previous_stream['channels']
                 )
 
             skip_group = (
@@ -1810,7 +1810,16 @@ class VideoInfo(object):
                     default = True
                     role = 'main'
             elif group.startswith(container) and 'list' in stream_select:
-                label = main_stream['label']
+                if 'auto' in stream_select or media_type == 'video':
+                    label = main_stream['label']
+                else:
+                    label = '{0} {1}'.format(
+                        main_stream['langName'],
+                        main_stream['label']
+                    )
+                    if main_stream == stream_info[media_type]:
+                        default = True
+                        role = 'main'
             else:
                 continue
 
