@@ -1627,7 +1627,6 @@ class VideoInfo(object):
                     elif role_type == 3:
                         role = 'dub'
                         label = self._context.localize(30745)
-                        label = 'Dubbed'
                     elif role_type == 2:
                         role = 'description'
                         label = self._context.localize(30746)
@@ -1657,8 +1656,9 @@ class VideoInfo(object):
 
                 sample_rate = int(stream_map.get('audioSampleRate', '0'), 10)
                 height = width = fps = frame_rate = hdr = None
-                label = '{0} {1:.0f} kbps'.format(label,
-                                                  stream_map.get('averageBitrate', 0) / 1000)
+                language = self._context.get_language_name(language_code)
+                label = '{0} ({1:.0f} kbps)'.format(label,
+                                                    stream_map.get('averageBitrate', 0) / 1000)
                 if channels > 2:
                     quality_group = '{0}_{1}_{2}.{3}'.format(container, codec, language_code, role_type)
                 else:
@@ -1708,7 +1708,7 @@ class VideoInfo(object):
                     frame_rate = None
 
                 mime_group = mime_type
-                channels = role = role_type = sample_rate = None
+                channels = language = role = role_type = sample_rate = None
                 label = quality['label'].format(fps if fps > 30 else '',
                                                 ' HDR' if hdr else '',
                                                 compare_height)
@@ -1745,6 +1745,7 @@ class VideoInfo(object):
                 'indexRange': '{start}-{end}'.format(**index_range),
                 'initRange': '{start}-{end}'.format(**init_range),
                 'lang': language_code,
+                'langName': language,
                 'role': role,
                 'roleType': role_type,
                 'sampleRate': sample_rate,
@@ -1778,7 +1779,7 @@ class VideoInfo(object):
             ) if main_stream['mediaType'] == 'video' else (
                 not group.startswith(main_stream['mimeType']),
                 preferred_audio['id'] not in group,
-                self._context.get_language_name(main_stream['lang']),
+                main_stream['langName'],
                 - main_stream['roleType'],
             )
             return key + _stream_sort(main_stream)
@@ -1865,8 +1866,10 @@ class VideoInfo(object):
             role = main_stream['role'] or ''
 
             if group.startswith(mime_type) and 'auto' in stream_select:
-                label = '{0} [{1}]'.format(self._context.localize(30583),
-                                           main_stream['label'])
+                label = '{0} [{1}]'.format(
+                    main_stream['langName'] or self._context.localize(30583),
+                    main_stream['label']
+                )
                 if main_stream == stream_info[media_type]:
                     default = True
                     role = 'main'
@@ -1890,7 +1893,7 @@ class VideoInfo(object):
                     ' lang="', main_stream['lang'], '"'
                     # name attribute is ISA specific and does not exist in the MPD spec
                     # Should be a child Label element instead
-                    ' name="', label, '"'
+                    ' name="[B]', label, '[/B]"'
                     # original, default and impaired are ISA specific attributes
                     ' original="', str(original).lower(), '"'
                     ' default="', str(default).lower(), '"'
