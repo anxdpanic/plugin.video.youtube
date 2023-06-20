@@ -100,7 +100,7 @@ def find_best_fit(data, compare_method=None):
 def select_stream(context, stream_data_list, quality_map_override=None, ask_for_quality=None, audio_only=None):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
-        return _stream_data.get('sort', [0, 0])
+        return _stream_data.get('sort', (0, 0))
 
     settings = context.get_settings()
     use_adaptive = context.use_inputstream_adaptive()
@@ -145,11 +145,11 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 
     def _find_best_fit_video(_stream_data):
         if audio_only:
-            return video_quality - _stream_data.get('sort', [0, 0])[0]
+            return video_quality - _stream_data.get('sort', (0, 0))[0]
         else:
             return video_quality - _stream_data.get('video', {}).get('height', 0)
 
-    sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data, reverse=True)
+    sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data)
 
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
     log_streams = list()
