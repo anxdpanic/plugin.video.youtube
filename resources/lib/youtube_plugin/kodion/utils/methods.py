@@ -20,7 +20,7 @@ import xbmcvfs
 
 
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_str', 'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
+           'to_str', 'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id', 'get_language_name']
 
 try:
     xbmc.translatePath = xbmcvfs.translatePath
@@ -253,3 +253,7 @@ def find_video_id(plugin_path):
     if match:
         return match.group('video_id')
     return ''
+
+
+def get_language_name(lang_id):
+    return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME)

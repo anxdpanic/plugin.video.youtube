@@ -17,7 +17,7 @@ from urllib.parse import (parse_qs, urlsplit, urlunsplit, urlencode, urljoin,
                           quote, unquote)
 
 import requests
-from ...kodion.utils import is_httpd_live, make_dirs, DataCache
+from ...kodion.utils import get_language_name, is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .subtitles import Subtitles
 from .ratebypass import ratebypass
@@ -1564,19 +1564,19 @@ class VideoInfo(object):
                         role = 'alternate'
                         label = self._context.localize(30747)
 
-                    mime_group = '{0}_{1}'.format(mime_type, language)
+                    mime_group = '{0}_{1}.{2}'.format(mime_type, language_code, role_type)
                     if (language_code == self._language_base and (
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
                         )):
                         preferred_audio = {
-                            'id': '_'+language,
+                            'id': '_{0}.{1}'.format(language_code, role_type),
                             'language_code': language_code,
                             'role_type': role_type,
                         }
                 else:
-                    language = language_code = 'und'
+                    language_code = 'und'
                     role = 'main'
                     role_type = 4
                     label = self._context.localize(30744)
@@ -1587,7 +1587,7 @@ class VideoInfo(object):
                 label = '{0} {1:.0f} kbps'.format(label,
                                                   stream_map.get('averageBitrate', 0) / 1000)
                 if channels > 2:
-                    quality_group = '{0}_{1}_{2}'.format(container, codec, language)
+                    quality_group = '{0}_{1}_{2}.{3}'.format(container, codec, language_code, role_type)
                 else:
                     quality_group = mime_group
 
@@ -1635,7 +1635,7 @@ class VideoInfo(object):
                     frame_rate = None
 
                 mime_group = mime_type
-                role = role_type = sample_rate = channels = None
+                channels = role = role_type = sample_rate = None
                 label = quality['label'].format(fps if fps > 30 else '',
                                                 ' HDR' if hdr else '',
                                                 compare_height)
@@ -1684,30 +1684,31 @@ class VideoInfo(object):
 
         def _stream_sort(stream):
             if not stream:
-                return (-1, )
+                return (1, )
+
             return (
-                stream['height'],
-                stream['fps'],
-                stream['hdr'],
-                stream['biasedBitrate'],
+                - stream['height'],
+                - stream['fps'],
+                - stream['hdr'],
+                - stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
-                stream['channels'],
-                stream['biasedBitrate'],
+                - stream['channels'],
+                - stream['biasedBitrate'],
             )
 
         def _group_sort(item):
             group, streams = item
             main_stream = streams[0]
-            return (
-                group == main_stream['mimeType'],
-                _stream_sort(main_stream),
+
+            key = (
+                group != main_stream['mimeType'],
             ) if main_stream['mediaType'] == 'video' else (
-                group.startswith(main_stream['mimeType']),
-                preferred_audio['id'] in group,
-                [-ord(char) for char in main_stream['lang']],
-                main_stream['roleType'],
-                _stream_sort(main_stream),
+                not group.startswith(main_stream['mimeType']),
+                preferred_audio['id'] not in group,
+                get_language_name(main_stream['lang']),
+                - main_stream['roleType'],
             )
+            return key + _stream_sort(main_stream)
 
         def _filter_group(previous_group, previous_stream, item):
             skip_group = True
@@ -1754,14 +1755,14 @@ class VideoInfo(object):
             return skip_group
 
         video_data = sorted((
-            (group, sorted(streams.values(), reverse=True, key=_stream_sort))
+            (group, sorted(streams.values(), key=_stream_sort))
             for group, streams in video_data.items()
-        ), reverse=True, key=_group_sort)
+        ), key=_group_sort)
 
         audio_data = sorted((
-            (group, sorted(streams.values(), reverse=True, key=_stream_sort))
+            (group, sorted(streams.values(), key=_stream_sort))
             for group, streams in audio_data.items()
-        ), reverse=True, key=_group_sort)
+        ), key=_group_sort)
 
         stream_info = {
             'video': video_data[0][1][0],
