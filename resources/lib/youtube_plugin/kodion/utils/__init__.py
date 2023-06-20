@@ -9,7 +9,6 @@
 """
 
 from . import datetime_parser
-from .methods import loose_version
 from .methods import *
 from .search_history import SearchHistory
 from .favorite_list import FavoriteList
@@ -29,4 +28,4 @@ __all__ = ['SearchHistory', 'FavoriteList', 'WatchLaterList', 'FunctionCache', '
            'strip_html_from_text', 'create_path', 'create_uri_path', 'find_best_fit', 'to_unicode', 'to_utf8',
            'datetime_parser', 'select_stream', 'get_http_server', 'is_httpd_live', 'YouTubeMonitor',
            'make_dirs', 'loose_version', 'ip_api', 'PlaybackHistory', 'DataCache', 'get_client_ip_address',
-           'SystemVersion', 'find_video_id', 'YouTubePlayer']
+           'SystemVersion', 'find_video_id', 'YouTubePlayer', 'get_language_name']
