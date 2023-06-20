@@ -135,6 +135,11 @@ class XbmcContext(AbstractContext):
 
         return 'en-US'
 
+    def get_language_name(self, lang_id=None):
+        if lang_id is None:
+            lang_id = self.get_language()
+        return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
+
     def get_video_playlist(self):
         if not self._video_playlist:
             self._video_playlist = XbmcPlaylist('video', weakref.proxy(self))

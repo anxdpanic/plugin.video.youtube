@@ -35,7 +35,7 @@ import random
 import traceback
 
 import requests
-from ...kodion.utils import get_language_name, is_httpd_live, make_dirs, DataCache
+from ...kodion.utils import is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .subtitles import Subtitles
 from .ratebypass import ratebypass
@@ -1778,7 +1778,7 @@ class VideoInfo(object):
             ) if main_stream['mediaType'] == 'video' else (
                 not group.startswith(main_stream['mimeType']),
                 preferred_audio['id'] not in group,
-                get_language_name(main_stream['lang']),
+                self._context.get_language_name(main_stream['lang']),
                 - main_stream['roleType'],
             )
             return key + _stream_sort(main_stream)
