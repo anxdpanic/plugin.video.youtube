@@ -1521,7 +1521,7 @@ class VideoInfo(object):
         basepath = 'special://temp/plugin.video.youtube/'
         if not make_dirs(basepath):
             self._context.log_debug('Failed to create directories: %s' % basepath)
-            return None
+            return None, None
 
         qualities = self._context.get_settings().get_mpd_video_qualities()
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
