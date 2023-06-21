@@ -758,7 +758,7 @@ class VideoInfo(object):
 
     def load_stream_infos(self, video_id):
         self.video_id = video_id
-        return self._method_get_video_info()
+        return self._get_video_info()
 
     def get_watch_page(self):
         headers = self.CLIENTS['web']['headers'].copy()
@@ -1132,7 +1132,7 @@ class VideoInfo(object):
             return result['simpleText']
         return None
 
-    def _method_get_video_info(self):
+    def _get_video_info(self):
         if self._access_token:
             auth_header = 'Bearer %s' % self._access_token
         else:
@@ -1247,57 +1247,16 @@ class VideoInfo(object):
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
         video_details = player_response.get('videoDetails', {})
-        is_live_content = video_details.get('isLiveContent') is True
-        streaming_data = player_response.get('streamingData', {})
-
-        live_stream_type = self._context.get_settings().get_live_stream_type()
-        if live_stream_type == 'ia_mpd':
-            manifest_url = streaming_data.get('dashManifestUrl', '')
-        else:
-            manifest_url = ''
-        hls_manifest_url = streaming_data.get('hlsManifestUrl', '')
-        is_live = is_live_content and hls_manifest_url
-
-        meta_info = {'video': {},
-                     'channel': {},
-                     'images': {},
-                     'subtitles': []}
-
-        meta_info['video']['id'] = video_details.get('videoId', self.video_id)
-
-        meta_info['video']['title'] = video_details.get('title', '')
-        meta_info['channel']['author'] = video_details.get('author', '')
-
-        meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape')
-        meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape')
-
-        meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
-        meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
-
-        meta_info['video']['title'] = unescape(meta_info['video']['title'])
-        meta_info['channel']['author'] = unescape(meta_info['channel']['author'])
-
-        meta_info['channel']['id'] = video_details.get('channelId', '')
-        image_data_list = [
-            {'from': 'iurlhq', 'to': 'high', 'image': 'hqdefault.jpg'},
-            {'from': 'iurlmq', 'to': 'medium', 'image': 'mqdefault.jpg'},
-            {'from': 'iurlsd', 'to': 'standard', 'image': 'sddefault.jpg'},
-            {'from': 'thumbnail_url', 'to': 'default', 'image': 'default.jpg'}]
-        for image_data in image_data_list:
-            image_url = 'https://i.ytimg.com/vi/{0}/{1}'.format(self.video_id, image_data['image'])
-            if image_url:
-                if is_live:
-                    image_url = image_url.replace('.jpg', '_live.jpg')
-                meta_info['images'][image_data['to']] = image_url
-
         microformat = player_response.get('microformat', {}).get('playerMicroformatRenderer', {})
-        meta_info['video']['status'] = {
-            'unlisted': microformat.get('isUnlisted', False),
-            'private': video_details.get('isPrivate', False),
-            'crawlable': video_details.get('isCrawlable', False),
-            'family_safe': microformat.get('isFamilySafe', False),
-            'live': is_live,
-        }
+
+        streaming_data = player_response.get('streamingData', {})
+        live_stream_type = self._context.get_settings().get_live_stream_type()
+        manifest_url = (streaming_data.get('dashManifestUrl', '')
+                        if live_stream_type == 'ia_mpd' else '')
+        hls_manifest_url = streaming_data.get('hlsManifestUrl', '')
+        is_live = '_live' if hls_manifest_url and video_details.get('isLiveContent') else ''
+        adaptive_fmts = streaming_data.get('adaptiveFormats', [])
+        std_fmts = streaming_data.get('formats', [])
 
         if self._selected_client.get('query_subtitles'):
             client = self.CLIENTS['smarttv_embedded']
@@ -1321,36 +1280,48 @@ class VideoInfo(object):
         else:
             captions = player_response.get('captions')
 
-        if captions:
-            meta_info['subtitles'] = Subtitles(self._context, headers,
-                                               self.video_id, captions).get_subtitles()
-        else:
-            meta_info['subtitles'] = []
-
-        playback_stats = {
-            'playback_url': '',
-            'watchtime_url': ''
+        meta_info = {
+            'video': {
+                'id': video_details.get('videoId', self.video_id),
+                'title': unescape(video_details.get('title', '').encode('raw_unicode_escape').decode('raw_unicode_escape')),
+                'status': {
+                    'unlisted': microformat.get('isUnlisted', False),
+                    'private': video_details.get('isPrivate', False),
+                    'crawlable': video_details.get('isCrawlable', False),
+                    'family_safe': microformat.get('isFamilySafe', False),
+                    'live': bool(is_live),
+                },
+            },
+            'channel': {
+                'id': video_details.get('channelId', ''),
+                'author': unescape(video_details.get('author', '').encode('raw_unicode_escape').decode('raw_unicode_escape')),
+            },
+            'images': {
+                'high': 'https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg'.format(self.video_id, is_live),
+                'medium': 'https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg'.format(self.video_id, is_live),
+                'standard': 'https://i.ytimg.com/vi/{0}/sddefault{1}.jpg'.format(self.video_id, is_live),
+                'default': 'https://i.ytimg.com/vi/{0}/default{1}.jpg'.format(self.video_id, is_live),
+            },
+            'subtitles': (Subtitles(self._context, headers, self.video_id, captions).get_subtitles()
+                          if captions else []),
         }
 
         playback_tracking = player_response.get('playbackTracking', {})
         playback_url = playback_tracking.get('videostatsPlaybackUrl', {}).get('baseUrl', '')
         watchtime_url = playback_tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl', '')
+        playback_stats = {
+            'playback_url': (''.join([playback_url,
+                                      '&ver=2&fs=0&volume=100&muted=0',
+                                      '&cpn={cpn}'.format(cpn=self.generate_cpn())])
+                             if playback_url.startswith('http') else ''),
+            'watchtime_url': (''.join([watchtime_url,
+                                       '&ver=2&fs=0&volume=100&muted=0',
+                                       '&cpn={cpn}'.format(cpn=self.generate_cpn()),
+                                       '&st={st}&et={et}&state={state}'])
+                              if watchtime_url.startswith('http') else '')
+        }
 
-        if playback_url and playback_url.startswith('http'):
-            playback_stats['playback_url'] = ''.join([
-                playback_url,
-                '&ver=2&fs=0&volume=100&muted=0',
-                '&cpn={cpn}'.format(cpn=self.generate_cpn())
-            ])
-
-        if watchtime_url and watchtime_url.startswith('http'):
-            playback_stats['watchtime_url'] = ''.join([
-                watchtime_url,
-                '&ver=2&fs=0&volume=100&muted=0',
-                '&cpn={cpn}'.format(cpn=self.generate_cpn()),
-                '&st={st}&et={et}&state={state}'
-            ])
-
+        s_info = {}
         stream_list = []
 
         if is_live:
@@ -1362,27 +1333,31 @@ class VideoInfo(object):
         httpd_is_live = (self._context.get_settings().use_mpd() and
                          is_httpd_live(port=self._context.get_settings().httpd_port()))
 
-        s_info = {}
-        adaptive_fmts = streaming_data.get('adaptiveFormats', [])
-        std_fmts = streaming_data.get('formats', [])
-
-        license_info = {'url': None, 'proxy': None, 'token': None}
         pa_li_info = streaming_data.get('licenseInfos', [])
-        if pa_li_info and (pa_li_info != ['']) and not httpd_is_live:
+        if any(pa_li_info) and not httpd_is_live:
             raise YouTubeException('Proxy is not running')
         for li_info in pa_li_info:
-            if li_info.get('drmFamily') == 'WIDEVINE':
-                license_info['url'] = li_info.get('url', None)
-                if license_info['url']:
-                    self._context.log_debug('Found widevine license url: |%s|' % license_info['url'])
-                    proxy_addr = \
-                        ['http://{ipaddress}:{port}/widevine'.format(
-                            ipaddress=self._context.get_settings().httpd_listen(default='127.0.0.1'),
-                            port=self._context.get_settings().httpd_port()
-                        ), '||R{SSM}|']
-                    license_info['proxy'] = ''.join(proxy_addr)
-                    license_info['token'] = self._access_token
-                    break
+            if li_info.get('drmFamily') != 'WIDEVINE':
+                continue
+            url = li_info.get('url')
+            if not url:
+                continue
+            self._context.log_debug('Found widevine license url: {0}'.format(url))
+            license_info = {
+                'url': url,
+                'proxy': 'http://{0}:{1}/widevine||R{{SSM}}|'.format(
+                    self._context.get_settings().httpd_listen(default='127.0.0.1'),
+                    self._context.get_settings().httpd_port()
+                ),
+                'token': self._access_token,
+            }
+            break
+        else:
+            license_info = {
+                'url': None,
+                'proxy': None,
+                'token': None
+            }
 
         if (any((True for fmt in adaptive_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))
                 or any((True for fmt in std_fmts if fmt and 'url' not in fmt and 'signatureCipher' in fmt))):
