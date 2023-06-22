@@ -651,7 +651,12 @@
                 </setting>
             </group>
             <group id="2">
-                <setting id="kodion.playback.history" type="boolean" label="30675" help="">
+                <setting id="kodion.history.local" type="boolean" label="30675" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="kodion.history.remote" type="boolean" label="30761" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>

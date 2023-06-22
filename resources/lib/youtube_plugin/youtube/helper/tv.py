@@ -46,7 +46,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
 
             video_id_dict[video_id] = video_item
 
-    use_play_data = not incognito and context.get_settings().use_playback_history()
+    use_play_data = not incognito and context.get_settings().use_local_history()
 
     channel_item_dict = {}
     utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
@@ -92,7 +92,7 @@ def tv_videos_to_items(provider, context, json_data):
 
         video_id_dict[video_id] = video_item
 
-    use_play_data = not incognito and context.get_settings().use_playback_history()
+    use_play_data = not incognito and context.get_settings().use_local_history()
 
     channel_item_dict = {}
     utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)

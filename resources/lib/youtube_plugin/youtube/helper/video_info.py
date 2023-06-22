@@ -1306,19 +1306,27 @@ class VideoInfo(object):
                           if captions else []),
         }
 
-        playback_tracking = player_response.get('playbackTracking', {})
-        playback_url = playback_tracking.get('videostatsPlaybackUrl', {}).get('baseUrl', '')
-        watchtime_url = playback_tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl', '')
+        if self._context.get_settings().use_remote_history():
+            playback_tracking = player_response.get('playbackTracking', {})
+            cpn = None
+            playback_url = playback_tracking.get('videostatsPlaybackUrl', {}).get('baseUrl', '')
+            if playback_url.startswith('http'):
+                cpn = self.generate_cpn()
+                playback_url = '{0}&ver=2&fs=0&volume=100&muted=0&cpn={1}'.format(playback_url, cpn)
+            else:
+                playback_url = ''
+            watchtime_url = playback_tracking.get('videostatsWatchtimeUrl', {}).get('baseUrl', '')
+            if watchtime_url.startswith('http'):
+                cpn = cpn or self.generate_cpn()
+                watchtime_url = '{0}&ver=2&fs=0&volume=100&muted=0&cpn={1}&st={{st}}&et={{et}}&state={{state}}'.format(watchtime_url, cpn)
+            else:
+                watchtime_url = ''
+        else:
+            playback_url = ''
+            watchtime_url = ''
         playback_stats = {
-            'playback_url': (''.join([playback_url,
-                                      '&ver=2&fs=0&volume=100&muted=0',
-                                      '&cpn={cpn}'.format(cpn=self.generate_cpn())])
-                             if playback_url.startswith('http') else ''),
-            'watchtime_url': (''.join([watchtime_url,
-                                       '&ver=2&fs=0&volume=100&muted=0',
-                                       '&cpn={cpn}'.format(cpn=self.generate_cpn()),
-                                       '&st={st}&et={et}&state={state}'])
-                              if watchtime_url.startswith('http') else '')
+            'playback_url': playback_url,
+            'watchtime_url': watchtime_url,
         }
 
         s_info = {}

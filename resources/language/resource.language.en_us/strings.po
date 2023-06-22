@@ -999,7 +999,7 @@ msgid "Reset resume point"
 msgstr ""
 
 msgctxt "#30675"
-msgid "Use playback history (watched, resume tracking)"
+msgid "Use local playback history (watched, resume tracking)"
 msgstr ""
 
 msgctxt "#30676"
@@ -1340,4 +1340,8 @@ msgstr ""
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30761"
+msgid "Update playback history on Youtube"
 msgstr ""
