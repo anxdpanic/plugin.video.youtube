@@ -215,8 +215,11 @@ class AbstractSettings(object):
     def get_play_count_min_percent(self):
         return self.get_int(constants.setting.PLAY_COUNT_MIN_PERCENT, 0)
 
-    def use_playback_history(self):
-        return self.get_bool(constants.setting.USE_PLAYBACK_HISTORY, False)
+    def use_local_history(self):
+        return self.get_bool(constants.setting.USE_LOCAL_HISTORY, False)
+
+    def use_remote_history(self):
+        return self.get_bool(constants.setting.USE_REMOTE_HISTORY, False)
 
     # Selections based on max width and min height at common (utra-)wide aspect ratios
     _QUALITY_SELECTIONS = {                                                 # Setting | Resolution

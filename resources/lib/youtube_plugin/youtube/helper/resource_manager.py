@@ -129,7 +129,7 @@ class ResourceManager(object):
             self._context.log_debug('Cached data for videos |%s|' % ', '.join(list(video_data.keys())))
 
         played_items = dict()
-        if self._context.get_settings().use_playback_history():
+        if self._context.get_settings().use_local_history():
             playback_history = self._context.get_playback_history()
             played_items = playback_history.get_items(video_ids)
 
