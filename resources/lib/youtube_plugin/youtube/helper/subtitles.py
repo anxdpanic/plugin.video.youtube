@@ -24,12 +24,18 @@ class Subtitles(object):
     BASE_PATH = 'special://temp/plugin.video.youtube/'
     SRT_FILE = ''.join([BASE_PATH, '%s.%s.srt'])
 
-    def __init__(self, context, headers, video_id, captions):
+    def __init__(self, context, video_id, captions, headers=None):
         self.context = context
         self._verify = context.get_settings().verify_ssl()
         self.video_id = video_id
         self.language = context.get_settings().get_string('youtube.language', 'en_US').replace('_', '-')
-        self.headers = headers.copy()
+
+        if not headers and 'headers' in captions:
+            headers = captions['headers']
+            headers.pop('Authorization', None)
+            headers.pop('Content-Length', None)
+            headers.pop('Content-Type', None)
+        self.headers = headers
 
         self.caption_track = {}
         self.renderer = captions.get('playerCaptionsTracklistRenderer', {})
