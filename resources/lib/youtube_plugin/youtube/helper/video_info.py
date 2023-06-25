@@ -11,6 +11,7 @@
 from six.moves import range
 from six import PY2
 from six.moves import urllib
+from json import dumps as json_dumps, loads as json_loads
 
 try:
     from six.moves import html_parser
@@ -30,7 +31,6 @@ except AttributeError:
 
 import copy
 import re
-import json
 import random
 import traceback
 import requests
@@ -993,7 +993,7 @@ class VideoInfo(object):
         found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', html)
 
         if found:
-            config = json.loads(found.group(1))
+            config = json_loads(found.group(1))
             return config
         return None
 
@@ -1005,7 +1005,7 @@ class VideoInfo(object):
                 r'ytInitialPlayerResponse\s*=\s*(?P<response>{.+?})\s*;\s*(?:var\s+meta|</script|\n)', html
         )
         if found:
-            response = json.loads(found.group('response'))
+            response = json_loads(found.group('response'))
 
         return response
 
@@ -1033,7 +1033,7 @@ class VideoInfo(object):
             return ''
 
         js_url = self._normalize_url(js_url)
-        self._data_cache.set('player_js_url', json.dumps({'url': js_url}))
+        self._data_cache.set('player_js_url', json_dumps({'url': js_url}))
         cache_key = quote(js_url)
         cached_js = self._data_cache.get_item(DataCache.ONE_HOUR * 4, cache_key).get('js')
         if cached_js:
@@ -1048,7 +1048,7 @@ class VideoInfo(object):
             return ''
 
         javascript = result.text
-        self._data_cache.set(cache_key, json.dumps({'js': javascript}))
+        self._data_cache.set(cache_key, json_dumps({'js': javascript}))
         return javascript
 
     @staticmethod
@@ -1217,7 +1217,7 @@ class VideoInfo(object):
                 self._context.log_debug('{0}: {1}\n{2}'.format(error, encrypted_signature, traceback.format_exc()))
                 self._context.log_error('Stream URL unable to be extracted from signatureCipher')
                 return None
-            self._data_cache.set(encrypted_signature, json.dumps({'sig': signature}))
+            self._data_cache.set(encrypted_signature, json_dumps({'sig': signature}))
 
         if signature:
             url = '{0}&{1}={2}'.format(url, query_var, signature)
