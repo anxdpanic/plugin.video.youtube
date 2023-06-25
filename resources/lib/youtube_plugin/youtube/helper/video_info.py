@@ -590,9 +590,9 @@ class VideoInfo(object):
             'headers': {
                 'User-Agent': ('com.google.android.youtube/'
                                '{json[context][client][clientVersion]}'
-                               ' (Linux; U; Android '
-                               '{json[context][client][osVersion]}'
-                               '; US) gzip'),
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]};'
+                               ' {json[context][client][gl]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -618,9 +618,9 @@ class VideoInfo(object):
             'headers': {
                 'User-Agent': ('com.google.android.youtube/'
                                '{json[context][client][clientVersion]}'
-                               ' (Linux; U; Android '
-                               '{json[context][client][osVersion]}'
-                               '; US) gzip'),
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]};'
+                               ' {json[context][client][gl]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -645,13 +645,16 @@ class VideoInfo(object):
                         'platform': 'MOBILE',
                     },
                 },
+                'thirdParty': {
+                    'embedUrl': 'https://www.youtube.com/embed/{json[videoId]}',
+                },
             },
             'headers': {
                 'User-Agent': ('com.google.android.youtube/'
                                '{json[context][client][clientVersion]}'
-                               ' (Linux; U; Android '
-                               '{json[context][client][osVersion]}'
-                               '; US) gzip'),
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]};'
+                               ' {json[context][client][gl]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -680,9 +683,9 @@ class VideoInfo(object):
             'headers': {
                 'User-Agent': ('com.google.android.apps.youtube.unplugged/'
                                '{json[context][client][clientVersion]}'
-                               ' (Linux; U; Android '
-                               '{json[context][client][osVersion]}'
-                               '; US) gzip'),
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]};'
+                               ' {json[context][client][gl]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -707,8 +710,9 @@ class VideoInfo(object):
             'headers': {
                 'User-Agent': ('com.google.ios.youtube/'
                                '{json[context][client][clientVersion]}'
-                               ' (iPhone14,3; U; CPU iOS '
-                               '{json[context][client][osVersion]}'
+                               ' ({json[context][client][deviceModel]};'
+                               ' U; CPU {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]}'
                                ' like Mac OS X)'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
@@ -751,7 +755,8 @@ class VideoInfo(object):
                     },
                 },
             },
-            # Headers from the "Galaxy S20 Ultra" from Chrome dev tools device emulation
+            # Headers for a "Galaxy S20 Ultra" from Chrome dev tools device
+            # emulation
             'headers': {
                 'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
                                ' AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -763,6 +768,7 @@ class VideoInfo(object):
             },
         },
         '_common': {
+            '_access_token': None,
             'json': {
                 'contentCheckOk': True,
                 'context': {
@@ -777,9 +783,7 @@ class VideoInfo(object):
                     },
                 },
                 'racyCheckOk': True,
-                'thirdParty': {
-                    'embedUrl': 'https://www.youtube.com/',
-                },
+                'thirdParty': {},
                 'user': {
                     'lockedSafetyMode': False
                 },
@@ -795,7 +799,7 @@ class VideoInfo(object):
                            'application/xmlq=0.9,'
                            '*/*;q=0.8'),
                 'Accept-Language': 'en-us,en;q=0.5',
-                'Authorization': 'Bearer {0}',
+                'Authorization': 'Bearer {_access_token}',
             },
             'params': {
                 'key': None,
@@ -875,30 +879,34 @@ class VideoInfo(object):
         self.video_id = video_id
         return self._get_video_info()
 
-    def _build_client(self, client_name, auth_header=True):
+    def _build_client(self, client_name, auth_header=False):
         def _merge_dicts(item1, item2):
             if not isinstance(item1, dict) or not isinstance(item2, dict):
-                return item1 if item2 is None else item2
-            return {
-                key: _merge_dicts(item1.get(key), item2.get(key))
-                for key in set(item1) | set(item2)
-            }
+                return item1 if item2 is ... else item2
+            new = {}
+            for key in (item1.keys() | item2.keys()):
+                value = _merge_dicts(item1.get(key, ...), item2.get(key, ...))
+                if value is ...:
+                    continue
+                if isinstance(value, str) and '{' in value:
+                    _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
+                new[key] = value
+            return new or ...
+        _format = {}
 
         client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
+        client = _merge_dicts(self.CLIENTS['_common'], client)
+
         client['json']['videoId'] = self.video_id
-        client['headers'] = {
-            header: value.format(**client) if '{' in value else value
-            for header, value in client['headers'].items()
-        }
-
-        base = self.CLIENTS['_common']
-        client = _merge_dicts(base, client)
-
         if auth_header and self._access_token:
-            client['headers']['Authorization'] = client['headers']['Authorization'].format(self._access_token)
+            client['_access_token'] = self._access_token
             client['params'] = None
         elif 'Authorization' in client['headers']:
             del client['headers']['Authorization']
+
+        for values, key, value in _format.values():
+            values[key] = value.format(**client)
+
         return client
 
     def _request(self, url, method='GET',
@@ -925,7 +933,7 @@ class VideoInfo(object):
         return result
 
     def get_player_html(self, embed=False):
-        client = self._build_client('web', auth_header=True)
+        client = self._build_client('web')
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
@@ -1015,7 +1023,7 @@ class VideoInfo(object):
         if cached_js:
             return cached_js
 
-        client = self._build_client('web', auth_header=False)
+        client = self._build_client('web')
         result = self._request(
             js_url, headers=client['headers'],
             error_msg='Failed to get player js for video_id "{0}"'.format(self.video_id)
@@ -1060,7 +1068,7 @@ class VideoInfo(object):
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self._build_client('web', auth_header=False)['headers']
+            headers = self._build_client('web')['headers']
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
         result = self._request(
@@ -1125,7 +1133,7 @@ class VideoInfo(object):
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self._build_client('web', auth_header=False)['headers']
+            headers = self._build_client('web')['headers']
         curl_headers = self.make_curl_headers(headers, cookies=None)
 
         if meta_info is None:
