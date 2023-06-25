@@ -199,15 +199,15 @@ class Subtitles(object):
         if (caption_track is None) and has_translation:
             base_url = self._normalize_url(self.caption_track.get('baseUrl'))
             if base_url:
-                subtitle_url = self.set_query_param(base_url, 'type', 'track')
-                subtitle_url = self.set_query_param(subtitle_url, 'tlang', language)
+                subtitle_url = self._set_query_param(base_url, 'type', 'track')
+                subtitle_url = self._set_query_param(subtitle_url, 'tlang', language)
         elif caption_track is not None:
             base_url = self._normalize_url(caption_track.get('baseUrl'))
             if base_url:
-                subtitle_url = self.set_query_param(base_url, 'type', 'track')
+                subtitle_url = self._set_query_param(base_url, 'type', 'track')
 
         if subtitle_url:
-            subtitle_url = self.set_query_param(subtitle_url, 'fmt', 'vtt')
+            subtitle_url = self._set_query_param(subtitle_url, 'fmt', 'vtt')
             self.context.log_debug('Subtitle url: %s' % subtitle_url)
             if not self.context.get_settings().subtitle_download():
                 return [subtitle_url]
@@ -247,7 +247,7 @@ class Subtitles(object):
         return language_name
 
     @staticmethod
-    def set_query_param(url, name, value):
+    def _set_query_param(url, name, value):
         scheme, netloc, path, query_string, fragment = urlsplit(url)
         query_params = parse_qs(query_string)
 
