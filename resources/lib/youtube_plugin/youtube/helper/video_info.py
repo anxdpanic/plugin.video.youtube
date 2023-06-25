@@ -1411,20 +1411,23 @@ class VideoInfo(object):
         adaptive_fmts = streaming_data.get('adaptiveFormats', [])
         std_fmts = streaming_data.get('formats', [])
 
-        captions = player_response.get('captions')
-        if not captions and client.get('_query_subtitles'):
-            client = self._build_client('smarttv')
+        captions = response.get('captions')
+        if captions:
+            captions['headers'] = client['headers']
+        elif client.get('_query_subtitles'):
             result = self._request(
-                video_info_url, 'POST', **client,
+                video_info_url, 'POST', **self._build_client('smarttv', True),
                 error_msg='Caption request failed. Failed to get player response for video_id "{0}"'.format(self.video_id),
             )
-            self._context.log_notice(f'\n{result.json() = }\n')
-            captions = result.json().get('captions') if result else None
+            
+            response = result.json()
+            captions = response.get('captions')
+            if captions:
+                captions['headers'] = result.request.headers
         if captions:
-            captions = Subtitles(self._context,
-                                 client['headers'],
-                                 self.video_id,
-                                 captions).get_subtitles()
+            captions = Subtitles(
+                self._context, self.video_id, captions
+            ).get_subtitles()
 
         meta_info = {
             'video': {
