@@ -1061,9 +1061,7 @@ class VideoInfo(object):
         return url
 
     def _load_hls_manifest(self, url, stream_type=None, meta_info=None, headers=None, playback_stats=None):
-        if headers:
-            headers = headers.copy()
-        elif self._selected_client:
+        if not headers and self._selected_client:
             headers = self._selected_client['headers'].copy()
             if 'Authorization' in headers:
                 del headers['Authorization']
@@ -1126,9 +1124,7 @@ class VideoInfo(object):
         return stream_list
 
     def _parse_to_stream_list(self, streams, meta_info=None, headers=None, playback_stats=None ):
-        if headers:
-            headers = headers.copy()
-        elif self._selected_client:
+        if not headers and self._selected_client:
             headers = self._selected_client['headers'].copy()
             if 'Authorization' in headers:
                 del headers['Authorization']
