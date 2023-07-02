@@ -1613,40 +1613,27 @@ class VideoInfo(object):
                 # This breaks the InputStream.Adaptive partial manifest update
                 video_stream['url'] = ('{0}?start_seq=$START_NUMBER$'
                                        .format(video_stream['url']))
-                stream_details = self.FORMAT.get('9998')
+                details = self.FORMAT.get('9998')
             else:
-                stream_details = self.FORMAT.get('9999').copy()
+                details = self.FORMAT.get('9999').copy()
 
-                video_info = s_info.get('video')
-                if video_info:
-                    codec = video_info['codec']
-                    bitrate = video_info['bitrate']
-                    height = video_info['height']
+                video_info = s_info['video']
+                details['title'] = [video_info['label']]
+                details['video']['encoding'] = video_info['codec']
+                details['video']['height'] = video_info['height']
 
-                    if codec and bitrate:
-                        stream_details['video']['height'] = height
-                        stream_details['video']['encoding'] = codec
-                        stream_details['title'] = (
-                            video_info['label']
-                            or '{0}p{1}'.format(height, video_info['fps'])
-                        )
-
-                audio_info = s_info.get('audio')
+                audio_info = s_info['audio']
                 if audio_info:
-                    codec = audio_info.get('codec')
-                    bitrate = audio_info.get('bitrate', 0) // 1000
-
-                    if codec and bitrate:
-                        stream_details['audio']['encoding'] = codec
-                        stream_details['audio']['bitrate'] = bitrate
-                    if not video_info:
-                        stream_details['title'] = '{0}@{1}'.format(
-                            codec, bitrate
-                        )
+                    details['audio']['encoding'] = audio_info['codec']
+                    details['audio']['bitrate'] = audio_info['bitrate'] // 1000
                     if audio_info['lang'] not in {'', 'und'}:
-                        stream_details['title'] += ' Multi-language'
+                        details['title'].extend((
+                            ' ', audio_info['langName']
+                        ))
 
-            video_stream.update(stream_details)
+                details['title'] = ''.join(details['title'])
+
+            video_stream.update(details)
             stream_list.append(video_stream)
 
         def parse_to_stream_list(streams):
