@@ -1456,7 +1456,11 @@ class VideoInfo(object):
         if captions:
             captions = Subtitles(
                 self._context, self.video_id, captions
-            ).get_subtitles()
+            )
+            default_lang_code = captions.get_default_lang_code()
+            captions = captions.get_subtitles()
+        else:
+            default_lang_code = 'und'
 
         meta_info = {
             'video': {
@@ -1590,7 +1594,9 @@ class VideoInfo(object):
                     live_type, meta_info, client['headers'], playback_stats
                 ))
         elif httpd_is_live and adaptive_fmts:
-            video_data, audio_data = self._process_stream_data(adaptive_fmts)
+            video_data, audio_data = self._process_stream_data(
+                adaptive_fmts, default_lang_code
+            )
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
             )
@@ -1626,6 +1632,14 @@ class VideoInfo(object):
                     if audio_info['langCode'] not in {'', 'und'}:
                         details['title'].extend((
                             ' ', audio_info['langName']
+                        ))
+                    if main_stream['multi_lang']:
+                        details['title'].extend((
+                            ' [', self._context.localize(30762), ']'
+                        ))
+                    if main_stream['multi_audio']:
+                        details['title'].extend((
+                            ' [', self._context.localize(30763), ']'
                         ))
 
                 details['title'] = ''.join(details['title'])
@@ -2035,6 +2049,8 @@ class VideoInfo(object):
 
         set_id = 0
         group = stream = None
+        languages = set()
+        roles = set()
         for item in (video_data + audio_data):
             default = original = impaired = False
 
@@ -2076,6 +2092,9 @@ class VideoInfo(object):
                 original = True
             elif role == 'description':
                 impaired = True
+
+            languages.add(language)
+            roles.add(role)
 
             out_list.extend((
                 '\t\t<AdaptationSet'
@@ -2177,6 +2196,11 @@ class VideoInfo(object):
         out_list.append('\t</Period>\n'
                         '</MPD>\n')
         out = ''.join(out_list)
+
+        if len(languages.difference({'', 'und'})) > 1:
+            main_stream['multi_lang'] = True
+        if roles.difference({'', 'main', 'dub'}):
+            main_stream['multi_audio'] = True
 
         filepath = '{0}{1}.mpd'.format(basepath, self.video_id)
         success = None
