@@ -1569,9 +1569,7 @@ class VideoInfo(object):
                 'token': None
             }
 
-        s_info = {}
         stream_list = []
-
         adaptive_fmts = streaming_data.get('adaptiveFormats', [])
         all_fmts = streaming_data.get('formats', []) + adaptive_fmts
 
@@ -1592,10 +1590,9 @@ class VideoInfo(object):
                     live_type, meta_info, client['headers'], playback_stats
                 ))
         elif httpd_is_live and adaptive_fmts:
-            manifest_url, s_info = self._generate_mpd_manifest(
-                adaptive_fmts,
-                video_details.get('lengthSeconds', '0'),
-                license_info.get('url')
+            video_data, audio_data = self._process_stream_data(adaptive_fmts)
+            manifest_url, main_stream = self._generate_mpd_manifest(
+                video_data, audio_data, license_info.get('url')
             )
 
         if manifest_url:
@@ -1617,16 +1614,16 @@ class VideoInfo(object):
             else:
                 details = self.FORMAT.get('9999').copy()
 
-                video_info = s_info['video']
+                video_info = main_stream['video']
                 details['title'] = [video_info['label']]
                 details['video']['encoding'] = video_info['codec']
                 details['video']['height'] = video_info['height']
 
-                audio_info = s_info['audio']
+                audio_info = main_stream['audio']
                 if audio_info:
                     details['audio']['encoding'] = audio_info['codec']
                     details['audio']['bitrate'] = audio_info['bitrate'] // 1000
-                    if audio_info['lang'] not in {'', 'und'}:
+                    if audio_info['langCode'] not in {'', 'und'}:
                         details['title'].extend((
                             ' ', audio_info['langName']
                         ))
@@ -1681,20 +1678,13 @@ class VideoInfo(object):
 
         return stream_list
 
-    def _generate_mpd_manifest(self, adaptive_fmts, duration, license_url):
-        basepath = 'special://temp/plugin.video.youtube/'
-        if not make_dirs(basepath):
-            self._context.log_debug('Failed to create temp directory: {0}'
-                                    .format(basepath))
-            return None, None
-
+    def _process_stream_data(self, stream_data, default_lang_code='und'):
         qualities = self._context.get_settings().get_mpd_video_qualities()
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
         stream_features = self._context.get_settings().stream_features()
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
         allow_ssa = 'ssa' in stream_features
-        do_filter = 'filter' in stream_features
         stream_select = self._context.get_settings().stream_select()
 
         fps_scale_map = {
@@ -1726,26 +1716,26 @@ class VideoInfo(object):
             'language_code': None,
             'role_type': 0,
         }
-        for stream_map in adaptive_fmts:
-            mime_type = stream_map.get('mimeType')
+        for stream in stream_data:
+            mime_type = stream.get('mimeType')
             if not mime_type:
                 continue
 
-            itag = stream_map.get('itag')
+            itag = stream.get('itag')
             if not itag:
                 continue
 
-            index_range = stream_map.get('indexRange')
+            index_range = stream.get('indexRange')
             if not index_range:
                 continue
 
-            init_range = stream_map.get('initRange')
+            init_range = stream.get('initRange')
             if not init_range:
                 continue
 
-            url = stream_map.get('url')
-            if not url and self._cipher and 'signatureCipher' in stream_map:
-                url = self._process_signature_cipher(stream_map)
+            url = stream.get('url')
+            if not url and self._cipher and 'signatureCipher' in stream:
+                url = self._process_signature_cipher(stream)
             if not url:
                 continue
 
@@ -1763,14 +1753,14 @@ class VideoInfo(object):
 
             if media_type == 'audio':
                 data = audio_data
-                channels = stream_map.get('audioChannels', 2)
+                channels = stream.get('audioChannels', 2)
                 if channels > 2 and not allow_ssa:
                     continue
 
-                if 'audioTrack' in stream_map:
-                    audio_track = stream_map['audioTrack']
+                if 'audioTrack' in stream:
+                    audio_track = stream['audioTrack']
 
-                    language = audio_track.get('id', 'und')
+                    language = audio_track.get('id', default_lang_code)
                     if '.' in language:
                         language_code, role_type = language.split('.')
                         role_type = int(role_type)
@@ -1807,17 +1797,17 @@ class VideoInfo(object):
                             'role_type': role_type,
                         }
                 else:
-                    language_code = 'und'
+                    language_code = default_lang_code
                     role = 'main'
                     role_type = 4
                     label = self._context.localize(30744)
                     mime_group = mime_type
 
-                sample_rate = int(stream_map.get('audioSampleRate', '0'), 10)
+                sample_rate = int(stream.get('audioSampleRate', '0'), 10)
                 height = width = fps = frame_rate = hdr = None
                 language = self._context.get_language_name(language_code)
                 label = '{0} ({1:.0f} kbps)'.format(
-                    label, stream_map.get('averageBitrate', 0) / 1000
+                    label, stream.get('averageBitrate', 0) / 1000
                 )
                 if channels > 2 or 'auto' not in stream_select:
                     quality_group = '{0}_{1}_{2}.{3}'.format(
@@ -1832,16 +1822,16 @@ class VideoInfo(object):
                 # "Non-Linguistic, Not Applicable" but that is too verbose
                 language_code = ''
 
-                fps = stream_map.get('fps', 0)
+                fps = stream.get('fps', 0)
                 if fps > 30 and not allow_hfr:
                     continue
 
-                hdr = 'HDR' in stream_map.get('qualityLabel', '')
+                hdr = 'HDR' in stream.get('qualityLabel', '')
                 if hdr and not allow_hdr:
                     continue
 
-                height = stream_map.get('height')
-                width = stream_map.get('width')
+                height = stream.get('height')
+                width = stream.get('width')
                 if height > width:
                     compare_width = height
                     compare_height = width
@@ -1889,8 +1879,9 @@ class VideoInfo(object):
                    .replace("<", "&lt;")
                    .replace(">", "&gt;"))
 
-            bitrate = stream_map.get('bitrate', 0)
+            bitrate = stream.get('bitrate', 0)
             biased_bitrate = bitrate * codec_bias_map.get(codec, 1)
+            duration_s = int(stream.get('approxDurationMs', '0'), 10) / 1000
 
             data[mime_group][itag] = data[quality_group][itag] = {
                 'mimeType': mime_type,
@@ -1905,12 +1896,13 @@ class VideoInfo(object):
                 'label': label,
                 'bitrate': bitrate,
                 'biasedBitrate': biased_bitrate,
+                'durationS': duration_s,
                 'fps': fps,
                 'frameRate': frame_rate,
                 'hdr': hdr,
                 'indexRange': '{start}-{end}'.format(**index_range),
                 'initRange': '{start}-{end}'.format(**init_range),
-                'lang': language_code,
+                'langCode': language_code,
                 'langName': language,
                 'role': role,
                 'roleType': role_type,
@@ -1949,6 +1941,28 @@ class VideoInfo(object):
                 - main_stream['roleType'],
             )
             return key + _stream_sort(main_stream)
+
+        video_data = sorted((
+            (group, sorted(streams.values(), key=_stream_sort))
+            for group, streams in video_data.items()
+        ), key=_group_sort)
+
+        audio_data = sorted((
+            (group, sorted(streams.values(), key=_stream_sort))
+            for group, streams in audio_data.items()
+        ), key=_group_sort)
+
+        return video_data, audio_data
+
+    def _generate_mpd_manifest(self, video_data, audio_data, license_url):
+        if not video_data or not audio_data:
+            return None, None
+
+        basepath = 'special://temp/plugin.video.youtube/'
+        if not make_dirs(basepath):
+            self._context.log_debug('Failed to create temp directory: {0}'
+                                    .format(basepath))
+            return None, None
 
         def _filter_group(previous_group, previous_stream, item):
             skip_group = True
@@ -1989,24 +2003,20 @@ class VideoInfo(object):
                 and new_stream['hdr'] == previous_stream['hdr']
             ) if media_type == 'video' else (
                 skip_group
-                and new_stream['lang'] == previous_stream['lang']
+                and new_stream['langCode'] == previous_stream['langCode']
                 and new_stream['role'] == previous_stream['role']
             )
             return skip_group
 
-        video_data = sorted((
-            (group, sorted(streams.values(), key=_stream_sort))
-            for group, streams in video_data.items()
-        ), key=_group_sort)
+        stream_features = self._context.get_settings().stream_features()
+        do_filter = 'filter' in stream_features
+        stream_select = self._context.get_settings().stream_select()
 
-        audio_data = sorted((
-            (group, sorted(streams.values(), key=_stream_sort))
-            for group, streams in audio_data.items()
-        ), key=_group_sort)
-
-        stream_info = {
+        main_stream = {
             'video': video_data[0][1][0],
             'audio': audio_data[0][1][0],
+            'multi_audio': False,
+            'multi_lang': False,
         }
 
         out_list = [
@@ -2016,7 +2026,7 @@ class VideoInfo(object):
                 ' xmlns:xlink="http://www.w3.org/1999/xlink"'
                 ' xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"'
                 ' minBufferTime="PT1.5S"'
-                ' mediaPresentationDuration="PT', duration, 'S"'
+                ' mediaPresentationDuration="PT', str(main_stream['video']['durationS']), 'S"'
                 ' type="static"'
                 ' profiles="urn:mpeg:dash:profile:isoff-main:2011"'
                 '>\n'
@@ -2024,36 +2034,37 @@ class VideoInfo(object):
         ]
 
         set_id = 0
-        group = main_stream = None
-        for item in video_data + audio_data:
+        group = stream = None
+        for item in (video_data + audio_data):
             default = original = impaired = False
 
-            if do_filter and _filter_group(group, main_stream, item):
+            if do_filter and _filter_group(group, stream, item):
                 continue
             group, streams = item
-            main_stream = streams[0]
-            container = main_stream['container']
-            media_type = main_stream['mediaType']
-            mime_type = main_stream['mimeType']
-            role = main_stream['role'] or ''
+            stream = streams[0]
+            container = stream['container']
+            media_type = stream['mediaType']
+            mime_type = stream['mimeType']
+            language = stream['langCode']
+            role = stream['role'] or ''
 
             if group.startswith(mime_type) and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
-                    main_stream['langName'] or self._context.localize(30583),
-                    main_stream['label']
+                    stream['langName'] or self._context.localize(30583),
+                    stream['label']
                 )
-                if main_stream == stream_info[media_type]:
+                if stream == main_stream[media_type]:
                     default = True
                     role = 'main'
             elif group.startswith(container) and 'list' in stream_select:
                 if 'auto' in stream_select or media_type == 'video':
-                    label = main_stream['label']
+                    label = stream['label']
                 else:
                     label = '{0} {1}'.format(
-                        main_stream['langName'],
-                        main_stream['label']
+                        stream['langName'],
+                        stream['label']
                     )
-                    if main_stream == stream_info[media_type]:
+                    if stream == main_stream[media_type]:
                         default = True
                         role = 'main'
             else:
@@ -2074,7 +2085,7 @@ class VideoInfo(object):
                     ' id="', str(set_id), '"'
                     ' contentType="', media_type, '"'
                     ' mimeType="', mime_type, '"'
-                    ' lang="', main_stream['lang'], '"'
+                    ' lang="', language, '"'
                     # name attribute is ISA specific and does not exist in the
                     # MPD spec. Should be a child Label element instead
                     ' name="[B]', label, '[/B]"'
@@ -2190,4 +2201,4 @@ class VideoInfo(object):
             self._context.get_settings().httpd_listen('127.0.0.1'),
             self._context.get_settings().httpd_port(),
             self.video_id
-        ), stream_info
+        ), main_stream
