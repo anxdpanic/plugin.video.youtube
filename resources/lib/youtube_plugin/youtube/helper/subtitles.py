@@ -39,7 +39,6 @@ class Subtitles(object):
             headers.pop('Content-Type', None)
         self.headers = headers
 
-        self.caption_track = {}
         ui = self.context.get_ui()
         self.prompt_override = (
             ui.get_home_window_property('prompt_for_subtitles') == video_id
@@ -50,25 +49,51 @@ class Subtitles(object):
         self.caption_tracks = self.renderer.get('captionTracks', [])
         self.translation_langs = self.renderer.get('translationLanguages', [])
 
-        default_audio = self.renderer.get('defaultAudioTrackIndex')
-        if default_audio is not None:
-            audio_tracks = self.renderer.get('audioTracks', [])
-            try:
-                audio_track = audio_tracks[default_audio]
-            except:
-                audio_track = None
-            if audio_track:
-                default_caption = audio_track.get('defaultCaptionTrackIndex')
-                if default_caption is None:
-                    default_caption = audio_track.get('captionTrackIndices')
-                    if (default_caption is not None) and (isinstance(default_caption, list)):
-                        default_caption = default_caption[0]
-                if default_caption is not None:
-                    try:
-                        self.caption_track = self.caption_tracks[default_caption]
-                    except:
-                        pass
+        try:
+            default_audio = self.renderer.get('defaultAudioTrackIndex')
+            default_audio = self.renderer.get('audioTracks')[default_audio]
+        except (IndexError, TypeError):
+            default_audio = None
 
+        if default_audio is None:
+            self.default_caption = {}
+            self.default_lang_code = 'und'
+            return
+
+        default_caption = self.renderer.get(
+            'defaultTranslationSourceTrackIndices', [None]
+        )[0]
+        if default_caption is None:
+            for lang in self.translation_langs:
+                if 'translationSourceTrackIndices' not in lang:
+                    continue
+                default_caption = lang['translationSourceTrackIndices'][0]
+                break
+            else:
+                default_caption = (
+                    default_audio.get('hasDefaultTrack')
+                    and default_audio.get('defaultCaptionTrackIndex')
+                )
+
+        if default_caption is None:
+            default_lang_code = 'und'
+            try:
+                default_caption = default_audio.get('captionTrackIndices')[0]
+            except (IndexError, TypeError):
+                default_caption = 0
+        else:
+            default_lang_code = None
+
+        try:
+            default_caption = self.caption_tracks[default_caption] or {}
+            if not default_lang_code and default_caption.get('kind') != 'asr':
+                default_lang_code = default_caption.get('languageCode')
+        except IndexError:
+            default_caption = {}
+            default_lang_code = 'und'
+
+        self.default_caption = default_caption
+        self.default_lang_code = default_lang_code or 'und'
 
     def srt_filename(self, sub_language):
         return self.SRT_FILE % (self.video_id, sub_language)
@@ -97,6 +122,9 @@ class Subtitles(object):
         except:
             self.context.log_debug('Subtitle unescape: failed to unescape text')
         return text
+
+    def get_default_lang_code(self):
+        return self.default_lang_code
 
     def get_subtitles(self):
         if self.prompt_override:
@@ -178,8 +206,8 @@ class Subtitles(object):
                 has_translation = True
                 break
 
-        if (lang_code != self.caption_track.get('languageCode')
-                and not has_translation and caption_track is None):
+        if (lang_code != self.default_lang_code and not has_translation
+                and caption_track is None):
             self.context.log_debug('No subtitles found for: %s' % lang_code)
             return []
 
@@ -188,7 +216,7 @@ class Subtitles(object):
             base_url = self._normalize_url(caption_track.get('baseUrl'))
             has_translation = False
         elif has_translation:
-            base_url = self._normalize_url(self.caption_track.get('baseUrl'))
+            base_url = self._normalize_url(self.default_caption.get('baseUrl'))
         else:
             base_url = None
 
