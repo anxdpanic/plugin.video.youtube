@@ -1345,3 +1345,11 @@ msgstr ""
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
 msgstr ""
+
+msgctxt "#30762"
+msgid "Multi-language"
+msgstr ""
+
+msgctxt "#30763"
+msgid "Multi-audio"
+msgstr ""
