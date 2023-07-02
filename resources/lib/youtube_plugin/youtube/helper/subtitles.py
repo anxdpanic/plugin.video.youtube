@@ -247,11 +247,26 @@ class Subtitles(object):
         return language_name
 
     @staticmethod
-    def _set_query_param(url, name, value):
+    def _set_query_param(url, *pairs):
+        if not url or not pairs:
+            return url
+
+        num_params = len(pairs)
+        if not num_params:
+            return url
+        if not isinstance(pairs[0], (list, tuple)):
+            if num_params >= 2:
+                pairs = zip(*[iter(pairs)] * 2)
+            else:
+                return url
+
         scheme, netloc, path, query_string, fragment = urlsplit(url)
         query_params = parse_qs(query_string)
 
-        query_params[name] = [value]
+        for name, value in pairs:
+            if name:
+                query_params[name] = [value]
+
         new_query_string = urlencode(query_params, doseq=True)
         if isinstance(scheme, bytes):
             new_query_string = new_query_string.encode('utf-8')
