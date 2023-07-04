@@ -1441,10 +1441,10 @@ class VideoInfo(object):
             captions = Subtitles(
                 self._context, self.video_id, captions
             )
-            default_lang_code = captions.get_default_lang_code()
+            default_lang = captions.get_default_lang()
             captions = captions.get_subtitles()
         else:
-            default_lang_code = 'und'
+            default_lang = {'code': 'und', 'is_asr': False}
 
         meta_info = {
             'video': {
@@ -1557,7 +1557,7 @@ class VideoInfo(object):
                 ))
         elif httpd_is_live and adaptive_fmts:
             video_data, audio_data = self._process_stream_data(
-                adaptive_fmts, default_lang_code
+                adaptive_fmts, default_lang['code']
             )
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
@@ -1594,6 +1594,10 @@ class VideoInfo(object):
                     if audio_info['langCode'] not in {'', 'und'}:
                         details['title'].extend((
                             ' ', audio_info['langName']
+                        ))
+                    if default_lang['is_asr']:
+                        details['title'].extend((
+                            ' [ASR]'
                         ))
                     if main_stream['multi_lang']:
                         details['title'].extend((
