@@ -941,8 +941,8 @@ class VideoInfo(object):
             return None
         return result
 
-    def _get_player_html(self, embed=False):
-        client = self._build_client('web')
+    def _get_player_page(self, client='web', embed=False):
+        client = self._build_client(client)
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
@@ -955,7 +955,7 @@ class VideoInfo(object):
                        .format(self.video_id))
         )
         if result:
-            return result.text
+            return result
         return None
 
     @staticmethod
@@ -977,14 +977,14 @@ class VideoInfo(object):
         return None
 
     @staticmethod
-    def _get_player_config(html):
-        if not html:
+    def _get_player_config(page):
+        if not page:
             return None
 
         # pattern source is from youtube-dl
         # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
         # LICENSE: The Unlicense
-        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', html)
+        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page.text)
 
         if found:
             return json_loads(found.group(1))
@@ -1014,8 +1014,8 @@ class VideoInfo(object):
             js_url = None
 
         if not js_url:
-            html = self._get_player_html()
-            player_config = self._get_player_config(html)
+            player_page = self._get_player_page()
+            player_config = self._get_player_config(player_page)
             if not player_config:
                 return ''
             js_url = player_config.get('PLAYER_JS_URL')
