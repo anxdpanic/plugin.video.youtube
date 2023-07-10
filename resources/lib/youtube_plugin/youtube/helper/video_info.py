@@ -290,9 +290,10 @@ class VideoInfo(object):
         '271': {'container': 'webm',
                 'dash/video': True,
                 'video': {'height': 1440, 'encoding': 'vp9'}},
-        '272': {'container': 'webm',
+        '272': {'container': 'webm',  # was VP9 2160p30
                 'dash/video': True,
-                'video': {'height': 2160, 'encoding': 'vp9'}},
+                'fps': 60,
+                'video': {'height': 4320, 'encoding': 'vp9'}},
         '278': {'container': 'webm',
                 'dash/video': True,
                 'video': {'height': 144, 'encoding': 'vp9'}},
@@ -395,6 +396,14 @@ class VideoInfo(object):
                 'dash/video': True,
                 'fps': 30,
                 'video': {'height': 2160, 'encoding': 'av1'}},
+        '402': {'container': 'mp4',
+                'dash/video': True,
+                'fps': 30,
+                'video': {'height': 4320, 'encoding': 'av1'}},
+        '571': {'container': 'mp4',
+                'dash/video': True,
+                'fps': 30,
+                'video': {'height': 4320, 'encoding': 'av1'}},
         '694': {'container': 'mp4',
                 'dash/video': True,
                 'fps': 60,
@@ -442,65 +451,80 @@ class VideoInfo(object):
                 'video': {'height': 4320, 'encoding': 'av1'}},
         # === Dash (audio only)
         '139': {'container': 'mp4',
-                'sort': [48, 0],
-                'title': 'aac@48',
+                'sort': [0, 48 * 0.9],
+                'title': 'he-aac@48',
                 'dash/audio': True,
                 'audio': {'bitrate': 48, 'encoding': 'aac'}},
         '140': {'container': 'mp4',
-                'sort': [129, 0],
-                'title': 'aac@128',
+                'sort': [0, 128 * 0.9],
+                'title': 'aac-lc@128',
                 'dash/audio': True,
                 'audio': {'bitrate': 128, 'encoding': 'aac'}},
         '141': {'container': 'mp4',
-                'sort': [143, 0],
-                'title': 'aac@256',
+                'sort': [0, 256 * 0.9],
+                'title': 'aac-lc@256',
                 'dash/audio': True,
                 'audio': {'bitrate': 256, 'encoding': 'aac'}},
         '256': {'container': 'mp4',
-                'title': 'aac/itag 256',
+                'sort': [0, 192 * 0.9],
+                'title': 'he-aac@192',
                 'dash/audio': True,
-                'unsupported': True,
-                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+                'audio': {'bitrate': 192, 'encoding': 'aac'}},
         '258': {'container': 'mp4',
-                'title': 'aac/itag 258',
+                'sort': [0, 384 * 0.9],
+                'title': 'aac-lc@384',
                 'dash/audio': True,
-                'unsupported': True,
-                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+                'audio': {'bitrate': 384, 'encoding': 'aac'}},
         '325': {'container': 'mp4',
-                'title': 'dtse/itag 325',
+                'sort': [0, 384 * 1.3],
+                'title': 'dtse@384',
                 'dash/audio': True,
-                'unsupported': True,
-                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+                'audio': {'bitrate': 384, 'encoding': 'dtse'}},
+        '327': {'container': 'mp4',
+                'sort': [0, 256 * 0.9],
+                'title': 'aac-lc@256',
+                'dash/audio': True,
+                'audio': {'bitrate': 256, 'encoding': 'aac'}},
         '328': {'container': 'mp4',
-                'title': 'ec-3/itag 328',
+                'sort': [0, 384 * 1.2],
+                'title': 'ec-3@384',
                 'dash/audio': True,
-                'unsupported': True,
-                'audio': {'bitrate': 0, 'encoding': 'aac'}},
+                'audio': {'bitrate': 384, 'encoding': 'ec-3'}},
         '171': {'container': 'webm',
-                'sort': [128, 0],
+                'sort': [0, 128 * 0.75],
                 'title': 'vorbis@128',
                 'dash/audio': True,
                 'audio': {'bitrate': 128, 'encoding': 'vorbis'}},
         '172': {'container': 'webm',
-                'sort': [142, 0],
+                'sort': [0, 192 * 0.75],
                 'title': 'vorbis@192',
                 'dash/audio': True,
                 'audio': {'bitrate': 192, 'encoding': 'vorbis'}},
         '249': {'container': 'webm',
-                'sort': [50, 0],
+                'sort': [0, 50],
                 'title': 'opus@50',
                 'dash/audio': True,
                 'audio': {'bitrate': 50, 'encoding': 'opus'}},
         '250': {'container': 'webm',
-                'sort': [70, 0],
+                'sort': [0, 70],
                 'title': 'opus@70',
                 'dash/audio': True,
                 'audio': {'bitrate': 70, 'encoding': 'opus'}},
         '251': {'container': 'webm',
-                'sort': [141, 0],
+                'sort': [0, 160],
                 'title': 'opus@160',
                 'dash/audio': True,
                 'audio': {'bitrate': 160, 'encoding': 'opus'}},
+        '338': {'container': 'webm',
+                'sort': [0, 480],
+                'title': 'opus@480',
+                'dash/audio': True,
+                'audio': {'bitrate': 480, 'encoding': 'opus'}},
+        '380': {'container': 'mp4',
+                'sort': [0, 384 * 1.1],
+                'title': 'ac-3@384',
+                'dash/audio': True,
+                'audio': {'bitrate': 384, 'encoding': 'ac-3'}},
         # === DASH adaptive audio only
         '9997': {'container': 'mpd',
                  'sort': [-1, 0],
@@ -1263,7 +1287,7 @@ class VideoInfo(object):
                         stream_details['audio']['bitrate'] = bitrate
                     if not video_info:
                         stream_details['title'] = '{0}@{1}'.format(codec, bitrate)
-                    if audio_info['lang']:
+                    if audio_info['lang'] not in {'', 'und'}:
                         stream_details['title'] += ' Multi-language'
 
                 video_stream.update(stream_details)
@@ -1298,6 +1322,8 @@ class VideoInfo(object):
                           'headers': curl_headers,
                           'playback_stats': playback_stats}
                 stream.update(yt_format)
+                if 'audioTrack' in stream_map:
+                    stream['title'] = '{0} {1}'.format(stream['title'], stream_map['audioTrack']['displayName'])
                 stream_list.append(stream)
 
         # extract streams from map
@@ -1319,11 +1345,18 @@ class VideoInfo(object):
             self._context.log_debug('Failed to create directories: %s' % basepath)
             return None
 
+        qualities = self._context.get_settings().get_mpd_video_qualities()
+        if isinstance(qualities, str):
+            max_quality = None
+            selected_container = qualities
+            qualities = self._context.get_settings().get_mpd_video_qualities(list_all=True)
+        else:
+            max_quality = qualities[-2]
+            selected_container = None
+        qualities = list(enumerate(qualities))
+ 
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
-        mpd_quality = self._context.get_settings().get_mpd_quality()
-        quality_type = isinstance(mpd_quality, str) and mpd_quality or ''
-        quality_height = isinstance(mpd_quality, int) and mpd_quality or 0
-        hdr = self._context.get_settings().include_hdr() and {'vp9.2', 'av1'} & ia_capabilities
+        include_hdr = self._context.get_settings().include_hdr()
         limit_30fps = self._context.get_settings().mpd_30fps_limit()
 
         ipaddress = self._context.get_settings().httpd_listen()
@@ -1336,14 +1369,33 @@ class VideoInfo(object):
             60: 1001
         }
 
+        bitrate_bias_map = {
+            # video - order based on comparative compression ratio
+            'av01': 1,
+            'vp9': 0.75,
+            'vp8': 0.55,
+            'avc1': 0.5,
+            # audio - order based on preference
+            'vorbis': 0.75,
+            'mp4a': 0.9,
+            'opus': 1,
+            'ac-3': 1.1,
+            'ec-3': 1.2,
+            'dts': 1.3,
+        }
+
         data = {}
-        preferred_audio = ''
+        preferred_audio = {
+            'id': '',
+            'language_code': None,
+            'audio_type': 0,
+        }
         for stream_map in adaptive_fmts:
             mime_type = stream_map.get('mimeType')
             if not mime_type:
                 continue
 
-            itag = str(stream_map.get('itag', ''))
+            itag = stream_map.get('itag')
             if not itag:
                 continue
 
@@ -1362,52 +1414,97 @@ class VideoInfo(object):
                 continue
 
             mime_type, codecs = unquote(mime_type).split('; ')
-            codec = re.match(r'codecs="([a-z0-9]+)', codecs)
+            codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
             if codec:
                 codec = codec.group(1)
+                if codec.startswith('dts'):
+                    codec = 'dts'
             media_type, container = mime_type.split('/')
-            if ((quality_type and container != quality_type)
-                    or (mime_type == 'video/webm' and not {'vp9', 'vp9.2'} & ia_capabilities)
-                    or (mime_type == 'audio/webm' and not {'vorbis', 'opus'} & ia_capabilities)
-                    or (codec in {'av01', 'av1'} and 'av1' not in ia_capabilities)):
+            if ((selected_container and container != selected_container)
+                    or codec not in ia_capabilities):
                 continue
 
-            if 'audioTrack' in stream_map:
-                audio_track = stream_map['audioTrack']
-                language_code = audio_track.get('id', '')[0:2]
-                label = audio_track.get('displayName', '')
-                audio_type = 'main' if audio_track.get('audioIsDefault') else 'dub'
-                height = None
-                width = None
-                key = '{0}_{1}'.format(mime_type, language_code)
-                if language_code == self._language_base:
-                    preferred_audio = '_'+language_code
-            elif media_type == 'audio':
-                language_code = ''
-                label = ''
-                audio_type = 'main'
-                height = None
-                width = None
-                key = mime_type
+            if media_type == 'audio':
+                if 'audioTrack' in stream_map:
+                    audio_track = stream_map['audioTrack']
+                    language = audio_track.get('id', '')
+                    if '.' in language:
+                        language_code, audio_type = language.split('.')
+                        audio_type = int(audio_type)
+                    else:
+                        language_code = language or 'und'
+                        audio_type = 4
+                    if audio_type == 4 or audio_track.get('audioIsDefault'):
+                        role = 'main'
+                        label = 'Original'
+                    elif audio_type == 3:
+                        role = 'dub'
+                        label = 'Dubbed'
+                    elif audio_type == 2:
+                        role = 'description'
+                        label = 'Descriptive'
+                    # Unsure of what other audio types are actually available
+                    # Role set to "alternate" as default fallback
+                    else:
+                        role = 'alternate'
+                        label = 'Alternate'
+                    label = '{0} - {1:.0f} kbps'.format(label,
+                                                        stream_map.get('averageBitrate', 0) / 1000)
+                    key = '{0}_{1}'.format(mime_type, language)
+                    if (language_code == self._language_base and (
+                            not preferred_audio['id']
+                            or role == 'main'
+                            or audio_type > preferred_audio['audio_type']
+                        )):
+                        preferred_audio = {
+                            'id': '_'+language,
+                            'language_code': language_code,
+                            'audio_type': audio_type,
+                        }
+                else:
+                    language_code = 'und'
+                    role = 'main'
+                    label = 'Original - {0:.0f} kbps'.format(stream_map.get('averageBitrate', 0) / 1000)
+                    key = mime_type
+                sample_rate = int(stream_map.get('audioSampleRate', '0'), 10)
+                channels = stream_map.get('audioChannels', 2)
+                height = width = fps = frame_rate = hdr = None
             else:
+                # Could use "zxx" language code for Non-Linguistic, Not Applicable
+                # but that is too verbose
                 language_code = ''
-                label = stream_map.get('qualityLabel', '')
-                audio_type = None
                 height = stream_map.get('height')
                 width = stream_map.get('width')
+                if height > width:
+                    compare_width = height
+                    compare_height = width
+                else:
+                    compare_width = width
+                    compare_height = height
+                if max_quality and compare_width > max_quality['width']:
+                    continue
+                fps = stream_map.get('fps', 0)
+                if limit_30fps and fps > 30:
+                    continue
+                hdr = 'HDR' in stream_map.get('qualityLabel', '')
+                if hdr and not include_hdr:
+                    continue
+                # map frame rates to a more common representation to lessen the chance of double refresh changes
+                # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
+                if fps:
+                    frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
+                else:
+                    frame_rate = None
+                for idx, quality in qualities:
+                    if compare_width <= quality['width']:
+                        if compare_height < quality['height']:
+                            quality = qualities[idx - 1][1]
+                        break
+                label = quality['label'].format(fps if fps > 30 else '',
+                                                ' HDR' if hdr else '',
+                                                compare_height)
                 key = mime_type
-
-            # map frame rates to a more common representation to lessen the chance of double refresh changes
-            # sometimes 30 fps is 30 fps, more commonly it is 29.97 fps (same for all mapped frame rates)
-            fps = stream_map.get('fps', 0)
-            if fps:
-                frame_rate = '{0}/{1}'.format(fps * 1000, fps_scale_map.get(fps, 1000))
-            else:
-                frame_rate = None
-
-            if ((not hdr and 'HDR' in label) or (limit_30fps and fps > 30)
-                    or (height and 0 < quality_height < height)):
-                continue
+                role = sample_rate = channels = None
 
             if key not in data:
                 data[key] = {}
@@ -1415,6 +1512,9 @@ class VideoInfo(object):
             url = unquote(url)
             url = self._process_url_params(url)
             url = url.replace("&", "&amp;").replace('"', "&quot;").replace("<", "&lt;").replace(">", "&gt;")
+
+            bitrate = stream_map.get('bitrate', 0)
+            biased_bitrate = bitrate * bitrate_bias_map.get(codec, 1)
 
             data[key][itag] = {
                 'mimeType': mime_type,
@@ -1427,15 +1527,17 @@ class VideoInfo(object):
                 'width': width,
                 'height': height,
                 'label': label,
-                'bitrate': stream_map.get('bitrate', 0),
+                'bitrate': bitrate,
+                'biasedBitrate': biased_bitrate,
                 'fps': fps,
                 'frameRate': frame_rate,
+                'hdr': hdr,
                 'indexRange': '{start}-{end}'.format(**index_range),
                 'initRange': '{start}-{end}'.format(**init_range),
                 'lang': language_code,
-                'audioType': audio_type,
-                'sampleRate': int(stream_map.get('audioSampleRate', '0'), 10),
-                'channels': stream_map.get('audioChannels'),
+                'role': role,
+                'sampleRate': sample_rate,
+                'channels': channels,
             }
 
         if 'video/mp4' not in data and 'video/webm' not in data:
@@ -1448,14 +1550,12 @@ class VideoInfo(object):
             return (
                 stream['height'],
                 stream['fps'],
-                hdr and ('HDR' in stream['label']),
-                # Prefer lower bitrate for video streams
-                # Used to preference more advanced codecs
-                -stream['bitrate'],
+                stream['hdr'],
+                stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
                 stream['channels'],
                 stream['sampleRate'],
-                stream['bitrate'],
+                stream['biasedBitrate'],
             )
 
         data = {
@@ -1473,8 +1573,8 @@ class VideoInfo(object):
         else:
             stream_info['video'] = data['video/webm'][0]
 
-        mp4_audio = data.get('audio/mp4'+preferred_audio, [None])[0]
-        webm_audio = data.get('audio/webm'+preferred_audio, [None])[0]
+        mp4_audio = data.get('audio/mp4'+preferred_audio['id'], [None])[0]
+        webm_audio = data.get('audio/webm'+preferred_audio['id'], [None])[0]
         if _stream_sort(mp4_audio) > _stream_sort(webm_audio):
             stream_info['audio'] = mp4_audio
         else:
@@ -1492,21 +1592,24 @@ class VideoInfo(object):
         for streams in data.values():
             default = False
             original = False
+            impaired = False
+            label = ''
             main_stream = streams[0]
             media_type = main_stream['mediaType']
             if media_type == 'video':
-                # InputStream.Adaptive seems to mark any video AdaptationSet as default
-                # regardless of Role or default attribute
                 if stream_info[media_type] == main_stream:
                     default = True
-                    video_type = 'main'
+                    role = 'main'
                 else:
-                    video_type = 'alternate'
+                    role = 'alternate'
                 original = ''
             elif media_type == 'audio':
                 label = main_stream['label']
-                audio_type = main_stream['audioType']
-                original = audio_type == 'main'
+                role = main_stream['role']
+                if role == 'main':
+                    original = True
+                elif role == 'description':
+                    impaired = True
                 if stream_info[media_type] == main_stream:
                     default = True
                 # Use main audio stream with same container format as video stream
@@ -1521,8 +1624,16 @@ class VideoInfo(object):
                     ' id="', str(set_id), '"'
                     ' mimeType="', main_stream['mimeType'], '"'
                     ' lang="', main_stream['lang'], '"'
+                    # name attribute is ISA specific and does not exist in the MPD spec
+                    # Should be a child Label element instead
+                    ' name="', label, '"'
+                    # original, default and impaired are ISA specific attributes
                     ' original="', str(original).lower(), '"'
-                    ' default="', str(default).lower(), '">\n'
+                    ' default="', str(default).lower(), '"'
+                    ' impaired="', str(impaired).lower(), '">\n'
+                # AdaptationSet Label element not currently used by ISA
+                '\t\t\t<Label>', label, '</Label>\n'
+                '\t\t\t<Role schemeIdUri="urn:mpeg:dash:role:2011" value="', role, '"/>\n'
             ))
 
             if license_url:
@@ -1533,35 +1644,36 @@ class VideoInfo(object):
                     '\t\t\t</ContentProtection>\n'
                 ))
 
+            num_streams = len(streams)
             if media_type == 'audio':
-                # InputStream.Adaptive seems to mark any AdaptationSet with a Role as default
-                # regardless of what the role is. Omit Role as a workaround
-                # out_list.extend((
-                    # '\t\t\t<Label>', label, '</Label>\n',
-                    # '\t\t\t<Role schemeIdUri="urn:mpeg:dash:role:2011" value="', audio_type, '"/>\n'
-                # ))
                 out_list.extend(((
-                    '\t\t\t<Representation id="{id}" {codecs} bandwidth="{bitrate}" sampleRate="{sampleRate}" numChannels="{channels}">\n'
+                    '\t\t\t<Representation id="{id}" {codecs}'
+                        ' bandwidth="{bitrate}" sampleRate="{sampleRate}" numChannels="{channels}"'
+                        # quality and priority attributes not currently used by ISA
+                        ' qualityRanking="{quality}" selectionPriority="{priority}">\n'
                     '\t\t\t\t<AudioChannelConfiguration schemeIdUri="urn:mpeg:dash:23003:3:audio_channel_configuration:2011" value="{channels}"/>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
-                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
-                    '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
-                    '\t\t\t\t</SegmentBase>\n'
-                    '\t\t\t</Representation>\n'
-                ).format(**stream) for stream in streams))
-            elif media_type == 'video':
-                out_list.extend((
-                    '\t\t\t<Role schemeIdUri="urn:mpeg:dash:role:2011" value="', video_type, '"/>\n'
-                ))
-                out_list.extend(((
-                    '\t\t\t<Representation id="{id}" {codecs} startWithSAP="1" bandwidth="{bitrate}" width="{width}" height="{height}" frameRate="{frameRate}">\n'
+                    # Representation Label element not currently used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
                     '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
-                ).format(**stream) for stream in streams))
+                ).format(quality=(idx + 1), priority=(num_streams - idx), **stream) for idx, stream in enumerate(streams)))
+            elif media_type == 'video':
+                out_list.extend(((
+                    '\t\t\t<Representation id="{id}" {codecs} startWithSAP="1"'
+                        ' bandwidth="{bitrate}" width="{width}" height="{height}" frameRate="{frameRate}"'
+                        # quality and priority attributes not currently used by ISA
+                        ' qualityRanking="{quality}" selectionPriority="{priority}">\n'
+                    # Representation Label element not currently used by ISA
+                    '\t\t\t\t<Label>{label}</Label>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
+                    '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
+                    '\t\t\t\t</SegmentBase>\n'
+                    '\t\t\t</Representation>\n'
+                ).format(quality=(idx + 1), priority=(num_streams - idx), **stream) for idx, stream in enumerate(streams)))
 
             out_list.append('\t\t</AdaptationSet>\n')
             set_id += 1

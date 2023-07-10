@@ -268,25 +268,17 @@
                     <default>false</default>
                     <dependencies>
                         <dependency type="enable">
-                            <and>
-                                <condition operator="is" setting="kodion.mpd.videos">true</condition>
-                                <condition operator="!is" setting="kodion.mpd.quality.selection">8</condition>
-                            </and>
+                            <condition operator="is" setting="kodion.mpd.videos">true</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting help="" id="kodion.mpd.limit.30" label="30724" parent="kodion.mpd.hdr" type="boolean">
+                <setting help="" id="kodion.mpd.limit.30" label="30724" parent="kodion.mpd.quality.selection" type="boolean">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
                         <dependency type="enable">
-                            <and>
-                                <condition operator="is" setting="kodion.mpd.videos">true</condition>
-                                <condition operator="is" setting="kodion.mpd.hdr">false</condition>
-                                <condition operator="!is" setting="kodion.mpd.quality.selection">8</condition>
-                                <condition operator="!is" setting="kodion.mpd.quality.selection">9</condition>
-                            </and>
+                            <condition operator="is" setting="kodion.mpd.videos">true</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
