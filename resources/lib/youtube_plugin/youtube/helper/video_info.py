@@ -1336,8 +1336,13 @@ class VideoInfo(object):
 
                 result = self._request(
                     video_info_url, 'POST', **client,
-                    error_msg=('Failed to get player response for video_id:'
-                               ' {0}'.format(self.video_id)),
+                    error_msg=(
+                        'Player response failed for video_id: {0},'
+                        ' using {1} client ({2})'
+                        .format(self.video_id,
+                                client_name,
+                                'logged in' if auth_header else 'logged out')
+                    ),
                     raise_error=True
                 )
 
@@ -1404,10 +1409,12 @@ class VideoInfo(object):
                 reason = self._get_error_details(playability_status)
             raise YouTubeException(reason or 'UNKNOWN')
 
-        self._context.log_debug('Retrieved video info using: {0} ({1})'.format(
-            client['json']['context']['client']['clientName'],
-            'logged in' if auth_header else 'logged out'
-        ))
+        self._context.log_debug(
+            'Retrieved video info for video_id: {0}, using {1} client ({2})'
+            .format(self.video_id,
+                    client['json']['context']['client']['clientName'],
+                    'logged in' if auth_header else 'logged out')
+        )
         self._selected_client = client.copy()
 
         if 'Authorization' in client['headers']:
