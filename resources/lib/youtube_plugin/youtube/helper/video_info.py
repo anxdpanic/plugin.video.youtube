@@ -918,12 +918,12 @@ class VideoInfo(object):
 
     def _request(self, url, method='GET',
                  cookies=None, data=None, headers=None, json=None, params=None,
-                 error_msg=None, raise_error=False, **_):
+                 error_msg=None, raise_error=False, timeout=(3.05, 27), **_):
         try:
             result = requests.request(method, url,
                                       verify=self._verify,
                                       allow_redirects=True,
-                                      timeout=(3.05, 27),
+                                      timeout=timeout,
                                       cookies=cookies,
                                       data=data,
                                       headers=headers,
