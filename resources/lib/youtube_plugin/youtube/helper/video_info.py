@@ -987,20 +987,6 @@ class VideoInfo(object):
             return json_loads(found.group(1))
         return None
 
-    @staticmethod
-    def _get_player_response(html):
-        response = {}
-
-        found = re.search(
-            (r'ytInitialPlayerResponse\s*=\s*'
-             r'(?P<response>{.+?})\s*;\s*(?:var\s+meta|</script|\n)'),
-            html
-        )
-        if found:
-            response = json_loads(found.group('response'))
-
-        return response
-
     def _get_player_js(self):
         cached_url = self._data_cache.get_item(
             DataCache.ONE_HOUR * 4, 'player_js_url'
@@ -1325,6 +1311,7 @@ class VideoInfo(object):
         auth_header = bool(self._access_token)
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
+        _settings = self._context.get_settings()
         playability_status = status = reason = None
         for _ in range(2):
             for client_name in self._prioritised_clients:
@@ -1351,7 +1338,7 @@ class VideoInfo(object):
                               'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED',
                               'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
                     if (playability_status.get('desktopLegacyAgeGateReason')
-                            and self._context.get_settings().age_gate()):
+                            and _settings.age_gate()):
                         break
                     # Geo-blocked video with error reasons like:
                     # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
@@ -1483,7 +1470,7 @@ class VideoInfo(object):
             'subtitles': captions or [],
         }
 
-        if self._context.get_settings().use_remote_history():
+        if _settings.use_remote_history():
             playback_stats = {
                 'playback_url': (
                     'videostatsPlaybackUrl',
@@ -1509,8 +1496,8 @@ class VideoInfo(object):
                 'watchtime_url': '',
             }
 
-        httpd_is_live = (self._context.get_settings().use_mpd() and
-            is_httpd_live(port=self._context.get_settings().httpd_port()))
+        httpd_is_live = (_settings.use_mpd() and
+                         is_httpd_live(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not httpd_is_live:
@@ -1526,8 +1513,8 @@ class VideoInfo(object):
             license_info = {
                 'url': url,
                 'proxy': 'http://{0}:{1}/widevine||R{{SSM}}|'.format(
-                    self._context.get_settings().httpd_listen('127.0.0.1'),
-                    self._context.get_settings().httpd_port()
+                    _settings.httpd_listen('127.0.0.1'),
+                    _settings.httpd_port()
                 ),
                 'token': self._access_token,
             }
@@ -1550,7 +1537,7 @@ class VideoInfo(object):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         if is_live:
-            live_type = self._context.get_settings().get_live_stream_type()
+            live_type = _settings.get_live_stream_type()
             if live_type == 'ia_mpd':
                 manifest_url = streaming_data.get('dashManifestUrl', '')
             else:
@@ -1630,13 +1617,14 @@ class VideoInfo(object):
         return stream_list
 
     def _process_stream_data(self, stream_data, default_lang_code='und'):
-        qualities = self._context.get_settings().get_mpd_video_qualities()
+        _settings = self._context.get_settings()
+        qualities = _settings.get_mpd_video_qualities()
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
-        stream_features = self._context.get_settings().stream_features()
+        stream_features = _settings.stream_features()
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
         allow_ssa = 'ssa' in stream_features
-        stream_select = self._context.get_settings().stream_select()
+        stream_select = _settings.stream_select()
 
         fps_scale_map = {
             0: '{0}000/1000',  # --.00 fps
@@ -1741,7 +1729,7 @@ class VideoInfo(object):
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
-                        )):
+                    )):
                         preferred_audio = {
                             'id': '_{0}.{1}'.format(language_code, role_type),
                             'language_code': language_code,
@@ -1959,9 +1947,10 @@ class VideoInfo(object):
             )
             return skip_group
 
-        stream_features = self._context.get_settings().stream_features()
+        _settings = self._context.get_settings()
+        stream_features = _settings.stream_features()
         do_filter = 'filter' in stream_features
-        stream_select = self._context.get_settings().stream_select()
+        stream_select = _settings.stream_select()
 
         main_stream = {
             'video': video_data[0][1][0],
@@ -2146,7 +2135,7 @@ class VideoInfo(object):
         if not success:
             return None, None
         return 'http://{0}:{1}/{2}.mpd'.format(
-            self._context.get_settings().httpd_listen('127.0.0.1'),
-            self._context.get_settings().httpd_port(),
+            _settings.httpd_listen('127.0.0.1'),
+            _settings.httpd_port(),
             self.video_id
         ), main_stream
