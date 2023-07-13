@@ -912,7 +912,8 @@ class VideoInfo(object):
             del client['headers']['Authorization']
 
         for values, key, value in _format.values():
-            values[key] = value.format(**client)
+            if key in values:
+                values[key] = value.format(**client)
 
         return client
 
