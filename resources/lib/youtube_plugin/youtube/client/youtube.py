@@ -97,7 +97,7 @@ class YouTube(LoginClient):
 
     def get_video_streams(self, context, video_id):
         video_info = VideoInfo(context, access_token=self._access_token_tv,
-                               api_key=self._config_tv['key'], language=self._language)
+                               language=self._language)
 
         video_streams = video_info.load_stream_infos(video_id)
 
