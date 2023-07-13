@@ -985,20 +985,6 @@ class VideoInfo(object):
             return json_loads(found.group(1))
         return None
 
-    @staticmethod
-    def _get_player_response(html):
-        response = {}
-
-        found = re.search(
-            (r'ytInitialPlayerResponse\s*=\s*'
-             r'(?P<response>{.+?})\s*;\s*(?:var\s+meta|</script|\n)'),
-            html
-        )
-        if found:
-            response = json_loads(found.group('response'))
-
-        return response
-
     def _get_player_js(self):
         cached_url = self._data_cache.get_item(
             DataCache.ONE_HOUR * 4, 'player_js_url'
@@ -1323,6 +1309,7 @@ class VideoInfo(object):
         auth_header = bool(self._access_token)
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
+        _settings = self._context.get_settings()
         playability_status = status = reason = None
         for _ in range(2):
             for client_name in self._prioritised_clients:
@@ -1349,7 +1336,7 @@ class VideoInfo(object):
                               'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED',
                               'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
                     if (playability_status.get('desktopLegacyAgeGateReason')
-                            and self._context.get_settings().age_gate()):
+                            and _settings.age_gate()):
                         break
                     # Geo-blocked video with error reasons like:
                     # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
@@ -1503,7 +1490,7 @@ class VideoInfo(object):
         
         
 
-        if self._context.get_settings().use_remote_history():
+        if _settings.use_remote_history():
             playback_stats = {
                 'playback_url': (
                     'videostatsPlaybackUrl',
@@ -1529,8 +1516,8 @@ class VideoInfo(object):
                 'watchtime_url': '',
             }
 
-        httpd_is_live = (self._context.get_settings().use_mpd() and
-            is_httpd_live(port=self._context.get_settings().httpd_port()))
+        httpd_is_live = (_settings.use_mpd() and
+                         is_httpd_live(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not httpd_is_live:
@@ -1546,8 +1533,8 @@ class VideoInfo(object):
             license_info = {
                 'url': url,
                 'proxy': 'http://{0}:{1}/widevine||R{{SSM}}|'.format(
-                    self._context.get_settings().httpd_listen('127.0.0.1'),
-                    self._context.get_settings().httpd_port()
+                    _settings.httpd_listen('127.0.0.1'),
+                    _settings.httpd_port()
                 ),
                 'token': self._access_token,
             }
@@ -1570,7 +1557,7 @@ class VideoInfo(object):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         if is_live:
-            live_type = self._context.get_settings().get_live_stream_type()
+            live_type = _settings.get_live_stream_type()
             if live_type == 'ia_mpd':
                 manifest_url = streaming_data.get('dashManifestUrl', '')
             else:
@@ -1672,29 +1659,15 @@ class VideoInfo(object):
 
         return stream_list
 
-    def generate_mpd(self, adaptive_fmts, duration, license_url):
-        basepath = 'special://temp/plugin.video.youtube/'
-        if not make_dirs(basepath):
-            self._context.log_debug('Failed to create directories: %s' % basepath)
-            return None
-
-        qualities = self._context.get_settings().get_mpd_video_qualities()
-        if isinstance(qualities, str):
-            max_quality = None
-            selected_container = qualities
-            qualities = self._context.get_settings().get_mpd_video_qualities(list_all=True)
-        else:
-            max_quality = qualities[-2]
-            selected_container = None
-        qualities = list(enumerate(qualities))
- 
+    def _process_stream_data(self, stream_data, default_lang_code='und'):
+        _settings = self._context.get_settings()
+        qualities = _settings.get_mpd_video_qualities()
         ia_capabilities = self._context.inputstream_adaptive_capabilities()
-        include_hdr = self._context.get_settings().include_hdr()
-        limit_30fps = self._context.get_settings().mpd_30fps_limit()
-
-        ipaddress = self._context.get_settings().httpd_listen()
-        if ipaddress == '0.0.0.0':
-            ipaddress = '127.0.0.1'
+        stream_features = _settings.stream_features()
+        allow_hdr = 'hdr' in stream_features
+        allow_hfr = 'hfr' in stream_features
+        allow_ssa = 'ssa' in stream_features
+        stream_select = _settings.stream_select()
 
         fps_scale_map = {
             0: '{0}000/1000',  # --.00 fps
@@ -1798,7 +1771,7 @@ class VideoInfo(object):
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
-                        )):
+                    )):
                         preferred_audio = {
                             'id': '_{0}.{1}'.format(language_code, role_type),
                             'language_code': language_code,
@@ -2019,12 +1992,83 @@ class VideoInfo(object):
             )
             return key + _stream_sort(main_stream)
 
-        mp4_audio = data.get('audio/mp4'+preferred_audio['id'], [None])[0]
-        webm_audio = data.get('audio/webm'+preferred_audio['id'], [None])[0]
-        if _stream_sort(mp4_audio) > _stream_sort(webm_audio):
-            stream_info['audio'] = mp4_audio
-        else:
-            stream_info['audio'] = webm_audio
+        video_data = sorted((
+            (group, sorted(streams.values(), key=_stream_sort))
+            for group, streams in video_data.items()
+        ), key=_group_sort)
+
+        audio_data = sorted((
+            (group, sorted(streams.values(), key=_stream_sort))
+            for group, streams in audio_data.items()
+        ), key=_group_sort)
+
+        return video_data, audio_data
+
+    def _generate_mpd_manifest(self, video_data, audio_data, license_url):
+        if not video_data or not audio_data:
+            return None, None
+
+        basepath = 'special://temp/plugin.video.youtube/'
+        if not make_dirs(basepath):
+            self._context.log_debug('Failed to create temp directory: {0}'
+                                    .format(basepath))
+            return None, None
+
+        def _filter_group(previous_group, previous_stream, item):
+            skip_group = True
+            if not item:
+                return skip_group
+            if not previous_group or not previous_stream:
+                return not skip_group
+
+            new_group = item[0]
+            new_stream = item[1][0]
+
+            media_type = new_stream['mediaType']
+            if media_type != previous_stream['mediaType']:
+                return not skip_group
+
+            if previous_group.startswith(previous_stream['mimeType']):
+                if new_group.startswith(new_stream['container']):
+                    return not skip_group
+
+                skip_group = (
+                    new_stream['height'] <= previous_stream['height']
+                ) if media_type == 'video' else (
+                    new_stream['channels'] <= previous_stream['channels']
+                )
+            else:
+                if new_group.startswith(new_stream['mimeType']):
+                    return not skip_group
+
+                skip_group = (
+                    new_stream['height'] == previous_stream['height']
+                ) if media_type == 'video' else (
+                    2 == new_stream['channels'] == previous_stream['channels']
+                )
+
+            skip_group = (
+                skip_group
+                and new_stream['fps'] == previous_stream['fps']
+                and new_stream['hdr'] == previous_stream['hdr']
+            ) if media_type == 'video' else (
+                skip_group
+                and new_stream['langCode'] == previous_stream['langCode']
+                and new_stream['role'] == previous_stream['role']
+            )
+            return skip_group
+
+        _settings = self._context.get_settings()
+        stream_features = _settings.stream_features()
+        do_filter = 'filter' in stream_features
+        stream_select = _settings.stream_select()
+
+        main_stream = {
+            'video': video_data[0][1][0],
+            'audio': audio_data[0][1][0],
+            'multi_audio': False,
+            'multi_lang': False,
+        }
 
         out_list = [
             '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -2170,7 +2214,7 @@ class VideoInfo(object):
         except:
             return None, None
         return 'http://{0}:{1}/{2}.mpd'.format(
-            self._context.get_settings().httpd_listen('127.0.0.1'),
-            self._context.get_settings().httpd_port(),
+            _settings.httpd_listen('127.0.0.1'),
+            _settings.httpd_port(),
             self.video_id
         ), main_stream
