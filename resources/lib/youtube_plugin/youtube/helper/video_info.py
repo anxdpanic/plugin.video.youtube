@@ -804,7 +804,7 @@ class VideoInfo(object):
         },
     }
 
-    def __init__(self, context, access_token='', api_key='', language='en-US'):
+    def __init__(self, context, access_token='', language='en-US'):
         settings = context.get_settings()
 
         self.video_id = None
@@ -815,7 +815,6 @@ class VideoInfo(object):
                           .replace('-', '_'))
         self._language_base = self._language[0:2]
         self._access_token = access_token
-        self._api_key = api_key
         self._player_js = None
         self._calculate_n = True
         self._cipher = None
