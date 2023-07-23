@@ -126,9 +126,9 @@ class YouTube(LoginClient):
                                                 video_stream['audio']['bitrate'])
 
             elif 'audio' in video_stream or 'video' in video_stream:
-                encoding = video_stream.get('audio', dict()).get('encoding')
+                encoding = video_stream.get('audio', {}).get('encoding')
                 if not encoding:
-                    encoding = video_stream.get('video', dict()).get('encoding')
+                    encoding = video_stream.get('video', {}).get('encoding')
                 if encoding:
                     title = '%s (%s; %s)' % (context.get_ui().bold(video_stream['title']),
                                              video_stream['container'],
@@ -1047,42 +1047,36 @@ class YouTube(LoginClient):
     def perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
                            allow_redirects=True, no_login=False):
 
-        yt_config = self._config
-
-        if not yt_config.get('key'):
-            return {
-                'error':
-                    {
-                        'errors': [{'reason': 'accessNotConfigured'}],
-                        'message': 'No API keys provided'
-                    }
-            }
 
         # params
-        if not params:
-            params = {}
-        _params = {'key': yt_config['key']}
-        _params.update(params)
+        _params = {}
 
         # headers
-        if not headers:
-            headers = {}
         _headers = {'Host': 'www.googleapis.com',
                     'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
                     'Accept-Encoding': 'gzip, deflate'}
+
         # a config can decide if a token is allowed
-        if self._access_token and yt_config.get('token-allowed', True) and not no_login:
+        if self._access_token and self._config.get('token-allowed', True) and not no_login:
             _headers['Authorization'] = 'Bearer %s' % self._access_token
-        _headers.update(headers)
+        else:
+            _params['key'] = self._config_tv['key']
 
         # url
         _url = 'https://www.googleapis.com/youtube/v3/%s' % path.strip('/')
 
-        result = None
-        log_params = copy.deepcopy(params)
-        if 'location' in log_params:
-            log_params['location'] = 'xx.xxxx,xx.xxxx'
+        if headers:
+            _headers.update(headers)
+        if params:
+            _params.update(params)
+            log_params = copy.deepcopy(params)
+            if 'location' in log_params:
+                log_params['location'] = 'xx.xxxx,xx.xxxx'
+        else:
+            log_params = None
         _context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
+
+        result = None
         if method == 'GET':
             result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
         elif method == 'POST':
@@ -1114,12 +1108,11 @@ class YouTube(LoginClient):
         return {}
 
     def perform_v1_tv_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                              allow_redirects=True):
+                              allow_redirects=True, no_login=False):
+
         # params
         if not params:
             params = {}
-        _params = {'key': self._config_tv['key']}
-        _params.update(params)
 
         # headers
         if not headers:
@@ -1134,8 +1127,12 @@ class YouTube(LoginClient):
             'Accept-Language': 'en-US,en;q=0.5',
         }
 
-        if self._access_token_tv:
-            _headers['Authorization'] = 'Bearer %s' % self._access_token_tv
+        if self._access_token and self._config.get('token-allowed', True) and not no_login:
+            _headers['Authorization'] = 'Bearer %s' % self._access_token
+        else:
+            _params = {'key': self._config_tv['key']}
+
+        _params.update(params)
         _headers.update(headers)
 
         # url
@@ -1158,8 +1155,6 @@ class YouTube(LoginClient):
             result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
                                      allow_redirects=allow_redirects)
 
-        if result is None:
-            return {}
-
-        if result.headers.get('content-type', '').startswith('application/json'):
+        if result and result.headers.get('content-type', '').startswith('application/json'):
             return result.json()
+        return {}
