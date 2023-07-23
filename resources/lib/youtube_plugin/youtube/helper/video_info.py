@@ -1062,6 +1062,9 @@ class VideoInfo(object):
         return url
 
     def _load_hls_manifest(self, url, live_type=None, meta_info=None, headers=None, playback_stats=None):
+        if not url:
+            return []
+
         if not headers and self._selected_client:
             headers = self._selected_client['headers'].copy()
             if 'Authorization' in headers:
@@ -1543,7 +1546,7 @@ class VideoInfo(object):
             else:
                 manifest_url = None
                 stream_list.extend(self._load_hls_manifest(
-                    streaming_data.get('hlsManifestUrl', ''),
+                    streaming_data.get('hlsManifestUrl'),
                     live_type, meta_info, client['headers'], playback_stats
                 ))
         elif httpd_is_live and adaptive_fmts:
