@@ -1539,12 +1539,12 @@ class VideoInfo(object):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
+        manifest_url = None
         if is_live:
             live_type = _settings.get_live_stream_type()
             if live_type == 'ia_mpd':
                 manifest_url = streaming_data.get('dashManifestUrl', '')
             else:
-                manifest_url = None
                 stream_list.extend(self._load_hls_manifest(
                     streaming_data.get('hlsManifestUrl'),
                     live_type, meta_info, client['headers'], playback_stats
