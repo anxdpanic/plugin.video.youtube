@@ -1603,18 +1603,24 @@ class VideoInfo(object):
 
                 audio_info = main_stream['audio']
                 if audio_info:
-                    codec = audio_info.get('codec')
-                    bitrate = audio_info.get('bitrate', 0) // 1000
+                    details['audio']['encoding'] = audio_info['codec']
+                    details['audio']['bitrate'] = audio_info['bitrate'] // 1000
+                    if audio_info['langCode'] not in {'', 'und'}:
+                        details['title'].extend((' ', audio_info['langName']))
+                    if default_lang['is_asr']:
+                        details['title'].append(' [ASR]')
+                    if main_stream['multi_lang']:
+                        details['title'].extend((
+                            ' [', self._context.localize(30762), ']'
+                        ))
+                    if main_stream['multi_audio']:
+                        details['title'].extend((
+                            ' [', self._context.localize(30763), ']'
+                        ))
 
-                    if codec and bitrate:
-                        stream_details['audio']['encoding'] = codec
-                        stream_details['audio']['bitrate'] = bitrate
-                    if not video_info:
-                        stream_details['title'] = '{0}@{1}'.format(codec, bitrate)
-                    if audio_info['lang'] not in {'', 'und'}:
-                        stream_details['title'] += ' Multi-language'
+                details['title'] = ''.join(details['title'])
 
-                video_stream.update(stream_details)
+            video_stream.update(details)
             stream_list.append(video_stream)
 
         def parse_to_stream_list(streams):
@@ -1679,7 +1685,7 @@ class VideoInfo(object):
             60: '60000/1001',  # 59.97 fps
         }
 
-        bitrate_bias_map = {
+        quality_factor_map = {
             # video - order based on comparative compression ratio
             'av01': 1,
             'vp9': 0.75,
@@ -1734,6 +1740,7 @@ class VideoInfo(object):
                     or codec not in ia_capabilities):
                 continue
             media_type, container = mime_type.split('/')
+            bitrate = stream.get('bitrate', 0)
 
             if media_type == 'audio':
                 data = audio_data
@@ -1790,9 +1797,7 @@ class VideoInfo(object):
                 sample_rate = int(stream.get('audioSampleRate', '0'), 10)
                 height = width = fps = frame_rate = hdr = None
                 language = self._context.get_language_name(language_code)
-                label = '{0} ({1:.0f} kbps)'.format(
-                    label, stream.get('averageBitrate', 0) / 1000
-                )
+                label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
                 if channels > 2 or 'auto' not in stream_select:
                     quality_group = '{0}_{1}_{2}.{3}'.format(
                         container, codec, language_code, role_type
@@ -1935,10 +1940,7 @@ class VideoInfo(object):
                    .replace("<", "&lt;")
                    .replace(">", "&gt;"))
 
-            bitrate = stream_map.get('bitrate', 0)
-            biased_bitrate = bitrate * bitrate_bias_map.get(codec, 1)
-
-            data[key][itag] = {
+            data[mime_group][itag] = data[quality_group][itag] = {
                 'mimeType': mime_type,
                 'baseUrl': url,
                 'mediaType': media_type,
@@ -1950,7 +1952,9 @@ class VideoInfo(object):
                 'height': height,
                 'label': label,
                 'bitrate': bitrate,
-                'biasedBitrate': biased_bitrate,
+                'biasedBitrate': bitrate * quality_factor_map.get(codec, 1),
+                # integer round up
+                'duration': -(-int(stream.get('approxDurationMs', 0)) // 1000),
                 'fps': fps,
                 'frameRate': frame_rate,
                 'hdr': hdr,
@@ -2080,7 +2084,7 @@ class VideoInfo(object):
                 ' xmlns:xlink="http://www.w3.org/1999/xlink"'
                 ' xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"'
                 ' minBufferTime="PT1.5S"'
-                ' mediaPresentationDuration="PT', str(main_stream['video']['durationS']), 'S"'
+                ' mediaPresentationDuration="PT', str(main_stream['video']['duration']), 'S"'
                 ' type="static"'
                 ' profiles="urn:mpeg:dash:profile:isoff-main:2011"'
                 '>\n'
