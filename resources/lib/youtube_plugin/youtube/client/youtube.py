@@ -18,6 +18,7 @@ import xml.etree.ElementTree as ET
 import requests
 
 from .login_client import LoginClient
+from ..youtube_exceptions import YouTubeException
 from ..helper.video_info import VideoInfo
 from ...kodion import Context
 from ...kodion.utils import datetime_parser
@@ -1044,9 +1045,33 @@ class YouTube(LoginClient):
 
         return result
 
-    def perform_v3_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                           allow_redirects=True, no_login=False):
+    def _request(self, url, method='GET',
+                 cookies=None, data=None, headers=None, json=None, params=None,
+                 error_msg=None, raise_error=False, timeout=(3.05, 27), **_):
+        try:
+            result = requests.request(method, url,
+                                      verify=self._verify,
+                                      allow_redirects=True,
+                                      timeout=timeout,
+                                      cookies=cookies,
+                                      data=data,
+                                      headers=headers,
+                                      json=json,
+                                      params=params)
+            result.raise_for_status()
+        except requests.exceptions.RequestException as error:
+            response = error.response and error.response.text
+            _context.log_debug('Response: {0}'.format(response))
+            _context.log_error('{0}\n{1}'.format(
+                error_msg or 'Request failed', traceback.format_exc()
+            ))
+            if raise_error:
+                raise YouTubeException(error_msg) from error
+            return None
+        return result
 
+    def perform_v3_request(self, method='GET', headers=None, path=None,
+                           post_data=None, params=None, no_login=False):
 
         # params
         _params = {}
@@ -1076,25 +1101,11 @@ class YouTube(LoginClient):
             log_params = None
         _context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
 
-        result = None
-        if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
-        elif method == 'POST':
-            _headers['content-type'] = 'application/json'
-            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                   allow_redirects=allow_redirects)
-        elif method == 'PUT':
-            _headers['content-type'] = 'application/json'
-            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                  allow_redirects=allow_redirects)
-        elif method == 'DELETE':
-            result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
-                                     allow_redirects=allow_redirects)
-
-        _context.log_debug('[data] v3 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
-
+        result = self._request(_url, method=method, headers=_headers, json=post_data, params=_params)
         if result is None:
             return {}
+
+        _context.log_debug('[data] v3 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
 
         if result.headers.get('content-type', '').startswith('application/json'):
             try:
@@ -1104,19 +1115,15 @@ class YouTube(LoginClient):
                     'status_code': result.status_code,
                     'payload': result.text
                 }
-
         return {}
 
-    def perform_v1_tv_request(self, method='GET', headers=None, path=None, post_data=None, params=None,
-                              allow_redirects=True, no_login=False):
+    def perform_v1_tv_request(self, method='GET', headers=None, path=None,
+                              post_data=None, params=None, no_login=False):
 
         # params
-        if not params:
-            params = {}
+        _params = {}
 
         # headers
-        if not headers:
-            headers = {}
         _headers = {
             'User-Agent': ('Mozilla/5.0 (Linux; Android 7.0; SM-G892A Build/NRD90M;'
                            ' wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0'
@@ -1132,29 +1139,32 @@ class YouTube(LoginClient):
         else:
             _params = {'key': self._config_tv['key']}
 
-        _params.update(params)
-        _headers.update(headers)
-
         # url
         _url = 'https://www.googleapis.com/youtubei/v1/%s' % path.strip('/')
 
-        result = None
+        if headers:
+            _headers.update(headers)
+        if params:
+            _params.update(params)
+            log_params = copy.deepcopy(params)
+            if 'location' in log_params:
+                log_params['location'] = 'xx.xxxx,xx.xxxx'
+        else:
+            log_params = None
+        _context.log_debug('[data] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
 
-        _context.log_debug('[i] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, params, post_data))
-        if method == 'GET':
-            result = requests.get(_url, params=_params, headers=_headers, verify=self._verify, allow_redirects=allow_redirects)
-        elif method == 'POST':
-            _headers['content-type'] = 'application/json'
-            result = requests.post(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                   allow_redirects=allow_redirects)
-        elif method == 'PUT':
-            _headers['content-type'] = 'application/json'
-            result = requests.put(_url, json=post_data, params=_params, headers=_headers, verify=self._verify,
-                                  allow_redirects=allow_redirects)
-        elif method == 'DELETE':
-            result = requests.delete(_url, params=_params, headers=_headers, verify=self._verify,
-                                     allow_redirects=allow_redirects)
+        result = self._request(_url, method=method, headers=_headers, json=post_data, params=_params)
+        if result is None:
+            return {}
 
-        if result and result.headers.get('content-type', '').startswith('application/json'):
-            return result.json()
+        _context.log_debug('[data] v1 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
+
+        if result.headers.get('content-type', '').startswith('application/json'):
+            try:
+                return result.json()
+            except ValueError:
+                return {
+                    'status_code': result.status_code,
+                    'payload': result.text
+                }
         return {}
