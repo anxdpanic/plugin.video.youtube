@@ -831,7 +831,7 @@ class YouTube(LoginClient):
 
                 def fetch_xml(_url, _responses):
                     try:
-                        _response = session.get(_url, {}, headers=headers, verify=self._verify, allow_redirects=True)
+                        _response = session.get(_url, timeout=(3.05, 27))
                         _response.raise_for_status()
                     except requests.exceptions.RequestException as error:
                         _context.log_debug('Response: {0}'.format(error.response and error.response.text))
