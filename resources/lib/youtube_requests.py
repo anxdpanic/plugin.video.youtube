@@ -39,7 +39,7 @@ def handle_error(context, json_data):
     return True
 
 
-def v3_request(method='GET', headers=None, path=None, post_data=None, params=None, allow_redirects=True, addon_id=None):
+def v3_request(method='GET', headers=None, path=None, post_data=None, params=None, addon_id=None):
     """
         https://developers.google.com/youtube/v3/docs/
         :param method:
@@ -47,12 +47,11 @@ def v3_request(method='GET', headers=None, path=None, post_data=None, params=Non
         :param path:
         :param post_data:
         :param params:
-        :param allow_redirects:
         :param addon_id: addon id associated with developer keys to use for requests
         :type addon_id: str
     """
     provider, context, client = __get_core_components(addon_id)
-    return client.perform_v3_request(method=method, headers=headers, path=path, post_data=post_data, params=params, allow_redirects=allow_redirects)
+    return client.perform_v3_request(method=method, headers=headers, path=path, post_data=post_data, params=params)
 
 
 def _append_missing_page_token(items):
