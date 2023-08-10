@@ -1516,7 +1516,7 @@ class VideoInfo(object):
             license_info = {
                 'url': url,
                 'proxy': 'http://{0}:{1}/widevine||R{{SSM}}|'.format(
-                    _settings.httpd_listen('127.0.0.1'),
+                    _settings.httpd_listen(for_request=True),
                     _settings.httpd_port()
                 ),
                 'token': self._access_token,
@@ -2130,7 +2130,7 @@ class VideoInfo(object):
         if not success:
             return None, None
         return 'http://{0}:{1}/{2}.mpd'.format(
-            _settings.httpd_listen('127.0.0.1'),
+            _settings.httpd_listen(for_request=True),
             _settings.httpd_port(),
             self.video_id
         ), main_stream
