@@ -597,6 +597,7 @@ class VideoInfo(object):
             'params': {
                 'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             },
+            'query_subtitles': True,
         },
         'android': {
             '_id': 3,
@@ -739,6 +740,22 @@ class VideoInfo(object):
             'params': {
                 'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
             },
+            'query_subtitles': True,
+        },
+        # Used to requests captions for clients that don't provide them 
+        # Requires handling of nsig to overcome throttling (TODO)
+        'smarttv_embedded': {
+            'id': 85,
+            'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+            'details': {
+                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'clientVersion': '2.0',
+                'clientScreen': 'EMBED',
+            },
+            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
+            'headers': {
+                'User-Agent': 'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5) AppleWebKit/537.36 (KHTML, like Gecko) 85.0.4183.93/6.5 TV Safari/537.36',
+            },
         },
         # Used for misc api requests by default
         # Requires handling of nsig to overcome throttling (TODO)
@@ -820,47 +837,41 @@ class VideoInfo(object):
         self._selected_client = None
         client_selection = settings.client_selection()
 
-        # All client selections use the Android client as the first option to
-        # ensure that the age gate setting is enforced, regardless of login
-        # status
-
         # Alternate #1
-        # Will play most videos with subtitles at full resolution with HDR
-        # Some restricted videos may only play at 720p
-        # Some restricted videos require additional requests for subtitles
+        # Will play almost all videos with available subtitles at full resolution with HDR
+        # Some very small minority of videos may only play at 720p
         if client_selection == 1:
-            self._prioritised_clients = (
-                'android',
-                'android_embedded',
-                'android_youtube_tv',
-                'android_testsuite',
+            client_selection = (
+                self.CLIENTS['android_embedded'],
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
             )
         # Alternate #2
         # Will play most videos at full resolution with HDR
         # Most videos wont show subtitles
         # Useful for testing AV1 HDR
         elif client_selection == 2:
-            self._prioritised_clients = (
-                'android',
-                'android_testsuite',
-                'android_youtube_tv',
-                'android_embedded',
+            client_selection = (
+                self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_embedded'],
             )
         # Default
-        # Will play most videos with subtitles at full resolution with HDR
-        # Some restricted videos require additional requests for subtitles
+        # Will play almost all videos with available subtitles at full resolution with HDR
+        # Some very small minority of videos require additional requests to fetch subtitles
         else:
-            self._prioritised_clients = (
-                'android',
-                'android_youtube_tv',
-                'android_testsuite',
-                'android_embedded',
+            client_selection = (
+                self.CLIENTS['android_youtube_tv'],
+                self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android_embedded'],
             )
 
-        self.CLIENTS['_common']['json']['context']['client'] = {
-            'hl': self._language,
-            'gl': settings.get_string('youtube.region', 'US'),
-        }
+        # All client selections use the Android client as the first option to
+        # ensure that the age gate setting is enforced, regardless of login status
+        self._prioritised_clients = (self.CLIENTS['android'], ) + client_selection
+
+        self.CLIENTS['_common']['hl'] = self._language
+        self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
 
     @staticmethod
     def _generate_cpn():
@@ -1265,29 +1276,27 @@ class VideoInfo(object):
                            parts.fragment))
 
     @staticmethod
-    def _get_error_details(playability_status, details=None):
-        if not playability_status:
-            return None
-        if not details:
-            details = (
-                'errorScreen',
-                ('playerErrorMessageRenderer', 'confirmDialogRenderer'),
-                ('reason', 'title')
-            )
-
+    def _get_error_details(playability_status,
+                           details=('errorScreen',
+                                    ('playerErrorMessageRenderer', 'confirmDialogRenderer'),
+                                    ('reason', 'title'))):
         result = playability_status
         for keys in details:
-            is_dict = isinstance(result, dict)
-            if not is_dict and not isinstance(result, list):
+            if isinstance(result, dict):
+                is_dict = True
+                is_list = False
+            elif isinstance(result, list):
+                is_dict = False
+                is_list = True
+            else:
                 return None
 
             if not isinstance(keys, (list, tuple)):
                 keys = [keys]
             for key in keys:
-                if is_dict:
-                    if key not in result:
-                        continue
-                elif not isinstance(key, int) or len(result) <= key:
+                if is_dict and key not in result:
+                    continue
+                if is_list and (not isinstance(key, int) or len(result) <= key):
                     continue
                 result = result[key]
                 break
@@ -1330,21 +1339,40 @@ class VideoInfo(object):
                     raise_error=True
                 )
 
-                response = result.json()
-                playability_status = response.get('playabilityStatus', {})
-                status = playability_status.get('status', '').upper()
-                reason = playability_status.get('reason', '')
+                headers = (client.get('headers') or self.CLIENTS['web']['headers']).copy()
+                for name, value in headers.items():
+                    headers[name] = value.format(**client)
+                if auth_header:
+                    headers['Authorization'] = auth_header
+                    params = None
+                else:
+                    params = {'key': client['api_key'] or self._api_key}
+                headers.update(self.CLIENTS['_headers'])
 
-                if status in {'', 'AGE_CHECK_REQUIRED', 'UNPLAYABLE',
-                              'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED',
-                              'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
+                try:
+                    result = requests.post(video_info_url, params=params, json=payload,
+                                      headers=headers, verify=self._verify, cookies=None,
+                                      allow_redirects=True)
+                    result.raise_for_status()
+                except requests.exceptions.RequestException as error:
+                    self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
+                    error_message = 'Failed to get player response for video_id "{0}"'.format(self.video_id)
+                    self._context.log_error(error_message + '\n' + traceback.format_exc())
+                    raise YouTubeException(error_message) from error
+
+                player_response = result.json()
+                playability_status = player_response.get('playabilityStatus', {})
+                status = playability_status.get('status', '').upper()
+
+                if status in {'', 'AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED',
+                              'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
                     if (playability_status.get('desktopLegacyAgeGateReason')
-                            and _settings.age_gate()):
+                            and self._context.get_settings().age_gate()):
                         break
                     # Geo-blocked video with error reasons like:
                     # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
                     # "The uploader has not made this video available in your country"
-                    if status == 'UNPLAYABLE' and 'country' in reason:
+                    if status == 'UNPLAYABLE' and 'country' in playability_status.get('reason', ''):
                         break
                     if status != 'ERROR':
                         continue
@@ -1352,18 +1380,11 @@ class VideoInfo(object):
                     # "The following content is not available on this app."
                     # Text will vary depending on Accept-Language and client hl
                     # Youtube support url is checked instead
-                    url = self._get_error_details(
-                        playability_status,
-                        details=(
-                            'errorScreen',
-                            'playerErrorMessageRenderer',
-                            'learnMore',
-                            'runs', 0,
-                            'navigationEndpoint',
-                            'urlEndpoint',
-                            'url'
-                        )
-                    )
+                    url = self._get_error_details(playability_status,
+                                                  details=('errorScreen', 'playerErrorMessageRenderer',
+                                                           'learnMore', 'runs', 0,
+                                                           'navigationEndpoint',
+                                                           'urlEndpoint', 'url'))
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
                 break
@@ -1375,6 +1396,22 @@ class VideoInfo(object):
                     continue
             # Otherwise skip retrying clients without Authorization header
             break
+
+        if status != 'OK':
+            reason = playability_status.get('reason')
+            if status == 'LIVE_STREAM_OFFLINE':
+                if not reason:
+                    reason = self._get_error_details(playability_status, details=(
+                        'liveStreamability', 'liveStreamabilityRenderer', 'offlineSlate',
+                        'liveStreamOfflineSlateRenderer', 'mainText'))
+            elif not reason:
+                reason = self._get_error_details(playability_status) or 'UNKNOWN'
+            raise YouTubeException(reason)
+
+        self._context.log_debug('Requested video info with client: {0} (logged {1})'.format(
+            client['details']['clientName'], 'in' if auth_header else 'out'))
+        self._selected_client = client.copy()
+        self._selected_client['headers'] = headers.copy()
 
         if status != 'OK':
             if status == 'LIVE_STREAM_OFFLINE':
@@ -1415,26 +1452,84 @@ class VideoInfo(object):
         streaming_data = response.get('streamingData', {})
         is_live = '_live' if video_details.get('isLiveContent') else ''
 
-        captions = response.get('captions')
-        if captions:
-            captions['headers'] = client['headers']
-        elif client.get('_query_subtitles'):
-            result = self._request(
-                video_info_url, 'POST', **self._build_client('smarttv', True),
-                error_msg=('Caption request failed to get player response for'
-                           'video_id: {0}'.format(self.video_id)),
-            )
+        meta_info = {'video': {},
+                     'channel': {},
+                     'images': {},
+                     'subtitles': []}
 
-            response = result.json()
-            captions = response.get('captions')
-            if captions:
-                captions['headers'] = result.request.headers
+        meta_info['video']['id'] = video_details.get('videoId', self.video_id)
+
+        meta_info['video']['title'] = video_details.get('title', '')
+        meta_info['channel']['author'] = video_details.get('author', '')
+        
+        
+        if PY2:
+            try:
+                if r'\u' not in meta_info['video']['title']:
+                    meta_info['video']['title'] = meta_info['video']['title'].decode('utf-8')
+                    meta_info['channel']['author'] = meta_info['channel']['author'].decode('utf-8')
+                else:
+                    meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape').decode('raw_unicode_escape')
+                    meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape').decode('raw_unicode_escape')
+            except UnicodeDecodeError:
+                meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
+                meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
+                
+        else:
+            meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape').decode('raw_unicode_escape')
+            meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape').decode('raw_unicode_escape')
+
+        meta_info['video']['title'] = unescape(meta_info['video']['title'])
+        meta_info['channel']['author'] = unescape(meta_info['channel']['author'])
+
+
+        meta_info['channel']['id'] = video_details.get('channelId', '')
+        image_data_list = [
+            {'from': 'iurlhq', 'to': 'high', 'image': 'hqdefault.jpg'},
+            {'from': 'iurlmq', 'to': 'medium', 'image': 'mqdefault.jpg'},
+            {'from': 'iurlsd', 'to': 'standard', 'image': 'sddefault.jpg'},
+            {'from': 'thumbnail_url', 'to': 'default', 'image': 'default.jpg'}]
+        for image_data in image_data_list:
+            image_url = 'https://i.ytimg.com/vi/{0}/{1}'.format(self.video_id, image_data['image'])
+            if image_url:
+                if is_live:
+                    image_url = image_url.replace('.jpg', '_live.jpg')
+                meta_info['images'][image_data['to']] = image_url
+
+        microformat = player_response.get('microformat', {}).get('playerMicroformatRenderer', {})
+        meta_info['video']['status'] = {
+            'unlisted': microformat.get('isUnlisted', False),
+            'private': video_details.get('isPrivate', False),
+            'crawlable': video_details.get('isCrawlable', False),
+            'family_safe': microformat.get('isFamilySafe', False),
+            'live': is_live,
+        }
+
+        if self._selected_client.get('query_subtitles'):
+            client = self.CLIENTS['smarttv_embedded']
+            payload['context']['client'] = client['details']
+            headers = client['headers'].copy()
+            headers.update(self.CLIENTS['_headers'])
+            params = {'key': client['api_key']}
+
+            try:
+                result = requests.post(video_info_url, params=params, json=payload,
+                                  headers=headers, verify=self._verify, cookies=None,
+                                  allow_redirects=True)
+                result.raise_for_status()
+            except requests.exceptions.RequestException as error:
+                self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
+                error_message = 'Caption request failed. Failed to get player response for video_id "{0}"'.format(self.video_id)
+                self._context.log_error(error_message + '\n' + traceback.format_exc())
+                captions = None
+            else:
+                captions = result.json().get('captions')
+        else:
+            captions = player_response.get('captions')
+
         if captions:
-            captions = Subtitles(
-                self._context, self.video_id, captions
-            )
-            default_lang = captions.get_default_lang()
-            captions = captions.get_subtitles()
+            meta_info['subtitles'] = Subtitles(self._context, headers,
+                                               self.video_id, captions).get_subtitles()
         else:
             default_lang = {'code': 'und', 'is_asr': False}
 
@@ -1480,8 +1575,8 @@ class VideoInfo(object):
                     meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
                     meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
             except UnicodeDecodeError:
-                meta_info['video']['title'] = meta_info['video']['title'].decode('raw_unicode_escape')
-                meta_info['channel']['author'] = meta_info['channel']['author'].decode('raw_unicode_escape')
+                meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape').decode('raw_unicode_escape')
+                meta_info['channel']['author'] = meta_info['channel']['author'].encode('raw_unicode_escape').decode('raw_unicode_escape')
                 
         else:
             meta_info['video']['title'] = meta_info['video']['title'].encode('raw_unicode_escape').decode('raw_unicode_escape')
@@ -1559,23 +1654,10 @@ class VideoInfo(object):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        manifest_url = None
-        if is_live:
-            live_type = _settings.get_live_stream_type()
-            if live_type == 'ia_mpd':
-                manifest_url = streaming_data.get('dashManifestUrl', '')
-            else:
-                stream_list.extend(self._load_hls_manifest(
-                    streaming_data.get('hlsManifestUrl'),
-                    live_type, meta_info, client['headers'], playback_stats
-                ))
-        elif httpd_is_live and adaptive_fmts:
-            video_data, audio_data = self._process_stream_data(
-                adaptive_fmts, default_lang['code']
-            )
-            manifest_url, main_stream = self._generate_mpd_manifest(
-                video_data, audio_data, license_info.get('url')
-            )
+        if not is_live and httpd_is_live and adaptive_fmts:
+            mpd_url, s_info = self.generate_mpd(adaptive_fmts,
+                                                video_details.get('lengthSeconds', '0'),
+                                                license_info.get('url'))
 
         if manifest_url:
             video_stream = {
