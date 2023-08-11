@@ -1,6 +1,7 @@
 # Based on https://github.com/im85288/service.upnext/blob/master/.github/workflows/release.yml
 name: Make Release
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
