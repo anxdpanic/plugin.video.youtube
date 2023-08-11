@@ -569,6 +569,7 @@ class VideoInfo(object):
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
+            'query_subtitles': True,
         },
         'android': {
             'id': 3,
@@ -586,7 +587,6 @@ class VideoInfo(object):
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
             },
-            'disableDash': False,
         },
         # Only for videos that allow embedding
         # Limited to 720p on some videos
@@ -626,6 +626,22 @@ class VideoInfo(object):
                 'User-Agent': 'com.google.android.apps.youtube.unplugged/{details[clientVersion]} (Linux; U; Android {details[osVersion]}; US) gzip',
                 'X-YouTube-Client-Name': '{id}',
                 'X-YouTube-Client-Version': '{details[clientVersion]}',
+            },
+            'query_subtitles': True,
+        },
+        # Used to requests captions for clients that don't provide them 
+        # Requires handling of nsig to overcome throttling (TODO)
+        'smarttv_embedded': {
+            'id': 85,
+            'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+            'details': {
+                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                'clientVersion': '2.0',
+                'clientScreen': 'EMBED',
+            },
+            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
+            'headers': {
+                'User-Agent': 'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5) AppleWebKit/537.36 (KHTML, like Gecko) 85.0.4183.93/6.5 TV Safari/537.36',
             },
         },
         # Used for misc api requests by default
@@ -675,37 +691,39 @@ class VideoInfo(object):
 
         self._selected_client = None
         client_selection = settings.client_selection()
+
         # Alternate #1
         # Will play almost all videos with available subtitles at full resolution with HDR
-        # Some very small minority of videos won't show available subtitles
+        # Some very small minority of videos may only play at 720p
         if client_selection == 1:
-            self._prioritised_clients = (
-                self.CLIENTS['android'],
+            client_selection = (
+                self.CLIENTS['android_embedded'],
                 self.CLIENTS['android_youtube_tv'],
                 self.CLIENTS['android_testsuite'],
-                self.CLIENTS['android_embedded'],
             )
         # Alternate #2
         # Will play almost all videos at full resolution with HDR
         # Most videos wont show available subtitles
         # Useful for testing AV1 HDR
         elif client_selection == 2:
-            self._prioritised_clients = (
+            client_selection = (
                 self.CLIENTS['android_testsuite'],
                 self.CLIENTS['android_youtube_tv'],
-                self.CLIENTS['android'],
                 self.CLIENTS['android_embedded'],
             )
         # Default
         # Will play almost all videos with available subtitles at full resolution with HDR
-        # Some very small minority of videos may only play at 720p
+        # Some very small minority of videos require additional requests to fetch subtitles
         else:
-            self._prioritised_clients = (
-                self.CLIENTS['android'],
-                self.CLIENTS['android_embedded'],
+            client_selection = (
                 self.CLIENTS['android_youtube_tv'],
                 self.CLIENTS['android_testsuite'],
+                self.CLIENTS['android_embedded'],
             )
+
+        # All client selections use the Android client as the first option to
+        # ensure that the age gate setting is enforced, regardless of login status
+        self._prioritised_clients = (self.CLIENTS['android'], ) + client_selection
 
         self.CLIENTS['_common']['hl'] = self._language
         self.CLIENTS['_common']['gl'] = settings.get_string('youtube.region', 'US')
@@ -965,35 +983,45 @@ class VideoInfo(object):
         return url
 
     @staticmethod
-    def _get_error_details(playability_status, details=None):
-        if ('errorScreen' not in playability_status
-                or 'playerErrorMessageRenderer' not in playability_status['errorScreen']):
-            return None
+    def _get_error_details(playability_status,
+                           details=('errorScreen',
+                                    ('playerErrorMessageRenderer', 'confirmDialogRenderer'),
+                                    ('reason', 'title'))):
+        result = playability_status
+        for keys in details:
+            if isinstance(result, dict):
+                is_dict = True
+                is_list = False
+            elif isinstance(result, list):
+                is_dict = False
+                is_list = True
+            else:
+                return None
 
-        status_renderer = playability_status['errorScreen']['playerErrorMessageRenderer']
-
-        if details:
-            result = status_renderer
-            for key in details:
-                if isinstance(result, dict) and key not in result:
-                    return None
-                if isinstance(result, list) and (not isinstance(key, int) or len(result) <= key):
-                    return None
+            if not isinstance(keys, (list, tuple)):
+                keys = [keys]
+            for key in keys:
+                if is_dict and key not in result:
+                    continue
+                if is_list and (not isinstance(key, int) or len(result) <= key):
+                    continue
                 result = result[key]
+                break
+            else:
+                return None
+
+        if 'runs' not in result:
             return result
 
-        status_reason = status_renderer.get('reason', {})
-        status_reason_runs = status_reason.get('runs', [{}])
-
-        status_reason_texts = [
+        detail_texts = [
             text['text']
-            for text in status_reason_runs
-            if 'text' in text and text['text']
+            for text in result['runs']
+            if text and 'text' in text and text['text']
         ]
-        if status_reason_texts:
-            return ''.join(status_reason_texts)
-        if 'simpleText' in status_reason:
-            return status_reason['simpleText']
+        if detail_texts:
+            return ''.join(detail_texts)
+        if 'simpleText' in result:
+            return result['simpleText']
         return None
 
     def _method_get_video_info(self):
@@ -1045,19 +1073,24 @@ class VideoInfo(object):
                                       allow_redirects=True)
                     result.raise_for_status()
                 except requests.exceptions.RequestException as error:
-                    self._context.log_debug(error.response.text)
+                    self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
                     error_message = 'Failed to get player response for video_id "{0}"'.format(self.video_id)
                     self._context.log_error(error_message + '\n' + traceback.format_exc())
                     raise YouTubeException(error_message) from error
 
                 player_response = result.json()
                 playability_status = player_response.get('playabilityStatus', {})
-                status = playability_status.get('status', 'OK')
+                status = playability_status.get('status', '').upper()
 
-                if status in ('AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED',
-                              'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'):
-                    if (status == 'UNPLAYABLE' and
-                            playability_status.get('reason', '') == 'The uploader has not made this video available in your country'):
+                if status in {'', 'AGE_CHECK_REQUIRED', 'UNPLAYABLE', 'CONTENT_CHECK_REQUIRED',
+                              'LOGIN_REQUIRED', 'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
+                    if (playability_status.get('desktopLegacyAgeGateReason')
+                            and self._context.get_settings().age_gate()):
+                        break
+                    # Geo-blocked video with error reasons like:
+                    # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
+                    # "The uploader has not made this video available in your country"
+                    if status == 'UNPLAYABLE' and 'country' in playability_status.get('reason', ''):
                         break
                     if status != 'ERROR':
                         continue
@@ -1065,9 +1098,10 @@ class VideoInfo(object):
                     # error occurs. Text will vary depending on Accept-Language and client hl so
                     # Youtube support url is checked instead
                     url = self._get_error_details(playability_status,
-                                                  details=['learnMore', 'runs', 0,
+                                                  details=('errorScreen', 'playerErrorMessageRenderer',
+                                                           'learnMore', 'runs', 0,
                                                            'navigationEndpoint',
-                                                           'urlEndpoint', 'url'])
+                                                           'urlEndpoint', 'url'))
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
                 break
@@ -1079,9 +1113,22 @@ class VideoInfo(object):
                     continue
             # Otherwise skip retrying clients without Authorization header
             break
+
+        if status != 'OK':
+            reason = playability_status.get('reason')
+            if status == 'LIVE_STREAM_OFFLINE':
+                if not reason:
+                    reason = self._get_error_details(playability_status, details=(
+                        'liveStreamability', 'liveStreamabilityRenderer', 'offlineSlate',
+                        'liveStreamOfflineSlateRenderer', 'mainText'))
+            elif not reason:
+                reason = self._get_error_details(playability_status) or 'UNKNOWN'
+            raise YouTubeException(reason)
+
         self._context.log_debug('Requested video info with client: {0} (logged {1})'.format(
             client['details']['clientName'], 'in' if auth_header else 'out'))
-        self._selected_client = client
+        self._selected_client = client.copy()
+        self._selected_client['headers'] = headers.copy()
 
         if 'Authorization' in headers:
             del headers['Authorization']
@@ -1139,37 +1186,29 @@ class VideoInfo(object):
             'live': is_live,
         }
 
-        if (playability_status.get('status', 'ok').lower() != 'ok'
-                and not ((playability_status.get('desktopLegacyAgeGateReason', 0) == 1)
-                and not self._context.get_settings().age_gate())):
-            reason = None
-            if playability_status.get('status') == 'LIVE_STREAM_OFFLINE':
-                if playability_status.get('reason'):
-                    reason = playability_status.get('reason')
-                else:
-                    live_streamability = playability_status.get('liveStreamability', {})
-                    live_streamability_renderer = live_streamability.get('liveStreamabilityRenderer', {})
-                    offline_slate = live_streamability_renderer.get('offlineSlate', {})
-                    live_stream_offline_slate_renderer = offline_slate.get('liveStreamOfflineSlateRenderer', {})
-                    renderer_main_text = live_stream_offline_slate_renderer.get('mainText', {})
-                    main_text_runs = renderer_main_text.get('runs', [{}])
-                    reason_text = []
-                    for text in main_text_runs:
-                        reason_text.append(text.get('text', ''))
-                    if reason_text:
-                        reason = ''.join(reason_text)
-            else:
-                reason = self._get_error_details(playability_status) or playability_status.get('reason')
-
-            if not reason:
-                reason = 'UNKNOWN'
-
-            raise YouTubeException(reason)
-
-        captions = player_response.get('captions')
-        if captions:
-            headers = self.CLIENTS['web']['headers'].copy()
+        if self._selected_client.get('query_subtitles'):
+            client = self.CLIENTS['smarttv_embedded']
+            payload['context']['client'] = client['details']
+            headers = client['headers'].copy()
             headers.update(self.CLIENTS['_headers'])
+            params = {'key': client['api_key']}
+
+            try:
+                result = requests.post(video_info_url, params=params, json=payload,
+                                  headers=headers, verify=self._verify, cookies=None,
+                                  allow_redirects=True)
+                result.raise_for_status()
+            except requests.exceptions.RequestException as error:
+                self._context.log_debug('Response: {0}'.format(error.response and error.response.text))
+                error_message = 'Caption request failed. Failed to get player response for video_id "{0}"'.format(self.video_id)
+                self._context.log_error(error_message + '\n' + traceback.format_exc())
+                captions = None
+            else:
+                captions = result.json().get('captions')
+        else:
+            captions = player_response.get('captions')
+
+        if captions:
             meta_info['subtitles'] = Subtitles(self._context, headers,
                                                self.video_id, captions).get_subtitles()
         else:
@@ -1241,7 +1280,7 @@ class VideoInfo(object):
             self._player_js = self.get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        if not is_live and httpd_is_live and adaptive_fmts and not client.get('disableDash'):
+        if not is_live and httpd_is_live and adaptive_fmts:
             mpd_url, s_info = self.generate_mpd(adaptive_fmts,
                                                 video_details.get('lengthSeconds', '0'),
                                                 license_info.get('url'))
