@@ -10,9 +10,10 @@ on:
 jobs:
   release:
     if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
-
     name: Make Release
     runs-on: ubuntu-20.04
+    permissions:
+      contents: write
 
     steps:
       - name: Release Status
@@ -39,11 +40,12 @@ jobs:
       - name: Get Changelog
         id: changelog
         run: |
-          changes=$(xmlstarlet sel -t -v '//news' -n addon.xml)
-          changes="${changes//'%'/'%25'}"
-          changes="${changes//$'\n'/'%0A'}"
-          changes="${changes//$'\r'/'%0D'}"
-          echo "changes=$changes" >> $GITHUB_OUTPUT
+          readarray -t changes < <(xmlstarlet sel -t -v '//news' -n addon.xml)
+          echo "body<<${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
+          for change in "${changes[@]}"; do
+              echo "${change}" >> $GITHUB_OUTPUT
+          done
+          echo "${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
       - name: Create Zip (Nexus)
@@ -125,7 +127,7 @@ jobs:
         with:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
-          body: ${{ steps.changelog.outputs.changes }}
+          body: ${{ steps.changelog.outputs.body }}
           draft: false
           prerelease: ${{ steps.release.outputs.pre-release }}
 
