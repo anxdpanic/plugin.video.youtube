@@ -10,6 +10,22 @@
 
 import xbmcgui
 
+try:
+    from infotagger.listitem import ListItemInfoTag
+except ImportError:
+    class ListItemInfoTag:
+        __slots__ = (__li__, )
+
+        def __init__(self, list_item):
+            self.__li__ = list_item
+
+        def add_stream_info(self, *args, **kwargs):
+            return self.__li__.addStreamInfo(*args, **kwargs)
+        
+        def set_info(self, *args, **kwargs):
+            return self.__li__.setInfo(*args, **kwargs)
+            
+
 from ...items import VideoItem, AudioItem, UriItem
 from ... import utils
 from . import info_labels
