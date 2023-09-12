@@ -599,7 +599,6 @@ class VideoInfo(object):
             'params': {
                 'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
             },
-            'query_subtitles': True,
         },
         'android': {
             '_id': 3,
@@ -741,22 +740,6 @@ class VideoInfo(object):
             },
             'params': {
                 'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
-            'query_subtitles': True,
-        },
-        # Used to requests captions for clients that don't provide them 
-        # Requires handling of nsig to overcome throttling (TODO)
-        'smarttv_embedded': {
-            'id': 85,
-            'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            'details': {
-                'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                'clientVersion': '2.0',
-                'clientScreen': 'EMBED',
-            },
-            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
-            'headers': {
-                'User-Agent': 'Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5) AppleWebKit/537.36 (KHTML, like Gecko) 85.0.4183.93/6.5 TV Safari/537.36',
             },
         },
         # Used for misc api requests by default
