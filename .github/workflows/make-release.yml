@@ -78,6 +78,45 @@ jobs:
           echo "filename=$filename" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
+      - name: Create Zip (Matrix)
+        id: zip-matrix
+        run: |
+          git reset
+          git checkout .
+          git clean -fdx
+          mv .git ..
+          rm -rf .??*
+          rm *.md
+          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
+          xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
+          filename=${{ github.event.repository.name }}-${version}.matrix.1.zip
+          cd ..
+          zip -r $filename ${{ github.event.repository.name }}
+          mv .git ${{ github.event.repository.name }}
+          echo "filename=$filename" >> $GITHUB_OUTPUT
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Create Zip (Matrix-Unofficial)
+        id: zip-unofficial-matrix
+        run: |
+          git reset
+          git checkout .
+          git clean -fdx
+          git apply .patches/unofficial.patch
+          mv .git ..
+          rm -rf .??*
+          rm *.md
+          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
+          xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
+          filename=${{ github.event.repository.name }}-unofficial-${version}.matrix.1.zip
+          cd ..
+          zip -r $filename ${{ github.event.repository.name }}
+          mv .git ${{ github.event.repository.name }}
+          echo "filename=$filename" >> $GITHUB_OUTPUT
+        working-directory: ${{ github.event.repository.name }}
+
       - name: Create Release
         id: create-release
         uses: actions/create-release@v1
@@ -110,4 +149,26 @@ jobs:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_name: ${{ steps.zip-unofficial-nexus.outputs.filename }}
           asset_path: ${{ steps.zip-unofficial-nexus.outputs.filename }}
+          asset_content_type: application/zip
+
+      - name: Upload Zip (Matrix)
+        id: upload-matrix
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_name: ${{ steps.zip-matrix.outputs.filename }}
+          asset_path: ${{ steps.zip-matrix.outputs.filename }}
+          asset_content_type: application/zip
+
+      - name: Upload Zip (Matrix-Unofficial)
+        id: upload-unofficial-matrix
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_name: ${{ steps.zip-unofficial-matrix.outputs.filename }}
+          asset_path: ${{ steps.zip-unofficial-matrix.outputs.filename }}
           asset_content_type: application/zip
