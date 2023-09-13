@@ -32,13 +32,10 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "General"
@@ -52,7 +49,6 @@ msgid "Password"
 msgstr "Password"
 
 # empty strings from id 30003 to 30006
-
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
 msgstr ""
@@ -183,7 +179,6 @@ msgstr ""
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
 msgid "Favourites"
 msgstr "Favorites"
@@ -270,7 +265,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr ""
@@ -297,7 +291,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Channels"

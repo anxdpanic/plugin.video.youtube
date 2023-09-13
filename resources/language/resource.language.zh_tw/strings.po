@@ -62,8 +62,8 @@ msgid "Always ask for the video quality"
 msgstr "每次詢問影片解像度"
 
 msgctxt "#30010"
-msgid "Video quality"
-msgstr "影片解像度"
+msgid "Maximum video quality"
+msgstr ""
 
 msgctxt "#30011"
 msgid "480p"
@@ -74,16 +74,16 @@ msgid "720p (HD)"
 msgstr "720p (HD)"
 
 msgctxt "#30013"
-msgid "1080p (HD)"
-msgstr "1080p (HD)"
+msgid "1080p (FHD)"
+msgstr ""
 
 msgctxt "#30014"
-msgid "2160p (4k)"
-msgstr "2160p (4k)"
+msgid "2160p (4K)"
+msgstr ""
 
 msgctxt "#30015"
-msgid "4320p (8k)"
-msgstr "4320p (8k)"
+msgid "4320p (8K)"
+msgstr ""
 
 msgctxt "#30016"
 msgid "240p"
@@ -96,6 +96,10 @@ msgstr "360p"
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p 直播 / 720p (HD)"
+
+msgctxt "#30019"
+msgid "144p"
+msgstr ""
 
 # empty strings 30019
 msgctxt "#30020"
@@ -989,8 +993,8 @@ msgid "Reset resume point"
 msgstr "重設繼續播放點"
 
 msgctxt "#30675"
-msgid "Use playback history (watched, resume tracking)"
-msgstr "啟用播放歷史 (已觀看, 繼續播放)"
+msgid "Use local playback history (watched, resume tracking)"
+msgstr ""
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1049,8 +1053,8 @@ msgid "Use for live streams"
 msgstr "使用在直播串流"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr "直播串流需要 InputStream Adaptive 2.0.12 以上版本"
+msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr ""
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1177,32 +1181,32 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr "初始為WEBM adaptation(4K)"
 
 msgctxt "#30722"
-msgid "HDR"
-msgstr "HDR"
+msgid "Enable HDR video"
+msgstr ""
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "mpeg-dash 隨選視訊需要設定代理 (請看 HTTP 伺服器)[CR]> 1080p 且 HDR 需要 InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
-msgid "Limit to 30fps"
-msgstr "限制在30fps"
+msgid "Enable high framerate video"
+msgstr ""
 
 msgctxt "#30725"
-msgid "1440p (HD)"
-msgstr "1440p (HD)"
+msgid "1440p (QHD)"
+msgstr ""
 
 msgctxt "#30726"
 msgid "Uploads"
 msgstr "上傳的影片"
 
 msgctxt "#30727"
-msgid "Adaptive (MP4/H264)"
-msgstr "動態 (MP4/H264)"
+msgid "Enable H.264 video"
+msgstr ""
 
 msgctxt "#30728"
-msgid "Adaptive (WEBM/VP9)"
-msgstr "動態 (WEBM/VP9)"
+msgid "Enable VP9 video"
+msgstr ""
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1247,3 +1251,143 @@ msgstr ""
 msgctxt "#30739"
 msgid "Alternate #2"
 msgstr ""
+
+msgctxt "#30740"
+msgid "HLS"
+msgstr ""
+
+msgctxt "#30741"
+msgid "Multi-stream HLS"
+msgstr ""
+
+msgctxt "#30742"
+msgid "Adaptive HLS"
+msgstr ""
+
+msgctxt "#30743"
+msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30744"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30745"
+msgid "Dubbed"
+msgstr ""
+
+msgctxt "#30746"
+msgid "Descriptive"
+msgstr ""
+
+msgctxt "#30747"
+msgid "Alternate"
+msgstr ""
+
+msgctxt "#30748"
+msgid "Stream features"
+msgstr ""
+
+msgctxt "#30749"
+msgid "Enable AV1 video"
+msgstr ""
+
+msgctxt "#30750"
+msgid "Enable Vorbis audio"
+msgstr ""
+
+msgctxt "#30751"
+msgid "Enable Opus audio"
+msgstr ""
+
+msgctxt "#30752"
+msgid "Enable AAC audio"
+msgstr ""
+
+msgctxt "#30753"
+msgid "Enable surround sound audio"
+msgstr ""
+
+msgctxt "#30754"
+msgid "Enable AC-3 audio"
+msgstr ""
+
+msgctxt "#30755"
+msgid "Enable EAC-3 audio"
+msgstr ""
+
+msgctxt "#30756"
+msgid "Enable DTS audio"
+msgstr ""
+
+msgctxt "#30757"
+msgid "Remove similar/duplicate streams"
+msgstr ""
+
+msgctxt "#30758"
+msgid "Stream selection"
+msgstr ""
+
+msgctxt "#30759"
+msgid "Quality selection"
+msgstr ""
+
+msgctxt "#30760"
+msgid "Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30761"
+msgid "Update playback history on Youtube"
+msgstr ""
+
+msgctxt "#30762"
+msgid "Multi-language"
+msgstr ""
+
+msgctxt "#30763"
+msgid "Multi-audio"
+msgstr ""
+
+#~ msgctxt "#30010"
+#~ msgid "Video quality"
+#~ msgstr "影片解像度"
+
+#~ msgctxt "#30013"
+#~ msgid "1080p (HD)"
+#~ msgstr "1080p (HD)"
+
+#~ msgctxt "#30014"
+#~ msgid "2160p (4k)"
+#~ msgstr "2160p (4k)"
+
+#~ msgctxt "#30015"
+#~ msgid "4320p (8k)"
+#~ msgstr "4320p (8k)"
+
+#~ msgctxt "#30675"
+#~ msgid "Use playback history (watched, resume tracking)"
+#~ msgstr "啟用播放歷史 (已觀看, 繼續播放)"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+#~ msgstr "直播串流需要 InputStream Adaptive 2.0.12 以上版本"
+
+#~ msgctxt "#30722"
+#~ msgid "HDR"
+#~ msgstr "HDR"
+
+#~ msgctxt "#30724"
+#~ msgid "Limit to 30fps"
+#~ msgstr "限制在30fps"
+
+#~ msgctxt "#30725"
+#~ msgid "1440p (HD)"
+#~ msgstr "1440p (HD)"
+
+#~ msgctxt "#30727"
+#~ msgid "Adaptive (MP4/H264)"
+#~ msgstr "動態 (MP4/H264)"
+
+#~ msgctxt "#30728"
+#~ msgid "Adaptive (WEBM/VP9)"
+#~ msgstr "動態 (WEBM/VP9)"
