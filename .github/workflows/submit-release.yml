@@ -74,6 +74,7 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.1" addon.xml
           xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
+          xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.7' addon.xml
           xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
           git add .
           git commit -m "Kodi 19 Patch"

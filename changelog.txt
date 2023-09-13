@@ -1,3 +1,6 @@
+7.0.2.1
+[fix] fix Matrix InputStream.Adaptive dependency version
+
 7.0.2
 [new] quality and stream feature selection
 [new] enable HLS live streams
