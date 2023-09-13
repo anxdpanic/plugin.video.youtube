@@ -63,7 +63,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # noinspection PyPep8Naming
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
-        dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
+        mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
 
         # Strip trailing slash if present
@@ -78,12 +78,12 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.wfile.write(client_json.encode('utf-8'))
 
         if stripped_path != '/ping':
-            logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+            logger.log_debug('HTTPServer: GET Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
         else:
-            if dash_proxy_enabled and self.path.endswith('.mpd'):
+            if mpd_proxy_enabled and self.path.endswith('.mpd'):
                 file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 file_chunk = True
                 logger.log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path.encode('utf-8')))
@@ -165,14 +165,14 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        logger.log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+        logger.log_debug('HTTPServer: HEAD Request uri path |{proxy_path}|'.format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
         else:
             addon = xbmcaddon.Addon('plugin.video.youtube')
-            dash_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
-            if dash_proxy_enabled and self.path.endswith('.mpd'):
+            mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
+            if mpd_proxy_enabled and self.path.endswith('.mpd'):
                 file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 if not os.path.isfile(file_path):
                     response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))

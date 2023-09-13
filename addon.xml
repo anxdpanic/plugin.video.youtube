@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="7.0.2~alpha7" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="7.0.2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -14,8 +14,14 @@
     <extension point="xbmc.python.module" library="resources/lib/"/>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] error when filtering short videos
-[fix] fix playback |contrib: MoojMidge|
+[new] quality and stream feature selection
+[new] enable HLS live streams
+[new] stream and language labelling
+[chg] separately enable local/remote history
+[chg] restore unsupported compatibility for Kodi v19 (Matrix)
+[fix] fix various playback issues |contrib: various|
+[fix] Limit host connections getting subscription feeds |contrib: cas--|
+[fix] fix handling of connection failures
 [upd] Translations updated from Kodi Weblate
         </news>
         <assets>

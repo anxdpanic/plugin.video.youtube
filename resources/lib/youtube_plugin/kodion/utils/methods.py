@@ -92,19 +92,20 @@ def find_best_fit(data, compare_method=None):
 def select_stream(context, stream_data_list, quality_map_override=None, ask_for_quality=None, audio_only=None):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
-        return _stream_data.get('sort', [0, 0])
+        return _stream_data.get('sort', (0, 0))
 
     settings = context.get_settings()
-    use_dash = settings.use_dash()
+    use_adaptive = context.use_inputstream_adaptive()
     ask_for_quality = context.get_settings().ask_for_video_quality() if ask_for_quality is None else ask_for_quality
     video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
     audio_only = audio_only if audio_only is not None else settings.audio_only()
+    adaptive_live = settings.use_adaptive_live_streams() and context.inputstream_adaptive_capabilities('live')
 
     if not ask_for_quality:
         stream_data_list = [item for item in stream_data_list
-                            if ((item['container'] != 'mpd') or
-                                ((item['container'] == 'mpd') and
-                                 (item.get('dash/video', False))))]
+                            if (item['container'] not in {'mpd', 'hls'} or
+                                item.get('hls/video') or
+                                item.get('dash/video'))]
 
     if not ask_for_quality and audio_only:  # check for live stream, audio only not supported
         context.log_debug('Select stream: Audio only')
@@ -116,43 +117,31 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 
     if not ask_for_quality and audio_only:
         audio_stream_data_list = [item for item in stream_data_list
-                                  if (item.get('dash/audio', False) and
-                                      not item.get('dash/video', False))]
+                                  if (item.get('dash/audio') and
+                                      not item.get('dash/video') and
+                                      not item.get('hls/video'))]
 
         if audio_stream_data_list:
-            use_dash = False
+            use_adaptive = False
             stream_data_list = audio_stream_data_list
         else:
             context.log_debug('Select stream: Audio only, no audio only streams found')
 
-    dash_live = settings.use_dash_live_streams() and 'live' in context.inputstream_adaptive_capabilities()
-    dash_videos = settings.use_dash_videos()
-
-    if use_dash and any([item['container'] == 'mpd' for item in stream_data_list]):
-        use_dash = context.use_inputstream_adaptive()
-
-    if not use_dash:
-        stream_data_list = [item for item in stream_data_list if (item['container'] != 'mpd')]
-    else:
-        if not dash_live:
-            stream_data_list = [item for item in stream_data_list
-                                if ((item['container'] != 'mpd') or
-                                    ((item['container'] == 'mpd') and
-                                     (item.get('Live') is not True)))]
-
-        if not dash_videos:
-            stream_data_list = [item for item in stream_data_list
-                                if ((item['container'] != 'mpd') or
-                                    ((item['container'] == 'mpd') and
-                                     (item.get('Live') is True)))]
+    if not adaptive_live:
+        stream_data_list = [item for item in stream_data_list
+                            if (item['container'] != 'mpd' or
+                                not item.get('Live'))]
+    elif not use_adaptive:
+        stream_data_list = [item for item in stream_data_list
+                            if item['container'] != 'mpd']
 
     def _find_best_fit_video(_stream_data):
         if audio_only:
-            return video_quality - _stream_data.get('sort', [0, 0])[0]
+            return video_quality - _stream_data.get('sort', (0, 0))[0]
         else:
             return video_quality - _stream_data.get('video', {}).get('height', 0)
 
-    sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data, reverse=True)
+    sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data)
 
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
     log_streams = list()

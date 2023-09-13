@@ -54,6 +54,6 @@ def resolve(video_id, sort=True, addon_id=None):
         streams = client.get_video_streams(context=context, video_id=matched_id)
 
     if sort and streams:
-        streams = sorted(streams, key=lambda x: x.get('sort', 0), reverse=True)
+        streams = sorted(streams, key=lambda x: x.get('sort', (0, 0)))
 
     return streams

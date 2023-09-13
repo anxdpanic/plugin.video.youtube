@@ -137,6 +137,11 @@ class XbmcContext(AbstractContext):
 
         return 'en-US'
 
+    def get_language_name(self, lang_id=None):
+        if lang_id is None:
+            lang_id = self.get_language()
+        return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
+
     def get_video_playlist(self):
         if not self._video_playlist:
             self._video_playlist = XbmcPlaylist('video', weakref.proxy(self))
@@ -282,59 +287,59 @@ class XbmcContext(AbstractContext):
         self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
 
     def use_inputstream_adaptive(self):
-        addon_enabled = self.addon_enabled('inputstream.adaptive')
-        if self._settings.use_dash() and not addon_enabled:
-            if self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):
-                use_dash = self.set_addon_enabled('inputstream.adaptive')
+        if self._settings.use_mpd_videos() or self._settings.use_adaptive_live_streams():
+            if self.addon_enabled('inputstream.adaptive'):
+                success = True
+            elif self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):
+                success = self.set_addon_enabled('inputstream.adaptive')
             else:
-                use_dash = False
-        elif self._settings.use_dash() and addon_enabled:
-            use_dash = True
+                success = False
         else:
-            use_dash = False
-        return use_dash
+            success = False
+        return success
+
+    # Values of capability map can be any of the following:
+    # - required version number as string for comparison with actual installed InputStream.Adaptive version
+    # - any Falsey value to exclude capability regardless of version
+    # - True to include capability regardless of version
+    _IA_CAPABILITIES = {
+        'live': '2.0.12',
+        'drm': '2.2.12',
+        # audio codecs
+        'vorbis': '2.3.14',
+        'opus': '19.0.7',
+        'mp4a': True,
+        'ac-3': '2.1.15',
+        'ec-3': '2.1.15',
+        'dts': '2.1.15',
+        # video codecs
+        'avc1': True,
+        'av01': '20.3.0',
+        'vp8': False,
+        'vp9': '2.3.14',
+    }
 
     def inputstream_adaptive_capabilities(self, capability=None):
         # return a list inputstream.adaptive capabilities, if capability set return version required
 
-        use_dash = self.use_inputstream_adaptive()
         try:
             inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
         except RuntimeError:
             inputstream_version = ''
 
-        if not use_dash or not inputstream_version:
+        if not self.use_inputstream_adaptive() or not inputstream_version:
             return frozenset() if capability is None else None
 
-        # Values of capability map can be any of the following:
-        # - required version number as string for comparison with actual installed InputStream.Adaptive version
-        # - any Falsey value to exclude capability regardless of version
-        # - True to include capability regardless of version
-        capability_map = {
-            'live': '2.0.12',
-            'drm': '2.2.12',
-            # audio
-            'vorbis': '2.3.14',
-            'opus': '19.0.7',
-            'mp4a': True,
-            'ac-3': '2.1.15',
-            'ec-3': '2.1.15',
-            'dts': '2.1.15',
-            # video
-            'avc1': True,
-            'av01': '20.3.0',
-            'vp8': False,
-            'vp9': '2.3.14',
-            'vp9.2': '2.3.14',
-        }
-
+        ia_loose_version = utils.loose_version(inputstream_version)
         if capability is None:
-            ia_loose_version = utils.loose_version(inputstream_version)
-            capabilities = frozenset(key for key, version in capability_map.items()
-                                     if version is True
-                                     or version and ia_loose_version >= utils.loose_version(version))
+            capabilities = frozenset(
+                capability for capability, version in self._IA_CAPABILITIES.items()
+                if version is True
+                or version and ia_loose_version >= utils.loose_version(version)
+            )
             return capabilities
-        return capability_map.get(capability)
+        version = self._IA_CAPABILITIES.get(capability)
+        return version is True or version and ia_loose_version >= utils.loose_version(version)
 
     def inputstream_adaptive_auto_stream_selection(self):
         try:

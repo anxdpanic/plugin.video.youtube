@@ -108,7 +108,7 @@ class Provider(kodion.AbstractProvider):
                  'youtube.succeeded': 30575,
                  'youtube.failed': 30576,
                  'youtube.settings': 30577,
-                 'youtube.dash.enable.confirm': 30579,
+                 'youtube.mpd.enable.confirm': 30579,
                  'youtube.reset.access.manager.confirm': 30581,
                  'youtube.my_subscriptions_filtered': 30584,
                  'youtube.add.my_subscriptions.filter': 30587,
@@ -1077,8 +1077,7 @@ class Provider(kodion.AbstractProvider):
             context.addon().openSettings()
             context.get_ui().refresh_container()
         elif switch == 'mpd':
-            use_dash = context.use_inputstream_adaptive()
-            if use_dash:
+            if context.use_inputstream_adaptive():
                 xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
             else:
                 settings.set_bool('kodion.video.quality.mpd', False)

@@ -9,7 +9,6 @@
 """
 
 from . import datetime_parser
-from .methods import loose_version
 from .methods import *
 from .search_history import SearchHistory
 from .favorite_list import FavoriteList

@@ -82,17 +82,19 @@ def play_video(provider, context):
 
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
         use_history = not is_live and not screensaver and not incognito
-        playback_history = use_history and settings.use_playback_history()
+        use_remote_history = use_history and settings.use_remote_history()
+        use_play_data = use_history and settings.use_local_history()
+
 
         video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream,
-                                            use_play_data=playback_history)
+                                            use_play_data=use_play_data)
 
         seek_time = None
         play_count = 0
         playback_stats = video_stream.get('playback_stats')
 
-        if use_history:
-            if video_item.get_start_time() and video_item.use_dash():
+        if use_remote_history:
+            if video_item.get_start_time() and video_item.use_mpd_video():
                 seek_time = video_item.get_start_time()
             play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
 
@@ -112,8 +114,8 @@ def play_video(provider, context):
             "video_status": metadata.get('video', {}).get('status', {}),
             "playing_file": video_item.get_uri(),
             "play_count": play_count,
-            "use_history": use_history,
-            "playback_history": playback_history,
+            "use_remote_history": use_remote_history,
+            "use_local_history": use_play_data,
             "playback_stats": playback_stats,
             "seek_time": seek_time,
             "refresh_only": screensaver

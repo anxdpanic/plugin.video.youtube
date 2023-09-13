@@ -1,9 +1,4 @@
-From 3376c5b8eef06d7022da535ac548fd9cc50f0589 Mon Sep 17 00:00:00 2001
-From: anxdpanic <anxdpanic@users.noreply.github.com>
-Date: Sat, 25 Feb 2023 14:57:44 -0500
-Subject: [PATCH] update changelog
-
-From b2c43a85accecd08471f0446ac587bbcf6539bbe Mon Sep 17 00:00:00 2001
+From cb73ff623ea6474ccc4ec1d5bd7e8653d90cd1aa Mon Sep 17 00:00:00 2001
 From: anxdpanic <anxdpanic@gmail.com>
 Date: Fri, 7 Feb 2020 16:44:38 -0500
 Subject: [PATCH] unofficial patch
@@ -27,16 +22,16 @@ Subject: [PATCH] unofficial patch
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index 4ecb584..84e96ff 100644
+index 44bece4a..41282ace 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -102,3 +102,4 @@
+@@ -105,3 +105,4 @@
          <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
      </extension>
  </addon>
 +<!-- unofficial -->
 diff --git a/resources/lib/youtube_plugin/kodion/abstract_provider.py b/resources/lib/youtube_plugin/kodion/abstract_provider.py
-index ff8ffd4..1306ca2 100644
+index ff8ffd44..1306ca2c 100644
 --- a/resources/lib/youtube_plugin/kodion/abstract_provider.py
 +++ b/resources/lib/youtube_plugin/kodion/abstract_provider.py
 @@ -72,10 +72,29 @@ class AbstractProvider(object):
@@ -79,10 +74,10 @@ index ff8ffd4..1306ca2 100644
  
              location = str(context.get_param('location', False)).lower() == 'true'
 diff --git a/resources/lib/youtube_plugin/kodion/constants/const_settings.py b/resources/lib/youtube_plugin/kodion/constants/const_settings.py
-index dfeeace..e797928 100644
+index 6f64ca46..a751a1c1 100644
 --- a/resources/lib/youtube_plugin/kodion/constants/const_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/constants/const_settings.py
-@@ -35,6 +35,10 @@ HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
+@@ -31,6 +31,10 @@ HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
  SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
  ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web.urls'  # (bool)
  
@@ -92,9 +87,9 @@ index dfeeace..e797928 100644
 +
  ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
  
- DASH_VIDEOS = 'kodion.mpd.videos'  # (bool)
+ VIDEO_QUALITY = 'kodion.video.quality'  # (int)
 diff --git a/resources/lib/youtube_plugin/kodion/impl/abstract_context_ui.py b/resources/lib/youtube_plugin/kodion/impl/abstract_context_ui.py
-index 7ed3fef..46eabf2 100644
+index 7ed3feff..46eabf26 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/abstract_context_ui.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/abstract_context_ui.py
 @@ -16,6 +16,12 @@ class AbstractContextUI(object):
@@ -111,24 +106,24 @@ index 7ed3fef..46eabf2 100644
          raise NotImplementedError()
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
-index b79c3b0..591bec4 100644
+index 47ec7ed2..a07a260d 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 @@ -90,6 +90,9 @@ class AbstractSettings(object):
      def is_setup_wizard_enabled(self):
-         return self.get_bool(constants.setting.SETUP_WIZARD, False)
+         return self.get_bool(SETTINGS.SETUP_WIZARD, False)
  
 +    def is_override_view_enabled(self):
 +        return self.get_bool(constants.setting.VIEW_OVERRIDE, False)
 +
      def is_support_alternative_player_enabled(self):
-         return self.get_bool(constants.setting.SUPPORT_ALTERNATIVE_PLAYER, False)
+         return self.get_bool(SETTINGS.SUPPORT_ALTERNATIVE_PLAYER, False)
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py
-index bd6c44f..a165e0d 100644
+index 03b9cee7..6704d974 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context.py
-@@ -210,6 +210,7 @@ class XbmcContext(AbstractContext):
+@@ -215,6 +215,7 @@ class XbmcContext(AbstractContext):
      def set_content_type(self, content_type):
          self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
          xbmcplugin.setContent(self._plugin_handle, content_type)
@@ -137,7 +132,7 @@ index bd6c44f..a165e0d 100644
      def add_sort_method(self, *sort_methods):
          for sort_method in sort_methods:
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
-index 147d4e5..b83f101 100644
+index 147d4e5e..b83f101b 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_context_ui.py
 @@ -33,6 +33,18 @@ class XbmcContextUI(AbstractContextUI):
@@ -160,7 +155,7 @@ index 147d4e5..b83f101 100644
          return xbmc.getSkinDir()
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py
-index 60e03bb..371f45f 100644
+index 46fda8a7..1f35935a 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/xbmc/xbmc_runner.py
 @@ -8,6 +8,7 @@
@@ -171,7 +166,7 @@ index 60e03bb..371f45f 100644
  import xbmcgui
  import xbmcplugin
  
-@@ -68,6 +69,13 @@ class XbmcRunner(AbstractProviderRunner):
+@@ -66,6 +67,13 @@ class XbmcRunner(AbstractProviderRunner):
                  self.handle, succeeded=True,
                  updateListing=options.get(AbstractProvider.RESULT_UPDATE_LISTING, False),
                  cacheToDisc=options.get(AbstractProvider.RESULT_CACHE_TO_DISC, True))
@@ -186,10 +181,10 @@ index 60e03bb..371f45f 100644
              # handle exception
              pass
 diff --git a/resources/lib/youtube_plugin/kodion/utils/__init__.py b/resources/lib/youtube_plugin/kodion/utils/__init__.py
-index 20e9597..4c279f9 100644
+index 717fb4dc..da0c45b1 100644
 --- a/resources/lib/youtube_plugin/kodion/utils/__init__.py
 +++ b/resources/lib/youtube_plugin/kodion/utils/__init__.py
-@@ -16,6 +16,7 @@ from .favorite_list import FavoriteList
+@@ -15,6 +15,7 @@ from .favorite_list import FavoriteList
  from .watch_later_list import WatchLaterList
  from .function_cache import FunctionCache
  from .access_manager import AccessManager
@@ -197,7 +192,7 @@ index 20e9597..4c279f9 100644
  from .http_server import get_http_server, is_httpd_live, get_client_ip_address
  from .monitor import YouTubeMonitor
  from .player import YouTubePlayer
-@@ -25,7 +26,7 @@ from .system_version import SystemVersion
+@@ -24,7 +25,7 @@ from .system_version import SystemVersion
  from . import ip_api
  
  
@@ -208,7 +203,7 @@ index 20e9597..4c279f9 100644
             'make_dirs', 'loose_version', 'ip_api', 'PlaybackHistory', 'DataCache', 'get_client_ip_address',
 diff --git a/resources/lib/youtube_plugin/kodion/utils/view_manager.py b/resources/lib/youtube_plugin/kodion/utils/view_manager.py
 new file mode 100644
-index 0000000..9a5fe5a
+index 00000000..9a5fe5ae
 --- /dev/null
 +++ b/resources/lib/youtube_plugin/kodion/utils/view_manager.py
 @@ -0,0 +1,166 @@
@@ -379,7 +374,7 @@ index 0000000..9a5fe5a
 +
 +        return False
 diff --git a/resources/lib/youtube_plugin/youtube/helper/utils.py b/resources/lib/youtube_plugin/youtube/helper/utils.py
-index 2fdd610..44a8ab9 100644
+index 734e0a12..784468b2 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/utils.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/utils.py
 @@ -254,7 +254,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
@@ -392,7 +387,7 @@ index 2fdd610..44a8ab9 100644
          if not yt_item:
              continue
 diff --git a/resources/lib/youtube_plugin/youtube/helper/yt_specials.py b/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
-index 89ad2b1..c5c8fec 100644
+index 89ad2b11..c5c8fec3 100644
 --- a/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
 +++ b/resources/lib/youtube_plugin/youtube/helper/yt_specials.py
 @@ -15,7 +15,7 @@ from . import utils
@@ -477,7 +472,7 @@ index 89ad2b1..c5c8fec 100644
      result = []
      next_page_token = context.get_param('next_page_token', '')
 diff --git a/resources/lib/youtube_plugin/youtube/provider.py b/resources/lib/youtube_plugin/youtube/provider.py
-index fea2957..75c6780 100644
+index bdab6658..2503e380 100644
 --- a/resources/lib/youtube_plugin/youtube/provider.py
 +++ b/resources/lib/youtube_plugin/youtube/provider.py
 @@ -437,7 +437,7 @@ class Provider(kodion.AbstractProvider):
@@ -555,7 +550,7 @@ index fea2957..75c6780 100644
  
          if page == 1 and search_type == 'video' and not event_type and not hide_folders:
              if not channel_id and not location:
-@@ -1361,7 +1361,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1360,7 +1360,7 @@ class Provider(kodion.AbstractProvider):
          settings = context.get_settings()
          _ = self.get_client(context)  # required for self.is_logged_in()
  
@@ -564,7 +559,7 @@ index fea2957..75c6780 100644
  
          result = []
  
-@@ -1596,7 +1596,7 @@ class Provider(kodion.AbstractProvider):
+@@ -1595,7 +1595,7 @@ class Provider(kodion.AbstractProvider):
      @staticmethod
      def set_content_type(context, content_type):
          context.set_content_type(content_type)
@@ -574,36 +569,36 @@ index fea2957..75c6780 100644
                                      kodion.constants.sort_method.VIDEO_RUNTIME,
                                      kodion.constants.sort_method.DATE_ADDED,
 diff --git a/resources/settings.xml b/resources/settings.xml
-index 240043a..736c92d 100644
+index 70429df9..65206514 100644
 --- a/resources/settings.xml
 +++ b/resources/settings.xml
-@@ -598,6 +598,37 @@
+@@ -663,6 +663,37 @@
                  </setting>
              </group>
              <group id="3">
-+                <setting help="" id="kodion.view.override" label="30026" type="boolean">
++                <setting id="kodion.view.override" type="boolean" label="30026" help="">
 +                    <level>0</level>
 +                    <default>false</default>
 +                    <control type="toggle"/>
 +                </setting>
-+                <setting help="" id="kodion.view.default" label="30027" type="integer">
++                <setting id="kodion.view.default" type="integer" label="30027"help="">
 +                    <level>0</level>
 +                    <default>50</default>
 +                    <dependencies>
 +                        <dependency type="enable">
-+                            <condition operator="is" setting="kodion.view.override">true</condition>
++                            <condition setting="kodion.view.override" operator="is">true</condition>
 +                        </dependency>
 +                    </dependencies>
 +                    <control format="integer" type="edit">
 +                        <heading>30027</heading>
 +                    </control>
 +                </setting>
-+                <setting help="" id="kodion.view.episodes" label="30028" type="integer">
++                <setting id="kodion.view.episodes" type="integer" label="30028" help="">
 +                    <level>0</level>
 +                    <default>50</default>
 +                    <dependencies>
 +                        <dependency type="enable">
-+                            <condition operator="is" setting="kodion.view.override">true</condition>
++                            <condition setting="kodion.view.override" operator="is">true</condition>
 +                        </dependency>
 +                    </dependencies>
 +                    <control format="integer" type="edit">
@@ -612,18 +607,18 @@ index 240043a..736c92d 100644
 +                </setting>
 +            </group>
 +            <group id="4">
-                 <setting help="" id="kodion.cache.size" label="30024" type="integer">
+                 <setting id="kodion.cache.size" type="integer" label="30024" help="">
                      <level>0</level>
                      <default>10</default>
-@@ -616,7 +647,7 @@
+@@ -681,7 +712,7 @@
                      <control type="toggle"/>
                  </setting>
              </group>
 -            <group id="4">
 +            <group id="5">
-                 <setting help="" id="youtube.language" label="30523" type="string">
+                 <setting id="youtube.language" type="string" label="30523" help="">
                      <level>0</level>
                      <default>en-US</default>
 -- 
-2.33.0.windows.2
+2.40.0.windows.1
 

@@ -209,8 +209,8 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-notification_data = {'use_httpd': (__settings.use_dash_videos() and
-                                   __settings.use_dash()) or
+notification_data = {'use_httpd': (__settings.use_mpd_videos() or
+                                   __settings.use_mpd_live_streams()) or
                                   (__settings.api_config_page()),
                      'httpd_port': __settings.httpd_port(),
                      'whitelist': __settings.httpd_whitelist(),
