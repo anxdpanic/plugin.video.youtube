@@ -328,33 +328,13 @@ class XbmcContext(AbstractContext):
         if not self.use_inputstream_adaptive() or not inputstream_version:
             return frozenset() if capability is None else None
 
-        # Values of capability map can be any of the following:
-        # - required version number as string for comparison with actual installed InputStream.Adaptive version
-        # - any Falsey value to exclude capability regardless of version
-        # - True to include capability regardless of version
-        capability_map = {
-            'live': '2.0.12',
-            'drm': '2.2.12',
-            # audio
-            'vorbis': '2.3.14',
-            'opus': '19.0.7',
-            'mp4a': True,
-            'ac-3': '2.1.15',
-            'ec-3': '2.1.15',
-            'dts': '2.1.15',
-            # video
-            'avc1': True,
-            'av01': '20.3.0',
-            'vp8': False,
-            'vp9': '2.3.14',
-            'vp9.2': '2.3.14',
-        }
-
+        ia_loose_version = utils.loose_version(inputstream_version)
         if capability is None:
-            ia_loose_version = utils.loose_version(inputstream_version)
-            capabilities = frozenset(key for key, version in capability_map.items()
-                                     if version is True
-                                     or version and ia_loose_version >= utils.loose_version(version))
+            capabilities = frozenset(
+                capability for capability, version in self._IA_CAPABILITIES.items()
+                if version is True
+                or version and ia_loose_version >= utils.loose_version(version)
+            )
             return capabilities
         version = self._IA_CAPABILITIES.get(capability)
         return version is True or version and ia_loose_version >= utils.loose_version(version)
