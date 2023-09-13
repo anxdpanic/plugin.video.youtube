@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2022-11-20 05:15+0000\n"
+"PO-Revision-Date: 2023-05-06 00:35+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
 "Language: ko_kr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.14.2\n"
+"X-Generator: Weblate 4.15.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -61,8 +61,8 @@ msgid "Always ask for the video quality"
 msgstr "동영상 품질 항상 확인"
 
 msgctxt "#30010"
-msgid "Video quality"
-msgstr "동영상 품질"
+msgid "Maximum video quality"
+msgstr ""
 
 msgctxt "#30011"
 msgid "480p"
@@ -73,16 +73,16 @@ msgid "720p (HD)"
 msgstr "720p (HD)"
 
 msgctxt "#30013"
-msgid "1080p (HD)"
-msgstr "1080p (HD)"
+msgid "1080p (FHD)"
+msgstr ""
 
 msgctxt "#30014"
-msgid "2160p (4k)"
-msgstr "2160p (4k)"
+msgid "2160p (4K)"
+msgstr ""
 
 msgctxt "#30015"
-msgid "4320p (8k)"
-msgstr "4320p (8k)"
+msgid "4320p (8K)"
+msgstr ""
 
 msgctxt "#30016"
 msgid "240p"
@@ -95,6 +95,10 @@ msgstr "360p"
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p 라이브 / 720p (HD)"
+
+msgctxt "#30019"
+msgid "144p"
+msgstr ""
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -987,8 +991,8 @@ msgid "Reset resume point"
 msgstr "이어 볼 지점 다시 설정"
 
 msgctxt "#30675"
-msgid "Use playback history (watched, resume tracking)"
-msgstr "재생 이력 사용 (재생 함, 이어볼 지점)"
+msgid "Use local playback history (watched, resume tracking)"
+msgstr ""
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1047,8 +1051,8 @@ msgid "Use for live streams"
 msgstr "실시간에 사용"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr "InputStream Adaptive >= 실시간에는 2.0.12 필요함"
+msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr ""
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1175,32 +1179,32 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr "기본으로 WEBM 적응 설정 (4K)"
 
 msgctxt "#30722"
-msgid "HDR"
-msgstr "HDR"
+msgid "Enable HDR video"
+msgstr ""
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "mpeg-dash vods (HTTP 서버 참고)[CR]> 1080p에 프록시가 필요하고 HDR에 InputStream Adaptive >= 2.3.14 필요함"
 
 msgctxt "#30724"
-msgid "Limit to 30fps"
-msgstr "30fps 제한"
+msgid "Enable high framerate video"
+msgstr ""
 
 msgctxt "#30725"
-msgid "1440p (HD)"
-msgstr "1440p (HD)"
+msgid "1440p (QHD)"
+msgstr ""
 
 msgctxt "#30726"
 msgid "Uploads"
 msgstr "업로드한 동영상"
 
 msgctxt "#30727"
-msgid "Adaptive (MP4/H264)"
-msgstr "적응형 (MP4/H264)"
+msgid "Enable H.264 video"
+msgstr ""
 
 msgctxt "#30728"
-msgid "Adaptive (WEBM/VP9)"
-msgstr "적용형 (WEBM/VP9)"
+msgid "Enable VP9 video"
+msgstr ""
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1233,6 +1237,158 @@ msgstr "수정됨"
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
 msgstr "짧은 동영상 숨기기(1분 이하)"
+
+msgctxt "#30737"
+msgid "Use alternate client details"
+msgstr "대체 클라이언트 세부 정보 사용"
+
+msgctxt "#30738"
+msgid "Alternate #1"
+msgstr "대체 #1"
+
+msgctxt "#30739"
+msgid "Alternate #2"
+msgstr "대체 #2"
+
+msgctxt "#30740"
+msgid "HLS"
+msgstr ""
+
+msgctxt "#30741"
+msgid "Multi-stream HLS"
+msgstr ""
+
+msgctxt "#30742"
+msgid "Adaptive HLS"
+msgstr ""
+
+msgctxt "#30743"
+msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30744"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30745"
+msgid "Dubbed"
+msgstr ""
+
+msgctxt "#30746"
+msgid "Descriptive"
+msgstr ""
+
+msgctxt "#30747"
+msgid "Alternate"
+msgstr ""
+
+msgctxt "#30748"
+msgid "Stream features"
+msgstr ""
+
+msgctxt "#30749"
+msgid "Enable AV1 video"
+msgstr ""
+
+msgctxt "#30750"
+msgid "Enable Vorbis audio"
+msgstr ""
+
+msgctxt "#30751"
+msgid "Enable Opus audio"
+msgstr ""
+
+msgctxt "#30752"
+msgid "Enable AAC audio"
+msgstr ""
+
+msgctxt "#30753"
+msgid "Enable surround sound audio"
+msgstr ""
+
+msgctxt "#30754"
+msgid "Enable AC-3 audio"
+msgstr ""
+
+msgctxt "#30755"
+msgid "Enable EAC-3 audio"
+msgstr ""
+
+msgctxt "#30756"
+msgid "Enable DTS audio"
+msgstr ""
+
+msgctxt "#30757"
+msgid "Remove similar/duplicate streams"
+msgstr ""
+
+msgctxt "#30758"
+msgid "Stream selection"
+msgstr ""
+
+msgctxt "#30759"
+msgid "Quality selection"
+msgstr ""
+
+msgctxt "#30760"
+msgid "Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30761"
+msgid "Update playback history on Youtube"
+msgstr ""
+
+msgctxt "#30762"
+msgid "Multi-language"
+msgstr ""
+
+msgctxt "#30763"
+msgid "Multi-audio"
+msgstr ""
+
+#~ msgctxt "#30010"
+#~ msgid "Video quality"
+#~ msgstr "동영상 품질"
+
+#~ msgctxt "#30013"
+#~ msgid "1080p (HD)"
+#~ msgstr "1080p (HD)"
+
+#~ msgctxt "#30014"
+#~ msgid "2160p (4k)"
+#~ msgstr "2160p (4k)"
+
+#~ msgctxt "#30015"
+#~ msgid "4320p (8k)"
+#~ msgstr "4320p (8k)"
+
+#~ msgctxt "#30675"
+#~ msgid "Use playback history (watched, resume tracking)"
+#~ msgstr "재생 이력 사용 (재생 함, 이어볼 지점)"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+#~ msgstr "InputStream Adaptive >= 실시간에는 2.0.12 필요함"
+
+#~ msgctxt "#30722"
+#~ msgid "HDR"
+#~ msgstr "HDR"
+
+#~ msgctxt "#30724"
+#~ msgid "Limit to 30fps"
+#~ msgstr "30fps 제한"
+
+#~ msgctxt "#30725"
+#~ msgid "1440p (HD)"
+#~ msgstr "1440p (HD)"
+
+#~ msgctxt "#30727"
+#~ msgid "Adaptive (MP4/H264)"
+#~ msgstr "적응형 (MP4/H264)"
+
+#~ msgctxt "#30728"
+#~ msgid "Adaptive (WEBM/VP9)"
+#~ msgstr "적용형 (WEBM/VP9)"
 
 #~ msgctxt "#30100"
 #~ msgid "Favorites"
