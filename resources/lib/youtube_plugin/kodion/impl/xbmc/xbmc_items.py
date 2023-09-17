@@ -14,17 +14,18 @@ try:
     from infotagger.listitem import ListItemInfoTag
 except ImportError:
     class ListItemInfoTag:
-        __slots__ = (__li__, )
+        __slots__ = ('__li__', '__type__' )
 
-        def __init__(self, list_item):
+        def __init__(self, list_item, tag_type):
             self.__li__ = list_item
+            self.__type__ = tag_type
 
         def add_stream_info(self, *args, **kwargs):
             return self.__li__.addStreamInfo(*args, **kwargs)
-        
+
         def set_info(self, *args, **kwargs):
-            return self.__li__.setInfo(*args, **kwargs)
-            
+            return self.__li__.setInfo(self.__type__, *args, **kwargs)
+
 
 from ...items import VideoItem, AudioItem, UriItem
 from ... import utils
