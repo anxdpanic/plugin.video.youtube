@@ -1,9 +1,3 @@
-From cb73ff623ea6474ccc4ec1d5bd7e8653d90cd1aa Mon Sep 17 00:00:00 2001
-From: anxdpanic <anxdpanic@gmail.com>
-Date: Fri, 7 Feb 2020 16:44:38 -0500
-Subject: [PATCH] unofficial patch
-
----
  addon.xml                                     |   1 +
  .../kodion/abstract_provider.py               |  21 ++-
  .../kodion/constants/const_settings.py        |   4 +
@@ -22,10 +16,10 @@ Subject: [PATCH] unofficial patch
  create mode 100644 resources/lib/youtube_plugin/kodion/utils/view_manager.py
 
 diff --git a/addon.xml b/addon.xml
-index 44bece4a..41282ace 100644
+index 57d0b3c6..13eba70c 100644
 --- a/addon.xml
 +++ b/addon.xml
-@@ -105,3 +105,4 @@
+@@ -107,3 +107,4 @@
          <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
      </extension>
  </addon>
@@ -106,7 +100,7 @@ index 7ed3feff..46eabf26 100644
          raise NotImplementedError()
  
 diff --git a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
-index 47ec7ed2..a07a260d 100644
+index 47ec7ed2..4a314d65 100644
 --- a/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 +++ b/resources/lib/youtube_plugin/kodion/impl/abstract_settings.py
 @@ -90,6 +90,9 @@ class AbstractSettings(object):
@@ -114,7 +108,7 @@ index 47ec7ed2..a07a260d 100644
          return self.get_bool(SETTINGS.SETUP_WIZARD, False)
  
 +    def is_override_view_enabled(self):
-+        return self.get_bool(constants.setting.VIEW_OVERRIDE, False)
++        return self.get_bool(SETTINGS.VIEW_OVERRIDE, False)
 +
      def is_support_alternative_player_enabled(self):
          return self.get_bool(SETTINGS.SUPPORT_ALTERNATIVE_PLAYER, False)
@@ -619,6 +613,3 @@ index 70429df9..65206514 100644
                  <setting id="youtube.language" type="string" label="30523" help="">
                      <level>0</level>
                      <default>en-US</default>
--- 
-2.40.0.windows.1
-
