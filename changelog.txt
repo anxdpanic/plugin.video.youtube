@@ -1,3 +1,7 @@
+7.0.2.2
+[fix] Fix Matrix compatibility
+[fix] Update unofficial patch
+
 7.0.2.1
 [fix] fix Matrix InputStream.Adaptive dependency version
 
