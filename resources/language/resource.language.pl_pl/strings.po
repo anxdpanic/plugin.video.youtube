@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-05-04 09:10+0000\n"
+"PO-Revision-Date: 2023-09-14 03:24+0000\n"
 "Last-Translator: Marek Adamski <fevbew@wp.pl>\n"
 "Language-Team: Polish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/pl_pl/>\n"
 "Language: pl_pl\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
-"X-Generator: Weblate 4.15.2\n"
+"X-Generator: Weblate 5.0.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -62,7 +62,7 @@ msgstr "Pytaj o jakość strumienia wideo"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "Maksymalna jakość wideo"
 
 msgctxt "#30011"
 msgid "480p"
@@ -74,15 +74,15 @@ msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -98,7 +98,7 @@ msgstr "1080p na żywo / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -992,7 +992,7 @@ msgstr "Resetuj punkt wznowienia"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Użyj lokalnej historii odtwarzania (obejrzane, wznów śledzenie)"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1052,7 +1052,7 @@ msgstr "Używaj dla transmisji na żywo"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "Do adaptacyjnych transmisji na żywo wymagana jest wersja InputStream Adaptive >= 2.0.12"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1180,7 +1180,7 @@ msgstr "Domyślnie do zestawu adaptacyjnego WEBM (4K)"
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "Włącz wideo HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
@@ -1188,11 +1188,11 @@ msgstr "Serwer proxy jest wymagany do vod-ów mpeg-dash (patrz serwer HTTP)[CR]>
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "Włącz wideo o dużej liczbie klatek na sekundę"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1200,11 +1200,11 @@ msgstr "Przesłane"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "Włącz wideo H.264"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "Włącz wideo VP9"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1252,99 +1252,99 @@ msgstr "Alternatywa nr 2"
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HLS"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "Wielostrumieniowy HLS"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "Adaptacyjny HLS"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "Oryginalny"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "Dubbingowany"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "Opisowy"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "Alternatywny"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr ""
+msgstr "Funkcje strumienia"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "Włącz wideo AV1"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "Włącz dźwięk Vorbis"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "Włącz dźwięk Opus"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "Włącz dźwięk AAC"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
-msgstr ""
+msgstr "Włącz dźwięk przestrzenny"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr ""
+msgstr "Włącz dźwięk AC-3"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
-msgstr ""
+msgstr "Włącz dźwięk EAC-3"
 
 msgctxt "#30756"
 msgid "Enable DTS audio"
-msgstr ""
+msgstr "Włącz dźwięk DTS"
 
 msgctxt "#30757"
 msgid "Remove similar/duplicate streams"
-msgstr ""
+msgstr "Usuń podobne/zduplikowane strumienie"
 
 msgctxt "#30758"
 msgid "Stream selection"
-msgstr ""
+msgstr "Wybór strumienia"
 
 msgctxt "#30759"
 msgid "Quality selection"
-msgstr ""
+msgstr "Wybór jakości"
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
-msgstr ""
+msgstr "Automatyczny + wybór jakości"
 
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
-msgstr ""
+msgstr "Zaktualizuj historię odtwarzania w YouTube"
 
 msgctxt "#30762"
 msgid "Multi-language"
-msgstr ""
+msgstr "Wielojęzyczny"
 
 msgctxt "#30763"
 msgid "Multi-audio"
-msgstr ""
+msgstr "Wielodźwiękowy"
 
 #~ msgctxt "#30010"
 #~ msgid "Video quality"
