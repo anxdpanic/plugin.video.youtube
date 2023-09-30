@@ -73,7 +73,8 @@ jobs:
           rm -rf .??*
           rm *.md
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          filename=${{ github.event.repository.name }}-unofficial-${version}.zip
+          xmlstarlet ed -L -u '/addon/@version' -v "${version}+unofficial.1" addon.xml
+          filename=${{ github.event.repository.name }}-${version}.unofficial.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
@@ -90,6 +91,7 @@ jobs:
           rm -rf .??*
           rm *.md
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.1" addon.xml
           xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
           xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.7' addon.xml
           xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
@@ -111,9 +113,10 @@ jobs:
           rm -rf .??*
           rm *.md
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.unofficial.1" addon.xml
           xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
           xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
-          filename=${{ github.event.repository.name }}-unofficial-${version}.matrix.1.zip
+          filename=${{ github.event.repository.name }}-${version}.matrix.unofficial.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
