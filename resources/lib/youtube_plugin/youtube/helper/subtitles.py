@@ -180,9 +180,9 @@ class Subtitles(object):
         translations = [(track.get('languageCode'), self._get_language_name(track)) for track in self.translation_langs]
         languages = tracks + translations
         if languages:
-            choice = self.context.get_ui().on_select(self.context.localize(30560), [language_name for language, language_name in languages])
+            choice = self.context.get_ui().on_select(self.context.localize(30560), [language for _, language in languages])
             if choice != -1:
-                return self._get(language=languages[choice][0], language_name=languages[choice][1])
+                return self._get(lang_code=languages[choice][0], language=languages[choice][1])
             self.context.log_debug('Subtitle selection cancelled')
             return []
         self.context.log_debug('No subtitles found for prompt')
