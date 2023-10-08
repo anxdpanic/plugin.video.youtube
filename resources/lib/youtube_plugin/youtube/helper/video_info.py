@@ -889,28 +889,25 @@ class VideoInfo(object):
         cpn_alphabet = ('abcdefghijklmnopqrstuvwxyz'
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                         '0123456789-_')
-        # Python 2 compatible method
-        # cpn = ''.join(cpn_alphabet[random.randint(0, 63)] for _ in range(16))
-        # return cpn
-        return ''.join(random.choices(cpn_alphabet, k=16))
+        return ''.join(random.choice(cpn_alphabet) for _ in range(16))
 
     def load_stream_infos(self, video_id):
         self.video_id = video_id
         return self._get_video_info()
 
     def _build_client(self, client_name, auth_header=False):
-        def _merge_dicts(item1, item2):
+        def _merge_dicts(item1, item2, _=Ellipsis):
             if not isinstance(item1, dict) or not isinstance(item2, dict):
-                return item1 if item2 is ... else item2
+                return item1 if item2 is _ else item2
             new = {}
             for key in (item1.keys() | item2.keys()):
-                value = _merge_dicts(item1.get(key, ...), item2.get(key, ...))
-                if value is ...:
+                value = _merge_dicts(item1.get(key, _), item2.get(key, _))
+                if value is _:
                     continue
                 if isinstance(value, str) and '{' in value:
                     _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
                 new[key] = value
-            return new or ...
+            return new or _
         _format = {}
 
         client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
@@ -950,7 +947,7 @@ class VideoInfo(object):
                 error_msg or 'Request failed', traceback.format_exc()
             ))
             if raise_error:
-                raise YouTubeException(error_msg) from error
+                raise YouTubeException(error_msg)
             return None
         return result
 
@@ -1337,7 +1334,7 @@ class VideoInfo(object):
                 client = self._build_client(client_name, auth_header)
 
                 result = self._request(
-                    video_info_url, 'POST', **client,
+                    video_info_url, 'POST',
                     error_msg=(
                         'Player response failed for video_id: {0},'
                         ' using {1} client ({2})'
@@ -1345,7 +1342,8 @@ class VideoInfo(object):
                                 client_name,
                                 'logged in' if auth_header else 'logged out')
                     ),
-                    raise_error=True
+                    raise_error=True,
+                    **client
                 )
 
                 response = result.json()
@@ -1437,9 +1435,10 @@ class VideoInfo(object):
             captions['headers'] = client['headers']
         elif client.get('_query_subtitles'):
             result = self._request(
-                video_info_url, 'POST', **self._build_client('smarttv', True),
+                video_info_url, 'POST',
                 error_msg=('Caption request failed to get player response for'
                            'video_id: {0}'.format(self.video_id)),
+                **self._build_client('smarttv', True)
             )
 
             response = result.json()

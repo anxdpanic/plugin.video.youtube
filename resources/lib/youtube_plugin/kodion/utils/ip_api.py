@@ -10,11 +10,11 @@
 import requests
 
 
-class Locator:
+class Locator(object):
 
     def __init__(self, context):
         self._base_url = 'http://ip-api.com'
-        self._response = dict()
+        self._response = {}
         self._context = context
 
     def response(self):

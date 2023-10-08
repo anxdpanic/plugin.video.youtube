@@ -14,7 +14,7 @@ import re
 try:
     from ....kodion import logger
 except:
-    class logger:
+    class logger(object):
         @staticmethod
         def log_debug(txt):
             print(txt)
@@ -24,7 +24,7 @@ def throttling_reverse(arr):
     """Reverses the input list.
     Needs to do an in-place reversal so that the passed list gets changed.
     To accomplish this, we create a reversed copy, and then change each
-    indvidual element.
+    individual element.
     """
     reverse_copy = arr[::-1]
     for i in range(len(reverse_copy)):
@@ -221,7 +221,7 @@ def throttling_splice(d, e):
     js_splice(d, e, 1)
 
 
-class CalculateN:
+class CalculateN(object):
     # References:
     # https://github.com/ytdl-org/youtube-dl/issues/29326#issuecomment-894619419
     # https://github.com/pytube/pytube/blob/fc9aec5c35829f2ebb4ef8dd599b14a666850d20/pytube/cipher.py

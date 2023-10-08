@@ -1070,7 +1070,7 @@ class YouTube(LoginClient):
                 error_msg or 'Request failed', traceback.format_exc()
             ))
             if raise_error:
-                raise YouTubeException(error_msg) from error
+                raise YouTubeException(error_msg)
             return None
         return result
 
