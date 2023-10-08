@@ -13,8 +13,8 @@ import xbmcgui
 try:
     from infotagger.listitem import ListItemInfoTag
 except ImportError:
-    class ListItemInfoTag:
-        __slots__ = ('__li__', '__type__' )
+    class ListItemInfoTag(object):
+        __slots__ = ('__li__', '__type__')
 
         def __init__(self, list_item, tag_type):
             self.__li__ = list_item
