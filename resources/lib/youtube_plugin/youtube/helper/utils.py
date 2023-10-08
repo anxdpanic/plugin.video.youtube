@@ -50,7 +50,7 @@ def make_comment_item(context, provider, snippet, uri, total_replies=0):
     label_props = None
     plot_props = None
     is_edited = (snippet['publishedAt'] != snippet['updatedAt'])
-    
+
     str_likes = ('%.1fK' % (snippet['likeCount'] / 1000.0)) if snippet['likeCount'] > 1000 else str(snippet['likeCount'])
     str_replies = ('%.1fK' % (total_replies / 1000.0)) if total_replies > 1000 else str(total_replies)
 

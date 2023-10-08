@@ -35,7 +35,6 @@ from . import info_labels
 def to_play_item(context, play_item):
     context.log_debug('Converting PlayItem |%s|' % play_item.get_uri())
 
-
     is_strm = str(context.get_param('strm', False)).lower() == 'true'
 
     thumb = play_item.get_image() if play_item.get_image() else u'DefaultVideo.png'

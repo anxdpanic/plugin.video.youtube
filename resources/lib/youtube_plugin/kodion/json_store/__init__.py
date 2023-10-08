@@ -12,4 +12,3 @@ from .api_keys import APIKeyStore
 from .login_tokens import LoginTokenStore
 
 __all__ = ['JSONStore', 'APIKeyStore', 'LoginTokenStore']
-

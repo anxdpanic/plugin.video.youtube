@@ -157,7 +157,7 @@ def _process_list_response(provider, context, json_data):
             video_item.set_track_number(snippet['position'] + 1)
             result.append(video_item)
             video_id_dict[video_id] = video_item
-            
+
         elif kind == 'activity':
             snippet = yt_item['snippet']
             details = yt_item['contentDetails']
@@ -186,7 +186,7 @@ def _process_list_response(provider, context, json_data):
             video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
-            
+
         elif kind == 'commentthread':
             thread_snippet = yt_item['snippet']
             total_replies = thread_snippet['totalReplyCount']
@@ -197,10 +197,10 @@ def _process_list_response(provider, context, json_data):
             else:
                 item_uri = ''
             result.append(utils.make_comment_item(context, provider, snippet, item_uri, total_replies))
-        
+
         elif kind == 'comment':
             result.append(utils.make_comment_item(context, provider, yt_item['snippet'], uri=''))
-            
+
         elif kind == 'searchresult':
             _, kind = _parse_kind(yt_item.get('id', {}))
 

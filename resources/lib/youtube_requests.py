@@ -16,7 +16,7 @@ from youtube_plugin.kodion.impl import Context
 def __get_core_components(addon_id=None):
     """
     :param addon_id: addon id associated with developer keys to use for requests
-    :return: addon provider, context and client 
+    :return: addon provider, context and client
     """
     provider = Provider()
     if addon_id is not None:
