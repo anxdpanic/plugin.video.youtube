@@ -141,8 +141,8 @@ class CommonResolver(AbstractResolver, list):
                         _next_query = urllib.parse.parse_qs(_nc.query) # query string encoded inside next_url
                         del _query['next_url'] # remove next_url from top level query string
                         _next_query.update(_query) # add/overwrite all other params from top level query string
-                        _next_query = dict(map(lambda kv : (kv[0], kv[1][0]), _next_query.items())) # flatten to only use first argument of each param
-                        _next_url = urllib.parse.urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urllib.parse.urlencode(_next_query), _nc.fragment)) # build new URL from these components
+                        _next_query = dict(map(lambda kv: (kv[0], kv[1][0]), _next_query.items())) # flatten to only use first argument of each param
+                        _next_url = urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urlencode(_next_query), _nc.fragment)) # build new URL from these components
                         return _next_url
 
             except:

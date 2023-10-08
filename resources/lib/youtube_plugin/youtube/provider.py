@@ -689,9 +689,9 @@ class Provider(kodion.AbstractProvider):
 
     path for playlist: '/play/?playlist_id=XXXXXXX&mode=[OPTION]'
     OPTION: [normal(default)|reverse|shuffle]
-    
+
     path for channel live streams: '/play/?channel_id=UCXXXXXXX&live=X
-    OPTION: 
+    OPTION:
         live parameter required, live=1 for first live stream
         live = index of live stream if channel has multiple live streams
     """
@@ -758,7 +758,7 @@ class Provider(kodion.AbstractProvider):
                 context.log_debug('Redirecting playback, handle is -1')
             context.execute(builtin % context.create_uri(['play'], {'video_id': params['video_id']}))
             return
-    
+
         if 'playlist_id' in params and (context.get_handle() != -1):
             builtin = 'RunPlugin(%s)'
             stream_url = context.create_uri(['play'], params)
@@ -1375,12 +1375,12 @@ class Provider(kodion.AbstractProvider):
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
-            
+
             #clear cache
             cache = context.get_data_cache()
             cache_items_key = 'my-subscriptions-items'
             cache.set(cache_items_key, '[]')
-            
+
             my_subscriptions_item = DirectoryItem(
                 context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.my_subscriptions'])),
                 context.create_uri(['special', 'new_uploaded_videos_tv']),

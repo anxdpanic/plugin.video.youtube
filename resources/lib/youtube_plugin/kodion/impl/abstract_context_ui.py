@@ -25,7 +25,7 @@ class AbstractContextUI(object):
     def on_numeric_input(self, title, default=''):
         raise NotImplementedError()
 
-    def on_yes_no_input(self, title, text):
+    def on_yes_no_input(self, title, text, nolabel='', yeslabel=''):
         raise NotImplementedError()
 
     def on_ok(self, title, text):
@@ -40,7 +40,7 @@ class AbstractContextUI(object):
     def open_settings(self):
         raise NotImplementedError()
 
-    def show_notification(self, message, header='', image_uri='', time_milliseconds=5000):
+    def show_notification(self, message, header='', image_uri='', time_milliseconds=5000, audible=True):
         raise NotImplementedError()
 
     @staticmethod
