@@ -900,7 +900,7 @@ class VideoInfo(object):
             if not isinstance(item1, dict) or not isinstance(item2, dict):
                 return item1 if item2 is _ else item2
             new = {}
-            for key in (item1.keys() | item2.keys()):
+            for key in (item1.viewkeys() | item2.viewkeys()):
                 value = _merge_dicts(item1.get(key, _), item2.get(key, _))
                 if value is _:
                     continue

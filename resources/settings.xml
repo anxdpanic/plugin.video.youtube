@@ -32,10 +32,12 @@
         <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" enable="eq(-1,true)" option="close" action="RunPlugin(plugin://$ID/config/mpd/)"/>
         <setting type="lsep" label="30723"/>
         <setting id="kodion.mpd.videos" type="bool" label="30688" default="true" enable="eq(-3,true)"/>
-        <setting id="kodion.mpd.quality.selection" type="enum" label="30010" default="4" lvalues="30016|30017|30011|30012|30013|30725|30014|30015" enable="eq(-1,true)" subsetting="true"/>
+        <!-- 0-7: 240p,360p,480p,720p,1080p,1440p,2160p,4320p -->
+		<setting id="kodion.mpd.quality.selection" type="enum" label="30010" default="4" lvalues="30016|30017|30011|30012|30013|30725|30014|30015" enable="eq(-1,true)" subsetting="true"/>
         <!-- TODO commit #7fd9fab0 replacement of type="list[string]" in old settings format in kodion.mpd.stream.features -->
 		<setting id="kodion.mpd.stream.features" type="text" label="30748" default="avc1,vp9,av01,hdr,hfr,vorbis,opus,mp4a,ssa,ac-3,ec-3,dts,filter" enable="eq(-2,true)" subsetting="true"/>
-		<!-- TODO commit #7fd9fab0 replacement of labeled select (starting from 0) in old settings format in kodion.mpd.stream.select -->
+		<!-- TODO commit #7fd9fab0 replacement of labeled select (starting from 0) in old settings format in kodion.mpd.stream.select 
+				1 - Auto, 2 - List, 3 - Auto+List-->
         <setting id="kodion.mpd.stream.select" type="select" label="30758" values="1|2|3" default="1" enable="eq(-3,true)" subsetting="true"/>
 		<setting id="kodion.mpd.live_stream.selection.1" type="enum" label="30689" default="0" lvalues="30740|30741|30742|30743" enable="eq(-6,true)" subsetting="true"/>
 		<setting id="kodion.mpd.live_stream.selection.2" type="enum" label="30689" default="0" lvalues="30740|30741|30742" enable="eq(-7,true)" subsetting="true"/>
