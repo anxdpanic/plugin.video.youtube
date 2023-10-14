@@ -900,22 +900,15 @@ class VideoInfo(object):
             if not isinstance(item1, dict) or not isinstance(item2, dict):
                 return item1 if item2 is _ else item2
             new = {}
-            if PY2:
-                for key in (item1.viewkeys() | item2.viewkeys()):
-                    value = _merge_dicts(item1.get(key, _), item2.get(key, _))
-                    if value is _:
-                        continue
-                    if isinstance(value, str) and '{' in value:
-                        _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
-                    new[key] = value
-            else:
-                for key in (item1.keys() | item2.keys()):
-                    value = _merge_dicts(item1.get(key, _), item2.get(key, _))
-                    if value is _:
-                        continue
-                    if isinstance(value, str) and '{' in value:
-                        _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
-                    new[key] = value
+            keys = set(item1)
+            keys.update(item2)
+            for key in keys:
+                value = _merge_dicts(item1.get(key, _), item2.get(key, _))
+                if value is _:
+                    continue
+                if isinstance(value, str) and '{' in value:
+                    _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
+                new[key] = value
             return new or _
         _format = {}
 
