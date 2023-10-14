@@ -576,6 +576,7 @@ class VideoInfo(object):
             '_id': 30,
             '_query_subtitles': True,
             'json': {
+                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_TESTSUITE',
@@ -603,7 +604,7 @@ class VideoInfo(object):
         'android': {
             '_id': 3,
             'json': {
-                'params': 'CgIQBg==',
+                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
@@ -633,6 +634,7 @@ class VideoInfo(object):
         'android_embedded': {
             '_id': 55,
             'json': {
+                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
@@ -668,6 +670,7 @@ class VideoInfo(object):
             '_id': 29,
             '_query_subtitles': True,
             'json': {
+                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
@@ -722,14 +725,19 @@ class VideoInfo(object):
         },
         # Used to requests captions for clients that don't provide them
         # Requires handling of nsig to overcome throttling (TODO)
-        'smarttv': {
-            '_id': 75,
+        'smarttv_embedded': {
+            '_id': 85,
             'json': {
+                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
-                        'clientName': 'TVHTML5_SIMPLY',
-                        'clientVersion': '1.0',
+                        'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                        'clientScreen': 'WATCH',
+                        'clientVersion': '2.0',
                     },
+                },
+                'thirdParty': {
+                    'embedUrl': 'https://www.youtube.com',
                 },
             },
             # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
@@ -1234,8 +1242,7 @@ class VideoInfo(object):
         new_query = {}
         update_url = False
 
-        if (self._calculate_n and 'n' in query
-                and query.get('ratebypass', [None])[0] != 'yes'):
+        if self._calculate_n and 'n' in query:
             self._player_js = self._player_js or self._get_player_js()
             if self._calculate_n is True:
                 self._context.log_debug('nsig detected')
@@ -1397,8 +1404,7 @@ class VideoInfo(object):
 
         self._context.log_debug(
             'Retrieved video info for video_id: {0}, using {1} client ({2})'
-            .format(self.video_id,
-                    client['json']['context']['client']['clientName'],
+            .format(self.video_id, client_name,
                     'logged in' if auth_header else 'logged out')
         )
         self._selected_client = client.copy()
@@ -1425,7 +1431,7 @@ class VideoInfo(object):
                 video_info_url, 'POST',
                 error_msg=('Caption request failed to get player response for'
                            'video_id: {0}'.format(self.video_id)),
-                **self._build_client('smarttv', True)
+                **self._build_client('smarttv_embedded', True)
             )
 
             response = result.json()
