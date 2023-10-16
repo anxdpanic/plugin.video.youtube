@@ -2163,20 +2163,16 @@ class VideoInfo(object):
         success = None
         
         try:
-            f = xbmcvfs.File(filepath, 'w')
-            if PY2:
-                success = f.write(str(out.encode('utf-8')))
-            else:
-                success = f.write(str(out))
-            f.close()
-            if not success:
-                return None, None
-            return 'http://{0}:{1}/{2}.mpd'.format(
-                ipaddress,
-                self._context.get_settings().httpd_port(),
-                self.video_id
-            ), stream_info
-        except:
+            mpd_file = xbmcvfs.File(filepath, 'w')
+        except (IOError, OSError):
+            self._context.log_error('Unable to open MPD file path for writing')
+        else:
+            try:
+                success = mpd_file.write(str(out.encode('utf-8')))
+            finally:
+                mpd_file.close()
+
+        if not success:
             return None, None
         return 'http://{0}:{1}/{2}.mpd'.format(
             _settings.httpd_listen(for_request=True),

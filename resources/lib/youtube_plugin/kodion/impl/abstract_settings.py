@@ -242,7 +242,11 @@ class AbstractSettings(object):
         if not self.use_mpd_videos():
             return []
         selected = self.get_int(SETTINGS.MPD_QUALITY_SELECTION, 4)
-        return [quality for key, quality in self._QUALITY_SELECTIONS.items()
+        return [quality
+                for key, quality in sorted(
+                    self._QUALITY_SELECTIONS.viewitems(),
+                    reverse=True
+                )
                 if selected >= key]
 
     def stream_features(self):

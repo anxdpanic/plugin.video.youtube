@@ -75,6 +75,7 @@ def to_play_item(context, play_item):
         list_item.setContentLookup(False)
         list_item.setMimeType('application/xml+dash')
         list_item.setProperty('inputstream', 'inputstream.adaptive')
+        list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')  # For Kodi18 Backward compatibility
         list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
         if 'auto' in settings.stream_select():
             list_item.setProperty('inputstream.adaptive.stream_selection_type', 'adaptive')
@@ -101,6 +102,7 @@ def to_play_item(context, play_item):
         list_item.setContentLookup(False)
         list_item.setMimeType(mime_type)
         list_item.setProperty('inputstream', 'inputstream.adaptive')
+        list_item.setProperty('inputstreamaddon', 'inputstream.adaptive')  # For Kodi18 Backward compatibility
         list_item.setProperty('inputstream.adaptive.manifest_type', manifest_type)
 
         if play_item.get_headers():
