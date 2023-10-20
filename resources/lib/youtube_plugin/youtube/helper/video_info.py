@@ -1577,8 +1577,12 @@ class VideoInfo(object):
                 # MPD structure has segments with additional attributes
                 # and url has changed from using a query string to using url params
                 # This breaks the InputStream.Adaptive partial manifest update
-                video_stream['url'] = ('{0}?start_seq=$START_NUMBER$'
-                                       .format(video_stream['url']))
+                if '?' in manifest_url:
+                    video_stream['url'] = manifest_url + '&mpd_version=5'
+                elif manifest_url.endswith('/'):
+                    video_stream['url'] = manifest_url + 'mpd_version/5'
+                else:
+                    video_stream['url'] = manifest_url + '/mpd_version/5'
                 details = self.FORMAT.get('9998')
             else:
                 details = self.FORMAT.get('9999').copy()
