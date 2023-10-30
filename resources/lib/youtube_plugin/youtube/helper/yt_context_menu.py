@@ -120,10 +120,7 @@ def append_add_my_subscriptions_filter(context_menu, provider, context, channel_
 
 
 def append_rate_video(context_menu, provider, context, video_id, refresh_container=False):
-    if refresh_container:
-        refresh_container = '1'
-    else:
-        refresh_container = '0'
+    refresh_container = '1' if refresh_container else '0'
     context_menu.append((context.localize(provider.LOCAL_MAP['youtube.video.rate']),
                          'RunPlugin(%s)' % context.create_uri(['video', 'rate'],
                                                               {'video_id': video_id,
@@ -158,7 +155,7 @@ def append_refresh(context_menu, provider, context):
     context_menu.append((context.localize(provider.LOCAL_MAP['youtube.refresh']), 'Container.Refresh'))
 
 
-def append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name=u''):
+def append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name=''):
     if channel_name:
         text = context.localize(provider.LOCAL_MAP['youtube.subscribe_to']) % context.get_ui().bold(channel_name)
         context_menu.append(

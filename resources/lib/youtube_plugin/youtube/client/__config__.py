@@ -44,10 +44,10 @@ class APICheck(object):
             # users are now pasting keys into api_keys.json
             # try stripping whitespace and .apps.googleusercontent.com from keys and saving the result if they differ
             stripped_key, stripped_id, stripped_secret = self._strip_api_keys(j_key, j_id, j_secret)
-            if stripped_key and stripped_id and stripped_secret:
-                if (j_key != stripped_key) or (j_id != stripped_id) or (j_secret != stripped_secret):
-                    self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
-                    self._api_jstore.save(self._json_api)
+            if (stripped_key and stripped_id and stripped_secret
+                    and (j_key != stripped_key or j_id != stripped_id or j_secret != stripped_secret)):
+                self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
+                self._api_jstore.save(self._json_api)
 
         original_key = self._settings.get_string('youtube.api.key')
         original_id = self._settings.get_string('youtube.api.id')
@@ -81,18 +81,18 @@ class APICheck(object):
         refresh_token = self._settings.get_string('kodion.refresh_token', '')
         token_expires = self._settings.get_int('kodion.access_token.expires', -1)
         last_hash = self._settings.get_string('youtube.api.last.hash', '')
-        if not self._json_am['access_manager']['users'].get(user, {}).get('access_token') or \
-                not self._json_am['access_manager']['users'].get(user, {}).get('refresh_token'):
-            if access_token and refresh_token:
-                self._json_am['access_manager']['users'][user]['access_token'] = access_token
-                self._json_am['access_manager']['users'][user]['refresh_token'] = refresh_token
-                self._json_am['access_manager']['users'][user]['token_expires'] = token_expires
-                if switch == 'own':
-                    own_key_hash = self._get_key_set_hash('own')
-                    if last_hash == self._get_key_set_hash('own', True) or \
-                            last_hash == own_key_hash:
-                        self._json_am['access_manager']['users'][user]['last_key_hash'] = own_key_hash
-                self._am_jstore.save(self._json_am)
+        if ((not self._json_am['access_manager']['users'].get(user, {}).get('access_token')
+                or not self._json_am['access_manager']['users'].get(user, {}).get('refresh_token'))
+                and access_token and refresh_token):
+            self._json_am['access_manager']['users'][user]['access_token'] = access_token
+            self._json_am['access_manager']['users'][user]['refresh_token'] = refresh_token
+            self._json_am['access_manager']['users'][user]['token_expires'] = token_expires
+            if switch == 'own':
+                own_key_hash = self._get_key_set_hash('own')
+                if (last_hash == self._get_key_set_hash('own', True)
+                        or last_hash == own_key_hash):
+                    self._json_am['access_manager']['users'][user]['last_key_hash'] = own_key_hash
+            self._am_jstore.save(self._json_am)
         if access_token or refresh_token or last_hash:
             self._settings.set_string('kodion.access_token', '')
             self._settings.set_string('kodion.refresh_token', '')
@@ -121,26 +121,23 @@ class APICheck(object):
         own_key = self._json_api['keys']['personal']['api_key']
         own_id = self._json_api['keys']['personal']['client_id']
         own_secret = self._json_api['keys']['personal']['client_secret']
-        return False if not own_key or \
-                        not own_id or \
-                        not own_secret else True
+        return own_key and own_id and own_secret
 
     def get_api_keys(self, switch):
         self._json_api = self._api_jstore.get_data()
+        if switch == 'developer':
+            return self._json_api['keys'][switch]
         if switch == 'youtube-tv':
-            api_key = b64decode(key_sets['youtube-tv']['key']).decode('utf-8'),
-            client_id = u''.join([b64decode(key_sets['youtube-tv']['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
-            client_secret = b64decode(key_sets['youtube-tv']['secret']).decode('utf-8')
-        elif switch == 'developer':
-            self._json_api = self._api_jstore.get_data()
-            return self._json_api['keys']['developer']
+            api_key = b64decode(key_sets[switch]['key']).decode('utf-8'),
+            client_id = ''.join([b64decode(key_sets[switch]['id']).decode('utf-8'), '.apps.googleusercontent.com'])
+            client_secret = b64decode(key_sets[switch]['secret']).decode('utf-8')
         elif switch == 'own':
             api_key = self._json_api['keys']['personal']['api_key']
-            client_id = u''.join([self._json_api['keys']['personal']['client_id'], u'.apps.googleusercontent.com'])
+            client_id = ''.join([self._json_api['keys']['personal']['client_id'], '.apps.googleusercontent.com'])
             client_secret = self._json_api['keys']['personal']['client_secret']
         else:
             api_key = b64decode(key_sets['provided'][switch]['key']).decode('utf-8')
-            client_id = u''.join([b64decode(key_sets['provided'][switch]['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
+            client_id = ''.join([b64decode(key_sets['provided'][switch]['id']).decode('utf-8'), '.apps.googleusercontent.com'])
             client_secret = b64decode(key_sets['provided'][switch]['secret']).decode('utf-8')
         return api_key, client_id, client_secret
 
@@ -152,14 +149,13 @@ class APICheck(object):
         if last_set_hash != current_set_hash:
             self.changed = True
             return current_set_hash
-        else:
-            self.changed = False
-            return None
+        self.changed = False
+        return None
 
     def _get_key_set_hash(self, switch, old=False):
         api_key, client_id, client_secret = self.get_api_keys(switch)
         if old and switch == 'own':
-            client_id = client_id.replace(u'.apps.googleusercontent.com', u'')
+            client_id = client_id.replace('.apps.googleusercontent.com', '')
         m = md5()
         m.update(api_key.encode('utf-8'))
         m.update(client_id.encode('utf-8'))
@@ -209,9 +205,9 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-notification_data = {'use_httpd': (__settings.use_mpd_videos() or
-                                   __settings.use_mpd_live_streams()) or
-                                  (__settings.api_config_page()),
+notification_data = {'use_httpd': (__settings.use_mpd_videos()
+                                   or __settings.use_mpd_live_streams()
+                                   or __settings.api_config_page()),
                      'httpd_port': __settings.httpd_port(),
                      'whitelist': __settings.httpd_whitelist(),
                      'httpd_address': __settings.httpd_listen()
@@ -227,9 +223,7 @@ current_user = _api_check.get_current_user()
 api = dict()
 youtube_tv = dict()
 
-_current_switch = _api_check.get_current_switch()
-
-api['key'], api['id'], api['secret'] = _api_check.get_api_keys(_current_switch)
+api['key'], api['id'], api['secret'] = _api_check.get_api_keys(_api_check.get_current_switch())
 
 youtube_tv['key'], youtube_tv['id'], youtube_tv['secret'] = _api_check.get_api_keys('youtube-tv')
 

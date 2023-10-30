@@ -146,7 +146,7 @@ class PlaybackMonitorThread(threading.Thread):
             except RuntimeError:
                 pass
 
-            if self.current_time < 0.0:
+            if self.current_time < 0:
                 self.current_time = 0.0
 
             if self.abort_now():
@@ -162,7 +162,7 @@ class PlaybackMonitorThread(threading.Thread):
                 self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
                 break
 
-            if seek_time and seek_time != 0.0:
+            if seek_time:
                 player.seekTime(seek_time)
                 try:
                     self.current_time = float(player.getTime())
@@ -194,43 +194,43 @@ class PlaybackMonitorThread(threading.Thread):
                 self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
                 break
 
-            if is_logged_in and report_url and use_remote_history:
-                if first_report or (p_waited >= report_interval):
-                    if first_report:
-                        first_report = False
-                        self.segment_start = 0.0
-                        self.current_time = 0.0
-                        self.percent_complete = 0
+            if (is_logged_in and report_url and use_remote_history and (
+                    first_report or p_waited >= report_interval)):
+                if first_report:
+                    first_report = False
+                    self.segment_start = 0.0
+                    self.current_time = 0.0
+                    self.percent_complete = 0
 
-                    p_waited = 0.0
+                p_waited = 0.0
 
-                    if self.segment_start < 0.0:
-                        self.segment_start = 0.0
+                if self.segment_start < 0:
+                    self.segment_start = 0.0
 
-                    if state == 'playing':
-                        segment_end = self.current_time
-                    else:
-                        segment_end = self.segment_start
+                if state == 'playing':
+                    segment_end = self.current_time
+                else:
+                    segment_end = self.segment_start
 
-                    if segment_end > float(self.total_time):
-                        segment_end = float(self.total_time)
+                if segment_end > float(self.total_time):
+                    segment_end = float(self.total_time)
 
-                    if self.segment_start > segment_end:
-                        segment_end = self.segment_start + 10.0
+                if self.segment_start > segment_end:
+                    segment_end = self.segment_start + 10.0
 
-                    if state == 'playing' or last_state == 'playing':  # only report state='paused' once
-                        client.update_watch_history(self.video_id, report_url
-                                                    .format(st=format(self.segment_start, '.3f'),
-                                                            et=format(segment_end, '.3f'),
-                                                            state=state))
-                        self.context.log_debug(
-                            'Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
-                            (self.video_id,
-                             format(self.segment_start, '.3f'),
-                             format(segment_end, '.3f'),
-                             self.percent_complete, state))
+                if state == 'playing' or last_state == 'playing':  # only report state='paused' once
+                    client.update_watch_history(self.video_id, report_url
+                                                .format(st=format(self.segment_start, '.3f'),
+                                                        et=format(segment_end, '.3f'),
+                                                        state=state))
+                    self.context.log_debug(
+                        'Playback reported [%s]: %s segment start, %s segment end @ %s%% state=%s' %
+                        (self.video_id,
+                         format(self.segment_start, '.3f'),
+                         format(segment_end, '.3f'),
+                         self.percent_complete, state))
 
-                    self.segment_start = segment_end
+                self.segment_start = segment_end
 
             if self.abort_now():
                 break
@@ -292,42 +292,40 @@ class PlaybackMonitorThread(threading.Thread):
             self.context.get_playback_history().update(self.video_id, play_count, self.total_time,
                                                        self.current_time, self.percent_complete)
 
-        if not refresh_only:
-            if is_logged_in:
+        if not refresh_only and is_logged_in:
+            if settings.get_bool('youtube.playlist.watchlater.autoremove', True):
+                watch_later_id = access_manager.get_watch_later_id()
 
-                if settings.get_bool('youtube.playlist.watchlater.autoremove', True):
-                    watch_later_id = access_manager.get_watch_later_id()
+                if watch_later_id:
+                    playlist_item_id = \
+                        client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=self.video_id)
+                    if playlist_item_id:
+                        json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
+                        _ = self.provider.v3_handle_error(self.provider, self.context, json_data)
 
-                    if watch_later_id:
-                        playlist_item_id = \
-                            client.get_playlist_item_id_of_video_id(playlist_id=watch_later_id, video_id=self.video_id)
-                        if playlist_item_id:
-                            json_data = client.remove_video_from_playlist(watch_later_id, playlist_item_id)
-                            _ = self.provider.v3_handle_error(self.provider, self.context, json_data)
+            history_playlist_id = access_manager.get_watch_history_id()
+            if history_playlist_id and history_playlist_id != 'HL':
+                json_data = client.add_video_to_playlist(history_playlist_id, self.video_id)
+                _ = self.provider.v3_handle_error(self.provider, self.context, json_data)
 
-                history_playlist_id = access_manager.get_watch_history_id()
-                if history_playlist_id and history_playlist_id != 'HL':
-                    json_data = client.add_video_to_playlist(history_playlist_id, self.video_id)
-                    _ = self.provider.v3_handle_error(self.provider, self.context, json_data)
+            # rate video
+            if settings.get_bool('youtube.post.play.rate', False):
+                do_rating = True
+                if not settings.get_bool('youtube.post.play.rate.playlists', False):
+                    playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+                    do_rating = int(playlist.size()) < 2
 
-                # rate video
-                if settings.get_bool('youtube.post.play.rate', False):
-                    do_rating = True
-                    if not settings.get_bool('youtube.post.play.rate.playlists', False):
-                        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-                        do_rating = int(playlist.size()) < 2
-
-                    if do_rating:
-                        json_data = client.get_video_rating(self.video_id)
-                        success = self.provider.v3_handle_error(self.provider, self.context, json_data)
-                        if success:
-                            items = json_data.get('items', [{'rating': 'none'}])
-                            rating = items[0].get('rating', 'none')
-                            if rating == 'none':
-                                rating_match = \
-                                    re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' %
-                                              (self.video_id, rating))
-                                self.provider.yt_video.process('rate', self.provider, self.context, rating_match)
+                if do_rating:
+                    json_data = client.get_video_rating(self.video_id)
+                    success = self.provider.v3_handle_error(self.provider, self.context, json_data)
+                    if success:
+                        items = json_data.get('items', [{'rating': 'none'}])
+                        rating = items[0].get('rating', 'none')
+                        if rating == 'none':
+                            rating_match = \
+                                re.search('/(?P<video_id>[^/]+)/(?P<rating>[^/]+)', '/%s/%s/' %
+                                          (self.video_id, rating))
+                            self.provider.yt_video.process('rate', self.provider, self.context, rating_match)
 
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         do_refresh = (int(playlist.size()) < 2) or (playlist.getposition() == -1)

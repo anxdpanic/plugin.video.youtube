@@ -52,11 +52,10 @@ def _process_rate_video(provider, context, re_match):
             if rating != current_rating:
                 rating_items.append((context.localize(provider.LOCAL_MAP['youtube.video.rate.%s' % rating]), rating))
         result = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.video.rate']), rating_items)
+    elif rating_param != current_rating:
+        result = rating_param
     else:
-        if rating_param != current_rating:
-            result = rating_param
-        else:
-            result = -1
+        result = -1
 
     if result != -1:
         notify_message = ''
@@ -84,6 +83,8 @@ def _process_rate_video(provider, context, re_match):
                 time_milliseconds=2500,
                 audible=False
             )
+
+    return True
 
 
 def _process_more_for_video(provider, context):
@@ -124,7 +125,6 @@ def _process_more_for_video(provider, context):
 def process(method, provider, context, re_match):
     if method == 'rate':
         return _process_rate_video(provider, context, re_match)
-    elif method == 'more':
+    if method == 'more':
         return _process_more_for_video(provider, context)
-    else:
-        raise kodion.KodionException("Unknown method '%s'" % method)
+    raise kodion.KodionException("Unknown method '%s'" % method)

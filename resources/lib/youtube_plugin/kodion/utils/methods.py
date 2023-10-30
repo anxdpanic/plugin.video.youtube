@@ -22,6 +22,7 @@ import xbmcvfs
 __all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
            'to_str', 'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
 
+
 try:
     xbmc.translatePath = xbmcvfs.translatePath
 except AttributeError:
@@ -138,8 +139,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     def _find_best_fit_video(_stream_data):
         if audio_only:
             return video_quality - _stream_data.get('sort', (0, 0))[0]
-        else:
-            return video_quality - _stream_data.get('video', {}).get('height', 0)
+        return video_quality - _stream_data.get('video', {}).get('height', 0)
 
     sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data)
 
@@ -187,7 +187,7 @@ def create_path(*args):
 
     uri_path = '/'.join(comps)
     if uri_path:
-        return u'/%s/' % uri_path
+        return '/%s/' % uri_path
 
     return '/'
 

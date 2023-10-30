@@ -40,7 +40,8 @@ class AbstractContextUI(object):
     def open_settings(self):
         raise NotImplementedError()
 
-    def show_notification(self, message, header='', image_uri='', time_milliseconds=5000, audible=True):
+    def show_notification(self, message, header='', image_uri='',
+                          time_milliseconds=5000, audible=True):
         raise NotImplementedError()
 
     @staticmethod

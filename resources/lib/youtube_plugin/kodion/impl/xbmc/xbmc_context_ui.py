@@ -44,8 +44,7 @@ class XbmcContextUI(AbstractContextUI):
             if keyboard.isConfirmed() and keyboard.getText():
                 text = utils.to_unicode(keyboard.getText())
                 return True, text
-            else:
-                return False, u''
+            return False, ''
 
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
@@ -54,7 +53,7 @@ class XbmcContextUI(AbstractContextUI):
             text = utils.to_unicode(result)
             return True, text
 
-        return False, u''
+        return False, ''
 
     def on_numeric_input(self, title, default=''):
         dialog = xbmcgui.Dialog()

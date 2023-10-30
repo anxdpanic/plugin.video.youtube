@@ -17,6 +17,7 @@ import xbmc
 
 from .. import logger
 
+
 try:
     xbmc.translatePath = xbmcvfs.translatePath
 except AttributeError:

@@ -19,7 +19,7 @@ class BaseItem(object):
     VERSION = 3
     INFO_DATE = 'date'  # (string) iso 8601
 
-    def __init__(self, name, uri, image=u'', fanart=u''):
+    def __init__(self, name, uri, image='', fanart=''):
         self._version = BaseItem.VERSION
 
         try:
@@ -29,7 +29,7 @@ class BaseItem(object):
 
         self._uri = uri
 
-        self._image = u''
+        self._image = ''
         self.set_image(image)
 
         self._fanart = fanart
@@ -64,10 +64,7 @@ class BaseItem(object):
         return self._name
 
     def set_uri(self, uri):
-        if isinstance(uri, str):
-            self._uri = uri
-        else:
-            self._uri = ''
+        self._uri = uri if uri and isinstance(uri, str) else ''
 
     def get_uri(self):
         """

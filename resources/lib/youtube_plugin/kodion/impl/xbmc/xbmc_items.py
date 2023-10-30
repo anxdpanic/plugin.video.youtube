@@ -37,7 +37,7 @@ def to_play_item(context, play_item):
 
     is_strm = str(context.get_param('strm', False)).lower() == 'true'
 
-    thumb = play_item.get_image() if play_item.get_image() else u'DefaultVideo.png'
+    thumb = play_item.get_image() if play_item.get_image() else 'DefaultVideo.png'
     title = play_item.get_title() if play_item.get_title() else play_item.get_name()
     fanart = ''
     settings = context.get_settings()
@@ -138,7 +138,7 @@ def to_play_item(context, play_item):
 
 def to_video_item(context, video_item):
     context.log_debug('Converting VideoItem |%s|' % video_item.get_uri())
-    thumb = video_item.get_image() if video_item.get_image() else u'DefaultVideo.png'
+    thumb = video_item.get_image() if video_item.get_image() else 'DefaultVideo.png'
     title = video_item.get_title() if video_item.get_title() else video_item.get_name()
     fanart = ''
     settings = context.get_settings()
@@ -201,7 +201,7 @@ def to_video_item(context, video_item):
 
 def to_audio_item(context, audio_item):
     context.log_debug('Converting AudioItem |%s|' % audio_item.get_uri())
-    thumb = audio_item.get_image() if audio_item.get_image() else u'DefaultAudio.png'
+    thumb = audio_item.get_image() if audio_item.get_image() else 'DefaultAudio.png'
     title = audio_item.get_name()
     fanart = ''
     settings = context.get_settings()

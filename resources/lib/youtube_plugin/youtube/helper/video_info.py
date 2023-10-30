@@ -2,7 +2,7 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-present plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -1068,7 +1068,8 @@ class VideoInfo(object):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _load_hls_manifest(self, url, live_type=None, meta_info=None, headers=None, playback_stats=None):
+    def _load_hls_manifest(self, url, live_type=None, meta_info=None,
+                           headers=None, playback_stats=None):
         if not url:
             return []
 

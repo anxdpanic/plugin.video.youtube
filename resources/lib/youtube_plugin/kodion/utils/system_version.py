@@ -15,20 +15,20 @@ import xbmc
 
 class SystemVersion(object):
     def __init__(self, version, releasename, appname):
-        if not isinstance(version, tuple):
-            self._version = (0, 0, 0, 0)
-        else:
-            self._version = version
+        self._version = (
+            version if version and isinstance(version, tuple)
+            else (0, 0, 0, 0)
+        )
 
-        if not releasename or not isinstance(releasename, str):
-            self._releasename = 'UNKNOWN'
-        else:
-            self._releasename = releasename
+        self._releasename = (
+            releasename if releasename and isinstance(releasename, str)
+            else 'UNKNOWN'
+        )
 
-        if not appname or not isinstance(appname, str):
-            self._appname = 'UNKNOWN'
-        else:
-            self._appname = appname
+        self._appname = (
+            appname if appname and isinstance(appname, str)
+            else 'UNKNOWN'
+        )
 
         try:
             json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Application.GetProperties", '

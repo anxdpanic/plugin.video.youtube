@@ -138,6 +138,7 @@ class ResourceManager(object):
 
         if self.handle_error(json_data, suppress_errors) or suppress_errors:
             return result
+        return {}
 
     @staticmethod
     def _make_list_of_50(list_of_ids):
@@ -188,6 +189,7 @@ class ResourceManager(object):
 
         if self.handle_error(json_data):
             return result
+        return {}
 
     def get_playlists(self, playlists_ids):
         list_of_50s = self._make_list_of_50(playlists_ids)

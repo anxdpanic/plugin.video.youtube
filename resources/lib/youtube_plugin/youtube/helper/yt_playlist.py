@@ -55,9 +55,8 @@ def _process_add_video(provider, context, keymap_action=False):
             context.get_ui().set_focus_next_item()
 
         return True
-    else:
-        context.log_debug('Cannot add to playlist id |%s|' % playlist_id)
 
+    context.log_debug('Cannot add to playlist id |%s|' % playlist_id)
     return False
 
 
@@ -71,12 +70,14 @@ def _process_remove_video(provider, context):
     video_id = context.get_param('video_id', '')
     video_name = context.get_param('video_name', '')
 
-    if not playlist_id and not video_id:  # keymap support
-        if listitem_playlist_id and listitem_playlist_id.startswith('PL') \
-                and listitem_playlist_item_id and listitem_playlist_item_id.startswith('UE'):
-            playlist_id = listitem_playlist_id
-            video_id = listitem_playlist_item_id
-            keymap_action = True
+    # keymap support
+    if (not playlist_id and not video_id and listitem_playlist_id
+            and listitem_playlist_id.startswith('PL')
+            and listitem_playlist_item_id
+            and listitem_playlist_item_id.startswith('UE')):
+        playlist_id = listitem_playlist_id
+        video_id = listitem_playlist_item_id
+        keymap_action = True
 
     if not playlist_id:
         raise kodion.KodionException('Playlist/Remove: missing playlist_id')
@@ -209,17 +210,16 @@ def _process_select_playlist(provider, context):
                     new_context = context.clone(new_params=new_params)
                     _process_add_video(provider, new_context, keymap_action)
             break
-        elif result == 'playlist.next':
+        if result == 'playlist.next':
             continue
-        elif result != -1:
+        if result != -1:
             new_params = {}
             new_params.update(context.get_params())
             new_params['playlist_id'] = result
             new_context = context.clone(new_params=new_params)
             _process_add_video(provider, new_context, keymap_action)
             break
-        else:
-            break
+        break
 
 
 def _process_rename_playlist(provider, context):
@@ -287,17 +287,16 @@ def _history_playlist_id_change(context, method):
 def process(method, category, provider, context):
     if method == 'add' and category == 'video':
         return _process_add_video(provider, context)
-    elif method == 'remove' and category == 'video':
+    if method == 'remove' and category == 'video':
         return _process_remove_video(provider, context)
-    elif method == 'remove' and category == 'playlist':
+    if method == 'remove' and category == 'playlist':
         return _process_remove_playlist(provider, context)
-    elif method == 'select' and category == 'playlist':
+    if method == 'select' and category == 'playlist':
         return _process_select_playlist(provider, context)
-    elif method == 'rename' and category == 'playlist':
+    if method == 'rename' and category == 'playlist':
         return _process_rename_playlist(provider, context)
-    elif (method == 'set' or method == 'remove') and category == 'watchlater':
+    if method in {'set', 'remove'} and category == 'watchlater':
         return _watchlater_playlist_id_change(context, method)
-    elif (method == 'set' or method == 'remove') and category == 'history':
+    if method in {'set', 'remove'} and category == 'history':
         return _history_playlist_id_change(context, method)
-    else:
-        raise kodion.KodionException("Unknown category '%s' or method '%s'" % (category, method))
+    raise kodion.KodionException("Unknown category '%s' or method '%s'" % (category, method))

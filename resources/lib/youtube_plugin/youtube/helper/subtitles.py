@@ -221,7 +221,8 @@ class Subtitles(object):
             base_url = None
 
         if base_url:
-            subtitle_url = self._set_query_param(base_url,
+            subtitle_url = self._set_query_param(
+                base_url,
                 ('type', 'track'),
                 ('fmt', 'vtt'),
                 ('tlang', lang_code) if has_translation else (None, None),

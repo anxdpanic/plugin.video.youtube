@@ -12,7 +12,7 @@ from .base_item import BaseItem
 
 
 class DirectoryItem(BaseItem):
-    def __init__(self, name, uri, image=u'', fanart=u''):
+    def __init__(self, name, uri, image='', fanart=''):
         BaseItem.__init__(self, name, uri, image, fanart)
         self._plot = self.get_name()
         self._is_action = False

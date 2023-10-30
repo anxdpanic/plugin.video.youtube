@@ -323,22 +323,20 @@ class LoginClient(object):
             using_conf_main = ((client_id == self.CONFIGS['main'].get('id')) and (client_secret == self.CONFIGS['main'].get('secret')))
         if not using_conf_main and not using_conf_tv:
             return 'None'
-        elif using_conf_tv:
+        if using_conf_tv:
             return 'YouTube-TV'
-        elif using_conf_main:
+        if using_conf_main:
             return 'YouTube-Kodi'
-        else:
-            return 'Unknown'
+        return 'Unknown'
 
     @staticmethod
     def _get_response_dump(response, json_data=None):
         if json_data:
             return json_data
-        else:
+        try:
+            return response.json()
+        except ValueError:
             try:
-                return response.json()
-            except ValueError:
-                try:
-                    return response.text
-                except:
-                    return 'None'
+                return response.text
+            except:
+                return 'None'

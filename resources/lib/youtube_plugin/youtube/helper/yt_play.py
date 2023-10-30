@@ -63,8 +63,8 @@ def play_video(provider, context):
         if video_stream is None:
             return False
 
-        is_video = True if video_stream.get('video') else False
-        is_live = video_stream.get('Live') is True
+        is_video = video_stream.get('video')
+        is_live = video_stream.get('Live')
 
         if is_video and video_stream['video'].get('rtmpe', False):
             message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
@@ -225,8 +225,8 @@ def play_playlist(provider, context):
 
     if (context.get_param('play', '') == '1') and (context.get_handle() == -1):
         player.play(playlist_index=playlist_position)
-        return
-    elif context.get_param('play', '') == '1':
+        return False
+    if context.get_param('play', '') == '1':
         return videos[playlist_position]
 
     return True
@@ -257,5 +257,5 @@ def play_channel_live(provider, context):
 
     if context.get_handle() == -1:
         player.play(playlist_index=0)
-    else:
-        return video_item
+        return False
+    return video_item

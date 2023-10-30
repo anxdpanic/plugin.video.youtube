@@ -117,7 +117,7 @@ class AbstractProvider(object):
         :param re_match:
         :return:
         """
-        return None
+        return
 
     def _internal_on_extra_fanart(self, context, re_match):
         path = re_match.group('path')
@@ -146,12 +146,13 @@ class AbstractProvider(object):
         if command == 'add':
             fav_item = items.from_json(params['item'])
             context.get_favorite_list().add(fav_item)
-        elif command == 'remove':
+            return None
+        if command == 'remove':
             fav_item = items.from_json(params['item'])
             context.get_favorite_list().remove(fav_item)
             context.get_ui().refresh_container()
-        elif command == 'list':
-
+            return None
+        if command == 'list':
             directory_items = context.get_favorite_list().list()
 
             for directory_item in directory_items:
@@ -161,8 +162,7 @@ class AbstractProvider(object):
                 directory_item.set_context_menu(context_menu)
 
             return directory_items
-        else:
-            pass
+        return None
 
     def _internal_watch_later(self, context, re_match):
         self.on_watch_later(context, re_match)
@@ -173,11 +173,13 @@ class AbstractProvider(object):
         if command == 'add':
             item = items.from_json(params['item'])
             context.get_watch_later_list().add(item)
-        elif command == 'remove':
+            return None
+        if command == 'remove':
             item = items.from_json(params['item'])
             context.get_watch_later_list().remove(item)
             context.get_ui().refresh_container()
-        elif command == 'list':
+            return None
+        if command == 'list':
             video_items = context.get_watch_later_list().list()
 
             for video_item in video_items:
@@ -187,9 +189,7 @@ class AbstractProvider(object):
                 video_item.set_context_menu(context_menu)
 
             return video_items
-        else:
-            # do something
-            pass
+        return None
 
     @property
     def data_cache(self):
@@ -210,7 +210,7 @@ class AbstractProvider(object):
             search_history.remove(query)
             context.get_ui().refresh_container()
             return True
-        elif command == 'rename':
+        if command == 'rename':
             query = params['q']
             result, new_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_RENAME),
                                                                    query)
@@ -218,11 +218,11 @@ class AbstractProvider(object):
                 search_history.rename(query, new_query)
                 context.get_ui().refresh_container()
             return True
-        elif command == 'clear':
+        if command == 'clear':
             search_history.clear()
             context.get_ui().refresh_container()
             return True
-        elif command == 'input':
+        if command == 'input':
             self.data_cache = context
 
             folder_path = context.get_ui().get_info_label('Container.FolderPath')
@@ -263,7 +263,7 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
-        elif command == 'query':
+        if command == 'query':
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
             query = params['q']
@@ -277,30 +277,30 @@ class AbstractProvider(object):
             if isinstance(query, bytes):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
-        else:
-            context.set_content_type(constants.content_type.FILES)
-            result = []
 
-            location = str(context.get_param('location', False)).lower() == 'true'
+        context.set_content_type(constants.content_type.FILES)
+        result = []
 
-            # 'New Search...'
-            new_search_item = items.NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
-            result.append(new_search_item)
+        location = str(context.get_param('location', False)).lower() == 'true'
 
-            for search in search_history.list():
-                # little fallback for old history entries
-                if isinstance(search, items.DirectoryItem):
-                    search = search.get_name()
+        # 'New Search...'
+        new_search_item = items.NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
+        result.append(new_search_item)
 
-                # we create a new instance of the SearchItem
-                search_history_item = items.SearchHistoryItem(context, search, fanart=self.get_alternative_fanart(context), location=location)
-                result.append(search_history_item)
+        for search in search_history.list():
+            # little fallback for old history entries
+            if isinstance(search, items.DirectoryItem):
+                search = search.get_name()
 
-            if search_history.is_empty():
-                #  context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
-                pass
+            # we create a new instance of the SearchItem
+            search_history_item = items.SearchHistoryItem(context, search, fanart=self.get_alternative_fanart(context), location=location)
+            result.append(search_history_item)
 
-            return result, {self.RESULT_CACHE_TO_DISC: False}
+        if search_history.is_empty():
+            #  context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
+            pass
+
+        return result, {self.RESULT_CACHE_TO_DISC: False}
 
     def handle_exception(self, context, exception_to_handle):
         return True

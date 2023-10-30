@@ -42,6 +42,5 @@ class Locator(object):
         if lat is None or lon is None:
             self._context.log_error('No coordinates returned')
             return None
-        else:
-            self._context.log_debug('Coordinates found')
-            return lat, lon
+        self._context.log_debug('Coordinates found')
+        return lat, lon

@@ -334,31 +334,30 @@ def process(category, provider, context):
 
     if category == 'related_videos':
         return _process_related_videos(provider, context)
-    elif category == 'popular_right_now':
+    if category == 'popular_right_now':
         return _process_popular_right_now(provider, context)
-    elif category == 'recommendations':
+    if category == 'recommendations':
         return _process_recommendations(provider, context)
-    elif category == 'browse_channels':
+    if category == 'browse_channels':
         return _process_browse_channels(provider, context)
-    elif category == 'new_uploaded_videos_tv':
+    if category == 'new_uploaded_videos_tv':
         return _process_new_uploaded_videos_tv(provider, context)
-    elif category == 'new_uploaded_videos_tv_filtered':
+    if category == 'new_uploaded_videos_tv_filtered':
         return _process_new_uploaded_videos_tv_filtered(provider, context)
-    elif category == 'disliked_videos':
+    if category == 'disliked_videos':
         return _process_disliked_videos(provider, context)
-    elif category == 'live':
+    if category == 'live':
         return _process_live_events(provider, context)
-    elif category == 'upcoming_live':
+    if category == 'upcoming_live':
         return _process_live_events(provider, context, event_type='upcoming')
-    elif category == 'completed_live':
+    if category == 'completed_live':
         return _process_live_events(provider, context, event_type='completed')
-    elif category == 'description_links':
+    if category == 'description_links':
         return _process_description_links(provider, context)
-    elif category == 'parent_comments':
+    if category == 'parent_comments':
         return _process_parent_comments(provider, context)
-    elif category == 'child_comments':
+    if category == 'child_comments':
         return _process_child_comments(provider, context)
-    elif category == 'saved_playlists':
+    if category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context)
-    else:
-        raise kodion.KodionException("YouTube special category '%s' not found" % category)
+    raise kodion.KodionException("YouTube special category '%s' not found" % category)

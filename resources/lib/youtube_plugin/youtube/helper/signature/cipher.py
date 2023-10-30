@@ -32,7 +32,7 @@ class Cipher(object):
             json_script_engine = JsonScriptEngine(json_script)
             return json_script_engine.execute(signature)
 
-        return u''
+        return ''
 
     def _load_javascript(self, javascript):
         function_name = self._find_signature_function_name(javascript)

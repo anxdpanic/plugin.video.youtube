@@ -30,6 +30,7 @@ import xbmcvfs
 import xbmcgui
 import xbmcplugin
 
+
 try:
     xbmc.translatePath = xbmcvfs.translatePath
 except AttributeError:
@@ -220,29 +221,29 @@ class Provider(kodion.AbstractProvider):
         if dev_config and not context.get_settings().allow_dev_keys():
             context.log_debug('Developer config ignored')
             return None
-        elif dev_config:
+
+        if dev_config:
             if not dev_config.get('main') or not dev_config['main'].get('key') \
                     or not dev_config['main'].get('system') or not dev_config.get('origin') \
                     or not dev_config['main'].get('id') or not dev_config['main'].get('secret'):
                 context.log_error('Error loading developer config: |invalid structure| '
                                   'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
                 return dict()
+            dev_origin = dev_config['origin']
+            dev_main = dev_config['main']
+            dev_system = dev_main['system']
+            if dev_system == 'JSONStore':
+                dev_key = b64decode(dev_main['key'])
+                dev_id = b64decode(dev_main['id'])
+                dev_secret = b64decode(dev_main['secret'])
             else:
-                dev_origin = dev_config['origin']
-                dev_main = dev_config['main']
-                dev_system = dev_main['system']
-                if dev_system == 'JSONStore':
-                    dev_key = b64decode(dev_main['key'])
-                    dev_id = b64decode(dev_main['id'])
-                    dev_secret = b64decode(dev_main['secret'])
-                else:
-                    dev_key = dev_main['key']
-                    dev_id = dev_main['id']
-                    dev_secret = dev_main['secret']
-                context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
-                return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
-        else:
-            return dict()
+                dev_key = dev_main['key']
+                dev_id = dev_main['id']
+                dev_secret = dev_main['secret']
+            context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
+            return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
+
+        return dict()
 
     def reset_client(self):
         self._client = None
@@ -279,11 +280,10 @@ class Provider(kodion.AbstractProvider):
                 context.log_debug('API key origin changed, clearing cache. |%s|' % dev_origin)
                 access_manager.set_last_origin(dev_origin)
                 self.get_resource_manager(context).clear()
-        else:
-            if api_last_origin != 'plugin.video.youtube':
-                context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
-                access_manager.set_last_origin('plugin.video.youtube')
-                self.get_resource_manager(context).clear()
+        elif api_last_origin != 'plugin.video.youtube':
+            context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
+            access_manager.set_last_origin('plugin.video.youtube')
+            self.get_resource_manager(context).clear()
 
         if dev_id:
             access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
@@ -375,20 +375,17 @@ class Provider(kodion.AbstractProvider):
                             access_manager.update_dev_access_token(dev_id, access_token='', refresh_token='')
                         else:
                             access_manager.update_access_token(access_token='', refresh_token='')
+                    elif dev_id:
+                        access_manager.update_dev_access_token(dev_id, '')
                     else:
-                        if dev_id:
-                            access_manager.update_dev_access_token(dev_id, '')
-                        else:
-                            access_manager.update_access_token('')
+                        access_manager.update_access_token('')
                     # we clear the cache, so none cached data of an old account will be displayed.
                     self.get_resource_manager(context).clear()
 
             # in debug log the login status
             self._is_logged_in = len(access_tokens) == 2
-            if self._is_logged_in:
-                context.log_debug('User is logged in')
-            else:
-                context.log_debug('User is not logged in')
+            context.log_debug('User is logged in' if self._is_logged_in else
+                              'User is not logged in')
 
             if len(access_tokens) == 0:
                 access_tokens = ['', '']
@@ -553,9 +550,9 @@ class Provider(kodion.AbstractProvider):
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
 
-        if method == 'channel' and channel_id and channel_id.lower() == 'property':
-            if listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc')):
-                context.execute('Container.Update(%s)' % context.create_uri(['channel', listitem_channel_id]))  # redirect if keymap, without redirect results in 'invalid handle -1'
+        if (method == 'channel' and channel_id and channel_id.lower() == 'property'
+                and listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc'))):
+            context.execute('Container.Update(%s)' % context.create_uri(['channel', listitem_channel_id]))  # redirect if keymap, without redirect results in 'invalid handle -1'
 
         if method == 'channel' and not channel_id:
             return False
@@ -757,22 +754,21 @@ class Provider(kodion.AbstractProvider):
             if not redirect:
                 context.log_debug('Redirecting playback, handle is -1')
             context.execute(builtin % context.create_uri(['play'], {'video_id': params['video_id']}))
-            return
+            return False
 
         if 'playlist_id' in params and (context.get_handle() != -1):
             builtin = 'RunPlugin(%s)'
             stream_url = context.create_uri(['play'], params)
             xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=False, listitem=xbmcgui.ListItem(path=stream_url))
             context.execute(builtin % context.create_uri(['play'], params))
-            return
+            return False
 
         if 'video_id' in params and 'playlist_id' not in params:
             return yt_play.play_video(self, context)
-        elif 'playlist_id' in params:
+        if 'playlist_id' in params:
             return yt_play.play_playlist(self, context)
-        elif 'channel_id' in params and 'live' in params:
-            if int(params['live']) > 0:
-                return yt_play.play_channel_live(self, context)
+        if 'channel_id' in params and 'live' in params and int(params['live']) > 0:
+            return yt_play.play_channel_live(self, context)
         return False
 
     @kodion.RegisterProviderPath('^/video/(?P<method>[^/]+)/$')
@@ -869,7 +865,7 @@ class Provider(kodion.AbstractProvider):
             result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.switch.user']), users)
             if result == -1:
                 return True
-            elif result == 0:
+            if result == 0:
                 user = add_user(access_manager_users)
             else:
                 user = user_index_map[result - 1]
@@ -975,11 +971,13 @@ class Provider(kodion.AbstractProvider):
         if (mode == 'in') and context.get_access_manager().has_refresh_token():
             yt_login.process('out', self, context, sign_out_refresh=False)
 
-        if not sign_out_confirmed:
-            if (mode == 'out') and context.get_ui().on_yes_no_input(context.localize(self.LOCAL_MAP['youtube.sign.out']), context.localize(self.LOCAL_MAP['youtube.are.you.sure'])):
-                sign_out_confirmed = True
+        if (not sign_out_confirmed and mode == 'out'
+                and context.get_ui().on_yes_no_input(
+                    context.localize(self.LOCAL_MAP['youtube.sign.out']),
+                    context.localize(self.LOCAL_MAP['youtube.are.you.sure']))):
+            sign_out_confirmed = True
 
-        if (mode == 'in') or ((mode == 'out') and sign_out_confirmed):
+        if mode == 'in' or (mode == 'out' and sign_out_confirmed):
             yt_login.process(mode, self, context)
         return False
 
@@ -1111,12 +1109,9 @@ class Provider(kodion.AbstractProvider):
             local_ranges = ('10.', '172.16.', '192.168.')
             addresses = [iface[4][0] for iface in socket.getaddrinfo(socket.gethostname(), None) if iface[4][0].startswith(local_ranges)] + ['127.0.0.1', '0.0.0.0']
             selected_address = context.get_ui().on_select(context.localize(self.LOCAL_MAP['youtube.select.listen.ip']), addresses)
-            if selected_address == -1:
-                return False
-            else:
+            if selected_address != -1:
                 context.get_settings().set_httpd_listen(addresses[selected_address])
-        else:
-            return False
+        return False
 
     # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/my_subscriptions/filter/$')
@@ -1142,9 +1137,8 @@ class Provider(kodion.AbstractProvider):
         if action == 'add':
             if channel_name not in filter_list:
                 filter_list.append(channel_name)
-        elif action == 'remove':
-            if channel_name in filter_list:
-                filter_list = [chan_name for chan_name in filter_list if chan_name != channel_name]
+        elif action == 'remove' and channel_name in filter_list:
+            filter_list = [chan_name for chan_name in filter_list if chan_name != channel_name]
 
         modified_string = ','.join(filter_list).lstrip(',')
         if filter_string != modified_string:
@@ -1180,26 +1174,25 @@ class Provider(kodion.AbstractProvider):
                     context.get_playback_history().clear()
                     context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
         elif action == 'reset':
-            if maint_type == 'access_manager':
-                if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.reset.access.manager.confirm'])):
-                    try:
-                        context.get_function_cache().clear()
-                        access_manager = context.get_access_manager()
-                        client = self.get_client(context)
-                        if access_manager.has_refresh_token():
-                            refresh_tokens = access_manager.get_refresh_token().split('|')
-                            refresh_tokens = list(set(refresh_tokens))
-                            for refresh_token in refresh_tokens:
-                                try:
-                                    client.revoke(refresh_token)
-                                except:
-                                    pass
-                        self.reset_client()
-                        access_manager.update_access_token(access_token='', refresh_token='')
-                        context.get_ui().refresh_container()
-                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
-                    except:
-                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
+            if maint_type == 'access_manager' and context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.reset.access.manager.confirm'])):
+                try:
+                    context.get_function_cache().clear()
+                    access_manager = context.get_access_manager()
+                    client = self.get_client(context)
+                    if access_manager.has_refresh_token():
+                        refresh_tokens = access_manager.get_refresh_token().split('|')
+                        refresh_tokens = list(set(refresh_tokens))
+                        for refresh_token in refresh_tokens:
+                            try:
+                                client.revoke(refresh_token)
+                            except:
+                                pass
+                    self.reset_client()
+                    access_manager.update_access_token(access_token='', refresh_token='')
+                    context.get_ui().refresh_container()
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                except:
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
@@ -1240,16 +1233,15 @@ class Provider(kodion.AbstractProvider):
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
                     else:
                         context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
-        elif action == 'install':
-            if maint_type == 'inputstreamhelper':
-                if context.get_system_version().get_version()[0] >= 17:
-                    try:
-                        xbmcaddon.Addon('script.module.inputstreamhelper')
-                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.inputstreamhelper.is.installed']))
-                    except RuntimeError:
-                        context.execute('InstallAddon(script.module.inputstreamhelper)')
-                else:
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.requires.krypton']))
+        elif action == 'install' and maint_type == 'inputstreamhelper':
+            if context.get_system_version().get_version()[0] >= 17:
+                try:
+                    xbmcaddon.Addon('script.module.inputstreamhelper')
+                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.inputstreamhelper.is.installed']))
+                except RuntimeError:
+                    context.execute('InstallAddon(script.module.inputstreamhelper)')
+            else:
+                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.requires.krypton']))
 
     # noinspection PyUnusedLocal
     @kodion.RegisterProviderPath('^/api/update/$')

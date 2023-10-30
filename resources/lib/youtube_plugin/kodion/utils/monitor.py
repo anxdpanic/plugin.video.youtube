@@ -106,18 +106,26 @@ class YouTubeMonitor(xbmc.Monitor):
         self._old_httpd_port = self._httpd_port
 
     def start_httpd(self):
+        if self.httpd:
+            return
+
+        logger.log_debug('HTTPServer: Starting |{ip}:{port}|'.format(
+            ip=self.httpd_address(),
+            port=str(self.httpd_port())
+        ))
+        self.httpd_port_sync()
+        self.httpd = get_http_server(address=self.httpd_address(), port=self.httpd_port())
         if not self.httpd:
-            logger.log_debug('HTTPServer: Starting |{ip}:{port}|'.format(ip=self.httpd_address(),
-                                                                         port=str(self.httpd_port())))
-            self.httpd_port_sync()
-            self.httpd = get_http_server(address=self.httpd_address(), port=self.httpd_port())
-            if self.httpd:
-                self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
-                self.httpd_thread.daemon = True
-                self.httpd_thread.start()
-                sock_name = self.httpd.socket.getsockname()
-                logger.log_debug('HTTPServer: Serving on |{ip}:{port}|'.format(ip=str(sock_name[0]),
-                                                                               port=str(sock_name[1])))
+            return
+
+        self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
+        self.httpd_thread.daemon = True
+        self.httpd_thread.start()
+        sock_name = self.httpd.socket.getsockname()
+        logger.log_debug('HTTPServer: Serving on |{ip}:{port}|'.format(
+            ip=str(sock_name[0]),
+            port=str(sock_name[1])
+        ))
 
     def shutdown_httpd(self):
         if self.httpd:
@@ -160,5 +168,4 @@ class YouTubeMonitor(xbmc.Monitor):
         if os.path.isdir(path):
             logger.log_debug('Failed to remove directory: {dir}'.format(dir=path.encode('utf-8')))
             return False
-        else:
-            return True
+        return True

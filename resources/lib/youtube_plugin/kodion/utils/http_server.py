@@ -55,9 +55,8 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         if not conn_allowed:
             logger.log_debug('HTTPServer: Connection from |%s| not allowed' % client_ip)
-        else:
-            if self.path != '/ping':
-                logger.log_debug(' '.join(log_lines))
+        elif self.path != '/ping':
+            logger.log_debug(' '.join(log_lines))
         return conn_allowed
 
     # noinspection PyPep8Naming
@@ -82,86 +81,82 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         if not self.connection_allowed():
             self.send_error(403)
-        else:
-            if mpd_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
-                file_chunk = True
-                logger.log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path.encode('utf-8')))
-                try:
-                    with open(file_path, 'rb') as f:
-                        self.send_response(200)
-                        self.send_header('Content-Type', 'application/xml+dash')
-                        self.send_header('Content-Length', os.path.getsize(file_path))
-                        self.end_headers()
-                        while file_chunk:
-                            file_chunk = f.read(self.chunk_size)
-                            if file_chunk:
-                                self.wfile.write(file_chunk)
-                except IOError:
-                    response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
-                    self.send_error(404, response)
-            elif api_config_enabled and stripped_path.lower() == '/api':
-                html = self.api_config_page()
-                html = html.encode('utf-8')
-                self.send_response(200)
-                self.send_header('Content-Type', 'text/html; charset=utf-8')
-                self.send_header('Content-Length', len(html))
-                self.end_headers()
-                for chunk in self.get_chunks(html):
-                    self.wfile.write(chunk)
-            elif api_config_enabled and stripped_path.startswith('/api_submit'):
-                addon = xbmcaddon.Addon('plugin.video.youtube')
-                i18n = addon.getLocalizedString
-                xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
-                old_api_key = addon.getSetting('youtube.api.key')
-                old_api_id = addon.getSetting('youtube.api.id')
-                old_api_secret = addon.getSetting('youtube.api.secret')
-                query = urlparse(self.path).query
-                params = parse_qs(query)
-                api_key = params.get('api_key', [None])[0]
-                api_id = params.get('api_id', [None])[0]
-                api_secret = params.get('api_secret', [None])[0]
-                if api_key and api_id and api_secret:
-                    footer = i18n(30638)
-                else:
-                    footer = u''
-                if re.search(r'api_key=(?:&|$)', query):
-                    api_key = ''
-                if re.search(r'api_id=(?:&|$)', query):
-                    api_id = ''
-                if re.search(r'api_secret=(?:&|$)', query):
-                    api_secret = ''
-                updated = []
-                if api_key is not None and api_key != old_api_key:
-                    addon.setSetting('youtube.api.key', api_key)
-                    updated.append(i18n(30201))
-                if api_id is not None and api_id != old_api_id:
-                    addon.setSetting('youtube.api.id', api_id)
-                    updated.append(i18n(30202))
-                if api_secret is not None and api_secret != old_api_secret:
-                    updated.append(i18n(30203))
-                    addon.setSetting('youtube.api.secret', api_secret)
-                if addon.getSetting('youtube.api.key') and addon.getSetting('youtube.api.id') and \
-                        addon.getSetting('youtube.api.secret'):
-                    enabled = i18n(30636)
-                else:
-                    enabled = i18n(30637)
-                if not updated:
-                    updated = i18n(30635)
-                else:
-                    updated = i18n(30631) % u', '.join(updated)
-                html = self.api_submit_page(updated, enabled, footer)
-                html = html.encode('utf-8')
-                self.send_response(200)
-                self.send_header('Content-Type', 'text/html; charset=utf-8')
-                self.send_header('Content-Length', len(html))
-                self.end_headers()
-                for chunk in self.get_chunks(html):
-                    self.wfile.write(chunk)
-            elif stripped_path == '/ping':
-                self.send_error(204)
+        elif mpd_proxy_enabled and self.path.endswith('.mpd'):
+            file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
+            file_chunk = True
+            logger.log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path.encode('utf-8')))
+            try:
+                with open(file_path, 'rb') as f:
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/xml+dash')
+                    self.send_header('Content-Length', os.path.getsize(file_path))
+                    self.end_headers()
+                    while file_chunk:
+                        file_chunk = f.read(self.chunk_size)
+                        if file_chunk:
+                            self.wfile.write(file_chunk)
+            except IOError:
+                response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
+                self.send_error(404, response)
+        elif api_config_enabled and stripped_path.lower() == '/api':
+            html = self.api_config_page()
+            html = html.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', len(html))
+            self.end_headers()
+            for chunk in self.get_chunks(html):
+                self.wfile.write(chunk)
+        elif api_config_enabled and stripped_path.startswith('/api_submit'):
+            addon = xbmcaddon.Addon('plugin.video.youtube')
+            i18n = addon.getLocalizedString
+            xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
+            old_api_key = addon.getSetting('youtube.api.key')
+            old_api_id = addon.getSetting('youtube.api.id')
+            old_api_secret = addon.getSetting('youtube.api.secret')
+            query = urlparse(self.path).query
+            params = parse_qs(query)
+            api_key = params.get('api_key', [None])[0]
+            api_id = params.get('api_id', [None])[0]
+            api_secret = params.get('api_secret', [None])[0]
+            footer = i18n(30638) if api_key and api_id and api_secret else ''
+            if re.search(r'api_key=(?:&|$)', query):
+                api_key = ''
+            if re.search(r'api_id=(?:&|$)', query):
+                api_id = ''
+            if re.search(r'api_secret=(?:&|$)', query):
+                api_secret = ''
+            updated = []
+            if api_key is not None and api_key != old_api_key:
+                addon.setSetting('youtube.api.key', api_key)
+                updated.append(i18n(30201))
+            if api_id is not None and api_id != old_api_id:
+                addon.setSetting('youtube.api.id', api_id)
+                updated.append(i18n(30202))
+            if api_secret is not None and api_secret != old_api_secret:
+                updated.append(i18n(30203))
+                addon.setSetting('youtube.api.secret', api_secret)
+            if addon.getSetting('youtube.api.key') and addon.getSetting('youtube.api.id') and \
+                    addon.getSetting('youtube.api.secret'):
+                enabled = i18n(30636)
             else:
-                self.send_error(501)
+                enabled = i18n(30637)
+            if not updated:
+                updated = i18n(30635)
+            else:
+                updated = i18n(30631) % ', '.join(updated)
+            html = self.api_submit_page(updated, enabled, footer)
+            html = html.encode('utf-8')
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Length', len(html))
+            self.end_headers()
+            for chunk in self.get_chunks(html):
+                self.wfile.write(chunk)
+        elif stripped_path == '/ping':
+            self.send_error(204)
+        else:
+            self.send_error(501)
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
@@ -289,172 +284,172 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 class Pages(object):
     api_configuration = {
         'html':
-            u'<!doctype html>\n<html>\n'
-            u'<head>\n\t<meta charset="utf-8">\n'
-            u'\t<title>{title}</title>\n'
-            u'\t<style>\n{css}\t</style>\n'
-            u'</head>\n<body>\n'
-            u'\t<div class="center">\n'
-            u'\t<h5>{header}</h5>\n'
-            u'\t<form action="/api_submit" class="config_form">\n'
-            u'\t\t<label for="api_key">\n'
-            u'\t\t<span>{api_key_head}</span><input type="text" name="api_key" value="{api_key_value}" size="50"/>\n'
-            u'\t\t</label>\n'
-            u'\t\t<label for="api_id">\n'
-            u'\t\t<span>{api_id_head}</span><input type="text" name="api_id" value="{api_id_value}" size="50"/>\n'
-            u'\t\t</label>\n'
-            u'\t\t<label for="api_secret">\n'
-            u'\t\t<span>{api_secret_head}</span><input type="text" name="api_secret" value="{api_secret_value}" size="50"/>\n'
-            u'\t\t</label>\n'
-            u'\t\t<input type="submit" value="{submit}">\n'
-            u'\t</form>\n'
-            u'\t</div>\n'
-            u'</body>\n</html>',
+            '<!doctype html>\n<html>\n'
+            '<head>\n\t<meta charset="utf-8">\n'
+            '\t<title>{title}</title>\n'
+            '\t<style>\n{css}\t</style>\n'
+            '</head>\n<body>\n'
+            '\t<div class="center">\n'
+            '\t<h5>{header}</h5>\n'
+            '\t<form action="/api_submit" class="config_form">\n'
+            '\t\t<label for="api_key">\n'
+            '\t\t<span>{api_key_head}</span><input type="text" name="api_key" value="{api_key_value}" size="50"/>\n'
+            '\t\t</label>\n'
+            '\t\t<label for="api_id">\n'
+            '\t\t<span>{api_id_head}</span><input type="text" name="api_id" value="{api_id_value}" size="50"/>\n'
+            '\t\t</label>\n'
+            '\t\t<label for="api_secret">\n'
+            '\t\t<span>{api_secret_head}</span><input type="text" name="api_secret" value="{api_secret_value}" size="50"/>\n'
+            '\t\t</label>\n'
+            '\t\t<input type="submit" value="{submit}">\n'
+            '\t</form>\n'
+            '\t</div>\n'
+            '</body>\n</html>',
 
         'css':
-            u'body {\n'
-            u'  background: #141718;\n'
-            u'}\n'
-            u'.center {\n'
-            u'  margin: auto;\n'
-            u'  width: 600px;\n'
-            u'  padding: 10px;\n'
-            u'}\n'
-            u'.config_form {\n'
-            u'  width: 575px;\n'
-            u'  height: 145px;\n'
-            u'  font-size: 16px;\n'
-            u'  background: #1a2123;\n'
-            u'  padding: 30px 30px 15px 30px;\n'
-            u'  border: 5px solid #1a2123;\n'
-            u'}\n'
-            u'h5 {\n'
-            u'  font-family: Arial, Helvetica, sans-serif;\n'
-            u'  font-size: 16px;\n'
-            u'  color: #fff;\n'
-            u'  font-weight: 600;\n'
-            u'  width: 575px;\n'
-            u'  height: 20px;\n'
-            u'  background: #0f84a5;\n'
-            u'  padding: 5px 30px 5px 30px;\n'
-            u'  border: 5px solid #0f84a5;\n'
-            u'  margin: 0px;\n'
-            u'}\n'
-            u'.config_form input[type=submit],\n'
-            u'.config_form input[type=button],\n'
-            u'.config_form input[type=text],\n'
-            u'.config_form textarea,\n'
-            u'.config_form label {\n'
-            u'  font-family: Arial, Helvetica, sans-serif;\n'
-            u'  font-size: 16px;\n'
-            u'  color: #fff;\n'
-            u'}\n'
-            u'.config_form label {\n'
-            u'  display:block;\n'
-            u'  margin-bottom: 10px;\n'
-            u'}\n'
-            u'.config_form label > span {\n'
-            u'  display: inline-block;\n'
-            u'  float: left;\n'
-            u'  width: 150px;\n'
-            u'}\n'
-            u'.config_form input[type=text] {\n'
-            u'  background: transparent;\n'
-            u'  border: none;\n'
-            u'  border-bottom: 1px solid #147a96;\n'
-            u'  width: 400px;\n'
-            u'  outline: none;\n'
-            u'  padding: 0px 0px 0px 0px;\n'
-            u'}\n'
-            u'.config_form input[type=text]:focus {\n'
-            u'  border-bottom: 1px dashed #0f84a5;\n'
-            u'}\n'
-            u'.config_form input[type=submit],\n'
-            u'.config_form input[type=button] {\n'
-            u'  width: 150px;\n'
-            u'  background: #141718;\n'
-            u'  border: none;\n'
-            u'  padding: 8px 0px 8px 10px;\n'
-            u'  border-radius: 5px;\n'
-            u'  color: #fff;\n'
-            u'  margin-top: 10px\n'
-            u'}\n'
-            u'.config_form input[type=submit]:hover,\n'
-            u'.config_form input[type=button]:hover {\n'
-            u'  background: #0f84a5;\n'
-            u'}\n'
+            'body {\n'
+            '  background: #141718;\n'
+            '}\n'
+            '.center {\n'
+            '  margin: auto;\n'
+            '  width: 600px;\n'
+            '  padding: 10px;\n'
+            '}\n'
+            '.config_form {\n'
+            '  width: 575px;\n'
+            '  height: 145px;\n'
+            '  font-size: 16px;\n'
+            '  background: #1a2123;\n'
+            '  padding: 30px 30px 15px 30px;\n'
+            '  border: 5px solid #1a2123;\n'
+            '}\n'
+            'h5 {\n'
+            '  font-family: Arial, Helvetica, sans-serif;\n'
+            '  font-size: 16px;\n'
+            '  color: #fff;\n'
+            '  font-weight: 600;\n'
+            '  width: 575px;\n'
+            '  height: 20px;\n'
+            '  background: #0f84a5;\n'
+            '  padding: 5px 30px 5px 30px;\n'
+            '  border: 5px solid #0f84a5;\n'
+            '  margin: 0px;\n'
+            '}\n'
+            '.config_form input[type=submit],\n'
+            '.config_form input[type=button],\n'
+            '.config_form input[type=text],\n'
+            '.config_form textarea,\n'
+            '.config_form label {\n'
+            '  font-family: Arial, Helvetica, sans-serif;\n'
+            '  font-size: 16px;\n'
+            '  color: #fff;\n'
+            '}\n'
+            '.config_form label {\n'
+            '  display:block;\n'
+            '  margin-bottom: 10px;\n'
+            '}\n'
+            '.config_form label > span {\n'
+            '  display: inline-block;\n'
+            '  float: left;\n'
+            '  width: 150px;\n'
+            '}\n'
+            '.config_form input[type=text] {\n'
+            '  background: transparent;\n'
+            '  border: none;\n'
+            '  border-bottom: 1px solid #147a96;\n'
+            '  width: 400px;\n'
+            '  outline: none;\n'
+            '  padding: 0px 0px 0px 0px;\n'
+            '}\n'
+            '.config_form input[type=text]:focus {\n'
+            '  border-bottom: 1px dashed #0f84a5;\n'
+            '}\n'
+            '.config_form input[type=submit],\n'
+            '.config_form input[type=button] {\n'
+            '  width: 150px;\n'
+            '  background: #141718;\n'
+            '  border: none;\n'
+            '  padding: 8px 0px 8px 10px;\n'
+            '  border-radius: 5px;\n'
+            '  color: #fff;\n'
+            '  margin-top: 10px\n'
+            '}\n'
+            '.config_form input[type=submit]:hover,\n'
+            '.config_form input[type=button]:hover {\n'
+            '  background: #0f84a5;\n'
+            '}\n'
     }
 
     api_submit = {
         'html':
-            u'<!doctype html>\n<html>\n'
-            u'<head>\n\t<meta charset="utf-8">\n'
-            u'\t<title>{title}</title>\n'
-            u'\t<style>\n{css}\t</style>\n'
-            u'</head>\n<body>\n'
-            u'\t<div class="center">\n'
-            u'\t<h5>{header}</h5>\n'
-            u'\t<div class="content">\n'
-            u'\t\t<span>{updated}</span>\n'
-            u'\t\t<span>{enabled}</span>\n'
-            u'\t\t<span>&nbsp;</span>\n'
-            u'\t\t<span>&nbsp;</span>\n'
-            u'\t\t<span>&nbsp;</span>\n'
-            u'\t\t<span>&nbsp;</span>\n'
-            u'\t\t<div class="textcenter">\n'
-            u'\t\t\t<span><small>{footer}</small></span>\n'
-            u'\t\t</div>\n'
-            u'\t</div>\n'
-            u'\t</div>\n'
-            u'</body>\n</html>',
+            '<!doctype html>\n<html>\n'
+            '<head>\n\t<meta charset="utf-8">\n'
+            '\t<title>{title}</title>\n'
+            '\t<style>\n{css}\t</style>\n'
+            '</head>\n<body>\n'
+            '\t<div class="center">\n'
+            '\t<h5>{header}</h5>\n'
+            '\t<div class="content">\n'
+            '\t\t<span>{updated}</span>\n'
+            '\t\t<span>{enabled}</span>\n'
+            '\t\t<span>&nbsp;</span>\n'
+            '\t\t<span>&nbsp;</span>\n'
+            '\t\t<span>&nbsp;</span>\n'
+            '\t\t<span>&nbsp;</span>\n'
+            '\t\t<div class="textcenter">\n'
+            '\t\t\t<span><small>{footer}</small></span>\n'
+            '\t\t</div>\n'
+            '\t</div>\n'
+            '\t</div>\n'
+            '</body>\n</html>',
 
         'css':
-            u'body {\n'
-            u'  background: #141718;\n'
-            u'}\n'
-            u'.center {\n'
-            u'  margin: auto;\n'
-            u'  width: 600px;\n'
-            u'  padding: 10px;\n'
-            u'}\n'
-            u'.textcenter {\n'
-            u'  margin: auto;\n'
-            u'  width: 600px;\n'
-            u'  padding: 10px;\n'
-            u'  text-align: center;\n'
-            u'}\n'
-            u'.content {\n'
-            u'  width: 575px;\n'
-            u'  height: 145px;\n'
-            u'  background: #1a2123;\n'
-            u'  padding: 30px 30px 15px 30px;\n'
-            u'  border: 5px solid #1a2123;\n'
-            u'}\n'
-            u'h5 {\n'
-            u'  font-family: Arial, Helvetica, sans-serif;\n'
-            u'  font-size: 16px;\n'
-            u'  color: #fff;\n'
-            u'  font-weight: 600;\n'
-            u'  width: 575px;\n'
-            u'  height: 20px;\n'
-            u'  background: #0f84a5;\n'
-            u'  padding: 5px 30px 5px 30px;\n'
-            u'  border: 5px solid #0f84a5;\n'
-            u'  margin: 0px;\n'
-            u'}\n'
-            u'span {\n'
-            u'  font-family: Arial, Helvetica, sans-serif;\n'
-            u'  font-size: 16px;\n'
-            u'  color: #fff;\n'
-            u'  display: block;\n'
-            u'  float: left;\n'
-            u'  width: 575px;\n'
-            u'}\n'
-            u'small {\n'
-            u'  font-family: Arial, Helvetica, sans-serif;\n'
-            u'  font-size: 12px;\n'
-            u'  color: #fff;\n'
-            u'}\n'
+            'body {\n'
+            '  background: #141718;\n'
+            '}\n'
+            '.center {\n'
+            '  margin: auto;\n'
+            '  width: 600px;\n'
+            '  padding: 10px;\n'
+            '}\n'
+            '.textcenter {\n'
+            '  margin: auto;\n'
+            '  width: 600px;\n'
+            '  padding: 10px;\n'
+            '  text-align: center;\n'
+            '}\n'
+            '.content {\n'
+            '  width: 575px;\n'
+            '  height: 145px;\n'
+            '  background: #1a2123;\n'
+            '  padding: 30px 30px 15px 30px;\n'
+            '  border: 5px solid #1a2123;\n'
+            '}\n'
+            'h5 {\n'
+            '  font-family: Arial, Helvetica, sans-serif;\n'
+            '  font-size: 16px;\n'
+            '  color: #fff;\n'
+            '  font-weight: 600;\n'
+            '  width: 575px;\n'
+            '  height: 20px;\n'
+            '  background: #0f84a5;\n'
+            '  padding: 5px 30px 5px 30px;\n'
+            '  border: 5px solid #0f84a5;\n'
+            '  margin: 0px;\n'
+            '}\n'
+            'span {\n'
+            '  font-family: Arial, Helvetica, sans-serif;\n'
+            '  font-size: 16px;\n'
+            '  color: #fff;\n'
+            '  display: block;\n'
+            '  float: left;\n'
+            '  width: 575px;\n'
+            '}\n'
+            'small {\n'
+            '  font-family: Arial, Helvetica, sans-serif;\n'
+            '  font-size: 12px;\n'
+            '  color: #fff;\n'
+            '}\n'
     }
 
 

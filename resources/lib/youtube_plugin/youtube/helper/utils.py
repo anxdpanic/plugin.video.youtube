@@ -139,8 +139,7 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
 
         if context.get_path() == '/subscriptions/list/':
-            channel = title.lower()
-            channel = channel.replace(',', '')
+            channel = title.lower().replace(',', '')
             if channel in filter_list:
                 yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
             else:
@@ -295,16 +294,15 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             video_item.set_scheduled_start_utc(datetime)
             start_date, start_time = utils.datetime_parser.get_scheduled_start(datetime)
             if start_date:
-                title = u'({live} {date}@{time}) {title}' \
+                title = '({live} {date}@{time}) {title}' \
                     .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
             else:
-                title = u'({live} @ {time}) {title}' \
-                    .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
+                title = '({live} @ {time}) {title}' \
+                    .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), time=start_time, title=snippet['title'])
             video_item.set_title(title)
-        else:
-            # set the title
-            if not video_item.get_title():
-                video_item.set_title(snippet['title'])
+        # set the title
+        elif not video_item.get_title():
+            video_item.set_title(snippet['title'])
 
         """
         This is experimental. We try to get the most information out of the title of a video.
@@ -401,27 +399,25 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
                 if playlist_match:
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
-                    if playlist_id:
-                        if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
-                            playlist_item_id = playlist_item_id_dict[video_id]
-                            video_item.set_playlist_id(playlist_id)
-                            video_item.set_playlist_item_id(playlist_item_id)
-                            context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
-                                                 'RunPlugin(%s)' % context.create_uri(
-                                                     ['playlist', 'remove', 'video'],
-                                                     {'playlist_id': playlist_id, 'video_id': playlist_item_id,
-                                                      'video_name': video_item.get_name()})))
+                    if playlist_id and playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
+                        playlist_item_id = playlist_item_id_dict[video_id]
+                        video_item.set_playlist_id(playlist_id)
+                        video_item.set_playlist_item_id(playlist_item_id)
+                        context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
+                                             'RunPlugin(%s)' % context.create_uri(
+                                                 ['playlist', 'remove', 'video'],
+                                                 {'playlist_id': playlist_id, 'video_id': playlist_item_id,
+                                                  'video_name': video_item.get_name()})))
 
             is_history = re.match('^/special/watch_history_tv/$', context.get_path())
             if is_history:
                 yt_context_menu.append_clear_watch_history(context_menu, provider, context)
 
-        # got to [CHANNEL]
-        if channel_id and channel_name:
-            # only if we are not directly in the channel provide a jump to the channel
-            if kodion.utils.create_path('channel', channel_id) != context.get_path():
-                video_item.set_channel_id(channel_id)
-                yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
+        # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
+        if (channel_id and channel_name and
+                kodion.utils.create_path('channel', channel_id) != context.get_path()):
+            video_item.set_channel_id(channel_id)
+            yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
 
         if provider.is_logged_in():
             # subscribe to the channel of the video
@@ -630,10 +626,9 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
             context.log_debug('Found shelf index |{index}| for |{title}|'.format(index=str(shelf_index), title=shelf_title))
             break
 
-    if shelf_index is not None:
-        if 0 > shelf_index >= len(contents):
-            context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(index=str(shelf_index), content_length=str(len(contents))))
-            shelf_index = None
+    if shelf_index is not None and 0 > shelf_index >= len(contents):
+        context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(index=str(shelf_index), content_length=str(len(contents))))
+        shelf_index = None
 
     return shelf_index
 

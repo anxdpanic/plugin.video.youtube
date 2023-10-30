@@ -12,7 +12,7 @@ from .base_item import BaseItem
 
 
 class ImageItem(BaseItem):
-    def __init__(self, name, uri, image=u'', fanart=u''):
+    def __init__(self, name, uri, image='', fanart=''):
         BaseItem.__init__(self, name, uri, image, fanart)
         self._title = None
 

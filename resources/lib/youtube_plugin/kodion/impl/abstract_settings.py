@@ -205,8 +205,7 @@ class AbstractSettings(object):
                 latitude = longitude = None
         if latitude and longitude:
             return '{lat},{long}'.format(lat=latitude, long=longitude)
-        else:
-            return ''
+        return ''
 
     def set_location(self, value):
         self.set_string(SETTINGS.LOCATION, value)

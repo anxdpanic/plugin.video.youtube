@@ -61,12 +61,12 @@ class XbmcPlaylist(AbstractPlaylist):
             if 'items' in response['result']:
                 return response['result']['items']
             return []
+
+        if 'error' in response:
+            message = response['error']['message']
+            code = response['error']['code']
+            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
         else:
-            if 'error' in response:
-                message = response['error']['message']
-                code = response['error']['code']
-                error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            else:
-                error = 'Requested |%s| received error |%s|' % (rpc_request, str(response))
-            self._context.log_debug(error)
-            return []
+            error = 'Requested |%s| received error |%s|' % (rpc_request, str(response))
+        self._context.log_debug(error)
+        return []

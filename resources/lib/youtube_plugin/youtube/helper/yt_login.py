@@ -28,12 +28,11 @@ def process(mode, provider, context, sign_out_refresh=True):
                 refresh_tokens = list(set(refresh_tokens))
                 for _refresh_token in refresh_tokens:
                     provider.get_client(context).revoke(_refresh_token)
-        else:
-            if signout_access_manager.has_refresh_token():
-                refresh_tokens = signout_access_manager.get_refresh_token().split('|')
-                refresh_tokens = list(set(refresh_tokens))
-                for _refresh_token in refresh_tokens:
-                    provider.get_client(context).revoke(_refresh_token)
+        elif signout_access_manager.has_refresh_token():
+            refresh_tokens = signout_access_manager.get_refresh_token().split('|')
+            refresh_tokens = list(set(refresh_tokens))
+            for _refresh_token in refresh_tokens:
+                provider.get_client(context).revoke(_refresh_token)
 
         provider.reset_client()
 
@@ -70,7 +69,7 @@ def process(mode, provider, context, sign_out_refresh=True):
 
         steps = ((10 * 60 * 1000) // interval)  # 10 Minutes
         dialog.set_total(steps)
-        for i in range(steps):
+        for _ in range(steps):
             dialog.update()
             try:
                 if _for_tv:
@@ -97,18 +96,18 @@ def process(mode, provider, context, sign_out_refresh=True):
                     _expires_in = 0
                 return _access_token, _expires_in, _refresh_token
 
-            elif json_data['error'] != u'authorization_pending':
+            if json_data['error'] != 'authorization_pending':
                 message = json_data['error']
                 title = '%s: %s' % (context.get_name(), message)
                 context.get_ui().show_notification(message, title)
                 context.log_error('Error requesting access token: |%s|' % message)
 
             if dialog.is_aborted():
-                dialog.close()
-                return '', 0, ''
+                break
 
             context.sleep(interval)
         dialog.close()
+        return '', 0, ''
 
     if mode == 'out':
         _do_logout()

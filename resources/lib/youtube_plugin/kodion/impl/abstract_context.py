@@ -17,7 +17,7 @@ from ..utils import *
 
 
 class AbstractContext(object):
-    def __init__(self, path=u'/', params=None, plugin_name=u'', plugin_id=u''):
+    def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
         if not params:
             params = {}
 
@@ -137,7 +137,7 @@ class AbstractContext(object):
 
         return self._system_version
 
-    def create_uri(self, path=u'/', params=None):
+    def create_uri(self, path='/', params=None):
         if not params:
             params = {}
 
@@ -218,7 +218,7 @@ class AbstractContext(object):
     def get_settings(self):
         raise NotImplementedError()
 
-    def localize(self, text_id, default_text=u''):
+    def localize(self, text_id, default_text=''):
         raise NotImplementedError()
 
     def set_content_type(self, content_type):

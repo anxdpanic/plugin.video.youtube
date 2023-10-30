@@ -24,10 +24,10 @@ def from_json(json_data):
     """
 
     def _from_json(_json_data):
-        mapping = {'VideoItem': lambda: VideoItem(u'', u''),
-                   'DirectoryItem': lambda: DirectoryItem(u'', u''),
-                   'AudioItem': lambda: AudioItem(u'', u''),
-                   'ImageItem': lambda: ImageItem(u'', u'')}
+        mapping = {'VideoItem': lambda: VideoItem('', ''),
+                   'DirectoryItem': lambda: DirectoryItem('', ''),
+                   'AudioItem': lambda: AudioItem('', ''),
+                   'ImageItem': lambda: ImageItem('', '')}
 
         item = None
         item_type = _json_data.get('type', None)

@@ -107,17 +107,22 @@ def get_activities(channel_id, page_token='', all_pages=False, addon_id=None):
 
         for item in json_data.get('items', []):
             items.append(item)
+        error = False
 
         next_page_token = json_data.get('nextPageToken')
-        if all_pages and (next_page_token is not None):
-            get_items(_page_token=next_page_token)
-        elif next_page_token is not None:
+        if not next_page_token:
+            return error
+        if all_pages:
+            error = get_items(_page_token=next_page_token)
+        else:
             items.append({'nextPageToken': next_page_token})
+        return error
 
-    get_items(_page_token=page_token)
+    error = get_items(_page_token=page_token)
+    if error:
+        return error
 
     items = _append_missing_page_token(items)
-
     return items
 
 
@@ -148,17 +153,22 @@ def get_playlist_items(playlist_id, page_token='', all_pages=False, addon_id=Non
 
         for item in json_data.get('items', []):
             items.append(item)
+        error = False
 
         next_page_token = json_data.get('nextPageToken')
-        if all_pages and (next_page_token is not None):
-            get_items(_page_token=next_page_token)
-        elif next_page_token is not None:
+        if not next_page_token:
+            return error
+        if all_pages:
+            error = get_items(_page_token=next_page_token)
+        else:
             items.append({'nextPageToken': next_page_token})
+        return error
 
-    get_items(_page_token=page_token)
+    error = get_items(_page_token=page_token)
+    if error:
+        return error
 
     items = _append_missing_page_token(items)
-
     return items
 
 
@@ -249,17 +259,22 @@ def get_playlists_of_channel(channel_id, page_token='', all_pages=False, addon_i
 
         for item in json_data.get('items', []):
             items.append(item)
+        error = False
 
         next_page_token = json_data.get('nextPageToken')
-        if all_pages and (next_page_token is not None):
-            get_items(_page_token=next_page_token)
-        elif next_page_token is not None:
+        if not next_page_token:
+            return error
+        if all_pages:
+            error = get_items(_page_token=next_page_token)
+        else:
             items.append({'nextPageToken': next_page_token})
+        return error
 
-    get_items(_page_token=page_token)
+    error = get_items(_page_token=page_token)
+    if error:
+        return error
 
     items = _append_missing_page_token(items)
-
     return items
 
 
@@ -310,15 +325,18 @@ def get_related_videos(video_id, page_token='', addon_id=None):
         for item in json_data.get('items', []):
             if 'snippet' in item:
                 items.append(item)
+        error = False
 
         next_page_token = json_data.get('nextPageToken')
-        if next_page_token is not None:
+        if next_page_token:
             items.append({'nextPageToken': next_page_token})
+        return error
 
-    get_items(_page_token=page_token)
+    error = get_items(_page_token=page_token)
+    if error:
+        return error
 
     items = _append_missing_page_token(items)
-
     return items
 
 
@@ -360,15 +378,18 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
 
         for item in json_data.get('items', []):
             items.append(item)
+        error = False
 
         next_page_token = json_data.get('nextPageToken')
-        if next_page_token is not None:
+        if next_page_token:
             items.append({'nextPageToken': next_page_token})
+        return error
 
-    get_items(_page_token=page_token)
+    error = get_items(_page_token=page_token)
+    if error:
+        return error
 
     items = _append_missing_page_token(items)
-
     return items
 
 

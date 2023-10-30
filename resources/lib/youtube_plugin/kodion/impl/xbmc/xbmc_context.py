@@ -186,7 +186,7 @@ class XbmcContext(AbstractContext):
     def get_settings(self):
         return self._settings
 
-    def localize(self, text_id, default_text=u''):
+    def localize(self, text_id, default_text=''):
         result = None
         if isinstance(text_id, int):
             """

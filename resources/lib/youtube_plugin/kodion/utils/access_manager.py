@@ -344,8 +344,7 @@ class AccessManager(object):
         if last_hash != current_hash:
             self.set_dev_last_key_hash(addon_id, current_hash)
             return True
-        else:
-            return False
+        return False
 
     @staticmethod
     def __calc_key_hash(api_key, client_id, client_secret):

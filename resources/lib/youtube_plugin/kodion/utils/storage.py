@@ -70,15 +70,14 @@ class Storage(object):
         Tests revealed that sqlite has problems to release the database in time. This happens no so often, but just to
         be sure, we try at least 3 times to execute out statement.
         """
-        for tries in range(3):
+        for _ in range(3):
             try:
                 return self._cursor.execute(query, values)
             except TypeError:
                 return None
             except:
                 time.sleep(0.1)
-        else:
-            return None
+        return None
 
     def _close(self):
         if self._file is not None:
@@ -117,9 +116,10 @@ class Storage(object):
             self._table_created = True
 
     def sync(self):
-        if self._cursor is not None and self._needs_commit:
-            self._needs_commit = False
-            return self._execute(False, 'COMMIT')
+        if not self._cursor or not self._needs_commit:
+            return None
+        self._needs_commit = False
+        return self._execute(False, 'COMMIT')
 
     def _set(self, item_id, item):
         def _encode(obj):

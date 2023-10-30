@@ -19,7 +19,7 @@ __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-
 
 
 class VideoItem(BaseItem):
-    def __init__(self, name, uri, image=u'', fanart=u''):
+    def __init__(self, name, uri, image='', fanart=''):
         BaseItem.__init__(self, name, uri, image, fanart)
         self._genre = None
         self._aired = None
@@ -107,7 +107,9 @@ class VideoItem(BaseItem):
         self._premiered = date.isoformat()
 
     def set_premiered_from_datetime(self, date_time):
-        self.set_premiered(year=date_time.year, month=date_time.month, day=date_time.day)
+        self.set_premiered(year=date_time.year,
+                           month=date_time.month,
+                           day=date_time.day)
 
     def get_premiered(self):
         return self._premiered
@@ -191,7 +193,9 @@ class VideoItem(BaseItem):
         return self._aired_utc
 
     def set_aired_from_datetime(self, date_time):
-        self.set_aired(year=date_time.year, month=date_time.month, day=date_time.day)
+        self.set_aired(year=date_time.year,
+                       month=date_time.month,
+                       day=date_time.day)
 
     def set_scheduled_start_utc(self, dt):
         self._scheduled_start_utc = dt
@@ -221,8 +225,12 @@ class VideoItem(BaseItem):
         self._date = date.isoformat(sep=' ')
 
     def set_date_from_datetime(self, date_time):
-        self.set_date(year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour,
-                      minute=date_time.minute, second=date_time.second)
+        self.set_date(year=date_time.year,
+                      month=date_time.month,
+                      day=date_time.day,
+                      hour=date_time.hour,
+                      minute=date_time.minute,
+                      second=date_time.second)
 
     def get_date(self):
         return self._date
