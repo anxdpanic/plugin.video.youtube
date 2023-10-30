@@ -93,7 +93,7 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.1" addon.xml
           xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
-          xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.7' addon.xml
+          xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' addon.xml
           xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
           filename=${{ github.event.repository.name }}-${version}.matrix.1.zip
           cd ..
@@ -115,7 +115,7 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.unofficial.1" addon.xml
           xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
-          xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.7' addon.xml
+          xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' addon.xml
           xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
           filename=${{ github.event.repository.name }}-${version}.matrix.unofficial.1.zip
           cd ..

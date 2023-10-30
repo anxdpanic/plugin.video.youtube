@@ -307,7 +307,7 @@ class XbmcContext(AbstractContext):
         'drm': '2.2.12',
         # audio codecs
         'vorbis': '2.3.14',
-        'opus': '19.0.7',
+        'opus': '19.0.0',  # unknown when Opus audio support was first implemented
         'mp4a': True,
         'ac-3': '2.1.15',
         'ec-3': '2.1.15',
