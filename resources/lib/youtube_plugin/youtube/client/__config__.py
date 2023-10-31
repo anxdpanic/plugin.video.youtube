@@ -220,11 +220,10 @@ _api_check = APICheck(__context, __settings)
 keys_changed = _api_check.changed
 current_user = _api_check.get_current_user()
 
-api = dict()
-youtube_tv = dict()
-
+api = {}
 api['key'], api['id'], api['secret'] = _api_check.get_api_keys(_api_check.get_current_switch())
 
+youtube_tv = {}
 youtube_tv['key'], youtube_tv['id'], youtube_tv['secret'] = _api_check.get_api_keys('youtube-tv')
 
 developer_keys = _api_check.get_api_keys('developer')

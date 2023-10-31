@@ -39,15 +39,12 @@ class AccessManager(object):
         :param user_name: string, users name
         :return: a new user dict
         """
-        uuids = list()
-        new_uuid = uuid.uuid4().hex
-
-        for k in list(self._json['access_manager']['users'].keys()):
-            user_uuid = self._json['access_manager']['users'][k].get('id')
-            if user_uuid:
-                uuids.append(user_uuid)
-
-        while new_uuid in uuids:
+        uuids = [
+            user.get('id')
+            for user in self._json['access_manager']['users'].values()
+        ]
+        new_uuid = None
+        while not new_uuid or new_uuid in uuids:
             new_uuid = uuid.uuid4().hex
 
         return {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '',

@@ -53,7 +53,7 @@ def play_video(provider, context):
             context.log_error(traceback.print_exc())
             return False
 
-        if len(video_streams) == 0:
+        if not video_streams:
             message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False

@@ -55,7 +55,7 @@ def to_utf8(text):
 
 def to_unicode(text):
     result = text
-    if isinstance(text, str) or isinstance(text, bytes):
+    if isinstance(text, (bytes, str)):
         try:
             result = text.decode('utf-8', 'ignore')
         except (AttributeError, UnicodeEncodeError):
@@ -65,27 +65,24 @@ def to_unicode(text):
 
 
 def find_best_fit(data, compare_method=None):
+    if isinstance(data, dict):
+        data = data.values()
+
     try:
-        return next(item for item in data if item['container'] == 'mpd')
+        return next(item for item in data if item.get('container') == 'mpd')
     except StopIteration:
         pass
 
-    result = None
+    if not compare_method:
+        return None
 
+    result = None
     last_fit = -1
-    if isinstance(data, dict):
-        for key in list(data.keys()):
-            item = data[key]
-            fit = abs(compare_method(item))
-            if last_fit == -1 or fit < last_fit:
-                last_fit = fit
-                result = item
-    elif isinstance(data, list):
-        for item in data:
-            fit = abs(compare_method(item))
-            if last_fit == -1 or fit < last_fit:
-                last_fit = fit
-                result = item
+    for item in data:
+        fit = abs(compare_method(item))
+        if last_fit == -1 or fit < last_fit:
+            last_fit = fit
+            result = item
 
     return result
 
@@ -144,7 +141,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data)
 
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
-    log_streams = list()
+    log_streams = []
     for sorted_stream_data in sorted_stream_data_list:
         log_data = copy.deepcopy(sorted_stream_data)
         if 'license_info' in log_data:
@@ -157,9 +154,10 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 
     selected_stream_data = None
     if ask_for_quality and len(sorted_stream_data_list) > 1:
-        items = list()
-        for sorted_stream_data in sorted_stream_data_list:
-            items.append((sorted_stream_data['title'], sorted_stream_data))
+        items = [
+            (sorted_stream_data['title'], sorted_stream_data)
+            for sorted_stream_data in sorted_stream_data_list
+        ]
 
         result = context.get_ui().on_select(context.localize(localize.SELECT_VIDEO_QUALITY), items)
         if result != -1:

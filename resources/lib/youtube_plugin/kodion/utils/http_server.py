@@ -237,11 +237,11 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             if size_limit:
                 self.send_header('X-Limit-Video', 'max={size_limit}px'.format(size_limit=str(size_limit)))
-            for d in list(result.headers.items()):
-                if re.match('^[Cc]ontent-[Ll]ength$', d[0]):
-                    self.send_header(d[0], response_length)
+            for header, value in result.headers.items():
+                if re.match('^[Cc]ontent-[Ll]ength$', header):
+                    self.send_header(header, response_length)
                 else:
-                    self.send_header(d[0], d[1])
+                    self.send_header(header, value)
             self.end_headers()
 
             for chunk in self.get_chunks(response_body):

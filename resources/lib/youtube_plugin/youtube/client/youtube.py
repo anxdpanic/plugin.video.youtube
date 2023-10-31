@@ -398,7 +398,7 @@ class YouTube(LoginClient):
             channel_counts.setdefault(channel_id, 0)
             if channel_counts[channel_id] <= 3:
                 # Use the item
-                channel_counts[channel_id] = channel_counts[channel_id] + 1
+                channel_counts[channel_id] += 1
                 item["page_number"] = counter // 50
                 sorted_items.append(item)
             else:
@@ -775,7 +775,7 @@ class YouTube(LoginClient):
                 _result['items'] = cached[cache_items_key]
 
             """ no cache, get uploads data from web """
-            if len(_result['items']) == 0:
+            if not _result['items']:
                 # get all subscriptions channel ids
                 sub_page_token = True
                 sub_channel_ids = []

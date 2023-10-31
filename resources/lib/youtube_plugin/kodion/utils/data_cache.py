@@ -49,7 +49,9 @@ class DataCache(Storage):
             for item in query_result:
                 cached_time = item[1]
                 if cached_time is None:
-                    logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(content_id=str(item[0])))
+                    logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(
+                        content_id=item[0]
+                    ))
                     cached_time = current_time
                 # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
                 diff_seconds = self.get_seconds_diff(cached_time)
@@ -116,8 +118,7 @@ class DataCache(Storage):
 
         self._open()
 
-        for key in list(items.keys()):
-            item = items[key]
+        for key, item in items.items():
             self._execute(needs_commit, query, values=[key, current_time, _encode(json.dumps(item))])
             needs_commit = False
 

@@ -46,7 +46,7 @@ class XbmcRunner(AbstractProviderRunner):
 
         if isinstance(result, bool) and not result:
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)
-        elif isinstance(result, VideoItem) or isinstance(result, AudioItem) or isinstance(result, UriItem):
+        elif isinstance(result, (VideoItem, AudioItem, UriItem)):
             self._set_resolved_url(context, result)
         elif isinstance(result, DirectoryItem):
             self._add_directory(context, result)

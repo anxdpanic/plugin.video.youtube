@@ -10,10 +10,18 @@
 
 import json
 
-from .video_item import VideoItem
-from .directory_item import DirectoryItem
 from .audio_item import AudioItem
+from .directory_item import DirectoryItem
 from .image_item import ImageItem
+from .video_item import VideoItem
+
+
+_ITEM_TYPES = {
+    'AudioItem': AudioItem,
+    'DirectoryItem': DirectoryItem,
+    'ImageItem': ImageItem,
+    'VideoItem': VideoItem,
+}
 
 
 def from_json(json_data):
@@ -24,25 +32,16 @@ def from_json(json_data):
     """
 
     def _from_json(_json_data):
-        mapping = {'VideoItem': lambda: VideoItem('', ''),
-                   'DirectoryItem': lambda: DirectoryItem('', ''),
-                   'AudioItem': lambda: AudioItem('', ''),
-                   'ImageItem': lambda: ImageItem('', '')}
-
-        item = None
-        item_type = _json_data.get('type', None)
-        for key in mapping:
-            if item_type == key:
-                item = mapping[key]()
-                break
-
-        if item is None:
+        item_type = _json_data.get('type')
+        if not item_type or item_type not in _ITEM_TYPES:
             return _json_data
 
+        item = _ITEM_TYPES[item_type]()
+
         data = _json_data.get('data', {})
-        for key in data:
+        for key, value in data.items():
             if hasattr(item, key):
-                setattr(item, key, data[key])
+                setattr(item, key, value)
 
         return item
 
@@ -66,14 +65,9 @@ def to_json(base_item):
         if isinstance(obj, dict):
             return obj.__dict__
 
-        mapping = {VideoItem: 'VideoItem',
-                   DirectoryItem: 'DirectoryItem',
-                   AudioItem: 'AudioItem',
-                   ImageItem: 'ImageItem'}
-
-        for key in mapping:
-            if isinstance(obj, key):
-                return {'type': mapping[key], 'data': obj.__dict__}
+        for name, item_type in _ITEM_TYPES.items():
+            if isinstance(obj, item_type):
+                return {'type': name, 'data': obj.__dict__}
 
         return obj.__dict__
 

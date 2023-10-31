@@ -94,16 +94,23 @@ def make_comment_item(context, provider, snippet, uri, total_replies=0):
     return comment_item
 
 
-def update_channel_infos(provider, context, channel_id_dict, subscription_id_dict=None, channel_items_dict=None):
-    if subscription_id_dict is None:
-        subscription_id_dict = {}
-
-    channel_ids = list(channel_id_dict.keys())
-    if len(channel_ids) == 0:
+def update_channel_infos(provider, context, channel_id_dict,
+                         subscription_id_dict=None,
+                         channel_items_dict=None,
+                         data=None):
+    channel_ids = list(channel_id_dict)
+    if not channel_ids and not data:
         return
 
-    resource_manager = provider.get_resource_manager(context)
-    channel_data = resource_manager.get_channels(channel_ids)
+    if not data:
+        resource_manager = provider.get_resource_manager(context)
+        data = resource_manager.get_channels(channel_ids)
+
+    if not data:
+        return
+
+    if subscription_id_dict is None:
+        subscription_id_dict = {}
 
     filter_list = []
     if context.get_path() == '/subscriptions/list/':
@@ -112,9 +119,10 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
         filter_list = filter_string.split(',')
         filter_list = [x.lower() for x in filter_list]
 
-    thumb_size = context.get_settings().use_thumbnail_size()
-    for channel_id in list(channel_data.keys()):
-        yt_item = channel_data[channel_id]
+    thumb_size = context.get_settings().use_thumbnail_size
+    banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl', 'bannerTvImageUrl']
+
+    for channel_id, yt_item in data.items():
         channel_item = channel_id_dict[channel_id]
 
         snippet = yt_item['snippet']
@@ -144,17 +152,15 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
                 yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
             else:
                 yt_context_menu.append_add_my_subscriptions_filter(context_menu, provider, context, title)
-
         channel_item.set_context_menu(context_menu)
 
-        fanart = u''
         fanart_images = yt_item.get('brandingSettings', {}).get('image', {})
-        banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl', 'bannerTvImageUrl']
         for banner in banners:
-            fanart = fanart_images.get(banner, u'')
+            fanart = fanart_images.get(banner)
             if fanart:
                 break
-
+        else:
+            fanart = ''
         channel_item.set_fanart(fanart)
 
         # update channel mapping
@@ -164,21 +170,26 @@ def update_channel_infos(provider, context, channel_id_dict, subscription_id_dic
             channel_items_dict[channel_id].append(channel_item)
 
 
-def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict=None):
-    playlist_ids = list(playlist_id_dict.keys())
-    if len(playlist_ids) == 0:
+def update_playlist_infos(provider, context, playlist_id_dict,
+                          channel_items_dict=None,
+                          data=None):
+    playlist_ids = list(playlist_id_dict)
+    if not playlist_ids and not data:
         return
 
-    resource_manager = provider.get_resource_manager(context)
-    access_manager = context.get_access_manager()
-    playlist_data = resource_manager.get_playlists(playlist_ids)
+    if not data:
+        resource_manager = provider.get_resource_manager(context)
+        data = resource_manager.get_playlists(playlist_ids)
 
+    if not data:
+        return
+
+    access_manager = context.get_access_manager()
     custom_watch_later_id = access_manager.get_watch_later_id()
     custom_history_id = access_manager.get_watch_history_id()
-
     thumb_size = context.get_settings().use_thumbnail_size()
-    for playlist_id in list(playlist_data.keys()):
-        yt_item = playlist_data[playlist_id]
+
+    for playlist_id, yt_item in data.items():
         playlist_item = playlist_id_dict[playlist_id]
 
         snippet = yt_item['snippet']
@@ -221,7 +232,7 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
                 else:
                     yt_context_menu.append_set_as_history(context_menu, provider, context, playlist_id, title)
 
-        if len(context_menu) > 0:
+        if context_menu:
             playlist_item.set_context_menu(context_menu)
 
         # update channel mapping
@@ -231,25 +242,37 @@ def update_playlist_infos(provider, context, playlist_id_dict, channel_items_dic
             channel_items_dict[channel_id].append(playlist_item)
 
 
-def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=None, channel_items_dict=None, live_details=False, use_play_data=True):
-    settings = context.get_settings()
-    ui = context.get_ui()
+def update_video_infos(provider, context, video_id_dict,
+                       playlist_item_id_dict=None,
+                       channel_items_dict=None,
+                       live_details=False,
+                       use_play_data=True,
+                       data=None):
+    video_ids = list(video_id_dict)
+    if not video_ids and not data:
+        return
 
-    video_ids = list(video_id_dict.keys())
-    if len(video_ids) == 0:
+    if not data:
+        resource_manager = provider.get_resource_manager(context)
+        data = resource_manager.get_videos(video_ids,
+                                           live_details=live_details,
+                                           suppress_errors=True)
+
+    if not data:
         return
 
     if not playlist_item_id_dict:
         playlist_item_id_dict = {}
 
-    resource_manager = provider.get_resource_manager(context)
-    video_data = resource_manager.get_videos(video_ids, live_details=live_details,
-                                             suppress_errors=True)
+    settings = context.get_settings()
+    show_channel_name = settings.get_bool('youtube.view.description.show_channel_name', True)
+    alternate_player = settings.is_support_alternative_player_enabled()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
-    for video_id in list(video_data.keys()):
+    ui = context.get_ui()
+
+    for video_id, yt_item in data.items():
         datetime = None
-        yt_item = video_data.get(video_id)
         video_item = video_id_dict[video_id]
 
         # set mediatype
@@ -259,36 +282,36 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             continue
 
         snippet = yt_item['snippet']  # crash if not conform
-        play_data = yt_item['play_data']
+        play_data = use_play_data and yt_item.get('play_data')
         video_item.live = snippet.get('liveBroadcastContent') == 'live'
 
         # duration
-        if not video_item.live and use_play_data and play_data.get('total_time'):
-            video_item.set_duration_from_seconds(float(play_data.get('total_time')))
+        if not video_item.live and play_data and 'total_time' in play_data:
+            duration = float(play_data['total_time'] or 0)
         else:
-            duration = yt_item.get('contentDetails', {}).get('duration', '')
+            duration = yt_item.get('contentDetails', {}).get('duration')
             if duration:
-                duration = utils.datetime_parser.parse(duration)
-                # we subtract 1 seconds because YouTube returns +1 second to much
-                video_item.set_duration_from_seconds(duration.seconds - 1)
+                # subtract 1s because YouTube duration is +1s too long
+                duration = utils.datetime_parser.parse(duration).seconds - 1
+        if duration:
+            video_item.set_duration_from_seconds(duration)
 
-        if not video_item.live and use_play_data:
-            # play count
-            if play_data.get('play_count'):
-                video_item.set_play_count(int(play_data.get('play_count')))
+        if not video_item.live and play_data:
+            if 'play_count' in play_data:
+                video_item.set_play_count(play_data['play_count'])
 
-            if play_data.get('played_percent'):
-                video_item.set_start_percent(play_data.get('played_percent'))
+            if 'played_percent' in play_data:
+                video_item.set_start_percent(play_data['played_percent'])
 
-            if play_data.get('played_time'):
-                video_item.set_start_time(play_data.get('played_time'))
+            if 'played_time' in play_data:
+                video_item.set_start_time(play_data['played_time'])
 
-            if play_data.get('last_played'):
-                video_item.set_last_played(play_data.get('last_played'))
+            if 'last_played' in play_data:
+                video_item.set_last_played(play_data['last_played'])
         elif video_item.live:
             video_item.set_play_count(0)
 
-        scheduled_start = video_data[video_id].get('liveStreamingDetails', {}).get('scheduledStartTime')
+        scheduled_start = yt_item.get('liveStreamingDetails', {}).get('scheduledStartTime')
         if scheduled_start:
             datetime = utils.datetime_parser.parse(scheduled_start)
             video_item.set_scheduled_start_utc(datetime)
@@ -324,7 +347,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
         # plot
         channel_name = snippet.get('channelTitle', '')
         description = kodion.utils.strip_html_from_text(snippet['description'])
-        if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
+        if show_channel_name and channel_name:
             description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
         video_item.set_studio(channel_name)
         # video_item.add_cast(channel_name)
@@ -384,7 +407,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id)
 
         # 'play with...' (external player)
-        if settings.is_support_alternative_player_enabled():
+        if alternate_player:
             yt_context_menu.append_play_with(context_menu, provider, context)
 
         if provider.is_logged_in():
@@ -424,7 +447,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
             video_item.set_subscription_id(channel_id)
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
 
-        if not video_item.live and use_play_data:
+        if not video_item.live and play_data:
             if play_data.get('play_count') is None or int(play_data.get('play_count')) == 0:
                 yt_context_menu.append_mark_watched(context_menu, provider, context, video_id)
             else:
@@ -447,7 +470,7 @@ def update_video_infos(provider, context, video_id_dict, playlist_item_id_dict=N
 
         yt_context_menu.append_play_ask_for_quality(context_menu, provider, context, video_id)
 
-        if len(context_menu) > 0:
+        if context_menu:
             video_item.set_context_menu(context_menu, replace=replace_context_menu)
 
 
@@ -522,7 +545,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     yt_item = video_data[video_id]
 
     snippet = yt_item['snippet']  # crash if not conform
-    play_data = yt_item['play_data']
+    play_data = use_play_data and yt_item.get('play_data')
     video_item.live = snippet.get('liveBroadcastContent') == 'live'
 
     # set the title
@@ -530,28 +553,28 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
         video_item.set_title(snippet['title'])
 
     # duration
-    if not video_item.live and use_play_data and play_data.get('total_time'):
-        video_item.set_duration_from_seconds(float(play_data.get('total_time')))
+    if not video_item.live and play_data and 'total_time' in play_data:
+        duration = float(play_data['total_time'] or 0)
     else:
-        duration = yt_item.get('contentDetails', {}).get('duration', '')
+        duration = yt_item.get('contentDetails', {}).get('duration')
         if duration:
-            duration = utils.datetime_parser.parse(duration)
-            # we subtract 1 seconds because YouTube returns +1 second to much
-            video_item.set_duration_from_seconds(duration.seconds - 1)
+            # subtract 1s because YouTube duration is +1s too long
+            duration = utils.datetime_parser.parse(duration).seconds - 1
+    if duration:
+        video_item.set_duration_from_seconds(duration)
 
-    if not video_item.live and use_play_data:
-        # play count
-        if play_data.get('play_count'):
-            video_item.set_play_count(int(play_data.get('play_count')))
+    if not video_item.live and play_data:
+        if 'play_count' in play_data:
+            video_item.set_play_count(play_data['play_count'])
 
-        if play_data.get('played_percent'):
-            video_item.set_start_percent(play_data.get('played_percent'))
+        if 'played_percent' in play_data:
+            video_item.set_start_percent(play_data['played_percent'])
 
-        if play_data.get('played_time'):
-            video_item.set_start_time(play_data.get('played_time'))
+        if 'played_time' in play_data:
+            video_item.set_start_time(play_data['played_time'])
 
-        if play_data.get('last_played'):
-            video_item.set_last_played(play_data.get('last_played'))
+        if 'last_played' in play_data:
+            video_item.set_last_played(play_data['last_played'])
 
     # plot
     channel_name = snippet.get('channelTitle', '')
@@ -581,19 +604,23 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     return video_item
 
 
-def update_fanarts(provider, context, channel_items_dict):
+def update_fanarts(provider, context, channel_items_dict, data=None):
     # at least we need one channel id
-    channel_ids = list(channel_items_dict.keys())
-    if len(channel_ids) == 0:
+    channel_ids = list(channel_items_dict)
+    if not channel_ids and not data:
         return
 
-    fanarts = provider.get_resource_manager(context).get_fanarts(channel_ids)
+    if not data:
+        resource_manager = provider.get_resource_manager(context)
+        data = resource_manager.get_fanarts(channel_ids)
 
-    for channel_id in channel_ids:
-        channel_items = channel_items_dict[channel_id]
+    if not data:
+        return
+
+    for channel_id, channel_items in channel_items_dict.items():
         for channel_item in channel_items:
             # only set not empty fanarts
-            fanart = fanarts.get(channel_id, '')
+            fanart = data.get(channel_id, '')
             if fanart:
                 channel_item.set_fanart(fanart)
 
@@ -623,11 +650,15 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
         title = shelf.get('shelfRenderer', {}).get('title', {}).get('runs', [{}])[0].get('text', '')
         if title.lower() == shelf_title.lower():
             shelf_index = idx
-            context.log_debug('Found shelf index |{index}| for |{title}|'.format(index=str(shelf_index), title=shelf_title))
+            context.log_debug('Found shelf index |{index}| for |{title}|'.format(
+                index=shelf_index, title=shelf_title
+            ))
             break
 
     if shelf_index is not None and 0 > shelf_index >= len(contents):
-        context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(index=str(shelf_index), content_length=str(len(contents))))
+        context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(
+            index=shelf_index, content_length=len(contents)
+        ))
         shelf_index = None
 
     return shelf_index

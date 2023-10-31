@@ -56,7 +56,7 @@ class VideoItem(BaseItem):
         self._playlist_item_id = None
 
     def set_play_count(self, play_count):
-        self._play_count = int(play_count)
+        self._play_count = int(play_count or 0)
 
     def get_play_count(self):
         return self._play_count
@@ -177,7 +177,7 @@ class VideoItem(BaseItem):
         self.set_duration_from_seconds(int(minutes) * 60)
 
     def set_duration_from_seconds(self, seconds):
-        self._duration = int(seconds)
+        self._duration = int(seconds or 0)
 
     def get_duration(self):
         return self._duration
@@ -245,7 +245,10 @@ class VideoItem(BaseItem):
         self._mediatype = mediatype
 
     def get_mediatype(self):
-        if self._mediatype not in ['video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo']:
+        if (self._mediatype not in {'video',
+                                    'movie',
+                                    'tvshow', 'season', 'episode',
+                                    'musicvideo'}):
             self._mediatype = 'video'
         return self._mediatype
 
@@ -265,19 +268,19 @@ class VideoItem(BaseItem):
         return self.license_key
 
     def set_last_played(self, last_played):
-        self._last_played = last_played
+        self._last_played = last_played or ''
 
     def get_last_played(self):
         return self._last_played
 
     def set_start_percent(self, start_percent):
-        self._start_percent = start_percent
+        self._start_percent = start_percent or ''
 
     def get_start_percent(self):
         return self._start_percent
 
     def set_start_time(self, start_time):
-        self._start_time = start_time
+        self._start_time = start_time or ''
 
     def get_start_time(self):
         return self._start_time

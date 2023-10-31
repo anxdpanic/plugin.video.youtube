@@ -183,7 +183,7 @@ def _process_description_links(provider, context):
 
         progress_dialog.close()
 
-        if len(result) == 0:
+        if not result:
             progress_dialog.close()
             context.get_ui().on_ok(title=context.localize(provider.LOCAL_MAP['youtube.video.description.links']),
                                    text=context.localize(
@@ -253,13 +253,13 @@ def _process_description_links(provider, context):
     channel_ids = context.get_param('channel_ids', '')
     if channel_ids:
         channel_ids = channel_ids.split(',')
-        if len(channel_ids) > 0:
+        if channel_ids:
             return _display_channels(channel_ids)
 
     playlist_ids = context.get_param('playlist_ids', '')
     if playlist_ids:
         playlist_ids = playlist_ids.split(',')
-        if len(playlist_ids) > 0:
+        if playlist_ids:
             return _display_playlists(playlist_ids)
 
     context.log_error('Missing video_id or playlist_ids for description links')

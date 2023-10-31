@@ -226,7 +226,7 @@ class Provider(kodion.AbstractProvider):
         _dev_config = context.get_ui().get_home_window_property('configs')
         context.get_ui().clear_home_window_property('configs')
 
-        dev_config = dict()
+        dev_config = {}
         if _dev_config is not None:
             context.log_debug('Using window property for developer keys is deprecated, instead use the youtube_registration module.')
             try:
@@ -246,7 +246,7 @@ class Provider(kodion.AbstractProvider):
                     or not dev_config['main'].get('id') or not dev_config['main'].get('secret'):
                 context.log_error('Error loading developer config: |invalid structure| '
                                   'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
-                return dict()
+                return {}
             dev_origin = dev_config['origin']
             dev_main = dev_config['main']
             dev_system = dev_main['system']
@@ -261,7 +261,7 @@ class Provider(kodion.AbstractProvider):
             context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
             return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
 
-        return dict()
+        return {}
 
     def reset_client(self):
         self._client = None
@@ -285,12 +285,10 @@ class Provider(kodion.AbstractProvider):
         dev_id = context.get_param('addon_id', None)
         dev_configs = YouTube.CONFIGS.get('developer')
         dev_config = self.get_dev_config(context, dev_id, dev_configs)
-        dev_keys = dict()
-        if dev_config:
-            dev_keys = dev_config.get('main')
+        dev_keys = dev_config.get('main') if dev_config else None
 
         client = None
-        refresh_tokens = list()
+        refresh_tokens = []
 
         if dev_id:
             dev_origin = dev_config.get('origin') if dev_config.get('origin') else dev_id
@@ -308,13 +306,13 @@ class Provider(kodion.AbstractProvider):
             if len(access_tokens) != 2 or access_manager.is_dev_access_token_expired(dev_id):
                 # reset access_token
                 access_manager.update_dev_access_token(dev_id, '')
-                access_tokens = list()
+                access_tokens = []
         else:
             access_tokens = access_manager.get_access_token().split('|')
             if len(access_tokens) != 2 or access_manager.is_access_token_expired():
                 # reset access_token
                 access_manager.update_access_token('')
-                access_tokens = list()
+                access_tokens = []
 
         if dev_id:
             if dev_keys:
@@ -405,7 +403,7 @@ class Provider(kodion.AbstractProvider):
             context.log_debug('User is logged in' if self._is_logged_in else
                               'User is not logged in')
 
-            if len(access_tokens) == 0:
+            if not access_tokens:
                 access_tokens = ['', '']
             client.set_access_token(access_token=access_tokens[1])
             client.set_access_token_tv(access_token_tv=access_tokens[0])
@@ -445,7 +443,7 @@ class Provider(kodion.AbstractProvider):
         url_converter = UrlToItemConverter(flatten=True)
         url_converter.add_urls([res_url], self, context)
         items = url_converter.get_items(self, context, title_required=False)
-        if len(items) > 0:
+        if items:
             return items[0]
 
         return False
@@ -596,7 +594,7 @@ class Provider(kodion.AbstractProvider):
 
             # we correct the channel id based on the username
             items = json_data.get('items', [])
-            if len(items) > 0:
+            if items:
                 if method == 'user':
                     channel_id = items[0]['id']
                 else:
@@ -666,7 +664,7 @@ class Provider(kodion.AbstractProvider):
         self.set_content_type(context, kodion.constants.content_type.FILES)
 
         settings = context.get_settings()
-        result = list()
+        result = []
 
         # search
         search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
@@ -1199,8 +1197,7 @@ class Provider(kodion.AbstractProvider):
                     client = self.get_client(context)
                     if access_manager.has_refresh_token():
                         refresh_tokens = access_manager.get_refresh_token().split('|')
-                        refresh_tokens = list(set(refresh_tokens))
-                        for refresh_token in refresh_tokens:
+                        for refresh_token in set(refresh_tokens):
                             try:
                                 client.revoke(refresh_token)
                             except:
@@ -1614,8 +1611,7 @@ class Provider(kodion.AbstractProvider):
                                     kodion.constants.sort_method.DATE)
 
     def handle_exception(self, context, exception_to_handle):
-        if (isinstance(exception_to_handle, InvalidGrant) or
-                isinstance(exception_to_handle, LoginException)):
+        if isinstance(exception_to_handle, (InvalidGrant, LoginException)):
             ok_dialog = False
             message_timeout = 5000
 

@@ -159,7 +159,7 @@ class AbstractContext(object):
         else:
             uri = "%s://%s/" % ('plugin', str(self._plugin_id))
 
-        if len(params) > 0:
+        if params:
             # make a copy of the map
             uri_params = {}
             uri_params.update(params)

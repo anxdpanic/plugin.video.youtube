@@ -78,7 +78,7 @@ def get_videos(video_id, addon_id=None):
     if not handle_error(context, json_data):
         return [json_data]
 
-    return [item for item in json_data.get('items', [])]
+    return json_data.get('items', [])
 
 
 def get_activities(channel_id, page_token='', all_pages=False, addon_id=None):
@@ -105,8 +105,7 @@ def get_activities(channel_id, page_token='', all_pages=False, addon_id=None):
         if not handle_error(context, json_data):
             return [json_data]
 
-        for item in json_data.get('items', []):
-            items.append(item)
+        items.extend(json_data.get('items', []))
         error = False
 
         next_page_token = json_data.get('nextPageToken')
@@ -151,8 +150,7 @@ def get_playlist_items(playlist_id, page_token='', all_pages=False, addon_id=Non
         if not handle_error(context, json_data):
             return [json_data]
 
-        for item in json_data.get('items', []):
-            items.append(item)
+        items.extend(json_data.get('items', []))
         error = False
 
         next_page_token = json_data.get('nextPageToken')
@@ -189,7 +187,7 @@ def get_channel_id(channel_name, addon_id=None):
     if not handle_error(context, json_data):
         return [json_data]
 
-    return [item for item in json_data.get('items', [])]
+    return json_data.get('items', [])
 
 
 def get_channels(channel_id, addon_id=None):
@@ -209,7 +207,7 @@ def get_channels(channel_id, addon_id=None):
     if not handle_error(context, json_data):
         return [json_data]
 
-    return [item for item in json_data.get('items', [])]
+    return json_data.get('items', [])
 
 
 def get_channel_sections(channel_id, addon_id=None):
@@ -229,7 +227,7 @@ def get_channel_sections(channel_id, addon_id=None):
     if not handle_error(context, json_data):
         return [json_data]
 
-    return [item for item in json_data.get('items', [])]
+    return json_data.get('items', [])
 
 
 def get_playlists_of_channel(channel_id, page_token='', all_pages=False, addon_id=None):
@@ -257,8 +255,7 @@ def get_playlists_of_channel(channel_id, page_token='', all_pages=False, addon_i
         if not handle_error(context, json_data):
             return [json_data]
 
-        for item in json_data.get('items', []):
-            items.append(item)
+        items.extend(json_data.get('items', []))
         error = False
 
         next_page_token = json_data.get('nextPageToken')
@@ -295,7 +292,7 @@ def get_playlists(playlist_id, addon_id=None):
     if not handle_error(context, json_data):
         return [json_data]
 
-    return [item for item in json_data.get('items', [])]
+    return json_data.get('items', [])
 
 
 def get_related_videos(video_id, page_token='', addon_id=None):
@@ -322,9 +319,8 @@ def get_related_videos(video_id, page_token='', addon_id=None):
         if not handle_error(context, json_data):
             return [json_data]
 
-        for item in json_data.get('items', []):
-            if 'snippet' in item:
-                items.append(item)
+        items.extend([item for item in json_data.get('items', [])
+                      if 'snippet' in item])
         error = False
 
         next_page_token = json_data.get('nextPageToken')
@@ -376,8 +372,7 @@ def get_search(q, search_type='', event_type='', channel_id='', order='relevance
         if not handle_error(context, json_data):
             return [json_data]
 
-        for item in json_data.get('items', []):
-            items.append(item)
+        items.extend(json_data.get('items', []))
         error = False
 
         next_page_token = json_data.get('nextPageToken')

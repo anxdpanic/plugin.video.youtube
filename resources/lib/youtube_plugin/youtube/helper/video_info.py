@@ -2143,13 +2143,15 @@ class VideoInfo(object):
             main_stream['multi_audio'] = True
 
         filepath = '{0}{1}.mpd'.format(basepath, self.video_id)
-        success = None
-        with xbmcvfs.File(filepath, 'w') as mpd_file:
-            success = mpd_file.write(str(out))
-        if not success:
-            return None, None
-        return 'http://{0}:{1}/{2}.mpd'.format(
-            _settings.httpd_listen(for_request=True),
-            _settings.httpd_port(),
-            self.video_id
-        ), main_stream
+        try:
+            with xbmcvfs.File(filepath, 'w') as mpd_file:
+                success = mpd_file.write(str(out))
+        except (IOError, OSError):
+            success = False
+        if success:
+            return 'http://{0}:{1}/{2}.mpd'.format(
+                _settings.httpd_listen(for_request=True),
+                _settings.httpd_port(),
+                self.video_id
+            ), main_stream
+        return None, None

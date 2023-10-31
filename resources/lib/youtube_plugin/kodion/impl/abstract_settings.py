@@ -57,7 +57,7 @@ class AbstractSettings(object):
         if value is None or value == '':
             return default_value
 
-        if value != 'false' and value != 'true':
+        if value not in {'false', 'true'}:
             return default_value
 
         return value == 'true'

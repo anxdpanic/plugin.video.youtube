@@ -21,9 +21,7 @@ class SearchItem(DirectoryItem):
         if image is None:
             image = context.create_resource_path('media/search.png')
 
-        params = dict()
-        if location:
-            params = {'location': location}
+        params = {'location': location} if location else {}
 
         DirectoryItem.__init__(self, name, context.create_uri([constants.paths.SEARCH, 'list'], params=params), image=image)
         if fanart:

@@ -56,14 +56,9 @@ class XbmcContext(AbstractContext):
             # after that try to get the params
             if len(sys.argv) > 2:
                 params = sys.argv[2][1:]
-                if len(params) > 0:
+                if params:
                     self._uri = '?'.join([self._uri, params])
-
-                    self._params = {}
-                    params = dict(parse_qsl(params))
-                    for _param in params:
-                        item = params[_param]
-                        self._params[_param] = item
+                    self._params = dict(parse_qsl(params))
 
         self._ui = None
         self._video_playlist = None
@@ -184,29 +179,22 @@ class XbmcContext(AbstractContext):
         return self._settings
 
     def localize(self, text_id, default_text=''):
-        result = None
-        if isinstance(text_id, int):
-            """
-            We want to use all localization strings!
-            Addons should only use the range 30000 thru 30999 (see: http://kodi.wiki/view/Language_support) but we
-            do it anyway. I want some of the localized strings for the views of a skin.
-            """
-            if text_id >= 0 and (text_id < 30000 or text_id > 30999):
-                result = xbmc.getLocalizedString(text_id)
-                if result is not None and result:
-                    result = utils.to_unicode(result)
-
-        if not result:
+        if not isinstance(text_id, int):
             try:
-                result = self._addon.getLocalizedString(int(text_id))
-                if result is not None and result:
-                    result = utils.to_unicode(result)
+                text_id = int(text_id)
             except ValueError:
-                pass
+                return default_text
+        if text_id <= 0:
+            return default_text
 
-        if not result:
-            result = default_text
-
+        """
+        We want to use all localization strings!
+        Addons should only use the range 30000 thru 30999 (see: http://kodi.wiki/view/Language_support) but we
+        do it anyway. I want some of the localized strings for the views of a skin.
+        """
+        source = self._addon if 30000 <= text_id < 31000 else xbmc
+        result = source.getLocalizedString(text_id)
+        result = utils.to_unicode(result) if result else default_text
         return result
 
     def set_content_type(self, content_type):

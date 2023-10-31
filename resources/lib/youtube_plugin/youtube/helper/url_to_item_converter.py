@@ -87,7 +87,7 @@ class UrlToItemConverter(object):
     def get_items(self, provider, context, title_required=True):
         result = []
 
-        if self._flatten and len(self._channel_ids) > 0:
+        if self._flatten and self._channel_ids:
             # remove duplicates
             self._channel_ids = list(set(self._channel_ids))
 
@@ -98,7 +98,7 @@ class UrlToItemConverter(object):
             channels_item.set_fanart(provider.get_fanart(context))
             result.append(channels_item)
 
-        if self._flatten and len(self._playlist_ids) > 0:
+        if self._flatten and self._playlist_ids:
             # remove duplicates
             self._playlist_ids = list(set(self._playlist_ids))
 
@@ -124,39 +124,42 @@ class UrlToItemConverter(object):
         incognito = str(context.get_param('incognito', False)).lower() == 'true'
         use_play_data = not incognito
 
-        if len(self._video_items) == 0:
+        if not self._video_items:
             channel_id_dict = {}
             utils.update_video_infos(provider, context, self._video_id_dict, None, channel_id_dict, use_play_data=use_play_data)
             utils.update_fanarts(provider, context, channel_id_dict)
 
-            for key in self._video_id_dict:
-                video_item = self._video_id_dict[key]
-                if not title_required or (title_required and video_item.get_title()):
-                    self._video_items.append(video_item)
+            self._video_items = [
+                video_item
+                for video_item in self._video_id_dict.values()
+                if not title_required or video_item.get_title()
+            ]
 
         return self._video_items
 
     def get_playlist_items(self, provider, context):
-        if len(self._playlist_items) == 0:
+        if not self._playlist_items:
             channel_id_dict = {}
             utils.update_playlist_infos(provider, context, self._playlist_id_dict, channel_id_dict)
             utils.update_fanarts(provider, context, channel_id_dict)
 
-            for key in self._playlist_id_dict:
-                playlist_item = self._playlist_id_dict[key]
-                if playlist_item.get_name():
-                    self._playlist_items.append(playlist_item)
+            self._playlist_items = [
+                playlist_item
+                for playlist_item in self._playlist_id_dict.values()
+                if playlist_item.get_name()
+            ]
 
         return self._playlist_items
 
     def get_channel_items(self, provider, context):
-        if len(self._channel_items) == 0:
+        if not self._channel_items:
             channel_id_dict = {}
             utils.update_fanarts(provider, context, channel_id_dict)
 
-            for key in self._channel_id_dict:
-                channel_item = self._channel_id_dict[key]
-                if channel_item.get_name():
-                    self._channel_items.append(channel_item)
+            self._channel_items = [
+                channel_item
+                for channel_item in self._channel_id_dict.values()
+                if channel_item.get_name()
+            ]
 
         return self._channel_items
