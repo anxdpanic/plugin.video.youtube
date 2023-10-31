@@ -103,6 +103,8 @@ def to_play_item(context, play_item):
                 list_item.setContentLookup(False)
             except:
                 pass
+        if not alternative_player and headers and uri.startswith('http'):
+            play_item.set_uri('|'.join([uri, headers]))
 
     if not is_strm:
         if play_item.get_play_count() == 0:
