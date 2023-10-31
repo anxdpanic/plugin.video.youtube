@@ -10,9 +10,12 @@
 
 
 class KodionException(Exception):
-    def __init__(self, message):
-        Exception.__init__(self, message)
-        self._message = message
+    def __init__(self, message, **kwargs):
+        super(KodionException, self).__init__(message)
+        attrs = self.__dict__
+        for attr, value in kwargs.items():
+            if attr not in attrs:
+                setattr(self, attr, value)
 
     def get_message(self):
-        return self._message
+        return str(self)

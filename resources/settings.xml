@@ -623,10 +623,36 @@
                     </constraints>
                     <control format="string" type="spinner"/>
                 </setting>
-                <setting id="simple.requests.ssl.verify" type="boolean" label="30578" help="">
+                <setting id="requests.ssl.verify" type="boolean" label="30578" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="requests.timeout.connect" type="integer" label="30764" help="">
+                    <level>0</level>
+                    <default>9</default>
+                    <constraints>
+                        <minimum>3</minimum>
+                        <step>3</step>
+                        <maximum>120</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>false</popup>
+                        <formatlabel>14045</formatlabel>
+                    </control>
+                </setting>
+                <setting id="requests.timeout.read" type="integer" label="30765" help="">
+                    <level>0</level>
+                    <default>27</default>
+                    <constraints>
+                        <minimum>10</minimum>
+                        <step>1</step>
+                        <maximum>120</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>false</popup>
+                        <formatlabel>14045</formatlabel>
+                    </control>
                 </setting>
                 <setting id="kodion.support.alternative_player" type="boolean" label="30036" help="">
                     <level>0</level>

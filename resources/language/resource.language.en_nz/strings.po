@@ -1348,3 +1348,11 @@ msgstr ""
 msgctxt "#30763"
 msgid "Multi-audio"
 msgstr ""
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr ""
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr ""

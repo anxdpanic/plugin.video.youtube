@@ -12,13 +12,9 @@ import copy
 import json
 import re
 import threading
-import traceback
 import xml.etree.ElementTree as ET
 
-import requests
-
 from .login_client import LoginClient
-from ..youtube_exceptions import YouTubeException
 from ..helper.video_info import VideoInfo
 from ...kodion import Context
 from ...kodion.utils import datetime_parser
@@ -90,10 +86,8 @@ class YouTube(LoginClient):
         if self._access_token:
             params['access_token'] = self._access_token
 
-        try:
-            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        except:
-            _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
+        self._request(url, params=params, headers=headers,
+                      error_msg='Failed to update watch history')
 
     def get_video_streams(self, context, video_id):
         video_info = VideoInfo(context, access_token=self._access_token_tv,
@@ -822,22 +816,12 @@ class YouTube(LoginClient):
                     'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
                 }
 
-                session = requests.Session()
-                session.headers = headers
-                session.verify = self._verify
-                adapter = requests.adapters.HTTPAdapter(pool_maxsize=5, pool_block=True)
-                session.mount("https://", adapter)
                 responses = []
 
                 def fetch_xml(_url, _responses):
-                    try:
-                        _response = session.get(_url, timeout=(3.05, 27))
-                        _response.raise_for_status()
-                    except requests.exceptions.RequestException as error:
-                        _context.log_debug('Response: {0}'.format(error.response and error.response.text))
-                        _context.log_error('Failed |%s|' % traceback.print_exc())
-                        return
-                    _responses.append(_response)
+                    _response = self._request(_url, headers=headers)
+                    if _response:
+                        _responses.append(_response)
 
                 threads = []
                 for channel_id in sub_channel_ids:
@@ -851,7 +835,6 @@ class YouTube(LoginClient):
 
                 for thread in threads:
                     thread.join(30)
-                session.close()
 
                 for response in responses:
                     if response:
@@ -1043,31 +1026,6 @@ class YouTube(LoginClient):
             if 0 <= playlist_index < len(contents):
                 result = _perform(_playlist_idx=playlist_index, _page_token=page_token, _offset=offset, _result=result)
 
-        return result
-
-    def _request(self, url, method='GET',
-                 cookies=None, data=None, headers=None, json=None, params=None,
-                 error_msg=None, raise_error=False, timeout=(3.05, 27), **_):
-        try:
-            result = requests.request(method, url,
-                                      verify=self._verify,
-                                      allow_redirects=True,
-                                      timeout=timeout,
-                                      cookies=cookies,
-                                      data=data,
-                                      headers=headers,
-                                      json=json,
-                                      params=params)
-            result.raise_for_status()
-        except requests.exceptions.RequestException as error:
-            response = error.response and error.response.text
-            _context.log_debug('Response: {0}'.format(response))
-            _context.log_error('{0}\n{1}'.format(
-                error_msg or 'Request failed', traceback.format_exc()
-            ))
-            if raise_error:
-                raise YouTubeException(error_msg)
-            return None
         return result
 
     def perform_v3_request(self, method='GET', headers=None, path=None,

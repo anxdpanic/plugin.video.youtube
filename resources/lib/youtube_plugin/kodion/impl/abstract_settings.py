@@ -133,6 +133,11 @@ class AbstractSettings(object):
             verify = False
         return verify
 
+    def get_timeout(self):
+        connect_timeout = self.get_int(SETTINGS.CONNECT_TIMEOUT, 9) + 0.5
+        read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27)
+        return (connect_timeout, read_timout)
+
     def allow_dev_keys(self):
         return self.get_bool(SETTINGS.ALLOW_DEV_KEYS, False)
 
