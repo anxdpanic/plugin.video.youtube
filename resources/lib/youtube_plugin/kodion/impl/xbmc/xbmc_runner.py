@@ -13,7 +13,7 @@ import xbmcplugin
 
 from ..abstract_provider_runner import AbstractProviderRunner
 from ...exceptions import KodionException
-from ...items import *
+from ...items import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
 from ... import AbstractProvider
 from . import info_labels
 from . import xbmc_items

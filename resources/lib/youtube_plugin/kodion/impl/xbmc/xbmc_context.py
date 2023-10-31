@@ -13,10 +13,7 @@ import json
 import os
 import sys
 import weakref
-from urllib.parse import quote
-from urllib.parse import unquote
-from urllib.parse import urlparse
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl, quote, unquote, urlparse
 
 import xbmc
 import xbmcaddon

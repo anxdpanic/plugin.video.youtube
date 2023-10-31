@@ -9,7 +9,18 @@
 """
 
 from . import datetime_parser
-from .methods import *
+from .methods import (
+    create_path,
+    create_uri_path,
+    find_best_fit,
+    find_video_id,
+    loose_version,
+    make_dirs,
+    select_stream,
+    strip_html_from_text,
+    to_unicode,
+    to_utf8,
+)
 from .search_history import SearchHistory
 from .favorite_list import FavoriteList
 from .watch_later_list import WatchLaterList

@@ -14,9 +14,15 @@ from urllib.parse import quote
 from urllib.parse import unquote
 
 from .exceptions import KodionException
-from . import items
+from .items import (
+    from_json,
+    to_jsons,
+    DirectoryItem,
+    NewSearchItem,
+    SearchHistoryItem
+)
+from .utils import to_unicode, to_utf8
 from . import constants
-from . import utils
 
 
 class AbstractProvider(object):
@@ -144,11 +150,11 @@ class AbstractProvider(object):
 
         command = re_match.group('command')
         if command == 'add':
-            fav_item = items.from_json(params['item'])
+            fav_item = from_json(params['item'])
             context.get_favorite_list().add(fav_item)
             return None
         if command == 'remove':
-            fav_item = items.from_json(params['item'])
+            fav_item = from_json(params['item'])
             context.get_favorite_list().remove(fav_item)
             context.get_ui().refresh_container()
             return None
@@ -158,7 +164,7 @@ class AbstractProvider(object):
             for directory_item in directory_items:
                 context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
                                  'RunPlugin(%s)' % context.create_uri([constants.paths.FAVORITES, 'remove'],
-                                                                      params={'item': items.to_jsons(directory_item)}))]
+                                                                      params={'item': to_jsons(directory_item)}))]
                 directory_item.set_context_menu(context_menu)
 
             return directory_items
@@ -171,11 +177,11 @@ class AbstractProvider(object):
 
         command = re_match.group('command')
         if command == 'add':
-            item = items.from_json(params['item'])
+            item = from_json(params['item'])
             context.get_watch_later_list().add(item)
             return None
         if command == 'remove':
-            item = items.from_json(params['item'])
+            item = from_json(params['item'])
             context.get_watch_later_list().remove(item)
             context.get_ui().refresh_container()
             return None
@@ -185,7 +191,7 @@ class AbstractProvider(object):
             for video_item in video_items:
                 context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
                                  'RunPlugin(%s)' % context.create_uri([constants.paths.WATCH_LATER, 'remove'],
-                                                                      params={'item': items.to_jsons(video_item)}))]
+                                                                      params={'item': to_jsons(video_item)}))]
                 video_item.set_context_menu(context_menu)
 
             return video_items
@@ -233,7 +239,7 @@ class AbstractProvider(object):
                 #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
                 if cached_query and cached_query.get('search_query', {}).get('query'):
                     query = cached_query.get('search_query', {}).get('query')
-                    query = utils.to_unicode(query)
+                    query = to_unicode(query)
                     query = unquote(query)
             else:
                 result, input_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
@@ -246,7 +252,7 @@ class AbstractProvider(object):
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
 
-            query = utils.to_utf8(query)
+            query = to_utf8(query)
             try:
                 self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
             except KeyError:
@@ -267,7 +273,7 @@ class AbstractProvider(object):
             incognito = str(context.get_param('incognito', False)).lower() == 'true'
             channel_id = context.get_param('channel_id', '')
             query = params['q']
-            query = utils.to_unicode(query)
+            query = to_unicode(query)
 
             if not incognito and not channel_id:
                 try:
@@ -284,16 +290,16 @@ class AbstractProvider(object):
         location = str(context.get_param('location', False)).lower() == 'true'
 
         # 'New Search...'
-        new_search_item = items.NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
+        new_search_item = NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
         result.append(new_search_item)
 
         for search in search_history.list():
             # little fallback for old history entries
-            if isinstance(search, items.DirectoryItem):
+            if isinstance(search, DirectoryItem):
                 search = search.get_name()
 
             # we create a new instance of the SearchItem
-            search_history_item = items.SearchHistoryItem(context, search, fanart=self.get_alternative_fanart(context), location=location)
+            search_history_item = SearchHistoryItem(context, search, fanart=self.get_alternative_fanart(context), location=location)
             result.append(search_history_item)
 
         if search_history.is_empty():

@@ -7,7 +7,7 @@
 """
 
 from html import unescape
-from urllib.parse import (parse_qs, urlsplit, urlunsplit, urlencode, urljoin)
+from urllib.parse import parse_qs, urlsplit, urlunsplit, urlencode, urljoin
 
 import xbmcvfs
 import requests

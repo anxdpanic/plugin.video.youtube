@@ -17,11 +17,29 @@ from base64 import b64decode
 
 from ..youtube.helper import yt_subscriptions
 from .. import kodion
-from ..kodion.utils import FunctionCache, strip_html_from_text, get_client_ip_address, is_httpd_live, find_video_id
-from ..kodion.items import *
+from ..kodion.utils import (
+    find_video_id,
+    get_client_ip_address,
+    is_httpd_live,
+    strip_html_from_text,
+    FunctionCache,
+)
+from ..kodion.items import DirectoryItem
 from ..youtube.client import YouTube
-from .helper import v3, ResourceManager, yt_specials, yt_playlist, yt_login, yt_setup_wizard, yt_video, \
-    yt_context_menu, yt_play, yt_old_actions, UrlResolver, UrlToItemConverter
+from .helper import (
+    v3,
+    yt_context_menu,
+    yt_login,
+    yt_old_actions,
+    yt_play,
+    yt_playlist,
+    yt_setup_wizard,
+    yt_specials,
+    yt_video,
+    ResourceManager,
+    UrlResolver,
+    UrlToItemConverter,
+)
 from .youtube_exceptions import InvalidGrant, LoginException
 
 import xbmc

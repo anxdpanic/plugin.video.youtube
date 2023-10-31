@@ -14,8 +14,15 @@ import traceback
 
 from json import dumps as json_dumps, loads as json_loads
 from html import unescape
-from urllib.parse import (parse_qs, urlsplit, urlunsplit, urlencode, urljoin,
-                          quote, unquote)
+from urllib.parse import (
+    parse_qs,
+    quote,
+    unquote,
+    urlsplit,
+    urlunsplit,
+    urlencode,
+    urljoin,
+)
 
 import requests
 import xbmcvfs

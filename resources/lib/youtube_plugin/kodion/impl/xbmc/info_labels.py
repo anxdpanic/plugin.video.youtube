@@ -9,7 +9,7 @@
 """
 
 from ... import utils
-from ...items import *
+from ...items import AudioItem, DirectoryItem, ImageItem, VideoItem
 
 
 def _process_date(info_labels, param):
