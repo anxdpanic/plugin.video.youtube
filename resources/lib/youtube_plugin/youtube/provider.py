@@ -339,13 +339,6 @@ class Provider(kodion.AbstractProvider):
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
-                # create a new access_token
-
-            if dev_keys:
-                client = YouTube(language=language, region=region, items_per_page=items_per_page, config=dev_keys)
-            else:
-                client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
-
         else:
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
 
@@ -363,19 +356,23 @@ class Provider(kodion.AbstractProvider):
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
-                # create a new access_token
-                client = YouTube(language=language, region=region, items_per_page=items_per_page, config=youtube_config)
 
-        if client:
-            if len(access_tokens) != 2 and len(refresh_tokens) == 2:
+        client = YouTube(language=language,
+                         region=region,
+                         items_per_page=items_per_page,
+                         config=dev_keys if dev_keys else youtube_config)
+
+        with client:
+            if not refresh_tokens or not refresh_tokens[0]:
+                client.set_log_error(context.log_error)
+                self._client = client
+
+            # create new access tokens
+            elif len(access_tokens) != 2 and len(refresh_tokens) == 2:
                 try:
-
                     access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
-
                     access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
-
                     access_tokens = [access_token_tv, access_token_kodi]
-
                     access_token = '%s|%s' % (access_token_tv, access_token_kodi)
                     expires_in = min(expires_in_tv, expires_in_kodi)
                     if dev_id:
@@ -407,15 +404,9 @@ class Provider(kodion.AbstractProvider):
                 access_tokens = ['', '']
             client.set_access_token(access_token=access_tokens[1])
             client.set_access_token_tv(access_token_tv=access_tokens[0])
-            self._client = client
-            self._client.set_log_error(context.log_error)
-        else:
-            self._client = YouTube(items_per_page=items_per_page, language=language, region=region, config=youtube_config)
-            self._client.set_log_error(context.log_error)
 
-            # in debug log the login status
-            context.log_debug('User is not logged in')
-
+        client.set_log_error(context.log_error)
+        self._client = client
         return self._client
 
     def get_resource_manager(self, context):
