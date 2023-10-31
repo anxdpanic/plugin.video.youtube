@@ -204,7 +204,7 @@
             <group id="1">
                 <setting id="kodion.video.quality.isa" type="boolean" label="30007" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <dependencies>
                         <dependency type="enable">
                             <condition name="InfoBool" on="property">System.HasAddon(inputstream.adaptive)</condition>
@@ -295,7 +295,7 @@
                 </setting>
                 <setting id="kodion.mpd.stream.select" type="integer" parent="kodion.mpd.videos" label="30758" help="">
                     <level>0</level>
-                    <default>1</default>  <!-- auto -->
+                    <default>3</default>  <!-- auto+list -->
                     <constraints>
                         <options>
                             <option label="30583">1</option>  <!-- auto -->
@@ -314,7 +314,7 @@
             <group id="3" label="30690">
                 <setting id="kodion.live_stream.selection.1" type="integer" label="30689" help="">
                     <level>0</level>
-                    <default>0</default>  <!-- mpegts -->
+                    <default>2</default>  <!-- isa_hls -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts --> 
