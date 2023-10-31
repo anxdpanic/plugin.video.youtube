@@ -533,6 +533,14 @@ class VideoInfo(object):
                 'title': 'ac-3@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'ac-3'}},
+        # === HLS
+        '9994': {'container': 'hls',
+                 'sort': [-1080, -1],
+                 'title': 'HLS',
+                 'hls/audio': True,
+                 'hls/video': True,
+                 'audio': {'bitrate': 0, 'encoding': 'aac'},
+                 'video': {'height': 0, 'encoding': 'h.264'}},
         # === Live HLS
         '9995': {'container': 'hls',
                  'Live': True,
@@ -837,30 +845,30 @@ class VideoInfo(object):
         self._selected_client = None
         client_selection = settings.client_selection()
 
-        # All client selections use the Android client as the first option to
-        # ensure that the age gate setting is enforced, regardless of login
-        # status
+        # Default client selection uses the Android or iOS client as the first
+        # option to ensure that the age gate setting is enforced, regardless of
+        # login status
 
         # Alternate #1
-        # Will play most videos with subtitles at full resolution with HDR
-        # Some restricted videos may only play at 720p
-        # Some restricted videos require additional requests for subtitles
+        # Enable iOS client to access premium streams, however other stream
+        # types are limited
         if client_selection == 1:
             self._prioritised_clients = (
+                'ios',
                 'android',
-                'android_embedded',
                 'android_youtube_tv',
                 'android_testsuite',
+                'android_embedded',
             )
         # Alternate #2
-        # Will play most videos at full resolution with HDR
-        # Most videos wont show subtitles
-        # Useful for testing AV1 HDR
+        # Used to bypass age restriction, however streams are obfuscated and
+        # throttled. Useful for testing n-sig de-obfuscation.
         elif client_selection == 2:
             self._prioritised_clients = (
+                'smarttv_embedded',
                 'android',
-                'android_testsuite',
                 'android_youtube_tv',
+                'android_testsuite',
                 'android_embedded',
             )
         # Default
@@ -1105,14 +1113,15 @@ class VideoInfo(object):
         if playback_stats is None:
             playback_stats = {}
 
-        if live_type is None:
-            live_type = self._context.get_settings().get_live_stream_type()
-
-        if 'hls' in live_type:
-            if live_type == 'hls':
-                yt_format = self.FORMAT['9995']
-            else:
-                yt_format = self.FORMAT['9996']
+        yt_format = None
+        if not live_type:
+            yt_format = self.FORMAT['9994']
+        elif live_type == 'hls':
+            yt_format = self.FORMAT['9995']
+        elif live_type == 'isa_hls':
+            yt_format = self.FORMAT['9996']
+        
+        if yt_format:
             stream = {'url': url,
                       'meta': meta_info,
                       'headers': curl_headers,
@@ -1571,6 +1580,10 @@ class VideoInfo(object):
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
             )
+            stream_list.extend(self._load_hls_manifest(
+                streaming_data.get('hlsManifestUrl'),
+                None, meta_info, client['headers'], playback_stats
+            ))
 
         if manifest_url:
             video_stream = {
