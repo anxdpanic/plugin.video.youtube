@@ -45,9 +45,9 @@ class SystemVersion(object):
 
         self._releasename = 'Unknown Release'
         if self._version >= (21, 0):
-            self._releasename = 'O*****'
+            self._releasename = 'Omega'
         elif self._version >= (20, 0):
-            self._releasename = 'N*****'
+            self._releasename = 'Nexus'
         elif self._version >= (19, 0):
             self._releasename = 'Matrix'
         elif self._version >= (18, 0):
