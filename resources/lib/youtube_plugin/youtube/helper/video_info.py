@@ -1514,7 +1514,7 @@ class VideoInfo(object):
                 'watchtime_url': '',
             }
 
-        httpd_is_live = (_settings.use_mpd() and
+        httpd_is_live = (_settings.use_isa() and
                          is_httpd_live(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
@@ -1557,7 +1557,7 @@ class VideoInfo(object):
         manifest_url = None
         if is_live:
             live_type = _settings.get_live_stream_type()
-            if live_type == 'ia_mpd':
+            if live_type == 'isa_mpd':
                 manifest_url = streaming_data.get('dashManifestUrl', '')
             else:
                 stream_list.extend(self._load_hls_manifest(
@@ -1637,7 +1637,7 @@ class VideoInfo(object):
     def _process_stream_data(self, stream_data, default_lang_code='und'):
         _settings = self._context.get_settings()
         qualities = _settings.get_mpd_video_qualities()
-        ia_capabilities = self._context.inputstream_adaptive_capabilities()
+        isa_capabilities = self._context.inputstream_adaptive_capabilities()
         stream_features = _settings.stream_features()
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
@@ -1704,7 +1704,7 @@ class VideoInfo(object):
                     codec = 'vp9'
                 elif codec.startswith('dts'):
                     codec = 'dts'
-            if codec not in stream_features or codec not in ia_capabilities:
+            if codec not in stream_features or codec not in isa_capabilities:
                 continue
             media_type, container = mime_type.split('/')
             bitrate = stream.get('bitrate', 0)

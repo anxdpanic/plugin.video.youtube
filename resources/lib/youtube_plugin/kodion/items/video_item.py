@@ -40,7 +40,7 @@ class VideoItem(BaseItem):
         self._studio = None
         self._artist = None
         self._play_count = None
-        self._uses_mpd = None
+        self._uses_isa = None
         self._mediatype = None
         self._last_played = None
         self._start_percent = None
@@ -235,11 +235,23 @@ class VideoItem(BaseItem):
     def get_date(self):
         return self._date
 
-    def set_use_mpd_video(self, value=True):
-        self._uses_mpd = value
+    def set_isa_video(self, value=True):
+        self._uses_isa = value
+
+    def use_isa_video(self):
+        return self._uses_isa
+
+    def use_hls_video(self):
+        uri = self.get_uri()
+        if 'manifest/hls' in uri or uri.endswith('.m3u8'):
+            return True
+        return False
 
     def use_mpd_video(self):
-        return self._uses_mpd is True and ('manifest/dash' in self.get_uri() or self.get_uri().endswith('.mpd'))
+        uri = self.get_uri()
+        if 'manifest/dash' in uri or uri.endswith('.mpd'):
+            return True
+        return False
 
     def set_mediatype(self, mediatype):
         self._mediatype = mediatype

@@ -62,7 +62,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     # noinspection PyPep8Naming
     def do_GET(self):
         addon = xbmcaddon.Addon('plugin.video.youtube')
-        mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
+        mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.isa') == 'true'
         api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
 
         # Strip trailing slash if present
@@ -166,7 +166,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_error(403)
         else:
             addon = xbmcaddon.Addon('plugin.video.youtube')
-            mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.mpd') == 'true'
+            mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.isa') == 'true'
             if mpd_proxy_enabled and self.path.endswith('.mpd'):
                 file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
                 if not os.path.isfile(file_path):

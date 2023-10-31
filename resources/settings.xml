@@ -200,9 +200,9 @@
                 </setting>
             </group>
         </category>
-        <category id="mpeg-dash" label="30617" help="">
+        <category id="inputstream-adaptive" label="30617" help="">
             <group id="1">
-                <setting id="kodion.video.quality.mpd" type="boolean" label="30007" help="">
+                <setting id="kodion.video.quality.isa" type="boolean" label="30007" help="">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
@@ -212,15 +212,15 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="kodion.video.quality.mpd.configure" type="action" label="30008" help="">
+                <setting id="kodion.video.quality.isa.configure" type="action" parent="kodion.video.quality.isa" label="30008" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/config/mpd/)</data>
+                    <data>RunPlugin(plugin://plugin.video.youtube/config/isa/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
                     <dependencies>
                         <dependency type="enable">
-                            <condition setting="kodion.video.quality.mpd" operator="is">true</condition>
+                            <condition setting="kodion.video.quality.isa" operator="is">true</condition>
                         </dependency>
                     </dependencies>
                     <control format="action" type="button">
@@ -234,7 +234,7 @@
                     <default>true</default>
                     <dependencies>
                         <dependency type="enable">
-                            <condition setting="kodion.video.quality.mpd" operator="is">true</condition>
+                            <condition setting="kodion.video.quality.isa" operator="is">true</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
@@ -312,37 +312,36 @@
                 </setting>
             </group>
             <group id="3" label="30690">
-                <setting id="kodion.mpd.live_stream.selection.1" type="integer" label="30689" help="">
+                <setting id="kodion.live_stream.selection.1" type="integer" label="30689" help="">
                     <level>0</level>
                     <default>0</default>  <!-- mpegts -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts --> 
                             <option label="30741">1</option>  <!-- hls -->
-                            <option label="30742">2</option>  <!-- ia_hls -->
-                            <option label="30743">3</option>  <!-- ia_mpd -->
+                            <option label="30742">2</option>  <!-- isa_hls -->
+                            <option label="30743">3</option>  <!-- isa_mpd -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>
                     <dependencies>
                         <dependency type="visible">
-                            <condition setting="kodion.video.quality.mpd" operator="is">true</condition>
+                            <condition setting="kodion.video.quality.isa" operator="is">true</condition>
                         </dependency>
                     </dependencies>
                 </setting>
-                <setting id="kodion.mpd.live_stream.selection.2" type="integer" label="30689" help="">
+                <setting id="kodion.live_stream.selection.2" type="integer" label="30689" help="">
                     <level>0</level>
                     <default>0</default>  <!-- mpegts -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts -->
                             <option label="30741">1</option>  <!-- hls -->
-                            <option label="30742">2</option>  <!-- ia_hls -->
                         </options>
                     </constraints>
                     <dependencies>
                         <dependency type="visible">
-                            <condition setting="kodion.video.quality.mpd" operator="is">false</condition>
+                            <condition setting="kodion.video.quality.isa" operator="is">false</condition>
                         </dependency>
                     </dependencies>
                     <control format="string" type="spinner"/>
@@ -358,9 +357,9 @@
                     <dependencies>
                         <dependency type="enable">
                             <or>
-                                <condition setting="kodion.video.quality.mpd" operator="is">true</condition>
-                                <condition setting="kodion.mpd.live_stream.selection.1" operator="gt">1</condition>
-                                <condition setting="kodion.mpd.live_stream.selection.2" operator="gt">1</condition>
+                                <condition setting="kodion.video.quality.isa" operator="is">true</condition>
+                                <condition setting="kodion.live_stream.selection.1" operator="gt">1</condition>
+                                <condition setting="kodion.live_stream.selection.2" operator="gt">1</condition>
                             </or>
                         </dependency>
                     </dependencies>

@@ -96,8 +96,8 @@ class AbstractSettings(object):
     def alternative_player_web_urls(self):
         return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS, False)
 
-    def use_mpd(self):
-        return self.get_bool(SETTINGS.USE_MPD, False)
+    def use_isa(self):
+        return self.get_bool(SETTINGS.USE_ISA, False)
 
     def subtitle_languages(self):
         return self.get_int(SETTINGS.SUBTITLE_LANGUAGE, 0)
@@ -137,31 +137,31 @@ class AbstractSettings(object):
         return self.get_bool(SETTINGS.ALLOW_DEV_KEYS, False)
 
     def use_mpd_videos(self):
-        if self.use_mpd():
+        if self.use_isa():
             return self.get_bool(SETTINGS.MPD_VIDEOS, False)
         return False
 
     _LIVE_STREAM_TYPES = {
         0: 'mpegts',
         1: 'hls',
-        2: 'ia_hls',
-        3: 'ia_mpd',
+        2: 'isa_hls',
+        3: 'isa_mpd',
     }
 
     def get_live_stream_type(self):
-        if self.use_mpd():
+        if self.use_isa():
             stream_type = self.get_int(SETTINGS.LIVE_STREAMS + '.1', 0)
         else:
             stream_type = self.get_int(SETTINGS.LIVE_STREAMS + '.2', 0)
         return self._LIVE_STREAM_TYPES.get(stream_type) or self._LIVE_STREAM_TYPES[0]
 
-    def use_adaptive_live_streams(self):
-        if self.use_mpd():
+    def use_isa_live_streams(self):
+        if self.use_isa():
             return self.get_int(SETTINGS.LIVE_STREAMS + '.1', 0) > 1
-        return self.get_int(SETTINGS.LIVE_STREAMS + '.2', 0) > 1
+        return False
 
     def use_mpd_live_streams(self):
-        if self.use_mpd():
+        if self.use_isa():
             return self.get_int(SETTINGS.LIVE_STREAMS + '.1', 0) == 3
         return False
 

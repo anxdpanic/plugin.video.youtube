@@ -1090,11 +1090,11 @@ class Provider(kodion.AbstractProvider):
         if switch == 'youtube':
             context.addon().openSettings()
             context.get_ui().refresh_container()
-        elif switch == 'mpd':
+        elif switch == 'isa':
             if context.use_inputstream_adaptive():
                 xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
             else:
-                settings.set_bool('kodion.video.quality.mpd', False)
+                settings.set_bool('kodion.video.quality.isa', False)
         elif switch == 'subtitles':
             yt_language = context.get_settings().get_string('youtube.language', 'en-US')
             sub_setting = context.get_settings().subtitle_languages()

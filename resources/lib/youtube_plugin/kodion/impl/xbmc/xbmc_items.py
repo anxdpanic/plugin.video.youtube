@@ -33,7 +33,8 @@ from . import info_labels
 
 
 def to_play_item(context, play_item):
-    context.log_debug('Converting PlayItem |%s|' % play_item.get_uri())
+    uri = play_item.get_uri()
+    context.log_debug('Converting PlayItem |%s|' % uri)
 
     is_strm = str(context.get_param('strm', False)).lower() == 'true'
 
@@ -56,36 +57,28 @@ def to_play_item(context, play_item):
 
         list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
 
-    if settings.is_support_alternative_player_enabled() and \
-            settings.alternative_player_web_urls() and \
-            not play_item.get_license_key():
-        play_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(video_id=play_item.video_id))
+    headers = play_item.get_headers()
+    license_key = play_item.get_license_key()
+    alternative_player = settings.is_support_alternative_player_enabled()
 
-    ia_enabled = context.addon_enabled('inputstream.adaptive')
+    if (alternative_player and settings.alternative_player_web_urls()
+            and not license_key):
+        play_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(
+            video_id=play_item.video_id
+        ))
 
-    if ia_enabled and play_item.use_mpd_video() and not play_item.live:
-        list_item.setContentLookup(False)
-        list_item.setMimeType('application/xml+dash')
-        list_item.setProperty('inputstream', 'inputstream.adaptive')
-        list_item.setProperty('inputstream.adaptive.manifest_type', 'mpd')
-        if 'auto' in settings.stream_select():
-            list_item.setProperty('inputstream.adaptive.stream_selection_type', 'adaptive')
+    isa_enabled = settings.use_isa() and context.addon_enabled('inputstream.adaptive')
 
-        if play_item.get_headers():
-            list_item.setProperty('inputstream.adaptive.manifest_headers', play_item.get_headers())
-            list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
-
-        if play_item.get_license_key():
-            list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
-
-    elif ia_enabled and play_item.live and settings.use_adaptive_live_streams():
-        if settings.use_mpd_live_streams():
+    if isa_enabled and play_item.use_isa_video():
+        if play_item.use_mpd_video():
             manifest_type = 'mpd'
             mime_type = 'application/xml+dash'
             # MPD manifest update is currently broken
             # Following line will force a full update but restart live stream from start
-            # list_item.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
+            # if play_item.live:
+            #     list_item.setProperty('inputstream.adaptive.manifest_update_parameter', 'full')
+            if 'auto' in settings.stream_select():
+                list_item.setProperty('inputstream.adaptive.stream_selection_type', 'adaptive')
         else:
             manifest_type = 'hls'
             mime_type = 'application/x-mpegURL'
@@ -95,16 +88,14 @@ def to_play_item(context, play_item):
         list_item.setProperty('inputstream', 'inputstream.adaptive')
         list_item.setProperty('inputstream.adaptive.manifest_type', manifest_type)
 
-        if play_item.get_headers():
-            list_item.setProperty('inputstream.adaptive.manifest_headers', play_item.get_headers())
-            list_item.setProperty('inputstream.adaptive.stream_headers', play_item.get_headers())
+        if headers:
+            list_item.setProperty('inputstream.adaptive.manifest_headers', headers)
+            list_item.setProperty('inputstream.adaptive.stream_headers', headers)
 
-        if play_item.get_license_key():
+        if license_key:
             list_item.setProperty('inputstream.adaptive.license_type', 'com.widevine.alpha')
-            list_item.setProperty('inputstream.adaptive.license_key', play_item.get_license_key())
-
+            list_item.setProperty('inputstream.adaptive.license_key', license_key)
     else:
-        uri = play_item.get_uri()
         if 'mime=' in uri:
             try:
                 mime_type = uri.split('mime=', 1)[-1].split('&', 1)[0].replace('%2F', '/', 1)

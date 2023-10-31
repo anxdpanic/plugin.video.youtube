@@ -494,8 +494,11 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
     if 'headers' in video_stream:
         video_item.set_headers(video_stream['headers'])
 
-    # set uses_mpd
-    video_item.set_use_mpd_video(settings.use_mpd_videos())
+    # set _uses_isa
+    if video_item.live:
+        video_item.set_isa_video(settings.use_isa_live_streams())
+    elif video_item.use_hls_video() or video_item.use_mpd_video():
+        video_item.set_isa_video(settings.use_isa())
 
     license_info = video_stream.get('license_info', {})
 

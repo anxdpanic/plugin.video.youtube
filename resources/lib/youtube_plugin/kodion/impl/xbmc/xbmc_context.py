@@ -272,7 +272,7 @@ class XbmcContext(AbstractContext):
         self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
 
     def use_inputstream_adaptive(self):
-        if self._settings.use_mpd_videos() or self._settings.use_adaptive_live_streams():
+        if self._settings.use_isa():
             if self.addon_enabled('inputstream.adaptive'):
                 success = True
             elif self.get_ui().on_yes_no_input(self.get_name(), self.localize(30579)):
@@ -287,7 +287,7 @@ class XbmcContext(AbstractContext):
     # - required version number as string for comparison with actual installed InputStream.Adaptive version
     # - any Falsey value to exclude capability regardless of version
     # - True to include capability regardless of version
-    _IA_CAPABILITIES = {
+    _ISA_CAPABILITIES = {
         'live': '2.0.12',
         'drm': '2.2.12',
         # audio codecs
@@ -315,16 +315,16 @@ class XbmcContext(AbstractContext):
         if not self.use_inputstream_adaptive() or not inputstream_version:
             return frozenset() if capability is None else None
 
-        ia_loose_version = utils.loose_version(inputstream_version)
+        isa_loose_version = utils.loose_version(inputstream_version)
         if capability is None:
             capabilities = frozenset(
-                capability for capability, version in self._IA_CAPABILITIES.items()
+                capability for capability, version in self._ISA_CAPABILITIES.items()
                 if version is True
-                or version and ia_loose_version >= utils.loose_version(version)
+                or version and isa_loose_version >= utils.loose_version(version)
             )
             return capabilities
-        version = self._IA_CAPABILITIES.get(capability)
-        return version is True or version and ia_loose_version >= utils.loose_version(version)
+        version = self._ISA_CAPABILITIES.get(capability)
+        return version is True or version and isa_loose_version >= utils.loose_version(version)
 
     def inputstream_adaptive_auto_stream_selection(self):
         try:
