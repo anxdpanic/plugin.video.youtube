@@ -14,7 +14,7 @@ from .. import items
 
 class FavoriteList(Storage):
     def __init__(self, filename):
-        Storage.__init__(self, filename)
+        super(FavoriteList, self).__init__(filename)
 
     def clear(self):
         self._clear()

@@ -12,7 +12,7 @@ from . import JSONStore
 
 class APIKeyStore(JSONStore):
     def __init__(self):
-        JSONStore.__init__(self, 'api_keys.json')
+        super(APIKeyStore, self).__init__('api_keys.json')
 
     def set_defaults(self):
         data = self.get_data()

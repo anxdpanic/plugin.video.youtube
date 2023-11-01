@@ -16,7 +16,7 @@ from .. import items
 
 class WatchLaterList(Storage):
     def __init__(self, filename):
-        Storage.__init__(self, filename)
+        super(WatchLaterList, self).__init__(filename)
 
     def clear(self):
         self._clear()

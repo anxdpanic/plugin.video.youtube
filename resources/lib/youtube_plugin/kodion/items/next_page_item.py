@@ -21,7 +21,7 @@ class NextPageItem(DirectoryItem):
         if name.find('%d') != -1:
             name %= current_page + 1
 
-        DirectoryItem.__init__(self, name, context.create_uri(context.get_path(), new_params), image=image)
+        super(NextPageItem, self).__init__(name, context.create_uri(context.get_path(), new_params), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

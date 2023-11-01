@@ -16,7 +16,7 @@ from ..logger import log_debug
 
 class AbstractSettings(object):
     def __init__(self):
-        object.__init__(self)
+        super(AbstractSettings, self).__init__()
 
     def get_string(self, setting_id, default_value=None):
         raise NotImplementedError()

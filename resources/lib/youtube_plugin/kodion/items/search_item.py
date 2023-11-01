@@ -23,7 +23,7 @@ class SearchItem(DirectoryItem):
 
         params = {'location': location} if location else {}
 
-        DirectoryItem.__init__(self, name, context.create_uri([constants.paths.SEARCH, 'list'], params=params), image=image)
+        super(SearchItem, self).__init__(name, context.create_uri([constants.paths.SEARCH, 'list'], params=params), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

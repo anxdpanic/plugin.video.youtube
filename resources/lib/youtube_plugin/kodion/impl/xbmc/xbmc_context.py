@@ -35,7 +35,7 @@ except AttributeError:
 
 class XbmcContext(AbstractContext):
     def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
-        AbstractContext.__init__(self, path, params, plugin_name, plugin_id)
+        super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
 
         if plugin_id:
             self._addon = xbmcaddon.Addon(id=plugin_id)

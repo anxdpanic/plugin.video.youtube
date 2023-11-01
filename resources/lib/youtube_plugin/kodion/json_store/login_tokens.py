@@ -14,7 +14,7 @@ from . import JSONStore
 # noinspection PyTypeChecker
 class LoginTokenStore(JSONStore):
     def __init__(self):
-        JSONStore.__init__(self, 'access_manager.json')
+        super(LoginTokenStore, self).__init__('access_manager.json')
 
     def set_defaults(self):
         data = self.get_data()

@@ -21,7 +21,7 @@ class WatchLaterItem(DirectoryItem):
         if image is None:
             image = context.create_resource_path('media/watch_later.png')
 
-        DirectoryItem.__init__(self, name, context.create_uri([constants.paths.WATCH_LATER, 'list']), image=image)
+        super(WatchLaterItem, self).__init__(name, context.create_uri([constants.paths.WATCH_LATER, 'list']), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

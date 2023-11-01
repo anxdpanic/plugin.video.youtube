@@ -13,7 +13,7 @@ from .base_item import BaseItem
 
 class DirectoryItem(BaseItem):
     def __init__(self, name, uri, image='', fanart=''):
-        BaseItem.__init__(self, name, uri, image, fanart)
+        super(DirectoryItem, self).__init__(name, uri, image, fanart)
         self._plot = self.get_name()
         self._is_action = False
         self._channel_subscription_id = None

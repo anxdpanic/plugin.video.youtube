@@ -13,7 +13,7 @@ from .base_item import BaseItem
 
 class ImageItem(BaseItem):
     def __init__(self, name, uri, image='', fanart=''):
-        BaseItem.__init__(self, name, uri, image, fanart)
+        super(ImageItem, self).__init__(name, uri, image, fanart)
         self._title = None
 
     def set_title(self, title):

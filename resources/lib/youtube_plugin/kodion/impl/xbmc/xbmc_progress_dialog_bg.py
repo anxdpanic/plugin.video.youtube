@@ -14,7 +14,7 @@ from ..abstract_progress_dialog import AbstractProgressDialog
 
 class XbmcProgressDialogBG(AbstractProgressDialog):
     def __init__(self, heading, text):
-        AbstractProgressDialog.__init__(self, 100)
+        super(XbmcProgressDialogBG, self).__init__(100)
         self._dialog = xbmcgui.DialogProgressBG()
         self._dialog.create(heading, text)
 

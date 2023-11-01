@@ -42,7 +42,7 @@ class YouTubeRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.base_path = xbmc.translatePath('special://temp/%s' % self.addon_id).decode('utf-8')
         except AttributeError:
             self.base_path = xbmc.translatePath('special://temp/%s' % self.addon_id)
-        BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+        super(YouTubeRequestHandler, self).__init__(request, client_address, server)
 
     def connection_allowed(self):
         client_ip = self.client_address[0]

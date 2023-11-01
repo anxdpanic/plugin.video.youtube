@@ -13,7 +13,7 @@ from ..abstract_settings import AbstractSettings
 
 class XbmcPluginSettings(AbstractSettings):
     def __init__(self, xbmc_addon):
-        AbstractSettings.__init__(self)
+        super(XbmcPluginSettings, self).__init__()
 
         self._xbmc_addon = xbmc_addon
 

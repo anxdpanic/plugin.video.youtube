@@ -13,4 +13,4 @@ from .base_item import BaseItem
 
 class UriItem(BaseItem):
     def __init__(self, uri):
-        BaseItem.__init__(self, name='', uri=uri)
+        super(UriItem, self).__init__(name='', uri=uri)

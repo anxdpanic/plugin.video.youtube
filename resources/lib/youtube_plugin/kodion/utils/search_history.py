@@ -16,7 +16,7 @@ from .methods import to_utf8
 
 class SearchHistory(Storage):
     def __init__(self, filename, max_items=10):
-        Storage.__init__(self, filename, max_item_count=max_items)
+        super(SearchHistory, self).__init__(filename, max_item_count=max_items)
 
     def is_empty(self):
         return self._is_empty()

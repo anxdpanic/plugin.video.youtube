@@ -17,7 +17,7 @@ from . import xbmc_items
 
 class XbmcPlaylist(AbstractPlaylist):
     def __init__(self, playlist_type, context):
-        AbstractPlaylist.__init__(self)
+        super(XbmcPlaylist, self).__init__()
 
         self._context = context
         self._playlist = None

@@ -21,7 +21,7 @@ class SearchHistoryItem(DirectoryItem):
         if location:
             params['location'] = location
 
-        DirectoryItem.__init__(self, query, context.create_uri([constants.paths.SEARCH, 'query'], params=params), image=image)
+        super(SearchHistoryItem, self).__init__(query, context.create_uri([constants.paths.SEARCH, 'query'], params=params), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

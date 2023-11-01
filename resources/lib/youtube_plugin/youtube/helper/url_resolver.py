@@ -35,7 +35,7 @@ class YouTubeResolver(AbstractResolver):
     RE_USER_NAME = re.compile(r'http(s)?://(www.)?youtube.com/(?P<user_name>[a-zA-Z0-9]+)$')
 
     def __init__(self):
-        AbstractResolver.__init__(self)
+        super(YouTubeResolver, self).__init__()
 
     def supports_url(self, url, url_components):
         if url_components.hostname == 'www.youtube.com' or url_components.hostname == 'youtube.com':
@@ -91,7 +91,7 @@ class YouTubeResolver(AbstractResolver):
 
 class CommonResolver(AbstractResolver, list):
     def __init__(self):
-        AbstractResolver.__init__(self)
+        super(CommonResolver, self).__init__()
 
     def supports_url(self, url, url_components):
         return True

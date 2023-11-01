@@ -21,7 +21,7 @@ from . import xbmc_items
 
 class XbmcRunner(AbstractProviderRunner):
     def __init__(self):
-        AbstractProviderRunner.__init__(self)
+        super(XbmcRunner, self).__init__()
         self.handle = None
         self.settings = None
 

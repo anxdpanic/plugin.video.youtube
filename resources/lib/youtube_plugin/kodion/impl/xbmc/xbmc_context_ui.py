@@ -20,7 +20,7 @@ from ... import utils
 
 class XbmcContextUI(AbstractContextUI):
     def __init__(self, xbmc_addon, context):
-        AbstractContextUI.__init__(self)
+        super(XbmcContextUI, self).__init__()
 
         self._xbmc_addon = xbmc_addon
 

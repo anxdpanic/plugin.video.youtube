@@ -203,7 +203,7 @@ class Provider(kodion.AbstractProvider):
                  }
 
     def __init__(self):
-        kodion.AbstractProvider.__init__(self)
+        super(Provider, self).__init__()
         self._resource_manager = None
 
         self._client = None

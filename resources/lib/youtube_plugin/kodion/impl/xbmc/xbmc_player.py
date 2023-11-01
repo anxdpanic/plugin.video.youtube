@@ -14,7 +14,7 @@ from ..abstract_player import AbstractPlayer
 
 class XbmcPlayer(AbstractPlayer):
     def __init__(self, player_type, context):
-        AbstractPlayer.__init__(self)
+        super(XbmcPlayer, self).__init__()
 
         self._player_type = player_type
         if player_type == 'audio':

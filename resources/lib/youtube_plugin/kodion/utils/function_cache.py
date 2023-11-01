@@ -23,7 +23,7 @@ class FunctionCache(Storage):
 
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
-        Storage.__init__(self, filename, max_file_size_kb=max_file_size_kb)
+        super(FunctionCache, self).__init__(filename, max_file_size_kb=max_file_size_kb)
 
         self._enabled = True
 
