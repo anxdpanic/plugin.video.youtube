@@ -24,13 +24,13 @@ _context = Context(plugin_id='plugin.video.youtube')
 
 
 class YouTube(LoginClient):
-    def __init__(self, config=None, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
-        if config is None:
-            config = {}
-        LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
-                             access_token_tv=access_token_tv)
+    def __init__(self, **kwargs):
+        if not kwargs.get('config'):
+            kwargs['config'] = {}
+        if 'items_per_page' in kwargs:
+            self._max_results = kwargs.pop('items_per_page')
 
-        self._max_results = items_per_page
+        super(YouTube, self).__init__(**kwargs)
 
     def get_max_results(self):
         return self._max_results
@@ -86,8 +86,8 @@ class YouTube(LoginClient):
         if self._access_token:
             params['access_token'] = self._access_token
 
-        self._request(url, params=params, headers=headers,
-                      error_msg='Failed to update watch history')
+        self.request(url, params=params, headers=headers,
+                     error_msg='Failed to update watch history')
 
     def get_video_streams(self, context, video_id):
         video_info = VideoInfo(context, access_token=self._access_token_tv,
@@ -819,7 +819,7 @@ class YouTube(LoginClient):
                 responses = []
 
                 def fetch_xml(_url, _responses):
-                    _response = self._request(_url, headers=headers)
+                    _response = self.request(_url, headers=headers)
                     if _response:
                         _responses.append(_response)
 
@@ -1059,7 +1059,7 @@ class YouTube(LoginClient):
             log_params = None
         _context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
 
-        result = self._request(_url, method=method, headers=_headers, json=post_data, params=_params)
+        result = self.request(_url, method=method, headers=_headers, json=post_data, params=_params)
         if result is None:
             return {}
 
@@ -1111,7 +1111,7 @@ class YouTube(LoginClient):
             log_params = None
         _context.log_debug('[data] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
 
-        result = self._request(_url, method=method, headers=_headers, json=post_data, params=_params)
+        result = self.request(_url, method=method, headers=_headers, json=post_data, params=_params)
         if result is None:
             return {}
 

@@ -357,7 +357,8 @@ class Provider(kodion.AbstractProvider):
                     refresh_tokens = refresh_tokens.split('|')
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
 
-        client = YouTube(language=language,
+        client = YouTube(context=context,
+                         language=language,
                          region=region,
                          items_per_page=items_per_page,
                          config=dev_keys if dev_keys else youtube_config)

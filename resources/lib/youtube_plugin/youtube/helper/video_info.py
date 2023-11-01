@@ -24,9 +24,9 @@ from urllib.parse import (
     urljoin,
 )
 
-import requests
 import xbmcvfs
 
+from ..client.request_client import YouTubeRequestClient
 from ...kodion.utils import is_httpd_live, make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .subtitles import Subtitles
@@ -34,7 +34,7 @@ from .ratebypass import ratebypass
 from .signature.cipher import Cipher
 
 
-class VideoInfo(object):
+class VideoInfo(YouTubeRequestClient):
     FORMAT = {
         # === Non-DASH ===
         '5': {'container': 'flv',
@@ -584,256 +584,12 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
-    CLIENTS = {
-        # 4k no VP9 HDR
-        # Limited subtitle availability
-        'android_testsuite': {
-            '_id': 30,
-            '_query_subtitles': True,
-            'json': {
-                'params': '2AMBCgIQBg',
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_TESTSUITE',
-                        'clientVersion': '1.9',
-                        'androidSdkVersion': '29',
-                        'osName': 'Android',
-                        'osVersion': '10',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
-            },
-        },
-        'android': {
-            '_id': 3,
-            'json': {
-                'params': '2AMBCgIQBg',
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID',
-                        'clientVersion': '17.31.35',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
-            },
-        },
-        # Only for videos that allow embedding
-        # Limited to 720p on some videos
-        'android_embedded': {
-            '_id': 55,
-            'json': {
-                'params': '2AMBCgIQBg',
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '17.36.4',
-                        'clientScreen': 'EMBED',
-                        'androidSdkVersion': '29',
-                        'osName': 'Android',
-                        'osVersion': '10',
-                        'platform': 'MOBILE',
-                    },
-                },
-                'thirdParty': {
-                    'embedUrl': 'https://www.youtube.com/embed/{json[videoId]}',
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
-            },
-        },
-        # 4k with HDR
-        # Some videos block this client, may also require embedding enabled
-        # Limited subtitle availability
-        'android_youtube_tv': {
-            '_id': 29,
-            '_query_subtitles': True,
-            'json': {
-                'params': '2AMBCgIQBg',
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '6.36',
-                        'androidSdkVersion': '29',
-                        'osName': 'Android',
-                        'osVersion': '10',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.apps.youtube.unplugged/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
-            },
-        },
-        'ios': {
-            '_id': 5,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'IOS',
-                        'clientVersion': '17.33.2',
-                        'deviceModel': 'iPhone14,3',
-                        'osName': 'iOS',
-                        'osVersion': '15_6',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.ios.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' ({json[context][client][deviceModel]};'
-                               ' U; CPU {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}'
-                               ' like Mac OS X)'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
-            },
-        },
-        # Used to requests captions for clients that don't provide them
-        # Requires handling of nsig to overcome throttling (TODO)
-        'smarttv_embedded': {
-            '_id': 85,
-            'json': {
-                'params': '2AMBCgIQBg',
-                'context': {
-                    'client': {
-                        'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
-                        'clientScreen': 'WATCH',
-                        'clientVersion': '2.0',
-                    },
-                },
-                'thirdParty': {
-                    'embedUrl': 'https://www.youtube.com',
-                },
-            },
-            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
-            'headers': {
-                'User-Agent': ('Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
-                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                               ' 85.0.4183.93/6.5 TV Safari/537.36'),
-            },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
-        },
-        # Used for misc api requests by default
-        # Requires handling of nsig to overcome throttling (TODO)
-        'web': {
-            '_id': 1,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'WEB',
-                        'clientVersion': '2.20220801.00.00',
-                    },
-                },
-            },
-            # Headers for a "Galaxy S20 Ultra" from Chrome dev tools device
-            # emulation
-            'headers': {
-                'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
-                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                               ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}'
-            },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
-        },
-        '_common': {
-            '_access_token': None,
-            'json': {
-                'contentCheckOk': True,
-                'context': {
-                    'client': {
-                        'gl': None,
-                        'hl': None,
-                    },
-                },
-                'playbackContext': {
-                    'contentPlaybackContext': {
-                        'html5Preference': 'HTML5_PREF_WANTS',
-                    },
-                },
-                'racyCheckOk': True,
-                'thirdParty': {},
-                'user': {
-                    'lockedSafetyMode': False
-                },
-                'videoId': None,
-            },
-            'headers': {
-                'Origin': 'https://www.youtube.com',
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}',
-                'Accept-Encoding': 'gzip, deflate',
-                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': 'Bearer {_access_token}',
-            },
-            'params': {
-                'key': None,
-                'prettyPrint': 'false'
-            },
-        },
-    }
-
     def __init__(self, context, access_token='', language='en-US'):
         settings = context.get_settings()
 
         self.video_id = None
         self._context = context
         self._data_cache = self._context.get_data_cache()
-        self._verify = settings.verify_ssl()
         self._language = (settings.get_string('youtube.language', language)
                           .replace('-', '_'))
         self._language_base = self._language[0:2]
@@ -887,6 +643,8 @@ class VideoInfo(object):
             'gl': settings.get_string('youtube.region', 'US'),
         }
 
+        super(VideoInfo, self).__init__(context=context)
+
     @staticmethod
     def _generate_cpn():
         # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1381
@@ -902,73 +660,15 @@ class VideoInfo(object):
         self.video_id = video_id
         return self._get_video_info()
 
-    def _build_client(self, client_name, auth_header=False):
-        def _merge_dicts(item1, item2, _=Ellipsis):
-            if not isinstance(item1, dict) or not isinstance(item2, dict):
-                return item1 if item2 is _ else item2
-            new = {}
-            keys = set(item1)
-            keys.update(item2)
-            for key in keys:
-                value = _merge_dicts(item1.get(key, _), item2.get(key, _))
-                if value is _:
-                    continue
-                if isinstance(value, str) and '{' in value:
-                    _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
-                new[key] = value
-            return new or _
-        _format = {}
-
-        client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
-        client = _merge_dicts(self.CLIENTS['_common'], client)
-
-        client['json']['videoId'] = self.video_id
-        if auth_header and self._access_token:
-            client['_access_token'] = self._access_token
-            client['params'] = None
-        elif 'Authorization' in client['headers']:
-            del client['headers']['Authorization']
-
-        for values, key, value in _format.values():
-            if key in values:
-                values[key] = value.format(**client)
-
-        return client
-
-    def _request(self, url, method='GET',
-                 cookies=None, data=None, headers=None, json=None, params=None,
-                 error_msg=None, raise_error=False, timeout=(3.05, 27), **_):
-        try:
-            result = requests.request(method, url,
-                                      verify=self._verify,
-                                      allow_redirects=True,
-                                      timeout=timeout,
-                                      cookies=cookies,
-                                      data=data,
-                                      headers=headers,
-                                      json=json,
-                                      params=params)
-            result.raise_for_status()
-        except requests.exceptions.RequestException as error:
-            response = error.response and error.response.text
-            self._context.log_debug('Response: {0}'.format(response))
-            self._context.log_error('{0}\n{1}'.format(
-                error_msg or 'Request failed', traceback.format_exc()
-            ))
-            if raise_error:
-                raise YouTubeException(error_msg)
-            return None
-        return result
-
     def _get_player_page(self, client='web', embed=False):
-        client = self._build_client(client)
+        client = self.build_client(client)
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
             url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
-        result = self._request(
+        result = self.request(
             url, cookies=cookies, headers=client['headers'],
             error_msg=('Failed to get player html for video_id: {0}'
                        .format(self.video_id))
@@ -1045,8 +745,8 @@ class VideoInfo(object):
         if cached_js:
             return cached_js
 
-        client = self._build_client('web')
-        result = self._request(
+        client = self.build_client('web')
+        result = self.request(
             js_url, headers=client['headers'],
             error_msg=('Failed to get player js for video_id: {0}'
                        .format(self.video_id))
@@ -1093,10 +793,10 @@ class VideoInfo(object):
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self._build_client('web')['headers']
+            headers = self.build_client('web')['headers']
         curl_headers = self._make_curl_headers(headers, cookies=None)
 
-        result = self._request(
+        result = self.request(
             url, headers=headers,
             error_msg=('Failed to get manifest for video_id: {0}'
                        .format(self.video_id))
@@ -1120,7 +820,7 @@ class VideoInfo(object):
             yt_format = self.FORMAT['9995']
         elif live_type == 'isa_hls':
             yt_format = self.FORMAT['9996']
-        
+
         if yt_format:
             stream = {'url': url,
                       'meta': meta_info,
@@ -1161,7 +861,7 @@ class VideoInfo(object):
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self._build_client('web')['headers']
+            headers = self.build_client('web')['headers']
         curl_headers = self._make_curl_headers(headers, cookies=None)
 
         if meta_info is None:
@@ -1341,9 +1041,9 @@ class VideoInfo(object):
         playability_status = status = reason = None
         for _ in range(2):
             for client_name in self._prioritised_clients:
-                client = self._build_client(client_name, auth_header)
+                client = self.build_client(client_name, auth_header)
 
-                result = self._request(
+                result = self.request(
                     video_info_url, 'POST',
                     error_msg=(
                         'Player response failed for video_id: {0},'
@@ -1377,7 +1077,7 @@ class VideoInfo(object):
                     # This is used to check for error like:
                     # "The following content is not available on this app."
                     # Text will vary depending on Accept-Language and client hl
-                    # Youtube support url is checked instead
+                    # YouTube support url is checked instead
                     url = self._get_error_details(
                         playability_status,
                         details=(
@@ -1444,11 +1144,11 @@ class VideoInfo(object):
         if captions:
             captions['headers'] = client['headers']
         elif client.get('_query_subtitles'):
-            result = self._request(
+            result = self.request(
                 video_info_url, 'POST',
                 error_msg=('Caption request failed to get player response for'
                            'video_id: {0}'.format(self.video_id)),
-                **self._build_client('smarttv_embedded', True)
+                **self.build_client('smarttv_embedded', True)
             )
 
             response = result.json()
