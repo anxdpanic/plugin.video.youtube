@@ -7,22 +7,24 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import requests
+from .requests import BaseRequestsClass
 
 
-class Locator(object):
+class Locator(BaseRequestsClass):
 
     def __init__(self, context):
         self._base_url = 'http://ip-api.com'
         self._response = {}
         self._context = context
 
+        super(Locator, self).__init__(context=context)
+
     def response(self):
         return self._response
 
     def locate_requester(self):
         request_url = '/'.join([self._base_url, 'json'])
-        response = requests.get(request_url)
+        response = self.request(request_url)
         self._response = response.json()
 
     def success(self):
