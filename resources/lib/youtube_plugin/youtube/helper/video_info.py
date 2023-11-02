@@ -1264,26 +1264,32 @@ class VideoInfo(YouTubeRequestClient):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        manifest_url = None
-        if is_live:
-            live_type = _settings.get_live_stream_type()
-            if live_type == 'isa_mpd':
-                manifest_url = streaming_data.get('dashManifestUrl', '')
-            else:
-                stream_list.extend(self._load_hls_manifest(
-                    streaming_data.get('hlsManifestUrl'),
-                    live_type, meta_info, client['headers'], playback_stats
-                ))
-        elif httpd_is_live and adaptive_fmts:
+        manifest_url = main_stream = None
+        live_type = is_live and _settings.get_live_stream_type()
+
+        if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
+            manifest_url = streaming_data['dashManifestUrl']
+        elif 'hlsManifestUrl' in streaming_data:
+            stream_list.extend(self._load_hls_manifest(
+                streaming_data['hlsManifestUrl'],
+                live_type, meta_info, client['headers'], playback_stats
+            ))
+        else:
+            live_type = None
+
+        # extract adaptive streams and create MPEG-DASH manifest
+        if not manifest_url and httpd_is_live and adaptive_fmts:
             video_data, audio_data = self._process_stream_data(
                 adaptive_fmts, default_lang['code']
             )
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
             )
-            stream_list.extend(self._load_hls_manifest(
-                streaming_data.get('hlsManifestUrl'),
-                None, meta_info, client['headers'], playback_stats
+        
+        # extract non-adaptive streams
+        if all_fmts:
+            stream_list.extend(self._create_stream_list(
+                all_fmts, meta_info, client['headers'], playback_stats
             ))
 
         if manifest_url:
@@ -1295,7 +1301,7 @@ class VideoInfo(YouTubeRequestClient):
                 'playback_stats': playback_stats
             }
 
-            if is_live:
+            if live_type:
                 # MPD structure has segments with additional attributes
                 # and url has changed from using a query string to using url params
                 # This breaks the InputStream.Adaptive partial manifest update
@@ -1306,7 +1312,7 @@ class VideoInfo(YouTubeRequestClient):
                 else:
                     video_stream['url'] = manifest_url + '/mpd_version/5'
                 details = self.FORMAT.get('9998')
-            else:
+            elif main_stream:
                 details = self.FORMAT.get('9999').copy()
 
                 video_info = main_stream['video']
@@ -1336,13 +1342,6 @@ class VideoInfo(YouTubeRequestClient):
             video_stream.update(details)
             stream_list.append(video_stream)
 
-        # extract streams from map
-        if all_fmts:
-            stream_list.extend(self._create_stream_list(
-                all_fmts, meta_info, client['headers'], playback_stats
-            ))
-
-        # last fallback
         if not stream_list:
             raise YouTubeException('No streams found')
 
