@@ -9,7 +9,7 @@
 
 from base64 import b64encode
 from youtube_plugin.kodion.json_store import APIKeyStore
-from youtube_plugin.kodion.impl import Context
+from youtube_plugin.kodion.context import Context
 
 
 def register_api_keys(addon_id, api_key, client_id, client_secret):

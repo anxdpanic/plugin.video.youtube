@@ -17,8 +17,9 @@ import xbmc
 import xbmcaddon
 import xbmcvfs
 
-from ..utils import get_http_server, is_httpd_live
+from ..network import get_http_server, is_httpd_live
 from .. import logger
+
 
 try:
     xbmc.translatePath = xbmcvfs.translatePath

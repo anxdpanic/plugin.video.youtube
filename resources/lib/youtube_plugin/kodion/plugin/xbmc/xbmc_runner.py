@@ -15,8 +15,7 @@ from ..abstract_provider_runner import AbstractProviderRunner
 from ...exceptions import KodionException
 from ...items import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
 from ... import AbstractProvider
-from . import info_labels
-from . import xbmc_items
+from ...ui.xbmc import info_labels, xbmc_items
 
 
 class XbmcRunner(AbstractProviderRunner):
@@ -25,7 +24,7 @@ class XbmcRunner(AbstractProviderRunner):
         self.handle = None
         self.settings = None
 
-    def run(self, provider, context=None):
+    def run(self, provider, context):
 
         self.handle = context.get_handle()
 

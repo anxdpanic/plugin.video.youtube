@@ -11,8 +11,8 @@
 import re
 import time
 
-from ... import kodion
 from ...kodion import utils
+from ...kodion.items import DirectoryItem
 from ...youtube.helper import yt_context_menu
 
 try:
@@ -44,8 +44,8 @@ def get_thumb_timestamp(minutes=15):
 
 
 def make_comment_item(context, provider, snippet, uri, total_replies=0):
-    author = '[B]{}[/B]'.format(kodion.utils.to_str(snippet['authorDisplayName']))
-    body = kodion.utils.to_str(snippet['textOriginal'])
+    author = '[B]{}[/B]'.format(utils.to_str(snippet['authorDisplayName']))
+    body = utils.to_str(snippet['textOriginal'])
 
     label_props = None
     plot_props = None
@@ -86,7 +86,7 @@ def make_comment_item(context, provider, snippet, uri, total_replies=0):
     else:
         plot = '{author}{edited}[CR][CR]{body}'.format(author=author, edited=edited, body=body)
 
-    comment_item = kodion.items.DirectoryItem(label, uri)
+    comment_item = DirectoryItem(label, uri)
     comment_item.set_plot(plot)
     comment_item.set_date_from_datetime(utils.datetime_parser.parse(snippet['publishedAt']))
     if not uri:
@@ -346,7 +346,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # plot
         channel_name = snippet.get('channelTitle', '')
-        description = kodion.utils.strip_html_from_text(snippet['description'])
+        description = utils.strip_html_from_text(snippet['description'])
         if show_channel_name and channel_name:
             description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
         video_item.set_studio(channel_name)
@@ -438,7 +438,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
         if (channel_id and channel_name and
-                kodion.utils.create_path('channel', channel_id) != context.get_path()):
+                utils.create_path('channel', channel_id) != context.get_path()):
             video_item.set_channel_id(channel_id)
             yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
 
@@ -581,7 +581,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
 
     # plot
     channel_name = snippet.get('channelTitle', '')
-    description = kodion.utils.strip_html_from_text(snippet['description'])
+    description = utils.strip_html_from_text(snippet['description'])
     if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
         description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
     video_item.set_studio(channel_name)

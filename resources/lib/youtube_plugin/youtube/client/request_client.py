@@ -7,7 +7,7 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ...kodion.utils.requests import BaseRequestsClass
+from ...kodion.network import BaseRequestsClass
 from ...youtube.youtube_exceptions import YouTubeException
 
 
@@ -255,10 +255,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self, context):
-        super(YouTubeRequestClient, self).__init__(
-            context=context, exc_type=YouTubeException
-        )
+    def __init__(self):
+        super(YouTubeRequestClient, self).__init__(exc_type=YouTubeException)
 
     @staticmethod
     def json_traverse(json_data, path):

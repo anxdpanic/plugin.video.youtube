@@ -11,10 +11,9 @@
 from datetime import datetime
 import time
 
-from .impl import Context
+from .context import Context
+from .utils import YouTubeMonitor, YouTubePlayer
 from ..youtube.provider import Provider
-from .utils import YouTubeMonitor
-from .utils import YouTubePlayer
 
 
 def strptime(stamp, stamp_fmt):

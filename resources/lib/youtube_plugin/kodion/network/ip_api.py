@@ -8,16 +8,16 @@
 """
 
 from .requests import BaseRequestsClass
+from .. import logger
 
 
 class Locator(BaseRequestsClass):
 
-    def __init__(self, context):
+    def __init__(self):
         self._base_url = 'http://ip-api.com'
         self._response = {}
-        self._context = context
 
-        super(Locator, self).__init__(context=context)
+        super(Locator, self).__init__()
 
     def response(self):
         return self._response
@@ -30,9 +30,9 @@ class Locator(BaseRequestsClass):
     def success(self):
         successful = self.response().get('status', 'fail') == 'success'
         if successful:
-            self._context.log_debug('Location request was successful')
+            logger.log_debug('Location request was successful')
         else:
-            self._context.log_error(self.response().get('message', 'Location request failed with no error message'))
+            logger.log_error(self.response().get('message', 'Location request failed with no error message'))
         return successful
 
     def coordinates(self):
@@ -42,7 +42,7 @@ class Locator(BaseRequestsClass):
             lat = self._response.get('lat')
             lon = self._response.get('lon')
         if lat is None or lon is None:
-            self._context.log_error('No coordinates returned')
+            logger.log_error('No coordinates returned')
             return None
-        self._context.log_debug('Coordinates found')
-        return lat, lon
+        logger.log_debug('Coordinates found')
+        return {'lat': lat, 'lon': lon}

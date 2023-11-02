@@ -27,7 +27,8 @@ from urllib.parse import (
 import xbmcvfs
 
 from ..client.request_client import YouTubeRequestClient
-from ...kodion.utils import is_httpd_live, make_dirs, DataCache
+from ...kodion.network import is_httpd_live
+from ...kodion.utils import make_dirs, DataCache
 from ..youtube_exceptions import YouTubeException
 from .subtitles import Subtitles
 from .ratebypass import ratebypass
@@ -643,7 +644,7 @@ class VideoInfo(YouTubeRequestClient):
             'gl': settings.get_string('youtube.region', 'US'),
         }
 
-        super(VideoInfo, self).__init__(context=context)
+        super(VideoInfo, self).__init__()
 
     @staticmethod
     def _generate_cpn():

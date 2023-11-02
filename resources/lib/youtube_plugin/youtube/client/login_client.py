@@ -13,17 +13,18 @@ from urllib.parse import parse_qsl
 
 from requests.exceptions import InvalidJSONError
 
-from .request_client import YouTubeRequestClient
-from ...youtube.youtube_exceptions import (
-    InvalidGrant,
-    LoginException,
-    YouTubeException,
-)
 from .__config__ import (
     api,
     developer_keys,
     keys_changed,
     youtube_tv,
+)
+from .request_client import YouTubeRequestClient
+from ...kodion.logger import log_debug
+from ...youtube.youtube_exceptions import (
+    InvalidGrant,
+    LoginException,
+    YouTubeException,
 )
 
 
@@ -46,10 +47,8 @@ class LoginClient(YouTubeRequestClient):
         'developer': developer_keys
     }
 
-    def __init__(self, context, config=None, language='en-US', region='',
+    def __init__(self, config=None, language='en-US', region='',
                  access_token='', access_token_tv=''):
-        self._context = context
-
         self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
         # the default language is always en_US (like YouTube on the WEB)
@@ -64,7 +63,7 @@ class LoginClient(YouTubeRequestClient):
 
         self._log_error_callback = None
 
-        super(LoginClient, self).__init__(context=context)
+        super(LoginClient, self).__init__()
 
     @staticmethod
     def _login_json_hook(response):
@@ -151,7 +150,7 @@ class LoginClient(YouTubeRequestClient):
             ' client_id: |', client_id[:5], '...|',
             ' client_secret: |', client_secret[:5], '...|)'
         ])
-        self._context.log_debug('Refresh token for ' + client_summary)
+        log_debug('Refresh token for ' + client_summary)
 
         json_data = self.request('https://www.googleapis.com/oauth2/v4/token',
             method='POST', data=post_data, headers=headers,
@@ -192,7 +191,7 @@ class LoginClient(YouTubeRequestClient):
             ' client_id: |', client_id[:5], '...|',
             ' client_secret: |', client_secret[:5], '...|)'
         ])
-        self._context.log_debug('Requesting access token for ' + client_summary)
+        log_debug('Requesting access token for ' + client_summary)
 
         json_data = self.request('https://www.googleapis.com/oauth2/v4/token',
             method='POST', data=post_data, headers=headers,
@@ -223,7 +222,7 @@ class LoginClient(YouTubeRequestClient):
             '(config_type: |', config_type, '|',
             ' client_id: |', client_id[:5], '...|)',
         ])
-        self._context.log_debug('Requesting device and user code for ' + client_summary)
+        log_debug('Requesting device and user code for ' + client_summary)
 
         json_data = self.request('https://accounts.google.com/o/oauth2/device/code',
             method='POST', data=post_data, headers=headers,

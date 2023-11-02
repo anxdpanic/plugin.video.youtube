@@ -11,10 +11,10 @@
 import copy
 import timeit
 
-from .impl import Runner
-from .impl import Context
-
 from . import debug
+from .context import Context
+from .plugin import Runner
+
 
 __all__ = ['run']
 

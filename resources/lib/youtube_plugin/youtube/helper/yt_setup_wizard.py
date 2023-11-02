@@ -8,7 +8,7 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ...kodion.utils import ip_api
+from ...kodion.network import Locator
 
 
 DEFAULT_LANGUAGES = {'items': [{'snippet': {'name': 'Afrikaans', 'hl': 'af'}, 'id': 'af'}, {'snippet': {'name': 'Azerbaijani', 'hl': 'az'}, 'id': 'az'}, {'snippet': {'name': 'Indonesian', 'hl': 'id'}, 'id': 'id'}, {'snippet': {'name': 'Malay', 'hl': 'ms'}, 'id': 'ms'},
@@ -106,15 +106,14 @@ def _process_language(provider, context):
 
 
 def _process_geo_location(provider, context):
-    settings = context.get_settings()
     if not context.get_ui().on_yes_no_input(context.get_name(), context.localize(provider.LOCAL_MAP['youtube.perform.geolocation'])):
         return
 
-    locator = ip_api.Locator(context)
+    locator = Locator()
     locator.locate_requester()
     coordinates = locator.coordinates()
     if coordinates:
-        settings.set_location('{lat},{lon}'.format(lat=coordinates[0], lon=coordinates[1]))
+        context.get_settings().set_location('{0[lat]},{0[lon]}'.format(coordinates))
 
 
 def process(provider, context):

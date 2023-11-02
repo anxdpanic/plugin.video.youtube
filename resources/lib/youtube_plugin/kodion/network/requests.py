@@ -15,6 +15,14 @@ from requests import Session
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import RequestException
 
+from ..logger import log_error
+from ..settings import Settings
+
+from xbmcaddon import Addon
+
+
+_settings = Settings(Addon(id='plugin.video.youtube'))
+
 
 class BaseRequestsClass(object):
     http_adapter = HTTPAdapter(
@@ -28,10 +36,9 @@ class BaseRequestsClass(object):
         )
     )
 
-    def __init__(self, context, exc_type=RequestException):
-        self._context = context
-        self._verify = self._context.get_settings().verify_ssl()
-        self._timeout = self._context.get_settings().get_timeout()
+    def __init__(self, exc_type=RequestException):
+        self._verify = _settings.verify_ssl()
+        self._timeout = _settings.get_timeout()
         self._default_exc = exc_type
 
         self._session = Session()
@@ -46,20 +53,38 @@ class BaseRequestsClass(object):
         self._session.close()
 
     def request(self, url, method='GET',
-                cookies=None, data=None, headers=None, json=None, params=None,
+                params=None, data=None, headers=None, cookies=None, files=None,
+                auth=None, timeout=None, allow_redirects=None, proxies=None,
+                hooks=None, stream=None, verify=None, cert=None, json=None,
+                # Custom event hook implementation
+                # See _login_json_hook and _login_error_hook in login_client.py
+                # for example usage
                 response_hook=None, error_hook=None,
                 error_title=None, error_info=None, raise_exc=False, **_):
+        if timeout is None:
+            timeout = self._timeout
+        if verify is None:
+            verify = self._verify
+        if allow_redirects is None:
+            allow_redirects = True
+
         response = None
         try:
             response = self._session.request(method, url,
-                                             verify=self._verify,
-                                             allow_redirects=True,
-                                             timeout=self._timeout,
-                                             cookies=cookies,
+                                             params=params,
                                              data=data,
                                              headers=headers,
-                                             json=json,
-                                             params=params)
+                                             cookies=cookies,
+                                             files=files,
+                                             auth=auth,
+                                             timeout=timeout,
+                                             allow_redirects=allow_redirects,
+                                             proxies=proxies,
+                                             hooks=hooks,
+                                             stream=stream,
+                                             verify=verify,
+                                             cert=cert,
+                                             json=json,)
             if response_hook:
                 response = response_hook(response)
             else:
@@ -106,15 +131,15 @@ class BaseRequestsClass(object):
                     )
                 )
 
-            self._context.log_error('\n'.join([part for part in [
+            log_error('\n'.join([part for part in [
                 error_title, error_info, response_text, stack_trace, exc_tb
             ] if part]))
 
             if raise_exc:
                 if isinstance(raise_exc, BaseException):
-                    raise raise_exc from exc
-                if not callable(raise_exc):
-                    raise self._default_exc(error_title) from exc
-                raise raise_exc(error_title) from exc
+                    raise raise_exc(exc)
+                if callable(raise_exc):
+                    raise raise_exc(error_title)(exc)
+                raise self._default_exc(error_title)(exc)
 
         return response

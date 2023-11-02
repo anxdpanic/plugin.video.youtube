@@ -12,7 +12,7 @@ import json
 
 import xbmc
 from ..abstract_playlist import AbstractPlaylist
-from . import xbmc_items
+from ...ui.xbmc import xbmc_items
 
 
 class XbmcPlaylist(AbstractPlaylist):

@@ -10,7 +10,7 @@
 import re
 
 from youtube_plugin.youtube.provider import Provider
-from youtube_plugin.kodion.impl import Context
+from youtube_plugin.kodion.context import Context
 
 
 def __get_core_components(addon_id=None):

@@ -21,11 +21,12 @@ import xbmcplugin
 import xbmcvfs
 
 from ..abstract_context import AbstractContext
-from .xbmc_plugin_settings import XbmcPluginSettings
-from .xbmc_context_ui import XbmcContextUI
-from .xbmc_playlist import XbmcPlaylist
-from .xbmc_player import XbmcPlayer
+from ...player.xbmc.xbmc_playlist import XbmcPlaylist
+from ...player.xbmc.xbmc_player import XbmcPlayer
+from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
+from ...ui.xbmc.xbmc_context_ui import XbmcContextUI
 from ... import utils
+
 
 try:
     xbmc.translatePath = xbmcvfs.translatePath

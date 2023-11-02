@@ -18,7 +18,7 @@ import xbmcplugin
 from ... import kodion
 from ...kodion import constants
 from ...kodion.items import VideoItem
-from ...kodion.impl.xbmc.xbmc_items import to_playback_item
+from ...kodion.ui.xbmc.xbmc_items import to_playback_item
 from ...youtube.youtube_exceptions import YouTubeException
 from ...youtube.helper import utils, v3
 

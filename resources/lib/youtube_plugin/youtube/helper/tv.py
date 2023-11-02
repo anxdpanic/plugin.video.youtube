@@ -8,9 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ... import kodion
+from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 from ...youtube.helper import utils
-from ...kodion.items.video_item import VideoItem
 
 
 def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
@@ -65,7 +64,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         new_context = context.clone(new_params=new_params)
 
         current_page = int(new_context.get_param('page', 1))
-        next_page_item = kodion.items.NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 
     return result
@@ -111,7 +110,7 @@ def tv_videos_to_items(provider, context, json_data):
         new_context = context.clone(new_params=new_params)
 
         current_page = int(new_context.get_param('page', 1))
-        next_page_item = kodion.items.NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 
     return result
@@ -140,7 +139,7 @@ def saved_playlists_to_items(provider, context, json_data):
         else:
             item_uri = context.create_uri(['playlist', playlist_id], item_params)
 
-        playlist_item = kodion.items.DirectoryItem(title, item_uri, image=image)
+        playlist_item = DirectoryItem(title, item_uri, image=image)
         playlist_item.set_fanart(provider.get_fanart(context))
         result.append(playlist_item)
         playlist_id_dict[playlist_id] = playlist_item
@@ -162,7 +161,7 @@ def saved_playlists_to_items(provider, context, json_data):
         new_context = context.clone(new_params=new_params)
 
         current_page = int(new_context.get_param('page', 1))
-        next_page_item = kodion.items.NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 
     return result

@@ -15,17 +15,6 @@ import shutil
 import socket
 from base64 import b64decode
 
-from ..youtube.helper import yt_subscriptions
-from .. import kodion
-from ..kodion.utils import (
-    find_video_id,
-    get_client_ip_address,
-    is_httpd_live,
-    strip_html_from_text,
-    FunctionCache,
-)
-from ..kodion.items import DirectoryItem
-from ..youtube.client import YouTube
 from .helper import (
     v3,
     yt_context_menu,
@@ -41,6 +30,16 @@ from .helper import (
     UrlToItemConverter,
 )
 from .youtube_exceptions import InvalidGrant, LoginException
+from ..kodion import (
+    constants,
+    AbstractProvider,
+    RegisterProviderPath,
+)
+from ..youtube.client import YouTube
+from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem
+from ..kodion.network import get_client_ip_address, is_httpd_live
+from ..kodion.utils import find_video_id, strip_html_from_text, FunctionCache
+from ..youtube.helper import yt_subscriptions
 
 import xbmc
 import xbmcaddon
@@ -55,7 +54,7 @@ except AttributeError:
     pass
 
 
-class Provider(kodion.AbstractProvider):
+class Provider(AbstractProvider):
     LOCAL_MAP = {'youtube.search': 30102,
                  'youtube.next_page': 30106,
                  'youtube.watch_later': 30107,
@@ -357,8 +356,7 @@ class Provider(kodion.AbstractProvider):
                     refresh_tokens = refresh_tokens.split('|')
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
 
-        client = YouTube(context=context,
-                         language=language,
+        client = YouTube(language=language,
                          region=region,
                          items_per_page=items_per_page,
                          config=dev_keys if dev_keys else youtube_config)
@@ -424,7 +422,7 @@ class Provider(kodion.AbstractProvider):
         return context.create_resource_path('media', 'fanart.jpg')
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/uri2addon/$')
+    @RegisterProviderPath('^/uri2addon/$')
     def on_uri2addon(self, context, re_match):
         uri = context.get_param('uri', '')
         if not uri:
@@ -440,9 +438,9 @@ class Provider(kodion.AbstractProvider):
 
         return False
 
-    @kodion.RegisterProviderPath('^/playlist/(?P<playlist_id>[^/]+)/$')
+    @RegisterProviderPath('^/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
-        self.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        self.set_content_type(context, constants.content_type.VIDEOS)
 
         result = []
 
@@ -464,9 +462,9 @@ class Provider(kodion.AbstractProvider):
     playlist_id: <PLAYLIST_ID>
     """
 
-    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
+    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_channel_playlist(self, context, re_match):
-        self.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        self.set_content_type(context, constants.content_type.VIDEOS)
         client = self.get_client(context)
         result = []
 
@@ -487,9 +485,9 @@ class Provider(kodion.AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
+    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
-        self.set_content_type(context, kodion.constants.content_type.FILES)
+        self.set_content_type(context, constants.content_type.FILES)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -528,9 +526,9 @@ class Provider(kodion.AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @kodion.RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
+    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
     def _on_channel_live(self, context, re_match):
-        self.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        self.set_content_type(context, constants.content_type.VIDEOS)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -551,7 +549,7 @@ class Provider(kodion.AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @kodion.RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
+    @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
         listitem_channel_id = context.get_ui().get_info_label('Container.ListItem(0).Property(channel_id)')
 
@@ -565,7 +563,7 @@ class Provider(kodion.AbstractProvider):
         if method == 'channel' and not channel_id:
             return False
 
-        self.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        self.set_content_type(context, constants.content_type.VIDEOS)
 
         resource_manager = self.get_resource_manager(context)
 
@@ -623,9 +621,9 @@ class Provider(kodion.AbstractProvider):
 
             search_live_id = mine_id if mine_id else channel_id
             if not hide_search:
-                search_item = kodion.items.NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
-                                                         image=context.create_resource_path('media', 'search.png'),
-                                                         fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
+                search_item = NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
+                                            image=context.create_resource_path('media', 'search.png'),
+                                            fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
                 search_item.set_fanart(self.get_fanart(context))
                 result.append(search_item)
 
@@ -651,15 +649,15 @@ class Provider(kodion.AbstractProvider):
         return result
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/location/mine/$')
+    @RegisterProviderPath('^/location/mine/$')
     def _on_my_location(self, context, re_match):
-        self.set_content_type(context, kodion.constants.content_type.FILES)
+        self.set_content_type(context, constants.content_type.FILES)
 
         settings = context.get_settings()
         result = []
 
         # search
-        search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
+        search_item = SearchItem(context, image=context.create_resource_path('media', 'search.png'),
                                               fanart=self.get_fanart(context), location=True)
         result.append(search_item)
 
@@ -702,7 +700,7 @@ class Provider(kodion.AbstractProvider):
     """
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/play/$')
+    @RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
 
@@ -779,25 +777,25 @@ class Provider(kodion.AbstractProvider):
             return yt_play.play_channel_live(self, context)
         return False
 
-    @kodion.RegisterProviderPath('^/video/(?P<method>[^/]+)/$')
+    @RegisterProviderPath('^/video/(?P<method>[^/]+)/$')
     def _on_video_x(self, context, re_match):
         method = re_match.group('method')
         return yt_video.process(method, self, context, re_match)
 
-    @kodion.RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/$')
+    @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/$')
     def _on_playlist_x(self, context, re_match):
         method = re_match.group('method')
         category = re_match.group('category')
         return yt_playlist.process(method, category, self, context)
 
-    @kodion.RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
+    @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
         resource_manager = self.get_resource_manager(context)
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
-            self.set_content_type(context, kodion.constants.content_type.FILES)
+            self.set_content_type(context, constants.content_type.FILES)
             channel_ids = []
             for subscription in subscriptions:
                 channel_ids.append(subscription.get_channel_id())
@@ -808,20 +806,20 @@ class Provider(kodion.AbstractProvider):
 
         return subscriptions
 
-    @kodion.RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
+    @RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
     def _on_yt_specials(self, context, re_match):
         category = re_match.group('category')
         return yt_specials.process(category, self, context)
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/history/clear/$')
+    @RegisterProviderPath('^/history/clear/$')
     def _on_yt_clear_history(self, context, re_match):
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.clear_history_confirmation'])):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
 
-    @kodion.RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
+    @RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
         refresh = context.get_param('refresh', 'true').lower() == 'true'
@@ -972,7 +970,7 @@ class Provider(kodion.AbstractProvider):
 
         return True
 
-    @kodion.RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
+    @RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
         sign_out_confirmed = context.get_param('confirmed', '').lower() == 'true'
         mode = re_match.group('mode')
@@ -989,7 +987,7 @@ class Provider(kodion.AbstractProvider):
             yt_login.process(mode, self, context)
         return False
 
-    @kodion.RegisterProviderPath('^/search/$')
+    @RegisterProviderPath('^/search/$')
     def endpoint_search(self, context, re_match):
         query = context.get_param('q', '')
         if not query:
@@ -1031,9 +1029,9 @@ class Provider(kodion.AbstractProvider):
         context.set_param('q', search_text)
 
         if search_type == 'video':
-            self.set_content_type(context, kodion.constants.content_type.VIDEOS)
+            self.set_content_type(context, constants.content_type.VIDEOS)
         else:
-            self.set_content_type(context, kodion.constants.content_type.FILES)
+            self.set_content_type(context, constants.content_type.FILES)
 
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
@@ -1075,7 +1073,7 @@ class Provider(kodion.AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
-    @kodion.RegisterProviderPath('^/config/(?P<switch>[^/]+)/$')
+    @RegisterProviderPath('^/config/(?P<switch>[^/]+)/$')
     def configure_addon(self, context, re_match):
         switch = re_match.group('switch')
         settings = context.get_settings()
@@ -1122,7 +1120,7 @@ class Provider(kodion.AbstractProvider):
         return False
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/my_subscriptions/filter/$')
+    @RegisterProviderPath('^/my_subscriptions/filter/$')
     def manage_my_subscription_filter(self, context, re_match):
         params = context.get_params()
         action = params.get('action')
@@ -1160,7 +1158,7 @@ class Provider(kodion.AbstractProvider):
                 context.get_ui().show_notification(message=message)
         context.get_ui().refresh_container()
 
-    @kodion.RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
+    @RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
     def maintenance_actions(self, context, re_match):
         maint_type = re_match.group('maint_type')
         action = re_match.group('action')
@@ -1251,7 +1249,7 @@ class Provider(kodion.AbstractProvider):
                 context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.requires.krypton']))
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/api/update/$')
+    @RegisterProviderPath('^/api/update/$')
     def api_key_update(self, context, re_match):
         settings = context.get_settings()
         params = context.get_params()
@@ -1301,7 +1299,7 @@ class Provider(kodion.AbstractProvider):
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/show_client_ip/$')
+    @RegisterProviderPath('^/show_client_ip/$')
     def show_client_ip(self, context, re_match):
         port = context.get_settings().httpd_port()
 
@@ -1315,7 +1313,7 @@ class Provider(kodion.AbstractProvider):
             context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.httpd.not.running']))
 
     # noinspection PyUnusedLocal
-    @kodion.RegisterProviderPath('^/playback_history/$')
+    @RegisterProviderPath('^/playback_history/$')
     def on_playback_history(self, context, re_match):
         params = context.get_params()
         video_id = params.get('video_id')
@@ -1359,7 +1357,7 @@ class Provider(kodion.AbstractProvider):
         settings = context.get_settings()
         _ = self.get_client(context)  # required for self.is_logged_in()
 
-        self.set_content_type(context, kodion.constants.content_type.FILES)
+        self.set_content_type(context, constants.content_type.FILES)
 
         result = []
 
@@ -1420,22 +1418,20 @@ class Provider(kodion.AbstractProvider):
 
         # search
         if settings.get_bool('youtube.folder.search.show', True):
-            search_item = kodion.items.SearchItem(context, image=context.create_resource_path('media', 'search.png'),
-                                                  fanart=self.get_fanart(context))
+            search_item = SearchItem(context, image=context.create_resource_path('media', 'search.png'),
+                                     fanart=self.get_fanart(context))
             result.append(search_item)
 
         if settings.get_bool('youtube.folder.quick_search.show', True):
-            quick_search_item = kodion.items.NewSearchItem(context,
-                                                           alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search']),
-                                                           fanart=self.get_fanart(context))
+            quick_search_item = NewSearchItem(context, alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search']),
+                                              fanart=self.get_fanart(context))
             result.append(quick_search_item)
 
         if settings.get_bool('youtube.folder.quick_search_incognito.show', True):
-            quick_search_incognito_item = kodion.items.NewSearchItem(context,
-                                                                     alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search.incognito']),
-                                                                     image=context.create_resource_path('media', 'search.png'),
-                                                                     fanart=self.get_fanart(context),
-                                                                     incognito=True)
+            quick_search_incognito_item = NewSearchItem(context, alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search.incognito']),
+                                                        image=context.create_resource_path('media', 'search.png'),
+                                                        fanart=self.get_fanart(context),
+                                                        incognito=True)
             result.append(quick_search_incognito_item)
 
         # my location
@@ -1594,13 +1590,13 @@ class Provider(kodion.AbstractProvider):
     @staticmethod
     def set_content_type(context, content_type):
         context.set_content_type(content_type)
-        if content_type == kodion.constants.content_type.VIDEOS:
-            context.add_sort_method(kodion.constants.sort_method.UNSORTED,
-                                    kodion.constants.sort_method.VIDEO_RUNTIME,
-                                    kodion.constants.sort_method.DATEADDED,
-                                    kodion.constants.sort_method.TRACKNUM,
-                                    kodion.constants.sort_method.VIDEO_TITLE,
-                                    kodion.constants.sort_method.DATE)
+        if content_type == constants.content_type.VIDEOS:
+            context.add_sort_method(constants.sort_method.UNSORTED,
+                                    constants.sort_method.VIDEO_RUNTIME,
+                                    constants.sort_method.DATEADDED,
+                                    constants.sort_method.TRACKNUM,
+                                    constants.sort_method.VIDEO_TITLE,
+                                    constants.sort_method.DATE)
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, (InvalidGrant, LoginException)):

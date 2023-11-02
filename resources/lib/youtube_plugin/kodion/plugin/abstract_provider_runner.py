@@ -13,5 +13,5 @@ class AbstractProviderRunner(object):
     def __init__(self):
         pass
 
-    def run(self, provider, context=None):
+    def run(self, provider, context):
         raise NotImplementedError()

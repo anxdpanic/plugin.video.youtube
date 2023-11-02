@@ -26,17 +26,33 @@ from .favorite_list import FavoriteList
 from .watch_later_list import WatchLaterList
 from .function_cache import FunctionCache
 from .access_manager import AccessManager
-from .http_server import get_http_server, is_httpd_live, get_client_ip_address
 from .monitor import YouTubeMonitor
 from .player import YouTubePlayer
 from .playback_history import PlaybackHistory
 from .data_cache import DataCache
 from .system_version import SystemVersion
-from . import ip_api
 
 
-__all__ = ['SearchHistory', 'FavoriteList', 'WatchLaterList', 'FunctionCache', 'AccessManager',
-           'strip_html_from_text', 'create_path', 'create_uri_path', 'find_best_fit', 'to_unicode', 'to_utf8',
-           'datetime_parser', 'select_stream', 'get_http_server', 'is_httpd_live', 'YouTubeMonitor',
-           'make_dirs', 'loose_version', 'ip_api', 'PlaybackHistory', 'DataCache', 'get_client_ip_address',
-           'SystemVersion', 'find_video_id', 'YouTubePlayer']
+__all__ = [
+    'create_path',
+    'create_uri_path',
+    'datetime_parser',
+    'find_best_fit',
+    'find_video_id',
+    'loose_version',
+    'make_dirs',
+    'select_stream',
+    'strip_html_from_text',
+    'to_unicode',
+    'to_utf8',
+    'AccessManager',
+    'DataCache',
+    'FavoriteList',
+    'FunctionCache',
+    'PlaybackHistory',
+    'SearchHistory',
+    'SystemVersion',
+    'WatchLaterList',
+    'YouTubeMonitor',
+    'YouTubePlayer'
+]
