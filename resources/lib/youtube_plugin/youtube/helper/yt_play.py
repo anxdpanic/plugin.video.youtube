@@ -85,7 +85,6 @@ def play_video(provider, context):
         use_remote_history = use_history and settings.use_remote_history()
         use_play_data = use_history and settings.use_local_history()
 
-
         video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream,
                                             use_play_data=use_play_data)
 
@@ -93,9 +92,10 @@ def play_video(provider, context):
         play_count = 0
         playback_stats = video_stream.get('playback_stats')
 
-        if use_remote_history:
-            if video_item.get_start_time() and video_item.use_mpd_video():
-                seek_time = video_item.get_start_time()
+        if use_play_data:
+            seek = video_item.get_start_time()
+            if seek and context.get_param('resume'):
+                seek_time = start_time
             play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
 
         item = to_playback_item(context, video_item)

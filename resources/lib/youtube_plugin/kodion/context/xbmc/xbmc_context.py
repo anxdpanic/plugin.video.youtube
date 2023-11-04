@@ -48,6 +48,8 @@ class XbmcContext(AbstractContext):
         sys parameters and re-build our clean uri.
         Also we extract the path and parameters - man, that would be so simple with the normal url-parsing routines.
         """
+        num_args = len(sys.argv)
+
         # first the path of the uri
         if override:
             self._uri = sys.argv[0]
@@ -55,18 +57,21 @@ class XbmcContext(AbstractContext):
             self._path = unquote(comps.path)
 
             # after that try to get the params
-            if len(sys.argv) > 2:
+            if num_args > 2:
                 params = sys.argv[2][1:]
                 if params:
                     self._uri = '?'.join([self._uri, params])
                     self._params = dict(parse_qsl(params))
+
+            if num_args > 3 and sys.argv[3].lower() == 'resume:true':
+                self._params['resume'] = True
 
         self._ui = None
         self._video_playlist = None
         self._audio_playlist = None
         self._video_player = None
         self._audio_player = None
-        self._plugin_handle = int(sys.argv[1]) if len(sys.argv) > 1 else None
+        self._plugin_handle = int(sys.argv[1]) if num_args > 1 else -1
         self._plugin_id = plugin_id or self._addon.getAddonInfo('id')
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
