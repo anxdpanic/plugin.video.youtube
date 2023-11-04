@@ -136,7 +136,7 @@ class AbstractSettings(object):
     def get_timeout(self):
         connect_timeout = self.get_int(SETTINGS.CONNECT_TIMEOUT, 9) + 0.5
         read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27)
-        return (connect_timeout, read_timout)
+        return connect_timeout, read_timout
 
     def allow_dev_keys(self):
         return self.get_bool(SETTINGS.ALLOW_DEV_KEYS, False)
@@ -170,29 +170,70 @@ class AbstractSettings(object):
             return self.get_int(SETTINGS.LIVE_STREAMS + '.1', 0) == 3
         return False
 
-    def httpd_port(self):
-        return self.get_int(SETTINGS.HTTPD_PORT, 50152)
+    def httpd_port(self, port=None):
+        default_port = 50152
 
-    def httpd_listen(self, default='0.0.0.0', for_request=False):
-        ip_address = self.get_string(SETTINGS.HTTPD_LISTEN, default)
+        if not port:
+            port = self.get_int(SETTINGS.HTTPD_PORT, default_port)
+
         try:
-            ip_address = ip_address.strip()
-        except AttributeError:
-            pass
+            port = int(port)
+        except ValueError:
+            return default_port
+        return port
+
+    def httpd_listen(self, for_request=False, ip_address=None):
+        default_address = '0.0.0.0'
+        default_octets = [0, 0, 0, 0,]
+
         if not ip_address:
-            ip_address = default
-        if for_request and ip_address == default:
-            ip_address = '127.0.0.1'
-        return ip_address
+            ip_address = self.get_string(SETTINGS.HTTPD_LISTEN,
+                                         default_address)
+
+        try:
+            octets = [octet for octet in map(int, ip_address.split('.'))
+                      if 0 <= octet <= 255]
+            if len(octets) != 4:
+                raise ValueError
+        except ValueError:
+            octets = default_octets
+
+        if for_request and octets == default_octets:
+            return '127.0.0.1'
+        return '.'.join(map(str, octets))
 
     def set_httpd_listen(self, value):
         return self.set_string(SETTINGS.HTTPD_LISTEN, value)
 
     def httpd_whitelist(self):
-        return self.get_string(SETTINGS.HTTPD_WHITELIST, '')
+        allow_list = self.get_string(SETTINGS.HTTPD_WHITELIST, '')
+        allow_list = ''.join(allow_list.split()).split(',')
+        allow_list = [
+            self.httpd_listen(for_request=True, ip_address=ip_address)
+            for ip_address in allow_list
+        ]
+        return allow_list
 
     def api_config_page(self):
         return self.get_bool(SETTINGS.API_CONFIG_PAGE, False)
+
+    def api_id(self, new_id=None):
+        if new_id is not None:
+            self.set_string(SETTINGS.API_ID, new_id)
+            return new_id
+        return self.get_string(SETTINGS.API_ID)
+
+    def api_key(self, new_key=None):
+        if new_key is not None:
+            self.set_string(SETTINGS.API_KEY, new_key)
+            return new_key
+        return self.get_string(SETTINGS.API_KEY)
+
+    def api_secret(self, new_secret=None):
+        if new_secret is not None:
+            self.set_string(SETTINGS.API_SECRET, new_secret)
+            return new_secret
+        return self.get_string(SETTINGS.API_SECRET)
 
     def get_location(self):
         location = self.get_string(SETTINGS.LOCATION, '').replace(' ', '').strip()
