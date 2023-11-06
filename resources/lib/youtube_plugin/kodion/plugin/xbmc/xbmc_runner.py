@@ -35,7 +35,7 @@ class XbmcRunner(AbstractProviderRunner):
                 context.log_error(ex.__str__())
                 xbmcgui.Dialog().ok("Exception in ContentProvider", ex.__str__())
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)
-            return
+            return False
 
         self.settings = context.get_settings()
 
@@ -45,35 +45,45 @@ class XbmcRunner(AbstractProviderRunner):
 
         if isinstance(result, bool) and not result:
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)
-        elif isinstance(result, (VideoItem, AudioItem, UriItem)):
-            self._set_resolved_url(context, result)
-        elif isinstance(result, DirectoryItem):
-            self._add_directory(context, result)
+            return False
+
+        if isinstance(result, (VideoItem, AudioItem, UriItem)):
+            return self._set_resolved_url(context, result)
+
+        show_fanart = self.settings.show_fanart()
+
+        if isinstance(result, DirectoryItem):
+            item_count = 1
+            items = [self._add_directory(result, show_fanart)]
         elif isinstance(result, list):
             item_count = len(result)
-            for item in result:
-                if isinstance(item, DirectoryItem):
-                    self._add_directory(context, item, item_count)
-                elif isinstance(item, VideoItem):
-                    self._add_video(context, item, item_count)
-                elif isinstance(item, AudioItem):
-                    self._add_audio(context, item, item_count)
-                elif isinstance(item, ImageItem):
-                    self._add_image(context, item, item_count)
-
-            xbmcplugin.endOfDirectory(
-                self.handle, succeeded=True,
-                updateListing=options.get(AbstractProvider.RESULT_UPDATE_LISTING, False),
-                cacheToDisc=options.get(AbstractProvider.RESULT_CACHE_TO_DISC, True))
+            items = [
+                self._add_directory(item, show_fanart) if isinstance(item, DirectoryItem)
+                else self._add_video(context, item) if isinstance(item, VideoItem)
+                else self._add_audio(context, item) if isinstance(item, AudioItem)
+                else self._add_image(item, show_fanart) if isinstance(item, ImageItem)
+                else None
+                for item in result
+            ]
         else:
             # handle exception
-            pass
+            return False
+
+        succeeded = xbmcplugin.addDirectoryItems(
+            self.handle, items, item_count
+        )
+        xbmcplugin.endOfDirectory(
+            self.handle,
+            succeeded=succeeded,
+            updateListing=options.get(AbstractProvider.RESULT_UPDATE_LISTING, False),
+            cacheToDisc=options.get(AbstractProvider.RESULT_CACHE_TO_DISC, True)
+        )
+        return succeeded
 
     def _set_resolved_url(self, context, base_item, succeeded=True):
         item = xbmc_items.to_playback_item(context, base_item)
         item.setPath(base_item.get_uri())
         xbmcplugin.setResolvedUrl(self.handle, succeeded=succeeded, listitem=item)
-
         """
         # just to be sure :)
         if not isLiveStream:
@@ -85,8 +95,10 @@ class XbmcRunner(AbstractProviderRunner):
                     break
                 tries-=1
         """
+        return succeeded
 
-    def _add_directory(self, context, directory_item, item_count=0):
+    @staticmethod
+    def _add_directory(directory_item, show_fanart=False):
         art = {'icon': 'DefaultFolder.png',
                'thumb': directory_item.get_image()}
 
@@ -95,9 +107,10 @@ class XbmcRunner(AbstractProviderRunner):
         info_tag = xbmc_items.ListItemInfoTag(item, tag_type='video')
 
         # only set fanart is enabled
-        if directory_item.get_fanart() and self.settings.show_fanart():
-            art['fanart'] = directory_item.get_fanart()
-
+        if show_fanart:
+            fanart = directory_item.get_fanart()
+            if fanart:
+                art['fanart'] = fanart
 
         item.setArt(art)
 
@@ -119,28 +132,26 @@ class XbmcRunner(AbstractProviderRunner):
         if directory_item.get_channel_subscription_id():  # make channel_subscription_id property available for keymapping
             item.setProperty('channel_subscription_id', directory_item.get_channel_subscription_id())
 
-        xbmcplugin.addDirectoryItem(handle=self.handle,
-                                    url=directory_item.get_uri(),
-                                    listitem=item,
-                                    isFolder=is_folder,
-                                    totalItems=item_count)
+        return directory_item.get_uri(), item, is_folder
 
-    def _add_video(self, context, video_item, item_count=0):
+    @staticmethod
+    def _add_video(context, video_item):
         item = xbmc_items.to_video_item(context, video_item)
         item.setPath(video_item.get_uri())
-        xbmcplugin.addDirectoryItem(handle=self.handle,
-                                    url=video_item.get_uri(),
-                                    listitem=item,
-                                    totalItems=item_count)
+        return video_item.get_uri(), item, False
 
-    def _add_image(self, context, image_item, item_count):
+    @staticmethod
+    def _add_image(image_item, show_fanart=False):
         art = {'icon': 'DefaultPicture.png',
                'thumb': image_item.get_image()}
 
         item = xbmcgui.ListItem(label=image_item.get_name(), offscreen=True)
 
-        if image_item.get_fanart() and self.settings.show_fanart():
-            art['fanart'] = image_item.get_fanart()
+        # only set fanart is enabled
+        if show_fanart:
+            fanart = image_item.get_fanart()
+            if fanart:
+                art['fanart'] = fanart
 
         item.setArt(art)
 
@@ -150,15 +161,10 @@ class XbmcRunner(AbstractProviderRunner):
         item.setInfo(type='picture', infoLabels=info_labels.create_from_item(image_item))
 
         item.setPath(image_item.get_uri())
-        xbmcplugin.addDirectoryItem(handle=self.handle,
-                                    url=image_item.get_uri(),
-                                    listitem=item,
-                                    totalItems=item_count)
+        return image_item.get_uri(), item, False
 
-    def _add_audio(self, context, audio_item, item_count):
+    @staticmethod
+    def _add_audio(context, audio_item):
         item = xbmc_items.to_audio_item(context, audio_item)
         item.setPath(audio_item.get_uri())
-        xbmcplugin.addDirectoryItem(handle=self.handle,
-                                    url=audio_item.get_uri(),
-                                    listitem=item,
-                                    totalItems=item_count)
+        return audio_item.get_uri(), item, False
