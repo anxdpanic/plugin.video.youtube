@@ -53,15 +53,15 @@ class XbmcContext(AbstractContext):
         # first the path of the uri
         if override:
             self._uri = sys.argv[0]
-            comps = urlparse(self._uri)
-            self._path = unquote(comps.path)
+            parsed_url = urlparse(self._uri)
+            self._path = unquote(parsed_url.path)
 
             # after that try to get the params
             if num_args > 2:
                 params = sys.argv[2][1:]
                 if params:
                     self._uri = '?'.join([self._uri, params])
-                    self._params = dict(parse_qsl(params))
+                    self.parse_params(dict(parse_qsl(params)))
 
             if num_args > 3 and sys.argv[3].lower() == 'resume:true':
                 self._params['resume'] = True
@@ -332,7 +332,8 @@ class XbmcContext(AbstractContext):
         version = self._ISA_CAPABILITIES.get(capability)
         return version is True or version and isa_loose_version >= utils.loose_version(version)
 
-    def inputstream_adaptive_auto_stream_selection(self):
+    @staticmethod
+    def inputstream_adaptive_auto_stream_selection():
         try:
             return xbmcaddon.Addon('inputstream.adaptive').getSetting('STREAMSELECTION') == '0'
         except RuntimeError:

@@ -67,7 +67,7 @@ def _process_rate_video(provider, context, re_match):
 
         elif response.get('status_code') == 204:
             # this will be set if we are in the 'Liked Video' playlist
-            if context.get_param('refresh_container', '0') == '1':
+            if context.get_param('refresh_container'):
                 context.get_ui().refresh_container()
 
             if result == 'none':

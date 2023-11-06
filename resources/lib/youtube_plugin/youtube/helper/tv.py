@@ -16,7 +16,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     result = []
     video_id_dict = {}
 
-    incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    incognito = context.get_param('incognito', False)
 
     filter_list = []
     black_list = False
@@ -63,7 +63,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
 
         new_context = context.clone(new_params=new_params)
 
-        current_page = int(new_context.get_param('page', 1))
+        current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 
@@ -74,7 +74,7 @@ def tv_videos_to_items(provider, context, json_data):
     result = []
     video_id_dict = {}
 
-    incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    incognito = context.get_param('incognito', False)
 
     items = json_data.get('items', [])
     for item in items:
@@ -109,7 +109,7 @@ def tv_videos_to_items(provider, context, json_data):
 
         new_context = context.clone(new_params=new_params)
 
-        current_page = int(new_context.get_param('page', 1))
+        current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 
@@ -120,7 +120,7 @@ def saved_playlists_to_items(provider, context, json_data):
     result = []
     playlist_id_dict = {}
 
-    incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    incognito = context.get_param('incognito', False)
     thumb_size = context.get_settings().use_thumbnail_size()
 
     items = json_data.get('items', [])
@@ -160,7 +160,7 @@ def saved_playlists_to_items(provider, context, json_data):
 
         new_context = context.clone(new_params=new_params)
 
-        current_page = int(new_context.get_param('page', 1))
+        current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 

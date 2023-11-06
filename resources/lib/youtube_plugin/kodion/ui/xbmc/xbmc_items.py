@@ -109,10 +109,10 @@ def to_play_item(context, play_item):
     if not is_strm:
         if play_item.get_play_count() == 0:
             if play_item.get_start_percent():
-                list_item.setProperty('StartPercent', play_item.get_start_percent())
+                list_item.setProperty('StartPercent', str(play_item.get_start_percent()))
 
             if play_item.get_start_time():
-                list_item.setProperty('StartOffset', play_item.get_start_time())
+                list_item.setProperty('StartOffset', str(play_item.get_start_time()))
 
         if play_item.subtitles:
             list_item.setSubtitles(play_item.subtitles)
@@ -165,10 +165,10 @@ def to_video_item(context, video_item):
 
     if video_item.get_play_count() == 0:
         if video_item.get_start_percent():
-            item.setProperty('StartPercent', video_item.get_start_percent())
+            item.setProperty('StartPercent', str(video_item.get_start_percent()))
 
         if video_item.get_start_time():
-            item.setProperty('StartOffset', video_item.get_start_time())
+            item.setProperty('StartOffset', str(video_item.get_start_time()))
 
     # This should work for all versions of XBMC/KODI.
     if 'duration' in _info_labels:

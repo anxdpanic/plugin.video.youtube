@@ -127,7 +127,7 @@ def _process_live_events(provider, context, event_type='live'):
 
     # TODO: cache result
     page_token = context.get_param('page_token', '')
-    location = str(context.get_param('location', False)).lower() == 'true'
+    location = context.get_param('location', False)
 
     json_data = provider.get_client(context).get_live_events(event_type=event_type, page_token=page_token, location=location)
     if not v3.handle_error(provider, context, json_data):
@@ -138,7 +138,7 @@ def _process_live_events(provider, context, event_type='live'):
 
 
 def _process_description_links(provider, context):
-    incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    incognito = context.get_param('incognito', False)
     addon_id = context.get_param('addon_id', '')
 
     def _extract_urls(_video_id):
@@ -250,17 +250,13 @@ def _process_description_links(provider, context):
     if video_id:
         return _extract_urls(video_id)
 
-    channel_ids = context.get_param('channel_ids', '')
+    channel_ids = context.get_param('channel_ids', [])
     if channel_ids:
-        channel_ids = channel_ids.split(',')
-        if channel_ids:
-            return _display_channels(channel_ids)
+        return _display_channels(channel_ids)
 
-    playlist_ids = context.get_param('playlist_ids', '')
+    playlist_ids = context.get_param('playlist_ids', [])
     if playlist_ids:
-        playlist_ids = playlist_ids.split(',')
-        if playlist_ids:
-            return _display_playlists(playlist_ids)
+        return _display_playlists(playlist_ids)
 
     context.log_error('Missing video_id or playlist_ids for description links')
 
@@ -272,7 +268,7 @@ def _process_saved_playlists_tv(provider, context):
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
-    offset = int(context.get_param('offset', 0))
+    offset = context.get_param('offset', 0)
     json_data = provider.get_client(context).get_saved_playlists(page_token=next_page_token, offset=offset)
     result.extend(tv.saved_playlists_to_items(provider, context, json_data))
 
@@ -284,7 +280,7 @@ def _process_watch_history_tv(provider, context):
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
-    offset = int(context.get_param('offset', 0))
+    offset = context.get_param('offset', 0)
     json_data = provider.get_client(context).get_watch_history(page_token=next_page_token, offset=offset)
     result.extend(tv.tv_videos_to_items(provider, context, json_data))
 
@@ -296,7 +292,7 @@ def _process_purchases_tv(provider, context):
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
-    offset = int(context.get_param('offset', 0))
+    offset = context.get_param('offset', 0)
     json_data = provider.get_client(context).get_purchases(page_token=next_page_token, offset=offset)
     result.extend(tv.tv_videos_to_items(provider, context, json_data))
 
@@ -308,7 +304,7 @@ def _process_new_uploaded_videos_tv(provider, context):
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
-    offset = int(context.get_param('offset', 0))
+    offset = context.get_param('offset', 0)
     json_data = provider.get_client(context).get_my_subscriptions(page_token=next_page_token, offset=offset)
     result.extend(tv.my_subscriptions_to_items(provider, context, json_data))
 
@@ -320,7 +316,7 @@ def _process_new_uploaded_videos_tv_filtered(provider, context):
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
-    offset = int(context.get_param('offset', 0))
+    offset = context.get_param('offset', 0)
     json_data = provider.get_client(context).get_my_subscriptions(page_token=next_page_token, offset=offset)
     result.extend(tv.my_subscriptions_to_items(provider, context, json_data, do_filter=True))
 

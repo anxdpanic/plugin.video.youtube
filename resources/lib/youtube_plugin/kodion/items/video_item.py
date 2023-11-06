@@ -286,13 +286,13 @@ class VideoItem(BaseItem):
         return self._last_played
 
     def set_start_percent(self, start_percent):
-        self._start_percent = start_percent or ''
+        self._start_percent = start_percent or 0
 
     def get_start_percent(self):
         return self._start_percent
 
     def set_start_time(self, start_time):
-        self._start_time = start_time or ''
+        self._start_time = start_time or 0
 
     def get_start_time(self):
         return self._start_time

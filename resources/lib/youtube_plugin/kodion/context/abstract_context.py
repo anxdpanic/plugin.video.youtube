@@ -16,7 +16,6 @@ from .. import logger
 from ..utils import (
     create_path,
     create_uri_path,
-    to_utf8,
     AccessManager,
     DataCache,
     FavoriteList,
@@ -29,6 +28,63 @@ from ..utils import (
 
 
 class AbstractContext(object):
+    _BOOL_PARAMS = {
+        'ask_for_quality',
+        'audio_only',
+        'confirmed',
+        'enable',
+        'hide_folders',
+        'hide_live',
+        'hide_playlists',
+        'hide_search',
+        'incognito',
+        'location',
+        'logged_in',
+        'play',
+        'prompt_for_subtitles',
+        'refresh',
+        'refresh_container'
+        'resume',
+        'screensaver',
+        'strm',
+    }
+    _INT_PARAMS = {
+        'live',
+        'offset',
+        'page',
+    }
+    _FLOAT_PARAMS = {
+        'seek',
+    }
+    _LIST_PARAMS = {
+        'channel_ids',
+        'playlist_ids',
+    }
+    _STRING_PARAMS = {
+        'api_key',
+        'action',  # deprecated
+        'addon_id',
+        'channel_id',
+        'channel_name',
+        'client_id',
+        'client_secret',
+        'event_type',
+        'item',
+        'next_page_token',
+        'page_token',
+        'parent_id',
+        'playlist',  # deprecated
+        'playlist_id',
+        'playlist_name',
+        'q',
+        'rating',
+        'search_type',
+        'subscription_id',
+        'videoid',  # deprecated
+        'video_id',
+        'uri',
+    }
+
     def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
         if not params:
             params = {}
@@ -55,6 +111,7 @@ class AbstractContext(object):
         self._view_mode = None
 
         # create valid uri
+        self.parse_params()
         self._uri = self.create_uri(self._path, self._params)
 
     def format_date_short(self, date_obj):
@@ -90,7 +147,7 @@ class AbstractContext(object):
             if max_cache_size_mb <= 0:
                 max_cache_size_mb = 5
             else:
-                max_cache_size_mb = max_cache_size_mb / 2.0
+                max_cache_size_mb /= 2.0
             self._data_cache = DataCache(os.path.join(self.get_cache_path(), 'data_cache'),
                                          max_file_size_mb=max_cache_size_mb)
         return self._data_cache
@@ -101,7 +158,7 @@ class AbstractContext(object):
             if max_cache_size_mb <= 0:
                 max_cache_size_mb = 5
             else:
-                max_cache_size_mb = max_cache_size_mb / 2.0
+                max_cache_size_mb /= 2.0
             self._function_cache = FunctionCache(os.path.join(self.get_cache_path(), 'cache'),
                                                  max_file_size_mb=max_cache_size_mb)
         return self._function_cache
@@ -160,17 +217,7 @@ class AbstractContext(object):
             uri = "%s://%s/" % ('plugin', str(self._plugin_id))
 
         if params:
-            # make a copy of the map
-            uri_params = {}
-            uri_params.update(params)
-
-            # encode in utf-8
-            for param in uri_params:
-                if isinstance(params[param], int):
-                    params[param] = str(params[param])
-
-                uri_params[param] = to_utf8(params[param])
-            uri = '?'.join([uri, urlencode(uri_params)])
+            uri = '?'.join([uri, urlencode(params, encoding='utf-8')])
 
         return uri
 
@@ -184,10 +231,47 @@ class AbstractContext(object):
         return self._params
 
     def get_param(self, name, default=None):
-        return self.get_params().get(name, default)
+        return self._params.get(name, default)
+
+    def parse_params(self, params=None):
+        if not params:
+            params = self._params
+        to_delete = []
+
+        for param, value in params.items():
+            try:
+                if param in self._BOOL_PARAMS:
+                    parsed_value = str(value).lower() in ('true', '1')
+                elif param in self._INT_PARAMS:
+                    parsed_value = int(value)
+                elif param in self._FLOAT_PARAMS:
+                    parsed_value = float(value)
+                elif param in self._LIST_PARAMS:
+                    parsed_value = [
+                        val for val in value.split(',') if val
+                    ]
+                elif param in self._STRING_PARAMS:
+                    parsed_value = str(value)
+                else:
+                    self.log_debug('Unknown parameter - |{0}: {1}|'.format(
+                        param, value
+                    ))
+                    to_delete.append(param)
+                    continue
+            except (TypeError, ValueError):
+                self.log_error('Invalid parameter value - |{0}: {1}|'.format(
+                    param, value
+                ))
+                to_delete.append(param)
+                continue
+
+            self._params[param] = parsed_value
+
+        for param in to_delete:
+            del params[param]
 
     def set_param(self, name, value):
-        self._params[name] = value
+        self.parse_params({name: value})
 
     def get_data_path(self):
         """

@@ -31,7 +31,7 @@ def _process_list_response(provider, context, json_data):
         context.log_warning('List of search result is empty')
         return result
 
-    incognito = str(context.get_param('incognito', False)).lower() == 'true'
+    incognito = context.get_param('incognito', False)
     addon_id = context.get_param('addon_id', '')
 
     for yt_item in yt_items:
@@ -325,7 +325,7 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
 
         new_context = context.clone(new_params=new_params)
 
-        current_page = int(new_context.get_param('page', 1))
+        current_page = new_context.get_param('page', 1)
         next_page_item = items.NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
         result.append(next_page_item)
 

@@ -71,8 +71,6 @@ class PlaybackMonitorThread(threading.Thread):
         if playback_stats is None:
             playback_stats = {}
 
-        play_count = str(play_count)
-
         played_time = -1.0
 
         state = 'playing'
@@ -266,7 +264,7 @@ class PlaybackMonitorThread(threading.Thread):
             is_logged_in = self.provider.is_logged_in()
 
         if self.percent_complete >= settings.get_play_count_min_percent():
-            play_count = '1'
+            play_count += 1
             self.current_time = 0.0
             if is_logged_in and report_url and use_remote_history:
                 client.update_watch_history(self.video_id, report_url

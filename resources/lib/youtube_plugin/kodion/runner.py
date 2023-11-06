@@ -55,7 +55,7 @@ def run(provider, context=None):
 
     context.log_notice('Running: %s (%s) on %s with %s\n\tPath: %s\n\tParams: %s' %
                        (name, addon_version, version, python_version,
-                        context.get_path(), str(context_params)))
+                        context.get_path(), context_params))
 
     __RUNNER__.run(provider, context)
     provider.tear_down(context)

@@ -36,7 +36,7 @@ def play_video(provider, context):
         context.get_ui().clear_home_window_property('ask_for_quality')
 
         screensaver = False
-        if context.get_param('screensaver', None) and str(context.get_param('screensaver')).lower() == 'true':
+        if context.get_param('screensaver'):
             ask_for_quality = False
             screensaver = True
 
@@ -80,7 +80,7 @@ def play_video(provider, context):
         title = metadata.get('video', {}).get('title', '')
         video_item = VideoItem(title, video_stream['url'])
 
-        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        incognito = context.get_param('incognito', False)
         use_history = not is_live and not screensaver and not incognito
         use_remote_history = use_history and settings.use_remote_history()
         use_play_data = use_history and settings.use_local_history()
@@ -96,7 +96,7 @@ def play_video(provider, context):
             seek = video_item.get_start_time()
             if seek and context.get_param('resume'):
                 seek_time = start_time
-            play_count = video_item.get_play_count() if video_item.get_play_count() is not None else '0'
+            play_count = video_item.get_play_count() or 0
 
         item = to_playback_item(context, video_item)
         item.setPath(video_item.get_uri())
@@ -223,10 +223,10 @@ def play_playlist(provider, context):
     if progress_dialog:
         progress_dialog.close()
 
-    if (context.get_param('play', '') == '1') and (context.get_handle() == -1):
+    if context.get_param('play') and context.get_handle() == -1:
         player.play(playlist_index=playlist_position)
         return False
-    if context.get_param('play', '') == '1':
+    if context.get_param('play'):
         return videos[playlist_position]
 
     return True
@@ -234,7 +234,7 @@ def play_playlist(provider, context):
 
 def play_channel_live(provider, context):
     channel_id = context.get_param('channel_id')
-    index = int(context.get_param('live')) - 1
+    index = context.get_param('live') - 1
     if index < 0:
         index = 0
     json_data = provider.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, safe_search=False)

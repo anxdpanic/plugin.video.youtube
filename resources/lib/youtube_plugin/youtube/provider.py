@@ -496,7 +496,7 @@ class Provider(AbstractProvider):
         resource_manager = self.get_resource_manager(context)
 
         item_params = {}
-        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        incognito = context.get_param('incognito', False)
         addon_id = context.get_param('addon_id', '')
         if incognito:
             item_params.update({'incognito': incognito})
@@ -595,9 +595,9 @@ class Provider(AbstractProvider):
                     return False
 
         channel_fanarts = resource_manager.get_fanarts([channel_id])
-        page = int(context.get_param('page', 1))
+        page = context.get_param('page', 1)
         page_token = context.get_param('page_token', '')
-        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        incognito = context.get_param('incognito', False)
         addon_id = context.get_param('addon_id', '')
         item_params = {}
         if incognito:
@@ -605,12 +605,12 @@ class Provider(AbstractProvider):
         if addon_id:
             item_params.update({'addon_id': addon_id})
 
-        hide_folders = str(context.get_param('hide_folders', False)).lower() == 'true'
+        hide_folders = context.get_param('hide_folders', False)
 
         if page == 1 and not hide_folders:
-            hide_playlists = str(context.get_param('hide_playlists', False)).lower() == 'true'
-            hide_search = str(context.get_param('hide_search', False)).lower() == 'true'
-            hide_live = str(context.get_param('hide_live', False)).lower() == 'true'
+            hide_playlists = context.get_param('hide_playlists', False)
+            hide_search = context.get_param('hide_search', False)
+            hide_live = context.get_param('hide_live', False)
 
             if not hide_playlists:
                 playlists_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.playlists'])),
@@ -729,7 +729,7 @@ class Provider(AbstractProvider):
             context.get_ui().clear_home_window_property('ask_for_quality')
 
         if 'prompt_for_subtitles' in params:
-            prompt_subtitles = params['prompt_for_subtitles'] == '1'
+            prompt_subtitles = params['prompt_for_subtitles']
             del params['prompt_for_subtitles']
             if prompt_subtitles and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
@@ -738,7 +738,7 @@ class Provider(AbstractProvider):
                 redirect = True
 
         elif 'audio_only' in params:
-            audio_only = params['audio_only'] == '1'
+            audio_only = params['audio_only']
             del params['audio_only']
             if audio_only and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
@@ -747,7 +747,7 @@ class Provider(AbstractProvider):
                 redirect = True
 
         elif 'ask_for_quality' in params:
-            ask_for_quality = params['ask_for_quality'] == '1'
+            ask_for_quality = params['ask_for_quality']
             del params['ask_for_quality']
             if ask_for_quality and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
@@ -773,7 +773,7 @@ class Provider(AbstractProvider):
             return yt_play.play_video(self, context)
         if 'playlist_id' in params:
             return yt_play.play_playlist(self, context)
-        if 'channel_id' in params and 'live' in params and int(params['live']) > 0:
+        if 'channel_id' in params and 'live' in params and params['live'] > 0:
             return yt_play.play_channel_live(self, context)
         return False
 
@@ -822,7 +822,8 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
-        refresh = context.get_param('refresh', 'true').lower() == 'true'
+        refresh = context.get_param('refresh')
+
         access_manager = context.get_access_manager()
         ui = context.get_ui()
 
@@ -972,7 +973,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
-        sign_out_confirmed = context.get_param('confirmed', '').lower() == 'true'
+        sign_out_confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
         if (mode == 'in') and context.get_access_manager().has_refresh_token():
             yt_login.process('out', self, context, sign_out_refresh=False)
@@ -1018,9 +1019,9 @@ class Provider(AbstractProvider):
 
         channel_id = context.get_param('channel_id', '')
         event_type = context.get_param('event_type', '')
-        hide_folders = str(context.get_param('hide_folders', False)).lower() == 'true'
-        location = str(context.get_param('location', False)).lower() == 'true'
-        page = int(context.get_param('page', 1))
+        hide_folders = context.get_param('hide_folders', False)
+        location = context.get_param('location', False)
+        page = context.get_param('page', 1)
         page_token = context.get_param('page_token', '')
         search_type = context.get_param('search_type', 'video')
 
@@ -1256,7 +1257,7 @@ class Provider(AbstractProvider):
         client_id = params.get('client_id')
         client_secret = params.get('client_secret')
         api_key = params.get('api_key')
-        enable = params.get('enable', '').lower() == 'true'
+        enable = params.get('enable')
         updated_list = []
         log_list = []
 
@@ -1321,28 +1322,34 @@ class Provider(AbstractProvider):
         if not video_id or not action:
             return True
         playback_history = context.get_playback_history()
-        items = playback_history.get_items([video_id])
-        if not items or not items.get(video_id):
-            item_dict = {'play_count': '0', 'total_time': '0.0',
-                         'played_time': '0.0', 'played_percent': '0'}
-        else:
-            item_dict = items.get(video_id)
+        play_data = playback_history.get_items([video_id]).get(video_id)
+        if not play_data:
+            play_data = {
+                'play_count': 0,
+                'total_time': 0,
+                'played_time': 0,
+                'played_percent': 0
+            }
+
         if action == 'mark_unwatched':
-            if int(item_dict.get('play_count', 0)) > 0:
-                item_dict['play_count'] = '0'
-                item_dict['played_time'] = '0.0'
-                item_dict['played_percent'] = '0'
+            if play_data.get('play_count', 0) > 0:
+                play_data['play_count'] = 0
+                play_data['played_time'] = 0
+                play_data['played_percent'] = 0
+
         elif action == 'mark_watched':
-            if int(item_dict.get('play_count', 0)) == 0:
-                item_dict['play_count'] = '1'
+            if not play_data.get('play_count', 0):
+                play_data['play_count'] = 1
+
         elif action == 'reset_resume':
-            item_dict['played_time'] = '0.0'
-            item_dict['played_percent'] = '0'
-        item_dict['play_count'] = item_dict.get('play_count', '0')
-        item_dict['total_time'] = item_dict.get('total_time', '0.0')
-        item_dict['played_time'] = item_dict.get('played_time', '0.0')
-        item_dict['played_percent'] = item_dict.get('played_percent', '0')
-        playback_history.update(video_id, item_dict['play_count'], item_dict['total_time'], item_dict['played_time'], item_dict['played_percent'])
+            play_data['played_time'] = 0
+            play_data['played_percent'] = 0
+
+        playback_history.update(video_id,
+                                play_data.get('play_count', 0),
+                                play_data.get('total_time', 0),
+                                play_data.get('played_time', 0),
+                                play_data.get('played_percent', 0))
         context.get_ui().refresh_container()
         return True
 

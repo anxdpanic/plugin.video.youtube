@@ -26,30 +26,37 @@ class PlaybackHistory(Storage):
             return pickle.loads(obj)
 
         self._open()
-        placeholders = ','.join(['?' for _ in keys])
-        keys = [str(item) for item in keys]
+        placeholders = ','.join(['?'] * len(keys))
         query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
-        query_result = self._execute(False, query, keys)
+        query_result = self._execute(False, query, list(keys))
+        data_keys = ['play_count', 'total_time' 'played_time', 'played_percent']
         result = {}
         if query_result:
             for item in query_result:
                 values = _decode(item[2]).split(',')
-                result[str(item[0])] = {'play_count': values[0], 'total_time': values[1],
-                                        'played_time': values[2], 'played_percent': values[3],
-                                        'last_played': item[1]}
+                result[item[0]] = {
+                    'play_count': int(values[0]),
+                    'total_time': float(values[1]),
+                    'played_time': float(values[2]),
+                    'played_percent': int(values[3]),
+                    'last_played': item[1],
+                }
 
         self._close()
         return result
 
     def get_item(self, key):
-        key = str(key)
         query_result = self._get(key)
         result = {}
         if query_result:
             values = query_result[0].split(',')
-            result[key] = {'play_count': values[0], 'total_time': values[1],
-                           'played_time': values[2], 'played_percent': values[3],
-                           'last_played': query_result[1]}
+            result[key] = {
+                'play_count': int(values[0]),
+                'total_time': float(values[1]),
+                'played_time': float(values[2]),
+                'played_percent': int(values[3]),
+                'last_played': query_result[1],
+            }
         return result
 
     def clear(self):

@@ -121,7 +121,7 @@ class UrlToItemConverter(object):
         return result
 
     def get_video_items(self, provider, context, title_required=True):
-        incognito = str(context.get_param('incognito', False)).lower() == 'true'
+        incognito = context.get_param('incognito', False)
         use_play_data = not incognito
 
         if not self._video_items:

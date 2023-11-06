@@ -249,7 +249,7 @@ class AbstractProvider(object):
             if not query:
                 return False
 
-            incognito = str(context.get_param('incognito', False)).lower() == 'true'
+            incognito = context.get_param('incognito', False)
             channel_id = context.get_param('channel_id', '')
 
             query = to_utf8(query)
@@ -270,7 +270,7 @@ class AbstractProvider(object):
             return self.on_search(query, context, re_match)
 
         if command == 'query':
-            incognito = str(context.get_param('incognito', False)).lower() == 'true'
+            incognito = context.get_param('incognito', False)
             channel_id = context.get_param('channel_id', '')
             query = params['q']
             query = to_unicode(query)
@@ -287,7 +287,7 @@ class AbstractProvider(object):
         context.set_content_type(constants.content_type.FILES)
         result = []
 
-        location = str(context.get_param('location', False)).lower() == 'true'
+        location = context.get_param('location', False)
 
         # 'New Search...'
         new_search_item = NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)

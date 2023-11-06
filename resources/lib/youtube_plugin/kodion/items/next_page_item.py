@@ -16,7 +16,7 @@ class NextPageItem(DirectoryItem):
     def __init__(self, context, current_page=1, image=None, fanart=None):
         new_params = {}
         new_params.update(context.get_params())
-        new_params['page'] = str(current_page + 1)
+        new_params['page'] = current_page + 1
         name = context.localize(constants.localize.NEXT_PAGE, 'Next Page')
         if name.find('%d') != -1:
             name %= current_page + 1

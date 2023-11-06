@@ -287,7 +287,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # duration
         if not video_item.live and play_data and 'total_time' in play_data:
-            duration = float(play_data['total_time'] or 0)
+            duration = play_data['total_time']
         else:
             duration = yt_item.get('contentDetails', {}).get('duration')
             if duration:
@@ -448,12 +448,12 @@ def update_video_infos(provider, context, video_id_dict,
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
 
         if not video_item.live and play_data:
-            if play_data.get('play_count') is None or int(play_data.get('play_count')) == 0:
+            if not play_data.get('play_count'):
                 yt_context_menu.append_mark_watched(context_menu, provider, context, video_id)
             else:
                 yt_context_menu.append_mark_unwatched(context_menu, provider, context, video_id)
 
-            if int(play_data.get('played_percent', '0')) > 0 or float(play_data.get('played_time', '0.0')) > 0.0:
+            if play_data.get('played_percent', 0) > 0 or play_data.get('played_time', 0) > 0:
                 yt_context_menu.append_reset_resume_point(context_menu, provider, context, video_id)
 
         # more...
@@ -557,7 +557,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
 
     # duration
     if not video_item.live and play_data and 'total_time' in play_data:
-        duration = float(play_data['total_time'] or 0)
+        duration = play_data['total_time']
     else:
         duration = yt_item.get('contentDetails', {}).get('duration')
         if duration:
