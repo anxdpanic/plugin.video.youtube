@@ -1382,8 +1382,7 @@ class Provider(AbstractProvider):
 
             #clear cache
             cache = context.get_data_cache()
-            cache_items_key = 'my-subscriptions-items'
-            cache.set(cache_items_key, '[]')
+            cache.set_item('my-subscriptions-items', '[]')
 
             my_subscriptions_item = DirectoryItem(
                 context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.my_subscriptions'])),

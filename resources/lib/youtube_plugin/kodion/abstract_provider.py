@@ -159,7 +159,7 @@ class AbstractProvider(object):
             context.get_ui().refresh_container()
             return None
         if command == 'list':
-            directory_items = context.get_favorite_list().list()
+            directory_items = context.get_favorite_list().get_items()
 
             for directory_item in directory_items:
                 context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
@@ -186,7 +186,7 @@ class AbstractProvider(object):
             context.get_ui().refresh_container()
             return None
         if command == 'list':
-            video_items = context.get_watch_later_list().list()
+            video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
                 context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
@@ -207,6 +207,8 @@ class AbstractProvider(object):
             self._data_cache = context.get_data_cache()
 
     def _internal_search(self, context, re_match):
+        context.add_sort_method(constants.sort_method.UNSORTED)
+
         params = context.get_params()
 
         command = re_match.group('command')
@@ -254,10 +256,10 @@ class AbstractProvider(object):
 
             query = to_utf8(query)
             try:
-                self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
+                encoded = json.dumps({'query': quote(query)})
             except KeyError:
                 encoded = json.dumps({'query': quote(query.encode('utf8'))})
-                self._data_cache.set('search_query', encoded)
+            self._data_cache.set_item('search_query', encoded)
 
             if not incognito and not channel_id:
                 try:
@@ -293,7 +295,7 @@ class AbstractProvider(object):
         new_search_item = NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
         result.append(new_search_item)
 
-        for search in search_history.list():
+        for search in search_history.get_items():
             # little fallback for old history entries
             if isinstance(search, DirectoryItem):
                 search = search.get_name()

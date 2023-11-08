@@ -15,25 +15,17 @@ from .methods import to_utf8
 
 
 class SearchHistory(Storage):
-    def __init__(self, filename, max_items=10):
-        super(SearchHistory, self).__init__(filename, max_item_count=max_items)
+    def __init__(self, filename, max_item_count=10):
+        super(SearchHistory, self).__init__(filename,
+                                            max_item_count=max_item_count)
 
     def is_empty(self):
         return self._is_empty()
 
-    def list(self):
-        result = []
-
-        keys = self._get_ids(oldest_first=False)
-        for i, key in enumerate(keys):
-            if i >= self._max_item_count:
-                break
-            item = self._get(key)
-
-            if item:
-                result.append(item[0])
-
-        return result
+    def get_items(self):
+        result = self._get_by_ids(oldest_first=False,
+                                  limit=self._max_item_count)
+        return [item[2] for item in result]
 
     def clear(self):
         self._clear()

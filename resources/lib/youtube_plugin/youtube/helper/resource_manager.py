@@ -82,7 +82,7 @@ class ResourceManager(object):
                 if yt_item
             }
             result.update(channel_data)
-            data_cache.set_all(channel_data)
+            data_cache.set_items(channel_data)
             self._context.log_debug('Cached data for channels |%s|' % ', '.join(channel_data))
 
         if self.handle_error(json_data):
@@ -112,7 +112,7 @@ class ResourceManager(object):
                 if yt_item
             }
             result.update(video_data)
-            data_cache.set_all(video_data)
+            data_cache.set_items(video_data)
             self._context.log_debug('Cached data for videos |%s|' % ', '.join(video_data))
 
         if self._context.get_settings().use_local_history():
@@ -163,7 +163,7 @@ class ResourceManager(object):
                 if yt_item
             }
             result.update(playlist_data)
-            data_cache.set_all(playlist_data)
+            data_cache.set_items(playlist_data)
             self._context.log_debug('Cached data for playlists |%s|' % ', '.join(playlist_data))
 
         if self.handle_error(json_data):

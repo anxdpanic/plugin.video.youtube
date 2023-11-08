@@ -21,21 +21,13 @@ class WatchLaterList(Storage):
     def clear(self):
         self._clear()
 
-    def list(self):
-        result = []
+    @staticmethod
+    def _sort_item(_item):
+        return _item[2].get_date()
 
-        for key in self._get_ids():
-            data = self._get(key)
-            item = items.from_json(data[0])
-            result.append(item)
-
-        def _sort(video_item):
-            return video_item.get_date()
-
-        self.sync()
-
-        sorted_list = sorted(result, key=_sort, reverse=False)
-        return sorted_list
+    def get_items(self):
+        result = self._get_by_ids(process=items.from_json)
+        return sorted(result, key=self._sort_item, reverse=False)
 
     def add(self, base_item):
         now = datetime.datetime.now()

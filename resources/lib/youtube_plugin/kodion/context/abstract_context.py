@@ -167,7 +167,7 @@ class AbstractContext(object):
         if not self._search_history:
             max_search_history_items = self.get_settings().get_int(constants.setting.SEARCH_SIZE, 50)
             self._search_history = SearchHistory(os.path.join(self.get_cache_path(), 'search'),
-                                                 max_search_history_items)
+                                                 max_item_count=max_search_history_items)
         return self._search_history
 
     def get_favorite_list(self):

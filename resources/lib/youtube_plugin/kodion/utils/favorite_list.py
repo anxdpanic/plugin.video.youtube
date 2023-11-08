@@ -19,18 +19,13 @@ class FavoriteList(Storage):
     def clear(self):
         self._clear()
 
-    def list(self):
-        result = []
+    @staticmethod
+    def _sort_item(_item):
+        return _item[2].get_name().upper()
 
-        for key in self._get_ids():
-            data = self._get(key)
-            item = items.from_json(data[0])
-            result.append(item)
-
-        def _sort(_item):
-            return _item.get_name().upper()
-
-        return sorted(result, key=_sort, reverse=False)
+    def get_items(self):
+        result = self._get_by_ids(process=items.from_json)
+        return sorted(result, key=self._sort_item, reverse=False)
 
     def add(self, base_item):
         item_json_data = items.to_json(base_item)

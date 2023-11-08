@@ -9,13 +9,9 @@
 """
 
 import json
-import pickle
-import sqlite3
-
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from .storage import Storage
-from .. import logger
 
 
 class DataCache(Storage):
@@ -33,55 +29,35 @@ class DataCache(Storage):
         return self._is_empty()
 
     def get_items(self, seconds, content_ids):
-        def _decode(obj):
-            return pickle.loads(obj)
+        query_result = self._get_by_ids(content_ids, process=json.loads)
+        if not query_result:
+            return {}
 
         current_time = datetime.now()
-        placeholders = ','.join(['?' for _ in content_ids])
-        keys = [str(item) for item in content_ids]
-        query = 'SELECT * FROM %s WHERE key IN (%s)' % (self._table_name, placeholders)
-
-        self._open()
-
-        query_result = self._execute(False, query, keys)
-        result = {}
-        if query_result:
-            for item in query_result:
-                cached_time = item[1]
-                if cached_time is None:
-                    logger.log_error('Data Cache [get_items]: cached_time is None while getting {content_id}'.format(
-                        content_id=item[0]
-                    ))
-                    cached_time = current_time
-                # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-                diff_seconds = self.get_seconds_diff(cached_time)
-                if diff_seconds <= seconds:
-                    result[str(item[0])] = json.loads(_decode(item[2]))
-
-        self._close()
+        result = {
+            item[0]: item[2]
+            for item in query_result
+            if self.get_seconds_diff(item[1] or current_time) <= seconds
+        }
         return result
 
     def get_item(self, seconds, content_id):
         content_id = str(content_id)
         query_result = self._get(content_id)
-        result = {}
-        if query_result:
-            current_time = datetime.now()
-            cached_time = query_result[1]
-            if cached_time is None:
-                logger.log_error('Data Cache [get]: cached_time is None while getting {content_id}'.format(content_id=content_id))
-                cached_time = current_time
-            # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
-            diff_seconds = self.get_seconds_diff(cached_time)
-            if diff_seconds <= seconds:
-                result[content_id] = json.loads(query_result[0])
+        if not query_result:
+            return {}
 
+        current_time = datetime.now()
+        if self.get_seconds_diff(query_result[1] or current_time) > seconds:
+            return {}
+
+        result = {content_id: json.loads(query_result[0])}
         return result
 
-    def set(self, content_id, item):
+    def set_item(self, content_id, item):
         self._set(content_id, item)
 
-    def set_all(self, items):
+    def set_items(self, items):
         self._set_all(items)
 
     def clear(self):
@@ -95,31 +71,3 @@ class DataCache(Storage):
 
     def _optimize_item_count(self):
         pass
-
-    def _set(self, content_id, item):
-        def _encode(obj):
-            return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
-
-        current_time = datetime.now() + timedelta(microseconds=1)
-        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
-
-        self._open()
-        self._execute(True, query, values=[content_id, current_time, _encode(item)])
-        self._close()
-
-    def _set_all(self, items):
-        def _encode(obj):
-            return sqlite3.Binary(pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL))
-
-        needs_commit = True
-        current_time = datetime.now() + timedelta(microseconds=1)
-
-        query = 'REPLACE INTO %s (key,time,value) VALUES(?,?,?)' % self._table_name
-
-        self._open()
-
-        for key, item in items.items():
-            self._execute(needs_commit, query, values=[key, current_time, _encode(json.dumps(item))])
-            needs_commit = False
-
-        self._close()
