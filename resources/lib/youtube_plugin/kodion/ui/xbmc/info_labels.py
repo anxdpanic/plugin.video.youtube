@@ -15,8 +15,7 @@ from ...items import AudioItem, DirectoryItem, ImageItem, VideoItem
 def _process_date(info_labels, param):
     if param:
         datetime = utils.datetime_parser.parse(param)
-        datetime = '%02d.%02d.%04d' % (datetime.day, datetime.month, datetime.year)
-        info_labels['date'] = datetime
+        info_labels['date'] = datetime.isoformat()
 
 
 def _process_int_value(info_labels, name, param):
@@ -68,8 +67,7 @@ def _process_video_rating(info_labels, param):
 def _process_date_value(info_labels, name, param):
     if param:
         date = utils.datetime_parser.parse(param)
-        date = '%04d-%02d-%02d' % (date.year, date.month, date.day)
-        info_labels[name] = date
+        info_labels[name] = date.isoformat()
 
 
 def _process_list_value(info_labels, name, param):
@@ -92,7 +90,7 @@ def _process_last_played(info_labels, name, param):
 def create_from_item(base_item):
     info_labels = {}
 
-    # 'date' = '09.03.1982'
+    # 'date' = '1982-03-09'
     _process_date(info_labels, base_item.get_date())
 
     # Directory

@@ -104,7 +104,8 @@ class XbmcRunner(AbstractProviderRunner):
 
         item = xbmcgui.ListItem(label=directory_item.get_name(), offscreen=True)
 
-        info_tag = xbmc_items.ListItemInfoTag(item, tag_type='video')
+        info = info_labels.create_from_item(directory_item)
+        xbmc_items.set_info_tag(item, info, 'video')
 
         # only set fanart is enabled
         if show_fanart:
@@ -118,7 +119,6 @@ class XbmcRunner(AbstractProviderRunner):
             item.addContextMenuItems(directory_item.get_context_menu(),
                                      replaceItems=directory_item.replace_context_menu())
 
-        info_tag.set_info(info_labels.create_from_item(directory_item))
         item.setPath(directory_item.get_uri())
 
         is_folder = True
