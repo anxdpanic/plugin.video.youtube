@@ -1529,12 +1529,16 @@ class VideoInfo(YouTubeRequestClient):
                 else:
                     frame_rate = None
 
-                mime_group = mime_type
+                mime_group = '{mime_type}_{codec}{hdr}'.format(
+                    mime_type=mime_type,
+                    codec=codec,
+                    hdr='_hdr' if hdr else ''
+                )
                 channels = language = role = role_type = sample_rate = None
                 label = quality['label'].format(fps if fps > 30 else '',
                                                 ' HDR' if hdr else '',
                                                 compare_height)
-                quality_group = '{0}_{1}'.format(container, label)
+                quality_group = '{0}_{1}_{2}'.format(container, codec, label)
 
             if mime_group not in data:
                 data[mime_group] = {}
@@ -1599,7 +1603,7 @@ class VideoInfo(YouTubeRequestClient):
             main_stream = streams[0]
 
             key = (
-                group != main_stream['mimeType'],
+                not group.startswith(main_stream['mimeType']),
             ) if main_stream['mediaType'] == 'video' else (
                 not group.startswith(main_stream['mimeType']),
                 preferred_audio['id'] not in group,
