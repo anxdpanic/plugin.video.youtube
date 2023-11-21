@@ -245,7 +245,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 def update_video_infos(provider, context, video_id_dict,
                        playlist_item_id_dict=None,
                        channel_items_dict=None,
-                       live_details=False,
+                       live_details=True,
                        use_play_data=True,
                        data=None):
     video_ids = list(video_id_dict)
@@ -283,7 +283,9 @@ def update_video_infos(provider, context, video_id_dict,
 
         snippet = yt_item['snippet']  # crash if not conform
         play_data = use_play_data and yt_item.get('play_data')
-        video_item.live = snippet.get('liveBroadcastContent') == 'live'
+        broadcast_type = snippet.get('liveBroadcastContent')
+        video_item.live = broadcast_type == 'live'
+        video_item.upcoming = broadcast_type == 'upcoming'
 
         # duration
         if not video_item.live and play_data and 'total_time' in play_data:
@@ -311,21 +313,34 @@ def update_video_infos(provider, context, video_id_dict,
         elif video_item.live:
             video_item.set_play_count(0)
 
-        scheduled_start = yt_item.get('liveStreamingDetails', {}).get('scheduledStartTime')
-        if scheduled_start:
-            datetime = utils.datetime_parser.parse(scheduled_start)
+        if ((video_item.live or video_item.upcoming)
+                and 'liveStreamingDetails' in yt_item):
+            start_at = yt_item['liveStreamingDetails'].get('scheduledStartTime')
+        else:
+            start_at = None
+        if start_at:
+            datetime = utils.datetime_parser.parse(start_at, as_utc=True)
             video_item.set_scheduled_start_utc(datetime)
-            start_date, start_time = utils.datetime_parser.get_scheduled_start(datetime)
-            if start_date:
-                title = '({live} {date}@{time}) {title}' \
-                    .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), date=start_date, time=start_time, title=snippet['title'])
-            else:
-                title = '({live} @ {time}) {title}' \
-                    .format(live=context.localize(provider.LOCAL_MAP['youtube.live']), time=start_time, title=snippet['title'])
-            video_item.set_title(title)
-        # set the title
-        elif not video_item.get_title():
-            video_item.set_title(snippet['title'])
+            local_datetime = utils.datetime_parser.utc_to_local(datetime)
+            video_item.set_year_from_datetime(local_datetime)
+            video_item.set_aired_from_datetime(local_datetime)
+            video_item.set_premiered_from_datetime(local_datetime)
+            video_item.set_date_from_datetime(local_datetime)
+            type_label = context.localize(provider.LOCAL_MAP[
+                'youtube.live' if video_item.live else 'youtube.upcoming'
+            ])
+            start_at = '{type_label} {start_at}'.format(
+                type_label=type_label,
+                start_at=utils.datetime_parser.get_scheduled_start(
+                    context, local_datetime
+                )
+            )
+
+        # update and set the title
+        title = video_item.get_title() or snippet['title'] or ''
+        if video_item.upcoming:
+            title = ui.italic(title)
+        video_item.set_title(title)
 
         """
         This is experimental. We try to get the most information out of the title of a video.
@@ -355,15 +370,17 @@ def update_video_infos(provider, context, video_id_dict,
         video_item.set_plot(description)
 
         # date time
-        if not datetime and 'publishedAt' in snippet and snippet['publishedAt']:
-            datetime = utils.datetime_parser.parse(snippet['publishedAt'])
-            video_item.set_aired_utc(utils.datetime_parser.strptime(snippet['publishedAt']))
-
-        if datetime:
-            video_item.set_year_from_datetime(datetime)
-            video_item.set_aired_from_datetime(datetime)
-            video_item.set_premiered_from_datetime(datetime)
-            video_item.set_date_from_datetime(datetime)
+        published_at = snippet.get('publishedAt')
+        if published_at:
+            datetime = utils.datetime_parser.parse(published_at, as_utc=True)
+            video_item.set_added_utc(datetime)
+            local_datetime = utils.datetime_parser.utc_to_local(datetime)
+            video_item.set_dateadded_from_datetime(local_datetime)
+            if not start_at:
+                video_item.set_year_from_datetime(local_datetime)
+                video_item.set_aired_from_datetime(local_datetime)
+                video_item.set_premiered_from_datetime(local_datetime)
+                video_item.set_date_from_datetime(local_datetime)
 
         # try to find a better resolution for the image
         image = video_item.get_image()

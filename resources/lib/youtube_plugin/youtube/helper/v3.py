@@ -23,8 +23,6 @@ def _process_list_response(provider, context, json_data):
 
     result = []
 
-    is_upcoming = False
-
     thumb_size = context.get_settings().use_thumbnail_size()
     yt_items = json_data.get('items', [])
     if not yt_items:
@@ -208,7 +206,6 @@ def _process_list_response(provider, context, json_data):
             if kind == 'video':
                 video_id = yt_item['id']['videoId']
                 snippet = yt_item.get('snippet', {})
-                is_upcoming = snippet.get('liveBroadcastContent', '').lower() == 'upcoming'
                 title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
                 item_params = {'video_id': video_id}
@@ -271,7 +268,7 @@ def _process_list_response(provider, context, json_data):
     # this will also update the channel_id_dict with the correct channel id for each video.
     channel_items_dict = {}
     utils.update_video_infos(provider, context, video_id_dict, playlist_item_id_dict, channel_items_dict,
-                             live_details=is_upcoming, use_play_data=use_play_data)
+                             live_details=True, use_play_data=use_play_data)
     utils.update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict)
     utils.update_channel_infos(provider, context, channel_id_dict, subscription_id_dict, channel_items_dict)
     if video_id_dict or playlist_id_dict:

@@ -400,13 +400,10 @@ class YouTube(LoginClient):
                 items.append(item)
 
         # Finally sort items per page by date for a better distribution
-        now = datetime_parser.now()
         sorted_items.sort(
             key=lambda a: (
                 a['page_number'],
-                datetime_parser.total_seconds(
-                    now - datetime_parser.parse(a['snippet']['publishedAt'])
-                )
+                -datetime_parser.parse(a['snippet']['publishedAt']).timestamp()
             ),
         )
 

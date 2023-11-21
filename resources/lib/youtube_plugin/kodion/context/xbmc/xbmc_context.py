@@ -98,7 +98,13 @@ class XbmcContext(AbstractContext):
     def is_plugin_path(self, uri, uri_path):
         return uri.startswith('plugin://%s/%s/' % (self.get_id(), uri_path))
 
-    def format_date_short(self, date_obj):
+    @staticmethod
+    def format_date_short(date_obj, short_isoformat=False):
+        if short_isoformat:
+            if isinstance(date_obj, datetime.datetime):
+                date_obj = date_obj.date()
+            return date_obj.isoformat()
+            
         date_format = xbmc.getRegion('dateshort')
         _date_obj = date_obj
         if isinstance(_date_obj, datetime.date):
@@ -106,7 +112,11 @@ class XbmcContext(AbstractContext):
 
         return _date_obj.strftime(date_format)
 
-    def format_time(self, time_obj):
+    @staticmethod
+    def format_time(time_obj, short_isoformat=False):
+        if short_isoformat:
+            return '{:02d}:{:02d}'.format(time_obj.hour, time_obj.minute)
+
         time_format = xbmc.getRegion('time')
         _time_obj = time_obj
         if isinstance(_time_obj, datetime.time):

@@ -143,12 +143,12 @@ def to_video_item(context, video_item):
 
     list_item = ListItem(**kwargs)
 
-    published_at = video_item.get_aired_utc()
+    published_at = video_item.get_added_utc()
     scheduled_start = video_item.get_scheduled_start_utc()
-    datetime_string = scheduled_start or published_at
+    datetime = scheduled_start or published_at
     local_datetime = None
-    if datetime_string:
-        local_datetime = datetime_parser.utc_to_local(datetime_string)
+    if datetime:
+        local_datetime = datetime_parser.utc_to_local(datetime)
         props['PublishedLocal'] = str(local_datetime)
     if video_item.live:
         props['PublishedSince'] = context.localize('30539')

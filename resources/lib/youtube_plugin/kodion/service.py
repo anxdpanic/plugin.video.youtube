@@ -38,10 +38,9 @@ def get_stamp_diff(current_stamp):
         stamp_datetime = datetime(*(strptime(current_stamp, stamp_format)[0:6]))
 
     time_delta = current_datetime - stamp_datetime
-    total_seconds = 0
     if time_delta:
-        total_seconds = ((time_delta.seconds + time_delta.days * 24 * 3600) * 10 ** 6) // (10 ** 6)
-    return total_seconds
+        return time_delta.total_seconds()
+    return 0
 
 
 def run():

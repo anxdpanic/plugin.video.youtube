@@ -101,7 +101,6 @@ class FunctionCache(Storage):
         diff_seconds = 0
 
         if cached_time is not None:
-            # this is so stupid, but we have the function 'total_seconds' only starting with python 2.7
             diff_seconds = self.get_seconds_diff(cached_time)
 
         if cached_data is None or diff_seconds > seconds:

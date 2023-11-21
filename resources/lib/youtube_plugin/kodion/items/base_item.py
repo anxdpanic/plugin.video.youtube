@@ -35,7 +35,9 @@ class BaseItem(object):
         self._fanart = fanart
         self._context_menu = None
         self._replace_context_menu = False
+        self._added_utc = None
         self._date = None
+        self._dateadded = None
 
         self._next_page = False
 
@@ -103,12 +105,36 @@ class BaseItem(object):
         self._date = date.isoformat(sep=' ')
 
     def set_date_from_datetime(self, date_time):
-        self.set_date(year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour,
-                      minute=date_time.minute, second=date_time.second)
+        self.set_date(year=date_time.year,
+                      month=date_time.month,
+                      day=date_time.day,
+                      hour=date_time.hour,
+                      minute=date_time.minute,
+                      second=date_time.second)
+
+    def set_dateadded(self, year, month, day, hour=0, minute=0, second=0):
+        date = datetime.datetime(year, month, day, hour, minute, second)
+        self._dateadded = date.isoformat(sep=' ')
+
+    def set_dateadded_from_datetime(self, date_time):
+        self.set_dateadded(year=date_time.year,
+                           month=date_time.month,
+                           day=date_time.day,
+                           hour=date_time.hour,
+                           minute=date_time.minute,
+                           second=date_time.second)
+
+    def set_added_utc(self, dt):
+        self._added_utc = dt
+
+    def get_added_utc(self):
+        return self._added_utc
 
     def get_date(self):
         return self._date
 
+    def get_dateadded(self):
+        return self._dateadded
     @property
     def next_page(self):
         return self._next_page

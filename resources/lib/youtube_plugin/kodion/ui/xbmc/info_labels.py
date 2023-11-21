@@ -130,8 +130,8 @@ def create_from_item(base_item):
         # 'artist' = [] (list)
         _process_list_value(info_labels, 'artist', base_item.get_artist())
 
-        # 'dateadded' = '2014-08-11 13:08:56' (string) will be taken from 'date'
-        _process_video_dateadded(info_labels, base_item.get_date())
+        # 'dateadded' = '2014-08-11 13:08:56' (string) will be taken from 'dateadded'
+        _process_video_dateadded(info_labels, base_item.get_dateadded())
 
         # TODO: starting with Helix this could be seconds
         # 'duration' = '3:18' (string)

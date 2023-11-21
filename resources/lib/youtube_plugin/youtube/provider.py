@@ -104,6 +104,7 @@ class Provider(AbstractProvider):
                  'youtube.playlist.play.from_here': 30537,
                  'youtube.video.disliked': 30538,
                  'youtube.live': 30539,
+                 'youtube.upcoming': 30766,
                  'youtube.video.play_with': 30540,
                  'youtube.error.rtmpe_not_supported': 30542,
                  'youtube.refresh': 30543,

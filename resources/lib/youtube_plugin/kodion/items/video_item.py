@@ -23,7 +23,6 @@ class VideoItem(BaseItem):
         super(VideoItem, self).__init__(name, uri, image, fanart)
         self._genre = None
         self._aired = None
-        self._aired_utc = None
         self._scheduled_start_utc = None
         self._duration = None
         self._director = None
@@ -46,6 +45,7 @@ class VideoItem(BaseItem):
         self._start_percent = None
         self._start_time = None
         self._live = False
+        self._upcoming = False
         self.subtitles = None
         self._headers = None
         self.license_key = None
@@ -186,12 +186,6 @@ class VideoItem(BaseItem):
         date = datetime.date(year, month, day)
         self._aired = date.isoformat()
 
-    def set_aired_utc(self, dt):
-        self._aired_utc = dt
-
-    def get_aired_utc(self):
-        return self._aired_utc
-
     def set_aired_from_datetime(self, date_time):
         self.set_aired(year=date_time.year,
                        month=date_time.month,
@@ -211,6 +205,14 @@ class VideoItem(BaseItem):
     def live(self, value):
         self._live = value
 
+    @property
+    def upcoming(self):
+        return self._upcoming
+
+    @upcoming.setter
+    def upcoming(self, value):
+        self._upcoming = value
+
     def get_aired(self):
         return self._aired
 
@@ -219,21 +221,6 @@ class VideoItem(BaseItem):
 
     def get_genre(self):
         return self._genre
-
-    def set_date(self, year, month, day, hour=0, minute=0, second=0):
-        date = datetime.datetime(year, month, day, hour, minute, second)
-        self._date = date.isoformat(sep=' ')
-
-    def set_date_from_datetime(self, date_time):
-        self.set_date(year=date_time.year,
-                      month=date_time.month,
-                      day=date_time.day,
-                      hour=date_time.hour,
-                      minute=date_time.minute,
-                      second=date_time.second)
-
-    def get_date(self):
-        return self._date
 
     def set_isa_video(self, value=True):
         self._uses_isa = value
