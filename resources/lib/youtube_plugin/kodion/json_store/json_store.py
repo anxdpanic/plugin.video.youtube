@@ -9,13 +9,13 @@
 
 import os
 import json
-from copy import deepcopy
 
 import xbmcaddon
 import xbmcvfs
 import xbmc
 
-from .. import logger
+from ..logger import log_debug, log_error
+from ..utils import make_dirs
 
 
 try:
@@ -34,53 +34,74 @@ class JSONStore(object):
         except AttributeError:
             self.base_path = xbmc.translatePath(addon.getAddonInfo('profile'))
 
-        self.filename = os.path.join(self.base_path, filename)
+        if not xbmcvfs.exists(self.base_path) and not make_dirs(self.base_path):
+            log_error('JSONStore.__init__ |{path}| invalid path'.format(
+                path=self.base_path
+            ))
+            return
 
-        self._data = None
+        self.filename = os.path.join(self.base_path, filename)
+        self._data = {}
         self.load()
         self.set_defaults()
 
-    def set_defaults(self):
+    def set_defaults(self, reset=False):
         raise NotImplementedError
 
     def save(self, data):
-        if data != self._data:
-            self._data = deepcopy(data)
-            if not xbmcvfs.exists(self.base_path):
-                if not self.make_dirs(self.base_path):
-                    logger.log_debug('JSONStore Save |{filename}| failed to create directories.'.format(filename=self.filename.encode("utf-8")))
-                    return
-            with open(self.filename, 'w') as jsonfile:
-                logger.log_debug('JSONStore Save |{filename}|'.format(filename=self.filename.encode("utf-8")))
-                json.dump(self._data, jsonfile, indent=4, sort_keys=True)
+        if data == self._data:
+            log_debug('JSONStore.save |{filename}| data unchanged'.format(
+                    filename=self.filename
+            ))
+            return
+        log_debug('JSONStore.save |{filename}|'.format(
+            filename=self.filename
+        ))
+        try:
+            if not data:
+                raise ValueError
+            _data = json.loads(json.dumps(data))
+            with open(self.filename, mode='w', encoding='utf-8') as jsonfile:
+                json.dump(_data, jsonfile, indent=4, sort_keys=True)
+            self._data = _data
+        except (IOError, OSError):
+            log_error('JSONStore.save |{filename}| no access to file'.format(
+                filename=self.filename
+            ))
+            return
+        except (TypeError, ValueError):
+            log_error('JSONStore.save |{data}| invalid data'.format(
+                data=data
+            ))
+            self.set_defaults(reset=True)
 
     def load(self):
-        if xbmcvfs.exists(self.filename) and xbmcvfs.Stat(self.filename).st_size() > 0:
-            with open(self.filename, 'r') as jsonfile:
-                data = json.load(jsonfile)
-                self._data = data
-                logger.log_debug('JSONStore Load |{filename}|'.format(filename=self.filename.encode("utf-8")))
-        else:
-            self._data = dict()
+        log_debug('JSONStore.load |{filename}|'.format(
+            filename=self.filename
+        ))
+        try:
+            with open(self.filename, mode='r', encoding='utf-8') as jsonfile:
+                data = jsonfile.read()
+            if not data:
+                raise ValueError
+            self._data = json.loads(data)
+        except (IOError, OSError):
+            log_error('JSONStore.load |{filename}| no access to file'.format(
+                filename=self.filename
+            ))
+        except (TypeError, ValueError):
+            log_error('JSONStore.load |{data}| invalid data'.format(
+                data=data
+            ))
 
     def get_data(self):
-        return deepcopy(self._data)
-
-    @staticmethod
-    def make_dirs(path):
-        if not path.endswith('/'):
-            path = ''.join([path, '/'])
-        path = xbmc.translatePath(path)
-        if not xbmcvfs.exists(path):
-            try:
-                _ = xbmcvfs.mkdirs(path)
-            except:
-                pass
-            if not xbmcvfs.exists(path):
-                try:
-                    os.makedirs(path)
-                except:
-                    pass
-            return xbmcvfs.exists(path)
-
-        return True
+        try:
+            if not self._data:
+                raise ValueError
+            return json.loads(json.dumps(self._data))
+        except (TypeError, ValueError):
+            log_error('JSONStore.get_data |{data}| invalid data'.format(
+                data=self._data
+            ))
+            self.set_defaults(reset=True)
+        return json.loads(json.dumps(self._data))

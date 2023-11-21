@@ -16,8 +16,8 @@ class LoginTokenStore(JSONStore):
     def __init__(self):
         super(LoginTokenStore, self).__init__('access_manager.json')
 
-    def set_defaults(self):
-        data = self.get_data()
+    def set_defaults(self, reset=False):
+        data = {} if reset else self.get_data()
         if 'access_manager' not in data:
             data = {'access_manager': {'users': {'0': {'access_token': '', 'refresh_token': '', 'token_expires': -1,
                                                        'last_key_hash': '', 'name': 'Default', 'watch_later': ' WL', 'watch_history': 'HL'}}}}
