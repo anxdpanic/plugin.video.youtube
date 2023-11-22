@@ -169,16 +169,62 @@ class XbmcContextUI(AbstractContextUI):
         xbmcgui.Window(10000).clearProperty(property_id)
 
     @staticmethod
-    def bold(value):
-        return ''.join(['[B]', value, '[/B]'])
+    def bold(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[B]', value, '[/B]',
+            '[CR]' * cr_after,
+        ))
 
     @staticmethod
-    def uppercase(value):
-        return ''.join(['[UPPERCASE]', value, '[/UPPERCASE]'])
+    def uppercase(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[UPPERCASE]', value, '[/UPPERCASE]',
+            '[CR]' * cr_after,
+        ))
 
     @staticmethod
-    def color(color, value):
-        return ''.join(['[COLOR=', color.lower(), ']', value, '[/COLOR]'])
+    def color(color, value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[COLOR=', color.lower(), ']', value, '[/COLOR]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def light(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[LIGHT]', value, '[/LIGHT]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def italic(value, cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[I]', value, '[/I]',
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def indent(number=1, value='', cr_before=0, cr_after=0):
+        return ''.join((
+            '[CR]' * cr_before,
+            '[TABS]', str(number), '[/TABS]', value,
+            '[CR]' * cr_after,
+        ))
+
+    @staticmethod
+    def new_line(value=1, cr_before=0, cr_after=0):
+        if isinstance(value, int):
+            return '[CR]' * value
+        return ''.join((
+            '[CR]' * cr_before,
+            value,
+            '[CR]' * cr_after,
+        ))
 
     def set_focus_next_item(self):
         cid = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
