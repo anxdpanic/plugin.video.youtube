@@ -16,17 +16,20 @@ from ...kodion.items import DirectoryItem
 from ...youtube.helper import yt_context_menu
 
 try:
-    import inputstreamhelper
+    from inputstreamhelper import Helper as ISHelper
 except ImportError:
-    inputstreamhelper = None
+    ISHelper = None
 
-__RE_SEASON_EPISODE_MATCHES__ = [re.compile(r'Part (?P<episode>\d+)'),
-                                 re.compile(r'#(?P<episode>\d+)'),
-                                 re.compile(r'Ep.[^\w]?(?P<episode>\d+)'),
-                                 re.compile(r'\[(?P<episode>\d+)\]'),
-                                 re.compile(r'S(?P<season>\d+)E(?P<episode>\d+)'),
-                                 re.compile(r'Season (?P<season>\d+)(.+)Episode (?P<episode>\d+)'),
-                                 re.compile(r'Episode (?P<episode>\d+)')]
+
+__RE_SEASON_EPISODE_MATCHES__ = [
+    re.compile(r'Part (?P<episode>\d+)'),
+    re.compile(r'#(?P<episode>\d+)'),
+    re.compile(r'Ep.[^\w]?(?P<episode>\d+)'),
+    re.compile(r'\[(?P<episode>\d+)\]'),
+    re.compile(r'S(?P<season>\d+)E(?P<episode>\d+)'),
+    re.compile(r'Season (?P<season>\d+)(.+)Episode (?P<episode>\d+)'),
+    re.compile(r'Episode (?P<episode>\d+)'),
+]
 
 
 def extract_urls(text):
@@ -113,7 +116,9 @@ def update_channel_infos(provider, context, channel_id_dict,
         subscription_id_dict = {}
 
     filter_list = []
-    if context.get_path() == '/subscriptions/list/':
+    logged_in = provider.is_logged_in()
+    path = context.get_path()
+    if path == '/subscriptions/list/':
         filter_string = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.list', '')
         filter_string = filter_string.replace(', ', ',')
         filter_list = filter_string.split(',')
@@ -143,10 +148,10 @@ def update_channel_infos(provider, context, channel_id_dict,
             channel_item.set_channel_subscription_id(subscription_id)
             yt_context_menu.append_unsubscribe_from_channel(context_menu, provider, context, subscription_id)
         # -- subscribe to the channel
-        if provider.is_logged_in() and context.get_path() != '/subscriptions/list/':
+        if logged_in and path != '/subscriptions/list/':
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
 
-        if context.get_path() == '/subscriptions/list/':
+        if path == '/subscriptions/list/':
             channel = title.lower().replace(',', '')
             if channel in filter_list:
                 yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
@@ -187,6 +192,8 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     access_manager = context.get_access_manager()
     custom_watch_later_id = access_manager.get_watch_later_id()
     custom_history_id = access_manager.get_watch_history_id()
+    logged_in = provider.is_logged_in()
+    path = context.get_path()
     thumb_size = context.get_settings().use_thumbnail_size()
 
     for playlist_id, yt_item in data.items():
@@ -200,14 +207,14 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
         channel_id = snippet['channelId']
         # if the path directs to a playlist of our own, we correct the channel id to 'mine'
-        if context.get_path() == '/channel/mine/playlists/':
+        if path == '/channel/mine/playlists/':
             channel_id = 'mine'
         channel_name = snippet.get('channelTitle', '')
         context_menu = []
         # play all videos of the playlist
         yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id)
 
-        if provider.is_logged_in():
+        if logged_in:
             if channel_id != 'mine':
                 # subscribe to the channel via the playlist item
                 yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id,
@@ -265,14 +272,15 @@ def update_video_infos(provider, context, video_id_dict,
         playlist_item_id_dict = {}
 
     settings = context.get_settings()
-    show_details = settings.show_detailed_description()
     alternate_player = settings.is_support_alternative_player_enabled()
+    logged_in = provider.is_logged_in()
+    path = context.get_path()
+    show_details = settings.show_detailed_description()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
     ui = context.get_ui()
 
     for video_id, yt_item in data.items():
-        datetime = None
         video_item = video_id_dict[video_id]
 
         # set mediatype
@@ -439,7 +447,7 @@ def update_video_infos(provider, context, video_id_dict,
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        some_playlist_match = re.match(r'^(/channel/([^/]+))/playlist/(?P<playlist_id>[^/]+)/$', context.get_path())
+        some_playlist_match = re.match(r'^(/channel/([^/]+))/playlist/(?P<playlist_id>[^/]+)/$', path)
         if some_playlist_match:
             replace_context_menu = True
             playlist_id = some_playlist_match.group('playlist_id')
@@ -451,7 +459,7 @@ def update_video_infos(provider, context, video_id_dict,
         if alternate_player:
             yt_context_menu.append_play_with(context_menu, provider, context)
 
-        if provider.is_logged_in():
+        if logged_in:
             # add 'Watch Later' only if we are not in my 'Watch Later' list
             watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
             if watch_later_playlist_id:
@@ -459,7 +467,7 @@ def update_video_infos(provider, context, video_id_dict,
 
             # provide 'remove' for videos in my playlists
             if video_id in playlist_item_id_dict:
-                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', context.get_path())
+                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', path)
                 if playlist_match:
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
@@ -470,8 +478,10 @@ def update_video_infos(provider, context, video_id_dict,
                         context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
                                              'RunPlugin(%s)' % context.create_uri(
                                                  ['playlist', 'remove', 'video'],
-                                                 {'playlist_id': playlist_id, 'video_id': playlist_item_id,
-                                                  'video_name': video_item.get_name()})))
+                                                 {'playlist_id': playlist_id,
+                                                  'video_id': playlist_item_id,
+                                                  'video_name': video_item.get_name()}
+                                             )))
 
             is_history = re.match('^/special/watch_history_tv/$', context.get_path())
             if is_history:
@@ -479,11 +489,11 @@ def update_video_infos(provider, context, video_id_dict,
 
         # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
         if (channel_id and channel_name and
-                utils.create_path('channel', channel_id) != context.get_path()):
+                utils.create_path('channel', channel_id) != path):
             video_item.set_channel_id(channel_id)
             yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
 
-        if provider.is_logged_in():
+        if logged_in:
             # subscribe to the channel of the video
             video_item.set_subscription_id(channel_id)
             yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
@@ -498,16 +508,15 @@ def update_video_infos(provider, context, video_id_dict,
                 yt_context_menu.append_reset_resume_point(context_menu, provider, context, video_id)
 
         # more...
-        refresh_container = \
-            context.get_path().startswith('/channel/mine/playlist/LL') or \
-            context.get_path() == '/special/disliked_videos/'
-        yt_context_menu.append_more_for_video(context_menu, provider, context, video_id,
-                                              is_logged_in=provider.is_logged_in(),
+        refresh_container = (path.startswith('/channel/mine/playlist/LL')
+                             or path == '/special/disliked_videos/')
+        yt_context_menu.append_more_for_video(context_menu, context, video_id,
+                                              is_logged_in=logged_in,
                                               refresh_container=refresh_container)
 
         if not video_item.live:
-            yt_context_menu.append_play_with_subtitles(context_menu, provider, context, video_id)
-            yt_context_menu.append_play_audio_only(context_menu, provider, context, video_id)
+            yt_context_menu.append_play_with_subtitles(context_menu, context, video_id)
+            yt_context_menu.append_play_audio_only(context_menu, context, video_id)
 
         yt_context_menu.append_play_ask_for_quality(context_menu, provider, context, video_id)
 
@@ -515,22 +524,26 @@ def update_video_infos(provider, context, video_id_dict,
             video_item.set_context_menu(context_menu, replace=replace_context_menu)
 
 
-def update_play_info(provider, context, video_id, video_item, video_stream, use_play_data=True):
+def update_play_info(provider, context, video_id, video_item, video_stream,
+                     use_play_data=True):
+    video_item.video_id = video_id
+    update_video_infos(provider,
+                       context,
+                       {video_id: video_item},
+                       use_play_data=use_play_data)
+
     settings = context.get_settings()
     ui = context.get_ui()
-    resource_manager = provider.get_resource_manager(context)
-
-    video_data = resource_manager.get_videos([video_id], suppress_errors=True)
 
     meta_data = video_stream.get('meta', None)
-    thumb_size = settings.use_thumbnail_size()
-    image = None
-
-    video_item.video_id = video_id
-
     if meta_data:
         video_item.set_subtitles(meta_data.get('subtitles', None))
-        image = get_thumbnail(thumb_size, meta_data.get('images', {}))
+        image = get_thumbnail(settings.use_thumbnail_size(),
+                              meta_data.get('images', {}))
+        if image:
+            if video_item.live:
+                image = ''.join([image, '?ct=', get_thumb_timestamp()])
+            video_item.set_image(image)
 
     if 'headers' in video_stream:
         video_item.set_headers(video_stream['headers'])
@@ -542,110 +555,16 @@ def update_play_info(provider, context, video_id, video_item, video_stream, use_
         video_item.set_isa_video(settings.use_isa())
 
     license_info = video_stream.get('license_info', {})
+    license_proxy = license_info.get('proxy', '')
+    license_url = license_info.get('url', '')
+    license_token = license_info.get('token', '')
 
-    if inputstreamhelper and \
-            license_info.get('proxy') and \
-            license_info.get('url') and \
-            license_info.get('token'):
-        ishelper = inputstreamhelper.Helper('mpd', drm='com.widevine.alpha')
-        ishelper.check_inputstream()
+    if ISHelper and license_proxy and license_url and license_token:
+        ISHelper('mpd', drm='com.widevine.alpha').check_inputstream()
 
-    video_item.set_license_key(license_info.get('proxy'))
-    ui.set_home_window_property('license_url', license_info.get('url'))
-    ui.set_home_window_property('license_token', license_info.get('token'))
-
-    """
-    This is experimental. We try to get the most information out of the title of a video.
-    This is not based on any language. In some cases this won't work at all.
-    TODO: via language and settings provide the regex for matching episode and season.
-    """
-
-    for regex in __RE_SEASON_EPISODE_MATCHES__:
-        re_match = regex.search(video_item.get_name())
-        if re_match:
-            if 'season' in re_match.groupdict():
-                video_item.set_season(int(re_match.group('season')))
-
-            if 'episode' in re_match.groupdict():
-                video_item.set_episode(int(re_match.group('episode')))
-            break
-
-    if video_item.live:
-        video_item.set_play_count(0)
-
-    if image:
-        if video_item.live:
-            image = ''.join([image, '?ct=', get_thumb_timestamp()])
-        video_item.set_image(image)
-
-    # set fanart
-    video_item.set_fanart(provider.get_fanart(context))
-
-    if not video_data:
-        return video_item
-
-    # requires API
-    # ===============
-    yt_item = video_data[video_id]
-
-    snippet = yt_item['snippet']  # crash if not conform
-    play_data = use_play_data and yt_item.get('play_data')
-    video_item.live = snippet.get('liveBroadcastContent') == 'live'
-
-    # set the title
-    if not video_item.get_title():
-        video_item.set_title(snippet['title'])
-
-    # duration
-    if not video_item.live and play_data and 'total_time' in play_data:
-        duration = play_data['total_time']
-    else:
-        duration = yt_item.get('contentDetails', {}).get('duration')
-        if duration:
-            # subtract 1s because YouTube duration is +1s too long
-            duration = utils.datetime_parser.parse(duration).seconds - 1
-    if duration:
-        video_item.set_duration_from_seconds(duration)
-
-    if not video_item.live and play_data:
-        if 'play_count' in play_data:
-            video_item.set_play_count(play_data['play_count'])
-
-        if 'played_percent' in play_data:
-            video_item.set_start_percent(play_data['played_percent'])
-
-        if 'played_time' in play_data:
-            video_item.set_start_time(play_data['played_time'])
-
-        if 'last_played' in play_data:
-            video_item.set_last_played(play_data['last_played'])
-
-    # plot
-    channel_name = snippet.get('channelTitle', '')
-    description = utils.strip_html_from_text(snippet['description'])
-    if channel_name and settings.get_bool('youtube.view.description.show_channel_name', True):
-        description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
-    video_item.set_studio(channel_name)
-    # video_item.add_cast(channel_name)
-    video_item.add_artist(channel_name)
-    video_item.set_plot(description)
-
-    # date time
-    if 'publishedAt' in snippet and snippet['publishedAt']:
-        date_time = utils.datetime_parser.parse(snippet['publishedAt'])
-        video_item.set_year_from_datetime(date_time)
-        video_item.set_aired_from_datetime(date_time)
-        video_item.set_premiered_from_datetime(date_time)
-        video_item.set_date_from_datetime(date_time)
-
-    if not image:
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
-
-        if video_item.live and image:
-            image = ''.join([image, '?ct=', get_thumb_timestamp()])
-        video_item.set_image(image)
-
-    return video_item
+    video_item.set_license_key(license_proxy)
+    ui.set_home_window_property('license_url', license_url)
+    ui.set_home_window_property('license_token', license_token)
 
 
 def update_fanarts(provider, context, channel_items_dict, data=None):

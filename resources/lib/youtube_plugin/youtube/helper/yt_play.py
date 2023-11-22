@@ -85,8 +85,8 @@ def play_video(provider, context):
         use_remote_history = use_history and settings.use_remote_history()
         use_play_data = use_history and settings.use_local_history()
 
-        video_item = utils.update_play_info(provider, context, video_id, video_item, video_stream,
-                                            use_play_data=use_play_data)
+        utils.update_play_info(provider, context, video_id, video_item,
+                               video_stream, use_play_data=use_play_data)
 
         seek_time = None
         play_count = 0
