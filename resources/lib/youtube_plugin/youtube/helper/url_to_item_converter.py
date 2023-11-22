@@ -17,8 +17,15 @@ from . import utils
 
 
 class UrlToItemConverter(object):
-    RE_CHANNEL_ID = re.compile(r'^/channel/(?P<channel_id>.+)$')
-    RE_SHORTS_VID = re.compile(r'^/shorts/(?P<video_id>.+)$')
+    RE_CHANNEL_ID = re.compile(r'^/channel/(?P<channel_id>.+)$', re.I)
+    RE_LIVE_VID = re.compile(r'^/live/(?P<video_id>.+)$', re.I)
+    RE_SHORTS_VID = re.compile(r'^/shorts/(?P<video_id>[^?/]+)$', re.I)
+    RE_SEEK_TIME = re.compile(r'\d+')
+    VALID_HOSTNAMES = {
+        'youtube.com',
+        'www.youtube.com',
+        'm.youtube.com',
+    }
 
     def __init__(self, flatten=True):
         self._flatten = flatten
@@ -35,50 +42,78 @@ class UrlToItemConverter(object):
         self._channel_ids = []
 
     def add_url(self, url, provider, context):
-        url_components = urlparse(url)
-        if url_components.hostname.lower() in ('youtube.com', 'www.youtube.com', 'm.youtube.com'):
-            params = dict(parse_qsl(url_components.query))
-            if url_components.path.lower() == '/watch':
-                video_id = params.get('v', '')
-                if video_id:
-                    plugin_uri = context.create_uri(['play'], {'video_id': video_id})
-                    video_item = VideoItem('', plugin_uri)
-                    self._video_id_dict[video_id] = video_item
+        parsed_url = urlparse(url)
+        if parsed_url.hostname.lower() not in self.VALID_HOSTNAMES:
+            context.log_debug('Unknown hostname "{0}" in url "{1}"'.format(
+                parsed_url.hostname, url
+            ))
+            return
 
-                playlist_id = params.get('list', '')
-                if playlist_id:
-                    if self._flatten:
-                        self._playlist_ids.append(playlist_id)
-                    else:
-                        playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
-                        playlist_item.set_fanart(provider.get_fanart(context))
-                        self._playlist_id_dict[playlist_id] = playlist_item
-            elif url_components.path.lower() == '/playlist':
-                playlist_id = params.get('list', '')
-                if playlist_id:
-                    if self._flatten:
-                        self._playlist_ids.append(playlist_id)
-                    else:
-                        playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
-                        playlist_item.set_fanart(provider.get_fanart(context))
-                        self._playlist_id_dict[playlist_id] = playlist_item
-            elif self.RE_SHORTS_VID.match(url_components.path):
-                re_match = self.RE_SHORTS_VID.match(url_components.path)
-                video_id = re_match.group('video_id')
-                plugin_uri = context.create_uri(['play'], {'video_id': video_id})
-                video_item = VideoItem('', plugin_uri)
-                self._video_id_dict[video_id] = video_item
-            elif self.RE_CHANNEL_ID.match(url_components.path):
-                re_match = self.RE_CHANNEL_ID.match(url_components.path)
-                channel_id = re_match.group('channel_id')
-                if self._flatten:
-                    self._channel_ids.append(channel_id)
-                else:
-                    channel_item = DirectoryItem('', context.create_uri(['channel', channel_id]))
-                    channel_item.set_fanart(provider.get_fanart(context))
-                    self._channel_id_dict[channel_id] = channel_item
+        params = dict(parse_qsl(parsed_url.query))
+        path = parsed_url.path.lower()
+
+        video_id = playlist_id = channel_id = seek_time = None
+        if path == '/watch':
+            video_id = params.get('v')
+            playlist_id = params.get('list')
+            seek_time = params.get('t')
+        elif path == '/playlist':
+            playlist_id = params.get('list')
+        elif path.startswith('/shorts/'):
+            re_match = self.RE_SHORTS_VID.match(parsed_url.path)
+            video_id = re_match.group('video_id')
+        elif path.startswith('/channel/'):
+            re_match = self.RE_CHANNEL_ID.match(parsed_url.path)
+            channel_id = re_match.group('channel_id')
+        elif path.startswith('/live/'):
+            re_match = self.RE_LIVE_VID.match(parsed_url.path)
+            video_id = re_match.group('video_id')
+        else:
+            context.log_debug('Unknown path "{0}" in url "{1}"'.format(
+                parsed_url.path, url
+            ))
+            return
+
+        if video_id:
+            plugin_params = {
+                'video_id': video_id,
+            }
+            if seek_time:
+                seek_time = sum(
+                    int(number) * seconds_per_unit
+                    for number, seconds_per_unit in zip(
+                        reversed(re.findall(self.RE_SEEK_TIME, seek_time)),
+                        (1, 60, 3600, 86400)
+                    )
+                    if number
+                )
+                plugin_params['seek'] = seek_time
+            plugin_uri = context.create_uri(['play'], plugin_params)
+            video_item = VideoItem('', plugin_uri)
+            self._video_id_dict[video_id] = video_item
+
+        elif playlist_id:
+            if self._flatten:
+                self._playlist_ids.append(playlist_id)
             else:
-                context.log_debug('Unknown path "%s"' % url_components.path)
+                playlist_item = DirectoryItem(
+                    '', context.create_uri(['playlist', playlist_id])
+                )
+                playlist_item.set_fanart(provider.get_fanart(context))
+                self._playlist_id_dict[playlist_id] = playlist_item
+
+        elif channel_id:
+            if self._flatten:
+                self._channel_ids.append(channel_id)
+            else:
+                channel_item = DirectoryItem(
+                    '', context.create_uri(['channel', channel_id])
+                )
+                channel_item.set_fanart(provider.get_fanart(context))
+                self._channel_id_dict[channel_id] = channel_item
+
+        else:
+            context.log_debug('No items found in url "{0}"'.format(url))
 
     def add_urls(self, urls, provider, context):
         for url in urls:
@@ -91,10 +126,12 @@ class UrlToItemConverter(object):
             # remove duplicates
             self._channel_ids = list(set(self._channel_ids))
 
-            channels_item = DirectoryItem(context.get_ui().bold(context.localize(provider.LOCAL_MAP['youtube.channels'])),
-                                          context.create_uri(['special', 'description_links'],
-                                                             {'channel_ids': ','.join(self._channel_ids)}),
-                                          context.create_resource_path('media', 'playlist.png'))
+            channels_item = DirectoryItem(
+                context.get_ui().bold(context.localize(provider.LOCAL_MAP['youtube.channels'])),
+                context.create_uri(['special', 'description_links'],
+                                   {'channel_ids': ','.join(self._channel_ids)}),
+                context.create_resource_path('media', 'playlist.png')
+            )
             channels_item.set_fanart(provider.get_fanart(context))
             result.append(channels_item)
 
@@ -126,7 +163,9 @@ class UrlToItemConverter(object):
 
         if not self._video_items:
             channel_id_dict = {}
-            utils.update_video_infos(provider, context, self._video_id_dict, None, channel_id_dict, use_play_data=use_play_data)
+            utils.update_video_infos(provider, context, self._video_id_dict,
+                                     channel_items_dict=channel_id_dict,
+                                     use_play_data=use_play_data)
             utils.update_fanarts(provider, context, channel_id_dict)
 
             self._video_items = [
@@ -140,7 +179,9 @@ class UrlToItemConverter(object):
     def get_playlist_items(self, provider, context):
         if not self._playlist_items:
             channel_id_dict = {}
-            utils.update_playlist_infos(provider, context, self._playlist_id_dict, channel_id_dict)
+            utils.update_playlist_infos(provider, context,
+                                        self._playlist_id_dict,
+                                        channel_items_dict=channel_id_dict)
             utils.update_fanarts(provider, context, channel_id_dict)
 
             self._playlist_items = [

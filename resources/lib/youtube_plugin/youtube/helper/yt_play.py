@@ -88,25 +88,21 @@ def play_video(provider, context):
         utils.update_play_info(provider, context, video_id, video_item,
                                video_stream, use_play_data=use_play_data)
 
-        seek_time = None
+        seek_time = 0.0
         play_count = 0
         playback_stats = video_stream.get('playback_stats')
 
+        if not context.get_param('resume'):
+            try:
+                seek_time = context.get_param('seek', 0.0)
+            except (ValueError, TypeError):
+                pass
+
         if use_play_data:
-            seek = video_item.get_start_time()
-            if seek and context.get_param('resume'):
-                seek_time = start_time
             play_count = video_item.get_play_count() or 0
 
         item = to_playback_item(context, video_item)
         item.setPath(video_item.get_uri())
-
-        try:
-            seek = float(context.get_param('seek', None))
-            if seek:
-                seek_time = seek
-        except (ValueError, TypeError):
-            pass
 
         playback_json = {
             "video_id": video_id,

@@ -436,7 +436,7 @@ class Provider(AbstractProvider):
         resolver = UrlResolver(context)
         res_url = resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
-        url_converter.add_urls([res_url], self, context)
+        url_converter.add_url(res_url, self, context)
         items = url_converter.get_items(self, context, title_required=False)
         if items:
             return items[0]

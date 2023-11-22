@@ -139,13 +139,13 @@ class CommonResolver(AbstractResolver, list):
                     if _url_components.path == '/supported_browsers':
                         # "sometimes", we get a redirect through an URL of the form https://.../supported_browsers?next_url=<urlencoded_next_url>&further=paramaters&stuck=here
                         # put together query string from both what's encoded inside next_url and the remaining paramaters of this URL...
-                        _query = parse_qs(_url_components.query) # top-level query string
-                        _nc = urlparse(_query['next_url'][0]) # components of next_url
-                        _next_query = parse_qs(_nc.query) # query string encoded inside next_url
-                        del _query['next_url'] # remove next_url from top level query string
-                        _next_query.update(_query) # add/overwrite all other params from top level query string
-                        _next_query = dict(map(lambda kv: (kv[0], kv[1][0]), _next_query.items())) # flatten to only use first argument of each param
-                        _next_url = urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urlencode(_next_query), _nc.fragment)) # build new URL from these components
+                        _query = parse_qs(_url_components.query)  # top-level query string
+                        _nc = urlparse(_query['next_url'][0])  # components of next_url
+                        _next_query = parse_qs(_nc.query)  # query string encoded inside next_url
+                        del _query['next_url']  # remove next_url from top level query string
+                        _next_query.update(_query)  # add/overwrite all other params from top level query string
+                        _next_query = dict(map(lambda kv: (kv[0], kv[1][0]), _next_query.items()))  # flatten to only use first argument of each param
+                        _next_url = urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urlencode(_next_query), _nc.fragment))  # build new URL from these components
                         return _next_url
 
             except:
