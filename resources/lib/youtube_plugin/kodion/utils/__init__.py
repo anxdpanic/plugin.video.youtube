@@ -14,6 +14,7 @@ from .methods import (
     create_uri_path,
     find_best_fit,
     find_video_id,
+    friendly_number,
     loose_version,
     make_dirs,
     select_stream,
@@ -33,12 +34,13 @@ from .data_cache import DataCache
 from .system_version import SystemVersion
 
 
-__all__ = [
+__all__ = (
     'create_path',
     'create_uri_path',
     'datetime_parser',
     'find_best_fit',
     'find_video_id',
+    'friendly_number',
     'loose_version',
     'make_dirs',
     'select_stream',
@@ -55,4 +57,4 @@ __all__ = [
     'WatchLaterList',
     'YouTubeMonitor',
     'YouTubePlayer'
-]
+)

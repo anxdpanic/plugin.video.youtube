@@ -38,6 +38,7 @@ class BaseItem(object):
         self._added_utc = None
         self._date = None
         self._dateadded = None
+        self._short_details = None
 
         self._next_page = False
 
@@ -135,6 +136,13 @@ class BaseItem(object):
 
     def get_dateadded(self):
         return self._dateadded
+
+    def get_short_details(self):
+        return self._short_details
+
+    def set_short_details(self, details):
+        self._short_details = details or ''
+
     @property
     def next_page(self):
         return self._next_page

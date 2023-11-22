@@ -458,7 +458,7 @@ msgid "Play with..."
 msgstr ""
 
 msgctxt "#30541"
-msgid "Show channel name in description"
+msgid "Show channel name and video details in description"
 msgstr ""
 
 msgctxt "#30542"
@@ -1359,4 +1359,8 @@ msgstr ""
 
 msgctxt "#30766"
 msgid "Premieres"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Views"
 msgstr ""

@@ -669,7 +669,7 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.view.description.show_channel_name" type="boolean" label="30541" help="">
+                <setting id="youtube.view.description.details" type="boolean" label="30541" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>

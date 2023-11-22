@@ -551,7 +551,7 @@ class YouTube(LoginClient):
         if isinstance(video_id, list):
             video_id = ','.join(video_id)
 
-        parts = ['snippet,contentDetails,status']
+        parts = ['snippet,contentDetails,status,statistics']
         if live_details:
             parts.append(',liveStreamingDetails')
 

@@ -48,6 +48,7 @@ def to_play_item(context, play_item):
     kwargs = {
         'label': (None if is_strm
                   else (play_item.get_title() or play_item.get_name())),
+        'label2': None if is_strm else play_item.get_short_details(),
         'offscreen': True,
     }
     props = {
@@ -135,6 +136,7 @@ def to_video_item(context, video_item):
 
     kwargs = {
         'label': video_item.get_title() or video_item.get_name(),
+        'label2': video_item.get_short_details(),
         'offscreen': True,
     }
     props = {
@@ -218,6 +220,7 @@ def to_audio_item(context, audio_item):
 
     kwargs = {
         'label': audio_item.get_title() or audio_item.get_name(),
+        'label2': audio_item.get_short_details(),
         'offscreen': True,
     }
     props = {

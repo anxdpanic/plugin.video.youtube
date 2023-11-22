@@ -314,3 +314,6 @@ class AbstractSettings(object):
 
     def client_selection(self):
         return self.get_int(SETTINGS.CLIENT_SELECTION, 0)
+
+    def show_detailed_description(self):
+        return self.get_bool(SETTINGS.DETAILED_DESCRIPTION, True)

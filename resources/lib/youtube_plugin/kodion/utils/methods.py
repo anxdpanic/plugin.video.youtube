@@ -11,6 +11,7 @@
 import os
 import copy
 import re
+from math import floor, log
 from urllib.parse import quote
 
 from ..constants import localize
@@ -19,8 +20,21 @@ import xbmc
 import xbmcvfs
 
 
-__all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_str', 'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
+__all__ = (
+    'create_path',
+    'create_uri_path',
+    'find_best_fit',
+    'find_video_id',
+    'friendly_number',
+    'loose_version',
+    'make_dirs',
+    'print_items',
+    'select_stream',
+    'strip_html_from_text',
+    'to_str',
+    'to_unicode',
+    'to_utf8',
+)
 
 
 try:
@@ -251,3 +265,14 @@ def find_video_id(plugin_path):
     if match:
         return match.group('video_id')
     return ''
+
+
+def friendly_number(number, precision=3, scale=('', 'K', 'M', 'B')):
+    _input = float('{input:.{precision}g}'.format(
+        input=float(number), precision=precision
+    ))
+    _abs_input = abs(_input)
+    magnitude = 0 if _abs_input < 1000 else int(log(floor(_abs_input), 1000))
+    return '{output:f}'.format(
+        output=_input / 1000 ** magnitude
+    ).rstrip('0').rstrip('.') + scale[magnitude]

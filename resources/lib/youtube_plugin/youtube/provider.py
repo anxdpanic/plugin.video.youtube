@@ -200,6 +200,10 @@ class Provider(AbstractProvider):
                  'youtube.video.comments.likes': 30733,
                  'youtube.video.comments.replies': 30734,
                  'youtube.video.comments.edited': 30735,
+                 'youtube.stats.viewCount': 30767,
+                 'youtube.stats.likeCount': 30733,
+                 # 'youtube.stats.favoriteCount': 30100,
+                 'youtube.stats.commentCount': 30732,
                  }
 
     def __init__(self):

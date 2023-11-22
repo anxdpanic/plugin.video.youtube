@@ -265,7 +265,7 @@ def update_video_infos(provider, context, video_id_dict,
         playlist_item_id_dict = {}
 
     settings = context.get_settings()
-    show_channel_name = settings.get_bool('youtube.view.description.show_channel_name', True)
+    show_details = settings.show_detailed_description()
     alternate_player = settings.is_support_alternative_player_enabled()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
@@ -342,6 +342,24 @@ def update_video_infos(provider, context, video_id_dict,
             title = ui.italic(title)
         video_item.set_title(title)
 
+        stats = []
+        if 'statistics' in yt_item:
+            for stat, value in yt_item['statistics'].items():
+                label = provider.LOCAL_MAP.get('youtube.stats.' + stat)
+                if label:
+                    stats.append('{value} {name}'.format(
+                        name=context.localize(label).lower(),
+                        value=utils.friendly_number(value)
+                    ))
+            stats = ', '.join(stats)
+
+        # Used for label2, but is poorly supported in skins
+        video_details = ' | '.join((detail for detail in (
+            ui.light(stats) if stats else '',
+            ui.italic(start_at) if start_at else '',
+        ) if detail))
+        video_item.set_short_details(video_details)
+
         """
         This is experimental. We try to get the most information out of the title of a video.
         This is not based on any language. In some cases this won't work at all.
@@ -362,8 +380,14 @@ def update_video_infos(provider, context, video_id_dict,
         # plot
         channel_name = snippet.get('channelTitle', '')
         description = utils.strip_html_from_text(snippet['description'])
-        if show_channel_name and channel_name:
-            description = '%s[CR][CR]%s' % (ui.uppercase(ui.bold(channel_name)), description)
+        if show_details:
+            description = ''.join((
+                ui.bold(channel_name, cr_after=2) if channel_name else '',
+                ui.light(stats, cr_after=1) if stats else '',
+                ui.italic(start_at, cr_after=1) if start_at else '',
+                ui.new_line() if stats or start_at else '',
+                description,
+            ))
         video_item.set_studio(channel_name)
         # video_item.add_cast(channel_name)
         video_item.add_artist(channel_name)
