@@ -9,21 +9,21 @@
 """
 
 from .directory_item import DirectoryItem
-from .. import constants
+from ..constants.const_paths import SEARCH
 
 
 class SearchItem(DirectoryItem):
     def __init__(self, context, alt_name=None, image=None, fanart=None, location=False):
         name = alt_name
         if not name:
-            name = context.localize(constants.localize.SEARCH)
+            name = context.localize('search')
 
         if image is None:
             image = context.create_resource_path('media/search.png')
 
         params = {'location': location} if location else {}
 
-        super(SearchItem, self).__init__(name, context.create_uri([constants.paths.SEARCH, 'list'], params=params), image=image)
+        super(SearchItem, self).__init__(name, context.create_uri([SEARCH, 'list'], params=params), image=image)
         if fanart:
             self.set_fanart(fanart)
         else:

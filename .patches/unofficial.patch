@@ -34,7 +34,7 @@ index ff8ffd44..1306ca2c 100644
      def _process_wizard(self, context):
 +        def _setup_views(_context, _view):
 +            view_manager = utils.ViewManager(_context)
-+            if not view_manager.update_view_mode(_context.localize(self._local_map['kodion.wizard.view.%s' % _view]),
++            if not view_manager.update_view_mode(_context.localize('setup_wizard.view.%s' % _view]),
 +                                                 _view):
 +                return
 +

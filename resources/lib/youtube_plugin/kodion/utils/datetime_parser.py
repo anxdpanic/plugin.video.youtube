@@ -30,10 +30,6 @@ __EPOCH_DT__ = datetime.fromtimestamp(0)
 now = datetime.now
 
 
-def py2_utf8(text):
-    return text
-
-
 def parse(datetime_string, as_utc=True):
     offset = 0 if as_utc else None
 
@@ -88,8 +84,9 @@ def parse(datetime_string, as_utc=True):
     # abbreviated match
     abbreviated_match = __RE_MATCH_ABBREVIATED__.match(datetime_string)
     if abbreviated_match:
-        month = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'June': 6, 'Jun': 6, 'July': 7, 'Jul': 7, 'Aug': 8,
-                 'Sept': 9, 'Sep': 9, 'Oct': 10, 'Nov': 11, 'Dec': 12}
+        month = {'Jan': 1, 'Feb': 2, 'Mar': 3, 'Apr': 4, 'May': 5, 'June': 6,
+                 'Jun': 6, 'July': 7, 'Jul': 7, 'Aug': 8, 'Sept': 9, 'Sep': 9,
+                 'Oct': 10, 'Nov': 11, 'Dec': 12}
         return utc_to_local(
             dt=datetime(year=_to_int(abbreviated_match.group('year')),
                         month=month[abbreviated_match.group('month')],
@@ -138,43 +135,48 @@ def datetime_to_since(context, dt):
 
     if seconds > 0:
         if seconds < 60:
-            return py2_utf8(context.localize('30676'))
+            return context.localize('datetime.just_now')
         if 60 <= seconds < 120:
-            return py2_utf8(context.localize('30677'))
+            return context.localize('datetime.a_minute_ago')
         if 120 <= seconds < 3600:
-            return py2_utf8(context.localize('30678'))
+            return context.localize('datetime.recently')
         if 3600 <= seconds < 7200:
-            return py2_utf8(context.localize('30679'))
+            return context.localize('datetime.an_hour_ago')
         if 7200 <= seconds < 10800:
-            return py2_utf8(context.localize('30680'))
+            return context.localize('datetime.two_hours_ago')
         if 10800 <= seconds < 14400:
-            return py2_utf8(context.localize('30681'))
+            return context.localize('datetime.three_hours_ago')
         if use_yesterday and dt.date() == yesterday.date():
-            return ' '.join([py2_utf8(context.localize('30682')), context.format_time(dt)])
+            return ' '.join((context.localize('datetime.yesterday_at'),
+                             context.format_time(dt)))
         if dt.date() == yyesterday.date():
-            return py2_utf8(context.localize('30683'))
+            return context.localize('datetime.two_days_ago')
         if 5400 <= seconds < 86400:
-            return ' '.join([py2_utf8(context.localize('30684')), context.format_time(dt)])
+            return ' '.join((context.localize('datetime.today_at'),
+                             context.format_time(dt)))
         if 86400 <= seconds < 172800:
-            return ' '.join([py2_utf8(context.localize('30682')), context.format_time(dt)])
+            return ' '.join((context.localize('datetime.yesterday_at'),
+                             context.format_time(dt)))
     else:
         seconds *= -1
         if seconds < 60:
-            return py2_utf8(context.localize('30691'))
+            return context.localize('datetime.airing_now')
         if 60 <= seconds < 120:
-            return py2_utf8(context.localize('30692'))
+            return context.localize('datetime.in_a_minute')
         if 120 <= seconds < 3600:
-            return py2_utf8(context.localize('30693'))
+            return context.localize('datetime.airing_soon')
         if 3600 <= seconds < 7200:
-            return py2_utf8(context.localize('30694'))
+            return context.localize('datetime.in_over_an_hour')
         if 7200 <= seconds < 10800:
-            return py2_utf8(context.localize('30695'))
+            return context.localize('datetime.in_over_two_hours')
         if dt.date() == today:
-            return ' '.join([py2_utf8(context.localize('30696')), context.format_time(dt)])
+            return ' '.join((context.localize('datetime.airing_today_at'),
+                             context.format_time(dt)))
         if dt.date() == tomorrow:
-            return ' '.join([py2_utf8(context.localize('30697')), context.format_time(dt)])
+            return ' '.join((context.localize('datetime.tomorrow_at'),
+                             context.format_time(dt)))
 
-    return ' '.join([context.format_date_short(dt), context.format_time(dt)])
+    return ' '.join((context.format_date_short(dt), context.format_time(dt)))
 
 
 def strptime(s, fmt='%Y-%m-%dT%H:%M:%S.%fZ'):

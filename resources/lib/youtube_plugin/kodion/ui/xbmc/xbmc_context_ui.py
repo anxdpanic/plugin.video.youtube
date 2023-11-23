@@ -14,7 +14,6 @@ import xbmcgui
 from .xbmc_progress_dialog import XbmcProgressDialog
 from .xbmc_progress_dialog_bg import XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
-from ... import constants
 from ... import utils
 
 
@@ -72,12 +71,12 @@ class XbmcContextUI(AbstractContextUI):
         return dialog.ok(title, text)
 
     def on_remove_content(self, content_name):
-        text = self._context.localize(constants.localize.REMOVE_CONTENT) % utils.to_unicode(content_name)
-        return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_REMOVE), text)
+        text = self._context.localize('content.remove') % utils.to_unicode(content_name)
+        return self.on_yes_no_input(self._context.localize('content.remove.confirm'), text)
 
     def on_delete_content(self, content_name):
-        text = self._context.localize(constants.localize.DELETE_CONTENT) % utils.to_unicode(content_name)
-        return self.on_yes_no_input(self._context.localize(constants.localize.CONFIRM_DELETE), text)
+        text = self._context.localize('content.delete') % utils.to_unicode(content_name)
+        return self.on_yes_no_input(self._context.localize('content.delete.confirm'), text)
 
     def on_select(self, title, items=None):
         if items is None:

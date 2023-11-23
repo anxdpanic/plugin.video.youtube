@@ -55,157 +55,6 @@ except AttributeError:
 
 
 class Provider(AbstractProvider):
-    LOCAL_MAP = {'youtube.search': 30102,
-                 'youtube.next_page': 30106,
-                 'youtube.watch_later': 30107,
-                 'youtube.video.rate.none': 30108,
-                 'youtube.remove': 30108,
-                 'youtube.sign.in': 30111,
-                 'youtube.sign.out': 30112,
-                 'youtube.rename': 30113,
-                 'youtube.delete': 30118,
-                 'youtube.api.key': 30201,
-                 'youtube.api.id': 30202,
-                 'youtube.api.secret': 30203,
-                 'youtube.channels': 30500,
-                 'youtube.playlists': 30501,
-                 'youtube.go_to_channel': 30502,
-                 'youtube.subscriptions': 30504,
-                 'youtube.unsubscribe': 30505,
-                 'youtube.subscribe': 30506,
-                 'youtube.my_channel': 30507,
-                 'youtube.video.liked': 30508,
-                 'youtube.history': 30509,
-                 'youtube.my_subscriptions': 30510,
-                 'youtube.video.queue': 30511,
-                 'youtube.browse_channels': 30512,
-                 'youtube.popular_right_now': 30513,
-                 'youtube.related_videos': 30514,
-                 'youtube.setting.auto_remove_watch_later': 30515,
-                 'youtube.subscribe_to': 30517,
-                 'youtube.sign.go_to': 30518,
-                 'youtube.sign.enter_code': 30519,
-                 'youtube.video.add_to_playlist': 30520,
-                 'youtube.playlist.select': 30521,
-                 'youtube.playlist.create': 30522,
-                 'youtube.setup_wizard.select_language': 30524,
-                 'youtube.setup_wizard.select_region': 30525,
-                 'youtube.setup_wizard.adjust': 30526,
-                 'youtube.setup_wizard.adjust.language_and_region': 30527,
-                 'youtube.video.rate': 30528,
-                 'youtube.video.rate.like': 30529,
-                 'youtube.video.rate.dislike': 30530,
-                 'youtube.playlist.play.all': 30531,
-                 'youtube.playlist.play.default': 30532,
-                 'youtube.playlist.play.reverse': 30533,
-                 'youtube.playlist.play.shuffle': 30534,
-                 'youtube.playlist.play.select': 30535,
-                 'youtube.playlist.progress.updating': 30536,
-                 'youtube.playlist.play.from_here': 30537,
-                 'youtube.video.disliked': 30538,
-                 'youtube.live': 30539,
-                 'youtube.upcoming': 30766,
-                 'youtube.video.play_with': 30540,
-                 'youtube.error.rtmpe_not_supported': 30542,
-                 'youtube.refresh': 30543,
-                 'youtube.video.description.links': 30544,
-                 'youtube.video.description.links.not_found': 30545,
-                 'youtube.sign.twice.title': 30546,
-                 'youtube.sign.twice.text': 30547,
-                 'youtube.video.more': 30548,
-                 'youtube.error.no_video_streams_found': 30549,
-                 'youtube.recommendations': 30551,
-                 'youtube.function.cache': 30557,
-                 'youtube.search.history': 30558,
-                 'youtube.subtitle.language': 30560,
-                 'youtube.none': 30561,
-                 'youtube.prompt': 30566,
-                 'youtube.set.as.watchlater': 30567,
-                 'youtube.remove.as.watchlater': 30568,
-                 'youtube.set.as.history': 30571,
-                 'youtube.remove.as.history': 30572,
-                 'youtube.succeeded': 30575,
-                 'youtube.failed': 30576,
-                 'youtube.settings': 30577,
-                 'youtube.mpd.enable.confirm': 30579,
-                 'youtube.reset.access.manager.confirm': 30581,
-                 'youtube.my_subscriptions_filtered': 30584,
-                 'youtube.add.my_subscriptions.filter': 30587,
-                 'youtube.remove.my_subscriptions.filter': 30588,
-                 'youtube.added.my_subscriptions.filter': 30589,
-                 'youtube.removed.my_subscriptions.filter': 30590,
-                 'youtube.updated_': 30597,
-                 'youtube.api.personal.enabled': 30598,
-                 'youtube.api.personal.failed': 30599,
-                 'youtube.subtitle._with_fallback': 30601,
-                 'youtube.subtitle.no.auto.generated': 30602,
-                 'youtube.quick.search': 30605,
-                 'youtube.quick.search.incognito': 30606,
-                 'youtube.clear_history': 30609,
-                 'youtube.clear_history_confirmation': 30610,
-                 'youtube.saved.playlists': 30611,
-                 'youtube.retry': 30612,
-                 'youtube.failed.watch_later.retry': 30614,
-                 'youtube.cancel': 30615,
-                 'youtube.must.be.signed.in': 30616,
-                 'youtube.select.listen.ip': 30644,
-                 'youtube.purchases': 30622,
-                 'youtube.requires.krypton': 30624,
-                 'youtube.inputstreamhelper.is.installed': 30625,
-                 'youtube.upcoming.live': 30646,
-                 'youtube.completed.live': 30647,
-                 'youtube.api.key.incorrect': 30648,
-                 'youtube.client.id.incorrect': 30649,
-                 'youtube.client.secret.incorrect': 30650,
-                 'youtube.perform.geolocation': 30653,
-                 'youtube.my_location': 30654,
-                 'youtube.switch.user': 30655,
-                 'youtube.user.new': 30656,
-                 'youtube.user.unnamed': 30657,
-                 'youtube.enter.user.name': 30658,
-                 'youtube.user.changed': 30659,
-                 'youtube.remove.a.user': 30662,
-                 'youtube.rename.a.user': 30663,
-                 'youtube.switch.user.now': 30665,
-                 'youtube.removed': 30666,
-                 'youtube.renamed': 30667,
-                 'youtube.playback.history': 30673,
-                 'youtube.mark.watched': 30670,
-                 'youtube.mark.unwatched': 30669,
-                 'youtube.reset.resume.point': 30674,
-                 'youtube.data.cache': 30687,
-                 'youtube.httpd.not.running': 30699,
-                 'youtube.client.ip': 30700,
-                 'youtube.client.ip.failed': 30701,
-                 'youtube.video.play_with_subtitles': 30702,
-                 'youtube.are.you.sure': 30703,
-                 'youtube.subtitles.download': 30705,
-                 'youtube.pre.download.subtitles': 30706,
-                 'youtube.untitled': 30707,
-                 'youtube.video.play_audio_only': 30708,
-                 'youtube.failed.watch_later.retry.2': 30709,
-                 'youtube.failed.watch_later.retry.3': 30710,
-                 'youtube.added.to.watch.later': 30713,
-                 'youtube.added.to.playlist': 30714,
-                 'youtube.removed.from.playlist': 30715,
-                 'youtube.liked.video': 30716,
-                 'youtube.disliked.video': 30717,
-                 'youtube.unrated.video': 30718,
-                 'youtube.subscribed.to.channel': 30719,
-                 'youtube.unsubscribed.from.channel': 30720,
-                 'youtube.uploads': 30726,
-                 'youtube.video.play_ask_for_quality': 30730,
-                 'youtube.key.requirement.notification': 30731,
-                 'youtube.video.comments': 30732,
-                 'youtube.video.comments.likes': 30733,
-                 'youtube.video.comments.replies': 30734,
-                 'youtube.video.comments.edited': 30735,
-                 'youtube.stats.viewCount': 30767,
-                 'youtube.stats.likeCount': 30733,
-                 # 'youtube.stats.favoriteCount': 30100,
-                 'youtube.stats.commentCount': 30732,
-                 }
-
     def __init__(self):
         super(Provider, self).__init__()
         self._resource_manager = None
@@ -286,12 +135,11 @@ class Provider(AbstractProvider):
 
         youtube_config = YouTube.CONFIGS.get('main')
 
-        dev_id = context.get_param('addon_id', None)
+        dev_id = context.get_param('addon_id')
         dev_configs = YouTube.CONFIGS.get('developer')
         dev_config = self.get_dev_config(context, dev_id, dev_configs)
         dev_keys = dev_config.get('main') if dev_config else None
 
-        client = None
         refresh_tokens = []
 
         if dev_id:
@@ -429,7 +277,7 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/uri2addon/$')
     def on_uri2addon(self, context, re_match):
-        uri = context.get_param('uri', '')
+        uri = context.get_param('uri')
         if not uri:
             return False
 
@@ -454,7 +302,7 @@ class Provider(AbstractProvider):
 
         # no caching
         json_data = self.get_client(context).get_playlist_items(playlist_id=playlist_id, page_token=page_token)
-        if not v3.handle_error(self, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
 
@@ -478,7 +326,7 @@ class Provider(AbstractProvider):
 
         # no caching
         json_data = client.get_playlist_items(playlist_id=playlist_id, page_token=page_token)
-        if not v3.handle_error(self, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
 
@@ -501,8 +349,8 @@ class Provider(AbstractProvider):
         resource_manager = self.get_resource_manager(context)
 
         item_params = {}
-        incognito = context.get_param('incognito', False)
-        addon_id = context.get_param('addon_id', '')
+        incognito = context.get_param('incognito')
+        addon_id = context.get_param('addon_id')
         if incognito:
             item_params.update({'incognito': incognito})
         if addon_id:
@@ -511,7 +359,7 @@ class Provider(AbstractProvider):
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads_playlist = playlists.get('uploads', '')
         if uploads_playlist:
-            uploads_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.uploads'])),
+            uploads_item = DirectoryItem(context.get_ui().bold(context.localize('uploads')),
                                          context.create_uri(['channel', channel_id, 'playlist', uploads_playlist],
                                                             item_params),
                                          image=context.create_resource_path('media', 'playlist.png'))
@@ -519,7 +367,7 @@ class Provider(AbstractProvider):
 
         # no caching
         json_data = self.get_client(context).get_playlists_of_channel(channel_id, page_token)
-        if not v3.handle_error(self, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
 
@@ -542,7 +390,7 @@ class Provider(AbstractProvider):
 
         # no caching
         json_data = self.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, page_token=page_token, safe_search=safe_search)
-        if not v3.handle_error(self, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
 
@@ -556,14 +404,21 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
-        listitem_channel_id = context.get_ui().get_info_label('Container.ListItem(0).Property(channel_id)')
+        localize = context.localize
+        create_path = context.create_resource_path
+        create_uri = context.create_uri
+        function_cache = context.get_function_cache()
+        params = context.get_params()
+        ui = context.get_ui()
+
+        listitem_channel_id = ui.get_info_label('Container.ListItem(0).Property(channel_id)')
 
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
 
         if (method == 'channel' and channel_id and channel_id.lower() == 'property'
                 and listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc'))):
-            context.execute('Container.Update(%s)' % context.create_uri(['channel', listitem_channel_id]))  # redirect if keymap, without redirect results in 'invalid handle -1'
+            context.execute('Container.Update(%s)' % create_uri(['channel', listitem_channel_id]))  # redirect if keymap, without redirect results in 'invalid handle -1'
 
         if method == 'channel' and not channel_id:
             return False
@@ -582,9 +437,9 @@ class Provider(AbstractProvider):
         if method == 'user' or channel_id == 'mine':
             context.log_debug('Trying to get channel id for user "%s"' % channel_id)
 
-            json_data = context.get_function_cache().get(FunctionCache.ONE_DAY,
-                                                         self.get_client(context).get_channel_by_username, channel_id)
-            if not v3.handle_error(self, context, json_data):
+            json_data = function_cache.get(FunctionCache.ONE_DAY,
+                                           self.get_client(context).get_channel_by_username, channel_id)
+            if not v3.handle_error(context, json_data):
                 return False
 
             # we correct the channel id based on the username
@@ -600,52 +455,52 @@ class Provider(AbstractProvider):
                     return False
 
         channel_fanarts = resource_manager.get_fanarts([channel_id])
-        page = context.get_param('page', 1)
-        page_token = context.get_param('page_token', '')
-        incognito = context.get_param('incognito', False)
-        addon_id = context.get_param('addon_id', '')
+        page = params.get('page', 1)
+        page_token = params.get('page_token', '')
+        incognito = params.get('incognito')
+        addon_id = params.get('addon_id')
         item_params = {}
         if incognito:
             item_params.update({'incognito': incognito})
         if addon_id:
             item_params.update({'addon_id': addon_id})
 
-        hide_folders = context.get_param('hide_folders', False)
+        hide_folders = params.get('hide_folders')
 
         if page == 1 and not hide_folders:
-            hide_playlists = context.get_param('hide_playlists', False)
-            hide_search = context.get_param('hide_search', False)
-            hide_live = context.get_param('hide_live', False)
+            hide_playlists = params.get('hide_playlists')
+            hide_search = params.get('hide_search')
+            hide_live = params.get('hide_live')
 
             if not hide_playlists:
-                playlists_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.playlists'])),
-                                               context.create_uri(['channel', channel_id, 'playlists'], item_params),
-                                               image=context.create_resource_path('media', 'playlist.png'))
+                playlists_item = DirectoryItem(ui.bold(localize('playlists')),
+                                               create_uri(['channel', channel_id, 'playlists'], item_params),
+                                               image=create_path('media', 'playlist.png'))
                 playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
                 result.append(playlists_item)
 
             search_live_id = mine_id if mine_id else channel_id
             if not hide_search:
-                search_item = NewSearchItem(context, alt_name=context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.search'])),
-                                            image=context.create_resource_path('media', 'search.png'),
+                search_item = NewSearchItem(context, alt_name=ui.bold(localize('search')),
+                                            image=create_path('media', 'search.png'),
                                             fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
                 search_item.set_fanart(self.get_fanart(context))
                 result.append(search_item)
 
             if not hide_live:
-                live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
-                                          context.create_uri(['channel', search_live_id, 'live'], item_params),
-                                          image=context.create_resource_path('media', 'live.png'))
+                live_item = DirectoryItem(ui.bold(localize('live')),
+                                          create_uri(['channel', search_live_id, 'live'], item_params),
+                                          image=create_path('media', 'live.png'))
                 live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
         if upload_playlist:
-            json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 5,
-                                                         self.get_client(context).get_playlist_items, upload_playlist,
-                                                         page_token=page_token)
-            if not v3.handle_error(self, context, json_data):
+            json_data = function_cache.get(FunctionCache.ONE_MINUTE * 5,
+                                           self.get_client(context).get_playlist_items, upload_playlist,
+                                           page_token=page_token)
+            if not v3.handle_error(context, json_data):
                 return False
 
             result.extend(
@@ -658,34 +513,47 @@ class Provider(AbstractProvider):
     def _on_my_location(self, context, re_match):
         self.set_content_type(context, constants.content_type.FILES)
 
+        create_path = context.create_resource_path
+        create_uri = context.create_uri
+        localize = context.localize
         settings = context.get_settings()
         result = []
 
         # search
-        search_item = SearchItem(context, image=context.create_resource_path('media', 'search.png'),
-                                              fanart=self.get_fanart(context), location=True)
+        search_item = SearchItem(
+            context,
+            image=create_path('media', 'search.png'),
+            fanart=self.get_fanart(context),
+            location=True
+        )
         result.append(search_item)
 
         # completed live events
         if settings.get_bool('youtube.folder.completed.live.show', True):
-            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.completed.live']),
-                                             context.create_uri(['special', 'completed_live'], params={'location': True}),
-                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item = DirectoryItem(
+                localize('live.completed'),
+                create_uri(['special', 'completed_live'], params={'location': True}),
+                image=create_path('media', 'live.png')
+            )
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # upcoming live events
         if settings.get_bool('youtube.folder.upcoming.live.show', True):
-            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.upcoming.live']),
-                                             context.create_uri(['special', 'upcoming_live'], params={'location': True}),
-                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item = DirectoryItem(
+                localize('live.upcoming'),
+                create_uri(['special', 'upcoming_live'], params={'location': True}),
+                image=create_path('media', 'live.png')
+            )
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # live events
-        live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.live']),
-                                         context.create_uri(['special', 'live'], params={'location': True}),
-                                         image=context.create_resource_path('media', 'live.png'))
+        live_events_item = DirectoryItem(
+            localize('live'),
+            create_uri(['special', 'live'], params={'location': True}),
+            image=create_path('media', 'live.png')
+        )
         live_events_item.set_fanart(self.get_fanart(context))
         result.append(live_events_item)
 
@@ -707,7 +575,8 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
-        listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
+        ui = context.get_ui()
+        listitem_path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')
 
         redirect = False
         params = context.get_params()
@@ -724,21 +593,21 @@ class Provider(AbstractProvider):
             else:
                 return False
 
-        if context.get_ui().get_home_window_property('prompt_for_subtitles') != params.get('video_id'):
-            context.get_ui().clear_home_window_property('prompt_for_subtitles')
+        if ui.get_home_window_property('prompt_for_subtitles') != params.get('video_id'):
+            ui.clear_home_window_property('prompt_for_subtitles')
 
-        if context.get_ui().get_home_window_property('audio_only') != params.get('video_id'):
-            context.get_ui().clear_home_window_property('audio_only')
+        if ui.get_home_window_property('audio_only') != params.get('video_id'):
+            ui.clear_home_window_property('audio_only')
 
-        if context.get_ui().get_home_window_property('ask_for_quality') != params.get('video_id'):
-            context.get_ui().clear_home_window_property('ask_for_quality')
+        if ui.get_home_window_property('ask_for_quality') != params.get('video_id'):
+            ui.clear_home_window_property('ask_for_quality')
 
         if 'prompt_for_subtitles' in params:
             prompt_subtitles = params['prompt_for_subtitles']
             del params['prompt_for_subtitles']
             if prompt_subtitles and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
-                context.get_ui().set_home_window_property('prompt_for_subtitles', params['video_id'])
+                ui.set_home_window_property('prompt_for_subtitles', params['video_id'])
                 context.log_debug('Redirecting playback with subtitles')
                 redirect = True
 
@@ -747,7 +616,7 @@ class Provider(AbstractProvider):
             del params['audio_only']
             if audio_only and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
-                context.get_ui().set_home_window_property('audio_only', params['video_id'])
+                ui.set_home_window_property('audio_only', params['video_id'])
                 context.log_debug('Redirecting audio only playback')
                 redirect = True
 
@@ -756,7 +625,7 @@ class Provider(AbstractProvider):
             del params['ask_for_quality']
             if ask_for_quality and 'video_id' in params and 'playlist_id' not in params:
                 # redirect to builtin after setting home window property, so playback url matches playable listitems
-                context.get_ui().set_home_window_property('ask_for_quality', params['video_id'])
+                ui.set_home_window_property('ask_for_quality', params['video_id'])
                 context.log_debug('Redirecting audio only playback')
                 redirect = True
 
@@ -819,38 +688,40 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/history/clear/$')
     def _on_yt_clear_history(self, context, re_match):
-        if context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.clear_history_confirmation'])):
+        if context.get_ui().on_yes_no_input(context.get_name(), context.localize('clear_history_confirmation')):
             json_data = self.get_client(context).clear_watch_history()
             if 'error' not in json_data:
-                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                context.get_ui().show_notification(context.localize('succeeded'))
 
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
         refresh = context.get_param('refresh')
 
+        localize = context.localize
         access_manager = context.get_access_manager()
         ui = context.get_ui()
 
         def add_user(_access_manager_users):
-            _results = ui.on_keyboard_input(context.localize(self.LOCAL_MAP['youtube.enter.user.name']))
+            _results = ui.on_keyboard_input(localize('user.enter_name'))
             if _results[0] is False:
                 return None
             _new_user_name = _results[1]
             if not _new_user_name.strip():
-                _new_user_name = context.localize(self.LOCAL_MAP['youtube.user.unnamed'])
-            _new_users = {}
-            for idx, key in enumerate(list(_access_manager_users.keys())):
-                _new_users[str(idx)] = _access_manager_users[key]
+                _new_user_name = localize('user.unnamed')
+            _new_users = {
+                str(idx): user
+                for idx, user in enumerate(_access_manager_users.values())
+            }
             _new_users[str(len(_new_users))] = access_manager.get_new_user(_new_user_name)
             access_manager.set_users(_new_users)
             return str(len(_new_users) - 1)
 
         def switch_to_user(_user):
-            _user_name = access_manager.get_users()[_user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
+            _user_name = access_manager.get_users()[_user].get('name', localize('user.unnamed'))
             access_manager.set_user(_user, switch_to=True)
-            ui.show_notification(context.localize(self.LOCAL_MAP['youtube.user.changed']) % _user_name,
-                                 context.localize(self.LOCAL_MAP['youtube.switch.user']))
+            ui.show_notification(localize('user.changed') % _user_name,
+                                 localize('user.switch'))
             self.get_resource_manager(context).clear()
             if refresh:
                 ui.refresh_container()
@@ -858,23 +729,23 @@ class Provider(AbstractProvider):
         if action == 'switch':
             access_manager_users = access_manager.get_users()
             current_user = access_manager.get_user()
-            users = [ui.bold(context.localize(self.LOCAL_MAP['youtube.user.new']))]
+            users = [ui.bold(localize('user.new'))]
             user_index_map = []
-            for k in list(access_manager_users.keys()):
-                if k == current_user:
-                    if access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+            for user, details in access_manager_users.items():
+                if user == current_user:
+                    if details.get('access_token') or details.get('refresh_token'):
                         users.append(
                             ui.color('limegreen',
-                                     ' '.join([access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])), '*']))
+                                     ' '.join([details.get('name', localize('user.unnamed')), '*']))
                         )
                     else:
-                        users.append(' '.join([access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])), '*']))
-                elif access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
-                    users.append(ui.color('limegreen', access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))))
+                        users.append(' '.join([details.get('name', localize('user.unnamed')), '*']))
+                elif details.get('access_token') or details.get('refresh_token'):
+                    users.append(ui.color('limegreen', details.get('name', localize('user.unnamed'))))
                 else:
-                    users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
-                user_index_map.append(k)
-            result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.switch.user']), users)
+                    users.append(details.get('name', localize('user.unnamed')))
+                user_index_map.append(user)
+            result = ui.on_select(localize('user.switch'), users)
             if result == -1:
                 return True
             if result == 0:
@@ -888,8 +759,8 @@ class Provider(AbstractProvider):
         elif action == 'add':
             user = add_user(access_manager.get_users())
             if user:
-                user_name = access_manager.get_users()[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
-                result = ui.on_yes_no_input(context.localize(self.LOCAL_MAP['youtube.switch.user']), context.localize(self.LOCAL_MAP['youtube.switch.user.now']) % user_name)
+                user_name = access_manager.get_users()[user].get('name', localize('user.unnamed'))
+                result = ui.on_yes_no_input(localize('user.switch'), localize('user.switch.now') % user_name)
                 if result:
                     switch_to_user(user)
 
@@ -898,81 +769,84 @@ class Provider(AbstractProvider):
             users = []
             user_index_map = []
             current_user = access_manager.get_user()
-            current_user_dict = access_manager_users[current_user]
-            for k in list(access_manager_users.keys()):
-                if k == current_user:
-                    if access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+            current_user_idx = '0'
+            for user, details in access_manager_users.items():
+                if user == current_user:
+                    current_user_idx = str(len(user_index_map))
+                    if details.get('access_token') or details.get('refresh_token'):
                         users.append(
                             ui.color('limegreen',
-                                     ' '.join([access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])), '*']))
+                                     ' '.join([details.get('name', localize('user.unnamed')), '*']))
                         )
                     else:
-                        users.append(' '.join([access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])), '*']))
-                elif access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
-                    users.append(ui.color('limegreen', access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))))
+                        users.append(' '.join([details.get('name', localize('user.unnamed')), '*']))
+                elif details.get('access_token') or details.get('refresh_token'):
+                    users.append(ui.color('limegreen', details.get('name', localize('user.unnamed'))))
                 else:
-                    users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
-                user_index_map.append(k)
-            result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.remove.a.user']), users)
+                    users.append(details.get('name', localize('user.unnamed')))
+                user_index_map.append(user)
+            result = ui.on_select(localize('user.remove'), users)
             if result == -1:
                 return True
-            else:
-                user = user_index_map[result]
-                user_name = access_manager_users[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
-                result = ui.on_remove_content(user_name)
-                if result:
-                    if user == current_user:
-                        access_manager.set_user('0', switch_to=True)
-                    del access_manager_users[user]
-                    new_users = {}
-                    for i, u in enumerate(list(access_manager_users.keys())):
-                        if access_manager_users[u] == current_user_dict:
-                            access_manager.set_user(str(i), switch_to=True)
-                        new_users[str(i)] = access_manager_users[u]
 
-                    if not new_users.get(access_manager.get_user()):
-                        access_manager.set_user('0', switch_to=True)
+            user = user_index_map[result]
+            user_name = access_manager_users[user].get('name', localize('user.unnamed'))
+            result = ui.on_remove_content(user_name)
+            if result:
+                if user == current_user:
+                    access_manager.set_user('0', switch_to=True)
+                del access_manager_users[user]
 
-                    access_manager.set_users(new_users)
-                    ui.show_notification(context.localize(self.LOCAL_MAP['youtube.removed']) % user_name,
-                                         context.localize(self.LOCAL_MAP['youtube.remove']))
+                new_users = {
+                    str(idx): user
+                    for idx, user in enumerate(access_manager_users.values())
+                }
+
+                if current_user_idx in new_users:
+                    access_manager.set_user(current_user_idx, switch_to=True)
+                else:
+                    access_manager.set_user('0', switch_to=True)
+
+                access_manager.set_users(new_users)
+                ui.show_notification(localize('removed') % user_name,
+                                     localize('remove'))
 
         elif action == 'rename':
             access_manager_users = access_manager.get_users()
             users = []
             user_index_map = []
             current_user = access_manager.get_user()
-            for k in list(access_manager_users.keys()):
-                if k == current_user:
-                    if access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
+            for user, details in access_manager_users.items():
+                if user == current_user:
+                    if details.get('access_token') or details.get('refresh_token'):
                         users.append(
                             ui.color('limegreen',
-                                     ' '.join([access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])), '*']))
+                                     ' '.join([details.get('name', localize('user.unnamed')), '*']))
                         )
                     else:
-                        users.append(' '.join([access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])), '*']))
-                elif access_manager_users[k].get('access_token') or access_manager_users[k].get('refresh_token'):
-                    users.append(ui.color('limegreen', access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))))
+                        users.append(' '.join([details.get('name', localize('user.unnamed')), '*']))
+                elif details.get('access_token') or details.get('refresh_token'):
+                    users.append(ui.color('limegreen', details.get('name', localize('user.unnamed'))))
                 else:
-                    users.append(access_manager_users[k].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed'])))
-                user_index_map.append(k)
-            result = ui.on_select(context.localize(self.LOCAL_MAP['youtube.rename.a.user']), users)
+                    users.append(details.get('name', localize('user.unnamed')))
+                user_index_map.append(user)
+            result = ui.on_select(localize('user.rename'), users)
             if result == -1:
                 return True
-            else:
-                user = user_index_map[result]
-                old_user_name = access_manager_users[user].get('name', context.localize(self.LOCAL_MAP['youtube.user.unnamed']))
-                results = ui.on_keyboard_input(context.localize(self.LOCAL_MAP['youtube.enter.user.name']), default=old_user_name)
-                if results[0] is False:
-                    return True
-                new_user_name = results[1]
-                if not new_user_name.strip() or (old_user_name == new_user_name):
-                    return True
 
-                access_manager_users[user]['name'] = new_user_name
-                access_manager.set_users(access_manager_users)
-                ui.show_notification(context.localize(self.LOCAL_MAP['youtube.renamed']) % (old_user_name, new_user_name),
-                                     context.localize(self.LOCAL_MAP['youtube.rename']))
+            user = user_index_map[result]
+            old_user_name = access_manager_users[user].get('name', localize('user.unnamed'))
+            results = ui.on_keyboard_input(localize('user.enter_name'), default=old_user_name)
+            if results[0] is False:
+                return True
+            new_user_name = results[1]
+            if not new_user_name.strip() or (old_user_name == new_user_name):
+                return True
+
+            access_manager_users[user]['name'] = new_user_name
+            access_manager.set_users(access_manager_users)
+            ui.show_notification(localize('renamed') % (old_user_name, new_user_name),
+                                 localize('rename'))
 
         return True
 
@@ -985,8 +859,8 @@ class Provider(AbstractProvider):
 
         if (not sign_out_confirmed and mode == 'out'
                 and context.get_ui().on_yes_no_input(
-                    context.localize(self.LOCAL_MAP['youtube.sign.out']),
-                    context.localize(self.LOCAL_MAP['youtube.are.you.sure']))):
+                    context.localize('sign.out'),
+                    context.localize('are_you_sure'))):
             sign_out_confirmed = True
 
         if mode == 'in' or (mode == 'out' and sign_out_confirmed):
@@ -995,7 +869,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/search/$')
     def endpoint_search(self, context, re_match):
-        query = context.get_param('q', '')
+        query = context.get_param('q')
         if not query:
             return []
 
@@ -1011,7 +885,7 @@ class Provider(AbstractProvider):
         elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', id_string):
             json_data = self.get_client(context).get_playlists(id_string)
 
-        if not json_data or not v3.handle_error(self, context, json_data):
+        if not json_data or not v3.handle_error(context, json_data):
             return []
 
         result.extend(v3.response_to_items(self, context, json_data))
@@ -1022,17 +896,18 @@ class Provider(AbstractProvider):
         if result:  # found a channel or playlist matching search_text
             return result
 
-        channel_id = context.get_param('channel_id', '')
-        event_type = context.get_param('event_type', '')
-        hide_folders = context.get_param('hide_folders', False)
-        location = context.get_param('location', False)
-        page = context.get_param('page', 1)
-        page_token = context.get_param('page_token', '')
-        search_type = context.get_param('search_type', 'video')
+        context.set_param('q', search_text)
+
+        params = context.get_params()
+        channel_id = params.get('channel_id')
+        event_type = params.get('event_type')
+        hide_folders = params.get('hide_folders')
+        location = params.get('location')
+        page = params.get('page', 1)
+        page_token = params.get('page_token', '')
+        search_type = params.get('search_type', 'video')
 
         safe_search = context.get_settings().safe_search()
-
-        context.set_param('q', search_text)
 
         if search_type == 'video':
             self.set_content_type(context, constants.content_type.VIDEOS)
@@ -1042,18 +917,19 @@ class Provider(AbstractProvider):
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
                 channel_params = {}
-                channel_params.update(context.get_params())
+                channel_params.update(params)
                 channel_params['search_type'] = 'channel'
-                channel_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.channels'])),
+                channel_item = DirectoryItem(context.get_ui().bold(context.localize('channels')),
                                              context.create_uri([context.get_path()], channel_params),
                                              image=context.create_resource_path('media', 'channels.png'))
                 channel_item.set_fanart(self.get_fanart(context))
                 result.append(channel_item)
+
             if not location:
                 playlist_params = {}
-                playlist_params.update(context.get_params())
+                playlist_params.update(params)
                 playlist_params['search_type'] = 'playlist'
-                playlist_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.playlists'])),
+                playlist_item = DirectoryItem(context.get_ui().bold(context.localize('playlists')),
                                               context.create_uri([context.get_path()], playlist_params),
                                               image=context.create_resource_path('media', 'playlist.png'))
                 playlist_item.set_fanart(self.get_fanart(context))
@@ -1062,10 +938,10 @@ class Provider(AbstractProvider):
             if not channel_id:
                 # live
                 live_params = {}
-                live_params.update(context.get_params())
+                live_params.update(params)
                 live_params['search_type'] = 'video'
                 live_params['event_type'] = 'live'
-                live_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.live'])),
+                live_item = DirectoryItem(context.get_ui().bold(context.localize('live')),
                                           context.create_uri([context.get_path().replace('input', 'query')], live_params),
                                           image=context.create_resource_path('media', 'live.png'))
                 live_item.set_fanart(self.get_fanart(context))
@@ -1074,7 +950,7 @@ class Provider(AbstractProvider):
         json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,
                                                      q=search_text, search_type=search_type, event_type=event_type,
                                                      safe_search=safe_search, page_token=page_token, channel_id=channel_id, location=location)
-        if not v3.handle_error(self, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))
         return result
@@ -1082,66 +958,79 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/config/(?P<switch>[^/]+)/$')
     def configure_addon(self, context, re_match):
         switch = re_match.group('switch')
+        localize = context.localize
         settings = context.get_settings()
+        ui = context.get_ui()
+
         if switch == 'youtube':
             context.addon().openSettings()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
         elif switch == 'isa':
             if context.use_inputstream_adaptive():
                 xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
             else:
                 settings.set_bool('kodion.video.quality.isa', False)
         elif switch == 'subtitles':
-            yt_language = context.get_settings().get_string('youtube.language', 'en-US')
-            sub_setting = context.get_settings().subtitle_languages()
+            yt_language = settings.get_string('youtube.language', 'en-US')
+            sub_setting = settings.subtitle_languages()
 
             if yt_language.startswith('en'):
-                sub_opts = [context.localize(self.LOCAL_MAP['youtube.none']), context.localize(self.LOCAL_MAP['youtube.prompt']),
-                            context.localize(self.LOCAL_MAP['youtube.subtitle._with_fallback']) % ('en', 'en-US/en-GB'), yt_language,
-                            '%s (%s)' % (yt_language, context.localize(self.LOCAL_MAP['youtube.subtitle.no.auto.generated']))]
+                sub_opts = [localize('none'),
+                            localize('prompt'),
+                            localize('subtitles.with_fallback') % ('en', 'en-US/en-GB'),
+                            yt_language,
+                            '%s (%s)' % (yt_language, localize('subtitles.no_auto_generated'))]
 
             else:
-                sub_opts = [context.localize(self.LOCAL_MAP['youtube.none']), context.localize(self.LOCAL_MAP['youtube.prompt']),
-                            context.localize(self.LOCAL_MAP['youtube.subtitle._with_fallback']) % (yt_language, 'en'), yt_language,
-                            '%s (%s)' % (yt_language, context.localize(self.LOCAL_MAP['youtube.subtitle.no.auto.generated']))]
+                sub_opts = [localize('none'),
+                            localize('prompt'),
+                            localize('subtitles.with_fallback') % (yt_language, 'en'),
+                            yt_language,
+                            '%s (%s)' % (yt_language, localize('subtitles.no_auto_generated'))]
 
-            sub_opts[sub_setting] = context.get_ui().bold(sub_opts[sub_setting])
+            sub_opts[sub_setting] = ui.bold(sub_opts[sub_setting])
 
-            result = context.get_ui().on_select(context.localize(self.LOCAL_MAP['youtube.subtitle.language']), sub_opts)
+            result = ui.on_select(localize('subtitles.language'), sub_opts)
             if result > -1:
-                context.get_settings().set_subtitle_languages(result)
+                settings.set_subtitle_languages(result)
 
-            result = context.get_ui().on_yes_no_input(
-                context.localize(self.LOCAL_MAP['youtube.subtitles.download']),
-                context.localize(self.LOCAL_MAP['youtube.pre.download.subtitles'])
+            result = ui.on_yes_no_input(
+                localize('subtitles.download'),
+                localize('subtitles.download.pre')
             )
             if result > -1:
-                context.get_settings().set_subtitle_download(result == 1)
+                settings.set_subtitle_download(result == 1)
         elif switch == 'listen_ip':
             local_ranges = ('10.', '172.16.', '192.168.')
-            addresses = [iface[4][0] for iface in socket.getaddrinfo(socket.gethostname(), None) if iface[4][0].startswith(local_ranges)] + ['127.0.0.1', '0.0.0.0']
-            selected_address = context.get_ui().on_select(context.localize(self.LOCAL_MAP['youtube.select.listen.ip']), addresses)
+            addresses = [iface[4][0]
+                         for iface in socket.getaddrinfo(socket.gethostname(), None)
+                         if iface[4][0].startswith(local_ranges)]
+            addresses += ['127.0.0.1', '0.0.0.0']
+            selected_address = ui.on_select(localize('select.listen.ip'), addresses)
             if selected_address != -1:
-                context.get_settings().set_httpd_listen(addresses[selected_address])
+                settings.set_httpd_listen(addresses[selected_address])
         return False
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/my_subscriptions/filter/$')
     def manage_my_subscription_filter(self, context, re_match):
         params = context.get_params()
+        settings = context.get_settings()
+        ui = context.get_ui()
+
         action = params.get('action')
         channel = params.get('channel_name')
         if (not channel) or (not action):
             return
 
-        filter_enabled = context.get_settings().get_bool('youtube.folder.my_subscriptions_filtered.show', False)
+        filter_enabled = settings.get_bool('youtube.folder.my_subscriptions_filtered.show', False)
         if not filter_enabled:
             return
 
         channel_name = channel.lower()
         channel_name = channel_name.replace(',', '')
 
-        filter_string = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.list', '')
+        filter_string = settings.get_string('youtube.filter.my_subscriptions_filtered.list', '')
         filter_string = filter_string.replace(', ', ',')
         filter_list = filter_string.split(',')
         filter_list = [x.lower() for x in filter_list]
@@ -1154,39 +1043,42 @@ class Provider(AbstractProvider):
 
         modified_string = ','.join(filter_list).lstrip(',')
         if filter_string != modified_string:
-            context.get_settings().set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
+            settings.set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
             message = ''
             if action == 'add':
-                message = context.localize(self.LOCAL_MAP['youtube.added.my_subscriptions.filter'])
+                message = context.localize('my_subscriptions.filter.added')
             elif action == 'remove':
-                message = context.localize(self.LOCAL_MAP['youtube.removed.my_subscriptions.filter'])
+                message = context.localize('my_subscriptions.filter.removed')
             if message:
-                context.get_ui().show_notification(message=message)
-        context.get_ui().refresh_container()
+                ui.show_notification(message=message)
+        ui.refresh_container()
 
     @RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
     def maintenance_actions(self, context, re_match):
         maint_type = re_match.group('maint_type')
         action = re_match.group('action')
+
+        ui = context.get_ui()
+        localize = context.localize
+
         if action == 'clear':
             if maint_type == 'function_cache':
-                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.function.cache'])):
+                if ui.on_remove_content(localize('cache.function')):
                     context.get_function_cache().clear()
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                    ui.show_notification(localize('succeeded'))
             elif maint_type == 'data_cache':
-                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.data.cache'])):
+                if ui.on_remove_content(localize('cache.data')):
                     context.get_data_cache().clear()
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                    ui.show_notification(localize('succeeded'))
             elif maint_type == 'search_cache':
-                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.search.history'])):
+                if ui.on_remove_content(localize('search.history')):
                     context.get_search_history().clear()
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
-            elif maint_type == 'playback_history':
-                if context.get_ui().on_remove_content(context.localize(self.LOCAL_MAP['youtube.playback.history'])):
-                    context.get_playback_history().clear()
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                    ui.show_notification(localize('succeeded'))
+            elif maint_type == 'playback_history' and ui.on_remove_content(localize('playback.history')):
+                context.get_playback_history().clear()
+                ui.show_notification(localize('succeeded'))
         elif action == 'reset':
-            if maint_type == 'access_manager' and context.get_ui().on_yes_no_input(context.get_name(), context.localize(self.LOCAL_MAP['youtube.reset.access.manager.confirm'])):
+            if maint_type == 'access_manager' and ui.on_yes_no_input(context.get_name(), localize('reset.access_manager.confirm')):
                 try:
                     context.get_function_cache().clear()
                     access_manager = context.get_access_manager()
@@ -1200,10 +1092,10 @@ class Provider(AbstractProvider):
                                 pass
                     self.reset_client()
                     access_manager.update_access_token(access_token='', refresh_token='')
-                    context.get_ui().refresh_container()
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                    ui.refresh_container()
+                    ui.show_notification(localize('succeeded'))
                 except:
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
+                    ui.show_notification(localize('failed'))
         elif action == 'delete':
             _maint_files = {'function_cache': 'cache.sqlite',
                             'search_cache': 'search.sqlite',
@@ -1225,7 +1117,7 @@ class Provider(AbstractProvider):
                     _file_w_path = os.path.join(os.path.join(context.get_data_path(), 'playback'), _file)
                 else:
                     _file_w_path = os.path.join(context.get_data_path(), _file)
-                if context.get_ui().on_delete_content(_file):
+                if ui.on_delete_content(_file):
                     if maint_type == 'temp_files':
                         _trans_path = xbmc.translatePath(_file_w_path)
                         try:
@@ -1241,45 +1133,49 @@ class Provider(AbstractProvider):
                     elif _file_w_path:
                         success = xbmcvfs.delete(_file_w_path)
                     if success:
-                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.succeeded']))
+                        ui.show_notification(localize('succeeded'))
                     else:
-                        context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.failed']))
+                        ui.show_notification(localize('failed'))
         elif action == 'install' and maint_type == 'inputstreamhelper':
             if context.get_system_version().get_version()[0] >= 17:
                 try:
                     xbmcaddon.Addon('script.module.inputstreamhelper')
-                    context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.inputstreamhelper.is.installed']))
+                    ui.show_notification(localize('inputstreamhelper.is_installed'))
                 except RuntimeError:
                     context.execute('InstallAddon(script.module.inputstreamhelper)')
             else:
-                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.requires.krypton']))
+                ui.show_notification(localize('requires.krypton'))
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/api/update/$')
     def api_key_update(self, context, re_match):
-        settings = context.get_settings()
+        localize = context.localize
         params = context.get_params()
+        settings = context.get_settings()
+        ui = context.get_ui()
+
+        api_key = params.get('api_key')
         client_id = params.get('client_id')
         client_secret = params.get('client_secret')
-        api_key = params.get('api_key')
         enable = params.get('enable')
+
         updated_list = []
         log_list = []
 
         if api_key:
             settings.set_string('youtube.api.key', api_key)
-            updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.key']))
+            updated_list.append(localize('api.key'))
             log_list.append('Key')
         if client_id:
             settings.set_string('youtube.api.id', client_id)
-            updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.id']))
+            updated_list.append(localize('api.id'))
             log_list.append('Id')
         if client_secret:
             settings.set_string('youtube.api.secret', client_secret)
-            updated_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
+            updated_list.append(localize('api.secret'))
             log_list.append('Secret')
         if updated_list:
-            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.updated_']) % ', '.join(updated_list))
+            ui.show_notification(localize('updated_') % ', '.join(updated_list))
         context.log_debug('Updated API keys: %s' % ', '.join(log_list))
 
         client_id = settings.get_string('youtube.api.id', '')
@@ -1289,19 +1185,19 @@ class Provider(AbstractProvider):
         log_list = []
 
         if enable and client_id and client_secret and api_key:
-            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.enabled']))
+            ui.show_notification(localize('api.personal.enabled'))
             context.log_debug('Personal API keys enabled')
         elif enable:
             if not api_key:
-                missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.key']))
+                missing_list.append(localize('api.key'))
                 log_list.append('Key')
             if not client_id:
-                missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.id']))
+                missing_list.append(localize('api.id'))
                 log_list.append('Id')
             if not client_secret:
-                missing_list.append(context.localize(self.LOCAL_MAP['youtube.api.secret']))
+                missing_list.append(localize('api.secret'))
                 log_list.append('Secret')
-            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.api.personal.failed']) % ', '.join(missing_list))
+            ui.show_notification(localize('api.personal.failed') % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
     # noinspection PyUnusedLocal
@@ -1312,11 +1208,11 @@ class Provider(AbstractProvider):
         if is_httpd_live(port=port):
             client_ip = get_client_ip_address(port=port)
             if client_ip:
-                context.get_ui().on_ok(context.get_name(), context.localize(self.LOCAL_MAP['youtube.client.ip']) % client_ip)
+                context.get_ui().on_ok(context.get_name(), context.localize('client.ip') % client_ip)
             else:
-                context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.client.ip.failed']))
+                context.get_ui().show_notification(context.localize('client.ip.failed'))
         else:
-            context.get_ui().show_notification(context.localize(self.LOCAL_MAP['youtube.httpd.not.running']))
+            context.get_ui().show_notification(context.localize('httpd.not.running'))
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/playback_history/$')
@@ -1362,11 +1258,16 @@ class Provider(AbstractProvider):
         """
         Support old YouTube url calls, but also log a deprecation warnings.
         """
-        old_action = context.get_param('action', '')
+        old_action = context.get_param('action')
         if old_action:
             return yt_old_actions.process_old_action(self, context, re_match)
 
+        create_path = context.create_resource_path
+        create_uri = context.create_uri
+        localize = context.localize
         settings = context.get_settings()
+        ui = context.get_ui()
+
         _ = self.get_client(context)  # required for self.is_logged_in()
 
         self.set_content_type(context, constants.content_type.FILES)
@@ -1375,9 +1276,9 @@ class Provider(AbstractProvider):
 
         # sign in
         if not self.is_logged_in() and settings.get_bool('youtube.folder.sign.in.show', True):
-            sign_in_item = DirectoryItem(context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.sign.in'])),
-                                         context.create_uri(['sign', 'in']),
-                                         image=context.create_resource_path('media', 'sign_in.png'))
+            sign_in_item = DirectoryItem(ui.bold(localize('sign.in')),
+                                         create_uri(['sign', 'in']),
+                                         image=create_path('media', 'sign_in.png'))
             sign_in_item.set_action(True)
             sign_in_item.set_fanart(self.get_fanart(context))
             result.append(sign_in_item)
@@ -1385,23 +1286,23 @@ class Provider(AbstractProvider):
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
 
-            #clear cache
+            # clear cache
             cache = context.get_data_cache()
             cache.set_item('my-subscriptions-items', '[]')
 
             my_subscriptions_item = DirectoryItem(
-                context.get_ui().bold(context.localize(self.LOCAL_MAP['youtube.my_subscriptions'])),
-                context.create_uri(['special', 'new_uploaded_videos_tv']),
-                context.create_resource_path('media', 'new_uploads.png'))
+                ui.bold(localize('my_subscriptions')),
+                create_uri(['special', 'new_uploaded_videos_tv']),
+                create_path('media', 'new_uploads.png'))
             my_subscriptions_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_item)
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
             # my subscriptions filtered
             my_subscriptions_filtered_item = DirectoryItem(
-                context.localize(self.LOCAL_MAP['youtube.my_subscriptions_filtered']),
-                context.create_uri(['special', 'new_uploaded_videos_tv_filtered']),
-                context.create_resource_path('media', 'new_uploads.png'))
+                localize('my_subscriptions.filtered'),
+                create_uri(['special', 'new_uploaded_videos_tv_filtered']),
+                create_path('media', 'new_uploads.png'))
             my_subscriptions_filtered_item.set_fanart(self.get_fanart(context))
             result.append(my_subscriptions_filtered_item)
 
@@ -1412,44 +1313,46 @@ class Provider(AbstractProvider):
             watch_history_playlist_id = access_manager.get_watch_history_id()
             if watch_history_playlist_id != 'HL':
                 recommendations_item = DirectoryItem(
-                    context.localize(self.LOCAL_MAP['youtube.recommendations']),
-                    context.create_uri(['special', 'recommendations']),
-                    context.create_resource_path('media', 'popular.png'))
+                    localize('recommendations'),
+                    create_uri(['special', 'recommendations']),
+                    create_path('media', 'popular.png'))
                 recommendations_item.set_fanart(self.get_fanart(context))
                 result.append(recommendations_item)
 
         # what to watch
         if settings.get_bool('youtube.folder.popular_right_now.show', True):
             what_to_watch_item = DirectoryItem(
-                context.localize(self.LOCAL_MAP['youtube.popular_right_now']),
-                context.create_uri(['special', 'popular_right_now']),
-                context.create_resource_path('media', 'popular.png'))
+                localize('popular_right_now'),
+                create_uri(['special', 'popular_right_now']),
+                create_path('media', 'popular.png'))
             what_to_watch_item.set_fanart(self.get_fanart(context))
             result.append(what_to_watch_item)
 
         # search
         if settings.get_bool('youtube.folder.search.show', True):
-            search_item = SearchItem(context, image=context.create_resource_path('media', 'search.png'),
+            search_item = SearchItem(context, image=create_path('media', 'search.png'),
                                      fanart=self.get_fanart(context))
             result.append(search_item)
 
         if settings.get_bool('youtube.folder.quick_search.show', True):
-            quick_search_item = NewSearchItem(context, alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search']),
+            quick_search_item = NewSearchItem(context,
+                                              alt_name=localize('search.quick'),
                                               fanart=self.get_fanart(context))
             result.append(quick_search_item)
 
         if settings.get_bool('youtube.folder.quick_search_incognito.show', True):
-            quick_search_incognito_item = NewSearchItem(context, alt_name=context.localize(self.LOCAL_MAP['youtube.quick.search.incognito']),
-                                                        image=context.create_resource_path('media', 'search.png'),
+            quick_search_incognito_item = NewSearchItem(context,
+                                                        alt_name=localize('search.quick.incognito'),
+                                                        image=create_path('media', 'search.png'),
                                                         fanart=self.get_fanart(context),
                                                         incognito=True)
             result.append(quick_search_incognito_item)
 
         # my location
         if settings.get_bool('youtube.folder.my_location.show', True) and settings.get_location():
-            my_location_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.my_location']),
-                                             context.create_uri(['location', 'mine']),
-                                             image=context.create_resource_path('media', 'channel.png'))
+            my_location_item = DirectoryItem(localize('my_location'),
+                                             create_uri(['location', 'mine']),
+                                             image=create_path('media', 'channel.png'))
             my_location_item.set_fanart(self.get_fanart(context))
             result.append(my_location_item)
 
@@ -1457,22 +1360,21 @@ class Provider(AbstractProvider):
         if self.is_logged_in():
             # my channel
             if settings.get_bool('youtube.folder.my_channel.show', True):
-                my_channel_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.my_channel']),
-                                                context.create_uri(['channel', 'mine']),
-                                                image=context.create_resource_path('media', 'channel.png'))
+                my_channel_item = DirectoryItem(localize('my_channel'),
+                                                create_uri(['channel', 'mine']),
+                                                image=create_path('media', 'channel.png'))
                 my_channel_item.set_fanart(self.get_fanart(context))
                 result.append(my_channel_item)
 
             # watch later
             watch_later_playlist_id = access_manager.get_watch_later_id()
             if settings.get_bool('youtube.folder.watch_later.show', True) and watch_later_playlist_id:
-                watch_later_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.watch_later']),
-                                                 context.create_uri(
-                                                     ['channel', 'mine', 'playlist', watch_later_playlist_id]),
-                                                 context.create_resource_path('media', 'watch_later.png'))
+                watch_later_item = DirectoryItem(localize('watch_later'),
+                                                 create_uri(['channel', 'mine', 'playlist', watch_later_playlist_id]),
+                                                 create_path('media', 'watch_later.png'))
                 watch_later_item.set_fanart(self.get_fanart(context))
                 context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu, self, context, watch_later_playlist_id)
+                yt_context_menu.append_play_all_from_playlist(context_menu, context, watch_later_playlist_id)
                 watch_later_item.set_context_menu(context_menu)
                 result.append(watch_later_item)
 
@@ -1481,21 +1383,20 @@ class Provider(AbstractProvider):
                 resource_manager = self.get_resource_manager(context)
                 playlists = resource_manager.get_related_playlists(channel_id='mine')
                 if 'likes' in playlists:
-                    liked_videos_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.video.liked']),
-                                                      context.create_uri(
-                                                          ['channel', 'mine', 'playlist', playlists['likes']]),
-                                                      context.create_resource_path('media', 'likes.png'))
+                    liked_videos_item = DirectoryItem(localize('video.liked'),
+                                                      create_uri(['channel', 'mine', 'playlist', playlists['likes']]),
+                                                      create_path('media', 'likes.png'))
                     liked_videos_item.set_fanart(self.get_fanart(context))
                     context_menu = []
-                    yt_context_menu.append_play_all_from_playlist(context_menu, self, context, playlists['likes'])
+                    yt_context_menu.append_play_all_from_playlist(context_menu, context, playlists['likes'])
                     liked_videos_item.set_context_menu(context_menu)
                     result.append(liked_videos_item)
 
             # disliked videos
             if settings.get_bool('youtube.folder.disliked_videos.show', True):
-                disliked_videos_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.video.disliked']),
-                                                     context.create_uri(['special', 'disliked_videos']),
-                                                     context.create_resource_path('media', 'dislikes.png'))
+                disliked_videos_item = DirectoryItem(localize('video.disliked'),
+                                                     create_uri(['special', 'disliked_videos']),
+                                                     create_path('media', 'dislikes.png'))
                 disliked_videos_item.set_fanart(self.get_fanart(context))
                 result.append(disliked_videos_item)
 
@@ -1503,95 +1404,94 @@ class Provider(AbstractProvider):
             if settings.get_bool('youtube.folder.history.show', False):
                 watch_history_playlist_id = access_manager.get_watch_history_id()
                 if watch_history_playlist_id != 'HL':
-                    watch_history_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.history']),
-                                                       context.create_uri(
-                                                           ['channel', 'mine', 'playlist', watch_history_playlist_id]),
-                                                       context.create_resource_path('media', 'history.png'))
+                    watch_history_item = DirectoryItem(localize('history'),
+                                                       create_uri(['channel', 'mine', 'playlist', watch_history_playlist_id]),
+                                                       create_path('media', 'history.png'))
                     watch_history_item.set_fanart(self.get_fanart(context))
                     context_menu = []
-                    yt_context_menu.append_play_all_from_playlist(context_menu, self, context, watch_history_playlist_id)
+                    yt_context_menu.append_play_all_from_playlist(context_menu, context, watch_history_playlist_id)
                     watch_history_item.set_context_menu(context_menu)
 
                     result.append(watch_history_item)
 
             # (my) playlists
             if settings.get_bool('youtube.folder.playlists.show', True):
-                playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.playlists']),
-                                               context.create_uri(['channel', 'mine', 'playlists']),
-                                               context.create_resource_path('media', 'playlist.png'))
+                playlists_item = DirectoryItem(localize('playlists'),
+                                               create_uri(['channel', 'mine', 'playlists']),
+                                               create_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
 
             # saved playlists
             if settings.get_bool('youtube.folder.saved.playlists.show', True):
-                playlists_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.saved.playlists']),
-                                               context.create_uri(['special', 'saved_playlists']),
-                                               context.create_resource_path('media', 'playlist.png'))
+                playlists_item = DirectoryItem(localize('saved.playlists'),
+                                               create_uri(['special', 'saved_playlists']),
+                                               create_path('media', 'playlist.png'))
                 playlists_item.set_fanart(self.get_fanart(context))
                 result.append(playlists_item)
 
             # subscriptions
             if settings.get_bool('youtube.folder.subscriptions.show', True):
-                subscriptions_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.subscriptions']),
-                                                   context.create_uri(['subscriptions', 'list']),
-                                                   image=context.create_resource_path('media', 'channels.png'))
+                subscriptions_item = DirectoryItem(localize('subscriptions'),
+                                                   create_uri(['subscriptions', 'list']),
+                                                   image=create_path('media', 'channels.png'))
                 subscriptions_item.set_fanart(self.get_fanart(context))
                 result.append(subscriptions_item)
 
             # browse channels
             if settings.get_bool('youtube.folder.browse_channels.show', True):
-                browse_channels_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.browse_channels']),
-                                                     context.create_uri(['special', 'browse_channels']),
-                                                     image=context.create_resource_path('media', 'browse_channels.png'))
+                browse_channels_item = DirectoryItem(localize('browse_channels'),
+                                                     create_uri(['special', 'browse_channels']),
+                                                     image=create_path('media', 'browse_channels.png'))
                 browse_channels_item.set_fanart(self.get_fanart(context))
                 result.append(browse_channels_item)
 
         # completed live events
         if settings.get_bool('youtube.folder.completed.live.show', True):
-            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.completed.live']),
-                                             context.create_uri(['special', 'completed_live']),
-                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item = DirectoryItem(localize('live.completed'),
+                                             create_uri(['special', 'completed_live']),
+                                             image=create_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # upcoming live events
         if settings.get_bool('youtube.folder.upcoming.live.show', True):
-            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.upcoming.live']),
-                                             context.create_uri(['special', 'upcoming_live']),
-                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item = DirectoryItem(localize('live.upcoming'),
+                                             create_uri(['special', 'upcoming_live']),
+                                             image=create_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # live events
         if settings.get_bool('youtube.folder.live.show', True):
-            live_events_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.live']),
-                                             context.create_uri(['special', 'live']),
-                                             image=context.create_resource_path('media', 'live.png'))
+            live_events_item = DirectoryItem(localize('live'),
+                                             create_uri(['special', 'live']),
+                                             image=create_path('media', 'live.png'))
             live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # switch user
         if settings.get_bool('youtube.folder.switch.user.show', True):
-            switch_user_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.switch.user']),
-                                             context.create_uri(['users', 'switch']),
-                                             image=context.create_resource_path('media', 'channel.png'))
+            switch_user_item = DirectoryItem(localize('user.switch'),
+                                             create_uri(['users', 'switch']),
+                                             image=create_path('media', 'channel.png'))
             switch_user_item.set_action(True)
             switch_user_item.set_fanart(self.get_fanart(context))
             result.append(switch_user_item)
 
         # sign out
         if self.is_logged_in() and settings.get_bool('youtube.folder.sign.out.show', True):
-            sign_out_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.sign.out']),
-                                          context.create_uri(['sign', 'out']),
-                                          image=context.create_resource_path('media', 'sign_out.png'))
+            sign_out_item = DirectoryItem(localize('sign.out'),
+                                          create_uri(['sign', 'out']),
+                                          image=create_path('media', 'sign_out.png'))
             sign_out_item.set_action(True)
             sign_out_item.set_fanart(self.get_fanart(context))
             result.append(sign_out_item)
 
         if settings.get_bool('youtube.folder.settings.show', True):
-            settings_menu_item = DirectoryItem(context.localize(self.LOCAL_MAP['youtube.settings']),
-                                               context.create_uri(['config', 'youtube']),
-                                               image=context.create_resource_path('media', 'settings.png'))
+            settings_menu_item = DirectoryItem(localize('settings'),
+                                               create_uri(['config', 'youtube']),
+                                               image=create_path('media', 'settings.png'))
             settings_menu_item.set_action(True)
             settings_menu_item.set_fanart(self.get_fanart(context))
             result.append(settings_menu_item)
@@ -1647,16 +1547,16 @@ class Provider(AbstractProvider):
             context.log_error('%s: %s' % (title, log_message))
 
             if error == 'deleted_client':
-                message = context.localize(self.LOCAL_MAP['youtube.key.requirement.notification'])
+                message = context.localize('key.requirement.notification')
                 context.get_access_manager().update_access_token(access_token='', refresh_token='')
                 ok_dialog = True
 
             if error == 'invalid_client':
                 if message == 'The OAuth client was not found.':
-                    message = context.localize(self.LOCAL_MAP['youtube.client.id.incorrect'])
+                    message = context.localize('client.id.incorrect')
                     message_timeout = 7000
                 elif message == 'Unauthorized':
-                    message = context.localize(self.LOCAL_MAP['youtube.client.secret.incorrect'])
+                    message = context.localize('client.secret.incorrect')
                     message_timeout = 7000
 
             if ok_dialog:

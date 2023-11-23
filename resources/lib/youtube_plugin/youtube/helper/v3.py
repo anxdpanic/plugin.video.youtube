@@ -42,7 +42,7 @@ def _process_list_response(provider, context, json_data):
         if kind == 'video':
             video_id = yt_item['id']
             snippet = yt_item['snippet']
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             item_params = {'video_id': video_id}
             if incognito:
@@ -60,7 +60,7 @@ def _process_list_response(provider, context, json_data):
         elif kind == 'channel':
             channel_id = yt_item['id']
             snippet = yt_item['snippet']
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             item_params = {}
             if incognito:
@@ -74,14 +74,14 @@ def _process_list_response(provider, context, json_data):
             # if logged in => provide subscribing to the channel
             if provider.is_logged_in():
                 context_menu = []
-                yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
+                yt_context_menu.append_subscribe_to_channel(context_menu, context, channel_id)
                 channel_item.set_context_menu(context_menu)
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
         elif kind == 'guidecategory':
             guide_id = yt_item['id']
             snippet = yt_item['snippet']
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             item_params = {'guide_id': guide_id}
             if incognito:
                 item_params['incognito'] = incognito
@@ -93,7 +93,7 @@ def _process_list_response(provider, context, json_data):
             result.append(guide_item)
         elif kind == 'subscription':
             snippet = yt_item['snippet']
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             channel_id = snippet['resourceId']['channelId']
             item_params = {}
@@ -113,7 +113,7 @@ def _process_list_response(provider, context, json_data):
         elif kind == 'playlist':
             playlist_id = yt_item['id']
             snippet = yt_item['snippet']
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
             channel_id = snippet['channelId']
@@ -138,7 +138,7 @@ def _process_list_response(provider, context, json_data):
             # store the id of the playlistItem - for deleting this item we need this item
             playlist_item_id_dict[video_id] = yt_item['id']
 
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             item_params = {'video_id': video_id}
             if incognito:
@@ -169,7 +169,7 @@ def _process_list_response(provider, context, json_data):
             else:
                 continue
 
-            title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+            title = snippet.get('title', context.localize('untitled'))
             image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             item_params = {'video_id': video_id}
             if incognito:
@@ -194,10 +194,10 @@ def _process_list_response(provider, context, json_data):
                 item_uri = context.create_uri(['special', 'child_comments'], item_params)
             else:
                 item_uri = ''
-            result.append(utils.make_comment_item(context, provider, snippet, item_uri, total_replies))
+            result.append(utils.make_comment_item(context, snippet, item_uri, total_replies))
 
         elif kind == 'comment':
-            result.append(utils.make_comment_item(context, provider, yt_item['snippet'], uri=''))
+            result.append(utils.make_comment_item(context, yt_item['snippet'], uri=''))
 
         elif kind == 'searchresult':
             _, kind = _parse_kind(yt_item.get('id', {}))
@@ -206,7 +206,7 @@ def _process_list_response(provider, context, json_data):
             if kind == 'video':
                 video_id = yt_item['id']['videoId']
                 snippet = yt_item.get('snippet', {})
-                title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+                title = snippet.get('title', context.localize('untitled'))
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
                 item_params = {'video_id': video_id}
                 if incognito:
@@ -225,7 +225,7 @@ def _process_list_response(provider, context, json_data):
             elif kind == 'playlist':
                 playlist_id = yt_item['id']['playlistId']
                 snippet = yt_item['snippet']
-                title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+                title = snippet.get('title', context.localize('untitled'))
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
 
                 channel_id = snippet['channelId']
@@ -246,7 +246,7 @@ def _process_list_response(provider, context, json_data):
             elif kind == 'channel':
                 channel_id = yt_item['id']['channelId']
                 snippet = yt_item['snippet']
-                title = snippet.get('title', context.localize(provider.LOCAL_MAP['youtube.untitled']))
+                title = snippet.get('title', context.localize('untitled'))
                 image = utils.get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
                 item_params = {}
                 if incognito:
@@ -329,7 +329,7 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     return result
 
 
-def handle_error(provider, context, json_data):
+def handle_error(context, json_data):
     if json_data and 'error' in json_data:
         ok_dialog = False
         message_timeout = 5000
@@ -342,11 +342,11 @@ def handle_error(provider, context, json_data):
         context.log_error('Error reason: |%s| with message: |%s|' % (reason, log_message))
 
         if reason == 'accessNotConfigured':
-            message = context.localize(provider.LOCAL_MAP['youtube.key.requirement.notification'])
+            message = context.localize('key.requirement.notification')
             ok_dialog = True
 
         if reason == 'keyInvalid' and message == 'Bad Request':
-            message = context.localize(provider.LOCAL_MAP['youtube.api.key.incorrect'])
+            message = context.localize('api.key.incorrect')
             message_timeout = 7000
 
         if reason in {'quotaExceeded', 'dailyLimitExceeded'}:

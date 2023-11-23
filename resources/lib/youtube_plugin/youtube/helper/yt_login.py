@@ -60,12 +60,12 @@ def process(mode, provider, context, sign_out_refresh=True):
         user_code = json_data['user_code']
         verification_url = json_data.get('verification_url', 'youtube.com/activate').lstrip('https://www.')
 
-        text = [context.localize(provider.LOCAL_MAP['youtube.sign.go_to']) % context.get_ui().bold(verification_url),
-                '[CR]%s %s' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']),
+        text = [context.localize('sign.go_to') % context.get_ui().bold(verification_url),
+                '[CR]%s %s' % (context.localize('sign.enter_code'),
                                context.get_ui().bold(user_code))]
         text = ''.join(text)
         dialog = context.get_ui().create_progress_dialog(
-            heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
+            heading=context.localize('sign.in'), text=text, background=False)
 
         steps = ((10 * 60 * 1000) // interval)  # 10 Minutes
         dialog.set_total(steps)
@@ -115,8 +115,8 @@ def process(mode, provider, context, sign_out_refresh=True):
             context.get_ui().refresh_container()
 
     elif mode == 'in':
-        context.get_ui().on_ok(context.localize(provider.LOCAL_MAP['youtube.sign.twice.title']),
-                               context.localize(provider.LOCAL_MAP['youtube.sign.twice.text']))
+        context.get_ui().on_ok(context.localize('sign.twice.title'),
+                               context.localize('sign.twice.text'))
 
         access_token_tv, expires_in_tv, refresh_token_tv = _do_login(_for_tv=True)
         # abort tv login

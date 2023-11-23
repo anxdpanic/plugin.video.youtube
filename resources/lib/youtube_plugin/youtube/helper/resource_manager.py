@@ -239,7 +239,7 @@ class ResourceManager(object):
             context.log_error(error_message)
 
             if reason == 'accessNotConfigured':
-                message = context.localize(30731)
+                message = context.localize('key.requirement.notification')
                 ok_dialog = True
 
             elif reason in {'quotaExceeded', 'dailyLimitExceeded'}:

@@ -153,7 +153,7 @@ def to_video_item(context, video_item):
         local_datetime = datetime_parser.utc_to_local(datetime)
         props['PublishedLocal'] = str(local_datetime)
     if video_item.live:
-        props['PublishedSince'] = context.localize('30539')
+        props['PublishedSince'] = context.localize('live')
     elif local_datetime:
         props['PublishedSince'] = str(datetime_parser.datetime_to_since(
             context, local_datetime

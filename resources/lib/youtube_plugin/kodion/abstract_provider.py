@@ -30,16 +30,6 @@ class AbstractProvider(object):
     RESULT_UPDATE_LISTING = 'update_listing'
 
     def __init__(self):
-        self._local_map = {
-            'kodion.wizard.view.default': 30027,
-            'kodion.wizard.view.episodes': 30028,
-            'kodion.wizard.view.movies': 30029,
-            'kodion.wizard.view.tvshows': 30032,
-            'kodion.wizard.view.songs': 30033,
-            'kodion.wizard.view.artists': 30034,
-            'kodion.wizard.view.albums': 30035
-        }
-
         # map for regular expression (path) to method (names)
         self._dict_path = {}
 
@@ -85,7 +75,7 @@ class AbstractProvider(object):
             wizard_steps.extend(self.get_wizard_steps(context))
 
         if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
-                                                             context.localize(constants.localize.SETUP_WIZARD_EXECUTE)):
+                                                             context.localize('setup_wizard.execute')):
             for wizard_step in wizard_steps:
                 wizard_step[0](*wizard_step[1])
 
@@ -162,7 +152,7 @@ class AbstractProvider(object):
             directory_items = context.get_favorite_list().get_items()
 
             for directory_item in directory_items:
-                context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
+                context_menu = [(context.localize('watch_later.remove'),
                                  'RunPlugin(%s)' % context.create_uri([constants.paths.FAVORITES, 'remove'],
                                                                       params={'item': to_jsons(directory_item)}))]
                 directory_item.set_context_menu(context_menu)
@@ -189,7 +179,7 @@ class AbstractProvider(object):
             video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
-                context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
+                context_menu = [(context.localize('watch_later.remove'),
                                  'RunPlugin(%s)' % context.create_uri([constants.paths.WATCH_LATER, 'remove'],
                                                                       params={'item': to_jsons(video_item)}))]
                 video_item.set_context_menu(context_menu)
@@ -220,7 +210,7 @@ class AbstractProvider(object):
             return True
         if command == 'rename':
             query = params['q']
-            result, new_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_RENAME),
+            result, new_query = context.get_ui().on_keyboard_input(context.localize('search.rename'),
                                                                    query)
             if result:
                 search_history.rename(query, new_query)
@@ -244,7 +234,7 @@ class AbstractProvider(object):
                     query = to_unicode(query)
                     query = unquote(query)
             else:
-                result, input_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
+                result, input_query = context.get_ui().on_keyboard_input(context.localize('search.title'))
                 if result:
                     query = input_query
 

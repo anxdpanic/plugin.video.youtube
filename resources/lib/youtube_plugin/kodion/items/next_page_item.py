@@ -9,7 +9,6 @@
 """
 
 from .directory_item import DirectoryItem
-from .. import constants
 
 
 class NextPageItem(DirectoryItem):
@@ -17,7 +16,7 @@ class NextPageItem(DirectoryItem):
         new_params = {}
         new_params.update(context.get_params())
         new_params['page'] = current_page + 1
-        name = context.localize(constants.localize.NEXT_PAGE, 'Next Page')
+        name = context.localize('next_page', 'Next Page')
         if name.find('%d') != -1:
             name %= current_page + 1
 

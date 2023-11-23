@@ -16,7 +16,7 @@ class WatchLaterItem(DirectoryItem):
     def __init__(self, context, alt_name=None, image=None, fanart=None):
         name = alt_name
         if not name:
-            name = context.localize(constants.localize.WATCH_LATER)
+            name = context.localize('watch_later')
 
         if image is None:
             image = context.create_resource_path('media/watch_later.png')

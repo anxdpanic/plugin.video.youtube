@@ -14,8 +14,6 @@ import re
 from math import floor, log
 from urllib.parse import quote
 
-from ..constants import localize
-
 import xbmc
 import xbmcvfs
 
@@ -173,7 +171,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
             for sorted_stream_data in sorted_stream_data_list
         ]
 
-        result = context.get_ui().on_select(context.localize(localize.SELECT_VIDEO_QUALITY), items)
+        result = context.get_ui().on_select(context.localize('select_video_quality'), items)
         if result != -1:
             selected_stream_data = result
     else:

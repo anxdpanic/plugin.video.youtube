@@ -1285,7 +1285,7 @@ class VideoInfo(YouTubeRequestClient):
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
             )
-        
+
         # extract non-adaptive streams
         if all_fmts:
             stream_list.extend(self._create_stream_list(
@@ -1330,11 +1330,15 @@ class VideoInfo(YouTubeRequestClient):
                         details['title'].append(' [ASR]')
                     if main_stream['multi_lang']:
                         details['title'].extend((
-                            ' [', self._context.localize(30762), ']'
+                            ' [',
+                            self._context.localize('stream.multi_language'),
+                            ']'
                         ))
                     if main_stream['multi_audio']:
                         details['title'].extend((
-                            ' [', self._context.localize(30763), ']'
+                            ' [',
+                            self._context.localize('stream.multi_audio'),
+                            ']'
                         ))
 
                 details['title'] = ''.join(details['title'])
@@ -1441,18 +1445,18 @@ class VideoInfo(YouTubeRequestClient):
 
                     if role_type == 4 or audio_track.get('audioIsDefault'):
                         role = 'main'
-                        label = self._context.localize(30744)
+                        label = self._context.localize('stream.original')
                     elif role_type == 3:
                         role = 'dub'
-                        label = self._context.localize(30745)
+                        label = self._context.localize('stream.dubbed')
                     elif role_type == 2:
                         role = 'description'
-                        label = self._context.localize(30746)
+                        label = self._context.localize('stream.descriptive')
                     # Unsure of what other audio types are actually available
                     # Role set to "alternate" as default fallback
                     else:
                         role = 'alternate'
-                        label = self._context.localize(30747)
+                        label = self._context.localize('stream.alternate')
 
                     mime_group = '{0}_{1}.{2}'.format(
                         mime_type, language_code, role_type
@@ -1471,7 +1475,7 @@ class VideoInfo(YouTubeRequestClient):
                     language_code = default_lang_code
                     role = 'main'
                     role_type = 4
-                    label = self._context.localize(30744)
+                    label = self._context.localize('stream.original')
                     mime_group = mime_type
 
                 sample_rate = int(stream.get('audioSampleRate', '0'), 10)
@@ -1723,7 +1727,8 @@ class VideoInfo(YouTubeRequestClient):
 
             if group.startswith(mime_type) and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
-                    stream['langName'] or self._context.localize(30583),
+                    stream['langName']
+                        or self._context.localize('stream.automatic'),
                     stream['label']
                 )
                 if stream == main_stream[media_type]:

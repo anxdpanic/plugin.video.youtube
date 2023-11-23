@@ -19,7 +19,7 @@ def _process_list(provider, context):
     page_token = context.get_param('page_token', '')
     # no caching
     json_data = provider.get_client(context).get_subscription('mine', page_token=page_token)
-    if not v3.handle_error(provider, context, json_data):
+    if not v3.handle_error(context, json_data):
         return []
     result.extend(v3.response_to_items(provider, context, json_data))
 
@@ -36,11 +36,11 @@ def _process_add(provider, context):
 
     if subscription_id:
         json_data = provider.get_client(context).subscribe(subscription_id)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
 
         context.get_ui().show_notification(
-            context.localize(provider.LOCAL_MAP['youtube.subscribed.to.channel']),
+            context.localize('subscribed.to.channel'),
             time_milliseconds=2500,
             audible=False
         )
@@ -59,13 +59,13 @@ def _process_remove(provider, context):
 
     if subscription_id:
         json_data = provider.get_client(context).unsubscribe(subscription_id)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
 
         context.get_ui().refresh_container()
 
         context.get_ui().show_notification(
-            context.localize(provider.LOCAL_MAP['youtube.unsubscribed.from.channel']),
+            context.localize('unsubscribed.from.channel'),
             time_milliseconds=2500,
             audible=False
         )

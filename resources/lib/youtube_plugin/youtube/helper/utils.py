@@ -46,7 +46,7 @@ def get_thumb_timestamp(minutes=15):
     return str(time.mktime(time.gmtime(minutes * 60 * (round(time.time() / (minutes * 60))))))
 
 
-def make_comment_item(context, provider, snippet, uri, total_replies=0):
+def make_comment_item(context, snippet, uri, total_replies=0):
     author = '[B]{}[/B]'.format(utils.to_str(snippet['authorDisplayName']))
     body = utils.to_str(snippet['textOriginal'])
 
@@ -60,16 +60,16 @@ def make_comment_item(context, provider, snippet, uri, total_replies=0):
     if snippet['likeCount'] and total_replies:
         label_props = '[COLOR lime][B]+%s[/B][/COLOR]|[COLOR cyan][B]%s[/B][/COLOR]' % (str_likes, str_replies)
         plot_props = '[COLOR lime][B]%s %s[/B][/COLOR]|[COLOR cyan][B]%s %s[/B][/COLOR]' % (str_likes,
-                     context.localize(provider.LOCAL_MAP['youtube.video.comments.likes']), str_replies,
-                     context.localize(provider.LOCAL_MAP['youtube.video.comments.replies']))
+                     context.localize('video.comments.likes'), str_replies,
+                     context.localize('video.comments.replies'))
     elif snippet['likeCount']:
         label_props = '[COLOR lime][B]+%s[/B][/COLOR]' % str_likes
         plot_props = '[COLOR lime][B]%s %s[/B][/COLOR]' % (str_likes,
-                     context.localize(provider.LOCAL_MAP['youtube.video.comments.likes']))
+                     context.localize('video.comments.likes'))
     elif total_replies:
         label_props = '[COLOR cyan][B]%s[/B][/COLOR]' % str_replies
         plot_props = '[COLOR cyan][B]%s %s[/B][/COLOR]' % (str_replies,
-                     context.localize(provider.LOCAL_MAP['youtube.video.comments.replies']))
+                     context.localize('video.comments.replies'))
     else:
         pass # The comment has no likes or replies.
 
@@ -82,7 +82,7 @@ def make_comment_item(context, provider, snippet, uri, total_replies=0):
         label = '{author}{edited} {body}'.format(author=author, edited=edited, body=body.replace('\n', ' '))
 
     # Format the plot of the comment item.
-    edited = ' (%s)' % context.localize(provider.LOCAL_MAP['youtube.video.comments.edited']) if is_edited else ''
+    edited = ' (%s)' % context.localize('video.comments.edited') if is_edited else ''
     if plot_props:
         plot = '{author} ({props}){edited}[CR][CR]{body}'.format(author=author, props=plot_props,
                                                                edited=edited, body=body)
@@ -146,17 +146,17 @@ def update_channel_infos(provider, context, channel_id_dict,
         subscription_id = subscription_id_dict.get(channel_id, '')
         if subscription_id:
             channel_item.set_channel_subscription_id(subscription_id)
-            yt_context_menu.append_unsubscribe_from_channel(context_menu, provider, context, subscription_id)
+            yt_context_menu.append_unsubscribe_from_channel(context_menu, context, subscription_id)
         # -- subscribe to the channel
         if logged_in and path != '/subscriptions/list/':
-            yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id)
+            yt_context_menu.append_subscribe_to_channel(context_menu, context, channel_id)
 
         if path == '/subscriptions/list/':
             channel = title.lower().replace(',', '')
             if channel in filter_list:
-                yt_context_menu.append_remove_my_subscriptions_filter(context_menu, provider, context, title)
+                yt_context_menu.append_remove_my_subscriptions_filter(context_menu, context, title)
             else:
-                yt_context_menu.append_add_my_subscriptions_filter(context_menu, provider, context, title)
+                yt_context_menu.append_add_my_subscriptions_filter(context_menu, context, title)
         channel_item.set_context_menu(context_menu)
 
         fanart_images = yt_item.get('brandingSettings', {}).get('image', {})
@@ -212,32 +212,32 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         channel_name = snippet.get('channelTitle', '')
         context_menu = []
         # play all videos of the playlist
-        yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id)
+        yt_context_menu.append_play_all_from_playlist(context_menu, context, playlist_id)
 
         if logged_in:
             if channel_id != 'mine':
                 # subscribe to the channel via the playlist item
-                yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id,
+                yt_context_menu.append_subscribe_to_channel(context_menu, context, channel_id,
                                                             channel_name)
             else:
                 # remove my playlist
-                yt_context_menu.append_delete_playlist(context_menu, provider, context, playlist_id, title)
+                yt_context_menu.append_delete_playlist(context_menu, context, playlist_id, title)
 
                 # rename playlist
-                yt_context_menu.append_rename_playlist(context_menu, provider, context, playlist_id, title)
+                yt_context_menu.append_rename_playlist(context_menu, context, playlist_id, title)
 
                 # remove as my custom watch later playlist
                 if playlist_id == custom_watch_later_id:
-                    yt_context_menu.append_remove_as_watchlater(context_menu, provider, context, playlist_id, title)
+                    yt_context_menu.append_remove_as_watchlater(context_menu, context, playlist_id, title)
                 # set as my custom watch later playlist
                 else:
-                    yt_context_menu.append_set_as_watchlater(context_menu, provider, context, playlist_id, title)
+                    yt_context_menu.append_set_as_watchlater(context_menu, context, playlist_id, title)
                 # remove as custom history playlist
                 if playlist_id == custom_history_id:
-                    yt_context_menu.append_remove_as_history(context_menu, provider, context, playlist_id, title)
+                    yt_context_menu.append_remove_as_history(context_menu, context, playlist_id, title)
                 # set as custom history playlist
                 else:
-                    yt_context_menu.append_set_as_history(context_menu, provider, context, playlist_id, title)
+                    yt_context_menu.append_set_as_history(context_menu, context, playlist_id, title)
 
         if context_menu:
             playlist_item.set_context_menu(context_menu)
@@ -334,9 +334,8 @@ def update_video_infos(provider, context, video_id_dict,
             video_item.set_aired_from_datetime(local_datetime)
             video_item.set_premiered_from_datetime(local_datetime)
             video_item.set_date_from_datetime(local_datetime)
-            type_label = context.localize(provider.LOCAL_MAP[
-                'youtube.live' if video_item.live else 'youtube.upcoming'
-            ])
+            type_label = context.localize('live' if video_item.live
+                                          else 'upcoming')
             start_at = '{type_label} {start_at}'.format(
                 type_label=type_label,
                 start_at=utils.datetime_parser.get_scheduled_start(
@@ -353,7 +352,7 @@ def update_video_infos(provider, context, video_id_dict,
         stats = []
         if 'statistics' in yt_item:
             for stat, value in yt_item['statistics'].items():
-                label = provider.LOCAL_MAP.get('youtube.stats.' + stat)
+                label = context.LOCAL_MAP.get('stats.' + stat)
                 if label:
                     stats.append('{value} {name}'.format(
                         name=context.localize(label).lower(),
@@ -436,10 +435,10 @@ def update_video_infos(provider, context, video_id_dict,
         replace_context_menu = False
 
         # Refresh
-        yt_context_menu.append_refresh(context_menu, provider, context)
+        yt_context_menu.append_refresh(context_menu, context)
 
         # Queue Video
-        yt_context_menu.append_queue_video(context_menu, provider, context)
+        yt_context_menu.append_queue_video(context_menu, context)
 
         """
         Play all videos of the playlist.
@@ -452,8 +451,8 @@ def update_video_infos(provider, context, video_id_dict,
             replace_context_menu = True
             playlist_id = some_playlist_match.group('playlist_id')
 
-            yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id, video_id)
-            yt_context_menu.append_play_all_from_playlist(context_menu, provider, context, playlist_id)
+            yt_context_menu.append_play_all_from_playlist(context_menu, context, playlist_id, video_id)
+            yt_context_menu.append_play_all_from_playlist(context_menu, context, playlist_id)
 
         # 'play with...' (external player)
         if alternate_player:
@@ -463,11 +462,11 @@ def update_video_infos(provider, context, video_id_dict,
             # add 'Watch Later' only if we are not in my 'Watch Later' list
             watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
             if watch_later_playlist_id:
-                yt_context_menu.append_watch_later(context_menu, provider, context, watch_later_playlist_id, video_id)
+                yt_context_menu.append_watch_later(context_menu, context, watch_later_playlist_id, video_id)
 
             # provide 'remove' for videos in my playlists
             if video_id in playlist_item_id_dict:
-                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', path)
+                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', context.get_path())
                 if playlist_match:
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
@@ -475,7 +474,7 @@ def update_video_infos(provider, context, video_id_dict,
                         playlist_item_id = playlist_item_id_dict[video_id]
                         video_item.set_playlist_id(playlist_id)
                         video_item.set_playlist_item_id(playlist_item_id)
-                        context_menu.append((context.localize(provider.LOCAL_MAP['youtube.remove']),
+                        context_menu.append((context.localize('remove'),
                                              'RunPlugin(%s)' % context.create_uri(
                                                  ['playlist', 'remove', 'video'],
                                                  {'playlist_id': playlist_id,
@@ -485,27 +484,27 @@ def update_video_infos(provider, context, video_id_dict,
 
             is_history = re.match('^/special/watch_history_tv/$', context.get_path())
             if is_history:
-                yt_context_menu.append_clear_watch_history(context_menu, provider, context)
+                yt_context_menu.append_clear_watch_history(context_menu, context)
 
         # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
         if (channel_id and channel_name and
                 utils.create_path('channel', channel_id) != path):
             video_item.set_channel_id(channel_id)
-            yt_context_menu.append_go_to_channel(context_menu, provider, context, channel_id, channel_name)
+            yt_context_menu.append_go_to_channel(context_menu, context, channel_id, channel_name)
 
         if logged_in:
             # subscribe to the channel of the video
             video_item.set_subscription_id(channel_id)
-            yt_context_menu.append_subscribe_to_channel(context_menu, provider, context, channel_id, channel_name)
+            yt_context_menu.append_subscribe_to_channel(context_menu, context, channel_id, channel_name)
 
         if not video_item.live and play_data:
             if not play_data.get('play_count'):
-                yt_context_menu.append_mark_watched(context_menu, provider, context, video_id)
+                yt_context_menu.append_mark_watched(context_menu, context, video_id)
             else:
-                yt_context_menu.append_mark_unwatched(context_menu, provider, context, video_id)
+                yt_context_menu.append_mark_unwatched(context_menu, context, video_id)
 
             if play_data.get('played_percent', 0) > 0 or play_data.get('played_time', 0) > 0:
-                yt_context_menu.append_reset_resume_point(context_menu, provider, context, video_id)
+                yt_context_menu.append_reset_resume_point(context_menu, context, video_id)
 
         # more...
         refresh_container = (path.startswith('/channel/mine/playlist/LL')
@@ -518,7 +517,7 @@ def update_video_infos(provider, context, video_id_dict,
             yt_context_menu.append_play_with_subtitles(context_menu, context, video_id)
             yt_context_menu.append_play_audio_only(context_menu, context, video_id)
 
-        yt_context_menu.append_play_ask_for_quality(context_menu, provider, context, video_id)
+        yt_context_menu.append_play_ask_for_quality(context_menu, context, video_id)
 
         if context_menu:
             video_item.set_context_menu(context_menu, replace=replace_context_menu)

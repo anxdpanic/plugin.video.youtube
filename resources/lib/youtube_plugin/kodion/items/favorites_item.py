@@ -16,7 +16,7 @@ class FavoritesItem(DirectoryItem):
     def __init__(self, context, alt_name=None, image=None, fanart=None):
         name = alt_name
         if not name:
-            name = context.localize(constants.localize.FAVORITES)
+            name = context.localize('favorites')
 
         if image is None:
             image = context.create_resource_path('media/favorites.png')

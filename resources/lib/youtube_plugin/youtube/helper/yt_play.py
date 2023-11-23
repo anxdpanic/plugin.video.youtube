@@ -16,7 +16,6 @@ import traceback
 import xbmcplugin
 
 from ... import kodion
-from ...kodion import constants
 from ...kodion.items import VideoItem
 from ...kodion.ui.xbmc.xbmc_items import to_playback_item
 from ...youtube.youtube_exceptions import YouTubeException
@@ -54,7 +53,7 @@ def play_video(provider, context):
             return False
 
         if not video_streams:
-            message = context.localize(provider.LOCAL_MAP['youtube.error.no_video_streams_found'])
+            message = context.localize('error.no_video_streams_found')
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
@@ -67,7 +66,7 @@ def play_video(provider, context):
         is_live = video_stream.get('Live')
 
         if is_video and video_stream['video'].get('rtmpe', False):
-            message = context.localize(provider.LOCAL_MAP['youtube.error.rtmpe_not_supported'])
+            message = context.localize('error.rtmpe_not_supported')
             context.get_ui().show_notification(message, time_milliseconds=5000)
             return False
 
@@ -137,17 +136,17 @@ def play_playlist(provider, context):
     def _load_videos(_page_token='', _progress_dialog=None):
         if _progress_dialog is None:
             _progress_dialog = context.get_ui().create_progress_dialog(
-                context.localize(provider.LOCAL_MAP['youtube.playlist.progress.updating']),
-                context.localize(constants.localize.COMMON_PLEASE_WAIT), background=True)
+                context.localize('playlist.progress.updating'),
+                context.localize('please_wait'), background=True)
         json_data = client.get_playlist_items(playlist_id, page_token=_page_token)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return None
         _progress_dialog.set_total(int(json_data.get('pageInfo', {}).get('totalResults', 0)))
 
         result = v3.response_to_items(provider, context, json_data, process_next_page=False)
         videos.extend(result)
         progress_text = '%s %d/%d' % (
-            context.localize(constants.localize.COMMON_PLEASE_WAIT), len(videos), _progress_dialog.get_total())
+            context.localize('please_wait'), len(videos), _progress_dialog.get_total())
         _progress_dialog.update(steps=len(result), text=progress_text)
 
         next_page_token = json_data.get('nextPageToken', '')
@@ -166,9 +165,9 @@ def play_playlist(provider, context):
             order_list.append('shuffle')
         items = []
         for order in order_list:
-            items.append((context.localize(provider.LOCAL_MAP['youtube.playlist.play.%s' % order]), order))
+            items.append((context.localize('playlist.play.%s' % order), order))
 
-        order = context.get_ui().on_select(context.localize(provider.LOCAL_MAP['youtube.playlist.play.select']), items)
+        order = context.get_ui().on_select(context.localize('playlist.play.select'), items)
         if order not in order_list:
             return False
 
@@ -234,7 +233,7 @@ def play_channel_live(provider, context):
     if index < 0:
         index = 0
     json_data = provider.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, safe_search=False)
-    if not v3.handle_error(provider, context, json_data):
+    if not v3.handle_error(context, json_data):
         return False
 
     video_items = v3.response_to_items(provider, context, json_data, process_next_page=False)

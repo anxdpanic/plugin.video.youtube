@@ -22,7 +22,7 @@ def _process_related_videos(provider, context):
     video_id = context.get_param('video_id', '')
     if video_id:
         json_data = provider.get_client(context).get_related_videos(video_id=video_id, page_token=page_token)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data, process_next_page=False))
 
@@ -37,7 +37,7 @@ def _process_parent_comments(provider, context):
     video_id = context.get_param('video_id', '')
     if video_id:
         json_data = provider.get_client(context).get_parent_comments(video_id=video_id, page_token=page_token)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
 
@@ -52,7 +52,7 @@ def _process_child_comments(provider, context):
     parent_id = context.get_param('parent_id', '')
     if parent_id:
         json_data = provider.get_client(context).get_child_comments(parent_id=parent_id, page_token=page_token)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
 
@@ -65,7 +65,7 @@ def _process_recommendations(provider, context):
 
     page_token = context.get_param('page_token', '')
     json_data = provider.get_client(context).get_activities('home', page_token=page_token)
-    if not v3.handle_error(provider, context, json_data):
+    if not v3.handle_error(context, json_data):
         return False
     result.extend(v3.response_to_items(provider, context, json_data))
     return result
@@ -77,7 +77,7 @@ def _process_popular_right_now(provider, context):
 
     page_token = context.get_param('page_token', '')
     json_data = provider.get_client(context).get_popular_videos(page_token=page_token)
-    if not v3.handle_error(provider, context, json_data):
+    if not v3.handle_error(context, json_data):
         return False
     result.extend(v3.response_to_items(provider, context, json_data))
 
@@ -94,12 +94,12 @@ def _process_browse_channels(provider, context):
 
     if guide_id:
         json_data = client.get_guide_category(guide_id)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
     else:
         json_data = context.get_function_cache().get(kodion.utils.FunctionCache.ONE_MONTH, client.get_guide_categories)
-        if not v3.handle_error(provider, context, json_data):
+        if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
 
@@ -112,7 +112,7 @@ def _process_disliked_videos(provider, context):
 
     page_token = context.get_param('page_token', '')
     json_data = provider.get_client(context).get_disliked_videos(page_token=page_token)
-    if not v3.handle_error(provider, context, json_data):
+    if not v3.handle_error(context, json_data):
         return False
     result.extend(v3.response_to_items(provider, context, json_data))
     return result
@@ -130,7 +130,7 @@ def _process_live_events(provider, context, event_type='live'):
     location = context.get_param('location', False)
 
     json_data = provider.get_client(context).get_live_events(event_type=event_type, page_token=page_token, location=location)
-    if not v3.handle_error(provider, context, json_data):
+    if not v3.handle_error(context, json_data):
         return False
     result.extend(v3.response_to_items(provider, context, json_data, sort=_sort, reverse_sort=True))
 
@@ -148,7 +148,7 @@ def _process_description_links(provider, context):
         result = []
 
         progress_dialog = \
-            context.get_ui().create_progress_dialog(heading=context.localize(kodion.constants.localize.COMMON_PLEASE_WAIT),
+            context.get_ui().create_progress_dialog(heading=context.localize('please_wait'),
                                                     background=False)
 
         resource_manager = provider.get_resource_manager(context)
@@ -185,9 +185,8 @@ def _process_description_links(provider, context):
 
         if not result:
             progress_dialog.close()
-            context.get_ui().on_ok(title=context.localize(provider.LOCAL_MAP['youtube.video.description.links']),
-                                   text=context.localize(
-                                       provider.LOCAL_MAP['youtube.video.description.links.not_found']))
+            context.get_ui().on_ok(title=context.localize('video.description.links'),
+                                   text=context.localize('video.description.links.not_found'))
             return False
 
         return result
