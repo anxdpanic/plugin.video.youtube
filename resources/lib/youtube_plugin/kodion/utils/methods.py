@@ -14,7 +14,6 @@ import re
 from math import floor, log
 from urllib.parse import quote
 
-import xbmc
 import xbmcvfs
 
 
@@ -33,12 +32,6 @@ __all__ = (
     'to_unicode',
     'to_utf8',
 )
-
-
-try:
-    xbmc.translatePath = xbmcvfs.translatePath
-except AttributeError:
-    pass
 
 
 def loose_version(v):
@@ -242,7 +235,7 @@ def print_items(items):
 def make_dirs(path):
     if not path.endswith('/'):
         path = ''.join([path, '/'])
-    path = xbmc.translatePath(path)
+    path = xbmcvfs.translatePath(path)
     if not xbmcvfs.exists(path):
         try:
             _ = xbmcvfs.mkdirs(path)

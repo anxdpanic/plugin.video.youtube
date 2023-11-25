@@ -21,12 +21,6 @@ from ..network import get_http_server, is_httpd_live
 from .. import logger
 
 
-try:
-    xbmc.translatePath = xbmcvfs.translatePath
-except AttributeError:
-    pass
-
-
 class YouTubeMonitor(xbmc.Monitor):
 
     # noinspection PyUnusedLocal,PyMissingConstructor
@@ -150,10 +144,7 @@ class YouTubeMonitor(xbmc.Monitor):
         return is_httpd_live(port=self.httpd_port())
 
     def remove_temp_dir(self):
-        try:
-            path = xbmc.translatePath('special://temp/%s' % self.addon_id).decode('utf-8')
-        except AttributeError:
-            path = xbmc.translatePath('special://temp/%s' % self.addon_id)
+        path = xbmcvfs.translatePath('special://temp/%s' % self._addon_id)
 
         if os.path.isdir(path):
             try:

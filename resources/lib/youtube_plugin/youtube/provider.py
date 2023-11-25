@@ -41,17 +41,10 @@ from ..kodion.network import get_client_ip_address, is_httpd_live
 from ..kodion.utils import find_video_id, strip_html_from_text, FunctionCache
 from ..youtube.helper import yt_subscriptions
 
-import xbmc
 import xbmcaddon
 import xbmcvfs
 import xbmcgui
 import xbmcplugin
-
-
-try:
-    xbmc.translatePath = xbmcvfs.translatePath
-except AttributeError:
-    pass
 
 
 class Provider(AbstractProvider):
@@ -1119,7 +1112,7 @@ class Provider(AbstractProvider):
                     _file_w_path = os.path.join(context.get_data_path(), _file)
                 if ui.on_delete_content(_file):
                     if maint_type == 'temp_files':
-                        _trans_path = xbmc.translatePath(_file_w_path)
+                        _trans_path = xbmcvfs.translatePath(_file_w_path)
                         try:
                             xbmcvfs.rmdir(_trans_path, force=True)
                         except:

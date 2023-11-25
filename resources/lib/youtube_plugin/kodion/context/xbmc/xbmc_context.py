@@ -28,12 +28,6 @@ from ...ui.xbmc.xbmc_context_ui import XbmcContextUI
 from ... import utils
 
 
-try:
-    xbmc.translatePath = xbmcvfs.translatePath
-except AttributeError:
-    pass
-
-
 class XbmcContext(AbstractContext):
     LOCAL_MAP = {
         'api.id': 30202,
@@ -286,16 +280,13 @@ class XbmcContext(AbstractContext):
         self._plugin_id = plugin_id or self._addon.getAddonInfo('id')
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
-        self._native_path = xbmc.translatePath(self._addon.getAddonInfo('path'))
+        self._native_path = xbmcvfs.translatePath(self._addon.getAddonInfo('path'))
         self._settings = XbmcPluginSettings(self._addon)
 
         """
         Set the data path for this addon and create the folder
         """
-        try:
-            self._data_path = xbmc.translatePath(self._addon.getAddonInfo('profile')).decode('utf-8')
-        except AttributeError:
-            self._data_path = xbmc.translatePath(self._addon.getAddonInfo('profile'))
+        self._data_path = xbmcvfs.translatePath(self._addon.getAddonInfo('profile'))
 
         if not xbmcvfs.exists(self._data_path):
             xbmcvfs.mkdir(self._data_path)

@@ -25,11 +25,6 @@ from ..logger import log_debug
 from ..settings import Settings
 
 
-try:
-    xbmc.translatePath = xbmcvfs.translatePath
-except AttributeError:
-    pass
-
 _addon_id = 'plugin.video.youtube'
 _settings = Settings(Addon(id=_addon_id))
 
@@ -42,10 +37,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.whitelist_ips = whitelist_ips.split(',')
         self.local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
         self.chunk_size = 1024 * 64
-        try:
-            self.base_path = xbmc.translatePath('special://temp/%s' % _addon_id).decode('utf-8')
-        except AttributeError:
-            self.base_path = xbmc.translatePath('special://temp/%s' % _addon_id)
+        self.base_path = xbmcvfs.translatePath('special://temp/%s' % _addon_id)
         super(YouTubeProxyRequestHandler, self).__init__(request, client_address, server)
 
     def connection_allowed(self):
