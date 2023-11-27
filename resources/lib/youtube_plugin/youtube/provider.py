@@ -695,151 +695,101 @@ class Provider(AbstractProvider):
         access_manager = context.get_access_manager()
         ui = context.get_ui()
 
-        def add_user(_access_manager_users):
-            _results = ui.on_keyboard_input(localize('user.enter_name'))
-            if _results[0] is False:
-                return None
-            _new_user_name = _results[1]
-            if not _new_user_name.strip():
-                _new_user_name = localize('user.unnamed')
-            _new_users = {
-                str(idx): user
-                for idx, user in enumerate(_access_manager_users.values())
-            }
-            _new_users[str(len(_new_users))] = access_manager.get_new_user(_new_user_name)
-            access_manager.set_users(_new_users)
-            return str(len(_new_users) - 1)
+        def select_user(reason, new_user=False):
+            current_users = access_manager.get_users()
+            current_user = access_manager.get_user()
+            usernames = []
+            for user, details in sorted(current_users.items()):
+                username = details.get('name') or localize('user.unnamed')
+                if user == current_user:
+                    username = '> ' + ui.bold(username)
+                if details.get('access_token') or details.get('refresh_token'):
+                    username = ui.color('limegreen', username)
+                usernames.append(username)
+            if new_user:
+                usernames.append(ui.italic(localize('user.new')))
+            return ui.on_select(reason, usernames), sorted(current_users.keys())
 
-        def switch_to_user(_user):
-            _user_name = access_manager.get_users()[_user].get('name', localize('user.unnamed'))
-            access_manager.set_user(_user, switch_to=True)
-            ui.show_notification(localize('user.changed') % _user_name,
-                                 localize('user.switch'))
+        def add_user():
+            results = ui.on_keyboard_input(localize('user.enter_name'))
+            if results[0] is False:
+                return None, None
+            new_username = results[1].strip()
+            if not new_username:
+                new_username = localize('user.unnamed')
+            return access_manager.add_user(new_username)
+
+        def switch_to_user(user):
+            access_manager.set_user(user, switch_to=True)
+            ui.show_notification(
+                localize('user.changed') % access_manager.get_username(user),
+                localize('user.switch')
+            )
             self.get_resource_manager(context).clear()
             if refresh:
                 ui.refresh_container()
 
         if action == 'switch':
-            access_manager_users = access_manager.get_users()
-            current_user = access_manager.get_user()
-            users = [ui.bold(localize('user.new'))]
-            user_index_map = []
-            for user, details in access_manager_users.items():
-                if user == current_user:
-                    if details.get('access_token') or details.get('refresh_token'):
-                        users.append(
-                            ui.color('limegreen',
-                                     ' '.join([details.get('name', localize('user.unnamed')), '*']))
-                        )
-                    else:
-                        users.append(' '.join([details.get('name', localize('user.unnamed')), '*']))
-                elif details.get('access_token') or details.get('refresh_token'):
-                    users.append(ui.color('limegreen', details.get('name', localize('user.unnamed'))))
-                else:
-                    users.append(details.get('name', localize('user.unnamed')))
-                user_index_map.append(user)
-            result = ui.on_select(localize('user.switch'), users)
+            result, user_index_map = select_user(localize('user.switch'),
+                                                 new_user=True)
             if result == -1:
                 return True
-            if result == 0:
-                user = add_user(access_manager_users)
+            if result == len(user_index_map):
+                user, _ = add_user()
             else:
-                user = user_index_map[result - 1]
+                user = user_index_map[result]
 
-            if user and (user != access_manager.get_user()):
+            if user is not None and user != access_manager.get_user():
                 switch_to_user(user)
 
         elif action == 'add':
-            user = add_user(access_manager.get_users())
-            if user:
-                user_name = access_manager.get_users()[user].get('name', localize('user.unnamed'))
-                result = ui.on_yes_no_input(localize('user.switch'), localize('user.switch.now') % user_name)
+            user, details = add_user()
+            if user is not None:
+                result = ui.on_yes_no_input(
+                    localize('user.switch'),
+                    localize('user.switch.now') % details.get('name')
+                )
                 if result:
                     switch_to_user(user)
 
         elif action == 'remove':
-            access_manager_users = access_manager.get_users()
-            users = []
-            user_index_map = []
-            current_user = access_manager.get_user()
-            current_user_idx = '0'
-            for user, details in access_manager_users.items():
-                if user == current_user:
-                    current_user_idx = str(len(user_index_map))
-                    if details.get('access_token') or details.get('refresh_token'):
-                        users.append(
-                            ui.color('limegreen',
-                                     ' '.join([details.get('name', localize('user.unnamed')), '*']))
-                        )
-                    else:
-                        users.append(' '.join([details.get('name', localize('user.unnamed')), '*']))
-                elif details.get('access_token') or details.get('refresh_token'):
-                    users.append(ui.color('limegreen', details.get('name', localize('user.unnamed'))))
-                else:
-                    users.append(details.get('name', localize('user.unnamed')))
-                user_index_map.append(user)
-            result = ui.on_select(localize('user.remove'), users)
+            result, user_index_map = select_user(localize('user.remove'))
             if result == -1:
                 return True
 
             user = user_index_map[result]
-            user_name = access_manager_users[user].get('name', localize('user.unnamed'))
-            result = ui.on_remove_content(user_name)
-            if result:
-                if user == current_user:
-                    access_manager.set_user('0', switch_to=True)
-                del access_manager_users[user]
-
-                new_users = {
-                    str(idx): user
-                    for idx, user in enumerate(access_manager_users.values())
-                }
-
-                if current_user_idx in new_users:
-                    access_manager.set_user(current_user_idx, switch_to=True)
-                else:
-                    access_manager.set_user('0', switch_to=True)
-
-                access_manager.set_users(new_users)
-                ui.show_notification(localize('removed') % user_name,
+            username = access_manager.get_username(user)
+            if ui.on_remove_content(username):
+                access_manager.remove_user(user)
+                if user == 0:
+                    access_manager.add_user(username=localize('user.default'),
+                                            user=0)
+                if user == access_manager.get_user():
+                    access_manager.set_user(0, switch_to=True)
+                ui.show_notification(localize('removed') % username,
                                      localize('remove'))
 
         elif action == 'rename':
-            access_manager_users = access_manager.get_users()
-            users = []
-            user_index_map = []
-            current_user = access_manager.get_user()
-            for user, details in access_manager_users.items():
-                if user == current_user:
-                    if details.get('access_token') or details.get('refresh_token'):
-                        users.append(
-                            ui.color('limegreen',
-                                     ' '.join([details.get('name', localize('user.unnamed')), '*']))
-                        )
-                    else:
-                        users.append(' '.join([details.get('name', localize('user.unnamed')), '*']))
-                elif details.get('access_token') or details.get('refresh_token'):
-                    users.append(ui.color('limegreen', details.get('name', localize('user.unnamed'))))
-                else:
-                    users.append(details.get('name', localize('user.unnamed')))
-                user_index_map.append(user)
-            result = ui.on_select(localize('user.rename'), users)
+            result, user_index_map = select_user(localize('user.rename'))
             if result == -1:
                 return True
 
             user = user_index_map[result]
-            old_user_name = access_manager_users[user].get('name', localize('user.unnamed'))
-            results = ui.on_keyboard_input(localize('user.enter_name'), default=old_user_name)
+            old_username = access_manager.get_username(user)
+            results = ui.on_keyboard_input(localize('user.enter_name'),
+                                           default=old_username)
             if results[0] is False:
                 return True
-            new_user_name = results[1]
-            if not new_user_name.strip() or (old_user_name == new_user_name):
+            new_username = results[1].strip()
+            if not new_username:
+                new_username = localize('user.unnamed')
+            if old_username == new_username:
                 return True
 
-            access_manager_users[user]['name'] = new_user_name
-            access_manager.set_users(access_manager_users)
-            ui.show_notification(localize('renamed') % (old_user_name, new_user_name),
-                                 localize('rename'))
+            if access_manager.set_username(user, new_username):
+                ui.show_notification(localize('renamed') % (old_username,
+                                                            new_username),
+                                     localize('rename'))
 
         return True
 

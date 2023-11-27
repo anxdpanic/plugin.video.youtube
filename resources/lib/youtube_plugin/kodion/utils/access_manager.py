@@ -23,7 +23,7 @@ class AccessManager(object):
         self._settings = context.get_settings()
         self._jstore = LoginTokenStore()
         self._json = self._jstore.get_data()
-        self._user = self._json['access_manager'].get('current_user', '0')
+        self._user = self._json['access_manager'].get('current_user', 0)
         self._last_origin = self._json['access_manager'].get('last_origin', 'plugin.video.youtube')
 
     def get_current_user_id(self):
@@ -34,9 +34,9 @@ class AccessManager(object):
         self._json = self._jstore.get_data()
         return self._json['access_manager']['users'][self.get_user()]['id']
 
-    def get_new_user(self, user_name=''):
+    def get_new_user(self, username=''):
         """
-        :param user_name: string, users name
+        :param username: string, users name
         :return: a new user dict
         """
         uuids = [
@@ -46,9 +46,16 @@ class AccessManager(object):
         new_uuid = None
         while not new_uuid or new_uuid in uuids:
             new_uuid = uuid.uuid4().hex
-
-        return {'access_token': '', 'refresh_token': '', 'token_expires': -1, 'last_key_hash': '',
-                'name': user_name, 'id': new_uuid, 'watch_later': ' WL', 'watch_history': 'HL'}
+        return {
+            'access_token': '',
+            'refresh_token': '',
+            'token_expires': -1,
+            'last_key_hash': '',
+            'name': username,
+            'id': new_uuid,
+            'watch_later': ' WL',
+            'watch_history': 'HL'
+        }
 
     def get_users(self):
         """
@@ -57,9 +64,36 @@ class AccessManager(object):
         """
         return self._json['access_manager'].get('users', {})
 
+    def add_user(self, username='', user=None):
+        """
+        Add single new user to users collection
+        :param username: str, chosen name of new user
+        :param user: int, optional index for new user
+        :return: tuple, (index, details) of newly added user
+        """
+        users = self._json['access_manager'].get('users', {})
+        new_user_details = self.get_new_user(username)
+        new_user = max(users) + 1 if users and user is None else user or 0
+        users[new_user] = new_user_details
+        self._json['access_manager']['users'] = users
+        self._jstore.save(self._json)
+        return new_user, new_user_details
+
+    def remove_user(self, user):
+        """
+        Remove user from collection of current users
+        :param user: int, user index
+        :return:
+        """
+        users = self._json['access_manager'].get('users', {})
+        if user in users:
+            del users[user]
+        self._json['access_manager']['users'] = users
+        self._jstore.save(self._json)
+
     def set_users(self, users):
         """
-        Updates the users
+        Updates all users
         :param users: dict, users
         :return:
         """
@@ -86,6 +120,31 @@ class AccessManager(object):
         :return: user
         """
         return self._user
+
+    def get_username(self, user=None):
+        """
+        Returns the username of the current or nominated user
+        :return: username
+        """
+        if user is None:
+            user = self._user
+        users = self._json['access_manager'].get('users', {})
+        if user in users:
+            return users[user].get('name')
+        return ''
+
+    def set_username(self, user, username):
+        """
+        Sets the username of the nominated user
+        :return: True if username was set, false otherwise
+        """
+        users = self._json['access_manager'].get('users', {})
+        if user in users:
+            users[user]['name'] = username
+            self._json['access_manager']['users'] = users
+            self._jstore.save(self._json)
+            return True
+        return False
 
     def get_watch_later_id(self):
         """

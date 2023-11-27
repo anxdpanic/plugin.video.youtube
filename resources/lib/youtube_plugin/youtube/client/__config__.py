@@ -114,7 +114,7 @@ class APICheck(object):
 
     def get_current_user(self):
         self._json_am = self._am_jstore.get_data()
-        return self._json_am['access_manager'].get('current_user', '0')
+        return self._json_am['access_manager'].get('current_user', 0)
 
     def has_own_api_keys(self):
         self._json_api = self._api_jstore.get_data()

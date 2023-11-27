@@ -13,22 +13,37 @@ from . import JSONStore
 
 # noinspection PyTypeChecker
 class LoginTokenStore(JSONStore):
+    DEFAULT_NEW_USER = {
+        'access_token': '',
+        'refresh_token': '',
+        'token_expires': -1,
+        'last_key_hash': '',
+        'name': 'Default',
+        'watch_later': ' WL',
+        'watch_history': 'HL'
+    }
+
     def __init__(self):
         super(LoginTokenStore, self).__init__('access_manager.json')
 
     def set_defaults(self, reset=False):
         data = {} if reset else self.get_data()
         if 'access_manager' not in data:
-            data = {'access_manager': {'users': {'0': {'access_token': '', 'refresh_token': '', 'token_expires': -1,
-                                                       'last_key_hash': '', 'name': 'Default', 'watch_later': ' WL', 'watch_history': 'HL'}}}}
+            data = {
+                'access_manager': {
+                    'users': {
+                        0: self.DEFAULT_NEW_USER.copy()
+                    }
+                }
+            }
         if 'users' not in data['access_manager']:
-            data['access_manager']['users'] = {'0': {'access_token': '', 'refresh_token': '', 'token_expires': -1,
-                                                     'last_key_hash': '', 'name': 'Default', 'watch_later': ' WL', 'watch_history': 'HL'}}
-        if '0' not in data['access_manager']['users']:
-            data['access_manager']['users']['0'] = {'access_token': '', 'refresh_token': '', 'token_expires': -1,
-                                                    'last_key_hash': '', 'name': 'Default', 'watch_later': ' WL', 'watch_history': 'HL'}
+            data['access_manager']['users'] = {
+                0: self.DEFAULT_NEW_USER.copy()
+            }
+        if 0 not in data['access_manager']['users']:
+            data['access_manager']['users'][0] = self.DEFAULT_NEW_USER.copy()
         if 'current_user' not in data['access_manager']:
-            data['access_manager']['current_user'] = '0'
+            data['access_manager']['current_user'] = 0
         if 'last_origin' not in data['access_manager']:
             data['access_manager']['last_origin'] = 'plugin.video.youtube'
         if 'developers' not in data['access_manager']:
@@ -36,7 +51,7 @@ class LoginTokenStore(JSONStore):
 
         # clean up
         if data['access_manager']['current_user'] == 'default':
-            data['access_manager']['current_user'] = '0'
+            data['access_manager']['current_user'] = 0
         if 'access_token' in data['access_manager']:
             del data['access_manager']['access_token']
         if 'refresh_token' in data['access_manager']:
@@ -44,13 +59,13 @@ class LoginTokenStore(JSONStore):
         if 'token_expires' in data['access_manager']:
             del data['access_manager']['token_expires']
         if 'default' in data['access_manager']:
-            if (data['access_manager']['default'].get('access_token') or
-                data['access_manager']['default'].get('refresh_token')) and \
-                    (not data['access_manager']['users']['0'].get('access_token') and
-                     not data['access_manager']['users']['0'].get('refresh_token')):
+            if ((data['access_manager']['default'].get('access_token')
+                 or data['access_manager']['default'].get('refresh_token'))
+                    and not data['access_manager']['users'][0].get('access_token')
+                    and not data['access_manager']['users'][0].get('refresh_token')):
                 if 'name' not in data['access_manager']['default']:
                     data['access_manager']['default']['name'] = 'Default'
-                data['access_manager']['users']['0'] = data['access_manager']['default']
+                data['access_manager']['users'][0] = data['access_manager']['default']
             del data['access_manager']['default']
         # end clean up
 
@@ -71,3 +86,14 @@ class LoginTokenStore(JSONStore):
         # end uuid check
 
         self.save(data)
+
+    def get_data(self):
+        data = super(LoginTokenStore, self).get_data()
+        # process users, change str keys to int
+        users = data['access_manager']['users']
+        if '0' in users:
+            data['access_manager']['users'] = {
+                int(key): value
+                for key, value in users.items()
+            }
+        return data

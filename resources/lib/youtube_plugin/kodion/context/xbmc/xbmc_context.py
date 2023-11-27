@@ -195,6 +195,7 @@ class XbmcContext(AbstractContext):
         'updated_': 30597,
         'uploads': 30726,
         'user.changed': 30659,
+        'user.default': 30532,
         'user.enter_name': 30658,
         'user.new': 30656,
         'user.remove': 30662,
