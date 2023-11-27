@@ -47,53 +47,80 @@ def get_thumb_timestamp(minutes=15):
 
 
 def make_comment_item(context, snippet, uri, total_replies=0):
-    author = '[B]{}[/B]'.format(utils.to_str(snippet['authorDisplayName']))
-    body = utils.to_str(snippet['textOriginal'])
+    ui = context.get_ui()
 
-    label_props = None
-    plot_props = None
-    is_edited = (snippet['publishedAt'] != snippet['updatedAt'])
+    author = ui.bold(snippet['authorDisplayName'])
+    body = snippet['textOriginal']
 
-    str_likes = ('%.1fK' % (snippet['likeCount'] / 1000.0)) if snippet['likeCount'] > 1000 else str(snippet['likeCount'])
-    str_replies = ('%.1fK' % (total_replies / 1000.0)) if total_replies > 1000 else str(total_replies)
+    label_props = []
+    plot_props = []
 
-    if snippet['likeCount'] and total_replies:
-        label_props = '[COLOR lime][B]+%s[/B][/COLOR]|[COLOR cyan][B]%s[/B][/COLOR]' % (str_likes, str_replies)
-        plot_props = '[COLOR lime][B]%s %s[/B][/COLOR]|[COLOR cyan][B]%s %s[/B][/COLOR]' % (str_likes,
-                     context.localize('video.comments.likes'), str_replies,
-                     context.localize('video.comments.replies'))
-    elif snippet['likeCount']:
-        label_props = '[COLOR lime][B]+%s[/B][/COLOR]' % str_likes
-        plot_props = '[COLOR lime][B]%s %s[/B][/COLOR]' % (str_likes,
-                     context.localize('video.comments.likes'))
-    elif total_replies:
-        label_props = '[COLOR cyan][B]%s[/B][/COLOR]' % str_replies
-        plot_props = '[COLOR cyan][B]%s %s[/B][/COLOR]' % (str_replies,
-                     context.localize('video.comments.replies'))
-    else:
-        pass # The comment has no likes or replies.
+    like_count = snippet['likeCount']
+    if like_count:
+        like_count = utils.friendly_number(like_count)
+        label_likes = ui.color('lime', ui.bold(like_count))
+        plot_likes = ui.color('lime', ui.bold(' '.join((
+            like_count, context.localize('video.comments.likes')
+        ))))
+        label_props.append(label_likes)
+        plot_props.append(plot_likes)
+
+    if total_replies:
+        total_replies = utils.friendly_number(total_replies)
+        label_replies = ui.color('cyan', ui.bold(total_replies))
+        plot_replies = ui.color('cyan', ui.bold(' '.join((
+            total_replies, context.localize('video.comments.replies')
+        ))))
+        label_props.append(label_replies)
+        plot_props.append(plot_replies)
+
+    published_at = snippet['publishedAt']
+    updated_at = snippet['updatedAt']
+    edited = published_at != updated_at
+    if edited:
+        label_props.append('*')
+        plot_props.append(context.localize('video.comments.edited'))
 
     # Format the label of the comment item.
-    edited = '[B]*[/B]' if is_edited else ''
     if label_props:
-        label = '{author} ({props}){edited} {body}'.format(author=author, props=label_props, edited=edited,
-                                                             body=body.replace('\n', ' '))
+        label = '{author} ({props}) {body}'.format(
+            author=author,
+            props='|'.join(label_props),
+            body=body.replace('\n', ' ')
+        )
     else:
-        label = '{author}{edited} {body}'.format(author=author, edited=edited, body=body.replace('\n', ' '))
+        label = '{author} {body}'.format(
+            author=author, body=body.replace('\n', ' ')
+        )
 
     # Format the plot of the comment item.
-    edited = ' (%s)' % context.localize('video.comments.edited') if is_edited else ''
     if plot_props:
-        plot = '{author} ({props}){edited}[CR][CR]{body}'.format(author=author, props=plot_props,
-                                                               edited=edited, body=body)
+        plot = '{author} ({props}){body}'.format(
+            author=author,
+            props='|'.join(plot_props),
+            body=ui.new_line(body, cr_before=2)
+        )
     else:
-        plot = '{author}{edited}[CR][CR]{body}'.format(author=author, edited=edited, body=body)
+        plot = '{author}{body}'.format(
+            author=author, body=ui.new_line(body, cr_before=2)
+        )
 
     comment_item = DirectoryItem(label, uri)
     comment_item.set_plot(plot)
-    comment_item.set_date_from_datetime(utils.datetime_parser.parse(snippet['publishedAt']))
+
+    datetime = utils.datetime_parser.parse(published_at, as_utc=True)
+    comment_item.set_added_utc(datetime)
+    local_datetime = utils.datetime_parser.utc_to_local(datetime)
+    comment_item.set_dateadded_from_datetime(local_datetime)
+    if edited:
+        datetime = utils.datetime_parser.parse(updated_at, as_utc=True)
+        local_datetime = utils.datetime_parser.utc_to_local(datetime)
+    comment_item.set_date_from_datetime(local_datetime)
+
     if not uri:
-        comment_item.set_action(True) # Cosmetic, makes the item not a folder.
+        # Cosmetic, makes the item not a folder.
+        comment_item.set_action(True)
+
     return comment_item
 
 
@@ -456,7 +483,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # 'play with...' (external player)
         if alternate_player:
-            yt_context_menu.append_play_with(context_menu, provider, context)
+            yt_context_menu.append_play_with(context_menu, context)
 
         if logged_in:
             # add 'Watch Later' only if we are not in my 'Watch Later' list
@@ -466,7 +493,7 @@ def update_video_infos(provider, context, video_id_dict,
 
             # provide 'remove' for videos in my playlists
             if video_id in playlist_item_id_dict:
-                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', context.get_path())
+                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', path)
                 if playlist_match:
                     playlist_id = playlist_match.group('playlist_id')
                     # we support all playlist except 'Watch History'
@@ -482,7 +509,7 @@ def update_video_infos(provider, context, video_id_dict,
                                                   'video_name': video_item.get_name()}
                                              )))
 
-            is_history = re.match('^/special/watch_history_tv/$', context.get_path())
+            is_history = re.match('^/special/watch_history_tv/$', path)
             if is_history:
                 yt_context_menu.append_clear_watch_history(context_menu, context)
 
