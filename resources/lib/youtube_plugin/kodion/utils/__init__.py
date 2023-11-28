@@ -19,6 +19,7 @@ from .methods import (
     make_dirs,
     select_stream,
     strip_html_from_text,
+    to_str,
     to_unicode,
     to_utf8,
 )
@@ -45,6 +46,7 @@ __all__ = (
     'make_dirs',
     'select_stream',
     'strip_html_from_text',
+    'to_str',
     'to_unicode',
     'to_utf8',
     'AccessManager',
