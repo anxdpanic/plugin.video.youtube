@@ -316,3 +316,6 @@ class AbstractSettings(object):
 
     def show_detailed_description(self):
         return self.get_bool(SETTINGS.DETAILED_DESCRIPTION, True)
+
+    def get_language(self):
+        return self.get_string(SETTINGS.LANGUAGE, 'en_US').replace('_', '-')
