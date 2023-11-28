@@ -167,7 +167,7 @@ class XbmcContext(AbstractContext):
         'sign.twice.text': 30547,
         'sign.twice.title': 30546,
         'stats.commentCount': 30732,
-        'stats.favoriteCount': 30100,
+        # 'stats.favoriteCount': 30100,
         'stats.likeCount': 30733,
         'stats.viewCount': 30767,
         'stream.alternate': 30747,

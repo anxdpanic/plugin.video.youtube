@@ -20,6 +20,12 @@ try:
 except ImportError:
     ISHelper = None
 
+__COLOR_MAP = {
+    'commentCount': 'cyan',
+    'favoriteCount': 'gold',
+    'likeCount': 'lime',
+    'viewCount': 'lightblue',
+}
 
 __RE_HISTORY_MATCH = re.compile(r'^/special/watch_history_tv/$')
 
@@ -63,8 +69,9 @@ def make_comment_item(context, snippet, uri, total_replies=0):
     like_count = snippet['likeCount']
     if like_count:
         like_count = utils.friendly_number(like_count)
-        label_likes = ui.color('lime', ui.bold(like_count))
-        plot_likes = ui.color('lime', ui.bold(' '.join((
+        color = __COLOR_MAP['likeCount']
+        label_likes = ui.color(color, ui.bold(like_count))
+        plot_likes = ui.color(color, ui.bold(' '.join((
             like_count, context.localize('video.comments.likes')
         ))))
         label_props.append(label_likes)
@@ -72,8 +79,9 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     if total_replies:
         total_replies = utils.friendly_number(total_replies)
-        label_replies = ui.color('cyan', ui.bold(total_replies))
-        plot_replies = ui.color('cyan', ui.bold(' '.join((
+        color = __COLOR_MAP['commentCount']
+        label_replies = ui.color(color, ui.bold(total_replies))
+        plot_replies = ui.color(color, ui.bold(' '.join((
             total_replies, context.localize('video.comments.replies')
         ))))
         label_props.append(label_replies)
@@ -405,29 +413,35 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-        # update and set the title
-        title = video_item.get_title() or snippet['title'] or ''
-        if video_item.upcoming:
-            title = ui.italic(title)
-        video_item.set_title(title)
-
+        label_stats = []
         stats = []
         if 'statistics' in yt_item:
             for stat, value in yt_item['statistics'].items():
                 label = context.LOCAL_MAP.get('stats.' + stat)
                 if label:
-                    stats.append('{value} {name}'.format(
-                        name=context.localize(label).lower(),
-                        value=utils.friendly_number(value)
-                    ))
-            stats = ', '.join(stats)
+                    color = __COLOR_MAP.get(stat, 'white')
+                    value = utils.friendly_number(value)
+                    label_stats.append(ui.color(color, value))
+                    stats.append(ui.color(color, ui.bold(' '.join((
+                        value, context.localize(label)
+                    )))))
+            label_stats = '|'.join(label_stats)
+            stats = '|'.join(stats)
 
         # Used for label2, but is poorly supported in skins
         video_details = ' | '.join((detail for detail in (
-            ui.light(stats) if stats else '',
+            stats if stats else '',
             ui.italic(start_at) if start_at else '',
         ) if detail))
         video_item.set_short_details(video_details)
+
+        # update and set the title
+        title = video_item.get_title() or snippet['title'] or ''
+        if video_item.upcoming:
+            title = ui.italic(title)
+        if label_stats:
+            title = '{0} ({1})'.format(title, label_stats)
+        video_item.set_title(title)
 
         """
         This is experimental. We try to get the most information out of the title of a video.
@@ -452,7 +466,7 @@ def update_video_infos(provider, context, video_id_dict,
         if show_details:
             description = ''.join((
                 ui.bold(channel_name, cr_after=2) if channel_name else '',
-                ui.light(stats, cr_after=1) if stats else '',
+                ui.new_line(stats, cr_after=1) if stats else '',
                 ui.italic(start_at, cr_after=1) if start_at else '',
                 ui.new_line() if stats or start_at else '',
                 description,
