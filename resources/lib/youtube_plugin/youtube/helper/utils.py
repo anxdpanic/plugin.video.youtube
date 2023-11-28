@@ -21,29 +21,34 @@ except ImportError:
     ISHelper = None
 
 
+__RE_HISTORY_MATCH = re.compile(r'^/special/watch_history_tv/$')
+
+__RE_PLAYLIST_MATCH = re.compile(
+    r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/$'
+)
+
 __RE_SEASON_EPISODE_MATCHES__ = [
     re.compile(r'Part (?P<episode>\d+)'),
     re.compile(r'#(?P<episode>\d+)'),
-    re.compile(r'Ep.[^\w]?(?P<episode>\d+)'),
-    re.compile(r'\[(?P<episode>\d+)\]'),
+    re.compile(r'Ep.\W?(?P<episode>\d+)'),
+    re.compile(r'\[(?P<episode>\d+)]'),
     re.compile(r'S(?P<season>\d+)E(?P<episode>\d+)'),
     re.compile(r'Season (?P<season>\d+)(.+)Episode (?P<episode>\d+)'),
     re.compile(r'Episode (?P<episode>\d+)'),
 ]
 
+__RE_URL = re.compile(r'(https?://\S+)')
+
 
 def extract_urls(text):
-    result = []
-
-    re_url = re.compile(r'(https?://[^\s]+)')
-    matches = re_url.findall(text)
-    result = matches or result
-
-    return result
+    return __RE_URL.findall(text)
 
 
 def get_thumb_timestamp(minutes=15):
-    return str(time.mktime(time.gmtime(minutes * 60 * (round(time.time() / (minutes * 60))))))
+    seconds = minutes * 60
+    return str(time.mktime(time.gmtime(
+        seconds * (round(time.time() / seconds))
+    )))
 
 
 def make_comment_item(context, snippet, uri, total_replies=0):
@@ -335,6 +340,7 @@ def update_video_infos(provider, context, video_id_dict,
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
     ui = context.get_ui()
+    watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
 
     for video_id, yt_item in data.items():
         video_item = video_id_dict[video_id]
@@ -502,10 +508,12 @@ def update_video_infos(provider, context, video_id_dict,
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        some_playlist_match = re.match(r'^(/channel/([^/]+))/playlist/(?P<playlist_id>[^/]+)/$', path)
-        if some_playlist_match:
+        playlist_match = __RE_PLAYLIST_MATCH.match(path)
+        playlist_id = playlist_channel_id = ''
+        if playlist_match:
             replace_context_menu = True
-            playlist_id = some_playlist_match.group('playlist_id')
+            playlist_id = playlist_match.group('playlist_id')
+            playlist_channel_id = playlist_match.group('channel_id')
 
             yt_context_menu.append_play_all_from_playlist(
                 context_menu, context, playlist_id, video_id
@@ -520,31 +528,34 @@ def update_video_infos(provider, context, video_id_dict,
 
         if logged_in:
             # add 'Watch Later' only if we are not in my 'Watch Later' list
-            watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
-            if watch_later_playlist_id:
-                yt_context_menu.append_watch_later(context_menu, context, watch_later_playlist_id, video_id)
+            if (watch_later_playlist_id
+                    and watch_later_playlist_id != playlist_id):
+                yt_context_menu.append_watch_later(
+                    context_menu, context, watch_later_playlist_id, video_id
+                )
 
             # provide 'remove' for videos in my playlists
-            if video_id in playlist_item_id_dict:
-                playlist_match = re.match('^/channel/mine/playlist/(?P<playlist_id>[^/]+)/$', path)
-                if playlist_match:
-                    playlist_id = playlist_match.group('playlist_id')
-                    # we support all playlist except 'Watch History'
-                    if playlist_id and playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
-                        playlist_item_id = playlist_item_id_dict[video_id]
-                        video_item.set_playlist_id(playlist_id)
-                        video_item.set_playlist_item_id(playlist_item_id)
-                        context_menu.append((context.localize('remove'),
-                                             'RunPlugin(%s)' % context.create_uri(
-                                                 ['playlist', 'remove', 'video'],
-                                                 {'playlist_id': playlist_id,
-                                                  'video_id': playlist_item_id,
-                                                  'video_name': video_item.get_name()}
-                                             )))
+            # we support all playlist except 'Watch History'
+            if (video_id in playlist_item_id_dict and playlist_id
+                    and playlist_channel_id == 'mine'
+                    and playlist_id.strip().lower() not in ('hl', 'wl')):
+                playlist_item_id = playlist_item_id_dict[video_id]
+                video_item.set_playlist_id(playlist_id)
+                video_item.set_playlist_item_id(playlist_item_id)
+                context_menu.append((
+                    context.localize('remove'),
+                    'RunPlugin(%s)' % context.create_uri(
+                        ['playlist', 'remove', 'video'],
+                        {'playlist_id': playlist_id,
+                         'video_id': playlist_item_id,
+                         'video_name': video_item.get_name()}
+                    )
+                ))
 
-            is_history = re.match('^/special/watch_history_tv/$', path)
-            if is_history:
-                yt_context_menu.append_clear_watch_history(context_menu, context)
+            if __RE_HISTORY_MATCH.match(path):
+                yt_context_menu.append_clear_watch_history(
+                    context_menu, context
+                )
 
         # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
         if (channel_id and channel_name and
