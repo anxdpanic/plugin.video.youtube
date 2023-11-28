@@ -10,4 +10,4 @@
 from .xbmc.xbmc_plugin_settings import XbmcPluginSettings as Settings
 
 
-__all__ = ('Settings', )
+__all__ = ('Settings',)

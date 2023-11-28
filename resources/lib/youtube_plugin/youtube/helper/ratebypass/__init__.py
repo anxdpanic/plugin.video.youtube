@@ -9,4 +9,5 @@
 
 from ....youtube.helper.ratebypass import ratebypass
 
-__all__ = ['ratebypass']
+
+__all__ = ('ratebypass',)

@@ -288,9 +288,8 @@ class AbstractSettings(object):
             return []
         selected = self.get_int(SETTINGS.MPD_QUALITY_SELECTION, 4)
         return [quality
-                for key, quality in sorted(
-                    self._QUALITY_SELECTIONS.items(), reverse=True
-                )
+                for key, quality in sorted(self._QUALITY_SELECTIONS.items(),
+                                           reverse=True)
                 if selected >= key]
 
     def stream_features(self):

@@ -10,4 +10,4 @@
 from .xbmc.xbmc_runner import XbmcRunner as Runner
 
 
-__all__ = ('Runner', )
+__all__ = ('Runner',)

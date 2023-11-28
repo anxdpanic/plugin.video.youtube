@@ -9,13 +9,13 @@
 """
 
 from ..youtube_exceptions import YouTubeException
-from ...kodion.utils import FunctionCache, DataCache, strip_html_from_text
+from ...kodion.utils import strip_html_from_text
 
 
 class ResourceManager(object):
-    def __init__(self, context, youtube_client):
+    def __init__(self, context, client):
         self._context = context
-        self._youtube_client = youtube_client
+        self._client = client
         self._channel_data = {}
         self._video_data = {}
         self._playlist_data = {}
@@ -41,7 +41,7 @@ class ResourceManager(object):
 
         for channel_id in channel_ids:
             if channel_id == 'mine':
-                json_data = function_cache.get(FunctionCache.ONE_DAY, self._youtube_client.get_channel_by_username, channel_id)
+                json_data = function_cache.get(function_cache.ONE_DAY, self._client.get_channel_by_username, channel_id)
                 items = json_data.get('items', [{'id': 'mine'}])
 
                 try:
@@ -58,7 +58,7 @@ class ResourceManager(object):
         channel_ids = updated_channel_ids
 
         data_cache = self._context.get_data_cache()
-        channel_data = data_cache.get_items(DataCache.ONE_MONTH, channel_ids)
+        channel_data = data_cache.get_items(data_cache.ONE_MONTH, channel_ids)
 
         channel_ids = set(channel_ids)
         channel_ids_cached = set(channel_data)
@@ -72,7 +72,7 @@ class ResourceManager(object):
         if channel_ids_to_update:
             self._context.log_debug('No data for channels |%s| cached' % ', '.join(channel_ids_to_update))
             json_data = [
-                self._youtube_client.get_channels(list_of_50)
+                self._client.get_channels(list_of_50)
                 for list_of_50 in self._list_batch(channel_ids_to_update, n=50)
             ]
             channel_data = {
@@ -92,7 +92,7 @@ class ResourceManager(object):
     def _update_videos(self, video_ids, live_details=False, suppress_errors=False):
         json_data = None
         data_cache = self._context.get_data_cache()
-        video_data = data_cache.get_items(DataCache.ONE_MONTH, video_ids)
+        video_data = data_cache.get_items(data_cache.ONE_MONTH, video_ids)
 
         video_ids = set(video_ids)
         video_ids_cached = set(video_data)
@@ -105,7 +105,7 @@ class ResourceManager(object):
 
         if video_ids_to_update:
             self._context.log_debug('No data for videos |%s| cached' % ', '.join(video_ids_to_update))
-            json_data = self._youtube_client.get_videos(video_ids_to_update, live_details)
+            json_data = self._client.get_videos(video_ids_to_update, live_details)
             video_data = {
                 yt_item['id']: yt_item
                 for yt_item in json_data.get('items', [])
@@ -143,7 +143,7 @@ class ResourceManager(object):
     def _update_playlists(self, playlists_ids):
         json_data = None
         data_cache = self._context.get_data_cache()
-        playlist_data = data_cache.get_items(DataCache.ONE_MONTH, playlists_ids)
+        playlist_data = data_cache.get_items(data_cache.ONE_MONTH, playlists_ids)
 
         playlists_ids = set(playlists_ids)
         playlists_ids_cached = set(playlist_data)
@@ -156,7 +156,7 @@ class ResourceManager(object):
 
         if playlist_ids_to_update:
             self._context.log_debug('No data for playlists |%s| cached' % ', '.join(playlist_ids_to_update))
-            json_data = self._youtube_client.get_playlists(playlist_ids_to_update)
+            json_data = self._client.get_playlists(playlist_ids_to_update)
             playlist_data = {
                 yt_item['id']: yt_item
                 for yt_item in json_data.get('items', [])

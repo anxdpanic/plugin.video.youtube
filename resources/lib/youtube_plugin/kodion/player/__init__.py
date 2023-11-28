@@ -11,4 +11,4 @@ from .xbmc.xbmc_player import XbmcPlayer as Player
 from .xbmc.xbmc_playlist import XbmcPlaylist as Playlist
 
 
-__all__ = ('Player', 'Playlist', )
+__all__ = ('Player', 'Playlist',)

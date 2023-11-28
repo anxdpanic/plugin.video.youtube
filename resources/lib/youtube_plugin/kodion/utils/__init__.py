@@ -56,5 +56,5 @@ __all__ = (
     'SystemVersion',
     'WatchLaterList',
     'YouTubeMonitor',
-    'YouTubePlayer'
+    'YouTubePlayer',
 )

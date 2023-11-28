@@ -10,4 +10,4 @@
 from .xbmc.xbmc_context import XbmcContext as Context
 
 
-__all__ = ('Context', )
+__all__ = ('Context',)

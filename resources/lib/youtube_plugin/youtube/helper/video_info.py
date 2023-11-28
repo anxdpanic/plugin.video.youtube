@@ -837,7 +837,7 @@ class VideoInfo(YouTubeRequestClient):
         # Capture the URL of a .m3u8 playlist and the itag value from that URL.
         re_playlist_data = re.compile(
             r'#EXT-X-STREAM-INF[^#]+'
-            r'(?P<url>http[^\s]+/itag/(?P<itag>\d+)[^\s]+)'
+            r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
         )
         for match in re_playlist_data.finditer(result.text):
             playlist_url = match.group('url')

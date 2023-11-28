@@ -10,4 +10,5 @@
 
 from ....youtube.helper.signature.cipher import Cipher
 
-__all__ = ['Cipher']
+
+__all__ = ('Cipher',)

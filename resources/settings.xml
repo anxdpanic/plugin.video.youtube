@@ -317,7 +317,7 @@
                     <default>2</default>  <!-- isa_hls -->
                     <constraints>
                         <options>
-                            <option label="30740">0</option>  <!-- mpegts --> 
+                            <option label="30740">0</option>  <!-- mpegts -->
                             <option label="30741">1</option>  <!-- hls -->
                             <option label="30742">2</option>  <!-- isa_hls -->
                             <option label="30743">3</option>  <!-- isa_mpd -->

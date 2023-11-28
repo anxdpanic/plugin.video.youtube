@@ -10,4 +10,4 @@
 from .xbmc.xbmc_context_ui import XbmcContextUI as ContextUI
 
 
-__all__ = ('ContextUI', )
+__all__ = ('ContextUI',)

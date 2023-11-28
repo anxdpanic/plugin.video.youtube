@@ -41,7 +41,7 @@ class JSONStore(object):
     def save(self, data):
         if data == self._data:
             log_debug('JSONStore.save |{filename}| data unchanged'.format(
-                    filename=self.filename
+                filename=self.filename
             ))
             return
         log_debug('JSONStore.save |{filename}|'.format(
