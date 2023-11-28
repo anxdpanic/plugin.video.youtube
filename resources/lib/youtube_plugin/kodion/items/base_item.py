@@ -19,6 +19,8 @@ class BaseItem(object):
     VERSION = 3
     INFO_DATE = 'date'  # (string) iso 8601
 
+    _playable = False
+
     def __init__(self, name, uri, image='', fanart=''):
         self._version = BaseItem.VERSION
 
@@ -150,3 +152,7 @@ class BaseItem(object):
     @next_page.setter
     def next_page(self, value):
         self._next_page = bool(value)
+
+    @property
+    def playable(cls):
+        return cls._playable

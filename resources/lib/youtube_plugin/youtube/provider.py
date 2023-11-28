@@ -69,11 +69,11 @@ class Provider(AbstractProvider):
 
     @staticmethod
     def get_dev_config(context, addon_id, dev_configs):
-        _dev_config = context.get_ui().get_home_window_property('configs')
-        context.get_ui().clear_home_window_property('configs')
+        _dev_config = context.get_ui().get_property('configs')
+        context.get_ui().clear_property('configs')
 
         dev_config = {}
-        if _dev_config is not None:
+        if _dev_config:
             context.log_debug('Using window property for developer keys is deprecated, instead use the youtube_registration module.')
             try:
                 dev_config = json.loads(_dev_config)
@@ -569,15 +569,15 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         ui = context.get_ui()
-        listitem_path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')
+        path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')
 
         redirect = False
         params = context.get_params()
 
-        if 'video_id' not in params and 'playlist_id' not in params and \
-                'channel_id' not in params and 'live' not in params:
-            if context.is_plugin_path(listitem_path, 'play'):
-                video_id = find_video_id(listitem_path)
+        if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
+                .isdisjoint(params.keys())):
+            if context.is_plugin_path(path, 'play'):
+                video_id = find_video_id(path)
                 if video_id:
                     context.set_param('video_id', video_id)
                     params = context.get_params()
@@ -586,61 +586,58 @@ class Provider(AbstractProvider):
             else:
                 return False
 
-        if ui.get_home_window_property('prompt_for_subtitles') != params.get('video_id'):
-            ui.clear_home_window_property('prompt_for_subtitles')
+        video_id = params.get('video_id')
+        playlist_id = params.get('playlist_id')
 
-        if ui.get_home_window_property('audio_only') != params.get('video_id'):
-            ui.clear_home_window_property('audio_only')
+        if ui.get_property('prompt_for_subtitles') != video_id:
+            ui.clear_property('prompt_for_subtitles')
 
-        if ui.get_home_window_property('ask_for_quality') != params.get('video_id'):
-            ui.clear_home_window_property('ask_for_quality')
+        if ui.get_property('audio_only') != video_id:
+            ui.clear_property('audio_only')
 
-        if 'prompt_for_subtitles' in params:
-            prompt_subtitles = params['prompt_for_subtitles']
-            del params['prompt_for_subtitles']
-            if prompt_subtitles and 'video_id' in params and 'playlist_id' not in params:
-                # redirect to builtin after setting home window property, so playback url matches playable listitems
-                ui.set_home_window_property('prompt_for_subtitles', params['video_id'])
+        if ui.get_property('ask_for_quality') != video_id:
+            ui.clear_property('ask_for_quality')
+
+        if video_id and not playlist_id:
+            if params.pop('prompt_for_subtitles', None):
+                # redirect to builtin after setting home window property,
+                # so playback url matches playable listitems
+                ui.set_property('prompt_for_subtitles', video_id)
                 context.log_debug('Redirecting playback with subtitles')
                 redirect = True
 
-        elif 'audio_only' in params:
-            audio_only = params['audio_only']
-            del params['audio_only']
-            if audio_only and 'video_id' in params and 'playlist_id' not in params:
-                # redirect to builtin after setting home window property, so playback url matches playable listitems
-                ui.set_home_window_property('audio_only', params['video_id'])
+            if params.pop('audio_only', None):
+                # redirect to builtin after setting home window property,
+                # so playback url matches playable listitems
+                ui.set_property('audio_only', video_id)
                 context.log_debug('Redirecting audio only playback')
                 redirect = True
 
-        elif 'ask_for_quality' in params:
-            ask_for_quality = params['ask_for_quality']
-            del params['ask_for_quality']
-            if ask_for_quality and 'video_id' in params and 'playlist_id' not in params:
-                # redirect to builtin after setting home window property, so playback url matches playable listitems
-                ui.set_home_window_property('ask_for_quality', params['video_id'])
-                context.log_debug('Redirecting audio only playback')
+            if params.pop('ask_for_quality', None):
+                # redirect to builtin after setting home window property,
+                # so playback url matches playable listitems
+                ui.set_property('ask_for_quality', video_id)
+                context.log_debug('Redirecting ask quality playback')
                 redirect = True
 
-        if 'playlist_id' not in params and 'video_id' in params and (context.get_handle() == -1 or redirect):
-            builtin = 'PlayMedia(%s)' if context.get_handle() == -1 else 'RunPlugin(%s)'
-            if not redirect:
+            builtin = None
+            if context.get_handle() == -1:
+                builtin = 'PlayMedia({0})'
                 context.log_debug('Redirecting playback, handle is -1')
-            context.execute(builtin % context.create_uri(['play'], {'video_id': params['video_id']}))
-            return False
+            elif redirect:
+                builtin = 'RunPlugin({0})'
 
-        if 'playlist_id' in params and (context.get_handle() != -1):
-            builtin = 'RunPlugin(%s)'
-            stream_url = context.create_uri(['play'], params)
-            xbmcplugin.setResolvedUrl(handle=context.get_handle(), succeeded=False, listitem=xbmcgui.ListItem(path=stream_url))
-            context.execute(builtin % context.create_uri(['play'], params))
-            return False
-
-        if 'video_id' in params and 'playlist_id' not in params:
+            if builtin:
+                context.execute(builtin.format(
+                    context.create_uri(['play'], {'video_id': video_id})
+                ))
+                return False
             return yt_play.play_video(self, context)
-        if 'playlist_id' in params:
+
+        if playlist_id or 'playlist_ids' in params:
             return yt_play.play_playlist(self, context)
-        if 'channel_id' in params and 'live' in params and params['live'] > 0:
+
+        if 'channel_id' in params and params.get('live', 0) > 0:
             return yt_play.play_channel_live(self, context)
         return False
 

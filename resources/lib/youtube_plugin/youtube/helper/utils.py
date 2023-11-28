@@ -589,8 +589,8 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
         ISHelper('mpd', drm='com.widevine.alpha').check_inputstream()
 
     video_item.set_license_key(license_proxy)
-    ui.set_home_window_property('license_url', license_url)
-    ui.set_home_window_property('license_token', license_token)
+    ui.set_property('license_url', license_url)
+    ui.set_property('license_token', license_token)
 
 
 def update_fanarts(provider, context, channel_items_dict, data=None):
@@ -694,15 +694,9 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
 
 def filter_short_videos(context, items):
     if context.get_settings().hide_short_videos():
-        shorts_filtered = []
-
-        for item in items:
-            if hasattr(item, '_duration'):
-                item_duration = 0 if item.get_duration() is None else item.get_duration()
-                if 0 < item_duration <= 60:
-                    continue
-            shorts_filtered += [item]
-
-        return shorts_filtered
-
+        items = [
+            item
+            for item in items
+            if item.playable and not 0 <= item.get_duration() <= 60
+        ]
     return items

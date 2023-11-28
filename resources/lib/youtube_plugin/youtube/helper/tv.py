@@ -148,8 +148,6 @@ def saved_playlists_to_items(provider, context, json_data):
     utils.update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict)
     utils.update_fanarts(provider, context, channel_items_dict)
 
-    result = utils.filter_short_videos(context, result)
-
     # next page
     next_page_token = json_data.get('next_page_token', '')
     if next_page_token or json_data.get('continue', False):

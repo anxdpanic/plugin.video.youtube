@@ -9,11 +9,10 @@
 """
 
 import re
-from urllib.parse import urlparse
-from urllib.parse import parse_qsl
+from urllib.parse import parse_qsl, urlparse
 
-from ...kodion.items import VideoItem, DirectoryItem
 from . import utils
+from ...kodion.items import DirectoryItem, UriItem, VideoItem
 
 
 class UrlToItemConverter(object):
@@ -128,8 +127,9 @@ class UrlToItemConverter(object):
 
             channels_item = DirectoryItem(
                 context.get_ui().bold(context.localize('channels')),
-                context.create_uri(['special', 'description_links'],
-                                   {'channel_ids': ','.join(self._channel_ids)}),
+                context.create_uri(['special', 'description_links'], {
+                    'channel_ids': ','.join(self._channel_ids),
+                }),
                 context.create_resource_path('media', 'playlist.png')
             )
             channels_item.set_fanart(provider.get_fanart(context))
@@ -139,11 +139,19 @@ class UrlToItemConverter(object):
             # remove duplicates
             self._playlist_ids = list(set(self._playlist_ids))
 
-            playlists_item = DirectoryItem(
+            playlists_item = UriItem(
+                context.create_uri(['play'], {
+                    'playlist_ids': ','.join(self._playlist_ids),
+                    'play': True,
+                }),
+                playable=True
+            ) if context.get_param('uri') else DirectoryItem(
                 context.get_ui().bold(context.localize('playlists')),
-                context.create_uri(['special', 'description_links'],
-                                   {'playlist_ids': ','.join(self._playlist_ids)}),
-                context.create_resource_path('media', 'playlist.png'))
+                context.create_uri(['special', 'description_links'], {
+                    'playlist_ids': ','.join(self._playlist_ids),
+                }),
+                context.create_resource_path('media', 'playlist.png')
+            )
             playlists_item.set_fanart(provider.get_fanart(context))
             result.append(playlists_item)
 

@@ -153,17 +153,17 @@ class XbmcContextUI(AbstractContextUI):
         return xbmc.getInfoLabel(value)
 
     @staticmethod
-    def set_home_window_property(property_id, value):
+    def set_property(property_id, value):
         property_id = ''.join(['plugin.video.youtube-', property_id])
         xbmcgui.Window(10000).setProperty(property_id, value)
 
     @staticmethod
-    def get_home_window_property(property_id):
+    def get_property(property_id):
         property_id = ''.join(['plugin.video.youtube-', property_id])
-        return xbmcgui.Window(10000).getProperty(property_id) or None
+        return xbmcgui.Window(10000).getProperty(property_id)
 
     @staticmethod
-    def clear_home_window_property(property_id):
+    def clear_property(property_id):
         property_id = ''.join(['plugin.video.youtube-', property_id])
         xbmcgui.Window(10000).clearProperty(property_id)
 

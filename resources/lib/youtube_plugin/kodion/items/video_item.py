@@ -19,12 +19,14 @@ __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-
 
 
 class VideoItem(BaseItem):
+    _playable = True
+
     def __init__(self, name, uri, image='', fanart=''):
         super(VideoItem, self).__init__(name, uri, image, fanart)
         self._genre = None
         self._aired = None
         self._scheduled_start_utc = None
-        self._duration = None
+        self._duration = -1
         self._director = None
         self._premiered = None
         self._episode = None

@@ -40,10 +40,9 @@ class Subtitles(object):
         self.headers = headers
 
         ui = self.context.get_ui()
-        self.prompt_override = (
-            ui.get_home_window_property('prompt_for_subtitles') == video_id
-        )
-        ui.clear_home_window_property('prompt_for_subtitles')
+        self.prompt_override = (ui.get_property('prompt_for_subtitles')
+                                == video_id)
+        ui.clear_property('prompt_for_subtitles')
 
         self.renderer = captions.get('playerCaptionsTracklistRenderer', {})
         self.caption_tracks = self.renderer.get('captionTracks', [])

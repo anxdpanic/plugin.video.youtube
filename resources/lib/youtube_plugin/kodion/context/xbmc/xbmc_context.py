@@ -556,4 +556,4 @@ class XbmcContext(AbstractContext):
             return False
 
     def abort_requested(self):
-        return str(self.get_ui().get_home_window_property('abort_requested')).lower() == 'true'
+        return self.get_ui().get_property('abort_requested').lower() == 'true'

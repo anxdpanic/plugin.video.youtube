@@ -14,9 +14,11 @@ from html import unescape
 
 
 class AudioItem(BaseItem):
+    _playable = True
+
     def __init__(self, name, uri, image='', fanart=''):
         super(AudioItem, self).__init__(name, uri, image, fanart)
-        self._duration = None
+        self._duration = -1
         self._track_number = None
         self._year = None
         self._genre = None

@@ -399,9 +399,10 @@ class YouTubePlayer(xbmc.Player):
         self.threads = active_threads
 
     def onPlayBackStarted(self):
-        if self.ui.get_home_window_property('playback_json'):
-            playback_json = json.loads(self.ui.get_home_window_property('playback_json'))
-            self.ui.clear_home_window_property('playback_json')
+        playback_json = self.ui.get_property('playback_json')
+        if playback_json:
+            playback_json = json.loads(playback_json)
+            self.ui.clear_property('playback_json')
             self.cleanup_threads()
             self.threads.append(PlaybackMonitorThread(self.provider, self.context, playback_json))
 

@@ -66,7 +66,7 @@ def run():
         # prevent service to failing due to cache related issues
         pass
 
-    context.get_ui().clear_home_window_property('abort_requested')
+    context.get_ui().clear_property('abort_requested')
 
     while not monitor.abortRequested():
 
@@ -84,7 +84,7 @@ def run():
         if monitor.waitForAbort(sleep_time):
             break
 
-    context.get_ui().set_home_window_property('abort_requested', 'true')
+    context.get_ui().set_property('abort_requested', 'true')
 
     player.cleanup_threads(only_ended=False)  # clean up any/all playback monitoring threads
 
