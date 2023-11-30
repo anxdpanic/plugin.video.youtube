@@ -164,10 +164,8 @@ def _process_description_links(provider, context):
 
         res_urls = []
         for url in urls:
-            context.log_debug('Resolving url "%s"' % url)
             progress_dialog.update(steps=1, text=url)
             resolved_url = url_resolver.resolve(url)
-            context.log_debug('Resolved url "%s"' % resolved_url)
             res_urls.append(resolved_url)
 
             if progress_dialog.is_aborted():
