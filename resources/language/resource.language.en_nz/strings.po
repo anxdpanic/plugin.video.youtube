@@ -1364,3 +1364,7 @@ msgstr ""
 msgctxt "#30767"
 msgid "Views"
 msgstr ""
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr ""

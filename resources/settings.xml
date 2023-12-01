@@ -271,6 +271,7 @@
                             <option label="30749">av01</option>
                             <option label="30722">hdr</option>
                             <option label="30724">hfr</option>
+                            <option label="30768">no_hfr_max</option>
                             <option label="30750">vorbis</option>
                             <option label="30751">opus</option>
                             <option label="30752">mp4a</option>

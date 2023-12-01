@@ -1358,6 +1358,7 @@ class VideoInfo(YouTubeRequestClient):
         stream_features = _settings.stream_features()
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
+        disable_hfr_max = 'no_hfr_max' in stream_features
         allow_ssa = 'ssa' in stream_features
         stream_select = _settings.stream_select()
 
@@ -1512,7 +1513,7 @@ class VideoInfo(YouTubeRequestClient):
                     compare_width = width
                     compare_height = height
 
-                bounded_quality = {}
+                bounded_quality = None
                 for quality in qualities:
                     if compare_width > quality['width']:
                         if bounded_quality:
@@ -1520,7 +1521,10 @@ class VideoInfo(YouTubeRequestClient):
                                 quality = bounded_quality
                             elif compare_height < quality['height']:
                                 quality = qualities[-1]
+                        if fps > 30 and disable_hfr_max:
+                            bounded_quality = None
                         break
+                    disable_hfr_max = disable_hfr_max and not bounded_quality
                     bounded_quality = quality
                 if not bounded_quality:
                     continue
