@@ -16,9 +16,7 @@ from ...kodion.items import DirectoryItem, UriItem, VideoItem
 
 
 class UrlToItemConverter(object):
-    RE_CHANNEL_ID = re.compile(r'^/channel/(?P<channel_id>.+)$', re.I)
-    RE_LIVE_VID = re.compile(r'^/live/(?P<video_id>.+)$', re.I)
-    RE_SHORTS_VID = re.compile(r'^/shorts/(?P<video_id>[^?/]+)$', re.I)
+    RE_PATH_ID = re.compile(r'/\w+/(?P<id>[^/?#]+)', re.I)
     RE_SEEK_TIME = re.compile(r'\d+')
     VALID_HOSTNAMES = {
         'youtube.com',
@@ -48,25 +46,25 @@ class UrlToItemConverter(object):
             ))
             return
 
-        params = dict(parse_qsl(parsed_url.query))
+        url_params = dict(parse_qsl(parsed_url.query))
         path = parsed_url.path.lower()
 
-        video_id = playlist_id = channel_id = seek_time = None
+        channel_id = live = playlist_id = seek_time = video_id = None
         if path == '/watch':
-            video_id = params.get('v')
-            playlist_id = params.get('list')
-            seek_time = params.get('t')
+            video_id = url_params.get('v')
+            playlist_id = url_params.get('list')
+            seek_time = url_params.get('t')
         elif path == '/playlist':
-            playlist_id = params.get('list')
-        elif path.startswith('/shorts/'):
-            re_match = self.RE_SHORTS_VID.match(parsed_url.path)
-            video_id = re_match.group('video_id')
+            playlist_id = url_params.get('list')
         elif path.startswith('/channel/'):
-            re_match = self.RE_CHANNEL_ID.match(parsed_url.path)
-            channel_id = re_match.group('channel_id')
-        elif path.startswith('/live/'):
-            re_match = self.RE_LIVE_VID.match(parsed_url.path)
-            video_id = re_match.group('video_id')
+            re_match = self.RE_PATH_ID.match(parsed_url.path)
+            channel_id = re_match.group('id')
+            if '/live' in path:
+                live = 1
+        elif path.startswith(('/live/', '/shorts/')):
+            re_match = self.RE_PATH_ID.match(parsed_url.path)
+            video_id = re_match.group('id')
+            seek_time = url_params.get('t')
         else:
             context.log_debug('Unknown path "{0}" in url "{1}"'.format(
                 parsed_url.path, url
@@ -87,8 +85,11 @@ class UrlToItemConverter(object):
                     if number
                 )
                 plugin_params['seek'] = seek_time
-            plugin_uri = context.create_uri(['play'], plugin_params)
-            video_item = VideoItem('', plugin_uri)
+            if playlist_id:
+                plugin_params['playlist_id'] = playlist_id
+            video_item = VideoItem(
+                '', context.create_uri(['play'], plugin_params)
+            )
             self._video_id_dict[video_id] = video_item
 
         elif playlist_id:
@@ -103,10 +104,13 @@ class UrlToItemConverter(object):
 
         elif channel_id:
             if self._flatten:
+                if live:
+                    context.set_param('live', live)
                 self._channel_ids.append(channel_id)
             else:
                 channel_item = DirectoryItem(
-                    '', context.create_uri(['channel', channel_id])
+                    '', context.create_uri(['channel', channel_id],
+                                           {'live': live} if live else None)
                 )
                 channel_item.set_fanart(provider.get_fanart(context))
                 self._channel_id_dict[channel_id] = channel_item
