@@ -20,6 +20,7 @@ import xbmcvfs
 __all__ = (
     'create_path',
     'create_uri_path',
+    'duration_to_seconds',
     'find_best_fit',
     'find_video_id',
     'friendly_number',
@@ -266,4 +267,20 @@ def friendly_number(number, precision=3, scale=('', 'K', 'M', 'B')):
     magnitude = 0 if _abs_input < 1000 else int(log(floor(_abs_input), 1000))
     return '{output:f}'.format(
         output=_input / 1000 ** magnitude
-    ).rstrip('0').rstrip('.') + scale[magnitude]
+    ).rstrip('0').rstrip('.') + scale[magnitude], _input
+
+
+_RE_PERIODS = re.compile(r'(\d+)(d|h|m|s)')
+_SECONDS_IN_PERIODS = {
+    's': 1,      # 1 second
+    'm': 60,     # 1 minute
+    'h': 3600,   # 1 hour
+    'd': 86400,  # 1 day
+}
+
+
+def duration_to_seconds(duration):
+    return sum(
+        int(number) * _SECONDS_IN_PERIODS[period]
+        for number, period in re.findall(_RE_PERIODS, duration)
+    )

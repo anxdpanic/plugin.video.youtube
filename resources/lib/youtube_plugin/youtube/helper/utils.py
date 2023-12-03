@@ -10,6 +10,7 @@
 
 import re
 import time
+from math import log10
 
 from ...kodion import utils
 from ...kodion.items import DirectoryItem
@@ -68,7 +69,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     like_count = snippet['likeCount']
     if like_count:
-        like_count = utils.friendly_number(like_count)
+        like_count, _ = utils.friendly_number(like_count)
         color = __COLOR_MAP['likeCount']
         label_likes = ui.color(color, ui.bold(like_count))
         plot_likes = ui.color(color, ui.bold(' '.join((
@@ -78,7 +79,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
         plot_props.append(plot_likes)
 
     if total_replies:
-        total_replies = utils.friendly_number(total_replies)
+        total_replies, _ = utils.friendly_number(total_replies)
         color = __COLOR_MAP['commentCount']
         label_replies = ui.color(color, ui.bold(total_replies))
         plot_replies = ui.color(color, ui.bold(' '.join((
@@ -366,13 +367,15 @@ def update_video_infos(provider, context, video_id_dict,
         video_item.upcoming = broadcast_type == 'upcoming'
 
         # duration
-        if not video_item.live and play_data and 'total_time' in play_data:
+        if (not (video_item.live or video_item.upcoming)
+                and play_data and 'total_time' in play_data):
             duration = play_data['total_time']
         else:
             duration = yt_item.get('contentDetails', {}).get('duration')
             if duration:
+                duration = utils.datetime_parser.parse(duration)
                 # subtract 1s because YouTube duration is +1s too long
-                duration = utils.datetime_parser.parse(duration).seconds - 1
+                duration = (duration.seconds - 1) if duration.seconds else None
         if duration:
             video_item.set_duration_from_seconds(duration)
 
@@ -415,33 +418,45 @@ def update_video_infos(provider, context, video_id_dict,
 
         label_stats = []
         stats = []
+        rating = [0, 0]
         if 'statistics' in yt_item:
             for stat, value in yt_item['statistics'].items():
                 label = context.LOCAL_MAP.get('stats.' + stat)
                 if label:
                     color = __COLOR_MAP.get(stat, 'white')
-                    value = utils.friendly_number(value)
-                    label_stats.append(ui.color(color, value))
+                    str_value, value = utils.friendly_number(value)
+                    label_stats.append(ui.color(color, str_value))
                     stats.append(ui.color(color, ui.bold(' '.join((
-                        value, context.localize(label)
+                        str_value, context.localize(label)
                     )))))
+                else:
+                    continue
+                if stat == 'likeCount':
+                    rating[0] = value
+                elif stat == 'viewCount':
+                    rating[1] = value
+                    video_item.set_count(value)
             label_stats = '|'.join(label_stats)
             stats = '|'.join(stats)
+            if 0 < rating[0] <= rating[1]:
+                if rating[0] == rating[1]:
+                    rating = 10
+                else:
+                    # This is a completely made up, arbitrary ranking score
+                    rating = (10 * (log10(rating[1]) * log10(rating[0]))
+                              / (log10(rating[0] + rating[1]) ** 2))
+                video_item.set_rating(rating)
 
         # Used for label2, but is poorly supported in skins
-        video_details = ' | '.join((detail for detail in (
-            stats if stats else '',
-            ui.italic(start_at) if start_at else '',
-        ) if detail))
-        video_item.set_short_details(video_details)
+        video_item.set_short_details(label_stats)
+        # Hack to force a custom label mask containing production code,
+        # activated on sort order selection, to display details
+        # Refer Provider.set_content_type for usage
+        video_item.set_code(label_stats)
 
         # update and set the title
         title = video_item.get_title() or snippet['title'] or ''
-        if video_item.upcoming:
-            title = ui.italic(title)
-        if label_stats:
-            title = '{0} ({1})'.format(title, label_stats)
-        video_item.set_title(title)
+        video_item.set_title(ui.italic(title) if video_item.upcoming else title)
 
         """
         This is experimental. We try to get the most information out of the title of a video.

@@ -9,66 +9,57 @@
 """
 
 import sys
+
 from xbmcplugin import __dict__ as xbmcplugin
 
 
 namespace = sys.modules[__name__]
 names = [
-    # 'NONE',
-    'LABEL',
-    'LABEL_IGNORE_THE',
-    'DATE',
-    'SIZE',
-    'FILE',
-    'DRIVE_TYPE',
-    'TRACKNUM',
-    'DURATION',
-    'TITLE',
-    'TITLE_IGNORE_THE',
-    'ARTIST',
-    # 'ARTIST_AND_YEAR',
-    'ARTIST_IGNORE_THE',
-    'ALBUM',
-    'ALBUM_IGNORE_THE',
-    'GENRE',
-    'COUNTRY',
-    # 'YEAR',
-    'VIDEO_YEAR',
-    'VIDEO_RATING',
-    'VIDEO_USER_RATING',
-    'DATEADDED',
-    'PROGRAM_COUNT',
-    'PLAYLIST_ORDER',
-    'EPISODE',
-    'VIDEO_TITLE',
-    'VIDEO_SORT_TITLE',
-    'VIDEO_SORT_TITLE_IGNORE_THE',
-    'PRODUCTIONCODE',
-    'SONG_RATING',
-    'SONG_USER_RATING',
-    'MPAA_RATING',
-    'VIDEO_RUNTIME',
-    'STUDIO',
-    'STUDIO_IGNORE_THE',
-    'FULLPATH',
-    'LABEL_IGNORE_FOLDERS',
-    'LASTPLAYED',
-    'PLAYCOUNT',
-    'LISTENERS',
-    'UNSORTED',
-    'CHANNEL',
-    'CHANNEL_NUMBER',
-    'BITRATE',
-    'DATE_TAKEN',
-    'CLIENT_CHANNEL_ORDER',
-    'TOTAL_DISCS',
-    'ORIG_DATE',
-    'BPM',
-    'VIDEO_ORIGINAL_TITLE',
-    'VIDEO_ORIGINAL_TITLE_IGNORE_THE',
-    'PROVIDER',
-    'USER_PREFERENCE',
-    # 'MAX',
+    'NONE',                             # 0
+    'LABEL',                            # 1
+    'LABEL_IGNORE_THE',                 # 2
+    'DATE',                             # 3
+    'SIZE',                             # 4
+    'FILE',                             # 5
+    'DRIVE_TYPE',                       # 6
+    'TRACKNUM',                         # 7
+    'DURATION',                         # 8
+    'TITLE',                            # 9
+    'TITLE_IGNORE_THE',                 # 10
+    'ARTIST',                           # 11
+    'ARTIST_IGNORE_THE',                # 13
+    'ALBUM',                            # 14
+    'ALBUM_IGNORE_THE',                 # 15
+    'GENRE',                            # 16
+    'COUNTRY',                          # 17
+    'VIDEO_YEAR',                       # 18
+    'VIDEO_RATING',                     # 19
+    'VIDEO_USER_RATING',                # 20
+    'DATEADDED',                        # 21
+    'PROGRAM_COUNT',                    # 22
+    'PLAYLIST_ORDER',                   # 23
+    'EPISODE',                          # 24
+    'VIDEO_TITLE',                      # 25
+    'VIDEO_SORT_TITLE',                 # 26
+    'VIDEO_SORT_TITLE_IGNORE_THE',      # 27
+    'PRODUCTIONCODE',                   # 28
+    'SONG_RATING',                      # 29
+    'SONG_USER_RATING',                 # 30
+    'MPAA_RATING',                      # 31
+    'VIDEO_RUNTIME',                    # 32
+    'STUDIO',                           # 33
+    'STUDIO_IGNORE_THE',                # 34
+    'FULLPATH',                         # 35
+    'LABEL_IGNORE_FOLDERS',             # 36
+    'LASTPLAYED',                       # 37
+    'PLAYCOUNT',                        # 38
+    'LISTENERS',                        # 39
+    'UNSORTED',                         # 40
+    'CHANNEL',                          # 41
+    'BITRATE',                          # 43
+    'DATE_TAKEN',                       # 44
+    'VIDEO_ORIGINAL_TITLE',             # 49
+    'VIDEO_ORIGINAL_TITLE_IGNORE_THE',  # 50
 ]
 
 for name in names:

@@ -8,12 +8,13 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
 import datetime
+import re
+from html import unescape
 
 from .base_item import BaseItem
+from ..utils import duration_to_seconds
 
-from html import unescape
 
 __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?')
 
@@ -56,6 +57,7 @@ class VideoItem(BaseItem):
         self._subscription_id = None
         self._playlist_id = None
         self._playlist_item_id = None
+        self._production_code = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count or 0)
@@ -169,10 +171,11 @@ class VideoItem(BaseItem):
     def get_season(self):
         return self._season
 
-    def set_duration(self, hours, minutes, seconds=0):
-        _seconds = seconds
-        _seconds += minutes * 60
-        _seconds += hours * 60 * 60
+    def set_duration(self, hours=0, minutes=0, seconds=0, duration=''):
+        if duration:
+            _seconds = duration_to_seconds(duration)
+        else:
+            _seconds = seconds + minutes * 60 + hours * 60 * 60
         self.set_duration_from_seconds(_seconds)
 
     def set_duration_from_minutes(self, minutes):
@@ -317,3 +320,9 @@ class VideoItem(BaseItem):
 
     def set_playlist_item_id(self, value):
         self._playlist_item_id = value
+
+    def get_code(self):
+        return self._production_code
+
+    def set_code(self, value):
+        self._production_code = value or ''

@@ -425,7 +425,7 @@ class XbmcContext(AbstractContext):
 
     def add_sort_method(self, *sort_methods):
         for sort_method in sort_methods:
-            xbmcplugin.addSortMethod(self._plugin_handle, sort_method)
+            xbmcplugin.addSortMethod(self._plugin_handle, *sort_method)
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:

@@ -37,6 +37,7 @@ class BaseItem(object):
         self._context_menu = None
         self._replace_context_menu = False
         self._added_utc = None
+        self._count = None
         self._date = None
         self._dateadded = None
         self._short_details = None
@@ -143,6 +144,12 @@ class BaseItem(object):
 
     def set_short_details(self, details):
         self._short_details = details or ''
+
+    def get_count(self):
+        return self._count
+
+    def set_count(self, count):
+        self._count = int(count or 0)
 
     @property
     def next_page(self):

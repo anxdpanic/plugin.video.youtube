@@ -38,9 +38,8 @@ def _process_audio_rating(info_labels, param):
         rating = int(param)
         if rating > 5:
             rating = 5
-        if rating < 0:
+        elif rating < 0:
             rating = 0
-
         info_labels['rating'] = rating
 
 
@@ -59,7 +58,7 @@ def _process_video_rating(info_labels, param):
         rating = float(param)
         if rating > 10.0:
             rating = 10.0
-        if rating < 0.0:
+        elif rating < 0.0:
             rating = 0.0
         info_labels['rating'] = rating
 
@@ -92,6 +91,11 @@ def create_from_item(base_item):
 
     # 'date' = '1982-03-09'
     _process_date(info_labels, base_item.get_date())
+
+    # 'count' = 12 (integer)
+    # Can be used to store an id for later, or for sorting purposes
+    # Used for video view count
+    _process_int_value(info_labels, 'count', base_item.get_count())
 
     # Directory
     if isinstance(base_item, DirectoryItem):
@@ -160,11 +164,16 @@ def create_from_item(base_item):
         # 'plot' = '...' (string)
         _process_string_value(info_labels, 'plot', base_item.get_plot())
 
-        # 'code' = 'tt3458353' (string) - imdb id
-        _process_string_value(info_labels, 'code', base_item.get_imdb_id())
+        # 'imdbnumber' = 'tt3458353' (string) - imdb id
+        _process_string_value(info_labels, 'imdbnumber', base_item.get_imdb_id())
 
         # 'cast' = [] (list)
         _process_list_value(info_labels, 'cast', base_item.get_cast())
+
+        # 'code' = '101' (string)
+        # Production code, currently used to store misc video data for label
+        # formatting
+        _process_string_value(info_labels, 'code', base_item.get_code())
 
     # Audio and Video
     if isinstance(base_item, (AudioItem, VideoItem)):

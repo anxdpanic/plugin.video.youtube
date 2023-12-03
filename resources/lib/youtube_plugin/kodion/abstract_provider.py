@@ -134,8 +134,6 @@ class AbstractProvider(object):
 
     @staticmethod
     def _internal_favorite(context, re_match):
-        context.add_sort_method(constants.sort_method.LABEL_IGNORE_THE)
-
         params = context.get_params()
 
         command = re_match.group('command')
@@ -197,8 +195,6 @@ class AbstractProvider(object):
             self._data_cache = context.get_data_cache()
 
     def _internal_search(self, context, re_match):
-        context.add_sort_method(constants.sort_method.UNSORTED)
-
         params = context.get_params()
 
         command = re_match.group('command')
@@ -276,7 +272,7 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
-        context.set_content_type(constants.content_type.FILES)
+        context.set_content_type(constants.content_type.VIDEOS)
         result = []
 
         location = context.get_param('location', False)

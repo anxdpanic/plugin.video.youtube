@@ -1441,13 +1441,20 @@ class Provider(AbstractProvider):
     @staticmethod
     def set_content_type(context, content_type):
         context.set_content_type(content_type)
-        if content_type == constants.content_type.VIDEOS:
-            context.add_sort_method(constants.sort_method.UNSORTED,
-                                    constants.sort_method.VIDEO_RUNTIME,
-                                    constants.sort_method.DATEADDED,
-                                    constants.sort_method.TRACKNUM,
-                                    constants.sort_method.VIDEO_TITLE,
-                                    constants.sort_method.DATE)
+        context.add_sort_method(
+            (constants.sort_method.UNSORTED,         '%T',                     '%P | %J | %D'),
+            (constants.sort_method.LABEL_IGNORE_THE, '%T',                     '%P | %J | %D'),
+        )
+        if content_type != constants.content_type.VIDEOS:
+            return
+        context.add_sort_method(
+            (constants.sort_method.PROGRAM_COUNT,    '%T \u2022 %P | %J | %D', '%C'),
+            (constants.sort_method.VIDEO_RATING,     '%T \u2022 %P | %J | %D', '%R'),
+            (constants.sort_method.DATE,             '%T \u2022 %P | %D',      '%J'),
+            (constants.sort_method.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
+            (constants.sort_method.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
+            (constants.sort_method.TRACKNUM,         '[%N. ]%T',               '%P | %J | %D'),
+        )
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, (InvalidGrant, LoginException)):

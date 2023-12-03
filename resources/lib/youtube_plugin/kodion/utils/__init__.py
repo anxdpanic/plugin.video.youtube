@@ -12,6 +12,7 @@ from . import datetime_parser
 from .methods import (
     create_path,
     create_uri_path,
+    duration_to_seconds,
     find_best_fit,
     find_video_id,
     friendly_number,
@@ -39,6 +40,7 @@ __all__ = (
     'create_path',
     'create_uri_path',
     'datetime_parser',
+    'duration_to_seconds',
     'find_best_fit',
     'find_video_id',
     'friendly_number',
