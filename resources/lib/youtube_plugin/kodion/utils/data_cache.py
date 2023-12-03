@@ -15,12 +15,6 @@ from .storage import Storage
 
 
 class DataCache(Storage):
-    ONE_MINUTE = 60
-    ONE_HOUR = 60 * ONE_MINUTE
-    ONE_DAY = 24 * ONE_HOUR
-    ONE_WEEK = 7 * ONE_DAY
-    ONE_MONTH = 4 * ONE_WEEK
-
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
         super(DataCache, self).__init__(filename, max_file_size_kb=max_file_size_kb)
@@ -28,7 +22,7 @@ class DataCache(Storage):
     def is_empty(self):
         return self._is_empty()
 
-    def get_items(self, seconds, content_ids):
+    def get_items(self, content_ids, seconds):
         query_result = self._get_by_ids(content_ids, process=json.loads)
         if not query_result:
             return {}
@@ -41,18 +35,17 @@ class DataCache(Storage):
         }
         return result
 
-    def get_item(self, seconds, content_id):
+    def get_item(self, content_id, seconds):
         content_id = str(content_id)
         query_result = self._get(content_id)
         if not query_result:
-            return {}
+            return None
 
         current_time = datetime.now()
         if self.get_seconds_diff(query_result[1] or current_time) > seconds:
-            return {}
+            return None
 
-        result = {content_id: json.loads(query_result[0])}
-        return result
+        return json.loads(query_result[0])
 
     def set_item(self, content_id, item):
         self._set(content_id, item)

@@ -15,7 +15,13 @@ import shutil
 import socket
 from base64 import b64decode
 
+import xbmcaddon
+import xbmcvfs
+
 from .helper import (
+    ResourceManager,
+    UrlResolver,
+    UrlToItemConverter,
     v3,
     yt_context_menu,
     yt_login,
@@ -25,26 +31,14 @@ from .helper import (
     yt_setup_wizard,
     yt_specials,
     yt_video,
-    ResourceManager,
-    UrlResolver,
-    UrlToItemConverter,
 )
 from .youtube_exceptions import InvalidGrant, LoginException
-from ..kodion import (
-    constants,
-    AbstractProvider,
-    RegisterProviderPath,
-)
-from ..youtube.client import YouTube
+from ..kodion import (AbstractProvider, RegisterProviderPath, constants)
 from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem
 from ..kodion.network import get_client_ip_address, is_httpd_live
-from ..kodion.utils import find_video_id, strip_html_from_text, FunctionCache
+from ..kodion.utils import find_video_id, strip_html_from_text
+from ..youtube.client import YouTube
 from ..youtube.helper import yt_subscriptions
-
-import xbmcaddon
-import xbmcvfs
-import xbmcgui
-import xbmcplugin
 
 
 class Provider(AbstractProvider):
@@ -397,6 +391,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
+        client = self.get_client(context)
         localize = context.localize
         create_path = context.create_resource_path
         create_uri = context.create_uri
@@ -424,14 +419,15 @@ class Provider(AbstractProvider):
         result = []
 
         """
-        This is a helper routine if we only have the username of a channel. This will retrieve the correct channel id
-        based on the username.
+        This is a helper routine if we only have the username of a channel.
+        This will retrieve the correct channel id based on the username.
         """
         if method == 'user' or channel_id == 'mine':
             context.log_debug('Trying to get channel id for user "%s"' % channel_id)
 
-            json_data = function_cache.get(FunctionCache.ONE_DAY,
-                                           self.get_client(context).get_channel_by_username, channel_id)
+            json_data = function_cache.get(client.get_channel_by_username,
+                                           function_cache.ONE_DAY,
+                                           channel_id)
             if not v3.handle_error(context, json_data):
                 return False
 
@@ -490,8 +486,9 @@ class Provider(AbstractProvider):
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
         if upload_playlist:
-            json_data = function_cache.get(FunctionCache.ONE_MINUTE * 5,
-                                           self.get_client(context).get_playlist_items, upload_playlist,
+            json_data = function_cache.get(client.get_playlist_items,
+                                           function_cache.ONE_MINUTE * 5,
+                                           upload_playlist,
                                            page_token=page_token)
             if not v3.handle_error(context, json_data):
                 return False
@@ -887,9 +884,16 @@ class Provider(AbstractProvider):
                 live_item.set_fanart(self.get_fanart(context))
                 result.append(live_item)
 
-        json_data = context.get_function_cache().get(FunctionCache.ONE_MINUTE * 10, self.get_client(context).search,
-                                                     q=search_text, search_type=search_type, event_type=event_type,
-                                                     safe_search=safe_search, page_token=page_token, channel_id=channel_id, location=location)
+        function_cache = context.get_function_cache()
+        json_data = function_cache.get(self.get_client(context).search,
+                                       function_cache.ONE_MINUTE * 10,
+                                       q=search_text,
+                                       search_type=search_type,
+                                       event_type=event_type,
+                                       safe_search=safe_search,
+                                       page_token=page_token,
+                                       channel_id=channel_id,
+                                       location=location)
         if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(self, context, json_data))

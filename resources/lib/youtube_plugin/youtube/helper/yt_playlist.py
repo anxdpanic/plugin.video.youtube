@@ -8,8 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ...kodion.utils.function_cache import FunctionCache
-
 from ... import kodion
 from ...youtube.helper import v3
 
@@ -135,9 +133,9 @@ def _process_remove_playlist(provider, context):
 
 
 def _process_select_playlist(provider, context):
-    listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')  # do this asap, relies on listitems focus
-    keymap_action = False
     ui = context.get_ui()
+    listitem_path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')  # do this asap, relies on listitems focus
+    keymap_action = False
     page_token = ''
     current_page = 0
 
@@ -151,16 +149,19 @@ def _process_select_playlist(provider, context):
         if not video_id:
             raise kodion.KodionException('Playlist/Select: missing video_id')
 
+    function_cache = context.get_function_cache()
+    client = provider.get_client(context)
     while True:
         current_page += 1
         if not page_token:
-            json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
-                                                         provider.get_client(context).get_playlists_of_channel,
-                                                         channel_id='mine')
+            json_data = function_cache.get(client.get_playlists_of_channel,
+                                           function_cache.ONE_MINUTE // 3,
+                                           channel_id='mine')
         else:
-            json_data = context.get_function_cache().get((FunctionCache.ONE_MINUTE // 3),
-                                                         provider.get_client(context).get_playlists_of_channel,
-                                                         channel_id='mine', page_token=page_token)
+            json_data = function_cache.get(client.get_playlists_of_channel,
+                                           function_cache.ONE_MINUTE // 3,
+                                           channel_id='mine',
+                                           page_token=page_token)
 
         playlists = json_data.get('items', [])
         page_token = json_data.get('nextPageToken', False)
@@ -193,12 +194,12 @@ def _process_select_playlist(provider, context):
             items.append((ui.bold(context.localize('next_page')).replace('%d', str(current_page + 1)), '',
                           'playlist.next', 'DefaultFolder.png'))
 
-        result = context.get_ui().on_select(context.localize('playlist.select'), items)
+        result = ui.on_select(context.localize('playlist.select'), items)
         if result == 'playlist.create':
-            result, text = context.get_ui().on_keyboard_input(
+            result, text = ui.on_keyboard_input(
                 context.localize('playlist.create'))
             if result and text:
-                json_data = provider.get_client(context).create_playlist(title=text)
+                json_data = client.create_playlist(title=text)
                 if not v3.handle_error(context, json_data):
                     break
 

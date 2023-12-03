@@ -185,7 +185,7 @@ class UrlResolver(object):
         return resolved_url
 
     def resolve(self, url):
-        resolved_url = self._cache.get(self._cache.ONE_DAY, self._resolve, url)
+        resolved_url = self._cache.get(self._resolve, self._cache.ONE_DAY, url)
         if not resolved_url or resolved_url == '/':
             return url
 

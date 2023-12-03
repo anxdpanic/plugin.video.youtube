@@ -8,31 +8,31 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
 import random
+import re
 import traceback
 
-from json import dumps as json_dumps, loads as json_loads
 from html import unescape
+from json import dumps as json_dumps, loads as json_loads
 from urllib.parse import (
     parse_qs,
     quote,
     unquote,
-    urlsplit,
-    urlunsplit,
     urlencode,
     urljoin,
+    urlsplit,
+    urlunsplit,
 )
 
 import xbmcvfs
 
-from ..client.request_client import YouTubeRequestClient
-from ...kodion.network import is_httpd_live
-from ...kodion.utils import make_dirs, DataCache
-from ..youtube_exceptions import YouTubeException
-from .subtitles import Subtitles
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
+from .subtitles import Subtitles
+from ..client.request_client import YouTubeRequestClient
+from ..youtube_exceptions import YouTubeException
+from ...kodion.network import is_httpd_live
+from ...kodion.utils import make_dirs
 
 
 class VideoInfo(YouTubeRequestClient):
@@ -711,13 +711,10 @@ class VideoInfo(YouTubeRequestClient):
         return None
 
     def _get_player_js(self):
-        cached_url = self._data_cache.get_item(
-            DataCache.ONE_HOUR * 4, 'player_js_url'
-        ).get('url', '')
-        if cached_url not in {'', 'http://', 'https://'}:
-            js_url = cached_url
-        else:
-            js_url = None
+        cached = self._data_cache.get_item('player_js_url',
+                                           self._data_cache.ONE_HOUR * 4)
+        cached = cached and cached.get('url', '')
+        js_url = cached if cached not in {'', 'http://', 'https://'} else None
 
         if not js_url:
             player_page = self._get_player_page()
@@ -739,12 +736,12 @@ class VideoInfo(YouTubeRequestClient):
         js_url = self._normalize_url(js_url)
         self._data_cache.set_item('player_js_url', json_dumps({'url': js_url}))
 
-        cache_key = quote(js_url)
-        cached_js = self._data_cache.get_item(
-            DataCache.ONE_HOUR * 4, cache_key
-        ).get('js')
-        if cached_js:
-            return cached_js
+        js_cache_key = quote(js_url)
+        cached = self._data_cache.get_item(js_cache_key,
+                                           self._data_cache.ONE_HOUR * 4)
+        cached = cached and cached.get('js')
+        if cached:
+            return cached
 
         client = self.build_client('web')
         result = self.request(
@@ -756,7 +753,7 @@ class VideoInfo(YouTubeRequestClient):
             return ''
 
         javascript = result.text
-        self._data_cache.set_item(cache_key, json_dumps({'js': javascript}))
+        self._data_cache.set_item(js_cache_key, json_dumps({'js': javascript}))
         return javascript
 
     @staticmethod
@@ -928,9 +925,9 @@ class VideoInfo(YouTubeRequestClient):
         if not url or not encrypted_signature:
             return None
 
-        signature = self._data_cache.get_item(
-            DataCache.ONE_HOUR * 4, encrypted_signature
-        ).get('sig')
+        signature = self._data_cache.get_item(encrypted_signature,
+                                              self._data_cache.ONE_HOUR * 4)
+        signature = signature and signature.get('sig')
         if not signature:
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
@@ -942,9 +939,8 @@ class VideoInfo(YouTubeRequestClient):
                     'Failed to extract URL from signatureCipher'
                 )
                 return None
-            self._data_cache.set_item(
-                encrypted_signature, json_dumps({'sig': signature})
-            )
+            self._data_cache.set_item(encrypted_signature,
+                                      json_dumps({'sig': signature}))
 
         if signature:
             url = '{0}&{1}={2}'.format(url, query_var, signature)

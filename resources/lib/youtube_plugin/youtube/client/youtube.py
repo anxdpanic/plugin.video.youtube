@@ -303,16 +303,15 @@ class YouTube(LoginClient):
 
         # Do we have a cached result?
         cache_home_key = 'get-activities-home'
-        cached = cache.get_item(cache.ONE_HOUR * 4, cache_home_key)
-        if cache_home_key in cached and cached[cache_home_key].get('items'):
-            return cached[cache_home_key]
+        cached = cache.get_item(cache_home_key, cache.ONE_HOUR * 4)
+        cached = cached and cached.get('items')
+        if cached:
+            return cached
 
         # Fetch existing list of items, if any
-        items = []
         cache_items_key = 'get-activities-home-items'
-        cached = cache.get_item(cache.ONE_WEEK * 2, cache_items_key)
-        if cache_items_key in cached:
-            items = cached[cache_items_key]
+        cached = cache.get_item(cache_items_key, cache.ONE_WEEK * 2)
+        items = cached if cached else []
 
         # Fetch history and recommended items. Use threads for faster execution.
         def helper(video_id, responses):
@@ -761,9 +760,9 @@ class YouTube(LoginClient):
 
             # if new uploads is cached
             cache_items_key = 'my-subscriptions-items'
-            cached = cache.get_item(cache.ONE_HOUR, cache_items_key)
-            if cache_items_key in cached:
-                _result['items'] = cached[cache_items_key]
+            cached = cache.get_item(cache_items_key, cache.ONE_HOUR)
+            if cached:
+                _result['items'] = cached
 
             """ no cache, get uploads data from web """
             if not _result['items']:

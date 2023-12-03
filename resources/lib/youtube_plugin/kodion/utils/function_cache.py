@@ -15,12 +15,6 @@ from .storage import Storage
 
 
 class FunctionCache(Storage):
-    ONE_MINUTE = 60
-    ONE_HOUR = 60 * ONE_MINUTE
-    ONE_DAY = 24 * ONE_HOUR
-    ONE_WEEK = 7 * ONE_DAY
-    ONE_MONTH = 4 * ONE_WEEK
-
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
         super(FunctionCache, self).__init__(filename, max_file_size_kb=max_file_size_kb)
@@ -76,12 +70,11 @@ class FunctionCache(Storage):
 
         return None
 
-    def get(self, seconds, func, *args, **keywords):
+    def get(self, func, seconds, *args, **keywords):
         """
         Returns the cached data of the given function.
-        :param partial_func: function to cache
+        :param func, function to cache
         :param seconds: time to live in seconds
-        :param return_cached_only: return only cached data and don't call the function
         :return:
         """
 

@@ -196,41 +196,46 @@ class AbstractProvider(object):
 
     def _internal_search(self, context, re_match):
         params = context.get_params()
+        ui = context.get_ui()
 
         command = re_match.group('command')
         search_history = context.get_search_history()
         if command == 'remove':
             query = params['q']
             search_history.remove(query)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
             return True
         if command == 'rename':
             query = params['q']
-            result, new_query = context.get_ui().on_keyboard_input(context.localize('search.rename'),
-                                                                   query)
+            result, new_query = ui.on_keyboard_input(
+                context.localize('search.rename'), query
+            )
             if result:
                 search_history.rename(query, new_query)
-                context.get_ui().refresh_container()
+                ui.refresh_container()
             return True
         if command == 'clear':
             search_history.clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
             return True
         if command == 'input':
             self.data_cache = context
 
-            folder_path = context.get_ui().get_info_label('Container.FolderPath')
+            folder_path = ui.get_info_label('Container.FolderPath')
             query = None
+            #  came from page 1 of search query by '..'/back
+            #  user doesn't want to input on this path
             if (folder_path.startswith('plugin://%s' % context.get_id()) and
                     re.match('.+/(?:query|input)/.*', folder_path)):
-                cached_query = self.data_cache.get_item(self.data_cache.ONE_DAY, 'search_query')
-                #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
-                if cached_query and cached_query.get('search_query', {}).get('query'):
-                    query = cached_query.get('search_query', {}).get('query')
-                    query = to_unicode(query)
-                    query = unquote(query)
+                cached = self.data_cache.get_item('search_query',
+                                                  self.data_cache.ONE_DAY)
+                cached = cached and cached.get('query')
+                if cached:
+                    query = unquote(to_unicode(cached))
             else:
-                result, input_query = context.get_ui().on_keyboard_input(context.localize('search.title'))
+                result, input_query = ui.on_keyboard_input(
+                    context.localize('search.title')
+                )
                 if result:
                     query = input_query
 

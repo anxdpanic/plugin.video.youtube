@@ -41,7 +41,9 @@ class ResourceManager(object):
 
         for channel_id in channel_ids:
             if channel_id == 'mine':
-                json_data = function_cache.get(function_cache.ONE_DAY, self._client.get_channel_by_username, channel_id)
+                json_data = function_cache.get(self._client.get_channel_by_username,
+                                               function_cache.ONE_DAY,
+                                               channel_id)
                 items = json_data.get('items', [{'id': 'mine'}])
 
                 try:
@@ -58,7 +60,7 @@ class ResourceManager(object):
         channel_ids = updated_channel_ids
 
         data_cache = self._context.get_data_cache()
-        channel_data = data_cache.get_items(data_cache.ONE_MONTH, channel_ids)
+        channel_data = data_cache.get_items(channel_ids, data_cache.ONE_MONTH)
 
         channel_ids = set(channel_ids)
         channel_ids_cached = set(channel_data)
@@ -92,7 +94,7 @@ class ResourceManager(object):
     def _update_videos(self, video_ids, live_details=False, suppress_errors=False):
         json_data = None
         data_cache = self._context.get_data_cache()
-        video_data = data_cache.get_items(data_cache.ONE_MONTH, video_ids)
+        video_data = data_cache.get_items(video_ids, data_cache.ONE_MONTH)
 
         video_ids = set(video_ids)
         video_ids_cached = set(video_data)
@@ -143,7 +145,7 @@ class ResourceManager(object):
     def _update_playlists(self, playlists_ids):
         json_data = None
         data_cache = self._context.get_data_cache()
-        playlist_data = data_cache.get_items(data_cache.ONE_MONTH, playlists_ids)
+        playlist_data = data_cache.get_items(playlists_ids, data_cache.ONE_MONTH)
 
         playlists_ids = set(playlists_ids)
         playlists_ids_cached = set(playlist_data)

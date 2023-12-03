@@ -8,14 +8,21 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ... import kodion
-from ...kodion.items import DirectoryItem, UriItem
-from ...youtube.helper import v3, tv, extract_urls, UrlResolver, UrlToItemConverter
 from . import utils
+from ...kodion import KodionException, constants
+from ...kodion.items import DirectoryItem, UriItem
+from ...kodion.utils import strip_html_from_text
+from ...youtube.helper import (
+    UrlResolver,
+    UrlToItemConverter,
+    extract_urls,
+    tv,
+    v3,
+)
 
 
 def _process_related_videos(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -30,7 +37,7 @@ def _process_related_videos(provider, context):
 
 
 def _process_parent_comments(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.FILES)
+    provider.set_content_type(context, constants.content_type.FILES)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -45,7 +52,7 @@ def _process_parent_comments(provider, context):
 
 
 def _process_child_comments(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.FILES)
+    provider.set_content_type(context, constants.content_type.FILES)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -60,7 +67,7 @@ def _process_child_comments(provider, context):
 
 
 def _process_recommendations(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -72,7 +79,7 @@ def _process_recommendations(provider, context):
 
 
 def _process_popular_right_now(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -85,7 +92,7 @@ def _process_popular_right_now(provider, context):
 
 
 def _process_browse_channels(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.FILES)
+    provider.set_content_type(context, constants.content_type.FILES)
     result = []
 
     # page_token = context.get_param('page_token', '')
@@ -98,7 +105,9 @@ def _process_browse_channels(provider, context):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
     else:
-        json_data = context.get_function_cache().get(kodion.utils.FunctionCache.ONE_MONTH, client.get_guide_categories)
+        function_cache = context.get_function_cache()
+        json_data = function_cache.get(client.get_guide_categories,
+                                       function_cache.ONE_MONTH)
         if not v3.handle_error(context, json_data):
             return False
         result.extend(v3.response_to_items(provider, context, json_data))
@@ -107,7 +116,7 @@ def _process_browse_channels(provider, context):
 
 
 def _process_disliked_videos(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
     result = []
 
     page_token = context.get_param('page_token', '')
@@ -122,7 +131,7 @@ def _process_live_events(provider, context, event_type='live'):
     def _sort(x):
         return x.get_aired()
 
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
     result = []
 
     # TODO: cache result
@@ -142,7 +151,7 @@ def _process_description_links(provider, context):
     addon_id = context.get_param('addon_id', '')
 
     def _extract_urls(_video_id):
-        provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+        provider.set_content_type(context, constants.content_type.VIDEOS)
         url_resolver = UrlResolver(context)
 
         result = []
@@ -156,9 +165,12 @@ def _process_description_links(provider, context):
         video_data = resource_manager.get_videos([_video_id])
         yt_item = video_data[_video_id]
         snippet = yt_item['snippet']  # crash if not conform
-        description = kodion.utils.strip_html_from_text(snippet['description'])
+        description = strip_html_from_text(snippet['description'])
 
-        urls = context.get_function_cache().get(kodion.utils.FunctionCache.ONE_WEEK, extract_urls, description)
+        function_cache = context.get_function_cache()
+        urls = function_cache.get(extract_urls,
+                                  function_cache.ONE_WEEK,
+                                  description)
 
         progress_dialog.set_total(len(urls))
 
@@ -261,7 +273,7 @@ def _process_description_links(provider, context):
 
 
 def _process_saved_playlists_tv(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.FILES)
+    provider.set_content_type(context, constants.content_type.FILES)
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
@@ -273,7 +285,7 @@ def _process_saved_playlists_tv(provider, context):
 
 
 def _process_watch_history_tv(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
@@ -285,7 +297,7 @@ def _process_watch_history_tv(provider, context):
 
 
 def _process_purchases_tv(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
@@ -297,7 +309,7 @@ def _process_purchases_tv(provider, context):
 
 
 def _process_new_uploaded_videos_tv(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
@@ -309,7 +321,7 @@ def _process_new_uploaded_videos_tv(provider, context):
 
 
 def _process_new_uploaded_videos_tv_filtered(provider, context):
-    provider.set_content_type(context, kodion.constants.content_type.VIDEOS)
+    provider.set_content_type(context, constants.content_type.VIDEOS)
 
     result = []
     next_page_token = context.get_param('next_page_token', '')
@@ -353,4 +365,4 @@ def process(category, provider, context):
         return _process_child_comments(provider, context)
     if category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context)
-    raise kodion.KodionException("YouTube special category '%s' not found" % category)
+    raise KodionException("YouTube special category '%s' not found" % category)

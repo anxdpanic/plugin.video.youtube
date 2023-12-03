@@ -20,6 +20,12 @@ from .. import logger
 
 
 class Storage(object):
+    ONE_MINUTE = 60
+    ONE_HOUR = 60 * ONE_MINUTE
+    ONE_DAY = 24 * ONE_HOUR
+    ONE_WEEK = 7 * ONE_DAY
+    ONE_MONTH = 4 * ONE_WEEK
+
     _table_name = 'storage'
     _clear_query = 'DELETE FROM %s' % _table_name
     _create_table_query = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time TIMESTAMP, value BLOB)' % _table_name
