@@ -11,6 +11,7 @@
 import os
 import copy
 import re
+from datetime import timedelta
 from math import floor, log
 from urllib.parse import quote
 
@@ -27,6 +28,7 @@ __all__ = (
     'loose_version',
     'make_dirs',
     'print_items',
+    'seconds_to_duration',
     'select_stream',
     'strip_html_from_text',
     'to_str',
@@ -280,7 +282,16 @@ _SECONDS_IN_PERIODS = {
 
 
 def duration_to_seconds(duration):
+    if ':' in duration:
+        seconds = 0
+        for part in duration.split(':'):
+            seconds = seconds * 60 + int(part, 10)
+        return seconds
     return sum(
         int(number) * _SECONDS_IN_PERIODS[period]
         for number, period in re.findall(_RE_PERIODS, duration)
     )
+
+
+def seconds_to_duration(seconds):
+    return str(timedelta(seconds=seconds))

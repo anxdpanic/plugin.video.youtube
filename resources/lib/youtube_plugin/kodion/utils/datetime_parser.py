@@ -55,9 +55,9 @@ def parse(datetime_string, as_utc=True):
     date_only_match = __RE_MATCH_DATE_ONLY__.match(datetime_string)
     if date_only_match:
         return utc_to_local(
-            dt=date(_to_int(date_only_match.group('year')),
-                    _to_int(date_only_match.group('month')),
-                    _to_int(date_only_match.group('day'))),
+            dt=datetime(_to_int(date_only_match.group('year')),
+                        _to_int(date_only_match.group('month')),
+                        _to_int(date_only_match.group('day'))),
             offset=offset
         )
 

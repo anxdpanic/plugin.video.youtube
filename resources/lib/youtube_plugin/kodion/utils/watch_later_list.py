@@ -30,8 +30,7 @@ class WatchLaterList(Storage):
         return sorted(result, key=self._sort_item, reverse=False)
 
     def add(self, base_item):
-        now = datetime.datetime.now()
-        base_item.set_date(now.year, now.month, now.day, now.hour, now.minute, now.second)
+        base_item.set_date_from_datetime(datetime.datetime.now())
 
         item_json_data = items.to_json(base_item)
         self._set(base_item.get_id(), item_json_data)

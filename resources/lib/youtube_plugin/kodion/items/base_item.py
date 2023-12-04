@@ -104,40 +104,43 @@ class BaseItem(object):
         return self._replace_context_menu
 
     def set_date(self, year, month, day, hour=0, minute=0, second=0):
-        date = datetime.datetime(year, month, day, hour, minute, second)
-        self._date = date.isoformat(sep=' ')
+        self._date = datetime.datetime(year, month, day, hour, minute, second)
 
     def set_date_from_datetime(self, date_time):
-        self.set_date(year=date_time.year,
-                      month=date_time.month,
-                      day=date_time.day,
-                      hour=date_time.hour,
-                      minute=date_time.minute,
-                      second=date_time.second)
+        self._date = date_time
+
+    def get_date(self, as_text=True, short=False):
+        if not self._date:
+            return ''
+        if short:
+            return self._date.date().isoformat()
+        if as_text:
+            return self._date.isoformat(sep=' ')
+        return self._date
 
     def set_dateadded(self, year, month, day, hour=0, minute=0, second=0):
-        date = datetime.datetime(year, month, day, hour, minute, second)
-        self._dateadded = date.isoformat(sep=' ')
+        self._dateadded = datetime.datetime(year,
+                                            month,
+                                            day,
+                                            hour,
+                                            minute,
+                                            second)
 
     def set_dateadded_from_datetime(self, date_time):
-        self.set_dateadded(year=date_time.year,
-                           month=date_time.month,
-                           day=date_time.day,
-                           hour=date_time.hour,
-                           minute=date_time.minute,
-                           second=date_time.second)
+        self._dateadded = date_time
 
-    def set_added_utc(self, dt):
-        self._added_utc = dt
+    def get_dateadded(self, as_text=True):
+        if not self._dateadded:
+            return ''
+        if as_text:
+            return self._dateadded.isoformat(sep=' ')
+        return self._dateadded
+
+    def set_added_utc(self, date_time):
+        self._added_utc = date_time
 
     def get_added_utc(self):
         return self._added_utc
-
-    def get_date(self):
-        return self._date
-
-    def get_dateadded(self):
-        return self._dateadded
 
     def get_short_details(self):
         return self._short_details

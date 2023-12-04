@@ -54,13 +54,24 @@ def video_playback_item(context, video_item):
     is_strm = context.get_param('strm')
     mime_type = None
 
-    kwargs = {
-        'label': (None if is_strm
-                  else (video_item.get_title() or video_item.get_name())),
-        'label2': None if is_strm else video_item.get_short_details(),
-        'path': uri,
-        'offscreen': True,
-    }
+    if is_strm:
+        kwargs = {
+            'path': uri,
+            'offscreen': True,
+        }
+    else:
+        kwargs = {
+            'label': video_item.get_title() or video_item.get_name(),
+            'label2': ' | '.join((part
+                                  for part in (
+                                      video_item.get_code(),
+                                      video_item.get_date(short=True),
+                                      video_item.get_duration(as_text=True),
+                                  )
+                                  if part)),
+            'path': uri,
+            'offscreen': True,
+        }
     props = {
         'isPlayable': str(video_item.playable).lower(),
     }
@@ -193,7 +204,13 @@ def video_listitem(context, video_item):
 
     kwargs = {
         'label': video_item.get_title() or video_item.get_name(),
-        'label2': video_item.get_short_details(),
+        'label2': ' | '.join((part
+                              for part in (
+                                  video_item.get_code(),
+                                  video_item.get_date(short=True),
+                                  video_item.get_duration(as_text=True),
+                              )
+                              if part)),
         'path': uri,
         'offscreen': True,
     }

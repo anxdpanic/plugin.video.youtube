@@ -12,10 +12,14 @@ from ... import utils
 from ...items import AudioItem, DirectoryItem, ImageItem, VideoItem
 
 
-def _process_date(info_labels, param):
+def _process_date_value(info_labels, name, param):
     if param:
-        datetime = utils.datetime_parser.parse(param)
-        info_labels['date'] = datetime.isoformat()
+        info_labels[name] = param.isoformat()
+
+
+def _process_datetime_value(info_labels, name, param):
+    if param:
+        info_labels[name] = param.isoformat(' ')
 
 
 def _process_int_value(info_labels, name, param):
@@ -43,11 +47,6 @@ def _process_audio_rating(info_labels, param):
         info_labels['rating'] = rating
 
 
-def _process_video_dateadded(info_labels, param):
-    if param is not None and param:
-        info_labels['dateadded'] = param
-
-
 def _process_video_duration(info_labels, param):
     if param is not None:
         info_labels['duration'] = '%d' % param
@@ -63,7 +62,7 @@ def _process_video_rating(info_labels, param):
         info_labels['rating'] = rating
 
 
-def _process_date_value(info_labels, name, param):
+def _process_date_string(info_labels, name, param):
     if param:
         date = utils.datetime_parser.parse(param)
         info_labels[name] = date.isoformat()
@@ -89,8 +88,8 @@ def _process_last_played(info_labels, name, param):
 def create_from_item(base_item):
     info_labels = {}
 
-    # 'date' = '1982-03-09'
-    _process_date(info_labels, base_item.get_date())
+    # 'date' = '1982-03-09' (string)
+    _process_datetime_value(info_labels, 'date', base_item.get_date(as_text=False))
 
     # 'count' = 12 (integer)
     # Can be used to store an id for later, or for sorting purposes
@@ -135,7 +134,7 @@ def create_from_item(base_item):
         _process_list_value(info_labels, 'artist', base_item.get_artist())
 
         # 'dateadded' = '2014-08-11 13:08:56' (string) will be taken from 'dateadded'
-        _process_video_dateadded(info_labels, base_item.get_dateadded())
+        _process_datetime_value(info_labels, 'dateadded', base_item.get_dateadded(as_text=False))
 
         # TODO: starting with Helix this could be seconds
         # 'duration' = '3:18' (string)
@@ -147,13 +146,13 @@ def create_from_item(base_item):
         _process_video_rating(info_labels, base_item.get_rating())
 
         # 'aired' = '2013-12-12' (string)
-        _process_date_value(info_labels, 'aired', base_item.get_aired())
+        _process_date_value(info_labels, 'aired', base_item.get_aired(as_text=False))
 
         # 'director' = 'Steven Spielberg' (string)
         _process_string_value(info_labels, 'director', base_item.get_director())
 
         # 'premiered' = '2013-12-12' (string)
-        _process_date_value(info_labels, 'premiered', base_item.get_premiered())
+        _process_date_value(info_labels, 'premiered', base_item.get_premiered(as_text=False))
 
         # 'episode' = 12 (int)
         _process_int_value(info_labels, 'episode', base_item.get_episode())

@@ -13,7 +13,7 @@ import re
 from html import unescape
 
 from .base_item import BaseItem
-from ..utils import duration_to_seconds
+from ..utils import duration_to_seconds, seconds_to_duration
 
 
 __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?')
@@ -107,15 +107,16 @@ class VideoItem(BaseItem):
         return self._year
 
     def set_premiered(self, year, month, day):
-        date = datetime.date(year, month, day)
-        self._premiered = date.isoformat()
+        self._premiered = datetime.date(year, month, day)
 
     def set_premiered_from_datetime(self, date_time):
-        self.set_premiered(year=date_time.year,
-                           month=date_time.month,
-                           day=date_time.day)
+        self._premiered = date_time.date()
 
-    def get_premiered(self):
+    def get_premiered(self, as_text=True):
+        if not self._premiered:
+            return ''
+        if as_text:
+            return self._premiered.isoformat()
         return self._premiered
 
     def set_plot(self, plot):
@@ -175,29 +176,35 @@ class VideoItem(BaseItem):
         if duration:
             _seconds = duration_to_seconds(duration)
         else:
-            _seconds = seconds + minutes * 60 + hours * 60 * 60
-        self.set_duration_from_seconds(_seconds)
+            _seconds = seconds + minutes * 60 + hours * 3600
+        self._duration = _seconds or 0
 
     def set_duration_from_minutes(self, minutes):
-        self.set_duration_from_seconds(int(minutes) * 60)
+        self._duration = int(minutes) * 60
 
     def set_duration_from_seconds(self, seconds):
         self._duration = int(seconds or 0)
 
-    def get_duration(self):
+    def get_duration(self, as_text=False):
+        if as_text:
+            return seconds_to_duration(self._duration)
         return self._duration
 
     def set_aired(self, year, month, day):
-        date = datetime.date(year, month, day)
-        self._aired = date.isoformat()
+        self._aired = datetime.date(year, month, day)
 
     def set_aired_from_datetime(self, date_time):
-        self.set_aired(year=date_time.year,
-                       month=date_time.month,
-                       day=date_time.day)
+        self._aired = date_time.date()
 
-    def set_scheduled_start_utc(self, dt):
-        self._scheduled_start_utc = dt
+    def get_aired(self, as_text=True):
+        if not self._aired:
+            return ''
+        if as_text:
+            return self._aired.isoformat()
+        return self._aired
+
+    def set_scheduled_start_utc(self, date_time):
+        self._scheduled_start_utc = date_time
 
     def get_scheduled_start_utc(self):
         return self._scheduled_start_utc
@@ -217,9 +224,6 @@ class VideoItem(BaseItem):
     @upcoming.setter
     def upcoming(self, value):
         self._upcoming = value
-
-    def get_aired(self):
-        return self._aired
 
     def set_genre(self, genre):
         self._genre = genre
