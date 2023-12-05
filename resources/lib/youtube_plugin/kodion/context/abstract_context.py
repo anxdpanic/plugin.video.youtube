@@ -55,6 +55,8 @@ class AbstractContext(object):
     }
     _FLOAT_PARAMS = {
         'seek',
+        'start',
+        'end'
     }
     _LIST_PARAMS = {
         'channel_ids',

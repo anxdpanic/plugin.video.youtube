@@ -15,7 +15,7 @@ import xbmc
 
 
 class PlaybackMonitorThread(threading.Thread):
-    def __init__(self, provider, context, playback_json):
+    def __init__(self, player, provider, context, playback_json):
         super(PlaybackMonitorThread, self).__init__()
 
         self._stopped = threading.Event()
@@ -25,7 +25,7 @@ class PlaybackMonitorThread(threading.Thread):
         self.provider = provider
         self.ui = self.context.get_ui()
 
-        self.player = xbmc.Player()
+        self.player = player
 
         self.playback_json = playback_json
         self.video_id = self.playback_json.get('video_id')
@@ -56,10 +56,6 @@ class PlaybackMonitorThread(threading.Thread):
         use_local_history = self.playback_json.get('use_local_history', False)
         playback_stats = self.playback_json.get('playback_stats')
         refresh_only = self.playback_json.get('refresh_only', False)
-        try:
-            seek_time = float(self.playback_json.get('seek_time'))
-        except (ValueError, TypeError):
-            seek_time = None
 
         player = self.player
 
@@ -160,14 +156,20 @@ class PlaybackMonitorThread(threading.Thread):
                 self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
                 break
 
-            if seek_time:
-                player.seekTime(seek_time)
-                try:
-                    self.current_time = float(player.getTime())
-                except RuntimeError:
-                    pass
-                if self.current_time >= seek_time:
-                    seek_time = None
+            if player._start_time or player._seek_time:
+                _seek_time = player._start_time or player._seek_time
+                if self.current_time < _seek_time:
+                    player.seekTime(_seek_time)
+                    try:
+                        self.current_time = float(player.getTime())
+                    except RuntimeError:
+                        pass
+
+            if player._end_time and self.current_time >= player._end_time:
+                if player._start_time:
+                    player.seekTime(player._start_time)
+                else:
+                    player.stop()
 
             if self.abort_now():
                 self.update_times(last_total_time, last_current_time, last_segment_start, last_percent_complete)
@@ -359,6 +361,9 @@ class YouTubePlayer(xbmc.Player):
         self.provider = kwargs.get('provider')
         self.ui = self.context.get_ui()
         self.threads = []
+        self._seek_time = None
+        self._start_time = None
+        self._end_time = None
 
     def stop_threads(self):
         for thread in self.threads:
@@ -400,11 +405,25 @@ class YouTubePlayer(xbmc.Player):
 
     def onPlayBackStarted(self):
         playback_json = self.ui.get_property('playback_json')
-        if playback_json:
-            playback_json = json.loads(playback_json)
-            self.ui.clear_property('playback_json')
-            self.cleanup_threads()
-            self.threads.append(PlaybackMonitorThread(self.provider, self.context, playback_json))
+        if not playback_json:
+            return
+
+        playback_json = json.loads(playback_json)
+        try:
+            self._seek_time = float(playback_json.get('seek_time'))
+            self._start_time = float(playback_json.get('start_time'))
+            self._end_time = float(playback_json.get('end_time'))
+        except (ValueError, TypeError):
+            self._seek_time = None
+            self._start_time = None
+            self._end_time = None
+
+        self.ui.clear_property('playback_json')
+        self.cleanup_threads()
+        self.threads.append(PlaybackMonitorThread(self,
+                                                  self.provider,
+                                                  self.context,
+                                                  playback_json))
 
     def onPlayBackEnded(self):
         self.stop_threads()
@@ -415,3 +434,11 @@ class YouTubePlayer(xbmc.Player):
 
     def onPlayBackError(self):
         self.onPlayBackEnded()
+
+    def onPlayBackSeek(self, time, seekOffset):
+        time_s = time // 1000
+        self._seek_time = None
+        if ((self._end_time and time_s > self._end_time)
+                or (self._start_time and time_s < self._start_time)):
+            self._start_time = None
+            self._end_time = None

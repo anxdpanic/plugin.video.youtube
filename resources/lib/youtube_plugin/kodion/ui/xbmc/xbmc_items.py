@@ -127,7 +127,11 @@ def video_playback_item(context, video_item):
         return list_item
 
     if not context.get_param('resume'):
-        if 'ResumeTime' in props:
+        if context.get_param('start'):
+            prop_value = video_item.get_start_time()
+            if prop_value:
+                props['ResumeTime'] = prop_value
+        elif 'ResumeTime' in props:
             del props['ResumeTime']
 
         prop_value = video_item.get_duration()

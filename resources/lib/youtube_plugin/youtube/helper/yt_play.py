@@ -93,30 +93,31 @@ def play_video(provider, context):
     utils.update_play_info(provider, context, video_id, video_item,
                            video_stream, use_play_data=use_play_data)
 
-    seek_time = 0.0
-    play_count = 0
+    seek_time = 0.0 if params.get('resume') else params.get('seek', 0.0)
+    start_time = params.get('start', 0.0)
+    end_time = params.get('end', 0.0)
+
+    if start_time:
+        video_item.set_start_time(start_time)
+    if end_time:
+        video_item.set_duration_from_seconds(end_time)
+
+    play_count = use_play_data and video_item.get_play_count() or 0
     playback_stats = video_stream.get('playback_stats')
 
-    if not params.get('resume'):
-        try:
-            seek_time = params.get('seek', 0.0)
-        except (ValueError, TypeError):
-            pass
-
-    if use_play_data:
-        play_count = video_item.get_play_count() or 0
-
     playback_json = {
-        "video_id": video_id,
-        "channel_id": metadata.get('channel', {}).get('id', ''),
-        "video_status": metadata.get('video', {}).get('status', {}),
-        "playing_file": video_item.get_uri(),
-        "play_count": play_count,
-        "use_remote_history": use_remote_history,
-        "use_local_history": use_play_data,
-        "playback_stats": playback_stats,
-        "seek_time": seek_time,
-        "refresh_only": screensaver
+        'video_id': video_id,
+        'channel_id': metadata.get('channel', {}).get('id', ''),
+        'video_status': metadata.get('video', {}).get('status', {}),
+        'playing_file': video_item.get_uri(),
+        'play_count': play_count,
+        'use_remote_history': use_remote_history,
+        'use_local_history': use_play_data,
+        'playback_stats': playback_stats,
+        'seek_time': seek_time,
+        'start_time': start_time,
+        'end_time': end_time,
+        'refresh_only': screensaver
     }
 
     ui.set_property('playback_json', json.dumps(playback_json))
