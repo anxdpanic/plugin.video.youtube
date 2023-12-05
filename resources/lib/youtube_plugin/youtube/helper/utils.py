@@ -657,6 +657,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
 
     meta_data = video_stream.get('meta', None)
     if meta_data:
+        video_item.live = meta_data.get('status', {}).get('live', False)
         video_item.set_subtitles(meta_data.get('subtitles', None))
         image = get_thumbnail(settings.use_thumbnail_size(),
                               meta_data.get('images', {}))
@@ -674,17 +675,19 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
     elif video_item.use_hls_video() or video_item.use_mpd_video():
         video_item.set_isa_video(settings.use_isa())
 
-    license_info = video_stream.get('license_info', {})
-    license_proxy = license_info.get('proxy', '')
-    license_url = license_info.get('url', '')
-    license_token = license_info.get('token', '')
+    if video_item.use_isa_video():
+        license_info = video_stream.get('license_info', {})
+        license_proxy = license_info.get('proxy', '')
+        license_url = license_info.get('url', '')
+        license_token = license_info.get('token', '')
 
-    if ISHelper and license_proxy and license_url and license_token:
-        ISHelper('mpd', drm='com.widevine.alpha').check_inputstream()
+        if ISHelper and license_proxy and license_url and license_token:
+            ISHelper('mpd' if video_item.use_mpd_video() else 'hls',
+                     drm='com.widevine.alpha').check_inputstream()
 
-    video_item.set_license_key(license_proxy)
-    ui.set_property('license_url', license_url)
-    ui.set_property('license_token', license_token)
+        video_item.set_license_key(license_proxy)
+        ui.set_property('license_url', license_url)
+        ui.set_property('license_token', license_token)
 
 
 def update_fanarts(provider, context, channel_items_dict, data=None):
