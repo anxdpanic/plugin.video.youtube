@@ -74,6 +74,7 @@ def video_playback_item(context, video_item):
         }
     props = {
         'isPlayable': str(video_item.playable).lower(),
+        'ForceResolvePlugin': 'true',
     }
 
     if (alternative_player
@@ -170,6 +171,7 @@ def audio_listitem(context, audio_item):
     }
     props = {
         'isPlayable': str(audio_item.playable).lower(),
+        'ForceResolvePlugin': 'true',
     }
 
     list_item = ListItem(**kwargs)
@@ -194,12 +196,23 @@ def audio_listitem(context, audio_item):
     return list_item
 
 
-def uri_listitem(context, base_item):
-    uri = base_item.get_uri()
+def uri_listitem(context, uri_item):
+    uri = uri_item.get_uri()
     context.log_debug('Converting UriItem |%s|' % uri)
-    item = ListItem(path=uri, offscreen=True)
-    item.setProperty('IsPlayable', str(base_item.playable).lower())
-    return item
+
+    kwargs = {
+        'label': uri_item.get_name(),
+        'path': uri,
+        'offscreen': True,
+    }
+    props = {
+        'isPlayable': str(uri_item.playable).lower(),
+        'ForceResolvePlugin': 'true',
+    }
+
+    list_item = ListItem(**kwargs)
+    list_item.setProperties(props)
+    return list_item
 
 
 def video_listitem(context, video_item):
@@ -220,6 +233,7 @@ def video_listitem(context, video_item):
     }
     props = {
         'isPlayable': str(video_item.playable).lower(),
+        'ForceResolvePlugin': 'true',
     }
 
     list_item = ListItem(**kwargs)

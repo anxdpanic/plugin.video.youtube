@@ -101,12 +101,12 @@ def create_from_item(base_item):
         _process_string_value(info_labels, 'plot', base_item.get_plot())
 
     # Image
-    if isinstance(base_item, ImageItem):
+    elif isinstance(base_item, ImageItem):
         # 'title' = 'Blow Your Head Off' (string)
         _process_string_value(info_labels, 'title', base_item.get_title())
 
     # Audio
-    if isinstance(base_item, AudioItem):
+    elif isinstance(base_item, AudioItem):
         # 'duration' = 79 (int)
         _process_int_value(info_labels, 'duration', base_item.get_duration())
 
@@ -120,7 +120,7 @@ def create_from_item(base_item):
         _process_audio_rating(info_labels, base_item.get_rating())
 
     # Video
-    if isinstance(base_item, VideoItem):
+    elif isinstance(base_item, VideoItem):
         # mediatype
         _process_mediatype(info_labels, 'mediatype', base_item.get_mediatype())
 
