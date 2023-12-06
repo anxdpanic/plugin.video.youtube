@@ -99,8 +99,10 @@ def play_video(provider, context):
 
     if start_time:
         video_item.set_start_time(start_time)
-    if end_time:
-        video_item.set_duration_from_seconds(end_time)
+    # Setting the duration based on end_time can cause issues with
+    # listing/sorting and other addons that monitor playback
+    # if end_time:
+    #     video_item.set_duration_from_seconds(end_time)
 
     play_count = use_play_data and video_item.get_play_count() or 0
     playback_stats = video_stream.get('playback_stats')
@@ -117,6 +119,7 @@ def play_video(provider, context):
         'seek_time': seek_time,
         'start_time': start_time,
         'end_time': end_time,
+        'clip': params.get('clip'),
         'refresh_only': screensaver
     }
 

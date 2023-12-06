@@ -9,6 +9,7 @@
 """
 
 import re
+from html import unescape
 from urllib.parse import parse_qsl, urlencode, urlparse
 
 from ...kodion.network import BaseRequestsClass
@@ -51,6 +52,15 @@ class AbstractResolver(BaseRequestsClass):
 
 
 class YouTubeResolver(AbstractResolver):
+    _RE_CHANNEL_URL = re.compile(r'<meta property="og:url" content="'
+                                 r'(?P<channel_url>[^"]+)'
+                                 r'">')
+    _RE_CLIP_DETAILS = re.compile(r'(<meta property="og:video:url" content="'
+                                  r'(?P<video_url>[^"]+)'
+                                  r'">)'
+                                  r'|("startTimeMs":"(?P<start_time>\d+)")'
+                                  r'|("endTimeMs":"(?P<end_time>\d+)")')
+
     def __init__(self, *args, **kwargs):
         super(YouTubeResolver, self).__init__(*args, **kwargs)
 
@@ -67,6 +77,7 @@ class YouTubeResolver(AbstractResolver):
                 '/@',
                 '/c/',
                 '/channel/',
+                '/clip',
                 '/user/',
         )):
             return 'GET'
@@ -118,13 +129,47 @@ class YouTubeResolver(AbstractResolver):
         if response.status_code != 200:
             return url
 
+        if path.startswith('/clip'):
+            all_matches = self._RE_CLIP_DETAILS.finditer(response.text)
+            num_matched = 0
+            url_components = params = start_time = end_time = None
+            for matches in all_matches:
+                matches = matches.groupdict()
+
+                if not num_matched & 1:
+                    url = matches['video_url']
+                    if url:
+                        num_matched += 1
+                        url_components = urlparse(unescape(url))
+                        params = dict(parse_qsl(url_components.query))
+
+                if not num_matched & 2:
+                    start_time = matches['start_time']
+                    if start_time:
+                        start_time = int(start_time) / 1000
+                        num_matched += 2
+
+                if not num_matched & 4:
+                    end_time = matches['end_time']
+                    if end_time:
+                        end_time = int(end_time) / 1000
+                        num_matched += 4
+
+                if num_matched != 7:
+                    continue
+
+                params.update({
+                    'clip': True,
+                    'start': start_time,
+                    'end': end_time,
+                })
+                return url_components._replace(query=urlencode(params)).geturl()
+
         # we try to extract the channel id from the html content
         # With the channel id we can construct a URL we already work with
         # https://www.youtube.com/channel/<CHANNEL_ID>
-        if method == 'GET':
-            match = re.search(
-                r'<meta property="og:url" content="(?P<channel_url>.+?)">',
-                response.text)
+        elif method == 'GET':
+            match = self._RE_CHANNEL_URL.search(response.text)
             if match:
                 return match.group('channel_url')
 

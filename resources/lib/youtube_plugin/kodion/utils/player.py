@@ -56,6 +56,7 @@ class PlaybackMonitorThread(threading.Thread):
         use_local_history = self.playback_json.get('use_local_history', False)
         playback_stats = self.playback_json.get('playback_stats')
         refresh_only = self.playback_json.get('refresh_only', False)
+        clip = self.playback_json.get('clip', False)
 
         player = self.player
 
@@ -166,7 +167,7 @@ class PlaybackMonitorThread(threading.Thread):
                         pass
 
             if player._end_time and self.current_time >= player._end_time:
-                if player._start_time:
+                if clip and player._start_time:
                     player.seekTime(player._start_time)
                 else:
                     player.stop()
@@ -403,7 +404,10 @@ class YouTubePlayer(xbmc.Player):
                                ', '.join([thread.video_id for thread in active_threads]))
         self.threads = active_threads
 
-    def onPlayBackStarted(self):
+    def onAVStarted(self):
+        if not self.ui.busy_dialog_active():
+            self.ui.clear_property('busy')
+
         playback_json = self.ui.get_property('playback_json')
         if not playback_json:
             return
@@ -426,6 +430,9 @@ class YouTubePlayer(xbmc.Player):
                                                   playback_json))
 
     def onPlayBackEnded(self):
+        if not self.ui.busy_dialog_active():
+            self.ui.clear_property('busy')
+
         self.stop_threads()
         self.cleanup_threads()
 

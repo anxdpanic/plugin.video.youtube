@@ -13,11 +13,11 @@ from urllib.parse import parse_qsl, urlparse
 
 from . import utils
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
+from ...kodion.utils import duration_to_seconds
 
 
 class UrlToItemConverter(object):
     RE_PATH_ID = re.compile(r'/\w+/(?P<id>[^/?#]+)', re.I)
-    RE_SEEK_TIME = re.compile(r'\d+')
     VALID_HOSTNAMES = {
         'youtube.com',
         'www.youtube.com',
@@ -47,73 +47,67 @@ class UrlToItemConverter(object):
             return
 
         url_params = dict(parse_qsl(parsed_url.query))
-        path = parsed_url.path.lower()
+        new_params = {
+            new: process(url_params[old]) if process else url_params[old]
+            for old, new, process in (
+                ('end', 'end', duration_to_seconds),
+                ('start', 'start', duration_to_seconds),
+                ('t', 'seek', duration_to_seconds),
+                ('list', 'playlist_id', False),
+                ('v', 'video_id', False),
+                ('live', 'live', False),
+                ('clip', 'clip', False),
+            )
+            if old in url_params
+        }
 
-        channel_id = live = playlist_id = seek_time = video_id = None
-        if path == '/watch':
-            video_id = url_params.get('v')
-            playlist_id = url_params.get('list')
-            seek_time = url_params.get('t')
-        elif path == '/playlist':
-            playlist_id = url_params.get('list')
+        path = parsed_url.path.rstrip('/').lower()
+        channel_id = video_id = None
+        if path.startswith(('/playlist', '/watch')):
+            pass
         elif path.startswith('/channel/'):
             re_match = self.RE_PATH_ID.match(parsed_url.path)
             channel_id = re_match.group('id')
-            if '/live' in path:
-                live = 1
-        elif path.startswith(('/live/', '/shorts/')):
+            if path.endswith(('/live', '/streams')):
+                new_params['live'] = 1
+        elif path.startswith(('/clip/', '/embed/', '/live/', '/shorts/')):
             re_match = self.RE_PATH_ID.match(parsed_url.path)
-            video_id = re_match.group('id')
-            seek_time = url_params.get('t')
+            new_params['video_id'] = re_match.group('id')
         else:
             context.log_debug('Unknown path "{0}" in url "{1}"'.format(
                 parsed_url.path, url
             ))
             return
 
-        if video_id:
-            plugin_params = {
-                'video_id': video_id,
-            }
-            if seek_time:
-                seek_time = sum(
-                    int(number) * seconds_per_unit
-                    for number, seconds_per_unit in zip(
-                        reversed(re.findall(self.RE_SEEK_TIME, seek_time)),
-                        (1, 60, 3600, 86400)
-                    )
-                    if number
-                )
-                plugin_params['seek'] = seek_time
-            if playlist_id:
-                plugin_params['playlist_id'] = playlist_id
+        if 'video_id' in new_params:
+            video_id = new_params['video_id']
             video_item = VideoItem(
-                '', context.create_uri(['play'], plugin_params)
+                '', context.create_uri(['play'], new_params)
             )
             self._video_id_dict[video_id] = video_item
 
-        elif playlist_id:
+        elif 'playlist_id' in new_params:
+            playlist_id = new_params['playlist_id']
             if self._flatten:
                 self._playlist_ids.append(playlist_id)
-            else:
-                playlist_item = DirectoryItem(
-                    '', context.create_uri(['playlist', playlist_id])
-                )
-                playlist_item.set_fanart(provider.get_fanart(context))
-                self._playlist_id_dict[playlist_id] = playlist_item
+                return
+
+            playlist_item = DirectoryItem(
+                '', context.create_uri(['playlist', playlist_id]), new_params
+            )
+            playlist_item.set_fanart(provider.get_fanart(context))
+            self._playlist_id_dict[playlist_id] = playlist_item
 
         elif channel_id:
             if self._flatten:
-                if live:
-                    context.set_param('live', live)
                 self._channel_ids.append(channel_id)
-            else:
-                channel_item = DirectoryItem(
-                    '', context.create_uri(['channel', channel_id],
-                                           {'live': live} if live else None)
-                )
-                channel_item.set_fanart(provider.get_fanart(context))
-                self._channel_id_dict[channel_id] = channel_item
+                return
+
+            channel_item = DirectoryItem(
+                '', context.create_uri(['channel', channel_id], new_params)
+            )
+            channel_item.set_fanart(provider.get_fanart(context))
+            self._channel_id_dict[channel_id] = channel_item
 
         else:
             context.log_debug('No items found in url "{0}"'.format(url))

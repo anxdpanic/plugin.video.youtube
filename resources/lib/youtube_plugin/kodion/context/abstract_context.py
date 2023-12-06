@@ -32,6 +32,7 @@ class AbstractContext(object):
         'ask_for_quality',
         'audio_only',
         'confirmed',
+        'clip',
         'enable',
         'hide_folders',
         'hide_live',

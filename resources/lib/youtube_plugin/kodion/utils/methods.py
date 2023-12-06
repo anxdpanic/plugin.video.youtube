@@ -272,8 +272,9 @@ def friendly_number(number, precision=3, scale=('', 'K', 'M', 'B')):
     ).rstrip('0').rstrip('.') + scale[magnitude], _input
 
 
-_RE_PERIODS = re.compile(r'(\d+)(d|h|m|s)')
+_RE_PERIODS = re.compile(r'([\d.]+)(d|h|m|s|$)')
 _SECONDS_IN_PERIODS = {
+    '': 1,       # 1 second for unitless period
     's': 1,      # 1 second
     'm': 60,     # 1 minute
     'h': 3600,   # 1 hour
@@ -285,11 +286,12 @@ def duration_to_seconds(duration):
     if ':' in duration:
         seconds = 0
         for part in duration.split(':'):
-            seconds = seconds * 60 + int(part, 10)
+            seconds = seconds * 60 + (float(part) if '.' in part else int(part))
         return seconds
     return sum(
-        int(number) * _SECONDS_IN_PERIODS[period]
-        for number, period in re.findall(_RE_PERIODS, duration)
+        (float(number) if '.' in number else int(number))
+        * _SECONDS_IN_PERIODS.get(period, 1)
+        for number, period in re.findall(_RE_PERIODS, duration.lower())
     )
 
 
