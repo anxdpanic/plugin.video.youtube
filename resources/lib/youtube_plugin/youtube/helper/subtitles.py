@@ -27,7 +27,7 @@ class Subtitles(object):
 
     def __init__(self, context, video_id, captions, headers=None):
         self.video_id = video_id
-        self.context = context
+        self._context = context
 
         settings = context.get_settings()
         self.language = settings.get_language()
@@ -41,7 +41,7 @@ class Subtitles(object):
             headers.pop('Content-Type', None)
         self.headers = headers
 
-        ui = self.context.get_ui()
+        ui = self._context.get_ui()
         self.prompt_override = (ui.get_property('prompt_for_subtitles')
                                 == video_id)
         ui.clear_property('prompt_for_subtitles')
@@ -93,15 +93,15 @@ class Subtitles(object):
 
     def _write_file(self, filepath, contents):
         if not make_dirs(self.BASE_PATH):
-            self.context.log_debug('Failed to create directories: %s' % self.BASE_PATH)
+            self._context.log_debug('Failed to create directories: %s' % self.BASE_PATH)
             return False
-        self.context.log_debug('Writing subtitle file: %s' % filepath)
+        self._context.log_debug('Writing subtitle file: %s' % filepath)
 
         try:
             with xbmcvfs.File(filepath, 'w') as srt_file:
                 success = srt_file.write(contents)
         except (IOError, OSError):
-            self.context.log_debug('File write failed for: %s' % filepath)
+            self._context.log_debug('File write failed for: %s' % filepath)
             return False
         return success
 
@@ -109,7 +109,7 @@ class Subtitles(object):
         try:
             text = unescape(text)
         except:
-            self.context.log_debug('Subtitle unescape: failed to unescape text')
+            self._context.log_debug('Subtitle unescape: failed to unescape text')
         return text
 
     def get_default_lang(self):
@@ -123,7 +123,7 @@ class Subtitles(object):
             languages = self.LANG_PROMPT
         else:
             languages = self.subtitle_languages
-        self.context.log_debug('Subtitle get_subtitles: for setting |%s|' % str(languages))
+        self._context.log_debug('Subtitle get_subtitles: for setting |%s|' % str(languages))
         if languages == self.LANG_NONE:
             return []
         if languages == self.LANG_CURR:
@@ -146,7 +146,7 @@ class Subtitles(object):
             list_of_subs.extend(self._get('en-US'))
             list_of_subs.extend(self._get('en-GB'))
             return list(set(list_of_subs))
-        self.context.log_debug('Unknown language_enum: %s for subtitles' % str(languages))
+        self._context.log_debug('Unknown language_enum: %s for subtitles' % str(languages))
         return []
 
     def _get_all(self, download=False):
@@ -173,13 +173,13 @@ class Subtitles(object):
         num_total = num_captions + num_translations
 
         if num_total:
-            choice = self.context.get_ui().on_select(
-                self.context.localize('subtitles.language'),
+            choice = self._context.get_ui().on_select(
+                self._context.localize('subtitles.language'),
                 [name for _, name in captions] +
                 [name + ' *' for _, name in translations]
             )
             if choice == -1:
-                self.context.log_debug('Subtitle selection cancelled')
+                self._context.log_debug('Subtitle selection cancelled')
                 return []
 
             subtitle = None
@@ -192,13 +192,13 @@ class Subtitles(object):
 
             if subtitle:
                 return subtitle
-        self.context.log_debug('No subtitles found for prompt')
+        self._context.log_debug('No subtitles found for prompt')
         return []
 
     def _get(self, lang_code='en', language=None, no_asr=False, download=None):
         filename = self.srt_filename(lang_code)
         if xbmcvfs.exists(filename):
-            self.context.log_debug('Subtitle exists for: %s, filename: %s' % (lang_code, filename))
+            self._context.log_debug('Subtitle exists for: %s, filename: %s' % (lang_code, filename))
             return [filename]
 
         if download is None:
@@ -230,7 +230,7 @@ class Subtitles(object):
 
         if (lang_code != self.defaults['lang_code'] and not has_translation
                 and caption_track is None):
-            self.context.log_debug('No subtitles found for: %s' % lang_code)
+            self._context.log_debug('No subtitles found for: %s' % lang_code)
             return []
 
         subtitle_url = None
@@ -253,24 +253,24 @@ class Subtitles(object):
             )
 
         if subtitle_url:
-            self.context.log_debug('Subtitle url: %s' % subtitle_url)
+            self._context.log_debug('Subtitle url: %s' % subtitle_url)
             if not download:
                 return [subtitle_url]
 
             response = BaseRequestsClass().request(subtitle_url,
                                                    headers=self.headers)
             if response.text:
-                self.context.log_debug('Subtitle found for: %s' % lang_code)
+                self._context.log_debug('Subtitle found for: %s' % lang_code)
                 self._write_file(filename,
                                  bytearray(self._unescape(response.text),
                                            encoding='utf8',
                                            errors='ignore'))
                 return [filename]
 
-            self.context.log_debug('Failed to retrieve subtitles for: %s' % lang_code)
+            self._context.log_debug('Failed to retrieve subtitles for: %s' % lang_code)
             return []
 
-        self.context.log_debug('No subtitles found for: %s' % lang_code)
+        self._context.log_debug('No subtitles found for: %s' % lang_code)
         return []
 
     @staticmethod

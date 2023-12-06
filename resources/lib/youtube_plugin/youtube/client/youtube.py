@@ -65,7 +65,25 @@ class YouTube(LoginClient):
 
         return 'C%s%s%sAA' % (high[high_iteration], low[low_iteration], overflow_token)
 
-    def update_watch_history(self, video_id, url):
+    def update_watch_history(self,
+                             context,
+                             video_id,
+                             url,
+                             st=None,
+                             et=None,
+                             state=None):
+        if None not in (st, et, state):
+            url.format(st=st, et=et, state=state)
+        else:
+            st = et = state = 'N/A'
+
+        context.log_debug('Playback reported [{video_id}]:'
+                          ' {st} segment start,'
+                          ' {et} segment end,'
+                          ' state={state}'.format(
+            video_id=video_id, st=st, et=et, state=state
+        ))
+
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
