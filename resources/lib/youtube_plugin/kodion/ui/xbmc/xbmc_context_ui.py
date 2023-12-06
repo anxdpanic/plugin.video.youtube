@@ -232,3 +232,10 @@ class XbmcContextUI(AbstractContextUI):
             self._context.execute('SetFocus(%s,%s)' % (cid, str(current_position)))
         except ValueError:
             pass
+
+    @staticmethod
+    def busy_dialog_active():
+        dialog_id = xbmcgui.getCurrentWindowDialogId()
+        if dialog_id == 10160 or dialog_id == 10138:
+            return dialog_id
+        return False

@@ -14,6 +14,7 @@ import xbmcplugin
 from ..abstract_provider_runner import AbstractProviderRunner
 from ...exceptions import KodionException
 from ...items import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
+from ...player import Playlist
 from ...ui.xbmc import info_labels, xbmc_items
 
 
@@ -24,8 +25,24 @@ class XbmcRunner(AbstractProviderRunner):
         self.settings = None
 
     def run(self, provider, context):
-
         self.handle = context.get_handle()
+        ui = context.get_ui()
+
+        if ui.get_property('busy').lower() == 'true':
+            ui.clear_property('busy')
+            if ui.busy_dialog_active():
+                playlist = Playlist('video', context)
+                playlist.clear()
+
+                xbmcplugin.endOfDirectory(self.handle, succeeded=False)
+
+                items = ui.get_property('playlist')
+                if items:
+                    ui.clear_property('playlist')
+                    context.log_error('Multiple busy dialogs active - playlist'
+                                      ' reloading to prevent Kodi crashing')
+                    playlist.add_items(items, loads=True)
+                return False
 
         try:
             results = provider.navigate(context)
@@ -80,17 +97,25 @@ class XbmcRunner(AbstractProviderRunner):
         return succeeded
 
     def _set_resolved_url(self, context, base_item):
+        uri = base_item.get_uri()
+
         if base_item.playable:
+            ui = context.get_ui()
+            if not context.is_plugin_path(uri) and ui.busy_dialog_active():
+                ui.set_property('busy', 'true')
+                playlist = Playlist('video', context)
+                ui.set_property('playlist', playlist.get_items(dumps=True))
+
             item = xbmc_items.to_playback_item(context, base_item)
             xbmcplugin.setResolvedUrl(self.handle,
                                       succeeded=True,
                                       listitem=item)
             return True
 
-        uri = base_item.get_uri()
-        if uri.startswith('plugin://'):
+        if context.is_plugin_path(uri):
             context.log_debug('Redirecting to |{0}|'.format(uri))
             context.execute('RunPlugin({0})'.format(uri))
+
         xbmcplugin.endOfDirectory(self.handle,
                                   succeeded=False,
                                   updateListing=False,

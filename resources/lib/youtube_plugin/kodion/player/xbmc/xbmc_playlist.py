@@ -12,6 +12,7 @@ import json
 
 import xbmc
 from ..abstract_playlist import AbstractPlaylist
+from ...items import VideoItem
 from ...ui.xbmc import xbmc_items
 
 
@@ -43,24 +44,25 @@ class XbmcPlaylist(AbstractPlaylist):
     def size(self):
         return self._playlist.size()
 
-    def get_items(self):
-        rpc_request = json.dumps(
-            {
-                "jsonrpc": "2.0",
-                "method": "Playlist.GetItems",
-                "params": {
-                    "properties": ["title", "file"],
-                    "playlistid": self._playlist.getPlayListId()
-                },
-                "id": 1
-            })
+    def get_items(self, properties=None, dumps=False):
+        rpc_request = json.dumps({
+            'jsonrpc': '2.0',
+            'method': 'Playlist.GetItems',
+            'params': {
+                'properties': properties if properties else ['title', 'file'],
+                'playlistid': self._playlist.getPlayListId()
+            },
+            'id': 1
+        })
 
         response = json.loads(xbmc.executeJSONRPC(rpc_request))
 
         if 'result' in response:
             if 'items' in response['result']:
-                return response['result']['items']
-            return []
+                result = response['result']['items']
+            else:
+                result = []
+            return json.dumps(result) if dumps else result
 
         if 'error' in response:
             message = response['error']['message']
@@ -69,4 +71,26 @@ class XbmcPlaylist(AbstractPlaylist):
         else:
             error = 'Requested |%s| received error |%s|' % (rpc_request, str(response))
         self._context.log_debug(error)
-        return []
+        return '[]' if dumps else []
+
+    def add_items(self, items, loads=False):
+        if loads:
+            items = json.loads(items)
+
+        # Playlist.GetItems allows retrieving full playlist item details, but
+        # Playlist.Add only allows for file/path/id etc.
+        # Have to add items individually rather than using JSON-RPC
+
+        for item in items:
+            self.add(VideoItem(item.get('title', ''), item['file']))
+
+        # rpc_request = json.dumps({
+        #     'jsonrpc': '2.0',
+        #     'method': 'Playlist.Add',
+        #     'params': {
+        #         'playlistid': self._playlist.getPlayListId(),
+        #         'item': items,
+        #     },
+        #     'id': 1
+        # })
+        # response = json.loads(xbmc.executeJSONRPC(rpc_request))

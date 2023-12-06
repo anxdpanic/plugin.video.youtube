@@ -566,14 +566,14 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/play/$')
     def on_play(self, context, re_match):
         ui = context.get_ui()
-        path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')
 
         redirect = False
         params = context.get_params()
 
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
-            if context.is_plugin_path(path, 'play'):
+            path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')
+            if context.is_plugin_path(path, 'play/'):
                 video_id = find_video_id(path)
                 if video_id:
                     context.set_param('video_id', video_id)
@@ -626,7 +626,7 @@ class Provider(AbstractProvider):
 
             if builtin:
                 context.execute(builtin.format(
-                    context.create_uri(['play'], {'video_id': video_id})
+                    context.create_uri(['play'], params)
                 ))
                 return False
             return yt_play.play_video(self, context)
