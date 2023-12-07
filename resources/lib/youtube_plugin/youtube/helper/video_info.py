@@ -986,8 +986,7 @@ class VideoInfo(YouTubeRequestClient):
                            urlencode(query, doseq=True),
                            parts.fragment))
 
-    @staticmethod
-    def _get_error_details(playability_status, details=None):
+    def _get_error_details(self, playability_status, details=None):
         if not playability_status:
             return None
         if not details:
@@ -997,26 +996,9 @@ class VideoInfo(YouTubeRequestClient):
                 ('reason', 'title')
             )
 
-        result = playability_status
-        for keys in details:
-            is_dict = isinstance(result, dict)
-            if not is_dict and not isinstance(result, list):
-                return None
+        result = self.json_traverse(playability_status, details)
 
-            if not isinstance(keys, (list, tuple)):
-                keys = [keys]
-            for key in keys:
-                if is_dict:
-                    if key not in result:
-                        continue
-                elif not isinstance(key, int) or len(result) <= key:
-                    continue
-                result = result[key]
-                break
-            else:
-                return None
-
-        if 'runs' not in result:
+        if not result or 'runs' not in result:
             return result
 
         detail_texts = [
