@@ -255,8 +255,10 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self):
-        super(YouTubeRequestClient, self).__init__(exc_type=YouTubeException)
+    def __init__(self, exc_type=YouTubeException):
+        super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
+        self._access_token = None
+        self.video_id = None
 
     @staticmethod
     def json_traverse(json_data, path):
@@ -286,7 +288,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             return None
         return result
 
-    def build_client(self, client_name, auth_header=False):
+    def build_client(self, client_name, auth_header=False, data=None):
         def _merge_dicts(item1, item2, _=Ellipsis):
             if not isinstance(item1, dict) or not isinstance(item2, dict):
                 return item1 if item2 is _ else item2
@@ -301,11 +303,14 @@ class YouTubeRequestClient(BaseRequestsClass):
                     _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
                 new[key] = value
             return new or _
+
         _format = {}
 
         client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
         client = _merge_dicts(self.CLIENTS['_common'], client)
 
+        if data:
+            client.update(data)
         client['json']['videoId'] = self.video_id
         if auth_header and self._access_token:
             client['_access_token'] = self._access_token
@@ -313,8 +318,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         elif 'Authorization' in client['headers']:
             del client['headers']['Authorization']
 
-        for values, key, value in _format.values():
-            if key in values:
-                values[key] = value.format(**client)
+        for values, value_key, template_value in _format.values():
+            if value_key in values:
+                values[value_key] = template_value.format(**client)
 
         return client
