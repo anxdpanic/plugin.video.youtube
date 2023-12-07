@@ -97,7 +97,7 @@ class YouTubeResolver(AbstractResolver):
         return 'GET' if len(path) == 1 and path[0] else False
 
     def resolve(self, url, url_components, method='HEAD'):
-        path = url_components.path.lower()
+        path = url_components.path.rstrip('/').lower()
         if path == '/redirect':
             params = dict(parse_qsl(url_components.query))
             url = params['q']
@@ -171,7 +171,15 @@ class YouTubeResolver(AbstractResolver):
         elif method == 'GET':
             match = self._RE_CHANNEL_URL.search(response.text)
             if match:
-                return match.group('channel_url')
+                url = match.group('channel_url')
+                if path.endswith(('/live', '/streams')):
+                    url_components = urlparse(unescape(url))
+                    params = dict(parse_qsl(url_components.query))
+                    params['live'] = 1
+                    return url_components._replace(
+                        query=urlencode(params)
+                    ).geturl()
+                return url
 
         return response.url
 
