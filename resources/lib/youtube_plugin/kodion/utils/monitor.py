@@ -14,37 +14,41 @@ import threading
 from urllib.parse import unquote
 
 import xbmc
-import xbmcaddon
 import xbmcvfs
+from xbmcaddon import Addon
 
+from ..logger import log_debug
 from ..network import get_http_server, is_httpd_live
-from .. import logger
+from ..settings import Settings
 
 
 class YouTubeMonitor(xbmc.Monitor):
+    _addon_id = 'plugin.video.youtube'
+    _addon = Addon(_addon_id)
+    _settings = Settings(_addon)
 
     # noinspection PyUnusedLocal,PyMissingConstructor
     def __init__(self, *args, **kwargs):
-        self.addon_id = 'plugin.video.youtube'
-        addon = xbmcaddon.Addon(self.addon_id)
-        self._whitelist = addon.getSetting('kodion.http.ip.whitelist')
-        self._httpd_port = int(addon.getSetting('kodion.mpd.proxy.port'))
-        self._old_httpd_port = self._httpd_port
-        self._use_httpd = (addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.isa') == 'true') or \
-                          (addon.getSetting('youtube.api.config.page') == 'true')
-        self._httpd_address = addon.getSetting('kodion.http.listen')
-        self._old_httpd_address = self._httpd_address
+        settings = self._settings
+        self._whitelist = settings.httpd_whitelist()
+        self._old_httpd_port = self._httpd_port = int(settings.httpd_port())
+        self._use_httpd = (settings.use_mpd_videos()
+                           or settings.api_config_page())
+        self._old_httpd_address = self._httpd_address = settings.httpd_listen()
         self.httpd = None
         self.httpd_thread = None
         if self.use_httpd():
             self.start_httpd()
-        del addon
+        super(YouTubeMonitor, self).__init__()
 
     def onNotification(self, sender, method, data):
-        if sender == 'plugin.video.youtube' and method.endswith('.check_settings'):
-            data = json.loads(data)
-            data = json.loads(unquote(data[0]))
-            logger.log_debug('onNotification: |check_settings| -> |%s|' % json.dumps(data))
+        if (sender == 'plugin.video.youtube'
+                and method.endswith('.check_settings')):
+            if not isinstance(data, dict):
+                data = json.loads(data)
+                data = json.loads(unquote(data[0]))
+            log_debug('onNotification: |check_settings| -> |{data}|'
+                      .format(data=data))
 
             _use_httpd = data.get('use_httpd')
             _httpd_port = data.get('httpd_port')
@@ -55,32 +59,48 @@ class YouTubeMonitor(xbmc.Monitor):
             port_changed = self._httpd_port != _httpd_port
             address_changed = self._httpd_address != _httpd_address
 
-            if _whitelist != self._whitelist:
+            if whitelist_changed:
                 self._whitelist = _whitelist
 
             if self._use_httpd != _use_httpd:
                 self._use_httpd = _use_httpd
 
-            if self._httpd_port != _httpd_port:
+            if port_changed:
                 self._old_httpd_port = self._httpd_port
                 self._httpd_port = _httpd_port
 
-            if self._httpd_address != _httpd_address:
+            if address_changed:
                 self._old_httpd_address = self._httpd_address
                 self._httpd_address = _httpd_address
 
-            if self.use_httpd() and not self.httpd:
+            if not _use_httpd:
+                if self.httpd:
+                    self.shutdown_httpd()
+            elif not self.httpd:
                 self.start_httpd()
-            elif self.use_httpd() and (port_changed or whitelist_changed or address_changed):
+            elif port_changed or whitelist_changed or address_changed:
                 if self.httpd:
                     self.restart_httpd()
                 else:
                     self.start_httpd()
-            elif not self.use_httpd() and self.httpd:
-                self.shutdown_httpd()
 
         elif sender == 'plugin.video.youtube':
-            logger.log_debug('onNotification: |unknown method|')
+            log_debug('onNotification: |unhandled method| -> |{method}|'
+                      .format(method=method))
+
+    def onSettingsChanged(self):
+        YouTubeMonitor._addon = Addon(self._addon_id)
+        YouTubeMonitor._settings = Settings(self._addon)
+        data = {
+            'use_httpd': (self._settings.use_mpd_videos()
+                          or self._settings.api_config_page()),
+            'httpd_port': self._settings.httpd_port(),
+            'whitelist': self._settings.httpd_whitelist(),
+            'httpd_address': self._settings.httpd_listen()
+        }
+        self.onNotification('plugin.video.youtube',
+                            'Other.check_settings',
+                            data)
 
     def use_httpd(self):
         return self._use_httpd
@@ -104,12 +124,11 @@ class YouTubeMonitor(xbmc.Monitor):
         if self.httpd:
             return
 
-        logger.log_debug('HTTPServer: Starting |{ip}:{port}|'.format(
-            ip=self.httpd_address(),
-            port=str(self.httpd_port())
-        ))
+        log_debug('HTTPServer: Starting |{ip}:{port}|'
+                  .format(ip=self.httpd_address(), port=str(self.httpd_port())))
         self.httpd_port_sync()
-        self.httpd = get_http_server(address=self.httpd_address(), port=self.httpd_port())
+        self.httpd = get_http_server(address=self.httpd_address(),
+                                     port=self.httpd_port())
         if not self.httpd:
             return
 
@@ -117,15 +136,16 @@ class YouTubeMonitor(xbmc.Monitor):
         self.httpd_thread.daemon = True
         self.httpd_thread.start()
         sock_name = self.httpd.socket.getsockname()
-        logger.log_debug('HTTPServer: Serving on |{ip}:{port}|'.format(
+        log_debug('HTTPServer: Serving on |{ip}:{port}|'.format(
             ip=str(sock_name[0]),
             port=str(sock_name[1])
         ))
 
     def shutdown_httpd(self):
         if self.httpd:
-            logger.log_debug('HTTPServer: Shutting down |{ip}:{port}|'.format(ip=self.old_httpd_address(),
-                                                                              port=str(self.old_httpd_port())))
+            log_debug('HTTPServer: Shutting down |{ip}:{port}|'
+                      .format(ip=self.old_httpd_address(),
+                              port=self.old_httpd_port()))
             self.httpd_port_sync()
             self.httpd.shutdown()
             self.httpd.socket.close()
@@ -134,9 +154,11 @@ class YouTubeMonitor(xbmc.Monitor):
             self.httpd = None
 
     def restart_httpd(self):
-        logger.log_debug('HTTPServer: Restarting... |{old_ip}:{old_port}| -> |{ip}:{port}|'
-                         .format(old_ip=self.old_httpd_address(), old_port=str(self.old_httpd_port()),
-                                 ip=self.httpd_address(), port=str(self.httpd_port())))
+        log_debug('HTTPServer: Restarting |{old_ip}:{old_port}| > |{ip}:{port}|'
+                  .format(old_ip=self.old_httpd_address(),
+                          old_port=self.old_httpd_port(),
+                          ip=self.httpd_address(),
+                          port=self.httpd_port()))
         self.shutdown_httpd()
         self.start_httpd()
 
@@ -158,6 +180,8 @@ class YouTubeMonitor(xbmc.Monitor):
                 pass
 
         if os.path.isdir(path):
-            logger.log_debug('Failed to remove directory: {dir}'.format(dir=path.encode('utf-8')))
+            log_debug('Failed to remove directory: {path}'.format(
+                path=path
+            ))
             return False
         return True

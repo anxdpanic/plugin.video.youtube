@@ -206,7 +206,6 @@ class APICheck(object):
 
 
 notification_data = {'use_httpd': (__settings.use_mpd_videos()
-                                   or __settings.use_mpd_live_streams()
                                    or __settings.api_config_page()),
                      'httpd_port': __settings.httpd_port(),
                      'whitelist': __settings.httpd_whitelist(),

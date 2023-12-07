@@ -173,7 +173,7 @@ class AbstractSettings(object):
     def httpd_port(self, port=None):
         default_port = 50152
 
-        if not port:
+        if port is None:
             port = self.get_int(SETTINGS.HTTPD_PORT, default_port)
 
         try:

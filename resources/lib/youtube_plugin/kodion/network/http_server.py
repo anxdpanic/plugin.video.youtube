@@ -10,35 +10,45 @@
 import json
 import os
 import re
-import requests
-import socket
+from socket import error as socket_error
 from http import server as BaseHTTPServer
-from urllib.parse import parse_qs
-from urllib.parse import urlparse
+from textwrap import dedent
+from urllib.parse import parse_qs, urlparse
 
-import xbmc
-import xbmcgui
-import xbmcvfs
+from xbmc import getCondVisibility, executebuiltin
+from xbmcgui import Dialog, Window
+from xbmcvfs import translatePath
 from xbmcaddon import Addon
 
+from .requests import BaseRequestsClass
 from ..logger import log_debug
 from ..settings import Settings
 
 
 _addon_id = 'plugin.video.youtube'
-_settings = Settings(Addon(id=_addon_id))
+_addon = Addon(_addon_id)
+_settings = Settings(_addon)
+_i18n = _addon.getLocalizedString
+_server_requests = BaseRequestsClass()
 
 
 class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+    base_path = translatePath('special://temp/{0}'.format(_addon_id))
+    chunk_size = 1024 * 64
+    local_ranges = (
+        '10.',
+        '172.16.',
+        '192.168.',
+        '127.0.0.1',
+        'localhost',
+        '::1',
+    )
+
     def __init__(self, request, client_address, server):
-        addon = Addon(_addon_id)
-        whitelist_ips = addon.getSetting('kodion.http.ip.whitelist')
-        whitelist_ips = ''.join(whitelist_ips.split())
-        self.whitelist_ips = whitelist_ips.split(',')
-        self.local_ranges = ('10.', '172.16.', '192.168.', '127.0.0.1', 'localhost', '::1')
-        self.chunk_size = 1024 * 64
-        self.base_path = xbmcvfs.translatePath('special://temp/%s' % _addon_id)
-        super(YouTubeProxyRequestHandler, self).__init__(request, client_address, server)
+        self.whitelist_ips = _settings.httpd_whitelist()
+        super(YouTubeProxyRequestHandler, self).__init__(request,
+                                                         client_address,
+                                                         server)
 
     def connection_allowed(self):
         client_ip = self.client_address[0]
@@ -50,146 +60,169 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             log_lines.append('Whitelisted: |%s|' % str(conn_allowed))
 
         if not conn_allowed:
-            log_debug('HTTPServer: Connection from |%s| not allowed' % client_ip)
+            log_debug('HTTPServer: Connection from |{client_ip| not allowed'.
+                      format(client_ip=client_ip))
         elif self.path != '/ping':
             log_debug(' '.join(log_lines))
         return conn_allowed
 
     # noinspection PyPep8Naming
     def do_GET(self):
-        addon = Addon('plugin.video.youtube')
-        mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.isa') == 'true'
-        api_config_enabled = addon.getSetting('youtube.api.config.page') == 'true'
+        api_config_enabled = _settings.api_config_page()
 
         # Strip trailing slash if present
-        stripped_path = self.path.rstrip('/')
-
-        if stripped_path == '/client_ip':
-            client_json = json.dumps({"ip": "{ip}".format(ip=self.client_address[0])})
-            self.send_response(200)
-            self.send_header('Content-Type', 'application/json; charset=utf-8')
-            self.send_header('Content-Length', len(client_json))
-            self.end_headers()
-            self.wfile.write(client_json.encode('utf-8'))
-
+        stripped_path = self.path.rstrip('/').lower()
         if stripped_path != '/ping':
-            log_debug('HTTPServer: GET Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+            log_debug('HTTPServer: GET Request uri path |{stripped_path}|'
+                      .format(stripped_path=stripped_path))
 
         if not self.connection_allowed():
             self.send_error(403)
-        elif mpd_proxy_enabled and self.path.endswith('.mpd'):
-            file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
+
+        elif stripped_path == '/client_ip':
+            client_json = json.dumps({"ip": "{ip}"
+                                     .format(ip=self.client_address[0])})
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json; charset=utf-8')
+            self.send_header('Content-Length', str(len(client_json)))
+            self.end_headers()
+            self.wfile.write(client_json.encode('utf-8'))
+
+        elif _settings.use_mpd_videos() and stripped_path.endswith('.mpd'):
+            file_path = os.path.join(self.base_path,
+                                     self.path.strip('/').strip('\\'))
             file_chunk = True
-            log_debug('HTTPServer: Request file path |{file_path}|'.format(file_path=file_path.encode('utf-8')))
+            log_debug('HTTPServer: Request file path |{file_path}|'
+                      .format(file_path=file_path))
             try:
                 with open(file_path, 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/xml+dash')
-                    self.send_header('Content-Length', os.path.getsize(file_path))
+                    self.send_header('Content-Length',
+                                     str(os.path.getsize(file_path)))
                     self.end_headers()
                     while file_chunk:
                         file_chunk = f.read(self.chunk_size)
                         if file_chunk:
                             self.wfile.write(file_chunk)
             except IOError:
-                response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
+                response = ('File Not Found: |{proxy_path}| -> |{file_path}|'
+                            .format(proxy_path=self.path, file_path=file_path))
                 self.send_error(404, response)
-        elif api_config_enabled and stripped_path.lower() == '/api':
+
+        elif api_config_enabled and stripped_path == '/api':
             html = self.api_config_page()
             html = html.encode('utf-8')
+
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.send_header('Content-Length', len(html))
+            self.send_header('Content-Length', str(len(html)))
             self.end_headers()
+
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
+
         elif api_config_enabled and stripped_path.startswith('/api_submit'):
-            addon = Addon('plugin.video.youtube')
-            i18n = addon.getLocalizedString
-            xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
-            old_api_key = addon.getSetting('youtube.api.key')
-            old_api_id = addon.getSetting('youtube.api.id')
-            old_api_secret = addon.getSetting('youtube.api.secret')
+            executebuiltin('Dialog.Close(addonsettings, true)')
+
             query = urlparse(self.path).query
             params = parse_qs(query)
+            updated = []
+
             api_key = params.get('api_key', [None])[0]
             api_id = params.get('api_id', [None])[0]
             api_secret = params.get('api_secret', [None])[0]
-            footer = i18n(30638) if api_key and api_id and api_secret else ''
+            # Bookmark this page
+            footer = _i18n(30638) if api_key and api_id and api_secret else ''
+
             if re.search(r'api_key=(?:&|$)', query):
                 api_key = ''
             if re.search(r'api_id=(?:&|$)', query):
                 api_id = ''
             if re.search(r'api_secret=(?:&|$)', query):
                 api_secret = ''
-            updated = []
-            if api_key is not None and api_key != old_api_key:
-                addon.setSetting('youtube.api.key', api_key)
-                updated.append(i18n(30201))
-            if api_id is not None and api_id != old_api_id:
-                addon.setSetting('youtube.api.id', api_id)
-                updated.append(i18n(30202))
-            if api_secret is not None and api_secret != old_api_secret:
-                updated.append(i18n(30203))
-                addon.setSetting('youtube.api.secret', api_secret)
-            if addon.getSetting('youtube.api.key') and addon.getSetting('youtube.api.id') and \
-                    addon.getSetting('youtube.api.secret'):
-                enabled = i18n(30636)
+
+            if api_key is not None and api_key != _settings.api_key():
+                _settings.api_key(new_key=api_key)
+                updated.append(_i18n(30201))  # API Key
+
+            if api_id is not None and api_id != _settings.api_id():
+                _settings.api_id(new_id=api_id)
+                updated.append(_i18n(30202))  # API ID
+
+            if api_secret is not None and api_secret != _settings.api_secret():
+                _settings.api_secret(new_secret=api_secret)
+                updated.append(_i18n(30203))  # API Secret
+
+            if api_key and api_id and api_secret:
+                enabled = _i18n(30636)  # Personal keys enabled
             else:
-                enabled = i18n(30637)
-            if not updated:
-                updated = i18n(30635)
+                enabled = _i18n(30637)  # Personal keys disabled
+
+            if updated:
+                # Successfully updated
+                updated = _i18n(30631) % ', '.join(updated)
             else:
-                updated = i18n(30631) % ', '.join(updated)
+                # No changes, not updated
+                updated = _i18n(30635)
+
             html = self.api_submit_page(updated, enabled, footer)
             html = html.encode('utf-8')
+
             self.send_response(200)
             self.send_header('Content-Type', 'text/html; charset=utf-8')
-            self.send_header('Content-Length', len(html))
+            self.send_header('Content-Length', str(len(html)))
             self.end_headers()
+
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
+
         elif stripped_path == '/ping':
             self.send_error(204)
+
         else:
             self.send_error(501)
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        log_debug('HTTPServer: HEAD Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+        log_debug('HTTPServer: HEAD Request uri path |{proxy_path}|'
+                  .format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
-        else:
-            addon = Addon('plugin.video.youtube')
-            mpd_proxy_enabled = addon.getSetting('kodion.mpd.videos') == 'true' and addon.getSetting('kodion.video.quality.isa') == 'true'
-            if mpd_proxy_enabled and self.path.endswith('.mpd'):
-                file_path = os.path.join(self.base_path, self.path.strip('/').strip('\\'))
-                if not os.path.isfile(file_path):
-                    response = 'File Not Found: |{proxy_path}| -> |{file_path}|'.format(proxy_path=self.path, file_path=file_path.encode('utf-8'))
-                    self.send_error(404, response)
-                else:
-                    self.send_response(200)
-                    self.send_header('Content-Type', 'application/xml+dash')
-                    self.send_header('Content-Length', os.path.getsize(file_path))
-                    self.end_headers()
+        elif _settings.use_mpd_videos() and self.path.endswith('.mpd'):
+            file_path = os.path.join(self.base_path,
+                                     self.path.strip('/').strip('\\'))
+            if not os.path.isfile(file_path):
+                response = ('File Not Found: |{proxy_path}| -> |{file_path}|'
+                            .format(proxy_path=self.path, file_path=file_path))
+                self.send_error(404, response)
             else:
-                self.send_error(501)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/xml+dash')
+                self.send_header('Content-Length',
+                                 str(os.path.getsize(file_path)))
+                self.end_headers()
+        else:
+            self.send_error(501)
 
     # noinspection PyPep8Naming
     def do_POST(self):
-        log_debug('HTTPServer: Request uri path |{proxy_path}|'.format(proxy_path=self.path))
+        log_debug('HTTPServer: Request uri path |{proxy_path}|'
+                  .format(proxy_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
         elif self.path.startswith('/widevine'):
-            license_url = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_url')
-            license_token = xbmcgui.Window(10000).getProperty('plugin.video.youtube-license_token')
+            home = Window(10000)
 
-            if not license_url:
+            lic_url = home.getProperty('plugin.video.youtube-license_url')
+            if not lic_url:
                 self.send_error(404)
                 return
-            if not license_token:
+
+            lic_token = home.getProperty('plugin.video.youtube-license_token')
+            if not lic_token:
                 self.send_error(403)
                 return
 
@@ -200,29 +233,40 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             li_headers = {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'Authorization': 'Bearer %s' % license_token
+                'Authorization': 'Bearer %s' % lic_token
             }
 
-            result = requests.post(url=license_url, headers=li_headers, data=post_data, stream=True)
+            response = _server_requests.request(lic_url,
+                                                method='POST',
+                                                headers=li_headers,
+                                                data=post_data,
+                                                stream=True)
 
-            response_length = int(result.headers.get('content-length'))
-            content = result.raw.read(response_length)
+            response_length = int(response.headers.get('content-length'))
+            content = response.raw.read(response_length)
 
             content_split = content.split('\r\n\r\n'.encode('utf-8'))
             response_header = content_split[0].decode('utf-8', 'ignore')
             response_body = content_split[1]
-            response_length = len(response_body)
 
-            match = re.search(r'^Authorized-Format-Types:\s*(?P<authorized_types>.+?)\r*$', response_header, re.MULTILINE)
+            match = re.search(r'^Authorized-Format-Types:\s*'
+                              r'(?P<authorized_types>.+?)\r*$',
+                              response_header,
+                              re.MULTILINE)
             if match:
                 authorized_types = match.group('authorized_types').split(',')
-                log_debug('HTTPServer: Found authorized formats |{authorized_fmts}|'.format(authorized_fmts=authorized_types))
+                log_debug('HTTPServer: Found authorized formats |{auth_fmts}|'
+                          .format(auth_fmts=authorized_types))
 
-                fmt_to_px = {'SD': (1280 * 528) - 1, 'HD720': 1280 * 720, 'HD': 7680 * 4320}
+                fmt_to_px = {
+                    'SD': (1280 * 528) - 1,
+                    'HD720': 1280 * 720,
+                    'HD': 7680 * 4320
+                }
                 if 'HD' in authorized_types:
                     size_limit = fmt_to_px['HD']
                 elif 'HD720' in authorized_types:
-                    if xbmc.getCondVisibility('system.platform.android') == 1:
+                    if getCondVisibility('system.platform.android') == 1:
                         size_limit = fmt_to_px['HD720']
                     else:
                         size_limit = fmt_to_px['SD']
@@ -232,10 +276,11 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             self.send_response(200)
 
             if size_limit:
-                self.send_header('X-Limit-Video', 'max={size_limit}px'.format(size_limit=str(size_limit)))
-            for header, value in result.headers.items():
+                self.send_header('X-Limit-Video',
+                                 'max={0}px'.format(size_limit))
+            for header, value in response.headers.items():
                 if re.match('^[Cc]ontent-[Ll]ength$', header):
-                    self.send_header(header, response_length)
+                    self.send_header(header, str(len(response_body)))
                 else:
                     self.send_header(header, value)
             self.end_headers()
@@ -255,242 +300,265 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     @staticmethod
     def api_config_page():
-        addon = Addon('plugin.video.youtube')
-        i18n = addon.getLocalizedString
-        api_key = addon.getSetting('youtube.api.key')
-        api_id = addon.getSetting('youtube.api.id')
-        api_secret = addon.getSetting('youtube.api.secret')
-        html = Pages().api_configuration.get('html')
-        css = Pages().api_configuration.get('css')
-        html = html.format(css=css, title=i18n(30634), api_key_head=i18n(30201), api_id_head=i18n(30202),
-                           api_secret_head=i18n(30203), api_id_value=api_id, api_key_value=api_key,
-                           api_secret_value=api_secret, submit=i18n(30630), header=i18n(30634))
+        api_key = _settings.api_key()
+        api_id = _settings.api_id()
+        api_secret = _settings.api_secret()
+        html = Pages.api_configuration.get('html')
+        css = Pages.api_configuration.get('css')
+        html = html.format(
+            css=css,
+            title=_i18n(30634),  # YouTube Add-on API Configuration
+            api_key_head=_i18n(30201),  # API Key
+            api_id_head=_i18n(30202),  # API ID
+            api_secret_head=_i18n(30203),  # API Secret
+            api_id_value=api_id,
+            api_key_value=api_key,
+            api_secret_value=api_secret,
+            submit=_i18n(30630),  # Save
+            header=_i18n(30634),  # YouTube Add-on API Configuration
+        )
         return html
 
     @staticmethod
     def api_submit_page(updated_keys, enabled, footer):
-        addon = Addon('plugin.video.youtube')
-        i18n = addon.getLocalizedString
-        html = Pages().api_submit.get('html')
-        css = Pages().api_submit.get('css')
-        html = html.format(css=css, title=i18n(30634), updated=updated_keys, enabled=enabled, footer=footer, header=i18n(30634))
+        html = Pages.api_submit.get('html')
+        css = Pages.api_submit.get('css')
+        html = html.format(
+            css=css,
+            title=_i18n(30634),  # YouTube Add-on API Configuration
+            updated=updated_keys,
+            enabled=enabled,
+            footer=footer,
+            header=_i18n(30634),  # YouTube Add-on API Configuration
+        )
         return html
 
 
 class Pages(object):
     api_configuration = {
-        'html':
-            '<!doctype html>\n<html>\n'
-            '<head>\n\t<meta charset="utf-8">\n'
-            '\t<title>{title}</title>\n'
-            '\t<style>\n{css}\t</style>\n'
-            '</head>\n<body>\n'
-            '\t<div class="center">\n'
-            '\t<h5>{header}</h5>\n'
-            '\t<form action="/api_submit" class="config_form">\n'
-            '\t\t<label for="api_key">\n'
-            '\t\t<span>{api_key_head}</span><input type="text" name="api_key" value="{api_key_value}" size="50"/>\n'
-            '\t\t</label>\n'
-            '\t\t<label for="api_id">\n'
-            '\t\t<span>{api_id_head}</span><input type="text" name="api_id" value="{api_id_value}" size="50"/>\n'
-            '\t\t</label>\n'
-            '\t\t<label for="api_secret">\n'
-            '\t\t<span>{api_secret_head}</span><input type="text" name="api_secret" value="{api_secret_value}" size="50"/>\n'
-            '\t\t</label>\n'
-            '\t\t<input type="submit" value="{submit}">\n'
-            '\t</form>\n'
-            '\t</div>\n'
-            '</body>\n</html>',
-
-        'css':
-            'body {\n'
-            '  background: #141718;\n'
-            '}\n'
-            '.center {\n'
-            '  margin: auto;\n'
-            '  width: 600px;\n'
-            '  padding: 10px;\n'
-            '}\n'
-            '.config_form {\n'
-            '  width: 575px;\n'
-            '  height: 145px;\n'
-            '  font-size: 16px;\n'
-            '  background: #1a2123;\n'
-            '  padding: 30px 30px 15px 30px;\n'
-            '  border: 5px solid #1a2123;\n'
-            '}\n'
-            'h5 {\n'
-            '  font-family: Arial, Helvetica, sans-serif;\n'
-            '  font-size: 16px;\n'
-            '  color: #fff;\n'
-            '  font-weight: 600;\n'
-            '  width: 575px;\n'
-            '  height: 20px;\n'
-            '  background: #0f84a5;\n'
-            '  padding: 5px 30px 5px 30px;\n'
-            '  border: 5px solid #0f84a5;\n'
-            '  margin: 0px;\n'
-            '}\n'
-            '.config_form input[type=submit],\n'
-            '.config_form input[type=button],\n'
-            '.config_form input[type=text],\n'
-            '.config_form textarea,\n'
-            '.config_form label {\n'
-            '  font-family: Arial, Helvetica, sans-serif;\n'
-            '  font-size: 16px;\n'
-            '  color: #fff;\n'
-            '}\n'
-            '.config_form label {\n'
-            '  display:block;\n'
-            '  margin-bottom: 10px;\n'
-            '}\n'
-            '.config_form label > span {\n'
-            '  display: inline-block;\n'
-            '  float: left;\n'
-            '  width: 150px;\n'
-            '}\n'
-            '.config_form input[type=text] {\n'
-            '  background: transparent;\n'
-            '  border: none;\n'
-            '  border-bottom: 1px solid #147a96;\n'
-            '  width: 400px;\n'
-            '  outline: none;\n'
-            '  padding: 0px 0px 0px 0px;\n'
-            '}\n'
-            '.config_form input[type=text]:focus {\n'
-            '  border-bottom: 1px dashed #0f84a5;\n'
-            '}\n'
-            '.config_form input[type=submit],\n'
-            '.config_form input[type=button] {\n'
-            '  width: 150px;\n'
-            '  background: #141718;\n'
-            '  border: none;\n'
-            '  padding: 8px 0px 8px 10px;\n'
-            '  border-radius: 5px;\n'
-            '  color: #fff;\n'
-            '  margin-top: 10px\n'
-            '}\n'
-            '.config_form input[type=submit]:hover,\n'
-            '.config_form input[type=button]:hover {\n'
-            '  background: #0f84a5;\n'
-            '}\n'
+        'html': dedent('''\
+            <!doctype html>
+            <html>
+              <head>
+                <link rel="icon" href="data:;base64,=">
+                <meta charset="utf-8">
+                <title>{title}</title>
+                <style>{css}</style>
+              </head>
+              <body>
+                <div class="center">
+                  <h5>{header}</h5>
+                  <form action="/api_submit" class="config_form">
+                    <label for="api_key">
+                      <span>{api_key_head}:</span>
+                      <input type="text" name="api_key" value="{api_key_value}" size="50"/>
+                    </label>
+                    <label for="api_id">
+                      <span>{api_id_head}:</span>
+                      <input type="text" name="api_id" value="{api_id_value}" size="50"/>
+                    </label>
+                    <label for="api_secret">
+                      <span>{api_secret_head}:</span>
+                      <input type="text" name="api_secret" value="{api_secret_value}" size="50"/>
+                    </label>
+                    <input type="submit" value="{submit}">
+                  </form>
+                </div>
+              </body>
+            </html>
+        '''),
+        'css': ''.join('\t\t\t'.expandtabs(2) + line for line in dedent('''
+            body {
+              background: #141718;
+            }
+            .center {
+              margin: auto;
+              width: 600px;
+              padding: 10px;
+            }
+            .config_form {
+              width: 575px;
+              height: 145px;
+              font-size: 16px;
+              background: #1a2123;
+              padding: 30px 30px 15px 30px;
+              border: 5px solid #1a2123;
+            }
+            h5 {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 16px;
+              color: #fff;
+              font-weight: 600;
+              width: 575px;
+              height: 20px;
+              background: #0f84a5;
+              padding: 5px 30px 5px 30px;
+              border: 5px solid #0f84a5;
+              margin: 0px;
+            }
+            .config_form input[type=submit],
+            .config_form input[type=button],
+            .config_form input[type=text],
+            .config_form textarea,
+            .config_form label {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 16px;
+              color: #fff;
+            }
+            .config_form label {
+              display:block;
+              margin-bottom: 10px;
+            }
+            .config_form label > span {
+              display: inline-block;
+              float: left;
+              width: 150px;
+            }
+            .config_form input[type=text] {
+              background: transparent;
+              border: none;
+              border-bottom: 1px solid #147a96;
+              width: 400px;
+              outline: none;
+              padding: 0px 0px 0px 0px;
+            }
+            .config_form input[type=text]:focus {
+              border-bottom: 1px dashed #0f84a5;
+            }
+            .config_form input[type=submit],
+            .config_form input[type=button] {
+              width: 150px;
+              background: #141718;
+              border: 1px solid #147a96;
+              padding: 8px 0px 8px 10px;
+              border-radius: 5px;
+              color: #fff;
+              margin-top: 10px
+            }
+            .config_form input[type=submit]:hover,
+            .config_form input[type=button]:hover {
+              background: #0f84a5;
+            }
+        ''').splitlines(True)) + '\t\t'.expandtabs(2)
     }
 
     api_submit = {
-        'html':
-            '<!doctype html>\n<html>\n'
-            '<head>\n\t<meta charset="utf-8">\n'
-            '\t<title>{title}</title>\n'
-            '\t<style>\n{css}\t</style>\n'
-            '</head>\n<body>\n'
-            '\t<div class="center">\n'
-            '\t<h5>{header}</h5>\n'
-            '\t<div class="content">\n'
-            '\t\t<span>{updated}</span>\n'
-            '\t\t<span>{enabled}</span>\n'
-            '\t\t<span>&nbsp;</span>\n'
-            '\t\t<span>&nbsp;</span>\n'
-            '\t\t<span>&nbsp;</span>\n'
-            '\t\t<span>&nbsp;</span>\n'
-            '\t\t<div class="textcenter">\n'
-            '\t\t\t<span><small>{footer}</small></span>\n'
-            '\t\t</div>\n'
-            '\t</div>\n'
-            '\t</div>\n'
-            '</body>\n</html>',
-
-        'css':
-            'body {\n'
-            '  background: #141718;\n'
-            '}\n'
-            '.center {\n'
-            '  margin: auto;\n'
-            '  width: 600px;\n'
-            '  padding: 10px;\n'
-            '}\n'
-            '.textcenter {\n'
-            '  margin: auto;\n'
-            '  width: 600px;\n'
-            '  padding: 10px;\n'
-            '  text-align: center;\n'
-            '}\n'
-            '.content {\n'
-            '  width: 575px;\n'
-            '  height: 145px;\n'
-            '  background: #1a2123;\n'
-            '  padding: 30px 30px 15px 30px;\n'
-            '  border: 5px solid #1a2123;\n'
-            '}\n'
-            'h5 {\n'
-            '  font-family: Arial, Helvetica, sans-serif;\n'
-            '  font-size: 16px;\n'
-            '  color: #fff;\n'
-            '  font-weight: 600;\n'
-            '  width: 575px;\n'
-            '  height: 20px;\n'
-            '  background: #0f84a5;\n'
-            '  padding: 5px 30px 5px 30px;\n'
-            '  border: 5px solid #0f84a5;\n'
-            '  margin: 0px;\n'
-            '}\n'
-            'span {\n'
-            '  font-family: Arial, Helvetica, sans-serif;\n'
-            '  font-size: 16px;\n'
-            '  color: #fff;\n'
-            '  display: block;\n'
-            '  float: left;\n'
-            '  width: 575px;\n'
-            '}\n'
-            'small {\n'
-            '  font-family: Arial, Helvetica, sans-serif;\n'
-            '  font-size: 12px;\n'
-            '  color: #fff;\n'
-            '}\n'
+        'html': dedent('''\
+            <!doctype html>
+            <html>
+              <head>
+                <link rel="icon" href="data:;base64,=">
+                <meta charset="utf-8">
+                <title>{title}</title>
+                <style>{css}</style>
+              </head>
+              <body>
+                <div class="center">
+                  <h5>{header}</h5>
+                  <div class="content">
+                    <p>{updated}</p>
+                    <p>{enabled}</p>
+                    <p class="text_center">
+                      <small>{footer}</small>
+                    </p>
+                  </div>
+                </div>
+              </body>
+            </html>
+        '''),
+        'css': ''.join('\t\t\t'.expandtabs(2) + line for line in dedent('''
+            body {
+              background: #141718;
+            }
+            .center {
+              margin: auto;
+              width: 600px;
+              padding: 10px;
+            }
+            .text_center {
+              margin: 2em auto auto;
+              width: 600px;
+              padding: 10px;
+              text-align: center;
+            }
+            .content {
+              width: 575px;
+              height: 145px;
+              background: #1a2123;
+              padding: 30px 30px 15px 30px;
+              border: 5px solid #1a2123;
+            }
+            h5 {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 16px;
+              color: #fff;
+              font-weight: 600;
+              width: 575px;
+              height: 20px;
+              background: #0f84a5;
+              padding: 5px 30px 5px 30px;
+              border: 5px solid #0f84a5;
+              margin: 0px;
+            }
+            p {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 16px;
+              color: #fff;
+              float: left;
+              width: 575px;
+              margin: 0.5em auto;
+            }
+            small {
+              font-family: Arial, Helvetica, sans-serif;
+              font-size: 12px;
+              color: #fff;
+            }
+        ''').splitlines(True)) + '\t\t'.expandtabs(2)
     }
 
 
 def get_http_server(address=None, port=None):
-    addon = Addon(_addon_id)
-    address = address if address else addon.getSetting('kodion.http.listen')
-    address = address if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address) else '0.0.0.0'
-    port = int(port) if port else 50152
+    address = _settings.httpd_listen(for_request=False, ip_address=address)
+    port = _settings.httpd_port(port)
     try:
-        server = BaseHTTPServer.HTTPServer((address, port), YouTubeProxyRequestHandler)
+        server = BaseHTTPServer.HTTPServer((address, port),
+                                           YouTubeProxyRequestHandler)
         return server
-    except socket.error as e:
-        log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'.format(address=address, port=port, response=str(e)))
-        xbmcgui.Dialog().notification(addon.getAddonInfo('name'), str(e),
-                                      addon.getAddonInfo('icon'),
-                                      5000, False)
+    except socket_error as e:
+        log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
+                  .format(address=address, port=port, response=str(e)))
+        Dialog().notification(_addon.getAddonInfo('name'),
+                              str(e),
+                              _addon.getAddonInfo('icon'),
+                              time=5000,
+                              sound=False)
         return None
 
 
 def is_httpd_live(address=None, port=None):
-    addon = Addon(_addon_id)
-    address = address if address else addon.getSetting('kodion.http.listen')
-    address = '127.0.0.1' if address == '0.0.0.0' else address
-    address = address if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address) else '127.0.0.1'
-    port = int(port) if port else 50152
+    address = _settings.httpd_listen(for_request=True, ip_address=address)
+    port = _settings.httpd_port(port=port)
     url = 'http://{address}:{port}/ping'.format(address=address, port=port)
     try:
-        response = requests.get(url)
+        response = _server_requests.request(url)
         result = response.status_code == 204
         if not result:
-            log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'.format(address=address, port=port, response=response.status_code))
+            log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'
+                      .format(address=address,
+                              port=port,
+                              response=response.status_code))
         return result
     except:
-        log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'.format(address=address, port=port, response='failed'))
+        log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'
+                  .format(address=address, port=port, response='failed'))
         return False
 
 
 def get_client_ip_address(address=None, port=None):
-    addon = Addon(_addon_id)
-    address = address if address else addon.getSetting('kodion.http.listen')
-    address = '127.0.0.1' if address == '0.0.0.0' else address
-    address = address if re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', address) else '127.0.0.1'
-    port = int(port) if port else 50152
+    address = _settings.httpd_listen(for_request=True, ip_address=address)
+    port = _settings.httpd_port(port=port)
     url = 'http://{address}:{port}/client_ip'.format(address=address, port=port)
-    response = requests.get(url)
+    response = _server_requests.request(url)
     ip_address = None
     if response.status_code == 200:
         response_json = response.json()

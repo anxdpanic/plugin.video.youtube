@@ -790,9 +790,13 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="kodion.mpd.proxy.port" type="integer" label="30619" help="">
+                <setting id="kodion.http.port" type="integer" label="30619" help="">
                     <level>0</level>
                     <default>50152</default>
+                    <constraints>
+                        <minimum>0</minimum>
+                        <maximum>65535</maximum>
+                    </constraints>
                     <dependencies>
                         <dependency type="enable">
                             <condition name="InfoBool" on="property">true</condition>

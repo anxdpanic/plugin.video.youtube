@@ -47,7 +47,7 @@ VERIFY_SSL = 'requests.ssl.verify'  # (bool)
 CONNECT_TIMEOUT = 'requests.timeout.connect'  # (int)
 READ_TIMEOUT = 'requests.timeout.read'  # (int)
 
-HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)
+HTTPD_PORT = 'kodion.http.port'  # (number)
 HTTPD_LISTEN = 'kodion.http.listen'  # (string)
 HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (string)
 
