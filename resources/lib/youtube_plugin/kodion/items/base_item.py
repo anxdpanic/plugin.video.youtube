@@ -56,10 +56,10 @@ class BaseItem(object):
         Returns a unique id of the item.
         :return: unique id of the item.
         """
-        m = hashlib.md5()
-        m.update(self._name.encode('utf-8'))
-        m.update(self._uri.encode('utf-8'))
-        return m.hexdigest()
+        md5_hash = hashlib.md5()
+        md5_hash.update(self._name.encode('utf-8'))
+        md5_hash.update(self._uri.encode('utf-8'))
+        return md5_hash.hexdigest()
 
     def get_name(self):
         """
@@ -113,9 +113,9 @@ class BaseItem(object):
         if not self._date:
             return ''
         if short:
-            return self._date.date().isoformat()
+            return self._date.date().strftime('%x')
         if as_text:
-            return self._date.isoformat(sep=' ')
+            return self._date.strftime('%x %X')
         return self._date
 
     def set_dateadded(self, year, month, day, hour=0, minute=0, second=0):
@@ -133,7 +133,7 @@ class BaseItem(object):
         if not self._dateadded:
             return ''
         if as_text:
-            return self._dateadded.isoformat(sep=' ')
+            return self._dateadded.strftime('%x %X')
         return self._dateadded
 
     def set_added_utc(self, date_time):

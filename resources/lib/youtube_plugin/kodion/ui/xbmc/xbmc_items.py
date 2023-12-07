@@ -11,8 +11,9 @@
 from xbmcgui import ListItem
 
 from . import info_labels
-from ...items import VideoItem, AudioItem, UriItem
+from ...items import AudioItem, UriItem, VideoItem
 from ...utils import datetime_parser
+
 
 try:
     from infotagger.listitem import set_info_tag
@@ -62,13 +63,7 @@ def video_playback_item(context, video_item):
     else:
         kwargs = {
             'label': video_item.get_title() or video_item.get_name(),
-            'label2': ' | '.join((part
-                                  for part in (
-                                      video_item.get_code(),
-                                      video_item.get_date(short=True),
-                                      video_item.get_duration(as_text=True),
-                                  )
-                                  if part)),
+            'label2': video_item.get_short_details(),
             'path': uri,
             'offscreen': True,
         }
@@ -221,13 +216,7 @@ def video_listitem(context, video_item):
 
     kwargs = {
         'label': video_item.get_title() or video_item.get_name(),
-        'label2': ' | '.join((part
-                              for part in (
-                                  video_item.get_code(),
-                                  video_item.get_date(short=True),
-                                  video_item.get_duration(as_text=True),
-                              )
-                              if part)),
+        'label2': video_item.get_short_details(),
         'path': uri,
         'offscreen': True,
     }

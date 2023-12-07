@@ -8,7 +8,6 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import datetime
 import json
 import os
 import sys
@@ -21,11 +20,11 @@ import xbmcplugin
 import xbmcvfs
 
 from ..abstract_context import AbstractContext
-from ...player.xbmc.xbmc_playlist import XbmcPlaylist
+from ... import utils
 from ...player.xbmc.xbmc_player import XbmcPlayer
+from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
 from ...ui.xbmc.xbmc_context_ui import XbmcContextUI
-from ... import utils
 
 
 class XbmcContext(AbstractContext):
@@ -302,30 +301,18 @@ class XbmcContext(AbstractContext):
         return uri.startswith('plugin://%s/%s' % (self.get_id(), uri_path))
 
     @staticmethod
-    def format_date_short(date_obj, short_isoformat=False):
-        if short_isoformat:
-            if isinstance(date_obj, datetime.datetime):
-                date_obj = date_obj.date()
-            return date_obj.isoformat()
-
-        date_format = xbmc.getRegion('dateshort')
-        _date_obj = date_obj
-        if isinstance(_date_obj, datetime.date):
-            _date_obj = datetime.datetime(_date_obj.year, _date_obj.month, _date_obj.day)
-
-        return _date_obj.strftime(date_format)
+    def format_date_short(date_obj, str_format=None):
+        if str_format is None:
+            str_format = xbmc.getRegion('dateshort')
+        return date_obj.strftime(str_format)
 
     @staticmethod
-    def format_time(time_obj, short_isoformat=False):
-        if short_isoformat:
-            return '{:02d}:{:02d}'.format(time_obj.hour, time_obj.minute)
-
-        time_format = xbmc.getRegion('time')
-        _time_obj = time_obj
-        if isinstance(_time_obj, datetime.time):
-            _time_obj = datetime.time(_time_obj.hour, _time_obj.minute, _time_obj.second)
-
-        return _time_obj.strftime(time_format.replace("%H%H", "%H"))
+    def format_time(time_obj, str_format=None):
+        if str_format is None:
+            str_format = (xbmc.getRegion('time')
+                          .replace("%H%H", "%H")
+                          .replace(':%S', ''))
+        return time_obj.strftime(str_format)
 
     def get_language(self):
         """

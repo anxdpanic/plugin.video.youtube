@@ -15,19 +15,15 @@ from datetime import date, datetime, time as dt_time, timedelta
 from ..exceptions import KodionException
 
 
-__RE_MATCH_TIME_ONLY__ = re.compile(r'^(?P<hour>[0-9]{2})([:]?(?P<minute>[0-9]{2})([:]?(?P<second>[0-9]{2}))?)?$')
-__RE_MATCH_DATE_ONLY__ = re.compile(r'^(?P<year>[0-9]{4})[-]?(?P<month>[0-9]{2})[-]?(?P<day>[0-9]{2})$')
-__RE_MATCH_DATETIME__ = re.compile(r'^(?P<year>[0-9]{4})[-]?(?P<month>[0-9]{2})[-]?(?P<day>[0-9]{2})["T ](?P<hour>[0-9]{2})[:]?(?P<minute>[0-9]{2})[:]?(?P<second>[0-9]{2})')
+__RE_MATCH_TIME_ONLY__ = re.compile(r'^(?P<hour>[0-9]{2})(:?(?P<minute>[0-9]{2})(:?(?P<second>[0-9]{2}))?)?$')
+__RE_MATCH_DATE_ONLY__ = re.compile(r'^(?P<year>[0-9]{4})[-/.]?(?P<month>[0-9]{2})[-/.]?(?P<day>[0-9]{2})$')
+__RE_MATCH_DATETIME__ = re.compile(r'^(?P<year>[0-9]{4})[-/.]?(?P<month>[0-9]{2})[-/.]?(?P<day>[0-9]{2})["T ](?P<hour>[0-9]{2}):?(?P<minute>[0-9]{2}):?(?P<second>[0-9]{2})')
 __RE_MATCH_PERIOD__ = re.compile(r'P((?P<years>\d+)Y)?((?P<months>\d+)M)?((?P<days>\d+)D)?(T((?P<hours>\d+)H)?((?P<minutes>\d+)M)?((?P<seconds>\d+)S)?)?')
 __RE_MATCH_ABBREVIATED__ = re.compile(r'(\w+), (?P<day>\d+) (?P<month>\w+) (?P<year>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<second>\d+)')
 
-now = time.time()
-__LOCAL_OFFSET__ = datetime.fromtimestamp(now) - datetime.utcfromtimestamp(now)
+__LOCAL_OFFSET__ = datetime.now() - datetime.utcnow()
 
 __EPOCH_DT__ = datetime.fromtimestamp(0)
-
-
-now = datetime.now
 
 
 def parse(datetime_string, as_utc=True):
@@ -74,7 +70,8 @@ def parse(datetime_string, as_utc=True):
             offset=offset
         )
 
-    # period - at the moment we support only hours, minutes and seconds (e.g. videos and audio)
+    # period - at the moment we support only hours, minutes and seconds
+    # e.g. videos and audio
     period_match = __RE_MATCH_PERIOD__.match(datetime_string)
     if period_match:
         return timedelta(hours=_to_int(period_match.group('hours')),
@@ -97,24 +94,19 @@ def parse(datetime_string, as_utc=True):
             offset=offset
         )
 
-    raise KodionException("Could not parse iso 8601 timestamp '%s'" % datetime_string)
+    raise KodionException('Could not parse |{datetime}| as ISO 8601'
+                          .format(datetime=datetime_string))
 
 
 def get_scheduled_start(context, datetime_object, local=True):
     now = datetime.now() if local else datetime.utcnow()
     if datetime_object.date() == now.date():
         return '@ {start_time}'.format(
-            start_time=context.format_time(
-                datetime_object.timetz(), short_isoformat=True
-            )
+            start_time=context.format_time(datetime_object.time())
         )
     return '@ {start_date}, {start_time}'.format(
-        start_time=context.format_time(
-            datetime_object.timetz(), short_isoformat=True
-        ),
-        start_date=context.format_date_short(
-            datetime_object.date(), short_isoformat=True
-        )
+        start_time=context.format_time(datetime_object.time()),
+        start_date=context.format_date_short(datetime_object.date())
     )
 
 
@@ -189,6 +181,7 @@ def strptime(s, fmt='%Y-%m-%dT%H:%M:%S.%fZ'):
         fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
 
     import _strptime
+
     try:
         time.strptime('01 01 2012', '%d %m %Y')  # dummy call
     except:

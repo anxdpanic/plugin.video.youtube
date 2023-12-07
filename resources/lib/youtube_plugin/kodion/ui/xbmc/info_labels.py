@@ -19,7 +19,7 @@ def _process_date_value(info_labels, name, param):
 
 def _process_datetime_value(info_labels, name, param):
     if param:
-        info_labels[name] = param.isoformat(' ')
+        info_labels[name] = param.isoformat('T')
 
 
 def _process_int_value(info_labels, name, param):

@@ -422,22 +422,32 @@ def update_video_infos(provider, context, video_id_dict,
         if 'statistics' in yt_item:
             for stat, value in yt_item['statistics'].items():
                 label = context.LOCAL_MAP.get('stats.' + stat)
-                if label:
-                    color = __COLOR_MAP.get(stat, 'white')
-                    str_value, value = utils.friendly_number(value)
-                    label_stats.append(ui.color(color, str_value))
-                    stats.append(ui.color(color, ui.bold(' '.join((
-                        str_value, context.localize(label)
-                    )))))
-                else:
+                if not label:
                     continue
+
+                str_value, value = utils.friendly_number(value)
+                if not value:
+                    continue
+
+                color = __COLOR_MAP.get(stat, 'white')
+                label = context.localize(label)
+                if value == 1:
+                    label = label.rstrip('s')
+
+                label_stats.append(ui.color(color, str_value))
+                stats.append(ui.color(color, ui.bold(' '.join((
+                    str_value, label
+                )))))
+
                 if stat == 'likeCount':
                     rating[0] = value
                 elif stat == 'viewCount':
                     rating[1] = value
                     video_item.set_count(value)
-            label_stats = '|'.join(label_stats)
-            stats = '|'.join(stats)
+
+            label_stats = ' | '.join(label_stats)
+            stats = ' | '.join(stats)
+
             if 0 < rating[0] <= rating[1]:
                 if rating[0] == rating[1]:
                     rating = 10
@@ -482,7 +492,8 @@ def update_video_infos(provider, context, video_id_dict,
             description = ''.join((
                 ui.bold(channel_name, cr_after=2) if channel_name else '',
                 ui.new_line(stats, cr_after=1) if stats else '',
-                ui.italic(start_at, cr_after=1) if start_at else '',
+                (ui.italic(start_at, cr_after=1) if video_item.upcoming
+                 else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 ui.new_line() if stats or start_at else '',
                 description,
             ))

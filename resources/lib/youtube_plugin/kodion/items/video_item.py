@@ -116,7 +116,7 @@ class VideoItem(BaseItem):
         if not self._premiered:
             return ''
         if as_text:
-            return self._premiered.isoformat()
+            return self._premiered.strftime('%x')
         return self._premiered
 
     def set_plot(self, plot):
@@ -200,7 +200,7 @@ class VideoItem(BaseItem):
         if not self._aired:
             return ''
         if as_text:
-            return self._aired.isoformat()
+            return self._aired.strftime('%x')
         return self._aired
 
     def set_scheduled_start_utc(self, date_time):
