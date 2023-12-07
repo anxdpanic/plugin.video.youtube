@@ -263,7 +263,7 @@
                 </setting>
                 <setting id="kodion.mpd.stream.features" type="list[string]" parent="kodion.mpd.videos" label="30748" help="">
                    <level>0</level>
-                   <default>avc1,vp9,av01,hdr,hfr,vorbis,opus,mp4a,ssa,ac-3,ec-3,dts,filter</default>  <!-- All features -->
+                   <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>  <!-- All features except opus and no HFR at max quality -->
                    <constraints>
                         <options>
                             <option label="30727">avc1</option>
