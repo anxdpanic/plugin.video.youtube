@@ -11,7 +11,7 @@
 import xbmc
 import xbmcaddon
 
-DEBUG = xbmc.LOGINFO
+DEBUG = xbmc.LOGDEBUG
 INFO = xbmc.LOGINFO
 NOTICE = INFO
 WARNING = xbmc.LOGWARNING
