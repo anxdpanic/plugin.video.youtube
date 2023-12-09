@@ -26,14 +26,8 @@ from .methods import (
     to_unicode,
     to_utf8,
 )
-from .search_history import SearchHistory
-from .favorite_list import FavoriteList
-from .watch_later_list import WatchLaterList
-from .function_cache import FunctionCache
 from .monitor import YouTubeMonitor
 from .player import YouTubePlayer
-from .playback_history import PlaybackHistory
-from .data_cache import DataCache
 from .system_version import SystemVersion
 
 
@@ -54,13 +48,7 @@ __all__ = (
     'to_str',
     'to_unicode',
     'to_utf8',
-    'DataCache',
-    'FavoriteList',
-    'FunctionCache',
-    'PlaybackHistory',
-    'SearchHistory',
     'SystemVersion',
-    'WatchLaterList',
     'YouTubeMonitor',
     'YouTubePlayer',
 )

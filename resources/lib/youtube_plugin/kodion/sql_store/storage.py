@@ -8,15 +8,15 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import datetime
 import json
 import os
 import pickle
 import sqlite3
 import time
-import traceback
+from datetime import datetime
+from traceback import print_exc
 
-from .. import logger
+from ..logger import log_error
 
 
 class Storage(object):
@@ -155,7 +155,7 @@ class Storage(object):
 
     def _set(self, item_id, item):
         # add 1 microsecond, required for dbapi2
-        now = datetime.datetime.now().timestamp() + 0.000001
+        now = datetime.now().timestamp() + 0.000001
         self._open()
         self._execute(True, self._set_query, values=[item_id,
                                                      now,
@@ -165,7 +165,7 @@ class Storage(object):
 
     def _set_all(self, items):
         # add 1 microsecond, required for dbapi2
-        now = datetime.datetime.now().timestamp() + 0.000001
+        now = datetime.now().timestamp() + 0.000001
         self._open()
         self._execute(True, self._set_query,
                       values=[(key, now, self._encode(json.dumps(item)))
@@ -278,27 +278,27 @@ class Storage(object):
         val = val.decode('utf-8')
         if '-' in val or ':' in val:
             return cls._parse_datetime_string(val)
-        return datetime.datetime.fromtimestamp(float(val))
+        return datetime.fromtimestamp(float(val))
 
     @classmethod
     def _parse_datetime_string(cls, current_stamp):
         for stamp_format in ['%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S']:
             try:
-                stamp_datetime = datetime.datetime(
+                stamp_datetime = datetime(
                     *(cls.strptime(current_stamp, stamp_format)[0:6])
                 )
                 break
             except ValueError:  # current_stamp has no microseconds
                 continue
             except TypeError:
-                logger.log_error('Exception while parsing timestamp:\n'
-                                 'current_stamp |{cs}|{cst}|\n'
-                                 'stamp_format |{sf}|{sft}|\n{tb}'
-                                 .format(cs=current_stamp,
-                                         cst=type(current_stamp),
-                                         sf=stamp_format,
-                                         sft=type(stamp_format),
-                                         tb=traceback.print_exc()))
+                log_error('Exception while parsing timestamp:\n'
+                          'current_stamp |{cs}|{cst}|\n'
+                          'stamp_format |{sf}|{sft}|\n{tb}'
+                          .format(cs=current_stamp,
+                                  cst=type(current_stamp),
+                                  sf=stamp_format,
+                                  sft=type(stamp_format),
+                                  tb=print_exc()))
         else:
             return None
         return stamp_datetime
@@ -307,8 +307,8 @@ class Storage(object):
         if not current_stamp:
             return 86400  # 24 hrs
 
-        current_datetime = datetime.datetime.now()
-        if isinstance(current_stamp, datetime.datetime):
+        current_datetime = datetime.now()
+        if isinstance(current_stamp, datetime):
             time_delta = current_datetime - current_stamp
             return time_delta.total_seconds()
 

@@ -11,20 +11,17 @@
 import os
 from urllib.parse import urlencode
 
-from .. import constants
-from .. import logger
+from .. import constants, logger
 from ..json_store import AccessManager
-from ..utils import (
-    create_path,
-    create_uri_path,
+from ..sql_store import (
     DataCache,
     FavoriteList,
     FunctionCache,
     PlaybackHistory,
     SearchHistory,
-    SystemVersion,
     WatchLaterList,
 )
+from ..utils import (SystemVersion, create_path, create_uri_path)
 
 
 class AbstractContext(object):

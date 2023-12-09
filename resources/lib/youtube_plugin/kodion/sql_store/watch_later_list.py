@@ -8,26 +8,30 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from datetime import datetime
+
 from .storage import Storage
 from .. import items
 
 
-class FavoriteList(Storage):
+class WatchLaterList(Storage):
     def __init__(self, filename):
-        super(FavoriteList, self).__init__(filename)
+        super(WatchLaterList, self).__init__(filename)
 
     def clear(self):
         self._clear()
 
     @staticmethod
     def _sort_item(_item):
-        return _item[2].get_name().upper()
+        return _item[2].get_date()
 
     def get_items(self):
         result = self._get_by_ids(process=items.from_json)
         return sorted(result, key=self._sort_item, reverse=False)
 
     def add(self, base_item):
+        base_item.set_date_from_datetime(datetime.now())
+
         item_json_data = items.to_json(base_item)
         self._set(base_item.get_id(), item_json_data)
 

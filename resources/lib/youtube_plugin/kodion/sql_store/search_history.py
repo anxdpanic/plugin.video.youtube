@@ -8,10 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import hashlib
+from hashlib import md5
 
 from .storage import Storage
-from .methods import to_utf8
+from ..utils import to_utf8
 
 
 class SearchHistory(Storage):
@@ -32,9 +32,9 @@ class SearchHistory(Storage):
 
     @staticmethod
     def _make_id(search_text):
-        m = hashlib.md5()
-        m.update(to_utf8(search_text))
-        return m.hexdigest()
+        md5_hash = md5()
+        md5_hash.update(to_utf8(search_text))
+        return md5_hash.hexdigest()
 
     def rename(self, old_search_text, new_search_text):
         self.remove(old_search_text)

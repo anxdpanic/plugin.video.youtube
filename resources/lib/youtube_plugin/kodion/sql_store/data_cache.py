@@ -17,7 +17,8 @@ from .storage import Storage
 class DataCache(Storage):
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
-        super(DataCache, self).__init__(filename, max_file_size_kb=max_file_size_kb)
+        super(DataCache, self).__init__(filename,
+                                        max_file_size_kb=max_file_size_kb)
 
     def is_empty(self):
         return self._is_empty()

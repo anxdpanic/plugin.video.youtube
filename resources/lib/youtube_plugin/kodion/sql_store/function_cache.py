@@ -9,7 +9,7 @@
 """
 
 from functools import partial
-import hashlib
+from hashlib import md5
 
 from .storage import Storage
 
@@ -45,12 +45,12 @@ class FunctionCache(Storage):
         :param partial_func:
         :return: id for the given function
         """
-        m = hashlib.md5()
-        m.update(partial_func.func.__module__.encode('utf-8'))
-        m.update(partial_func.func.__name__.encode('utf-8'))
-        m.update(str(partial_func.args).encode('utf-8'))
-        m.update(str(partial_func.keywords).encode('utf-8'))
-        return m.hexdigest()
+        md5_hash = md5()
+        md5_hash.update(partial_func.func.__module__.encode('utf-8'))
+        md5_hash.update(partial_func.func.__name__.encode('utf-8'))
+        md5_hash.update(str(partial_func.args).encode('utf-8'))
+        md5_hash.update(str(partial_func.keywords).encode('utf-8'))
+        return md5_hash.hexdigest()
 
     def _get_cached_data(self, partial_func):
         cache_id = self._create_id_from_func(partial_func)
@@ -103,6 +103,6 @@ class FunctionCache(Storage):
         return cached_data
 
     def _optimize_item_count(self):
-        # override method from resources/lib/youtube_plugin/kodion/utils/storage.py
-        # for function cache do not optimize by item count, using database size.
+        # override method Storage._optimize_item_count
+        # for function cache do not optimize by item count, use database size.
         pass
