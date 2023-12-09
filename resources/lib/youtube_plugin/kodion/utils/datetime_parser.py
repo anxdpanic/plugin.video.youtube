@@ -15,13 +15,15 @@ from datetime import date, datetime, time as dt_time, timedelta
 from ..exceptions import KodionException
 
 
+now = datetime.now
+
 __RE_MATCH_TIME_ONLY__ = re.compile(r'^(?P<hour>[0-9]{2})(:?(?P<minute>[0-9]{2})(:?(?P<second>[0-9]{2}))?)?$')
 __RE_MATCH_DATE_ONLY__ = re.compile(r'^(?P<year>[0-9]{4})[-/.]?(?P<month>[0-9]{2})[-/.]?(?P<day>[0-9]{2})$')
 __RE_MATCH_DATETIME__ = re.compile(r'^(?P<year>[0-9]{4})[-/.]?(?P<month>[0-9]{2})[-/.]?(?P<day>[0-9]{2})["T ](?P<hour>[0-9]{2}):?(?P<minute>[0-9]{2}):?(?P<second>[0-9]{2})')
 __RE_MATCH_PERIOD__ = re.compile(r'P((?P<years>\d+)Y)?((?P<months>\d+)M)?((?P<days>\d+)D)?(T((?P<hours>\d+)H)?((?P<minutes>\d+)M)?((?P<seconds>\d+)S)?)?')
 __RE_MATCH_ABBREVIATED__ = re.compile(r'(\w+), (?P<day>\d+) (?P<month>\w+) (?P<year>\d+) (?P<hour>\d+):(?P<minute>\d+):(?P<second>\d+)')
 
-__LOCAL_OFFSET__ = datetime.now() - datetime.utcnow()
+__LOCAL_OFFSET__ = now() - datetime.utcnow()
 
 __EPOCH_DT__ = datetime.fromtimestamp(0)
 
@@ -99,8 +101,8 @@ def parse(datetime_string, as_utc=True):
 
 
 def get_scheduled_start(context, datetime_object, local=True):
-    now = datetime.now() if local else datetime.utcnow()
-    if datetime_object.date() == now.date():
+    _now = now() if local else datetime.utcnow()
+    if datetime_object.date() == _now:
         return '@ {start_time}'.format(
             start_time=context.format_time(datetime_object.time())
         )
@@ -116,12 +118,12 @@ def utc_to_local(dt, offset=None):
 
 
 def datetime_to_since(context, dt):
-    now = datetime.now()
-    diff = now - dt
-    yesterday = now - timedelta(days=1)
-    yyesterday = now - timedelta(days=2)
-    use_yesterday = (now - yesterday).total_seconds() > 10800
-    today = now.date()
+    _now = now()
+    diff = _now - dt
+    yesterday = _now - timedelta(days=1)
+    yyesterday = _now - timedelta(days=2)
+    use_yesterday = (_now - yesterday).total_seconds() > 10800
+    today = _now.date()
     tomorrow = today + timedelta(days=1)
     seconds = diff.total_seconds()
 
