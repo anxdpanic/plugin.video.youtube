@@ -10,9 +10,14 @@
 
 
 class AbstractProgressDialog(object):
-    def __init__(self, total=100):
+    def __init__(self, dialog, heading, text, total=100):
+        self._dialog = dialog()
+        self._dialog.create(heading, text)
+
+        # simple reset because KODI won't do it :(
         self._total = int(total)
-        self._position = 0
+        self._position = 1
+        self.update(steps=-1)
 
     def get_total(self):
         return self._total
@@ -21,13 +26,27 @@ class AbstractProgressDialog(object):
         return self._position
 
     def close(self):
-        raise NotImplementedError()
+        if self._dialog:
+            self._dialog.close()
+            self._dialog = None
 
     def set_total(self, total):
         self._total = int(total)
 
     def update(self, steps=1, text=None):
-        raise NotImplementedError()
+        self._position += steps
+
+        if not self._total:
+            position = 0
+        elif self._position >= self._total:
+            position = 100
+        else:
+            position = int(100 * self._position / self._total)
+
+        if isinstance(text, str):
+            self._dialog.update(percent=position, message=text)
+        else:
+            self._dialog.update(percent=position)
 
     def is_aborted(self):
         raise NotImplementedError()

@@ -159,11 +159,14 @@ def play_playlist(provider, context):
         while page_token is not None:
             json_data = client.get_playlist_items(playlist_id, page_token)
             if not v3.handle_error(context, json_data):
-                return None
+                break
 
             if page_token == 0:
-                total += int(json_data.get('pageInfo', {})
-                             .get('totalResults', 0))
+                playlist_total = int(json_data.get('pageInfo', {})
+                                     .get('totalResults', 0))
+                if not playlist_total:
+                    break
+                total += playlist_total
                 progress_dialog.set_total(total)
 
             result = v3.response_to_items(provider,

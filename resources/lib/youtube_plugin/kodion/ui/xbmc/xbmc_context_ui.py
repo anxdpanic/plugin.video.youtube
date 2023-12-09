@@ -11,8 +11,7 @@
 import xbmc
 import xbmcgui
 
-from .xbmc_progress_dialog import XbmcProgressDialog
-from .xbmc_progress_dialog_bg import XbmcProgressDialogBG
+from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ... import utils
 
