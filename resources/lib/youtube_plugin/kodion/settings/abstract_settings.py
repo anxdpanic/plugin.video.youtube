@@ -319,3 +319,15 @@ class AbstractSettings(object):
 
     def get_language(self):
         return self.get_string(SETTINGS.LANGUAGE, 'en_US').replace('_', '-')
+
+    def get_watch_later_playlist(self):
+        return self.get_string(SETTINGS.WATCH_LATER_PLAYLIST, '').strip()
+
+    def set_watch_later_playlist(self, value):
+        return self.set_string(SETTINGS.WATCH_LATER_PLAYLIST, value)
+
+    def get_history_playlist(self):
+        return self.get_string(SETTINGS.HISTORY_PLAYLIST, '').strip()
+
+    def set_history_playlist(self, value):
+        return self.set_string(SETTINGS.HISTORY_PLAYLIST, value)

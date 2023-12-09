@@ -57,3 +57,6 @@ API_ID = 'youtube.api.id'  # (string)
 API_SECRET = 'youtube.api.secret'  # (string)
 
 CLIENT_SELECTION = 'youtube.client.selection'  # (int)
+
+WATCH_LATER_PLAYLIST = 'youtube.folder.watch_later.playlist'  # (str)
+HISTORY_PLAYLIST = 'youtube.folder.history.playlist'  # (str)
