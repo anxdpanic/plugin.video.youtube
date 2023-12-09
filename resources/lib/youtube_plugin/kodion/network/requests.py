@@ -7,21 +7,21 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import atexit
+from __future__ import absolute_import, division, unicode_literals
 
+import atexit
 from traceback import format_exc, format_stack
 
 from requests import Session
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import RequestException
 
+from ..compatibility import xbmcaddon
 from ..logger import log_error
 from ..settings import Settings
 
-from xbmcaddon import Addon
 
-
-_settings = Settings(Addon(id='plugin.video.youtube'))
+_settings = Settings(xbmcaddon.Addon(id='plugin.video.youtube'))
 
 
 class BaseRequestsClass(object):

@@ -7,16 +7,14 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import os
 import shutil
 import threading
-from urllib.parse import unquote
 
-import xbmc
-import xbmcvfs
-from xbmcaddon import Addon
-
+from ..compatibility import unquote, xbmc, xbmcaddon, xbmcvfs
 from ..logger import log_debug
 from ..network import get_http_server, is_httpd_live
 from ..settings import Settings
@@ -24,7 +22,7 @@ from ..settings import Settings
 
 class YouTubeMonitor(xbmc.Monitor):
     _addon_id = 'plugin.video.youtube'
-    _settings = Settings(Addon(_addon_id))
+    _settings = Settings(xbmcaddon.Addon(_addon_id))
 
     # noinspection PyUnusedLocal,PyMissingConstructor
     def __init__(self, *args, **kwargs):
@@ -88,7 +86,7 @@ class YouTubeMonitor(xbmc.Monitor):
                       .format(method=method))
 
     def onSettingsChanged(self):
-        self._settings.flush(Addon(self._addon_id))
+        self._settings.flush(xbmcaddon.Addon(self._addon_id))
 
         data = {
             'use_httpd': (self._settings.use_mpd_videos()

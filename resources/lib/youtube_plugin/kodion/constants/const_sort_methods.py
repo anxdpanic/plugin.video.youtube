@@ -8,11 +8,14 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import sys
 
-from xbmcplugin import __dict__ as xbmcplugin
+from ..compatibility import xbmcplugin
 
 
+xbmcplugin = xbmcplugin.__dict__
 namespace = sys.modules[__name__]
 names = [
     'NONE',                             # 0

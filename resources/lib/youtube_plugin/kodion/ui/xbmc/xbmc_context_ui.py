@@ -8,12 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import xbmc
-import xbmcgui
+from __future__ import absolute_import, division, unicode_literals
 
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ... import utils
+from ...compatibility import xbmc, xbmcgui
 
 
 class XbmcContextUI(AbstractContextUI):

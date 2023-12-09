@@ -8,11 +8,13 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import datetime
 import re
-from html import unescape
 
 from .base_item import BaseItem
+from ..compatibility import unescape
 from ..utils import duration_to_seconds, seconds_to_duration
 
 

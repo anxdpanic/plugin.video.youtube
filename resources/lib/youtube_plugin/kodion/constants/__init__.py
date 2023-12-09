@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from . import const_settings as setting
 from . import const_sort_methods as sort_method
 from . import const_content_types as content_type

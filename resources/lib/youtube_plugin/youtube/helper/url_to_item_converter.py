@@ -8,10 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import re
-from urllib.parse import parse_qsl, urlparse
 
 from . import utils
+from ...kodion.compatibility import parse_qsl, urlparse
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
 from ...kodion.utils import duration_to_seconds
 

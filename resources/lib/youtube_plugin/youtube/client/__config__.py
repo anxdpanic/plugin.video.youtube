@@ -7,6 +7,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from base64 import b64decode
 from hashlib import md5
 

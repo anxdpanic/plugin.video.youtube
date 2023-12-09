@@ -8,9 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import xbmcaddon
+from __future__ import absolute_import, division, unicode_literals
 
 from ..abstract_settings import AbstractSettings
+from ...compatibility import xbmcaddon
 from ...logger import log_debug
 from ...utils.methods import get_kodi_setting
 from ...utils.system_version import current_system_version

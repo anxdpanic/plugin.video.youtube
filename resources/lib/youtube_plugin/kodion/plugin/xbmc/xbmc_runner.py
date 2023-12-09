@@ -8,10 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import xbmcgui
-import xbmcplugin
+from __future__ import absolute_import, division, unicode_literals
 
 from ..abstract_provider_runner import AbstractProviderRunner
+from ...compatibility import xbmcgui, xbmcplugin
 from ...exceptions import KodionException
 from ...items import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
 from ...player import Playlist

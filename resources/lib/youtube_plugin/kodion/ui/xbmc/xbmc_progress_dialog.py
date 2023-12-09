@@ -8,8 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import xbmcgui
+from __future__ import absolute_import, division, unicode_literals
+
 from ..abstract_progress_dialog import AbstractProgressDialog
+from ...compatibility import xbmcgui
 
 
 class XbmcProgressDialog(AbstractProgressDialog):

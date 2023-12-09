@@ -7,6 +7,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from ...kodion.utils import merge_dicts
 from ...kodion.network import BaseRequestsClass
 from ...youtube.youtube_exceptions import YouTubeException

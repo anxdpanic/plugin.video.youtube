@@ -8,10 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import os
-from urllib.parse import urlencode
 
 from .. import constants, logger
+from ..compatibility import urlencode
 from ..json_store import AccessManager
 from ..sql_store import (
     DataCache,

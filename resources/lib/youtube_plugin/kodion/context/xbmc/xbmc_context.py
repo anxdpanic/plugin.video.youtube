@@ -8,18 +8,24 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import os
 import sys
 import weakref
-from urllib.parse import parse_qsl, quote, unquote, urlparse
-
-import xbmc
-import xbmcaddon
-import xbmcplugin
-import xbmcvfs
 
 from ..abstract_context import AbstractContext
+from ...compatibility import (
+    parse_qsl,
+    quote,
+    unquote,
+    urlparse,
+    xbmc,
+    xbmcaddon,
+    xbmcplugin,
+    xbmcvfs,
+)
 from ...player.xbmc.xbmc_player import XbmcPlayer
 from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings

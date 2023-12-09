@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 THUMB_SIZE = 'kodion.thumbnail.size'  # (int)
 SHOW_FANART = 'kodion.fanart.show'  # (bool)
 SAFE_SEARCH = 'kodion.safe.search'  # (int)

@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from ...items import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...utils import current_system_version, datetime_parser
 

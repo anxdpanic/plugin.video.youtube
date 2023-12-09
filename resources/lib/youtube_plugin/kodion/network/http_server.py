@@ -7,34 +7,38 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import os
 import re
-from http import server as BaseHTTPServer
 from io import open
 from socket import error as socket_error
 from textwrap import dedent
-from urllib.parse import parse_qs, urlparse
-
-from xbmc import executebuiltin, getCondVisibility
-from xbmcaddon import Addon
-from xbmcgui import Dialog, Window
-from xbmcvfs import translatePath
 
 from .requests import BaseRequestsClass
+from ..compatibility import (
+    BaseHTTPServer,
+    parse_qs,
+    urlparse,
+    xbmc,
+    xbmcaddon,
+    xbmcgui,
+    xbmcvfs,
+)
 from ..logger import log_debug
 from ..settings import Settings
 
 
 _addon_id = 'plugin.video.youtube'
-_addon = Addon(_addon_id)
+_addon = xbmcaddon.Addon(_addon_id)
 _settings = Settings(_addon)
 _i18n = _addon.getLocalizedString
 _server_requests = BaseRequestsClass()
 
 
 class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
-    base_path = translatePath('special://temp/{0}'.format(_addon_id))
+    base_path = xbmcvfs.translatePath('special://temp/{0}'.format(_addon_id))
     chunk_size = 1024 * 64
     local_ranges = (
         '10.',
@@ -124,7 +128,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                 self.wfile.write(chunk)
 
         elif api_config_enabled and stripped_path.startswith('/api_submit'):
-            executebuiltin('Dialog.Close(addonsettings, true)')
+            xbmc.executebuiltin('Dialog.Close(addonsettings, true)')
 
             query = urlparse(self.path).query
             params = parse_qs(query)
@@ -215,7 +219,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         if not self.connection_allowed():
             self.send_error(403)
         elif self.path.startswith('/widevine'):
-            home = Window(10000)
+            home = xbmcgui.Window(10000)
 
             lic_url = home.getProperty('plugin.video.youtube-license_url')
             if not lic_url:
@@ -267,7 +271,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                 if 'HD' in authorized_types:
                     size_limit = fmt_to_px['HD']
                 elif 'HD720' in authorized_types:
-                    if getCondVisibility('system.platform.android') == 1:
+                    if xbmc.getCondVisibility('system.platform.android') == 1:
                         size_limit = fmt_to_px['HD720']
                     else:
                         size_limit = fmt_to_px['SD']
@@ -528,11 +532,11 @@ def get_http_server(address=None, port=None):
     except socket_error as e:
         log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
                   .format(address=address, port=port, response=str(e)))
-        Dialog().notification(_addon.getAddonInfo('name'),
-                              str(e),
-                              _addon.getAddonInfo('icon'),
-                              time=5000,
-                              sound=False)
+        xbmcgui.Dialog().notification(_addon.getAddonInfo('name'),
+                                      str(e),
+                                      _addon.getAddonInfo('icon'),
+                                      time=5000,
+                                      sound=False)
         return None
 
 

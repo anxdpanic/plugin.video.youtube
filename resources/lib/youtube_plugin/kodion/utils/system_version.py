@@ -8,9 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 
-import xbmc
+from ..compatibility import xbmc
 
 
 class SystemVersion(object):

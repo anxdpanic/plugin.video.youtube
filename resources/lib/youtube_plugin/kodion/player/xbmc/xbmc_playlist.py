@@ -8,10 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 
-import xbmc
 from ..abstract_playlist import AbstractPlaylist
+from ...compatibility import xbmc
 from ...items import VideoItem
 from ...ui.xbmc import xbmc_items
 

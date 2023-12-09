@@ -8,11 +8,13 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import re
-from urllib.parse import quote, unquote
 
 from . import constants
+from .compatibility import quote, unquote
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,

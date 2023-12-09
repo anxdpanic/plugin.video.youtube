@@ -8,8 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import time
-from urllib.parse import parse_qsl
 
 from requests.exceptions import InvalidJSONError
 
@@ -20,6 +21,7 @@ from .__config__ import (
     youtube_tv,
 )
 from .request_client import YouTubeRequestClient
+from ...kodion.compatibility import parse_qsl
 from ...kodion.logger import log_debug
 from ...youtube.youtube_exceptions import (
     InvalidGrant,

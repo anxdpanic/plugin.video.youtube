@@ -8,10 +8,11 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
-from html import unescape
-from urllib.parse import parse_qsl, urlencode, urlparse
+from __future__ import absolute_import, division, unicode_literals
 
+import re
+
+from ...kodion.compatibility import parse_qsl, unescape, urlencode, urlparse
 from ...kodion.network import BaseRequestsClass
 
 

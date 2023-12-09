@@ -7,13 +7,13 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import os
 from io import open
 
-import xbmcaddon
-import xbmcvfs
-
+from ..compatibility import xbmcaddon, xbmcvfs
 from ..logger import log_debug, log_error
 from ..utils import make_dirs, merge_dicts, to_unicode
 

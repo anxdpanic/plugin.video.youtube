@@ -8,16 +8,16 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
 import json
 import os
 import re
 from datetime import timedelta
 from math import floor, log
-from urllib.parse import quote
 
-import xbmc
-import xbmcvfs
+from ..compatibility import quote, xbmc, xbmcvfs
 
 
 __all__ = (

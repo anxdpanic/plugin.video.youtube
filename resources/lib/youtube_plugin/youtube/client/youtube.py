@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
 import json
 import re
@@ -17,8 +19,8 @@ import xml.etree.ElementTree as ET
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ...kodion import Context
-from ...kodion.utils import datetime_parser
-from ...kodion.utils import to_unicode
+from ...kodion.utils import datetime_parser, to_unicode
+
 
 _context = Context(plugin_id='plugin.video.youtube')
 

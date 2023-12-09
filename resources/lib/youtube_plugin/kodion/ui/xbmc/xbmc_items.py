@@ -8,9 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from xbmcgui import ListItem
+from __future__ import absolute_import, division, unicode_literals
 
 from . import info_labels
+from ...compatibility import xbmcgui
 from ...items import AudioItem, UriItem, VideoItem
 from ...utils import current_system_version, datetime_parser
 
@@ -35,7 +36,7 @@ except ImportError:
         def set_resume_point(self,
                              infoproperties,
                              resume_key='ResumeTime',
-                             total_key='TotalTime',):
+                             total_key='TotalTime'):
             if resume_key in infoproperties:
                 infoproperties[resume_key] = str(infoproperties[resume_key])
             if total_key in infoproperties:
@@ -115,7 +116,7 @@ def video_playback_item(context, video_item):
         if not alternative_player and headers and uri.startswith('http'):
             video_item.set_uri('|'.join([uri, headers]))
 
-    list_item = ListItem(**kwargs)
+    list_item = xbmcgui.ListItem(**kwargs)
     if mime_type:
         list_item.setContentLookup(False)
         list_item.setMimeType(mime_type)
@@ -170,7 +171,7 @@ def audio_listitem(context, audio_item):
         'ForceResolvePlugin': 'true',
     }
 
-    list_item = ListItem(**kwargs)
+    list_item = xbmcgui.ListItem(**kwargs)
 
     fanart = (context.get_settings().show_fanart()
               and audio_item.get_fanart()
@@ -206,7 +207,7 @@ def uri_listitem(context, uri_item):
         'ForceResolvePlugin': 'true',
     }
 
-    list_item = ListItem(**kwargs)
+    list_item = xbmcgui.ListItem(**kwargs)
     list_item.setProperties(props)
     return list_item
 
@@ -226,7 +227,7 @@ def video_listitem(context, video_item):
         'ForceResolvePlugin': 'true',
     }
 
-    list_item = ListItem(**kwargs)
+    list_item = xbmcgui.ListItem(**kwargs)
 
     published_at = video_item.get_added_utc()
     scheduled_start = video_item.get_scheduled_start_utc()

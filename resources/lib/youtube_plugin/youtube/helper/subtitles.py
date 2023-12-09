@@ -6,11 +6,17 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from html import unescape
-from urllib.parse import parse_qs, urlsplit, urlunsplit, urlencode, urljoin
+from __future__ import absolute_import, division, unicode_literals
 
-import xbmcvfs
-
+from ...kodion.compatibility import (
+    parse_qs,
+    unescape,
+    urlencode,
+    urljoin,
+    urlsplit,
+    urlunsplit,
+    xbmcvfs,
+)
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import make_dirs
 

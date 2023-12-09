@@ -8,15 +8,14 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 import os
 import re
 import shutil
 import socket
 from base64 import b64decode
-
-import xbmcaddon
-import xbmcvfs
 
 from .helper import (
     ResourceManager,
@@ -34,6 +33,7 @@ from .helper import (
 )
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import (AbstractProvider, RegisterProviderPath, constants)
+from ..kodion.compatibility import xbmcaddon, xbmcvfs
 from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem
 from ..kodion.network import get_client_ip_address, is_httpd_live
 from ..kodion.utils import find_video_id, strip_html_from_text

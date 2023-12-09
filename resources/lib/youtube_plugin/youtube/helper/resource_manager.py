@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from ..youtube_exceptions import YouTubeException
 from ...kodion.utils import strip_html_from_text
 

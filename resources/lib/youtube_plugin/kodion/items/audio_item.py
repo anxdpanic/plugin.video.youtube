@@ -8,9 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from .base_item import BaseItem
+from __future__ import absolute_import, division, unicode_literals
 
-from html import unescape
+from .base_item import BaseItem
+from ..compatibility import unescape
 
 
 class AudioItem(BaseItem):

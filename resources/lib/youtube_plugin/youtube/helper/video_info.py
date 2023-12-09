@@ -8,29 +8,29 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import random
 import re
 import traceback
-
-from html import unescape
 from json import dumps as json_dumps, loads as json_loads
-from urllib.parse import (
-    parse_qs,
-    quote,
-    unquote,
-    urlencode,
-    urljoin,
-    urlsplit,
-    urlunsplit,
-)
-
-import xbmcvfs
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import YouTubeException
+from ...kodion.compatibility import (
+    parse_qs,
+    quote,
+    unescape,
+    unquote,
+    urlencode,
+    urljoin,
+    urlsplit,
+    urlunsplit,
+    xbmcvfs,
+)
 from ...kodion.network import is_httpd_live
 from ...kodion.utils import make_dirs
 
