@@ -7,6 +7,7 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from ...kodion.utils import merge_dicts
 from ...kodion.network import BaseRequestsClass
 from ...youtube.youtube_exceptions import YouTubeException
 
@@ -289,25 +290,10 @@ class YouTubeRequestClient(BaseRequestsClass):
         return result
 
     def build_client(self, client_name, auth_header=False, data=None):
-        def _merge_dicts(item1, item2, _=Ellipsis):
-            if not isinstance(item1, dict) or not isinstance(item2, dict):
-                return item1 if item2 is _ else item2
-            new = {}
-            keys = set(item1)
-            keys.update(item2)
-            for key in keys:
-                value = _merge_dicts(item1.get(key, _), item2.get(key, _))
-                if value is _:
-                    continue
-                if isinstance(value, str) and '{' in value:
-                    _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
-                new[key] = value
-            return new or _
-
-        _format = {}
+        templates = {}
 
         client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
-        client = _merge_dicts(self.CLIENTS['_common'], client)
+        client = merge_dicts(self.CLIENTS['_common'], client, templates)
 
         if data:
             client.update(data)
@@ -318,8 +304,8 @@ class YouTubeRequestClient(BaseRequestsClass):
         elif 'Authorization' in client['headers']:
             del client['headers']['Authorization']
 
-        for values, value_key, template_value in _format.values():
-            if value_key in values:
-                values[value_key] = template_value.format(**client)
+        for values, template_id, template in templates.values():
+            if template_id in values:
+                values[template_id] = template.format(**client)
 
         return client

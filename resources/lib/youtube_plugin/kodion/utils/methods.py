@@ -27,6 +27,7 @@ __all__ = (
     'friendly_number',
     'loose_version',
     'make_dirs',
+    'merge_dicts',
     'print_items',
     'seconds_to_duration',
     'select_stream',
@@ -297,3 +298,20 @@ def duration_to_seconds(duration):
 
 def seconds_to_duration(seconds):
     return str(timedelta(seconds=seconds))
+
+
+def merge_dicts(item1, item2, templates=None, _=Ellipsis):
+    if not isinstance(item1, dict) or not isinstance(item2, dict):
+        return item1 if item2 is _ else item2
+    new = {}
+    keys = set(item1)
+    keys.update(item2)
+    for key in keys:
+        value = merge_dicts(item1.get(key, _), item2.get(key, _), templates)
+        if value is _:
+            continue
+        if (templates is not None
+                and isinstance(value, str) and '{' in value):
+            templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
+        new[key] = value
+    return new or _
