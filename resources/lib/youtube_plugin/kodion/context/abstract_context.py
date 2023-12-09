@@ -117,10 +117,12 @@ class AbstractContext(object):
         self.parse_params()
         self._uri = self.create_uri(self._path, self._params)
 
-    def format_date_short(self, date_obj, str_format=None):
+    @staticmethod
+    def format_date_short(date_obj, str_format=None):
         raise NotImplementedError()
 
-    def format_time(self, time_obj, str_format=None):
+    @staticmethod
+    def format_time(time_obj, str_format=None):
         raise NotImplementedError()
 
     def get_language(self):
