@@ -691,7 +691,7 @@ class Provider(AbstractProvider):
 
         def select_user(reason, new_user=False):
             current_users = access_manager.get_users()
-            current_user = access_manager.get_user()
+            current_user = access_manager.get_current_user()
             usernames = []
             for user, details in sorted(current_users.items()):
                 username = details.get('name') or localize('user.unnamed')
@@ -733,7 +733,7 @@ class Provider(AbstractProvider):
             else:
                 user = user_index_map[result]
 
-            if user is not None and user != access_manager.get_user():
+            if user is not None and user != access_manager.get_current_user():
                 switch_to_user(user)
 
         elif action == 'add':
@@ -758,7 +758,7 @@ class Provider(AbstractProvider):
                 if user == 0:
                     access_manager.add_user(username=localize('user.default'),
                                             user=0)
-                if user == access_manager.get_user():
+                if user == access_manager.get_current_user():
                     access_manager.set_user(0, switch_to=True)
                 ui.show_notification(localize('removed') % username,
                                      localize('remove'))

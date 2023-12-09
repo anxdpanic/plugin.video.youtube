@@ -7,7 +7,7 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from . import JSONStore
+from .json_store import JSONStore
 
 
 class APIKeyStore(JSONStore):

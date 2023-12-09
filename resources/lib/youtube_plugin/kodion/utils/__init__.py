@@ -30,7 +30,6 @@ from .search_history import SearchHistory
 from .favorite_list import FavoriteList
 from .watch_later_list import WatchLaterList
 from .function_cache import FunctionCache
-from .access_manager import AccessManager
 from .monitor import YouTubeMonitor
 from .player import YouTubePlayer
 from .playback_history import PlaybackHistory
@@ -55,7 +54,6 @@ __all__ = (
     'to_str',
     'to_unicode',
     'to_utf8',
-    'AccessManager',
     'DataCache',
     'FavoriteList',
     'FunctionCache',

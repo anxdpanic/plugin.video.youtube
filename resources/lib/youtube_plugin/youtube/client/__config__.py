@@ -9,7 +9,7 @@
 
 from base64 import b64decode
 from hashlib import md5
-from ...kodion.json_store import APIKeyStore, LoginTokenStore
+from ...kodion.json_store import AccessManager, APIKeyStore
 from ...kodion import Context as __Context
 from ... import key_sets
 
@@ -27,8 +27,8 @@ class APICheck(object):
         self._ui = context.get_ui()
         self._api_jstore = APIKeyStore()
         self._json_api = self._api_jstore.get_data()
-        self._am_jstore = LoginTokenStore()
-        self._json_am = self._am_jstore.get_data()
+        self._access_manager = AccessManager(context)
+        self._json_am = self._access_manager.get_data()
         self.changed = False
 
         self._on_init()
@@ -92,7 +92,7 @@ class APICheck(object):
                 if (last_hash == self._get_key_set_hash('own', True)
                         or last_hash == own_key_hash):
                     self._json_am['access_manager']['users'][user]['last_key_hash'] = own_key_hash
-            self._am_jstore.save(self._json_am)
+            self._access_manager.save(self._json_am)
         if access_token or refresh_token or last_hash:
             self._settings.set_string('kodion.access_token', '')
             self._settings.set_string('kodion.refresh_token', '')
@@ -103,7 +103,7 @@ class APICheck(object):
         if updated_hash:
             self._context.log_warning('User: |%s| Switching API key set to |%s|' % (user, switch))
             self._json_am['access_manager']['users'][user]['last_key_hash'] = updated_hash
-            self._am_jstore.save(self._json_am)
+            self._access_manager.save(self._json_am)
             self._context.log_debug('API key set changed: Signing out')
             self._context.execute('RunPlugin(plugin://plugin.video.youtube/sign/out/?confirmed=true)')
         else:
@@ -113,7 +113,7 @@ class APICheck(object):
         return 'own'
 
     def get_current_user(self):
-        self._json_am = self._am_jstore.get_data()
+        self._json_am = self._access_manager.get_data()
         return self._json_am['access_manager'].get('current_user', 0)
 
     def has_own_api_keys(self):
@@ -142,7 +142,7 @@ class APICheck(object):
         return api_key, client_id, client_secret
 
     def _api_keys_changed(self, switch):
-        self._json_am = self._am_jstore.get_data()
+        self._json_am = self._access_manager.get_data()
         user = self.get_current_user()
         last_set_hash = self._json_am['access_manager']['users'].get(user, {}).get('last_key_hash', '')
         current_set_hash = self._get_key_set_hash(switch)
