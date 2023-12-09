@@ -507,9 +507,9 @@ class YouTubePlayer(xbmc.Player):
         self.onPlayBackEnded()
 
     def onPlayBackSeek(self, time, seekOffset):
-        time_s = time // 1000
+        time_s = time / 1000
         self.seek_time = None
-        if ((self.end_time and time_s > self.end_time)
-                or (self.start_time and time_s < self.start_time)):
+        if ((self.end_time and time_s > self.end_time + 1)
+                or (self.start_time and time_s < self.start_time - 1)):
             self.start_time = None
             self.end_time = None
