@@ -24,8 +24,7 @@ from ..settings import Settings
 
 class YouTubeMonitor(xbmc.Monitor):
     _addon_id = 'plugin.video.youtube'
-    _addon = Addon(_addon_id)
-    _settings = Settings(_addon)
+    _settings = Settings(Addon(_addon_id))
 
     # noinspection PyUnusedLocal,PyMissingConstructor
     def __init__(self, *args, **kwargs):
@@ -89,8 +88,8 @@ class YouTubeMonitor(xbmc.Monitor):
                       .format(method=method))
 
     def onSettingsChanged(self):
-        YouTubeMonitor._addon = Addon(self._addon_id)
-        YouTubeMonitor._settings = Settings(self._addon)
+        self._settings.flush(Addon(self._addon_id))
+
         data = {
             'use_httpd': (self._settings.use_mpd_videos()
                           or self._settings.api_config_page()),

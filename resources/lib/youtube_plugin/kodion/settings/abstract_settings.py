@@ -11,56 +11,49 @@
 import sys
 
 from ..constants import setting as SETTINGS
-from ..logger import log_debug
 
 
 class AbstractSettings(object):
-    def __init__(self):
-        super(AbstractSettings, self).__init__()
+    VALUE_FROM_STR = {
+        'false': False,
+        'true': True,
+    }
 
-    def get_string(self, setting_id, default_value=None):
+    _echo = False
+    _cache = {}
+    _funcs = {}
+    _store = None
+
+    @classmethod
+    def flush(cls, xbmc_addon):
         raise NotImplementedError()
 
-    def set_string(self, setting_id, value):
+    def get_bool(self, setting, default=None, echo=None):
+        raise NotImplementedError()
+
+    def set_bool(self, setting, value, echo=None):
+        raise NotImplementedError()
+
+    def get_int(self, setting, default=-1, converter=None, echo=None):
+        raise NotImplementedError()
+
+    def set_int(self, setting, value, echo=None):
+        raise NotImplementedError()
+
+    def get_string(self, setting, default='', echo=None):
+        raise NotImplementedError()
+
+    def set_string(self, setting, value, echo=None):
+        raise NotImplementedError()
+
+    def get_string_list(self, setting, default=None, echo=None):
+        raise NotImplementedError()
+
+    def set_string_list(self, setting, value, echo=None):
         raise NotImplementedError()
 
     def open_settings(self):
         raise NotImplementedError()
-
-    def get_int(self, setting_id, default_value, converter=None):
-        if not converter:
-            def converter(x):
-                return x
-
-        value = self.get_string(setting_id)
-        if value is None or value == '':
-            return default_value
-
-        try:
-            return converter(int(value))
-        except Exception as ex:
-            log_debug("Failed to get setting '%s' as 'int' (%s)" % setting_id, ex.__str__())
-
-        return default_value
-
-    def set_int(self, setting_id, value):
-        self.set_string(setting_id, str(value))
-
-    def set_bool(self, setting_id, value):
-        if value:
-            self.set_string(setting_id, 'true')
-        else:
-            self.set_string(setting_id, 'false')
-
-    def get_bool(self, setting_id, default_value):
-        value = self.get_string(setting_id)
-        if value is None or value == '':
-            return default_value
-
-        if value not in {'false', 'true'}:
-            return default_value
-
-        return value == 'true'
 
     def get_items_per_page(self):
         return self.get_int(SETTINGS.ITEMS_PER_PAGE, 50)
@@ -293,7 +286,7 @@ class AbstractSettings(object):
                 if selected >= key]
 
     def stream_features(self):
-        return self.get_string(SETTINGS.MPD_STREAM_FEATURES, '').split(',')
+        return self.get_string_list(SETTINGS.MPD_STREAM_FEATURES)
 
     _STREAM_SELECT = {
         1: 'auto',
