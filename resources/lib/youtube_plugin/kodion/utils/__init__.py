@@ -28,12 +28,13 @@ from .methods import (
 )
 from .monitor import YouTubeMonitor
 from .player import YouTubePlayer
-from .system_version import SystemVersion
+from .system_version import current_system_version
 
 
 __all__ = (
     'create_path',
     'create_uri_path',
+    'current_system_version',
     'datetime_parser',
     'duration_to_seconds',
     'find_best_fit',
@@ -48,7 +49,6 @@ __all__ = (
     'to_str',
     'to_unicode',
     'to_utf8',
-    'SystemVersion',
     'YouTubeMonitor',
     'YouTubePlayer',
 )

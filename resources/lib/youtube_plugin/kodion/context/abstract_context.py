@@ -21,7 +21,7 @@ from ..sql_store import (
     SearchHistory,
     WatchLaterList,
 )
-from ..utils import (SystemVersion, create_path, create_uri_path)
+from ..utils import (create_path, create_uri_path, current_system_version)
 
 
 class AbstractContext(object):
@@ -204,7 +204,7 @@ class AbstractContext(object):
 
     def get_system_version(self):
         if not self._system_version:
-            self._system_version = SystemVersion(version='', releasename='', appname='')
+            self._system_version = current_system_version
 
         return self._system_version
 
