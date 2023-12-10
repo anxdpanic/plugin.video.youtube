@@ -8,14 +8,16 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import os
 import copy
+import json
+import os
 import re
 from datetime import timedelta
 from math import floor, log
 from urllib.parse import quote
 
 import xbmcvfs
+from xbmc import executeJSONRPC
 
 
 __all__ = (
@@ -25,6 +27,7 @@ __all__ = (
     'find_best_fit',
     'find_video_id',
     'friendly_number',
+    'get_kodi_setting',
     'loose_version',
     'make_dirs',
     'merge_dicts',
@@ -315,3 +318,13 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
             templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
         new[key] = value
     return new or _
+
+def get_kodi_setting(setting):
+    json_query = executeJSONRPC(json.dumps({
+        'jsonrpc': '2.0',
+        'method': 'Settings.GetSettingValue',
+        'params': {'setting': setting},
+        'id': 1,
+    }))
+    json_query = json.loads(json_query)
+    return json_query.get('result', {}).get('value')
