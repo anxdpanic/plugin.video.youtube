@@ -55,6 +55,11 @@ API_CONFIG_PAGE = 'youtube.api.config.page'  # (bool)
 API_KEY = 'youtube.api.key'  # (string)
 API_ID = 'youtube.api.id'  # (string)
 API_SECRET = 'youtube.api.secret'  # (string)
+API_LAST_HASH = 'youtube.api.last.hash'  # (string)
+
+USER_ACCESS_TOKEN = 'kodion.access_token'  # (string)
+USER_REFRESH_TOKEN = 'kodion.refresh_token'  # (string)
+USER_TOKEN_EXPIRATION = 'kodion.access_token.expires'  # (int)
 
 CLIENT_SELECTION = 'youtube.client.selection'  # (int)
 

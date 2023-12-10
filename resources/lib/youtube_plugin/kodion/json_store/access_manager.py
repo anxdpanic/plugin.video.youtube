@@ -425,12 +425,14 @@ class AccessManager(JSONStore):
     def update_access_token(self,
                             access_token,
                             unix_timestamp=None,
-                            refresh_token=None):
+                            refresh_token=None,
+                            last_key_hash=None):
         """
         Updates the old access token with the new one.
         :param access_token:
         :param unix_timestamp:
         :param refresh_token:
+        :param last_key_hash:
         :return:
         """
         current_user = self.get_current_user_details()
@@ -441,6 +443,9 @@ class AccessManager(JSONStore):
 
         if refresh_token is not None:
             current_user['refresh_token'] = refresh_token
+
+        if last_key_hash is not None:
+            current_user['last_key_hash'] = last_key_hash
 
         data = {
             'access_manager': {
