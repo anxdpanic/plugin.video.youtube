@@ -108,7 +108,7 @@ def _process_language(provider, context):
 
 
 def _process_geo_location(context):
-    if not context.get_ui().on_yes_no_input(context.get_name(), context.localize('perform.geolocation')):
+    if not context.get_ui().on_yes_no_input(context.get_name(), context.localize('perform_geolocation')):
         return
 
     locator = Locator()
