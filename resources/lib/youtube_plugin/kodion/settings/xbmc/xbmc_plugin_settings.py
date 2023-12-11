@@ -23,20 +23,18 @@ class XbmcPluginSettings(AbstractSettings):
 
         self.flush(xbmc_addon)
 
-        if self._funcs:
-            return
         if current_system_version.compatible(20, 0):
             _class = xbmcaddon.Settings
 
-            self._funcs.update({
-                'get_bool': _class.getBool,
-                'set_bool': _class.setBool,
-                'get_int': _class.getInt,
-                'set_int': _class.setInt,
-                'get_str': _class.getString,
-                'set_str': _class.setString,
-                'get_str_list': _class.getStringList,
-                'set_str_list': _class.setStringList,
+            self.__dict__.update({
+                '_get_bool': _class.getBool,
+                '_set_bool': _class.setBool,
+                '_get_int': _class.getInt,
+                '_set_int': _class.setInt,
+                '_get_str': _class.getString,
+                '_set_str': _class.setString,
+                '_get_str_list': _class.getStringList,
+                '_set_str_list': _class.setStringList,
             })
         else:
             _class = xbmcaddon.Addon
@@ -48,15 +46,15 @@ class XbmcPluginSettings(AbstractSettings):
                 value = ','.join(value)
                 return _class.setSetting(store, setting, value)
 
-            self._funcs.update({
-                'get_bool': _class.getSettingBool,
-                'set_bool': _class.setSettingBool,
-                'get_int': _class.getSettingInt,
-                'set_int': _class.setSettingInt,
-                'get_str': _class.getSettingString,
-                'set_str': _class.setSettingString,
-                'get_str_list': _get_string_list,
-                'set_str_list': _set_string_list,
+            self.__dict__.update({
+                '_get_bool': _class.getSettingBool,
+                '_set_bool': _class.setSettingBool,
+                '_get_int': _class.getSettingInt,
+                '_set_int': _class.setSettingInt,
+                '_get_str': _class.getSettingString,
+                '_set_str': _class.setSettingString,
+                '_get_str_list': _get_string_list,
+                '_set_str_list': _set_string_list,
             })
 
     @classmethod
@@ -64,9 +62,9 @@ class XbmcPluginSettings(AbstractSettings):
         cls._echo = get_kodi_setting('debug.showloginfo')
         cls._cache = {}
         if current_system_version.compatible(20, 0):
-            cls._store = xbmc_addon.getSettings()
+            cls._type = xbmc_addon.getSettings
         else:
-            cls._store = xbmc_addon
+            cls._type = xbmcaddon.Addon
 
     def get_bool(self, setting, default=None, echo=None):
         if setting in self._cache:
@@ -74,7 +72,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         error = False
         try:
-            value = bool(self._funcs['get_bool'](self._store, setting))
+            value = bool(self._get_bool(self._type(), setting))
         except (AttributeError, TypeError) as ex:
             error = ex
             value = self.get_string(setting, echo=False)
@@ -94,7 +92,7 @@ class XbmcPluginSettings(AbstractSettings):
 
     def set_bool(self, setting, value, echo=None):
         try:
-            error = not self._funcs['set_bool'](self._store, setting, value)
+            error = not self._set_bool(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
         except RuntimeError as ex:
@@ -114,7 +112,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         error = False
         try:
-            value = int(self._funcs['get_int'](self._store, setting))
+            value = int(self._get_int(self._type(), setting))
             if process:
                 value = process(value)
         except (AttributeError, TypeError, ValueError) as ex:
@@ -140,7 +138,7 @@ class XbmcPluginSettings(AbstractSettings):
 
     def set_int(self, setting, value, echo=None):
         try:
-            error = not self._funcs['set_int'](self._store, setting, value)
+            error = not self._set_int(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
         except RuntimeError as ex:
@@ -160,7 +158,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         error = False
         try:
-            value = self._funcs['get_str'](self._store, setting) or default
+            value = self._get_str(self._type(), setting) or default
         except RuntimeError as ex:
             error = ex
             value = default
@@ -176,7 +174,7 @@ class XbmcPluginSettings(AbstractSettings):
 
     def set_string(self, setting, value, echo=None):
         try:
-            error = not self._funcs['set_str'](self._store, setting, value)
+            error = not self._set_str(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
         except RuntimeError as ex:
@@ -196,7 +194,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         error = False
         try:
-            value = self._funcs['get_str_list'](self._store, setting)
+            value = self._get_str_list(self._type(), setting)
             if not value:
                 value = [] if default is None else default
         except RuntimeError as ex:
@@ -214,7 +212,7 @@ class XbmcPluginSettings(AbstractSettings):
 
     def set_string_list(self, setting, value, echo=None):
         try:
-            error = not self._funcs['set_str_list'](self._store, setting, value)
+            error = not self._set_str_list(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
         except RuntimeError as ex:

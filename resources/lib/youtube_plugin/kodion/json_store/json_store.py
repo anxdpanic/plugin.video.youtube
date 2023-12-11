@@ -20,11 +20,13 @@ from ..utils import make_dirs, merge_dicts, to_unicode
 
 _addon_id = 'plugin.video.youtube'
 _addon = xbmcaddon.Addon(_addon_id)
+_addon_data_path = _addon.getAddonInfo('profile')
+del _addon
 
 
 class JSONStore(object):
     def __init__(self, filename):
-        self.base_path = xbmcvfs.translatePath(_addon.getAddonInfo('profile'))
+        self.base_path = xbmcvfs.translatePath(_addon_data_path)
 
         if not xbmcvfs.exists(self.base_path) and not make_dirs(self.base_path):
             log_error('JSONStore.__init__ |{path}| invalid path'.format(

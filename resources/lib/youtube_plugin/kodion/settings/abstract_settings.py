@@ -23,8 +23,7 @@ class AbstractSettings(object):
 
     _echo = False
     _cache = {}
-    _funcs = {}
-    _store = None
+    _type = None
 
     @classmethod
     def flush(cls, xbmc_addon):

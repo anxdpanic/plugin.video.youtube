@@ -34,6 +34,10 @@ _addon_id = 'plugin.video.youtube'
 _addon = xbmcaddon.Addon(_addon_id)
 _settings = Settings(_addon)
 _i18n = _addon.getLocalizedString
+_addon_name = _addon.getAddonInfo('name')
+_addon_icon = _addon.getAddonInfo('icon')
+del _addon
+
 _server_requests = BaseRequestsClass()
 
 
@@ -532,9 +536,9 @@ def get_http_server(address=None, port=None):
     except socket_error as e:
         log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
                   .format(address=address, port=port, response=str(e)))
-        xbmcgui.Dialog().notification(_addon.getAddonInfo('name'),
+        xbmcgui.Dialog().notification(_addon_name,
                                       str(e),
-                                      _addon.getAddonInfo('icon'),
+                                      _addon_icon,
                                       time=5000,
                                       sound=False)
         return None
