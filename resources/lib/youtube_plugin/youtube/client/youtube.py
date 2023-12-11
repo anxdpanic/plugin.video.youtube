@@ -417,12 +417,13 @@ class YouTube(LoginClient):
                 items.append(item)
 
         # Finally sort items per page by date for a better distribution
-        sorted_items.sort(
-            key=lambda a: (
-                a['page_number'],
-                -datetime_parser.parse(a['snippet']['publishedAt']).timestamp()
-            ),
-        )
+        def _sort_by_date_time(item):
+            return (item['page_number'],
+                    -datetime_parser.since_epoch(datetime_parser.parse(
+                        item['snippet']['publishedAt']
+                    )))
+
+        sorted_items.sort(key=_sort_by_date_time)
 
         # Finalize result
         payload['items'] = sorted_items
@@ -873,9 +874,9 @@ class YouTube(LoginClient):
                             _result['items'].append(entry_data)
 
                 # sorting by publish date
-                def _sort_by_date_time(e):
+                def _sort_by_date_time(item):
                     return datetime_parser.since_epoch(
-                        datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S")
+                        datetime_parser.strptime(item['published'][0:19])
                     )
 
                 _result['items'].sort(reverse=True, key=_sort_by_date_time)

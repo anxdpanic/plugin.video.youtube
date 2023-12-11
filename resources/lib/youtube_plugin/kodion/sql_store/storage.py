@@ -17,6 +17,7 @@ from datetime import datetime
 from traceback import print_exc
 
 from ..logger import log_error
+from ..utils.datetime_parser import since_epoch
 
 
 class Storage(object):
@@ -160,7 +161,7 @@ class Storage(object):
 
     def _set(self, item_id, item):
         # add 1 microsecond, required for dbapi2
-        now = datetime.now().timestamp() + 0.000001
+        now = since_epoch(datetime.now()) + 0.000001
         self._open()
         self._execute(True, self._set_query, values=[item_id,
                                                      now,
@@ -170,7 +171,7 @@ class Storage(object):
 
     def _set_all(self, items):
         # add 1 microsecond, required for dbapi2
-        now = datetime.now().timestamp() + 0.000001
+        now = since_epoch(datetime.now()) + 0.000001
         self._open()
         self._execute(True, self._set_query,
                       values=[(key, now, self._encode(json.dumps(item)))
@@ -322,7 +323,7 @@ class Storage(object):
             return time_delta.total_seconds()
 
         if isinstance(current_stamp, (float, int)):
-            return current_datetime.timestamp() - current_stamp
+            return since_epoch(current_datetime) - current_stamp
 
         stamp_datetime = self._parse_datetime_string(current_stamp)
         if not stamp_datetime:

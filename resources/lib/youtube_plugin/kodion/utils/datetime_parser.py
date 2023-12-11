@@ -173,14 +173,14 @@ def datetime_to_since(context, dt):
     return ' '.join((context.format_date_short(dt), context.format_time(dt)))
 
 
-def strptime(s, fmt='%Y-%m-%dT%H:%M:%S.%fZ'):
+def strptime(s, fmt='%Y-%m-%dT%H:%M:%S'):
     # noinspection PyUnresolvedReferences
 
-    ms_precision = '.' in s[-5:-1]
-    if fmt == '%Y-%m-%dT%H:%M:%S.%fZ' and not ms_precision:
-        fmt = '%Y-%m-%dT%H:%M:%SZ'
-    elif fmt == '%Y-%m-%dT%H:%M:%SZ' and ms_precision:
-        fmt = '%Y-%m-%dT%H:%M:%S.%fZ'
+    ms_precision_required = '.' in s[-5:-1]
+    if ms_precision_required:
+        fmt.replace('%S', '%S.%f')
+    else:
+        fmt.replace('%S.%f', '%S')
 
     import _strptime
 
