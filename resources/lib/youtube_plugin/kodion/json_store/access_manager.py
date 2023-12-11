@@ -111,6 +111,11 @@ class AccessManager(JSONStore):
                 int(key): value
                 for key, value in users.items()
             }
+        current_user = data['access_manager']['current_user']
+        try:
+            data['access_manager']['current_user'] = int(current_user)
+        except (TypeError, ValueError):
+            pass
         return data
 
     def get_data(self, process=_process_data.__func__):
@@ -216,6 +221,11 @@ class AccessManager(JSONStore):
         :param switch_to: boolean, change current user
         :return:
         """
+        try:
+            user = int(user)
+        except (TypeError, ValueError):
+            pass
+
         self._user = user
         if switch_to:
             data = {
