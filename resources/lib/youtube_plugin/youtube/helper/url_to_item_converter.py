@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import re
 
 from . import utils
-from ...kodion.compatibility import parse_qsl, urlparse
+from ...kodion.compatibility import parse_qsl, urlsplit
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
 from ...kodion.utils import duration_to_seconds
 
@@ -41,7 +41,7 @@ class UrlToItemConverter(object):
         self._channel_ids = []
 
     def add_url(self, url, provider, context):
-        parsed_url = urlparse(url)
+        parsed_url = urlsplit(url)
         if parsed_url.hostname.lower() not in self.VALID_HOSTNAMES:
             context.log_debug('Unknown hostname "{0}" in url "{1}"'.format(
                 parsed_url.hostname, url

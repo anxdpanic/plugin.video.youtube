@@ -20,7 +20,7 @@ from ...compatibility import (
     parse_qsl,
     quote,
     unquote,
-    urlparse,
+    urlsplit,
     xbmc,
     xbmcaddon,
     xbmcplugin,
@@ -264,7 +264,7 @@ class XbmcContext(AbstractContext):
         # first the path of the uri
         if override:
             self._uri = sys.argv[0]
-            parsed_url = urlparse(self._uri)
+            parsed_url = urlsplit(self._uri)
             self._path = unquote(parsed_url.path)
 
             # after that try to get the params

@@ -14,7 +14,6 @@ from ...kodion.compatibility import (
     urlencode,
     urljoin,
     urlsplit,
-    urlunsplit,
     xbmcvfs,
 )
 from ...kodion.network import BaseRequestsClass
@@ -306,18 +305,16 @@ class Subtitles(object):
             else:
                 return url
 
-        scheme, netloc, path, query_string, fragment = urlsplit(url)
-        query_params = parse_qs(query_string)
+        components = urlsplit(url)
+        query_params = parse_qs(components.query)
 
         for name, value in pairs:
             if name:
                 query_params[name] = [value]
 
-        new_query_string = urlencode(query_params, doseq=True)
-        if isinstance(scheme, bytes):
-            new_query_string = new_query_string.encode('utf-8')
-
-        return urlunsplit((scheme, netloc, path, new_query_string, fragment))
+        return components._replace(
+            query=urlencode(query_params, doseq=True)
+        ).geturl()
 
     @staticmethod
     def _normalize_url(url):

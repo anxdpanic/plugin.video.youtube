@@ -28,7 +28,6 @@ from ...kodion.compatibility import (
     urlencode,
     urljoin,
     urlsplit,
-    urlunsplit,
     xbmcvfs,
 )
 from ...kodion.network import is_httpd_live
@@ -980,11 +979,7 @@ class VideoInfo(YouTubeRequestClient):
         elif not update_url:
             return url
 
-        return urlunsplit((parts.scheme,
-                           parts.netloc,
-                           parts.path,
-                           urlencode(query, doseq=True),
-                           parts.fragment))
+        return parts._replace(query=urlencode(query, doseq=True)).geturl()
 
     def _get_error_details(self, playability_status, details=None):
         if not playability_status:

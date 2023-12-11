@@ -17,9 +17,7 @@ try:
         unquote,
         urlencode,
         urljoin,
-        urlparse,
         urlsplit,
-        urlunsplit,
     )
 
     import xbmc
@@ -40,9 +38,7 @@ except ImportError:
         parse_qs,
         parse_qsl,
         urljoin,
-        urlparse,
         urlsplit,
-        urlunsplit,
     )
     from xml.sax.saxutils import unescape
 
@@ -105,9 +101,7 @@ __all__ = (
     'unquote',
     'urlencode',
     'urljoin',
-    'urlparse',
     'urlsplit',
-    'urlunsplit',
     'xbmc',
     'xbmcaddon',
     'xbmcgui',

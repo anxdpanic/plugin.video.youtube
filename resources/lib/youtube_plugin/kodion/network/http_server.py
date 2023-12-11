@@ -20,7 +20,7 @@ from .requests import BaseRequestsClass
 from ..compatibility import (
     BaseHTTPServer,
     parse_qs,
-    urlparse,
+    urlsplit,
     xbmc,
     xbmcaddon,
     xbmcgui,
@@ -134,7 +134,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         elif api_config_enabled and stripped_path.startswith('/api_submit'):
             xbmc.executebuiltin('Dialog.Close(addonsettings, true)')
 
-            query = urlparse(self.path).query
+            query = urlsplit(self.path).query
             params = parse_qs(query)
             updated = []
 

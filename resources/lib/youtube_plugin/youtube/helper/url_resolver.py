@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from ...kodion.compatibility import parse_qsl, unescape, urlencode, urlparse
+from ...kodion.compatibility import parse_qsl, unescape, urlencode, urlsplit
 from ...kodion.network import BaseRequestsClass
 
 
@@ -111,7 +111,7 @@ class YouTubeResolver(AbstractResolver):
             # top-level query string
             params = dict(parse_qsl(url_components.query))
             # components of next_url
-            next_components = urlparse(params.pop('next_url', ''))
+            next_components = urlsplit(params.pop('next_url', ''))
             if not next_components.scheme or not next_components.netloc:
                 return url
             # query string encoded inside next_url
@@ -141,7 +141,7 @@ class YouTubeResolver(AbstractResolver):
                     url = matches['video_url']
                     if url:
                         num_matched += 1
-                        url_components = urlparse(unescape(url))
+                        url_components = urlsplit(unescape(url))
                         params = dict(parse_qsl(url_components.query))
 
                 if not num_matched & 2:
@@ -174,7 +174,7 @@ class YouTubeResolver(AbstractResolver):
             if match:
                 url = match.group('channel_url')
                 if path.endswith(('/live', '/streams')):
-                    url_components = urlparse(unescape(url))
+                    url_components = urlsplit(unescape(url))
                     params = dict(parse_qsl(url_components.query))
                     params['live'] = 1
                     return url_components._replace(
@@ -223,7 +223,7 @@ class UrlResolver(object):
         resolved_url = url
         for resolver_name in self._resolvers:
             resolver = self._resolver_map[resolver_name]
-            url_components = urlparse(resolved_url)
+            url_components = urlsplit(resolved_url)
             method = resolver.supports_url(resolved_url, url_components)
             if not method:
                 continue
