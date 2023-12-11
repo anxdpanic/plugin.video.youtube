@@ -10,10 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ...youtube.helper import yt_context_menu
+from . import utils
 from ... import kodion
 from ...kodion import items
-from . import utils
+from ...youtube.helper import yt_context_menu
 
 
 def _process_list_response(provider, context, json_data):

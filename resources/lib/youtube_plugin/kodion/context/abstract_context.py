@@ -23,7 +23,7 @@ from ..sql_store import (
     SearchHistory,
     WatchLaterList,
 )
-from ..utils import (create_path, create_uri_path, current_system_version)
+from ..utils import create_path, create_uri_path, current_system_version
 
 
 class AbstractContext(object):

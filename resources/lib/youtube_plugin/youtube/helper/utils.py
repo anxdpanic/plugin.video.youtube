@@ -14,9 +14,15 @@ import re
 import time
 from math import log10
 
-from ...kodion import utils
 from ...kodion.items import DirectoryItem
+from ...kodion.utils import (
+    create_path,
+    datetime_parser,
+    friendly_number,
+    strip_html_from_text,
+)
 from ...youtube.helper import yt_context_menu
+
 
 try:
     from inputstreamhelper import Helper as ISHelper
@@ -71,7 +77,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     like_count = snippet['likeCount']
     if like_count:
-        like_count, _ = utils.friendly_number(like_count)
+        like_count, _ = friendly_number(like_count)
         color = __COLOR_MAP['likeCount']
         label_likes = ui.color(color, ui.bold(like_count))
         plot_likes = ui.color(color, ui.bold(' '.join((
@@ -81,7 +87,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
         plot_props.append(plot_likes)
 
     if total_replies:
-        total_replies, _ = utils.friendly_number(total_replies)
+        total_replies, _ = friendly_number(total_replies)
         color = __COLOR_MAP['commentCount']
         label_replies = ui.color(color, ui.bold(total_replies))
         plot_replies = ui.color(color, ui.bold(' '.join((
@@ -124,13 +130,13 @@ def make_comment_item(context, snippet, uri, total_replies=0):
     comment_item = DirectoryItem(label, uri)
     comment_item.set_plot(plot)
 
-    datetime = utils.datetime_parser.parse(published_at, as_utc=True)
+    datetime = datetime_parser.parse(published_at, as_utc=True)
     comment_item.set_added_utc(datetime)
-    local_datetime = utils.datetime_parser.utc_to_local(datetime)
+    local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_dateadded_from_datetime(local_datetime)
     if edited:
-        datetime = utils.datetime_parser.parse(updated_at, as_utc=True)
-        local_datetime = utils.datetime_parser.utc_to_local(datetime)
+        datetime = datetime_parser.parse(updated_at, as_utc=True)
+        local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_date_from_datetime(local_datetime)
 
     if not uri:
@@ -375,7 +381,7 @@ def update_video_infos(provider, context, video_id_dict,
         else:
             duration = yt_item.get('contentDetails', {}).get('duration')
             if duration:
-                duration = utils.datetime_parser.parse(duration)
+                duration = datetime_parser.parse(duration)
                 # subtract 1s because YouTube duration is +1s too long
                 duration = (duration.seconds - 1) if duration.seconds else None
         if duration:
@@ -402,9 +408,9 @@ def update_video_infos(provider, context, video_id_dict,
         else:
             start_at = None
         if start_at:
-            datetime = utils.datetime_parser.parse(start_at, as_utc=True)
+            datetime = datetime_parser.parse(start_at, as_utc=True)
             video_item.set_scheduled_start_utc(datetime)
-            local_datetime = utils.datetime_parser.utc_to_local(datetime)
+            local_datetime = datetime_parser.utc_to_local(datetime)
             video_item.set_year_from_datetime(local_datetime)
             video_item.set_aired_from_datetime(local_datetime)
             video_item.set_premiered_from_datetime(local_datetime)
@@ -413,7 +419,7 @@ def update_video_infos(provider, context, video_id_dict,
                                           else 'upcoming')
             start_at = '{type_label} {start_at}'.format(
                 type_label=type_label,
-                start_at=utils.datetime_parser.get_scheduled_start(
+                start_at=datetime_parser.get_scheduled_start(
                     context, local_datetime
                 )
             )
@@ -427,7 +433,7 @@ def update_video_infos(provider, context, video_id_dict,
                 if not label:
                     continue
 
-                str_value, value = utils.friendly_number(value)
+                str_value, value = friendly_number(value)
                 if not value:
                     continue
 
@@ -489,7 +495,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # plot
         channel_name = snippet.get('channelTitle', '')
-        description = utils.strip_html_from_text(snippet['description'])
+        description = strip_html_from_text(snippet['description'])
         if show_details:
             description = ''.join((
                 ui.bold(channel_name, cr_after=2) if channel_name else '',
@@ -507,9 +513,9 @@ def update_video_infos(provider, context, video_id_dict,
         # date time
         published_at = snippet.get('publishedAt')
         if published_at:
-            datetime = utils.datetime_parser.parse(published_at, as_utc=True)
+            datetime = datetime_parser.parse(published_at, as_utc=True)
             video_item.set_added_utc(datetime)
-            local_datetime = utils.datetime_parser.utc_to_local(datetime)
+            local_datetime = datetime_parser.utc_to_local(datetime)
             video_item.set_dateadded_from_datetime(local_datetime)
             if not start_at:
                 video_item.set_year_from_datetime(local_datetime)
@@ -601,7 +607,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
         if (channel_id and channel_name and
-                utils.create_path('channel', channel_id) != path):
+                create_path('channel', channel_id) != path):
             video_item.set_channel_id(channel_id)
             yt_context_menu.append_go_to_channel(
                 context_menu, context, channel_id, channel_name
