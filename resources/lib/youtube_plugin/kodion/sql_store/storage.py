@@ -26,6 +26,11 @@ class Storage(object):
     ONE_WEEK = 7 * ONE_DAY
     ONE_MONTH = 4 * ONE_WEEK
 
+    _key = str('key')
+    _time = str('time')
+    _value = str('value')
+    _timestamp = str('timestamp')
+
     _table_name = 'storage'
     _clear_query = 'DELETE FROM %s' % _table_name
     _create_table_query = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time TIMESTAMP, value BLOB)' % _table_name
@@ -51,7 +56,7 @@ class Storage(object):
         self._table_created = False
         self._needs_commit = False
 
-        sqlite3.register_converter('timestamp', self._convert_timestamp)
+        sqlite3.register_converter(self._timestamp, self._convert_timestamp)
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
@@ -184,7 +189,8 @@ class Storage(object):
         query = self._optimize_item_query.format(self._max_item_count)
         self._open()
         item_ids = self._execute(False, query)
-        item_ids = [item_id['key'] for item_id in item_ids]
+        key = self._key
+        item_ids = [item_id[key] for item_id in item_ids]
         if item_ids:
             self._remove_all(item_ids)
         self._close()
@@ -210,7 +216,7 @@ class Storage(object):
 
     @staticmethod
     def _decode(obj, process=None):
-        decoded_obj = pickle.loads(obj, encoding='utf-8')
+        decoded_obj = pickle.loads(obj)
         if process:
             return process(decoded_obj)
         return decoded_obj
@@ -228,7 +234,7 @@ class Storage(object):
             result = result.fetchone()
         self._close()
         if result:
-            return self._decode(result['value']), result['time']
+            return self._decode(result[self._value]), result[self._time]
         return None
 
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
@@ -246,8 +252,11 @@ class Storage(object):
 
         self._open()
         result = self._execute(False, query, item_ids)
+        key = self._key
+        time = self._time
+        value = self._value
         result = [
-            (item['key'], item['time'], self._decode(item['value'], process))
+            (item[key], item[time], self._decode(item[value], process))
             for item in result
         ]
         self._close()

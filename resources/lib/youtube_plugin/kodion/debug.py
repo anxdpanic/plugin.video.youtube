@@ -8,8 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import os
 import json
+import os
+from io import open
 
 from .logger import log_debug
 
@@ -41,10 +42,10 @@ def runtime(context, addon_version, elapsed, single_file=True):
     with open(debug_file, 'a') as _:
         pass  # touch
 
-    with open(debug_file, 'r') as f:
+    with open(debug_file, 'r', encoding='utf-8') as f:
         contents = f.read()
 
-    with open(debug_file, 'w') as f:
+    with open(debug_file, 'w', encoding='utf-8') as f:
         contents = json.loads(contents) if contents else default_contents
         if not single_file:
             items = contents.get('runtimes', [])

@@ -9,16 +9,17 @@
 
 import json
 import os
+from io import open
 
-from xbmcaddon import Addon
+import xbmcaddon
 import xbmcvfs
 
 from ..logger import log_debug, log_error
-from ..utils import make_dirs, merge_dicts
+from ..utils import make_dirs, merge_dicts, to_unicode
 
 
 _addon_id = 'plugin.video.youtube'
-_addon = Addon(_addon_id)
+_addon = xbmcaddon.Addon(_addon_id)
 
 
 class JSONStore(object):
@@ -55,7 +56,10 @@ class JSONStore(object):
                 raise ValueError
             _data = json.loads(json.dumps(data))
             with open(self.filename, mode='w', encoding='utf-8') as jsonfile:
-                json.dump(_data, jsonfile, indent=4, sort_keys=True)
+                jsonfile.write(to_unicode(json.dumps(_data,
+                                                     ensure_ascii=False,
+                                                     indent=4,
+                                                     sort_keys=True)))
             self._data = process(_data) if process is not None else _data
         except (IOError, OSError):
             log_error('JSONStore.save |{filename}| no access to file'.format(

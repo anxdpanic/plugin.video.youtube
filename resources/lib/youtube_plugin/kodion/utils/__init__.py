@@ -25,7 +25,6 @@ from .methods import (
     strip_html_from_text,
     to_str,
     to_unicode,
-    to_utf8,
 )
 from .monitor import YouTubeMonitor
 from .player import YouTubePlayer
@@ -50,7 +49,6 @@ __all__ = (
     'strip_html_from_text',
     'to_str',
     'to_unicode',
-    'to_utf8',
     'YouTubeMonitor',
     'YouTubePlayer',
 )

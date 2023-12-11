@@ -16,8 +16,8 @@ from datetime import timedelta
 from math import floor, log
 from urllib.parse import quote
 
+import xbmc
 import xbmcvfs
-from xbmc import executeJSONRPC
 
 
 __all__ = (
@@ -37,7 +37,6 @@ __all__ = (
     'strip_html_from_text',
     'to_str',
     'to_unicode',
-    'to_utf8',
 )
 
 
@@ -54,23 +53,12 @@ def to_str(text):
     return text
 
 
-def to_utf8(text):
-    result = text
-    if isinstance(text, str):
-        try:
-            result = text.encode('utf-8', 'ignore')
-        except UnicodeDecodeError:
-            pass
-
-    return result
-
-
 def to_unicode(text):
     result = text
     if isinstance(text, (bytes, str)):
         try:
             result = text.decode('utf-8', 'ignore')
-        except (AttributeError, UnicodeEncodeError):
+        except (AttributeError, UnicodeError):
             pass
 
     return result
@@ -320,7 +308,7 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
     return new or _
 
 def get_kodi_setting(setting):
-    json_query = executeJSONRPC(json.dumps({
+    json_query = xbmc.executeJSONRPC(json.dumps({
         'jsonrpc': '2.0',
         'method': 'Settings.GetSettingValue',
         'params': {'setting': setting},

@@ -10,19 +10,18 @@
 
 import json
 import re
-from urllib.parse import quote
-from urllib.parse import unquote
+from urllib.parse import quote, unquote
 
+from . import constants
 from .exceptions import KodionException
 from .items import (
-    from_json,
-    to_jsons,
     DirectoryItem,
     NewSearchItem,
-    SearchHistoryItem
+    SearchHistoryItem,
+    from_json,
+    to_jsons,
 )
-from .utils import to_unicode, to_utf8
-from . import constants
+from .utils import to_unicode
 
 
 class AbstractProvider(object):
@@ -245,12 +244,9 @@ class AbstractProvider(object):
             incognito = context.get_param('incognito', False)
             channel_id = context.get_param('channel_id', '')
 
-            query = to_utf8(query)
-            try:
-                encoded = json.dumps({'query': quote(query)})
-            except KeyError:
-                encoded = json.dumps({'query': quote(query.encode('utf8'))})
-            self._data_cache.set_item('search_query', encoded)
+            self._data_cache.set_item('search_query',
+                                      json.dumps({'query': quote(query)},
+                                                 ensure_ascii=False))
 
             if not incognito and not channel_id:
                 try:

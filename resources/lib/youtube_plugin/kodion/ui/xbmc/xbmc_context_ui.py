@@ -110,35 +110,27 @@ class XbmcContextUI(AbstractContextUI):
 
         return _dict.get(result, -1)
 
-    def show_notification(self, message, header='', image_uri='', time_milliseconds=5000, audible=True):
+    def show_notification(self,
+                          message,
+                          header='',
+                          image_uri='',
+                          time_milliseconds=5000,
+                          audible=True):
         _header = header
         if not _header:
             _header = self._context.get_name()
-        _header = utils.to_utf8(_header)
 
         _image = image_uri
         if not _image:
             _image = self._context.get_icon()
 
-        if isinstance(message, str):
-            message = utils.to_unicode(message)
+        _message = message.replace(',', ' ').replace('\n', ' ')
 
-        try:
-            _message = utils.to_utf8(message.decode('unicode-escape'))
-        except (AttributeError, UnicodeEncodeError):
-            _message = utils.to_utf8(message)
-
-        try:
-            _message = _message.replace(',', ' ')
-            _message = _message.replace('\n', ' ')
-        except TypeError:
-            _message = _message.replace(b',', b' ')
-            _message = _message.replace(b'\n', b' ')
-            _message = utils.to_unicode(_message)
-            _header = utils.to_unicode(_header)
-
-        #  xbmc.executebuiltin("Notification(%s, %s, %d, %s)" % (_header, _message, time_milliseconds, _image))
-        xbmcgui.Dialog().notification(_header, _message, _image, time_milliseconds, audible)
+        xbmcgui.Dialog().notification(_header,
+                                      _message,
+                                      _image,
+                                      time_milliseconds,
+                                      audible)
 
     def open_settings(self):
         self._xbmc_addon.openSettings()

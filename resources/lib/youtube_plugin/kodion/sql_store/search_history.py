@@ -11,7 +11,6 @@
 from hashlib import md5
 
 from .storage import Storage
-from ..utils import to_utf8
 
 
 class SearchHistory(Storage):
@@ -33,7 +32,7 @@ class SearchHistory(Storage):
     @staticmethod
     def _make_id(search_text):
         md5_hash = md5()
-        md5_hash.update(to_utf8(search_text))
+        md5_hash.update(search_text.encode('utf-8'))
         return md5_hash.hexdigest()
 
     def rename(self, old_search_text, new_search_text):
