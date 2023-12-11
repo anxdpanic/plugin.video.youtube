@@ -20,11 +20,11 @@ import xbmcplugin
 import xbmcvfs
 
 from ..abstract_context import AbstractContext
-from ... import utils
 from ...player.xbmc.xbmc_player import XbmcPlayer
 from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
 from ...ui.xbmc.xbmc_context_ui import XbmcContextUI
+from ...utils import current_system_version, loose_version, to_unicode
 
 
 class XbmcContext(AbstractContext):
@@ -403,7 +403,7 @@ class XbmcContext(AbstractContext):
         """
         source = self._addon if 30000 <= text_id < 31000 else xbmc
         result = source.getLocalizedString(text_id)
-        result = utils.to_unicode(result) if result else default_text
+        result = to_unicode(result) if result else default_text
         return result
 
     def set_content_type(self, content_type):
@@ -411,8 +411,9 @@ class XbmcContext(AbstractContext):
         xbmcplugin.setContent(self._plugin_handle, content_type)
 
     def add_sort_method(self, *sort_methods):
+        args = slice(None if current_system_version.compatible(19, 0) else 2)
         for sort_method in sort_methods:
-            xbmcplugin.addSortMethod(self._plugin_handle, *sort_method)
+            xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[args])
 
     def clone(self, new_path=None, new_params=None):
         if not new_path:
@@ -524,16 +525,16 @@ class XbmcContext(AbstractContext):
         if not self.use_inputstream_adaptive() or not inputstream_version:
             return frozenset() if capability is None else None
 
-        isa_loose_version = utils.loose_version(inputstream_version)
+        isa_loose_version = loose_version(inputstream_version)
         if capability is None:
             capabilities = frozenset(
                 capability for capability, version in self._ISA_CAPABILITIES.items()
                 if version is True
-                or version and isa_loose_version >= utils.loose_version(version)
+                or version and isa_loose_version >= loose_version(version)
             )
             return capabilities
         version = self._ISA_CAPABILITIES.get(capability)
-        return version is True or version and isa_loose_version >= utils.loose_version(version)
+        return version is True or version and isa_loose_version >= loose_version(version)
 
     @staticmethod
     def inputstream_adaptive_auto_stream_selection():

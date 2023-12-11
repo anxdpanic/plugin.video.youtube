@@ -90,5 +90,8 @@ class SystemVersion(object):
     def get_app_name(self):
         return self._appname
 
+    def compatible(self, *version):
+        return self._version >= version
+
 
 current_system_version = SystemVersion()

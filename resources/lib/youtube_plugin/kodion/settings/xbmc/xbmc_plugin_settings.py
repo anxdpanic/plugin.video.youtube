@@ -24,7 +24,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         if self._funcs:
             return
-        if current_system_version.get_version() >= (20, 0):
+        if current_system_version.compatible(20, 0):
             _class = xbmcaddon.Settings
 
             self._funcs.update({
@@ -41,11 +41,11 @@ class XbmcPluginSettings(AbstractSettings):
             _class = xbmcaddon.Addon
 
             def _get_string_list(store, setting):
-                return _class.getSettingString(store, setting).split(',')
+                return _class.getSetting(store, setting).split(',')
 
             def _set_string_list(store, setting, value):
                 value = ','.join(value)
-                return _class.setSettingString(store, setting, value)
+                return _class.setSetting(store, setting, value)
 
             self._funcs.update({
                 'get_bool': _class.getSettingBool,
@@ -62,7 +62,7 @@ class XbmcPluginSettings(AbstractSettings):
     def flush(cls, xbmc_addon):
         cls._echo = get_kodi_setting('debug.showloginfo')
         cls._cache = {}
-        if current_system_version.get_version() >= (20, 0):
+        if current_system_version.compatible(20, 0):
             cls._store = xbmc_addon.getSettings()
         else:
             cls._store = xbmc_addon

@@ -10,15 +10,16 @@
 import json
 import os
 import re
-from socket import error as socket_error
 from http import server as BaseHTTPServer
+from io import open
+from socket import error as socket_error
 from textwrap import dedent
 from urllib.parse import parse_qs, urlparse
 
-from xbmc import getCondVisibility, executebuiltin
+from xbmc import executebuiltin, getCondVisibility
+from xbmcaddon import Addon
 from xbmcgui import Dialog, Window
 from xbmcvfs import translatePath
-from xbmcaddon import Addon
 
 from .requests import BaseRequestsClass
 from ..logger import log_debug
@@ -32,7 +33,7 @@ _i18n = _addon.getLocalizedString
 _server_requests = BaseRequestsClass()
 
 
-class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
+class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
     base_path = translatePath('special://temp/{0}'.format(_addon_id))
     chunk_size = 1024 * 64
     local_ranges = (

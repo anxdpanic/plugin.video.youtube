@@ -8,8 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ... import utils
 from ...items import AudioItem, DirectoryItem, ImageItem, VideoItem
+from ...utils import current_system_version, datetime_parser
 
 
 def _process_date_value(info_labels, name, param):
@@ -19,7 +19,9 @@ def _process_date_value(info_labels, name, param):
 
 def _process_datetime_value(info_labels, name, param):
     if param:
-        info_labels[name] = param.isoformat('T')
+        info_labels[name] = (param.isoformat('T')
+                             if current_system_version.compatible(19, 0) else
+                             param.strftime('%d.%d.%Y'))
 
 
 def _process_int_value(info_labels, name, param):
@@ -64,7 +66,7 @@ def _process_video_rating(info_labels, param):
 
 def _process_date_string(info_labels, name, param):
     if param:
-        date = utils.datetime_parser.parse(param)
+        date = datetime_parser.parse(param)
         info_labels[name] = date.isoformat()
 
 

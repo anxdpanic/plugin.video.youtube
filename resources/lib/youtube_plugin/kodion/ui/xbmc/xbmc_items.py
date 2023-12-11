@@ -12,7 +12,7 @@ from xbmcgui import ListItem
 
 from . import info_labels
 from ...items import AudioItem, UriItem, VideoItem
-from ...utils import datetime_parser
+from ...utils import current_system_version, datetime_parser
 
 
 try:
@@ -34,10 +34,8 @@ except ImportError:
 
         def set_resume_point(self,
                              infoproperties,
-                             *_args,
                              resume_key='ResumeTime',
-                             total_key='TotalTime',
-                             **_kwargs):
+                             total_key='TotalTime',):
             if resume_key in infoproperties:
                 infoproperties[resume_key] = str(infoproperties[resume_key])
             if total_key in infoproperties:
@@ -95,7 +93,10 @@ def video_playback_item(context, video_item):
             manifest_type = 'hls'
             mime_type = 'application/x-mpegURL'
 
-        props['inputstream'] = 'inputstream.adaptive'
+        inputstream_property = ('inputstream'
+                                if current_system_version.compatible(19, 0) else
+                                'inputstreamaddon')
+        props[inputstream_property] = 'inputstream.adaptive'
         props['inputstream.adaptive.manifest_type'] = manifest_type
 
         if headers:
