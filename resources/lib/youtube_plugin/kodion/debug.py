@@ -218,3 +218,8 @@ class Profiler(object):
             self.enable(flush)
 
         return output
+
+    def print_stats(self):
+        log_debug('Profiling stats: {0}'.format(self.get_stats(
+            reuse=self._reuse
+        )))
