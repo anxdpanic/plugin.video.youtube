@@ -278,7 +278,7 @@ def _process_list_response(provider, context, json_data):
     return result
 
 
-def response_to_items(provider, context, json_data, sort=None, reverse_sort=False, process_next_page=True):
+def response_to_items(provider, context, json_data, sort=None, reverse=False, process_next_page=True):
     result = []
 
     is_youtube, kind = _parse_kind(json_data)

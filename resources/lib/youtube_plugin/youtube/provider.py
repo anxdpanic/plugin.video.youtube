@@ -494,7 +494,7 @@ class Provider(AbstractProvider):
                 return False
 
             result.extend(
-                v3.response_to_items(self, context, json_data, sort=lambda x: x.get_aired(), reverse_sort=True))
+                v3.response_to_items(self, context, json_data, sort=lambda x: x.get_date()))
 
         return result
 

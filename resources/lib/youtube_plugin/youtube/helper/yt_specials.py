@@ -131,7 +131,7 @@ def _process_disliked_videos(provider, context):
 
 def _process_live_events(provider, context, event_type='live'):
     def _sort(x):
-        return x.get_aired()
+        return x.get_date()
 
     provider.set_content_type(context, constants.content_type.VIDEOS)
     result = []
@@ -143,7 +143,7 @@ def _process_live_events(provider, context, event_type='live'):
     json_data = provider.get_client(context).get_live_events(event_type=event_type, page_token=page_token, location=location)
     if not v3.handle_error(context, json_data):
         return False
-    result.extend(v3.response_to_items(provider, context, json_data, sort=_sort, reverse_sort=True))
+    result.extend(v3.response_to_items(provider, context, json_data, sort=_sort))
 
     return result
 
