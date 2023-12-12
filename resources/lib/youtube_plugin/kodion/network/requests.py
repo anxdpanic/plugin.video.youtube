@@ -30,7 +30,7 @@ class BaseRequestsClass(object):
         pool_block=True,
         max_retries=Retry(
             total=3,
-            backoff_factor=1,
+            backoff_factor=0.1,
             status_forcelist={500, 502, 503, 504},
             allowed_methods=None,
         )

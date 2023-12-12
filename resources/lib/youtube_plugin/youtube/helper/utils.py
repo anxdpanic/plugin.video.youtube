@@ -349,16 +349,21 @@ def update_video_infos(provider, context, video_id_dict,
     if not playlist_item_id_dict:
         playlist_item_id_dict = {}
 
-    settings = context.get_settings()
-    alternate_player = settings.is_support_alternative_player_enabled()
     logged_in = provider.is_logged_in()
-    path = context.get_path()
+    if logged_in:
+        wl_playlist_id = context.get_access_manager().get_watch_later_id()
+    else:
+        wl_playlist_id = None
+
+    settings = context.get_settings()
     hide_shorts = settings.hide_short_videos()
+    alternate_player = settings.is_support_alternative_player_enabled()
     show_details = settings.show_detailed_description()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+
+    path = context.get_path()
     ui = context.get_ui()
-    watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
 
     for video_id, yt_item in data.items():
         video_item = video_id_dict[video_id]
@@ -579,10 +584,9 @@ def update_video_infos(provider, context, video_id_dict,
 
         if logged_in:
             # add 'Watch Later' only if we are not in my 'Watch Later' list
-            if (watch_later_playlist_id
-                    and watch_later_playlist_id != playlist_id):
+            if wl_playlist_id and wl_playlist_id != playlist_id:
                 yt_context_menu.append_watch_later(
-                    context_menu, context, watch_later_playlist_id, video_id
+                    context_menu, context, wl_playlist_id, video_id
                 )
 
             # provide 'remove' for videos in my playlists
