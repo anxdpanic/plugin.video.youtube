@@ -29,7 +29,7 @@ class JSONStore(object):
         self.base_path = xbmcvfs.translatePath(_addon_data_path)
 
         if not xbmcvfs.exists(self.base_path) and not make_dirs(self.base_path):
-            log_error('JSONStore.__init__ |{path}| invalid path'.format(
+            log_error('JSONStore.__init__ - invalid path:\n|{path}|'.format(
                 path=self.base_path
             ))
             return
@@ -45,12 +45,12 @@ class JSONStore(object):
     def save(self, data, update=False, process=None):
         if update:
             data = merge_dicts(self._data, data)
-        elif data == self._data:
-            log_debug('JSONStore.save |{filename}| data unchanged'.format(
+        if data == self._data:
+            log_debug('JSONStore.save - data unchanged:\n|{filename}|'.format(
                 filename=self.filename
             ))
             return
-        log_debug('JSONStore.save |{filename}|'.format(
+        log_debug('JSONStore.save - saving:\n|{filename}|'.format(
             filename=self.filename
         ))
         try:
@@ -64,18 +64,18 @@ class JSONStore(object):
                                                      sort_keys=True)))
             self._data = process(_data) if process is not None else _data
         except (IOError, OSError):
-            log_error('JSONStore.save |{filename}| no access to file'.format(
+            log_error('JSONStore.save - access error:\n|{filename}|'.format(
                 filename=self.filename
             ))
             return
         except (TypeError, ValueError):
-            log_error('JSONStore.save |{data}| invalid data'.format(
+            log_error('JSONStore.save - invalid data:\n|{data}|'.format(
                 data=data
             ))
             self.set_defaults(reset=True)
 
     def load(self, process=None):
-        log_debug('JSONStore.load |{filename}|'.format(
+        log_debug('JSONStore.load - loading:\n|{filename}|'.format(
             filename=self.filename
         ))
         try:
@@ -86,11 +86,11 @@ class JSONStore(object):
             _data = json.loads(data)
             self._data = process(_data) if process is not None else _data
         except (IOError, OSError):
-            log_error('JSONStore.load |{filename}| no access to file'.format(
+            log_error('JSONStore.load - access error:\n|{filename}|'.format(
                 filename=self.filename
             ))
         except (TypeError, ValueError):
-            log_error('JSONStore.load |{data}| invalid data'.format(
+            log_error('JSONStore.load - invalid data:\n|{data}|'.format(
                 data=data
             ))
 
@@ -101,7 +101,7 @@ class JSONStore(object):
             _data = json.loads(json.dumps(self._data))
             return process(_data) if process is not None else _data
         except (TypeError, ValueError):
-            log_error('JSONStore.get_data |{data}| invalid data'.format(
+            log_error('JSONStore.get_data - invalid data:\n|{data}|'.format(
                 data=self._data
             ))
             self.set_defaults(reset=True)
