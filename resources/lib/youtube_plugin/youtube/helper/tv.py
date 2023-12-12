@@ -53,7 +53,8 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
     utils.update_fanarts(provider, context, channel_item_dict)
 
-    result = utils.filter_short_videos(context, result)
+    if context.get_settings().hide_short_videos():
+        result = utils.filter_short_videos(result)
 
     # next page
     next_page_token = json_data.get('next_page_token', '')
@@ -99,7 +100,8 @@ def tv_videos_to_items(provider, context, json_data):
     utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
     utils.update_fanarts(provider, context, channel_item_dict)
 
-    result = utils.filter_short_videos(context, result)
+    if context.get_settings().hide_short_videos():
+        result = utils.filter_short_videos(result)
 
     # next page
     next_page_token = json_data.get('next_page_token', '')

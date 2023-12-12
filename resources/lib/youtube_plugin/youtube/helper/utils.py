@@ -353,6 +353,7 @@ def update_video_infos(provider, context, video_id_dict,
     alternate_player = settings.is_support_alternative_player_enabled()
     logged_in = provider.is_logged_in()
     path = context.get_path()
+    hide_shorts = settings.hide_short_videos()
     show_details = settings.show_detailed_description()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
@@ -386,6 +387,8 @@ def update_video_infos(provider, context, video_id_dict,
                 duration = (duration.seconds - 1) if duration.seconds else None
         if duration:
             video_item.set_duration_from_seconds(duration)
+            if hide_shorts and duration <= 60:
+                continue
 
         if not video_item.live and play_data:
             if 'play_count' in play_data:
@@ -808,11 +811,9 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                 break
 
 
-def filter_short_videos(context, items):
-    if context.get_settings().hide_short_videos():
-        items = [
-            item
-            for item in items
-            if item.playable and not 0 <= item.get_duration() <= 60
-        ]
-    return items
+def filter_short_videos(items):
+    return [
+        item
+        for item in items
+        if item.playable and not 0 <= item.get_duration() <= 60
+    ]

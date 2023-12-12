@@ -297,7 +297,8 @@ def response_to_items(provider, context, json_data, sort=None, reverse_sort=Fals
     if sort is not None:
         result = sorted(result, key=sort, reverse=reverse_sort)
 
-    result = utils.filter_short_videos(context, result)
+    if context.get_settings().hide_short_videos():
+        result = utils.filter_short_videos(result)
 
     # no processing of next page item
     if not process_next_page:
