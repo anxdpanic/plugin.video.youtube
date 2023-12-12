@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-05-06 00:35+0000\n"
+"PO-Revision-Date: 2023-10-19 09:11+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
 "Language: ko_kr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.15.2\n"
+"X-Generator: Weblate 5.0.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -62,7 +62,7 @@ msgstr "동영상 품질 항상 확인"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "최대 비디오 품질"
 
 msgctxt "#30011"
 msgid "480p"
@@ -74,15 +74,15 @@ msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -98,7 +98,7 @@ msgstr "1080p 라이브 / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -992,7 +992,7 @@ msgstr "이어 볼 지점 다시 설정"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "로컬 재생 기록 사용 (시청함, 이어 보기 탐색)"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1052,7 +1052,7 @@ msgstr "실시간에 사용"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "적응형 라이브 스트림에는 InputStream Adaptive >= 2.0.12가 필요함"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1180,7 +1180,7 @@ msgstr "기본으로 WEBM 적응 설정 (4K)"
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "HDR 비디오 사용"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
@@ -1188,11 +1188,11 @@ msgstr "mpeg-dash vods (HTTP 서버 참고)[CR]> 1080p에 프록시가 필요하
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "높은 프레임 비디오 사용"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1200,11 +1200,11 @@ msgstr "업로드한 동영상"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "H.264 비디오 사용"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "VP9 비디오 사용"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1252,99 +1252,99 @@ msgstr "대체 #2"
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HLS"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "멀티스트림 HLS"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "적응형 HLS"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "원본"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "더빙"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "설명"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "번갈아 나오기"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr ""
+msgstr "스트림 기능"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "AV1 비디오 활성화"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "Vorbis 오디오 사용"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "Opus 오디오 사용"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "AAC 오디오 사용"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
-msgstr ""
+msgstr "서라운드 사운드 사용"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr ""
+msgstr "AC-3 오디오 사용"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
-msgstr ""
+msgstr "EAC-3 오디오 사용"
 
 msgctxt "#30756"
 msgid "Enable DTS audio"
-msgstr ""
+msgstr "DTS 오디오 사용"
 
 msgctxt "#30757"
 msgid "Remove similar/duplicate streams"
-msgstr ""
+msgstr "유사/중복 스트림 제거"
 
 msgctxt "#30758"
 msgid "Stream selection"
-msgstr ""
+msgstr "스트림 선택"
 
 msgctxt "#30759"
 msgid "Quality selection"
-msgstr ""
+msgstr "품질 선택"
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
-msgstr ""
+msgstr "자동 + 품질 선택"
 
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
-msgstr ""
+msgstr "YouTube의 재생 기록 업데이트"
 
 msgctxt "#30762"
 msgid "Multi-language"
-msgstr ""
+msgstr "다국어"
 
 msgctxt "#30763"
 msgid "Multi-audio"
-msgstr ""
+msgstr "다중 오디오"
 
 #~ msgctxt "#30010"
 #~ msgid "Video quality"
