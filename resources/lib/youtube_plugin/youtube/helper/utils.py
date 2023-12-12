@@ -371,10 +371,10 @@ def update_video_infos(provider, context, video_id_dict,
         # set mediatype
         video_item.set_mediatype('video')  # using video
 
-        if not yt_item:
+        if not yt_item or 'snippet' not in yt_item:
             continue
 
-        snippet = yt_item['snippet']  # crash if not conform
+        snippet = yt_item['snippet']
         play_data = use_play_data and yt_item.get('play_data')
         broadcast_type = snippet.get('liveBroadcastContent')
         video_item.live = broadcast_type == 'live'

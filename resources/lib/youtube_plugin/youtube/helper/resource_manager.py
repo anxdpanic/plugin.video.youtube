@@ -110,11 +110,11 @@ class ResourceManager(object):
         if video_ids_to_update:
             self._context.log_debug('No data for videos |%s| cached' % ', '.join(video_ids_to_update))
             json_data = self._client.get_videos(video_ids_to_update, live_details)
-            video_data = {
-                yt_item['id']: yt_item
+            video_data = dict.fromkeys(video_ids_to_update, {})
+            video_data.update({
+                yt_item['id']: yt_item or {}
                 for yt_item in json_data.get('items', [])
-                if yt_item
-            }
+            })
             result.update(video_data)
             data_cache.set_items(video_data)
             self._context.log_debug('Cached data for videos |%s|' % ', '.join(video_data))

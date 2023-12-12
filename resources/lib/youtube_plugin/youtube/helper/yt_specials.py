@@ -150,7 +150,13 @@ def _process_description_links(provider, context):
 
         video_data = resource_manager.get_videos([video_id])
         yt_item = video_data[video_id]
-        snippet = yt_item['snippet']  # crash if not conform
+        if not yt_item or 'snippet' not in yt_item:
+            context.get_ui().on_ok(
+                title=context.localize('video.description.links'),
+                text=context.localize('video.description.links.not_found')
+            )
+            return False
+        snippet = yt_item['snippet']
         description = strip_html_from_text(snippet['description'])
 
         function_cache = context.get_function_cache()
