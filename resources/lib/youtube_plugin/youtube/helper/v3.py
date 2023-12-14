@@ -341,17 +341,20 @@ def _process_list_response(provider, context, json_data):
         resource['updater'](*resource['upd_args'], **resource['upd_kwargs'])
 
     for resource in resources:
+        if resource['defer']:
+            running += 1
+            continue
+
         if not resource['args'][0]:
             resource['complete'] = True
             continue
 
         running += 1
-        if not resource['defer']:
-            # _fetch(resource)
-            thread = Thread(target=_fetch, args=(resource, ))
-            thread.daemon = True
-            thread.start()
-            resource['thread'] = thread
+        # _fetch(resource)
+        thread = Thread(target=_fetch, args=(resource, ))
+        thread.daemon = True
+        thread.start()
+        resource['thread'] = thread
 
     while running > 0:
         for resource in resources:
