@@ -506,11 +506,10 @@ def update_video_infos(provider, context, video_id_dict,
         description = strip_html_from_text(snippet['description'])
         if show_details:
             description = ''.join((
-                ui.bold(channel_name, cr_after=2) if channel_name else '',
+                ui.bold(channel_name, cr_after=1) if channel_name else '',
                 ui.new_line(stats, cr_after=1) if stats else '',
                 (ui.italic(start_at, cr_after=1) if video_item.upcoming
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
-                ui.new_line() if stats or start_at else '',
                 description,
             ))
         video_item.set_studio(channel_name)
