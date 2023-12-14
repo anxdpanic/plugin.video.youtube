@@ -88,7 +88,14 @@ class APICheck(object):
         refresh_token = self._settings.user_refresh_token()
         token_expires = self._settings.user_token_expiration()
         last_hash = self._settings.api_last_hash()
-        updated_hash = self._api_keys_changed(switch)
+
+        current_set_hash = self._get_key_set_hash(switch)
+        if current_set_hash != user_details.get('last_key_hash', ''):
+            self.changed = True
+            updated_hash = current_set_hash
+        else:
+            self.changed = False
+            updated_hash = None
 
         if access_token or refresh_token or last_hash:
             self._settings.user_access_token('')
@@ -99,25 +106,22 @@ class APICheck(object):
         if updated_hash or (access_token and refresh_token
                             and not (user_details.get('access_token')
                                      and user_details.get('refresh_token'))):
-            if switch == 'own':
-                own_key_hash = self._get_key_set_hash('own')
-                if (last_hash == self._get_key_set_hash('own', True)
-                        or last_hash == own_key_hash):
-                    last_hash = own_key_hash
-                else:
-                    last_hash = None
-            else:
+            if (last_hash and switch == 'own' and (last_hash == current_set_hash
+                    or last_hash == self._get_key_set_hash('own', old=True))):
                 last_hash = None
 
             if updated_hash:
-                last_hash = updated_hash
                 self._context.log_warning('User: |{user}|, '
                                           'Switching API key set to: |{switch}|'
                                           .format(user=self.get_current_user(),
                                                   switch=switch))
+
+            if last_hash:
                 self._context.log_debug('API key set changed: Signing out')
                 self._context.execute('RunPlugin(plugin://plugin.video.youtube/'
                                       'sign/out/?confirmed=true)')
+
+            last_hash = updated_hash if updated_hash else current_set_hash
 
             self._access_manager.update_access_token(
                 access_token, token_expires, refresh_token, last_hash
@@ -172,16 +176,6 @@ class APICheck(object):
         return {'key': api_key,
                 'id': ''.join((client_id, '.apps.googleusercontent.com')),
                 'secret': client_secret}
-
-    def _api_keys_changed(self, switch):
-        user_details = self._access_manager.get_current_user_details()
-        last_set_hash = user_details.get('last_key_hash', '')
-        current_set_hash = self._get_key_set_hash(switch)
-        if last_set_hash != current_set_hash:
-            self.changed = True
-            return current_set_hash
-        self.changed = False
-        return None
 
     def _get_key_set_hash(self, switch, old=False):
         api_key, client_id, client_secret = self.get_api_keys(switch)
