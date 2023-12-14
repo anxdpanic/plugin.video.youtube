@@ -14,7 +14,7 @@ from traceback import format_exc, format_stack
 
 from requests import Session
 from requests.adapters import HTTPAdapter, Retry
-from requests.exceptions import RequestException
+from requests.exceptions import InvalidJSONError, RequestException
 
 from ..compatibility import xbmcaddon
 from ..logger import log_error
@@ -143,3 +143,6 @@ class BaseRequestsClass(object):
                 raise self._default_exc(error_title)(exc)
 
         return response
+
+
+__all__ = ('BaseRequestsClass', 'InvalidJSONError')

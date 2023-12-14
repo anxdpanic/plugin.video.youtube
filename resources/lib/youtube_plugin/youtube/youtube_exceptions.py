@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..kodion import KodionException
+from ..kodion.network import InvalidJSONError
 
 
 class LoginException(KodionException):
@@ -22,4 +23,8 @@ class YouTubeException(KodionException):
 
 
 class InvalidGrant(KodionException):
+    pass
+
+
+class InvalidJSON(KodionException, InvalidJSONError):
     pass

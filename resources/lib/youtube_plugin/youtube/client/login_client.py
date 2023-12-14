@@ -12,8 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import time
 
-from requests.exceptions import InvalidJSONError
-
 from .__config__ import (
     api,
     developer_keys,
@@ -23,6 +21,7 @@ from .__config__ import (
 from .request_client import YouTubeRequestClient
 from ..youtube_exceptions import (
     InvalidGrant,
+    InvalidJSON,
     LoginException,
     YouTubeException,
 )
@@ -91,7 +90,7 @@ class LoginClient(YouTubeRequestClient):
                                        json_data=json_data,
                                        response=response)
         except ValueError as error:
-            raise InvalidJSONError(error, response=response)
+            raise InvalidJSON(error, response=response)
         response.raise_for_status()
         return json_data
 
