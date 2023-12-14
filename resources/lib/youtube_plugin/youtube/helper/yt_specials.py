@@ -11,17 +11,17 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from . import utils
-from ...kodion import KodionException
-from ...kodion.constants import content_type
-from ...kodion.items import DirectoryItem, UriItem
-from ...kodion.utils import strip_html_from_text
-from ...youtube.helper import (
+from ..helper import (
     UrlResolver,
     UrlToItemConverter,
     extract_urls,
     tv,
     v3,
 )
+from ...kodion import KodionException
+from ...kodion.constants import content_type
+from ...kodion.items import DirectoryItem, UriItem
+from ...kodion.utils import strip_html_from_text
 
 
 def _process_related_videos(provider, context):

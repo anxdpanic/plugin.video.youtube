@@ -14,10 +14,10 @@ import json
 import random
 import traceback
 
-from ... import kodion
+from ..helper import utils, v3
+from ..youtube_exceptions import YouTubeException
 from ...kodion.items import VideoItem
-from ...youtube.helper import utils, v3
-from ...youtube.youtube_exceptions import YouTubeException
+from ...kodion.utils import select_stream
 
 
 def play_video(provider, context):
@@ -53,10 +53,10 @@ def play_video(provider, context):
 
     if not video_streams:
         message = context.localize('error.no_video_streams_found')
-        ui.show_notification(message, time_milliseconds=5000)
+        ui.show_notification(message, time_ms=5000)
         return False
 
-    video_stream = kodion.utils.select_stream(
+    video_stream = select_stream(
         context,
         video_streams,
         ask_for_quality=ask_for_quality,
@@ -71,7 +71,7 @@ def play_video(provider, context):
 
     if is_video and video_stream['video'].get('rtmpe', False):
         message = context.localize('error.rtmpe_not_supported')
-        ui.show_notification(message, time_milliseconds=5000)
+        ui.show_notification(message, time_ms=5000)
         return False
 
     play_suggested = settings.get_bool('youtube.suggested_videos', False)

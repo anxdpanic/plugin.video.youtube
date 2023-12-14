@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ....youtube.helper.signature.cipher import Cipher
+from .cipher import Cipher
 
 
 __all__ = ('Cipher',)

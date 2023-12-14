@@ -13,7 +13,8 @@ from __future__ import absolute_import, division, unicode_literals
 import copy
 import json
 import time
-from ...youtube.youtube_exceptions import LoginException
+
+from ..youtube_exceptions import LoginException
 
 
 def process(mode, provider, context, sign_out_refresh=True):

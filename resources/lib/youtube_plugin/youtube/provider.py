@@ -17,6 +17,7 @@ import shutil
 import socket
 from base64 import b64decode
 
+from .client import YouTube
 from .helper import (
     ResourceManager,
     UrlResolver,
@@ -29,6 +30,7 @@ from .helper import (
     yt_playlist,
     yt_setup_wizard,
     yt_specials,
+    yt_subscriptions,
     yt_video,
 )
 from .youtube_exceptions import InvalidGrant, LoginException
@@ -37,8 +39,6 @@ from ..kodion.compatibility import xbmcaddon, xbmcvfs
 from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem
 from ..kodion.network import get_client_ip_address, is_httpd_live
 from ..kodion.utils import find_video_id, strip_html_from_text
-from ..youtube.client import YouTube
-from ..youtube.helper import yt_subscriptions
 
 
 class Provider(AbstractProvider):
@@ -1513,7 +1513,7 @@ class Provider(AbstractProvider):
             if ok_dialog:
                 context.get_ui().on_ok(title, message)
             else:
-                context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
+                context.get_ui().show_notification(message, title, time_ms=message_timeout)
 
             return False
 

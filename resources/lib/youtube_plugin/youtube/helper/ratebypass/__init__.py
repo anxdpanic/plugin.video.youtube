@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ....youtube.helper.ratebypass import ratebypass
+from . import ratebypass
 
 
 __all__ = ('ratebypass',)

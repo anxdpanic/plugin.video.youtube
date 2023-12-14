@@ -10,8 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from ..helper import utils
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
-from ...youtube.helper import utils
 
 
 def my_subscriptions_to_items(provider, context, json_data, do_filter=False):

@@ -254,7 +254,7 @@ class ResourceManager(object):
                     context.get_ui().on_ok(title, message)
                 else:
                     context.get_ui().show_notification(message, title,
-                                                       time_milliseconds=message_timeout)
+                                                       time_ms=message_timeout)
 
                 raise YouTubeException(error_message)
 

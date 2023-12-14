@@ -41,7 +41,7 @@ class AbstractContextUI(object):
         raise NotImplementedError()
 
     def show_notification(self, message, header='', image_uri='',
-                          time_milliseconds=5000, audible=True):
+                          time_ms=5000, audible=True):
         raise NotImplementedError()
 
     @staticmethod

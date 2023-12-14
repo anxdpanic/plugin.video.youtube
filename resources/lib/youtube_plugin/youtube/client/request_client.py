@@ -9,9 +9,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ...kodion.utils import merge_dicts
+from ..youtube_exceptions import YouTubeException
 from ...kodion.network import BaseRequestsClass
-from ...youtube.youtube_exceptions import YouTubeException
+from ...kodion.utils import merge_dicts
 
 
 class YouTubeRequestClient(BaseRequestsClass):

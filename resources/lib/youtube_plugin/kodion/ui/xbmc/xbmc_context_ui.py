@@ -114,7 +114,7 @@ class XbmcContextUI(AbstractContextUI):
                           message,
                           header='',
                           image_uri='',
-                          time_milliseconds=5000,
+                          time_ms=5000,
                           audible=True):
         _header = header
         if not _header:
@@ -129,7 +129,7 @@ class XbmcContextUI(AbstractContextUI):
         xbmcgui.Dialog().notification(_header,
                                       _message,
                                       _image,
-                                      time_milliseconds,
+                                      time_ms,
                                       audible)
 
     def open_settings(self):

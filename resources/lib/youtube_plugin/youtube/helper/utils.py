@@ -14,6 +14,7 @@ import re
 import time
 from math import log10
 
+from ..helper import yt_context_menu
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     create_path,
@@ -21,7 +22,6 @@ from ...kodion.utils import (
     friendly_number,
     strip_html_from_text,
 )
-from ...youtube.helper import yt_context_menu
 
 
 try:
@@ -794,7 +794,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                 result_items = v3.response_to_items(provider, context, json_data, process_next_page=False)
                 page_token = json_data.get('nextPageToken', '')
             except:
-                context.get_ui().show_notification('Failed to add a suggested video.', time_milliseconds=5000)
+                context.get_ui().show_notification('Failed to add a suggested video.', time_ms=5000)
 
             if result_items:
                 add_item = next((

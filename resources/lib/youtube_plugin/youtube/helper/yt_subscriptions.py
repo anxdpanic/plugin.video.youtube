@@ -10,9 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from ..helper import v3
+from ...kodion import KodionException
 from ...kodion.items import UriItem
-from ... import kodion
-from ...youtube.helper import v3
 
 
 def _process_list(provider, context):
@@ -43,7 +43,7 @@ def _process_add(provider, context):
 
         context.get_ui().show_notification(
             context.localize('subscribed.to.channel'),
-            time_milliseconds=2500,
+            time_ms=2500,
             audible=False
         )
 
@@ -68,7 +68,7 @@ def _process_remove(provider, context):
 
         context.get_ui().show_notification(
             context.localize('unsubscribed.from.channel'),
-            time_milliseconds=2500,
+            time_ms=2500,
             audible=False
         )
 
@@ -92,6 +92,6 @@ def process(method, provider, context):
     elif method == 'remove':
         return _process_remove(provider, context)
     else:
-        raise kodion.KodionException("Unknown subscriptions method '%s'" % method)
+        raise KodionException("Unknown subscriptions method '%s'" % method)
 
     return result

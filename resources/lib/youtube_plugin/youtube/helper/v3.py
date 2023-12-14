@@ -21,10 +21,10 @@ from .utils import (
     update_playlist_infos,
     update_video_infos,
 )
+from ..helper import yt_context_menu
 from ...kodion import KodionException
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 from ...kodion.utils import strip_html_from_text
-from ...youtube.helper import yt_context_menu
 
 
 def _process_list_response(provider, context, json_data):
@@ -457,7 +457,7 @@ def handle_error(context, json_data):
         if ok_dialog:
             context.get_ui().on_ok(title, message)
         else:
-            context.get_ui().show_notification(message, title, time_milliseconds=message_timeout)
+            context.get_ui().show_notification(message, title, time_ms=message_timeout)
 
         return False
 

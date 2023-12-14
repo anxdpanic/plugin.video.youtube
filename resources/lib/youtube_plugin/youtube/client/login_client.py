@@ -21,13 +21,13 @@ from .__config__ import (
     youtube_tv,
 )
 from .request_client import YouTubeRequestClient
-from ...kodion.compatibility import parse_qsl
-from ...kodion.logger import log_debug
-from ...youtube.youtube_exceptions import (
+from ..youtube_exceptions import (
     InvalidGrant,
     LoginException,
     YouTubeException,
 )
+from ...kodion.compatibility import parse_qsl
+from ...kodion.logger import log_debug
 
 
 class LoginClient(YouTubeRequestClient):

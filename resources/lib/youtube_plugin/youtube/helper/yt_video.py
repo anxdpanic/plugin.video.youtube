@@ -10,8 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ... import kodion
-from ...youtube.helper import v3
+from ..helper import v3
+from ...kodion import KodionException
+from ...kodion.utils import find_video_id
 
 
 def _process_rate_video(provider, context, re_match):
@@ -28,10 +29,10 @@ def _process_rate_video(provider, context, re_match):
             video_id = re_match.group('video_id')
         except IndexError:
             if context.is_plugin_path(listitem_path, 'play/'):
-                video_id = kodion.utils.find_video_id(listitem_path)
+                video_id = find_video_id(listitem_path)
 
             if not video_id:
-                raise kodion.KodionException('video/rate/: missing video_id')
+                raise KodionException('video/rate/: missing video_id')
 
     try:
         current_rating = re_match.group('rating')
@@ -82,7 +83,7 @@ def _process_rate_video(provider, context, re_match):
         if notify_message:
             context.get_ui().show_notification(
                 message=notify_message,
-                time_milliseconds=2500,
+                time_ms=2500,
                 audible=False
             )
 
@@ -92,7 +93,7 @@ def _process_rate_video(provider, context, re_match):
 def _process_more_for_video(context):
     video_id = context.get_param('video_id', '')
     if not video_id:
-        raise kodion.KodionException('video/more/: missing video_id')
+        raise KodionException('video/more/: missing video_id')
 
     items = []
 
@@ -128,4 +129,4 @@ def process(method, provider, context, re_match):
         return _process_rate_video(provider, context, re_match)
     if method == 'more':
         return _process_more_for_video(context)
-    raise kodion.KodionException("Unknown method '%s'" % method)
+    raise KodionException("Unknown method '%s'" % method)
