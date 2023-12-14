@@ -131,7 +131,7 @@ class AccessManager(JSONStore):
         """
         :return: current user
         """
-        return self.get_users()[self._user]
+        return self.get_users()[self._user].copy()
 
     def get_current_user_id(self):
         """
@@ -435,14 +435,12 @@ class AccessManager(JSONStore):
     def update_access_token(self,
                             access_token,
                             unix_timestamp=None,
-                            refresh_token=None,
-                            last_key_hash=None):
+                            refresh_token=None):
         """
         Updates the old access token with the new one.
         :param access_token:
         :param unix_timestamp:
         :param refresh_token:
-        :param last_key_hash:
         :return:
         """
         current_user = self.get_current_user_details()
@@ -454,9 +452,18 @@ class AccessManager(JSONStore):
         if refresh_token is not None:
             current_user['refresh_token'] = refresh_token
 
-        if last_key_hash is not None:
-            current_user['last_key_hash'] = last_key_hash
+        data = {
+            'access_manager': {
+                'users': {
+                    self._user: current_user
+                }
+            }
+        }
+        self.save(data, update=True)
 
+    def set_last_key_hash(self, key_hash):
+        current_user = self.get_current_user_details()
+        current_user['last_key_hash'] = key_hash
         data = {
             'access_manager': {
                 'users': {
@@ -586,7 +593,7 @@ class AccessManager(JSONStore):
 
     def dev_keys_changed(self, addon_id, api_key, client_id, client_secret):
         last_hash = self.get_dev_last_key_hash(addon_id)
-        current_hash = self.__calc_key_hash(api_key, client_id, client_secret)
+        current_hash = self.calc_key_hash(api_key, client_id, client_secret)
 
         if not last_hash and current_hash:
             self.set_dev_last_key_hash(addon_id, current_hash)
@@ -599,16 +606,15 @@ class AccessManager(JSONStore):
         return False
 
     @staticmethod
-    def __calc_key_hash(api_key, client_id, client_secret):
-
+    def calc_key_hash(key, id, secret):
         md5_hash = md5()
         try:
-            md5_hash.update(api_key.encode('utf-8'))
-            md5_hash.update(client_id.encode('utf-8'))
-            md5_hash.update(client_secret.encode('utf-8'))
+            md5_hash.update(key.encode('utf-8'))
+            md5_hash.update(id.encode('utf-8'))
+            md5_hash.update(secret.encode('utf-8'))
         except:
-            md5_hash.update(api_key)
-            md5_hash.update(client_id)
-            md5_hash.update(client_secret)
+            md5_hash.update(key)
+            md5_hash.update(id)
+            md5_hash.update(secret)
 
         return md5_hash.hexdigest()

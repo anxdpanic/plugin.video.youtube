@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from base64 import b64decode
-from hashlib import md5
 
 from ... import key_sets
 from ...kodion import Context
@@ -83,54 +82,19 @@ class APICheck(object):
 
         switch = self.get_current_switch()
         user_details = self._access_manager.get_current_user_details()
-
-        access_token = self._settings.user_access_token()
-        refresh_token = self._settings.user_refresh_token()
-        token_expires = self._settings.user_token_expiration()
-        last_hash = self._settings.api_last_hash()
-
+        last_hash = user_details.get('last_key_hash', '')
         current_set_hash = self._get_key_set_hash(switch)
-        if current_set_hash != user_details.get('last_key_hash', ''):
-            self.changed = True
-            updated_hash = current_set_hash
-        else:
-            self.changed = False
-            updated_hash = None
+        self.changed = current_set_hash != last_hash
 
-        if access_token or refresh_token or last_hash:
-            self._settings.user_access_token('')
-            self._settings.user_refresh_token('')
-            self._settings.user_token_expiration(-1)
-            self._settings.api_last_hash('')
-
-        if updated_hash or (access_token and refresh_token
-                            and not (user_details.get('access_token')
-                                     and user_details.get('refresh_token'))):
-            if (last_hash and switch == 'own' and (last_hash == current_set_hash
-                    or last_hash == self._get_key_set_hash('own', old=True))):
-                last_hash = None
-
-            if updated_hash:
-                self._context.log_warning('User: |{user}|, '
-                                          'Switching API key set to: |{switch}|'
-                                          .format(user=self.get_current_user(),
-                                                  switch=switch))
-
-            if last_hash:
-                self._context.log_debug('API key set changed: Signing out')
-                self._context.execute('RunPlugin(plugin://plugin.video.youtube/'
-                                      'sign/out/?confirmed=true)')
-
-            last_hash = updated_hash if updated_hash else current_set_hash
-
-            self._access_manager.update_access_token(
-                access_token, token_expires, refresh_token, last_hash
-            )
-        elif not updated_hash:
-            self._context.log_debug('User: |{user}|, '
-                                    'Using API key set: |{switch}|'
-                                    .format(user=self.get_current_user(),
-                                            switch=switch))
+        self._context.log_debug('User: |{user}|, '
+                                'Using API key set: |{switch}|'
+                                .format(user=self.get_current_user(),
+                                        switch=switch))
+        if self.changed:
+            self._context.log_debug('API key set changed: Signing out')
+            self._context.execute('RunPlugin(plugin://plugin.video.youtube/'
+                                  'sign/out/?confirmed=true)')
+            self._access_manager.set_last_key_hash(current_set_hash)
 
     @staticmethod
     def get_current_switch():
@@ -173,20 +137,18 @@ class APICheck(object):
             client_id = b64decode(client_id).decode('utf-8')
             client_secret = b64decode(client_secret).decode('utf-8')
 
+        client_id += '.apps.googleusercontent.com'
         return {'key': api_key,
-                'id': ''.join((client_id, '.apps.googleusercontent.com')),
+                'id': client_id,
                 'secret': client_secret}
 
-    def _get_key_set_hash(self, switch, old=False):
-        api_key, client_id, client_secret = self.get_api_keys(switch)
-        if old and switch == 'own':
-            client_id = client_id.replace('.apps.googleusercontent.com', '')
-        md5_hash = md5()
-        md5_hash.update(api_key.encode('utf-8'))
-        md5_hash.update(client_id.encode('utf-8'))
-        md5_hash.update(client_secret.encode('utf-8'))
-
-        return md5_hash.hexdigest()
+    def _get_key_set_hash(self, switch):
+        key_set = self.get_api_keys(switch)
+        if switch == 'own':
+            client_id = key_set['id'].replace('.apps.googleusercontent.com',
+                                              '')
+            key_set['id'] = client_id
+        return self._access_manager.calc_key_hash(**key_set)
 
     def _strip_api_keys(self, api_key, client_id, client_secret):
 
