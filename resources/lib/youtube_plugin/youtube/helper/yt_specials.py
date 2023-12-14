@@ -270,24 +270,6 @@ def _process_saved_playlists_tv(provider, context):
     return tv.saved_playlists_to_items(provider, context, json_data)
 
 
-def _process_watch_history_tv(provider, context):
-    provider.set_content_type(context, content_type.VIDEOS)
-    json_data = provider.get_client(context).get_watch_history(
-        page_token=context.get_param('next_page_token', ''),
-        offset=context.get_param('offset', 0)
-    )
-    return tv.tv_videos_to_items(provider, context, json_data)
-
-
-def _process_purchases_tv(provider, context):
-    provider.set_content_type(context, content_type.VIDEOS)
-    json_data = provider.get_client(context).get_purchases(
-        page_token=context.get_param('next_page_token', ''),
-        offset=context.get_param('offset', 0)
-    )
-    return tv.tv_videos_to_items(provider, context, json_data)
-
-
 def _process_new_uploaded_videos_tv(provider, context):
     provider.set_content_type(context, content_type.VIDEOS)
     json_data = provider.get_client(context).get_my_subscriptions(
