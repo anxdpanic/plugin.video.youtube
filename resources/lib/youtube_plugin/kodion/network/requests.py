@@ -57,9 +57,12 @@ class BaseRequestsClass(object):
                 auth=None, timeout=None, allow_redirects=None, proxies=None,
                 hooks=None, stream=None, verify=None, cert=None, json=None,
                 # Custom event hook implementation
-                # See _login_json_hook and _login_error_hook in login_client.py
+                # See _response_hook and _error_hook in login_client.py
                 # for example usage
-                response_hook=None, error_hook=None,
+                response_hook=None,
+                response_hook_kwargs=None,
+                error_hook=None,
+                error_hook_kwargs=None,
                 error_title=None, error_info=None, raise_exc=False, **_):
         if timeout is None:
             timeout = self._timeout
@@ -86,7 +89,10 @@ class BaseRequestsClass(object):
                                              cert=cert,
                                              json=json,)
             if response_hook:
-                response = response_hook(response)
+                if response_hook_kwargs is None:
+                    response_hook_kwargs = {}
+                response_hook_kwargs['response'] = response
+                response = response_hook(**response_hook_kwargs)
             else:
                 response.raise_for_status()
 
@@ -94,14 +100,21 @@ class BaseRequestsClass(object):
             response_text = exc.response and exc.response.text
             stack_trace = format_stack()
             exc_tb = format_exc()
+            error_details = {'exc': exc}
 
             if error_hook:
-                error_response = error_hook(exc, response)
-                _title, _info, _response, _trace, _exc = error_response
+                if error_hook_kwargs is None:
+                    error_hook_kwargs = {}
+                error_hook_kwargs['exc'] = exc
+                error_hook_kwargs['response'] = response
+                error_response = error_hook(**error_hook_kwargs)
+                _title, _info, _detail, _response, _trace, _exc = error_response
                 if _title is not None:
                     error_title = _title
                 if _info is not None:
                     error_info = _info
+                if _detail is not None:
+                    error_details.update(_detail)
                 if _response is not None:
                     response = _response
                     response_text = str(_response)
@@ -117,7 +130,7 @@ class BaseRequestsClass(object):
                 error_info = str(exc)
             elif '{' in error_info:
                 try:
-                    error_info = error_info.format(exc=exc)
+                    error_info = error_info.format(**error_details)
                 except (AttributeError, IndexError, KeyError):
                     error_info = str(exc)
 

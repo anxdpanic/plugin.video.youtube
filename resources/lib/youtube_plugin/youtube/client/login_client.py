@@ -82,7 +82,8 @@ class LoginClient(YouTubeRequestClient):
         super(LoginClient, self).__init__(exc_type=LoginException)
 
     @staticmethod
-    def _login_json_hook(response):
+    def _response_hook(**kwargs):
+        response = kwargs['response']
         try:
             json_data = response.json()
             if 'error' in json_data:
@@ -95,16 +96,16 @@ class LoginClient(YouTubeRequestClient):
         return json_data
 
     @staticmethod
-    def _login_error_hook(error, _response):
-        json_data = getattr(error, 'json_data', None)
-        if not json_data:
-            return None, None, None, None, LoginException
+    def _error_hook(**kwargs):
+        json_data = getattr(kwargs['exc'], 'json_data', None)
+        if not json_data or 'error' not in json_data:
+            return None, None, None, None, None, LoginException
         if json_data['error'] == 'authorization_pending':
-            return None, None, json_data, False, False
+            return None, None, None, json_data, False, False
         if (json_data['error'] == 'invalid_grant'
                 and json_data.get('code') == '400'):
-            return None, None, json_data, False, InvalidGrant(json_data)
-        return None, None, json_data, False, LoginException(json_data)
+            return None, None, None, json_data, False, InvalidGrant(json_data)
+        return None, None, None, json_data, False, LoginException(json_data)
 
     def set_log_error(self, callback):
         self._log_error_callback = callback
@@ -138,8 +139,8 @@ class LoginClient(YouTubeRequestClient):
                      method='POST',
                      data=post_data,
                      headers=headers,
-                     response_hook=self._login_json_hook,
-                     error_hook=self._login_error_hook,
+                     response_hook=self._response_hook,
+                     error_hook=self._error_hook,
                      error_title='Logout Failed',
                      error_info='Revoke failed: {exc}',
                      raise_exc=True)
@@ -178,8 +179,8 @@ class LoginClient(YouTubeRequestClient):
                                  method='POST',
                                  data=post_data,
                                  headers=headers,
-                                 response_hook=self._login_json_hook,
-                                 error_hook=self._login_error_hook,
+                                 response_hook=self._response_hook,
+                                 error_hook=self._error_hook,
                                  error_title='Login Failed',
                                  error_info=('Refresh token failed'
                                              ' {client}: {{exc}}'
@@ -226,8 +227,8 @@ class LoginClient(YouTubeRequestClient):
                                  method='POST',
                                  data=post_data,
                                  headers=headers,
-                                 response_hook=self._login_json_hook,
-                                 error_hook=self._login_error_hook,
+                                 response_hook=self._response_hook,
+                                 error_hook=self._error_hook,
                                  error_title='Login Failed: Unknown response',
                                  error_info=('Access token request failed'
                                              ' {client}: {{exc}}'
@@ -262,8 +263,8 @@ class LoginClient(YouTubeRequestClient):
                                  method='POST',
                                  data=post_data,
                                  headers=headers,
-                                 response_hook=self._login_json_hook,
-                                 error_hook=self._login_error_hook,
+                                 response_hook=self._response_hook,
+                                 error_hook=self._error_hook,
                                  error_title='Login Failed: Unknown response',
                                  error_info=('Device/user code request failed'
                                              ' {client}: {{exc}}'
