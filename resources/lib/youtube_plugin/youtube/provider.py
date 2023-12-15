@@ -49,7 +49,6 @@ class Provider(AbstractProvider):
         self._client = None
         self._is_logged_in = False
 
-        self.v3_handle_error = v3.handle_error
         self.yt_video = yt_video
 
     def get_wizard_supported_views(self):
@@ -354,7 +353,7 @@ class Provider(AbstractProvider):
 
         # no caching
         json_data = self.get_client(context).get_playlists_of_channel(channel_id, page_token)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
         result.extend(v3.response_to_items(self, context, json_data))
 
@@ -377,7 +376,7 @@ class Provider(AbstractProvider):
 
         # no caching
         json_data = self.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, page_token=page_token, safe_search=safe_search)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
         result.extend(v3.response_to_items(self, context, json_data))
 
@@ -428,7 +427,7 @@ class Provider(AbstractProvider):
             json_data = function_cache.get(client.get_channel_by_username,
                                            function_cache.ONE_DAY,
                                            channel_id)
-            if not v3.handle_error(context, json_data):
+            if not json_data:
                 return False
 
             # we correct the channel id based on the username
@@ -490,7 +489,7 @@ class Provider(AbstractProvider):
                                            function_cache.ONE_MINUTE * 5,
                                            upload_playlist,
                                            page_token=page_token)
-            if not v3.handle_error(context, json_data):
+            if not json_data:
                 return False
 
             result.extend(v3.response_to_items(self, context, json_data))
@@ -821,7 +820,7 @@ class Provider(AbstractProvider):
         elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', id_string):
             json_data = self.get_client(context).get_playlists(id_string)
 
-        if not json_data or not v3.handle_error(context, json_data):
+        if not json_data:
             return []
 
         result.extend(v3.response_to_items(self, context, json_data))
@@ -893,7 +892,7 @@ class Provider(AbstractProvider):
                                        page_token=page_token,
                                        channel_id=channel_id,
                                        location=location)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
         result.extend(v3.response_to_items(self, context, json_data))
         return result

@@ -24,7 +24,6 @@ from .utils import (
 from ..helper import yt_context_menu
 from ...kodion import KodionException
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
-from ...kodion.utils import strip_html_from_text
 
 
 def _process_list_response(provider, context, json_data):
@@ -432,39 +431,6 @@ def response_to_items(provider, context, json_data, sort=None, reverse=False, pr
         result.append(next_page_item)
 
     return result
-
-
-def handle_error(context, json_data):
-    if json_data and 'error' in json_data:
-        ok_dialog = False
-        message_timeout = 5000
-
-        message = strip_html_from_text(json_data['error'].get('message', ''))
-        log_message = strip_html_from_text(json_data['error'].get('message', ''))
-        reason = json_data['error']['errors'][0].get('reason', '')
-        title = '%s: %s' % (context.get_name(), reason)
-
-        context.log_error('Error reason: |%s| with message: |%s|' % (reason, log_message))
-
-        if reason == 'accessNotConfigured':
-            message = context.localize('key.requirement.notification')
-            ok_dialog = True
-
-        if reason == 'keyInvalid' and message == 'Bad Request':
-            message = context.localize('api.key.incorrect')
-            message_timeout = 7000
-
-        if reason in {'quotaExceeded', 'dailyLimitExceeded'}:
-            message_timeout = 7000
-
-        if ok_dialog:
-            context.get_ui().on_ok(title, message)
-        else:
-            context.get_ui().show_notification(message, title, time_ms=message_timeout)
-
-        return False
-
-    return True
 
 
 def _parse_kind(item):

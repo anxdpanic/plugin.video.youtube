@@ -38,7 +38,7 @@ def _process_add_video(provider, context, keymap_action=False):
 
     if playlist_id != 'HL':
         json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
 
         if playlist_id == watch_later_id:
@@ -96,7 +96,7 @@ def _process_remove_video(provider, context):
         if context.get_ui().on_remove_content(video_name):
             json_data = provider.get_client(context).remove_video_from_playlist(playlist_id=playlist_id,
                                                                                 playlist_item_id=video_id)
-            if not v3.handle_error(context, json_data):
+            if not json_data:
                 return False
 
             context.get_ui().refresh_container()
@@ -128,7 +128,7 @@ def _process_remove_playlist(provider, context):
 
     if context.get_ui().on_delete_content(playlist_name):
         json_data = provider.get_client(context).remove_playlist(playlist_id=playlist_id)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
 
         context.get_ui().refresh_container()
@@ -203,7 +203,7 @@ def _process_select_playlist(provider, context):
                 context.localize('playlist.create'))
             if result and text:
                 json_data = client.create_playlist(title=text)
-                if not v3.handle_error(context, json_data):
+                if not json_data:
                     break
 
                 playlist_id = json_data.get('id', '')
@@ -236,7 +236,7 @@ def _process_rename_playlist(provider, context):
                                                       default=current_playlist_name)
     if result and text:
         json_data = provider.get_client(context).rename_playlist(playlist_id=playlist_id, new_title=text)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return
 
         context.get_ui().refresh_container()

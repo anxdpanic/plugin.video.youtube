@@ -246,11 +246,18 @@ def play_channel_live(provider, context):
     index = context.get_param('live') - 1
     if index < 0:
         index = 0
-    json_data = provider.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, safe_search=False)
-    if not v3.handle_error(context, json_data):
+    json_data = provider.get_client(context).search(q='',
+                                                    search_type='video',
+                                                    event_type='live',
+                                                    channel_id=channel_id,
+                                                    safe_search=False)
+    if not json_data:
         return False
 
-    video_items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+    video_items = v3.response_to_items(provider,
+                                       context,
+                                       json_data,
+                                       process_next_page=False)
 
     try:
         video_item = video_items[index]

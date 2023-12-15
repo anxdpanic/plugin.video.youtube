@@ -348,17 +348,11 @@ class PlaybackMonitorThread(threading.Thread):
                         json_data = client.remove_video_from_playlist(
                             watch_later_id, playlist_item_id
                         )
-                        _ = self.provider.v3_handle_error(self.provider,
-                                                          self._context,
-                                                          json_data)
 
             history_playlist_id = access_manager.get_watch_history_id()
             if history_playlist_id and history_playlist_id != 'HL':
                 json_data = client.add_video_to_playlist(history_playlist_id,
                                                          self.video_id)
-                _ = self.provider.v3_handle_error(self.provider,
-                                                  self._context,
-                                                  json_data)
 
             # rate video
             if settings.get_bool('youtube.post.play.rate', False):
@@ -370,10 +364,7 @@ class PlaybackMonitorThread(threading.Thread):
 
                 if do_rating:
                     json_data = client.get_video_rating(self.video_id)
-                    success = self.provider.v3_handle_error(self.provider,
-                                                            self._context,
-                                                            json_data)
-                    if success:
+                    if json_data:
                         items = json_data.get('items', [{'rating': 'none'}])
                         rating = items[0].get('rating', 'none')
                         if rating == 'none':

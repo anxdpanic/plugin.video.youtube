@@ -42,7 +42,7 @@ def _process_rate_video(provider, context, re_match):
     if not current_rating:
         client = provider.get_client(context)
         json_data = client.get_video_rating(video_id)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
 
         items = json_data.get('items', [])

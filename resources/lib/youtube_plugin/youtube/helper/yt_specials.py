@@ -33,7 +33,7 @@ def _process_related_videos(provider, context):
     json_data = provider.get_client(context).get_related_videos(
         video_id=video_id, page_token=context.get_param('page_token', '')
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider,
                                 context,
@@ -50,7 +50,7 @@ def _process_parent_comments(provider, context):
     json_data = provider.get_client(context).get_parent_comments(
         video_id=video_id, page_token=context.get_param('page_token', '')
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
@@ -64,7 +64,7 @@ def _process_child_comments(provider, context):
     json_data = provider.get_client(context).get_child_comments(
         parent_id=parent_id, page_token=context.get_param('page_token', '')
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
@@ -74,7 +74,7 @@ def _process_recommendations(provider, context):
     json_data = provider.get_client(context).get_activities(
         channel_id='home', page_token=context.get_param('page_token', '')
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
@@ -84,7 +84,7 @@ def _process_popular_right_now(provider, context):
     json_data = provider.get_client(context).get_popular_videos(
         page_token=context.get_param('page_token', '')
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
@@ -95,14 +95,14 @@ def _process_browse_channels(provider, context):
     guide_id = context.get_param('guide_id', '')
     if guide_id:
         json_data = client.get_guide_category(guide_id)
-        if not v3.handle_error(context, json_data):
+        if not json_data:
             return False
         return v3.response_to_items(provider, context, json_data)
 
     function_cache = context.get_function_cache()
     json_data = function_cache.get(client.get_guide_categories,
                                    function_cache.ONE_MONTH)
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
@@ -112,7 +112,7 @@ def _process_disliked_videos(provider, context):
     json_data = provider.get_client(context).get_disliked_videos(
         page_token=context.get_param('page_token', '')
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
@@ -128,7 +128,7 @@ def _process_live_events(provider, context, event_type='live'):
         page_token=context.get_param('page_token', ''),
         location=context.get_param('location', False),
     )
-    if not v3.handle_error(context, json_data):
+    if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data, sort=_sort)
 
