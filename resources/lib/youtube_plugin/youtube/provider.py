@@ -277,45 +277,28 @@ class Provider(AbstractProvider):
 
         return False
 
-    @RegisterProviderPath('^/playlist/(?P<playlist_id>[^/]+)/$')
-    def _on_playlist(self, context, re_match):
-        self.set_content_type(context, constants.content_type.VIDEOS)
-
-        result = []
-
-        playlist_id = re_match.group('playlist_id')
-        page_token = context.get_param('page_token', '')
-
-        # no caching
-        json_data = self.get_client(context).get_playlist_items(playlist_id=playlist_id, page_token=page_token)
-        if not v3.handle_error(context, json_data):
-            return False
-        result.extend(v3.response_to_items(self, context, json_data))
-
-        return result
-
     """
     Lists the videos of a playlist.
     path       : '/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/'
+        or
+    path       : '/playlist/(?P<playlist_id>[^/]+)/'
     channel_id : ['mine'|<CHANNEL_ID>]
     playlist_id: <PLAYLIST_ID>
     """
 
-    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/$')
-    def _on_channel_playlist(self, context, re_match):
+    @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
+    def _on_playlist(self, context, re_match):
         self.set_content_type(context, constants.content_type.VIDEOS)
         client = self.get_client(context)
-        result = []
+        resource_manager = self.get_resource_manager(context)
 
-        playlist_id = re_match.group('playlist_id')
-        page_token = context.get_param('page_token', '')
+        batch_id = (re_match.group('playlist_id'),
+                    context.get_param('page_token') or 0)
 
-        # no caching
-        json_data = client.get_playlist_items(playlist_id=playlist_id, page_token=page_token)
-        if not v3.handle_error(context, json_data):
+        json_data = resource_manager.get_playlist_items(batch_id=batch_id)
+        if not json_data:
             return False
-        result.extend(v3.response_to_items(self, context, json_data))
-
+        result = v3.response_to_items(self, context, json_data[batch_id])
         return result
 
     """

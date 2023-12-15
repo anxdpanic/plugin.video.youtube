@@ -146,35 +146,32 @@ def play_playlist(provider, context):
     if not playlist_ids:
         playlist_ids = [params.get('playlist_id')]
 
-    client = provider.get_client(context)
+    resource_manager = provider.get_resource_manager(context)
     ui = context.get_ui()
 
-    progress_dialog = ui.create_progress_dialog(
+    with ui.create_progress_dialog(
         context.localize('playlist.progress.updating'),
         context.localize('please_wait'),
         background=True
-    )
+    ) as progress_dialog:
+        json_data = resource_manager.get_playlist_items(playlist_ids)
 
-    # start the loop and fill the list with video items
-    total = 0
-    for playlist_id in playlist_ids:
-        page_token = 0
-        while page_token is not None:
-            json_data = client.get_playlist_items(playlist_id, page_token)
-            if not v3.handle_error(context, json_data):
-                break
+        total = sum(len(chunk.get('items', [])) for chunk in json_data.values())
+        progress_dialog.set_total(total)
+        progress_dialog.update(
+            steps=0,
+            text='{wait} {current}/{total}'.format(
+                wait=context.localize('please_wait'),
+                current=0,
+                total=total
+            )
+        )
 
-            if page_token == 0:
-                playlist_total = int(json_data.get('pageInfo', {})
-                                     .get('totalResults', 0))
-                if not playlist_total:
-                    break
-                total += playlist_total
-                progress_dialog.set_total(total)
-
+        # start the loop and fill the list with video items
+        for chunk in json_data.values():
             result = v3.response_to_items(provider,
                                           context,
-                                          json_data,
+                                          chunk,
                                           process_next_page=False)
             videos.extend(result)
 
@@ -187,51 +184,51 @@ def play_playlist(provider, context):
                 )
             )
 
-            page_token = json_data.get('nextPageToken') or None
+        if not videos:
+            return False
 
-    # select order
-    order = params.get('order', '')
-    if not order:
-        order_list = ['default', 'reverse', 'shuffle']
-        items = [(context.localize('playlist.play.%s' % order), order)
-                 for order in order_list]
-        order = ui.on_select(context.localize('playlist.play.select'), items)
-        if order not in order_list:
-            order = 'default'
+        # select order
+        order = params.get('order', '')
+        if not order:
+            order_list = ['default', 'reverse', 'shuffle']
+            items = [(context.localize('playlist.play.%s' % order), order)
+                     for order in order_list]
+            order = ui.on_select(context.localize('playlist.play.select'),
+                                 items)
+            if order not in order_list:
+                order = 'default'
 
-    # reverse the list
-    if order == 'reverse':
-        videos = videos[::-1]
-    elif order == 'shuffle':
-        # we have to shuffle the playlist by our self.
-        # The implementation of XBMC/KODI is quite weak :(
-        random.shuffle(videos)
+        # reverse the list
+        if order == 'reverse':
+            videos = videos[::-1]
+        elif order == 'shuffle':
+            # we have to shuffle the playlist by our self.
+            # The implementation of XBMC/KODI is quite weak :(
+            random.shuffle(videos)
 
-    # clear the playlist
-    playlist = context.get_video_playlist()
-    playlist.clear()
+        # clear the playlist
+        playlist = context.get_video_playlist()
+        playlist.clear()
 
-    # select unshuffle
-    if order == 'shuffle':
-        playlist.unshuffle()
+        # select unshuffle
+        if order == 'shuffle':
+            playlist.unshuffle()
 
-    # check if we have a video as starting point for the playlist
-    video_id = params.get('video_id', '')
-    # add videos to playlist
-    playlist_position = 0
-    for idx, video in enumerate(videos):
-        playlist.add(video)
-        if video_id and not playlist_position and video_id in video.get_uri():
-            playlist_position = idx
+        # check if we have a video as starting point for the playlist
+        video_id = params.get('video_id', '')
+        # add videos to playlist
+        playlist_position = 0
+        for idx, video in enumerate(videos):
+            playlist.add(video)
+            if (video_id and not playlist_position
+                    and video_id in video.get_uri()):
+                playlist_position = idx
 
-    # we use the shuffle implementation of the playlist
-    """
-    if order == 'shuffle':
-        playlist.shuffle()
-    """
-
-    if progress_dialog:
-        progress_dialog.close()
+        # we use the shuffle implementation of the playlist
+        """
+        if order == 'shuffle':
+            playlist.shuffle()
+        """
 
     if not params.get('play'):
         return videos
