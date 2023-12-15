@@ -93,7 +93,7 @@ def create_from_item(base_item):
     info_labels = {}
 
     # 'date' = '1982-03-09' (string)
-    _process_datetime_value(info_labels, 'date', base_item.get_date(as_text=False))
+    _process_datetime_value(info_labels, 'date', base_item.get_date())
 
     # 'count' = 12 (integer)
     # Can be used to store an id for later, or for sorting purposes
@@ -138,7 +138,7 @@ def create_from_item(base_item):
         _process_list_value(info_labels, 'artist', base_item.get_artist())
 
         # 'dateadded' = '2014-08-11 13:08:56' (string) will be taken from 'dateadded'
-        _process_datetime_value(info_labels, 'dateadded', base_item.get_dateadded(as_text=False))
+        _process_datetime_value(info_labels, 'dateadded', base_item.get_dateadded())
 
         # TODO: starting with Helix this could be seconds
         # 'duration' = '3:18' (string)

@@ -111,7 +111,7 @@ class BaseItem(object):
     def set_date_from_datetime(self, date_time):
         self._date = date_time
 
-    def get_date(self, as_text=True, short=False):
+    def get_date(self, as_text=False, short=False):
         if not self._date:
             return ''
         if short:
@@ -131,7 +131,7 @@ class BaseItem(object):
     def set_dateadded_from_datetime(self, date_time):
         self._dateadded = date_time
 
-    def get_dateadded(self, as_text=True):
+    def get_dateadded(self, as_text=False):
         if not self._dateadded:
             return ''
         if as_text:

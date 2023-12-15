@@ -493,8 +493,7 @@ class Provider(AbstractProvider):
             if not v3.handle_error(context, json_data):
                 return False
 
-            result.extend(
-                v3.response_to_items(self, context, json_data, sort=lambda x: x.get_date()))
+            result.extend(v3.response_to_items(self, context, json_data))
 
         return result
 
