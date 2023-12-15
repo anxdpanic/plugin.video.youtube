@@ -86,11 +86,11 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if list(result) != ids:
+        if list(result) != ids[:len(result)]:
             result = {
-                id: result[id]
-                for id in ids
-                if id in result
+                id_: result[id_]
+                for id_ in ids
+                if id_ in result
             }
 
         return result
@@ -118,6 +118,7 @@ class ResourceManager(object):
         return result
 
     def get_playlists(self, ids):
+        ids = tuple(ids)
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids if id_ not in result]
 
@@ -149,11 +150,11 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if list(result) != ids:
+        if list(result) != ids[:len(result)]:
             result = {
-                id: result[id]
-                for id in ids
-                if id in result
+                id_: result[id_]
+                for id_ in ids
+                if id_ in result
             }
 
         return result
@@ -193,13 +194,20 @@ class ResourceManager(object):
                                     .format(ids=list(result)))
 
         new_data = {}
+        insert_point = 0
         for playlist_id, page_token in to_update:
+            new_batch_ids = []
+            batch_id = (playlist_id, page_token)
+            insert_point = batch_ids.index(batch_id, insert_point)
             while 1:
                 batch_id = (playlist_id, page_token)
+                new_batch_ids.append(batch_id)
                 batch = self._client.get_playlist_items(*batch_id)
                 new_data[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
                 if page_token is None:
+                    batch_ids[insert_point:insert_point] = new_batch_ids
+                    insert_point += len(new_batch_ids)
                     break
 
         if new_data:
@@ -213,11 +221,11 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if list(result) != batch_ids:
+        if list(result) != batch_ids[:len(result)]:
             result = {
-                id: result[id]
-                for id in batch_ids
-                if id in result
+                id_: result[id_]
+                for id_ in batch_ids
+                if id_ in result
             }
 
         return result
@@ -240,6 +248,7 @@ class ResourceManager(object):
         return item.get('contentDetails', {}).get('relatedPlaylists', {})
 
     def get_videos(self, ids, live_details=False, suppress_errors=False):
+        ids = tuple(ids)
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids if id_ not in result]
 
@@ -274,11 +283,11 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if list(result) != ids:
+        if list(result) != ids[:len(result)]:
             result = {
-                id: result[id]
-                for id in ids
-                if id in result
+                id_: result[id_]
+                for id_ in ids
+                if id_ in result
             }
 
         if self._context.get_settings().use_local_history():
