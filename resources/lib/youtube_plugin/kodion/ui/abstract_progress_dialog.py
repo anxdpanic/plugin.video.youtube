@@ -19,6 +19,12 @@ class AbstractProgressDialog(object):
         self._position = 1
         self.update(steps=-1)
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.close()
+
     def get_total(self):
         return self._total
 
