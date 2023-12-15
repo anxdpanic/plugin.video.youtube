@@ -64,7 +64,7 @@ class XbmcPlaylist(AbstractPlaylist):
                 result = response['result']['items']
             else:
                 result = []
-            return json.dumps(result) if dumps else result
+            return json.dumps(result, ensure_ascii=False) if dumps else result
 
         if 'error' in response:
             message = response['error']['message']

@@ -56,7 +56,7 @@ class JSONStore(object):
         try:
             if not data:
                 raise ValueError
-            _data = json.loads(json.dumps(data))
+            _data = json.loads(json.dumps(data, ensure_ascii=False))
             with open(self.filename, mode='w', encoding='utf-8') as jsonfile:
                 jsonfile.write(to_unicode(json.dumps(_data,
                                                      ensure_ascii=False,
@@ -98,12 +98,12 @@ class JSONStore(object):
         try:
             if not self._data:
                 raise ValueError
-            _data = json.loads(json.dumps(self._data))
+            _data = json.loads(json.dumps(self._data, ensure_ascii=False))
             return process(_data) if process is not None else _data
         except (TypeError, ValueError):
             log_error('JSONStore.get_data - invalid data:\n|{data}|'.format(
                 data=self._data
             ))
             self.set_defaults(reset=True)
-        _data = json.loads(json.dumps(self._data))
+        _data = json.loads(json.dumps(self._data, ensure_ascii=False))
         return process(_data) if process is not None else _data

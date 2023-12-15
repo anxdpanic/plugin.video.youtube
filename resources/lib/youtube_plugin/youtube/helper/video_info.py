@@ -733,7 +733,7 @@ class VideoInfo(YouTubeRequestClient):
             return ''
 
         js_url = self._normalize_url(js_url)
-        self._data_cache.set_item('player_js_url', json_dumps({'url': js_url}))
+        self._data_cache.set_item('player_js_url', {'url': js_url})
 
         js_cache_key = quote(js_url)
         cached = self._data_cache.get_item(js_cache_key,
@@ -752,7 +752,7 @@ class VideoInfo(YouTubeRequestClient):
             return ''
 
         javascript = result.text
-        self._data_cache.set_item(js_cache_key, json_dumps({'js': javascript}))
+        self._data_cache.set_item(js_cache_key, {'js': javascript})
         return javascript
 
     @staticmethod
@@ -938,8 +938,7 @@ class VideoInfo(YouTubeRequestClient):
                     'Failed to extract URL from signatureCipher'
                 )
                 return None
-            self._data_cache.set_item(encrypted_signature,
-                                      json_dumps({'sig': signature}))
+            self._data_cache.set_item(encrypted_signature, {'sig': signature})
 
         if signature:
             url = '{0}&{1}={2}'.format(url, query_var, signature)

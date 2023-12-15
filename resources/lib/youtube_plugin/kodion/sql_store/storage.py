@@ -165,7 +165,7 @@ class Storage(object):
         # add 1 microsecond, required for dbapi2
         now = since_epoch(datetime.now()) + 0.000001
         self._open()
-        self._execute(True, self._set_query, values=[item_id,
+        self._execute(True, self._set_query, values=[str(item_id),
                                                      now,
                                                      self._encode(item)])
         self._close()
@@ -176,7 +176,7 @@ class Storage(object):
         now = since_epoch(datetime.now()) + 0.000001
         self._open()
         self._execute(True, self._set_query,
-                      values=[(key, now, self._encode(json.dumps(item)))
+                      values=[(str(key), now, self._encode(item))
                               for key, item in items.items()],
                       many=True)
         self._close()
@@ -222,12 +222,13 @@ class Storage(object):
         decoded_obj = pickle.loads(obj)
         if process:
             return process(decoded_obj)
-        return decoded_obj
+        return json.loads(decoded_obj)
 
     @staticmethod
     def _encode(obj):
         return sqlite3.Binary(pickle.dumps(
-            obj, protocol=pickle.HIGHEST_PROTOCOL
+            json.dumps(obj, ensure_ascii=False),
+            protocol=pickle.HIGHEST_PROTOCOL
         ))
 
     def _get(self, item_id):

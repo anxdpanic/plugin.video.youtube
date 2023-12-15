@@ -21,7 +21,7 @@ class PlaybackHistory(Storage):
 
     @staticmethod
     def _process_item(item):
-        return item.split(',')
+        return item.strip('"').split(',')
 
     def get_items(self, keys):
         query_result = self._get_by_ids(keys, process=self._process_item)

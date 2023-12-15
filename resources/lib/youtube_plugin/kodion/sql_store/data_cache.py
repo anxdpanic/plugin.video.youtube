@@ -26,7 +26,7 @@ class DataCache(Storage):
         return self._is_empty()
 
     def get_items(self, content_ids, seconds):
-        query_result = self._get_by_ids(content_ids, process=json.loads)
+        query_result = self._get_by_ids(content_ids)
         if not query_result:
             return {}
 
@@ -48,7 +48,7 @@ class DataCache(Storage):
         if self.get_seconds_diff(query_result[1] or current_time) > seconds:
             return None
 
-        return json.loads(query_result[0])
+        return query_result[0]
 
     def set_item(self, content_id, item):
         self._set(content_id, item)
@@ -63,7 +63,7 @@ class DataCache(Storage):
         self._remove(content_id)
 
     def update(self, content_id, item):
-        self._set(str(content_id), json.dumps(item))
+        self._set(str(content_id), item)
 
     def _optimize_item_count(self):
         pass

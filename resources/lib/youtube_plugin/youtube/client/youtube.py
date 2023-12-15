@@ -381,7 +381,7 @@ class YouTube(LoginClient):
 
         # Truncate items to keep it manageable, and cache
         items = items[:500]
-        cache.set_item(cache_items_key, json.dumps(items))
+        cache.set_item(cache_items_key, items)
 
         # Build the result set
         items.sort(
@@ -438,7 +438,7 @@ class YouTube(LoginClient):
         }
         """
         # Update cache
-        cache.set_item(cache_home_key, json.dumps(payload))
+        cache.set_item(cache_home_key, payload)
 
         # If there are no sorted_items we fall back to default API behaviour
         return payload
@@ -884,7 +884,7 @@ class YouTube(LoginClient):
                 _result['items'].sort(reverse=True, key=_sort_by_date_time)
 
                 # Update cache
-                cache.set_item(cache_items_key, json.dumps(_result['items']))
+                cache.set_item(cache_items_key, _result['items'])
             """ no cache, get uploads data from web """
 
             # trim result

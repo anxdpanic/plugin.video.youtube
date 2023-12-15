@@ -247,8 +247,7 @@ class AbstractProvider(object):
             channel_id = context.get_param('channel_id', '')
 
             self._data_cache.set_item('search_query',
-                                      json.dumps({'query': quote(query)},
-                                                 ensure_ascii=False))
+                                      {'query': quote(query)})
 
             if not incognito and not channel_id:
                 try:

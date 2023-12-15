@@ -125,7 +125,8 @@ def play_video(provider, context):
         'refresh_only': screensaver
     }
 
-    ui.set_property('playback_json', json.dumps(playback_json))
+    ui.set_property('playback_json', json.dumps(playback_json,
+                                                ensure_ascii=False))
     context.send_notification('PlaybackInit', {
         'video_id': video_id,
         'channel_id': playback_json.get('channel_id', ''),
