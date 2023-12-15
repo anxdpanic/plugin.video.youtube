@@ -329,11 +329,14 @@ class PlaybackMonitorThread(threading.Thread):
             refresh_only = True
 
         if use_local_history:
+            play_data = {
+                'play_count': play_count,
+                'total_time': self.total_time,
+                'played_time': self.current_time,
+                'played_percent': self.percent_complete,
+            }
             self._context.get_playback_history().update(self.video_id,
-                                                        play_count,
-                                                        self.total_time,
-                                                        self.current_time,
-                                                        self.percent_complete)
+                                                        play_data)
 
         if not refresh_only and is_logged_in:
             if settings.get_bool('youtube.playlist.watchlater.autoremove',

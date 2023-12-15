@@ -19,7 +19,8 @@ from .storage import Storage
 class FunctionCache(Storage):
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
-        super(FunctionCache, self).__init__(filename, max_file_size_kb=max_file_size_kb)
+        super(FunctionCache, self).__init__(filename,
+                                            max_file_size_kb=max_file_size_kb)
 
         self._enabled = True
 
@@ -67,10 +68,9 @@ class FunctionCache(Storage):
 
         # only return before cached data
         data, cache_id = self._get_cached_data(partial_func)
-        if data is not None:
-            return data[0]
-
-        return None
+        if data is None:
+            return None
+        return data[1]
 
     def get(self, func, seconds, *args, **keywords):
         """
@@ -86,22 +86,14 @@ class FunctionCache(Storage):
         if not self._enabled:
             return partial_func()
 
-        cached_data = None
-        cached_time = None
         data, cache_id = self._get_cached_data(partial_func)
         if data is not None:
-            cached_data = data[0]
-            cached_time = data[1]
+            cached_time, cached_data = data
 
-        diff_seconds = 0
-
-        if cached_time is not None:
-            diff_seconds = self.get_seconds_diff(cached_time)
-
-        if cached_data is None or diff_seconds > seconds:
-            cached_data = partial_func()
-            self._set(cache_id, cached_data)
-
+        if data is None or self.get_seconds_diff(cached_time) > seconds:
+            data = partial_func()
+            self._set(cache_id, data)
+            return data
         return cached_data
 
     def _optimize_item_count(self):

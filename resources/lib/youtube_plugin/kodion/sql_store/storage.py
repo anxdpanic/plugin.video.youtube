@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
 import os
 import pickle
 import sqlite3
@@ -29,23 +28,19 @@ class Storage(object):
     ONE_WEEK = 7 * ONE_DAY
     ONE_MONTH = 4 * ONE_WEEK
 
-    _key = str('key')
-    _time = str('time')
-    _value = str('value')
-    _timestamp = str('timestamp')
-
-    _table_name = 'storage'
-    _clear_query = 'DELETE FROM %s' % _table_name
-    _create_table_query = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time TIMESTAMP, value BLOB)' % _table_name
-    _get_query = 'SELECT * FROM %s WHERE key = ?' % _table_name
-    _get_by_query = 'SELECT * FROM %s WHERE key in ({0})' % _table_name
-    _get_all_asc_query = 'SELECT * FROM %s ORDER BY time ASC LIMIT {0}' % _table_name
-    _get_all_desc_query = 'SELECT * FROM %s ORDER BY time DESC LIMIT {0}' % _table_name
-    _is_empty_query = 'SELECT EXISTS(SELECT 1 FROM %s LIMIT 1)' % _table_name
-    _optimize_item_query = 'SELECT key FROM %s ORDER BY time DESC LIMIT -1 OFFSET {0}' % _table_name
-    _remove_query = 'DELETE FROM %s WHERE key = ?' % _table_name
-    _remove_all_query = 'DELETE FROM %s WHERE key in ({0})' % _table_name
-    _set_query = 'REPLACE INTO %s (key, time, value) VALUES(?, ?, ?)' % _table_name
+    _table_name = 'storage_v2'
+    _clear_sql = 'DELETE FROM %s' % _table_name
+    _create_table_sql = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time TIMESTAMP, value BLOB)' % _table_name
+    _drop_old_tables_sql = 'DELETE FROM sqlite_master WHERE type = "table" and name IS NOT "%s"' % _table_name
+    _get_sql = 'SELECT * FROM %s WHERE key = ?' % _table_name
+    _get_by_sql = 'SELECT * FROM %s WHERE key in ({0})' % _table_name
+    _get_all_asc_sql = 'SELECT * FROM %s ORDER BY time ASC LIMIT {0}' % _table_name
+    _get_all_desc_sql = 'SELECT * FROM %s ORDER BY time DESC LIMIT {0}' % _table_name
+    _is_empty_sql = 'SELECT EXISTS(SELECT 1 FROM %s LIMIT 1)' % _table_name
+    _optimize_item_sql = 'SELECT key FROM %s ORDER BY time DESC LIMIT -1 OFFSET {0}' % _table_name
+    _remove_sql = 'DELETE FROM %s WHERE key = ?' % _table_name
+    _remove_all_sql = 'DELETE FROM %s WHERE key in ({0})' % _table_name
+    _set_sql = 'REPLACE INTO %s (key, time, value) VALUES(?, ?, ?)' % _table_name
 
     def __init__(self, filename, max_item_count=-1, max_file_size_kb=-1):
         self._filename = filename
@@ -59,7 +54,7 @@ class Storage(object):
         self._table_created = False
         self._needs_commit = False
 
-        sqlite3.register_converter(self._timestamp, self._convert_timestamp)
+        sqlite3.register_converter(str('timestamp'), self._convert_timestamp)
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
@@ -68,10 +63,19 @@ class Storage(object):
         self._max_file_size_kb = max_file_size_kb
 
     def __del__(self):
+        self._close(True)
+
+    def __enter__(self):
+        self._open()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
         self._close()
 
     def _open(self):
         if self._db:
+            if not self._cursor:
+                self._cursor = self._db.cursor()
             return
 
         self._optimize_file_size()
@@ -83,7 +87,6 @@ class Storage(object):
         db = sqlite3.connect(self._filename, check_same_thread=False,
                              detect_types=sqlite3.PARSE_DECLTYPES,
                              timeout=1, isolation_level=None)
-        db.row_factory = sqlite3.Row
         cursor = db.cursor()
         # cursor.execute('PRAGMA journal_mode=MEMORY')
         cursor.execute('PRAGMA journal_mode=WAL')
@@ -96,6 +99,14 @@ class Storage(object):
         self._db = db
         self._cursor = cursor
         self._create_table()
+        self._drop_old_tables()
+
+    def _drop_old_tables(self):
+        self._execute(True, 'PRAGMA writable_schema=1')
+        self._execute(True, self._drop_old_tables_sql)
+        self._execute(True, 'PRAGMA writable_schema=0')
+        self._sync()
+        self._execute(False, 'VACUUM')
 
     def _execute(self, needs_commit, query, values=None, many=False):
         if values is None:
@@ -120,12 +131,13 @@ class Storage(object):
                 time.sleep(0.1)
         return []
 
-    def _close(self):
-        if self._db:
+    def _close(self, full=False):
+        if self._db and self._cursor:
             self._sync()
             self._db.commit()
             self._cursor.close()
             self._cursor = None
+        if full and self._db:
             self._db.close()
             self._db = None
 
@@ -152,7 +164,7 @@ class Storage(object):
     def _create_table(self):
         if self._table_created:
             return
-        self._execute(True, self._create_table_query)
+        self._execute(True, self._create_table_sql)
         self._table_created = True
 
     def _sync(self):
@@ -164,22 +176,18 @@ class Storage(object):
     def _set(self, item_id, item):
         # add 1 microsecond, required for dbapi2
         now = since_epoch(datetime.now()) + 0.000001
-        self._open()
-        self._execute(True, self._set_query, values=[str(item_id),
-                                                     now,
-                                                     self._encode(item)])
-        self._close()
+        with self as db:
+            db._execute(True, db._set_sql,
+                        values=[str(item_id), now, db._encode(item)])
         self._optimize_item_count()
 
     def _set_all(self, items):
         # add 1 microsecond, required for dbapi2
         now = since_epoch(datetime.now()) + 0.000001
-        self._open()
-        self._execute(True, self._set_query,
-                      values=[(str(key), now, self._encode(item))
-                              for key, item in items.items()],
-                      many=True)
-        self._close()
+        with self as db:
+            db._execute(True, db._set_sql, many=True,
+                        values=[(str(item_id), now, db._encode(item))
+                                for item_id, item in items.items()])
         self._optimize_item_count()
 
     def _optimize_item_count(self):
@@ -189,32 +197,28 @@ class Storage(object):
             return
         if self._max_item_count < 0:
             return
-        query = self._optimize_item_query.format(self._max_item_count)
-        self._open()
-        item_ids = self._execute(False, query)
-        key = self._key
-        item_ids = [item_id[key] for item_id in item_ids]
-        if item_ids:
-            self._remove_all(item_ids)
-        self._close()
+        query = self._optimize_item_sql.format(self._max_item_count)
+        with self as db:
+            item_ids = db._execute(False, query)
+            item_ids = [item_id[0] for item_id in item_ids]
+            if item_ids:
+                db._remove_all(item_ids)
 
     def _clear(self):
-        self._open()
-        self._execute(True, self._clear_query)
-        self._create_table()
-        self._sync()
-        self._execute(False, 'VACUUM')
-        self._close()
+        with self as db:
+            db._execute(True, db._clear_sql)
+            db._create_table()
+            db._sync()
+            db._execute(False, 'VACUUM')
 
     def _is_empty(self):
-        self._open()
-        result = self._execute(False, self._is_empty_query)
-        for item in result:
-            is_empty = item[0] == 0
-            break
-        else:
-            is_empty = True
-        self._close()
+        with self as db:
+            result = db._execute(False, db._is_empty_sql)
+            for item in result:
+                is_empty = item[0] == 0
+                break
+            else:
+                is_empty = True
         return is_empty
 
     @staticmethod
@@ -222,58 +226,51 @@ class Storage(object):
         decoded_obj = pickle.loads(obj)
         if process:
             return process(decoded_obj)
-        return json.loads(decoded_obj)
+        return decoded_obj
 
     @staticmethod
     def _encode(obj):
         return sqlite3.Binary(pickle.dumps(
-            json.dumps(obj, ensure_ascii=False),
-            protocol=pickle.HIGHEST_PROTOCOL
+            obj, protocol=pickle.HIGHEST_PROTOCOL
         ))
 
-    def _get(self, item_id):
-        self._open()
-        result = self._execute(False, self._get_query, [item_id])
-        if result:
-            result = result.fetchone()
-        self._close()
-        if result:
-            return self._decode(result[self._value]), result[self._time]
-        return None
+    def _get(self, item_id, process=None):
+        with self as db:
+            result = db._execute(False, db._get_sql, [item_id])
+            if result:
+                result = result.fetchone()
+            if not result:
+                return None
+        return result[1], self._decode(result[2], process)
 
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
                     process=None):
         if not item_ids:
             if oldest_first:
-                query = self._get_all_asc_query
+                query = self._get_all_asc_sql
             else:
-                query = self._get_all_desc_query
+                query = self._get_all_desc_sql
             query = query.format(limit)
         else:
             num_ids = len(item_ids)
-            query = self._get_by_query.format(('?,' * (num_ids - 1)) + '?')
+            query = self._get_by_sql.format(('?,' * (num_ids - 1)) + '?')
             item_ids = tuple(item_ids)
 
-        self._open()
-        result = self._execute(False, query, item_ids)
-        key = self._key
-        time = self._time
-        value = self._value
-        result = [
-            (item[key], item[time], self._decode(item[value], process))
-            for item in result
-        ]
-        self._close()
+        with self as db:
+            result = db._execute(False, query, item_ids)
+            result = [
+                (item[0], item[1], db._decode(item[2], process))
+                for item in result
+            ]
         return result
 
     def _remove(self, item_id):
-        self._open()
-        self._execute(True, self._remove_query, [item_id])
+        with self as db:
+            db._execute(True, db._remove_sql, [item_id])
 
     def _remove_all(self, item_ids):
         num_ids = len(item_ids)
-        query = self._remove_all_query.format(('?,' * (num_ids - 1)) + '?')
-        self._open()
+        query = self._remove_all_sql.format(('?,' * (num_ids - 1)) + '?')
         self._execute(True, query, tuple(item_ids))
 
     @staticmethod

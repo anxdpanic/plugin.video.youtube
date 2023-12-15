@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
 from datetime import datetime
 
 from .storage import Storage
@@ -45,10 +44,10 @@ class DataCache(Storage):
             return None
 
         current_time = datetime.now()
-        if self.get_seconds_diff(query_result[1] or current_time) > seconds:
+        if self.get_seconds_diff(query_result[0] or current_time) > seconds:
             return None
 
-        return query_result[0]
+        return query_result[1]
 
     def set_item(self, content_id, item):
         self._set(content_id, item)

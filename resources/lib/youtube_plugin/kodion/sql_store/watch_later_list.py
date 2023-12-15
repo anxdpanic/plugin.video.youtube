@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from datetime import datetime
 
 from .storage import Storage
-from .. import items
+from ..items import to_json, from_json
 
 
 class WatchLaterList(Storage):
@@ -28,13 +28,13 @@ class WatchLaterList(Storage):
         return _item[2].get_date()
 
     def get_items(self):
-        result = self._get_by_ids(process=items.from_json)
+        result = self._get_by_ids(process=from_json)
         return sorted(result, key=self._sort_item, reverse=False)
 
     def add(self, base_item):
         base_item.set_date_from_datetime(datetime.now())
 
-        item_json_data = items.to_json(base_item)
+        item_json_data = to_json(base_item)
         self._set(base_item.get_id(), item_json_data)
 
     def remove(self, base_item):

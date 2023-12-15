@@ -473,7 +473,7 @@ class Provider(AbstractProvider):
                                            upload_playlist,
                                            page_token=page_token)
             if not json_data:
-                return False
+                return result
 
             result.extend(v3.response_to_items(self, context, json_data))
 
@@ -1171,11 +1171,7 @@ class Provider(AbstractProvider):
             play_data['played_time'] = 0
             play_data['played_percent'] = 0
 
-        playback_history.update(video_id,
-                                play_data.get('play_count', 0),
-                                play_data.get('total_time', 0),
-                                play_data.get('played_time', 0),
-                                play_data.get('played_percent', 0))
+        playback_history.update(video_id, play_data)
         context.get_ui().refresh_container()
         return True
 
