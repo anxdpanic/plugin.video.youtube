@@ -71,7 +71,7 @@ class XbmcRunner(AbstractProviderRunner):
         if isinstance(result, DirectoryItem):
             item_count = 1
             items = [self._add_directory(result, show_fanart)]
-        elif isinstance(result, list):
+        elif isinstance(result, (list, tuple)):
             item_count = len(result)
             items = [
                 self._add_directory(item, show_fanart) if isinstance(item, DirectoryItem)

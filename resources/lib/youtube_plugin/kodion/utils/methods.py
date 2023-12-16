@@ -178,7 +178,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 def create_path(*args):
     comps = []
     for arg in args:
-        if isinstance(arg, list):
+        if isinstance(arg, (list, tuple)):
             return create_path(*arg)
 
         comps.append(str(arg.strip('/').replace('\\', '/').replace('//', '/')))
@@ -193,7 +193,7 @@ def create_path(*args):
 def create_uri_path(*args):
     comps = []
     for arg in args:
-        if isinstance(arg, list):
+        if isinstance(arg, (list, tuple)):
             return create_uri_path(*arg)
 
         comps.append(str(arg.strip('/').replace('\\', '/').replace('//', '/')))

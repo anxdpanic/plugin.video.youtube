@@ -271,7 +271,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         result = json_data
         for keys in path:
             is_dict = isinstance(result, dict)
-            if not is_dict and not isinstance(result, list):
+            if not is_dict and not isinstance(result, (list, tuple)):
                 return None
 
             if not isinstance(keys, (list, tuple)):

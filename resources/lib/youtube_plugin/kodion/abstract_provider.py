@@ -52,9 +52,10 @@ class AbstractProvider(object):
         """
 
         for method_name in dir(self):
-            method = getattr(self, method_name)
-            if hasattr(method, 'kodion_re_path'):
-                self.register_path(method.kodion_re_path, method_name)
+            method = getattr(self, method_name, None)
+            path = method and getattr(method, 'kodion_re_path', None)
+            if path:
+                self.register_path(path, method_name)
 
     def get_alternative_fanart(self, context):
         return context.get_fanart()
@@ -96,7 +97,7 @@ class AbstractProvider(object):
             re_match = re.search(key, path, re.UNICODE)
             if re_match is not None:
                 method_name = self._dict_path.get(key, '')
-                method = getattr(self, method_name)
+                method = getattr(self, method_name, None)
                 if method is not None:
                     result = method(context, re_match)
                     if not isinstance(result, tuple):

@@ -284,7 +284,7 @@ class Subtitles(object):
         lang_name = track.get(key, {}).get('simpleText')
         if not lang_name:
             track_name = track.get(key, {}).get('runs', [{}])
-            if isinstance(track_name, list) and len(track_name) >= 1:
+            if isinstance(track_name, (list, tuple)) and len(track_name) >= 1:
                 lang_name = track_name[0].get('text')
 
         if lang_name:

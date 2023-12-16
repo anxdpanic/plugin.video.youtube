@@ -53,7 +53,7 @@ def v3_request(method='GET', headers=None, path=None, post_data=None, params=Non
 
 
 def _append_missing_page_token(items):
-    if items and isinstance(items, list) and (items[-1].get('nextPageToken') is None):
+    if items and isinstance(items, list) and 'nextPageToken' not in items[-1]:
         items.append({'nextPageToken': ''})
 
     return items
@@ -481,7 +481,7 @@ def get_live(channel_id=None, user=None, url=None, addon_id=None):
 
     if matched_type == 'user':
         items = get_channel_id(matched_id, addon_id=addon_id)
-        if not items or not isinstance(items, list):
+        if not items or not isinstance(items, list) or 'id' not in items[0]:
             return None
 
         matched_id = items[0]['id']

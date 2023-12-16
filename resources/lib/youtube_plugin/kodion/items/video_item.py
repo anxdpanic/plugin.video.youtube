@@ -263,7 +263,8 @@ class VideoItem(BaseItem):
         return self._mediatype
 
     def set_subtitles(self, value):
-        self.subtitles = value if value and isinstance(value, list) else None
+        if value and isinstance(value, (list, tuple)):
+            self.subtitles = value
 
     def set_headers(self, value):
         self._headers = value

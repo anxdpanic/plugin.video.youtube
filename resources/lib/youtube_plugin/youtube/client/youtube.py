@@ -213,7 +213,7 @@ class YouTube(LoginClient):
                                        **kwargs)
 
     def get_video_rating(self, video_id, **kwargs):
-        if isinstance(video_id, list):
+        if not isinstance(video_id, str):
             video_id = ','.join(video_id)
 
         params = {'id': video_id}
@@ -622,7 +622,7 @@ class YouTube(LoginClient):
         :param channel_id: list or comma-separated list of the YouTube channel ID(s)
         :return:
         """
-        if isinstance(channel_id, list):
+        if not isinstance(channel_id, str):
             channel_id = ','.join(channel_id)
 
         params = {'part': 'snippet,contentDetails,brandingSettings'}
@@ -659,14 +659,14 @@ class YouTube(LoginClient):
         :param live_details: also retrieve liveStreamingDetails
         :return:
         """
-        if isinstance(video_id, list):
+        if not isinstance(video_id, str):
             video_id = ','.join(video_id)
 
-        parts = ['snippet,contentDetails,status,statistics']
+        parts = ['snippet', 'contentDetails', 'status', 'statistics']
         if live_details:
-            parts.append(',liveStreamingDetails')
+            parts.append('liveStreamingDetails')
 
-        params = {'part': ''.join(parts),
+        params = {'part': ','.join(parts),
                   'id': video_id}
         return self.perform_v3_request(method='GET',
                                        path='videos',
@@ -674,7 +674,7 @@ class YouTube(LoginClient):
                                        **kwargs)
 
     def get_playlists(self, playlist_id, **kwargs):
-        if isinstance(playlist_id, list):
+        if not isinstance(playlist_id, str):
             playlist_id = ','.join(playlist_id)
 
         params = {'part': 'snippet,contentDetails',
@@ -850,7 +850,7 @@ class YouTube(LoginClient):
         # prepare search type
         if not search_type:
             search_type = ''
-        if isinstance(search_type, list):
+        if not isinstance(search_type, str):
             search_type = ','.join(search_type)
 
         # prepare page token
