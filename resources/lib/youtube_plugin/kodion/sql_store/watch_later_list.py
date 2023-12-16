@@ -23,13 +23,9 @@ class WatchLaterList(Storage):
     def clear(self):
         self._clear()
 
-    @staticmethod
-    def _sort_item(_item):
-        return _item[2].get_date()
-
     def get_items(self):
-        result = self._get_by_ids(process=from_json)
-        return sorted(result, key=self._sort_item, reverse=False)
+        result = self._get_by_ids(process=from_json, values_only=True)
+        return result
 
     def add(self, base_item):
         base_item.set_date_from_datetime(datetime.now())

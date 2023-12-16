@@ -25,8 +25,9 @@ class SearchHistory(Storage):
 
     def get_items(self):
         result = self._get_by_ids(oldest_first=False,
-                                  limit=self._max_item_count)
-        return [item[2] for item in result]
+                                  limit=self._max_item_count,
+                                  values_only=True)
+        return result
 
     def clear(self):
         self._clear()

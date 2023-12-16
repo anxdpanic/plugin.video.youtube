@@ -19,23 +19,19 @@ class PlaybackHistory(Storage):
     def is_empty(self):
         return self._is_empty()
 
-    def get_items(self, keys):
-        query_result = self._get_by_ids(keys)
-        if not query_result:
-            return {}
+    def _add_last_played(self, value, item):
+        value['last_played'] = self._convert_timestamp(item[1])
+        return value
 
-        result = {
-            item[0]: dict(item[2], last_played=item[1])
-            for item in query_result
-        }
+    def get_items(self, keys=None):
+        result = self._get_by_ids(keys,
+                                  oldest_first=False,
+                                  process=self._add_last_played,
+                                  as_dict=True)
         return result
 
     def get_item(self, key):
-        query_result = self._get(key)
-        if not query_result:
-            return {}
-
-        result = {key: dict(query_result[1], last_played=query_result[0])}
+        result = self._get(key, process=self._add_last_played)
         return result
 
     def clear(self):

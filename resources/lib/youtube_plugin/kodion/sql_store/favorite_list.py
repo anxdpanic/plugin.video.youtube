@@ -22,11 +22,11 @@ class FavoriteList(Storage):
         self._clear()
 
     @staticmethod
-    def _sort_item(_item):
-        return _item[2].get_name().upper()
+    def _sort_item(item):
+        return item.get_name().upper()
 
     def get_items(self):
-        result = self._get_by_ids(process=from_json)
+        result = self._get_by_ids(process=from_json, values_only=True)
         return sorted(result, key=self._sort_item, reverse=False)
 
     def add(self, base_item):

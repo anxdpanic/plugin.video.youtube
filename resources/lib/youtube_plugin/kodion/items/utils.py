@@ -26,7 +26,7 @@ _ITEM_TYPES = {
 }
 
 
-def from_json(json_data):
+def from_json(json_data, *_args):
     """
     Creates a instance of the given json dump or dict.
     :param json_data:

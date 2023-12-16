@@ -30,7 +30,7 @@ class Storage(object):
 
     _table_name = 'storage_v2'
     _clear_sql = 'DELETE FROM %s' % _table_name
-    _create_table_sql = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time TIMESTAMP, value BLOB)' % _table_name
+    _create_table_sql = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time REAL, value BLOB)' % _table_name
     _drop_old_tables_sql = 'DELETE FROM sqlite_master WHERE type = "table" and name IS NOT "%s"' % _table_name
     _get_sql = 'SELECT * FROM %s WHERE key = ?' % _table_name
     _get_by_sql = 'SELECT * FROM %s WHERE key in ({0})' % _table_name
@@ -53,8 +53,6 @@ class Storage(object):
 
         self._table_created = False
         self._needs_commit = False
-
-        sqlite3.register_converter(str('timestamp'), self._convert_timestamp)
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
@@ -174,16 +172,14 @@ class Storage(object):
         return self._execute(False, 'COMMIT')
 
     def _set(self, item_id, item):
-        # add 1 microsecond, required for dbapi2
-        now = since_epoch(datetime.now()) + 0.000001
+        now = since_epoch(datetime.now())
         with self as db:
             db._execute(True, db._set_sql,
                         values=[str(item_id), now, db._encode(item)])
         self._optimize_item_count()
 
     def _set_all(self, items):
-        # add 1 microsecond, required for dbapi2
-        now = since_epoch(datetime.now()) + 0.000001
+        now = since_epoch(datetime.now())
         with self as db:
             db._execute(True, db._set_sql, many=True,
                         values=[(str(item_id), now, db._encode(item))
@@ -222,10 +218,10 @@ class Storage(object):
         return is_empty
 
     @staticmethod
-    def _decode(obj, process=None):
+    def _decode(obj, process=None, item=None):
         decoded_obj = pickle.loads(obj)
         if process:
-            return process(decoded_obj)
+            return process(decoded_obj, item)
         return decoded_obj
 
     @staticmethod
@@ -234,17 +230,20 @@ class Storage(object):
             obj, protocol=pickle.HIGHEST_PROTOCOL
         ))
 
-    def _get(self, item_id, process=None):
+    def _get(self, item_id, process=None, seconds=None):
         with self as db:
-            result = db._execute(False, db._get_sql, [item_id])
-            if result:
-                result = result.fetchone()
-            if not result:
+            result = db._execute(False, db._get_sql, [str(item_id)])
+            item = result.fetchone() if result else None
+            if not item:
                 return None
-        return result[1], self._decode(result[2], process)
+        cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
+        if not cut_off or item[1] >= cut_off:
+            return self._decode(item[2], process, item)
+        return None
 
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
-                    process=None):
+                    seconds=None, process=None,
+                    as_dict=False, values_only=False):
         if not item_ids:
             if oldest_first:
                 query = self._get_all_asc_sql
@@ -258,10 +257,24 @@ class Storage(object):
 
         with self as db:
             result = db._execute(False, query, item_ids)
-            result = [
-                (item[0], item[1], db._decode(item[2], process))
-                for item in result
-            ]
+            cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
+            if as_dict:
+                result = {
+                    item[0]: db._decode(item[2], process, item)
+                    for item in result if not cut_off or item[1] >= cut_off
+                }
+            elif values_only:
+                result = [
+                    db._decode(item[2], process, item)
+                    for item in result if not cut_off or item[1] >= cut_off
+                ]
+            else:
+                result = [
+                    (item[0],
+                     self._convert_timestamp(item[1]),
+                     db._decode(item[2], process, item))
+                    for item in result if not cut_off or item[1] >= cut_off
+                ]
         return result
 
     def _remove(self, item_id):
@@ -273,60 +286,6 @@ class Storage(object):
         query = self._remove_all_sql.format(('?,' * (num_ids - 1)) + '?')
         self._execute(True, query, tuple(item_ids))
 
-    @staticmethod
-    def strptime(stamp, stamp_fmt):
-        # noinspection PyUnresolvedReferences
-        import _strptime
-        try:
-            time.strptime('01 01 2012', '%d %m %Y')  # dummy call
-        except:
-            pass
-        return time.strptime(stamp, stamp_fmt)
-
     @classmethod
     def _convert_timestamp(cls, val):
-        val = val.decode('utf-8')
-        if '-' in val or ':' in val:
-            return cls._parse_datetime_string(val)
-        return datetime.fromtimestamp(float(val))
-
-    @classmethod
-    def _parse_datetime_string(cls, current_stamp):
-        for stamp_format in ['%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d %H:%M:%S']:
-            try:
-                stamp_datetime = datetime(
-                    *(cls.strptime(current_stamp, stamp_format)[0:6])
-                )
-                break
-            except ValueError:  # current_stamp has no microseconds
-                continue
-            except TypeError:
-                log_error('Exception while parsing timestamp:\n'
-                          'current_stamp |{cs}|{cst}|\n'
-                          'stamp_format |{sf}|{sft}|\n{tb}'
-                          .format(cs=current_stamp,
-                                  cst=type(current_stamp),
-                                  sf=stamp_format,
-                                  sft=type(stamp_format),
-                                  tb=print_exc()))
-        else:
-            return None
-        return stamp_datetime
-
-    def get_seconds_diff(self, current_stamp):
-        if not current_stamp:
-            return 86400  # 24 hrs
-
-        current_datetime = datetime.now()
-        if isinstance(current_stamp, datetime):
-            time_delta = current_datetime - current_stamp
-            return time_delta.total_seconds()
-
-        if isinstance(current_stamp, (float, int)):
-            return since_epoch(current_datetime) - current_stamp
-
-        stamp_datetime = self._parse_datetime_string(current_stamp)
-        if not stamp_datetime:
-            return 604800  # one week
-        time_delta = current_datetime - stamp_datetime
-        return time_delta.total_seconds()
+        return datetime.fromtimestamp(val)

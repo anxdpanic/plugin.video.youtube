@@ -55,9 +55,9 @@ class FunctionCache(Storage):
         md5_hash.update(str(partial_func.keywords).encode('utf-8'))
         return md5_hash.hexdigest()
 
-    def _get_cached_data(self, partial_func):
+    def _get_cached_data(self, partial_func, seconds=None):
         cache_id = self._create_id_from_func(partial_func)
-        return self._get(cache_id), cache_id
+        return self._get(cache_id, seconds=seconds), cache_id
 
     def get_cached_only(self, func, *args, **keywords):
         partial_func = partial(func, *args, **keywords)
@@ -67,10 +67,8 @@ class FunctionCache(Storage):
             return partial_func()
 
         # only return before cached data
-        data, cache_id = self._get_cached_data(partial_func)
-        if data is None:
-            return None
-        return data[1]
+        data, _ = self._get_cached_data(partial_func)
+        return data
 
     def get(self, func, seconds, *args, **keywords):
         """
@@ -86,15 +84,11 @@ class FunctionCache(Storage):
         if not self._enabled:
             return partial_func()
 
-        data, cache_id = self._get_cached_data(partial_func)
-        if data is not None:
-            cached_time, cached_data = data
-
-        if data is None or self.get_seconds_diff(cached_time) > seconds:
+        data, cache_id = self._get_cached_data(partial_func, seconds=seconds)
+        if data is None:
             data = partial_func()
             self._set(cache_id, data)
-            return data
-        return cached_data
+        return data
 
     def _optimize_item_count(self):
         # override method Storage._optimize_item_count

@@ -25,29 +25,12 @@ class DataCache(Storage):
         return self._is_empty()
 
     def get_items(self, content_ids, seconds):
-        query_result = self._get_by_ids(content_ids)
-        if not query_result:
-            return {}
-
-        current_time = datetime.now()
-        result = {
-            item[0]: item[2]
-            for item in query_result
-            if self.get_seconds_diff(item[1] or current_time) <= seconds
-        }
+        result = self._get_by_ids(content_ids, seconds=seconds, as_dict=True)
         return result
 
     def get_item(self, content_id, seconds):
-        content_id = str(content_id)
-        query_result = self._get(content_id)
-        if not query_result:
-            return None
-
-        current_time = datetime.now()
-        if self.get_seconds_diff(query_result[0] or current_time) > seconds:
-            return None
-
-        return query_result[1]
+        result = self._get(content_id, seconds=seconds)
+        return result
 
     def set_item(self, content_id, item):
         self._set(content_id, item)
