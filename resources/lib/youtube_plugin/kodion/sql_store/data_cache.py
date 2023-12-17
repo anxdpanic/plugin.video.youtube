@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from datetime import datetime
-
 from .storage import Storage
 
 

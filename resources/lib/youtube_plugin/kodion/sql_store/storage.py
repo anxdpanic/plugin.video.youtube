@@ -28,19 +28,20 @@ class Storage(object):
     ONE_WEEK = 7 * ONE_DAY
     ONE_MONTH = 4 * ONE_WEEK
 
-    _table_name = 'storage_v2'
-    _clear_sql = 'DELETE FROM %s' % _table_name
-    _create_table_sql = 'CREATE TABLE IF NOT EXISTS %s (key TEXT PRIMARY KEY, time REAL, value BLOB)' % _table_name
-    _drop_old_tables_sql = 'DELETE FROM sqlite_master WHERE type = "table" and name IS NOT "%s"' % _table_name
-    _get_sql = 'SELECT * FROM %s WHERE key = ?' % _table_name
-    _get_by_sql = 'SELECT * FROM %s WHERE key in ({0})' % _table_name
-    _get_all_asc_sql = 'SELECT * FROM %s ORDER BY time ASC LIMIT {0}' % _table_name
-    _get_all_desc_sql = 'SELECT * FROM %s ORDER BY time DESC LIMIT {0}' % _table_name
-    _is_empty_sql = 'SELECT EXISTS(SELECT 1 FROM %s LIMIT 1)' % _table_name
-    _optimize_item_sql = 'SELECT key FROM %s ORDER BY time DESC LIMIT -1 OFFSET {0}' % _table_name
-    _remove_sql = 'DELETE FROM %s WHERE key = ?' % _table_name
-    _remove_all_sql = 'DELETE FROM %s WHERE key in ({0})' % _table_name
-    _set_sql = 'REPLACE INTO %s (key, time, value) VALUES(?, ?, ?)' % _table_name
+    _table_name = 'storage_v3'
+    _clear_sql = 'DELETE FROM {table}'.format(table=_table_name)
+    _create_table_sql = 'CREATE TABLE IF NOT EXISTS {table} (key TEXT PRIMARY KEY, time REAL, value BLOB, size INTEGER)'.format(table=_table_name)
+    _drop_old_tables_sql = 'DELETE FROM sqlite_master WHERE type = "table" and name IS NOT "{table}"'.format(table=_table_name)
+    _get_sql = 'SELECT * FROM {table} WHERE key = ?'.format(table=_table_name)
+    _get_by_sql = 'SELECT * FROM {table} WHERE key in ({{0}})'.format(table=_table_name)
+    _get_all_asc_sql = 'SELECT * FROM {table} ORDER BY time ASC LIMIT {{0}}'.format(table=_table_name)
+    _get_all_desc_sql = 'SELECT * FROM {table} ORDER BY time DESC LIMIT {{0}}'.format(table=_table_name)
+    _is_empty_sql = 'SELECT EXISTS(SELECT 1 FROM {table} LIMIT 1)'.format(table=_table_name)
+    _optimize_item_sql = 'SELECT key FROM {table} ORDER BY time DESC LIMIT -1 OFFSET {{0}}'.format(table=_table_name)
+    _prune_sql = 'DELETE FROM {table} WHERE ROWID IN (SELECT ROWID FROM {table} WHERE (SELECT SUM(size) FROM {table} AS _ WHERE time<={table}.time) <= {{0}})'.format(table=_table_name)
+    _remove_sql = 'DELETE FROM {table} WHERE key = ?'.format(table=_table_name)
+    _remove_all_sql = 'DELETE FROM {table} WHERE key in ({{0}})'.format(table=_table_name)
+    _set_sql = 'REPLACE INTO {table} (key, time, value, size) VALUES(?, ?, ?, ?)'.format(table=_table_name)
 
     def __init__(self, filename, max_item_count=-1, max_file_size_kb=-1):
         self._filename = filename
@@ -52,6 +53,7 @@ class Storage(object):
         self._max_file_size_kb = max_file_size_kb
 
         self._table_created = False
+        self._table_updated = False
         self._needs_commit = False
 
     def set_max_item_count(self, max_item_count):
@@ -76,14 +78,11 @@ class Storage(object):
                 self._cursor = self._db.cursor()
             return
 
-        self._optimize_file_size()
-
         path = os.path.dirname(self._filename)
         if not os.path.exists(path):
             os.makedirs(path)
 
         db = sqlite3.connect(self._filename, check_same_thread=False,
-                             detect_types=sqlite3.PARSE_DECLTYPES,
                              timeout=1, isolation_level=None)
         cursor = db.cursor()
         # cursor.execute('PRAGMA journal_mode=MEMORY')
@@ -91,20 +90,26 @@ class Storage(object):
         cursor.execute('PRAGMA busy_timeout=20000')
         cursor.execute('PRAGMA read_uncommitted=TRUE')
         cursor.execute('PRAGMA temp_store=MEMORY')
+        cursor.execute('PRAGMA page_size=4096')
         # cursor.execute('PRAGMA synchronous=OFF')
         cursor.execute('PRAGMA synchronous=NORMAL')
-        cursor.arraysize = 100
+        cursor.arraysize = 50
         self._db = db
         self._cursor = cursor
+
         self._create_table()
         self._drop_old_tables()
+        self._optimize_file_size()
 
     def _drop_old_tables(self):
+        if self._table_updated:
+            return
         self._execute(True, 'PRAGMA writable_schema=1')
         self._execute(True, self._drop_old_tables_sql)
         self._execute(True, 'PRAGMA writable_schema=0')
         self._sync()
         self._execute(False, 'VACUUM')
+        self._table_updated = True
 
     def _execute(self, needs_commit, query, values=None, many=False):
         if values is None:
@@ -124,18 +129,23 @@ class Storage(object):
                     return self._cursor.executemany(query, values)
                 return self._cursor.execute(query, values)
             except TypeError:
+                log_error('SQLStorage._execute - |{0}|'.format(print_exc()))
                 return []
             except:
+                log_error('SQLStorage._execute - |{0}|'.format(print_exc()))
                 time.sleep(0.1)
         return []
 
     def _close(self, full=False):
-        if self._db and self._cursor:
+        if not self._db:
+            return
+
+        if self._cursor:
             self._sync()
             self._db.commit()
             self._cursor.close()
             self._cursor = None
-        if full and self._db:
+        if full:
             self._db.close()
             self._db = None
 
@@ -144,20 +154,19 @@ class Storage(object):
         if self._max_file_size_kb <= 0:
             return
 
-        # do nothing - only if this folder exists
-        path = os.path.dirname(self._filename)
-        if not os.path.exists(path):
-            return
-
+        # do nothing - only if this db exists
         if not os.path.exists(self._filename):
             return
 
-        try:
-            file_size_kb = (os.path.getsize(self._filename) // 1024)
-            if file_size_kb >= self._max_file_size_kb:
-                os.remove(self._filename)
-        except OSError:
-            pass
+        file_size_kb = (os.path.getsize(self._filename) // 1024)
+        if file_size_kb <= self._max_file_size_kb:
+            return
+
+        prune_size = 1024 * int(file_size_kb - self._max_file_size_kb / 2)
+        query = self._prune_sql.format(prune_size)
+        self._execute(True, query)
+        self._sync()
+        self._execute(False, 'VACUUM')
 
     def _create_table(self):
         if self._table_created:
@@ -175,14 +184,14 @@ class Storage(object):
         now = since_epoch(datetime.now())
         with self as db:
             db._execute(True, db._set_sql,
-                        values=[str(item_id), now, db._encode(item)])
+                        values=[str(item_id), now, *db._encode(item)])
         self._optimize_item_count()
 
     def _set_all(self, items):
         now = since_epoch(datetime.now())
         with self as db:
             db._execute(True, db._set_sql, many=True,
-                        values=[(str(item_id), now, db._encode(item))
+                        values=[(str(item_id), now, *db._encode(item))
                                 for item_id, item in items.items()])
         self._optimize_item_count()
 
@@ -226,9 +235,12 @@ class Storage(object):
 
     @staticmethod
     def _encode(obj):
-        return sqlite3.Binary(pickle.dumps(
+        blob = sqlite3.Binary(pickle.dumps(
             obj, protocol=pickle.HIGHEST_PROTOCOL
         ))
+        size = getattr(blob, 'nbytes', None) or blob.itemsize * len(blob)
+        return blob, size
+
 
     def _get(self, item_id, process=None, seconds=None):
         with self as db:
