@@ -20,6 +20,7 @@ class ResourceManager(object):
         self._show_fanart = context.get_settings().get_bool(
             'youtube.channel.fanart.show', True
         )
+        self.new_data = {}
 
     @staticmethod
     def _list_batch(input_list, n=50):
@@ -32,7 +33,7 @@ class ResourceManager(object):
         self._func_cache.clear()
         self._data_cache.clear()
 
-    def get_channels(self, ids):
+    def get_channels(self, ids, defer_cache=False):
         updated = []
         for channel_id in ids:
             if not channel_id:
@@ -80,9 +81,7 @@ class ResourceManager(object):
                 if yt_item
             }
             result.update(new_data)
-            self._data_cache.set_items(new_data)
-            self._context.log_debug('Cached data for channels:\n|{ids}|'
-                                    .format(ids=list(new_data)))
+            self.cache_data(new_data, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
@@ -95,11 +94,11 @@ class ResourceManager(object):
 
         return result
 
-    def get_fanarts(self, channel_ids):
+    def get_fanarts(self, channel_ids, defer_cache=False):
         if not self._show_fanart:
             return {}
 
-        result = self.get_channels(channel_ids)
+        result = self.get_channels(channel_ids, defer_cache=defer_cache)
         banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl',
                    'bannerTvImageUrl', 'bannerExternalUrl']
         # transform
@@ -117,7 +116,7 @@ class ResourceManager(object):
 
         return result
 
-    def get_playlists(self, ids):
+    def get_playlists(self, ids, defer_cache=False):
         ids = tuple(ids)
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids if id_ not in result]
@@ -144,9 +143,7 @@ class ResourceManager(object):
                 if yt_item
             }
             result.update(new_data)
-            self._data_cache.set_items(new_data)
-            self._context.log_debug('Cached data for playlists:\n|{ids}|'
-                                    .format(ids=list(new_data)))
+            self.cache_data(new_data, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
@@ -159,7 +156,7 @@ class ResourceManager(object):
 
         return result
 
-    def get_playlist_items(self, ids=None, batch_id=None):
+    def get_playlist_items(self, ids=None, batch_id=None, defer_cache=False):
         if not ids and not batch_id:
             return None
 
@@ -214,10 +211,8 @@ class ResourceManager(object):
             to_update = list(new_data)
             self._context.log_debug('Got items for playlists:\n|{ids}|'
                                     .format(ids=to_update))
-            self._data_cache.set_items(new_data)
             result.update(new_data)
-            self._context.log_debug('Cached items for playlists:\n|{ids}|'
-                                    .format(ids=to_update))
+            self.cache_data(new_data, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
@@ -230,8 +225,8 @@ class ResourceManager(object):
 
         return result
 
-    def get_related_playlists(self, channel_id):
-        result = self.get_channels([channel_id])
+    def get_related_playlists(self, channel_id, defer_cache=False):
+        result = self.get_channels([channel_id], defer_cache=defer_cache)
 
         # transform
         item = None
@@ -247,7 +242,11 @@ class ResourceManager(object):
 
         return item.get('contentDetails', {}).get('relatedPlaylists', {})
 
-    def get_videos(self, ids, live_details=False, suppress_errors=False):
+    def get_videos(self,
+                   ids,
+                   live_details=False,
+                   suppress_errors=False,
+                   defer_cache=False):
         ids = tuple(ids)
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids if id_ not in result]
@@ -277,9 +276,7 @@ class ResourceManager(object):
                 for yt_item in batch.get('items', [])
             })
             result.update(new_data)
-            self._data_cache.set_items(new_data)
-            self._context.log_debug('Cached data for videos:\n|{ids}|'
-                                    .format(ids=list(new_data)))
+            self.cache_data(new_data, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
@@ -297,3 +294,15 @@ class ResourceManager(object):
                 result[video_id]['play_data'] = play_data
 
         return result
+
+    def cache_data(self, data=None, defer=False):
+        if defer:
+            if data:
+                self.new_data.update(data)
+            return
+
+        data = data or self.new_data
+        if data:
+            self._data_cache.set_items(data)
+            self._context.log_debug('Cached data for items:\n|{ids}|'
+                                    .format(ids=list(data)))

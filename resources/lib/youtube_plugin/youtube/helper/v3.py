@@ -281,102 +281,142 @@ def _process_list_response(provider, context, json_data):
     # for each video.
     channel_items_dict = {}
 
-    running = 0
     resource_manager = provider.get_resource_manager(context)
-    resources = [
-        {
+    resources = {
+        1: {
             'fetcher': resource_manager.get_videos,
-            'args': (video_id_dict.keys(), ),
-            'kwargs': {'live_details': True, 'suppress_errors': True},
+            'args': (video_id_dict,),
+            'kwargs': {
+                'live_details': True,
+                'suppress_errors': True,
+                'defer_cache': True,
+            },
             'thread': None,
             'updater': update_video_infos,
-            'upd_args': (provider, context, video_id_dict, playlist_item_id_dict, channel_items_dict),
-            'upd_kwargs': {'data': None, 'live_details': True, 'use_play_data': use_play_data},
+            'upd_args': (
+                provider,
+                context,
+                video_id_dict,
+                playlist_item_id_dict,
+                channel_items_dict,
+            ),
+            'upd_kwargs': {
+                'data': None,
+                'live_details': True,
+                'use_play_data': use_play_data
+            },
             'complete': False,
             'defer': False,
         },
-        {
+        2: {
             'fetcher': resource_manager.get_playlists,
-            'args': (playlist_id_dict.keys(), ),
-            'kwargs': {},
+            'args': (playlist_id_dict,),
+            'kwargs': {'defer_cache': True},
             'thread': None,
             'updater': update_playlist_infos,
-            'upd_args': (provider, context, playlist_id_dict, channel_items_dict),
+            'upd_args': (
+                provider,
+                context,
+                playlist_id_dict,
+                channel_items_dict,
+            ),
             'upd_kwargs': {'data': None},
             'complete': False,
             'defer': False,
         },
-        {
+        3: {
             'fetcher': resource_manager.get_channels,
-            'args': (channel_id_dict.keys(), ),
-            'kwargs': {},
+            'args': (channel_id_dict,),
+            'kwargs': {'defer_cache': True},
             'thread': None,
             'updater': update_channel_infos,
-            'upd_args': (provider, context, channel_id_dict, subscription_id_dict, channel_items_dict),
+            'upd_args': (
+                provider,
+                context,
+                channel_id_dict,
+                subscription_id_dict,
+                channel_items_dict,
+            ),
             'upd_kwargs': {'data': None},
             'complete': False,
             'defer': False,
         },
-        {
+        4: {
             'fetcher': resource_manager.get_fanarts,
-            'args': (channel_items_dict.keys(), ),
-            'kwargs': {},
+            'args': (channel_items_dict,),
+            'kwargs': {'defer_cache': True},
             'thread': None,
             'updater': update_fanarts,
-            'upd_args': (provider, context, channel_items_dict),
+            'upd_args': (
+                provider,
+                context,
+                channel_items_dict,
+            ),
             'upd_kwargs': {'data': None},
             'complete': False,
             'defer': True,
         },
-    ]
+        5: {
+            'fetcher': resource_manager.cache_data,
+            'args': (),
+            'kwargs': {},
+            'thread': None,
+            'updater': None,
+            'upd_args': (),
+            'upd_kwargs': {},
+            'complete': False,
+            'defer': 4,
+        },
+    }
 
     def _fetch(resource):
         data = resource['fetcher'](
             *resource['args'], **resource['kwargs']
         )
-        if not data:
+        if not data or not resource['updater']:
             return
         resource['upd_kwargs']['data'] = data
         resource['updater'](*resource['upd_args'], **resource['upd_kwargs'])
 
-    for resource in resources:
-        if resource['defer']:
-            running += 1
+    remaining = len(resources)
+    deferred = sum(1 for resource in resources.values() if resource['defer'])
+    iterator = iter(resources.values())
+    while remaining:
+        try:
+            resource = next(iterator)
+        except StopIteration:
+            iterator = iter(resources.values())
+            resource = next(iterator)
+
+        if resource['complete']:
             continue
 
-        if not resource['args'][0]:
-            resource['complete'] = True
-            continue
-
-        running += 1
-        # _fetch(resource)
-        thread = Thread(target=_fetch, args=(resource, ))
-        thread.daemon = True
-        thread.start()
-        resource['thread'] = thread
-
-    while running > 0:
-        for resource in resources:
-            if resource['complete']:
+        defer = resource['defer']
+        if defer:
+            if remaining > deferred:
                 continue
+            if defer in resources and not resources[defer]['complete']:
+                continue
+            resource['defer'] = False
 
-            thread = resource['thread']
-            if thread:
-                thread.join(30)
-                if not thread.is_alive():
-                    resource['thread'] = None
-                    resource['complete'] = True
-                    running -= 1
-            elif resource['defer']:
-                resource['defer'] = False
-                # _fetch(resource)
-                thread = Thread(target=_fetch, args=(resource, ))
-                thread.daemon = True
-                thread.start()
-                resource['thread'] = thread
-            else:
-                running -= 1
+        args = resource['args']
+        if args and not args[0]:
+            resource['complete'] = True
+            remaining -= 1
+            continue
+
+        thread = resource['thread']
+        if thread:
+            thread.join(1)
+            if not thread.is_alive():
+                resource['thread'] = None
                 resource['complete'] = True
+                remaining -= 1
+        else:
+            thread = Thread(target=_fetch, args=(resource,))
+            thread.daemon = True
+            thread.start()
+            resource['thread'] = thread
 
     return result
 
