@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .storage import Storage
-from ..items import from_json, to_json
+from ..items import from_json
 
 
 class FavoriteList(Storage):
@@ -31,9 +31,8 @@ class FavoriteList(Storage):
         result = self._get_by_ids(process=from_json, values_only=True)
         return sorted(result, key=self._sort_item, reverse=False)
 
-    def add(self, base_item):
-        item_json_data = to_json(base_item)
-        self._set(base_item.get_id(), item_json_data)
+    def add(self, item_id, item):
+        self._set(item_id, item)
 
-    def remove(self, base_item):
-        self._remove(base_item.get_id())
+    def remove(self, item_id):
+        self._remove(item_id)

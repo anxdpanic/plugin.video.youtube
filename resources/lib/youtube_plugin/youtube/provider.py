@@ -1140,15 +1140,74 @@ class Provider(AbstractProvider):
             context.get_ui().show_notification(context.localize('httpd.not.running'))
 
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/playback_history/$')
     def on_playback_history(self, context, re_match):
         params = context.get_params()
-        video_id = params.get('video_id')
         action = params.get('action')
-        if not video_id or not action:
-            return True
+        if not action:
+            return False
+
         playback_history = context.get_playback_history()
-        play_data = playback_history.get_items([video_id]).get(video_id)
+
+        if action == 'list':
+            play_data = playback_history.get_items()
+            if not play_data:
+                return True
+            json_data = self.get_client(context).get_videos(play_data)
+            if not json_data:
+                return True
+            items = v3.response_to_items(self, context, json_data)
+
+            for item in items:
+                context_menu = [(
+                    context.localize('remove'),
+                    'RunPlugin({0})'.format(context.create_uri(
+                        [constants.paths.HISTORY],
+                        params={'action': 'remove',
+                                'video_id': item.video_id}
+                    ))
+                ), (
+                    context.localize('mark.unwatched'),
+                    'RunPlugin({0})'.format(context.create_uri(
+                        [constants.paths.HISTORY],
+                        params={'action': 'mark_unwatched',
+                                'video_id': item.video_id}
+                    ))
+                ), (
+                    context.localize('mark.watched'),
+                    'RunPlugin({0})'.format(context.create_uri(
+                        [constants.paths.HISTORY],
+                        params={'action': 'mark_watched',
+                                'video_id': item.video_id}
+                    ))
+                ), (
+                    context.localize('history.clear'),
+                    'RunPlugin({0})'.format(context.create_uri(
+                        [constants.paths.HISTORY],
+                        params={'action': 'clear'}
+                    ))
+                )]
+                item.set_context_menu(context_menu)
+
+            return items
+
+        if (action == 'clear' and context.get_ui().on_yes_no_input(
+                    context.get_name(),
+                    context.localize('history.clear.confirm')
+                )):
+            playback_history.clear()
+            context.get_ui().refresh_container()
+            return True
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
+        if action == 'remove':
+            playback_history.remove(video_id)
+            context.get_ui().refresh_container()
+            return True
+
+        play_data = playback_history.get_item(video_id)
         if not play_data:
             play_data = {
                 'play_count': 0,
@@ -1190,6 +1249,7 @@ class Provider(AbstractProvider):
         ui = context.get_ui()
 
         _ = self.get_client(context)  # required for self.is_logged_in()
+        logged_in = self.is_logged_in()
 
         self.set_content_type(context, constants.content_type.FILES)
 
@@ -1277,95 +1337,131 @@ class Provider(AbstractProvider):
             my_location_item.set_fanart(self.get_fanart(context))
             result.append(my_location_item)
 
-        # subscriptions
-        if self.is_logged_in():
-            # my channel
-            if settings.get_bool('youtube.folder.my_channel.show', True):
-                my_channel_item = DirectoryItem(localize('my_channel'),
-                                                create_uri(['channel', 'mine']),
-                                                image=create_path('media', 'channel.png'))
-                my_channel_item.set_fanart(self.get_fanart(context))
-                result.append(my_channel_item)
+        # my channel
+        if logged_in and settings.get_bool('youtube.folder.my_channel.show', True):
+            my_channel_item = DirectoryItem(
+                localize('my_channel'),
+                create_uri(['channel', 'mine']),
+                image=create_path('media', 'channel.png'),
+                fanart=self.get_fanart(context)
+            )
+            result.append(my_channel_item)
 
-            # watch later
-            watch_later_playlist_id = access_manager.get_watch_later_id()
-            if settings.get_bool('youtube.folder.watch_later.show', True) and watch_later_playlist_id:
-                watch_later_item = DirectoryItem(localize('watch_later'),
-                                                 create_uri(['channel', 'mine', 'playlist', watch_later_playlist_id]),
-                                                 create_path('media', 'watch_later.png'))
-                watch_later_item.set_fanart(self.get_fanart(context))
+        # watch later
+        if settings.get_bool('youtube.folder.watch_later.show', True):
+            playlist_id = logged_in and access_manager.get_watch_later_id()
+            if playlist_id and playlist_id != 'HL':
+                watch_later_item = DirectoryItem(
+                    localize('watch_later'),
+                    create_uri(['channel', 'mine', 'playlist', playlist_id]),
+                    image=create_path('media', 'watch_later.png'),
+                    fanart=self.get_fanart(context)
+                )
                 context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu, context, watch_later_playlist_id)
+                yt_context_menu.append_play_all_from_playlist(context_menu,
+                                                              context,
+                                                              playlist_id)
                 watch_later_item.set_context_menu(context_menu)
                 result.append(watch_later_item)
+            else:
+                watch_history_item = DirectoryItem(
+                    localize('watch_later'),
+                    create_uri([constants.paths.WATCH_LATER, 'list']),
+                    image=create_path('media', 'watch_later.png'),
+                    fanart=self.get_fanart(context)
+                )
+                result.append(watch_history_item)
 
-            # liked videos
-            if settings.get_bool('youtube.folder.liked_videos.show', True):
-                resource_manager = self.get_resource_manager(context)
-                playlists = resource_manager.get_related_playlists(channel_id='mine')
-                if 'likes' in playlists:
-                    liked_videos_item = DirectoryItem(localize('video.liked'),
-                                                      create_uri(['channel', 'mine', 'playlist', playlists['likes']]),
-                                                      create_path('media', 'likes.png'))
-                    liked_videos_item.set_fanart(self.get_fanart(context))
-                    context_menu = []
-                    yt_context_menu.append_play_all_from_playlist(context_menu, context, playlists['likes'])
-                    liked_videos_item.set_context_menu(context_menu)
-                    result.append(liked_videos_item)
+        # liked videos
+        if logged_in and settings.get_bool('youtube.folder.liked_videos.show', True):
+            resource_manager = self.get_resource_manager(context)
+            playlists = resource_manager.get_related_playlists(channel_id='mine')
+            if 'likes' in playlists:
+                liked_videos_item = DirectoryItem(
+                    localize('video.liked'),
+                    create_uri(['channel', 'mine', 'playlist', playlists['likes']]),
+                    image=create_path('media', 'likes.png'),
+                    fanart=self.get_fanart(context)
+                )
+                context_menu = []
+                yt_context_menu.append_play_all_from_playlist(context_menu, context, playlists['likes'])
+                liked_videos_item.set_context_menu(context_menu)
+                result.append(liked_videos_item)
 
-            # disliked videos
-            if settings.get_bool('youtube.folder.disliked_videos.show', True):
-                disliked_videos_item = DirectoryItem(localize('video.disliked'),
-                                                     create_uri(['special', 'disliked_videos']),
-                                                     create_path('media', 'dislikes.png'))
-                disliked_videos_item.set_fanart(self.get_fanart(context))
-                result.append(disliked_videos_item)
+        # disliked videos
+        if logged_in and settings.get_bool('youtube.folder.disliked_videos.show', True):
+            disliked_videos_item = DirectoryItem(
+                localize('video.disliked'),
+                create_uri(['special', 'disliked_videos']),
+                image=create_path('media', 'dislikes.png'),
+                fanart=self.get_fanart(context)
+            )
+            result.append(disliked_videos_item)
 
-            # history
-            if settings.get_bool('youtube.folder.history.show', False):
-                watch_history_playlist_id = access_manager.get_watch_history_id()
-                if watch_history_playlist_id != 'HL':
-                    watch_history_item = DirectoryItem(localize('history'),
-                                                       create_uri(['channel', 'mine', 'playlist', watch_history_playlist_id]),
-                                                       create_path('media', 'history.png'))
-                    watch_history_item.set_fanart(self.get_fanart(context))
-                    context_menu = []
-                    yt_context_menu.append_play_all_from_playlist(context_menu, context, watch_history_playlist_id)
-                    watch_history_item.set_context_menu(context_menu)
+        # history
+        if settings.get_bool('youtube.folder.history.show', False):
+            playlist_id = logged_in and access_manager.get_watch_history_id()
+            if playlist_id and playlist_id != 'HL':
+                watch_history_item = DirectoryItem(
+                    localize('history'),
+                    create_uri(['channel', 'mine', 'playlist', playlist_id]),
+                    image=create_path('media', 'history.png'),
+                    fanart=self.get_fanart(context)
+                )
+                context_menu = []
+                yt_context_menu.append_play_all_from_playlist(context_menu,
+                                                              context,
+                                                              playlist_id)
+                watch_history_item.set_context_menu(context_menu)
+                result.append(watch_history_item)
+            elif settings.use_local_history():
+                watch_history_item = DirectoryItem(
+                    localize('history'),
+                    create_uri([constants.paths.HISTORY], params={'action': 'list'}),
+                    image=create_path('media', 'history.png'),
+                    fanart=self.get_fanart(context)
+                )
+                result.append(watch_history_item)
 
-                    result.append(watch_history_item)
+        # (my) playlists
+        if logged_in and settings.get_bool('youtube.folder.playlists.show', True):
+            playlists_item = DirectoryItem(
+                localize('playlists'),
+                create_uri(['channel', 'mine', 'playlists']),
+                image=create_path('media', 'playlist.png'),
+                fanart=self.get_fanart(context)
+            )
+            result.append(playlists_item)
 
-            # (my) playlists
-            if settings.get_bool('youtube.folder.playlists.show', True):
-                playlists_item = DirectoryItem(localize('playlists'),
-                                               create_uri(['channel', 'mine', 'playlists']),
-                                               create_path('media', 'playlist.png'))
-                playlists_item.set_fanart(self.get_fanart(context))
-                result.append(playlists_item)
+        # saved playlists
+        if logged_in and settings.get_bool('youtube.folder.saved.playlists.show', True):
+            playlists_item = DirectoryItem(
+                localize('saved.playlists'),
+                create_uri(['special', 'saved_playlists']),
+                image=create_path('media', 'playlist.png'),
+                fanart=self.get_fanart(context)
+            )
+            result.append(playlists_item)
 
-            # saved playlists
-            if settings.get_bool('youtube.folder.saved.playlists.show', True):
-                playlists_item = DirectoryItem(localize('saved.playlists'),
-                                               create_uri(['special', 'saved_playlists']),
-                                               create_path('media', 'playlist.png'))
-                playlists_item.set_fanart(self.get_fanart(context))
-                result.append(playlists_item)
+        # subscriptions
+        if logged_in and settings.get_bool('youtube.folder.subscriptions.show', True):
+            subscriptions_item = DirectoryItem(
+                localize('subscriptions'),
+                create_uri(['subscriptions', 'list']),
+                image=create_path('media', 'channels.png'),
+                fanart=self.get_fanart(context)
+            )
+            result.append(subscriptions_item)
 
-            # subscriptions
-            if settings.get_bool('youtube.folder.subscriptions.show', True):
-                subscriptions_item = DirectoryItem(localize('subscriptions'),
-                                                   create_uri(['subscriptions', 'list']),
-                                                   image=create_path('media', 'channels.png'))
-                subscriptions_item.set_fanart(self.get_fanart(context))
-                result.append(subscriptions_item)
-
-            # browse channels
-            if settings.get_bool('youtube.folder.browse_channels.show', True):
-                browse_channels_item = DirectoryItem(localize('browse_channels'),
-                                                     create_uri(['special', 'browse_channels']),
-                                                     image=create_path('media', 'browse_channels.png'))
-                browse_channels_item.set_fanart(self.get_fanart(context))
-                result.append(browse_channels_item)
+        # browse channels
+        if logged_in and settings.get_bool('youtube.folder.browse_channels.show', True):
+            browse_channels_item = DirectoryItem(
+                localize('browse_channels'),
+                create_uri(['special', 'browse_channels']),
+                image=create_path('media', 'browse_channels.png'),
+                fanart=self.get_fanart(context)
+            )
+            result.append(browse_channels_item)
 
         # completed live events
         if settings.get_bool('youtube.folder.completed.live.show', True):

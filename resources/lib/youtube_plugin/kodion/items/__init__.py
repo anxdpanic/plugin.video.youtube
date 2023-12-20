@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .utils import to_json, from_json, to_jsons
-
 from .audio_item import AudioItem
 from .base_item import BaseItem
 from .directory_item import DirectoryItem
@@ -22,6 +20,7 @@ from .next_page_item import NextPageItem
 from .search_history_item import SearchHistoryItem
 from .search_item import SearchItem
 from .uri_item import UriItem
+from .utils import from_json
 from .video_item import VideoItem
 from .watch_later_item import WatchLaterItem
 
@@ -38,6 +37,4 @@ __all__ = ('AudioItem',
            'UriItem',
            'VideoItem',
            'WatchLaterItem',
-           'from_json',
-           'to_json',
-           'to_jsons')
+           'from_json',)

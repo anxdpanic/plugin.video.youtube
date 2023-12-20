@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
+from datetime import date, datetime
 
 from .audio_item import AudioItem
 from .directory_item import DirectoryItem
@@ -26,51 +27,33 @@ _ITEM_TYPES = {
 }
 
 
+def _decoder(obj):
+    date_in_isoformat = obj.get('__isoformat__')
+    if not date_in_isoformat:
+        return obj
+
+    if obj['__class__'] == 'date':
+        return date.fromisoformat(date_in_isoformat)
+    return datetime.fromisoformat(date_in_isoformat)
+
+
 def from_json(json_data, *_args):
     """
-    Creates a instance of the given json dump or dict.
+    Creates an instance of the given json dump or dict.
     :param json_data:
     :return:
     """
-
-    def _from_json(_json_data):
-        item_type = _json_data.get('type')
-        if not item_type or item_type not in _ITEM_TYPES:
-            return _json_data
-
-        item = _ITEM_TYPES[item_type]()
-
-        data = _json_data.get('data', {})
-        for key, value in data.items():
-            if hasattr(item, key):
-                setattr(item, key, value)
-
-        return item
-
     if isinstance(json_data, str):
-        json_data = json.loads(json_data)
-    return _from_json(json_data)
+        json_data = json.loads(json_data, object_hook=_decoder)
 
+    item_type = json_data.get('type')
+    if not item_type or item_type not in _ITEM_TYPES:
+        return json_data
 
-def to_jsons(base_item):
-    return json.dumps(to_json(base_item))
+    item = _ITEM_TYPES[item_type](name='', uri='')
 
+    for key, value in json_data.get('data', {}).items():
+        if hasattr(item, key):
+            setattr(item, key, value)
 
-def to_json(base_item):
-    """
-    Convert the given @base_item to json
-    :param base_item:
-    :return: json string
-    """
-
-    def _to_json(obj):
-        if isinstance(obj, dict):
-            return obj.__dict__
-
-        for name, item_type in _ITEM_TYPES.items():
-            if isinstance(obj, item_type):
-                return {'type': name, 'data': obj.__dict__}
-
-        return obj.__dict__
-
-    return _to_json(base_item)
+    return item

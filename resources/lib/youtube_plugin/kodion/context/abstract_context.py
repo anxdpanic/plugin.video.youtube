@@ -64,7 +64,7 @@ class AbstractContext(object):
     }
     _STRING_PARAMS = {
         'api_key',
-        'action',  # deprecated
+        'action',
         'addon_id',
         'channel_id',
         'channel_name',
@@ -72,6 +72,7 @@ class AbstractContext(object):
         'client_secret',
         'event_type',
         'item',
+        'item_id',
         'next_page_token',
         'page_token',
         'parent_id',

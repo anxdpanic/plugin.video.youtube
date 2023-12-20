@@ -1373,3 +1373,11 @@ msgstr ""
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
 msgstr ""
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
+msgstr ""

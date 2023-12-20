@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
 import re
 
 from . import constants
@@ -20,8 +19,6 @@ from .items import (
     DirectoryItem,
     NewSearchItem,
     SearchHistoryItem,
-    from_json,
-    to_jsons,
 )
 from .utils import to_unicode
 
@@ -38,12 +35,33 @@ class AbstractProvider(object):
 
         # register some default paths
         self.register_path(r'^/$', '_internal_root')
-        self.register_path(r''.join(['^/', constants.paths.WATCH_LATER, '/(?P<command>add|remove|list)/?$']),
-                           '_internal_watch_later')
-        self.register_path(r''.join(['^/', constants.paths.FAVORITES, '/(?P<command>add|remove|list)/?$']), '_internal_favorite')
-        self.register_path(r''.join(['^/', constants.paths.SEARCH, '/(?P<command>input|query|list|remove|clear|rename)/?$']),
-                           '_internal_search')
-        self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$', '_internal_on_extra_fanart')
+
+        self.register_path(r''.join([
+            '^/',
+            constants.paths.WATCH_LATER,
+            '/(?P<command>add|clear|list|remove)/?$'
+        ]), '_internal_watch_later')
+
+        self.register_path(r''.join([
+            '^/',
+            constants.paths.FAVORITES,
+            '/(?P<command>add|clear|list|remove)/?$'
+        ]), '_internal_favorite')
+
+        self.register_path(r''.join([
+            '^/',
+            constants.paths.SEARCH,
+            '/(?P<command>input|query|list|remove|clear|rename)/?$'
+        ]), '_internal_search')
+
+        self.register_path(r''.join([
+            '^/',
+            constants.paths.HISTORY,
+            '/$'
+        ]), 'on_playback_history')
+
+        self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
+                           '_internal_on_extra_fanart')
 
         """
         Test each method of this class for the appended attribute '_re_match' by the
@@ -122,14 +140,14 @@ class AbstractProvider(object):
         new_context = context.clone(new_path=path)
         return self.on_extra_fanart(new_context, re_match)
 
+    def on_playback_history(self, context, re_match):
+        raise NotImplementedError()
+
     def on_search(self, search_text, context, re_match):
         raise NotImplementedError()
 
     def on_root(self, context, re_match):
         raise NotImplementedError()
-
-    def on_watch_later(self, context, re_match):
-        pass
 
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
@@ -137,55 +155,92 @@ class AbstractProvider(object):
     @staticmethod
     def _internal_favorite(context, re_match):
         params = context.get_params()
-
         command = re_match.group('command')
-        if command == 'add':
-            fav_item = from_json(params['item'])
-            context.get_favorite_list().add(fav_item)
-            return None
-        if command == 'remove':
-            fav_item = from_json(params['item'])
-            context.get_favorite_list().remove(fav_item)
-            context.get_ui().refresh_container()
-            return None
+        if not command:
+            return False
+
         if command == 'list':
-            directory_items = context.get_favorite_list().get_items()
+            items = context.get_favorite_list().get_items()
 
-            for directory_item in directory_items:
-                context_menu = [(context.localize('watch_later.remove'),
-                                 'RunPlugin(%s)' % context.create_uri([constants.paths.FAVORITES, 'remove'],
-                                                                      params={'item': to_jsons(directory_item)}))]
-                directory_item.set_context_menu(context_menu)
+            for item in items:
+                context_menu = [(
+                    context.localize('favorites.remove'),
+                    'RunPlugin(%s)' % context.create_uri(
+                        [constants.paths.FAVORITES, 'remove'],
+                        params={'item_id': item.get_id()}
+                    )
+                )]
+                item.set_context_menu(context_menu)
 
-            return directory_items
-        return None
+            return items
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
+        if command == 'add':
+            item = params.get('item')
+            if item:
+                context.get_favorite_list().add(video_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_favorite_list().remove(video_id)
+            context.get_ui().refresh_container()
+            return True
+
+        return False
 
     def _internal_watch_later(self, context, re_match):
-        self.on_watch_later(context, re_match)
-
         params = context.get_params()
-
         command = re_match.group('command')
-        if command == 'add':
-            item = from_json(params['item'])
-            context.get_watch_later_list().add(item)
-            return None
-        if command == 'remove':
-            item = from_json(params['item'])
-            context.get_watch_later_list().remove(item)
-            context.get_ui().refresh_container()
-            return None
+        if not command:
+            return False
+
         if command == 'list':
             video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
-                context_menu = [(context.localize('watch_later.remove'),
-                                 'RunPlugin(%s)' % context.create_uri([constants.paths.WATCH_LATER, 'remove'],
-                                                                      params={'item': to_jsons(video_item)}))]
+                context_menu = [(
+                    context.localize('watch_later.remove'),
+                    'RunPlugin(%s)' % context.create_uri(
+                        [constants.paths.WATCH_LATER, 'remove'],
+                        params={'item_id': video_item.get_id()}
+                    )
+                ), (
+                    context.localize('watch_later.clear'),
+                    'RunPlugin(%s)' % context.create_uri(
+                        [constants.paths.WATCH_LATER, 'clear']
+                    )
+                )]
                 video_item.set_context_menu(context_menu)
 
             return video_items
-        return None
+
+        if (command == 'clear' and context.get_ui().on_yes_no_input(
+                    context.get_name(),
+                    context.localize('watch_later.clear.confirm')
+                )):
+            context.get_watch_later_list().clear()
+            context.get_ui().refresh_container()
+            return True
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
+        if command == 'add':
+            item = params.get('item')
+            if item:
+                context.get_watch_later_list().add(video_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_watch_later_list().remove(video_id)
+            context.get_ui().refresh_container()
+            return True
+
+        return False
 
     @property
     def data_cache(self):

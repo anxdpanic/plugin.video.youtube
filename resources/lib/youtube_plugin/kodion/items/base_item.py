@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import json
 from datetime import date, datetime
 from hashlib import md5
 
@@ -52,6 +53,20 @@ class BaseItem(object):
         image = self._image
         obj_str = "------------------------------\n'%s'\nURI: %s\nImage: %s\n------------------------------" % (name, uri, image)
         return obj_str
+
+    def to_dict(self):
+        return {'type': self.__class__.__name__, 'data': self.__dict__}
+
+    def dumps(self):
+        def _encoder(obj):
+            if isinstance(obj, (date, datetime)):
+                return {
+                    '__class__': obj.__class__.__name__,
+                    '__isoformat__': obj.isoformat(),
+                }
+            return json.JSONEncoder().default(obj)
+
+        return json.dumps(self.to_dict(), ensure_ascii=False, default=_encoder)
 
     def get_id(self):
         """

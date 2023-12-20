@@ -10,10 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from datetime import datetime
-
 from .storage import Storage
-from ..items import to_json, from_json
+from ..items import from_json
 
 
 class WatchLaterList(Storage):
@@ -29,11 +27,8 @@ class WatchLaterList(Storage):
         result = self._get_by_ids(process=from_json, values_only=True)
         return result
 
-    def add(self, base_item):
-        base_item.set_date_from_datetime(datetime.now())
+    def add(self, video_id, item):
+        self._set(video_id, item)
 
-        item_json_data = to_json(base_item)
-        self._set(base_item.get_id(), item_json_data)
-
-    def remove(self, base_item):
-        self._remove(base_item.get_id())
+    def remove(self, video_id):
+        self._remove(video_id)
