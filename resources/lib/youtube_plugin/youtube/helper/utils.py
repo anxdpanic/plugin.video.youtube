@@ -269,7 +269,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         playlist_item.set_image(image)
 
         channel_id = snippet['channelId']
-        # if the path directs to a playlist of our own, we correct the channel id to 'mine'
+        # if the path directs to a playlist of our own, set channel id to 'mine'
         if path == '/channel/mine/playlists/':
             channel_id = 'mine'
         channel_name = snippet.get('channelTitle', '')
@@ -611,7 +611,7 @@ def update_video_infos(provider, context, video_id_dict,
                     context_menu, context
                 )
 
-        # got to [CHANNEL], only if we are not directly in the channel provide a jump to the channel
+        # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and
                 create_path('channel', channel_id) != path):
             video_item.set_channel_id(channel_id)

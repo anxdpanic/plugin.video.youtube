@@ -63,7 +63,7 @@ def runtime(context, addon_version, elapsed, single_file=True):
 class Profiler(object):
     """Class used to profile a block of code"""
 
-    __slots__ = ('__weakref__', '_enabled', '_profiler', '_reuse', 'name', )
+    __slots__ = ('__weakref__', '_enabled', '_profiler', '_reuse', 'name',)
 
     from cProfile import Profile as _Profile
     from pstats import Stats as _Stats
@@ -120,7 +120,7 @@ class Profiler(object):
         if not self._profiler:
             self._create_profiler()
 
-    def __exit__(self, exc_type=None, exc_value=None, traceback=None):
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         if not self._enabled:
             return
 

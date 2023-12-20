@@ -533,11 +533,11 @@ def get_http_server(address=None, port=None):
         server = BaseHTTPServer.HTTPServer((address, port),
                                            YouTubeProxyRequestHandler)
         return server
-    except socket_error as e:
+    except socket_error as exc:
         log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
-                  .format(address=address, port=port, response=str(e)))
+                  .format(address=address, port=port, response=str(exc)))
         xbmcgui.Dialog().notification(_addon_name,
-                                      str(e),
+                                      str(exc),
                                       _addon_icon,
                                       time=5000,
                                       sound=False)

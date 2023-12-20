@@ -90,8 +90,8 @@ class LoginClient(YouTubeRequestClient):
                 raise YouTubeException('"error" in response JSON data',
                                        json_data=json_data,
                                        response=response)
-        except ValueError as error:
-            raise InvalidJSON(error, response=response)
+        except ValueError as exc:
+            raise InvalidJSON(exc, response=response)
         response.raise_for_status()
         return json_data
 

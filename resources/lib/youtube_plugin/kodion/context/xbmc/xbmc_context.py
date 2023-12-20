@@ -334,8 +334,8 @@ class XbmcContext(AbstractContext):
             language = language.split('-')
             language = '%s-%s' % (language[0].lower(), language[1].upper())
             return language
-        except Exception, ex:
-            self.log_error('Failed to get system language (%s)', ex.__str__())
+        except Exception as exc:
+            self.log_error('Failed to get system language (%s)', exc.__str__())
             return 'en-US'
         '''
 

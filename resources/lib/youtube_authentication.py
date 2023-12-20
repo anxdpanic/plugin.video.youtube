@@ -103,8 +103,8 @@ def sign_in(addon_id):
 
     try:
         signed_in = youtube_authentication.sign_in(addon_id='plugin.video.example')  # refreshes access tokens if already signed in
-    except youtube_authentication.LoginException as e:
-        error_message = e.get_message()
+    except youtube_authentication.LoginException as exc:
+        error_message = exc.get_message()
         # handle error
         signed_in = False
 

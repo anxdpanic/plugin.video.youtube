@@ -217,11 +217,11 @@ class Provider(AbstractProvider):
                         access_manager.update_dev_access_token(dev_id, access_token, expires_in)
                     else:
                         access_manager.update_access_token(access_token, expires_in)
-                except (InvalidGrant, LoginException) as ex:
-                    self.handle_exception(context, ex)
+                except (InvalidGrant, LoginException) as exc:
+                    self.handle_exception(context, exc)
                     access_tokens = ['', '']
                     # reset access_token
-                    if isinstance(ex, InvalidGrant):
+                    if isinstance(exc, InvalidGrant):
                         if dev_id:
                             access_manager.update_dev_access_token(dev_id, access_token='', refresh_token='')
                         else:

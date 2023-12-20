@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from traceback import format_exc
+
 from ..abstract_provider_runner import AbstractProviderRunner
 from ...compatibility import xbmcgui, xbmcplugin
 from ...exceptions import KodionException
@@ -46,10 +48,12 @@ class XbmcRunner(AbstractProviderRunner):
 
         try:
             results = provider.navigate(context)
-        except KodionException as ex:
-            if provider.handle_exception(context, ex):
-                context.log_error(ex.__str__())
-                xbmcgui.Dialog().ok("Exception in ContentProvider", ex.__str__())
+        except KodionException as exc:
+            if provider.handle_exception(context, exc):
+                context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
+                    exc=exc, details=format_exc()
+                ))
+                xbmcgui.Dialog().ok("Error in ContentProvider", exc.__str__())
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)
             return False
 

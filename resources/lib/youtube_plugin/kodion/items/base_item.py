@@ -10,8 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import hashlib
-import datetime
+from datetime import date, datetime
+from hashlib import md5
 
 from ..compatibility import unescape
 
@@ -58,7 +58,7 @@ class BaseItem(object):
         Returns a unique id of the item.
         :return: unique id of the item.
         """
-        md5_hash = hashlib.md5()
+        md5_hash = md5()
         md5_hash.update(self._name.encode('utf-8'))
         md5_hash.update(self._uri.encode('utf-8'))
         return md5_hash.hexdigest()
@@ -106,7 +106,7 @@ class BaseItem(object):
         return self._replace_context_menu
 
     def set_date(self, year, month, day, hour=0, minute=0, second=0):
-        self._date = datetime.datetime(year, month, day, hour, minute, second)
+        self._date = datetime(year, month, day, hour, minute, second)
 
     def set_date_from_datetime(self, date_time):
         self._date = date_time
@@ -121,12 +121,12 @@ class BaseItem(object):
         return self._date
 
     def set_dateadded(self, year, month, day, hour=0, minute=0, second=0):
-        self._dateadded = datetime.datetime(year,
-                                            month,
-                                            day,
-                                            hour,
-                                            minute,
-                                            second)
+        self._dateadded = datetime(year,
+                                   month,
+                                   day,
+                                   hour,
+                                   minute,
+                                   second)
 
     def set_dateadded_from_datetime(self, date_time):
         self._dateadded = date_time

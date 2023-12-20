@@ -48,7 +48,6 @@ def _process_list_response(provider, context, json_data):
     use_play_data = not incognito and settings.use_local_history()
 
     for yt_item in yt_items:
-
         is_youtube, kind = _parse_kind(yt_item)
         if not is_youtube or not kind:
             context.log_debug('v3 response: Item discarded, is_youtube=False')
@@ -278,7 +277,8 @@ def _process_list_response(provider, context, json_data):
         else:
             raise KodionException("Unknown kind '%s'" % kind)
 
-    # this will also update the channel_id_dict with the correct channel id for each video.
+    # this will also update the channel_id_dict with the correct channel_id
+    # for each video.
     channel_items_dict = {}
 
     running = 0

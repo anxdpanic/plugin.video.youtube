@@ -73,12 +73,12 @@ class XbmcPluginSettings(AbstractSettings):
         error = False
         try:
             value = bool(self._get_bool(self._type(), setting))
-        except (AttributeError, TypeError) as ex:
-            error = ex
+        except (AttributeError, TypeError) as exc:
+            error = exc
             value = self.get_string(setting, echo=False)
             value = AbstractSettings.VALUE_FROM_STR.get(value.lower(), default)
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
             value = default
 
         if self._echo and echo is not False:
@@ -95,8 +95,8 @@ class XbmcPluginSettings(AbstractSettings):
             error = not self._set_bool(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
 
         if self._echo and echo is not False:
             log_debug('Set |{setting}|: {value} (bool, {status})'.format(
@@ -115,16 +115,16 @@ class XbmcPluginSettings(AbstractSettings):
             value = int(self._get_int(self._type(), setting))
             if process:
                 value = process(value)
-        except (AttributeError, TypeError, ValueError) as ex:
-            error = ex
+        except (AttributeError, TypeError, ValueError) as exc:
+            error = exc
             value = self.get_string(setting, echo=False)
             try:
                 value = int(value)
-            except (TypeError, ValueError) as ex:
-                error = ex
+            except (TypeError, ValueError) as exc:
+                error = exc
                 value = default
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
             value = default
 
         if self._echo and echo is not False:
@@ -141,8 +141,8 @@ class XbmcPluginSettings(AbstractSettings):
             error = not self._set_int(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
 
         if self._echo and echo is not False:
             log_debug('Set |{setting}|: {value} (int, {status})'.format(
@@ -159,8 +159,8 @@ class XbmcPluginSettings(AbstractSettings):
         error = False
         try:
             value = self._get_str(self._type(), setting) or default
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
             value = default
 
         if self._echo and echo is not False:
@@ -177,8 +177,8 @@ class XbmcPluginSettings(AbstractSettings):
             error = not self._set_str(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
 
         if self._echo and echo is not False:
             log_debug('Set |{setting}|: "{value}" (str, {status})'.format(
@@ -197,8 +197,8 @@ class XbmcPluginSettings(AbstractSettings):
             value = self._get_str_list(self._type(), setting)
             if not value:
                 value = [] if default is None else default
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
             value = default
 
         if self._echo and echo is not False:
@@ -215,8 +215,8 @@ class XbmcPluginSettings(AbstractSettings):
             error = not self._set_str_list(self._type(), setting, value)
             if not error:
                 self._cache[setting] = value
-        except RuntimeError as ex:
-            error = ex
+        except RuntimeError as exc:
+            error = exc
 
         if self._echo and echo is not False:
             log_debug('Set |{setting}|: "{value}" (str list, {status})'.format(

@@ -10,10 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import json
 import random
 import re
-import traceback
-from json import dumps as json_dumps, loads as json_loads
+from traceback import format_exc
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
@@ -706,7 +706,7 @@ class VideoInfo(YouTubeRequestClient):
         found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page.text)
 
         if found:
-            return json_loads(found.group(1))
+            return json.loads(found.group(1))
         return None
 
     def _get_player_js(self):
@@ -930,9 +930,9 @@ class VideoInfo(YouTubeRequestClient):
         if not signature:
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
-            except Exception as error:
+            except Exception as exc:
                 self._context.log_debug('{0}: {1}\n{2}'.format(
-                    error, encrypted_signature, traceback.format_exc()
+                    exc, encrypted_signature, format_exc()
                 ))
                 self._context.log_error(
                     'Failed to extract URL from signatureCipher'
@@ -1566,7 +1566,7 @@ class VideoInfo(YouTubeRequestClient):
 
         def _stream_sort(stream):
             if not stream:
-                return (1, )
+                return (1,)
 
             return (
                 - stream['height'],
