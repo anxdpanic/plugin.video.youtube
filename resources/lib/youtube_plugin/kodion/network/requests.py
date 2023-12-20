@@ -25,7 +25,7 @@ _settings = Settings(xbmcaddon.Addon(id='plugin.video.youtube'))
 
 
 class BaseRequestsClass(object):
-    http_adapter = HTTPAdapter(
+    _http_adapter = HTTPAdapter(
         pool_maxsize=10,
         pool_block=True,
         max_retries=Retry(
@@ -36,15 +36,17 @@ class BaseRequestsClass(object):
         )
     )
 
+    _session = Session()
+    _session.mount('https://', _http_adapter)
+    atexit.register(_session.close)
+
     def __init__(self, exc_type=RequestException):
         self._verify = _settings.verify_ssl()
         self._timeout = _settings.get_timeout()
         self._default_exc = exc_type
 
-        self._session = Session()
-        self._session.verify = self._verify
-        self._session.mount('https://', self.http_adapter)
-        atexit.register(self._session.close)
+    def __del__(self):
+        self._session.close()
 
     def __enter__(self):
         return self
