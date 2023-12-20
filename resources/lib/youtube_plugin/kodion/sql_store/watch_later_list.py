@@ -17,11 +17,13 @@ from ..items import to_json, from_json
 
 
 class WatchLaterList(Storage):
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+    _sql = {}
+
     def __init__(self, filename):
         super(WatchLaterList, self).__init__(filename)
-
-    def clear(self):
-        self._clear()
 
     def get_items(self):
         result = self._get_by_ids(process=from_json, values_only=True)

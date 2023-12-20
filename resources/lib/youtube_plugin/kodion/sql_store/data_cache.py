@@ -14,6 +14,11 @@ from .storage import Storage
 
 
 class DataCache(Storage):
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+    _sql = {}
+
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
         super(DataCache, self).__init__(filename,
@@ -34,10 +39,7 @@ class DataCache(Storage):
         self._set(content_id, item)
 
     def set_items(self, items):
-        self._set_all(items)
-
-    def clear(self):
-        self._clear()
+        self._set_many(items)
 
     def remove(self, content_id):
         self._remove(content_id)
@@ -45,5 +47,5 @@ class DataCache(Storage):
     def update(self, content_id, item):
         self._set(str(content_id), item)
 
-    def _optimize_item_count(self):
-        pass
+    def _optimize_item_count(self, limit=-1, defer=False):
+        return False

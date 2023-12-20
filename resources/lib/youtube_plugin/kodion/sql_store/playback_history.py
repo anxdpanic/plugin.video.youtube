@@ -13,6 +13,11 @@ from .storage import Storage
 
 
 class PlaybackHistory(Storage):
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+    _sql = {}
+
     def __init__(self, filename):
         super(PlaybackHistory, self).__init__(filename)
 
@@ -34,17 +39,14 @@ class PlaybackHistory(Storage):
         result = self._get(key, process=self._add_last_played)
         return result
 
-    def clear(self):
-        self._clear()
-
     def remove(self, video_id):
         self._remove(video_id)
 
     def update(self, video_id, play_data):
         self._set(video_id, play_data)
 
-    def _optimize_item_count(self):
-        pass
+    def _optimize_item_count(self, limit=-1, defer=False):
+        return False
 
-    def _optimize_file_size(self):
-        pass
+    def _optimize_file_size(self, limit=-1, defer=False):
+        return False

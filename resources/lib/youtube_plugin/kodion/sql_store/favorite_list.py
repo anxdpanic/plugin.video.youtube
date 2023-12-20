@@ -15,11 +15,13 @@ from ..items import from_json, to_json
 
 
 class FavoriteList(Storage):
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+    _sql = {}
+
     def __init__(self, filename):
         super(FavoriteList, self).__init__(filename)
-
-    def clear(self):
-        self._clear()
 
     @staticmethod
     def _sort_item(item):

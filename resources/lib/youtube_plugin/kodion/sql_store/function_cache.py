@@ -17,15 +17,17 @@ from .storage import Storage
 
 
 class FunctionCache(Storage):
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+    _sql = {}
+
     def __init__(self, filename, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
         super(FunctionCache, self).__init__(filename,
                                             max_file_size_kb=max_file_size_kb)
 
         self._enabled = True
-
-    def clear(self):
-        self._clear()
 
     def enabled(self):
         """
@@ -90,7 +92,7 @@ class FunctionCache(Storage):
             self._set(cache_id, data)
         return data
 
-    def _optimize_item_count(self):
+    def _optimize_item_count(self, limit=-1, defer=False):
         # override method Storage._optimize_item_count
         # for function cache do not optimize by item count, use database size.
-        pass
+        return False

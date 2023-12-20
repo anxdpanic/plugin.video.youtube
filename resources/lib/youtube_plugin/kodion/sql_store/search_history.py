@@ -16,6 +16,11 @@ from .storage import Storage
 
 
 class SearchHistory(Storage):
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+    _sql = {}
+
     def __init__(self, filename, max_item_count=10):
         super(SearchHistory, self).__init__(filename,
                                             max_item_count=max_item_count)
@@ -28,9 +33,6 @@ class SearchHistory(Storage):
                                   limit=self._max_item_count,
                                   values_only=True)
         return result
-
-    def clear(self):
-        self._clear()
 
     @staticmethod
     def _make_id(search_text):

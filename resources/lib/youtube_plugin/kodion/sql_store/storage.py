@@ -15,7 +15,7 @@ import pickle
 import sqlite3
 import time
 from datetime import datetime
-from traceback import print_exc
+from traceback import format_exc
 
 from ..logger import log_error
 from ..utils.datetime_parser import since_epoch
@@ -28,20 +28,107 @@ class Storage(object):
     ONE_WEEK = 7 * ONE_DAY
     ONE_MONTH = 4 * ONE_WEEK
 
-    _table_name = 'storage_v3'
-    _clear_sql = 'DELETE FROM {table}'.format(table=_table_name)
-    _create_table_sql = 'CREATE TABLE IF NOT EXISTS {table} (key TEXT PRIMARY KEY, time REAL, value BLOB, size INTEGER)'.format(table=_table_name)
-    _drop_old_tables_sql = 'DELETE FROM sqlite_master WHERE type = "table" and name IS NOT "{table}"'.format(table=_table_name)
-    _get_sql = 'SELECT * FROM {table} WHERE key = ?'.format(table=_table_name)
-    _get_by_sql = 'SELECT * FROM {table} WHERE key in ({{0}})'.format(table=_table_name)
-    _get_all_asc_sql = 'SELECT * FROM {table} ORDER BY time ASC LIMIT {{0}}'.format(table=_table_name)
-    _get_all_desc_sql = 'SELECT * FROM {table} ORDER BY time DESC LIMIT {{0}}'.format(table=_table_name)
-    _is_empty_sql = 'SELECT EXISTS(SELECT 1 FROM {table} LIMIT 1)'.format(table=_table_name)
-    _optimize_item_sql = 'SELECT key FROM {table} ORDER BY time DESC LIMIT -1 OFFSET {{0}}'.format(table=_table_name)
-    _prune_sql = 'DELETE FROM {table} WHERE ROWID IN (SELECT ROWID FROM {table} WHERE (SELECT SUM(size) FROM {table} AS _ WHERE time<={table}.time) <= {{0}})'.format(table=_table_name)
-    _remove_sql = 'DELETE FROM {table} WHERE key = ?'.format(table=_table_name)
-    _remove_all_sql = 'DELETE FROM {table} WHERE key in ({{0}})'.format(table=_table_name)
-    _set_sql = 'REPLACE INTO {table} (key, time, value, size) VALUES(?, ?, ?, ?)'.format(table=_table_name)
+    _table_name = 'storage_v2'
+    _table_created = False
+    _table_updated = False
+
+    _sql = {
+        'clear': (
+            'DELETE'
+            ' FROM {table};'
+        ),
+        'create_table': (
+            'CREATE TABLE'
+            ' IF NOT EXISTS {table} ('
+            '  key TEXT PRIMARY KEY,'
+            '  timestamp REAL,'
+            '  value BLOB,'
+            '  size INTEGER'
+            ' );'
+        ),
+        'drop_old_table': (
+            'DELETE'
+            ' FROM sqlite_master'
+            ' WHERE type = "table"'
+            ' and name IS NOT "{table}";'
+        ),
+        'get': (
+            'SELECT *'
+            ' FROM {table}'
+            ' WHERE key = ?;'
+        ),
+        'get_by_key': (
+            'SELECT *'
+            ' FROM {table}'
+            ' WHERE key in ({{0}});'
+        ),
+        'get_many': (
+            'SELECT *'
+            ' FROM {table}'
+            ' ORDER BY timestamp'
+            ' LIMIT {{0}};'
+        ),
+        'get_many_desc': (
+            'SELECT *'
+            ' FROM {table}'
+            ' ORDER BY timestamp DESC'
+            ' LIMIT {{0}};'
+        ),
+        'has_old_table': (
+            'SELECT EXISTS ('
+            ' SELECT 1'
+            ' FROM sqlite_master'
+            ' WHERE type = "table"'
+            ' and name IS NOT "{table}"'
+            ');'
+        ),
+        'is_empty': (
+            'SELECT EXISTS ('
+            ' SELECT 1'
+            ' FROM {table}'
+            ');'
+        ),
+        'prune_by_count': (
+            'DELETE'
+            ' FROM {table}'
+            ' WHERE rowid IN ('
+            '  SELECT rowid'
+            '  FROM {table}'
+            '  ORDER BY timestamp DESC'
+            '  LIMIT {{0}}'
+            '  OFFSET {{1}}'
+            ' );'
+        ),
+        'prune_by_size': (
+            'DELETE'
+            ' FROM {table}'
+            ' WHERE rowid IN ('
+            '  SELECT rowid'
+            '  FROM {table}'
+            '  WHERE ('
+            '   SELECT SUM(size)'
+            '   FROM {table} AS _'
+            '   WHERE timestamp<={table}.timestamp'
+            '  ) <= {{0}}'
+            ' );'
+        ),
+        'remove': (
+            'DELETE'
+            ' FROM {table}'
+            ' WHERE key = ?;'
+        ),
+        'remove_by_key': (
+            'DELETE'
+            ' FROM {table}'
+            ' WHERE key in ({{0}});'
+        ),
+        'set': (
+            'REPLACE'
+            ' INTO {table}'
+            ' (key, timestamp, value, size)'
+            ' VALUES(?, ?, ?, ?);'
+        ),
+    }
 
     def __init__(self, filename, max_item_count=-1, max_file_size_kb=-1):
         self._filename = filename
@@ -52,9 +139,12 @@ class Storage(object):
         self._max_item_count = max_item_count
         self._max_file_size_kb = max_file_size_kb
 
-        self._table_created = False
-        self._table_updated = False
-        self._needs_commit = False
+        if not self._sql:
+            statements = {
+                name: sql.format(table=self._table_name)
+                for name, sql in Storage._sql.items()
+            }
+            self.__class__._sql.update(statements)
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
@@ -63,61 +153,88 @@ class Storage(object):
         self._max_file_size_kb = max_file_size_kb
 
     def __del__(self):
-        self._close(True)
+        self._close()
 
     def __enter__(self):
-        self._open()
-        return self
+        if not self._db or not self._cursor:
+            self._open()
+        return self._db, self._cursor
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self._close()
 
     def _open(self):
-        if self._db:
-            if not self._cursor:
-                self._cursor = self._db.cursor()
-            return
+        if not os.path.exists(self._filename):
+            os.makedirs(os.path.dirname(self._filename), exist_ok=True)
+            self.__class__._table_created = False
+            self.__class__._table_updated = True
 
-        path = os.path.dirname(self._filename)
-        if not os.path.exists(path):
-            os.makedirs(path)
+        try:
+            db = sqlite3.connect(self._filename,
+                                 check_same_thread=False,
+                                 timeout=1,
+                                 isolation_level=None)
+        except sqlite3.OperationalError as exc:
+            log_error('SQLStorage._execute - {exc}:\n{details}'.format(
+                exc=exc, details=format_exc()
+            ))
+            return False
 
-        db = sqlite3.connect(self._filename, check_same_thread=False,
-                             timeout=1, isolation_level=None)
         cursor = db.cursor()
-        # cursor.execute('PRAGMA journal_mode=MEMORY')
-        cursor.execute('PRAGMA journal_mode=WAL')
-        cursor.execute('PRAGMA busy_timeout=20000')
-        cursor.execute('PRAGMA read_uncommitted=TRUE')
-        cursor.execute('PRAGMA temp_store=MEMORY')
-        cursor.execute('PRAGMA page_size=4096')
-        # cursor.execute('PRAGMA synchronous=OFF')
-        cursor.execute('PRAGMA synchronous=NORMAL')
-        cursor.arraysize = 50
+        cursor.arraysize = 100
+
+        sql_script = [
+            'PRAGMA journal_mode = WAL;',
+            'PRAGMA busy_timeout = 20000;',
+            'PRAGMA read_uncommitted = TRUE;',
+            'PRAGMA temp_store = MEMORY;',
+            'PRAGMA page_size = 4096;',
+            'PRAGMA synchronous = NORMAL;',
+            'PRAGMA mmap_size = 10485760;',
+            # 'PRAGMA locking_mode = EXCLUSIVE;'
+            'PRAGMA cache_size = 500;'
+        ]
+        statements = []
+
+        if not self._table_created:
+            statements.append(self._sql['create_table'])
+
+        if not self._table_updated:
+            for result in cursor.execute(self._sql['has_old_table']):
+                if result[0] == 1:
+                    statements.extend((
+                        'PRAGMA writable_schema = 1;',
+                        self._sql['drop_old_table'],
+                        'PRAGMA writable_schema = 0;',
+                    ))
+                break
+
+        if statements:
+            transaction_begin = len(sql_script) + 1
+            sql_script.extend(('BEGIN;', 'COMMIT;', 'VACUUM;'))
+            sql_script[transaction_begin:transaction_begin] = statements
+        cursor.executescript('\n'.join(sql_script))
+
+        self.__class__._table_created = True
+        self.__class__._table_updated = True
         self._db = db
         self._cursor = cursor
 
-        self._create_table()
-        self._drop_old_tables()
-        self._optimize_file_size()
+    def _close(self):
+        if self._cursor:
+            self._execute(self._cursor, 'PRAGMA optimize')
+            self._cursor.close()
+            self._cursor = None
+        if self._db:
+            # Not needed if using self._db as a context manager
+            # self._db.commit()
+            self._db.close()
+            self._db = None
 
-    def _drop_old_tables(self):
-        if self._table_updated:
-            return
-        self._execute(True, 'PRAGMA writable_schema=1')
-        self._execute(True, self._drop_old_tables_sql)
-        self._execute(True, 'PRAGMA writable_schema=0')
-        self._sync()
-        self._execute(False, 'VACUUM')
-        self._table_updated = True
-
-    def _execute(self, needs_commit, query, values=None, many=False):
+    @staticmethod
+    def _execute(cursor, query, values=None, many=False):
         if values is None:
             values = ()
-        if not self._needs_commit and needs_commit:
-            self._needs_commit = True
-            self._cursor.execute('BEGIN')
-
         """
         Tests revealed that sqlite has problems to release the database in time
         This happens no so often, but just to be sure, we try at least 3 times
@@ -126,99 +243,95 @@ class Storage(object):
         for _ in range(3):
             try:
                 if many:
-                    return self._cursor.executemany(query, values)
-                return self._cursor.execute(query, values)
-            except TypeError:
-                log_error('SQLStorage._execute - |{0}|'.format(print_exc()))
-                return []
-            except:
-                log_error('SQLStorage._execute - |{0}|'.format(print_exc()))
+                    return cursor.executemany(query, values)
+                return cursor.execute(query, values)
+            except sqlite3.OperationalError as exc:
+                log_error('SQLStorage._execute - {exc}:\n{details}'.format(
+                    exc=exc, details=format_exc()
+                ))
                 time.sleep(0.1)
+            except sqlite3.Error as exc:
+                log_error('SQLStorage._execute - {exc}:\n{details}'.format(
+                    exc=exc, details=format_exc()
+                ))
+                return []
         return []
 
-    def _close(self, full=False):
-        if not self._db:
-            return
-
-        if self._cursor:
-            self._sync()
-            self._db.commit()
-            self._cursor.close()
-            self._cursor = None
-        if full:
-            self._db.close()
-            self._db = None
-
-    def _optimize_file_size(self):
-        # do nothing - only we have given a size
+    def _optimize_file_size(self, defer=False):
+        # do nothing - optimize only if max size limit has been set
         if self._max_file_size_kb <= 0:
-            return
+            return False
 
-        # do nothing - only if this db exists
-        if not os.path.exists(self._filename):
-            return
-
-        file_size_kb = (os.path.getsize(self._filename) // 1024)
-        if file_size_kb <= self._max_file_size_kb:
-            return
+        try:
+            file_size_kb = (os.path.getsize(self._filename) // 1024)
+            if file_size_kb <= self._max_file_size_kb:
+                return False
+        except OSError:
+            return False
 
         prune_size = 1024 * int(file_size_kb - self._max_file_size_kb / 2)
-        query = self._prune_sql.format(prune_size)
-        self._execute(True, query)
-        self._sync()
-        self._execute(False, 'VACUUM')
+        query = self._sql['prune_by_size'].format(prune_size)
+        if defer:
+            return query
+        with self as (db, cursor), db:
+            self._execute(cursor, query)
+            self._execute(cursor, 'VACUUM')
+        return True
 
-    def _create_table(self):
-        if self._table_created:
-            return
-        self._execute(True, self._create_table_sql)
-        self._table_created = True
+    def _optimize_item_count(self, limit=-1, defer=False):
+        # do nothing - optimize only if max item limit has been set
+        if self._max_item_count < 0:
+            return False
 
-    def _sync(self):
-        if not self._needs_commit:
-            return None
-        self._needs_commit = False
-        return self._execute(False, 'COMMIT')
-
-    def _set(self, item_id, item):
-        now = since_epoch(datetime.now())
-        with self as db:
-            db._execute(True, db._set_sql,
-                        values=[str(item_id), now, *db._encode(item)])
-        self._optimize_item_count()
-
-    def _set_all(self, items):
-        now = since_epoch(datetime.now())
-        with self as db:
-            db._execute(True, db._set_sql, many=True,
-                        values=[(str(item_id), now, *db._encode(item))
-                                for item_id, item in items.items()])
-        self._optimize_item_count()
-
-    def _optimize_item_count(self):
+        # clear db if max item count has been set to 0
         if not self._max_item_count:
             if not self._is_empty():
-                self._clear()
-            return
-        if self._max_item_count < 0:
-            return
-        query = self._optimize_item_sql.format(self._max_item_count)
-        with self as db:
-            item_ids = db._execute(False, query)
-            item_ids = [item_id[0] for item_id in item_ids]
-            if item_ids:
-                db._remove_all(item_ids)
+                return self.clear(defer)
+            return False
 
-    def _clear(self):
-        with self as db:
-            db._execute(True, db._clear_sql)
-            db._create_table()
-            db._sync()
-            db._execute(False, 'VACUUM')
+        query = self._sql['prune_by_count'].format(
+            limit, self._max_item_count
+        )
+        if defer:
+            return query
+        with self as (db, cursor), db:
+            self._execute(cursor, query)
+            self._execute(cursor, 'VACUUM')
+        return True
+
+    def _set(self, item_id, item):
+        values = self._encode(item_id, item)
+        optimize_query = self._optimize_item_count(1, defer=True)
+        with self as (db, cursor), db:
+            if optimize_query:
+                self._execute(cursor, 'BEGIN')
+                self._execute(cursor, optimize_query)
+            self._execute(cursor, self._sql['set'], values=values)
+
+    def _set_many(self, items):
+        now = since_epoch(datetime.now())
+        values = [self._encode(*item, timestamp=now)
+                  for item in items.items()]
+        optimize_query = self._optimize_item_count(len(items), defer=True)
+        with self as (db, cursor), db:
+            self._execute(cursor, 'BEGIN')
+            if optimize_query:
+                self._execute(cursor, optimize_query)
+            self._execute(cursor, self._sql['set'], many=True, values=values)
+        self._optimize_file_size()
+
+    def clear(self, defer=False):
+        query = self._sql['clear']
+        if defer:
+            return query
+        with self as (db, cursor), db:
+            self._execute(cursor, query)
+            self._execute(cursor, 'VACUUM')
+        return True
 
     def _is_empty(self):
-        with self as db:
-            result = db._execute(False, db._is_empty_sql)
+        with self as (db, cursor), db:
+            result = self._execute(cursor, self._sql['is_empty'])
             for item in result:
                 is_empty = item[0] == 0
                 break
@@ -234,17 +347,17 @@ class Storage(object):
         return decoded_obj
 
     @staticmethod
-    def _encode(obj):
+    def _encode(key, obj, timestamp=None):
+        timestamp = timestamp or since_epoch(datetime.now())
         blob = sqlite3.Binary(pickle.dumps(
             obj, protocol=pickle.HIGHEST_PROTOCOL
         ))
         size = getattr(blob, 'nbytes', None) or blob.itemsize * len(blob)
-        return blob, size
-
+        return str(key), timestamp, blob, size
 
     def _get(self, item_id, process=None, seconds=None):
-        with self as db:
-            result = db._execute(False, db._get_sql, [str(item_id)])
+        with self as (db, cursor), db:
+            result = self._execute(cursor, self._sql['get'], [str(item_id)])
             item = result.fetchone() if result else None
             if not item:
                 return None
@@ -258,45 +371,47 @@ class Storage(object):
                     as_dict=False, values_only=False):
         if not item_ids:
             if oldest_first:
-                query = self._get_all_asc_sql
+                query = self._sql['get_many']
             else:
-                query = self._get_all_desc_sql
+                query = self._sql['get_many_desc']
             query = query.format(limit)
         else:
             num_ids = len(item_ids)
-            query = self._get_by_sql.format(('?,' * (num_ids - 1)) + '?')
+            query = self._sql['get_by_key'].format(('?,' * (num_ids - 1)) + '?')
             item_ids = tuple(item_ids)
 
-        with self as db:
-            result = db._execute(False, query, item_ids)
+        with self as (db, cursor), db:
+            result = self._execute(cursor, query, item_ids)
             cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
             if as_dict:
                 result = {
-                    item[0]: db._decode(item[2], process, item)
+                    item[0]: self._decode(item[2], process, item)
                     for item in result if not cut_off or item[1] >= cut_off
                 }
             elif values_only:
                 result = [
-                    db._decode(item[2], process, item)
+                    self._decode(item[2], process, item)
                     for item in result if not cut_off or item[1] >= cut_off
                 ]
             else:
                 result = [
                     (item[0],
                      self._convert_timestamp(item[1]),
-                     db._decode(item[2], process, item))
+                     self._decode(item[2], process, item))
                     for item in result if not cut_off or item[1] >= cut_off
                 ]
         return result
 
     def _remove(self, item_id):
-        with self as db:
-            db._execute(True, db._remove_sql, [item_id])
+        with self as (db, cursor), db:
+            self._execute(cursor, self._sql['remove'], [item_id])
 
-    def _remove_all(self, item_ids):
+    def _remove_many(self, item_ids):
         num_ids = len(item_ids)
-        query = self._remove_all_sql.format(('?,' * (num_ids - 1)) + '?')
-        self._execute(True, query, tuple(item_ids))
+        query = self._sql['remove_by_key'].format(('?,' * (num_ids - 1)) + '?')
+        with self as (db, cursor), db:
+            self._execute(cursor, query, tuple(item_ids))
+            self._execute(cursor, 'VACUUM')
 
     @classmethod
     def _convert_timestamp(cls, val):
