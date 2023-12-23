@@ -42,7 +42,7 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     :param client_secret: YouTube Data v3 Client secret
     """
 
-    context = Context(plugin_id='plugin.video.youtube')
+    context = Context()
 
     if not addon_id or addon_id == 'plugin.video.youtube':
         context.log_error('Register API Keys: |%s| Invalid addon_id' % addon_id)

@@ -192,7 +192,7 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-_api_check = APICheck(Context(plugin_id='plugin.video.youtube'))
+_api_check = APICheck(Context())
 
 keys_changed = _api_check.changed
 current_user = _api_check.get_current_user()

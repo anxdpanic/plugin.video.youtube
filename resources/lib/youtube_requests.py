@@ -22,9 +22,9 @@ def __get_core_components(addon_id=None):
     """
     provider = Provider()
     if addon_id is not None:
-        context = Context(params={'addon_id': addon_id}, plugin_id='plugin.video.youtube')
+        context = Context(params={'addon_id': addon_id})
     else:
-        context = Context(plugin_id='plugin.video.youtube')
+        context = Context()
     client = provider.get_client(context=context)
 
     return provider, context, client

@@ -26,6 +26,7 @@ from ...compatibility import (
     xbmcplugin,
     xbmcvfs,
 )
+from ...constants import ADDON_ID
 from ...player.xbmc.xbmc_player import XbmcPlayer
 from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
@@ -255,7 +256,7 @@ class XbmcContext(AbstractContext):
         if plugin_id:
             self._addon = xbmcaddon.Addon(id=plugin_id)
         else:
-            self._addon = xbmcaddon.Addon(id='plugin.video.youtube')
+            self._addon = xbmcaddon.Addon(id=ADDON_ID)
 
         """
         I don't know what xbmc/kodi is doing with a simple uri, but we have to extract the information from the
@@ -286,7 +287,7 @@ class XbmcContext(AbstractContext):
         self._video_player = None
         self._audio_player = None
         self._plugin_handle = int(sys.argv[1]) if num_args > 1 else -1
-        self._plugin_id = plugin_id or self._addon.getAddonInfo('id')
+        self._plugin_id = plugin_id or ADDON_ID
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
         self._native_path = xbmcvfs.translatePath(self._addon.getAddonInfo('path'))
@@ -431,8 +432,11 @@ class XbmcContext(AbstractContext):
         if not new_params:
             new_params = self.get_params()
 
-        new_context = XbmcContext(path=new_path, params=new_params, plugin_name=self._plugin_name,
-                                  plugin_id=self._plugin_id, override=False)
+        new_context = XbmcContext(path=new_path,
+                                  params=new_params,
+                                  plugin_name=self._plugin_name,
+                                  plugin_id=self._plugin_id,
+                                  override=False)
         new_context._function_cache = self._function_cache
         new_context._search_history = self._search_history
         new_context._favorite_list = self._favorite_list
@@ -488,7 +492,7 @@ class XbmcContext(AbstractContext):
         data = json.dumps(data)
         self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
         data = '\\"[\\"%s\\"]\\"' % quote(data)
-        self.execute('NotifyAll(plugin.video.youtube,%s,%s)' % (method, data))
+        self.execute('NotifyAll({0},{1},{2})'.format(ADDON_ID, method, data))
 
     def use_inputstream_adaptive(self):
         if self._settings.use_isa():

@@ -51,7 +51,7 @@ def run():
     ping_timestamp = None
     first_run = True
 
-    context = Context(plugin_id='plugin.video.youtube')
+    context = Context()
 
     context.log_debug('YouTube service initialization...')
 

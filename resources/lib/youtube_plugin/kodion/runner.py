@@ -30,7 +30,7 @@ def run(provider, context=None):
     start_time = timeit.default_timer()
 
     if not context:
-        context = Context(plugin_id='plugin.video.youtube')
+        context = Context()
 
     context.log_debug('Starting Kodion framework by bromix...')
     python_version = 'Unknown version of Python'

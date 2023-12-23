@@ -16,4 +16,12 @@ from . import const_content_types as content_type
 from . import const_paths as paths
 
 
-__all__ = ['setting', 'sort_method', 'content_type', 'paths']
+ADDON_ID = 'plugin.video.youtube'
+
+__all__ = (
+    'ADDON_ID',
+    'content_type',
+    'paths',
+    'setting',
+    'sort_method',
+)

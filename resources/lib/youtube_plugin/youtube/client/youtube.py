@@ -22,7 +22,7 @@ from ...kodion import Context
 from ...kodion.utils import datetime_parser, strip_html_from_text, to_unicode
 
 
-_context = Context(plugin_id='plugin.video.youtube')
+_context = Context()
 
 
 class YouTube(LoginClient):
