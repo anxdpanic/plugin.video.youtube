@@ -258,8 +258,15 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self, exc_type=YouTubeException):
+    def __init__(self, exc_type=None):
+        if isinstance(exc_type, tuple):
+            exc_type = (YouTubeException,) + exc_type
+        elif exc_type:
+            exc_type = (YouTubeException, exc_type)
+        else:
+            exc_type = YouTubeException
         super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
+
         self._access_token = None
         self.video_id = None
 

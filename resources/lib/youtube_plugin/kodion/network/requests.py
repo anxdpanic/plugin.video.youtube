@@ -40,10 +40,15 @@ class BaseRequestsClass(object):
     _session.mount('https://', _http_adapter)
     atexit.register(_session.close)
 
-    def __init__(self, exc_type=RequestException):
+    def __init__(self, exc_type=None):
         self._verify = _settings.verify_ssl()
         self._timeout = _settings.get_timeout()
-        self._default_exc = exc_type
+        if isinstance(exc_type, tuple):
+            self._default_exc = (RequestException,) + exc_type
+        elif exc_type:
+            self._default_exc = (RequestException, exc_type)
+        else:
+            self._default_exc = RequestException
 
     def __del__(self):
         self._session.close()
@@ -98,7 +103,7 @@ class BaseRequestsClass(object):
             else:
                 response.raise_for_status()
 
-        except (RequestException, self._default_exc) as exc:
+        except self._default_exc as exc:
             response_text = exc.response and exc.response.text
             stack_trace = format_stack()
             error_details = {'exc': exc}

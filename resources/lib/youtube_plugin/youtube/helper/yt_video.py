@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ..helper import v3
 from ...kodion import KodionException
 from ...kodion.utils import find_video_id
 
