@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from traceback import format_exc
+from traceback import format_stack
 
 from ..abstract_provider_runner import AbstractProviderRunner
 from ...compatibility import xbmcgui, xbmcplugin
@@ -51,7 +51,7 @@ class XbmcRunner(AbstractProviderRunner):
         except KodionException as exc:
             if provider.handle_exception(context, exc):
                 context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
-                    exc=exc, details=format_exc()
+                    exc=exc, details=''.join(format_stack())
                 ))
                 xbmcgui.Dialog().ok("Error in ContentProvider", exc.__str__())
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)

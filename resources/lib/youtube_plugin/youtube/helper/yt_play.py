@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import random
-from traceback import format_exc
+from traceback import format_stack
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
@@ -47,8 +47,10 @@ def play_video(provider, context):
     try:
         video_streams = client.get_video_streams(context, video_id)
     except YouTubeException as exc:
+        context.log_error('yt_play.play_video - {exc}:\n{details}'.format(
+            exc=exc, details=''.join(format_stack())
+        ))
         ui.show_notification(message=exc.get_message())
-        context.log_error(format_exc())
         return False
 
     if not video_streams:

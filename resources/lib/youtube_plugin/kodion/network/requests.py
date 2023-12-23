@@ -10,7 +10,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import atexit
-from traceback import format_exc, format_stack
+from traceback import format_stack
 
 from requests import Session
 from requests.adapters import HTTPAdapter, Retry
@@ -101,7 +101,6 @@ class BaseRequestsClass(object):
         except (RequestException, self._default_exc) as exc:
             response_text = exc.response and exc.response.text
             stack_trace = format_stack()
-            exc_tb = format_exc()
             error_details = {'exc': exc}
 
             if error_hook:
@@ -147,7 +146,7 @@ class BaseRequestsClass(object):
                 )
 
             log_error('\n'.join([part for part in [
-                error_title, error_info, response_text, stack_trace, exc_tb
+                error_title, error_info, response_text, stack_trace
             ] if part]))
 
             if raise_exc:

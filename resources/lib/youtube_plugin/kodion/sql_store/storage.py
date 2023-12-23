@@ -15,7 +15,7 @@ import pickle
 import sqlite3
 import time
 from datetime import datetime
-from traceback import format_exc
+from traceback import format_stack
 
 from ..logger import log_error
 from ..utils.datetime_parser import since_epoch
@@ -176,7 +176,7 @@ class Storage(object):
                                  isolation_level=None)
         except sqlite3.OperationalError as exc:
             log_error('SQLStorage._execute - {exc}:\n{details}'.format(
-                exc=exc, details=format_exc()
+                exc=exc, details=''.join(format_stack())
             ))
             return False
 
@@ -247,12 +247,12 @@ class Storage(object):
                 return cursor.execute(query, values)
             except sqlite3.OperationalError as exc:
                 log_error('SQLStorage._execute - {exc}:\n{details}'.format(
-                    exc=exc, details=format_exc()
+                    exc=exc, details=''.join(format_stack())
                 ))
                 time.sleep(0.1)
             except sqlite3.Error as exc:
                 log_error('SQLStorage._execute - {exc}:\n{details}'.format(
-                    exc=exc, details=format_exc()
+                    exc=exc, details=''.join(format_stack())
                 ))
                 return []
         return []

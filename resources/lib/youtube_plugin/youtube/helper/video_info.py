@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import random
 import re
-from traceback import format_exc
+from traceback import format_stack
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
@@ -931,12 +931,13 @@ class VideoInfo(YouTubeRequestClient):
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
             except Exception as exc:
-                self._context.log_debug('{0}: {1}\n{2}'.format(
-                    exc, encrypted_signature, format_exc()
+                self._context.log_error('VideoInfo._process_signature_cipher - '
+                                        'failed to extract URL from |{sig}|\n'
+                                        '{exc}:\n{details}'.format(
+                    sig=encrypted_signature,
+                    exc=exc,
+                    details=''.join(format_stack())
                 ))
-                self._context.log_error(
-                    'Failed to extract URL from signatureCipher'
-                )
                 return None
             self._data_cache.set_item(encrypted_signature, {'sig': signature})
 
