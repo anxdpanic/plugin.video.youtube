@@ -19,6 +19,7 @@ from .items import (
     DirectoryItem,
     NewSearchItem,
     SearchHistoryItem,
+    menu_items
 )
 from .utils import to_unicode
 
@@ -163,13 +164,11 @@ class AbstractProvider(object):
             items = context.get_favorite_list().get_items()
 
             for item in items:
-                context_menu = [(
-                    context.localize('favorites.remove'),
-                    'RunPlugin(%s)' % context.create_uri(
-                        [constants.paths.FAVORITES, 'remove'],
-                        params={'item_id': item.get_id()}
-                    )
-                )]
+                context_menu = [
+                    menu_items.favorites_remove(
+                        context, item.video_id
+                    ),
+                ]
                 item.set_context_menu(context_menu)
 
             return items
@@ -201,18 +200,14 @@ class AbstractProvider(object):
             video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
-                context_menu = [(
-                    context.localize('watch_later.remove'),
-                    'RunPlugin(%s)' % context.create_uri(
-                        [constants.paths.WATCH_LATER, 'remove'],
-                        params={'item_id': video_item.get_id()}
+                context_menu = [
+                    menu_items.watch_later_local_remove(
+                        context, video_item.video_id
+                    ),
+                    menu_items.watch_later_local_clear(
+                        context
                     )
-                ), (
-                    context.localize('watch_later.clear'),
-                    'RunPlugin(%s)' % context.create_uri(
-                        [constants.paths.WATCH_LATER, 'clear']
-                    )
-                )]
+                ]
                 video_item.set_context_menu(context_menu)
 
             return video_items

@@ -21,9 +21,8 @@ from .utils import (
     update_playlist_infos,
     update_video_infos,
 )
-from ..helper import yt_context_menu
 from ...kodion import KodionException
-from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
+from ...kodion.items import DirectoryItem, NextPageItem, VideoItem, menu_items
 
 
 def _process_list_response(provider, context, json_data):
@@ -87,8 +86,11 @@ def _process_list_response(provider, context, json_data):
 
             # if logged in => provide subscribing to the channel
             if provider.is_logged_in():
-                context_menu = []
-                yt_context_menu.append_subscribe_to_channel(context_menu, context, channel_id)
+                context_menu = [
+                    menu_items.subscribe_to_channel(
+                        context, channel_id
+                    ),
+                ]
                 channel_item.set_context_menu(context_menu)
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item

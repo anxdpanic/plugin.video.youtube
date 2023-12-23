@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import menu_items
 from .directory_item import DirectoryItem
 from ..constants.const_paths import SEARCH
 
@@ -29,10 +30,9 @@ class SearchHistoryItem(DirectoryItem):
         else:
             self.set_fanart(context.get_fanart())
 
-        context_menu = [(context.localize('search.remove'),
-                         'RunPlugin(%s)' % context.create_uri([SEARCH, 'remove'], params={'q': query})),
-                        (context.localize('search.rename'),
-                         'RunPlugin(%s)' % context.create_uri([SEARCH, 'rename'], params={'q': query})),
-                        (context.localize('search.clear'),
-                         'RunPlugin(%s)' % context.create_uri([SEARCH, 'clear']))]
+        context_menu = [
+            menu_items.search_remove(context, query),
+            menu_items.search_rename(context, query),
+            menu_items.search_clear(context),
+        ]
         self.set_context_menu(context_menu)

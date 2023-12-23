@@ -23,7 +23,6 @@ from .helper import (
     UrlResolver,
     UrlToItemConverter,
     v3,
-    yt_context_menu,
     yt_login,
     yt_old_actions,
     yt_play,
@@ -36,7 +35,7 @@ from .helper import (
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import (AbstractProvider, RegisterProviderPath, constants)
 from ..kodion.compatibility import xbmcaddon, xbmcvfs
-from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem
+from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem, menu_items
 from ..kodion.network import get_client_ip_address, is_httpd_live
 from ..kodion.utils import find_video_id, strip_html_from_text
 
@@ -653,14 +652,6 @@ class Provider(AbstractProvider):
         category = re_match.group('category')
         return yt_specials.process(category, self, context)
 
-    # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/history/clear/$')
-    def _on_yt_clear_history(self, context, re_match):
-        if context.get_ui().on_yes_no_input(context.get_name(), context.localize('clear_history_confirmation')):
-            json_data = self.get_client(context).clear_watch_history()
-            if 'error' not in json_data:
-                context.get_ui().show_notification(context.localize('succeeded'))
-
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
@@ -1158,34 +1149,21 @@ class Provider(AbstractProvider):
             items = v3.response_to_items(self, context, json_data)
 
             for item in items:
-                context_menu = [(
-                    context.localize('remove'),
-                    'RunPlugin({0})'.format(context.create_uri(
-                        [constants.paths.HISTORY],
-                        params={'action': 'remove',
-                                'video_id': item.video_id}
-                    ))
-                ), (
-                    context.localize('mark.unwatched'),
-                    'RunPlugin({0})'.format(context.create_uri(
-                        [constants.paths.HISTORY],
-                        params={'action': 'mark_unwatched',
-                                'video_id': item.video_id}
-                    ))
-                ), (
-                    context.localize('mark.watched'),
-                    'RunPlugin({0})'.format(context.create_uri(
-                        [constants.paths.HISTORY],
-                        params={'action': 'mark_watched',
-                                'video_id': item.video_id}
-                    ))
-                ), (
-                    context.localize('history.clear'),
-                    'RunPlugin({0})'.format(context.create_uri(
-                        [constants.paths.HISTORY],
-                        params={'action': 'clear'}
-                    ))
-                )]
+                video_id = item.video_id
+                context_menu = [
+                    menu_items.history_remove(
+                        context, video_id
+                    ),
+                    menu_items.history_mark_unwatched(
+                        context, video_id
+                    ) if play_data[video_id]['play_count'] else
+                    menu_items.history_mark_watched(
+                        context, video_id
+                    ),
+                    menu_items.history_clear(
+                        context
+                    ),
+                ]
                 item.set_context_menu(context_menu)
 
             return items
@@ -1357,10 +1335,11 @@ class Provider(AbstractProvider):
                     image=create_path('media', 'watch_later.png'),
                     fanart=self.get_fanart(context)
                 )
-                context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu,
-                                                              context,
-                                                              playlist_id)
+                context_menu = [
+                    menu_items.play_all_from_playlist(
+                        context, playlist_id
+                    )
+                ]
                 watch_later_item.set_context_menu(context_menu)
                 result.append(watch_later_item)
             else:
@@ -1383,8 +1362,11 @@ class Provider(AbstractProvider):
                     image=create_path('media', 'likes.png'),
                     fanart=self.get_fanart(context)
                 )
-                context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu, context, playlists['likes'])
+                context_menu = [
+                    menu_items.play_all_from_playlist(
+                        context, playlists['likes']
+                    )
+                ]
                 liked_videos_item.set_context_menu(context_menu)
                 result.append(liked_videos_item)
 
@@ -1408,10 +1390,11 @@ class Provider(AbstractProvider):
                     image=create_path('media', 'history.png'),
                     fanart=self.get_fanart(context)
                 )
-                context_menu = []
-                yt_context_menu.append_play_all_from_playlist(context_menu,
-                                                              context,
-                                                              playlist_id)
+                context_menu = [
+                    menu_items.play_all_from_playlist(
+                        context, playlist_id
+                    )
+                ]
                 watch_history_item.set_context_menu(context_menu)
                 result.append(watch_history_item)
             elif settings.use_local_history():
