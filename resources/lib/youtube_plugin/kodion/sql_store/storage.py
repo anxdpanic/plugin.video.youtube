@@ -285,7 +285,7 @@ class Storage(object):
 
         # clear db if max item count has been set to 0
         if not self._max_item_count:
-            if not self._is_empty():
+            if not self.is_empty():
                 return self.clear(defer)
             return False
 
@@ -329,7 +329,7 @@ class Storage(object):
             self._execute(cursor, 'VACUUM')
         return True
 
-    def _is_empty(self):
+    def is_empty(self):
         with self as (db, cursor), db:
             result = self._execute(cursor, self._sql['is_empty'])
             for item in result:

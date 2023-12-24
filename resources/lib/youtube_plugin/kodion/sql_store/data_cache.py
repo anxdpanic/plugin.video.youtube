@@ -24,9 +24,6 @@ class DataCache(Storage):
         super(DataCache, self).__init__(filename,
                                         max_file_size_kb=max_file_size_kb)
 
-    def is_empty(self):
-        return self._is_empty()
-
     def get_items(self, content_ids, seconds):
         result = self._get_by_ids(content_ids, seconds=seconds, as_dict=True)
         return result

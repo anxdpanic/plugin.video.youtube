@@ -21,9 +21,6 @@ class PlaybackHistory(Storage):
     def __init__(self, filename):
         super(PlaybackHistory, self).__init__(filename)
 
-    def is_empty(self):
-        return self._is_empty()
-
     def _add_last_played(self, value, item):
         value['last_played'] = self._convert_timestamp(item[1])
         return value

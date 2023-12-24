@@ -25,9 +25,6 @@ class SearchHistory(Storage):
         super(SearchHistory, self).__init__(filename,
                                             max_item_count=max_item_count)
 
-    def is_empty(self):
-        return self._is_empty()
-
     def get_items(self):
         result = self._get_by_ids(oldest_first=False,
                                   limit=self._max_item_count,
