@@ -97,7 +97,7 @@ class UrlToItemConverter(object):
                 return
 
             playlist_item = DirectoryItem(
-                '', context.create_uri(['playlist', playlist_id]), new_params
+                '', context.create_uri(['playlist', playlist_id], new_params),
             )
             playlist_item.set_fanart(provider.get_fanart(context))
             self._playlist_id_dict[playlist_id] = playlist_item
