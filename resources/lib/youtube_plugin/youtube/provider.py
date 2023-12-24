@@ -33,8 +33,13 @@ from .helper import (
     yt_video,
 )
 from .youtube_exceptions import InvalidGrant, LoginException
-from ..kodion import (AbstractProvider, RegisterProviderPath, constants)
+from ..kodion import AbstractProvider, RegisterProviderPath
 from ..kodion.compatibility import xbmcaddon, xbmcvfs
+from ..kodion.constants import (
+    content,
+    paths,
+    sort,
+)
 from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem, menu_items
 from ..kodion.network import get_client_ip_address, is_httpd_live
 from ..kodion.utils import find_video_id, strip_html_from_text
@@ -286,7 +291,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
-        self.set_content_type(context, constants.content_type.VIDEOS)
+        self.set_content_type(context, content.VIDEOS)
         client = self.get_client(context)
         resource_manager = self.get_resource_manager(context)
 
@@ -307,7 +312,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
-        self.set_content_type(context, constants.content_type.FILES)
+        self.set_content_type(context, content.FILES)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -348,7 +353,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
     def _on_channel_live(self, context, re_match):
-        self.set_content_type(context, constants.content_type.VIDEOS)
+        self.set_content_type(context, content.VIDEOS)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -391,7 +396,7 @@ class Provider(AbstractProvider):
         if method == 'channel' and not channel_id:
             return False
 
-        self.set_content_type(context, constants.content_type.VIDEOS)
+        self.set_content_type(context, content.VIDEOS)
 
         resource_manager = self.get_resource_manager(context)
 
@@ -480,7 +485,7 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/location/mine/$')
     def _on_my_location(self, context, re_match):
-        self.set_content_type(context, constants.content_type.FILES)
+        self.set_content_type(context, content.FILES)
 
         create_path = context.create_resource_path
         create_uri = context.create_uri
@@ -635,7 +640,7 @@ class Provider(AbstractProvider):
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
-            self.set_content_type(context, constants.content_type.FILES)
+            self.set_content_type(context, content.FILES)
             channel_ids = []
             for subscription in subscriptions:
                 channel_ids.append(subscription.get_channel_id())
@@ -818,9 +823,9 @@ class Provider(AbstractProvider):
         safe_search = context.get_settings().safe_search()
 
         if search_type == 'video':
-            self.set_content_type(context, constants.content_type.VIDEOS)
+            self.set_content_type(context, content.VIDEOS)
         else:
-            self.set_content_type(context, constants.content_type.FILES)
+            self.set_content_type(context, content.FILES)
 
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
@@ -1228,7 +1233,7 @@ class Provider(AbstractProvider):
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
 
-        self.set_content_type(context, constants.content_type.FILES)
+        self.set_content_type(context, content.FILES)
 
         result = []
 
@@ -1344,7 +1349,7 @@ class Provider(AbstractProvider):
             else:
                 watch_history_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri([constants.paths.WATCH_LATER, 'list']),
+                    create_uri([paths.WATCH_LATER, 'list']),
                     image=create_path('media', 'watch_later.png'),
                     fanart=self.get_fanart(context)
                 )
@@ -1399,7 +1404,7 @@ class Provider(AbstractProvider):
             elif settings.use_local_history():
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri([constants.paths.HISTORY], params={'action': 'list'}),
+                    create_uri([paths.HISTORY], params={'action': 'list'}),
                     image=create_path('media', 'history.png'),
                     fanart=self.get_fanart(context)
                 )
@@ -1501,18 +1506,18 @@ class Provider(AbstractProvider):
     def set_content_type(context, content_type):
         context.set_content_type(content_type)
         context.add_sort_method(
-            (constants.sort_method.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-            (constants.sort_method.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+            (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
         )
-        if content_type != constants.content_type.VIDEOS:
+        if content_type != content.VIDEOS:
             return
         context.add_sort_method(
-            (constants.sort_method.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
-            (constants.sort_method.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
-            (constants.sort_method.DATE,             '%T \u2022 %P | %D',      '%J'),
-            (constants.sort_method.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
-            (constants.sort_method.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-            (constants.sort_method.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
+            (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
+            (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
+            (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
+            (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
+            (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
+            (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
         )
 
     def handle_exception(self, context, exception_to_handle):

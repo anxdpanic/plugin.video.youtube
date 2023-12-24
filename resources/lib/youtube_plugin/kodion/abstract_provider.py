@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from . import constants
+from .constants import settings, paths, content
 from .compatibility import quote, unquote
 from .exceptions import KodionException
 from .items import (
@@ -39,25 +39,25 @@ class AbstractProvider(object):
 
         self.register_path(r''.join([
             '^/',
-            constants.paths.WATCH_LATER,
+            paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
         ]), '_internal_watch_later')
 
         self.register_path(r''.join([
             '^/',
-            constants.paths.FAVORITES,
+            paths.FAVORITES,
             '/(?P<command>add|clear|list|remove)/?$'
         ]), '_internal_favorite')
 
         self.register_path(r''.join([
             '^/',
-            constants.paths.SEARCH,
+            paths.SEARCH,
             '/(?P<command>input|query|list|remove|clear|rename)/?$'
         ]), '_internal_search')
 
         self.register_path(r''.join([
             '^/',
-            constants.paths.HISTORY,
+            paths.HISTORY,
             '/$'
         ]), 'on_playback_history')
 
@@ -92,7 +92,7 @@ class AbstractProvider(object):
         # start the setup wizard
         wizard_steps = []
         if context.get_settings().is_setup_wizard_enabled():
-            context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
+            context.get_settings().set_bool(settings.SETUP_WIZARD, False)
             wizard_steps.extend(self.get_wizard_steps(context))
 
         if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
@@ -324,8 +324,7 @@ class AbstractProvider(object):
             if isinstance(query, bytes):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
-
-        context.set_content_type(constants.content_type.VIDEOS)
+        context.set_content_type(content.VIDEOS)
         result = []
 
         location = context.get_param('location', False)

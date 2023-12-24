@@ -10,18 +10,20 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from . import const_settings as setting
-from . import const_sort_methods as sort_method
-from . import const_content_types as content_type
-from . import const_paths as paths
+from . import (
+    const_content_types as content,
+    const_paths as paths,
+    const_settings as settings,
+    const_sort_methods as sort,
+)
 
 
 ADDON_ID = 'plugin.video.youtube'
 
 __all__ = (
     'ADDON_ID',
-    'content_type',
+    'content',
     'paths',
-    'setting',
-    'sort_method',
+    'settings',
+    'sort',
 )

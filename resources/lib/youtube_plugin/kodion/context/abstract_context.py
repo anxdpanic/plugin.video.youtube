@@ -12,8 +12,9 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
-from .. import constants, logger
+from .. import logger
 from ..compatibility import urlencode
+from ..constants import settings
 from ..json_store import AccessManager
 from ..sql_store import (
     DataCache,
@@ -148,7 +149,7 @@ class AbstractContext(object):
 
     def get_data_cache(self):
         if not self._data_cache:
-            max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, -1)
+            max_cache_size_mb = self.get_settings().get_int(settings.CACHE_SIZE, -1)
             if max_cache_size_mb <= 0:
                 max_cache_size_mb = 5
             else:
@@ -159,7 +160,7 @@ class AbstractContext(object):
 
     def get_function_cache(self):
         if not self._function_cache:
-            max_cache_size_mb = self.get_settings().get_int(constants.setting.CACHE_SIZE, -1)
+            max_cache_size_mb = self.get_settings().get_int(settings.CACHE_SIZE, -1)
             if max_cache_size_mb <= 0:
                 max_cache_size_mb = 5
             else:
@@ -170,7 +171,7 @@ class AbstractContext(object):
 
     def get_search_history(self):
         if not self._search_history:
-            max_search_history_items = self.get_settings().get_int(constants.setting.SEARCH_SIZE, 50)
+            max_search_history_items = self.get_settings().get_int(settings.SEARCH_SIZE, 50)
             self._search_history = SearchHistory(os.path.join(self.get_cache_path(), 'search'),
                                                  max_item_count=max_search_history_items)
         return self._search_history
