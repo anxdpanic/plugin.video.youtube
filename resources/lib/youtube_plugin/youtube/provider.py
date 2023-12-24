@@ -194,14 +194,14 @@ class Provider(AbstractProvider):
                     refresh_tokens = refresh_tokens.split('|')
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
 
-        client = YouTube(language=language,
+        client = YouTube(context=context,
+                         language=language,
                          region=region,
                          items_per_page=items_per_page,
                          config=dev_keys if dev_keys else youtube_config)
 
         with client:
             if not refresh_tokens or not refresh_tokens[0]:
-                client.set_log_error(context.log_error)
                 self._client = client
 
             # create new access tokens
@@ -242,7 +242,6 @@ class Provider(AbstractProvider):
             client.set_access_token(access_token=access_tokens[1])
             client.set_access_token_tv(access_token_tv=access_tokens[0])
 
-        client.set_log_error(context.log_error)
         self._client = client
         return self._client
 

@@ -18,15 +18,12 @@ import xml.etree.ElementTree as ET
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
-from ...kodion import Context
 from ...kodion.utils import datetime_parser, strip_html_from_text, to_unicode
 
 
-_context = Context()
-
-
 class YouTube(LoginClient):
-    def __init__(self, **kwargs):
+    def __init__(self, context, **kwargs):
+        self._context = context
         if not kwargs.get('config'):
             kwargs['config'] = {}
         if 'items_per_page' in kwargs:
@@ -381,11 +378,11 @@ class YouTube(LoginClient):
             'items': []
         }
 
-        watch_history_id = _context.get_access_manager().get_watch_history_id()
-        if not watch_history_id or watch_history_id == 'HL':
+        history_id = self._context.get_access_manager().get_watch_history_id()
+        if not history_id or history_id == 'HL':
             return payload
 
-        cache = _context.get_data_cache()
+        cache = self._context.get_data_cache()
 
         # Do we have a cached result?
         cache_home_key = 'get-activities-home'
@@ -401,7 +398,7 @@ class YouTube(LoginClient):
 
         # Fetch history and recommended items. Use threads for faster execution.
         def helper(video_id, responses):
-            _context.log_debug(
+            self._context.log_debug(
                 'Method get_activities: doing expensive API fetch for related'
                 'items for video %s' % video_id
             )
@@ -412,7 +409,7 @@ class YouTube(LoginClient):
                     item['plugin_fetched_for'] = video_id
                 responses.extend(di['items'])
 
-        history = self.get_playlist_items(watch_history_id, max_results=50)
+        history = self.get_playlist_items(history_id, max_results=50)
 
         if not history.get('items'):
             return payload
@@ -712,10 +709,11 @@ class YouTube(LoginClient):
                   'maxResults': str(self._max_results)}
 
         if location:
-            location = _context.get_settings().get_location()
+            settings = self._context.get_settings()
+            location = settings.get_location()
             if location:
                 params['location'] = location
-                params['locationRadius'] = _context.get_settings().get_location_radius()
+                params['locationRadius'] = settings.get_location_radius()
 
         if page_token:
             params['pageToken'] = page_token
@@ -887,10 +885,11 @@ class YouTube(LoginClient):
                 break
 
         if params['type'] == 'video' and location:
-            location = _context.get_settings().get_location()
+            settings = self._context.get_settings()
+            location = settings.get_location()
             if location:
                 params['location'] = location
-                params['locationRadius'] = _context.get_settings().get_location_radius()
+                params['locationRadius'] = settings.get_location_radius()
 
         return self.perform_v3_request(method='GET',
                                        path='search',
@@ -918,7 +917,7 @@ class YouTube(LoginClient):
                     'items': []
                 }
 
-            cache = _context.get_data_cache()
+            cache = self._context.get_data_cache()
 
             # if new uploads is cached
             cache_items_key = 'my-subscriptions-items'
@@ -1189,11 +1188,10 @@ class YouTube(LoginClient):
 
         return result
 
-    @staticmethod
-    def _response_hook(**kwargs):
+    def _response_hook(self, **kwargs):
         response = kwargs['response']
-        _context.log_debug('[data] v3 response: |{0.status_code}|\n'
-                           '\theaders: |{0.headers}|'.format(response))
+        self._context.log_debug('[data] v3 response: |{0.status_code}|\n'
+                                '\theaders: |{0.headers}|'.format(response))
         try:
             json_data = response.json()
             if 'error' in json_data:
@@ -1205,8 +1203,7 @@ class YouTube(LoginClient):
         response.raise_for_status()
         return json_data
 
-    @staticmethod
-    def _error_hook(**kwargs):
+    def _error_hook(self, **kwargs):
         exc = kwargs['exc']
         json_data = getattr(exc, 'json_data', None)
         data = getattr(exc, 'pass_data', False) and json_data
@@ -1224,10 +1221,10 @@ class YouTube(LoginClient):
             ok_dialog = False
             timeout = 5000
             if reason == 'accessNotConfigured':
-                notification = _context.localize('key.requirement.notification')
+                notification = self._context.localize('key.requirement')
                 ok_dialog = True
             elif reason == 'keyInvalid' and message == 'Bad Request':
-                notification = _context.localize('api.key.incorrect')
+                notification = self._context.localize('api.key.incorrect')
                 timeout = 7000
             elif reason in ('quotaExceeded', 'dailyLimitExceeded'):
                 notification = message
@@ -1235,13 +1232,13 @@ class YouTube(LoginClient):
             else:
                 notification = message
 
-            title = '{0}: {1}'.format(_context.get_name(), reason)
+            title = '{0}: {1}'.format(self._context.get_name(), reason)
             if ok_dialog:
-                _context.get_ui().on_ok(title, notification)
+                self._context.get_ui().on_ok(title, notification)
             else:
-                _context.get_ui().show_notification(notification,
-                                                    title,
-                                                    time_ms=timeout)
+                self._context.get_ui().show_notification(notification,
+                                                         title,
+                                                         time_ms=timeout)
 
         info = ('[data] v3 error: {reason}\n'
                 '\texc: |{exc}|\n'
@@ -1282,15 +1279,16 @@ class YouTube(LoginClient):
         else:
             log_params = None
 
-        _context.log_debug('[data] v3 request: |{method}|\n'
-                           '\tpath: |{path}|\n'
-                           '\tparams: |{params}|\n'
-                           '\tpost_data: |{data}|\n'
-                           '\theaders: |{headers}|'.format(method=method,
-                                                           path=path,
-                                                           params=log_params,
-                                                           data=post_data,
-                                                           headers=_headers))
+        self._context.log_debug('[data] v3 request: |{method}|\n'
+                                '\tpath: |{path}|\n'
+                                '\tparams: |{params}|\n'
+                                '\tpost_data: |{data}|\n'
+                                '\theaders: |{headers}|'
+                                .format(method=method,
+                                        path=path,
+                                        params=log_params,
+                                        data=post_data,
+                                        headers=_headers))
 
         json_data = self.request(_url,
                                  method=method,
@@ -1336,13 +1334,27 @@ class YouTube(LoginClient):
                 log_params['location'] = 'xx.xxxx,xx.xxxx'
         else:
             log_params = None
-        _context.log_debug('[data] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
+        self._context.log_debug('[data] v1 request: |{method}|\n'
+                                '\tpath: |{path}|\n'
+                                '\tparams: |{params}|\n'
+                                '\tpost_data: |{data}|\n'
+                                '\theaders: |{headers}|'
+                                .format(method=method,
+                                        path=path,
+                                        params=log_params,
+                                        data=post_data,
+                                        headers=_headers))
 
-        result = self.request(_url, method=method, headers=_headers, json=post_data, params=_params)
+        result = self.request(_url,
+                              method=method,
+                              headers=_headers,
+                              json=post_data,
+                              params=_params)
         if result is None:
             return {}
 
-        _context.log_debug('[data] v1 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
+        self._context.log_debug('[data] v1 response: |{0.status_code}|\n'
+                                '\theaders: |{0.headers}|'.format(result))
 
         if result.headers.get('content-type', '').startswith('application/json'):
             try:

@@ -76,8 +76,6 @@ class LoginClient(YouTubeRequestClient):
         self._access_token = access_token
         self._access_token_tv = access_token_tv
 
-        self._log_error_callback = None
-
         super(LoginClient, self).__init__(exc_type=LoginException)
 
     @staticmethod
@@ -105,15 +103,6 @@ class LoginClient(YouTubeRequestClient):
                 and json_data.get('code') == '400'):
             return None, None, None, json_data, False, InvalidGrant(json_data)
         return None, None, None, json_data, False, LoginException(json_data)
-
-    def set_log_error(self, callback):
-        self._log_error_callback = callback
-
-    def log_error(self, text):
-        if self._log_error_callback:
-            self._log_error_callback(text)
-        else:
-            print(text)
 
     def verify(self):
         return self._verify
