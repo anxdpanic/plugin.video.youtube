@@ -81,7 +81,7 @@ def video_playback_item(context, video_item):
             and context.addon_enabled('inputstream.adaptive')):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
-            mime_type = 'application/xml+dash'
+            mime_type = 'application/dash+xml'
             """
             # MPD manifest update is currently broken
             # Following line will force a full update but restart live stream

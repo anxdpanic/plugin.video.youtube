@@ -106,7 +106,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             try:
                 with open(file_path, 'rb') as f:
                     self.send_response(200)
-                    self.send_header('Content-Type', 'application/xml+dash')
+                    self.send_header('Content-Type', 'application/dash+xml')
                     self.send_header('Content-Length',
                                      str(os.path.getsize(file_path)))
                     self.end_headers()
@@ -208,7 +208,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                 self.send_error(404, response)
             else:
                 self.send_response(200)
-                self.send_header('Content-Type', 'application/xml+dash')
+                self.send_header('Content-Type', 'application/dash+xml')
                 self.send_header('Content-Length',
                                  str(os.path.getsize(file_path)))
                 self.end_headers()
