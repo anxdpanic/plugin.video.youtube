@@ -14,6 +14,7 @@ from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ... import utils
 from ...compatibility import xbmc, xbmcgui
+from ...constants import ADDON_ID, ADDON_PATH
 
 
 class XbmcContextUI(AbstractContextUI):
@@ -136,8 +137,10 @@ class XbmcContextUI(AbstractContextUI):
         self._xbmc_addon.openSettings()
 
     def refresh_container(self):
-        script_uri = "{}/resources/lib/youtube_plugin/refresh.py".format(self._xbmc_addon.getAddonInfo('path'))
-        xbmc.executebuiltin('RunScript(%s)' % script_uri)
+        xbmc.executebuiltin(
+            'RunScript({path}/resources/lib/youtube_plugin/refresh.py)'
+            .format(path=ADDON_PATH)
+        )
 
     @staticmethod
     def get_info_label(value):
@@ -145,17 +148,17 @@ class XbmcContextUI(AbstractContextUI):
 
     @staticmethod
     def set_property(property_id, value):
-        property_id = ''.join(['plugin.video.youtube-', property_id])
+        property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(property_id, value)
 
     @staticmethod
     def get_property(property_id):
-        property_id = ''.join(['plugin.video.youtube-', property_id])
+        property_id = '-'.join((ADDON_ID, property_id))
         return xbmcgui.Window(10000).getProperty(property_id)
 
     @staticmethod
     def clear_property(property_id):
-        property_id = ''.join(['plugin.video.youtube-', property_id])
+        property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).clearProperty(property_id)
 
     @staticmethod

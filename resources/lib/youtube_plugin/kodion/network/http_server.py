@@ -26,13 +26,12 @@ from ..compatibility import (
     xbmcgui,
     xbmcvfs,
 )
-from ..constants import TEMP_PATH
+from ..constants import ADDON_ID, TEMP_PATH
 from ..logger import log_debug
 from ..settings import Settings
 
 
-_addon_id = 'plugin.video.youtube'
-_addon = xbmcaddon.Addon(_addon_id)
+_addon = xbmcaddon.Addon(ADDON_ID)
 _settings = Settings(_addon)
 _i18n = _addon.getLocalizedString
 _addon_name = _addon.getAddonInfo('name')
@@ -226,12 +225,12 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         elif self.path.startswith('/widevine'):
             home = xbmcgui.Window(10000)
 
-            lic_url = home.getProperty('plugin.video.youtube-license_url')
+            lic_url = home.getProperty('-'.join((ADDON_ID, 'license_url')))
             if not lic_url:
                 self.send_error(404)
                 return
 
-            lic_token = home.getProperty('plugin.video.youtube-license_token')
+            lic_token = home.getProperty('-'.join((ADDON_ID, 'license_token')))
             if not lic_token:
                 self.send_error(403)
                 return

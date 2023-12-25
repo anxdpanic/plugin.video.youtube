@@ -13,6 +13,7 @@ import uuid
 from hashlib import md5
 
 from .json_store import JSONStore
+from ..constants import ADDON_ID
 
 
 __author__ = 'bromix'
@@ -34,8 +35,7 @@ class AccessManager(JSONStore):
         self._settings = context.get_settings()
         access_manager_data = self._data['access_manager']
         self._user = access_manager_data.get('current_user', 0)
-        self._last_origin = access_manager_data.get('last_origin',
-                                                    'plugin.video.youtube')
+        self._last_origin = access_manager_data.get('last_origin', ADDON_ID)
 
     def set_defaults(self, reset=False):
         data = {} if reset else self.get_data()
@@ -56,7 +56,7 @@ class AccessManager(JSONStore):
         if 'current_user' not in data['access_manager']:
             data['access_manager']['current_user'] = 0
         if 'last_origin' not in data['access_manager']:
-            data['access_manager']['last_origin'] = 'plugin.video.youtube'
+            data['access_manager']['last_origin'] = ADDON_ID
         if 'developers' not in data['access_manager']:
             data['access_manager']['developers'] = {}
 

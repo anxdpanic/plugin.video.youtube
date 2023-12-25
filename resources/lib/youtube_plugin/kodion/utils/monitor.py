@@ -15,15 +15,14 @@ import shutil
 import threading
 
 from ..compatibility import unquote, xbmc, xbmcaddon, xbmcvfs
-from ..constants import TEMP_PATH
+from ..constants import ADDON_ID, TEMP_PATH
 from ..logger import log_debug
 from ..network import get_http_server, is_httpd_live
 from ..settings import Settings
 
 
 class YouTubeMonitor(xbmc.Monitor):
-    _addon_id = 'plugin.video.youtube'
-    _settings = Settings(xbmcaddon.Addon(_addon_id))
+    _settings = Settings(xbmcaddon.Addon(ADDON_ID))
 
     # noinspection PyUnusedLocal,PyMissingConstructor
     def __init__(self, *args, **kwargs):
@@ -40,8 +39,7 @@ class YouTubeMonitor(xbmc.Monitor):
         super(YouTubeMonitor, self).__init__()
 
     def onNotification(self, sender, method, data):
-        if (sender == 'plugin.video.youtube'
-                and method.endswith('.check_settings')):
+        if sender == ADDON_ID and method.endswith('.check_settings'):
             if not isinstance(data, dict):
                 data = json.loads(data)
                 data = json.loads(unquote(data[0]))
@@ -82,12 +80,12 @@ class YouTubeMonitor(xbmc.Monitor):
                 else:
                     self.start_httpd()
 
-        elif sender == 'plugin.video.youtube':
+        elif sender == ADDON_ID:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
 
     def onSettingsChanged(self):
-        self._settings.flush(xbmcaddon.Addon(self._addon_id))
+        self._settings.flush(xbmcaddon.Addon(ADDON_ID))
 
         data = {
             'use_httpd': (self._settings.use_mpd_videos()
@@ -96,9 +94,7 @@ class YouTubeMonitor(xbmc.Monitor):
             'whitelist': self._settings.httpd_whitelist(),
             'httpd_address': self._settings.httpd_listen()
         }
-        self.onNotification('plugin.video.youtube',
-                            'Other.check_settings',
-                            data)
+        self.onNotification(ADDON_ID, 'Other.check_settings', data)
 
     def use_httpd(self):
         return self._use_httpd

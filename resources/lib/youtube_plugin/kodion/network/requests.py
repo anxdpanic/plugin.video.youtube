@@ -17,11 +17,12 @@ from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import InvalidJSONError, RequestException
 
 from ..compatibility import xbmcaddon
+from ..constants import ADDON_ID
 from ..logger import log_error
 from ..settings import Settings
 
 
-_settings = Settings(xbmcaddon.Addon(id='plugin.video.youtube'))
+_settings = Settings(xbmcaddon.Addon(id=ADDON_ID))
 
 
 class BaseRequestsClass(object):

@@ -36,6 +36,7 @@ from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider, RegisterProviderPath
 from ..kodion.compatibility import xbmcaddon, xbmcvfs
 from ..kodion.constants import (
+    ADDON_ID,
     DATA_PATH,
     TEMP_PATH,
     content,
@@ -135,14 +136,13 @@ class Provider(AbstractProvider):
         refresh_tokens = []
 
         if dev_id:
-            dev_origin = dev_config.get('origin') if dev_config.get('origin') else dev_id
-            if api_last_origin != dev_origin:
-                context.log_debug('API key origin changed, clearing cache. |%s|' % dev_origin)
-                access_manager.set_last_origin(dev_origin)
-                self.get_resource_manager(context).clear()
-        elif api_last_origin != 'plugin.video.youtube':
-            context.log_debug('API key origin changed, clearing cache. |plugin.video.youtube|')
-            access_manager.set_last_origin('plugin.video.youtube')
+            origin = dev_config.get('origin') if dev_config.get('origin') else dev_id
+        else:
+            origin = ADDON_ID
+
+        if api_last_origin != origin:
+            context.log_debug('API key origin changed, clearing cache. |%s|' % origin)
+            access_manager.set_last_origin(origin)
             self.get_resource_manager(context).clear()
 
         if dev_id:
