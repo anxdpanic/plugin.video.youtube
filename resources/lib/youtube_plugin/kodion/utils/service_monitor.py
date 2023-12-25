@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import os
 import shutil
 import threading
 
@@ -21,11 +20,10 @@ from ..network import get_http_server, is_httpd_live
 from ..settings import Settings
 
 
-class YouTubeMonitor(xbmc.Monitor):
+class ServiceMonitor(xbmc.Monitor):
     _settings = Settings(xbmcaddon.Addon(ADDON_ID))
 
-    # noinspection PyUnusedLocal,PyMissingConstructor
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         settings = self._settings
         self._whitelist = settings.httpd_whitelist()
         self._old_httpd_port = self._httpd_port = int(settings.httpd_port())
@@ -36,7 +34,7 @@ class YouTubeMonitor(xbmc.Monitor):
         self.httpd_thread = None
         if self.use_httpd():
             self.start_httpd()
-        super(YouTubeMonitor, self).__init__()
+        super(ServiceMonitor, self).__init__()
 
     def onNotification(self, sender, method, data):
         if sender == ADDON_ID and method.endswith('.check_settings'):

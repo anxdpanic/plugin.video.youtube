@@ -28,13 +28,14 @@ from .methods import (
     to_str,
     to_unicode,
 )
-from .monitor import YouTubeMonitor
 from .player_monitor import PlayerMonitor
+from .service_monitor import ServiceMonitor
 from .system_version import current_system_version
 
 
 __all__ = (
     'PlayerMonitor',
+    'ServiceMonitor',
     'create_path',
     'create_uri_path',
     'current_system_version',
@@ -52,5 +53,4 @@ __all__ = (
     'strip_html_from_text',
     'to_str',
     'to_unicode',
-    'YouTubeMonitor',
 )
