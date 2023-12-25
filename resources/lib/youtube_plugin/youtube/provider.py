@@ -36,6 +36,8 @@ from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider, RegisterProviderPath
 from ..kodion.compatibility import xbmcaddon, xbmcvfs
 from ..kodion.constants import (
+    DATA_PATH,
+    TEMP_PATH,
     content,
     paths,
     sort,
@@ -1024,38 +1026,56 @@ class Provider(AbstractProvider):
                             'settings_xml': 'settings.xml',
                             'api_keys': 'api_keys.json',
                             'access_manager': 'access_manager.json',
-                            'temp_files': 'special://temp/plugin.video.youtube/'}
-            _file = _maint_files.get(maint_type, '')
-            success = False
-            if _file:
-                if 'sqlite' in _file:
-                    _file_w_path = os.path.join(context.get_cache_path(), _file)
-                elif maint_type == 'temp_files':
-                    _file_w_path = _file
-                elif _file == 'playback_history':
-                    _file = ''.join([str(context.get_access_manager().get_current_user_id()), '.sqlite'])
-                    _file_w_path = os.path.join(os.path.join(context.get_data_path(), 'playback'), _file)
+                            'temp_files': TEMP_PATH}
+            _file = _maint_files.get(maint_type)
+            succeeded = False
+
+            if not _file:
+                return
+
+            data_path = xbmcvfs.translatePath(DATA_PATH)
+            if 'sqlite' in _file:
+                _file_w_path = os.path.join(data_path, 'kodion', _file)
+            elif maint_type == 'temp_files':
+                _file_w_path = _file
+            elif maint_type == 'playback_history':
+                _file = ''.join((
+                    context.get_access_manager().get_current_user_id(),
+                    '.sqlite'
+                ))
+                _file_w_path = os.path.join(data_path, 'playback', _file)
+            else:
+                _file_w_path = os.path.join(data_path, _file)
+
+            if not ui.on_delete_content(_file):
+                return
+
+            if maint_type == 'temp_files':
+                temp_path = _file_w_path
+
+                if xbmcvfs.exists(temp_path):
+                    try:
+                        succeeded = xbmcvfs.rmdir(temp_path, force=True)
+                    except OSError:
+                        pass
                 else:
-                    _file_w_path = os.path.join(context.get_data_path(), _file)
-                if ui.on_delete_content(_file):
-                    if maint_type == 'temp_files':
-                        _trans_path = xbmcvfs.translatePath(_file_w_path)
-                        try:
-                            xbmcvfs.rmdir(_trans_path, force=True)
-                        except:
-                            pass
-                        if xbmcvfs.exists(_trans_path):
-                            try:
-                                shutil.rmtree(_trans_path)
-                            except:
-                                pass
-                        success = not xbmcvfs.exists(_trans_path)
-                    elif _file_w_path:
-                        success = xbmcvfs.delete(_file_w_path)
-                    if success:
-                        ui.show_notification(localize('succeeded'))
-                    else:
-                        ui.show_notification(localize('failed'))
+                    succeeded = True
+
+                if not succeeded:
+                    temp_path = xbmcvfs.translatePath(_file_w_path)
+                    try:
+                        shutil.rmtree(temp_path)
+                        succeeded = not xbmcvfs.exists(temp_path)
+                    except OSError:
+                        pass
+
+            elif _file_w_path:
+                succeeded = xbmcvfs.delete(_file_w_path)
+
+            if succeeded:
+                ui.show_notification(localize('succeeded'))
+            else:
+                ui.show_notification(localize('failed'))
         elif action == 'install' and maint_type == 'inputstreamhelper':
             if context.get_system_version().get_version()[0] >= 17:
                 try:

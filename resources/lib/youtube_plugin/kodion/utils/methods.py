@@ -18,6 +18,7 @@ from datetime import timedelta
 from math import floor, log
 
 from ..compatibility import quote, xbmc, xbmcvfs
+from ..logger import log_error
 
 
 __all__ = (
@@ -229,21 +230,31 @@ def print_items(items):
 
 def make_dirs(path):
     if not path.endswith('/'):
-        path = ''.join([path, '/'])
-    path = xbmcvfs.translatePath(path)
-    if not xbmcvfs.exists(path):
-        try:
-            _ = xbmcvfs.mkdirs(path)
-        except:
-            pass
-        if not xbmcvfs.exists(path):
-            try:
-                os.makedirs(path)
-            except:
-                pass
-        return xbmcvfs.exists(path)
+        path = ''.join((path, '/'))
+    succeeded = xbmcvfs.exists(path)
 
-    return True
+    if succeeded:
+        return xbmcvfs.translatePath(path)
+
+    try:
+        succeeded = xbmcvfs.mkdirs(path)
+    except OSError:
+        pass
+
+    if succeeded:
+        return xbmcvfs.translatePath(path)
+
+    path = xbmcvfs.translatePath(path)
+    try:
+        os.makedirs(path)
+        succeeded = True
+    except OSError:
+        pass
+
+    if succeeded:
+        return path
+    log_error('Failed to create directory: |{0}|'.format(path))
+    return False
 
 
 def find_video_id(plugin_path):

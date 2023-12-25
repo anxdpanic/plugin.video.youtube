@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
+import os
 import random
 import re
 from traceback import format_stack
@@ -30,11 +31,14 @@ from ...kodion.compatibility import (
     urlsplit,
     xbmcvfs,
 )
+from ...kodion.constants import TEMP_PATH, paths
 from ...kodion.network import is_httpd_live
 from ...kodion.utils import make_dirs
 
 
 class VideoInfo(YouTubeRequestClient):
+    BASE_PATH = make_dirs(TEMP_PATH)
+
     FORMAT = {
         # === Non-DASH ===
         '5': {'container': 'flv',
@@ -1168,7 +1172,7 @@ class VideoInfo(YouTubeRequestClient):
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
                             .format(self.video_id, is_live)),
             },
-            'subtitles': captions or [],
+            'subtitles': captions,
         }
 
         if _settings.use_remote_history():
@@ -1609,10 +1613,9 @@ class VideoInfo(YouTubeRequestClient):
         if not video_data or not audio_data:
             return None, None
 
-        basepath = 'special://temp/plugin.video.youtube/'
-        if not make_dirs(basepath):
-            self._context.log_debug('Failed to create temp directory: {0}'
-                                    .format(basepath))
+        if not self.BASE_PATH:
+            self._context.log_error('VideoInfo._generate_mpd_manifest - '
+                                    'unable to access temp directory')
             return None, None
 
         def _filter_group(previous_group, previous_stream, item):
@@ -1671,7 +1674,7 @@ class VideoInfo(YouTubeRequestClient):
             'multi_lang': False,
         }
 
-        out_list = [
+        output = [
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
                 ' xmlns="urn:mpeg:dash:schema:mpd:2011"'
@@ -1735,7 +1738,7 @@ class VideoInfo(YouTubeRequestClient):
             languages.add(language)
             roles.add(role)
 
-            out_list.extend((
+            output.extend((
                 '\t\t<AdaptationSet'
                     ' subsegmentAlignment="true"'
                     ' subsegmentStartsWithSAP="1"'
@@ -1764,7 +1767,7 @@ class VideoInfo(YouTubeRequestClient):
                 license_url = (license_url.replace("&", "&amp;")
                                .replace('"', "&quot;").replace("<", "&lt;")
                                .replace(">", "&gt;"))
-                out_list.extend((
+                output.extend((
                     '\t\t\t<ContentProtection'
                         ' schemeIdUri="http://youtube.com/drm/2012/10/10"'
                         '>\n'
@@ -1778,7 +1781,7 @@ class VideoInfo(YouTubeRequestClient):
 
             num_streams = len(streams)
             if media_type == 'audio':
-                out_list.extend(((
+                output.extend(((
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -1805,7 +1808,7 @@ class VideoInfo(YouTubeRequestClient):
                     quality=(idx + 1), priority=(num_streams - idx), **stream
                 ) for idx, stream in enumerate(streams)))
             elif media_type == 'video':
-                out_list.extend(((
+                output.extend(((
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -1829,23 +1832,27 @@ class VideoInfo(YouTubeRequestClient):
                     quality=(idx + 1), priority=(num_streams - idx), **stream
                 ) for idx, stream in enumerate(streams)))
 
-            out_list.append('\t\t</AdaptationSet>\n')
+            output.append('\t\t</AdaptationSet>\n')
             set_id += 1
 
-        out_list.append('\t</Period>\n'
-                        '</MPD>\n')
-        out = ''.join(out_list)
+        output.append('\t</Period>\n'
+                      '</MPD>\n')
+        output = ''.join(output)
 
         if len(languages.difference({'', 'und'})) > 1:
             main_stream['multi_lang'] = True
         if roles.difference({'', 'main', 'dub'}):
             main_stream['multi_audio'] = True
 
-        filepath = '{0}{1}.mpd'.format(basepath, self.video_id)
+        filename = '.'.join((self.video_id, 'mpd'))
+        filepath = os.path.join(self.BASE_PATH, filename)
         try:
             with xbmcvfs.File(filepath, 'w') as mpd_file:
-                success = mpd_file.write(str(out))
+                success = mpd_file.write(output)
         except (IOError, OSError):
+            self._context.log_error('VideoInfo._generate_mpd_manifest - '
+                                    'file write failed for: {file}'
+                                    .format(file=filepath))
             success = False
         if success:
             return 'http://{0}:{1}/{2}.mpd'.format(

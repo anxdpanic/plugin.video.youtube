@@ -31,7 +31,12 @@ from ...player.xbmc.xbmc_player import XbmcPlayer
 from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
 from ...ui.xbmc.xbmc_context_ui import XbmcContextUI
-from ...utils import current_system_version, loose_version, to_unicode
+from ...utils import (
+    current_system_version,
+    loose_version,
+    make_dirs,
+    to_unicode,
+)
 
 
 class XbmcContext(AbstractContext):
@@ -290,16 +295,9 @@ class XbmcContext(AbstractContext):
         self._plugin_id = plugin_id or ADDON_ID
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
-        self._native_path = xbmcvfs.translatePath(self._addon.getAddonInfo('path'))
+        self._addon_path = make_dirs(self._addon.getAddonInfo('path'))
+        self._data_path = make_dirs(self._addon.getAddonInfo('profile'))
         self._settings = XbmcPluginSettings(self._addon)
-
-        """
-        Set the data path for this addon and create the folder
-        """
-        self._data_path = xbmcvfs.translatePath(self._addon.getAddonInfo('profile'))
-
-        if not xbmcvfs.exists(self._data_path):
-            xbmcvfs.mkdir(self._data_path)
 
     def get_region(self):
         pass  # implement from abstract
@@ -388,8 +386,8 @@ class XbmcContext(AbstractContext):
                 xbmcvfs.mkdir(self._debug_path)
         return self._debug_path
 
-    def get_native_path(self):
-        return self._native_path
+    def get_addon_path(self):
+        return self._addon_path
 
     def get_settings(self):
         return self._settings

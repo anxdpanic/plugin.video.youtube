@@ -143,7 +143,7 @@ class AbstractContext(object):
     def get_playback_history(self):
         if not self._playback_history:
             uuid = self.get_access_manager().get_current_user_id()
-            db_file = os.path.join(os.path.join(self.get_data_path(), 'playback'), str(uuid))
+            db_file = os.path.join(self.get_data_path(), 'playback', uuid)
             self._playback_history = PlaybackHistory(db_file)
         return self._playback_history
 
@@ -286,7 +286,7 @@ class AbstractContext(object):
         """
         raise NotImplementedError()
 
-    def get_native_path(self):
+    def get_addon_path(self):
         raise NotImplementedError()
 
     def get_icon(self):
@@ -299,7 +299,7 @@ class AbstractContext(object):
         path_comps = []
         for arg in args:
             path_comps.extend(arg.split('/'))
-        path = os.path.join(self.get_native_path(), 'resources', *path_comps)
+        path = os.path.join(self.get_addon_path(), 'resources', *path_comps)
         return path
 
     def get_uri(self):

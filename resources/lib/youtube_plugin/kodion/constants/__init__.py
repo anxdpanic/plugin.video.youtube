@@ -19,9 +19,13 @@ from . import (
 
 
 ADDON_ID = 'plugin.video.youtube'
+DATA_PATH = 'special://profile/addon_data/{id}'.format(id=ADDON_ID)
+TEMP_PATH = 'special://temp/{id}'.format(id=ADDON_ID)
 
 __all__ = (
     'ADDON_ID',
+    'DATA_PATH',
+    'TEMP_PATH',
     'content',
     'paths',
     'settings',

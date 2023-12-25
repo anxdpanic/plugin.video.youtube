@@ -26,6 +26,7 @@ from ..compatibility import (
     xbmcgui,
     xbmcvfs,
 )
+from ..constants import TEMP_PATH
 from ..logger import log_debug
 from ..settings import Settings
 
@@ -42,7 +43,7 @@ _server_requests = BaseRequestsClass()
 
 
 class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
-    base_path = xbmcvfs.translatePath('special://temp/{0}'.format(_addon_id))
+    BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
     chunk_size = 1024 * 64
     local_ranges = (
         '10.',
@@ -98,7 +99,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.wfile.write(client_json.encode('utf-8'))
 
         elif _settings.use_mpd_videos() and stripped_path.endswith('.mpd'):
-            file_path = os.path.join(self.base_path,
+            file_path = os.path.join(self.BASE_PATH,
                                      self.path.strip('/').strip('\\'))
             file_chunk = True
             log_debug('HTTPServer: Request file path |{file_path}|'
@@ -200,7 +201,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         if not self.connection_allowed():
             self.send_error(403)
         elif _settings.use_mpd_videos() and self.path.endswith('.mpd'):
-            file_path = os.path.join(self.base_path,
+            file_path = os.path.join(self.BASE_PATH,
                                      self.path.strip('/').strip('\\'))
             if not os.path.isfile(file_path):
                 response = ('File Not Found: |{proxy_path}| -> |{file_path}|'

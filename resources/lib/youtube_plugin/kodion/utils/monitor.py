@@ -15,6 +15,7 @@ import shutil
 import threading
 
 from ..compatibility import unquote, xbmc, xbmcaddon, xbmcvfs
+from ..constants import TEMP_PATH
 from ..logger import log_debug
 from ..network import get_http_server, is_httpd_live
 from ..settings import Settings
@@ -162,23 +163,30 @@ class YouTubeMonitor(xbmc.Monitor):
     def ping_httpd(self):
         return is_httpd_live(port=self.httpd_port())
 
-    def remove_temp_dir(self):
-        path = xbmcvfs.translatePath('special://temp/%s' % self._addon_id)
+    @staticmethod
+    def remove_temp_dir():
+        temp_path = TEMP_PATH
+        succeeded = False
 
-        if os.path.isdir(path):
+        if xbmcvfs.exists(temp_path):
             try:
-                xbmcvfs.rmdir(path, force=True)
-            except:
+                succeeded = xbmcvfs.rmdir(temp_path, force=True)
+            except OSError:
                 pass
-        if os.path.isdir(path):
-            try:
-                shutil.rmtree(path)
-            except:
-                pass
+        else:
+            succeeded = True
 
-        if os.path.isdir(path):
-            log_debug('Failed to remove directory: {path}'.format(
-                path=path
-            ))
-            return False
-        return True
+        if succeeded:
+            return True
+
+        temp_path = xbmcvfs.translatePath(TEMP_PATH)
+        try:
+            shutil.rmtree(temp_path)
+            succeeded = not xbmcvfs.exists(temp_path)
+        except OSError:
+            pass
+
+        if succeeded:
+            return True
+        log_debug('Failed to remove directory: {0}'.format(temp_path))
+        return False

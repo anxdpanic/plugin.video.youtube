@@ -8,6 +8,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import os
+
 from ...kodion.compatibility import (
     parse_qs,
     unescape,
@@ -16,6 +18,7 @@ from ...kodion.compatibility import (
     urlsplit,
     xbmcvfs,
 )
+from ...kodion.constants import TEMP_PATH
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import make_dirs
 
@@ -27,8 +30,7 @@ class Subtitles(object):
     LANG_CURR = 3
     LANG_CURR_NO_ASR = 4
 
-    BASE_PATH = 'special://temp/plugin.video.youtube/'
-    SRT_FILE = ''.join([BASE_PATH, '%s.%s.srt'])
+    BASE_PATH = make_dirs(TEMP_PATH)
 
     def __init__(self, context, video_id, captions, headers=None):
         self.video_id = video_id
@@ -92,23 +94,6 @@ class Subtitles(object):
             'lang_code': default_caption.get('languageCode') or 'und',
             'is_asr': default_caption.get('kind') == 'asr',
         }
-
-    def srt_filename(self, sub_language):
-        return self.SRT_FILE % (self.video_id, sub_language)
-
-    def _write_file(self, filepath, contents):
-        if not make_dirs(self.BASE_PATH):
-            self._context.log_debug('Failed to create directories: %s' % self.BASE_PATH)
-            return False
-        self._context.log_debug('Writing subtitle file: %s' % filepath)
-
-        try:
-            with xbmcvfs.File(filepath, 'w') as srt_file:
-                success = srt_file.write(contents)
-        except (IOError, OSError):
-            self._context.log_debug('File write failed for: %s' % filepath)
-            return False
-        return success
 
     def _unescape(self, text):
         try:
@@ -201,10 +186,17 @@ class Subtitles(object):
         return []
 
     def _get(self, lang_code='en', language=None, no_asr=False, download=None):
-        filename = self.srt_filename(lang_code)
-        if xbmcvfs.exists(filename):
-            self._context.log_debug('Subtitle exists for: %s, filename: %s' % (lang_code, filename))
-            return [filename]
+        filename = '.'.join((self.video_id, lang_code, 'srt'))
+        if not self.BASE_PATH:
+            self._context.log_error('Subtitles._get - '
+                                    'unable to access temp directory')
+            return []
+
+        filepath = os.path.join(self.BASE_PATH, filename)
+        if xbmcvfs.exists(filepath):
+            self._context.log_debug('Subtitle exists for |{lang}| - |{file}|'
+                                    .format(lang=lang_code, file=filepath))
+            return [filepath]
 
         if download is None:
             download = self.pre_download
@@ -257,25 +249,34 @@ class Subtitles(object):
                 ('tlang', lang_code) if has_translation else (None, None),
             )
 
-        if subtitle_url:
-            self._context.log_debug('Subtitle url: %s' % subtitle_url)
-            if not download:
-                return [subtitle_url]
-
-            response = BaseRequestsClass().request(subtitle_url,
-                                                   headers=self.headers)
-            if response.text:
-                self._context.log_debug('Subtitle found for: %s' % lang_code)
-                self._write_file(filename,
-                                 bytearray(self._unescape(response.text),
-                                           encoding='utf8',
-                                           errors='ignore'))
-                return [filename]
-
-            self._context.log_debug('Failed to retrieve subtitles for: %s' % lang_code)
+        if not subtitle_url:
+            self._context.log_debug('No subtitles found for: %s' % lang_code)
             return []
 
-        self._context.log_debug('No subtitles found for: %s' % lang_code)
+        if not download:
+            return [subtitle_url]
+
+        response = BaseRequestsClass().request(
+            subtitle_url,
+            headers=self.headers,
+            error_info=('Failed to retrieve subtitles for: {lang}: {{exc}}'
+                        .format(lang=lang_code))
+        )
+        if not response.text:
+            return []
+
+        output = bytearray(self._unescape(response.text),
+                           encoding='utf8',
+                           errors='ignore')
+        try:
+            with xbmcvfs.File(filepath, 'w') as srt_file:
+                success = srt_file.write(output)
+        except (IOError, OSError):
+            self._context.log_error('Subtitles._get - '
+                                    'file write failed for: {file}'
+                                    .format(file=filepath))
+        if success:
+            return [filepath]
         return []
 
     @staticmethod

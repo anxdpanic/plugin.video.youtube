@@ -13,28 +13,21 @@ import json
 import os
 from io import open
 
-from ..compatibility import xbmcaddon, xbmcvfs
+from ..constants import DATA_PATH
 from ..logger import log_debug, log_error
 from ..utils import make_dirs, merge_dicts, to_unicode
 
 
-_addon_id = 'plugin.video.youtube'
-_addon = xbmcaddon.Addon(_addon_id)
-_addon_data_path = _addon.getAddonInfo('profile')
-del _addon
-
-
 class JSONStore(object):
+    BASE_PATH = make_dirs(DATA_PATH)
+
     def __init__(self, filename):
-        self.base_path = xbmcvfs.translatePath(_addon_data_path)
+        if self.BASE_PATH:
+            self.filename = os.path.join(self.BASE_PATH, filename)
+        else:
+            log_error('JSONStore.__init__ - unable to access temp directory')
+            self.filename = None
 
-        if not xbmcvfs.exists(self.base_path) and not make_dirs(self.base_path):
-            log_error('JSONStore.__init__ - invalid path:\n|{path}|'.format(
-                path=self.base_path
-            ))
-            return
-
-        self.filename = os.path.join(self.base_path, filename)
         self._data = {}
         self.load()
         self.set_defaults()
@@ -43,6 +36,9 @@ class JSONStore(object):
         raise NotImplementedError
 
     def save(self, data, update=False, process=None):
+        if not self.filename:
+            return
+
         if update:
             data = merge_dicts(self._data, data)
         if data == self._data:
@@ -75,6 +71,9 @@ class JSONStore(object):
             self.set_defaults(reset=True)
 
     def load(self, process=None):
+        if not self.filename:
+            return
+
         log_debug('JSONStore.load - loading:\n|{filename}|'.format(
             filename=self.filename
         ))
