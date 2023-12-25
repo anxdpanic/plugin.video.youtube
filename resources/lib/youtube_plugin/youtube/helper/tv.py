@@ -18,8 +18,6 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     result = []
     video_id_dict = {}
 
-    incognito = context.get_param('incognito', False)
-
     filter_list = []
     black_list = False
     if do_filter:
@@ -29,6 +27,11 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         filter_list = filter_list.split(',')
         filter_list = [x.lower() for x in filter_list]
 
+    item_params = {'video_id': None}
+    incognito = context.get_param('incognito', False)
+    if incognito:
+        item_params['incognito'] = incognito
+
     items = json_data.get('items', [])
     for item in items:
         channel = item['channel'].lower()
@@ -36,9 +39,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         if not do_filter or (do_filter and (not black_list) and (channel in filter_list)) or \
                 (do_filter and black_list and (channel not in filter_list)):
             video_id = item['id']
-            item_params = {'video_id': video_id}
-            if incognito:
-                item_params.update({'incognito': incognito})
+            item_params['video_id'] = video_id
             item_uri = context.create_uri(['play'], item_params)
             video_item = VideoItem(item['title'], uri=item_uri)
             if incognito:
@@ -59,15 +60,12 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     # next page
     next_page_token = json_data.get('next_page_token', '')
     if next_page_token or json_data.get('continue', False):
-        new_params = {}
-        new_params.update(context.get_params())
-        new_params['next_page_token'] = next_page_token
-        new_params['offset'] = int(json_data.get('offset', 0))
-
+        new_params = dict(context.get_params(),
+                          next_page_token=next_page_token,
+                          offset=int(json_data.get('offset', 0)))
         new_context = context.clone(new_params=new_params)
-
         current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page)
         result.append(next_page_item)
 
     return result
@@ -77,14 +75,15 @@ def tv_videos_to_items(provider, context, json_data):
     result = []
     video_id_dict = {}
 
+    item_params = {'video_id': None}
     incognito = context.get_param('incognito', False)
+    if incognito:
+        item_params['incognito'] = incognito
 
     items = json_data.get('items', [])
     for item in items:
         video_id = item['id']
-        item_params = {'video_id': video_id}
-        if incognito:
-            item_params.update({'incognito': incognito})
+        item_params['video_id'] = video_id
         item_uri = context.create_uri(['play'], item_params)
         video_item = VideoItem(item['title'], uri=item_uri)
         if incognito:
@@ -106,15 +105,12 @@ def tv_videos_to_items(provider, context, json_data):
     # next page
     next_page_token = json_data.get('next_page_token', '')
     if next_page_token or json_data.get('continue', False):
-        new_params = {}
-        new_params.update(context.get_params())
-        new_params['next_page_token'] = next_page_token
-        new_params['offset'] = int(json_data.get('offset', 0))
-
+        new_params = dict(context.get_params(),
+                          next_page_token=next_page_token,
+                          offset=int(json_data.get('offset', 0)))
         new_context = context.clone(new_params=new_params)
-
         current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page)
         result.append(next_page_item)
 
     return result
@@ -124,8 +120,11 @@ def saved_playlists_to_items(provider, context, json_data):
     result = []
     playlist_id_dict = {}
 
-    incognito = context.get_param('incognito', False)
     thumb_size = context.get_settings().use_thumbnail_size()
+    incognito = context.get_param('incognito', False)
+    item_params = {}
+    if incognito:
+        item_params['incognito'] = incognito
 
     items = json_data.get('items', [])
     for item in items:
@@ -134,17 +133,12 @@ def saved_playlists_to_items(provider, context, json_data):
         playlist_id = item['id']
         image = utils.get_thumbnail(thumb_size, item.get('thumbnails', {}))
 
-        item_params = {}
-        if incognito:
-            item_params.update({'incognito': incognito})
-
         if channel_id:
             item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
         else:
             item_uri = context.create_uri(['playlist', playlist_id], item_params)
 
         playlist_item = DirectoryItem(title, item_uri, image=image)
-        playlist_item.set_fanart(provider.get_fanart(context))
         result.append(playlist_item)
         playlist_id_dict[playlist_id] = playlist_item
 
@@ -155,15 +149,12 @@ def saved_playlists_to_items(provider, context, json_data):
     # next page
     next_page_token = json_data.get('next_page_token', '')
     if next_page_token or json_data.get('continue', False):
-        new_params = {}
-        new_params.update(context.get_params())
-        new_params['next_page_token'] = next_page_token
-        new_params['offset'] = int(json_data.get('offset', 0))
-
+        new_params = dict(context.get_params(),
+                          next_page_token=next_page_token,
+                          offset=int(json_data.get('offset', 0)))
         new_context = context.clone(new_params=new_params)
-
         current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page)
         result.append(next_page_item)
 
     return result

@@ -604,9 +604,9 @@ class YouTube(LoginClient):
         """
         params = {'part': 'id'}
         if username == 'mine':
-            params.update({'mine': 'true'})
+            params['mine'] = True
         else:
-            params.update({'forUsername': username})
+            params['forUsername'] = username
 
         return self.perform_v3_request(method='GET',
                                        path='channels',

@@ -99,7 +99,6 @@ class UrlToItemConverter(object):
             playlist_item = DirectoryItem(
                 '', context.create_uri(['playlist', playlist_id], new_params),
             )
-            playlist_item.set_fanart(provider.get_fanart(context))
             self._playlist_id_dict[playlist_id] = playlist_item
 
         elif 'channel_id' in new_params:
@@ -115,7 +114,6 @@ class UrlToItemConverter(object):
             ) if live else DirectoryItem(
                 '', context.create_uri(['channel', channel_id], new_params)
             )
-            channel_item.set_fanart(provider.get_fanart(context))
             self._channel_id_dict[channel_id] = channel_item
 
         else:
@@ -137,9 +135,8 @@ class UrlToItemConverter(object):
                 context.create_uri(['special', 'description_links'], {
                     'channel_ids': ','.join(self._channel_ids),
                 }),
-                context.create_resource_path('media', 'playlist.png')
+                image='{media}/playlist.png'
             )
-            channels_item.set_fanart(provider.get_fanart(context))
             result.append(channels_item)
 
         if self._playlist_ids:
@@ -157,9 +154,8 @@ class UrlToItemConverter(object):
                 context.create_uri(['special', 'description_links'], {
                     'playlist_ids': ','.join(self._playlist_ids),
                 }),
-                context.create_resource_path('media', 'playlist.png')
+                image='{media}/playlist.png'
             )
-            playlists_item.set_fanart(provider.get_fanart(context))
             result.append(playlists_item)
 
         if self._channel_id_dict:

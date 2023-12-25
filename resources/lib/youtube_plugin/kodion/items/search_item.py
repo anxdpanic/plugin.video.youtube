@@ -11,22 +11,32 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .directory_item import DirectoryItem
-from ..constants.const_paths import SEARCH
+from ..constants import paths
 
 
 class SearchItem(DirectoryItem):
-    def __init__(self, context, alt_name=None, image=None, fanart=None, location=False):
-        name = alt_name
+    def __init__(self,
+                 context,
+                 name=None,
+                 image=None,
+                 fanart=None,
+                 location=False):
         if not name:
             name = context.localize('search')
 
         if image is None:
-            image = context.create_resource_path('media/search.png')
+            image = '{media}/search.png'
 
-        params = {'location': location} if location else {}
+        params = {}
+        if location:
+            params['location'] = location
 
-        super(SearchItem, self).__init__(name, context.create_uri([SEARCH, 'list'], params=params), image=image)
+        super(SearchItem, self).__init__(name,
+                                         context.create_uri(
+                                             [paths.SEARCH, 'list'],
+                                             params=params
+                                         ),
+                                         image=image)
+
         if fanart:
             self.set_fanart(fanart)
-        else:
-            self.set_fanart(context.get_fanart())

@@ -67,7 +67,6 @@ def _process_list_response(provider, context, json_data):
             video_item.video_id = video_id
             if incognito:
                 video_item.set_play_count(0)
-            video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
         elif kind == 'channel':
@@ -82,7 +81,6 @@ def _process_list_response(provider, context, json_data):
                 item_params['addon_id'] = addon_id
             item_uri = context.create_uri(['channel', channel_id], item_params)
             channel_item = DirectoryItem(title, item_uri, image=image)
-            channel_item.set_fanart(provider.get_fanart(context))
 
             # if logged in => provide subscribing to the channel
             if provider.is_logged_in():
@@ -105,7 +103,6 @@ def _process_list_response(provider, context, json_data):
                 item_params['addon_id'] = addon_id
             item_uri = context.create_uri(['special', 'browse_channels'], item_params)
             guide_item = DirectoryItem(title, item_uri)
-            guide_item.set_fanart(provider.get_fanart(context))
             result.append(guide_item)
         elif kind == 'subscription':
             snippet = yt_item['snippet']
@@ -119,7 +116,6 @@ def _process_list_response(provider, context, json_data):
                 item_params['addon_id'] = addon_id
             item_uri = context.create_uri(['channel', channel_id], item_params)
             channel_item = DirectoryItem(title, item_uri, image=image)
-            channel_item.set_fanart(provider.get_fanart(context))
             channel_item.set_channel_id(channel_id)
             # map channel id with subscription id - we need it for the unsubscription
             subscription_id_dict[channel_id] = yt_item['id']
@@ -144,7 +140,6 @@ def _process_list_response(provider, context, json_data):
                 item_params['addon_id'] = addon_id
             item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
             playlist_item = DirectoryItem(title, item_uri, image=image)
-            playlist_item.set_fanart(provider.get_fanart(context))
             result.append(playlist_item)
             playlist_id_dict[playlist_id] = playlist_item
         elif kind == 'playlistitem':
@@ -166,7 +161,6 @@ def _process_list_response(provider, context, json_data):
             video_item.video_id = video_id
             if incognito:
                 video_item.set_play_count(0)
-            video_item.set_fanart(provider.get_fanart(context))
             # Get Track-ID from Playlist
             video_item.set_track_number(snippet['position'] + 1)
             result.append(video_item)
@@ -197,7 +191,6 @@ def _process_list_response(provider, context, json_data):
             video_item.video_id = video_id
             if incognito:
                 video_item.set_play_count(0)
-            video_item.set_fanart(provider.get_fanart(context))
             result.append(video_item)
             video_id_dict[video_id] = video_item
 
@@ -234,7 +227,6 @@ def _process_list_response(provider, context, json_data):
                 video_item.video_id = video_id
                 if incognito:
                     video_item.set_play_count(0)
-                video_item.set_fanart(provider.get_fanart(context))
                 result.append(video_item)
                 video_id_dict[video_id] = video_item
             # playlist
@@ -256,7 +248,6 @@ def _process_list_response(provider, context, json_data):
                     item_params['addon_id'] = addon_id
                 item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
                 playlist_item = DirectoryItem(title, item_uri, image=image)
-                playlist_item.set_fanart(provider.get_fanart(context))
                 result.append(playlist_item)
                 playlist_id_dict[playlist_id] = playlist_item
             elif kind == 'channel':
@@ -271,7 +262,6 @@ def _process_list_response(provider, context, json_data):
                     item_params['addon_id'] = addon_id
                 item_uri = context.create_uri(['channel', channel_id], item_params)
                 channel_item = DirectoryItem(title, item_uri, image=image)
-                channel_item.set_fanart(provider.get_fanart(context))
                 result.append(channel_item)
                 channel_id_dict[channel_id] = channel_item
             else:
@@ -462,14 +452,11 @@ def response_to_items(provider, context, json_data, sort=None, reverse=False, pr
             client = provider.get_client(context)
             yt_next_page_token = client.calculate_next_page_token(page + 1, yt_results_per_page)
 
-        new_params = {}
-        new_params.update(context.get_params())
-        new_params['page_token'] = yt_next_page_token
-
+        new_params = dict(context.get_params(),
+                          page_token=yt_next_page_token)
         new_context = context.clone(new_params=new_params)
-
         current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page, fanart=provider.get_fanart(new_context))
+        next_page_item = NextPageItem(new_context, current_page)
         result.append(next_page_item)
 
     return result

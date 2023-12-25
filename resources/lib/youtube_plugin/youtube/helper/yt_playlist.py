@@ -207,18 +207,15 @@ def _process_select_playlist(provider, context):
 
                 playlist_id = json_data.get('id', '')
                 if playlist_id:
-                    new_params = {}
-                    new_params.update(context.get_params())
-                    new_params['playlist_id'] = playlist_id
+                    new_params = dict(context.get_params(),
+                                      playlist_id=playlist_id)
                     new_context = context.clone(new_params=new_params)
                     _process_add_video(provider, new_context, keymap_action)
             break
         if result == 'playlist.next':
             continue
         if result != -1:
-            new_params = {}
-            new_params.update(context.get_params())
-            new_params['playlist_id'] = result
+            new_params = dict(context.get_params(), playlist_id=result)
             new_context = context.clone(new_params=new_params)
             _process_add_video(provider, new_context, keymap_action)
             break

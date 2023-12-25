@@ -258,13 +258,6 @@ class Provider(AbstractProvider):
             self._resource_manager = ResourceManager(context, self.get_client(context))
         return self._resource_manager
 
-    def get_alternative_fanart(self, context):
-        return self.get_fanart(context)
-
-    @staticmethod
-    def get_fanart(context):
-        return context.create_resource_path('media', 'fanart.jpg')
-
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/uri2addon/$')
     def on_uri2addon(self, context, re_match):
@@ -318,25 +311,31 @@ class Provider(AbstractProvider):
         result = []
 
         channel_id = re_match.group('channel_id')
-        page_token = context.get_param('page_token', '')
 
         resource_manager = self.get_resource_manager(context)
 
-        item_params = {}
-        incognito = context.get_param('incognito')
-        addon_id = context.get_param('addon_id')
+        params = context.get_params()
+        page_token = params.get('page_token', '')
+        incognito = params.get('incognito')
+        addon_id = params.get('addon_id')
+
+        new_params = {}
         if incognito:
-            item_params.update({'incognito': incognito})
+            new_params['incognito'] = incognito
         if addon_id:
-            item_params.update({'addon_id': addon_id})
+            new_params['addon_id'] = addon_id
 
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads_playlist = playlists.get('uploads', '')
         if uploads_playlist:
-            uploads_item = DirectoryItem(context.get_ui().bold(context.localize('uploads')),
-                                         context.create_uri(['channel', channel_id, 'playlist', uploads_playlist],
-                                                            item_params),
-                                         image=context.create_resource_path('media', 'playlist.png'))
+            uploads_item = DirectoryItem(
+                context.get_ui().bold(context.localize('uploads')),
+                context.create_uri(
+                    ['channel', channel_id, 'playlist', uploads_playlist],
+                    new_params
+                ),
+                image='{media}/playlist.png',
+            )
             result.append(uploads_item)
 
         # no caching
@@ -380,10 +379,8 @@ class Provider(AbstractProvider):
     def _on_channel(self, context, re_match):
         client = self.get_client(context)
         localize = context.localize
-        create_path = context.create_resource_path
         create_uri = context.create_uri
         function_cache = context.get_function_cache()
-        params = context.get_params()
         ui = context.get_ui()
 
         listitem_channel_id = ui.get_info_label('Container.ListItem(0).Property(channel_id)')
@@ -431,15 +428,18 @@ class Provider(AbstractProvider):
                     return False
 
         channel_fanarts = resource_manager.get_fanarts([channel_id])
+
+        params = context.get_params()
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
         incognito = params.get('incognito')
         addon_id = params.get('addon_id')
-        item_params = {}
+
+        new_params = {}
         if incognito:
-            item_params.update({'incognito': incognito})
+            new_params['incognito'] = incognito
         if addon_id:
-            item_params.update({'addon_id': addon_id})
+            new_params['addon_id'] = addon_id
 
         hide_folders = params.get('hide_folders')
 
@@ -449,25 +449,31 @@ class Provider(AbstractProvider):
             hide_live = params.get('hide_live')
 
             if not hide_playlists:
-                playlists_item = DirectoryItem(ui.bold(localize('playlists')),
-                                               create_uri(['channel', channel_id, 'playlists'], item_params),
-                                               image=create_path('media', 'playlist.png'))
-                playlists_item.set_fanart(channel_fanarts.get(channel_id, self.get_fanart(context)))
+                playlists_item = DirectoryItem(
+                    ui.bold(localize('playlists')),
+                    create_uri(['channel', channel_id, 'playlists'], new_params),
+                    image='{media}/playlist.png',
+                    fanart=channel_fanarts.get(channel_id),
+                )
                 result.append(playlists_item)
 
             search_live_id = mine_id if mine_id else channel_id
             if not hide_search:
-                search_item = NewSearchItem(context, alt_name=ui.bold(localize('search')),
-                                            image=create_path('media', 'search.png'),
-                                            fanart=self.get_fanart(context), channel_id=search_live_id, incognito=incognito, addon_id=addon_id)
-                search_item.set_fanart(self.get_fanart(context))
+                search_item = NewSearchItem(
+                    context, name=ui.bold(localize('search')),
+                    image='{media}/search.png',
+                    channel_id=search_live_id,
+                    incognito=incognito,
+                    addon_id=addon_id,
+                )
                 result.append(search_item)
 
             if not hide_live:
-                live_item = DirectoryItem(ui.bold(localize('live')),
-                                          create_uri(['channel', search_live_id, 'live'], item_params),
-                                          image=create_path('media', 'live.png'))
-                live_item.set_fanart(self.get_fanart(context))
+                live_item = DirectoryItem(
+                    ui.bold(localize('live')),
+                    create_uri(['channel', search_live_id, 'live'], new_params),
+                    image='{media}/live.png',
+                )
                 result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
@@ -489,7 +495,6 @@ class Provider(AbstractProvider):
     def _on_my_location(self, context, re_match):
         self.set_content_type(context, content.FILES)
 
-        create_path = context.create_resource_path
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
@@ -498,8 +503,7 @@ class Provider(AbstractProvider):
         # search
         search_item = SearchItem(
             context,
-            image=create_path('media', 'search.png'),
-            fanart=self.get_fanart(context),
+            image='{media}/search.png',
             location=True
         )
         result.append(search_item)
@@ -508,29 +512,35 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.completed.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
-                create_uri(['special', 'completed_live'], params={'location': True}),
-                image=create_path('media', 'live.png')
+                create_uri(
+                    ['special', 'completed_live'],
+                    params={'location': True}
+                ),
+                image='{media}/live.png',
             )
-            live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # upcoming live events
         if settings.get_bool('youtube.folder.upcoming.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
-                create_uri(['special', 'upcoming_live'], params={'location': True}),
-                image=create_path('media', 'live.png')
+                create_uri(
+                    ['special', 'upcoming_live'],
+                    params={'location': True}
+                ),
+                image='{media}/live.png',
             )
-            live_events_item.set_fanart(self.get_fanart(context))
             result.append(live_events_item)
 
         # live events
         live_events_item = DirectoryItem(
             localize('live'),
-            create_uri(['special', 'live'], params={'location': True}),
-            image=create_path('media', 'live.png')
+            create_uri(
+                ['special', 'live'],
+                params={'location': True}
+            ),
+            image='{media}/live.png',
         )
-        live_events_item.set_fanart(self.get_fanart(context))
         result.append(live_events_item)
 
         return result
@@ -563,7 +573,7 @@ class Provider(AbstractProvider):
                 video_id = find_video_id(path)
                 if video_id:
                     context.set_param('video_id', video_id)
-                    params = context.get_params()
+                    params['video_id'] = video_id
                 else:
                     return False
             else:
@@ -646,10 +656,11 @@ class Provider(AbstractProvider):
             channel_ids = []
             for subscription in subscriptions:
                 channel_ids.append(subscription.get_channel_id())
+            channel_ids = {subscription.get_channel_id(): subscription
+                           for subscription in subscriptions}
             channel_fanarts = resource_manager.get_fanarts(channel_ids)
-            for subscription in subscriptions:
-                if channel_fanarts.get(subscription.get_channel_id()):
-                    subscription.set_fanart(channel_fanarts.get(subscription.get_channel_id()))
+            for channel_id, fanart in channel_fanarts:
+                channel_ids[channel_id].set_fanart(fanart)
 
         return subscriptions
 
@@ -821,7 +832,6 @@ class Provider(AbstractProvider):
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
         search_type = params.get('search_type', 'video')
-
         safe_search = context.get_settings().safe_search()
 
         if search_type == 'video':
@@ -831,35 +841,36 @@ class Provider(AbstractProvider):
 
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
-                channel_params = {}
-                channel_params.update(params)
-                channel_params['search_type'] = 'channel'
-                channel_item = DirectoryItem(context.get_ui().bold(context.localize('channels')),
-                                             context.create_uri([context.get_path()], channel_params),
-                                             image=context.create_resource_path('media', 'channels.png'))
-                channel_item.set_fanart(self.get_fanart(context))
+                channel_params = dict(params, search_type='channel')
+                channel_item = DirectoryItem(
+                    context.get_ui().bold(context.localize('channels')),
+                    context.create_uri([context.get_path()], channel_params),
+                    image='{media}/channels.png',
+                )
                 result.append(channel_item)
 
             if not location:
-                playlist_params = {}
-                playlist_params.update(params)
-                playlist_params['search_type'] = 'playlist'
-                playlist_item = DirectoryItem(context.get_ui().bold(context.localize('playlists')),
-                                              context.create_uri([context.get_path()], playlist_params),
-                                              image=context.create_resource_path('media', 'playlist.png'))
-                playlist_item.set_fanart(self.get_fanart(context))
+                playlist_params = dict(params, search_type='playlist')
+                playlist_item = DirectoryItem(
+                    context.get_ui().bold(context.localize('playlists')),
+                    context.create_uri([context.get_path()], playlist_params),
+                    image='{media}/playlist.png',
+                )
                 result.append(playlist_item)
 
             if not channel_id:
                 # live
-                live_params = {}
-                live_params.update(params)
-                live_params['search_type'] = 'video'
-                live_params['event_type'] = 'live'
-                live_item = DirectoryItem(context.get_ui().bold(context.localize('live')),
-                                          context.create_uri([context.get_path().replace('input', 'query')], live_params),
-                                          image=context.create_resource_path('media', 'live.png'))
-                live_item.set_fanart(self.get_fanart(context))
+                live_params = dict(params,
+                                   search_type='video',
+                                   event_type='live')
+                live_item = DirectoryItem(
+                    context.get_ui().bold(context.localize('live')),
+                    context.create_uri(
+                        [context.get_path().replace('input', 'query')],
+                        live_params
+                    ),
+                    image='{media}/live.png',
+                )
                 result.append(live_item)
 
         function_cache = context.get_function_cache()
@@ -936,10 +947,10 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/my_subscriptions/filter/$')
     def manage_my_subscription_filter(self, context, re_match):
-        params = context.get_params()
         settings = context.get_settings()
         ui = context.get_ui()
 
+        params = context.get_params()
         action = params.get('action')
         channel = params.get('channel_name')
         if (not channel) or (not action):
@@ -1076,6 +1087,7 @@ class Provider(AbstractProvider):
                 ui.show_notification(localize('succeeded'))
             else:
                 ui.show_notification(localize('failed'))
+
         elif action == 'install' and maint_type == 'inputstreamhelper':
             if context.get_system_version().get_version()[0] >= 17:
                 try:
@@ -1090,10 +1102,10 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/api/update/$')
     def api_key_update(self, context, re_match):
         localize = context.localize
-        params = context.get_params()
         settings = context.get_settings()
         ui = context.get_ui()
 
+        params = context.get_params()
         api_key = params.get('api_key')
         client_id = params.get('client_id')
         client_secret = params.get('client_secret')
@@ -1244,7 +1256,6 @@ class Provider(AbstractProvider):
         if old_action:
             return yt_old_actions.process_old_action(self, context, re_match)
 
-        create_path = context.create_resource_path
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
@@ -1258,12 +1269,13 @@ class Provider(AbstractProvider):
         result = []
 
         # sign in
-        if not self.is_logged_in() and settings.get_bool('youtube.folder.sign.in.show', True):
-            sign_in_item = DirectoryItem(ui.bold(localize('sign.in')),
-                                         create_uri(['sign', 'in']),
-                                         image=create_path('media', 'sign_in.png'))
-            sign_in_item.set_action(True)
-            sign_in_item.set_fanart(self.get_fanart(context))
+        if not logged_in and settings.get_bool('youtube.folder.sign.in.show', True):
+            sign_in_item = DirectoryItem(
+                ui.bold(localize('sign.in')),
+                create_uri(['sign', 'in']),
+                image='{media}/sign_in.png',
+                action=True
+            )
             result.append(sign_in_item)
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
@@ -1276,8 +1288,8 @@ class Provider(AbstractProvider):
             my_subscriptions_item = DirectoryItem(
                 ui.bold(localize('my_subscriptions')),
                 create_uri(['special', 'new_uploaded_videos_tv']),
-                create_path('media', 'new_uploads.png'))
-            my_subscriptions_item.set_fanart(self.get_fanart(context))
+                image='{media}/new_uploads.png',
+            )
             result.append(my_subscriptions_item)
 
         if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
@@ -1285,8 +1297,8 @@ class Provider(AbstractProvider):
             my_subscriptions_filtered_item = DirectoryItem(
                 localize('my_subscriptions.filtered'),
                 create_uri(['special', 'new_uploaded_videos_tv_filtered']),
-                create_path('media', 'new_uploads.png'))
-            my_subscriptions_filtered_item.set_fanart(self.get_fanart(context))
+                image='{media}/new_uploads.png',
+            )
             result.append(my_subscriptions_filtered_item)
 
         access_manager = context.get_access_manager()
@@ -1298,8 +1310,8 @@ class Provider(AbstractProvider):
                 recommendations_item = DirectoryItem(
                     localize('recommendations'),
                     create_uri(['special', 'recommendations']),
-                    create_path('media', 'popular.png'))
-                recommendations_item.set_fanart(self.get_fanart(context))
+                    image='{media}/popular.png',
+                )
                 result.append(recommendations_item)
 
         # what to watch
@@ -1307,36 +1319,41 @@ class Provider(AbstractProvider):
             what_to_watch_item = DirectoryItem(
                 localize('popular_right_now'),
                 create_uri(['special', 'popular_right_now']),
-                create_path('media', 'popular.png'))
-            what_to_watch_item.set_fanart(self.get_fanart(context))
+                image='{media}/popular.png',
+            )
             result.append(what_to_watch_item)
 
         # search
         if settings.get_bool('youtube.folder.search.show', True):
-            search_item = SearchItem(context, image=create_path('media', 'search.png'),
-                                     fanart=self.get_fanart(context))
+            search_item = SearchItem(
+                context,
+            )
             result.append(search_item)
 
         if settings.get_bool('youtube.folder.quick_search.show', True):
-            quick_search_item = NewSearchItem(context,
-                                              alt_name=localize('search.quick'),
-                                              fanart=self.get_fanart(context))
+            quick_search_item = NewSearchItem(
+                context,
+                name=localize('search.quick'),
+                image='{media}/quick_search.png',
+            )
             result.append(quick_search_item)
 
         if settings.get_bool('youtube.folder.quick_search_incognito.show', True):
-            quick_search_incognito_item = NewSearchItem(context,
-                                                        alt_name=localize('search.quick.incognito'),
-                                                        image=create_path('media', 'search.png'),
-                                                        fanart=self.get_fanart(context),
-                                                        incognito=True)
+            quick_search_incognito_item = NewSearchItem(
+                context,
+                name=localize('search.quick.incognito'),
+                image='{media}/incognito_search.png',
+                incognito=True,
+            )
             result.append(quick_search_incognito_item)
 
         # my location
         if settings.get_bool('youtube.folder.my_location.show', True) and settings.get_location():
-            my_location_item = DirectoryItem(localize('my_location'),
-                                             create_uri(['location', 'mine']),
-                                             image=create_path('media', 'channel.png'))
-            my_location_item.set_fanart(self.get_fanart(context))
+            my_location_item = DirectoryItem(
+                localize('my_location'),
+                create_uri(['location', 'mine']),
+                image='{media}/location.png',
+            )
             result.append(my_location_item)
 
         # my channel
@@ -1344,8 +1361,7 @@ class Provider(AbstractProvider):
             my_channel_item = DirectoryItem(
                 localize('my_channel'),
                 create_uri(['channel', 'mine']),
-                image=create_path('media', 'channel.png'),
-                fanart=self.get_fanart(context)
+                image='{media}/channel.png',
             )
             result.append(my_channel_item)
 
@@ -1356,8 +1372,7 @@ class Provider(AbstractProvider):
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
                     create_uri(['channel', 'mine', 'playlist', playlist_id]),
-                    image=create_path('media', 'watch_later.png'),
-                    fanart=self.get_fanart(context)
+                    image='{media}/watch_later.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
@@ -1370,8 +1385,7 @@ class Provider(AbstractProvider):
                 watch_history_item = DirectoryItem(
                     localize('watch_later'),
                     create_uri([paths.WATCH_LATER, 'list']),
-                    image=create_path('media', 'watch_later.png'),
-                    fanart=self.get_fanart(context)
+                    image='{media}/watch_later.png',
                 )
                 result.append(watch_history_item)
 
@@ -1383,8 +1397,7 @@ class Provider(AbstractProvider):
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
                     create_uri(['channel', 'mine', 'playlist', playlists['likes']]),
-                    image=create_path('media', 'likes.png'),
-                    fanart=self.get_fanart(context)
+                    image='{media}/likes.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
@@ -1399,8 +1412,7 @@ class Provider(AbstractProvider):
             disliked_videos_item = DirectoryItem(
                 localize('video.disliked'),
                 create_uri(['special', 'disliked_videos']),
-                image=create_path('media', 'dislikes.png'),
-                fanart=self.get_fanart(context)
+                image='{media}/dislikes.png',
             )
             result.append(disliked_videos_item)
 
@@ -1411,8 +1423,7 @@ class Provider(AbstractProvider):
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri(['channel', 'mine', 'playlist', playlist_id]),
-                    image=create_path('media', 'history.png'),
-                    fanart=self.get_fanart(context)
+                    image='{media}/history.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
@@ -1425,8 +1436,7 @@ class Provider(AbstractProvider):
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri([paths.HISTORY], params={'action': 'list'}),
-                    image=create_path('media', 'history.png'),
-                    fanart=self.get_fanart(context)
+                    image='{media}/history.png',
                 )
                 result.append(watch_history_item)
 
@@ -1435,8 +1445,7 @@ class Provider(AbstractProvider):
             playlists_item = DirectoryItem(
                 localize('playlists'),
                 create_uri(['channel', 'mine', 'playlists']),
-                image=create_path('media', 'playlist.png'),
-                fanart=self.get_fanart(context)
+                image='{media}/playlist.png',
             )
             result.append(playlists_item)
 
@@ -1445,8 +1454,7 @@ class Provider(AbstractProvider):
             playlists_item = DirectoryItem(
                 localize('saved.playlists'),
                 create_uri(['special', 'saved_playlists']),
-                image=create_path('media', 'playlist.png'),
-                fanart=self.get_fanart(context)
+                image='{media}/playlist.png',
             )
             result.append(playlists_item)
 
@@ -1455,8 +1463,7 @@ class Provider(AbstractProvider):
             subscriptions_item = DirectoryItem(
                 localize('subscriptions'),
                 create_uri(['subscriptions', 'list']),
-                image=create_path('media', 'channels.png'),
-                fanart=self.get_fanart(context)
+                image='{media}/channels.png',
             )
             result.append(subscriptions_item)
 
@@ -1465,59 +1472,64 @@ class Provider(AbstractProvider):
             browse_channels_item = DirectoryItem(
                 localize('browse_channels'),
                 create_uri(['special', 'browse_channels']),
-                image=create_path('media', 'browse_channels.png'),
-                fanart=self.get_fanart(context)
+                image='{media}/browse_channels.png',
             )
             result.append(browse_channels_item)
 
         # completed live events
         if settings.get_bool('youtube.folder.completed.live.show', True):
-            live_events_item = DirectoryItem(localize('live.completed'),
-                                             create_uri(['special', 'completed_live']),
-                                             image=create_path('media', 'live.png'))
-            live_events_item.set_fanart(self.get_fanart(context))
+            live_events_item = DirectoryItem(
+                localize('live.completed'),
+                create_uri(['special', 'completed_live']),
+                image='{media}/live.png',
+            )
             result.append(live_events_item)
 
         # upcoming live events
         if settings.get_bool('youtube.folder.upcoming.live.show', True):
-            live_events_item = DirectoryItem(localize('live.upcoming'),
-                                             create_uri(['special', 'upcoming_live']),
-                                             image=create_path('media', 'live.png'))
-            live_events_item.set_fanart(self.get_fanart(context))
+            live_events_item = DirectoryItem(
+                localize('live.upcoming'),
+                create_uri(['special', 'upcoming_live']),
+                image='{media}/live.png',
+            )
             result.append(live_events_item)
 
         # live events
         if settings.get_bool('youtube.folder.live.show', True):
-            live_events_item = DirectoryItem(localize('live'),
-                                             create_uri(['special', 'live']),
-                                             image=create_path('media', 'live.png'))
-            live_events_item.set_fanart(self.get_fanart(context))
+            live_events_item = DirectoryItem(
+                localize('live'),
+                create_uri(['special', 'live']),
+                image='{media}/live.png',
+            )
             result.append(live_events_item)
 
         # switch user
         if settings.get_bool('youtube.folder.switch.user.show', True):
-            switch_user_item = DirectoryItem(localize('user.switch'),
-                                             create_uri(['users', 'switch']),
-                                             image=create_path('media', 'channel.png'))
-            switch_user_item.set_action(True)
-            switch_user_item.set_fanart(self.get_fanart(context))
+            switch_user_item = DirectoryItem(
+                localize('user.switch'),
+                create_uri(['users', 'switch']),
+                image='{media}/channel.png',
+                action=True,
+            )
             result.append(switch_user_item)
 
         # sign out
-        if self.is_logged_in() and settings.get_bool('youtube.folder.sign.out.show', True):
-            sign_out_item = DirectoryItem(localize('sign.out'),
-                                          create_uri(['sign', 'out']),
-                                          image=create_path('media', 'sign_out.png'))
-            sign_out_item.set_action(True)
-            sign_out_item.set_fanart(self.get_fanart(context))
+        if logged_in and settings.get_bool('youtube.folder.sign.out.show', True):
+            sign_out_item = DirectoryItem(
+                localize('sign.out'),
+                create_uri(['sign', 'out']),
+                image='{media}/sign_out.png',
+                action=True,
+            )
             result.append(sign_out_item)
 
         if settings.get_bool('youtube.folder.settings.show', True):
-            settings_menu_item = DirectoryItem(localize('settings'),
-                                               create_uri(['config', 'youtube']),
-                                               image=create_path('media', 'settings.png'))
-            settings_menu_item.set_action(True)
-            settings_menu_item.set_fanart(self.get_fanart(context))
+            settings_menu_item = DirectoryItem(
+                localize('settings'),
+                create_uri(['config', 'youtube']),
+                image='{media}/settings.png',
+                action=True,
+            )
             result.append(settings_menu_item)
 
         return result

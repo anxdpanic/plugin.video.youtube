@@ -15,6 +15,7 @@ from datetime import date, datetime
 from hashlib import md5
 
 from ..compatibility import unescape
+from ..constants import MEDIA_PATH
 
 
 class BaseItem(object):
@@ -33,10 +34,11 @@ class BaseItem(object):
 
         self._uri = uri
 
-        self._image = ''
+        self._image = None
         self.set_image(image)
+        self._fanart = None
+        self.set_fanart(fanart)
 
-        self._fanart = fanart
         self._context_menu = None
         self._replace_context_menu = False
         self._added_utc = None
@@ -96,8 +98,12 @@ class BaseItem(object):
         return self._uri
 
     def set_image(self, image):
-        if image is None:
+        if not image:
             self._image = ''
+            return
+
+        if '{media}/' in image:
+            self._image = image.format(media=MEDIA_PATH)
         else:
             self._image = image
 
@@ -105,7 +111,14 @@ class BaseItem(object):
         return self._image
 
     def set_fanart(self, fanart):
-        self._fanart = fanart
+        if not fanart:
+            self._fanart = '{0}/fanart.jpg'.format(MEDIA_PATH)
+            return
+
+        if '{media}/' in fanart:
+            self._fanart = fanart.format(media=MEDIA_PATH)
+        else:
+            self._fanart = fanart
 
     def get_fanart(self):
         return self._fanart

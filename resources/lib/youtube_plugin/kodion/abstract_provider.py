@@ -76,9 +76,6 @@ class AbstractProvider(object):
             if path:
                 self.register_path(path, method_name)
 
-    def get_alternative_fanart(self, context):
-        return context.get_fanart()
-
     def register_path(self, re_path, method_name):
         """
         Registers a new method by name (string) for the given regular expression
@@ -330,7 +327,9 @@ class AbstractProvider(object):
         location = context.get_param('location', False)
 
         # 'New Search...'
-        new_search_item = NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
+        new_search_item = NewSearchItem(
+            context, location=location
+        )
         result.append(new_search_item)
 
         for search in search_history.get_items():
@@ -339,7 +338,9 @@ class AbstractProvider(object):
                 search = search.get_name()
 
             # we create a new instance of the SearchItem
-            search_history_item = SearchHistoryItem(context, search, fanart=self.get_alternative_fanart(context), location=location)
+            search_history_item = SearchHistoryItem(
+                context, search, location=location
+            )
             result.append(search_history_item)
 
         if search_history.is_empty():

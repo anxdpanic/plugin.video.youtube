@@ -204,7 +204,6 @@ def _process_description_links(provider, context):
             channel_item = DirectoryItem(
                 '', context.create_uri(['channel', channel_id], item_params)
             )
-            channel_item.set_fanart(provider.get_fanart(context))
             channel_id_dict[channel_id] = channel_item
 
         channel_item_dict = {}
@@ -230,7 +229,6 @@ def _process_description_links(provider, context):
             playlist_item = DirectoryItem(
                 '', context.create_uri(['playlist', playlist_id], item_params)
             )
-            playlist_item.set_fanart(provider.get_fanart(context))
             playlist_id_dict[playlist_id] = playlist_item
 
         channel_item_dict = {}

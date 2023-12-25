@@ -12,23 +12,27 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .directory_item import DirectoryItem
-from ..constants.const_paths import SEARCH
+from ..constants import paths
 
 
 class SearchHistoryItem(DirectoryItem):
     def __init__(self, context, query, image=None, fanart=None, location=False):
         if image is None:
-            image = context.create_resource_path('media/search.png')
+            image = '{media}/search.png'
 
         params = {'q': query}
         if location:
             params['location'] = location
 
-        super(SearchHistoryItem, self).__init__(query, context.create_uri([SEARCH, 'query'], params=params), image=image)
+        super(SearchHistoryItem, self).__init__(query,
+                                                context.create_uri(
+                                                    [paths.SEARCH, 'query'],
+                                                    params=params
+                                                ),
+                                                image=image)
+
         if fanart:
             self.set_fanart(fanart)
-        else:
-            self.set_fanart(context.get_fanart())
 
         context_menu = [
             menu_items.search_remove(context, query),

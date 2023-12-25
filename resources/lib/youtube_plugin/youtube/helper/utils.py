@@ -239,10 +239,8 @@ def update_channel_infos(provider, context, channel_id_dict,
         for banner in banners:
             fanart = fanart_images.get(banner)
             if fanart:
+                channel_item.set_fanart(fanart)
                 break
-        else:
-            fanart = ''
-        channel_item.set_fanart(fanart)
 
         # update channel mapping
         if channel_items_dict is not None:
