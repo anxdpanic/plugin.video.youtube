@@ -1356,7 +1356,8 @@ class YouTube(LoginClient):
         self._context.log_debug('[data] v1 response: |{0.status_code}|\n'
                                 '\theaders: |{0.headers}|'.format(result))
 
-        if result.headers.get('content-type', '').startswith('application/json'):
+        result_type = result.headers.get('content-type')
+        if result_type and result_type.startswith('application/json'):
             try:
                 return result.json()
             except ValueError:

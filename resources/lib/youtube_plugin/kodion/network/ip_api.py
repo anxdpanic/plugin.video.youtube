@@ -25,7 +25,7 @@ class Locator(BaseRequestsClass):
         return self._response
 
     def locate_requester(self):
-        request_url = '/'.join([self._base_url, 'json'])
+        request_url = '/'.join((self._base_url, 'json'))
         response = self.request(request_url)
         self._response = response.json()
 

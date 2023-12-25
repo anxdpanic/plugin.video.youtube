@@ -62,14 +62,19 @@ class LoginClient(YouTubeRequestClient):
         'developer': developer_keys
     }
 
-    def __init__(self, config=None, language='en-US', region='',
-                 access_token='', access_token_tv=''):
+    def __init__(self,
+                 config=None,
+                 language='en_US',
+                 region='',
+                 access_token='',
+                 access_token_tv=''):
         self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
         # the default language is always en_US (like YouTube on the WEB)
         if not language:
             language = 'en_US'
-        language = language.replace('-', '_')
+        else:
+            language = language.replace('-', '_')
         self._language = language
         self._region = region
 
@@ -275,7 +280,7 @@ class LoginClient(YouTubeRequestClient):
         post_data = {
             'device_country': self._region.lower(),
             'operatorCountry': self._region.lower(),
-            'lang': self._language.replace('-', '_'),
+            'lang': self._language,
             'sdk_version': '19',
             # 'google_play_services_version': '6188034',
             'accountType': 'HOSTED_OR_GOOGLE',

@@ -133,7 +133,7 @@ class Storage(object):
     def __init__(self, filename, max_item_count=-1, max_file_size_kb=-1):
         self._filename = filename
         if not self._filename.endswith('.sqlite'):
-            self._filename = ''.join([self._filename, '.sqlite'])
+            self._filename = ''.join((self._filename, '.sqlite'))
         self._db = None
         self._cursor = None
         self._max_item_count = max_item_count

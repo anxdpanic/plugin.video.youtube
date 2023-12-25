@@ -187,7 +187,8 @@ class AbstractProvider(object):
 
         return False
 
-    def _internal_watch_later(self, context, re_match):
+    @staticmethod
+    def _internal_watch_later(context, re_match):
         params = context.get_params()
         command = re_match.group('command')
         if not command:
@@ -249,11 +250,13 @@ class AbstractProvider(object):
 
         command = re_match.group('command')
         search_history = context.get_search_history()
+
         if command == 'remove':
             query = params['q']
             search_history.remove(query)
             ui.refresh_container()
             return True
+
         if command == 'rename':
             query = params['q']
             result, new_query = ui.on_keyboard_input(
@@ -263,10 +266,27 @@ class AbstractProvider(object):
                 search_history.rename(query, new_query)
                 ui.refresh_container()
             return True
+
         if command == 'clear':
             search_history.clear()
             ui.refresh_container()
             return True
+
+        if command == 'query':
+            incognito = context.get_param('incognito', False)
+            channel_id = context.get_param('channel_id', '')
+            query = params['q']
+            query = to_unicode(query)
+
+            if not incognito and not channel_id:
+                try:
+                    search_history.update(query)
+                except:
+                    pass
+            if isinstance(query, bytes):
+                query = query.decode('utf-8')
+            return self.on_search(query, context, re_match)
+
         if command == 'input':
             self.data_cache = context
 
@@ -307,20 +327,6 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
-        if command == 'query':
-            incognito = context.get_param('incognito', False)
-            channel_id = context.get_param('channel_id', '')
-            query = params['q']
-            query = to_unicode(query)
-
-            if not incognito and not channel_id:
-                try:
-                    search_history.update(query)
-                except:
-                    pass
-            if isinstance(query, bytes):
-                query = query.decode('utf-8')
-            return self.on_search(query, context, re_match)
         context.set_content_type(content.VIDEOS)
         result = []
 
@@ -342,10 +348,6 @@ class AbstractProvider(object):
                 context, search, location=location
             )
             result.append(search_history_item)
-
-        if search_history.is_empty():
-            #  context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
-            pass
 
         return result, {self.RESULT_CACHE_TO_DISC: False}
 

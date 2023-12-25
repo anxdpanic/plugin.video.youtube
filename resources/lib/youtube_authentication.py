@@ -9,17 +9,22 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from youtube_plugin.youtube.provider import Provider
 from youtube_plugin.kodion.constants import ADDON_ID
 from youtube_plugin.kodion.context import Context
 from youtube_plugin.youtube.helper import yt_login
+from youtube_plugin.youtube.provider import Provider
+from youtube_plugin.youtube.youtube_exceptions import LoginException
 
-# noinspection PyUnresolvedReferences
-from youtube_plugin.youtube.youtube_exceptions import LoginException  # NOQA
 
+__all__ = (
+    'LoginException',
+    'reset_access_tokens',
+    'sign_in',
+    'sign_out',
+)
 
-SIGN_IN = 'in'
-SIGN_OUT = 'out'
+_SIGN_IN = 'in'
+_SIGN_OUT = 'out'
 
 
 def __add_new_developer(addon_id):
@@ -38,7 +43,7 @@ def __add_new_developer(addon_id):
         context.log_debug('Creating developer user: |%s|' % addon_id)
 
 
-def __auth(addon_id, mode=SIGN_IN):
+def __auth(addon_id, mode=_SIGN_IN):
     """
 
     :param addon_id: id of the add-on being signed in
@@ -53,28 +58,28 @@ def __auth(addon_id, mode=SIGN_IN):
     provider = Provider()
     context = Context(params={'addon_id': addon_id})
 
-    _ = provider.get_client(context=context)  # NOQA
+    _ = provider.get_client(context=context)
     logged_in = provider.is_logged_in()
-    if mode == SIGN_IN:
+    if mode == _SIGN_IN:
         if logged_in:
             return True
         else:
             provider.reset_client()
             yt_login.process(mode, provider, context, sign_out_refresh=False)
-    elif mode == SIGN_OUT:
+    elif mode == _SIGN_OUT:
         if not logged_in:
             return True
         else:
             provider.reset_client()
             try:
                 yt_login.process(mode, provider, context, sign_out_refresh=False)
-            except:
+            except LoginException:
                 reset_access_tokens(addon_id)
     else:
         raise Exception('Unknown mode: |%s|' % mode)
 
-    _ = provider.get_client(context=context)  # NOQA
-    if mode == SIGN_IN:
+    _ = provider.get_client(context=context)
+    if mode == _SIGN_IN:
         return provider.is_logged_in()
     else:
         return not provider.is_logged_in()
@@ -115,7 +120,7 @@ def sign_in(addon_id):
     :return: boolean, True when signed in
     """
 
-    return __auth(addon_id, mode=SIGN_IN)
+    return __auth(addon_id, mode=_SIGN_IN)
 
 
 def sign_out(addon_id):
@@ -146,7 +151,7 @@ def sign_out(addon_id):
     :return: boolean, True when signed out
     """
 
-    return __auth(addon_id, mode=SIGN_OUT)
+    return __auth(addon_id, mode=_SIGN_OUT)
 
 
 def reset_access_tokens(addon_id):

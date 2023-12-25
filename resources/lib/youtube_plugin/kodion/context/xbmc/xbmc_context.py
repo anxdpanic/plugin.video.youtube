@@ -105,7 +105,7 @@ class XbmcContext(AbstractContext):
         'httpd.not.running': 30699,
         'inputstreamhelper.is_installed': 30625,
         'isa.enable.confirm': 30579,
-        'key.requirement.notification': 30731,
+        'key.requirement': 30731,
         'latest_videos': 30109,
         'library': 30103,
         'liked.video': 30716,
@@ -280,7 +280,7 @@ class XbmcContext(AbstractContext):
             if num_args > 2:
                 params = sys.argv[2][1:]
                 if params:
-                    self._uri = '?'.join([self._uri, params])
+                    self._uri = '?'.join((self._uri, params))
                     self.parse_params(dict(parse_qsl(params)))
 
             if num_args > 3 and sys.argv[3].lower() == 'resume:true':

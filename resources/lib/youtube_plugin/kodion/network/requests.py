@@ -22,6 +22,11 @@ from ..logger import log_error
 from ..settings import Settings
 
 
+__all__ = (
+    'BaseRequestsClass',
+    'InvalidJSONError'
+)
+
 _settings = Settings(xbmcaddon.Addon(id=ADDON_ID))
 
 
@@ -95,7 +100,7 @@ class BaseRequestsClass(object):
                                              stream=stream,
                                              verify=verify,
                                              cert=cert,
-                                             json=json,)
+                                             json=json)
             if response_hook:
                 if response_hook_kwargs is None:
                     response_hook_kwargs = {}
@@ -163,6 +168,3 @@ class BaseRequestsClass(object):
                 raise self._default_exc(error_title)(exc)
 
         return response
-
-
-__all__ = ('BaseRequestsClass', 'InvalidJSONError')

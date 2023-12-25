@@ -59,9 +59,7 @@ class XbmcRunner(AbstractProviderRunner):
 
         self.settings = context.get_settings()
 
-        result = results[0]
-        options = {}
-        options.update(results[1])
+        result, options = results
 
         if isinstance(result, bool):
             xbmcplugin.endOfDirectory(self.handle, succeeded=result)
@@ -78,10 +76,14 @@ class XbmcRunner(AbstractProviderRunner):
         elif isinstance(result, (list, tuple)):
             item_count = len(result)
             items = [
-                self._add_directory(item, show_fanart) if isinstance(item, DirectoryItem)
-                else self._add_video(context, item) if isinstance(item, VideoItem)
-                else self._add_audio(context, item) if isinstance(item, AudioItem)
-                else self._add_image(item, show_fanart) if isinstance(item, ImageItem)
+                self._add_directory(item, show_fanart)
+                if isinstance(item, DirectoryItem)
+                else self._add_video(context, item)
+                if isinstance(item, VideoItem)
+                else self._add_audio(context, item)
+                if isinstance(item, AudioItem)
+                else self._add_image(item, show_fanart)
+                if isinstance(item, ImageItem)
                 else None
                 for item in result
             ]
@@ -135,7 +137,7 @@ class XbmcRunner(AbstractProviderRunner):
         item_info = info_labels.create_from_item(directory_item)
         xbmc_items.set_info_tag(item, item_info, 'video')
 
-        # only set fanart is enabled
+        # only set fanart if enabled
         if show_fanart:
             fanart = directory_item.get_fanart()
             if fanart:
@@ -143,9 +145,11 @@ class XbmcRunner(AbstractProviderRunner):
 
         item.setArt(art)
 
-        if directory_item.get_context_menu() is not None:
-            item.addContextMenuItems(directory_item.get_context_menu(),
-                                     replaceItems=directory_item.replace_context_menu())
+        context_menu = directory_item.get_context_menu()
+        if context_menu is not None:
+            item.addContextMenuItems(
+                context_menu, replaceItems=directory_item.replace_context_menu()
+            )
 
         item.setPath(directory_item.get_uri())
 
@@ -154,8 +158,10 @@ class XbmcRunner(AbstractProviderRunner):
         if directory_item.next_page:
             item.setProperty('specialSort', 'bottom')
 
-        if directory_item.get_channel_subscription_id():  # make channel_subscription_id property available for keymapping
-            item.setProperty('channel_subscription_id', directory_item.get_channel_subscription_id())
+        # make channel_subscription_id property available for keymapping
+        subscription_id = directory_item.get_channel_subscription_id()
+        if subscription_id:
+            item.setProperty('channel_subscription_id', subscription_id)
 
         return directory_item.get_uri(), item, is_folder
 
@@ -180,10 +186,14 @@ class XbmcRunner(AbstractProviderRunner):
 
         item.setArt(art)
 
-        if image_item.get_context_menu() is not None:
-            item.addContextMenuItems(image_item.get_context_menu(), replaceItems=image_item.replace_context_menu())
+        context_menu = image_item.get_context_menu()
+        if context_menu is not None:
+            item.addContextMenuItems(
+                context_menu, replaceItems=image_item.replace_context_menu()
+            )
 
-        item.setInfo(type='picture', infoLabels=info_labels.create_from_item(image_item))
+        item.setInfo(type='picture',
+                     infoLabels=info_labels.create_from_item(image_item))
 
         item.setPath(image_item.get_uri())
         return image_item.get_uri(), item, False

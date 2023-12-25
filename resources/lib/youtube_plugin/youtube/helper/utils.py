@@ -546,7 +546,7 @@ def update_video_infos(provider, context, video_id_dict,
         if not image:
             image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         if image.endswith('_live.jpg'):
-            image = ''.join([image, '?ct=', thumb_stamp])
+            image = ''.join((image, '?ct=', thumb_stamp))
         video_item.set_image(image)
 
         # update channel mapping
@@ -702,7 +702,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
                               meta_data.get('images', {}))
         if image:
             if video_item.live:
-                image = ''.join([image, '?ct=', get_thumb_timestamp()])
+                image = ''.join((image, '?ct=', get_thumb_timestamp()))
             video_item.set_image(image)
 
     if 'headers' in video_stream:

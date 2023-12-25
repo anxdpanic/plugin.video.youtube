@@ -36,8 +36,9 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     for item in items:
         channel = item['channel'].lower()
         channel = channel.replace(',', '')
-        if not do_filter or (do_filter and (not black_list) and (channel in filter_list)) or \
-                (do_filter and black_list and (channel not in filter_list)):
+        if (not do_filter
+                or (black_list and channel not in filter_list)
+                or (not black_list and channel in filter_list)):
             video_id = item['id']
             item_params['video_id'] = video_id
             item_uri = context.create_uri(['play'], item_params)
@@ -51,7 +52,11 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
     use_play_data = not incognito and context.get_settings().use_local_history()
 
     channel_item_dict = {}
-    utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
+    utils.update_video_infos(provider,
+                             context,
+                             video_id_dict,
+                             channel_items_dict=channel_item_dict,
+                             use_play_data=use_play_data)
     utils.update_fanarts(provider, context, channel_item_dict)
 
     if context.get_settings().hide_short_videos():
@@ -96,7 +101,11 @@ def tv_videos_to_items(provider, context, json_data):
     use_play_data = not incognito and context.get_settings().use_local_history()
 
     channel_item_dict = {}
-    utils.update_video_infos(provider, context, video_id_dict, channel_items_dict=channel_item_dict, use_play_data=use_play_data)
+    utils.update_video_infos(provider,
+                             context,
+                             video_id_dict,
+                             channel_items_dict=channel_item_dict,
+                             use_play_data=use_play_data)
     utils.update_fanarts(provider, context, channel_item_dict)
 
     if context.get_settings().hide_short_videos():
@@ -134,16 +143,25 @@ def saved_playlists_to_items(provider, context, json_data):
         image = utils.get_thumbnail(thumb_size, item.get('thumbnails', {}))
 
         if channel_id:
-            item_uri = context.create_uri(['channel', channel_id, 'playlist', playlist_id], item_params)
+            item_uri = context.create_uri(
+                ['channel', channel_id, 'playlist', playlist_id],
+                item_params,
+            )
         else:
-            item_uri = context.create_uri(['playlist', playlist_id], item_params)
+            item_uri = context.create_uri(
+                ['playlist', playlist_id],
+                item_params,
+            )
 
         playlist_item = DirectoryItem(title, item_uri, image=image)
         result.append(playlist_item)
         playlist_id_dict[playlist_id] = playlist_item
 
     channel_items_dict = {}
-    utils.update_playlist_infos(provider, context, playlist_id_dict, channel_items_dict)
+    utils.update_playlist_infos(provider,
+                                context,
+                                playlist_id_dict,
+                                channel_items_dict)
     utils.update_fanarts(provider, context, channel_items_dict)
 
     # next page

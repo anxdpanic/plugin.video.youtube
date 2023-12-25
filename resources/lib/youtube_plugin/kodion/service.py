@@ -10,8 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from datetime import datetime
 import time
+from datetime import datetime
 
 from .context import Context
 from .utils import YouTubeMonitor, YouTubePlayer

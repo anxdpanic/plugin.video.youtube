@@ -12,9 +12,9 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
-from ... import utils
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, ADDON_PATH
+from ...utils import to_unicode
 
 
 class XbmcContextUI(AbstractContextUI):
@@ -41,15 +41,15 @@ class XbmcContextUI(AbstractContextUI):
             keyboard = xbmc.Keyboard(default, title, hidden)
             keyboard.doModal()
             if keyboard.isConfirmed() and keyboard.getText():
-                text = utils.to_unicode(keyboard.getText())
+                text = to_unicode(keyboard.getText())
                 return True, text
             return False, ''
 
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
-        result = dialog.input(title, utils.to_unicode(default), type=xbmcgui.INPUT_ALPHANUM)
+        result = dialog.input(title, to_unicode(default), type=xbmcgui.INPUT_ALPHANUM)
         if result:
-            text = utils.to_unicode(result)
+            text = to_unicode(result)
             return True, text
 
         return False, ''
@@ -71,11 +71,11 @@ class XbmcContextUI(AbstractContextUI):
         return dialog.ok(title, text)
 
     def on_remove_content(self, content_name):
-        text = self._context.localize('content.remove') % utils.to_unicode(content_name)
+        text = self._context.localize('content.remove') % to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize('content.remove.confirm'), text)
 
     def on_delete_content(self, content_name):
-        text = self._context.localize('content.delete') % utils.to_unicode(content_name)
+        text = self._context.localize('content.delete') % to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize('content.delete.confirm'), text)
 
     def on_select(self, title, items=None):

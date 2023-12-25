@@ -96,8 +96,8 @@ def _process_more_for_video(context):
 
     items = []
 
-    is_logged_in = context.get_param('logged_in', '0')
-    if is_logged_in == '1':
+    logged_in = context.get_param('logged_in', '0')
+    if logged_in == '1':
         # add video to a playlist
         items.append((context.localize('video.add_to_playlist'),
                       'RunPlugin(%s)' % context.create_uri(['playlist', 'select', 'playlist'], {'video_id': video_id})))
@@ -111,7 +111,7 @@ def _process_more_for_video(context):
                    'Container.Update(%s)' % context.create_uri(['special', 'description_links'],
                                                                {'video_id': video_id}))])
 
-    if is_logged_in == '1':
+    if logged_in == '1':
         # rate a video
         refresh_container = context.get_param('refresh_container', '0')
         items.append((context.localize('video.rate'),

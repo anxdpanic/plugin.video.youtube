@@ -148,7 +148,7 @@ def _process_description_links(provider, context):
 
         resource_manager = provider.get_resource_manager(context)
 
-        video_data = resource_manager.get_videos([video_id])
+        video_data = resource_manager.get_videos((video_id, ))
         yt_item = video_data[video_id]
         if not yt_item or 'snippet' not in yt_item:
             context.get_ui().on_ok(
@@ -179,7 +179,7 @@ def _process_description_links(provider, context):
             context.sleep(50)
 
         url_to_item_converter = UrlToItemConverter()
-        url_to_item_converter.add_urls(res_urls, provider, context)
+        url_to_item_converter.add_urls(res_urls, context)
         result = url_to_item_converter.get_items(provider, context)
 
         progress_dialog.close()
@@ -295,7 +295,7 @@ def process(category, provider, context):
             and category in ['new_uploaded_videos_tv',
                              'new_uploaded_videos_tv_filtered',
                              'disliked_videos']):
-        return UriItem(context.create_uri(['sign', 'in']))
+        return UriItem(context.create_uri(('sign', 'in')))
 
     if category == 'related_videos':
         return _process_related_videos(provider, context)

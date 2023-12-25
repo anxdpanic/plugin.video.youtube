@@ -164,7 +164,7 @@ class Cipher(object):
         _object_body = _object_body.split('},')
         for _function in _object_body:
             if not _function.endswith('}'):
-                _function = ''.join([_function, '}'])
+                _function = ''.join((_function, '}'))
             _function = _function.strip()
 
             match = re.match(r'(?P<name>[^:]*):function\((?P<parameter>[^)]*)\){(?P<body>[^}]+)}', _function)

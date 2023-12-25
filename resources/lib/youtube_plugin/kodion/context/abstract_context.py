@@ -223,7 +223,7 @@ class AbstractContext(object):
             uri = "%s://%s/" % ('plugin', str(self._plugin_id))
 
         if params:
-            uri = '?'.join([uri, urlencode(params)])
+            uri = '?'.join((uri, urlencode(params)))
 
         return uri
 

@@ -171,8 +171,11 @@ def _process_select_playlist(provider, context):
         items = []
         if current_page == 1:
             # create playlist
-            items.append((ui.bold(context.localize('playlist.create')), '',
-                          'playlist.create', context.create_resource_path('media', 'playlist.png')))
+            items.append((
+                ui.bold(context.localize('playlist.create')), '',
+                'playlist.create',
+                context.create_resource_path('media', 'playlist.png')
+            ))
 
             # add the 'Watch Later' playlist
             resource_manager = provider.get_resource_manager(context)
@@ -180,17 +183,25 @@ def _process_select_playlist(provider, context):
             if 'watchLater' in my_playlists:
                 watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
                 if watch_later_playlist_id:
-                    items.append((ui.bold(context.localize('watch_later')), '',
-                                  watch_later_playlist_id, context.create_resource_path('media', 'watch_later.png')))
+                    items.append((
+                        ui.bold(context.localize('watch_later')), '',
+                        watch_later_playlist_id,
+                        context.create_resource_path('media', 'watch_later.png')
+                    ))
 
+        default_thumb = context.create_resource_path('media', 'playlist.png')
         for playlist in playlists:
             snippet = playlist.get('snippet', {})
             title = snippet.get('title', '')
             description = snippet.get('description', '')
-            thumbnail = snippet.get('thumbnails', {}).get('default', {}).get('url', context.create_resource_path('media', 'playlist.png'))
+            thumbnail = snippet.get('thumbnails', {}).get('default', {})
             playlist_id = playlist.get('id', '')
             if title and playlist_id:
-                items.append((title, description, playlist_id, thumbnail))
+                items.append((
+                    title, description,
+                    playlist_id,
+                    thumbnail.get('url') or default_thumb
+                ))
 
         if page_token:
             items.append((ui.bold(context.localize('next_page')).replace('%d', str(current_page + 1)), '',

@@ -40,7 +40,7 @@ class UrlToItemConverter(object):
         self._channel_items = []
         self._channel_ids = []
 
-    def add_url(self, url, provider, context):
+    def add_url(self, url, context):
         parsed_url = urlsplit(url)
         if parsed_url.hostname.lower() not in self.VALID_HOSTNAMES:
             context.log_debug('Unknown hostname "{0}" in url "{1}"'.format(
@@ -119,9 +119,9 @@ class UrlToItemConverter(object):
         else:
             context.log_debug('No items found in url "{0}"'.format(url))
 
-    def add_urls(self, urls, provider, context):
+    def add_urls(self, urls, context):
         for url in urls:
-            self.add_url(url, provider, context)
+            self.add_url(url, context)
 
     def get_items(self, provider, context, skip_title=False):
         result = []

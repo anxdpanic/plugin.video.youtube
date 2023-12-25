@@ -83,7 +83,7 @@ def process(method, provider, context):
     # we need a login
     _ = provider.get_client(context)
     if not provider.is_logged_in():
-        return UriItem(context.create_uri(['sign', 'in']))
+        return UriItem(context.create_uri(('sign', 'in')))
 
     if method == 'list':
         result.extend(_process_list(provider, context))

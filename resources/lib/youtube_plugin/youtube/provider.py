@@ -54,7 +54,7 @@ class Provider(AbstractProvider):
         self._resource_manager = None
 
         self._client = None
-        self._is_logged_in = False
+        self._logged_in = False
 
         self.yt_video = yt_video
 
@@ -65,7 +65,7 @@ class Provider(AbstractProvider):
         return [(yt_setup_wizard.process, [self, context])]
 
     def is_logged_in(self):
-        return self._is_logged_in
+        return self._logged_in
 
     @staticmethod
     def get_dev_config(context, addon_id, dev_configs):
@@ -121,7 +121,7 @@ class Provider(AbstractProvider):
 
         items_per_page = settings.get_items_per_page()
 
-        language = settings.get_string('youtube.language', 'en-US')
+        language = settings.get_string('youtube.language', 'en_US')
         region = settings.get_string('youtube.region', 'US')
 
         api_last_origin = access_manager.get_last_origin()
@@ -240,8 +240,8 @@ class Provider(AbstractProvider):
                     self.get_resource_manager(context).clear()
 
             # in debug log the login status
-            self._is_logged_in = len(access_tokens) == 2
-            context.log_debug('User is logged in' if self._is_logged_in else
+            self._logged_in = len(access_tokens) == 2
+            context.log_debug('User is logged in' if self._logged_in else
                               'User is not logged in')
 
             if not access_tokens:
@@ -268,7 +268,7 @@ class Provider(AbstractProvider):
         resolver = UrlResolver(context)
         res_url = resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
-        url_converter.add_url(res_url, self, context)
+        url_converter.add_url(res_url, context)
         items = url_converter.get_items(self, context, skip_title=True)
         if items:
             return items[0]
@@ -287,7 +287,6 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
         self.set_content_type(context, content.VIDEOS)
-        client = self.get_client(context)
         resource_manager = self.get_resource_manager(context)
 
         batch_id = (re_match.group('playlist_id'),
@@ -362,7 +361,12 @@ class Provider(AbstractProvider):
         safe_search = context.get_settings().safe_search()
 
         # no caching
-        json_data = self.get_client(context).search(q='', search_type='video', event_type='live', channel_id=channel_id, page_token=page_token, safe_search=safe_search)
+        json_data = self.get_client(context).search(q='',
+                                                    search_type='video',
+                                                    event_type='live',
+                                                    channel_id=channel_id,
+                                                    page_token=page_token,
+                                                    safe_search=safe_search)
         if not json_data:
             return False
         result.extend(v3.response_to_items(self, context, json_data))
@@ -390,7 +394,7 @@ class Provider(AbstractProvider):
 
         if (method == 'channel' and channel_id and channel_id.lower() == 'property'
                 and listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc'))):
-            context.execute('Container.Update(%s)' % create_uri(['channel', listitem_channel_id]))  # redirect if keymap, without redirect results in 'invalid handle -1'
+            context.execute('Container.Update(%s)' % create_uri(('channel', listitem_channel_id)))  # redirect if keymap, without redirect results in 'invalid handle -1'
 
         if method == 'channel' and not channel_id:
             return False
@@ -427,7 +431,7 @@ class Provider(AbstractProvider):
                 if method == 'user':
                     return False
 
-        channel_fanarts = resource_manager.get_fanarts([channel_id])
+        channel_fanarts = resource_manager.get_fanarts((channel_id, ))
 
         params = context.get_params()
         page = params.get('page', 1)
@@ -1272,13 +1276,13 @@ class Provider(AbstractProvider):
         if not logged_in and settings.get_bool('youtube.folder.sign.in.show', True):
             sign_in_item = DirectoryItem(
                 ui.bold(localize('sign.in')),
-                create_uri(['sign', 'in']),
+                create_uri(('sign', 'in')),
                 image='{media}/sign_in.png',
                 action=True
             )
             result.append(sign_in_item)
 
-        if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions.show', True):
+        if logged_in and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
 
             # clear cache
@@ -1287,16 +1291,16 @@ class Provider(AbstractProvider):
 
             my_subscriptions_item = DirectoryItem(
                 ui.bold(localize('my_subscriptions')),
-                create_uri(['special', 'new_uploaded_videos_tv']),
+                create_uri(('special', 'new_uploaded_videos_tv')),
                 image='{media}/new_uploads.png',
             )
             result.append(my_subscriptions_item)
 
-        if self.is_logged_in() and settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
+        if logged_in and settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
             # my subscriptions filtered
             my_subscriptions_filtered_item = DirectoryItem(
                 localize('my_subscriptions.filtered'),
-                create_uri(['special', 'new_uploaded_videos_tv_filtered']),
+                create_uri(('special', 'new_uploaded_videos_tv_filtered')),
                 image='{media}/new_uploads.png',
             )
             result.append(my_subscriptions_filtered_item)
@@ -1304,12 +1308,12 @@ class Provider(AbstractProvider):
         access_manager = context.get_access_manager()
 
         # Recommendations
-        if self.is_logged_in() and settings.get_bool('youtube.folder.recommendations.show', True):
+        if logged_in and settings.get_bool('youtube.folder.recommendations.show', True):
             watch_history_playlist_id = access_manager.get_watch_history_id()
             if watch_history_playlist_id != 'HL':
                 recommendations_item = DirectoryItem(
                     localize('recommendations'),
-                    create_uri(['special', 'recommendations']),
+                    create_uri(('special', 'recommendations')),
                     image='{media}/popular.png',
                 )
                 result.append(recommendations_item)
@@ -1318,7 +1322,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.popular_right_now.show', True):
             what_to_watch_item = DirectoryItem(
                 localize('popular_right_now'),
-                create_uri(['special', 'popular_right_now']),
+                create_uri(('special', 'popular_right_now')),
                 image='{media}/popular.png',
             )
             result.append(what_to_watch_item)
@@ -1351,7 +1355,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.my_location.show', True) and settings.get_location():
             my_location_item = DirectoryItem(
                 localize('my_location'),
-                create_uri(['location', 'mine']),
+                create_uri(('location', 'mine')),
                 image='{media}/location.png',
             )
             result.append(my_location_item)
@@ -1360,7 +1364,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.my_channel.show', True):
             my_channel_item = DirectoryItem(
                 localize('my_channel'),
-                create_uri(['channel', 'mine']),
+                create_uri(('channel', 'mine')),
                 image='{media}/channel.png',
             )
             result.append(my_channel_item)
@@ -1368,10 +1372,10 @@ class Provider(AbstractProvider):
         # watch later
         if settings.get_bool('youtube.folder.watch_later.show', True):
             playlist_id = logged_in and access_manager.get_watch_later_id()
-            if playlist_id and playlist_id != 'HL':
+            if playlist_id:
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri(['channel', 'mine', 'playlist', playlist_id]),
+                    create_uri(('channel', 'mine', 'playlist', playlist_id)),
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
@@ -1384,7 +1388,7 @@ class Provider(AbstractProvider):
             else:
                 watch_history_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri([paths.WATCH_LATER, 'list']),
+                    create_uri((paths.WATCH_LATER, 'list')),
                     image='{media}/watch_later.png',
                 )
                 result.append(watch_history_item)
@@ -1396,7 +1400,7 @@ class Provider(AbstractProvider):
             if 'likes' in playlists:
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
-                    create_uri(['channel', 'mine', 'playlist', playlists['likes']]),
+                    create_uri(('channel', 'mine', 'playlist', playlists['likes'])),
                     image='{media}/likes.png',
                 )
                 context_menu = [
@@ -1411,7 +1415,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.disliked_videos.show', True):
             disliked_videos_item = DirectoryItem(
                 localize('video.disliked'),
-                create_uri(['special', 'disliked_videos']),
+                create_uri(('special', 'disliked_videos')),
                 image='{media}/dislikes.png',
             )
             result.append(disliked_videos_item)
@@ -1422,7 +1426,7 @@ class Provider(AbstractProvider):
             if playlist_id and playlist_id != 'HL':
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri(['channel', 'mine', 'playlist', playlist_id]),
+                    create_uri(('channel', 'mine', 'playlist', playlist_id)),
                     image='{media}/history.png',
                 )
                 context_menu = [
@@ -1444,7 +1448,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.playlists.show', True):
             playlists_item = DirectoryItem(
                 localize('playlists'),
-                create_uri(['channel', 'mine', 'playlists']),
+                create_uri(('channel', 'mine', 'playlists')),
                 image='{media}/playlist.png',
             )
             result.append(playlists_item)
@@ -1453,7 +1457,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.saved.playlists.show', True):
             playlists_item = DirectoryItem(
                 localize('saved.playlists'),
-                create_uri(['special', 'saved_playlists']),
+                create_uri(('special', 'saved_playlists')),
                 image='{media}/playlist.png',
             )
             result.append(playlists_item)
@@ -1462,7 +1466,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.subscriptions.show', True):
             subscriptions_item = DirectoryItem(
                 localize('subscriptions'),
-                create_uri(['subscriptions', 'list']),
+                create_uri(('subscriptions', 'list')),
                 image='{media}/channels.png',
             )
             result.append(subscriptions_item)
@@ -1471,7 +1475,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.browse_channels.show', True):
             browse_channels_item = DirectoryItem(
                 localize('browse_channels'),
-                create_uri(['special', 'browse_channels']),
+                create_uri(('special', 'browse_channels')),
                 image='{media}/browse_channels.png',
             )
             result.append(browse_channels_item)
@@ -1480,7 +1484,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.completed.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
-                create_uri(['special', 'completed_live']),
+                create_uri(('special', 'completed_live')),
                 image='{media}/live.png',
             )
             result.append(live_events_item)
@@ -1489,7 +1493,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.upcoming.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
-                create_uri(['special', 'upcoming_live']),
+                create_uri(('special', 'upcoming_live')),
                 image='{media}/live.png',
             )
             result.append(live_events_item)
@@ -1498,7 +1502,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live'),
-                create_uri(['special', 'live']),
+                create_uri(('special', 'live')),
                 image='{media}/live.png',
             )
             result.append(live_events_item)
@@ -1507,7 +1511,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.switch.user.show', True):
             switch_user_item = DirectoryItem(
                 localize('user.switch'),
-                create_uri(['users', 'switch']),
+                create_uri(('users', 'switch')),
                 image='{media}/channel.png',
                 action=True,
             )
@@ -1517,7 +1521,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.sign.out.show', True):
             sign_out_item = DirectoryItem(
                 localize('sign.out'),
-                create_uri(['sign', 'out']),
+                create_uri(('sign', 'out')),
                 image='{media}/sign_out.png',
                 action=True,
             )
@@ -1526,7 +1530,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.settings.show', True):
             settings_menu_item = DirectoryItem(
                 localize('settings'),
-                create_uri(['config', 'youtube']),
+                create_uri(('config', 'youtube')),
                 image='{media}/settings.png',
                 action=True,
             )
@@ -1590,8 +1594,10 @@ class Provider(AbstractProvider):
             context.log_error('%s: %s' % (title, log_message))
 
             if error == 'deleted_client':
-                message = context.localize('key.requirement.notification')
-                context.get_access_manager().update_access_token(access_token='', refresh_token='')
+                message = context.localize('key.requirement')
+                context.get_access_manager().update_access_token(
+                    access_token='', refresh_token=''
+                )
                 ok_dialog = True
 
             if error == 'invalid_client':
@@ -1605,7 +1611,9 @@ class Provider(AbstractProvider):
             if ok_dialog:
                 context.get_ui().on_ok(title, message)
             else:
-                context.get_ui().show_notification(message, title, time_ms=message_timeout)
+                context.get_ui().show_notification(message,
+                                                   title,
+                                                   time_ms=message_timeout)
 
             return False
 

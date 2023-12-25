@@ -275,7 +275,7 @@ class AbstractSettings(object):
         self.set_string(settings.LOCATION, value)
 
     def get_location_radius(self):
-        return ''.join([str(self.get_int(settings.LOCATION_RADIUS, 500)), 'km'])
+        return ''.join((str(self.get_int(settings.LOCATION_RADIUS, 500)), 'km'))
 
     def get_play_count_min_percent(self):
         return self.get_int(settings.PLAY_COUNT_MIN_PERCENT, 0)

@@ -114,7 +114,7 @@ def video_playback_item(context, video_item):
             mime_type = mime_type.replace('%2F', '/')
 
         if not alternative_player and headers and uri.startswith('http'):
-            video_item.set_uri('|'.join([uri, headers]))
+            video_item.set_uri('|'.join((uri, headers)))
 
     list_item = xbmcgui.ListItem(**kwargs)
     if mime_type:
