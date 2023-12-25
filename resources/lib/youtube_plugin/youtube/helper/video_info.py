@@ -1217,9 +1217,10 @@ class VideoInfo(YouTubeRequestClient):
                                     .format(url))
             license_info = {
                 'url': url,
-                'proxy': 'http://{0}:{1}/widevine||R{{SSM}}|'.format(
-                    _settings.httpd_listen(for_request=True),
-                    _settings.httpd_port()
+                'proxy': 'http://{address}:{port}{path}||R{{SSM}}|'.format(
+                    address=_settings.httpd_listen(for_request=True),
+                    port=_settings.httpd_port(),
+                    path=paths.DRM,
                 ),
                 'token': self._access_token,
             }
@@ -1855,9 +1856,10 @@ class VideoInfo(YouTubeRequestClient):
                                     .format(file=filepath))
             success = False
         if success:
-            return 'http://{0}:{1}/{2}.mpd'.format(
-                _settings.httpd_listen(for_request=True),
-                _settings.httpd_port(),
-                self.video_id
+            return 'http://{address}:{port}{path}{file}'.format(
+                address=_settings.httpd_listen(for_request=True),
+                port=_settings.httpd_port(),
+                path=paths.MPD,
+                file=filename,
             ), main_stream
         return None, None

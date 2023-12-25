@@ -26,7 +26,7 @@ from ..compatibility import (
     xbmcgui,
     xbmcvfs,
 )
-from ..constants import ADDON_ID, TEMP_PATH
+from ..constants import ADDON_ID, TEMP_PATH, paths
 from ..logger import log_debug
 from ..settings import Settings
 
@@ -41,7 +41,7 @@ del _addon
 _server_requests = BaseRequestsClass()
 
 
-class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
+class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
     chunk_size = 1024 * 64
     local_ranges = (
@@ -53,11 +53,9 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         '::1',
     )
 
-    def __init__(self, request, client_address, server):
+    def __init__(self, *args, **kwargs):
         self.whitelist_ips = _settings.httpd_whitelist()
-        super(YouTubeProxyRequestHandler, self).__init__(request,
-                                                         client_address,
-                                                         server)
+        super(RequestHandler, self).__init__(*args, **kwargs)
 
     def connection_allowed(self):
         client_ip = self.client_address[0]
@@ -71,7 +69,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         if not conn_allowed:
             log_debug('HTTPServer: Connection from |{client_ip| not allowed'.
                       format(client_ip=client_ip))
-        elif self.path != '/ping':
+        elif self.path != paths.PING:
             log_debug(' '.join(log_lines))
         return conn_allowed
 
@@ -80,15 +78,15 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         api_config_enabled = _settings.api_config_page()
 
         # Strip trailing slash if present
-        stripped_path = self.path.rstrip('/').lower()
-        if stripped_path != '/ping':
+        stripped_path = self.path.rstrip('/')
+        if stripped_path != paths.PING:
             log_debug('HTTPServer: GET Request uri path |{stripped_path}|'
-                      .format(stripped_path=stripped_path))
+                      .format(stripped_path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
 
-        elif stripped_path == '/client_ip':
+        elif stripped_path == paths.IP:
             client_json = json.dumps({"ip": "{ip}"
                                      .format(ip=self.client_address[0])})
             self.send_response(200)
@@ -97,9 +95,9 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.end_headers()
             self.wfile.write(client_json.encode('utf-8'))
 
-        elif _settings.use_mpd_videos() and stripped_path.endswith('.mpd'):
+        elif self.path.startswith(paths.MPD):
             file_path = os.path.join(self.BASE_PATH,
-                                     self.path.strip('/').strip('\\'))
+                                     self.path[len(paths.MPD):])
             file_chunk = True
             log_debug('HTTPServer: Request file path |{file_path}|'
                       .format(file_path=file_path))
@@ -119,7 +117,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                             .format(proxy_path=self.path, file_path=file_path))
                 self.send_error(404, response)
 
-        elif api_config_enabled and stripped_path == '/api':
+        elif api_config_enabled and stripped_path == paths.API:
             html = self.api_config_page()
             html = html.encode('utf-8')
 
@@ -131,7 +129,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif api_config_enabled and stripped_path.startswith('/api_submit'):
+        elif api_config_enabled and self.path.startswith(paths.API_SUBMIT):
             xbmc.executebuiltin('Dialog.Close(addonsettings, true)')
 
             query = urlsplit(self.path).query
@@ -186,7 +184,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif stripped_path == '/ping':
+        elif stripped_path == paths.PING:
             self.send_error(204)
 
         else:
@@ -199,9 +197,10 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
         if not self.connection_allowed():
             self.send_error(403)
-        elif _settings.use_mpd_videos() and self.path.endswith('.mpd'):
+
+        elif self.path.startswith(paths.MPD):
             file_path = os.path.join(self.BASE_PATH,
-                                     self.path.strip('/').strip('\\'))
+                                     self.path[len(paths.MPD):])
             if not os.path.isfile(file_path):
                 response = ('File Not Found: |{proxy_path}| -> |{file_path}|'
                             .format(proxy_path=self.path, file_path=file_path))
@@ -212,6 +211,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                 self.send_header('Content-Length',
                                  str(os.path.getsize(file_path)))
                 self.end_headers()
+
         else:
             self.send_error(501)
 
@@ -222,7 +222,8 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
         if not self.connection_allowed():
             self.send_error(403)
-        elif self.path.startswith('/widevine'):
+
+        elif self.path.startswith(paths.DRM):
             home = xbmcgui.Window(10000)
 
             lic_url = home.getProperty('-'.join((ADDON_ID, 'license_url')))
@@ -296,6 +297,7 @@ class YouTubeProxyRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
             for chunk in self.get_chunks(response_body):
                 self.wfile.write(chunk)
+
         else:
             self.send_error(501)
 
@@ -351,31 +353,31 @@ class Pages(object):
               <head>
                 <link rel="icon" href="data:;base64,=">
                 <meta charset="utf-8">
-                <title>{title}</title>
-                <style>{css}</style>
+                <title>{{title}}</title>
+                <style>{{css}}</style>
               </head>
               <body>
                 <div class="center">
-                  <h5>{header}</h5>
-                  <form action="/api_submit" class="config_form">
+                  <h5>{{header}}</h5>
+                  <form action="{action_url}" class="config_form">
                     <label for="api_key">
-                      <span>{api_key_head}:</span>
-                      <input type="text" name="api_key" value="{api_key_value}" size="50"/>
+                      <span>{{api_key_head}}:</span>
+                      <input type="text" name="api_key" value="{{api_key_value}}" size="50"/>
                     </label>
                     <label for="api_id">
-                      <span>{api_id_head}:</span>
-                      <input type="text" name="api_id" value="{api_id_value}" size="50"/>
+                      <span>{{api_id_head}}:</span>
+                      <input type="text" name="api_id" value="{{api_id_value}}" size="50"/>
                     </label>
                     <label for="api_secret">
-                      <span>{api_secret_head}:</span>
-                      <input type="text" name="api_secret" value="{api_secret_value}" size="50"/>
+                      <span>{{api_secret_head}}:</span>
+                      <input type="text" name="api_secret" value="{{api_secret_value}}" size="50"/>
                     </label>
-                    <input type="submit" value="{submit}">
+                    <input type="submit" value="{{submit}}">
                   </form>
                 </div>
               </body>
             </html>
-        '''),
+        '''.format(action_url=paths.API_SUBMIT)),
         'css': ''.join('\t\t\t'.expandtabs(2) + line for line in dedent('''
             body {
               background: #141718;
@@ -530,8 +532,7 @@ def get_http_server(address=None, port=None):
     address = _settings.httpd_listen(for_request=False, ip_address=address)
     port = _settings.httpd_port(port)
     try:
-        server = BaseHTTPServer.HTTPServer((address, port),
-                                           YouTubeProxyRequestHandler)
+        server = BaseHTTPServer.HTTPServer((address, port), RequestHandler)
         return server
     except socket_error as exc:
         log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
@@ -547,7 +548,9 @@ def get_http_server(address=None, port=None):
 def is_httpd_live(address=None, port=None):
     address = _settings.httpd_listen(for_request=True, ip_address=address)
     port = _settings.httpd_port(port=port)
-    url = 'http://{address}:{port}/ping'.format(address=address, port=port)
+    url = 'http://{address}:{port}{path}'.format(address=address,
+                                                 port=port,
+                                                 path=paths.PING)
     try:
         response = _server_requests.request(url)
         result = response.status_code == 204
@@ -566,7 +569,9 @@ def is_httpd_live(address=None, port=None):
 def get_client_ip_address(address=None, port=None):
     address = _settings.httpd_listen(for_request=True, ip_address=address)
     port = _settings.httpd_port(port=port)
-    url = 'http://{address}:{port}/client_ip'.format(address=address, port=port)
+    url = 'http://{address}:{port}{path}'.format(address=address,
+                                                 port=port,
+                                                 path=paths.IP)
     response = _server_requests.request(url)
     ip_address = None
     if response.status_code == 200:
