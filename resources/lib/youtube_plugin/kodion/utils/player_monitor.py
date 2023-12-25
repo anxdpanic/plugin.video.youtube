@@ -16,9 +16,9 @@ import threading
 from ..compatibility import xbmc
 
 
-class PlaybackMonitorThread(threading.Thread):
+class PlayerMonitorThread(threading.Thread):
     def __init__(self, player, provider, context, playback_json):
-        super(PlaybackMonitorThread, self).__init__()
+        super(PlayerMonitorThread, self).__init__()
 
         self._stopped = threading.Event()
         self._ended = threading.Event()
@@ -58,7 +58,6 @@ class PlaybackMonitorThread(threading.Thread):
                 or self.stopped())
 
     def run(self):
-        playing_file = self.playback_json.get('playing_file')
         play_count = self.playback_json.get('play_count', 0)
         use_remote_history = self.playback_json.get('use_remote_history', False)
         use_local_history = self.playback_json.get('use_local_history', False)
@@ -66,46 +65,39 @@ class PlaybackMonitorThread(threading.Thread):
         refresh_only = self.playback_json.get('refresh_only', False)
         clip = self.playback_json.get('clip', False)
 
+        self._context.log_debug('PlayerMonitorThread[{0}]: Starting'
+                                .format(self.video_id))
+
         player = self.player
 
-        self._context.log_debug('PlaybackMonitorThread[{0}]: Starting'
-                                .format(self.video_id))
-        access_manager = self._context.get_access_manager()
-
-        settings = self._context.get_settings()
-
-        if playback_stats is None:
-            playback_stats = {}
-
-        played_time = -1.0
-
-        state = 'playing'
-        last_state = 'playing'
-
-        np_wait_time = 0.2
-        np_waited = 0.0
-        p_wait_time = 0.5
-        p_waited = 0.0
-
-        report_interval = 10.0
-        first_report = True
-
-        report_url = playback_stats.get('playback_url', '')
-
-        while not player.isPlaying() and not self._context.abort_requested():
-            self._context.log_debug('Waiting for playback to start')
-
-            xbmc.sleep(int(np_wait_time * 1000))
-            if np_waited >= 5:
+        wait_time = 0.2
+        waited = 0.0
+        while not player.isPlaying():
+            if self._context.abort_requested():
+                break
+            if waited >= 5:
                 self.end()
                 return
 
-            np_waited += np_wait_time
+            self._context.log_debug('Waiting for playback to start')
+            xbmc.sleep(int(wait_time * 1000))
+            waited += wait_time
+        else:
+            self._context.send_notification('PlaybackStarted', {
+                'video_id': self.video_id,
+                'channel_id': self.channel_id,
+                'status': self.video_status,
+            })
 
         client = self.provider.get_client(self._context)
-        is_logged_in = self.provider.is_logged_in()
+        logged_in = self.provider.is_logged_in()
+        report_url = playback_stats.get('playback_url', '')
+        if playback_stats is None:
+            playback_stats = {}
+        state = 'playing'
+        last_state = 'playing'
 
-        if is_logged_in and report_url and use_remote_history:
+        if logged_in and report_url and use_remote_history:
             client.update_watch_history(
                 self._context,
                 self.video_id,
@@ -116,21 +108,18 @@ class PlaybackMonitorThread(threading.Thread):
             )
 
         report_url = playback_stats.get('watchtime_url', '')
+        report_interval = 10.0
+        first_report = True
 
-        plugin_play_path = 'plugin://plugin.video.youtube/play/'
+        access_manager = self._context.get_access_manager()
+        settings = self._context.get_settings()
+
         video_id_param = 'video_id=%s' % self.video_id
 
-        notification_sent = False
-
+        played_time = -1.0
+        wait_time = 0.5
+        waited = 0.0
         while not self.abort_now():
-            if not notification_sent:
-                notification_sent = True
-                self._context.send_notification('PlaybackStarted', {
-                    'video_id': self.video_id,
-                    'channel_id': self.channel_id,
-                    'status': self.video_status,
-                })
-
             last_total_time = self.total_time
             last_current_time = self.current_time
             last_segment_start = self.segment_start
@@ -138,13 +127,14 @@ class PlaybackMonitorThread(threading.Thread):
 
             try:
                 current_file = player.getPlayingFile()
-                if (current_file != playing_file and
-                    not (current_file.startswith(plugin_play_path) and
-                         video_id_param in current_file)) or self.stopped():
-                    self.stop()
-                    break
             except RuntimeError:
-                pass
+                current_file = None
+
+            if (not current_file or video_id_param not in current_file
+                    or not self._context.is_plugin_path(current_file, 'play/')
+                    or self.stopped()):
+                self.stop()
+                break
 
             if self.abort_now():
                 self.update_times(last_total_time,
@@ -204,12 +194,12 @@ class PlaybackMonitorThread(threading.Thread):
                                   last_percent_complete)
                 break
 
-            if p_waited >= report_interval:
+            if waited >= report_interval:
                 # refresh client, tokens may need refreshing
-                if is_logged_in:
+                if logged_in:
                     self.provider.reset_client()
                     client = self.provider.get_client(self._context)
-                    is_logged_in = self.provider.is_logged_in()
+                    logged_in = self.provider.is_logged_in()
 
                 if self.current_time == played_time:
                     last_state = state
@@ -227,15 +217,15 @@ class PlaybackMonitorThread(threading.Thread):
                                   last_percent_complete)
                 break
 
-            if (is_logged_in and report_url and use_remote_history
-                    and (first_report or p_waited >= report_interval)):
+            if (logged_in and report_url and use_remote_history
+                    and (first_report or waited >= report_interval)):
                 if first_report:
                     first_report = False
                     self.segment_start = 0.0
                     self.current_time = 0.0
                     self.percent_complete = 0
 
-                p_waited = 0.0
+                waited = 0.0
 
                 if self.segment_start < 0:
                     self.segment_start = 0.0
@@ -267,11 +257,11 @@ class PlaybackMonitorThread(threading.Thread):
             if self.abort_now():
                 break
 
-            xbmc.sleep(int(p_wait_time * 1000))
+            xbmc.sleep(int(wait_time * 1000))
 
-            p_waited += p_wait_time
+            waited += wait_time
 
-        if is_logged_in and report_url and use_remote_history:
+        if logged_in and report_url and use_remote_history:
             client.update_watch_history(
                 self._context,
                 self.video_id,
@@ -297,15 +287,15 @@ class PlaybackMonitorThread(threading.Thread):
 
         state = 'stopped'
         # refresh client, tokens may need refreshing
-        if is_logged_in:
+        if logged_in:
             self.provider.reset_client()
             client = self.provider.get_client(self._context)
-            is_logged_in = self.provider.is_logged_in()
+            logged_in = self.provider.is_logged_in()
 
         if self.percent_complete >= settings.get_play_count_min_percent():
             play_count += 1
             self.current_time = 0.0
-            if is_logged_in and report_url and use_remote_history:
+            if logged_in and report_url and use_remote_history:
                 client.update_watch_history(
                     self._context,
                     self.video_id,
@@ -316,7 +306,7 @@ class PlaybackMonitorThread(threading.Thread):
                 )
 
         else:
-            if is_logged_in and report_url and use_remote_history:
+            if logged_in and report_url and use_remote_history:
                 client.update_watch_history(
                     self._context,
                     self.video_id,
@@ -338,24 +328,26 @@ class PlaybackMonitorThread(threading.Thread):
             self._context.get_playback_history().update(self.video_id,
                                                         play_data)
 
-        if not refresh_only and is_logged_in:
-            if settings.get_bool('youtube.playlist.watchlater.autoremove',
-                                 True):
-                watch_later_id = access_manager.get_watch_later_id()
-
-                if watch_later_id:
-                    playlist_item_id = client.get_playlist_item_id_of_video_id(
-                        playlist_id=watch_later_id, video_id=self.video_id
+        if refresh_only:
+            pass
+        elif settings.get_bool('youtube.playlist.watchlater.autoremove', True):
+            watch_later_id = logged_in and access_manager.get_watch_later_id()
+            if watch_later_id:
+                playlist_item_id = client.get_playlist_item_id_of_video_id(
+                    playlist_id=watch_later_id, video_id=self.video_id
+                )
+                if playlist_item_id:
+                    _ = client.remove_video_from_playlist(
+                        watch_later_id, playlist_item_id
                     )
-                    if playlist_item_id:
-                        json_data = client.remove_video_from_playlist(
-                            watch_later_id, playlist_item_id
-                        )
+            else:
+                self._context.get_watch_later_list().remove(self.video_id)
 
+        if logged_in and not refresh_only:
             history_playlist_id = access_manager.get_watch_history_id()
             if history_playlist_id and history_playlist_id != 'HL':
-                json_data = client.add_video_to_playlist(history_playlist_id,
-                                                         self.video_id)
+                _ = client.add_video_to_playlist(history_playlist_id,
+                                                 self.video_id)
 
             # rate video
             if settings.get_bool('youtube.post.play.rate', False):
@@ -395,7 +387,7 @@ class PlaybackMonitorThread(threading.Thread):
         self.end()
 
     def stop(self):
-        self._context.log_debug('PlaybackMonitorThread[{0}]: Stop event set'
+        self._context.log_debug('PlayerMonitorThread[{0}]: Stop event set'
                                 .format(self.video_id))
         self._stopped.set()
 
@@ -403,7 +395,7 @@ class PlaybackMonitorThread(threading.Thread):
         return self._stopped.is_set()
 
     def end(self):
-        self._context.log_debug('PlaybackMonitorThread[{0}]: End event set'
+        self._context.log_debug('PlayerMonitorThread[{0}]: End event set'
                                 .format(self.video_id))
         self._ended.set()
 
@@ -411,9 +403,9 @@ class PlaybackMonitorThread(threading.Thread):
         return self._ended.is_set()
 
 
-class YouTubePlayer(xbmc.Player):
+class PlayerMonitor(xbmc.Player):
     def __init__(self, *_args, **kwargs):
-        super(YouTubePlayer, self).__init__()
+        super(PlayerMonitor, self).__init__()
         self._context = kwargs.get('context')
         self.provider = kwargs.get('provider')
         self.ui = self._context.get_ui()
@@ -428,14 +420,14 @@ class YouTubePlayer(xbmc.Player):
                 continue
 
             if not thread.stopped():
-                self._context.log_debug('PlaybackMonitorThread[{0}]: stopping'
+                self._context.log_debug('PlayerMonitorThread[{0}]: stopping'
                                         .format(thread.video_id))
                 thread.stop()
 
         for thread in self.threads:
             if thread.stopped() and not thread.ended():
                 try:
-                    thread.join()
+                    thread.join(5)
                 except RuntimeError:
                     pass
 
@@ -447,19 +439,19 @@ class YouTubePlayer(xbmc.Player):
                 continue
 
             if thread.ended():
-                self._context.log_debug('PlaybackMonitorThread[{0}]: clean up'
+                self._context.log_debug('PlayerMonitorThread[{0}]: clean up'
                                         .format(thread.video_id))
             else:
-                self._context.log_debug('PlaybackMonitorThread[{0}]: stopping'
+                self._context.log_debug('PlayerMonitorThread[{0}]: stopping'
                                         .format(thread.video_id))
                 if not thread.stopped():
                     thread.stop()
             try:
-                thread.join()
+                thread.join(5)
             except RuntimeError:
                 pass
 
-        self._context.log_debug('PlaybackMonitor active threads: |{0}|'.format(
+        self._context.log_debug('PlayerMonitor active threads: |{0}|'.format(
             ', '.join([thread.video_id for thread in active_threads])
         ))
         self.threads = active_threads
@@ -484,10 +476,10 @@ class YouTubePlayer(xbmc.Player):
 
         self.ui.clear_property('playback_json')
         self.cleanup_threads()
-        self.threads.append(PlaybackMonitorThread(self,
-                                                  self.provider,
-                                                  self._context,
-                                                  playback_json))
+        self.threads.append(PlayerMonitorThread(self,
+                                                self.provider,
+                                                self._context,
+                                                playback_json))
 
     def onPlayBackEnded(self):
         if not self.ui.busy_dialog_active():

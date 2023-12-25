@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 
 from .context import Context
-from .utils import YouTubeMonitor, YouTubePlayer
+from .utils import PlayerMonitor, YouTubeMonitor
 from ..youtube.provider import Provider
 
 
@@ -56,7 +56,7 @@ def run():
     context.log_debug('YouTube service initialization...')
 
     monitor = YouTubeMonitor()
-    player = YouTubePlayer(provider=Provider(), context=context)
+    player = PlayerMonitor(provider=Provider(), context=context)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     monitor.remove_temp_dir()

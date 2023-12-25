@@ -29,11 +29,12 @@ from .methods import (
     to_unicode,
 )
 from .monitor import YouTubeMonitor
-from .player import YouTubePlayer
+from .player_monitor import PlayerMonitor
 from .system_version import current_system_version
 
 
 __all__ = (
+    'PlayerMonitor',
     'create_path',
     'create_uri_path',
     'current_system_version',
@@ -52,5 +53,4 @@ __all__ = (
     'to_str',
     'to_unicode',
     'YouTubeMonitor',
-    'YouTubePlayer',
 )
