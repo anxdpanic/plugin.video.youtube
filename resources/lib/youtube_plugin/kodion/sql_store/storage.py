@@ -126,7 +126,13 @@ class Storage(object):
             'REPLACE'
             ' INTO {table}'
             ' (key, timestamp, value, size)'
-            ' VALUES(?, ?, ?, ?);'
+            ' VALUES (?,?,?,?);'
+        ),
+        'set_flat': (
+            'REPLACE'
+            ' INTO {table}'
+            ' (key, timestamp, value, size)'
+            ' VALUES {{0}};'
         ),
     }
 
@@ -184,20 +190,23 @@ class Storage(object):
         cursor.arraysize = 100
 
         sql_script = [
-            'PRAGMA journal_mode = WAL;',
-            'PRAGMA busy_timeout = 20000;',
+            'PRAGMA busy_timeout = 1000;',
             'PRAGMA read_uncommitted = TRUE;',
-            'PRAGMA temp_store = MEMORY;',
-            'PRAGMA page_size = 4096;',
+            'PRAGMA secure_delete = FALSE;',
             'PRAGMA synchronous = NORMAL;',
-            'PRAGMA mmap_size = 10485760;',
-            # 'PRAGMA locking_mode = EXCLUSIVE;'
-            'PRAGMA cache_size = 500;'
+            'PRAGMA locking_mode = NORMAL;'
+            'PRAGMA temp_store = MEMORY;',
+            'PRAGMA mmap_size = 4096000;',
+            'PRAGMA page_size = 4096;',
+            'PRAGMA cache_size = 1000;',
+            'PRAGMA journal_mode = WAL;',
         ]
         statements = []
 
         if not self._table_created:
-            statements.append(self._sql['create_table'])
+            statements.append(
+                self._sql['create_table']
+            )
 
         if not self._table_updated:
             for result in cursor.execute(self._sql['has_old_table']):
@@ -308,16 +317,28 @@ class Storage(object):
                 self._execute(cursor, optimize_query)
             self._execute(cursor, self._sql['set'], values=values)
 
-    def _set_many(self, items):
+    def _set_many(self, items, flatten=False):
         now = since_epoch(datetime.now())
-        values = [self._encode(*item, timestamp=now)
-                  for item in items.items()]
-        optimize_query = self._optimize_item_count(len(items), defer=True)
+        num_items = len(items)
+
+        if flatten:
+            values = [enc_part
+                      for item in items.items()
+                      for enc_part in self._encode(*item, timestamp=now)]
+            query = self._sql['set_flat'].format(
+                '(?,?,?,?),' * (num_items - 1) + '(?,?,?,?)'
+            )
+        else:
+            values = [self._encode(*item, timestamp=now)
+                      for item in items.items()]
+            query = self._sql['set']
+
+        optimize_query = self._optimize_item_count(num_items, defer=True)
         with self as (db, cursor), db:
             self._execute(cursor, 'BEGIN')
             if optimize_query:
                 self._execute(cursor, optimize_query)
-            self._execute(cursor, self._sql['set'], many=True, values=values)
+            self._execute(cursor, query, many=not flatten, values=values)
         self._optimize_file_size()
 
     def clear(self, defer=False):
@@ -377,12 +398,12 @@ class Storage(object):
             query = query.format(limit)
         else:
             num_ids = len(item_ids)
-            query = self._sql['get_by_key'].format(('?,' * (num_ids - 1)) + '?')
+            query = self._sql['get_by_key'].format('?,' * (num_ids - 1) + '?')
             item_ids = tuple(item_ids)
 
+        cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
         with self as (db, cursor), db:
             result = self._execute(cursor, query, item_ids)
-            cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
             if as_dict:
                 result = {
                     item[0]: self._decode(item[2], process, item)
@@ -408,7 +429,7 @@ class Storage(object):
 
     def _remove_many(self, item_ids):
         num_ids = len(item_ids)
-        query = self._sql['remove_by_key'].format(('?,' * (num_ids - 1)) + '?')
+        query = self._sql['remove_by_key'].format('?,' * (num_ids - 1) + '?')
         with self as (db, cursor), db:
             self._execute(cursor, query, tuple(item_ids))
             self._execute(cursor, 'VACUUM')
