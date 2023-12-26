@@ -7,9 +7,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from .json_store import JSONStore
+from __future__ import absolute_import, division, unicode_literals
+
+from .access_manager import AccessManager
 from .api_keys import APIKeyStore
-from .login_tokens import LoginTokenStore
 
-__all__ = ['JSONStore', 'APIKeyStore', 'LoginTokenStore']
 
+__all__ = ('AccessManager', 'APIKeyStore',)

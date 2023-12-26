@@ -8,8 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ....youtube.helper.signature.cipher import Cipher
+from __future__ import absolute_import, division, unicode_literals
 
-__all__ = ['Cipher']
+from .cipher import Cipher
 
 
+__all__ = ('Cipher',)

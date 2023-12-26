@@ -8,8 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from youtube_plugin.kodion import runner
+from __future__ import absolute_import, division, unicode_literals
+
 from youtube_plugin import youtube
+from youtube_plugin.kodion import runner
 
 __provider__ = youtube.Provider()
 runner.run(__provider__)

@@ -7,18 +7,20 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import re
 
 from youtube_plugin.youtube.provider import Provider
-from youtube_plugin.kodion.impl import Context
+from youtube_plugin.kodion.context import Context
 
 
 def _get_core_components(addon_id=None):
     provider = Provider()
     if addon_id is not None:
-        context = Context(params={'addon_id': addon_id}, plugin_id='plugin.video.youtube')
+        context = Context(params={'addon_id': addon_id})
     else:
-        context = Context(plugin_id='plugin.video.youtube')
+        context = Context()
     client = provider.get_client(context=context)
 
     return provider, context, client

@@ -8,6 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
+
 THUMB_SIZE = 'kodion.thumbnail.size'  # (int)
 SHOW_FANART = 'kodion.fanart.show'  # (bool)
 SAFE_SEARCH = 'kodion.safe.search'  # (int)
@@ -19,7 +22,7 @@ AGE_GATE = 'kodion.age.gate'  # (bool)
 SUBTITLE_LANGUAGE = 'kodion.subtitle.languages.num'  # (int)
 SUBTITLE_DOWNLOAD = 'kodion.subtitle.download'  # (bool)
 SETUP_WIZARD = 'kodion.setup_wizard'  # (bool)
-VERIFY_SSL = 'simple.requests.ssl.verify'  # (bool)
+LANGUAGE = 'youtube.language'  # (str)
 LOCATION = 'youtube.location'  # (str)
 LOCATION_RADIUS = 'youtube.location.radius'  # (int)
 PLAY_COUNT_MIN_PERCENT = 'kodion.play_count.percent'  # (int)
@@ -27,6 +30,7 @@ USE_LOCAL_HISTORY = 'kodion.history.local'  # (bool)
 USE_REMOTE_HISTORY = 'kodion.history.remote'  # (bool)
 REMOTE_FRIENDLY_SEARCH = 'youtube.search.remote.friendly'  # (bool)
 HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
+DETAILED_DESCRIPTION = 'youtube.view.description.details'  # (bool)
 
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web.urls'  # (bool)
@@ -35,17 +39,32 @@ ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 
 VIDEO_QUALITY = 'kodion.video.quality'  # (int)
 VIDEO_QUALITY_ASK = 'kodion.video.quality.ask'  # (bool)
-USE_MPD = 'kodion.video.quality.mpd'  # (bool)
-LIVE_STREAMS = 'kodion.mpd.live_stream.selection'  # (int)
+USE_ISA = 'kodion.video.quality.isa'  # (bool)
+LIVE_STREAMS = 'kodion.live_stream.selection'  # (int)
 MPD_VIDEOS = 'kodion.mpd.videos'  # (bool)
 MPD_QUALITY_SELECTION = 'kodion.mpd.quality.selection'  # (int)
 MPD_STREAM_FEATURES = 'kodion.mpd.stream.features'  # (list[string])
 MPD_STREAM_SELECT = 'kodion.mpd.stream.select'  # (int)
 
-HTTPD_PORT = 'kodion.mpd.proxy.port'  # (number)
+VERIFY_SSL = 'requests.ssl.verify'  # (bool)
+CONNECT_TIMEOUT = 'requests.timeout.connect'  # (int)
+READ_TIMEOUT = 'requests.timeout.read'  # (int)
+
+HTTPD_PORT = 'kodion.http.port'  # (number)
 HTTPD_LISTEN = 'kodion.http.listen'  # (string)
 HTTPD_WHITELIST = 'kodion.http.ip.whitelist'  # (string)
 
 API_CONFIG_PAGE = 'youtube.api.config.page'  # (bool)
+API_KEY = 'youtube.api.key'  # (string)
+API_ID = 'youtube.api.id'  # (string)
+API_SECRET = 'youtube.api.secret'  # (string)
+API_LAST_HASH = 'youtube.api.last.hash'  # (string)
+
+USER_ACCESS_TOKEN = 'kodion.access_token'  # (string)
+USER_REFRESH_TOKEN = 'kodion.refresh_token'  # (string)
+USER_TOKEN_EXPIRATION = 'kodion.access_token.expires'  # (int)
 
 CLIENT_SELECTION = 'youtube.client.selection'  # (int)
+
+WATCH_LATER_PLAYLIST = 'youtube.folder.watch_later.playlist'  # (str)
+HISTORY_PLAYLIST = 'youtube.folder.history.playlist'  # (str)

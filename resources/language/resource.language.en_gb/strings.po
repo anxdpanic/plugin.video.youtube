@@ -53,7 +53,7 @@ msgstr ""
 # empty strings from id 30003 to 30006
 
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
+msgid "Use InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30008"
@@ -462,7 +462,7 @@ msgid "Play with..."
 msgstr ""
 
 msgctxt "#30541"
-msgid "Show channel name in description"
+msgid "Show channel name and video details in description"
 msgstr ""
 
 msgctxt "#30542"
@@ -614,7 +614,7 @@ msgid "Force SSL certificate verification"
 msgstr ""
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -766,11 +766,11 @@ msgid "Must be signed in."
 msgstr ""
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
+msgid "InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
+msgid "Enable MPEG-DASH proxy"
 msgstr ""
 
 msgctxt "#30619"
@@ -782,7 +782,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
@@ -1050,7 +1050,7 @@ msgid "data cache"
 msgstr ""
 
 msgctxt "#30688"
-msgid "Use for videos"
+msgid "Use MPEG-DASH for videos"
 msgstr ""
 
 msgctxt "#30689"
@@ -1190,7 +1190,7 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1351,4 +1351,32 @@ msgstr ""
 
 msgctxt "#30763"
 msgid "Multi-audio"
+msgstr ""
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr ""
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr ""
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr ""
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
 msgstr ""

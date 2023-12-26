@@ -7,6 +7,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ....youtube.helper.ratebypass import ratebypass
+from __future__ import absolute_import, division, unicode_literals
 
-__all__ = ['ratebypass']
+from . import ratebypass
+
+
+__all__ = ('ratebypass',)

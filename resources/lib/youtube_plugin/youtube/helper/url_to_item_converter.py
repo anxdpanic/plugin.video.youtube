@@ -8,17 +8,23 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
-from urllib.parse import urlparse
-from urllib.parse import parse_qsl
+from __future__ import absolute_import, division, unicode_literals
 
-from ...kodion.items import VideoItem, DirectoryItem
+import re
+
 from . import utils
+from ...kodion.compatibility import parse_qsl, urlsplit
+from ...kodion.items import DirectoryItem, UriItem, VideoItem
+from ...kodion.utils import duration_to_seconds
 
 
 class UrlToItemConverter(object):
-    RE_CHANNEL_ID = re.compile(r'^/channel/(?P<channel_id>.+)$')
-    RE_SHORTS_VID = re.compile(r'^/shorts/(?P<video_id>.+)$')
+    RE_PATH_ID = re.compile(r'/[^/]+/(?P<id>[^/?#]+)', re.I)
+    VALID_HOSTNAMES = {
+        'youtube.com',
+        'www.youtube.com',
+        'm.youtube.com',
+    }
 
     def __init__(self, flatten=True):
         self._flatten = flatten
@@ -34,129 +40,181 @@ class UrlToItemConverter(object):
         self._channel_items = []
         self._channel_ids = []
 
-    def add_url(self, url, provider, context):
-        url_components = urlparse(url)
-        if url_components.hostname.lower() in ('youtube.com', 'www.youtube.com', 'm.youtube.com'):
-            params = dict(parse_qsl(url_components.query))
-            if url_components.path.lower() == '/watch':
-                video_id = params.get('v', '')
-                if video_id:
-                    plugin_uri = context.create_uri(['play'], {'video_id': video_id})
-                    video_item = VideoItem('', plugin_uri)
-                    self._video_id_dict[video_id] = video_item
+    def add_url(self, url, context):
+        parsed_url = urlsplit(url)
+        if parsed_url.hostname.lower() not in self.VALID_HOSTNAMES:
+            context.log_debug('Unknown hostname "{0}" in url "{1}"'.format(
+                parsed_url.hostname, url
+            ))
+            return
 
-                playlist_id = params.get('list', '')
-                if playlist_id:
-                    if self._flatten:
-                        self._playlist_ids.append(playlist_id)
-                    else:
-                        playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
-                        playlist_item.set_fanart(provider.get_fanart(context))
-                        self._playlist_id_dict[playlist_id] = playlist_item
-            elif url_components.path.lower() == '/playlist':
-                playlist_id = params.get('list', '')
-                if playlist_id:
-                    if self._flatten:
-                        self._playlist_ids.append(playlist_id)
-                    else:
-                        playlist_item = DirectoryItem('', context.create_uri(['playlist', playlist_id]))
-                        playlist_item.set_fanart(provider.get_fanart(context))
-                        self._playlist_id_dict[playlist_id] = playlist_item
-            elif self.RE_SHORTS_VID.match(url_components.path):
-                re_match = self.RE_SHORTS_VID.match(url_components.path)
-                video_id = re_match.group('video_id')
-                plugin_uri = context.create_uri(['play'], {'video_id': video_id})
-                video_item = VideoItem('', plugin_uri)
-                self._video_id_dict[video_id] = video_item
-            elif self.RE_CHANNEL_ID.match(url_components.path):
-                re_match = self.RE_CHANNEL_ID.match(url_components.path)
-                channel_id = re_match.group('channel_id')
-                if self._flatten:
-                    self._channel_ids.append(channel_id)
-                else:
-                    channel_item = DirectoryItem('', context.create_uri(['channel', channel_id]))
-                    channel_item.set_fanart(provider.get_fanart(context))
-                    self._channel_id_dict[channel_id] = channel_item
-            else:
-                context.log_debug('Unknown path "%s"' % url_components.path)
+        url_params = dict(parse_qsl(parsed_url.query))
+        new_params = {
+            new: process(url_params[old]) if process else url_params[old]
+            for old, new, process in (
+                ('end', 'end', duration_to_seconds),
+                ('start', 'start', duration_to_seconds),
+                ('t', 'seek', duration_to_seconds),
+                ('list', 'playlist_id', False),
+                ('v', 'video_id', False),
+                ('live', 'live', False),
+                ('clip', 'clip', False),
+            )
+            if old in url_params
+        }
 
-    def add_urls(self, urls, provider, context):
+        path = parsed_url.path.rstrip('/').lower()
+        if path.startswith(('/playlist', '/watch')):
+            pass
+        elif path.startswith('/channel/'):
+            re_match = self.RE_PATH_ID.match(parsed_url.path)
+            new_params['channel_id'] = re_match.group('id')
+            if ('live' not in new_params
+                    and path.endswith(('/live', '/streams'))):
+                new_params['live'] = 1
+        elif path.startswith(('/clip/', '/embed/', '/live/', '/shorts/')):
+            re_match = self.RE_PATH_ID.match(parsed_url.path)
+            new_params['video_id'] = re_match.group('id')
+        else:
+            context.log_debug('Unknown path "{0}" in url "{1}"'.format(
+                parsed_url.path, url
+            ))
+            return
+
+        if 'video_id' in new_params:
+            video_id = new_params['video_id']
+
+            video_item = VideoItem(
+                '', context.create_uri(['play'], new_params)
+            )
+            self._video_id_dict[video_id] = video_item
+
+        elif 'playlist_id' in new_params:
+            playlist_id = new_params['playlist_id']
+
+            if self._flatten:
+                self._playlist_ids.append(playlist_id)
+                return
+
+            playlist_item = DirectoryItem(
+                '', context.create_uri(['playlist', playlist_id], new_params),
+            )
+            self._playlist_id_dict[playlist_id] = playlist_item
+
+        elif 'channel_id' in new_params:
+            channel_id = new_params['channel_id']
+            live = new_params.get('live')
+
+            if not live and self._flatten:
+                self._channel_ids.append(channel_id)
+                return
+
+            channel_item = VideoItem(
+                '', context.create_uri(['play'], new_params)
+            ) if live else DirectoryItem(
+                '', context.create_uri(['channel', channel_id], new_params)
+            )
+            self._channel_id_dict[channel_id] = channel_item
+
+        else:
+            context.log_debug('No items found in url "{0}"'.format(url))
+
+    def add_urls(self, urls, context):
         for url in urls:
-            self.add_url(url, provider, context)
+            self.add_url(url, context)
 
-    def get_items(self, provider, context, title_required=True):
+    def get_items(self, provider, context, skip_title=False):
         result = []
 
-        if self._flatten and len(self._channel_ids) > 0:
+        if self._channel_ids:
             # remove duplicates
             self._channel_ids = list(set(self._channel_ids))
 
-            channels_item = DirectoryItem(context.get_ui().bold(context.localize(provider.LOCAL_MAP['youtube.channels'])),
-                                          context.create_uri(['special', 'description_links'],
-                                                             {'channel_ids': ','.join(self._channel_ids)}),
-                                          context.create_resource_path('media', 'playlist.png'))
-            channels_item.set_fanart(provider.get_fanart(context))
+            channels_item = DirectoryItem(
+                context.get_ui().bold(context.localize('channels')),
+                context.create_uri(['special', 'description_links'], {
+                    'channel_ids': ','.join(self._channel_ids),
+                }),
+                image='{media}/playlist.png'
+            )
             result.append(channels_item)
 
-        if self._flatten and len(self._playlist_ids) > 0:
+        if self._playlist_ids:
             # remove duplicates
             self._playlist_ids = list(set(self._playlist_ids))
 
-            playlists_item = DirectoryItem(context.get_ui().bold(context.localize(provider.LOCAL_MAP['youtube.playlists'])),
-                                           context.create_uri(['special', 'description_links'],
-                                                              {'playlist_ids': ','.join(self._playlist_ids)}),
-                                           context.create_resource_path('media', 'playlist.png'))
-            playlists_item.set_fanart(provider.get_fanart(context))
+            playlists_item = UriItem(
+                context.create_uri(['play'], {
+                    'playlist_ids': ','.join(self._playlist_ids),
+                    'play': True,
+                }),
+                playable=True
+            ) if context.get_param('uri') else DirectoryItem(
+                context.get_ui().bold(context.localize('playlists')),
+                context.create_uri(['special', 'description_links'], {
+                    'playlist_ids': ','.join(self._playlist_ids),
+                }),
+                image='{media}/playlist.png'
+            )
             result.append(playlists_item)
 
-        if not self._flatten:
-            result.extend(self.get_channel_items(provider, context))
+        if self._channel_id_dict:
+            result += self.get_channel_items(provider, context, skip_title)
 
-        if not self._flatten:
-            result.extend(self.get_playlist_items(provider, context))
+        if self._playlist_id_dict:
+            result += self.get_playlist_items(provider, context, skip_title)
 
-        # add videos
-        result.extend(self.get_video_items(provider, context, title_required))
+        if self._video_id_dict:
+            result += self.get_video_items(provider, context, skip_title)
 
         return result
 
-    def get_video_items(self, provider, context, title_required=True):
-        incognito = str(context.get_param('incognito', False)).lower() == 'true'
-        use_play_data = not incognito
+    def get_video_items(self, provider, context, skip_title=False):
+        if self._video_items:
+            return self._video_items
 
-        if len(self._video_items) == 0:
-            channel_id_dict = {}
-            utils.update_video_infos(provider, context, self._video_id_dict, None, channel_id_dict, use_play_data=use_play_data)
-            utils.update_fanarts(provider, context, channel_id_dict)
+        use_play_data = not context.get_param('incognito', False)
 
-            for key in self._video_id_dict:
-                video_item = self._video_id_dict[key]
-                if not title_required or (title_required and video_item.get_title()):
-                    self._video_items.append(video_item)
+        channel_id_dict = {}
+        utils.update_video_infos(provider, context, self._video_id_dict,
+                                 channel_items_dict=channel_id_dict,
+                                 use_play_data=use_play_data)
+        utils.update_fanarts(provider, context, channel_id_dict)
 
+        self._video_items = [
+            video_item
+            for video_item in self._video_id_dict.values()
+            if skip_title or video_item.get_title()
+        ]
         return self._video_items
 
-    def get_playlist_items(self, provider, context):
-        if len(self._playlist_items) == 0:
-            channel_id_dict = {}
-            utils.update_playlist_infos(provider, context, self._playlist_id_dict, channel_id_dict)
-            utils.update_fanarts(provider, context, channel_id_dict)
+    def get_playlist_items(self, provider, context, skip_title=False):
+        if self._playlist_items:
+            return self._playlist_items
 
-            for key in self._playlist_id_dict:
-                playlist_item = self._playlist_id_dict[key]
-                if playlist_item.get_name():
-                    self._playlist_items.append(playlist_item)
+        channel_id_dict = {}
+        utils.update_playlist_infos(provider, context,
+                                    self._playlist_id_dict,
+                                    channel_items_dict=channel_id_dict)
+        utils.update_fanarts(provider, context, channel_id_dict)
 
+        self._playlist_items = [
+            playlist_item
+            for playlist_item in self._playlist_id_dict.values()
+            if skip_title or playlist_item.get_title()
+        ]
         return self._playlist_items
 
-    def get_channel_items(self, provider, context):
-        if len(self._channel_items) == 0:
-            channel_id_dict = {}
-            utils.update_fanarts(provider, context, channel_id_dict)
+    def get_channel_items(self, provider, context, skip_title=False):
+        if self._channel_items:
+            return self._channel_items
 
-            for key in self._channel_id_dict:
-                channel_item = self._channel_id_dict[key]
-                if channel_item.get_name():
-                    self._channel_items.append(channel_item)
+        channel_id_dict = {}
+        utils.update_fanarts(provider, context, channel_id_dict)
 
+        self._channel_items = [
+            channel_item
+            for channel_item in self._channel_id_dict.values()
+            if skip_title or channel_item.get_title()
+        ]
         return self._channel_items

@@ -8,11 +8,32 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from . import const_settings as setting
-from . import const_localize as localize
-from . import const_sort_methods as sort_method
-from . import const_content_types as content_type
-from . import const_paths as paths
+from __future__ import absolute_import, division, unicode_literals
+
+from . import (
+    const_content_types as content,
+    const_paths as paths,
+    const_settings as settings,
+    const_sort_methods as sort,
+)
 
 
-__all__ = ['setting', 'localize', 'sort_method', 'content_type', 'paths']
+ADDON_ID = 'plugin.video.youtube'
+ADDON_PATH = 'special://home/addons/{id}'.format(id=ADDON_ID)
+DATA_PATH = 'special://profile/addon_data/{id}'.format(id=ADDON_ID)
+MEDIA_PATH = ADDON_PATH + '/resources/media'
+RESOURCE_PATH = ADDON_PATH + '/resources'
+TEMP_PATH = 'special://temp/{id}'.format(id=ADDON_ID)
+
+__all__ = (
+    'ADDON_ID',
+    'ADDON_PATH',
+    'DATA_PATH',
+    'MEDIA_PATH',
+    'RESOURCE_PATH',
+    'TEMP_PATH',
+    'content',
+    'paths',
+    'settings',
+    'sort',
+)

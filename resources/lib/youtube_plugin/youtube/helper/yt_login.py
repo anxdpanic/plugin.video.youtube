@@ -8,10 +8,13 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
 import json
 import time
-from ...youtube.youtube_exceptions import LoginException
+
+from ..youtube_exceptions import LoginException
 
 
 def process(mode, provider, context, sign_out_refresh=True):
@@ -28,12 +31,11 @@ def process(mode, provider, context, sign_out_refresh=True):
                 refresh_tokens = list(set(refresh_tokens))
                 for _refresh_token in refresh_tokens:
                     provider.get_client(context).revoke(_refresh_token)
-        else:
-            if signout_access_manager.has_refresh_token():
-                refresh_tokens = signout_access_manager.get_refresh_token().split('|')
-                refresh_tokens = list(set(refresh_tokens))
-                for _refresh_token in refresh_tokens:
-                    provider.get_client(context).revoke(_refresh_token)
+        elif signout_access_manager.has_refresh_token():
+            refresh_tokens = signout_access_manager.get_refresh_token().split('|')
+            refresh_tokens = list(set(refresh_tokens))
+            for _refresh_token in refresh_tokens:
+                provider.get_client(context).revoke(_refresh_token)
 
         provider.reset_client()
 
@@ -61,16 +63,16 @@ def process(mode, provider, context, sign_out_refresh=True):
         user_code = json_data['user_code']
         verification_url = json_data.get('verification_url', 'youtube.com/activate').lstrip('https://www.')
 
-        text = [context.localize(provider.LOCAL_MAP['youtube.sign.go_to']) % context.get_ui().bold(verification_url),
-                '[CR]%s %s' % (context.localize(provider.LOCAL_MAP['youtube.sign.enter_code']),
+        text = [context.localize('sign.go_to') % context.get_ui().bold(verification_url),
+                '[CR]%s %s' % (context.localize('sign.enter_code'),
                                context.get_ui().bold(user_code))]
         text = ''.join(text)
         dialog = context.get_ui().create_progress_dialog(
-            heading=context.localize(provider.LOCAL_MAP['youtube.sign.in']), text=text, background=False)
+            heading=context.localize('sign.in'), text=text, background=False)
 
         steps = ((10 * 60 * 1000) // interval)  # 10 Minutes
         dialog.set_total(steps)
-        for i in range(steps):
+        for _ in range(steps):
             dialog.update()
             try:
                 if _for_tv:
@@ -97,18 +99,18 @@ def process(mode, provider, context, sign_out_refresh=True):
                     _expires_in = 0
                 return _access_token, _expires_in, _refresh_token
 
-            elif json_data['error'] != u'authorization_pending':
+            if json_data['error'] != 'authorization_pending':
                 message = json_data['error']
                 title = '%s: %s' % (context.get_name(), message)
                 context.get_ui().show_notification(message, title)
                 context.log_error('Error requesting access token: |%s|' % message)
 
             if dialog.is_aborted():
-                dialog.close()
-                return '', 0, ''
+                break
 
             context.sleep(interval)
         dialog.close()
+        return '', 0, ''
 
     if mode == 'out':
         _do_logout()
@@ -116,8 +118,8 @@ def process(mode, provider, context, sign_out_refresh=True):
             context.get_ui().refresh_container()
 
     elif mode == 'in':
-        context.get_ui().on_ok(context.localize(provider.LOCAL_MAP['youtube.sign.twice.title']),
-                               context.localize(provider.LOCAL_MAP['youtube.sign.twice.text']))
+        context.get_ui().on_ok(context.localize('sign.twice.title'),
+                               context.localize('sign.twice.text'))
 
         access_token_tv, expires_in_tv, refresh_token_tv = _do_login(_for_tv=True)
         # abort tv login

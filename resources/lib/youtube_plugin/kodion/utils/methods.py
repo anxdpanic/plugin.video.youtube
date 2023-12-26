@@ -8,24 +8,39 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import os
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
+import json
+import os
 import re
-from urllib.parse import quote
+import shutil
+from datetime import timedelta
+from math import floor, log
 
-from ..constants import localize
-
-import xbmc
-import xbmcvfs
+from ..compatibility import quote, xbmc, xbmcvfs
+from ..logger import log_error
 
 
-__all__ = ['create_path', 'create_uri_path', 'strip_html_from_text', 'print_items', 'find_best_fit', 'to_utf8',
-           'to_str', 'to_unicode', 'select_stream', 'make_dirs', 'loose_version', 'find_video_id']
-
-try:
-    xbmc.translatePath = xbmcvfs.translatePath
-except AttributeError:
-    pass
+__all__ = (
+    'create_path',
+    'create_uri_path',
+    'duration_to_seconds',
+    'find_best_fit',
+    'find_video_id',
+    'friendly_number',
+    'get_kodi_setting',
+    'loose_version',
+    'make_dirs',
+    'merge_dicts',
+    'print_items',
+    'rm_dir',
+    'seconds_to_duration',
+    'select_stream',
+    'strip_html_from_text',
+    'to_str',
+    'to_unicode',
+)
 
 
 def loose_version(v):
@@ -41,50 +56,36 @@ def to_str(text):
     return text
 
 
-def to_utf8(text):
-    result = text
-    if isinstance(text, str):
-        try:
-            result = text.encode('utf-8', 'ignore')
-        except UnicodeDecodeError:
-            pass
-
-    return result
-
-
 def to_unicode(text):
     result = text
-    if isinstance(text, str) or isinstance(text, bytes):
+    if isinstance(text, (bytes, str)):
         try:
             result = text.decode('utf-8', 'ignore')
-        except (AttributeError, UnicodeEncodeError):
+        except (AttributeError, UnicodeError):
             pass
 
     return result
 
 
 def find_best_fit(data, compare_method=None):
+    if isinstance(data, dict):
+        data = data.values()
+
     try:
-        return next(item for item in data if item['container'] == 'mpd')
+        return next(item for item in data if item.get('container') == 'mpd')
     except StopIteration:
         pass
 
-    result = None
+    if not compare_method:
+        return None
 
+    result = None
     last_fit = -1
-    if isinstance(data, dict):
-        for key in list(data.keys()):
-            item = data[key]
-            fit = abs(compare_method(item))
-            if last_fit == -1 or fit < last_fit:
-                last_fit = fit
-                result = item
-    elif isinstance(data, list):
-        for item in data:
-            fit = abs(compare_method(item))
-            if last_fit == -1 or fit < last_fit:
-                last_fit = fit
-                result = item
+    for item in data:
+        fit = abs(compare_method(item))
+        if last_fit == -1 or fit < last_fit:
+            last_fit = fit
+            result = item
 
     return result
 
@@ -99,7 +100,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     ask_for_quality = context.get_settings().ask_for_video_quality() if ask_for_quality is None else ask_for_quality
     video_quality = settings.get_video_quality(quality_map_override=quality_map_override)
     audio_only = audio_only if audio_only is not None else settings.audio_only()
-    adaptive_live = settings.use_adaptive_live_streams() and context.inputstream_adaptive_capabilities('live')
+    adaptive_live = settings.use_isa_live_streams() and context.inputstream_adaptive_capabilities('live')
 
     if not ask_for_quality:
         stream_data_list = [item for item in stream_data_list
@@ -138,13 +139,12 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     def _find_best_fit_video(_stream_data):
         if audio_only:
             return video_quality - _stream_data.get('sort', (0, 0))[0]
-        else:
-            return video_quality - _stream_data.get('video', {}).get('height', 0)
+        return video_quality - _stream_data.get('video', {}).get('height', 0)
 
     sorted_stream_data_list = sorted(stream_data_list, key=_sort_stream_data)
 
     context.log_debug('selectable streams: %d' % len(sorted_stream_data_list))
-    log_streams = list()
+    log_streams = []
     for sorted_stream_data in sorted_stream_data_list:
         log_data = copy.deepcopy(sorted_stream_data)
         if 'license_info' in log_data:
@@ -157,11 +157,12 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 
     selected_stream_data = None
     if ask_for_quality and len(sorted_stream_data_list) > 1:
-        items = list()
-        for sorted_stream_data in sorted_stream_data_list:
-            items.append((sorted_stream_data['title'], sorted_stream_data))
+        items = [
+            (sorted_stream_data['title'], sorted_stream_data)
+            for sorted_stream_data in sorted_stream_data_list
+        ]
 
-        result = context.get_ui().on_select(context.localize(localize.SELECT_VIDEO_QUALITY), items)
+        result = context.get_ui().on_select(context.localize('select_video_quality'), items)
         if result != -1:
             selected_stream_data = result
     else:
@@ -180,14 +181,14 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
 def create_path(*args):
     comps = []
     for arg in args:
-        if isinstance(arg, list):
+        if isinstance(arg, (list, tuple)):
             return create_path(*arg)
 
         comps.append(str(arg.strip('/').replace('\\', '/').replace('//', '/')))
 
     uri_path = '/'.join(comps)
     if uri_path:
-        return u'/%s/' % uri_path
+        return '/%s/' % uri_path
 
     return '/'
 
@@ -195,7 +196,7 @@ def create_path(*args):
 def create_uri_path(*args):
     comps = []
     for arg in args:
-        if isinstance(arg, list):
+        if isinstance(arg, (list, tuple)):
             return create_uri_path(*arg)
 
         comps.append(str(arg.strip('/').replace('\\', '/').replace('//', '/')))
@@ -231,25 +232,108 @@ def print_items(items):
 
 def make_dirs(path):
     if not path.endswith('/'):
-        path = ''.join([path, '/'])
-    path = xbmc.translatePath(path)
-    if not xbmcvfs.exists(path):
+        path = ''.join((path, '/'))
+
+    succeeded = xbmcvfs.exists(path) or xbmcvfs.mkdirs(path)
+    if succeeded:
+        return xbmcvfs.translatePath(path)
+
+    path = xbmcvfs.translatePath(path)
+    try:
+        os.makedirs(path)
+        succeeded = True
+    except OSError:
+        pass
+
+    if succeeded:
+        return path
+    log_error('Failed to create directory: |{0}|'.format(path))
+    return False
+
+
+def rm_dir(path):
+    succeeded = (not xbmcvfs.exists(path)
+                 or xbmcvfs.rmdir(path, force=True))
+    if not succeeded:
+        path = xbmcvfs.translatePath(path)
         try:
-            _ = xbmcvfs.mkdirs(path)
-        except:
+            shutil.rmtree(path)
+            succeeded = not xbmcvfs.exists(path)
+        except OSError:
             pass
-        if not xbmcvfs.exists(path):
-            try:
-                os.makedirs(path)
-            except:
-                pass
-        return xbmcvfs.exists(path)
 
-    return True
-
+    if succeeded:
+        return True
+    log_error('Failed to remove directory: {0}'.format(path))
+    return False
 
 def find_video_id(plugin_path):
     match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', plugin_path)
     if match:
         return match.group('video_id')
     return ''
+
+
+def friendly_number(number, precision=3, scale=('', 'K', 'M', 'B')):
+    _input = float('{input:.{precision}g}'.format(
+        input=float(number), precision=precision
+    ))
+    _abs_input = abs(_input)
+    magnitude = 0 if _abs_input < 1000 else int(log(floor(_abs_input), 1000))
+    return '{output:f}'.format(
+        output=_input / 1000 ** magnitude
+    ).rstrip('0').rstrip('.') + scale[magnitude], _input
+
+
+_RE_PERIODS = re.compile(r'([\d.]+)(d|h|m|s|$)')
+_SECONDS_IN_PERIODS = {
+    '': 1,       # 1 second for unitless period
+    's': 1,      # 1 second
+    'm': 60,     # 1 minute
+    'h': 3600,   # 1 hour
+    'd': 86400,  # 1 day
+}
+
+
+def duration_to_seconds(duration):
+    if ':' in duration:
+        seconds = 0
+        for part in duration.split(':'):
+            seconds = seconds * 60 + (float(part) if '.' in part else int(part))
+        return seconds
+    return sum(
+        (float(number) if '.' in number else int(number))
+        * _SECONDS_IN_PERIODS.get(period, 1)
+        for number, period in re.findall(_RE_PERIODS, duration.lower())
+    )
+
+
+def seconds_to_duration(seconds):
+    return str(timedelta(seconds=seconds))
+
+
+def merge_dicts(item1, item2, templates=None, _=Ellipsis):
+    if not isinstance(item1, dict) or not isinstance(item2, dict):
+        return item1 if item2 is _ else item2
+    new = {}
+    keys = set(item1)
+    keys.update(item2)
+    for key in keys:
+        value = merge_dicts(item1.get(key, _), item2.get(key, _), templates)
+        if value is _:
+            continue
+        if (templates is not None
+                and isinstance(value, str) and '{' in value):
+            templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
+        new[key] = value
+    return new or _
+
+def get_kodi_setting(setting):
+    json_query = xbmc.executeJSONRPC(json.dumps({
+        'jsonrpc': '2.0',
+        'method': 'Settings.GetSettingValue',
+        'params': {'setting': setting},
+        'id': 1,
+    }))
+    json_query = json.loads(json_query)
+    return json_query.get('result', {}).get('value')

@@ -7,28 +7,33 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from base64 import b64decode
-from hashlib import md5
-from ...kodion.json_store import APIKeyStore, LoginTokenStore
-from ...kodion import Context as __Context
+
 from ... import key_sets
+from ...kodion import Context
+from ...kodion.json_store import APIKeyStore, AccessManager
+
 
 DEFAULT_SWITCH = 1
 
-__context = __Context(plugin_id='plugin.video.youtube')
-__settings = __context.get_settings()
-
 
 class APICheck(object):
-
-    def __init__(self, context, settings):
+    def __init__(self, context):
+        settings = context.get_settings()
+        context.send_notification('check_settings', {
+            'use_httpd': settings.use_mpd_videos() or settings.api_config_page(),
+            'httpd_port': settings.httpd_port(),
+            'whitelist': settings.httpd_whitelist(),
+            'httpd_address': settings.httpd_listen()
+        })
         self._context = context
         self._settings = settings
         self._ui = context.get_ui()
         self._api_jstore = APIKeyStore()
         self._json_api = self._api_jstore.get_data()
-        self._am_jstore = LoginTokenStore()
-        self._json_am = self._am_jstore.get_data()
+        self._access_manager = AccessManager(context)
         self.changed = False
 
         self._on_init()
@@ -44,21 +49,21 @@ class APICheck(object):
             # users are now pasting keys into api_keys.json
             # try stripping whitespace and .apps.googleusercontent.com from keys and saving the result if they differ
             stripped_key, stripped_id, stripped_secret = self._strip_api_keys(j_key, j_id, j_secret)
-            if stripped_key and stripped_id and stripped_secret:
-                if (j_key != stripped_key) or (j_id != stripped_id) or (j_secret != stripped_secret):
-                    self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
-                    self._api_jstore.save(self._json_api)
+            if (stripped_key and stripped_id and stripped_secret
+                    and (j_key != stripped_key or j_id != stripped_id or j_secret != stripped_secret)):
+                self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
+                self._api_jstore.save(self._json_api)
 
-        original_key = self._settings.get_string('youtube.api.key')
-        original_id = self._settings.get_string('youtube.api.id')
-        original_secret = self._settings.get_string('youtube.api.secret')
+        original_key = self._settings.api_key()
+        original_id = self._settings.api_id()
+        original_secret = self._settings.api_secret()
         if original_key and original_id and original_secret:
             own_key, own_id, own_secret = self._strip_api_keys(original_key, original_id, original_secret)
             if own_key and own_id and own_secret:
                 if (original_key != own_key) or (original_id != own_id) or (original_secret != own_secret):
-                    self._settings.set_string('youtube.api.key', own_key)
-                    self._settings.set_string('youtube.api.id', own_id)
-                    self._settings.set_string('youtube.api.secret', own_secret)
+                    self._settings.api_key(own_key)
+                    self._settings.api_id(own_id)
+                    self._settings.api_secret(own_secret)
 
                 if (j_key != own_key) or (j_id != own_id) or (j_secret != own_secret):
                     self._json_api['keys']['personal'] = {'api_key': own_key, 'client_id': own_id, 'client_secret': own_secret}
@@ -69,103 +74,81 @@ class APICheck(object):
                 j_id = self._json_api['keys']['personal'].get('client_id', '')
                 j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
-        if not original_key or not original_id or not original_secret and (j_key and j_secret and j_id):
-            self._settings.set_string('youtube.api.key', j_key)
-            self._settings.set_string('youtube.api.id', j_id)
-            self._settings.set_string('youtube.api.secret', j_secret)
+        if (not original_key or not original_id or not original_secret
+                and j_key and j_secret and j_id):
+            self._settings.api_key(j_key)
+            self._settings.api_id(j_id)
+            self._settings.api_secret(j_secret)
 
         switch = self.get_current_switch()
-        user = self.get_current_user()
+        user_details = self._access_manager.get_current_user_details()
+        last_hash = user_details.get('last_key_hash', '')
+        current_set_hash = self._get_key_set_hash(switch)
+        self.changed = current_set_hash != last_hash
 
-        access_token = self._settings.get_string('kodion.access_token', '')
-        refresh_token = self._settings.get_string('kodion.refresh_token', '')
-        token_expires = self._settings.get_int('kodion.access_token.expires', -1)
-        last_hash = self._settings.get_string('youtube.api.last.hash', '')
-        if not self._json_am['access_manager']['users'].get(user, {}).get('access_token') or \
-                not self._json_am['access_manager']['users'].get(user, {}).get('refresh_token'):
-            if access_token and refresh_token:
-                self._json_am['access_manager']['users'][user]['access_token'] = access_token
-                self._json_am['access_manager']['users'][user]['refresh_token'] = refresh_token
-                self._json_am['access_manager']['users'][user]['token_expires'] = token_expires
-                if switch == 'own':
-                    own_key_hash = self._get_key_set_hash('own')
-                    if last_hash == self._get_key_set_hash('own', True) or \
-                            last_hash == own_key_hash:
-                        self._json_am['access_manager']['users'][user]['last_key_hash'] = own_key_hash
-                self._am_jstore.save(self._json_am)
-        if access_token or refresh_token or last_hash:
-            self._settings.set_string('kodion.access_token', '')
-            self._settings.set_string('kodion.refresh_token', '')
-            self._settings.set_int('kodion.access_token.expires', -1)
-            self._settings.set_string('youtube.api.last.hash', '')
-
-        updated_hash = self._api_keys_changed(switch)
-        if updated_hash:
-            self._context.log_warning('User: |%s| Switching API key set to |%s|' % (user, switch))
-            self._json_am['access_manager']['users'][user]['last_key_hash'] = updated_hash
-            self._am_jstore.save(self._json_am)
+        self._context.log_debug('User: |{user}|, '
+                                'Using API key set: |{switch}|'
+                                .format(user=self.get_current_user(),
+                                        switch=switch))
+        if self.changed:
             self._context.log_debug('API key set changed: Signing out')
-            self._context.execute('RunPlugin(plugin://plugin.video.youtube/sign/out/?confirmed=true)')
-        else:
-            self._context.log_debug('User: |%s| Using API key set: |%s|' % (user, switch))
+            self._context.execute('RunPlugin(plugin://plugin.video.youtube/'
+                                  'sign/out/?confirmed=true)')
+            self._access_manager.set_last_key_hash(current_set_hash)
 
-    def get_current_switch(self):
+    @staticmethod
+    def get_current_switch():
         return 'own'
 
     def get_current_user(self):
-        self._json_am = self._am_jstore.get_data()
-        return self._json_am['access_manager'].get('current_user', '0')
+        return self._access_manager.get_current_user()
 
     def has_own_api_keys(self):
         self._json_api = self._api_jstore.get_data()
         own_key = self._json_api['keys']['personal']['api_key']
         own_id = self._json_api['keys']['personal']['client_id']
         own_secret = self._json_api['keys']['personal']['client_secret']
-        return False if not own_key or \
-                        not own_id or \
-                        not own_secret else True
+        return own_key and own_id and own_secret
 
     def get_api_keys(self, switch):
         self._json_api = self._api_jstore.get_data()
+        if switch == 'developer':
+            return self._json_api['keys'][switch]
+
+        decode = True
         if switch == 'youtube-tv':
-            api_key = b64decode(key_sets['youtube-tv']['key']).decode('utf-8'),
-            client_id = u''.join([b64decode(key_sets['youtube-tv']['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
-            client_secret = b64decode(key_sets['youtube-tv']['secret']).decode('utf-8')
-        elif switch == 'developer':
-            self._json_api = self._api_jstore.get_data()
-            return self._json_api['keys']['developer']
+            api_key = key_sets[switch]['key']
+            client_id = key_sets[switch]['id']
+            client_secret = key_sets[switch]['secret']
+
         elif switch == 'own':
+            decode = False
             api_key = self._json_api['keys']['personal']['api_key']
-            client_id = u''.join([self._json_api['keys']['personal']['client_id'], u'.apps.googleusercontent.com'])
+            client_id = self._json_api['keys']['personal']['client_id']
             client_secret = self._json_api['keys']['personal']['client_secret']
+
         else:
-            api_key = b64decode(key_sets['provided'][switch]['key']).decode('utf-8')
-            client_id = u''.join([b64decode(key_sets['provided'][switch]['id']).decode('utf-8'), u'.apps.googleusercontent.com'])
-            client_secret = b64decode(key_sets['provided'][switch]['secret']).decode('utf-8')
-        return api_key, client_id, client_secret
+            api_key = key_sets['provided'][switch]['key']
+            client_id = key_sets['provided'][switch]['id']
+            client_secret = key_sets['provided'][switch]['secret']
 
-    def _api_keys_changed(self, switch):
-        self._json_am = self._am_jstore.get_data()
-        user = self.get_current_user()
-        last_set_hash = self._json_am['access_manager']['users'].get(user, {}).get('last_key_hash', '')
-        current_set_hash = self._get_key_set_hash(switch)
-        if last_set_hash != current_set_hash:
-            self.changed = True
-            return current_set_hash
-        else:
-            self.changed = False
-            return None
+        if decode:
+            api_key = b64decode(api_key).decode('utf-8')
+            client_id = b64decode(client_id).decode('utf-8')
+            client_secret = b64decode(client_secret).decode('utf-8')
 
-    def _get_key_set_hash(self, switch, old=False):
-        api_key, client_id, client_secret = self.get_api_keys(switch)
-        if old and switch == 'own':
-            client_id = client_id.replace(u'.apps.googleusercontent.com', u'')
-        m = md5()
-        m.update(api_key.encode('utf-8'))
-        m.update(client_id.encode('utf-8'))
-        m.update(client_secret.encode('utf-8'))
+        client_id += '.apps.googleusercontent.com'
+        return {'key': api_key,
+                'id': client_id,
+                'secret': client_secret}
 
-        return m.hexdigest()
+    def _get_key_set_hash(self, switch):
+        key_set = self.get_api_keys(switch)
+        if switch == 'own':
+            client_id = key_set['id'].replace('.apps.googleusercontent.com',
+                                              '')
+            key_set['id'] = client_id
+        return self._access_manager.calc_key_hash(**key_set)
 
     def _strip_api_keys(self, api_key, client_id, client_secret):
 
@@ -209,28 +192,11 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-notification_data = {'use_httpd': (__settings.use_mpd_videos() or
-                                   __settings.use_mpd_live_streams()) or
-                                  (__settings.api_config_page()),
-                     'httpd_port': __settings.httpd_port(),
-                     'whitelist': __settings.httpd_whitelist(),
-                     'httpd_address': __settings.httpd_listen()
-                     }
-
-__context.send_notification('check_settings', notification_data)
-
-_api_check = APICheck(__context, __settings)
+_api_check = APICheck(Context())
 
 keys_changed = _api_check.changed
 current_user = _api_check.get_current_user()
 
-api = dict()
-youtube_tv = dict()
-
-_current_switch = _api_check.get_current_switch()
-
-api['key'], api['id'], api['secret'] = _api_check.get_api_keys(_current_switch)
-
-youtube_tv['key'], youtube_tv['id'], youtube_tv['secret'] = _api_check.get_api_keys('youtube-tv')
-
+api = _api_check.get_api_keys(_api_check.get_current_switch())
+youtube_tv = _api_check.get_api_keys('youtube-tv')
 developer_keys = _api_check.get_api_keys('developer')

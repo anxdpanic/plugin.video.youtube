@@ -2,32 +2,43 @@
 """
 
     Copyright (C) 2014-2016 bromix (plugin.video.youtube)
-    Copyright (C) 2016-2018 plugin.video.youtube
+    Copyright (C) 2016-present plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
+from __future__ import absolute_import, division, unicode_literals
+
+import json
+import os
 import random
-import traceback
+import re
+from traceback import format_stack
 
-from json import dumps as json_dumps, loads as json_loads
-from html import unescape
-from urllib.parse import (parse_qs, urlsplit, urlunsplit, urlencode, urljoin,
-                          quote, unquote)
-
-import requests
-import xbmcvfs
-
-from ...kodion.utils import is_httpd_live, make_dirs, DataCache
-from ..youtube_exceptions import YouTubeException
-from .subtitles import Subtitles
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
+from .subtitles import Subtitles
+from ..client.request_client import YouTubeRequestClient
+from ..youtube_exceptions import YouTubeException
+from ...kodion.compatibility import (
+    parse_qs,
+    quote,
+    unescape,
+    unquote,
+    urlencode,
+    urljoin,
+    urlsplit,
+    xbmcvfs,
+)
+from ...kodion.constants import TEMP_PATH, paths
+from ...kodion.network import is_httpd_live
+from ...kodion.utils import make_dirs
 
 
-class VideoInfo(object):
+class VideoInfo(YouTubeRequestClient):
+    BASE_PATH = make_dirs(TEMP_PATH)
+
     FORMAT = {
         # === Non-DASH ===
         '5': {'container': 'flv',
@@ -526,6 +537,14 @@ class VideoInfo(object):
                 'title': 'ac-3@384',
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'encoding': 'ac-3'}},
+        # === HLS
+        '9994': {'container': 'hls',
+                 'sort': [-1080, -1],
+                 'title': 'HLS',
+                 'hls/audio': True,
+                 'hls/video': True,
+                 'audio': {'bitrate': 0, 'encoding': 'aac'},
+                 'video': {'height': 0, 'encoding': 'h.264'}},
         # === Live HLS
         '9995': {'container': 'hls',
                  'Live': True,
@@ -569,248 +588,12 @@ class VideoInfo(object):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
-    CLIENTS = {
-        # 4k no VP9 HDR
-        # Limited subtitle availability
-        'android_testsuite': {
-            '_id': 30,
-            '_query_subtitles': True,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_TESTSUITE',
-                        'clientVersion': '1.9',
-                        'androidSdkVersion': '29',
-                        'osName': 'Android',
-                        'osVersion': '10',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
-            },
-        },
-        'android': {
-            '_id': 3,
-            'json': {
-                'params': 'CgIQBg==',
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID',
-                        'clientVersion': '17.31.35',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
-            },
-        },
-        # Only for videos that allow embedding
-        # Limited to 720p on some videos
-        'android_embedded': {
-            '_id': 55,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '17.36.4',
-                        'clientScreen': 'EMBED',
-                        'androidSdkVersion': '29',
-                        'osName': 'Android',
-                        'osVersion': '10',
-                        'platform': 'MOBILE',
-                    },
-                },
-                'thirdParty': {
-                    'embedUrl': 'https://www.youtube.com/embed/{json[videoId]}',
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
-            },
-        },
-        # 4k with HDR
-        # Some videos block this client, may also require embedding enabled
-        # Limited subtitle availability
-        'android_youtube_tv': {
-            '_id': 29,
-            '_query_subtitles': True,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '6.36',
-                        'androidSdkVersion': '29',
-                        'osName': 'Android',
-                        'osVersion': '10',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.apps.youtube.unplugged/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
-            },
-        },
-        'ios': {
-            '_id': 5,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'IOS',
-                        'clientVersion': '17.33.2',
-                        'deviceModel': 'iPhone14,3',
-                        'osName': 'iOS',
-                        'osVersion': '15_6',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.ios.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' ({json[context][client][deviceModel]};'
-                               ' U; CPU {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}'
-                               ' like Mac OS X)'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
-            },
-        },
-        # Used to requests captions for clients that don't provide them
-        # Requires handling of nsig to overcome throttling (TODO)
-        'smarttv': {
-            '_id': 75,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'TVHTML5_SIMPLY',
-                        'clientVersion': '1.0',
-                    },
-                },
-            },
-            # Headers from a 2022 Samsung Tizen 6.5 based Smart TV
-            'headers': {
-                'User-Agent': ('Mozilla/5.0 (SMART-TV; LINUX; Tizen 6.5)'
-                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                               ' 85.0.4183.93/6.5 TV Safari/537.36'),
-            },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
-        },
-        # Used for misc api requests by default
-        # Requires handling of nsig to overcome throttling (TODO)
-        'web': {
-            '_id': 1,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'WEB',
-                        'clientVersion': '2.20220801.00.00',
-                    },
-                },
-            },
-            # Headers for a "Galaxy S20 Ultra" from Chrome dev tools device
-            # emulation
-            'headers': {
-                'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
-                               ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                               ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}'
-            },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
-        },
-        '_common': {
-            '_access_token': None,
-            'json': {
-                'contentCheckOk': True,
-                'context': {
-                    'client': {
-                        'gl': None,
-                        'hl': None,
-                    },
-                },
-                'playbackContext': {
-                    'contentPlaybackContext': {
-                        'html5Preference': 'HTML5_PREF_WANTS',
-                    },
-                },
-                'racyCheckOk': True,
-                'thirdParty': {},
-                'user': {
-                    'lockedSafetyMode': False
-                },
-                'videoId': None,
-            },
-            'headers': {
-                'Origin': 'https://www.youtube.com',
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}',
-                'Accept-Encoding': 'gzip, deflate',
-                'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-                'Accept': '*/*',
-                'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': 'Bearer {_access_token}',
-            },
-            'params': {
-                'key': None,
-                'prettyPrint': 'false'
-            },
-        },
-    }
-
     def __init__(self, context, access_token='', language='en-US'):
         settings = context.get_settings()
 
         self.video_id = None
         self._context = context
         self._data_cache = self._context.get_data_cache()
-        self._verify = settings.verify_ssl()
         self._language = (settings.get_string('youtube.language', language)
                           .replace('-', '_'))
         self._language_base = self._language[0:2]
@@ -822,30 +605,30 @@ class VideoInfo(object):
         self._selected_client = None
         client_selection = settings.client_selection()
 
-        # All client selections use the Android client as the first option to
-        # ensure that the age gate setting is enforced, regardless of login
-        # status
+        # Default client selection uses the Android or iOS client as the first
+        # option to ensure that the age gate setting is enforced, regardless of
+        # login status
 
         # Alternate #1
-        # Will play most videos with subtitles at full resolution with HDR
-        # Some restricted videos may only play at 720p
-        # Some restricted videos require additional requests for subtitles
+        # Enable iOS client to access premium streams, however other stream
+        # types are limited
         if client_selection == 1:
             self._prioritised_clients = (
+                'ios',
                 'android',
-                'android_embedded',
                 'android_youtube_tv',
                 'android_testsuite',
+                'android_embedded',
             )
         # Alternate #2
-        # Will play most videos at full resolution with HDR
-        # Most videos wont show subtitles
-        # Useful for testing AV1 HDR
+        # Used to bypass age restriction, however streams are obfuscated and
+        # throttled. Useful for testing n-sig de-obfuscation.
         elif client_selection == 2:
             self._prioritised_clients = (
+                'smarttv_embedded',
                 'android',
-                'android_testsuite',
                 'android_youtube_tv',
+                'android_testsuite',
                 'android_embedded',
             )
         # Default
@@ -864,6 +647,8 @@ class VideoInfo(object):
             'gl': settings.get_string('youtube.region', 'US'),
         }
 
+        super(VideoInfo, self).__init__()
+
     @staticmethod
     def _generate_cpn():
         # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1381
@@ -873,80 +658,21 @@ class VideoInfo(object):
         cpn_alphabet = ('abcdefghijklmnopqrstuvwxyz'
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                         '0123456789-_')
-        # Python 2 compatible method
-        # cpn = ''.join(cpn_alphabet[random.randint(0, 63)] for _ in range(16))
-        # return cpn
-        return ''.join(random.choices(cpn_alphabet, k=16))
+        return ''.join(random.choice(cpn_alphabet) for _ in range(16))
 
     def load_stream_infos(self, video_id):
         self.video_id = video_id
         return self._get_video_info()
 
-    def _build_client(self, client_name, auth_header=False):
-        def _merge_dicts(item1, item2):
-            if not isinstance(item1, dict) or not isinstance(item2, dict):
-                return item1 if item2 is ... else item2
-            new = {}
-            for key in (item1.keys() | item2.keys()):
-                value = _merge_dicts(item1.get(key, ...), item2.get(key, ...))
-                if value is ...:
-                    continue
-                if isinstance(value, str) and '{' in value:
-                    _format['{0}.{1}'.format(id(new), key)] = (new, key, value)
-                new[key] = value
-            return new or ...
-        _format = {}
-
-        client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
-        client = _merge_dicts(self.CLIENTS['_common'], client)
-
-        client['json']['videoId'] = self.video_id
-        if auth_header and self._access_token:
-            client['_access_token'] = self._access_token
-            client['params'] = None
-        elif 'Authorization' in client['headers']:
-            del client['headers']['Authorization']
-
-        for values, key, value in _format.values():
-            if key in values:
-                values[key] = value.format(**client)
-
-        return client
-
-    def _request(self, url, method='GET',
-                 cookies=None, data=None, headers=None, json=None, params=None,
-                 error_msg=None, raise_error=False, timeout=(3.05, 27), **_):
-        try:
-            result = requests.request(method, url,
-                                      verify=self._verify,
-                                      allow_redirects=True,
-                                      timeout=timeout,
-                                      cookies=cookies,
-                                      data=data,
-                                      headers=headers,
-                                      json=json,
-                                      params=params)
-            result.raise_for_status()
-        except requests.exceptions.RequestException as error:
-            response = error.response and error.response.text
-            self._context.log_debug('Response: {0}'.format(response))
-            self._context.log_error('{0}\n{1}'.format(
-                error_msg or 'Request failed', traceback.format_exc()
-            ))
-            if raise_error:
-                raise YouTubeException(error_msg) from error
-            return None
-        return result
-
     def _get_player_page(self, client='web', embed=False):
-        client = self._build_client(client)
+        client = self.build_client(client)
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
             url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
-        result = self._request(
+        result = self.request(
             url, cookies=cookies, headers=client['headers'],
             error_msg=('Failed to get player html for video_id: {0}'
                        .format(self.video_id))
@@ -984,17 +710,14 @@ class VideoInfo(object):
         found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page.text)
 
         if found:
-            return json_loads(found.group(1))
+            return json.loads(found.group(1))
         return None
 
     def _get_player_js(self):
-        cached_url = self._data_cache.get_item(
-            DataCache.ONE_HOUR * 4, 'player_js_url'
-        ).get('url', '')
-        if cached_url not in {'', 'http://', 'https://'}:
-            js_url = cached_url
-        else:
-            js_url = None
+        cached = self._data_cache.get_item('player_js_url',
+                                           self._data_cache.ONE_HOUR * 4)
+        cached = cached and cached.get('url', '')
+        js_url = cached if cached not in {'', 'http://', 'https://'} else None
 
         if not js_url:
             player_page = self._get_player_page()
@@ -1014,17 +737,17 @@ class VideoInfo(object):
             return ''
 
         js_url = self._normalize_url(js_url)
-        self._data_cache.set('player_js_url', json_dumps({'url': js_url}))
+        self._data_cache.set_item('player_js_url', {'url': js_url})
 
-        cache_key = quote(js_url)
-        cached_js = self._data_cache.get_item(
-            DataCache.ONE_HOUR * 4, cache_key
-        ).get('js')
-        if cached_js:
-            return cached_js
+        js_cache_key = quote(js_url)
+        cached = self._data_cache.get_item(js_cache_key,
+                                           self._data_cache.ONE_HOUR * 4)
+        cached = cached and cached.get('js')
+        if cached:
+            return cached
 
-        client = self._build_client('web')
-        result = self._request(
+        client = self.build_client('web')
+        result = self.request(
             js_url, headers=client['headers'],
             error_msg=('Failed to get player js for video_id: {0}'
                        .format(self.video_id))
@@ -1033,7 +756,7 @@ class VideoInfo(object):
             return ''
 
         javascript = result.text
-        self._data_cache.set(cache_key, json_dumps({'js': javascript}))
+        self._data_cache.set_item(js_cache_key, {'js': javascript})
         return javascript
 
     @staticmethod
@@ -1061,7 +784,8 @@ class VideoInfo(object):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _load_hls_manifest(self, url, live_type=None, meta_info=None, headers=None, playback_stats=None):
+    def _load_hls_manifest(self, url, live_type=None, meta_info=None,
+                           headers=None, playback_stats=None):
         if not url:
             return []
 
@@ -1070,10 +794,10 @@ class VideoInfo(object):
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self._build_client('web')['headers']
+            headers = self.build_client('web')['headers']
         curl_headers = self._make_curl_headers(headers, cookies=None)
 
-        result = self._request(
+        result = self.request(
             url, headers=headers,
             error_msg=('Failed to get manifest for video_id: {0}'
                        .format(self.video_id))
@@ -1090,14 +814,15 @@ class VideoInfo(object):
         if playback_stats is None:
             playback_stats = {}
 
-        if live_type is None:
-            live_type = self._context.get_settings().get_live_stream_type()
+        yt_format = None
+        if not live_type:
+            yt_format = self.FORMAT['9994']
+        elif live_type == 'hls':
+            yt_format = self.FORMAT['9995']
+        elif live_type == 'isa_hls':
+            yt_format = self.FORMAT['9996']
 
-        if 'hls' in live_type:
-            if live_type == 'hls':
-                yt_format = self.FORMAT['9995']
-            else:
-                yt_format = self.FORMAT['9996']
+        if yt_format:
             stream = {'url': url,
                       'meta': meta_info,
                       'headers': curl_headers,
@@ -1112,7 +837,7 @@ class VideoInfo(object):
         # Capture the URL of a .m3u8 playlist and the itag value from that URL.
         re_playlist_data = re.compile(
             r'#EXT-X-STREAM-INF[^#]+'
-            r'(?P<url>http[^\s]+/itag/(?P<itag>\d+)[^\s]+)'
+            r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
         )
         for match in re_playlist_data.finditer(result.text):
             playlist_url = match.group('url')
@@ -1137,7 +862,7 @@ class VideoInfo(object):
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self._build_client('web')['headers']
+            headers = self.build_client('web')['headers']
         curl_headers = self._make_curl_headers(headers, cookies=None)
 
         if meta_info is None:
@@ -1203,23 +928,22 @@ class VideoInfo(object):
         if not url or not encrypted_signature:
             return None
 
-        signature = self._data_cache.get_item(
-            DataCache.ONE_HOUR * 4, encrypted_signature
-        ).get('sig')
+        signature = self._data_cache.get_item(encrypted_signature,
+                                              self._data_cache.ONE_HOUR * 4)
+        signature = signature and signature.get('sig')
         if not signature:
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
-            except Exception as error:
-                self._context.log_debug('{0}: {1}\n{2}'.format(
-                    error, encrypted_signature, traceback.format_exc()
+            except Exception as exc:
+                self._context.log_error('VideoInfo._process_signature_cipher - '
+                                        'failed to extract URL from |{sig}|\n'
+                                        '{exc}:\n{details}'.format(
+                    sig=encrypted_signature,
+                    exc=exc,
+                    details=''.join(format_stack())
                 ))
-                self._context.log_error(
-                    'Failed to extract URL from signatureCipher'
-                )
                 return None
-            self._data_cache.set(
-                encrypted_signature, json_dumps({'sig': signature})
-            )
+            self._data_cache.set_item(encrypted_signature, {'sig': signature})
 
         if signature:
             url = '{0}&{1}={2}'.format(url, query_var, signature)
@@ -1235,8 +959,7 @@ class VideoInfo(object):
         new_query = {}
         update_url = False
 
-        if (self._calculate_n and 'n' in query
-                and query.get('ratebypass', [None])[0] != 'yes'):
+        if self._calculate_n and 'n' in query:
             self._player_js = self._player_js or self._get_player_js()
             if self._calculate_n is True:
                 self._context.log_debug('nsig detected')
@@ -1260,14 +983,9 @@ class VideoInfo(object):
         elif not update_url:
             return url
 
-        return urlunsplit((parts.scheme,
-                           parts.netloc,
-                           parts.path,
-                           urlencode(query, doseq=True),
-                           parts.fragment))
+        return parts._replace(query=urlencode(query, doseq=True)).geturl()
 
-    @staticmethod
-    def _get_error_details(playability_status, details=None):
+    def _get_error_details(self, playability_status, details=None):
         if not playability_status:
             return None
         if not details:
@@ -1277,26 +995,9 @@ class VideoInfo(object):
                 ('reason', 'title')
             )
 
-        result = playability_status
-        for keys in details:
-            is_dict = isinstance(result, dict)
-            if not is_dict and not isinstance(result, list):
-                return None
+        result = self.json_traverse(playability_status, details)
 
-            if not isinstance(keys, (list, tuple)):
-                keys = [keys]
-            for key in keys:
-                if is_dict:
-                    if key not in result:
-                        continue
-                elif not isinstance(key, int) or len(result) <= key:
-                    continue
-                result = result[key]
-                break
-            else:
-                return None
-
-        if 'runs' not in result:
+        if not result or 'runs' not in result:
             return result
 
         detail_texts = [
@@ -1318,10 +1019,10 @@ class VideoInfo(object):
         playability_status = status = reason = None
         for _ in range(2):
             for client_name in self._prioritised_clients:
-                client = self._build_client(client_name, auth_header)
+                client = self.build_client(client_name, auth_header)
 
-                result = self._request(
-                    video_info_url, 'POST', **client,
+                result = self.request(
+                    video_info_url, 'POST',
                     error_msg=(
                         'Player response failed for video_id: {0},'
                         ' using {1} client ({2})'
@@ -1329,7 +1030,8 @@ class VideoInfo(object):
                                 client_name,
                                 'logged in' if auth_header else 'logged out')
                     ),
-                    raise_error=True
+                    raise_error=True,
+                    **client
                 )
 
                 response = result.json()
@@ -1353,7 +1055,7 @@ class VideoInfo(object):
                     # This is used to check for error like:
                     # "The following content is not available on this app."
                     # Text will vary depending on Accept-Language and client hl
-                    # Youtube support url is checked instead
+                    # YouTube support url is checked instead
                     url = self._get_error_details(
                         playability_status,
                         details=(
@@ -1397,8 +1099,7 @@ class VideoInfo(object):
 
         self._context.log_debug(
             'Retrieved video info for video_id: {0}, using {1} client ({2})'
-            .format(self.video_id,
-                    client['json']['context']['client']['clientName'],
+            .format(self.video_id, client_name,
                     'logged in' if auth_header else 'logged out')
         )
         self._selected_client = client.copy()
@@ -1421,10 +1122,11 @@ class VideoInfo(object):
         if captions:
             captions['headers'] = client['headers']
         elif client.get('_query_subtitles'):
-            result = self._request(
-                video_info_url, 'POST', **self._build_client('smarttv', True),
+            result = self.request(
+                video_info_url, 'POST',
                 error_msg=('Caption request failed to get player response for'
                            'video_id: {0}'.format(self.video_id)),
+                **self.build_client('smarttv_embedded', True)
             )
 
             response = result.json()
@@ -1470,7 +1172,7 @@ class VideoInfo(object):
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
                             .format(self.video_id, is_live)),
             },
-            'subtitles': captions or [],
+            'subtitles': captions,
         }
 
         if _settings.use_remote_history():
@@ -1499,7 +1201,7 @@ class VideoInfo(object):
                 'watchtime_url': '',
             }
 
-        httpd_is_live = (_settings.use_mpd() and
+        httpd_is_live = (_settings.use_isa() and
                          is_httpd_live(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
@@ -1515,9 +1217,10 @@ class VideoInfo(object):
                                     .format(url))
             license_info = {
                 'url': url,
-                'proxy': 'http://{0}:{1}/widevine||R{{SSM}}|'.format(
-                    _settings.httpd_listen(for_request=True),
-                    _settings.httpd_port()
+                'proxy': 'http://{address}:{port}{path}||R{{SSM}}|'.format(
+                    address=_settings.httpd_listen(for_request=True),
+                    port=_settings.httpd_port(),
+                    path=paths.DRM,
                 ),
                 'token': self._access_token,
             }
@@ -1539,23 +1242,33 @@ class VideoInfo(object):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        manifest_url = None
-        if is_live:
-            live_type = _settings.get_live_stream_type()
-            if live_type == 'ia_mpd':
-                manifest_url = streaming_data.get('dashManifestUrl', '')
-            else:
-                stream_list.extend(self._load_hls_manifest(
-                    streaming_data.get('hlsManifestUrl'),
-                    live_type, meta_info, client['headers'], playback_stats
-                ))
-        elif httpd_is_live and adaptive_fmts:
+        manifest_url = main_stream = None
+        live_type = is_live and _settings.get_live_stream_type()
+
+        if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
+            manifest_url = streaming_data['dashManifestUrl']
+        elif 'hlsManifestUrl' in streaming_data:
+            stream_list.extend(self._load_hls_manifest(
+                streaming_data['hlsManifestUrl'],
+                live_type, meta_info, client['headers'], playback_stats
+            ))
+        else:
+            live_type = None
+
+        # extract adaptive streams and create MPEG-DASH manifest
+        if not manifest_url and httpd_is_live and adaptive_fmts:
             video_data, audio_data = self._process_stream_data(
                 adaptive_fmts, default_lang['code']
             )
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
             )
+
+        # extract non-adaptive streams
+        if all_fmts:
+            stream_list.extend(self._create_stream_list(
+                all_fmts, meta_info, client['headers'], playback_stats
+            ))
 
         if manifest_url:
             video_stream = {
@@ -1566,14 +1279,18 @@ class VideoInfo(object):
                 'playback_stats': playback_stats
             }
 
-            if is_live:
+            if live_type:
                 # MPD structure has segments with additional attributes
                 # and url has changed from using a query string to using url params
                 # This breaks the InputStream.Adaptive partial manifest update
-                video_stream['url'] = ('{0}?start_seq=$START_NUMBER$'
-                                       .format(video_stream['url']))
+                if '?' in manifest_url:
+                    video_stream['url'] = manifest_url + '&mpd_version=5'
+                elif manifest_url.endswith('/'):
+                    video_stream['url'] = manifest_url + 'mpd_version/5'
+                else:
+                    video_stream['url'] = manifest_url + '/mpd_version/5'
                 details = self.FORMAT.get('9998')
-            else:
+            elif main_stream:
                 details = self.FORMAT.get('9999').copy()
 
                 video_info = main_stream['video']
@@ -1591,11 +1308,15 @@ class VideoInfo(object):
                         details['title'].append(' [ASR]')
                     if main_stream['multi_lang']:
                         details['title'].extend((
-                            ' [', self._context.localize(30762), ']'
+                            ' [',
+                            self._context.localize('stream.multi_language'),
+                            ']'
                         ))
                     if main_stream['multi_audio']:
                         details['title'].extend((
-                            ' [', self._context.localize(30763), ']'
+                            ' [',
+                            self._context.localize('stream.multi_audio'),
+                            ']'
                         ))
 
                 details['title'] = ''.join(details['title'])
@@ -1603,13 +1324,6 @@ class VideoInfo(object):
             video_stream.update(details)
             stream_list.append(video_stream)
 
-        # extract streams from map
-        if all_fmts:
-            stream_list.extend(self._create_stream_list(
-                all_fmts, meta_info, client['headers'], playback_stats
-            ))
-
-        # last fallback
         if not stream_list:
             raise YouTubeException('No streams found')
 
@@ -1618,10 +1332,11 @@ class VideoInfo(object):
     def _process_stream_data(self, stream_data, default_lang_code='und'):
         _settings = self._context.get_settings()
         qualities = _settings.get_mpd_video_qualities()
-        ia_capabilities = self._context.inputstream_adaptive_capabilities()
+        isa_capabilities = self._context.inputstream_adaptive_capabilities()
         stream_features = _settings.stream_features()
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
+        disable_hfr_max = 'no_hfr_max' in stream_features
         allow_ssa = 'ssa' in stream_features
         stream_select = _settings.stream_select()
 
@@ -1685,7 +1400,7 @@ class VideoInfo(object):
                     codec = 'vp9'
                 elif codec.startswith('dts'):
                     codec = 'dts'
-            if codec not in stream_features or codec not in ia_capabilities:
+            if codec not in stream_features or codec not in isa_capabilities:
                 continue
             media_type, container = mime_type.split('/')
             bitrate = stream.get('bitrate', 0)
@@ -1709,18 +1424,18 @@ class VideoInfo(object):
 
                     if role_type == 4 or audio_track.get('audioIsDefault'):
                         role = 'main'
-                        label = self._context.localize(30744)
+                        label = self._context.localize('stream.original')
                     elif role_type == 3:
                         role = 'dub'
-                        label = self._context.localize(30745)
+                        label = self._context.localize('stream.dubbed')
                     elif role_type == 2:
                         role = 'description'
-                        label = self._context.localize(30746)
+                        label = self._context.localize('stream.descriptive')
                     # Unsure of what other audio types are actually available
                     # Role set to "alternate" as default fallback
                     else:
                         role = 'alternate'
-                        label = self._context.localize(30747)
+                        label = self._context.localize('stream.alternate')
 
                     mime_group = '{0}_{1}.{2}'.format(
                         mime_type, language_code, role_type
@@ -1739,7 +1454,7 @@ class VideoInfo(object):
                     language_code = default_lang_code
                     role = 'main'
                     role_type = 4
-                    label = self._context.localize(30744)
+                    label = self._context.localize('stream.original')
                     mime_group = mime_type
 
                 sample_rate = int(stream.get('audioSampleRate', '0'), 10)
@@ -1776,7 +1491,7 @@ class VideoInfo(object):
                     compare_width = width
                     compare_height = height
 
-                bounded_quality = {}
+                bounded_quality = None
                 for quality in qualities:
                     if compare_width > quality['width']:
                         if bounded_quality:
@@ -1784,7 +1499,10 @@ class VideoInfo(object):
                                 quality = bounded_quality
                             elif compare_height < quality['height']:
                                 quality = qualities[-1]
+                        if fps > 30 and disable_hfr_max:
+                            bounded_quality = None
                         break
+                    disable_hfr_max = disable_hfr_max and not bounded_quality
                     bounded_quality = quality
                 if not bounded_quality:
                     continue
@@ -1797,12 +1515,16 @@ class VideoInfo(object):
                 else:
                     frame_rate = None
 
-                mime_group = mime_type
+                mime_group = '{mime_type}_{codec}{hdr}'.format(
+                    mime_type=mime_type,
+                    codec=codec,
+                    hdr='_hdr' if hdr else ''
+                )
                 channels = language = role = role_type = sample_rate = None
                 label = quality['label'].format(fps if fps > 30 else '',
                                                 ' HDR' if hdr else '',
                                                 compare_height)
-                quality_group = '{0}_{1}'.format(container, label)
+                quality_group = '{0}_{1}_{2}'.format(container, codec, label)
 
             if mime_group not in data:
                 data[mime_group] = {}
@@ -1850,7 +1572,7 @@ class VideoInfo(object):
 
         def _stream_sort(stream):
             if not stream:
-                return (1, )
+                return (1,)
 
             return (
                 - stream['height'],
@@ -1867,7 +1589,7 @@ class VideoInfo(object):
             main_stream = streams[0]
 
             key = (
-                group != main_stream['mimeType'],
+                not group.startswith(main_stream['mimeType']),
             ) if main_stream['mediaType'] == 'video' else (
                 not group.startswith(main_stream['mimeType']),
                 preferred_audio['id'] not in group,
@@ -1892,10 +1614,9 @@ class VideoInfo(object):
         if not video_data or not audio_data:
             return None, None
 
-        basepath = 'special://temp/plugin.video.youtube/'
-        if not make_dirs(basepath):
-            self._context.log_debug('Failed to create temp directory: {0}'
-                                    .format(basepath))
+        if not self.BASE_PATH:
+            self._context.log_error('VideoInfo._generate_mpd_manifest - '
+                                    'unable to access temp directory')
             return None, None
 
         def _filter_group(previous_group, previous_stream, item):
@@ -1954,7 +1675,7 @@ class VideoInfo(object):
             'multi_lang': False,
         }
 
-        out_list = [
+        output = [
             '<?xml version="1.0" encoding="UTF-8"?>\n'
             '<MPD xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"'
                 ' xmlns="urn:mpeg:dash:schema:mpd:2011"'
@@ -1987,7 +1708,8 @@ class VideoInfo(object):
 
             if group.startswith(mime_type) and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
-                    stream['langName'] or self._context.localize(30583),
+                    stream['langName']
+                        or self._context.localize('stream.automatic'),
                     stream['label']
                 )
                 if stream == main_stream[media_type]:
@@ -2017,7 +1739,7 @@ class VideoInfo(object):
             languages.add(language)
             roles.add(role)
 
-            out_list.extend((
+            output.extend((
                 '\t\t<AdaptationSet'
                     ' subsegmentAlignment="true"'
                     ' subsegmentStartsWithSAP="1"'
@@ -2046,7 +1768,7 @@ class VideoInfo(object):
                 license_url = (license_url.replace("&", "&amp;")
                                .replace('"', "&quot;").replace("<", "&lt;")
                                .replace(">", "&gt;"))
-                out_list.extend((
+                output.extend((
                     '\t\t\t<ContentProtection'
                         ' schemeIdUri="http://youtube.com/drm/2012/10/10"'
                         '>\n'
@@ -2060,7 +1782,7 @@ class VideoInfo(object):
 
             num_streams = len(streams)
             if media_type == 'audio':
-                out_list.extend(((
+                output.extend(((
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -2087,7 +1809,7 @@ class VideoInfo(object):
                     quality=(idx + 1), priority=(num_streams - idx), **stream
                 ) for idx, stream in enumerate(streams)))
             elif media_type == 'video':
-                out_list.extend(((
+                output.extend(((
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -2111,26 +1833,33 @@ class VideoInfo(object):
                     quality=(idx + 1), priority=(num_streams - idx), **stream
                 ) for idx, stream in enumerate(streams)))
 
-            out_list.append('\t\t</AdaptationSet>\n')
+            output.append('\t\t</AdaptationSet>\n')
             set_id += 1
 
-        out_list.append('\t</Period>\n'
-                        '</MPD>\n')
-        out = ''.join(out_list)
+        output.append('\t</Period>\n'
+                      '</MPD>\n')
+        output = ''.join(output)
 
         if len(languages.difference({'', 'und'})) > 1:
             main_stream['multi_lang'] = True
         if roles.difference({'', 'main', 'dub'}):
             main_stream['multi_audio'] = True
 
-        filepath = '{0}{1}.mpd'.format(basepath, self.video_id)
-        success = None
-        with xbmcvfs.File(filepath, 'w') as mpd_file:
-            success = mpd_file.write(str(out))
-        if not success:
-            return None, None
-        return 'http://{0}:{1}/{2}.mpd'.format(
-            _settings.httpd_listen(for_request=True),
-            _settings.httpd_port(),
-            self.video_id
-        ), main_stream
+        filename = '.'.join((self.video_id, 'mpd'))
+        filepath = os.path.join(self.BASE_PATH, filename)
+        try:
+            with xbmcvfs.File(filepath, 'w') as mpd_file:
+                success = mpd_file.write(output)
+        except (IOError, OSError):
+            self._context.log_error('VideoInfo._generate_mpd_manifest - '
+                                    'file write failed for: {file}'
+                                    .format(file=filepath))
+            success = False
+        if success:
+            return 'http://{address}:{port}{path}{file}'.format(
+                address=_settings.httpd_listen(for_request=True),
+                port=_settings.httpd_port(),
+                path=paths.MPD,
+                file=filename,
+            ), main_stream
+        return None, None

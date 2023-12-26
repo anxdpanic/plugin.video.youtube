@@ -8,13 +8,15 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
 import timeit
 
-from .impl import Runner
-from .impl import Context
-
 from . import debug
+from .context import Context
+from .plugin import Runner
+
 
 __all__ = ['run']
 
@@ -28,7 +30,7 @@ def run(provider, context=None):
     start_time = timeit.default_timer()
 
     if not context:
-        context = Context(plugin_id='plugin.video.youtube')
+        context = Context()
 
     context.log_debug('Starting Kodion framework by bromix...')
     python_version = 'Unknown version of Python'
@@ -55,7 +57,7 @@ def run(provider, context=None):
 
     context.log_notice('Running: %s (%s) on %s with %s\n\tPath: %s\n\tParams: %s' %
                        (name, addon_version, version, python_version,
-                        context.get_path(), str(context_params)))
+                        context.get_path(), context_params))
 
     __RUNNER__.run(provider, context)
     provider.tear_down(context)

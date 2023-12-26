@@ -8,33 +8,28 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
-import json
 import re
 import threading
-import traceback
 import xml.etree.ElementTree as ET
 
-import requests
-
 from .login_client import LoginClient
-from ..youtube_exceptions import YouTubeException
 from ..helper.video_info import VideoInfo
-from ...kodion import Context
-from ...kodion.utils import datetime_parser
-from ...kodion.utils import to_unicode
-
-_context = Context(plugin_id='plugin.video.youtube')
+from ..youtube_exceptions import InvalidJSON, YouTubeException
+from ...kodion.utils import datetime_parser, strip_html_from_text, to_unicode
 
 
 class YouTube(LoginClient):
-    def __init__(self, config=None, language='en-US', region='US', items_per_page=50, access_token='', access_token_tv=''):
-        if config is None:
-            config = {}
-        LoginClient.__init__(self, config=config, language=language, region=region, access_token=access_token,
-                             access_token_tv=access_token_tv)
+    def __init__(self, context, **kwargs):
+        self._context = context
+        if not kwargs.get('config'):
+            kwargs['config'] = {}
+        if 'items_per_page' in kwargs:
+            self._max_results = kwargs.pop('items_per_page')
 
-        self._max_results = items_per_page
+        super(YouTube, self).__init__(**kwargs)
 
     def get_max_results(self):
         return self._max_results
@@ -69,7 +64,25 @@ class YouTube(LoginClient):
 
         return 'C%s%s%sAA' % (high[high_iteration], low[low_iteration], overflow_token)
 
-    def update_watch_history(self, video_id, url):
+    def update_watch_history(self,
+                             context,
+                             video_id,
+                             url,
+                             st=None,
+                             et=None,
+                             state=None):
+        if None not in (st, et, state):
+            url.format(st=st, et=et, state=state)
+        else:
+            st = et = state = 'N/A'
+
+        context.log_debug('Playback reported [{video_id}]:'
+                          ' {st} segment start,'
+                          ' {et} segment end,'
+                          ' state={state}'.format(
+            video_id=video_id, st=st, et=et, state=state
+        ))
+
         headers = {'Host': 'www.youtube.com',
                    'Connection': 'keep-alive',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
@@ -90,10 +103,8 @@ class YouTube(LoginClient):
         if self._access_token:
             params['access_token'] = self._access_token
 
-        try:
-            _ = requests.get(url, params=params, headers=headers, verify=self._verify, allow_redirects=True)
-        except:
-            _context.log_error('Failed to update watch history |%s|' % traceback.print_exc())
+        self.request(url, params=params, headers=headers,
+                     error_msg='Failed to update watch history')
 
     def get_video_streams(self, context, video_id):
         video_info = VideoInfo(context, access_token=self._access_token_tv,
@@ -139,52 +150,76 @@ class YouTube(LoginClient):
 
         return video_streams
 
-    def remove_playlist(self, playlist_id):
+    def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
                   'mine': 'true'}
-        return self.perform_v3_request(method='DELETE', path='playlists', params=params)
+        return self.perform_v3_request(method='DELETE',
+                                       path='playlists',
+                                       params=params,
+                                       **kwargs)
 
-    def get_supported_languages(self, language=None):
+    def get_supported_languages(self, language=None, **kwargs):
         _language = language
         if not _language:
             _language = self._language
         _language = _language.replace('-', '_')
         params = {'part': 'snippet',
                   'hl': _language}
-        return self.perform_v3_request(method='GET', path='i18nLanguages', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='i18nLanguages',
+                                       params=params,
+                                       **kwargs)
 
-    def get_supported_regions(self, language=None):
+    def get_supported_regions(self, language=None, **kwargs):
         _language = language
         if not _language:
             _language = self._language
         _language = _language.replace('-', '_')
         params = {'part': 'snippet',
                   'hl': _language}
-        return self.perform_v3_request(method='GET', path='i18nRegions', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='i18nRegions',
+                                       params=params,
+                                       **kwargs)
 
-    def rename_playlist(self, playlist_id, new_title, privacy_status='private'):
+    def rename_playlist(self,
+                        playlist_id,
+                        new_title,
+                        privacy_status='private',
+                        **kwargs):
         params = {'part': 'snippet,id,status'}
         post_data = {'kind': 'youtube#playlist',
                      'id': playlist_id,
                      'snippet': {'title': new_title},
                      'status': {'privacyStatus': privacy_status}}
-        return self.perform_v3_request(method='PUT', path='playlists', params=params, post_data=post_data)
+        return self.perform_v3_request(method='PUT',
+                                       path='playlists',
+                                       params=params,
+                                       post_data=post_data,
+                                       **kwargs)
 
-    def create_playlist(self, title, privacy_status='private'):
+    def create_playlist(self, title, privacy_status='private', **kwargs):
         params = {'part': 'snippet,status'}
         post_data = {'kind': 'youtube#playlist',
                      'snippet': {'title': title},
                      'status': {'privacyStatus': privacy_status}}
-        return self.perform_v3_request(method='POST', path='playlists', params=params, post_data=post_data)
+        return self.perform_v3_request(method='POST',
+                                       path='playlists',
+                                       params=params,
+                                       post_data=post_data,
+                                       **kwargs)
 
-    def get_video_rating(self, video_id):
-        if isinstance(video_id, list):
+    def get_video_rating(self, video_id, **kwargs):
+        if not isinstance(video_id, str):
             video_id = ','.join(video_id)
 
         params = {'id': video_id}
-        return self.perform_v3_request(method='GET', path='videos/getRating', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='videos/getRating',
+                                       params=params,
+                                       **kwargs)
 
-    def rate_video(self, video_id, rating='like'):
+    def rate_video(self, video_id, rating='like', **kwargs):
         """
         Rate a video
         :param video_id: if of the video
@@ -193,34 +228,58 @@ class YouTube(LoginClient):
         """
         params = {'id': video_id,
                   'rating': rating}
-        return self.perform_v3_request(method='POST', path='videos/rate', params=params)
+        return self.perform_v3_request(method='POST',
+                                       path='videos/rate',
+                                       params=params,
+                                       **kwargs)
 
-    def add_video_to_playlist(self, playlist_id, video_id):
+    def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
         params = {'part': 'snippet',
                   'mine': 'true'}
         post_data = {'kind': 'youtube#playlistItem',
                      'snippet': {'playlistId': playlist_id,
                                  'resourceId': {'kind': 'youtube#video',
                                                 'videoId': video_id}}}
-        return self.perform_v3_request(method='POST', path='playlistItems', params=params, post_data=post_data)
+        return self.perform_v3_request(method='POST',
+                                       path='playlistItems',
+                                       params=params,
+                                       post_data=post_data,
+                                       **kwargs)
 
     # noinspection PyUnusedLocal
-    def remove_video_from_playlist(self, playlist_id, playlist_item_id):
+    def remove_video_from_playlist(self,
+                                   playlist_id,
+                                   playlist_item_id,
+                                   **kwargs):
         params = {'id': playlist_item_id}
-        return self.perform_v3_request(method='DELETE', path='playlistItems', params=params)
+        return self.perform_v3_request(method='DELETE',
+                                       path='playlistItems',
+                                       params=params,
+                                       **kwargs)
 
-    def unsubscribe(self, subscription_id):
+    def unsubscribe(self, subscription_id, **kwargs):
         params = {'id': subscription_id}
-        return self.perform_v3_request(method='DELETE', path='subscriptions', params=params)
+        return self.perform_v3_request(method='DELETE',
+                                       path='subscriptions',
+                                       params=params,
+                                       **kwargs)
 
-    def subscribe(self, channel_id):
+    def subscribe(self, channel_id, **kwargs):
         params = {'part': 'snippet'}
         post_data = {'kind': 'youtube#subscription',
                      'snippet': {'resourceId': {'kind': 'youtube#channel',
                                                 'channelId': channel_id}}}
-        return self.perform_v3_request(method='POST', path='subscriptions', params=params, post_data=post_data)
+        return self.perform_v3_request(method='POST',
+                                       path='subscriptions',
+                                       params=params,
+                                       post_data=post_data,
+                                       **kwargs)
 
-    def get_subscription(self, channel_id, order='alphabetical', page_token=''):
+    def get_subscription(self,
+                         channel_id,
+                         order='alphabetical',
+                         page_token='',
+                         **kwargs):
         """
 
         :param channel_id: [channel-id|'mine']
@@ -238,9 +297,12 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='subscriptions', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='subscriptions',
+                                       params=params,
+                                       **kwargs)
 
-    def get_guide_category(self, guide_category_id, page_token=''):
+    def get_guide_category(self, guide_category_id, page_token='', **kwargs):
         params = {'part': 'snippet,contentDetails,brandingSettings',
                   'maxResults': str(self._max_results),
                   'categoryId': guide_category_id,
@@ -248,9 +310,12 @@ class YouTube(LoginClient):
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
-        return self.perform_v3_request(method='GET', path='channels', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='channels',
+                                       params=params,
+                                       **kwargs)
 
-    def get_guide_categories(self, page_token=''):
+    def get_guide_categories(self, page_token='', **kwargs):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
@@ -258,9 +323,12 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='guideCategories', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='guideCategories',
+                                       params=params,
+                                       **kwargs)
 
-    def get_popular_videos(self, page_token=''):
+    def get_popular_videos(self, page_token='', **kwargs):
         params = {'part': 'snippet,status',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
@@ -268,9 +336,12 @@ class YouTube(LoginClient):
                   'chart': 'mostPopular'}
         if page_token:
             params['pageToken'] = page_token
-        return self.perform_v3_request(method='GET', path='videos', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='videos',
+                                       params=params,
+                                       **kwargs)
 
-    def get_video_category(self, video_category_id, page_token=''):
+    def get_video_category(self, video_category_id, page_token='', **kwargs):
         params = {'part': 'snippet,contentDetails,status',
                   'maxResults': str(self._max_results),
                   'videoCategoryId': video_category_id,
@@ -279,9 +350,12 @@ class YouTube(LoginClient):
                   'hl': self._language}
         if page_token:
             params['pageToken'] = page_token
-        return self.perform_v3_request(method='GET', path='videos', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='videos',
+                                       params=params,
+                                       **kwargs)
 
-    def get_video_categories(self, page_token=''):
+    def get_video_categories(self, page_token='', **kwargs):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
@@ -289,7 +363,10 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='videoCategories', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='videoCategories',
+                                       params=params,
+                                       **kwargs)
 
     def _get_recommendations_for_home(self):
         # YouTube has deprecated this API, so use history and related items to form
@@ -301,28 +378,27 @@ class YouTube(LoginClient):
             'items': []
         }
 
-        watch_history_id = _context.get_access_manager().get_watch_history_id()
-        if not watch_history_id or watch_history_id == 'HL':
+        history_id = self._context.get_access_manager().get_watch_history_id()
+        if not history_id or history_id == 'HL':
             return payload
 
-        cache = _context.get_data_cache()
+        cache = self._context.get_data_cache()
 
         # Do we have a cached result?
         cache_home_key = 'get-activities-home'
-        cached = cache.get_item(cache.ONE_HOUR * 4, cache_home_key)
-        if cache_home_key in cached and cached[cache_home_key].get('items'):
-            return cached[cache_home_key]
+        cached = cache.get_item(cache_home_key, cache.ONE_HOUR * 4)
+        cached = cached and cached.get('items')
+        if cached:
+            return cached
 
         # Fetch existing list of items, if any
-        items = []
         cache_items_key = 'get-activities-home-items'
-        cached = cache.get_item(cache.ONE_WEEK * 2, cache_items_key)
-        if cache_items_key in cached:
-            items = cached[cache_items_key]
+        cached = cache.get_item(cache_items_key, cache.ONE_WEEK * 2)
+        items = cached if cached else []
 
         # Fetch history and recommended items. Use threads for faster execution.
         def helper(video_id, responses):
-            _context.log_debug(
+            self._context.log_debug(
                 'Method get_activities: doing expensive API fetch for related'
                 'items for video %s' % video_id
             )
@@ -333,7 +409,7 @@ class YouTube(LoginClient):
                     item['plugin_fetched_for'] = video_id
                 responses.extend(di['items'])
 
-        history = self.get_playlist_items(watch_history_id, max_results=50)
+        history = self.get_playlist_items(history_id, max_results=50)
 
         if not history.get('items'):
             return payload
@@ -368,7 +444,7 @@ class YouTube(LoginClient):
 
         # Truncate items to keep it manageable, and cache
         items = items[:500]
-        cache.set(cache_items_key, json.dumps(items))
+        cache.set_item(cache_items_key, items)
 
         # Build the result set
         items.sort(
@@ -398,7 +474,7 @@ class YouTube(LoginClient):
             channel_counts.setdefault(channel_id, 0)
             if channel_counts[channel_id] <= 3:
                 # Use the item
-                channel_counts[channel_id] = channel_counts[channel_id] + 1
+                channel_counts[channel_id] += 1
                 item["page_number"] = counter // 50
                 sorted_items.append(item)
             else:
@@ -406,15 +482,13 @@ class YouTube(LoginClient):
                 items.append(item)
 
         # Finally sort items per page by date for a better distribution
-        now = datetime_parser.now()
-        sorted_items.sort(
-            key=lambda a: (
-                a['page_number'],
-                datetime_parser.total_seconds(
-                    now - datetime_parser.parse(a['snippet']['publishedAt'])
-                )
-            ),
-        )
+        def _sort_by_date_time(item):
+            return (item['page_number'],
+                    -datetime_parser.since_epoch(datetime_parser.parse(
+                        item['snippet']['publishedAt']
+                    )))
+
+        sorted_items.sort(key=_sort_by_date_time)
 
         # Finalize result
         payload['items'] = sorted_items
@@ -427,12 +501,12 @@ class YouTube(LoginClient):
         }
         """
         # Update cache
-        cache.set(cache_home_key, json.dumps(payload))
+        cache.set_item(cache_home_key, payload)
 
         # If there are no sorted_items we fall back to default API behaviour
         return payload
 
-    def get_activities(self, channel_id, page_token=''):
+    def get_activities(self, channel_id, page_token='', **kwargs):
         params = {'part': 'snippet,contentDetails',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
@@ -451,9 +525,12 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='activities', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='activities',
+                                       params=params,
+                                       **kwargs)
 
-    def get_channel_sections(self, channel_id):
+    def get_channel_sections(self, channel_id, **kwargs):
         params = {'part': 'snippet,contentDetails',
                   'regionCode': self._region,
                   'hl': self._language}
@@ -461,9 +538,12 @@ class YouTube(LoginClient):
             params['mine'] = 'true'
         else:
             params['channelId'] = channel_id
-        return self.perform_v3_request(method='GET', path='channelSections', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='channelSections',
+                                       params=params,
+                                       **kwargs)
 
-    def get_playlists_of_channel(self, channel_id, page_token=''):
+    def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
         params = {'part': 'snippet',
                   'maxResults': str(self._max_results)}
         if channel_id != 'mine':
@@ -473,7 +553,10 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='playlists', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='playlists',
+                                       params=params,
+                                       **kwargs)
 
     def get_playlist_item_id_of_video_id(self, playlist_id, video_id, page_token=''):
         old_max_results = self._max_results
@@ -495,7 +578,11 @@ class YouTube(LoginClient):
 
         return None
 
-    def get_playlist_items(self, playlist_id, page_token='', max_results=None):
+    def get_playlist_items(self,
+                           playlist_id,
+                           page_token='',
+                           max_results=None,
+                           **kwargs):
         # prepare params
         max_results = str(self._max_results) if max_results is None else str(max_results)
         params = {'part': 'snippet',
@@ -504,9 +591,12 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='playlistItems', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='playlistItems',
+                                       params=params,
+                                       **kwargs)
 
-    def get_channel_by_username(self, username):
+    def get_channel_by_username(self, username, **kwargs):
         """
         Returns a collection of zero or more channel resources that match the request criteria.
         :param username: retrieve channel_id for username
@@ -514,19 +604,22 @@ class YouTube(LoginClient):
         """
         params = {'part': 'id'}
         if username == 'mine':
-            params.update({'mine': 'true'})
+            params['mine'] = True
         else:
-            params.update({'forUsername': username})
+            params['forUsername'] = username
 
-        return self.perform_v3_request(method='GET', path='channels', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='channels',
+                                       params=params,
+                                       **kwargs)
 
-    def get_channels(self, channel_id):
+    def get_channels(self, channel_id, **kwargs):
         """
         Returns a collection of zero or more channel resources that match the request criteria.
         :param channel_id: list or comma-separated list of the YouTube channel ID(s)
         :return:
         """
-        if isinstance(channel_id, list):
+        if not isinstance(channel_id, str):
             channel_id = ','.join(channel_id)
 
         params = {'part': 'snippet,contentDetails,brandingSettings'}
@@ -534,9 +627,12 @@ class YouTube(LoginClient):
             params['id'] = channel_id
         else:
             params['mine'] = 'true'
-        return self.perform_v3_request(method='GET', path='channels', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='channels',
+                                       params=params,
+                                       **kwargs)
 
-    def get_disliked_videos(self, page_token=''):
+    def get_disliked_videos(self, page_token='', **kwargs):
         # prepare page token
         if not page_token:
             page_token = ''
@@ -548,37 +644,50 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='videos', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='videos',
+                                       params=params,
+                                       **kwargs)
 
-    def get_videos(self, video_id, live_details=False):
+    def get_videos(self, video_id, live_details=False, **kwargs):
         """
         Returns a list of videos that match the API request parameters
         :param video_id: list of video ids
         :param live_details: also retrieve liveStreamingDetails
         :return:
         """
-        if isinstance(video_id, list):
+        if not isinstance(video_id, str):
             video_id = ','.join(video_id)
 
-        parts = ['snippet,contentDetails,status']
+        parts = ['snippet', 'contentDetails', 'status', 'statistics']
         if live_details:
-            parts.append(',liveStreamingDetails')
+            parts.append('liveStreamingDetails')
 
-        params = {'part': ''.join(parts),
+        params = {'part': ','.join(parts),
                   'id': video_id}
-        return self.perform_v3_request(method='GET', path='videos', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='videos',
+                                       params=params,
+                                       **kwargs)
 
-    def get_playlists(self, playlist_id):
-        if isinstance(playlist_id, list):
+    def get_playlists(self, playlist_id, **kwargs):
+        if not isinstance(playlist_id, str):
             playlist_id = ','.join(playlist_id)
 
         params = {'part': 'snippet,contentDetails',
                   'id': playlist_id}
-        return self.perform_v3_request(method='GET', path='playlists', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='playlists',
+                                       params=params,
+                                       **kwargs)
 
-    def get_live_events(self, event_type='live', order='relevance', page_token='', location=False):
+    def get_live_events(self,
+                        event_type='live',
+                        order='relevance',
+                        page_token='',
+                        location=False,
+                        **kwargs):
         """
-
         :param event_type: one of: 'live', 'completed', 'upcoming'
         :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
         :param page_token:
@@ -600,17 +709,25 @@ class YouTube(LoginClient):
                   'maxResults': str(self._max_results)}
 
         if location:
-            location = _context.get_settings().get_location()
+            settings = self._context.get_settings()
+            location = settings.get_location()
             if location:
                 params['location'] = location
-                params['locationRadius'] = _context.get_settings().get_location_radius()
+                params['locationRadius'] = settings.get_location_radius()
 
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='search', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='search',
+                                       params=params,
+                                       **kwargs)
 
-    def get_related_videos(self, video_id, page_token='', max_results=0):
+    def get_related_videos(self,
+                           video_id,
+                           page_token='',
+                           max_results=0,
+                           **kwargs):
         # prepare page token
         if not page_token:
             page_token = ''
@@ -627,9 +744,16 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='search', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='search',
+                                       params=params,
+                                       **kwargs)
 
-    def get_parent_comments(self, video_id, page_token='', max_results=0):
+    def get_parent_comments(self,
+                            video_id,
+                            page_token='',
+                            max_results=0,
+                            **kwargs):
         max_results = self._max_results if max_results <= 0 else max_results
 
         # prepare params
@@ -641,9 +765,17 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='commentThreads', params=params, no_login=True)
+        return self.perform_v3_request(method='GET',
+                                       path='commentThreads',
+                                       params=params,
+                                       no_login=True,
+                                       **kwargs)
 
-    def get_child_comments(self, parent_id, page_token='', max_results=0):
+    def get_child_comments(self,
+                           parent_id,
+                           page_token='',
+                           max_results=0,
+                           **kwargs):
         max_results = self._max_results if max_results <= 0 else max_results
 
         # prepare params
@@ -654,9 +786,13 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='comments', params=params, no_login=True)
+        return self.perform_v3_request(method='GET',
+                                       path='comments',
+                                       params=params,
+                                       no_login=True,
+                                       **kwargs)
 
-    def get_channel_videos(self, channel_id, page_token=''):
+    def get_channel_videos(self, channel_id, page_token='', **kwargs):
         """
         Returns a collection of video search results for the specified channel_id
         """
@@ -676,10 +812,21 @@ class YouTube(LoginClient):
         if page_token:
             params['pageToken'] = page_token
 
-        return self.perform_v3_request(method='GET', path='search', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='search',
+                                       params=params,
+                                       **kwargs)
 
-    def search(self, q, search_type=None, event_type='', channel_id='',
-               order='relevance', safe_search='moderate', page_token='', location=False):
+    def search(self,
+               q,
+               search_type=None,
+               event_type='',
+               channel_id='',
+               order='relevance',
+               safe_search='moderate',
+               page_token='',
+               location=False,
+               **kwargs):
         """
         Returns a collection of search results that match the query parameters specified in the API request. By default,
         a search result set identifies matching video, channel, and playlist resources, but you can also configure
@@ -701,7 +848,7 @@ class YouTube(LoginClient):
         # prepare search type
         if not search_type:
             search_type = ''
-        if isinstance(search_type, list):
+        if not isinstance(search_type, str):
             search_type = ','.join(search_type)
 
         # prepare page token
@@ -738,14 +885,18 @@ class YouTube(LoginClient):
                 break
 
         if params['type'] == 'video' and location:
-            location = _context.get_settings().get_location()
+            settings = self._context.get_settings()
+            location = settings.get_location()
             if location:
                 params['location'] = location
-                params['locationRadius'] = _context.get_settings().get_location_radius()
+                params['locationRadius'] = settings.get_location_radius()
 
-        return self.perform_v3_request(method='GET', path='search', params=params)
+        return self.perform_v3_request(method='GET',
+                                       path='search',
+                                       params=params,
+                                       **kwargs)
 
-    def get_my_subscriptions(self, page_token=None, offset=0):
+    def get_my_subscriptions(self, page_token=None, offset=0, **kwargs):
         """
         modified by PureHemp, using YouTube RSS for fetching latest videos
         """
@@ -766,16 +917,16 @@ class YouTube(LoginClient):
                     'items': []
                 }
 
-            cache = _context.get_data_cache()
+            cache = self._context.get_data_cache()
 
             # if new uploads is cached
             cache_items_key = 'my-subscriptions-items'
-            cached = cache.get_item(cache.ONE_HOUR, cache_items_key)
-            if cache_items_key in cached:
-                _result['items'] = cached[cache_items_key]
+            cached = cache.get_item(cache_items_key, cache.ONE_HOUR)
+            if cached:
+                _result['items'] = cached
 
             """ no cache, get uploads data from web """
-            if len(_result['items']) == 0:
+            if not _result['items']:
                 # get all subscriptions channel ids
                 sub_page_token = True
                 sub_channel_ids = []
@@ -794,19 +945,22 @@ class YouTube(LoginClient):
                     if sub_page_token:
                         params['pageToken'] = sub_page_token
 
-                    sub_json_data = self.perform_v3_request(method='GET', path='subscriptions', params=params)
+                    json_data = self.perform_v3_request(method='GET',
+                                                        path='subscriptions',
+                                                        params=params,
+                                                        **kwargs)
 
-                    if not sub_json_data:
-                        sub_json_data = {}
+                    if not json_data:
+                        json_data = {}
 
-                    items = sub_json_data.get('items', [])
+                    items = json_data.get('items', [])
 
                     for item in items:
                         item = item.get('snippet', {}).get('resourceId', {}).get('channelId', '')
                         sub_channel_ids.append(item)
 
                     # get next token if exists
-                    sub_page_token = sub_json_data.get('nextPageToken', '')
+                    sub_page_token = json_data.get('nextPageToken', '')
 
                     # terminate loop when last page
                     if not sub_page_token:
@@ -822,22 +976,12 @@ class YouTube(LoginClient):
                     'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
                 }
 
-                session = requests.Session()
-                session.headers = headers
-                session.verify = self._verify
-                adapter = requests.adapters.HTTPAdapter(pool_maxsize=5, pool_block=True)
-                session.mount("https://", adapter)
                 responses = []
 
                 def fetch_xml(_url, _responses):
-                    try:
-                        _response = session.get(_url, timeout=(3.05, 27))
-                        _response.raise_for_status()
-                    except requests.exceptions.RequestException as error:
-                        _context.log_debug('Response: {0}'.format(error.response and error.response.text))
-                        _context.log_error('Failed |%s|' % traceback.print_exc())
-                        return
-                    _responses.append(_response)
+                    _response = self.request(_url, headers=headers)
+                    if _response:
+                        _responses.append(_response)
 
                 threads = []
                 for channel_id in sub_channel_ids:
@@ -851,7 +995,6 @@ class YouTube(LoginClient):
 
                 for thread in threads:
                     thread.join(30)
-                session.close()
 
                 for response in responses:
                     if response:
@@ -876,15 +1019,15 @@ class YouTube(LoginClient):
                             _result['items'].append(entry_data)
 
                 # sorting by publish date
-                def _sort_by_date_time(e):
+                def _sort_by_date_time(item):
                     return datetime_parser.since_epoch(
-                        datetime_parser.strptime(e["published"][0:19], "%Y-%m-%dT%H:%M:%S")
+                        datetime_parser.strptime(item['published'][0:19])
                     )
 
                 _result['items'].sort(reverse=True, key=_sort_by_date_time)
 
                 # Update cache
-                cache.set(cache_items_key, json.dumps(_result['items']))
+                cache.set_item(cache_items_key, _result['items'])
             """ no cache, get uploads data from web """
 
             # trim result
@@ -1045,44 +1188,80 @@ class YouTube(LoginClient):
 
         return result
 
-    def _request(self, url, method='GET',
-                 cookies=None, data=None, headers=None, json=None, params=None,
-                 error_msg=None, raise_error=False, timeout=(3.05, 27), **_):
+    def _response_hook(self, **kwargs):
+        response = kwargs['response']
+        self._context.log_debug('[data] v3 response: |{0.status_code}|\n'
+                                '\theaders: |{0.headers}|'.format(response))
         try:
-            result = requests.request(method, url,
-                                      verify=self._verify,
-                                      allow_redirects=True,
-                                      timeout=timeout,
-                                      cookies=cookies,
-                                      data=data,
-                                      headers=headers,
-                                      json=json,
-                                      params=params)
-            result.raise_for_status()
-        except requests.exceptions.RequestException as error:
-            response = error.response and error.response.text
-            _context.log_debug('Response: {0}'.format(response))
-            _context.log_error('{0}\n{1}'.format(
-                error_msg or 'Request failed', traceback.format_exc()
-            ))
-            if raise_error:
-                raise YouTubeException(error_msg) from error
-            return None
-        return result
+            json_data = response.json()
+            if 'error' in json_data:
+                raise YouTubeException('"error" in response JSON data',
+                                       json_data=json_data,
+                                       **kwargs)
+        except ValueError as exc:
+            raise InvalidJSON(exc, **kwargs)
+        response.raise_for_status()
+        return json_data
+
+    def _error_hook(self, **kwargs):
+        exc = kwargs['exc']
+        json_data = getattr(exc, 'json_data', None)
+        data = getattr(exc, 'pass_data', False) and json_data
+        exception = getattr(exc, 'raise_exc', False) and YouTubeException
+
+        if not json_data or 'error' not in json_data:
+            return None, None, None, data, None, exception
+
+        details = json_data['error']
+        reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
+        message = strip_html_from_text(details.get('message', 'Unknown error'))
+
+        notify = getattr(exc, 'notify', True)
+        if notify:
+            ok_dialog = False
+            timeout = 5000
+            if reason == 'accessNotConfigured':
+                notification = self._context.localize('key.requirement')
+                ok_dialog = True
+            elif reason == 'keyInvalid' and message == 'Bad Request':
+                notification = self._context.localize('api.key.incorrect')
+                timeout = 7000
+            elif reason in ('quotaExceeded', 'dailyLimitExceeded'):
+                notification = message
+                timeout = 7000
+            else:
+                notification = message
+
+            title = '{0}: {1}'.format(self._context.get_name(), reason)
+            if ok_dialog:
+                self._context.get_ui().on_ok(title, notification)
+            else:
+                self._context.get_ui().show_notification(notification,
+                                                         title,
+                                                         time_ms=timeout)
+
+        info = ('[data] v3 error: {reason}\n'
+                '\texc: |{exc}|\n'
+                '\tmessage: |{message}|')
+        details = {'reason': reason, 'message': message}
+        return '', info, details, data, False, exception
 
     def perform_v3_request(self, method='GET', headers=None, path=None,
-                           post_data=None, params=None, no_login=False):
-
+                           post_data=None, params=None, no_login=False,
+                           **kwargs):
         # params
         _params = {}
 
         # headers
         _headers = {'Host': 'www.googleapis.com',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64)'
+                                  ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                                  ' Chrome/39.0.2171.36 Safari/537.36',
                     'Accept-Encoding': 'gzip, deflate'}
 
         # a config can decide if a token is allowed
-        if self._access_token and self._config.get('token-allowed', True) and not no_login:
+        if (not no_login and self._access_token
+                and self._config.get('token-allowed', True)):
             _headers['Authorization'] = 'Bearer %s' % self._access_token
         else:
             _params['key'] = self._config_tv['key']
@@ -1099,23 +1278,27 @@ class YouTube(LoginClient):
                 log_params['location'] = 'xx.xxxx,xx.xxxx'
         else:
             log_params = None
-        _context.log_debug('[data] v3 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
 
-        result = self._request(_url, method=method, headers=_headers, json=post_data, params=_params)
-        if result is None:
-            return {}
+        self._context.log_debug('[data] v3 request: |{method}|\n'
+                                '\tpath: |{path}|\n'
+                                '\tparams: |{params}|\n'
+                                '\tpost_data: |{data}|\n'
+                                '\theaders: |{headers}|'
+                                .format(method=method,
+                                        path=path,
+                                        params=log_params,
+                                        data=post_data,
+                                        headers=_headers))
 
-        _context.log_debug('[data] v3 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
-
-        if result.headers.get('content-type', '').startswith('application/json'):
-            try:
-                return result.json()
-            except ValueError:
-                return {
-                    'status_code': result.status_code,
-                    'payload': result.text
-                }
-        return {}
+        json_data = self.request(_url,
+                                 method=method,
+                                 headers=_headers,
+                                 json=post_data,
+                                 params=_params,
+                                 response_hook=self._response_hook,
+                                 response_hook_kwargs=kwargs,
+                                 error_hook=self._error_hook)
+        return json_data
 
     def perform_v1_tv_request(self, method='GET', headers=None, path=None,
                               post_data=None, params=None, no_login=False):
@@ -1151,15 +1334,30 @@ class YouTube(LoginClient):
                 log_params['location'] = 'xx.xxxx,xx.xxxx'
         else:
             log_params = None
-        _context.log_debug('[data] v1 request: |{0}| path: |{1}| params: |{2}| post_data: |{3}|'.format(method, path, log_params, post_data))
+        self._context.log_debug('[data] v1 request: |{method}|\n'
+                                '\tpath: |{path}|\n'
+                                '\tparams: |{params}|\n'
+                                '\tpost_data: |{data}|\n'
+                                '\theaders: |{headers}|'
+                                .format(method=method,
+                                        path=path,
+                                        params=log_params,
+                                        data=post_data,
+                                        headers=_headers))
 
-        result = self._request(_url, method=method, headers=_headers, json=post_data, params=_params)
+        result = self.request(_url,
+                              method=method,
+                              headers=_headers,
+                              json=post_data,
+                              params=_params)
         if result is None:
             return {}
 
-        _context.log_debug('[data] v1 response: |{0}| headers: |{1}|'.format(result.status_code, result.headers))
+        self._context.log_debug('[data] v1 response: |{0.status_code}|\n'
+                                '\theaders: |{0.headers}|'.format(result))
 
-        if result.headers.get('content-type', '').startswith('application/json'):
+        result_type = result.headers.get('content-type')
+        if result_type and result_type.startswith('application/json'):
             try:
                 return result.json()
             except ValueError:

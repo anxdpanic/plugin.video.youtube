@@ -8,21 +8,25 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from .directory_item import DirectoryItem
-from .. import constants
+from ..constants import paths
 
 
 class FavoritesItem(DirectoryItem):
-    def __init__(self, context, alt_name=None, image=None, fanart=None):
-        name = alt_name
+    def __init__(self, context, name=None, image=None, fanart=None):
         if not name:
-            name = context.localize(constants.localize.FAVORITES)
+            name = context.localize('favorites')
 
         if image is None:
-            image = context.create_resource_path('media/favorites.png')
+            image = '{media}/favorites.png'
 
-        DirectoryItem.__init__(self, name, context.create_uri([constants.paths.FAVORITES, 'list']), image=image)
+        super(FavoritesItem, self).__init__(name,
+                                            context.create_uri(
+                                                [paths.FAVORITES, 'list']
+                                            ),
+                                            image=image)
+
         if fanart:
             self.set_fanart(fanart)
-        else:
-            self.set_fanart(context.get_fanart())
