@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import time
 from datetime import datetime
 
 from .context import Context
@@ -19,39 +18,7 @@ from .utils import PlayerMonitor, ServiceMonitor, rm_dir
 from ..youtube.provider import Provider
 
 
-def strptime(stamp, stamp_fmt):
-    # noinspection PyUnresolvedReferences
-    import _strptime
-    try:
-        time.strptime('01 01 2012', '%d %m %Y')  # dummy call
-    except:
-        pass
-    return time.strptime(stamp, stamp_fmt)
-
-
-def get_stamp_diff(current_stamp):
-    stamp_format = '%Y-%m-%d %H:%M:%S.%f'
-    current_datetime = datetime.now()
-    if not current_stamp:
-        return 86400  # 24 hrs
-    try:
-        stamp_datetime = datetime(*(strptime(current_stamp, stamp_format)[0:6]))
-    except ValueError:  # current_stamp has no microseconds
-        stamp_format = '%Y-%m-%d %H:%M:%S'
-        stamp_datetime = datetime(*(strptime(current_stamp, stamp_format)[0:6]))
-
-    time_delta = current_datetime - stamp_datetime
-    if time_delta:
-        return time_delta.total_seconds()
-    return 0
-
-
 def run():
-    sleep_time = 10
-    ping_delay_time = 60
-    ping_timestamp = None
-    first_run = True
-
     context = Context()
 
     context.log_debug('YouTube service initialization...')
@@ -71,18 +38,16 @@ def run():
 
     context.get_ui().clear_property('abort_requested')
 
+    sleep_time = 10
+    ping_delay = 60
+    ping_time = None
     while not monitor.abortRequested():
-
-        ping_diff = get_stamp_diff(ping_timestamp)
-
-        if (ping_timestamp is None) or (ping_diff >= ping_delay_time):
-            ping_timestamp = str(datetime.now())
+        now = datetime.now()
+        if not ping_time or (ping_time - now).total_seconds() >= ping_delay:
+            ping_time = now
 
             if monitor.httpd and not monitor.ping_httpd():
                 monitor.restart_httpd()
-
-        if first_run:
-            first_run = False
 
         if monitor.waitForAbort(sleep_time):
             break

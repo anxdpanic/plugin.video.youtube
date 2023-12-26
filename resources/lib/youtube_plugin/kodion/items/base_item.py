@@ -62,10 +62,28 @@ class BaseItem(object):
     def dumps(self):
         def _encoder(obj):
             if isinstance(obj, (date, datetime)):
+                class_name = obj.__class__.__name__
+
+                if 'fromisoformat' in dir(obj):
+                    return {
+                        '__class__': class_name,
+                        '__isoformat__': obj.isoformat(),
+                    }
+
+                if class_name == 'datetime':
+                    if obj.tzinfo:
+                        format_string = '%Y-%m-%dT%H:%M:%S%z'
+                    else:
+                        format_string = '%Y-%m-%dT%H:%M:%S'
+                else:
+                    format_string = '%Y-%m-%d'
+
                 return {
-                    '__class__': obj.__class__.__name__,
-                    '__isoformat__': obj.isoformat(),
+                    '__class__': class_name,
+                    '__format_string__': format_string,
+                    '__value__': obj.strftime(format_string)
                 }
+
             return json.JSONEncoder().default(obj)
 
         return json.dumps(self.to_dict(), ensure_ascii=False, default=_encoder)

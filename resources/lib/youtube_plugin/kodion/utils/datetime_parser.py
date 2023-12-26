@@ -11,8 +11,9 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import re
-import time
 from datetime import date, datetime, time as dt_time, timedelta
+from importlib import import_module
+from sys import modules
 
 from ..exceptions import KodionException
 
@@ -175,22 +176,18 @@ def datetime_to_since(context, dt):
     return ' '.join((context.format_date_short(dt), context.format_time(dt)))
 
 
-def strptime(s, fmt='%Y-%m-%dT%H:%M:%S'):
-    # noinspection PyUnresolvedReferences
-
-    ms_precision_required = '.' in s[-5:-1]
-    if ms_precision_required:
+def strptime(datetime_str, fmt='%Y-%m-%dT%H:%M:%S'):
+    if '.' in datetime_str[-5:]:
         fmt.replace('%S', '%S.%f')
     else:
         fmt.replace('%S.%f', '%S')
 
-    import _strptime
+    if not datetime.strptime:
+        if '_strptime' in modules:
+            del modules['_strptime']
+        modules['_strptime'] = import_module('_strptime')
 
-    try:
-        time.strptime('01 01 2012', '%d %m %Y')  # dummy call
-    except:
-        pass
-    return datetime(*time.strptime(s, fmt)[:6])
+    return datetime.strptime(datetime_str, fmt)
 
 
 def since_epoch(dt_object):
