@@ -337,7 +337,7 @@ class Storage(object):
             self._execute(cursor, 'BEGIN')
             if optimize_query:
                 self._execute(cursor, optimize_query)
-            self._execute(cursor, query, many=not flatten, values=values)
+            self._execute(cursor, query, many=(not flatten), values=values)
         self._optimize_file_size()
 
     def clear(self, defer=False):
@@ -372,7 +372,9 @@ class Storage(object):
         blob = sqlite3.Binary(pickle.dumps(
             obj, protocol=pickle.HIGHEST_PROTOCOL
         ))
-        size = getattr(blob, 'nbytes', None) or blob.itemsize * len(blob)
+        size = getattr(blob, 'nbytes', None)
+        if not size:
+            size = int(memoryview(blob).itemsize) * len(blob)
         return str(key), timestamp, blob, size
 
     def _get(self, item_id, process=None, seconds=None):
