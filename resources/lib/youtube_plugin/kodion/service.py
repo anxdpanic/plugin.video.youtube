@@ -14,7 +14,8 @@ import time
 from datetime import datetime
 
 from .context import Context
-from .utils import PlayerMonitor, ServiceMonitor
+from .constants import TEMP_PATH
+from .utils import PlayerMonitor, ServiceMonitor, rm_dir
 from ..youtube.provider import Provider
 
 
@@ -59,7 +60,7 @@ def run():
     player = PlayerMonitor(provider=Provider(), context=context)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
-    monitor.remove_temp_dir()
+    rm_dir(TEMP_PATH)
 
     # wipe function cache on updates/restarts (fix cipher related issues on update, valid for one day otherwise)
     try:

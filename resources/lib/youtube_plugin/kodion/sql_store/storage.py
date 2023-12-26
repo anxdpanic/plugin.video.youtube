@@ -19,6 +19,7 @@ from traceback import format_stack
 
 from ..logger import log_error
 from ..utils.datetime_parser import since_epoch
+from ..utils.methods import make_dirs
 
 
 class Storage(object):
@@ -171,7 +172,7 @@ class Storage(object):
 
     def _open(self):
         if not os.path.exists(self._filename):
-            os.makedirs(os.path.dirname(self._filename), exist_ok=True)
+            make_dirs(os.path.dirname(self._filename))
             self.__class__._table_created = False
             self.__class__._table_updated = True
 

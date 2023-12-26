@@ -14,6 +14,7 @@ import copy
 import json
 import os
 import re
+import shutil
 from datetime import timedelta
 from math import floor, log
 
@@ -33,6 +34,7 @@ __all__ = (
     'make_dirs',
     'merge_dicts',
     'print_items',
+    'rm_dir',
     'seconds_to_duration',
     'select_stream',
     'strip_html_from_text',
@@ -231,16 +233,8 @@ def print_items(items):
 def make_dirs(path):
     if not path.endswith('/'):
         path = ''.join((path, '/'))
-    succeeded = xbmcvfs.exists(path)
 
-    if succeeded:
-        return xbmcvfs.translatePath(path)
-
-    try:
-        succeeded = xbmcvfs.mkdirs(path)
-    except OSError:
-        pass
-
+    succeeded = xbmcvfs.exists(path) or xbmcvfs.mkdirs(path)
     if succeeded:
         return xbmcvfs.translatePath(path)
 
@@ -256,6 +250,22 @@ def make_dirs(path):
     log_error('Failed to create directory: |{0}|'.format(path))
     return False
 
+
+def rm_dir(path):
+    succeeded = (not xbmcvfs.exists(path)
+                 or xbmcvfs.rmdir(path, force=True))
+    if not succeeded:
+        path = xbmcvfs.translatePath(path)
+        try:
+            shutil.rmtree(path)
+            succeeded = not xbmcvfs.exists(path)
+        except OSError:
+            pass
+
+    if succeeded:
+        return True
+    log_error('Failed to remove directory: {0}'.format(path))
+    return False
 
 def find_video_id(plugin_path):
     match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', plugin_path)

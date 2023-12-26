@@ -13,7 +13,6 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import os
 import re
-import shutil
 import socket
 from base64 import b64decode
 
@@ -45,7 +44,7 @@ from ..kodion.constants import (
 )
 from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem, menu_items
 from ..kodion.network import get_client_ip_address, is_httpd_live
-from ..kodion.utils import find_video_id, strip_html_from_text
+from ..kodion.utils import find_video_id, rm_dir, strip_html_from_text
 
 
 class Provider(AbstractProvider):
@@ -1066,23 +1065,7 @@ class Provider(AbstractProvider):
                 return
 
             if maint_type == 'temp_files':
-                temp_path = _file_w_path
-
-                if xbmcvfs.exists(temp_path):
-                    try:
-                        succeeded = xbmcvfs.rmdir(temp_path, force=True)
-                    except OSError:
-                        pass
-                else:
-                    succeeded = True
-
-                if not succeeded:
-                    temp_path = xbmcvfs.translatePath(_file_w_path)
-                    try:
-                        shutil.rmtree(temp_path)
-                        succeeded = not xbmcvfs.exists(temp_path)
-                    except OSError:
-                        pass
+                succeeded = rm_dir(_file_w_path)
 
             elif _file_w_path:
                 succeeded = xbmcvfs.delete(_file_w_path)

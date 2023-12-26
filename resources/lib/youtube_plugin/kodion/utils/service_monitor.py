@@ -10,11 +10,10 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import shutil
 import threading
 
-from ..compatibility import unquote, xbmc, xbmcaddon, xbmcvfs
-from ..constants import ADDON_ID, TEMP_PATH
+from ..compatibility import unquote, xbmc, xbmcaddon
+from ..constants import ADDON_ID
 from ..logger import log_debug
 from ..network import get_http_server, is_httpd_live
 from ..settings import Settings
@@ -156,31 +155,3 @@ class ServiceMonitor(xbmc.Monitor):
 
     def ping_httpd(self):
         return is_httpd_live(port=self.httpd_port())
-
-    @staticmethod
-    def remove_temp_dir():
-        temp_path = TEMP_PATH
-        succeeded = False
-
-        if xbmcvfs.exists(temp_path):
-            try:
-                succeeded = xbmcvfs.rmdir(temp_path, force=True)
-            except OSError:
-                pass
-        else:
-            succeeded = True
-
-        if succeeded:
-            return True
-
-        temp_path = xbmcvfs.translatePath(TEMP_PATH)
-        try:
-            shutil.rmtree(temp_path)
-            succeeded = not xbmcvfs.exists(temp_path)
-        except OSError:
-            pass
-
-        if succeeded:
-            return True
-        log_debug('Failed to remove directory: {0}'.format(temp_path))
-        return False
