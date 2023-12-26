@@ -20,8 +20,8 @@ class WatchLaterList(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filename):
-        super(WatchLaterList, self).__init__(filename)
+    def __init__(self, filepath):
+        super(WatchLaterList, self).__init__(filepath)
 
     def get_items(self):
         result = self._get_by_ids(process=from_json, values_only=True)

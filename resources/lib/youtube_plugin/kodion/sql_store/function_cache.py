@@ -22,9 +22,9 @@ class FunctionCache(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filename, max_file_size_mb=5):
+    def __init__(self, filepath, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
-        super(FunctionCache, self).__init__(filename,
+        super(FunctionCache, self).__init__(filepath,
                                             max_file_size_kb=max_file_size_kb)
 
         self._enabled = True

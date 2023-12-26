@@ -19,9 +19,9 @@ class DataCache(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filename, max_file_size_mb=5):
+    def __init__(self, filepath, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
-        super(DataCache, self).__init__(filename,
+        super(DataCache, self).__init__(filepath,
                                         max_file_size_kb=max_file_size_kb)
 
     def get_items(self, content_ids, seconds):

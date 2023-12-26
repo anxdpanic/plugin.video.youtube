@@ -137,10 +137,8 @@ class Storage(object):
         ),
     }
 
-    def __init__(self, filename, max_item_count=-1, max_file_size_kb=-1):
-        self._filename = filename
-        if not self._filename.endswith('.sqlite'):
-            self._filename = ''.join((self._filename, '.sqlite'))
+    def __init__(self, filepath, max_item_count=-1, max_file_size_kb=-1):
+        self._filepath = filepath
         self._db = None
         self._cursor = None
         self._max_item_count = max_item_count
@@ -171,13 +169,13 @@ class Storage(object):
         self._close()
 
     def _open(self):
-        if not os.path.exists(self._filename):
-            make_dirs(os.path.dirname(self._filename))
+        if not os.path.exists(self._filepath):
+            make_dirs(os.path.dirname(self._filepath))
             self.__class__._table_created = False
             self.__class__._table_updated = True
 
         try:
-            db = sqlite3.connect(self._filename,
+            db = sqlite3.connect(self._filepath,
                                  check_same_thread=False,
                                  timeout=1,
                                  isolation_level=None)
@@ -273,7 +271,7 @@ class Storage(object):
             return False
 
         try:
-            file_size_kb = (os.path.getsize(self._filename) // 1024)
+            file_size_kb = (os.path.getsize(self._filepath) // 1024)
             if file_size_kb <= self._max_file_size_kb:
                 return False
         except OSError:

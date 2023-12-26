@@ -20,8 +20,8 @@ class FavoriteList(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filename):
-        super(FavoriteList, self).__init__(filename)
+    def __init__(self, filepath):
+        super(FavoriteList, self).__init__(filepath)
 
     @staticmethod
     def _sort_item(item):

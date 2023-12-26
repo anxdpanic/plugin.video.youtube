@@ -143,47 +143,57 @@ class AbstractContext(object):
     def get_playback_history(self):
         if not self._playback_history:
             uuid = self.get_access_manager().get_current_user_id()
-            db_file = os.path.join(self.get_data_path(), 'playback', uuid)
-            self._playback_history = PlaybackHistory(db_file)
+            filename = ''.join((uuid, '.sqlite'))
+            filepath = os.path.join(self.get_data_path(), 'playback', filename)
+            self._playback_history = PlaybackHistory(filepath)
         return self._playback_history
 
     def get_data_cache(self):
         if not self._data_cache:
-            max_cache_size_mb = self.get_settings().get_int(settings.CACHE_SIZE, -1)
-            if max_cache_size_mb <= 0:
-                max_cache_size_mb = 5
+            cache_size = self.get_settings().get_int(settings.CACHE_SIZE, -1)
+            if cache_size <= 0:
+                cache_size = 5
             else:
-                max_cache_size_mb /= 2.0
-            self._data_cache = DataCache(os.path.join(self.get_cache_path(), 'data_cache'),
-                                         max_file_size_mb=max_cache_size_mb)
+                cache_size /= 2.0
+            filename = 'data_cache.sqlite'
+            filepath = os.path.join(self.get_cache_path(), filename)
+            self._data_cache = DataCache(filepath, max_file_size_mb=cache_size)
         return self._data_cache
 
     def get_function_cache(self):
         if not self._function_cache:
-            max_cache_size_mb = self.get_settings().get_int(settings.CACHE_SIZE, -1)
-            if max_cache_size_mb <= 0:
-                max_cache_size_mb = 5
+            cache_size = self.get_settings().get_int(settings.CACHE_SIZE, -1)
+            if cache_size <= 0:
+                cache_size = 5
             else:
-                max_cache_size_mb /= 2.0
-            self._function_cache = FunctionCache(os.path.join(self.get_cache_path(), 'cache'),
-                                                 max_file_size_mb=max_cache_size_mb)
+                cache_size /= 2.0
+            filename = 'cache.sqlite'
+            filepath = os.path.join(self.get_cache_path(), filename)
+            self._function_cache = FunctionCache(filepath,
+                                                 max_file_size_mb=cache_size)
         return self._function_cache
 
     def get_search_history(self):
         if not self._search_history:
-            max_search_history_items = self.get_settings().get_int(settings.SEARCH_SIZE, 50)
-            self._search_history = SearchHistory(os.path.join(self.get_cache_path(), 'search'),
-                                                 max_item_count=max_search_history_items)
+            search_size = self.get_settings().get_int(settings.SEARCH_SIZE, 50)
+            filename = 'search.sqlite'
+            filepath = os.path.join(self.get_cache_path(), filename)
+            self._search_history = SearchHistory(filepath,
+                                                 max_item_count=search_size)
         return self._search_history
 
     def get_favorite_list(self):
         if not self._favorite_list:
-            self._favorite_list = FavoriteList(os.path.join(self.get_cache_path(), 'favorites'))
+            filename = 'favorites.sqlite'
+            filepath = os.path.join(self.get_cache_path(), filename)
+            self._favorite_list = FavoriteList(filepath)
         return self._favorite_list
 
     def get_watch_later_list(self):
         if not self._watch_later_list:
-            self._watch_later_list = WatchLaterList(os.path.join(self.get_cache_path(), 'watch_later'))
+            filename = 'watch_later.sqlite'
+            filepath = os.path.join(self.get_cache_path(), filename)
+            self._watch_later_list = WatchLaterList(filepath)
         return self._watch_later_list
 
     def get_access_manager(self):

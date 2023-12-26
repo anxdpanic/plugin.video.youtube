@@ -18,8 +18,8 @@ class PlaybackHistory(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filename):
-        super(PlaybackHistory, self).__init__(filename)
+    def __init__(self, filepath):
+        super(PlaybackHistory, self).__init__(filepath)
 
     def _add_last_played(self, value, item):
         value['last_played'] = self._convert_timestamp(item[1])

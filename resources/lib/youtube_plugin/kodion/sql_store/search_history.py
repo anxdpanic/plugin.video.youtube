@@ -21,8 +21,8 @@ class SearchHistory(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filename, max_item_count=10):
-        super(SearchHistory, self).__init__(filename,
+    def __init__(self, filepath, max_item_count=10):
+        super(SearchHistory, self).__init__(filepath,
                                             max_item_count=max_item_count)
 
     def get_items(self):
