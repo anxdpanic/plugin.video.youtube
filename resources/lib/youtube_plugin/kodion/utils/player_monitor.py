@@ -58,6 +58,7 @@ class PlayerMonitorThread(threading.Thread):
                 or self.stopped())
 
     def run(self):
+        playing_file = self.playback_json.get('playing_file')
         play_count = self.playback_json.get('play_count', 0)
         use_remote_history = self.playback_json.get('use_remote_history', False)
         use_local_history = self.playback_json.get('use_local_history', False)
@@ -130,8 +131,10 @@ class PlayerMonitorThread(threading.Thread):
             except RuntimeError:
                 current_file = None
 
-            if (not current_file or video_id_param not in current_file
-                    or not self._context.is_plugin_path(current_file, 'play/')
+            if (not current_file
+                    or (current_file != playing_file and not (
+                            self._context.is_plugin_path(current_file, 'play/')
+                            and video_id_param in current_file))
                     or self.stopped()):
                 self.stop()
                 break
@@ -278,12 +281,11 @@ class PlayerMonitorThread(threading.Thread):
         })
         self._context.log_debug('Playback stopped [{video_id}]:'
                                 ' {current:.3f} secs of {total:.3f}'
-                                ' @ {percent}%'.format(
-            video_id=self.video_id,
-            current=self.current_time,
-            total=self.total_time,
-            percent=self.percent_complete,
-        ))
+                                ' @ {percent}%'
+                                .format(video_id=self.video_id,
+                                        current=self.current_time,
+                                        total=self.total_time,
+                                        percent=self.percent_complete))
 
         state = 'stopped'
         # refresh client, tokens may need refreshing
