@@ -20,23 +20,21 @@ from ..youtube.provider import Provider
 
 def run():
     context = Context()
-
     context.log_debug('YouTube service initialization...')
+    context.get_ui().clear_property('abort_requested')
+    # wipe function cache on updates/restarts to fix cipher related issues on
+    # update, valid for one day otherwise
+    try:
+        context.get_function_cache().clear()
+    except Exception:
+        # prevent service failing due to cache related issues
+        pass
 
     monitor = ServiceMonitor()
     player = PlayerMonitor(provider=Provider(), context=context)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
-
-    # wipe function cache on updates/restarts (fix cipher related issues on update, valid for one day otherwise)
-    try:
-        context.get_function_cache().clear()
-    except:
-        # prevent service to failing due to cache related issues
-        pass
-
-    context.get_ui().clear_property('abort_requested')
 
     sleep_time = 10
     ping_delay = 60
@@ -54,7 +52,8 @@ def run():
 
     context.get_ui().set_property('abort_requested', 'true')
 
-    player.cleanup_threads(only_ended=False)  # clean up any/all playback monitoring threads
+    # clean up any/all playback monitoring threads
+    player.cleanup_threads(only_ended=False)
 
     if monitor.httpd:
         monitor.shutdown_httpd()  # shutdown http server

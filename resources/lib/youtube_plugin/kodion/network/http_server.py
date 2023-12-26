@@ -80,8 +80,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         # Strip trailing slash if present
         stripped_path = self.path.rstrip('/')
         if stripped_path != paths.PING:
-            log_debug('HTTPServer: GET Request uri path |{stripped_path}|'
-                      .format(stripped_path=self.path))
+            log_debug('HTTPServer: GET uri path |{path}|'.format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -96,25 +95,23 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.wfile.write(client_json.encode('utf-8'))
 
         elif self.path.startswith(paths.MPD):
-            file_path = os.path.join(self.BASE_PATH,
-                                     self.path[len(paths.MPD):])
+            filepath = os.path.join(self.BASE_PATH, self.path[len(paths.MPD):])
             file_chunk = True
-            log_debug('HTTPServer: Request file path |{file_path}|'
-                      .format(file_path=file_path))
+            log_debug('HTTPServer: GET filepath |{path}|'.format(path=filepath))
             try:
-                with open(file_path, 'rb') as f:
+                with open(filepath, 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/dash+xml')
                     self.send_header('Content-Length',
-                                     str(os.path.getsize(file_path)))
+                                     str(os.path.getsize(filepath)))
                     self.end_headers()
                     while file_chunk:
                         file_chunk = f.read(self.chunk_size)
                         if file_chunk:
                             self.wfile.write(file_chunk)
             except IOError:
-                response = ('File Not Found: |{proxy_path}| -> |{file_path}|'
-                            .format(proxy_path=self.path, file_path=file_path))
+                response = ('File Not Found: |{path}| -> |{filepath}|'
+                            .format(path=self.path, filepath=filepath))
                 self.send_error(404, response)
 
         elif api_config_enabled and stripped_path == paths.API:
@@ -192,24 +189,22 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        log_debug('HTTPServer: HEAD Request uri path |{proxy_path}|'
-                  .format(proxy_path=self.path))
+        log_debug('HTTPServer: HEAD uri path |{path}|'.format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
 
         elif self.path.startswith(paths.MPD):
-            file_path = os.path.join(self.BASE_PATH,
-                                     self.path[len(paths.MPD):])
-            if not os.path.isfile(file_path):
-                response = ('File Not Found: |{proxy_path}| -> |{file_path}|'
-                            .format(proxy_path=self.path, file_path=file_path))
+            filepath = os.path.join(self.BASE_PATH, self.path[len(paths.MPD):])
+            if not os.path.isfile(filepath):
+                response = ('File Not Found: |{path}| -> |{filepath}|'
+                            .format(path=self.path, filepath=filepath))
                 self.send_error(404, response)
             else:
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/dash+xml')
                 self.send_header('Content-Length',
-                                 str(os.path.getsize(file_path)))
+                                 str(os.path.getsize(filepath)))
                 self.end_headers()
 
         else:
@@ -217,8 +212,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_POST(self):
-        log_debug('HTTPServer: Request uri path |{proxy_path}|'
-                  .format(proxy_path=self.path))
+        log_debug('HTTPServer: POST uri path |{path}|'.format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
