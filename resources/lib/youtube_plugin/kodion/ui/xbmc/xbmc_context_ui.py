@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
-from ...constants import ADDON_ID, ADDON_PATH
+from ...constants import ADDON_ID
 from ...utils import to_unicode
 
 
@@ -137,10 +137,9 @@ class XbmcContextUI(AbstractContextUI):
         self._xbmc_addon.openSettings()
 
     def refresh_container(self):
-        xbmc.executebuiltin(
-            'RunScript({path}/resources/lib/youtube_plugin/refresh.py)'
-            .format(path=ADDON_PATH)
-        )
+        # TODO: find out why the RunScript call is required
+        # xbmc.executebuiltin("Container.Refresh")
+        xbmc.executebuiltin('RunScript({addon_id})'.format(addon_id=ADDON_ID))
 
     @staticmethod
     def get_info_label(value):

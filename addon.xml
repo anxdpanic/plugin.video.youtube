@@ -12,6 +12,9 @@
     </extension>
     <extension point="xbmc.service" library="resources/lib/startup.py"/>
     <extension point="xbmc.python.module" library="resources/lib/"/>
+    <extension point="xbmc.python.script" library="resources/lib/youtube_plugin/refresh.py">
+        <provides>executable</provides>
+    </extension>
     <extension point="xbmc.addon.metadata">
         <news>
 [new] quality and stream feature selection
