@@ -311,11 +311,11 @@ def update_playlist_infos(provider, context, playlist_id_dict,
                         context, playlist_id, title
                     ),
                     # remove as my custom watch later playlist
-                    menu_items.remove_as_watchlater(
+                    menu_items.remove_as_watch_later(
                         context, playlist_id, title
                     ) if playlist_id == custom_watch_later_id else
                     # set as my custom watch later playlist
-                    menu_items.set_as_watchlater(
+                    menu_items.set_as_watch_later(
                         context, playlist_id, title
                     ),
                     # remove as custom history playlist

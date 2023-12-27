@@ -161,11 +161,11 @@ def delete_playlist(context, playlist_id, playlist_name):
     )
 
 
-def remove_as_watchlater(context, playlist_id, playlist_name):
+def remove_as_watch_later(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('playlist', 'remove', 'watchlater',),
+            ('playlist', 'remove', 'watch_later',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -174,11 +174,11 @@ def remove_as_watchlater(context, playlist_id, playlist_name):
     )
 
 
-def set_as_watchlater(context, playlist_id, playlist_name):
+def set_as_watch_later(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.set'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('playlist', 'set', 'watchlater',),
+            ('playlist', 'set', 'watch_later',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name

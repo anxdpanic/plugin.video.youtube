@@ -249,7 +249,7 @@ def _process_rename_playlist(provider, context):
         context.get_ui().refresh_container()
 
 
-def _watchlater_playlist_id_change(context, method):
+def _watch_later_playlist_id_change(context, method):
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
         raise KodionException('watchlater_list/%s: missing playlist_id' % method)
@@ -306,8 +306,8 @@ def process(method, category, provider, context):
         return _process_select_playlist(provider, context)
     if method == 'rename' and category == 'playlist':
         return _process_rename_playlist(provider, context)
-    if method in {'set', 'remove'} and category == 'watchlater':
-        return _watchlater_playlist_id_change(context, method)
+    if method in {'set', 'remove'} and category == 'watch_later':
+        return _watch_later_playlist_id_change(context, method)
     if method in {'set', 'remove'} and category == 'history':
         return _history_playlist_id_change(context, method)
     raise KodionException("Unknown category '%s' or method '%s'" % (category, method))
