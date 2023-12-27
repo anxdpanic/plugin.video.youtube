@@ -488,7 +488,7 @@ def update_video_infos(provider, context, video_id_dict,
         video_item.set_short_details(label_stats)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer Provider.set_content_type for usage
+        # Refer XbmcContext.set_content_type for usage
         video_item.set_code(label_stats)
 
         # update and set the title

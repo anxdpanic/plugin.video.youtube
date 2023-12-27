@@ -26,7 +26,7 @@ from ...compatibility import (
     xbmcplugin,
     xbmcvfs,
 )
-from ...constants import ADDON_ID
+from ...constants import ADDON_ID, content, sort
 from ...player.xbmc.xbmc_player import XbmcPlayer
 from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
@@ -415,8 +415,24 @@ class XbmcContext(AbstractContext):
         return result
 
     def set_content_type(self, content_type):
-        self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
+        self.log_debug('Setting content-type: |{type}| for |{path}|'.format(
+            type=content_type, path=self.get_path()
+        ))
         xbmcplugin.setContent(self._plugin_handle, content_type)
+        self.add_sort_method(
+            (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+            (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+        )
+        if content_type != content.VIDEOS:
+            return
+        self.add_sort_method(
+            (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
+            (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
+            (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
+            (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
+            (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
+            (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
+        )
 
     def add_sort_method(self, *sort_methods):
         args = slice(None if current_system_version.compatible(19, 0) else 2)

@@ -40,7 +40,6 @@ from ..kodion.constants import (
     TEMP_PATH,
     content,
     paths,
-    sort,
 )
 from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem, menu_items
 from ..kodion.network import get_client_ip_address, is_httpd_live
@@ -285,7 +284,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
-        self.set_content_type(context, content.VIDEOS)
+        context.set_content_type(content.VIDEOS)
         resource_manager = self.get_resource_manager(context)
 
         batch_id = (re_match.group('playlist_id'),
@@ -305,7 +304,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
-        self.set_content_type(context, content.FILES)
+        context.set_content_type(content.FILES)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -352,7 +351,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
     def _on_channel_live(self, context, re_match):
-        self.set_content_type(context, content.VIDEOS)
+        context.set_content_type(content.VIDEOS)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -398,7 +397,7 @@ class Provider(AbstractProvider):
         if method == 'channel' and not channel_id:
             return False
 
-        self.set_content_type(context, content.VIDEOS)
+        context.set_content_type(content.VIDEOS)
 
         resource_manager = self.get_resource_manager(context)
 
@@ -496,7 +495,7 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/location/mine/$')
     def _on_my_location(self, context, re_match):
-        self.set_content_type(context, content.FILES)
+        context.set_content_type(content.FILES)
 
         create_uri = context.create_uri
         localize = context.localize
@@ -655,7 +654,7 @@ class Provider(AbstractProvider):
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
-            self.set_content_type(context, content.FILES)
+            context.set_content_type(content.FILES)
             channel_ids = []
             for subscription in subscriptions:
                 channel_ids.append(subscription.get_channel_id())
@@ -838,9 +837,9 @@ class Provider(AbstractProvider):
         safe_search = context.get_settings().safe_search()
 
         if search_type == 'video':
-            self.set_content_type(context, content.VIDEOS)
+            context.set_content_type(content.VIDEOS)
         else:
-            self.set_content_type(context, content.FILES)
+            context.set_content_type(content.FILES)
 
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
@@ -1251,7 +1250,7 @@ class Provider(AbstractProvider):
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
 
-        self.set_content_type(context, content.FILES)
+        context.set_content_type(content.FILES)
 
         result = []
 
@@ -1520,24 +1519,6 @@ class Provider(AbstractProvider):
             result.append(settings_menu_item)
 
         return result
-
-    @staticmethod
-    def set_content_type(context, content_type):
-        context.set_content_type(content_type)
-        context.add_sort_method(
-            (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-            (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
-        )
-        if content_type != content.VIDEOS:
-            return
-        context.add_sort_method(
-            (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
-            (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
-            (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
-            (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
-            (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-            (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
-        )
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, (InvalidGrant, LoginException)):
