@@ -30,7 +30,7 @@ def more_for_video(context, video_id, logged_in=False, refresh_container=False):
 def related_videos(context, video_id):
     return (
         context.localize('related_videos'),
-        'Container.Update({0})'.format(context.create_uri(
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
             ('special', 'related_videos',),
             {
                 'video_id': video_id,
@@ -42,7 +42,7 @@ def related_videos(context, video_id):
 def video_comments(context, video_id):
     return (
         context.localize('video.comments'),
-        'Container.Update({0})'.format(context.create_uri(
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
             ('special', 'parent_comments',),
             {
                 'video_id': video_id,
@@ -302,7 +302,7 @@ def watch_later_local_clear(context):
 def go_to_channel(context, channel_id, channel_name):
     return (
         context.localize('go_to_channel') % context.get_ui().bold(channel_name),
-        'Container.Update({0})'.format(context.create_uri(
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
             ('channel', channel_id,)
         ))
     )
