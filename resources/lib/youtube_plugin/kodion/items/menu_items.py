@@ -17,7 +17,7 @@ def more_for_video(context, video_id, logged_in=False, refresh_container=False):
     return (
         context.localize('video.more'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['video', 'more'],
+            ('video', 'more',),
             {
                 'video_id': video_id,
                 'logged_in': logged_in,
@@ -27,11 +27,35 @@ def more_for_video(context, video_id, logged_in=False, refresh_container=False):
     )
 
 
+def related_videos(context, video_id):
+    return (
+        context.localize('related_videos'),
+        'Container.Update({0})'.format(context.create_uri(
+            ('special', 'related_videos',),
+            {
+                'video_id': video_id,
+            }
+        ))
+    )
+
+
+def video_comments(context, video_id):
+    return (
+        context.localize('video.comments'),
+        'Container.Update({0})'.format(context.create_uri(
+            ('special', 'parent_comments',),
+            {
+                'video_id': video_id,
+            }
+        ))
+    )
+
+
 def content_from_description(context, video_id):
     return (
         context.localize('video.description.links'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['special', 'description_links'],
+            ('special', 'description_links',),
             {
                 'video_id': video_id,
             }
@@ -43,6 +67,13 @@ def play_with(context):
     return (
         context.localize('video.play.with'),
         'Action(SwitchPlayer)'
+    )
+
+
+def refresh(context):
+    return (
+        context.localize('refresh'),
+        'Container.Refresh'
     )
 
 
@@ -58,7 +89,7 @@ def play_all_from_playlist(context, playlist_id, video_id=''):
         return (
             context.localize('playlist.play.from_here'),
             'RunPlugin({0})'.format(context.create_uri(
-                ['play'],
+                ('play',),
                 {
                     'playlist_id': playlist_id,
                     'video_id': video_id,
@@ -69,7 +100,7 @@ def play_all_from_playlist(context, playlist_id, video_id=''):
     return (
         context.localize('playlist.play.all'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['play'],
+            ('play',),
             {
                 'playlist_id': playlist_id,
                 'play': True,
@@ -82,7 +113,7 @@ def add_video_to_playlist(context, video_id):
     return (
         context.localize('video.add_to_playlist'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'select', 'playlist'],
+            ('playlist', 'select', 'playlist',),
             {
                 'video_id': video_id,
             }
@@ -94,7 +125,7 @@ def remove_video_from_playlist(context, playlist_id, video_id, video_name):
     return (
         context.localize('remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'remove', 'video'],
+            ('playlist', 'remove', 'video',),
             {
                 'playlist_id': playlist_id,
                 'video_id': video_id,
@@ -108,7 +139,7 @@ def rename_playlist(context, playlist_id, playlist_name):
     return (
         context.localize('rename'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'rename', 'playlist'],
+            ('playlist', 'rename', 'playlist',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -121,7 +152,7 @@ def delete_playlist(context, playlist_id, playlist_name):
     return (
         context.localize('delete'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'remove', 'playlist'],
+            ('playlist', 'remove', 'playlist',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -134,7 +165,7 @@ def remove_as_watchlater(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'remove', 'watchlater'],
+            ('playlist', 'remove', 'watchlater',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -147,7 +178,7 @@ def set_as_watchlater(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.set'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'set', 'watchlater'],
+            ('playlist', 'set', 'watchlater',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -160,7 +191,7 @@ def remove_as_history(context, playlist_id, playlist_name):
     return (
         context.localize('history.list.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'remove', 'history'],
+            ('playlist', 'remove', 'history',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -173,7 +204,7 @@ def set_as_history(context, playlist_id, playlist_name):
     return (
         context.localize('history.list.set'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'set', 'history'],
+            ('playlist', 'set', 'history',),
             {
                 'playlist_id': playlist_id,
                 'playlist_name': playlist_name
@@ -186,7 +217,7 @@ def remove_my_subscriptions_filter(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['my_subscriptions', 'filter'],
+            ('my_subscriptions', 'filter',),
             {
                 'channel_name': channel_name,
                 'action': 'remove'
@@ -199,7 +230,7 @@ def add_my_subscriptions_filter(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['my_subscriptions', 'filter'],
+            ('my_subscriptions', 'filter',),
             {
                 'channel_name': channel_name,
                 'action': 'add',
@@ -212,7 +243,7 @@ def rate_video(context, video_id, refresh_container=False):
     return (
         context.localize('video.rate'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['video', 'rate'],
+            ('video', 'rate',),
             {
                 'video_id': video_id,
                 'refresh_container': refresh_container,
@@ -225,7 +256,7 @@ def watch_later_add(context, playlist_id, video_id):
     return (
         context.localize('watch_later.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['playlist', 'add', 'video'],
+            ('playlist', 'add', 'video',),
             {
                 'playlist_id': playlist_id,
                 'video_id': video_id,
@@ -238,7 +269,7 @@ def watch_later_local_add(context, item):
     return (
         context.localize('watch_later.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.WATCH_LATER, 'add'],
+            (paths.WATCH_LATER, 'add',),
             {
                 'video_id': item.video_id,
                 'item': item.dumps(),
@@ -251,7 +282,7 @@ def watch_later_local_remove(context, video_id):
     return (
         context.localize('watch_later.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.WATCH_LATER, 'remove'],
+            (paths.WATCH_LATER, 'remove',),
             {
                 'video_id': video_id,
             }
@@ -263,7 +294,7 @@ def watch_later_local_clear(context):
     return (
         context.localize('watch_later.clear'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.WATCH_LATER, 'clear']
+            (paths.WATCH_LATER, 'clear',)
         ))
     )
 
@@ -272,27 +303,8 @@ def go_to_channel(context, channel_id, channel_name):
     return (
         context.localize('go_to_channel') % context.get_ui().bold(channel_name),
         'Container.Update({0})'.format(context.create_uri(
-            ['channel', channel_id]
+            ('channel', channel_id,)
         ))
-    )
-
-
-def related_videos(context, video_id):
-    return (
-        context.localize('related_videos'),
-        'Container.Update({0})'.format(context.create_uri(
-            ['special', 'related_videos'],
-            {
-                'video_id': video_id,
-            }
-        ))
-    )
-
-
-def refresh(context):
-    return (
-        context.localize('refresh'),
-        'Container.Refresh'
     )
 
 
@@ -301,7 +313,7 @@ def subscribe_to_channel(context, channel_id, channel_name=''):
         return (
             context.localize('subscribe'),
             'RunPlugin({0})'.format(context.create_uri(
-                ['subscriptions', 'add'],
+                ('subscriptions', 'add',),
                 {
                     'subscription_id': channel_id,
                 }
@@ -310,7 +322,7 @@ def subscribe_to_channel(context, channel_id, channel_name=''):
     return (
         context.localize('subscribe_to') % context.get_ui().bold(channel_name),
         'RunPlugin({0})'.format(context.create_uri(
-            ['subscriptions', 'add'],
+            ('subscriptions', 'add',),
             {
                 'subscription_id': channel_id,
             }
@@ -322,7 +334,7 @@ def unsubscribe_from_channel(context, channel_id):
     return (
         context.localize('unsubscribe'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['subscriptions', 'remove'],
+            ('subscriptions', 'remove',),
             {
                 'subscription_id': channel_id,
             }
@@ -334,7 +346,7 @@ def play_with_subtitles(context, video_id):
     return (
         context.localize('video.play.with_subtitles'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['play'],
+            ('play',),
             {
                 'video_id': video_id,
                 'prompt_for_subtitles': True,
@@ -347,7 +359,7 @@ def play_audio_only(context, video_id):
     return (
         context.localize('video.play.audio_only'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['play'],
+            ('play',),
             {
                 'video_id': video_id,
                 'audio_only': True,
@@ -360,7 +372,7 @@ def play_ask_for_quality(context, video_id):
     return (
         context.localize('video.play.ask_for_quality'),
         'RunPlugin({0})'.format(context.create_uri(
-            ['play'],
+            ('play',),
             {
                 'video_id': video_id,
                 'ask_for_quality': True,
@@ -437,7 +449,7 @@ def favorites_add(context, item):
     return (
         context.localize('favorites.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.FAVORITES, 'add'],
+            (paths.FAVORITES, 'add',),
             {
                 'video_id': item.video_id,
                 'item': item.dumps(),
@@ -450,7 +462,7 @@ def favorites_remove(context, video_id):
     return (
         context.localize('favorites.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.FAVORITES, 'remove'],
+            (paths.FAVORITES, 'remove',),
             {
                 'vide_id': video_id,
             }
@@ -462,7 +474,7 @@ def search_remove(context, query):
     return (
         context.localize('search.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.SEARCH, 'remove'],
+            (paths.SEARCH, 'remove',),
             {
                 'q': query,
             }
@@ -474,7 +486,7 @@ def search_rename(context, query):
     return (
         context.localize('search.rename'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.SEARCH, 'rename'],
+            (paths.SEARCH, 'rename',),
             {
                 'q': query,
             }
@@ -486,6 +498,6 @@ def search_clear(context):
     return (
         context.localize('search.clear'),
         'RunPlugin({0})'.format(context.create_uri(
-            [paths.SEARCH, 'clear']
+            (paths.SEARCH, 'clear',)
         ))
     )

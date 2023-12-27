@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ...kodion import KodionException
+from ...kodion.items import menu_items
 from ...kodion.utils import find_video_id
 
 
@@ -90,33 +91,25 @@ def _process_rate_video(provider, context, re_match):
 
 
 def _process_more_for_video(context):
-    video_id = context.get_param('video_id', '')
+    params = context.get_params()
+
+    video_id = params.get('video_id')
     if not video_id:
         raise KodionException('video/more/: missing video_id')
 
-    items = []
-
-    logged_in = context.get_param('logged_in', '0')
-    if logged_in == '1':
-        # add video to a playlist
-        items.append((context.localize('video.add_to_playlist'),
-                      'RunPlugin(%s)' % context.create_uri(['playlist', 'select', 'playlist'], {'video_id': video_id})))
-
-    # default items
-    items.extend([(context.localize('related_videos'),
-                   'Container.Update(%s)' % context.create_uri(['special', 'related_videos'], {'video_id': video_id})),
-                  (context.localize('video.comments'),
-                   'Container.Update(%s)' % context.create_uri(['special', 'parent_comments'], {'video_id': video_id})),
-                  (context.localize('video.description.links'),
-                   'Container.Update(%s)' % context.create_uri(['special', 'description_links'],
-                                                               {'video_id': video_id}))])
-
-    if logged_in == '1':
-        # rate a video
-        refresh_container = context.get_param('refresh_container', '0')
-        items.append((context.localize('video.rate'),
-                      'RunPlugin(%s)' % context.create_uri(['video', 'rate'], {'video_id': video_id,
-                                                                               'refresh_container': refresh_container})))
+    items = [
+        menu_items.add_video_to_playlist(context, video_id),
+        menu_items.related_videos(context, video_id),
+        menu_items.video_comments(context, video_id),
+        menu_items.content_from_description(context, video_id),
+        menu_items.rate_video(context,
+                              video_id,
+                              params.get('refresh_container')),
+    ] if params.get('logged_in') else [
+        menu_items.related_videos(context, video_id),
+        menu_items.video_comments(context, video_id),
+        menu_items.content_from_description(context, video_id),
+    ]
 
     result = context.get_ui().on_select(context.localize('video.more'), items)
     if result != -1:
