@@ -155,8 +155,8 @@ class XbmcRunner(AbstractProviderRunner):
 
         is_folder = not directory_item.is_action()
 
-        if directory_item.next_page:
-            item.setProperty('specialSort', 'bottom')
+        item.setProperty('specialSort',
+                         'bottom' if directory_item.next_page else 'top')
 
         # make channel_subscription_id property available for keymapping
         subscription_id = directory_item.get_channel_subscription_id()
