@@ -414,15 +414,23 @@ class XbmcContext(AbstractContext):
         result = to_unicode(result) if result else default_text
         return result
 
-    def set_content_type(self, content_type):
+    def set_content_type(self, content_type, sub_type=None):
         self.log_debug('Setting content-type: |{type}| for |{path}|'.format(
-            type=content_type, path=self.get_path()
+            type=(sub_type or content_type), path=self.get_path()
         ))
         xbmcplugin.setContent(self._plugin_handle, content_type)
-        self.add_sort_method(
-            (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-            (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
-        )
+        if sub_type == 'history':
+            self.add_sort_method(
+                (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
+                (sort.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
+                (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            )
+        else:
+            self.add_sort_method(
+                (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            )
         if content_type != content.VIDEOS:
             return
         self.add_sort_method(

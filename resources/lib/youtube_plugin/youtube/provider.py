@@ -1162,6 +1162,7 @@ class Provider(AbstractProvider):
         playback_history = context.get_playback_history()
 
         if action == 'list':
+            context.set_content_type(content.VIDEOS, sub_type='history')
             play_data = playback_history.get_items()
             if not play_data:
                 return True
