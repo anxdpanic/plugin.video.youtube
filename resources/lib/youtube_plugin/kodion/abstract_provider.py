@@ -195,6 +195,7 @@ class AbstractProvider(object):
             return False
 
         if command == 'list':
+            context.set_content_type(content.VIDEOS, sub_type='watch_later')
             video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
