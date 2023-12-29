@@ -279,7 +279,7 @@ class VideoItem(BaseItem):
         return self.license_key
 
     def set_last_played(self, last_played):
-        self._last_played = last_played or ''
+        self._last_played = last_played
 
     def get_last_played(self):
         return self._last_played

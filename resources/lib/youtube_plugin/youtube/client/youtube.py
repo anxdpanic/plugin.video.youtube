@@ -439,7 +439,7 @@ class YouTube(LoginClient):
             vid = candidate['id']['videoId']
             if vid not in seen:
                 seen.append(vid)
-                candidate['plugin_created_date'] = datetime_parser.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                candidate['plugin_created_date'] = datetime_parser.since_epoch()
                 items.insert(0, candidate)
 
         # Truncate items to keep it manageable, and cache
@@ -448,7 +448,7 @@ class YouTube(LoginClient):
 
         # Build the result set
         items.sort(
-            key=lambda a: datetime_parser.parse(a['plugin_created_date']),
+            key=lambda a: a.get('plugin_created_date', 0),
             reverse=True
         )
         sorted_items = []

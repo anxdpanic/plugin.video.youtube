@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .storage import Storage
+from .storage import Storage, fromtimestamp
 
 
 class PlaybackHistory(Storage):
@@ -21,8 +21,9 @@ class PlaybackHistory(Storage):
     def __init__(self, filepath):
         super(PlaybackHistory, self).__init__(filepath)
 
-    def _add_last_played(self, value, item):
-        value['last_played'] = self._convert_timestamp(item[1])
+    @staticmethod
+    def _add_last_played(value, item):
+        value['last_played'] = fromtimestamp(item[1])
         return value
 
     def get_items(self, keys=None):

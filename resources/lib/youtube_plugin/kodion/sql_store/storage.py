@@ -14,11 +14,10 @@ import os
 import pickle
 import sqlite3
 import time
-from datetime import datetime
 from traceback import format_stack
 
 from ..logger import log_error
-from ..utils.datetime_parser import since_epoch
+from ..utils.datetime_parser import fromtimestamp, since_epoch
 from ..utils.methods import make_dirs
 
 
@@ -317,7 +316,7 @@ class Storage(object):
             self._execute(cursor, self._sql['set'], values=values)
 
     def _set_many(self, items, flatten=False):
-        now = since_epoch(datetime.now())
+        now = since_epoch()
         num_items = len(items)
 
         if flatten:
@@ -368,7 +367,7 @@ class Storage(object):
 
     @staticmethod
     def _encode(key, obj, timestamp=None):
-        timestamp = timestamp or since_epoch(datetime.now())
+        timestamp = timestamp or since_epoch()
         blob = sqlite3.Binary(pickle.dumps(
             obj, protocol=pickle.HIGHEST_PROTOCOL
         ))
@@ -383,7 +382,7 @@ class Storage(object):
             item = result.fetchone() if result else None
             if not item:
                 return None
-        cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
+        cut_off = since_epoch() - seconds if seconds else 0
         if not cut_off or item[1] >= cut_off:
             return self._decode(item[2], process, item)
         return None
@@ -402,7 +401,7 @@ class Storage(object):
             query = self._sql['get_by_key'].format('?,' * (num_ids - 1) + '?')
             item_ids = tuple(item_ids)
 
-        cut_off = since_epoch(datetime.now()) - seconds if seconds else 0
+        cut_off = since_epoch() - seconds if seconds else 0
         with self as (db, cursor), db:
             result = self._execute(cursor, query, item_ids)
             if as_dict:
@@ -418,7 +417,7 @@ class Storage(object):
             else:
                 result = [
                     (item[0],
-                     self._convert_timestamp(item[1]),
+                     fromtimestamp(item[1]),
                      self._decode(item[2], process, item))
                     for item in result if not cut_off or item[1] >= cut_off
                 ]
@@ -434,7 +433,3 @@ class Storage(object):
         with self as (db, cursor), db:
             self._execute(cursor, query, tuple(item_ids))
             self._execute(cursor, 'VACUUM')
-
-    @classmethod
-    def _convert_timestamp(cls, val):
-        return datetime.fromtimestamp(val)

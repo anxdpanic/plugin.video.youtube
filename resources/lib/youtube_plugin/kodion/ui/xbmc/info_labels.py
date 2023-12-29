@@ -20,10 +20,11 @@ def _process_date_value(info_labels, name, param):
 
 
 def _process_datetime_value(info_labels, name, param):
-    if param:
-        info_labels[name] = (param.isoformat('T')
-                             if current_system_version.compatible(19, 0) else
-                             param.strftime('%d.%d.%Y'))
+    if not param:
+        return
+    info_labels[name] = (param.replace(microsecond=0, tzinfo=None).isoformat()
+                         if current_system_version.compatible(19, 0) else
+                         param.strftime('%d.%m.%Y'))
 
 
 def _process_int_value(info_labels, name, param):
@@ -81,14 +82,6 @@ def _process_mediatype(info_labels, name, param):
     info_labels[name] = param
 
 
-def _process_last_played(info_labels, name, param):
-    if param:
-        try:
-            info_labels[name] = param.strftime('%Y-%m-%d %H:%M:%S')
-        except AttributeError:
-            info_labels[name] = param
-
-
 def create_from_item(base_item):
     info_labels = {}
 
@@ -144,7 +137,7 @@ def create_from_item(base_item):
         # 'duration' = '3:18' (string)
         _process_video_duration(info_labels, base_item.get_duration())
 
-        _process_last_played(info_labels, 'lastplayed', base_item.get_last_played())
+        _process_datetime_value(info_labels, 'lastplayed', base_item.get_last_played())
 
         # 'rating' = 4.5 (float)
         _process_video_rating(info_labels, base_item.get_rating())

@@ -22,11 +22,11 @@ from ...kodion.utils import (
     strip_html_from_text,
 )
 
-
 try:
     from inputstreamhelper import Helper as ISHelper
 except ImportError:
     ISHelper = None
+
 
 __COLOR_MAP = {
     'commentCount': 'cyan',
@@ -127,12 +127,12 @@ def make_comment_item(context, snippet, uri, total_replies=0):
     comment_item = DirectoryItem(label, uri)
     comment_item.set_plot(plot)
 
-    datetime = datetime_parser.parse(published_at, as_utc=True)
+    datetime = datetime_parser.parse(published_at)
     comment_item.set_added_utc(datetime)
     local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_dateadded_from_datetime(local_datetime)
     if edited:
-        datetime = datetime_parser.parse(updated_at, as_utc=True)
+        datetime = datetime_parser.parse(updated_at)
         local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_date_from_datetime(local_datetime)
 
@@ -427,7 +427,7 @@ def update_video_infos(provider, context, video_id_dict,
         else:
             start_at = None
         if start_at:
-            datetime = datetime_parser.parse(start_at, as_utc=True)
+            datetime = datetime_parser.parse(start_at)
             video_item.set_scheduled_start_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
             video_item.set_year_from_datetime(local_datetime)
@@ -531,7 +531,7 @@ def update_video_infos(provider, context, video_id_dict,
         # date time
         published_at = snippet.get('publishedAt')
         if published_at:
-            datetime = datetime_parser.parse(published_at, as_utc=True)
+            datetime = datetime_parser.parse(published_at)
             video_item.set_added_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
             video_item.set_dateadded_from_datetime(local_datetime)
