@@ -93,8 +93,6 @@ class AbstractContext(object):
         if not params:
             params = {}
 
-        self._system_version = None
-
         self._cache_path = None
         self._debug_path = None
 
@@ -217,10 +215,7 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     def get_system_version(self):
-        if not self._system_version:
-            self._system_version = current_system_version
-
-        return self._system_version
+        return current_system_version
 
     def create_uri(self, path='/', params=None):
         if not params:

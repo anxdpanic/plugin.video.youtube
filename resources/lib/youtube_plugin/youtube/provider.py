@@ -1075,7 +1075,7 @@ class Provider(AbstractProvider):
                 ui.show_notification(localize('failed'))
 
         elif action == 'install' and maint_type == 'inputstreamhelper':
-            if context.get_system_version().get_version()[0] >= 17:
+            if context.get_system_version().compatible(17):
                 try:
                     xbmcaddon.Addon('script.module.inputstreamhelper')
                     ui.show_notification(localize('inputstreamhelper.is_installed'))

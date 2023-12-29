@@ -27,7 +27,7 @@ class XbmcContextUI(AbstractContextUI):
         self._view_mode = None
 
     def create_progress_dialog(self, heading, text=None, background=False):
-        if background and self._context.get_system_version().get_version() > (12, 3):
+        if background:
             return XbmcProgressDialogBG(heading, text)
 
         return XbmcProgressDialog(heading, text)
@@ -36,15 +36,6 @@ class XbmcContextUI(AbstractContextUI):
         return xbmc.getSkinDir()
 
     def on_keyboard_input(self, title, default='', hidden=False):
-        # fallback for Frodo
-        if self._context.get_system_version().get_version() <= (12, 3):
-            keyboard = xbmc.Keyboard(default, title, hidden)
-            keyboard.doModal()
-            if keyboard.isConfirmed() and keyboard.getText():
-                text = to_unicode(keyboard.getText())
-                return True, text
-            return False, ''
-
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
         result = dialog.input(title, to_unicode(default), type=xbmcgui.INPUT_ALPHANUM)

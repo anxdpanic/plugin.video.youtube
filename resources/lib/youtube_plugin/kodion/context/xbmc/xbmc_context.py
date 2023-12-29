@@ -406,8 +406,9 @@ class XbmcContext(AbstractContext):
 
         """
         We want to use all localization strings!
-        Addons should only use the range 30000 thru 30999 (see: http://kodi.wiki/view/Language_support) but we
-        do it anyway. I want some of the localized strings for the views of a skin.
+        Addons should only use the range 30000 thru 30999
+        (see: http://kodi.wiki/view/Language_support) but we do it anyway.
+        I want some of the localized strings for the views of a skin.
         """
         source = self._addon if 30000 <= text_id < 31000 else xbmc
         result = source.getLocalizedString(text_id)
@@ -520,7 +521,9 @@ class XbmcContext(AbstractContext):
         if self._settings.use_isa():
             if self.addon_enabled('inputstream.adaptive'):
                 success = True
-            elif self.get_ui().on_yes_no_input(self.get_name(), self.localize('isa.enable.confirm')):
+            elif self.get_ui().on_yes_no_input(
+                self.get_name(), self.localize('isa.enable.confirm')
+            ):
                 success = self.set_addon_enabled('inputstream.adaptive')
             else:
                 success = False
@@ -529,15 +532,16 @@ class XbmcContext(AbstractContext):
         return success
 
     # Values of capability map can be any of the following:
-    # - required version number as string for comparison with actual installed InputStream.Adaptive version
-    # - any Falsey value to exclude capability regardless of version
+    # - required version number, as string for comparison with actual installed
+    #   InputStream.Adaptive version
+    # - any Falsy value to exclude capability regardless of version
     # - True to include capability regardless of version
     _ISA_CAPABILITIES = {
         'live': '2.0.12',
         'drm': '2.2.12',
         # audio codecs
         'vorbis': '2.3.14',
-        'opus': '19.0.0',  # unknown when Opus audio support was first implemented
+        'opus': '19.0.0',  # unknown when Opus audio support was implemented
         'mp4a': True,
         'ac-3': '2.1.15',
         'ec-3': '2.1.15',
@@ -550,10 +554,13 @@ class XbmcContext(AbstractContext):
     }
 
     def inputstream_adaptive_capabilities(self, capability=None):
-        # return a list inputstream.adaptive capabilities, if capability set return version required
+        # Returns a list of inputstream.adaptive capabilities
+        # If capability param is provided, returns version of ISA where the
+        # capability is available
 
         try:
-            inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
+            addon = xbmcaddon.Addon('inputstream.adaptive')
+            inputstream_version = addon.getAddonInfo('version')
         except RuntimeError:
             inputstream_version = ''
 
@@ -563,18 +570,21 @@ class XbmcContext(AbstractContext):
         isa_loose_version = loose_version(inputstream_version)
         if capability is None:
             capabilities = frozenset(
-                capability for capability, version in self._ISA_CAPABILITIES.items()
+                capability
+                for (capability, version) in self._ISA_CAPABILITIES.items()
                 if version is True
                 or version and isa_loose_version >= loose_version(version)
             )
             return capabilities
         version = self._ISA_CAPABILITIES.get(capability)
-        return version is True or version and isa_loose_version >= loose_version(version)
+        return (version is True
+                or version and isa_loose_version >= loose_version(version))
 
     @staticmethod
     def inputstream_adaptive_auto_stream_selection():
         try:
-            return xbmcaddon.Addon('inputstream.adaptive').getSetting('STREAMSELECTION') == '0'
+            addon = xbmcaddon.Addon('inputstream.adaptive')
+            return addon.getSetting('STREAMSELECTION') == '0'
         except RuntimeError:
             return False
 

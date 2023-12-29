@@ -69,6 +69,7 @@ def _process_list_response(provider, context, json_data):
                 video_item.set_play_count(0)
             result.append(video_item)
             video_id_dict[video_id] = video_item
+
         elif kind == 'channel':
             channel_id = yt_item['id']
             snippet = yt_item['snippet']
@@ -92,6 +93,7 @@ def _process_list_response(provider, context, json_data):
                 channel_item.set_context_menu(context_menu)
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
+
         elif kind == 'guidecategory':
             guide_id = yt_item['id']
             snippet = yt_item['snippet']
@@ -104,6 +106,7 @@ def _process_list_response(provider, context, json_data):
             item_uri = context.create_uri(['special', 'browse_channels'], item_params)
             guide_item = DirectoryItem(title, item_uri)
             result.append(guide_item)
+
         elif kind == 'subscription':
             snippet = yt_item['snippet']
             title = snippet.get('title', context.localize('untitled'))
@@ -122,6 +125,7 @@ def _process_list_response(provider, context, json_data):
 
             result.append(channel_item)
             channel_id_dict[channel_id] = channel_item
+
         elif kind == 'playlist':
             playlist_id = yt_item['id']
             snippet = yt_item['snippet']
@@ -142,6 +146,7 @@ def _process_list_response(provider, context, json_data):
             playlist_item = DirectoryItem(title, item_uri, image=image)
             result.append(playlist_item)
             playlist_id_dict[playlist_id] = playlist_item
+
         elif kind == 'playlistitem':
             snippet = yt_item['snippet']
             video_id = snippet['resourceId']['videoId']
@@ -229,7 +234,7 @@ def _process_list_response(provider, context, json_data):
                     video_item.set_play_count(0)
                 result.append(video_item)
                 video_id_dict[video_id] = video_item
-            # playlist
+
             elif kind == 'playlist':
                 playlist_id = yt_item['id']['playlistId']
                 snippet = yt_item['snippet']
@@ -250,6 +255,7 @@ def _process_list_response(provider, context, json_data):
                 playlist_item = DirectoryItem(title, item_uri, image=image)
                 result.append(playlist_item)
                 playlist_id_dict[playlist_id] = playlist_item
+
             elif kind == 'channel':
                 channel_id = yt_item['id']['channelId']
                 snippet = yt_item['snippet']
@@ -264,6 +270,7 @@ def _process_list_response(provider, context, json_data):
                 channel_item = DirectoryItem(title, item_uri, image=image)
                 result.append(channel_item)
                 channel_id_dict[channel_id] = channel_item
+
             else:
                 raise KodionException("Unknown kind '%s'" % kind)
         else:
@@ -413,16 +420,29 @@ def _process_list_response(provider, context, json_data):
     return result
 
 
-def response_to_items(provider, context, json_data, sort=None, reverse=False, process_next_page=True):
+def response_to_items(provider,
+                      context,
+                      json_data,
+                      sort=None,
+                      reverse=False,
+                      process_next_page=True):
     is_youtube, kind = _parse_kind(json_data)
     if not is_youtube:
         context.log_debug('v3 response: Response discarded, is_youtube=False')
         return []
 
-    if kind in ['searchlistresponse', 'playlistitemlistresponse', 'playlistlistresponse',
-                'subscriptionlistresponse', 'guidecategorylistresponse', 'channellistresponse',
-                'videolistresponse', 'activitylistresponse', 'commentthreadlistresponse',
-                'commentlistresponse']:
+    if kind in (
+            'activitylistresponse',
+            'channellistresponse',
+            'commentlistresponse',
+            'commentthreadlistresponse',
+            'guidecategorylistresponse',
+            'playlistitemlistresponse',
+            'playlistlistresponse',
+            'searchlistresponse',
+            'subscriptionlistresponse',
+            'videolistresponse',
+    ):
         result = _process_list_response(provider, context, json_data)
     else:
         raise KodionException("Unknown kind '%s'" % kind)
@@ -439,18 +459,23 @@ def response_to_items(provider, context, json_data, sort=None, reverse=False, pr
 
     # next page
     """
-    This will try to prevent the issue 7163 (https://code.google.com/p/gdata-issues/issues/detail?id=7163).
-    Somehow the APIv3 is missing the token for the next page. We implemented our own calculation for the token
-    into the YouTube client...this should work for up to ~2000 entries.
+    This will try to prevent the issue 7163
+    https://code.google.com/p/gdata-issues/issues/detail?id=7163
+    Somehow the APIv3 is missing the token for the next page.
+    We implemented our own calculation for the token into the YouTube client
+    This should work for up to ~2000 entries.
     """
-    yt_total_results = int(json_data.get('pageInfo', {}).get('totalResults', 0))
-    yt_results_per_page = int(json_data.get('pageInfo', {}).get('resultsPerPage', 0))
+    page_info = json_data.get('pageInfo', {})
+    yt_total_results = int(page_info.get('totalResults', 0))
+    yt_results_per_page = int(page_info.get('resultsPerPage', 0))
     page = int(context.get_param('page', 1))
     yt_next_page_token = json_data.get('nextPageToken', '')
     if yt_next_page_token or (page * yt_results_per_page < yt_total_results):
         if not yt_next_page_token:
             client = provider.get_client(context)
-            yt_next_page_token = client.calculate_next_page_token(page + 1, yt_results_per_page)
+            yt_next_page_token = client.calculate_next_page_token(
+                page + 1, yt_results_per_page
+            )
 
         new_params = dict(context.get_params(),
                           page_token=yt_next_page_token)

@@ -15,7 +15,6 @@ from ...compatibility import xbmcgui
 from ...items import AudioItem, UriItem, VideoItem
 from ...utils import current_system_version, datetime_parser
 
-
 try:
     from infotagger.listitem import set_info_tag
 except ImportError:

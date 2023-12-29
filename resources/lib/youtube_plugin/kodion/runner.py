@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import copy
+import platform
 import timeit
 
 from . import debug
@@ -33,31 +34,28 @@ def run(provider, context=None):
         context = Context()
 
     context.log_debug('Starting Kodion framework by bromix...')
-    python_version = 'Unknown version of Python'
-    try:
-        import platform
 
-        python_version = str(platform.python_version())
-        python_version = 'Python %s' % python_version
-    except:
-        # do nothing
-        pass
-
-    version = context.get_system_version()
-    name = context.get_name()
     addon_version = context.get_version()
-    redacted = '<redacted>'
-    context_params = copy.deepcopy(context.get_params())
-    if 'api_key' in context_params:
-        context_params['api_key'] = redacted
-    if 'client_id' in context_params:
-        context_params['client_id'] = redacted
-    if 'client_secret' in context_params:
-        context_params['client_secret'] = redacted
+    python_version = 'Python {0}'.format(platform.python_version())
 
-    context.log_notice('Running: %s (%s) on %s with %s\n\tPath: %s\n\tParams: %s' %
-                       (name, addon_version, version, python_version,
-                        context.get_path(), context_params))
+    redacted = '<redacted>'
+    params = copy.deepcopy(context.get_params())
+    if 'api_key' in params:
+        params['api_key'] = redacted
+    if 'client_id' in params:
+        params['client_id'] = redacted
+    if 'client_secret' in params:
+        params['client_secret'] = redacted
+
+    context.log_notice('Running: {plugin} ({version}) on {kodi} with {python}\n'
+                       '\tPath: {path}\n'
+                       '\tParams: {params}'
+                       .format(plugin=context.get_name(),
+                               version=addon_version,
+                               kodi=context.get_system_version(),
+                               python=python_version,
+                               path=context.get_path(),
+                               params=params))
 
     __RUNNER__.run(provider, context)
     provider.tear_down(context)
@@ -65,6 +63,10 @@ def run(provider, context=None):
     elapsed = timeit.default_timer() - start_time
 
     if __DEBUG_RUNTIME:
-        debug.runtime(context, addon_version, elapsed, single_file=__DEBUG_RUNTIME_SINGLE_FILE)
+        debug.runtime(context,
+                      addon_version,
+                      elapsed,
+                      single_file=__DEBUG_RUNTIME_SINGLE_FILE)
 
-    context.log_debug('Shutdown of Kodion after |%s| seconds' % str(round(elapsed, 4)))
+    context.log_debug('Shutdown of Kodion after |{elapsed:.4}| seconds'
+                      .format(elapsed=elapsed))
