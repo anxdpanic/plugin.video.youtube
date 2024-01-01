@@ -74,7 +74,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     like_count = snippet['likeCount']
     if like_count:
-        like_count, _ = friendly_number(like_count)
+        like_count = friendly_number(like_count)
         color = __COLOR_MAP['likeCount']
         label_likes = ui.color(color, ui.bold(like_count))
         plot_likes = ui.color(color, ui.bold(' '.join((
@@ -84,7 +84,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
         plot_props.append(plot_likes)
 
     if total_replies:
-        total_replies, _ = friendly_number(total_replies)
+        total_replies = friendly_number(total_replies)
         color = __COLOR_MAP['commentCount']
         label_replies = ui.color(color, ui.bold(total_replies))
         plot_replies = ui.color(color, ui.bold(' '.join((
@@ -452,7 +452,7 @@ def update_video_infos(provider, context, video_id_dict,
                 if not label:
                     continue
 
-                str_value, value = friendly_number(value)
+                str_value, value = friendly_number(value, as_str=False)
                 if not value:
                     continue
 
