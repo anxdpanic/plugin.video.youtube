@@ -88,11 +88,6 @@ def create_from_item(base_item):
     # 'date' = '1982-03-09' (string)
     _process_datetime_value(info_labels, 'date', base_item.get_date())
 
-    # 'count' = 12 (integer)
-    # Can be used to store an id for later, or for sorting purposes
-    # Used for video view count
-    _process_int_value(info_labels, 'count', base_item.get_count())
-
     # Directory
     if isinstance(base_item, DirectoryItem):
         _process_string_value(info_labels, 'plot', base_item.get_plot())
@@ -123,6 +118,11 @@ def create_from_item(base_item):
 
         # play count
         _process_int_value(info_labels, 'playcount', base_item.get_play_count())
+
+        # 'count' = 12 (integer)
+        # Can be used to store an id for later, or for sorting purposes
+        # Used for Youtube video view count
+        _process_int_value(info_labels, 'count', base_item.get_count())
 
         # studio
         _process_studios(info_labels, 'studio', base_item.get_studio())
