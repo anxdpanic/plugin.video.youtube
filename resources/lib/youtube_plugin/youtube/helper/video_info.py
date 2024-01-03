@@ -991,8 +991,16 @@ class VideoInfo(YouTubeRequestClient):
         if not details:
             details = (
                 'errorScreen',
-                ('playerErrorMessageRenderer', 'confirmDialogRenderer'),
-                ('reason', 'title')
+                (
+                    (
+                        'playerErrorMessageRenderer',
+                        'reason',
+                    ),
+                    (
+                        'confirmDialogRenderer',
+                        'title',
+                    ),
+                )
             )
 
         result = self.json_traverse(playability_status, details)

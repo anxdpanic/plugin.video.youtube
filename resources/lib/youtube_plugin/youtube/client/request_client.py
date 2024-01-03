@@ -270,26 +270,38 @@ class YouTubeRequestClient(BaseRequestsClass):
         self._access_token = None
         self.video_id = None
 
-    @staticmethod
-    def json_traverse(json_data, path):
+    @classmethod
+    def json_traverse(cls, json_data, path):
         if not json_data or not path:
             return None
 
         result = json_data
-        for keys in path:
-            is_dict = isinstance(result, dict)
-            if not is_dict and not isinstance(result, (list, tuple)):
+        for idx, keys in enumerate(path):
+            if not isinstance(result, (dict, list, tuple)):
                 return None
+
+            if isinstance(keys, slice):
+                return [
+                    cls.json_traverse(part, path[idx + 1:])
+                    for part in result[keys]
+                    if part
+                ]
 
             if not isinstance(keys, (list, tuple)):
                 keys = [keys]
+
             for key in keys:
-                if is_dict:
-                    if key not in result:
-                        continue
-                elif not isinstance(key, int) or len(result) <= key:
+                if isinstance(key, (list, tuple)):
+                    new_result = cls.json_traverse(result, key)
+                    if new_result:
+                        result = new_result
+                        break
                     continue
-                result = result[key]
+
+                try:
+                    result = result[key]
+                except (KeyError, IndexError):
+                    continue
                 break
             else:
                 return None
