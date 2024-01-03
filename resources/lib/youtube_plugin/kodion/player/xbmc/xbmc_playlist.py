@@ -33,9 +33,9 @@ class XbmcPlaylist(AbstractPlaylist):
         self._playlist.clear()
 
     def add(self, base_item):
-        item = xbmc_items.video_listitem(self._context, base_item)
+        uri, item, _ = xbmc_items.video_listitem(self._context, base_item)
         if item:
-            self._playlist.add(base_item.get_uri(), listitem=item)
+            self._playlist.add(uri, listitem=item)
 
     def shuffle(self):
         self._playlist.shuffle()
