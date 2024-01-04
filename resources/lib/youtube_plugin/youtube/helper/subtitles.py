@@ -262,10 +262,11 @@ class Subtitles(object):
             error_info=('Failed to retrieve subtitles for: {lang}: {{exc}}'
                         .format(lang=lang_code))
         )
-        if not response.text:
+        response = response and response.text
+        if not response:
             return []
 
-        output = bytearray(self._unescape(response.text),
+        output = bytearray(self._unescape(response),
                            encoding='utf8',
                            errors='ignore')
         try:

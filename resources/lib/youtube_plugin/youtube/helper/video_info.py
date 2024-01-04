@@ -750,12 +750,12 @@ class VideoInfo(YouTubeRequestClient):
             error_msg=('Failed to get player js for video_id: {0}'
                        .format(self.video_id))
         )
+        result = result and result.text
         if not result:
             return ''
 
-        javascript = result.text
-        self._data_cache.set_item(js_cache_key, {'js': javascript})
-        return javascript
+        self._data_cache.set_item(js_cache_key, {'js': result})
+        return result
 
     @staticmethod
     def _make_curl_headers(headers, cookies=None):
@@ -1144,8 +1144,7 @@ class VideoInfo(YouTubeRequestClient):
                            'video_id: {0}'.format(self.video_id)),
                 **self.build_client('smarttv_embedded', client_data)
             )
-
-            response = result.json()
+            response = result and result.json() or {}
             captions = response.get('captions')
             if captions:
                 captions['headers'] = result.request.headers

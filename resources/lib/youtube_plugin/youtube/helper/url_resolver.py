@@ -127,7 +127,7 @@ class YouTubeResolver(AbstractResolver):
                                 method=method,
                                 headers=self._HEADERS,
                                 allow_redirects=True)
-        if response.status_code != 200:
+        if not response or not response.ok:
             return url
 
         if path.startswith('/clip'):
@@ -197,7 +197,7 @@ class CommonResolver(AbstractResolver):
                                 method=method,
                                 headers=self._HEADERS,
                                 allow_redirects=True)
-        if response.status_code != 200:
+        if not response or not response.ok:
             return url
         return response.url
 
