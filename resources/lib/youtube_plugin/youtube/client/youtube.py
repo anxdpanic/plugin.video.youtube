@@ -728,26 +728,83 @@ class YouTube(LoginClient):
                            page_token='',
                            max_results=0,
                            **kwargs):
-        # prepare page token
-        if not page_token:
-            page_token = ''
-
+        # TODO: Improve handling of InnerTube requests, including automatic
+        # continuation processing to retrieve max_results number of results
+        # See Youtube.get_saved_playlists for existing implementation
         max_results = self._max_results if max_results <= 0 else max_results
 
-        # prepare params
-        params = {'relatedToVideoId': video_id,
-                  'part': 'snippet',
-                  'type': 'video',
-                  'regionCode': self._region,
-                  'hl': self._language,
-                  'maxResults': str(max_results)}
+        client_data = {'json': {'videoId': video_id}}
         if page_token:
-            params['pageToken'] = page_token
+            client_data['json']['continuation'] = page_token
+        client = self.build_client('web', client_data)
 
-        return self.perform_v3_request(method='GET',
-                                       path='search',
-                                       params=params,
-                                       **kwargs)
+        result = self.request(
+            'https://www.youtube.com/youtubei/v1/next',
+            method='POST',
+            response_hook=self._response_hook,
+            response_hook_kwargs=kwargs,
+            error_hook=self._error_hook,
+            **client
+        )
+        if not result:
+            return []
+
+        related_videos = self.json_traverse(
+            result,
+            path=((
+                'onResponseReceivedEndpoints',
+                0,
+                'appendContinuationItemsAction',
+                'continuationItems',
+            ) if page_token else (
+                'contents',
+                'twoColumnWatchNextResults',
+                'secondaryResults',
+                'secondaryResults',
+                'results',
+            )) + (
+                slice(None),
+                (
+                    (
+                        'compactVideoRenderer',
+                        # 'videoId',
+                    ),
+                    (
+                        'continuationItemRenderer',
+                        'continuationEndpoint',
+                        'continuationCommand',
+                        # 'token',
+                    ),
+                ),
+            )
+        )
+        if not related_videos:
+            return []
+
+        v3_response = {
+            'kind': 'youtube#videoListResponse',
+            'items': [
+                {
+                    'kind': "youtube#video",
+                    'id': video['videoId'],
+                    'snippet': {
+                        'title': video['title']['simpleText'],
+                        'thumbnails': dict(zip(
+                            ('default', 'high'),
+                            video['thumbnail']['thumbnails'],
+                        )),
+                    }
+                }
+                for video in related_videos
+                if video and 'videoId' in video
+            ]
+        }
+
+        last_item = related_videos[-1]
+        if last_item and 'token' in last_item:
+            v3_response['nextPageToken'] = last_item['token']
+
+        return v3_response
 
     def get_parent_comments(self,
                             video_id,

@@ -30,15 +30,16 @@ def _process_related_videos(provider, context):
     if not video_id:
         return []
 
-    json_data = provider.get_client(context).get_related_videos(
-        video_id=video_id, page_token=context.get_param('page_token', '')
+    function_cache = context.get_function_cache()
+    json_data = function_cache.get(
+        provider.get_client(context).get_related_videos,
+        function_cache.ONE_HOUR,
+        video_id=video_id,
+        page_token=context.get_param('page_token', ''),
     )
     if not json_data:
         return False
-    return v3.response_to_items(provider,
-                                context,
-                                json_data,
-                                process_next_page=False)
+    return v3.response_to_items(provider, context, json_data)
 
 
 def _process_parent_comments(provider, context):
