@@ -54,7 +54,7 @@ class BaseRequestsClass(object):
         elif exc_type:
             self._default_exc = (RequestException, exc_type)
         else:
-            self._default_exc = RequestException
+            self._default_exc = (RequestException,)
 
     def __del__(self):
         self._session.close()
@@ -101,6 +101,9 @@ class BaseRequestsClass(object):
                                              verify=verify,
                                              cert=cert,
                                              json=json)
+            if not response:
+                raise self._default_exc[0]
+
             if response_hook:
                 if response_hook_kwargs is None:
                     response_hook_kwargs = {}
@@ -118,7 +121,7 @@ class BaseRequestsClass(object):
                 if error_hook_kwargs is None:
                     error_hook_kwargs = {}
                 error_hook_kwargs['exc'] = exc
-                error_hook_kwargs['response'] = response
+                error_hook_kwargs['response'] = response or exc.response
                 error_response = error_hook(**error_hook_kwargs)
                 _title, _info, _detail, _response, _trace, _exc = error_response
                 if _title is not None:
@@ -161,10 +164,13 @@ class BaseRequestsClass(object):
             ] if part]))
 
             if raise_exc:
+                if not callable(raise_exc):
+                    raise_exc = self._default_exc[-1]
+                raise_exc = raise_exc(error_title)
+
                 if isinstance(raise_exc, BaseException):
-                    raise raise_exc(exc)
-                if callable(raise_exc):
-                    raise raise_exc(error_title)(exc)
-                raise self._default_exc(error_title)(exc)
+                    raise_exc.__cause__ = exc
+                    raise raise_exc
+                raise exc
 
         return response

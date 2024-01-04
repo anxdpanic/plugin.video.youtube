@@ -264,7 +264,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         elif exc_type:
             exc_type = (YouTubeException, exc_type)
         else:
-            exc_type = YouTubeException
+            exc_type = (YouTubeException,)
         super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
 
     @classmethod
