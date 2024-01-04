@@ -267,9 +267,6 @@ class YouTubeRequestClient(BaseRequestsClass):
             exc_type = YouTubeException
         super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
 
-        self._access_token = None
-        self.video_id = None
-
     @classmethod
     def json_traverse(cls, json_data, path):
         if not json_data or not path:
@@ -310,18 +307,18 @@ class YouTubeRequestClient(BaseRequestsClass):
             return None
         return result
 
-    def build_client(self, client_name, auth_header=False, data=None):
+    @classmethod
+    def build_client(cls, client_name, data=None):
         templates = {}
 
-        client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
-        client = merge_dicts(self.CLIENTS['_common'], client, templates)
+        client = (cls.CLIENTS.get(client_name) or cls.CLIENTS['web']).copy()
+        client = merge_dicts(cls.CLIENTS['_common'], client, templates)
 
         if data:
-            client.update(data)
-        client['json']['videoId'] = self.video_id
-        if auth_header and self._access_token:
-            client['_access_token'] = self._access_token
-            client['params'] = None
+            client = merge_dicts(client, data)
+
+        if data and '_access_token' in data:
+            del client['params']['key']
         elif 'Authorization' in client['headers']:
             del client['headers']['Authorization']
 
