@@ -177,8 +177,6 @@ def _process_description_links(provider, context):
                 context.log_debug('Resolving urls aborted')
                 break
 
-            context.sleep(50)
-
         url_to_item_converter = UrlToItemConverter()
         url_to_item_converter.add_urls(res_urls, context)
         result = url_to_item_converter.get_items(provider, context)
