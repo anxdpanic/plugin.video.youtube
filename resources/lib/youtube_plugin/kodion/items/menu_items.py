@@ -54,7 +54,7 @@ def video_comments(context, video_id):
 def content_from_description(context, video_id):
     return (
         context.localize('video.description.links'),
-        'RunPlugin({0})'.format(context.create_uri(
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
             ('special', 'description_links',),
             {
                 'video_id': video_id,
