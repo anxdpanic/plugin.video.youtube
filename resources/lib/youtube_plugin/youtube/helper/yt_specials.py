@@ -143,45 +143,42 @@ def _process_description_links(provider, context):
         context.set_content_type(content.VIDEOS)
         url_resolver = UrlResolver(context)
 
-        progress_dialog = context.get_ui().create_progress_dialog(
+        with context.get_ui().create_progress_dialog(
             heading=context.localize('please_wait'), background=False
-        )
+        ) as progress_dialog:
+            resource_manager = provider.get_resource_manager(context)
 
-        resource_manager = provider.get_resource_manager(context)
+            video_data = resource_manager.get_videos((video_id, ))
+            yt_item = video_data[video_id]
+            if not yt_item or 'snippet' not in yt_item:
+                context.get_ui().on_ok(
+                    title=context.localize('video.description.links'),
+                    text=context.localize('video.description.links.not_found')
+                )
+                return False
+            snippet = yt_item['snippet']
+            description = strip_html_from_text(snippet['description'])
 
-        video_data = resource_manager.get_videos((video_id, ))
-        yt_item = video_data[video_id]
-        if not yt_item or 'snippet' not in yt_item:
-            context.get_ui().on_ok(
-                title=context.localize('video.description.links'),
-                text=context.localize('video.description.links.not_found')
-            )
-            return False
-        snippet = yt_item['snippet']
-        description = strip_html_from_text(snippet['description'])
+            function_cache = context.get_function_cache()
+            urls = function_cache.get(extract_urls,
+                                      function_cache.ONE_WEEK,
+                                      description)
 
-        function_cache = context.get_function_cache()
-        urls = function_cache.get(extract_urls,
-                                  function_cache.ONE_WEEK,
-                                  description)
+            progress_dialog.set_total(len(urls))
 
-        progress_dialog.set_total(len(urls))
+            res_urls = []
+            for url in urls:
+                progress_dialog.update(steps=1, text=url)
+                resolved_url = url_resolver.resolve(url)
+                res_urls.append(resolved_url)
 
-        res_urls = []
-        for url in urls:
-            progress_dialog.update(steps=1, text=url)
-            resolved_url = url_resolver.resolve(url)
-            res_urls.append(resolved_url)
+                if progress_dialog.is_aborted():
+                    context.log_debug('Resolving urls aborted')
+                    break
 
-            if progress_dialog.is_aborted():
-                context.log_debug('Resolving urls aborted')
-                break
-
-        url_to_item_converter = UrlToItemConverter()
-        url_to_item_converter.add_urls(res_urls, context)
-        result = url_to_item_converter.get_items(provider, context)
-
-        progress_dialog.close()
+            url_to_item_converter = UrlToItemConverter()
+            url_to_item_converter.add_urls(res_urls, context)
+            result = url_to_item_converter.get_items(provider, context)
 
         if result:
             return result
