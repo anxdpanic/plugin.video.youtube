@@ -1251,7 +1251,7 @@ class Provider(AbstractProvider):
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
 
-        context.set_content_type(content.FILES)
+        # context.set_content_type(content.FILES)
 
         result = []
 
