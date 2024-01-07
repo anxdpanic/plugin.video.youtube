@@ -1289,26 +1289,28 @@ class Provider(AbstractProvider):
             result.append(my_subscriptions_filtered_item)
 
         access_manager = context.get_access_manager()
+        watch_later_id = logged_in and access_manager.get_watch_later_id()
+        history_id = logged_in and access_manager.get_watch_history_id()
+        local_history = settings.use_local_history()
 
         # Recommendations
-        if logged_in and settings.get_bool('youtube.folder.recommendations.show', True):
-            watch_history_playlist_id = access_manager.get_watch_history_id()
-            if watch_history_playlist_id != 'HL':
+        if settings.get_bool('youtube.folder.recommendations.show', True):
+            if history_id and history_id != 'HL' or local_history:
                 recommendations_item = DirectoryItem(
                     localize('recommendations'),
                     create_uri(('special', 'recommendations')),
-                    image='{media}/popular.png',
+                    image='{media}/what_to_watch.png',
                 )
                 result.append(recommendations_item)
 
-        # what to watch
+        # Trending
         if settings.get_bool('youtube.folder.popular_right_now.show', True):
-            what_to_watch_item = DirectoryItem(
+            trending_item = DirectoryItem(
                 localize('popular_right_now'),
                 create_uri(('special', 'popular_right_now')),
                 image='{media}/popular.png',
             )
-            result.append(what_to_watch_item)
+            result.append(trending_item)
 
         # search
         if settings.get_bool('youtube.folder.search.show', True):
@@ -1354,16 +1356,15 @@ class Provider(AbstractProvider):
 
         # watch later
         if settings.get_bool('youtube.folder.watch_later.show', True):
-            playlist_id = logged_in and access_manager.get_watch_later_id()
-            if playlist_id:
+            if watch_later_id:
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri(('channel', 'mine', 'playlist', playlist_id)),
+                    create_uri(('channel', 'mine', 'playlist', watch_later_id)),
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
-                        context, playlist_id
+                        context, watch_later_id
                     )
                 ]
                 watch_later_item.set_context_menu(context_menu)
@@ -1405,21 +1406,20 @@ class Provider(AbstractProvider):
 
         # history
         if settings.get_bool('youtube.folder.history.show', False):
-            playlist_id = logged_in and access_manager.get_watch_history_id()
-            if playlist_id and playlist_id != 'HL':
+            if history_id and history_id != 'HL':
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri(('channel', 'mine', 'playlist', playlist_id)),
+                    create_uri(('channel', 'mine', 'playlist', history_id)),
                     image='{media}/history.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
-                        context, playlist_id
+                        context, history_id
                     )
                 ]
                 watch_history_item.set_context_menu(context_menu)
                 result.append(watch_history_item)
-            elif settings.use_local_history():
+            elif local_history:
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri([paths.HISTORY], params={'action': 'list'}),
