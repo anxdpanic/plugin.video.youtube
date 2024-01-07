@@ -319,7 +319,7 @@ def _process_list_response(provider, context, json_data):
 
         thread = resource['thread']
         if thread:
-            thread.join(1)
+            thread.join(5)
             if not thread.is_alive():
                 resource['thread'] = None
                 resource['complete'] = True
