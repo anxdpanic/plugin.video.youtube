@@ -67,6 +67,7 @@ class AbstractContext(object):
         'api_key',
         'action',
         'addon_id',
+        'category_label',
         'channel_id',
         'channel_name',
         'client_id',
@@ -328,7 +329,7 @@ class AbstractContext(object):
     def localize(self, text_id, default_text=''):
         raise NotImplementedError()
 
-    def set_content_type(self, content_type, sub_type=None):
+    def set_content(self, content_type, sub_type=None, category_label=None):
         raise NotImplementedError()
 
     def add_sort_method(self, *sort_methods):

@@ -25,7 +25,8 @@ class NextPageItem(DirectoryItem):
                                                context.get_path(),
                                                new_params
                                            ),
-                                           image=image)
+                                           image=image,
+                                           category_label=False)
 
         if fanart:
             self.set_fanart(fanart)

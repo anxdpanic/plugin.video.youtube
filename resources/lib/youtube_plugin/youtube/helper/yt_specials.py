@@ -25,7 +25,7 @@ from ...kodion.utils import strip_html_from_text
 
 
 def _process_related_videos(provider, context):
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     video_id = context.get_param('video_id', '')
     if not video_id:
         return []
@@ -43,7 +43,7 @@ def _process_related_videos(provider, context):
 
 
 def _process_parent_comments(provider, context):
-    context.set_content_type(content.FILES)
+    context.set_content(content.FILES)
     video_id = context.get_param('video_id', '')
     if not video_id:
         return []
@@ -57,7 +57,7 @@ def _process_parent_comments(provider, context):
 
 
 def _process_child_comments(provider, context):
-    context.set_content_type(content.FILES)
+    context.set_content(content.FILES)
     parent_id = context.get_param('parent_id', '')
     if not parent_id:
         return []
@@ -71,7 +71,7 @@ def _process_child_comments(provider, context):
 
 
 def _process_recommendations(provider, context):
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     json_data = provider.get_client(context).get_activities(
         channel_id='home', page_token=context.get_param('page_token', '')
     )
@@ -81,7 +81,7 @@ def _process_recommendations(provider, context):
 
 
 def _process_popular_right_now(provider, context):
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     json_data = provider.get_client(context).get_popular_videos(
         page_token=context.get_param('page_token', '')
     )
@@ -91,7 +91,7 @@ def _process_popular_right_now(provider, context):
 
 
 def _process_browse_channels(provider, context):
-    context.set_content_type(content.FILES)
+    context.set_content(content.FILES)
     client = provider.get_client(context)
     guide_id = context.get_param('guide_id', '')
     if guide_id:
@@ -109,7 +109,7 @@ def _process_browse_channels(provider, context):
 
 
 def _process_disliked_videos(provider, context):
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     json_data = provider.get_client(context).get_disliked_videos(
         page_token=context.get_param('page_token', '')
     )
@@ -122,7 +122,7 @@ def _process_live_events(provider, context, event_type='live'):
     def _sort(x):
         return x.get_date()
 
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     # TODO: cache result
     json_data = provider.get_client(context).get_live_events(
         event_type=event_type,
@@ -140,7 +140,7 @@ def _process_description_links(provider, context):
     addon_id = params.get('addon_id', '')
 
     def _extract_urls(video_id):
-        context.set_content_type(content.VIDEOS)
+        context.set_content(content.VIDEOS)
         url_resolver = UrlResolver(context)
 
         with context.get_ui().create_progress_dialog(
@@ -256,7 +256,7 @@ def _process_description_links(provider, context):
 
 
 def _process_saved_playlists_tv(provider, context):
-    context.set_content_type(content.FILES)
+    context.set_content(content.FILES)
     json_data = provider.get_client(context).get_saved_playlists(
         page_token=context.get_param('next_page_token', ''),
         offset=context.get_param('offset', 0)
@@ -265,7 +265,7 @@ def _process_saved_playlists_tv(provider, context):
 
 
 def _process_new_uploaded_videos_tv(provider, context):
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     json_data = provider.get_client(context).get_my_subscriptions(
         page_token=context.get_param('next_page_token', ''),
         offset=context.get_param('offset', 0)
@@ -274,7 +274,7 @@ def _process_new_uploaded_videos_tv(provider, context):
 
 
 def _process_new_uploaded_videos_tv_filtered(provider, context):
-    context.set_content_type(content.VIDEOS)
+    context.set_content(content.VIDEOS)
     json_data = provider.get_client(context).get_my_subscriptions(
         page_token=context.get_param('next_page_token', ''),
         offset=context.get_param('offset', 0)

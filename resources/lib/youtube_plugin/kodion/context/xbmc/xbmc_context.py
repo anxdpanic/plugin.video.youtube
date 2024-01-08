@@ -252,7 +252,8 @@ class XbmcContext(AbstractContext):
         'setup_wizard.view.default': 30027,
         'setup_wizard.view.songs': 30033,
         'setup_wizard.view.artists': 30034,
-        'setup_wizard.view.albums': 30035
+        'setup_wizard.view.albums': 30035,
+        'youtube': 30003,
     }
 
     def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
@@ -415,11 +416,20 @@ class XbmcContext(AbstractContext):
         result = to_unicode(result) if result else default_text
         return result
 
-    def set_content_type(self, content_type, sub_type=None):
+    def set_content(self, content_type, sub_type=None, category_label=None):
         self.log_debug('Setting content-type: |{type}| for |{path}|'.format(
             type=(sub_type or content_type), path=self.get_path()
         ))
         xbmcplugin.setContent(self._plugin_handle, content_type)
+        if category_label is None:
+            category_label = self.get_param('category_label')
+            if category_label:
+                category_label = ' - '.join((
+                    self.localize('youtube'),
+                    category_label,
+                ))
+        if category_label:
+            xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
         if sub_type == 'history':
             self.add_sort_method(
                 (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),

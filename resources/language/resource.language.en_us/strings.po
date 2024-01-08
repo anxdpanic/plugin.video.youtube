@@ -51,7 +51,11 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Password"
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr ""
+
+# empty strings from id 30004 to 30006
 
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"

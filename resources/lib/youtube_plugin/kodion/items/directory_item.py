@@ -11,10 +11,24 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .base_item import BaseItem
+from ..compatibility import urlencode
 
 
 class DirectoryItem(BaseItem):
-    def __init__(self, name, uri, image='', fanart='', action=False):
+    def __init__(self,
+                 name,
+                 uri,
+                 image='',
+                 fanart='',
+                 action=False,
+                 category_label=None):
+        if category_label is None:
+            category_label = name
+        if category_label:
+            uri = ('&' if '?' in uri else '?').join((
+                uri,
+                urlencode({'category_label': category_label}),
+            ))
         super(DirectoryItem, self).__init__(name, uri, image, fanart)
         self._plot = self.get_name()
         self._is_action = action
