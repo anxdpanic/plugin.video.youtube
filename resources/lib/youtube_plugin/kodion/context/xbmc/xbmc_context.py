@@ -327,7 +327,7 @@ class XbmcContext(AbstractContext):
         The xbmc.getLanguage() method is fucked up!!! We always return 'en-US' for now
         """
 
-        '''
+        """
         if self.get_system_version().get_release_name() == 'Frodo':
             return 'en-US'
 
@@ -339,7 +339,7 @@ class XbmcContext(AbstractContext):
         except Exception as exc:
             self.log_error('Failed to get system language (%s)', exc.__str__())
             return 'en-US'
-        '''
+        """
 
         return 'en-US'
 

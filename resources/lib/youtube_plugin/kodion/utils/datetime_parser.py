@@ -70,6 +70,9 @@ fromtimestamp = datetime.fromtimestamp
 
 
 def parse(datetime_string):
+    if not datetime_string:
+        return None
+
     # match time only "00:45:10"
     match = __RE_MATCH_TIME_ONLY__.match(datetime_string)
     if match:

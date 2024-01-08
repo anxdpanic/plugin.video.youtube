@@ -10,9 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import copy
 import threading
 import xml.etree.ElementTree as ET
+from copy import deepcopy
 from itertools import chain, islice
 from random import randint
 
@@ -370,19 +370,23 @@ class YouTube(LoginClient):
                                        **kwargs)
 
     def _get_recommendations_for_home(self):
-        # YouTube has deprecated this API, so we use history and related items
-        # to form a recommended set.
-        # We cache aggressively because searches can be slow.
-        # Note this is a naive implementation and can be refined a lot more.
+        """
+        YouTube has deprecated this API, so we use history and related items to
+        form a recommended set.
+        We cache aggressively because searches can be slow.
+        Note this is a naive implementation and can be refined a lot more.
+        """
 
         # Do we have a cached result?
         cache = self._context.get_data_cache()
+        """
         # Caching of complete recommendation results currently disabled to allow
         # for some variation in recommendations
-        # cache_home_key = 'get-activities-home'
-        # cached = cache.get_item(cache_home_key, cache.ONE_HOUR)
-        # if cached and cached['items']:
-        #     return cached
+        cache_home_key = 'get-activities-home'
+        cached = cache.get_item(cache_home_key, cache.ONE_HOUR)
+        if cached and cached['items']:
+            return cached
+        """
 
         payload = {
             'kind': 'youtube#activityListResponse',
@@ -568,12 +572,14 @@ class YouTube(LoginClient):
             related_video = item['related_video_id']
             related_channel = item['related_channel_id']
             channel_id = item.get('snippet', {}).get('channelId')
+            """
             # Video channel and related channel can be the same which can double
             # up the channel count. Checking for this allows more similar videos
             # in the recommendation, ignoring it allows for more variety.
             # Currently prefer not to check for this to allow more variety.
-            # if channel_id == related_channel:
-            #     channel_id = None
+            if channel_id == related_channel:
+                channel_id = None
+            """
             while (page_count['_counter'] >= items_per_page
                    or (related_video in page_count
                        and page_count[related_video] >= diversity_limits)
@@ -618,10 +624,11 @@ class YouTube(LoginClient):
             'totalResults': len(sorted_items)
         }
         """
+        """
         # Update cache
         # Currently disabled to allow some variation in recommendations
-        # cache.set_item(cache_home_key, payload)
-
+        cache.set_item(cache_home_key, payload)
+        """
         return payload
 
     def get_activities(self, channel_id, page_token='', **kwargs):
@@ -1479,7 +1486,7 @@ class YouTube(LoginClient):
             _headers.update(headers)
         if params:
             _params.update(params)
-            log_params = copy.deepcopy(params)
+            log_params = deepcopy(params)
             if 'location' in log_params:
                 log_params['location'] = 'xx.xxxx,xx.xxxx'
         else:
@@ -1535,7 +1542,7 @@ class YouTube(LoginClient):
             _headers.update(headers)
         if params:
             _params.update(params)
-            log_params = copy.deepcopy(params)
+            log_params = deepcopy(params)
             if 'location' in log_params:
                 log_params['location'] = 'xx.xxxx,xx.xxxx'
         else:
