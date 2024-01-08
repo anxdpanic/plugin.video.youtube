@@ -679,7 +679,7 @@
             <group id="2">
                 <setting id="kodion.history.local" type="boolean" label="30675" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                 </setting>
                 <setting id="kodion.history.remote" type="boolean" label="30761" help="">
@@ -691,7 +691,7 @@
             <group id="3">
                 <setting id="kodion.cache.size" type="integer" label="30024" help="">
                     <level>0</level>
-                    <default>10</default>
+                    <default>20</default>
                     <constraints>
                         <minimum>5</minimum>
                         <step>1</step>
@@ -992,63 +992,6 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <control format="action" type="button"/>
-                </setting>
-                <setting id="kodion.access_token" type="string" label="" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="string" type="edit">
-                        <heading/>
-                    </control>
-                </setting>
-                <setting id="kodion.refresh_token" type="string" label="" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="string" type="edit">
-                        <heading/>
-                    </control>
-                </setting>
-                <setting id="kodion.access_token.expires" type="integer" label="" help="">
-                    <level>0</level>
-                    <default>0</default>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="integer" type="edit">
-                        <heading/>
-                    </control>
-                </setting>
-                <setting id="youtube.api.last.hash" type="string" label="" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="string" type="edit">
-                        <heading/>
-                    </control>
                 </setting>
             </group>
         </category>

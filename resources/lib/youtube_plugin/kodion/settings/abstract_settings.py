@@ -229,30 +229,6 @@ class AbstractSettings(object):
             return new_secret
         return self.get_string(settings.API_SECRET)
 
-    def api_last_hash(self, new_hash=None):
-        if new_hash is not None:
-            self.set_string(settings.API_LAST_HASH, new_hash)
-            return new_hash
-        return self.get_string(settings.API_LAST_HASH, '')
-
-    def user_access_token(self, new_access_token=None):
-        if new_access_token is not None:
-            self.set_string(settings.USER_ACCESS_TOKEN, new_access_token)
-            return new_access_token
-        return self.get_string(settings.USER_ACCESS_TOKEN, '')
-
-    def user_refresh_token(self, new_refresh_token=None):
-        if new_refresh_token is not None:
-            self.set_string(settings.USER_REFRESH_TOKEN, new_refresh_token)
-            return new_refresh_token
-        return self.get_string(settings.USER_REFRESH_TOKEN, '')
-
-    def user_token_expiration(self, new_token_expiration=None):
-        if new_token_expiration is not None:
-            self.set_int(settings.USER_TOKEN_EXPIRATION, new_token_expiration)
-            return new_token_expiration
-        return self.get_int(settings.USER_TOKEN_EXPIRATION, -1)
-
     def get_location(self):
         location = self.get_string(settings.LOCATION, '').replace(' ', '').strip()
         coords = location.split(',')
