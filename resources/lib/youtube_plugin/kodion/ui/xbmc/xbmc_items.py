@@ -208,6 +208,17 @@ def directory_listitem(context, directory_item, show_fanart=None):
     item_info = info_labels.create_from_item(directory_item)
     set_info_tag(list_item, item_info, 'video')
 
+    """
+    # ListItems that do not open a lower level list should have the isFolder
+    # parameter of the xbmcplugin.addDirectoryItem set to False, however this
+    # now appears to mark the ListItem as playable, even if the IsPlayable
+    # property is set to "false".
+    # Set isFolder to True as a workaround, regardless of whether the ListItem
+    # is actually a folder.
+    is_folder = not directory_item.is_action()
+    """
+    is_folder = True
+
     list_item.setProperties(props)
 
     context_menu = directory_item.get_context_menu()
@@ -216,7 +227,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
             context_menu, replaceItems=directory_item.replace_context_menu()
         )
 
-    return uri, list_item, not directory_item.is_action()
+    return uri, list_item, is_folder
 
 
 def image_listitem(context, image_item, show_fanart=None):
