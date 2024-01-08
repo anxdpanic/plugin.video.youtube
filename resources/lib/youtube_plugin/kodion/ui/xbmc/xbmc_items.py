@@ -41,7 +41,6 @@ def video_playback_item(context, video_item, show_fanart=None):
         }
     props = {
         'isPlayable': str(video_item.playable).lower(),
-        'ForceResolvePlugin': 'true',
     }
 
     if (alternative_player
