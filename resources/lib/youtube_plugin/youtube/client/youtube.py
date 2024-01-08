@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import copy
 import threading
 import xml.etree.ElementTree as ET
-from itertools import chain
+from itertools import chain, islice
 from random import randint
 
 from .login_client import LoginClient
@@ -389,16 +389,18 @@ class YouTube(LoginClient):
             'items': []
         }
 
+        # Related videos are retrieved for the following num_items from history
+        num_items = 10
         local_history = self._context.get_settings().use_local_history()
         history_id = self._context.get_access_manager().get_watch_history_id()
         if not history_id or history_id == 'HL':
             if local_history:
                 history = self._context.get_playback_history()
-                video_ids = history.get_items()
+                video_ids = history.get_items(limit=num_items)
             else:
                 return payload
         else:
-            history = self.get_playlist_items(history_id, max_results=50)
+            history = self.get_playlist_items(history_id, max_results=num_items)
             if history and 'items' in history:
                 history_items = history['items'] or []
                 video_ids = []
@@ -414,21 +416,40 @@ class YouTube(LoginClient):
         cache_items_key = 'get-activities-home-items'
         cached = cache.get_item(cache_items_key, cache.ONE_WEEK * 2) or []
 
+        # Increase value to recursively retrieve recommendations for the first
+        # recommended video, up to the set maximum recursion depth
+        max_depth = 2
         items_per_page = self._max_results
-        items = [[] for _ in range(len(video_ids))]
+        diversity_limits = items_per_page // (num_items * max_depth)
+        items = [[] for _ in range(max_depth * len(video_ids))]
         counts = {
             '_counter': 0,
             '_pages': {},
             '_related': {},
         }
 
-        def update_counts(items, item_store=None, original_ids=None):
+        def update_counts(items,
+                          item_store=None,
+                          original_ids=None,
+                          group=None,
+                          depth=1,
+                          original_related=None,
+                          original_channel=None):
             if original_ids is not None:
                 original_ids = list(original_ids)
 
-            for item in items:
-                related = item['related_video_id']
-                channel = item['related_channel_id']
+            running = 0
+            threads = []
+
+            for idx, item in enumerate(items):
+                if original_related is not None:
+                    related = item['related_video_id'] = original_related
+                else:
+                    related = item['related_video_id']
+                if original_channel is not None:
+                    channel = item['related_channel_id'] = original_channel
+                else:
+                    channel = item['related_channel_id']
                 video_id = item['id']
 
                 counts['_related'].setdefault(related, 0)
@@ -440,27 +461,59 @@ class YouTube(LoginClient):
                     item_count['related'][related] += 1
                     item_count['channels'].setdefault(channel, 0)
                     item_count['channels'][channel] += 1
+                    continue
+
+                counts[video_id] = {
+                    'related': {related: 1},
+                    'channels': {channel: 1}
+                }
+
+                if item_store is None:
+                    if original_ids and related not in original_ids:
+                        items[idx] = None
+                    continue
+
+                if group is not None:
+                    pass
+                elif original_ids and related in original_ids:
+                    group = max_depth * original_ids.index(related)
                 else:
-                    counts[video_id] = {
-                        'related': {related: 1},
-                        'channels': {channel: 1}
-                    }
-                    if item_store is None:
-                        continue
-                    if original_ids and related in original_ids:
-                        idx = original_ids.index(related)
-                    else:
-                        idx = 0
-                    item['order'] = items_per_page * idx + len(item_store[idx])
-                    item_store[idx].append(item)
+                    group = 0
 
-        update_counts(cached)
+                num_stored = len(item_store[group])
+                item['order'] = items_per_page * group + num_stored
+                item_store[group].append(item)
 
-        # Fetch history and recommended items. Use threads for faster execution.
-        def helper(video_id, responses):
-            related_videos = self.get_related_videos(video_id)
+                if num_stored or depth <= 1:
+                    continue
+
+                running += 1
+                thread = threading.Thread(
+                    target=threaded_get_related,
+                    args=(video_id, update_counts),
+                    kwargs={'item_store': item_store,
+                            'group': (group + 1),
+                            'depth': (depth - 1),
+                            'original_related': related,
+                            'original_channel': channel},
+                )
+                thread.daemon = True
+                threads.append(thread)
+                thread.start()
+
+            while running:
+                for thread in threads:
+                    thread.join(5)
+                    if not thread.is_alive():
+                        running -= 1
+
+        update_counts(cached, original_ids=video_ids)
+
+        # Fetch related videos. Use threads for faster execution.
+        def threaded_get_related(video_id, func, **kwargs):
+            related_videos = self.get_related_videos(video_id).get('items')
             if related_videos:
-                responses.extend(related_videos['items'][:items_per_page])
+                func(related_videos[:items_per_page], **kwargs)
 
         running = 0
         threads = []
@@ -470,8 +523,8 @@ class YouTube(LoginClient):
                 continue
             running += 1
             thread = threading.Thread(
-                target=helper,
-                args=(video_id, candidates),
+                target=threaded_get_related,
+                args=(video_id, candidates.extend),
             )
             thread.daemon = True
             threads.append(thread)
@@ -483,16 +536,21 @@ class YouTube(LoginClient):
                 if not thread.is_alive():
                     running -= 1
 
-        update_counts(candidates[:500], items, video_ids)
+        num_items = items_per_page * num_items * max_depth
+        update_counts(candidates[:num_items],
+                      item_store=items,
+                      original_ids=video_ids,
+                      depth=max_depth)
 
         # Truncate items to keep it manageable, and cache
         items = list(chain.from_iterable(items))
         counts['_counter'] = len(items)
-        remaining = 500 - counts['_counter']
+        remaining = num_items - counts['_counter']
         if remaining > 0:
-            items.extend(cached[:remaining])
+            items.extend(islice(filter(None, cached), remaining))
         elif remaining:
-            items = items[:500]
+            items = items[:num_items]
+
         cache.set_item(cache_items_key, items)
 
         # Finally sort items per page by rank and date for a better distribution
@@ -501,7 +559,7 @@ class YouTube(LoginClient):
                 counts['_counter'] += 1
                 item['order'] = counts['_counter']
 
-            page = 1 + item['order'] // items_per_page
+            page = 1 + item['order'] // (items_per_page * max_depth)
             page_count = counts['_pages'].setdefault(page, {'_counter': 0})
             while page_count['_counter'] < items_per_page and page > 1:
                 page -= 1
@@ -516,7 +574,6 @@ class YouTube(LoginClient):
             # Currently prefer not to check for this to allow more variety.
             # if channel_id == related_channel:
             #     channel_id = None
-            diversity_limits = items_per_page // 5
             while (page_count['_counter'] >= items_per_page
                    or (related_video in page_count
                        and page_count[related_video] >= diversity_limits)
