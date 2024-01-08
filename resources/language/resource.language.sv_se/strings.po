@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2022-10-24 14:04+0000\n"
+"PO-Revision-Date: 2023-11-03 15:11+0000\n"
 "Last-Translator: Christian Gade <gade@kodi.tv>\n"
 "Language-Team: Swedish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/sv_se/>\n"
 "Language: sv_se\n"
@@ -15,19 +15,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.14.1\n"
+"X-Generator: Weblate 5.1\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Plugin för YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr ""
+msgstr "YouTube är en av de största videodelningssajterna i världen."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Detta plugin är inte godkänt av Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -51,76 +51,80 @@ msgstr "Lösenord"
 # empty strings from id 30003 to 30006
 msgctxt "#30007"
 msgid "Use MPEG-DASH"
-msgstr ""
+msgstr "Använd MPEG-DASH"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
-msgstr ""
+msgstr "Konfigurera InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Fråga alltid efter videokvalitet"
 
 msgctxt "#30010"
-msgid "Video quality"
-msgstr ""
+msgid "Maximum video quality"
+msgstr "Bästa videokvalitet"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p (HD)"
 
 msgctxt "#30013"
-msgid "1080p (HD)"
-msgstr ""
+msgid "1080p (FHD)"
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
-msgid "2160p (4k)"
-msgstr ""
+msgid "2160p (4K)"
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
-msgid "4320p (8k)"
-msgstr ""
+msgid "4320p (8K)"
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Live / 720p (HD)"
+
+msgctxt "#30019"
+msgid "144p"
+msgstr "144p"
 
 # empty strings 30019
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr ""
+msgstr "Tillåt 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
-msgstr ""
+msgstr "Show fanart"
 
 msgctxt "#30022"
 msgid "Items per page"
-msgstr ""
+msgstr "Antal per sida"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr ""
+msgstr "Sökhistoriestorlek"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr ""
+msgstr "Cache-storlek (MB)"
 
 msgctxt "#30025"
 msgid "Enable setup-wizard"
-msgstr ""
+msgstr "Tillåt inställningsguide"
 
 msgctxt "#30026"
 msgid "Override view"
@@ -989,7 +993,7 @@ msgid "Reset resume point"
 msgstr ""
 
 msgctxt "#30675"
-msgid "Use playback history (watched, resume tracking)"
+msgid "Use local playback history (watched, resume tracking)"
 msgstr ""
 
 msgctxt "#30676"
@@ -1049,7 +1053,7 @@ msgid "Use for live streams"
 msgstr ""
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1177,7 +1181,7 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr ""
 
 msgctxt "#30722"
-msgid "HDR"
+msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
@@ -1185,11 +1189,11 @@ msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR
 msgstr ""
 
 msgctxt "#30724"
-msgid "Limit to 30fps"
+msgid "Enable high framerate video"
 msgstr ""
 
 msgctxt "#30725"
-msgid "1440p (HD)"
+msgid "1440p (QHD)"
 msgstr ""
 
 msgctxt "#30726"
@@ -1197,11 +1201,11 @@ msgid "Uploads"
 msgstr ""
 
 msgctxt "#30727"
-msgid "Adaptive (MP4/H264)"
+msgid "Enable H.264 video"
 msgstr ""
 
 msgctxt "#30728"
-msgid "Adaptive (WEBM/VP9)"
+msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
@@ -1246,4 +1250,100 @@ msgstr ""
 
 msgctxt "#30739"
 msgid "Alternate #2"
+msgstr ""
+
+msgctxt "#30740"
+msgid "HLS"
+msgstr ""
+
+msgctxt "#30741"
+msgid "Multi-stream HLS"
+msgstr ""
+
+msgctxt "#30742"
+msgid "Adaptive HLS"
+msgstr ""
+
+msgctxt "#30743"
+msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30744"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30745"
+msgid "Dubbed"
+msgstr ""
+
+msgctxt "#30746"
+msgid "Descriptive"
+msgstr ""
+
+msgctxt "#30747"
+msgid "Alternate"
+msgstr ""
+
+msgctxt "#30748"
+msgid "Stream features"
+msgstr ""
+
+msgctxt "#30749"
+msgid "Enable AV1 video"
+msgstr ""
+
+msgctxt "#30750"
+msgid "Enable Vorbis audio"
+msgstr ""
+
+msgctxt "#30751"
+msgid "Enable Opus audio"
+msgstr ""
+
+msgctxt "#30752"
+msgid "Enable AAC audio"
+msgstr ""
+
+msgctxt "#30753"
+msgid "Enable surround sound audio"
+msgstr ""
+
+msgctxt "#30754"
+msgid "Enable AC-3 audio"
+msgstr ""
+
+msgctxt "#30755"
+msgid "Enable EAC-3 audio"
+msgstr ""
+
+msgctxt "#30756"
+msgid "Enable DTS audio"
+msgstr ""
+
+msgctxt "#30757"
+msgid "Remove similar/duplicate streams"
+msgstr ""
+
+msgctxt "#30758"
+msgid "Stream selection"
+msgstr ""
+
+msgctxt "#30759"
+msgid "Quality selection"
+msgstr ""
+
+msgctxt "#30760"
+msgid "Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30761"
+msgid "Update playback history on Youtube"
+msgstr ""
+
+msgctxt "#30762"
+msgid "Multi-language"
+msgstr ""
+
+msgctxt "#30763"
+msgid "Multi-audio"
 msgstr ""
