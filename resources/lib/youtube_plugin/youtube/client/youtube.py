@@ -377,17 +377,6 @@ class YouTube(LoginClient):
         Note this is a naive implementation and can be refined a lot more.
         """
 
-        # Do we have a cached result?
-        cache = self._context.get_data_cache()
-        """
-        # Caching of complete recommendation results currently disabled to allow
-        # for some variation in recommendations
-        cache_home_key = 'get-activities-home'
-        cached = cache.get_item(cache_home_key, cache.ONE_HOUR)
-        if cached and cached['items']:
-            return cached
-        """
-
         payload = {
             'kind': 'youtube#activityListResponse',
             'items': []
@@ -417,8 +406,9 @@ class YouTube(LoginClient):
                     continue
 
         # Fetch existing list of items, if any
+        cache = self._context.get_data_cache()
         cache_items_key = 'get-activities-home-items'
-        cached = cache.get_item(cache_items_key, cache.ONE_WEEK * 2) or []
+        cached = cache.get_item(cache_items_key, None) or []
 
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth
@@ -432,13 +422,13 @@ class YouTube(LoginClient):
             '_related': {},
         }
 
-        def update_counts(items,
-                          item_store=None,
-                          original_ids=None,
-                          group=None,
-                          depth=1,
-                          original_related=None,
-                          original_channel=None):
+        def index_items(items, index,
+                        item_store=None,
+                        original_ids=None,
+                        group=None,
+                        depth=1,
+                        original_related=None,
+                        original_channel=None):
             if original_ids is not None:
                 original_ids = list(original_ids)
 
@@ -456,18 +446,18 @@ class YouTube(LoginClient):
                     channel = item['related_channel_id']
                 video_id = item['id']
 
-                counts['_related'].setdefault(related, 0)
-                counts['_related'][related] += 1
+                index['_related'].setdefault(related, 0)
+                index['_related'][related] += 1
 
-                if video_id in counts:
-                    item_count = counts[video_id]
+                if video_id in index:
+                    item_count = index[video_id]
                     item_count['related'].setdefault(related, 0)
                     item_count['related'][related] += 1
                     item_count['channels'].setdefault(channel, 0)
                     item_count['channels'][channel] += 1
                     continue
 
-                counts[video_id] = {
+                index[video_id] = {
                     'related': {related: 1},
                     'channels': {channel: 1}
                 }
@@ -494,7 +484,7 @@ class YouTube(LoginClient):
                 running += 1
                 thread = threading.Thread(
                     target=threaded_get_related,
-                    args=(video_id, update_counts),
+                    args=(video_id, index_items, counts),
                     kwargs={'item_store': item_store,
                             'group': (group + 1),
                             'depth': (depth - 1),
@@ -511,13 +501,13 @@ class YouTube(LoginClient):
                     if not thread.is_alive():
                         running -= 1
 
-        update_counts(cached, original_ids=video_ids)
+        index_items(cached, counts, original_ids=video_ids)
 
         # Fetch related videos. Use threads for faster execution.
-        def threaded_get_related(video_id, func, **kwargs):
+        def threaded_get_related(video_id, func, *args, **kwargs):
             related_videos = self.get_related_videos(video_id).get('items')
             if related_videos:
-                func(related_videos[:items_per_page], **kwargs)
+                func(related_videos[:items_per_page], *args, **kwargs)
 
         running = 0
         threads = []
@@ -541,10 +531,10 @@ class YouTube(LoginClient):
                     running -= 1
 
         num_items = items_per_page * num_items * max_depth
-        update_counts(candidates[:num_items],
-                      item_store=items,
-                      original_ids=video_ids,
-                      depth=max_depth)
+        index_items(candidates[:num_items], counts,
+                    item_store=items,
+                    original_ids=video_ids,
+                    depth=max_depth)
 
         # Truncate items to keep it manageable, and cache
         items = list(chain.from_iterable(items))
@@ -554,8 +544,6 @@ class YouTube(LoginClient):
             items.extend(islice(filter(None, cached), remaining))
         elif remaining:
             items = items[:num_items]
-
-        cache.set_item(cache_items_key, items)
 
         # Finally sort items per page by rank and date for a better distribution
         def rank_and_sort(item):
@@ -624,11 +612,10 @@ class YouTube(LoginClient):
             'totalResults': len(sorted_items)
         }
         """
-        """
+
         # Update cache
-        # Currently disabled to allow some variation in recommendations
-        cache.set_item(cache_home_key, payload)
-        """
+        cache.set_item(cache_items_key, items)
+
         return payload
 
     def get_activities(self, channel_id, page_token='', **kwargs):
