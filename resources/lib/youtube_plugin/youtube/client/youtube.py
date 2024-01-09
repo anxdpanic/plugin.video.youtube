@@ -935,6 +935,7 @@ class YouTube(LoginClient):
                     'id': video['videoId'],
                     'related_video_id': video_id,
                     'related_channel_id': channel_id,
+                    'partial': True,
                     'snippet': {
                         'title': video['title']['simpleText'],
                         'thumbnails': dict(zip(

@@ -57,7 +57,8 @@ class ResourceManager(object):
 
         ids = updated
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
-        to_update = [id_ for id_ in ids if id_ not in result]
+        to_update = [id_ for id_ in ids
+                     if id_ not in result or result[id_].get('partial')]
 
         if result:
             self._context.log_debug('Found cached data for channels:\n|{ids}|'
@@ -119,7 +120,8 @@ class ResourceManager(object):
     def get_playlists(self, ids, defer_cache=False):
         ids = tuple(ids)
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
-        to_update = [id_ for id_ in ids if id_ not in result]
+        to_update = [id_ for id_ in ids
+                     if id_ not in result or result[id_].get('partial')]
 
         if result:
             self._context.log_debug('Found cached data for playlists:\n|{ids}|'
@@ -249,7 +251,8 @@ class ResourceManager(object):
                    defer_cache=False):
         ids = tuple(ids)
         result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
-        to_update = [id_ for id_ in ids if id_ not in result]
+        to_update = [id_ for id_ in ids
+                     if id_ not in result or result[id_].get('partial')]
 
         if result:
             self._context.log_debug('Found cached data for videos:\n|{ids}|'
@@ -270,11 +273,13 @@ class ResourceManager(object):
         if new_data:
             self._context.log_debug('Got data for videos:\n|{ids}|'
                                     .format(ids=to_update))
-            new_data = dict(dict.fromkeys(to_update, {}), **{
-                yt_item['id']: yt_item or {}
+            new_data = {
+                yt_item['id']: yt_item
                 for batch in new_data
                 for yt_item in batch.get('items', [])
-            })
+                if yt_item
+            }
+            new_data = dict(dict.fromkeys(to_update, {}), **new_data)
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
