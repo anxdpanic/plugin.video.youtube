@@ -311,7 +311,8 @@ class YouTubeRequestClient(BaseRequestsClass):
     def build_client(cls, client_name, data=None):
         templates = {}
 
-        client = (cls.CLIENTS.get(client_name) or cls.CLIENTS['web']).copy()
+        client = (cls.CLIENTS.get(client_name)
+                  or YouTubeRequestClient.CLIENTS['web']).copy()
         if data:
             client = merge_dicts(client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
