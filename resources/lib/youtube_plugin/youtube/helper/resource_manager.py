@@ -296,7 +296,8 @@ class ResourceManager(object):
             playback_history = self._context.get_playback_history()
             played_items = playback_history.get_items(ids)
             for video_id, play_data in played_items.items():
-                result[video_id]['play_data'] = play_data
+                if video_id in result:
+                    result[video_id]['play_data'] = play_data
 
         return result
 
