@@ -72,7 +72,7 @@ class XbmcPlaylist(AbstractPlaylist):
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
         else:
             error = 'Requested |%s| received error |%s|' % (rpc_request, str(response))
-        self._context.log_debug(error)
+        self._context.log_error(error)
         return '[]' if dumps else []
 
     def add_items(self, items, loads=False):

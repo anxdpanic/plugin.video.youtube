@@ -52,7 +52,7 @@ class ResourceManager(object):
                 channel_id = items[0]['id']
                 updated.append(channel_id)
             except IndexError:
-                self._context.log_error('Channel not found:\n\t{data}'
+                self._context.log_error('Channel not found:\n{data}'
                                         .format(data=data))
 
         ids = updated

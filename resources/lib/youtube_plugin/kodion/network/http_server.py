@@ -27,7 +27,7 @@ from ..compatibility import (
     xbmcvfs,
 )
 from ..constants import ADDON_ID, TEMP_PATH, paths
-from ..logger import log_debug
+from ..logger import log_debug, log_error
 from ..settings import Settings
 
 
@@ -532,7 +532,7 @@ def get_http_server(address=None, port=None):
         server = BaseHTTPServer.HTTPServer((address, port), RequestHandler)
         return server
     except socket_error as exc:
-        log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
+        log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'
                   .format(address=address, port=port, response=str(exc)))
         xbmcgui.Dialog().notification(_addon_name,
                                       str(exc),

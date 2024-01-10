@@ -48,8 +48,8 @@ def run(provider, context=None):
         params['client_secret'] = redacted
 
     context.log_notice('Running: {plugin} ({version}) on {kodi} with {python}\n'
-                       '\tPath: {path}\n'
-                       '\tParams: {params}'
+                       'Path: {path}\n'
+                       'Params: {params}'
                        .format(plugin=context.get_name(),
                                version=addon_version,
                                kodi=context.get_system_version(),
