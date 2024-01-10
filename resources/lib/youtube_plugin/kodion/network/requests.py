@@ -102,7 +102,7 @@ class BaseRequestsClass(object):
                                              cert=cert,
                                              json=json)
             if not response:
-                raise self._default_exc[0]
+                raise self._default_exc[0](response=response)
 
             if response_hook:
                 if response_hook_kwargs is None:
@@ -113,7 +113,8 @@ class BaseRequestsClass(object):
                 response.raise_for_status()
 
         except self._default_exc as exc:
-            response_text = exc.response and exc.response.text
+            exc_response = exc.response or response
+            response_text = exc_response and exc_response.text
             stack_trace = format_stack()
             error_details = {'exc': exc}
 
@@ -121,7 +122,7 @@ class BaseRequestsClass(object):
                 if error_hook_kwargs is None:
                     error_hook_kwargs = {}
                 error_hook_kwargs['exc'] = exc
-                error_hook_kwargs['response'] = response or exc.response
+                error_hook_kwargs['response'] = exc_response
                 error_response = error_hook(**error_hook_kwargs)
                 _title, _info, _detail, _response, _trace, _exc = error_response
                 if _title is not None:
@@ -142,7 +143,12 @@ class BaseRequestsClass(object):
                 error_title = 'Request failed'
 
             if error_info is None:
-                error_info = str(exc)
+                try:
+                    error_info = 'Status: {0.status_code} - {0.reason}'.format(
+                        exc.response
+                    )
+                except AttributeError:
+                    error_info = str(exc)
             elif '{' in error_info:
                 try:
                     error_info = error_info.format(**error_details)

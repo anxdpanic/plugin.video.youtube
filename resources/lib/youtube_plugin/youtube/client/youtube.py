@@ -1407,8 +1407,8 @@ class YouTube(LoginClient):
     def _error_hook(self, **kwargs):
         exc = kwargs['exc']
         json_data = getattr(exc, 'json_data', None)
-        data = getattr(exc, 'pass_data', False) and json_data
-        exception = getattr(exc, 'raise_exc', False) and YouTubeException
+        data = getattr(exc, 'pass_data', None) and json_data
+        exception = getattr(exc, 'raise_exc', None) and YouTubeException
 
         if not json_data or 'error' not in json_data:
             return None, None, None, data, None, exception
