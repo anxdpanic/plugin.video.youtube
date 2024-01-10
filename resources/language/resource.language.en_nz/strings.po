@@ -350,7 +350,7 @@ msgid "Browse Channels"
 msgstr ""
 
 msgctxt "#30513"
-msgid "Popular right now"
+msgid "Trending"
 msgstr ""
 
 msgctxt "#30514"

@@ -1294,22 +1294,31 @@ class Provider(AbstractProvider):
         history_id = logged_in and access_manager.get_watch_history_id()
         local_history = settings.use_local_history()
 
-        # Recommendations
-        if settings.get_bool('youtube.folder.recommendations.show', True):
+        # Home / Recommended
+        if settings.get_bool('youtube.folder.recommended.show', True):
+            recommendations_item = DirectoryItem(
+                localize('recommendations'),
+                create_uri(('special', 'recommended')),
+                image='{media}/home.png',
+            )
+            result.append(recommendations_item)
+
+        # Related
+        if settings.get_bool('youtube.folder.related.show', True):
             if history_id and history_id != 'HL' or local_history:
-                recommendations_item = DirectoryItem(
-                    localize('recommendations'),
-                    create_uri(('special', 'recommendations')),
-                    image='{media}/what_to_watch.png',
+                related_item = DirectoryItem(
+                    localize('related_videos'),
+                    create_uri(('special', 'related_videos')),
+                    image='{media}/related_videos.png',
                 )
-                result.append(recommendations_item)
+                result.append(related_item)
 
         # Trending
-        if settings.get_bool('youtube.folder.popular_right_now.show', True):
+        if settings.get_bool('youtube.folder.trending.show', True):
             trending_item = DirectoryItem(
-                localize('popular_right_now'),
-                create_uri(('special', 'popular_right_now')),
-                image='{media}/popular.png',
+                localize('trending'),
+                create_uri(('special', 'trending')),
+                image='{media}/trending.png',
             )
             result.append(trending_item)
 

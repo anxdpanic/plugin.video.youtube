@@ -72,6 +72,7 @@ class AbstractContext(object):
         'channel_name',
         'client_id',
         'client_secret',
+        'click_tracking',
         'event_type',
         'item',
         'item_id',
@@ -85,9 +86,10 @@ class AbstractContext(object):
         'rating',
         'search_type',
         'subscription_id',
+        'uri',
         'videoid',  # deprecated
         'video_id',
-        'uri',
+        'visitor',
     }
 
     def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):

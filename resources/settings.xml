@@ -416,12 +416,17 @@
                         <heading>30585</heading>
                     </control>
                 </setting>
-                <setting id="youtube.folder.recommendations.show" type="boolean" label="30551" help="">
+                <setting id="youtube.folder.recommended.show" type="boolean" label="30551" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.folder.popular_right_now.show" type="boolean" label="30513" help="">
+                <setting id="youtube.folder.related.show" type="boolean" label="30514" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.folder.trending.show" type="boolean" label="30513" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>

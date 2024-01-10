@@ -26,17 +26,22 @@ from ...kodion.utils import strip_html_from_text
 
 def _process_related_videos(provider, context):
     context.set_content(content.VIDEOS)
-    video_id = context.get_param('video_id', '')
-    if not video_id:
-        return []
-
     function_cache = context.get_function_cache()
-    json_data = function_cache.get(
-        provider.get_client(context).get_related_videos,
-        function_cache.ONE_HOUR,
-        video_id=video_id,
-        page_token=context.get_param('page_token', ''),
-    )
+
+    video_id = context.get_param('video_id', '')
+    if video_id:
+        json_data = function_cache.get(
+            provider.get_client(context).get_related_videos,
+            function_cache.ONE_HOUR,
+            video_id=video_id,
+            page_token=context.get_param('page_token', ''),
+        )
+    else:
+        json_data = function_cache.get(
+            provider.get_client(context).get_related_for_home,
+            function_cache.ONE_HOUR,
+            page_token=context.get_param('page_token', ''),
+        )
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
@@ -72,17 +77,24 @@ def _process_child_comments(provider, context):
 
 def _process_recommendations(provider, context):
     context.set_content(content.VIDEOS)
-    json_data = provider.get_client(context).get_activities(
-        channel_id='home', page_token=context.get_param('page_token', '')
+    params = context.get_params()
+    function_cache = context.get_function_cache()
+
+    json_data = function_cache.get(
+        provider.get_client(context).get_recommended_for_home,
+        function_cache.ONE_HOUR,
+        visitor=params.get('visitor', ''),
+        page_token=params.get('page_token', ''),
+        click_tracking=params.get('click_tracking', ''),
     )
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
 
-def _process_popular_right_now(provider, context):
+def _process_trending(provider, context):
     context.set_content(content.VIDEOS)
-    json_data = provider.get_client(context).get_popular_videos(
+    json_data = provider.get_client(context).get_trending_videos(
         page_token=context.get_param('page_token', '')
     )
     if not json_data:
@@ -295,9 +307,9 @@ def process(category, provider, context):
 
     if category == 'related_videos':
         return _process_related_videos(provider, context)
-    if category == 'popular_right_now':
-        return _process_popular_right_now(provider, context)
-    if category == 'recommendations':
+    if category == 'trending':
+        return _process_trending(provider, context)
+    if category == 'recommended':
         return _process_recommendations(provider, context)
     if category == 'browse_channels':
         return _process_browse_channels(provider, context)

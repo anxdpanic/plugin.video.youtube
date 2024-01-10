@@ -375,7 +375,7 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def get_popular_videos(self, page_token='', **kwargs):
+    def get_trending_videos(self, page_token='', **kwargs):
         params = {'part': 'snippet,status',
                   'maxResults': str(self._max_results),
                   'regionCode': self._region,
@@ -415,7 +415,141 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def _get_recommendations_for_home(self):
+    def get_recommended_for_home(self,
+                                 visitor='',
+                                 page_token='',
+                                 click_tracking=''):
+        payload = {
+            'kind': 'youtube#activityListResponse',
+            'items': []
+        }
+
+        post_data = {'browseId': 'FEwhat_to_watch'}
+        if page_token:
+            post_data['continuation'] = page_token
+        if click_tracking or visitor:
+            context = {}
+            if click_tracking:
+                context['clickTracking'] = {
+                    'clickTrackingParams': click_tracking,
+                }
+            if visitor:
+                context['client'] = {
+                    'visitorData': visitor,
+                }
+            post_data['context'] = context
+
+        result = self.api_request(version=1,
+                                  method='POST',
+                                  path='browse',
+                                  post_data=post_data)
+        if not result:
+            return payload
+
+        recommended_videos = self.json_traverse(
+            result,
+            path=(
+                     (
+                         (
+                             'onResponseReceivedEndpoints',
+                             'onResponseReceivedActions',
+                         ),
+                         0,
+                         'appendContinuationItemsAction',
+                         'continuationItems',
+                     ) if page_token else (
+                         'contents',
+                         'twoColumnBrowseResultsRenderer',
+                         'tabs',
+                         0,
+                         'tabRenderer',
+                         'content',
+                         'richGridRenderer',
+                         'contents',
+                     )
+                 ) + (
+                     slice(None),
+                     (
+                         (
+                             'richItemRenderer',
+                             'content',
+                             'videoRenderer',
+                             # 'videoId',
+                         ),
+                         (
+                             'richSectionRenderer',
+                             'content',
+                             'richShelfRenderer',
+                             'contents',
+                             slice(None),
+                             'richItemRenderer',
+                             'content',
+                             (
+                                 'videoRenderer',
+                                 'reelItemRenderer'
+                             ),
+                             # 'videoId',
+                         ),
+                         (
+                             'continuationItemRenderer',
+                             'continuationEndpoint',
+                         ),
+                     ),
+                 )
+        )
+        if not recommended_videos:
+            return payload
+
+        v3_response = {
+            'kind': 'youtube#activityListResponse',
+            'items': [
+                {
+                    'kind': "youtube#video",
+                    'id': video['videoId'],
+                    'partial': True,
+                    'snippet': {
+                        'title': self.json_traverse(video, (
+                            ('title', 'runs', 0, 'text'),
+                            ('headline', 'simpleText'),
+                        )),
+                        'thumbnails': dict(zip(
+                            ('default', 'high'),
+                            video['thumbnail']['thumbnails'],
+                        )),
+                        'channelId': self.json_traverse(video, (
+                            ('longBylineText', 'shortBylineText'),
+                            'runs',
+                            0,
+                            'navigationEndpoint',
+                            'browseEndpoint',
+                            'browseId',
+                        )),
+                    }
+                }
+                for videos in recommended_videos
+                for video in
+                (videos if isinstance(videos, list) else (videos,))
+                if video and 'videoId' in video
+            ]
+        }
+
+        last_item = recommended_videos[-1]
+        if last_item and 'continuationCommand' in last_item:
+            if 'clickTrackingParams' in last_item:
+                v3_response['clickTracking'] = last_item['clickTrackingParams']
+            token = last_item['continuationCommand'].get('token')
+            if token:
+                v3_response['nextPageToken'] = token
+            visitor = self.json_traverse(result, (
+                'responseContext',
+                'visitorData',
+            )) or visitor
+            if visitor:
+                v3_response['visitorData'] = visitor
+
+        return v3_response
+
+    def get_related_for_home(self, page_token=''):
         """
         YouTube has deprecated this API, so we use history and related items to
         form a recommended set.
@@ -445,6 +579,7 @@ class YouTube(LoginClient):
                 video_ids = []
             else:
                 return payload
+
             for item in history_items:
                 try:
                     video_ids.append(item['snippet']['resourceId']['videoId'])
@@ -670,10 +805,6 @@ class YouTube(LoginClient):
                   'regionCode': self._region,
                   'hl': self._language}
 
-        if channel_id == 'home':
-            recommended = self._get_recommendations_for_home()
-            if 'items' in recommended and recommended['items']:
-                return recommended
         if channel_id == 'home':
             params['home'] = 'true'
         elif channel_id == 'mine':
@@ -904,32 +1035,34 @@ class YouTube(LoginClient):
 
         related_videos = self.json_traverse(
             result,
-            path=((
-                'onResponseReceivedEndpoints',
-                0,
-                'appendContinuationItemsAction',
-                'continuationItems',
-            ) if page_token else (
-                'contents',
-                'twoColumnWatchNextResults',
-                'secondaryResults',
-                'secondaryResults',
-                'results',
-            )) + (
-                slice(None),
-                (
-                    (
-                        'compactVideoRenderer',
-                        # 'videoId',
-                    ),
-                    (
-                        'continuationItemRenderer',
-                        'continuationEndpoint',
-                        'continuationCommand',
-                        # 'token',
-                    ),
-                ),
-            )
+            path=(
+                     (
+                         'onResponseReceivedEndpoints',
+                         0,
+                         'appendContinuationItemsAction',
+                         'continuationItems',
+                     ) if page_token else (
+                         'contents',
+                         'twoColumnWatchNextResults',
+                         'secondaryResults',
+                         'secondaryResults',
+                         'results',
+                     )
+                 ) + (
+                     slice(None),
+                     (
+                         (
+                             'compactVideoRenderer',
+                             # 'videoId',
+                         ),
+                         (
+                             'continuationItemRenderer',
+                             'continuationEndpoint',
+                             'continuationCommand',
+                             # 'token',
+                         ),
+                     ),
+                 )
         )
         if not related_videos:
             return []
