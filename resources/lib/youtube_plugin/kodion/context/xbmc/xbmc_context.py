@@ -423,11 +423,6 @@ class XbmcContext(AbstractContext):
         xbmcplugin.setContent(self._plugin_handle, content_type)
         if category_label is None:
             category_label = self.get_param('category_label')
-            if category_label:
-                category_label = ' - '.join((
-                    self.localize('youtube'),
-                    category_label,
-                ))
         if category_label:
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
         if sub_type == 'history':
