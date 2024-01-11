@@ -300,16 +300,16 @@ def _process_new_uploaded_videos_tv_filtered(provider, context):
 def process(category, provider, context):
     _ = provider.get_client(context)  # required for provider.is_logged_in()
     if (not provider.is_logged_in()
-            and category in ['new_uploaded_videos_tv',
+            and category in ('new_uploaded_videos_tv',
                              'new_uploaded_videos_tv_filtered',
-                             'disliked_videos']):
+                             'disliked_videos')):
         return UriItem(context.create_uri(('sign', 'in')))
 
     if category == 'related_videos':
         return _process_related_videos(provider, context)
-    if category == 'trending':
+    if category == 'popular_right_now':
         return _process_trending(provider, context)
-    if category == 'recommended':
+    if category == 'recommendations':
         return _process_recommendations(provider, context)
     if category == 'browse_channels':
         return _process_browse_channels(provider, context)

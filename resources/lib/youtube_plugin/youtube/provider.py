@@ -1294,11 +1294,11 @@ class Provider(AbstractProvider):
         history_id = logged_in and access_manager.get_watch_history_id()
         local_history = settings.use_local_history()
 
-        # Home / Recommended
-        if settings.get_bool('youtube.folder.recommended.show', True):
+        # Home / Recommendations
+        if settings.get_bool('youtube.folder.recommendations.show', True):
             recommendations_item = DirectoryItem(
                 localize('recommendations'),
-                create_uri(('special', 'recommended')),
+                create_uri(('special', 'recommendations')),
                 image='{media}/home.png',
             )
             result.append(recommendations_item)
@@ -1314,10 +1314,10 @@ class Provider(AbstractProvider):
                 result.append(related_item)
 
         # Trending
-        if settings.get_bool('youtube.folder.trending.show', True):
+        if settings.get_bool('youtube.folder.popular_right_now.show', True):
             trending_item = DirectoryItem(
                 localize('trending'),
-                create_uri(('special', 'trending')),
+                create_uri(('special', 'popular_right_now')),
                 image='{media}/trending.png',
             )
             result.append(trending_item)
