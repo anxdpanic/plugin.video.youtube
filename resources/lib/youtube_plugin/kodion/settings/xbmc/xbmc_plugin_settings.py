@@ -93,7 +93,9 @@ class XbmcPluginSettings(AbstractSettings):
     def set_bool(self, setting, value, echo=None):
         try:
             error = not self._set_bool(self._type(), setting, value)
-            if not error:
+            if error:
+                error = 'failed'
+            else:
                 self._cache[setting] = value
         except RuntimeError as exc:
             error = exc
@@ -139,7 +141,9 @@ class XbmcPluginSettings(AbstractSettings):
     def set_int(self, setting, value, echo=None):
         try:
             error = not self._set_int(self._type(), setting, value)
-            if not error:
+            if error:
+                error = 'failed'
+            else:
                 self._cache[setting] = value
         except RuntimeError as exc:
             error = exc
@@ -175,7 +179,9 @@ class XbmcPluginSettings(AbstractSettings):
     def set_string(self, setting, value, echo=None):
         try:
             error = not self._set_str(self._type(), setting, value)
-            if not error:
+            if error:
+                error = 'failed'
+            else:
                 self._cache[setting] = value
         except RuntimeError as exc:
             error = exc
@@ -213,7 +219,9 @@ class XbmcPluginSettings(AbstractSettings):
     def set_string_list(self, setting, value, echo=None):
         try:
             error = not self._set_str_list(self._type(), setting, value)
-            if not error:
+            if error:
+                error = 'failed'
+            else:
                 self._cache[setting] = value
         except RuntimeError as exc:
             error = exc
