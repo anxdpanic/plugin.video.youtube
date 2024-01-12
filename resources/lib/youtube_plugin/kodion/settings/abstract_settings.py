@@ -16,6 +16,11 @@ from ..constants import settings
 
 
 class AbstractSettings(object):
+    _vars = vars()
+    for name, value in settings.__dict__.items():
+        _vars[name] = value
+    del _vars
+
     VALUE_FROM_STR = {
         'false': False,
         'true': True,

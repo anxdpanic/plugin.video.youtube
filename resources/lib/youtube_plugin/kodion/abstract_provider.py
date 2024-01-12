@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import settings, paths, content
+from .constants import paths, content
 from .compatibility import quote, unquote
 from .exceptions import KodionException
 from .items import (
@@ -86,14 +86,20 @@ class AbstractProvider(object):
         self._dict_path[re_path] = method_name
 
     def _process_wizard(self, context):
-        # start the setup wizard
-        wizard_steps = []
-        if context.get_settings().is_setup_wizard_enabled():
-            context.get_settings().set_bool(settings.SETUP_WIZARD, False)
-            wizard_steps.extend(self.get_wizard_steps(context))
+        settings = context.get_settings()
+        ui = context.get_ui()
 
-        if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
-                                                             context.localize('setup_wizard.execute')):
+        # start the setup wizard
+        if settings.is_setup_wizard_enabled():
+            settings.set_bool(settings.SETUP_WIZARD, False)
+
+            wizard_steps.extend(self.get_wizard_steps(context))
+        else:
+            wizard_steps = None
+
+        if (wizard_steps and ui.on_yes_no_input(
+            context.get_name(), context.localize('setup_wizard.execute')
+        )):
             for wizard_step in wizard_steps:
                 wizard_step[0](*wizard_step[1])
 

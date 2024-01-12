@@ -14,7 +14,6 @@ import os
 
 from .. import logger
 from ..compatibility import urlencode
-from ..constants import settings
 from ..json_store import AccessManager
 from ..sql_store import (
     DataCache,
@@ -151,7 +150,8 @@ class AbstractContext(object):
 
     def get_data_cache(self):
         if not self._data_cache:
-            cache_size = self.get_settings().get_int(settings.CACHE_SIZE, -1)
+            settings = self.get_settings()
+            cache_size = settings.get_int(settings.CACHE_SIZE, -1)
             if cache_size <= 0:
                 cache_size = 5
             else:
@@ -163,7 +163,8 @@ class AbstractContext(object):
 
     def get_function_cache(self):
         if not self._function_cache:
-            cache_size = self.get_settings().get_int(settings.CACHE_SIZE, -1)
+            settings = self.get_settings()
+            cache_size = settings.get_int(settings.CACHE_SIZE, -1)
             if cache_size <= 0:
                 cache_size = 5
             else:
@@ -176,7 +177,8 @@ class AbstractContext(object):
 
     def get_search_history(self):
         if not self._search_history:
-            search_size = self.get_settings().get_int(settings.SEARCH_SIZE, 50)
+            settings = self.get_settings()
+            search_size = settings.get_int(settings.SEARCH_SIZE, 50)
             filename = 'search.sqlite'
             filepath = os.path.join(self.get_cache_path(), filename)
             self._search_history = SearchHistory(filepath,
