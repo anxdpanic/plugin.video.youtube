@@ -73,10 +73,14 @@ class XbmcPluginSettings(AbstractSettings):
         error = False
         try:
             value = bool(self._get_bool(self._type(), setting))
-        except (AttributeError, TypeError) as exc:
+        except (TypeError, ValueError) as exc:
             error = exc
-            value = self.get_string(setting, echo=False)
-            value = AbstractSettings.VALUE_FROM_STR.get(value.lower(), default)
+            try:
+                value = self.get_string(setting, echo=False).lower()
+                value = AbstractSettings.VALUE_FROM_STR.get(value, default)
+            except TypeError as exc:
+                error = exc
+                value = default
         except RuntimeError as exc:
             error = exc
             value = default
@@ -97,7 +101,7 @@ class XbmcPluginSettings(AbstractSettings):
                 error = 'failed'
             else:
                 self._cache[setting] = value
-        except RuntimeError as exc:
+        except (RuntimeError, TypeError) as exc:
             error = exc
 
         if self._echo and echo is not False:
@@ -117,10 +121,10 @@ class XbmcPluginSettings(AbstractSettings):
             value = int(self._get_int(self._type(), setting))
             if process:
                 value = process(value)
-        except (AttributeError, TypeError, ValueError) as exc:
+        except (TypeError, ValueError) as exc:
             error = exc
-            value = self.get_string(setting, echo=False)
             try:
+                value = self.get_string(setting, echo=False)
                 value = int(value)
             except (TypeError, ValueError) as exc:
                 error = exc
@@ -145,7 +149,7 @@ class XbmcPluginSettings(AbstractSettings):
                 error = 'failed'
             else:
                 self._cache[setting] = value
-        except RuntimeError as exc:
+        except (RuntimeError, TypeError) as exc:
             error = exc
 
         if self._echo and echo is not False:
@@ -163,7 +167,7 @@ class XbmcPluginSettings(AbstractSettings):
         error = False
         try:
             value = self._get_str(self._type(), setting) or default
-        except RuntimeError as exc:
+        except (RuntimeError, TypeError) as exc:
             error = exc
             value = default
 
@@ -183,7 +187,7 @@ class XbmcPluginSettings(AbstractSettings):
                 error = 'failed'
             else:
                 self._cache[setting] = value
-        except RuntimeError as exc:
+        except (RuntimeError, TypeError) as exc:
             error = exc
 
         if self._echo and echo is not False:
@@ -203,7 +207,7 @@ class XbmcPluginSettings(AbstractSettings):
             value = self._get_str_list(self._type(), setting)
             if not value:
                 value = [] if default is None else default
-        except RuntimeError as exc:
+        except (RuntimeError, TypeError) as exc:
             error = exc
             value = default
 
@@ -223,7 +227,7 @@ class XbmcPluginSettings(AbstractSettings):
                 error = 'failed'
             else:
                 self._cache[setting] = value
-        except RuntimeError as exc:
+        except (RuntimeError, TypeError) as exc:
             error = exc
 
         if self._echo and echo is not False:
