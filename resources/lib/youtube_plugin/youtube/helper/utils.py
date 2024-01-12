@@ -14,6 +14,7 @@ import re
 import time
 from math import log10
 
+from ...kodion.constants import content
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     create_path,
@@ -380,7 +381,7 @@ def update_video_infos(provider, context, video_id_dict,
         video_item = video_id_dict[video_id]
 
         # set mediatype
-        video_item.set_mediatype('video')  # using video
+        video_item.set_mediatype(content.VIDEO_TYPE)
 
         if not yt_item or 'snippet' not in yt_item:
             continue

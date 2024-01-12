@@ -437,16 +437,15 @@ class XbmcContext(AbstractContext):
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
                 (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
             )
-        if content_type != content.VIDEOS:
-            return
-        self.add_sort_method(
-            (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
-            (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
-            (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
-            (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
-            (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-            (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
-        )
+        if content_type == content.VIDEO_CONTENT:
+            self.add_sort_method(
+                (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
+                (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
+                (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
+                (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
+                (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
+                (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
+            )
 
     def add_sort_method(self, *sort_methods):
         args = slice(None if current_system_version.compatible(19, 0) else 2)

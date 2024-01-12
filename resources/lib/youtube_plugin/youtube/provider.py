@@ -284,7 +284,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
-        context.set_content(content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         resource_manager = self.get_resource_manager(context)
 
         batch_id = (re_match.group('playlist_id'),
@@ -304,7 +304,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
-        context.set_content(content.FILES)
+        context.set_content(content.LIST_CONTENT)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -351,7 +351,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
     def _on_channel_live(self, context, re_match):
-        context.set_content(content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -397,7 +397,7 @@ class Provider(AbstractProvider):
         if method == 'channel' and not channel_id:
             return False
 
-        context.set_content(content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
 
         resource_manager = self.get_resource_manager(context)
 
@@ -495,7 +495,7 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/location/mine/$')
     def _on_my_location(self, context, re_match):
-        context.set_content(content.FILES)
+        context.set_content(content.LIST_CONTENT)
 
         create_uri = context.create_uri
         localize = context.localize
@@ -654,7 +654,7 @@ class Provider(AbstractProvider):
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
-            context.set_content(content.FILES)
+            context.set_content(content.LIST_CONTENT)
             channel_ids = []
             for subscription in subscriptions:
                 channel_ids.append(subscription.get_channel_id())
@@ -838,9 +838,9 @@ class Provider(AbstractProvider):
         safe_search = context.get_settings().safe_search()
 
         if search_type == 'video':
-            context.set_content(content.VIDEOS)
+            context.set_content(content.VIDEO_CONTENT)
         else:
-            context.set_content(content.FILES)
+            context.set_content(content.LIST_CONTENT)
 
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
@@ -1163,7 +1163,7 @@ class Provider(AbstractProvider):
         playback_history = context.get_playback_history()
 
         if action == 'list':
-            context.set_content(content.VIDEOS, sub_type='history')
+            context.set_content(content.VIDEO_CONTENT, sub_type='history')
             play_data = playback_history.get_items()
             if not play_data:
                 return True
@@ -1252,7 +1252,7 @@ class Provider(AbstractProvider):
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
 
-        # context.set_content_type(content.FILES)
+        # context.set_content(content.LIST_CONTENT)
 
         result = []
 

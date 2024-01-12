@@ -201,7 +201,7 @@ class AbstractProvider(object):
             return False
 
         if command == 'list':
-            context.set_content(content.VIDEOS, sub_type='watch_later')
+            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
             video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
@@ -334,7 +334,7 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
-        context.set_content(content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         result = []
 
         location = context.get_param('location', False)
