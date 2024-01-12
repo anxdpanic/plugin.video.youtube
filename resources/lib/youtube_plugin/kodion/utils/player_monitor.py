@@ -377,13 +377,7 @@ class PlayerMonitorThread(threading.Thread):
 
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         do_refresh = playlist.size() < 2 or playlist.getposition() == -1
-        if (do_refresh and settings.get_bool('youtube.post.play.refresh', False)
-                and not xbmc.getInfoLabel('Container.FolderPath').startswith(
-                    self._context.create_uri(('kodion', 'search', 'input'))
-                )):
-            # don't refresh search input it causes request for new input,
-            # (Container.Update in abstract_provider /kodion/search/input/
-            # would resolve this but doesn't work with Remotes(Yatse))
+        if do_refresh and settings.get_bool('youtube.post.play.refresh', False):
             self.ui.refresh_container()
 
         self.end()

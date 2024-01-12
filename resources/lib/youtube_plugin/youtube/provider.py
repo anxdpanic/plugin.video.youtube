@@ -393,7 +393,9 @@ class Provider(AbstractProvider):
                 and channel_id.lower() == 'property'
                 and listitem_channel_id
                 and listitem_channel_id.lower().startswith(('mine', 'uc'))):
-            context.execute('Container.Update(%s)' % create_uri(('channel', listitem_channel_id)))  # redirect if keymap, without redirect results in 'invalid handle -1'
+            context.execute('ActivateWindow(Videos, {channel}, return)'.format(
+                channel=create_uri(('channel', listitem_channel_id))
+            ))
 
         if method == 'channel' and not channel_id:
             return False
