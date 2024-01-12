@@ -366,3 +366,7 @@ class AbstractContext(object):
     @staticmethod
     def sleep(milli_seconds):
         raise NotImplementedError()
+
+    @staticmethod
+    def get_infolabel(name):
+        raise NotImplementedError()

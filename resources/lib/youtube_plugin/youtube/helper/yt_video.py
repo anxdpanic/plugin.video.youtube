@@ -16,7 +16,7 @@ from ...kodion.utils import find_video_id
 
 
 def _process_rate_video(provider, context, re_match):
-    listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
+    listitem_path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
     ratings = ['like', 'dislike', 'none']
 
     rating_param = context.get_param('rating', '')

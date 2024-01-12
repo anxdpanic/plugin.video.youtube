@@ -29,7 +29,7 @@ def _process_list(provider, context):
 
 
 def _process_add(provider, context):
-    listitem_subscription_id = context.get_ui().get_info_label('Container.ListItem(0).Property(subscription_id)')
+    listitem_subscription_id = context.get_infolabel('Container.ListItem(0).Property(subscription_id)')
 
     subscription_id = context.get_param('subscription_id', '')
     if (not subscription_id and listitem_subscription_id
@@ -53,7 +53,7 @@ def _process_add(provider, context):
 
 
 def _process_remove(provider, context):
-    listitem_subscription_id = context.get_ui().get_info_label('Container.ListItem(0).Property(channel_subscription_id)')
+    listitem_subscription_id = context.get_infolabel('Container.ListItem(0).Property(channel_subscription_id)')
 
     subscription_id = context.get_param('subscription_id', '')
     if not subscription_id and listitem_subscription_id:

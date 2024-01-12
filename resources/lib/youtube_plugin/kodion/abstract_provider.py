@@ -294,7 +294,7 @@ class AbstractProvider(object):
         if command == 'input':
             self.data_cache = context
 
-            folder_path = ui.get_info_label('Container.FolderPath')
+            folder_path = context.get_infolabel('Container.FolderPath')
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path

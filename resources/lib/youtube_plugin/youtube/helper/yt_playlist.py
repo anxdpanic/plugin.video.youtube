@@ -15,7 +15,7 @@ from ...kodion.utils import find_video_id
 
 
 def _process_add_video(provider, context, keymap_action=False):
-    listitem_path = context.get_ui().get_info_label('Container.ListItem(0).FileNameAndPath')
+    path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
 
     client = provider.get_client(context)
     watch_later_id = context.get_access_manager().get_watch_later_id()
@@ -29,8 +29,8 @@ def _process_add_video(provider, context, keymap_action=False):
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(listitem_path, 'play/'):
-            video_id = find_video_id(listitem_path)
+        if context.is_plugin_path(path, 'play/'):
+            video_id = find_video_id(path)
             keymap_action = True
         if not video_id:
             raise KodionException('Playlist/Add: missing video_id')
@@ -61,9 +61,9 @@ def _process_add_video(provider, context, keymap_action=False):
 
 
 def _process_remove_video(provider, context):
-    listitem_playlist_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_id)')
-    listitem_playlist_item_id = context.get_ui().get_info_label('Container.ListItem(0).Property(playlist_item_id)')
-    listitem_title = context.get_ui().get_info_label('Container.ListItem(0).Title')
+    listitem_playlist_id = context.get_infolabel('Container.ListItem(0).Property(playlist_id)')
+    listitem_playlist_item_id = context.get_infolabel('Container.ListItem(0).Property(playlist_item_id)')
+    listitem_title = context.get_infolabel('Container.ListItem(0).Title')
     keymap_action = False
 
     playlist_id = context.get_param('playlist_id', '')
@@ -135,16 +135,18 @@ def _process_remove_playlist(provider, context):
 
 
 def _process_select_playlist(provider, context):
+    # Get listitem path asap, relies on listitems focus
+    path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
+
     ui = context.get_ui()
-    listitem_path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')  # do this asap, relies on listitems focus
     keymap_action = False
     page_token = ''
     current_page = 0
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(listitem_path, 'play/'):
-            video_id = find_video_id(listitem_path)
+        if context.is_plugin_path(path, 'play/'):
+            video_id = find_video_id(path)
             if video_id:
                 context.set_param('video_id', video_id)
                 keymap_action = True

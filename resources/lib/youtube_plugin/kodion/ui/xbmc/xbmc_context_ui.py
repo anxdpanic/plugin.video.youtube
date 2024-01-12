@@ -130,10 +130,6 @@ class XbmcContextUI(AbstractContextUI):
         xbmc.executebuiltin('RunScript({addon_id})'.format(addon_id=ADDON_ID))
 
     @staticmethod
-    def get_info_label(value):
-        return xbmc.getInfoLabel(value)
-
-    @staticmethod
     def set_property(property_id, value):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(property_id, value)
@@ -207,10 +203,13 @@ class XbmcContextUI(AbstractContextUI):
         ))
 
     def set_focus_next_item(self):
-        cid = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
+        list_id = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
         try:
-            current_position = int(self.get_info_label('Container.Position')) + 1
-            self._context.execute('SetFocus(%s,%s)' % (cid, str(current_position)))
+            position = self._context.get_infolabel('Container.Position')
+            next_position = int(position) + 1
+            self._context.execute('SetFocus({list_id},{position})'.format(
+                list_id=list_id, position=next_position
+            ))
         except ValueError:
             pass
 

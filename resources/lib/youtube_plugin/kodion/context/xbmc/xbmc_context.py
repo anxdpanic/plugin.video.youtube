@@ -589,3 +589,7 @@ class XbmcContext(AbstractContext):
 
     def abort_requested(self):
         return self.get_ui().get_property('abort_requested').lower() == 'true'
+
+    @staticmethod
+    def get_infolabel(name):
+        return xbmc.getInfoLabel(name)
