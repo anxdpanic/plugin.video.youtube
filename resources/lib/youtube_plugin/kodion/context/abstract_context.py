@@ -112,7 +112,6 @@ class AbstractContext(object):
         self._path = create_path(path)
         self._params = params
         self._utils = None
-        self._view_mode = None
 
         # create valid uri
         self.parse_params()
@@ -360,8 +359,10 @@ class AbstractContext(object):
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()
 
-    def execute(self, command):
+    @staticmethod
+    def execute(command):
         raise NotImplementedError()
 
-    def sleep(self, milli_seconds):
+    @staticmethod
+    def sleep(milli_seconds):
         raise NotImplementedError()

@@ -56,11 +56,8 @@ class Provider(AbstractProvider):
 
         self.yt_video = yt_video
 
-    def get_wizard_supported_views(self):
-        return ['default', 'episodes']
-
     def get_wizard_steps(self, context):
-        return [(yt_setup_wizard.process, [self, context])]
+        return [(yt_setup_wizard.process, (self, context))]
 
     def is_logged_in(self):
         return self._logged_in
@@ -390,8 +387,10 @@ class Provider(AbstractProvider):
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
 
-        if (method == 'channel' and channel_id and channel_id.lower() == 'property'
-                and listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc'))):
+        if (method == 'channel' and channel_id
+                and channel_id.lower() == 'property'
+                and listitem_channel_id
+                and listitem_channel_id.lower().startswith(('mine', 'uc'))):
             context.execute('Container.Update(%s)' % create_uri(('channel', listitem_channel_id)))  # redirect if keymap, without redirect results in 'invalid handle -1'
 
         if method == 'channel' and not channel_id:

@@ -211,7 +211,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
     # ListItems that do not open a lower level list should have the isFolder
     # parameter of the xbmcplugin.addDirectoryItem set to False, however this
     # now appears to mark the ListItem as playable, even if the IsPlayable
-    # property is set to "false".
+    # property is not set or set to "false".
     # Set isFolder to True as a workaround, regardless of whether the ListItem
     # is actually a folder.
     is_folder = not directory_item.is_action()

@@ -164,8 +164,6 @@ class XbmcContext(AbstractContext):
         'select.listen.ip': 30644,
         'select_video_quality': 30010,
         'settings': 30577,
-        'setup.view_default': 30027,
-        'setup.view_videos': 30028,
         'setup_wizard.adjust': 30526,
         'setup_wizard.adjust.language_and_region': 30527,
         'setup_wizard.execute': 30030,
@@ -245,14 +243,6 @@ class XbmcContext(AbstractContext):
         'watch_later.list.set.confirm': 30570,
         'watch_later.remove': 30108,
         'watch_later.retrieval_page': 30711,
-        # For unofficial setup wizard
-        'setup_wizard.view.episodes': 30028,
-        'setup_wizard.view.movies': 30029,
-        'setup_wizard.view.tvshows': 30032,
-        'setup_wizard.view.default': 30027,
-        'setup_wizard.view.songs': 30033,
-        'setup_wizard.view.artists': 30034,
-        'setup_wizard.view.albums': 30035,
         'youtube': 30003,
     }
 
@@ -475,10 +465,12 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    def execute(self, command):
+    @staticmethod
+    def execute(command):
         xbmc.executebuiltin(command)
 
-    def sleep(self, milli_seconds):
+    @staticmethod
+    def sleep(milli_seconds):
         xbmc.sleep(milli_seconds)
 
     def addon_enabled(self, addon_id):

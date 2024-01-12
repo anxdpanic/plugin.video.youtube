@@ -30,7 +30,6 @@ class XbmcRunner(AbstractProviderRunner):
     def __init__(self):
         super(XbmcRunner, self).__init__()
         self.handle = None
-        self.settings = None
 
     def run(self, provider, context):
         self.handle = context.get_handle()
@@ -63,15 +62,13 @@ class XbmcRunner(AbstractProviderRunner):
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)
             return False
 
-        self.settings = context.get_settings()
-
         result, options = results
-
         if isinstance(result, bool):
             xbmcplugin.endOfDirectory(self.handle, succeeded=result)
             return result
 
-        show_fanart = self.settings.show_fanart()
+        settings = context.get_settings()
+        show_fanart = settings.show_fanart()
 
         if isinstance(result, (VideoItem, AudioItem, UriItem)):
             return self._set_resolved_url(context, result, show_fanart)

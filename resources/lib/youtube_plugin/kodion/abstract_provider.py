@@ -103,9 +103,6 @@ class AbstractProvider(object):
             for wizard_step in wizard_steps:
                 wizard_step[0](*wizard_step[1])
 
-    def get_wizard_supported_views(self):
-        return ['default']
-
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
         return []

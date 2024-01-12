@@ -24,7 +24,6 @@ class XbmcContextUI(AbstractContextUI):
         self._xbmc_addon = xbmc_addon
 
         self._context = context
-        self._view_mode = None
 
     def create_progress_dialog(self, heading, text=None, background=False):
         if background:
@@ -32,8 +31,6 @@ class XbmcContextUI(AbstractContextUI):
 
         return XbmcProgressDialog(heading, text)
 
-    def get_skin_id(self):
-        return xbmc.getSkinDir()
 
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
