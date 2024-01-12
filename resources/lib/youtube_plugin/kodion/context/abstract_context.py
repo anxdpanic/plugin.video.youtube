@@ -329,7 +329,7 @@ class AbstractContext(object):
     def get_settings(self):
         raise NotImplementedError()
 
-    def localize(self, text_id, default_text=''):
+    def localize(self, text_id, default_text=None):
         raise NotImplementedError()
 
     def set_content(self, content_type, sub_type=None, category_label=None):

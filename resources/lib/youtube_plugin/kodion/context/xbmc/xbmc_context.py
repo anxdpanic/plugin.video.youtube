@@ -383,7 +383,10 @@ class XbmcContext(AbstractContext):
     def get_settings(self):
         return self._settings
 
-    def localize(self, text_id, default_text=''):
+    def localize(self, text_id, default_text=None):
+        if default_text is None:
+            default_text = 'Undefined string ID: |{0}|'.format(text_id)
+
         if not isinstance(text_id, int):
             try:
                 text_id = self.LOCAL_MAP[text_id]
