@@ -33,6 +33,7 @@ class XbmcRunner(AbstractProviderRunner):
 
     def run(self, provider, context):
         self.handle = context.get_handle()
+        settings = context.get_settings()
         ui = context.get_ui()
 
         if ui.get_property('busy').lower() == 'true':
@@ -51,6 +52,9 @@ class XbmcRunner(AbstractProviderRunner):
                     playlist.add_items(items, loads=True)
                 return False
 
+        if settings.is_setup_wizard_enabled():
+            provider.run_wizard(context)
+
         try:
             results = provider.navigate(context)
         except KodionException as exc:
@@ -67,7 +71,6 @@ class XbmcRunner(AbstractProviderRunner):
             xbmcplugin.endOfDirectory(self.handle, succeeded=result)
             return result
 
-        settings = context.get_settings()
         show_fanart = settings.show_fanart()
 
         if isinstance(result, (VideoItem, AudioItem, UriItem)):

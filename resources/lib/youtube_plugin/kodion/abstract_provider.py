@@ -85,17 +85,14 @@ class AbstractProvider(object):
         """
         self._dict_path[re_path] = method_name
 
-    def _process_wizard(self, context):
+    def run_wizard(self, context):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        # start the setup wizard
-        if settings.is_setup_wizard_enabled():
-            settings.set_bool(settings.SETUP_WIZARD, False)
+        settings.set_bool(settings.SETUP_WIZARD, False)
 
-            wizard_steps.extend(self.get_wizard_steps(context))
-        else:
-            wizard_steps = None
+        wizard_steps = self.get_wizard_steps(context)
+        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
 
         if (wizard_steps and ui.on_yes_no_input(
             context.get_name(), context.localize('setup_wizard.execute')
@@ -108,8 +105,6 @@ class AbstractProvider(object):
         return []
 
     def navigate(self, context):
-        self._process_wizard(context)
-
         path = context.get_path()
 
         for key in self._dict_path:
