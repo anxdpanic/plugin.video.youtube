@@ -89,6 +89,7 @@ class LoginClient(YouTubeRequestClient):
         try:
             json_data = response.json()
             if 'error' in json_data:
+                json_data.setdefault('code', response.status_code)
                 raise LoginException('"error" in response JSON data',
                                      json_data=json_data,
                                      response=response)

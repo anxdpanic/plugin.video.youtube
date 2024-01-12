@@ -101,7 +101,7 @@ class BaseRequestsClass(object):
                                              verify=verify,
                                              cert=cert,
                                              json=json)
-            if not response:
+            if not getattr(response, 'status_code', None):
                 raise self._default_exc[0](response=response)
 
             if response_hook:
