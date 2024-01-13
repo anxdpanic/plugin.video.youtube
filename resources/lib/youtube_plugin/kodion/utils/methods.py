@@ -315,7 +315,7 @@ def seconds_to_duration(seconds):
 
 def merge_dicts(item1, item2, templates=None, _=Ellipsis):
     if not isinstance(item1, dict) or not isinstance(item2, dict):
-        return item1 if item2 is _ else item2
+        return item1 if item2 is _ else _ if item2 is KeyError else item2
     new = {}
     keys = set(item1)
     keys.update(item2)
