@@ -125,8 +125,11 @@ class XbmcRunner(AbstractProviderRunner):
             return True
 
         if context.is_plugin_path(uri):
-            context.log_debug('Redirecting to |{0}|'.format(uri))
+            context.log_debug('Redirecting to: |{0}|'.format(uri))
             context.execute('RunPlugin({0})'.format(uri))
+        else:
+            context.log_debug('Running script: |{0}|'.format(uri))
+            context.execute('RunScript({0})'.format(uri))
 
         xbmcplugin.endOfDirectory(self.handle,
                                   succeeded=False,

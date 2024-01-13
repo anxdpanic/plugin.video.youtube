@@ -127,7 +127,9 @@ class XbmcContextUI(AbstractContextUI):
     def refresh_container(self):
         # TODO: find out why the RunScript call is required
         # xbmc.executebuiltin("Container.Refresh")
-        xbmc.executebuiltin('RunScript({addon_id})'.format(addon_id=ADDON_ID))
+        xbmc.executebuiltin('RunScript({addon_id},action/refresh)'.format(
+            addon_id=ADDON_ID
+        ))
 
     @staticmethod
     def set_property(property_id, value):

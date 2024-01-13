@@ -7,12 +7,12 @@
         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
         <import addon="script.module.infotagger" version="0.0.5"/>
     </requires>
-    <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
+    <extension point="xbmc.python.pluginsource" library="resources/lib/plugin.py">
         <provides>video</provides>
     </extension>
-    <extension point="xbmc.service" library="resources/lib/startup.py"/>
+    <extension point="xbmc.service" library="resources/lib/service.py"/>
     <extension point="xbmc.python.module" library="resources/lib/"/>
-    <extension point="xbmc.python.script" library="resources/lib/youtube_plugin/refresh.py">
+    <extension point="xbmc.python.script" library="resources/lib/youtube_plugin/script.py">
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">

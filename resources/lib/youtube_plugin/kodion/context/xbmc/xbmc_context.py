@@ -246,7 +246,12 @@ class XbmcContext(AbstractContext):
         'youtube': 30003,
     }
 
-    def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
+    def __init__(self,
+                 path='/',
+                 params=None,
+                 plugin_name='',
+                 plugin_id='',
+                 override=True):
         super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
 
         if plugin_id:
@@ -260,29 +265,37 @@ class XbmcContext(AbstractContext):
         Also we extract the path and parameters - man, that would be so simple with the normal url-parsing routines.
         """
         num_args = len(sys.argv)
+        if override and num_args:
+            uri = sys.argv[0]
+            is_plugin_invocation = uri.startswith('plugin://')
+            if is_plugin_invocation:
+                # first the path of the uri
+                self._uri = uri
+                parsed_url = urlsplit(uri)
+                self._path = unquote(parsed_url.path)
 
-        # first the path of the uri
-        if override:
-            self._uri = sys.argv[0]
-            parsed_url = urlsplit(self._uri)
-            self._path = unquote(parsed_url.path)
+                # after that try to get the params
+                if num_args > 2:
+                    params = sys.argv[2][1:]
+                    if params:
+                        self._uri = '?'.join((self._uri, params))
+                        self.parse_params(dict(parse_qsl(params)))
 
-            # after that try to get the params
-            if num_args > 2:
-                params = sys.argv[2][1:]
-                if params:
-                    self._uri = '?'.join((self._uri, params))
-                    self.parse_params(dict(parse_qsl(params)))
-
-            if num_args > 3 and sys.argv[3].lower() == 'resume:true':
-                self._params['resume'] = True
+                # then Kodi resume status
+                if num_args > 3 and sys.argv[3].lower() == 'resume:true':
+                    self._params['resume'] = True
+        elif num_args:
+            uri = sys.argv[0]
+            is_plugin_invocation = uri.startswith('plugin://')
+        else:
+            is_plugin_invocation = False
 
         self._ui = None
         self._video_playlist = None
         self._audio_playlist = None
         self._video_player = None
         self._audio_player = None
-        self._plugin_handle = int(sys.argv[1]) if num_args > 1 else -1
+        self._plugin_handle = int(sys.argv[1]) if is_plugin_invocation else -1
         self._plugin_id = plugin_id or ADDON_ID
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
