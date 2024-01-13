@@ -152,7 +152,7 @@ class AbstractContext(object):
             settings = self.get_settings()
             cache_size = settings.get_int(settings.CACHE_SIZE, -1)
             if cache_size <= 0:
-                cache_size = 5
+                cache_size = 10
             else:
                 cache_size /= 2.0
             filename = 'data_cache.sqlite'
@@ -165,7 +165,7 @@ class AbstractContext(object):
             settings = self.get_settings()
             cache_size = settings.get_int(settings.CACHE_SIZE, -1)
             if cache_size <= 0:
-                cache_size = 5
+                cache_size = 10
             else:
                 cache_size /= 2.0
             filename = 'cache.sqlite'
