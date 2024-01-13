@@ -142,8 +142,8 @@ class AbstractContext(object):
     def get_playback_history(self):
         if not self._playback_history:
             uuid = self.get_access_manager().get_current_user_id()
-            filename = ''.join((uuid, '.sqlite'))
-            filepath = os.path.join(self.get_data_path(), 'playback', filename)
+            filename = 'history.sqlite'
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._playback_history = PlaybackHistory(filepath)
         return self._playback_history
 
@@ -178,23 +178,26 @@ class AbstractContext(object):
         if not self._search_history:
             settings = self.get_settings()
             search_size = settings.get_int(settings.SEARCH_SIZE, 50)
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'search.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._search_history = SearchHistory(filepath,
                                                  max_item_count=search_size)
         return self._search_history
 
     def get_favorite_list(self):
         if not self._favorite_list:
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'favorites.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._favorite_list = FavoriteList(filepath)
         return self._favorite_list
 
     def get_watch_later_list(self):
         if not self._watch_later_list:
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'watch_later.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._watch_later_list = WatchLaterList(filepath)
         return self._watch_later_list
 
