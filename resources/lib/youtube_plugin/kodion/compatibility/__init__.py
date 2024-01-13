@@ -28,6 +28,9 @@ try:
 
     from infotagger.listitem import set_info_tag
 
+    xbmc.LOGNOTICE = xbmc.LOGINFO
+    xbmc.LOGSEVERE = xbmc.LOGFATAL
+
     string_type = str
 
 except ImportError:
