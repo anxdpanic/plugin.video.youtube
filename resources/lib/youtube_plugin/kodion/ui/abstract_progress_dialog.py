@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from ..compatibility import string_type
+
 
 class AbstractProgressDialog(object):
     def __init__(self, dialog, heading, text, total=100):
@@ -51,7 +53,7 @@ class AbstractProgressDialog(object):
         else:
             position = int(100 * self._position / self._total)
 
-        if isinstance(text, str):
+        if isinstance(text, string_type):
             self._dialog.update(percent=position, message=text)
         else:
             self._dialog.update(percent=position)

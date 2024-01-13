@@ -17,6 +17,7 @@ from .audio_item import AudioItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
 from .video_item import VideoItem
+from ..compatibility import string_type
 from ..utils.datetime_parser import strptime
 
 
@@ -52,7 +53,7 @@ def from_json(json_data, *_args):
     :param json_data:
     :return:
     """
-    if isinstance(json_data, str):
+    if isinstance(json_data, string_type):
         json_data = json.loads(json_data, object_hook=_decoder)
 
     item_type = json_data.get('type')

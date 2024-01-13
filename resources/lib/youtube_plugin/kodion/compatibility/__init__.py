@@ -28,6 +28,8 @@ try:
 
     from infotagger.listitem import set_info_tag
 
+    string_type = str
+
 except ImportError:
     import BaseHTTPServer
     from contextlib import contextmanager as _contextmanager
@@ -93,6 +95,7 @@ except ImportError:
     xbmcvfs.File = _file_closer
     xbmcvfs.translatePath = xbmc.translatePath
 
+
     def set_info_tag(listitem, infolabels, tag_type, *_args, **_kwargs):
         listitem.setInfo(tag_type, infolabels)
         return ListItemInfoTag(listitem, tag_type)
@@ -117,12 +120,15 @@ except ImportError:
                 infoproperties[total_key] = str(infoproperties[total_key])
 
 
+    string_type = basestring
+
 __all__ = (
     'BaseHTTPServer',
     'parse_qs',
     'parse_qsl',
     'quote',
     'set_info_tag',
+    'string_type',
     'unescape',
     'unquote',
     'urlencode',

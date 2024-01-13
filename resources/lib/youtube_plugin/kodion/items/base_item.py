@@ -14,7 +14,7 @@ import json
 from datetime import date, datetime
 from hashlib import md5
 
-from ..compatibility import unescape
+from ..compatibility import string_type, unescape
 from ..constants import MEDIA_PATH
 
 
@@ -106,7 +106,7 @@ class BaseItem(object):
         return self._name
 
     def set_uri(self, uri):
-        self._uri = uri if uri and isinstance(uri, str) else ''
+        self._uri = uri if uri and isinstance(uri, string_type) else ''
 
     def get_uri(self):
         """

@@ -18,7 +18,7 @@ import shutil
 from datetime import timedelta
 from math import floor, log
 
-from ..compatibility import quote, xbmc, xbmcvfs
+from ..compatibility import quote, string_type, xbmc, xbmcvfs
 from ..logger import log_error
 
 
@@ -324,7 +324,7 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
         if value is _:
             continue
         if (templates is not None
-                and isinstance(value, str) and '{' in value):
+                and isinstance(value, string_type) and '{' in value):
             templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
         new[key] = value
     return new or _

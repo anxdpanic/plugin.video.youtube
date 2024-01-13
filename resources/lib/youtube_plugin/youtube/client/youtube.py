@@ -19,6 +19,7 @@ from random import randint
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
+from ...kodion.compatibility import string_type
 from ...kodion.utils import datetime_parser, strip_html_from_text, to_unicode
 
 
@@ -257,7 +258,7 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def get_video_rating(self, video_id, **kwargs):
-        if not isinstance(video_id, str):
+        if not isinstance(video_id, string_type):
             video_id = ','.join(video_id)
 
         params = {'id': video_id}
@@ -908,7 +909,7 @@ class YouTube(LoginClient):
         :param channel_id: list or comma-separated list of the YouTube channel ID(s)
         :return:
         """
-        if not isinstance(channel_id, str):
+        if not isinstance(channel_id, string_type):
             channel_id = ','.join(channel_id)
 
         params = {'part': 'snippet,contentDetails,brandingSettings'}
@@ -945,7 +946,7 @@ class YouTube(LoginClient):
         :param live_details: also retrieve liveStreamingDetails
         :return:
         """
-        if not isinstance(video_id, str):
+        if not isinstance(video_id, string_type):
             video_id = ','.join(video_id)
 
         parts = ['snippet', 'contentDetails', 'status', 'statistics']
@@ -960,7 +961,7 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def get_playlists(self, playlist_id, **kwargs):
-        if not isinstance(playlist_id, str):
+        if not isinstance(playlist_id, string_type):
             playlist_id = ','.join(playlist_id)
 
         params = {'part': 'snippet,contentDetails',
@@ -1223,7 +1224,7 @@ class YouTube(LoginClient):
         # prepare search type
         if not search_type:
             search_type = ''
-        if not isinstance(search_type, str):
+        if not isinstance(search_type, string_type):
             search_type = ','.join(search_type)
 
         # prepare page token
