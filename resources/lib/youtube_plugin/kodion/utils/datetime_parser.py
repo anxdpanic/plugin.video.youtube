@@ -16,6 +16,7 @@ from importlib import import_module
 from sys import modules
 
 from ..exceptions import KodionException
+from ..logger import log_error
 
 try:
     from datetime import timezone
@@ -227,18 +228,52 @@ def datetime_to_since(context, dt, local=True):
     return ' '.join((context.format_date_short(dt), context.format_time(dt)))
 
 
-def strptime(datetime_str, fmt='%Y-%m-%dT%H:%M:%S'):
-    if '.' in datetime_str[-5:]:
-        fmt.replace('%S', '%S.%f')
+def strptime(datetime_str, fmt=None):
+    if fmt is None:
+        fmt = '%Y-%m-%dT%H%M%S'
+
+    if ' ' in datetime_str:
+        date_part, time_part = datetime_str.split(' ')
+    elif 'T' in datetime_str:
+        date_part, time_part = datetime_str.split('T')
+
+    if ':' in time_part:
+        time_part = time_part.replace(':', '')
+
+    if '+' in time_part:
+        time_part, offset, timezone_part = time_part.partition('+')
+    elif '-' in time_part:
+        time_part, offset, timezone_part = time_part.partition('+')
     else:
-        fmt.replace('%S.%f', '%S')
+        offset = timezone_part = ''
 
-    if not datetime.strptime:
-        if '_strptime' in modules:
-            del modules['_strptime']
-        modules['_strptime'] = import_module('_strptime')
+    if timezone and timezone_part and offset:
+        fmt = fmt.replace('%S', '%S%z')
+    else:
+        fmt = fmt.replace('%S%z', '%S')
 
-    return datetime.strptime(datetime_str, fmt)
+    if '.' in time_part:
+        fmt = fmt.replace('%S', '%S.%f')
+    else:
+        fmt = fmt.replace('%S.%f', '%S')
+
+    if timezone and timezone_part and offset:
+        time_part = offset.join((time_part, timezone_part))
+    datetime_str = 'T'.join((date_part, time_part))
+
+    try:
+        return datetime.strptime(datetime_str, fmt)
+    except TypeError:
+        log_error('Python strptime bug workaround.\n'
+                  'Refer to https://github.com/python/cpython/issues/71587')
+
+        if '_strptime' not in modules:
+            modules['_strptime'] = import_module('_strptime')
+        _strptime = modules['_strptime']
+
+        if timezone:
+            return _strptime._strptime_datetime(datetime, datetime_str, fmt)
+        return datetime(*(_strptime._strptime(datetime_str, fmt)[0][0:6]))
 
 
 def since_epoch(dt_object=None):
