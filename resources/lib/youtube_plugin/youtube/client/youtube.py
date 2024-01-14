@@ -1030,7 +1030,8 @@ class YouTube(LoginClient):
         result = self.api_request(version=1,
                                   method='POST',
                                   path='next',
-                                  post_data=post_data)
+                                  post_data=post_data,
+                                  no_login=True)
         if not result:
             return []
 
