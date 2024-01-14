@@ -20,7 +20,7 @@ jobs:
         id: release
         run: |
           version=${GITHUB_REF/refs\/tags\//}
-          if [[ $version == *-dev ]] ;
+          if [[ $version == *[-+]@(alpha|beta|dev)*([.0-9a-z]) ]] ;
           then
             echo "pre-release=true" >> $GITHUB_OUTPUT
           else
@@ -64,11 +64,14 @@ jobs:
 
       - name: Create Zip (Nexus-Unofficial)
         id: zip-unofficial-nexus
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git reset
           git checkout .
+          git fetch origin nexus-unofficial
+          git cherry-pick ...origin/nexus-unofficial -n
           git clean -fdx
-          git apply .patches/unofficial.patch
           mv .git ..
           rm -rf .??*
           rm *.md
@@ -104,11 +107,14 @@ jobs:
 
       - name: Create Zip (Matrix-Unofficial)
         id: zip-unofficial-matrix
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           git reset
           git checkout .
+          git fetch origin nexus-unofficial
+          git cherry-pick ...origin/nexus-unofficial -n
           git clean -fdx
-          git apply .patches/unofficial.patch
           mv .git ..
           rm -rf .??*
           rm *.md
