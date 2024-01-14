@@ -171,7 +171,7 @@ def _process_description_links(provider, context):
         ) as progress_dialog:
             resource_manager = provider.get_resource_manager(context)
 
-            video_data = resource_manager.get_videos((video_id, ))
+            video_data = resource_manager.get_videos((video_id,))
             yt_item = video_data[video_id]
             if not yt_item or 'snippet' not in yt_item:
                 context.get_ui().on_ok(
@@ -286,10 +286,12 @@ def _process_saved_playlists_tv(provider, context):
         offset=context.get_param('offset', 0)
     )
 
+    if not json_data:
+        return False
     return tv.saved_playlists_to_items(provider, context, json_data)
 
 
-def _process_new_uploaded_videos_tv(provider, context):
+def _process_new_uploaded_videos_tv(provider, context, filtered=False):
     context.set_content(content.VIDEO_CONTENT)
 
     json_data = provider.get_client(context).get_my_subscriptions(
@@ -297,21 +299,12 @@ def _process_new_uploaded_videos_tv(provider, context):
         offset=context.get_param('offset', 0)
     )
 
-    return tv.my_subscriptions_to_items(provider, context, json_data)
-
-
-def _process_new_uploaded_videos_tv_filtered(provider, context):
-    context.set_content(content.VIDEO_CONTENT)
-
-    json_data = provider.get_client(context).get_my_subscriptions(
-        page_token=context.get_param('next_page_token', ''),
-        offset=context.get_param('offset', 0)
-    )
-
+    if not json_data:
+        return False
     return tv.my_subscriptions_to_items(provider,
                                         context,
                                         json_data,
-                                        do_filter=True)
+                                        do_filter=filtered)
 
 
 def process(category, provider, context):
@@ -333,7 +326,7 @@ def process(category, provider, context):
     if category == 'new_uploaded_videos_tv':
         return _process_new_uploaded_videos_tv(provider, context)
     if category == 'new_uploaded_videos_tv_filtered':
-        return _process_new_uploaded_videos_tv_filtered(provider, context)
+        return _process_new_uploaded_videos_tv(provider, context, filtered=True)
     if category == 'disliked_videos':
         return _process_disliked_videos(provider, context)
     if category == 'live':

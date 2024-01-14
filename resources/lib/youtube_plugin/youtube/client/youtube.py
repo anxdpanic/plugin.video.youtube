@@ -1298,7 +1298,7 @@ class YouTube(LoginClient):
 
             # if new uploads is cached
             cache_items_key = 'my-subscriptions-items'
-            cached = cache.get_item(cache_items_key, cache.ONE_HOUR)
+            cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
             if cached:
                 _result['items'] = cached
 
@@ -1398,7 +1398,7 @@ class YouTube(LoginClient):
                 # sorting by publish date
                 def _sort_by_date_time(item):
                     return datetime_parser.since_epoch(
-                        datetime_parser.strptime(item['published'][0:19])
+                        datetime_parser.strptime(item['published'])
                     )
 
                 _result['items'].sort(reverse=True, key=_sort_by_date_time)
