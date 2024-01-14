@@ -567,7 +567,7 @@ class YouTube(LoginClient):
         num_items = 10
         local_history = self._context.get_settings().use_local_history()
         history_id = self._context.get_access_manager().get_watch_history_id()
-        if not history_id or history_id == 'HL':
+        if not history_id:
             if local_history:
                 history = self._context.get_playback_history()
                 video_ids = history.get_items(limit=num_items)

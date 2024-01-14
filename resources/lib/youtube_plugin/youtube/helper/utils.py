@@ -363,9 +363,9 @@ def update_video_infos(provider, context, video_id_dict,
 
     logged_in = provider.is_logged_in()
     if logged_in:
-        wl_playlist_id = context.get_access_manager().get_watch_later_id()
+        watch_later_id = context.get_access_manager().get_watch_later_id()
     else:
-        wl_playlist_id = None
+        watch_later_id = None
 
     settings = context.get_settings()
     hide_shorts = settings.hide_short_videos()
@@ -592,26 +592,12 @@ def update_video_infos(provider, context, video_id_dict,
         if alternate_player:
             context_menu.append(menu_items.play_with(context))
 
-        if logged_in:
-            # add 'Watch Later' only if we are not in my 'Watch Later' list
-            if wl_playlist_id and playlist_id and wl_playlist_id != playlist_id:
+        # add 'Watch Later' only if we are not in my 'Watch Later' list
+        if watch_later_id:
+            if not playlist_id or watch_later_id != playlist_id:
                 context_menu.append(
                     menu_items.watch_later_add(
-                        context, wl_playlist_id, video_id
-                    )
-                )
-
-            # provide 'remove' for videos in my playlists
-            # we support all playlist except 'Watch History'
-            if (video_id in playlist_item_id_dict and playlist_id
-                    and playlist_channel_id == 'mine'
-                    and playlist_id.strip().lower() not in ('hl', 'wl')):
-                playlist_item_id = playlist_item_id_dict[video_id]
-                video_item.set_playlist_id(playlist_id)
-                video_item.set_playlist_item_id(playlist_item_id)
-                context_menu.append(
-                    menu_items.remove_video_from_playlist(
-                        context, playlist_id, video_id, video_item.get_name()
+                        context, watch_later_id, video_id
                     )
                 )
         else:
@@ -620,6 +606,21 @@ def update_video_infos(provider, context, video_id_dict,
                     context, video_item
                 )
             )
+
+            # provide 'remove' for videos in my playlists
+            # we support all playlist except 'Watch History'
+        if (logged_in and video_id in playlist_item_id_dict and playlist_id
+                and playlist_channel_id == 'mine'
+                and playlist_id.strip().lower() not in ('hl', 'wl')):
+            playlist_item_id = playlist_item_id_dict[video_id]
+            video_item.set_playlist_id(playlist_id)
+            video_item.set_playlist_item_id(playlist_item_id)
+            context_menu.append(
+                menu_items.remove_video_from_playlist(
+                    context, playlist_id, video_id, video_item.get_name()
+                )
+            )
+
 
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and

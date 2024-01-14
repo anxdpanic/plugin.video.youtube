@@ -18,14 +18,18 @@ def _process_add_video(provider, context, keymap_action=False):
     path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
 
     client = provider.get_client(context)
+    logged_in = provider.is_logged_in()
+    if not logged_in:
+        raise KodionException('Playlist/Add: not logged in')
+
     watch_later_id = context.get_access_manager().get_watch_later_id()
 
     playlist_id = context.get_param('playlist_id', '')
-    if not playlist_id:
-        raise KodionException('Playlist/Add: missing playlist_id')
-
     if playlist_id.lower() == 'watch_later':
         playlist_id = watch_later_id
+
+    if not playlist_id:
+        raise KodionException('Playlist/Add: missing playlist_id')
 
     video_id = context.get_param('video_id', '')
     if not video_id:
@@ -35,29 +39,28 @@ def _process_add_video(provider, context, keymap_action=False):
         if not video_id:
             raise KodionException('Playlist/Add: missing video_id')
 
-    if playlist_id != 'HL':
-        json_data = client.add_video_to_playlist(playlist_id=playlist_id, video_id=video_id)
-        if not json_data:
-            return False
+    json_data = client.add_video_to_playlist(playlist_id=playlist_id,
+                                             video_id=video_id)
+    if not json_data:
+        context.log_debug('Playlist/Add: failed for playlist |{playlist_id}|'
+                          .format(playlist_id=playlist_id))
+        return False
 
-        if playlist_id == watch_later_id:
-            notify_message = context.localize('watch_later.added_to')
-        else:
-            notify_message = context.localize('playlist.added_to')
+    if playlist_id == watch_later_id:
+        notify_message = context.localize('watch_later.added_to')
+    else:
+        notify_message = context.localize('playlist.added_to')
 
-        context.get_ui().show_notification(
-            message=notify_message,
-            time_ms=2500,
-            audible=False
-        )
+    context.get_ui().show_notification(
+        message=notify_message,
+        time_ms=2500,
+        audible=False
+    )
 
-        if keymap_action:
-            context.get_ui().set_focus_next_item()
+    if keymap_action:
+        context.get_ui().set_focus_next_item()
 
-        return True
-
-    context.log_debug('Cannot add to playlist id |%s|' % playlist_id)
-    return False
+    return True
 
 
 def _process_remove_video(provider, context):
@@ -91,7 +94,7 @@ def _process_remove_video(provider, context):
         else:
             raise KodionException('Playlist/Remove: missing video_name')
 
-    if playlist_id != 'HL' and playlist_id.strip().lower() != 'wl':
+    if playlist_id.strip().lower() not in ('wl', 'hl'):
         if context.get_ui().on_remove_content(video_name):
             json_data = provider.get_client(context).remove_video_from_playlist(playlist_id=playlist_id,
                                                                                 playlist_item_id=video_id)
@@ -183,11 +186,11 @@ def _process_select_playlist(provider, context):
             resource_manager = provider.get_resource_manager(context)
             my_playlists = resource_manager.get_related_playlists(channel_id='mine')
             if 'watchLater' in my_playlists:
-                watch_later_playlist_id = context.get_access_manager().get_watch_later_id()
-                if watch_later_playlist_id:
+                watch_later_id = context.get_access_manager().get_watch_later_id()
+                if watch_later_id:
                     items.append((
                         ui.bold(context.localize('watch_later')), '',
-                        watch_later_playlist_id,
+                        watch_later_id,
                         context.create_resource_path('media', 'watch_later.png')
                     ))
 
@@ -266,7 +269,7 @@ def _watch_later_playlist_id_change(context, method):
             return
     elif method == 'remove':
         if context.get_ui().on_yes_no_input(context.get_name(), context.localize('watch_later.list.remove.confirm') % playlist_name):
-            context.get_access_manager().set_watch_later_id(' WL')
+            context.get_access_manager().set_watch_later_id('WL')
         else:
             return
     else:

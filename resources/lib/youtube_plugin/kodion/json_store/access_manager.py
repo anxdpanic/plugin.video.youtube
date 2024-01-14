@@ -26,7 +26,7 @@ class AccessManager(JSONStore):
         'token_expires': -1,
         'last_key_hash': '',
         'name': 'Default',
-        'watch_later': ' WL',
+        'watch_later': 'WL',
         'watch_history': 'HL'
     }
 
@@ -85,7 +85,7 @@ class AccessManager(JSONStore):
 
         current_user = data['access_manager']['current_user']
         if 'watch_later' not in data['access_manager']['users'][current_user]:
-            data['access_manager']['users'][current_user]['watch_later'] = ' WL'
+            data['access_manager']['users'][current_user]['watch_later'] = 'WL'
         if 'watch_history' not in data['access_manager']['users'][current_user]:
             data['access_manager']['users'][current_user][
                 'watch_history'] = 'HL'
@@ -158,7 +158,7 @@ class AccessManager(JSONStore):
             'last_key_hash': '',
             'name': username,
             'id': new_uuid,
-            'watch_later': ' WL',
+            'watch_later': 'WL',
             'watch_history': 'HL'
         }
 
@@ -282,13 +282,15 @@ class AccessManager(JSONStore):
         :return: the current users watch later playlist id
         """
         current_user = self.get_current_user_details()
-        current_playlist_id = current_user.get('watch_later', 'WL')
-        settings_playlist_id = self._settings.get_watch_later_playlist()
+        current_id = current_user.get('watch_later', 'WL')
+        settings_id = self._settings.get_watch_later_playlist()
 
-        if settings_playlist_id and current_playlist_id != settings_playlist_id:
-            self.set_watch_later_id(settings_playlist_id)
+        if settings_id and current_id != settings_id:
+            current_id = self.set_watch_later_id(settings_id)
 
-        return settings_playlist_id or current_playlist_id
+        if current_id and current_id.lower().strip() == 'wl':
+            return ''
+        return current_id
 
     def set_watch_later_id(self, playlist_id):
         """
@@ -296,6 +298,9 @@ class AccessManager(JSONStore):
         :param playlist_id: string, watch later playlist id
         :return:
         """
+        if playlist_id.lower().strip() == 'wl':
+            playlist_id = ''
+
         self._settings.set_watch_later_playlist(playlist_id)
         data = {
             'access_manager': {
@@ -307,6 +312,7 @@ class AccessManager(JSONStore):
             },
         }
         self.save(data, update=True)
+        return playlist_id
 
     def get_watch_history_id(self):
         """
@@ -314,13 +320,15 @@ class AccessManager(JSONStore):
         :return: the current users watch history playlist id
         """
         current_user = self.get_current_user_details()
-        current_playlist_id = current_user.get('watch_history', 'HL')
-        settings_playlist_id = self._settings.get_history_playlist()
+        current_id = current_user.get('watch_history', 'HL')
+        settings_id = self._settings.get_history_playlist()
 
-        if settings_playlist_id and current_playlist_id != settings_playlist_id:
-            self.set_watch_history_id(settings_playlist_id)
+        if settings_id and current_id != settings_id:
+            current_id = self.set_watch_history_id(settings_id)
 
-        return settings_playlist_id or current_playlist_id
+        if current_id and current_id.lower().strip() == 'hl':
+            return ''
+        return current_id
 
     def set_watch_history_id(self, playlist_id):
         """
@@ -328,6 +336,9 @@ class AccessManager(JSONStore):
         :param playlist_id: string, watch history playlist id
         :return:
         """
+        if playlist_id.lower().strip() == 'hl':
+            playlist_id = ''
+
         self._settings.set_history_playlist(playlist_id)
         data = {
             'access_manager': {
@@ -339,6 +350,7 @@ class AccessManager(JSONStore):
             },
         }
         self.save(data, update=True)
+        return playlist_id
 
     def set_last_origin(self, origin):
         """

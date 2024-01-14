@@ -1085,7 +1085,7 @@ class Provider(AbstractProvider):
 
         # Related
         if settings.get_bool('youtube.folder.related.show', True):
-            if history_id and history_id != 'HL' or local_history:
+            if history_id or local_history:
                 related_item = DirectoryItem(
                     localize('related_videos'),
                     create_uri(('special', 'related_videos')),
@@ -1196,7 +1196,7 @@ class Provider(AbstractProvider):
 
         # history
         if settings.get_bool('youtube.folder.history.show', False):
-            if history_id and history_id != 'HL':
+            if history_id:
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri(('channel', 'mine', 'playlist', history_id)),

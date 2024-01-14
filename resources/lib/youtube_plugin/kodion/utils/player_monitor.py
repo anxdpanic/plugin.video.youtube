@@ -346,10 +346,9 @@ class PlayerMonitorThread(threading.Thread):
                 self._context.get_watch_later_list().remove(self.video_id)
 
         if logged_in and not refresh_only:
-            history_playlist_id = access_manager.get_watch_history_id()
-            if history_playlist_id and history_playlist_id != 'HL':
-                _ = client.add_video_to_playlist(history_playlist_id,
-                                                 self.video_id)
+            history_id = access_manager.get_watch_history_id()
+            if history_id:
+                _ = client.add_video_to_playlist(history_id, self.video_id)
 
             # rate video
             if settings.get_bool('youtube.post.play.rate', False):
