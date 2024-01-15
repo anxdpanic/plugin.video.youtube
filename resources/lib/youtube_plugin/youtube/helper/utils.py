@@ -14,6 +14,7 @@ import re
 import time
 from math import log10
 
+from ...kodion.constants import content
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     create_path,
@@ -22,11 +23,11 @@ from ...kodion.utils import (
     strip_html_from_text,
 )
 
-
 try:
     from inputstreamhelper import Helper as ISHelper
 except ImportError:
     ISHelper = None
+
 
 __COLOR_MAP = {
     'commentCount': 'cyan',
@@ -74,7 +75,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     like_count = snippet['likeCount']
     if like_count:
-        like_count, _ = friendly_number(like_count)
+        like_count = friendly_number(like_count)
         color = __COLOR_MAP['likeCount']
         label_likes = ui.color(color, ui.bold(like_count))
         plot_likes = ui.color(color, ui.bold(' '.join((
@@ -84,7 +85,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
         plot_props.append(plot_likes)
 
     if total_replies:
-        total_replies, _ = friendly_number(total_replies)
+        total_replies = friendly_number(total_replies)
         color = __COLOR_MAP['commentCount']
         label_replies = ui.color(color, ui.bold(total_replies))
         plot_replies = ui.color(color, ui.bold(' '.join((
@@ -127,12 +128,12 @@ def make_comment_item(context, snippet, uri, total_replies=0):
     comment_item = DirectoryItem(label, uri)
     comment_item.set_plot(plot)
 
-    datetime = datetime_parser.parse(published_at, as_utc=True)
+    datetime = datetime_parser.parse(published_at)
     comment_item.set_added_utc(datetime)
     local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_dateadded_from_datetime(local_datetime)
     if edited:
-        datetime = datetime_parser.parse(updated_at, as_utc=True)
+        datetime = datetime_parser.parse(updated_at)
         local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_date_from_datetime(local_datetime)
 
@@ -311,11 +312,11 @@ def update_playlist_infos(provider, context, playlist_id_dict,
                         context, playlist_id, title
                     ),
                     # remove as my custom watch later playlist
-                    menu_items.remove_as_watchlater(
+                    menu_items.remove_as_watch_later(
                         context, playlist_id, title
                     ) if playlist_id == custom_watch_later_id else
                     # set as my custom watch later playlist
-                    menu_items.set_as_watchlater(
+                    menu_items.set_as_watch_later(
                         context, playlist_id, title
                     ),
                     # remove as custom history playlist
@@ -362,9 +363,9 @@ def update_video_infos(provider, context, video_id_dict,
 
     logged_in = provider.is_logged_in()
     if logged_in:
-        wl_playlist_id = context.get_access_manager().get_watch_later_id()
+        watch_later_id = context.get_access_manager().get_watch_later_id()
     else:
-        wl_playlist_id = None
+        watch_later_id = None
 
     settings = context.get_settings()
     hide_shorts = settings.hide_short_videos()
@@ -380,7 +381,7 @@ def update_video_infos(provider, context, video_id_dict,
         video_item = video_id_dict[video_id]
 
         # set mediatype
-        video_item.set_mediatype('video')  # using video
+        video_item.set_mediatype(content.VIDEO_TYPE)
 
         if not yt_item or 'snippet' not in yt_item:
             continue
@@ -427,7 +428,7 @@ def update_video_infos(provider, context, video_id_dict,
         else:
             start_at = None
         if start_at:
-            datetime = datetime_parser.parse(start_at, as_utc=True)
+            datetime = datetime_parser.parse(start_at)
             video_item.set_scheduled_start_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
             video_item.set_year_from_datetime(local_datetime)
@@ -452,7 +453,7 @@ def update_video_infos(provider, context, video_id_dict,
                 if not label:
                     continue
 
-                str_value, value = friendly_number(value)
+                str_value, value = friendly_number(value, as_str=False)
                 if not value:
                     continue
 
@@ -488,7 +489,7 @@ def update_video_infos(provider, context, video_id_dict,
         video_item.set_short_details(label_stats)
         # Hack to force a custom label mask containing production code,
         # activated on sort order selection, to display details
-        # Refer Provider.set_content_type for usage
+        # Refer XbmcContext.set_content for usage
         video_item.set_code(label_stats)
 
         # update and set the title
@@ -531,7 +532,7 @@ def update_video_infos(provider, context, video_id_dict,
         # date time
         published_at = snippet.get('publishedAt')
         if published_at:
-            datetime = datetime_parser.parse(published_at, as_utc=True)
+            datetime = datetime_parser.parse(published_at)
             video_item.set_added_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
             video_item.set_dateadded_from_datetime(local_datetime)
@@ -591,26 +592,12 @@ def update_video_infos(provider, context, video_id_dict,
         if alternate_player:
             context_menu.append(menu_items.play_with(context))
 
-        if logged_in:
-            # add 'Watch Later' only if we are not in my 'Watch Later' list
-            if wl_playlist_id and playlist_id and wl_playlist_id != playlist_id:
+        # add 'Watch Later' only if we are not in my 'Watch Later' list
+        if watch_later_id:
+            if not playlist_id or watch_later_id != playlist_id:
                 context_menu.append(
                     menu_items.watch_later_add(
-                        context, wl_playlist_id, video_id
-                    )
-                )
-
-            # provide 'remove' for videos in my playlists
-            # we support all playlist except 'Watch History'
-            if (video_id in playlist_item_id_dict and playlist_id
-                    and playlist_channel_id == 'mine'
-                    and playlist_id.strip().lower() not in ('hl', 'wl')):
-                playlist_item_id = playlist_item_id_dict[video_id]
-                video_item.set_playlist_id(playlist_id)
-                video_item.set_playlist_item_id(playlist_item_id)
-                context_menu.append(
-                    menu_items.remove_video_from_playlist(
-                        context, playlist_id, video_id, video_item.get_name()
+                        context, watch_later_id, video_id
                     )
                 )
         else:
@@ -619,6 +606,21 @@ def update_video_infos(provider, context, video_id_dict,
                     context, video_item
                 )
             )
+
+            # provide 'remove' for videos in my playlists
+            # we support all playlist except 'Watch History'
+        if (logged_in and video_id in playlist_item_id_dict and playlist_id
+                and playlist_channel_id == 'mine'
+                and playlist_id.strip().lower() not in ('hl', 'wl')):
+            playlist_item_id = playlist_item_id_dict[video_id]
+            video_item.set_playlist_id(playlist_id)
+            video_item.set_playlist_item_id(playlist_item_id)
+            context_menu.append(
+                menu_items.remove_video_from_playlist(
+                    context, playlist_id, video_id, video_item.get_name()
+                )
+            )
+
 
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and

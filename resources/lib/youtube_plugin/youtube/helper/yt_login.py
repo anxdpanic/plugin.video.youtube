@@ -11,7 +11,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import copy
-import json
 import time
 
 from ..youtube_exceptions import LoginException
@@ -67,49 +66,53 @@ def process(mode, provider, context, sign_out_refresh=True):
                 '[CR]%s %s' % (context.localize('sign.enter_code'),
                                context.get_ui().bold(user_code))]
         text = ''.join(text)
-        dialog = context.get_ui().create_progress_dialog(
-            heading=context.localize('sign.in'), text=text, background=False)
 
-        steps = ((10 * 60 * 1000) // interval)  # 10 Minutes
-        dialog.set_total(steps)
-        for _ in range(steps):
-            dialog.update()
-            try:
-                if _for_tv:
-                    json_data = _client.request_access_token_tv(device_code)
-                else:
-                    json_data = _client.request_access_token(device_code)
-            except LoginException:
-                _do_logout()
-                raise
+        with context.get_ui().create_progress_dialog(
+            heading=context.localize('sign.in'), text=text, background=False
+        ) as dialog:
+            steps = ((10 * 60 * 1000) // interval)  # 10 Minutes
+            dialog.set_total(steps)
+            for _ in range(steps):
+                dialog.update()
+                try:
+                    if _for_tv:
+                        json_data = _client.request_access_token_tv(device_code)
+                    else:
+                        json_data = _client.request_access_token(device_code)
+                except LoginException:
+                    _do_logout()
+                    raise
 
-            log_data = copy.deepcopy(json_data)
-            if 'access_token' in log_data:
-                log_data['access_token'] = '<redacted>'
-            if 'refresh_token' in log_data:
-                log_data['refresh_token'] = '<redacted>'
-            context.log_debug('Requesting access token: |%s|' % json.dumps(log_data))
+                log_data = copy.deepcopy(json_data)
+                if 'access_token' in log_data:
+                    log_data['access_token'] = '<redacted>'
+                if 'refresh_token' in log_data:
+                    log_data['refresh_token'] = '<redacted>'
+                context.log_debug('Requesting access token: |{data}|'.format(
+                    data=log_data
+                ))
 
-            if 'error' not in json_data:
-                _access_token = json_data.get('access_token', '')
-                _expires_in = time.time() + int(json_data.get('expires_in', 3600))
-                _refresh_token = json_data.get('refresh_token', '')
-                dialog.close()
-                if not _access_token and not _refresh_token:
-                    _expires_in = 0
-                return _access_token, _expires_in, _refresh_token
+                if 'error' not in json_data:
+                    _access_token = json_data.get('access_token', '')
+                    _refresh_token = json_data.get('refresh_token', '')
+                    if not _access_token and not _refresh_token:
+                        _expires_in = 0
+                    else:
+                        _expires_in = (int(json_data.get('expires_in', 3600))
+                                       + time.time())
+                    return _access_token, _expires_in, _refresh_token
 
-            if json_data['error'] != 'authorization_pending':
-                message = json_data['error']
-                title = '%s: %s' % (context.get_name(), message)
-                context.get_ui().show_notification(message, title)
-                context.log_error('Error requesting access token: |%s|' % message)
+                if json_data['error'] != 'authorization_pending':
+                    message = json_data['error']
+                    title = '%s: %s' % (context.get_name(), message)
+                    context.get_ui().show_notification(message, title)
+                    context.log_error('Error requesting access token: |error|'
+                                      .format(error=message))
 
-            if dialog.is_aborted():
-                break
+                if dialog.is_aborted():
+                    break
 
-            context.sleep(interval)
-        dialog.close()
+                context.sleep(interval)
         return '', 0, ''
 
     if mode == 'out':

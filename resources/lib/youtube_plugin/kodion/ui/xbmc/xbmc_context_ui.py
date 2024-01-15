@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
-from ...constants import ADDON_ID, ADDON_PATH
+from ...constants import ADDON_ID
 from ...utils import to_unicode
 
 
@@ -24,27 +24,15 @@ class XbmcContextUI(AbstractContextUI):
         self._xbmc_addon = xbmc_addon
 
         self._context = context
-        self._view_mode = None
 
     def create_progress_dialog(self, heading, text=None, background=False):
-        if background and self._context.get_system_version().get_version() > (12, 3):
+        if background:
             return XbmcProgressDialogBG(heading, text)
 
         return XbmcProgressDialog(heading, text)
 
-    def get_skin_id(self):
-        return xbmc.getSkinDir()
 
     def on_keyboard_input(self, title, default='', hidden=False):
-        # fallback for Frodo
-        if self._context.get_system_version().get_version() <= (12, 3):
-            keyboard = xbmc.Keyboard(default, title, hidden)
-            keyboard.doModal()
-            if keyboard.isConfirmed() and keyboard.getText():
-                text = to_unicode(keyboard.getText())
-                return True, text
-            return False, ''
-
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
         result = dialog.input(title, to_unicode(default), type=xbmcgui.INPUT_ALPHANUM)
@@ -137,14 +125,11 @@ class XbmcContextUI(AbstractContextUI):
         self._xbmc_addon.openSettings()
 
     def refresh_container(self):
-        xbmc.executebuiltin(
-            'RunScript({path}/resources/lib/youtube_plugin/refresh.py)'
-            .format(path=ADDON_PATH)
-        )
-
-    @staticmethod
-    def get_info_label(value):
-        return xbmc.getInfoLabel(value)
+        # TODO: find out why the RunScript call is required
+        # xbmc.executebuiltin("Container.Refresh")
+        xbmc.executebuiltin('RunScript({addon_id},action/refresh)'.format(
+            addon_id=ADDON_ID
+        ))
 
     @staticmethod
     def set_property(property_id, value):
@@ -220,10 +205,13 @@ class XbmcContextUI(AbstractContextUI):
         ))
 
     def set_focus_next_item(self):
-        cid = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
+        list_id = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
         try:
-            current_position = int(self.get_info_label('Container.Position')) + 1
-            self._context.execute('SetFocus(%s,%s)' % (cid, str(current_position)))
+            position = self._context.get_infolabel('Container.Position')
+            next_position = int(position) + 1
+            self._context.execute('SetFocus({list_id},{position})'.format(
+                list_id=list_id, position=next_position
+            ))
         except ValueError:
             pass
 

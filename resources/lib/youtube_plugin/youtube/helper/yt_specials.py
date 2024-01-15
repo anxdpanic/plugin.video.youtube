@@ -25,24 +25,32 @@ from ...kodion.utils import strip_html_from_text
 
 
 def _process_related_videos(provider, context):
-    provider.set_content_type(context, content.VIDEOS)
-    video_id = context.get_param('video_id', '')
-    if not video_id:
-        return []
+    context.set_content(content.VIDEO_CONTENT)
+    function_cache = context.get_function_cache()
 
-    json_data = provider.get_client(context).get_related_videos(
-        video_id=video_id, page_token=context.get_param('page_token', '')
-    )
+    video_id = context.get_param('video_id', '')
+    if video_id:
+        json_data = function_cache.get(
+            provider.get_client(context).get_related_videos,
+            function_cache.ONE_HOUR,
+            video_id=video_id,
+            page_token=context.get_param('page_token', ''),
+        )
+    else:
+        json_data = function_cache.get(
+            provider.get_client(context).get_related_for_home,
+            function_cache.ONE_HOUR,
+            page_token=context.get_param('page_token', ''),
+        )
+
     if not json_data:
         return False
-    return v3.response_to_items(provider,
-                                context,
-                                json_data,
-                                process_next_page=False)
+    return v3.response_to_items(provider, context, json_data)
 
 
 def _process_parent_comments(provider, context):
-    provider.set_content_type(context, content.FILES)
+    context.set_content(content.LIST_CONTENT)
+
     video_id = context.get_param('video_id', '')
     if not video_id:
         return []
@@ -50,13 +58,15 @@ def _process_parent_comments(provider, context):
     json_data = provider.get_client(context).get_parent_comments(
         video_id=video_id, page_token=context.get_param('page_token', '')
     )
+
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
 
 def _process_child_comments(provider, context):
-    provider.set_content_type(context, content.FILES)
+    context.set_content(content.LIST_CONTENT)
+
     parent_id = context.get_param('parent_id', '')
     if not parent_id:
         return []
@@ -64,54 +74,66 @@ def _process_child_comments(provider, context):
     json_data = provider.get_client(context).get_child_comments(
         parent_id=parent_id, page_token=context.get_param('page_token', '')
     )
+
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
 
 def _process_recommendations(provider, context):
-    provider.set_content_type(context, content.VIDEOS)
-    json_data = provider.get_client(context).get_activities(
-        channel_id='home', page_token=context.get_param('page_token', '')
+    context.set_content(content.VIDEO_CONTENT)
+    params = context.get_params()
+    function_cache = context.get_function_cache()
+
+    json_data = function_cache.get(
+        provider.get_client(context).get_recommended_for_home,
+        function_cache.ONE_HOUR,
+        visitor=params.get('visitor', ''),
+        page_token=params.get('page_token', ''),
+        click_tracking=params.get('click_tracking', ''),
     )
+
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
 
-def _process_popular_right_now(provider, context):
-    provider.set_content_type(context, content.VIDEOS)
-    json_data = provider.get_client(context).get_popular_videos(
+def _process_trending(provider, context):
+    context.set_content(content.VIDEO_CONTENT)
+
+    json_data = provider.get_client(context).get_trending_videos(
         page_token=context.get_param('page_token', '')
     )
+
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
 
 def _process_browse_channels(provider, context):
-    provider.set_content_type(context, content.FILES)
+    context.set_content(content.LIST_CONTENT)
     client = provider.get_client(context)
+
     guide_id = context.get_param('guide_id', '')
     if guide_id:
         json_data = client.get_guide_category(guide_id)
-        if not json_data:
-            return False
-        return v3.response_to_items(provider, context, json_data)
+    else:
+        function_cache = context.get_function_cache()
+        json_data = function_cache.get(client.get_guide_categories,
+                                       function_cache.ONE_MONTH)
 
-    function_cache = context.get_function_cache()
-    json_data = function_cache.get(client.get_guide_categories,
-                                   function_cache.ONE_MONTH)
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
 
 
 def _process_disliked_videos(provider, context):
-    provider.set_content_type(context, content.VIDEOS)
+    context.set_content(content.VIDEO_CONTENT)
+
     json_data = provider.get_client(context).get_disliked_videos(
         page_token=context.get_param('page_token', '')
     )
+
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data)
@@ -121,13 +143,15 @@ def _process_live_events(provider, context, event_type='live'):
     def _sort(x):
         return x.get_date()
 
-    provider.set_content_type(context, content.VIDEOS)
+    context.set_content(content.VIDEO_CONTENT)
+
     # TODO: cache result
     json_data = provider.get_client(context).get_live_events(
         event_type=event_type,
         page_token=context.get_param('page_token', ''),
         location=context.get_param('location', False),
     )
+
     if not json_data:
         return False
     return v3.response_to_items(provider, context, json_data, sort=_sort)
@@ -139,50 +163,45 @@ def _process_description_links(provider, context):
     addon_id = params.get('addon_id', '')
 
     def _extract_urls(video_id):
-        provider.set_content_type(context, content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         url_resolver = UrlResolver(context)
 
-        progress_dialog = context.get_ui().create_progress_dialog(
+        with context.get_ui().create_progress_dialog(
             heading=context.localize('please_wait'), background=False
-        )
+        ) as progress_dialog:
+            resource_manager = provider.get_resource_manager(context)
 
-        resource_manager = provider.get_resource_manager(context)
+            video_data = resource_manager.get_videos((video_id,))
+            yt_item = video_data[video_id]
+            if not yt_item or 'snippet' not in yt_item:
+                context.get_ui().on_ok(
+                    title=context.localize('video.description.links'),
+                    text=context.localize('video.description.links.not_found')
+                )
+                return False
+            snippet = yt_item['snippet']
+            description = strip_html_from_text(snippet['description'])
 
-        video_data = resource_manager.get_videos((video_id, ))
-        yt_item = video_data[video_id]
-        if not yt_item or 'snippet' not in yt_item:
-            context.get_ui().on_ok(
-                title=context.localize('video.description.links'),
-                text=context.localize('video.description.links.not_found')
-            )
-            return False
-        snippet = yt_item['snippet']
-        description = strip_html_from_text(snippet['description'])
+            function_cache = context.get_function_cache()
+            urls = function_cache.get(extract_urls,
+                                      function_cache.ONE_WEEK,
+                                      description)
 
-        function_cache = context.get_function_cache()
-        urls = function_cache.get(extract_urls,
-                                  function_cache.ONE_WEEK,
-                                  description)
+            progress_dialog.set_total(len(urls))
 
-        progress_dialog.set_total(len(urls))
+            res_urls = []
+            for url in urls:
+                progress_dialog.update(steps=1, text=url)
+                resolved_url = url_resolver.resolve(url)
+                res_urls.append(resolved_url)
 
-        res_urls = []
-        for url in urls:
-            progress_dialog.update(steps=1, text=url)
-            resolved_url = url_resolver.resolve(url)
-            res_urls.append(resolved_url)
+                if progress_dialog.is_aborted():
+                    context.log_debug('Resolving urls aborted')
+                    break
 
-            if progress_dialog.is_aborted():
-                context.log_debug('Resolving urls aborted')
-                break
-
-            context.sleep(50)
-
-        url_to_item_converter = UrlToItemConverter()
-        url_to_item_converter.add_urls(res_urls, context)
-        result = url_to_item_converter.get_items(provider, context)
-
-        progress_dialog.close()
+            url_to_item_converter = UrlToItemConverter()
+            url_to_item_converter.add_urls(res_urls, context)
+            result = url_to_item_converter.get_items(provider, context)
 
         if result:
             return result
@@ -260,47 +279,46 @@ def _process_description_links(provider, context):
 
 
 def _process_saved_playlists_tv(provider, context):
-    provider.set_content_type(context, content.FILES)
+    context.set_content(content.LIST_CONTENT)
+
     json_data = provider.get_client(context).get_saved_playlists(
         page_token=context.get_param('next_page_token', ''),
         offset=context.get_param('offset', 0)
     )
+
+    if not json_data:
+        return False
     return tv.saved_playlists_to_items(provider, context, json_data)
 
 
-def _process_new_uploaded_videos_tv(provider, context):
-    provider.set_content_type(context, content.VIDEOS)
+def _process_new_uploaded_videos_tv(provider, context, filtered=False):
+    context.set_content(content.VIDEO_CONTENT)
+
     json_data = provider.get_client(context).get_my_subscriptions(
         page_token=context.get_param('next_page_token', ''),
         offset=context.get_param('offset', 0)
     )
-    return tv.my_subscriptions_to_items(provider, context, json_data)
 
-
-def _process_new_uploaded_videos_tv_filtered(provider, context):
-    provider.set_content_type(context, content.VIDEOS)
-    json_data = provider.get_client(context).get_my_subscriptions(
-        page_token=context.get_param('next_page_token', ''),
-        offset=context.get_param('offset', 0)
-    )
+    if not json_data:
+        return False
     return tv.my_subscriptions_to_items(provider,
                                         context,
                                         json_data,
-                                        do_filter=True)
+                                        do_filter=filtered)
 
 
 def process(category, provider, context):
     _ = provider.get_client(context)  # required for provider.is_logged_in()
     if (not provider.is_logged_in()
-            and category in ['new_uploaded_videos_tv',
+            and category in ('new_uploaded_videos_tv',
                              'new_uploaded_videos_tv_filtered',
-                             'disliked_videos']):
+                             'disliked_videos')):
         return UriItem(context.create_uri(('sign', 'in')))
 
     if category == 'related_videos':
         return _process_related_videos(provider, context)
     if category == 'popular_right_now':
-        return _process_popular_right_now(provider, context)
+        return _process_trending(provider, context)
     if category == 'recommendations':
         return _process_recommendations(provider, context)
     if category == 'browse_channels':
@@ -308,7 +326,7 @@ def process(category, provider, context):
     if category == 'new_uploaded_videos_tv':
         return _process_new_uploaded_videos_tv(provider, context)
     if category == 'new_uploaded_videos_tv_filtered':
-        return _process_new_uploaded_videos_tv_filtered(provider, context)
+        return _process_new_uploaded_videos_tv(provider, context, filtered=True)
     if category == 'disliked_videos':
         return _process_disliked_videos(provider, context)
     if category == 'live':

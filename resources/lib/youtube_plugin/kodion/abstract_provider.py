@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import settings, paths, content
+from .constants import paths, content
 from .compatibility import quote, unquote
 from .exceptions import KodionException
 from .items import (
@@ -85,28 +85,26 @@ class AbstractProvider(object):
         """
         self._dict_path[re_path] = method_name
 
-    def _process_wizard(self, context):
-        # start the setup wizard
-        wizard_steps = []
-        if context.get_settings().is_setup_wizard_enabled():
-            context.get_settings().set_bool(settings.SETUP_WIZARD, False)
-            wizard_steps.extend(self.get_wizard_steps(context))
+    def run_wizard(self, context):
+        settings = context.get_settings()
+        ui = context.get_ui()
 
-        if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
-                                                             context.localize('setup_wizard.execute')):
+        settings.set_bool(settings.SETUP_WIZARD, False)
+
+        wizard_steps = self.get_wizard_steps(context)
+        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
+
+        if (wizard_steps and ui.on_yes_no_input(
+            context.get_name(), context.localize('setup_wizard.execute')
+        )):
             for wizard_step in wizard_steps:
                 wizard_step[0](*wizard_step[1])
-
-    def get_wizard_supported_views(self):
-        return ['default']
 
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
         return []
 
     def navigate(self, context):
-        self._process_wizard(context)
-
         path = context.get_path()
 
         for key in self._dict_path:
@@ -195,6 +193,7 @@ class AbstractProvider(object):
             return False
 
         if command == 'list':
+            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
             video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
@@ -290,7 +289,7 @@ class AbstractProvider(object):
         if command == 'input':
             self.data_cache = context
 
-            folder_path = ui.get_info_label('Container.FolderPath')
+            folder_path = context.get_infolabel('Container.FolderPath')
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
@@ -327,7 +326,7 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
-        context.set_content_type(content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         result = []
 
         location = context.get_param('location', False)

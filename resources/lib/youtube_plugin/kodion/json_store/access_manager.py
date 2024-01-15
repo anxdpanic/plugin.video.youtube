@@ -26,7 +26,7 @@ class AccessManager(JSONStore):
         'token_expires': -1,
         'last_key_hash': '',
         'name': 'Default',
-        'watch_later': ' WL',
+        'watch_later': 'WL',
         'watch_history': 'HL'
     }
 
@@ -85,7 +85,7 @@ class AccessManager(JSONStore):
 
         current_user = data['access_manager']['current_user']
         if 'watch_later' not in data['access_manager']['users'][current_user]:
-            data['access_manager']['users'][current_user]['watch_later'] = ' WL'
+            data['access_manager']['users'][current_user]['watch_later'] = 'WL'
         if 'watch_history' not in data['access_manager']['users'][current_user]:
             data['access_manager']['users'][current_user][
                 'watch_history'] = 'HL'
@@ -131,7 +131,7 @@ class AccessManager(JSONStore):
         """
         :return: current user
         """
-        return self.get_users()[self._user].copy()
+        return self.get_users()[self._user]
 
     def get_current_user_id(self):
         """
@@ -158,7 +158,7 @@ class AccessManager(JSONStore):
             'last_key_hash': '',
             'name': username,
             'id': new_uuid,
-            'watch_later': ' WL',
+            'watch_later': 'WL',
             'watch_history': 'HL'
         }
 
@@ -179,11 +179,12 @@ class AccessManager(JSONStore):
         users = self.get_users()
         new_user_details = self.get_new_user(username)
         new_user = max(users) + 1 if users and user is None else user or 0
-        users[new_user] = new_user_details
         data = {
             'access_manager': {
-                'users': users
-            }
+                'users': {
+                    new_user: new_user_details,
+                },
+            },
         }
         self.save(data, update=True)
         return new_user, new_user_details
@@ -196,13 +197,14 @@ class AccessManager(JSONStore):
         """
         users = self.get_users()
         if user in users:
-            del users[user]
-        data = {
-            'access_manager': {
-                'users': users
+            data = {
+                'access_manager': {
+                    'users': {
+                        user: KeyError,
+                    },
+                },
             }
-        }
-        self.save(data, update=True)
+            self.save(data, update=True)
 
     def set_users(self, users):
         """
@@ -230,8 +232,8 @@ class AccessManager(JSONStore):
         if switch_to:
             data = {
                 'access_manager': {
-                    'current_user': user
-                }
+                    'current_user': user,
+                },
             }
             self.save(data, update=True)
 
@@ -261,11 +263,14 @@ class AccessManager(JSONStore):
         """
         users = self.get_users()
         if user in users:
-            users[user]['name'] = username
             data = {
                 'access_manager': {
-                    'users': users
-                }
+                    'users': {
+                        user: {
+                            'name': username,
+                        },
+                    },
+                },
             }
             self.save(data, update=True)
             return True
@@ -276,39 +281,16 @@ class AccessManager(JSONStore):
         Returns the current users watch later playlist id
         :return: the current users watch later playlist id
         """
-        updated = False
-        watch_later_ids = ('wl', ' wl')
-
         current_user = self.get_current_user_details()
-        current_playlist_id = current_user.get('watch_later', '')
-        settings_playlist_id = self._settings.get_watch_later_playlist()
+        current_id = current_user.get('watch_later', 'WL')
+        settings_id = self._settings.get_watch_later_playlist()
 
-        if settings_playlist_id.lower().startswith(watch_later_ids):
-            self._settings.set_watch_later_playlist('')
-            settings_playlist_id = ''
+        if settings_id and current_id != settings_id:
+            current_id = self.set_watch_later_id(settings_id)
 
-        if current_playlist_id.lower().startswith(watch_later_ids):
-            updated = True
-            current_user['watch_later'] = settings_playlist_id
-            self._settings.set_watch_later_playlist('')
-            settings_playlist_id = ''
-
-        if settings_playlist_id and current_playlist_id != settings_playlist_id:
-            updated = True
-            current_user['watch_later'] = settings_playlist_id
-            self._settings.set_watch_later_playlist('')
-
-        if updated:
-            data = {
-                'access_manager': {
-                    'users': {
-                        self._user: current_user
-                    }
-                }
-            }
-            self.save(data, update=True)
-
-        return current_user.get('watch_later', '')
+        if current_id and current_id.lower().strip() == 'wl':
+            return ''
+        return current_id
 
     def set_watch_later_id(self, playlist_id):
         """
@@ -316,20 +298,21 @@ class AccessManager(JSONStore):
         :param playlist_id: string, watch later playlist id
         :return:
         """
-        if playlist_id.lower() == 'wl' or playlist_id.lower() == ' wl':
+        if playlist_id.lower().strip() == 'wl':
             playlist_id = ''
 
-        current_user = self.get_current_user_details()
-        current_user['watch_later'] = playlist_id
-        self._settings.set_watch_later_playlist('')
+        self._settings.set_watch_later_playlist(playlist_id)
         data = {
             'access_manager': {
                 'users': {
-                    self._user: current_user
-                }
-            }
+                    self._user: {
+                        'watch_later': playlist_id,
+                    },
+                },
+            },
         }
         self.save(data, update=True)
+        return playlist_id
 
     def get_watch_history_id(self):
         """
@@ -337,22 +320,15 @@ class AccessManager(JSONStore):
         :return: the current users watch history playlist id
         """
         current_user = self.get_current_user_details()
-        current_playlist_id = current_user.get('watch_history', 'HL')
-        settings_playlist_id = self._settings.get_history_playlist()
+        current_id = current_user.get('watch_history', 'HL')
+        settings_id = self._settings.get_history_playlist()
 
-        if settings_playlist_id and current_playlist_id != settings_playlist_id:
-            current_user['watch_history'] = settings_playlist_id
-            self._settings.set_history_playlist('')
-            data = {
-                'access_manager': {
-                    'users': {
-                        self._user: current_user
-                    }
-                }
-            }
-            self.save(data, update=True)
+        if settings_id and current_id != settings_id:
+            current_id = self.set_watch_history_id(settings_id)
 
-        return current_user.get('watch_history', 'HL')
+        if current_id and current_id.lower().strip() == 'hl':
+            return ''
+        return current_id
 
     def set_watch_history_id(self, playlist_id):
         """
@@ -360,17 +336,21 @@ class AccessManager(JSONStore):
         :param playlist_id: string, watch history playlist id
         :return:
         """
-        current_user = self.get_current_user_details()
-        current_user['watch_history'] = playlist_id
-        self._settings.set_history_playlist('')
+        if playlist_id.lower().strip() == 'hl':
+            playlist_id = ''
+
+        self._settings.set_history_playlist(playlist_id)
         data = {
             'access_manager': {
                 'users': {
-                    self._user: current_user
-                }
-            }
+                    self._user: {
+                        'watch_history': playlist_id,
+                    },
+                },
+            },
         }
         self.save(data, update=True)
+        return playlist_id
 
     def set_last_origin(self, origin):
         """
@@ -381,8 +361,8 @@ class AccessManager(JSONStore):
         self._last_origin = origin
         data = {
             'access_manager': {
-                'last_origin': origin
-            }
+                'last_origin': origin,
+            },
         }
         self.save(data, update=True)
 
@@ -443,8 +423,9 @@ class AccessManager(JSONStore):
         :param refresh_token:
         :return:
         """
-        current_user = self.get_current_user_details()
-        current_user['access_token'] = access_token
+        current_user = {
+            'access_token': access_token,
+        }
 
         if unix_timestamp is not None:
             current_user['token_expires'] = int(unix_timestamp)
@@ -455,21 +436,21 @@ class AccessManager(JSONStore):
         data = {
             'access_manager': {
                 'users': {
-                    self._user: current_user
-                }
-            }
+                    self._user: current_user,
+                },
+            },
         }
         self.save(data, update=True)
 
     def set_last_key_hash(self, key_hash):
-        current_user = self.get_current_user_details()
-        current_user['last_key_hash'] = key_hash
         data = {
             'access_manager': {
                 'users': {
-                    self._user: current_user
-                }
-            }
+                    self._user: {
+                        'last_key_hash': key_hash,
+                    },
+                },
+            },
         }
         self.save(data, update=True)
 
@@ -558,8 +539,9 @@ class AccessManager(JSONStore):
         :param refresh_token:
         :return:
         """
-        developer = self.get_developer(addon_id)
-        developer['access_token'] = access_token
+        developer = {
+            'access_token': access_token
+        }
 
         if unix_timestamp is not None:
             developer['token_expires'] = int(unix_timestamp)
@@ -570,9 +552,9 @@ class AccessManager(JSONStore):
         data = {
             'access_manager': {
                 'developers': {
-                    addon_id: developer
-                }
-            }
+                    addon_id: developer,
+                },
+            },
         }
         self.save(data, update=True)
 
@@ -580,14 +562,14 @@ class AccessManager(JSONStore):
         return self.get_developer(addon_id).get('last_key_hash', '')
 
     def set_dev_last_key_hash(self, addon_id, key_hash):
-        developer = self.get_developer(addon_id)
-        developer['last_key_hash'] = key_hash
         data = {
             'access_manager': {
                 'developers': {
-                    addon_id: developer
-                }
-            }
+                    addon_id: {
+                        'last_key_hash': key_hash,
+                    },
+                },
+            },
         }
         self.save(data, update=True)
 

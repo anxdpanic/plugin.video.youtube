@@ -58,6 +58,7 @@ class PlayerMonitorThread(threading.Thread):
                 or self.stopped())
 
     def run(self):
+        playing_file = self.playback_json.get('playing_file')
         play_count = self.playback_json.get('play_count', 0)
         use_remote_history = self.playback_json.get('use_remote_history', False)
         use_local_history = self.playback_json.get('use_local_history', False)
@@ -130,8 +131,10 @@ class PlayerMonitorThread(threading.Thread):
             except RuntimeError:
                 current_file = None
 
-            if (not current_file or video_id_param not in current_file
-                    or not self._context.is_plugin_path(current_file, 'play/')
+            if (not current_file
+                    or (current_file != playing_file and not (
+                            self._context.is_plugin_path(current_file, 'play/')
+                            and video_id_param in current_file))
                     or self.stopped()):
                 self.stop()
                 break
@@ -278,12 +281,11 @@ class PlayerMonitorThread(threading.Thread):
         })
         self._context.log_debug('Playback stopped [{video_id}]:'
                                 ' {current:.3f} secs of {total:.3f}'
-                                ' @ {percent}%'.format(
-            video_id=self.video_id,
-            current=self.current_time,
-            total=self.total_time,
-            percent=self.percent_complete,
-        ))
+                                ' @ {percent}%'
+                                .format(video_id=self.video_id,
+                                        current=self.current_time,
+                                        total=self.total_time,
+                                        percent=self.percent_complete))
 
         state = 'stopped'
         # refresh client, tokens may need refreshing
@@ -344,10 +346,9 @@ class PlayerMonitorThread(threading.Thread):
                 self._context.get_watch_later_list().remove(self.video_id)
 
         if logged_in and not refresh_only:
-            history_playlist_id = access_manager.get_watch_history_id()
-            if history_playlist_id and history_playlist_id != 'HL':
-                _ = client.add_video_to_playlist(history_playlist_id,
-                                                 self.video_id)
+            history_id = access_manager.get_watch_history_id()
+            if history_id:
+                _ = client.add_video_to_playlist(history_id, self.video_id)
 
             # rate video
             if settings.get_bool('youtube.post.play.rate', False):
@@ -375,13 +376,7 @@ class PlayerMonitorThread(threading.Thread):
 
         playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
         do_refresh = playlist.size() < 2 or playlist.getposition() == -1
-        if (do_refresh and settings.get_bool('youtube.post.play.refresh', False)
-                and not xbmc.getInfoLabel('Container.FolderPath').startswith(
-                    self._context.create_uri(('kodion', 'search', 'input'))
-                )):
-            # don't refresh search input it causes request for new input,
-            # (Container.Update in abstract_provider /kodion/search/input/
-            # would resolve this but doesn't work with Remotes(Yatse))
+        if do_refresh and settings.get_bool('youtube.post.play.refresh', False):
             self.ui.refresh_container()
 
         self.end()

@@ -665,7 +665,6 @@ class VideoInfo(YouTubeRequestClient):
         return self._get_video_info()
 
     def _get_player_page(self, client='web', embed=False):
-        client = self.build_client(client)
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
@@ -673,7 +672,7 @@ class VideoInfo(YouTubeRequestClient):
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
         result = self.request(
-            url, cookies=cookies, headers=client['headers'],
+            url, cookies=cookies, headers=self.build_client(client)['headers'],
             error_msg=('Failed to get player html for video_id: {0}'
                        .format(self.video_id))
         )
@@ -746,18 +745,17 @@ class VideoInfo(YouTubeRequestClient):
         if cached:
             return cached
 
-        client = self.build_client('web')
         result = self.request(
-            js_url, headers=client['headers'],
+            js_url, headers=self.build_client('web')['headers'],
             error_msg=('Failed to get player js for video_id: {0}'
                        .format(self.video_id))
         )
+        result = result and result.text
         if not result:
             return ''
 
-        javascript = result.text
-        self._data_cache.set_item(js_cache_key, {'js': javascript})
-        return javascript
+        self._data_cache.set_item(js_cache_key, {'js': result})
+        return result
 
     @staticmethod
     def _make_curl_headers(headers, cookies=None):
@@ -856,7 +854,11 @@ class VideoInfo(YouTubeRequestClient):
             stream_list.append(stream)
         return stream_list
 
-    def _create_stream_list(self, streams, meta_info=None, headers=None, playback_stats=None):
+    def _create_stream_list(self,
+                            streams,
+                            meta_info=None,
+                            headers=None,
+                            playback_stats=None):
         if not headers and self._selected_client:
             headers = self._selected_client['headers'].copy()
             if 'Authorization' in headers:
@@ -991,8 +993,16 @@ class VideoInfo(YouTubeRequestClient):
         if not details:
             details = (
                 'errorScreen',
-                ('playerErrorMessageRenderer', 'confirmDialogRenderer'),
-                ('reason', 'title')
+                (
+                    (
+                        'playerErrorMessageRenderer',
+                        'reason',
+                    ),
+                    (
+                        'confirmDialogRenderer',
+                        'title',
+                    ),
+                )
             )
 
         result = self.json_traverse(playability_status, details)
@@ -1012,14 +1022,18 @@ class VideoInfo(YouTubeRequestClient):
         return None
 
     def _get_video_info(self):
-        auth_header = bool(self._access_token)
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         _settings = self._context.get_settings()
         playability_status = status = reason = None
+
+        client_data = {'json': {'videoId': self.video_id}}
+        if self._access_token:
+            client_data['_access_token'] = self._access_token
+
         for _ in range(2):
             for client_name in self._prioritised_clients:
-                client = self.build_client(client_name, auth_header)
+                client = self.build_client(client_name, client_data)
 
                 result = self.request(
                     video_info_url, 'POST',
@@ -1028,7 +1042,8 @@ class VideoInfo(YouTubeRequestClient):
                         ' using {1} client ({2})'
                         .format(self.video_id,
                                 client_name,
-                                'logged in' if auth_header else 'logged out')
+                                'logged in' if '_access_token' in client_data
+                                else 'logged out')
                     ),
                     raise_error=True,
                     **client
@@ -1074,8 +1089,8 @@ class VideoInfo(YouTubeRequestClient):
             # Only attempt to remove Authorization header if clients iterable
             # was exhausted i.e. request attempted using all clients
             else:
-                if auth_header:
-                    auth_header = False
+                if '_access_token' in client_data:
+                    del client_data['_access_token']
                     continue
             # Otherwise skip retrying clients without Authorization header
             break
@@ -1100,7 +1115,8 @@ class VideoInfo(YouTubeRequestClient):
         self._context.log_debug(
             'Retrieved video info for video_id: {0}, using {1} client ({2})'
             .format(self.video_id, client_name,
-                    'logged in' if auth_header else 'logged out')
+                    'logged in' if '_access_token' in client_data
+                    else 'logged out')
         )
         self._selected_client = client.copy()
 
@@ -1126,10 +1142,9 @@ class VideoInfo(YouTubeRequestClient):
                 video_info_url, 'POST',
                 error_msg=('Caption request failed to get player response for'
                            'video_id: {0}'.format(self.video_id)),
-                **self.build_client('smarttv_embedded', True)
+                **self.build_client('smarttv_embedded', client_data)
             )
-
-            response = result.json()
+            response = result and result.json() or {}
             captions = response.get('captions')
             if captions:
                 captions['headers'] = result.request.headers

@@ -8,15 +8,14 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 
 class AbstractContextUI(object):
     def __init__(self):
         pass
 
     def create_progress_dialog(self, heading, text=None, background=False):
-        raise NotImplementedError()
-
-    def get_skin_id(self):
         raise NotImplementedError()
 
     def on_keyboard_input(self, title, default='', hidden=False):

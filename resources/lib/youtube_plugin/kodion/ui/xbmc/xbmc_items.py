@@ -11,39 +11,12 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from . import info_labels
-from ...compatibility import xbmcgui
+from ...compatibility import set_info_tag, xbmcgui
 from ...items import AudioItem, UriItem, VideoItem
 from ...utils import current_system_version, datetime_parser
 
 
-try:
-    from infotagger.listitem import set_info_tag
-except ImportError:
-    def set_info_tag(listitem, infolabels, tag_type, *_args, **_kwargs):
-        listitem.setInfo(tag_type, infolabels)
-        return ListItemInfoTag(listitem, tag_type)
-
-
-    class ListItemInfoTag(object):
-        __slots__ = ('__li__',)
-
-        def __init__(self, listitem, *_args, **_kwargs):
-            self.__li__ = listitem
-
-        def add_stream_info(self, *args, **kwargs):
-            return self.__li__.addStreamInfo(*args, **kwargs)
-
-        def set_resume_point(self,
-                             infoproperties,
-                             resume_key='ResumeTime',
-                             total_key='TotalTime'):
-            if resume_key in infoproperties:
-                infoproperties[resume_key] = str(infoproperties[resume_key])
-            if total_key in infoproperties:
-                infoproperties[total_key] = str(infoproperties[total_key])
-
-
-def video_playback_item(context, video_item):
+def video_playback_item(context, video_item, show_fanart=None):
     uri = video_item.get_uri()
     context.log_debug('Converting VideoItem |%s|' % uri)
 
@@ -68,7 +41,6 @@ def video_playback_item(context, video_item):
         }
     props = {
         'isPlayable': str(video_item.playable).lower(),
-        'ForceResolvePlugin': 'true',
     }
 
     if (alternative_player
@@ -117,6 +89,7 @@ def video_playback_item(context, video_item):
             video_item.set_uri('|'.join((uri, headers)))
 
     list_item = xbmcgui.ListItem(**kwargs)
+
     if mime_type:
         list_item.setContentLookup(False)
         list_item.setMimeType(mime_type)
@@ -136,9 +109,14 @@ def video_playback_item(context, video_item):
         if prop_value:
             props['TotalTime'] = prop_value
 
-    fanart = settings.show_fanart() and video_item.get_fanart() or ''
-    thumb = video_item.get_image() or 'DefaultVideo.png'
-    list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
+    if show_fanart is None:
+        show_fanart = settings.show_fanart()
+    image = video_item.get_image() or 'DefaultVideo.png'
+    list_item.setArt({
+        'icon': image,
+        'fanart': show_fanart and video_item.get_fanart() or '',
+        'thumb': image,
+    })
 
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
@@ -156,7 +134,7 @@ def video_playback_item(context, video_item):
     return list_item
 
 
-def audio_listitem(context, audio_item):
+def audio_listitem(context, audio_item, show_fanart=None):
     uri = audio_item.get_uri()
     context.log_debug('Converting AudioItem |%s|' % uri)
 
@@ -173,11 +151,14 @@ def audio_listitem(context, audio_item):
 
     list_item = xbmcgui.ListItem(**kwargs)
 
-    fanart = (context.get_settings().show_fanart()
-              and audio_item.get_fanart()
-              or '')
-    thumb = audio_item.get_image() or 'DefaultAudio.png'
-    list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
+    if show_fanart is None:
+        show_fanart = context.get_settings().show_fanart()
+    image = audio_item.get_image() or 'DefaultAudio.png'
+    list_item.setArt({
+        'icon': image,
+        'fanart': show_fanart and audio_item.get_fanart() or '',
+        'thumb': image,
+    })
 
     item_info = info_labels.create_from_item(audio_item)
     set_info_tag(list_item, item_info, 'music')
@@ -190,7 +171,101 @@ def audio_listitem(context, audio_item):
             context_menu, replaceItems=audio_item.replace_context_menu()
         )
 
-    return list_item
+    return uri, list_item, False
+
+
+def directory_listitem(context, directory_item, show_fanart=None):
+    uri = directory_item.get_uri()
+    context.log_debug('Converting DirectoryItem |%s|' % uri)
+
+    kwargs = {
+        'label': directory_item.get_name(),
+        'path': uri,
+        'offscreen': True,
+    }
+    props = {
+        'specialSort': 'bottom' if directory_item.next_page else 'top',
+        'ForceResolvePlugin': 'true',
+    }
+
+    list_item = xbmcgui.ListItem(**kwargs)
+
+    # make channel_subscription_id property available for keymapping
+    prop_value = directory_item.get_channel_subscription_id()
+    if prop_value:
+        props['channel_subscription_id'] = prop_value
+
+    if show_fanart is None:
+        show_fanart = context.get_settings().show_fanart()
+    image = directory_item.get_image() or 'DefaultFolder.png'
+    list_item.setArt({
+        'icon': image,
+        'fanart': show_fanart and directory_item.get_fanart() or '',
+        'thumb': image,
+    })
+
+    item_info = info_labels.create_from_item(directory_item)
+    set_info_tag(list_item, item_info, 'video')
+
+    """
+    # ListItems that do not open a lower level list should have the isFolder
+    # parameter of the xbmcplugin.addDirectoryItem set to False, however this
+    # now appears to mark the ListItem as playable, even if the IsPlayable
+    # property is not set or set to "false".
+    # Set isFolder to True as a workaround, regardless of whether the ListItem
+    # is actually a folder.
+    is_folder = not directory_item.is_action()
+    """
+    is_folder = True
+
+    list_item.setProperties(props)
+
+    context_menu = directory_item.get_context_menu()
+    if context_menu is not None:
+        list_item.addContextMenuItems(
+            context_menu, replaceItems=directory_item.replace_context_menu()
+        )
+
+    return uri, list_item, is_folder
+
+
+def image_listitem(context, image_item, show_fanart=None):
+    uri = image_item.get_uri()
+    context.log_debug('Converting ImageItem |%s|' % uri)
+
+    kwargs = {
+        'label': image_item.get_name(),
+        'path': uri,
+        'offscreen': True,
+    }
+    props = {
+        'isPlayable': str(image_item.playable).lower(),
+        'ForceResolvePlugin': 'true',
+    }
+
+    list_item = xbmcgui.ListItem(**kwargs)
+
+    if show_fanart is None:
+        show_fanart = context.get_settings().show_fanart()
+    image = image_item.get_image() or 'DefaultPicture.png'
+    list_item.setArt({
+        'icon': image,
+        'fanart': show_fanart and image_item.get_fanart() or '',
+        'thumb': image,
+    })
+
+    item_info = info_labels.create_from_item(image_item)
+    set_info_tag(list_item, item_info, 'picture')
+
+    list_item.setProperties(props)
+
+    context_menu = image_item.get_context_menu()
+    if context_menu is not None:
+        list_item.addContextMenuItems(
+            context_menu, replaceItems=image_item.replace_context_menu()
+        )
+
+    return uri, list_item, False
 
 
 def uri_listitem(context, uri_item):
@@ -212,7 +287,7 @@ def uri_listitem(context, uri_item):
     return list_item
 
 
-def video_listitem(context, video_item):
+def video_listitem(context, video_item, show_fanart=None):
     uri = video_item.get_uri()
     context.log_debug('Converting VideoItem |%s|' % uri)
 
@@ -271,11 +346,14 @@ def video_listitem(context, video_item):
     if prop_value:
         props['playlist_item_id'] = prop_value
 
-    fanart = (context.get_settings().show_fanart()
-              and video_item.get_fanart()
-              or '')
-    thumb = video_item.get_image() or 'DefaultVideo.png'
-    list_item.setArt({'icon': thumb, 'thumb': thumb, 'fanart': fanart})
+    if show_fanart is None:
+        show_fanart = context.get_settings().show_fanart()
+    image = video_item.get_image()
+    list_item.setArt({
+        'icon': image or 'DefaultVideo.png',
+        'fanart': show_fanart and video_item.get_fanart() or '',
+        'thumb': image,
+    })
 
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
@@ -296,17 +374,18 @@ def video_listitem(context, video_item):
             context_menu, replaceItems=video_item.replace_context_menu()
         )
 
-    return list_item
+    return uri, list_item, False
 
 
-def to_playback_item(context, base_item):
+def playback_item(context, base_item, show_fanart=None):
     if isinstance(base_item, UriItem):
         return uri_listitem(context, base_item)
 
     if isinstance(base_item, AudioItem):
-        return audio_listitem(context, base_item)
+        _, item, _ = audio_listitem(context, base_item, show_fanart)
+        return item
 
     if isinstance(base_item, VideoItem):
-        return video_playback_item(context, base_item)
+        return video_playback_item(context, base_item, show_fanart)
 
     return None

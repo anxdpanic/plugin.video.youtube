@@ -27,7 +27,7 @@ from ..compatibility import (
     xbmcvfs,
 )
 from ..constants import ADDON_ID, TEMP_PATH, paths
-from ..logger import log_debug
+from ..logger import log_debug, log_error
 from ..settings import Settings
 
 
@@ -245,6 +245,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                                                 headers=li_headers,
                                                 data=post_data,
                                                 stream=True)
+            if not response or not response.ok:
+                self.send_error(response and response.status_code or 500)
+                return
 
             response_length = int(response.headers.get('content-length'))
             content = response.raw.read(response_length)
@@ -529,7 +532,7 @@ def get_http_server(address=None, port=None):
         server = BaseHTTPServer.HTTPServer((address, port), RequestHandler)
         return server
     except socket_error as exc:
-        log_debug('HTTPServer: Failed to start |{address}:{port}| |{response}|'
+        log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'
                   .format(address=address, port=port, response=str(exc)))
         xbmcgui.Dialog().notification(_addon_name,
                                       str(exc),
@@ -545,30 +548,27 @@ def is_httpd_live(address=None, port=None):
     url = 'http://{address}:{port}{path}'.format(address=address,
                                                  port=port,
                                                  path=paths.PING)
-    try:
-        response = _server_requests.request(url)
-        result = response.status_code == 204
-        if not result:
-            log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'
-                      .format(address=address,
-                              port=port,
-                              response=response.status_code))
-        return result
-    except:
-        log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'
-                  .format(address=address, port=port, response='failed'))
-        return False
+    response = _server_requests.request(url)
+    result = response and response.status_code
+    if result == 204:
+        return True
+
+    log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'
+              .format(address=address,
+                      port=port,
+                      response=result or 'failed'))
+    return False
 
 
 def get_client_ip_address(address=None, port=None):
+    ip_address = None
     address = _settings.httpd_listen(for_request=True, ip_address=address)
     port = _settings.httpd_port(port=port)
     url = 'http://{address}:{port}{path}'.format(address=address,
                                                  port=port,
                                                  path=paths.IP)
     response = _server_requests.request(url)
-    ip_address = None
-    if response.status_code == 200:
+    if response and response.status_code == 200:
         response_json = response.json()
         if response_json:
             ip_address = response_json.get('ip')

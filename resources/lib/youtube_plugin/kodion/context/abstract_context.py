@@ -14,7 +14,6 @@ import os
 
 from .. import logger
 from ..compatibility import urlencode
-from ..constants import settings
 from ..json_store import AccessManager
 from ..sql_store import (
     DataCache,
@@ -67,10 +66,12 @@ class AbstractContext(object):
         'api_key',
         'action',
         'addon_id',
+        'category_label',
         'channel_id',
         'channel_name',
         'client_id',
         'client_secret',
+        'click_tracking',
         'event_type',
         'item',
         'item_id',
@@ -84,16 +85,15 @@ class AbstractContext(object):
         'rating',
         'search_type',
         'subscription_id',
+        'uri',
         'videoid',  # deprecated
         'video_id',
-        'uri',
+        'visitor',
     }
 
     def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
         if not params:
             params = {}
-
-        self._system_version = None
 
         self._cache_path = None
         self._debug_path = None
@@ -112,7 +112,6 @@ class AbstractContext(object):
         self._path = create_path(path)
         self._params = params
         self._utils = None
-        self._view_mode = None
 
         # create valid uri
         self.parse_params()
@@ -143,16 +142,17 @@ class AbstractContext(object):
     def get_playback_history(self):
         if not self._playback_history:
             uuid = self.get_access_manager().get_current_user_id()
-            filename = ''.join((uuid, '.sqlite'))
-            filepath = os.path.join(self.get_data_path(), 'playback', filename)
+            filename = 'history.sqlite'
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._playback_history = PlaybackHistory(filepath)
         return self._playback_history
 
     def get_data_cache(self):
         if not self._data_cache:
-            cache_size = self.get_settings().get_int(settings.CACHE_SIZE, -1)
+            settings = self.get_settings()
+            cache_size = settings.get_int(settings.CACHE_SIZE, -1)
             if cache_size <= 0:
-                cache_size = 5
+                cache_size = 10
             else:
                 cache_size /= 2.0
             filename = 'data_cache.sqlite'
@@ -162,9 +162,10 @@ class AbstractContext(object):
 
     def get_function_cache(self):
         if not self._function_cache:
-            cache_size = self.get_settings().get_int(settings.CACHE_SIZE, -1)
+            settings = self.get_settings()
+            cache_size = settings.get_int(settings.CACHE_SIZE, -1)
             if cache_size <= 0:
-                cache_size = 5
+                cache_size = 10
             else:
                 cache_size /= 2.0
             filename = 'cache.sqlite'
@@ -175,24 +176,28 @@ class AbstractContext(object):
 
     def get_search_history(self):
         if not self._search_history:
-            search_size = self.get_settings().get_int(settings.SEARCH_SIZE, 50)
+            settings = self.get_settings()
+            search_size = settings.get_int(settings.SEARCH_SIZE, 50)
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'search.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._search_history = SearchHistory(filepath,
                                                  max_item_count=search_size)
         return self._search_history
 
     def get_favorite_list(self):
         if not self._favorite_list:
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'favorites.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._favorite_list = FavoriteList(filepath)
         return self._favorite_list
 
     def get_watch_later_list(self):
         if not self._watch_later_list:
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'watch_later.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._watch_later_list = WatchLaterList(filepath)
         return self._watch_later_list
 
@@ -217,10 +222,7 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     def get_system_version(self):
-        if not self._system_version:
-            self._system_version = current_system_version
-
-        return self._system_version
+        return current_system_version
 
     def create_uri(self, path='/', params=None):
         if not params:
@@ -330,10 +332,10 @@ class AbstractContext(object):
     def get_settings(self):
         raise NotImplementedError()
 
-    def localize(self, text_id, default_text=''):
+    def localize(self, text_id, default_text=None):
         raise NotImplementedError()
 
-    def set_content_type(self, content_type):
+    def set_content(self, content_type, sub_type=None, category_label=None):
         raise NotImplementedError()
 
     def add_sort_method(self, *sort_methods):
@@ -360,8 +362,14 @@ class AbstractContext(object):
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()
 
-    def execute(self, command):
+    @staticmethod
+    def execute(command):
         raise NotImplementedError()
 
-    def sleep(self, milli_seconds):
+    @staticmethod
+    def sleep(milli_seconds):
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_infolabel(name):
         raise NotImplementedError()

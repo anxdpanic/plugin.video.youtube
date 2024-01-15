@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 
-from ..compatibility import xbmc
+from ..compatibility import string_type, xbmc
 
 
 class SystemVersion(object):
@@ -23,12 +23,12 @@ class SystemVersion(object):
         )
 
         self._releasename = (
-            releasename if releasename and isinstance(releasename, str)
+            releasename if releasename and isinstance(releasename, string_type)
             else 'UNKNOWN'
         )
 
         self._appname = (
-            appname if appname and isinstance(appname, str)
+            appname if appname and isinstance(appname, string_type)
             else 'UNKNOWN'
         )
 

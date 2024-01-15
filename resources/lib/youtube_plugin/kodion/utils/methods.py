@@ -18,7 +18,7 @@ import shutil
 from datetime import timedelta
 from math import floor, log
 
-from ..compatibility import quote, xbmc, xbmcvfs
+from ..compatibility import quote, string_type, xbmc, xbmcvfs
 from ..logger import log_error
 
 
@@ -274,15 +274,16 @@ def find_video_id(plugin_path):
     return ''
 
 
-def friendly_number(number, precision=3, scale=('', 'K', 'M', 'B')):
+def friendly_number(input, precision=3, scale=('', 'K', 'M', 'B'), as_str=True):
     _input = float('{input:.{precision}g}'.format(
-        input=float(number), precision=precision
+        input=float(input), precision=precision
     ))
     _abs_input = abs(_input)
     magnitude = 0 if _abs_input < 1000 else int(log(floor(_abs_input), 1000))
-    return '{output:f}'.format(
+    output = '{output:f}'.format(
         output=_input / 1000 ** magnitude
-    ).rstrip('0').rstrip('.') + scale[magnitude], _input
+    ).rstrip('0').rstrip('.') + scale[magnitude]
+    return output if as_str else (output, _input)
 
 
 _RE_PERIODS = re.compile(r'([\d.]+)(d|h|m|s|$)')
@@ -314,7 +315,7 @@ def seconds_to_duration(seconds):
 
 def merge_dicts(item1, item2, templates=None, _=Ellipsis):
     if not isinstance(item1, dict) or not isinstance(item2, dict):
-        return item1 if item2 is _ else item2
+        return item1 if item2 is _ else _ if item2 is KeyError else item2
     new = {}
     keys = set(item1)
     keys.update(item2)
@@ -323,7 +324,7 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
         if value is _:
             continue
         if (templates is not None
-                and isinstance(value, str) and '{' in value):
+                and isinstance(value, string_type) and '{' in value):
             templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
         new[key] = value
     return new or _

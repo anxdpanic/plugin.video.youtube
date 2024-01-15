@@ -89,6 +89,7 @@ class LoginClient(YouTubeRequestClient):
         try:
             json_data = response.json()
             if 'error' in json_data:
+                json_data.setdefault('code', response.status_code)
                 raise LoginException('"error" in response JSON data',
                                      json_data=json_data,
                                      response=response)
@@ -162,9 +163,10 @@ class LoginClient(YouTubeRequestClient):
 
         config_type = self._get_config_type(client_id, client_secret)
         client = ''.join([
-            '(config_type: |', config_type, '|',
-            ' client_id: |', client_id[:5], '...|',
-            ' client_secret: |', client_secret[:5], '...|)'
+            '(config_type: |', config_type,
+            '| client_id: |', client_id[:5], '...', client_id[-5:],
+            '| client_secret: |', client_secret[:5], '...', client_secret[-5:],
+            '|)'
         ])
         log_debug('Refresh token for {0}'.format(client))
 
@@ -176,7 +178,7 @@ class LoginClient(YouTubeRequestClient):
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed',
                                  error_info=('Refresh token failed'
-                                             ' {client}: {{exc}}'
+                                             ' {client}:\n{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
 
@@ -210,9 +212,10 @@ class LoginClient(YouTubeRequestClient):
 
         config_type = self._get_config_type(client_id, client_secret)
         client = ''.join([
-            '(config_type: |', config_type, '|',
-            ' client_id: |', client_id[:5], '...|',
-            ' client_secret: |', client_secret[:5], '...|)'
+            '(config_type: |', config_type,
+            '| client_id: |', client_id[:5], '...', client_id[-5:],
+            '| client_secret: |', client_secret[:5], '...', client_secret[-5:],
+            '|)'
         ])
         log_debug('Requesting access token for {0}'.format(client))
 
@@ -224,7 +227,7 @@ class LoginClient(YouTubeRequestClient):
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed: Unknown response',
                                  error_info=('Access token request failed'
-                                             ' {client}: {{exc}}'
+                                             ' {client}:\n{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
@@ -260,7 +263,7 @@ class LoginClient(YouTubeRequestClient):
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed: Unknown response',
                                  error_info=('Device/user code request failed'
-                                             ' {client}: {{exc}}'
+                                             ' {client}:\n{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data

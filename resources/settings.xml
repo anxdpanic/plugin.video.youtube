@@ -39,7 +39,6 @@
                 </setting>
                 <setting id="kodion.subtitle.configure" type="action" label="30600" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/config/subtitles/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
@@ -51,6 +50,7 @@
                             <condition name="InfoBool" on="property">true</condition>
                         </dependency>
                     </dependencies>
+                    <data>RunScript($ID,config/subtitles)</data>
                     <control format="action" type="button">
                         <close>true</close>
                     </control>
@@ -214,7 +214,6 @@
                 </setting>
                 <setting id="kodion.video.quality.isa.configure" type="action" parent="kodion.video.quality.isa" label="30008" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/config/isa/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
@@ -223,6 +222,7 @@
                             <condition setting="kodion.video.quality.isa" operator="is">true</condition>
                         </dependency>
                     </dependencies>
+                    <data>RunScript($ID,config/isa)</data>
                     <control format="action" type="button">
                         <close>true</close>
                     </control>
@@ -351,7 +351,6 @@
             <group id="4">
                 <setting id="kodion.install.inputstreamhelper" type="action" label="30623" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/inputstreamhelper/install/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
@@ -364,6 +363,7 @@
                             </or>
                         </dependency>
                     </dependencies>
+                    <data>RunScript($ID,config/inputstreamhelper)</data>
                     <control format="action" type="button"/>
                 </setting>
             </group>
@@ -417,6 +417,11 @@
                     </control>
                 </setting>
                 <setting id="youtube.folder.recommendations.show" type="boolean" label="30551" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="youtube.folder.related.show" type="boolean" label="30514" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -578,34 +583,34 @@
             <group id="1">
                 <setting id="kodion.users.add" type="action" label="30661" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/users/add/?refresh=false)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,users/add)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.users.remove" type="action" label="30662" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/users/remove/?refresh=false)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,users/remove)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.users.rename" type="action" label="30663" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/users/rename/?refresh=false)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,users/rename)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.users.switch" type="action" label="30664" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/users/switch/?refresh=false)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,users/switch/refresh=True)</data>
                     <control format="action" type="button"/>
                 </setting>
             </group>
@@ -679,7 +684,7 @@
             <group id="2">
                 <setting id="kodion.history.local" type="boolean" label="30675" help="">
                     <level>0</level>
-                    <default>false</default>
+                    <default>true</default>
                     <control type="toggle"/>
                 </setting>
                 <setting id="kodion.history.remote" type="boolean" label="30761" help="">
@@ -691,7 +696,7 @@
             <group id="3">
                 <setting id="kodion.cache.size" type="integer" label="30024" help="">
                     <level>0</level>
-                    <default>10</default>
+                    <default>20</default>
                     <constraints>
                         <minimum>5</minimum>
                         <step>1</step>
@@ -782,10 +787,10 @@
                 </setting>
                 <setting id="kodion.http.listen.select" type="action" label="30644" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/config/listen_ip/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,config/listen_ip)</data>
                     <control format="action" type="button">
                         <close>true</close>
                     </control>
@@ -823,10 +828,10 @@
                 </setting>
                 <setting id="kodion.http.client.ip" type="action" label="30698" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/show_client_ip/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,config/show_client_ip)</data>
                     <control format="action" type="button"/>
                 </setting>
             </group>
@@ -881,78 +886,78 @@
             <group id="1">
                 <setting id="kodion.maintain.clear.func" type="action" label="30555" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/function_cache/clear/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/clear/function_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.clear.data" type="action" label="30686" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/data_cache/clear/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/clear/data_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.clear.search" type="action" label="30556" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/search_cache/clear/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/clear/search_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.clear.playback.history" type="action" label="30671" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/playback_history/clear/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/clear/playback_history)</data>
                     <control format="action" type="button"/>
                 </setting>
             </group>
             <group id="2">
                 <setting id="kodion.maintain.delete.func" type="action" label="30553" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/function_cache/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/function_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.data" type="action" label="30685" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/data_cache/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/data_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.search" type="action" label="30554" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/search_cache/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/search_cache)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.playback.history" type="action" label="30672" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/playback_history/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/playback_history)</data>
                     <control format="action" type="button"/>
                 </setting>
             </group>
             <group id="3">
                 <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/reset/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunPlugin(plugin://$ID/maintenance/reset/access_manager)</data>
                     <control format="action" type="button">
                         <close>true</close>
                     </control>
@@ -961,94 +966,37 @@
             <group id="4">
                 <setting id="kodion.maintain.delete.settings" type="action" label="30559" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/settings_xml/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/settings_xml)</data>
                     <control format="action" type="button">
                         <close>true</close>
                     </control>
                 </setting>
                 <setting id="kodion.maintain.delete.api_keys" type="action" label="30641" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/api_keys/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/api_keys)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.access_manager" type="action" label="30642" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/access_manager/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/access_manager)</data>
                     <control format="action" type="button"/>
                 </setting>
                 <setting id="kodion.maintain.delete.temp" type="action" label="30626" help="">
                     <level>0</level>
-                    <data>RunPlugin(plugin://plugin.video.youtube/maintain/temp_files/delete/)</data>
                     <constraints>
                         <allowempty>true</allowempty>
                     </constraints>
+                    <data>RunScript($ID,maintenance/delete/temp_files)</data>
                     <control format="action" type="button"/>
-                </setting>
-                <setting id="kodion.access_token" type="string" label="" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="string" type="edit">
-                        <heading/>
-                    </control>
-                </setting>
-                <setting id="kodion.refresh_token" type="string" label="" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="string" type="edit">
-                        <heading/>
-                    </control>
-                </setting>
-                <setting id="kodion.access_token.expires" type="integer" label="" help="">
-                    <level>0</level>
-                    <default>0</default>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="integer" type="edit">
-                        <heading/>
-                    </control>
-                </setting>
-                <setting id="youtube.api.last.hash" type="string" label="" help="">
-                    <level>0</level>
-                    <default/>
-                    <constraints>
-                        <allowempty>true</allowempty>
-                    </constraints>
-                    <dependencies>
-                        <dependency type="visible">
-                            <condition name="InfoBool" on="property">false</condition>
-                        </dependency>
-                    </dependencies>
-                    <control format="string" type="edit">
-                        <heading/>
-                    </control>
                 </setting>
             </group>
         </category>

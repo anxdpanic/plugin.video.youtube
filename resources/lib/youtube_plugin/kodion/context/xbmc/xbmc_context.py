@@ -26,7 +26,7 @@ from ...compatibility import (
     xbmcplugin,
     xbmcvfs,
 )
-from ...constants import ADDON_ID
+from ...constants import ADDON_ID, content, sort
 from ...player.xbmc.xbmc_player import XbmcPlayer
 from ...player.xbmc.xbmc_playlist import XbmcPlaylist
 from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
@@ -139,7 +139,6 @@ class XbmcContext(AbstractContext):
         'playlist.select': 30521,
         'playlists': 30501,
         'please_wait': 30119,
-        'popular_right_now': 30513,
         'prompt': 30566,
         'purchases': 30622,
         'recommendations': 30551,
@@ -165,8 +164,6 @@ class XbmcContext(AbstractContext):
         'select.listen.ip': 30644,
         'select_video_quality': 30010,
         'settings': 30577,
-        'setup.view_default': 30027,
-        'setup.view_videos': 30028,
         'setup_wizard.adjust': 30526,
         'setup_wizard.adjust.language_and_region': 30527,
         'setup_wizard.execute': 30030,
@@ -199,6 +196,7 @@ class XbmcContext(AbstractContext):
         'subtitles.no_auto_generated': 30602,
         'subtitles.with_fallback': 30601,
         'succeeded': 30575,
+        'trending': 30513,
         'unrated.video': 30718,
         'unsubscribe': 30505,
         'unsubscribed.from.channel': 30720,
@@ -245,17 +243,15 @@ class XbmcContext(AbstractContext):
         'watch_later.list.set.confirm': 30570,
         'watch_later.remove': 30108,
         'watch_later.retrieval_page': 30711,
-        # For unofficial setup wizard
-        'setup_wizard.view.episodes': 30028,
-        'setup_wizard.view.movies': 30029,
-        'setup_wizard.view.tvshows': 30032,
-        'setup_wizard.view.default': 30027,
-        'setup_wizard.view.songs': 30033,
-        'setup_wizard.view.artists': 30034,
-        'setup_wizard.view.albums': 30035
+        'youtube': 30003,
     }
 
-    def __init__(self, path='/', params=None, plugin_name='', plugin_id='', override=True):
+    def __init__(self,
+                 path='/',
+                 params=None,
+                 plugin_name='',
+                 plugin_id='',
+                 override=True):
         super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
 
         if plugin_id:
@@ -269,29 +265,37 @@ class XbmcContext(AbstractContext):
         Also we extract the path and parameters - man, that would be so simple with the normal url-parsing routines.
         """
         num_args = len(sys.argv)
+        if override and num_args:
+            uri = sys.argv[0]
+            is_plugin_invocation = uri.startswith('plugin://')
+            if is_plugin_invocation:
+                # first the path of the uri
+                self._uri = uri
+                parsed_url = urlsplit(uri)
+                self._path = unquote(parsed_url.path)
 
-        # first the path of the uri
-        if override:
-            self._uri = sys.argv[0]
-            parsed_url = urlsplit(self._uri)
-            self._path = unquote(parsed_url.path)
+                # after that try to get the params
+                if num_args > 2:
+                    params = sys.argv[2][1:]
+                    if params:
+                        self._uri = '?'.join((self._uri, params))
+                        self.parse_params(dict(parse_qsl(params)))
 
-            # after that try to get the params
-            if num_args > 2:
-                params = sys.argv[2][1:]
-                if params:
-                    self._uri = '?'.join((self._uri, params))
-                    self.parse_params(dict(parse_qsl(params)))
-
-            if num_args > 3 and sys.argv[3].lower() == 'resume:true':
-                self._params['resume'] = True
+                # then Kodi resume status
+                if num_args > 3 and sys.argv[3].lower() == 'resume:true':
+                    self._params['resume'] = True
+        elif num_args:
+            uri = sys.argv[0]
+            is_plugin_invocation = uri.startswith('plugin://')
+        else:
+            is_plugin_invocation = False
 
         self._ui = None
         self._video_playlist = None
         self._audio_playlist = None
         self._video_player = None
         self._audio_player = None
-        self._plugin_handle = int(sys.argv[1]) if num_args > 1 else -1
+        self._plugin_handle = int(sys.argv[1]) if is_plugin_invocation else -1
         self._plugin_id = plugin_id or ADDON_ID
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
@@ -327,7 +331,7 @@ class XbmcContext(AbstractContext):
         The xbmc.getLanguage() method is fucked up!!! We always return 'en-US' for now
         """
 
-        '''
+        """
         if self.get_system_version().get_release_name() == 'Frodo':
             return 'en-US'
 
@@ -339,7 +343,7 @@ class XbmcContext(AbstractContext):
         except Exception as exc:
             self.log_error('Failed to get system language (%s)', exc.__str__())
             return 'en-US'
-        '''
+        """
 
         return 'en-US'
 
@@ -392,7 +396,10 @@ class XbmcContext(AbstractContext):
     def get_settings(self):
         return self._settings
 
-    def localize(self, text_id, default_text=''):
+    def localize(self, text_id, default_text=None):
+        if default_text is None:
+            default_text = 'Undefined string ID: |{0}|'.format(text_id)
+
         if not isinstance(text_id, int):
             try:
                 text_id = self.LOCAL_MAP[text_id]
@@ -406,17 +413,45 @@ class XbmcContext(AbstractContext):
 
         """
         We want to use all localization strings!
-        Addons should only use the range 30000 thru 30999 (see: http://kodi.wiki/view/Language_support) but we
-        do it anyway. I want some of the localized strings for the views of a skin.
+        Addons should only use the range 30000 thru 30999
+        (see: http://kodi.wiki/view/Language_support) but we do it anyway.
+        I want some of the localized strings for the views of a skin.
         """
         source = self._addon if 30000 <= text_id < 31000 else xbmc
         result = source.getLocalizedString(text_id)
         result = to_unicode(result) if result else default_text
         return result
 
-    def set_content_type(self, content_type):
-        self.log_debug('Setting content-type: "%s" for "%s"' % (content_type, self.get_path()))
+    def set_content(self, content_type, sub_type=None, category_label=None):
+        self.log_debug('Setting content-type: |{type}| for |{path}|'.format(
+            type=(sub_type or content_type), path=self.get_path()
+        ))
         xbmcplugin.setContent(self._plugin_handle, content_type)
+        if category_label is None:
+            category_label = self.get_param('category_label')
+        if category_label:
+            xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
+        if sub_type == 'history':
+            self.add_sort_method(
+                (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
+                (sort.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
+                (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            )
+        else:
+            self.add_sort_method(
+                (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            )
+        if content_type == content.VIDEO_CONTENT:
+            self.add_sort_method(
+                (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
+                (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
+                (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
+                (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
+                (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
+                (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
+            )
 
     def add_sort_method(self, *sort_methods):
         args = slice(None if current_system_version.compatible(19, 0) else 2)
@@ -446,10 +481,12 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    def execute(self, command):
+    @staticmethod
+    def execute(command):
         xbmc.executebuiltin(command)
 
-    def sleep(self, milli_seconds):
+    @staticmethod
+    def sleep(milli_seconds):
         xbmc.sleep(milli_seconds)
 
     def addon_enabled(self, addon_id):
@@ -466,7 +503,7 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            self.log_debug(error)
+            self.log_error(error)
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
@@ -483,7 +520,7 @@ class XbmcContext(AbstractContext):
             message = response['error']['message']
             code = response['error']['code']
             error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            self.log_debug(error)
+            self.log_error(error)
             return False
 
     def send_notification(self, method, data):
@@ -496,7 +533,9 @@ class XbmcContext(AbstractContext):
         if self._settings.use_isa():
             if self.addon_enabled('inputstream.adaptive'):
                 success = True
-            elif self.get_ui().on_yes_no_input(self.get_name(), self.localize('isa.enable.confirm')):
+            elif self.get_ui().on_yes_no_input(
+                self.get_name(), self.localize('isa.enable.confirm')
+            ):
                 success = self.set_addon_enabled('inputstream.adaptive')
             else:
                 success = False
@@ -505,15 +544,16 @@ class XbmcContext(AbstractContext):
         return success
 
     # Values of capability map can be any of the following:
-    # - required version number as string for comparison with actual installed InputStream.Adaptive version
-    # - any Falsey value to exclude capability regardless of version
+    # - required version number, as string for comparison with actual installed
+    #   InputStream.Adaptive version
+    # - any Falsy value to exclude capability regardless of version
     # - True to include capability regardless of version
     _ISA_CAPABILITIES = {
         'live': '2.0.12',
         'drm': '2.2.12',
         # audio codecs
         'vorbis': '2.3.14',
-        'opus': '19.0.0',  # unknown when Opus audio support was first implemented
+        'opus': '19.0.0',  # unknown when Opus audio support was implemented
         'mp4a': True,
         'ac-3': '2.1.15',
         'ec-3': '2.1.15',
@@ -526,10 +566,13 @@ class XbmcContext(AbstractContext):
     }
 
     def inputstream_adaptive_capabilities(self, capability=None):
-        # return a list inputstream.adaptive capabilities, if capability set return version required
+        # Returns a list of inputstream.adaptive capabilities
+        # If capability param is provided, returns version of ISA where the
+        # capability is available
 
         try:
-            inputstream_version = xbmcaddon.Addon('inputstream.adaptive').getAddonInfo('version')
+            addon = xbmcaddon.Addon('inputstream.adaptive')
+            inputstream_version = addon.getAddonInfo('version')
         except RuntimeError:
             inputstream_version = ''
 
@@ -539,20 +582,27 @@ class XbmcContext(AbstractContext):
         isa_loose_version = loose_version(inputstream_version)
         if capability is None:
             capabilities = frozenset(
-                capability for capability, version in self._ISA_CAPABILITIES.items()
+                capability
+                for (capability, version) in self._ISA_CAPABILITIES.items()
                 if version is True
                 or version and isa_loose_version >= loose_version(version)
             )
             return capabilities
         version = self._ISA_CAPABILITIES.get(capability)
-        return version is True or version and isa_loose_version >= loose_version(version)
+        return (version is True
+                or version and isa_loose_version >= loose_version(version))
 
     @staticmethod
     def inputstream_adaptive_auto_stream_selection():
         try:
-            return xbmcaddon.Addon('inputstream.adaptive').getSetting('STREAMSELECTION') == '0'
+            addon = xbmcaddon.Addon('inputstream.adaptive')
+            return addon.getSetting('STREAMSELECTION') == '0'
         except RuntimeError:
             return False
 
     def abort_requested(self):
         return self.get_ui().get_property('abort_requested').lower() == 'true'
+
+    @staticmethod
+    def get_infolabel(name):
+        return xbmc.getInfoLabel(name)

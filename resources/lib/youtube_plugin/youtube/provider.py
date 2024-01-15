@@ -11,9 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import os
 import re
-import socket
 from base64 import b64decode
 
 from .client import YouTube
@@ -33,18 +31,19 @@ from .helper import (
 )
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider, RegisterProviderPath
-from ..kodion.compatibility import xbmcaddon, xbmcvfs
 from ..kodion.constants import (
     ADDON_ID,
-    DATA_PATH,
-    TEMP_PATH,
     content,
     paths,
-    sort,
 )
-from ..kodion.items import DirectoryItem, NewSearchItem, SearchItem, menu_items
-from ..kodion.network import get_client_ip_address, is_httpd_live
-from ..kodion.utils import find_video_id, rm_dir, strip_html_from_text
+from ..kodion.items import (
+    DirectoryItem,
+    NewSearchItem,
+    SearchItem,
+    UriItem,
+    menu_items,
+)
+from ..kodion.utils import find_video_id, strip_html_from_text
 
 
 class Provider(AbstractProvider):
@@ -57,11 +56,8 @@ class Provider(AbstractProvider):
 
         self.yt_video = yt_video
 
-    def get_wizard_supported_views(self):
-        return ['default', 'episodes']
-
     def get_wizard_steps(self, context):
-        return [(yt_setup_wizard.process, [self, context])]
+        return [(yt_setup_wizard.process, (self, context))]
 
     def is_logged_in(self):
         return self._logged_in
@@ -285,7 +281,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
     def _on_playlist(self, context, re_match):
-        self.set_content_type(context, content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         resource_manager = self.get_resource_manager(context)
 
         batch_id = (re_match.group('playlist_id'),
@@ -305,7 +301,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
     def _on_channel_playlists(self, context, re_match):
-        self.set_content_type(context, content.FILES)
+        context.set_content(content.LIST_CONTENT)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -352,7 +348,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
     def _on_channel_live(self, context, re_match):
-        self.set_content_type(context, content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -380,25 +376,31 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
+        listitem_channel_id = context.get_infolabel(
+            'Container.ListItem(0).Property(channel_id)'
+        )
+
         client = self.get_client(context)
         localize = context.localize
         create_uri = context.create_uri
         function_cache = context.get_function_cache()
         ui = context.get_ui()
 
-        listitem_channel_id = ui.get_info_label('Container.ListItem(0).Property(channel_id)')
-
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
 
-        if (method == 'channel' and channel_id and channel_id.lower() == 'property'
-                and listitem_channel_id and listitem_channel_id.lower().startswith(('mine', 'uc'))):
-            context.execute('Container.Update(%s)' % create_uri(('channel', listitem_channel_id)))  # redirect if keymap, without redirect results in 'invalid handle -1'
+        if (method == 'channel' and channel_id
+                and channel_id.lower() == 'property'
+                and listitem_channel_id
+                and listitem_channel_id.lower().startswith(('mine', 'uc'))):
+            context.execute('ActivateWindow(Videos, {channel}, return)'.format(
+                channel=create_uri(('channel', listitem_channel_id))
+            ))
 
         if method == 'channel' and not channel_id:
             return False
 
-        self.set_content_type(context, content.VIDEOS)
+        context.set_content(content.VIDEO_CONTENT)
 
         resource_manager = self.get_resource_manager(context)
 
@@ -496,7 +498,7 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/location/mine/$')
     def _on_my_location(self, context, re_match):
-        self.set_content_type(context, content.FILES)
+        context.set_content(content.LIST_CONTENT)
 
         create_uri = context.create_uri
         localize = context.localize
@@ -571,7 +573,7 @@ class Provider(AbstractProvider):
 
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
-            path = ui.get_info_label('Container.ListItem(0).FileNameAndPath')
+            path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
             if context.is_plugin_path(path, 'play/'):
                 video_id = find_video_id(path)
                 if video_id:
@@ -655,14 +657,14 @@ class Provider(AbstractProvider):
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
-            self.set_content_type(context, content.FILES)
+            context.set_content(content.LIST_CONTENT)
             channel_ids = []
             for subscription in subscriptions:
                 channel_ids.append(subscription.get_channel_id())
             channel_ids = {subscription.get_channel_id(): subscription
                            for subscription in subscriptions}
             channel_fanarts = resource_manager.get_fanarts(channel_ids)
-            for channel_id, fanart in channel_fanarts:
+            for channel_id, fanart in channel_fanarts.items():
                 channel_ids[channel_id].set_fanart(fanart)
 
         return subscriptions
@@ -675,109 +677,9 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
     def _on_users(self, context, re_match):
         action = re_match.group('action')
-        refresh = context.get_param('refresh')
-
-        localize = context.localize
-        access_manager = context.get_access_manager()
-        ui = context.get_ui()
-
-        def select_user(reason, new_user=False):
-            current_users = access_manager.get_users()
-            current_user = access_manager.get_current_user()
-            usernames = []
-            for user, details in sorted(current_users.items()):
-                username = details.get('name') or localize('user.unnamed')
-                if user == current_user:
-                    username = '> ' + ui.bold(username)
-                if details.get('access_token') or details.get('refresh_token'):
-                    username = ui.color('limegreen', username)
-                usernames.append(username)
-            if new_user:
-                usernames.append(ui.italic(localize('user.new')))
-            return ui.on_select(reason, usernames), sorted(current_users.keys())
-
-        def add_user():
-            results = ui.on_keyboard_input(localize('user.enter_name'))
-            if results[0] is False:
-                return None, None
-            new_username = results[1].strip()
-            if not new_username:
-                new_username = localize('user.unnamed')
-            return access_manager.add_user(new_username)
-
-        def switch_to_user(user):
-            access_manager.set_user(user, switch_to=True)
-            ui.show_notification(
-                localize('user.changed') % access_manager.get_username(user),
-                localize('user.switch')
-            )
-            self.get_resource_manager(context).clear()
-            if refresh:
-                ui.refresh_container()
-
-        if action == 'switch':
-            result, user_index_map = select_user(localize('user.switch'),
-                                                 new_user=True)
-            if result == -1:
-                return True
-            if result == len(user_index_map):
-                user, _ = add_user()
-            else:
-                user = user_index_map[result]
-
-            if user is not None and user != access_manager.get_current_user():
-                switch_to_user(user)
-
-        elif action == 'add':
-            user, details = add_user()
-            if user is not None:
-                result = ui.on_yes_no_input(
-                    localize('user.switch'),
-                    localize('user.switch.now') % details.get('name')
-                )
-                if result:
-                    switch_to_user(user)
-
-        elif action == 'remove':
-            result, user_index_map = select_user(localize('user.remove'))
-            if result == -1:
-                return True
-
-            user = user_index_map[result]
-            username = access_manager.get_username(user)
-            if ui.on_remove_content(username):
-                access_manager.remove_user(user)
-                if user == 0:
-                    access_manager.add_user(username=localize('user.default'),
-                                            user=0)
-                if user == access_manager.get_current_user():
-                    access_manager.set_user(0, switch_to=True)
-                ui.show_notification(localize('removed') % username,
-                                     localize('remove'))
-
-        elif action == 'rename':
-            result, user_index_map = select_user(localize('user.rename'))
-            if result == -1:
-                return True
-
-            user = user_index_map[result]
-            old_username = access_manager.get_username(user)
-            results = ui.on_keyboard_input(localize('user.enter_name'),
-                                           default=old_username)
-            if results[0] is False:
-                return True
-            new_username = results[1].strip()
-            if not new_username:
-                new_username = localize('user.unnamed')
-            if old_username == new_username:
-                return True
-
-            if access_manager.set_username(user, new_username):
-                ui.show_notification(localize('renamed') % (old_username,
-                                                            new_username),
-                                     localize('rename'))
-
-        return True
+        return UriItem('{addon},users/{action}'.format(
+            addon=ADDON_ID, action=action
+        ))
 
     @RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
     def _on_sign(self, context, re_match):
@@ -826,6 +728,7 @@ class Provider(AbstractProvider):
             return result
 
         context.set_param('q', search_text)
+        context.set_param('category_label', search_text)
 
         params = context.get_params()
         channel_id = params.get('channel_id')
@@ -838,9 +741,9 @@ class Provider(AbstractProvider):
         safe_search = context.get_settings().safe_search()
 
         if search_type == 'video':
-            self.set_content_type(context, content.VIDEOS)
+            context.set_content(content.VIDEO_CONTENT)
         else:
-            self.set_content_type(context, content.FILES)
+            context.set_content(content.LIST_CONTENT)
 
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
@@ -891,61 +794,12 @@ class Provider(AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
-    @RegisterProviderPath('^/config/(?P<switch>[^/]+)/$')
+    @RegisterProviderPath('^/config/(?P<action>[^/]+)/$')
     def configure_addon(self, context, re_match):
-        switch = re_match.group('switch')
-        localize = context.localize
-        settings = context.get_settings()
-        ui = context.get_ui()
-
-        if switch == 'youtube':
-            context.addon().openSettings()
-            ui.refresh_container()
-        elif switch == 'isa':
-            if context.use_inputstream_adaptive():
-                xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
-            else:
-                settings.set_bool('kodion.video.quality.isa', False)
-        elif switch == 'subtitles':
-            yt_language = settings.get_string('youtube.language', 'en-US')
-            sub_setting = settings.subtitle_languages()
-
-            if yt_language.startswith('en'):
-                sub_opts = [localize('none'),
-                            localize('prompt'),
-                            localize('subtitles.with_fallback') % ('en', 'en-US/en-GB'),
-                            yt_language,
-                            '%s (%s)' % (yt_language, localize('subtitles.no_auto_generated'))]
-
-            else:
-                sub_opts = [localize('none'),
-                            localize('prompt'),
-                            localize('subtitles.with_fallback') % (yt_language, 'en'),
-                            yt_language,
-                            '%s (%s)' % (yt_language, localize('subtitles.no_auto_generated'))]
-
-            sub_opts[sub_setting] = ui.bold(sub_opts[sub_setting])
-
-            result = ui.on_select(localize('subtitles.language'), sub_opts)
-            if result > -1:
-                settings.set_subtitle_languages(result)
-
-            result = ui.on_yes_no_input(
-                localize('subtitles.download'),
-                localize('subtitles.download.pre')
-            )
-            if result > -1:
-                settings.set_subtitle_download(result == 1)
-        elif switch == 'listen_ip':
-            local_ranges = ('10.', '172.16.', '192.168.')
-            addresses = [iface[4][0]
-                         for iface in socket.getaddrinfo(socket.gethostname(), None)
-                         if iface[4][0].startswith(local_ranges)]
-            addresses += ['127.0.0.1', '0.0.0.0']
-            selected_address = ui.on_select(localize('select.listen.ip'), addresses)
-            if selected_address != -1:
-                settings.set_httpd_listen(addresses[selected_address])
-        return False
+        action = re_match.group('action')
+        return UriItem('{addon},config/{action}'.format(
+            addon=ADDON_ID, action=action
+        ))
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/my_subscriptions/filter/$')
@@ -989,101 +843,41 @@ class Provider(AbstractProvider):
                 ui.show_notification(message=message)
         ui.refresh_container()
 
-    @RegisterProviderPath('^/maintain/(?P<maint_type>[^/]+)/(?P<action>[^/]+)/$')
+    @RegisterProviderPath('^/maintenance/(?P<action>[^/]+)/(?P<target>[^/]+)/$')
     def maintenance_actions(self, context, re_match):
-        maint_type = re_match.group('maint_type')
+        target = re_match.group('target')
         action = re_match.group('action')
+
+        if action != 'reset':
+            return UriItem('{addon},maintenance/{action}/{target}'.format(
+                addon=ADDON_ID, action=action, target=target
+            ))
 
         ui = context.get_ui()
         localize = context.localize
 
-        if action == 'clear':
-            if maint_type == 'function_cache':
-                if ui.on_remove_content(localize('cache.function')):
-                    context.get_function_cache().clear()
-                    ui.show_notification(localize('succeeded'))
-            elif maint_type == 'data_cache':
-                if ui.on_remove_content(localize('cache.data')):
-                    context.get_data_cache().clear()
-                    ui.show_notification(localize('succeeded'))
-            elif maint_type == 'search_cache':
-                if ui.on_remove_content(localize('search.history')):
-                    context.get_search_history().clear()
-                    ui.show_notification(localize('succeeded'))
-            elif maint_type == 'playback_history' and ui.on_remove_content(localize('playback.history')):
-                context.get_playback_history().clear()
+        if (target == 'access_manager' and ui.on_yes_no_input(
+            context.get_name(), localize('reset.access_manager.confirm')
+        )):
+            try:
+                context.get_function_cache().clear()
+                access_manager = context.get_access_manager()
+                client = self.get_client(context)
+                if access_manager.has_refresh_token():
+                    refresh_tokens = access_manager.get_refresh_token()
+                    for refresh_token in set(refresh_tokens.split('|')):
+                        try:
+                            client.revoke(refresh_token)
+                        except:
+                            pass
+                self.reset_client()
+                access_manager.update_access_token(access_token='',
+                                                   refresh_token='')
+                ui.refresh_container()
                 ui.show_notification(localize('succeeded'))
-        elif action == 'reset':
-            if maint_type == 'access_manager' and ui.on_yes_no_input(context.get_name(), localize('reset.access_manager.confirm')):
-                try:
-                    context.get_function_cache().clear()
-                    access_manager = context.get_access_manager()
-                    client = self.get_client(context)
-                    if access_manager.has_refresh_token():
-                        refresh_tokens = access_manager.get_refresh_token().split('|')
-                        for refresh_token in set(refresh_tokens):
-                            try:
-                                client.revoke(refresh_token)
-                            except:
-                                pass
-                    self.reset_client()
-                    access_manager.update_access_token(access_token='', refresh_token='')
-                    ui.refresh_container()
-                    ui.show_notification(localize('succeeded'))
-                except:
-                    ui.show_notification(localize('failed'))
-        elif action == 'delete':
-            _maint_files = {'function_cache': 'cache.sqlite',
-                            'search_cache': 'search.sqlite',
-                            'data_cache': 'data_cache.sqlite',
-                            'playback_history': 'playback_history',
-                            'settings_xml': 'settings.xml',
-                            'api_keys': 'api_keys.json',
-                            'access_manager': 'access_manager.json',
-                            'temp_files': TEMP_PATH}
-            _file = _maint_files.get(maint_type)
-            succeeded = False
-
-            if not _file:
-                return
-
-            data_path = xbmcvfs.translatePath(DATA_PATH)
-            if 'sqlite' in _file:
-                _file_w_path = os.path.join(data_path, 'kodion', _file)
-            elif maint_type == 'temp_files':
-                _file_w_path = _file
-            elif maint_type == 'playback_history':
-                _file = ''.join((
-                    context.get_access_manager().get_current_user_id(),
-                    '.sqlite'
-                ))
-                _file_w_path = os.path.join(data_path, 'playback', _file)
-            else:
-                _file_w_path = os.path.join(data_path, _file)
-
-            if not ui.on_delete_content(_file):
-                return
-
-            if maint_type == 'temp_files':
-                succeeded = rm_dir(_file_w_path)
-
-            elif _file_w_path:
-                succeeded = xbmcvfs.delete(_file_w_path)
-
-            if succeeded:
-                ui.show_notification(localize('succeeded'))
-            else:
+            except:
                 ui.show_notification(localize('failed'))
 
-        elif action == 'install' and maint_type == 'inputstreamhelper':
-            if context.get_system_version().get_version()[0] >= 17:
-                try:
-                    xbmcaddon.Addon('script.module.inputstreamhelper')
-                    ui.show_notification(localize('inputstreamhelper.is_installed'))
-                except RuntimeError:
-                    context.execute('InstallAddon(script.module.inputstreamhelper)')
-            else:
-                ui.show_notification(localize('requires.krypton'))
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/api/update/$')
@@ -1140,20 +934,6 @@ class Provider(AbstractProvider):
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/show_client_ip/$')
-    def show_client_ip(self, context, re_match):
-        port = context.get_settings().httpd_port()
-
-        if is_httpd_live(port=port):
-            client_ip = get_client_ip_address(port=port)
-            if client_ip:
-                context.get_ui().on_ok(context.get_name(), context.localize('client.ip') % client_ip)
-            else:
-                context.get_ui().show_notification(context.localize('client.ip.failed'))
-        else:
-            context.get_ui().show_notification(context.localize('httpd.not.running'))
-
-    # noinspection PyUnusedLocal
     def on_playback_history(self, context, re_match):
         params = context.get_params()
         action = params.get('action')
@@ -1163,6 +943,7 @@ class Provider(AbstractProvider):
         playback_history = context.get_playback_history()
 
         if action == 'list':
+            context.set_content(content.VIDEO_CONTENT, sub_type='history')
             play_data = playback_history.get_items()
             if not play_data:
                 return True
@@ -1251,7 +1032,7 @@ class Provider(AbstractProvider):
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
 
-        self.set_content_type(context, content.FILES)
+        # context.set_content(content.LIST_CONTENT)
 
         result = []
 
@@ -1289,26 +1070,37 @@ class Provider(AbstractProvider):
             result.append(my_subscriptions_filtered_item)
 
         access_manager = context.get_access_manager()
+        watch_later_id = logged_in and access_manager.get_watch_later_id()
+        history_id = logged_in and access_manager.get_watch_history_id()
+        local_history = settings.use_local_history()
 
-        # Recommendations
-        if logged_in and settings.get_bool('youtube.folder.recommendations.show', True):
-            watch_history_playlist_id = access_manager.get_watch_history_id()
-            if watch_history_playlist_id != 'HL':
-                recommendations_item = DirectoryItem(
-                    localize('recommendations'),
-                    create_uri(('special', 'recommendations')),
-                    image='{media}/popular.png',
-                )
-                result.append(recommendations_item)
-
-        # what to watch
-        if settings.get_bool('youtube.folder.popular_right_now.show', True):
-            what_to_watch_item = DirectoryItem(
-                localize('popular_right_now'),
-                create_uri(('special', 'popular_right_now')),
-                image='{media}/popular.png',
+        # Home / Recommendations
+        if settings.get_bool('youtube.folder.recommendations.show', True):
+            recommendations_item = DirectoryItem(
+                localize('recommendations'),
+                create_uri(('special', 'recommendations')),
+                image='{media}/home.png',
             )
-            result.append(what_to_watch_item)
+            result.append(recommendations_item)
+
+        # Related
+        if settings.get_bool('youtube.folder.related.show', True):
+            if history_id or local_history:
+                related_item = DirectoryItem(
+                    localize('related_videos'),
+                    create_uri(('special', 'related_videos')),
+                    image='{media}/related_videos.png',
+                )
+                result.append(related_item)
+
+        # Trending
+        if settings.get_bool('youtube.folder.popular_right_now.show', True):
+            trending_item = DirectoryItem(
+                localize('trending'),
+                create_uri(('special', 'popular_right_now')),
+                image='{media}/trending.png',
+            )
+            result.append(trending_item)
 
         # search
         if settings.get_bool('youtube.folder.search.show', True):
@@ -1354,16 +1146,15 @@ class Provider(AbstractProvider):
 
         # watch later
         if settings.get_bool('youtube.folder.watch_later.show', True):
-            playlist_id = logged_in and access_manager.get_watch_later_id()
-            if playlist_id:
+            if watch_later_id:
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri(('channel', 'mine', 'playlist', playlist_id)),
+                    create_uri(('channel', 'mine', 'playlist', watch_later_id)),
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
-                        context, playlist_id
+                        context, watch_later_id
                     )
                 ]
                 watch_later_item.set_context_menu(context_menu)
@@ -1405,21 +1196,20 @@ class Provider(AbstractProvider):
 
         # history
         if settings.get_bool('youtube.folder.history.show', False):
-            playlist_id = logged_in and access_manager.get_watch_history_id()
-            if playlist_id and playlist_id != 'HL':
+            if history_id:
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri(('channel', 'mine', 'playlist', playlist_id)),
+                    create_uri(('channel', 'mine', 'playlist', history_id)),
                     image='{media}/history.png',
                 )
                 context_menu = [
                     menu_items.play_all_from_playlist(
-                        context, playlist_id
+                        context, history_id
                     )
                 ]
                 watch_history_item.set_context_menu(context_menu)
                 result.append(watch_history_item)
-            elif settings.use_local_history():
+            elif local_history:
                 watch_history_item = DirectoryItem(
                     localize('history'),
                     create_uri([paths.HISTORY], params={'action': 'list'}),
@@ -1520,24 +1310,6 @@ class Provider(AbstractProvider):
             result.append(settings_menu_item)
 
         return result
-
-    @staticmethod
-    def set_content_type(context, content_type):
-        context.set_content_type(content_type)
-        context.add_sort_method(
-            (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-            (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
-        )
-        if content_type != content.VIDEOS:
-            return
-        context.add_sort_method(
-            (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
-            (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
-            (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
-            (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
-            (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-            (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
-        )
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, (InvalidGrant, LoginException)):

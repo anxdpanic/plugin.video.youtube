@@ -264,32 +264,41 @@ class YouTubeRequestClient(BaseRequestsClass):
         elif exc_type:
             exc_type = (YouTubeException, exc_type)
         else:
-            exc_type = YouTubeException
+            exc_type = (YouTubeException,)
         super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
 
-        self._access_token = None
-        self.video_id = None
-
-    @staticmethod
-    def json_traverse(json_data, path):
+    @classmethod
+    def json_traverse(cls, json_data, path):
         if not json_data or not path:
             return None
 
         result = json_data
-        for keys in path:
-            is_dict = isinstance(result, dict)
-            if not is_dict and not isinstance(result, (list, tuple)):
+        for idx, keys in enumerate(path):
+            if not isinstance(result, (dict, list, tuple)):
                 return None
+
+            if isinstance(keys, slice):
+                return [
+                    cls.json_traverse(part, path[idx + 1:])
+                    for part in result[keys]
+                    if part
+                ]
 
             if not isinstance(keys, (list, tuple)):
                 keys = [keys]
+
             for key in keys:
-                if is_dict:
-                    if key not in result:
-                        continue
-                elif not isinstance(key, int) or len(result) <= key:
+                if isinstance(key, (list, tuple)):
+                    new_result = cls.json_traverse(result, key)
+                    if new_result:
+                        result = new_result
+                        break
                     continue
-                result = result[key]
+
+                try:
+                    result = result[key]
+                except (KeyError, IndexError):
+                    continue
                 break
             else:
                 return None
@@ -298,18 +307,18 @@ class YouTubeRequestClient(BaseRequestsClass):
             return None
         return result
 
-    def build_client(self, client_name, auth_header=False, data=None):
+    @classmethod
+    def build_client(cls, client_name, data=None):
         templates = {}
 
-        client = (self.CLIENTS.get(client_name) or self.CLIENTS['web']).copy()
-        client = merge_dicts(self.CLIENTS['_common'], client, templates)
-
+        client = (cls.CLIENTS.get(client_name)
+                  or YouTubeRequestClient.CLIENTS['web']).copy()
         if data:
-            client.update(data)
-        client['json']['videoId'] = self.video_id
-        if auth_header and self._access_token:
-            client['_access_token'] = self._access_token
-            client['params'] = None
+            client = merge_dicts(client, data)
+        client = merge_dicts(cls.CLIENTS['_common'], client, templates)
+
+        if data and '_access_token' in data:
+            del client['params']['key']
         elif 'Authorization' in client['headers']:
             del client['headers']['Authorization']
 
