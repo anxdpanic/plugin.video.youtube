@@ -1051,7 +1051,7 @@ class Provider(AbstractProvider):
 
             # clear cache
             cache = context.get_data_cache()
-            cache.set_item('my-subscriptions-items', '[]')
+            cache.set_item('my-subscriptions-items', [])
 
             my_subscriptions_item = DirectoryItem(
                 ui.bold(localize('my_subscriptions')),
