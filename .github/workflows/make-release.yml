@@ -70,7 +70,7 @@ jobs:
           git reset
           git checkout .
           git fetch origin nexus-unofficial
-          git cherry-pick ...origin/nexus-unofficial -n
+          git -c user.email="\<\>" -c user.name="make-release" merge -X theirs --allow-unrelated-histories origin/nexus-unofficial
           git clean -fdx
           mv .git ..
           rm -rf .??*
@@ -113,7 +113,7 @@ jobs:
           git reset
           git checkout .
           git fetch origin nexus-unofficial
-          git cherry-pick ...origin/nexus-unofficial -n
+          git -c user.email="\<\>" -c user.name="make-release" merge -X theirs --allow-unrelated-histories origin/nexus-unofficial
           git clean -fdx
           mv .git ..
           rm -rf .??*
