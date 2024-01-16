@@ -8,21 +8,42 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import re
-from urllib.parse import parse_qsl
-from urllib.parse import urlparse
-from urllib.parse import parse_qs
-from urllib.parse import urlunsplit
-from urllib.parse import urlencode
 
-from ...kodion.utils import FunctionCache
-from ...kodion import Context as _Context
-import requests
+from ...kodion.compatibility import parse_qsl, unescape, urlencode, urlsplit
+from ...kodion.network import BaseRequestsClass
 
 
-class AbstractResolver(object):
-    def __init__(self):
-        self._verify = _Context(plugin_id='plugin.video.youtube').get_settings().verify_ssl()
+class AbstractResolver(BaseRequestsClass):
+    _HEADERS = {
+        'Cache-Control': 'max-age=0',
+        'Accept': ('text/html,'
+                   'application/xhtml+xml,'
+                   'application/xml;q=0.9,'
+                   'image/webp,'
+                   '*/*;q=0.8'),
+        # Desktop user agent
+        'User-Agent': ('Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                       ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                       ' Chrome/119.0.0.0 Safari/537.36'),
+        # Mobile user agent - for testing m.youtube.com redirect
+        # 'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+        #                ' AppleWebKit/537.36 (KHTML, like Gecko)'
+        #                ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
+        # Old desktop user agent - for testing /supported_browsers redirect
+        # 'User-Agent': ('Mozilla/5.0 (Windows NT 6.1; WOW64)'
+        #                ' AppleWebKit/537.36 (KHTML, like Gecko)'
+        #                ' Chrome/41.0.2272.118 Safari/537.36'),
+        'DNT': '1',
+        'Accept-Encoding': 'gzip, deflate',
+        'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'
+    }
+
+    def __init__(self, context):
+        self._context = context
+        super(AbstractResolver, self).__init__()
 
     def supports_url(self, url, url_components):
         raise NotImplementedError()
@@ -32,165 +53,193 @@ class AbstractResolver(object):
 
 
 class YouTubeResolver(AbstractResolver):
-    RE_USER_NAME = re.compile(r'http(s)?://(www.)?youtube.com/(?P<user_name>[a-zA-Z0-9]+)$')
+    _RE_CHANNEL_URL = re.compile(r'<meta property="og:url" content="'
+                                 r'(?P<channel_url>[^"]+)'
+                                 r'">')
+    _RE_CLIP_DETAILS = re.compile(r'(<meta property="og:video:url" content="'
+                                  r'(?P<video_url>[^"]+)'
+                                  r'">)'
+                                  r'|("startTimeMs":"(?P<start_time>\d+)")'
+                                  r'|("endTimeMs":"(?P<end_time>\d+)")')
 
-    def __init__(self):
-        AbstractResolver.__init__(self)
+    def __init__(self, *args, **kwargs):
+        super(YouTubeResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
-        if url_components.hostname == 'www.youtube.com' or url_components.hostname == 'youtube.com':
-            if url_components.path.lower() in ['/redirect', '/user']:
-                return True
+        if url_components.hostname not in (
+                'www.youtube.com',
+                'youtube.com',
+                'm.youtube.com',
+        ):
+            return False
 
-            if url_components.path.lower().startswith('/user'):
-                return True
+        path = url_components.path.lower()
+        if path.startswith((
+                '/@',
+                '/c/',
+                '/channel/',
+                '/clip',
+                '/user/',
+        )):
+            return 'GET'
 
-            re_match = self.RE_USER_NAME.match(url)
-            if re_match:
-                return True
+        if path.startswith((
+                '/embed',
+                '/live',
+                '/redirect',
+                '/shorts',
+                '/supported_browsers',
+                '/watch',
+        )):
+            return 'HEAD'
 
-        return False
+        # user channel in the form of youtube.com/username
+        path = path.strip('/').split('/', 1)
+        return 'GET' if len(path) == 1 and path[0] else False
 
-    def resolve(self, url, url_components):
-        def _load_page(_url):
-            # we try to extract the channel id from the html content. With the channel id we can construct a url we
-            # already work with.
-            # https://www.youtube.com/channel/<CHANNEL_ID>
-            try:
-                headers = {'Cache-Control': 'max-age=0',
-                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36',
-                           'DNT': '1',
-                           'Accept-Encoding': 'gzip, deflate',
-                           'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.get(url, headers=headers, verify=self._verify)
-                if response.status_code == 200:
-                    match = re.search(r'<meta itemprop="channelId" content="(?P<channel_id>.+)">', response.text)
-                    if match:
-                        channel_id = match.group('channel_id')
-                        return 'https://www.youtube.com/channel/%s' % channel_id
-            except:
-                # do nothing
-                pass
-
-            return _url
-
-        if url_components.path.lower() == '/redirect':
+    def resolve(self, url, url_components, method='HEAD'):
+        path = url_components.path.rstrip('/').lower()
+        if path == '/redirect':
             params = dict(parse_qsl(url_components.query))
-            return params['q']
+            url = params['q']
 
-        if url_components.path.lower().startswith('/user'):
-            return _load_page(url)
+        # "sometimes", we get a redirect through a URL of the form
+        # https://.../supported_browsers?next_url=<urlencoded_next_url>&further=parameters&stuck=here
+        # put together query string from both what's encoded inside
+        # next_url and the remaining parameters of this URL...
+        elif path == '/supported_browsers':
+            # top-level query string
+            params = dict(parse_qsl(url_components.query))
+            # components of next_url
+            next_components = urlsplit(params.pop('next_url', ''))
+            if not next_components.scheme or not next_components.netloc:
+                return url
+            # query string encoded inside next_url
+            next_params = dict(parse_qsl(next_components.query))
+            # add/overwrite all other params from top level query string
+            next_params.update(params)
+            # build new URL from these components
+            return next_components._replace(
+                query=urlencode(next_params)
+            ).geturl()
 
-        re_match = self.RE_USER_NAME.match(url)
-        if re_match:
-            return _load_page(url)
+        response = self.request(url,
+                                method=method,
+                                headers=self._HEADERS,
+                                allow_redirects=True)
+        if not response or not response.ok:
+            return url
 
-        return url
+        if path.startswith('/clip'):
+            all_matches = self._RE_CLIP_DETAILS.finditer(response.text)
+            num_matched = 0
+            url_components = params = start_time = end_time = None
+            for matches in all_matches:
+                matches = matches.groupdict()
+
+                if not num_matched & 1:
+                    url = matches['video_url']
+                    if url:
+                        num_matched += 1
+                        url_components = urlsplit(unescape(url))
+                        params = dict(parse_qsl(url_components.query))
+
+                if not num_matched & 2:
+                    start_time = matches['start_time']
+                    if start_time:
+                        start_time = int(start_time) / 1000
+                        num_matched += 2
+
+                if not num_matched & 4:
+                    end_time = matches['end_time']
+                    if end_time:
+                        end_time = int(end_time) / 1000
+                        num_matched += 4
+
+                if num_matched != 7:
+                    continue
+
+                params.update({
+                    'clip': True,
+                    'start': start_time,
+                    'end': end_time,
+                })
+                return url_components._replace(query=urlencode(params)).geturl()
+
+        # we try to extract the channel id from the html content
+        # With the channel id we can construct a URL we already work with
+        # https://www.youtube.com/channel/<CHANNEL_ID>
+        elif method == 'GET':
+            match = self._RE_CHANNEL_URL.search(response.text)
+            if match:
+                url = match.group('channel_url')
+                if path.endswith(('/live', '/streams')):
+                    url_components = urlsplit(unescape(url))
+                    params = dict(parse_qsl(url_components.query))
+                    params['live'] = 1
+                    return url_components._replace(
+                        query=urlencode(params)
+                    ).geturl()
+                return url
+
+        return response.url
 
 
-class CommonResolver(AbstractResolver, list):
-    def __init__(self):
-        AbstractResolver.__init__(self)
+class CommonResolver(AbstractResolver):
+    def __init__(self, *args, **kwargs):
+        super(CommonResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
-        return True
+        return 'HEAD'
 
-    def resolve(self, url, url_components):
-        def _loop(_url, tries=5):
-            if tries == 0:
-                return _url
-
-            try:
-                headers = {'Cache-Control': 'max-age=0',
-                           'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                           'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2272.118 Safari/537.36',
-                           'DNT': '1',
-                           'Accept-Encoding': 'gzip, deflate',
-                           'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-                response = requests.head(_url, headers=headers, verify=self._verify, allow_redirects=False)
-                if response.status_code == 304:
-                    return url
-
-                if response.status_code in [301, 302, 303]:
-                    headers = response.headers
-                    location = headers.get('location', '')
-
-                    # validate the location - some server returned garbage
-                    _url_components = urlparse(location)
-                    if not _url_components.scheme and not _url_components.hostname:
-                        return url
-
-                    # some server return 301 for HEAD requests
-                    # we just compare the new location - if it's equal we can return the url
-                    if location == _url or ''.join([location, '/']) == _url or location == ''.join([_url, '/']):
-                        return _url
-
-                    if location:
-                        return _loop(location, tries=tries - 1)
-
-                    # just to be sure ;)
-                    location = headers.get('Location', '')
-                    if location:
-                        return _loop(location, tries=tries - 1)
-
-                if response.status_code == 200:
-                    _url_components = urlparse(_url)
-                    if _url_components.path == '/supported_browsers':
-                        # "sometimes", we get a redirect through an URL of the form https://.../supported_browsers?next_url=<urlencoded_next_url>&further=paramaters&stuck=here
-                        # put together query string from both what's encoded inside next_url and the remaining paramaters of this URL...
-                        _query = parse_qs(_url_components.query) # top-level query string
-                        _nc = urlparse(_query['next_url'][0]) # components of next_url
-                        _next_query = parse_qs(_nc.query) # query string encoded inside next_url
-                        del _query['next_url'] # remove next_url from top level query string
-                        _next_query.update(_query) # add/overwrite all other params from top level query string
-                        _next_query = dict(map(lambda kv : (kv[0], kv[1][0]), _next_query.items())) # flatten to only use first argument of each param
-                        _next_url = urlunsplit((_nc.scheme, _nc.netloc, _nc.path, urlencode(_next_query), _nc.fragment)) # build new URL from these components
-                        return _next_url
-
-            except:
-                # do nothing
-                pass
-
-            return _url
-
-        resolved_url = _loop(url)
-
-        return resolved_url
+    def resolve(self, url, url_components, method='HEAD'):
+        response = self.request(url,
+                                method=method,
+                                headers=self._HEADERS,
+                                allow_redirects=True)
+        if not response or not response.ok:
+            return url
+        return response.url
 
 
 class UrlResolver(object):
     def __init__(self, context):
         self._context = context
-        self._cache = {}
-        self._youtube_resolver = YouTubeResolver()
-        self._resolver = [
-            self._youtube_resolver,
-            CommonResolver()
+        self._cache = context.get_function_cache()
+        self._resolver_map = {
+            'common_resolver': CommonResolver(context),
+            'youtube_resolver': YouTubeResolver(context),
+        }
+        self._resolvers = [
+            'common_resolver',
+            'youtube_resolver',
         ]
 
     def clear(self):
-        self._context.get_function_cache().clear()
+        self._cache.clear()
 
     def _resolve(self, url):
-        # try one of the resolver
-        url_components = urlparse(url)
-        for resolver in self._resolver:
-            if resolver.supports_url(url, url_components):
-                resolved_url = resolver.resolve(url, url_components)
-                self._cache[url] = resolved_url
+        # try one of the resolvers
+        resolved_url = url
+        for resolver_name in self._resolvers:
+            resolver = self._resolver_map[resolver_name]
+            url_components = urlsplit(resolved_url)
+            method = resolver.supports_url(resolved_url, url_components)
+            if not method:
+                continue
 
-                # one last check...sometimes the resolved url is YouTube-specific and can be resolved again or
-                # simplified.
-                url_components = urlparse(resolved_url)
-                if resolver is not self._youtube_resolver and self._youtube_resolver.supports_url(resolved_url, url_components):
-                    return self._youtube_resolver.resolve(resolved_url, url_components)
-
-                return resolved_url
+            self._context.log_debug('Resolving |{uri}| using |{name} {method}|'
+                                    .format(uri=resolved_url,
+                                            name=resolver_name,
+                                            method=method))
+            resolved_url = resolver.resolve(resolved_url,
+                                            url_components,
+                                            method)
+            self._context.log_debug('Resolved to |{0}|'.format(resolved_url))
+        return resolved_url
 
     def resolve(self, url):
-        function_cache = self._context.get_function_cache()
-        resolved_url = function_cache.get(FunctionCache.ONE_DAY, self._resolve, url)
+        resolved_url = self._cache.get(self._resolve, self._cache.ONE_DAY, url)
         if not resolved_url or resolved_url == '/':
             return url
 

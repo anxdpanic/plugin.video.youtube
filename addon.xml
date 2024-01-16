@@ -1,22 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="7.0.2~alpha7" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="7.0.3+beta.1" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.requests" version="2.12.4"/>
-        <import addon="inputstream.adaptive" version="20.3.1"/>
+        <import addon="inputstream.adaptive" version="20.0.0"/>
         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
         <import addon="script.module.infotagger" version="0.0.5"/>
     </requires>
-    <extension point="xbmc.python.pluginsource" library="resources/lib/default.py">
+    <extension point="xbmc.python.pluginsource" library="resources/lib/plugin.py">
         <provides>video</provides>
     </extension>
-    <extension point="xbmc.service" library="resources/lib/startup.py"/>
+    <extension point="xbmc.service" library="resources/lib/service.py"/>
     <extension point="xbmc.python.module" library="resources/lib/"/>
+    <extension point="xbmc.python.script" library="resources/lib/youtube_plugin/script.py">
+        <provides>executable</provides>
+    </extension>
     <extension point="xbmc.addon.metadata">
         <news>
-[fix] error when filtering short videos
-[fix] fix playback |contrib: MoojMidge|
-[upd] Translations updated from Kodi Weblate
+### New
+- Add display of extra video information (premieres, views, comments, likes) #18, #464, #503
+- Add support for Clips #450
+- Add ability to combine playlists #480
+- Add support for timestamps in links #502
+- Add initial support for higher bitrate streams #505
+- Add ability to limit video FPS at max resolution #539
+- Add local Watch Later and History for use when not logged in or custom playlist not set
+- Update main menu items:
+  - New Recommended videos (similar to YouTube home page, will use login if available)
+  - Old Recommended videos renamed to Related videos (requires local/remote history enabled)
+  - Popular right now renamed to Trending
+
+### Changed
+- Local history made optional and enabled by default
+- Existing user data will be lost due to changes in data format:
+  - Search, local history, and local watch later is stored per user
+  - Function and data cache will be wiped (will also become per user in future)
+- Disable OPUS audio by default #537
+
+### Fixed
+- Fix sharing links #115, #250, #538
+- Fix date and sorting issues #411, #425, #434
+- Fix issue with switching between H264/AV1 streams #532
+- Fix prompt for subtitles #534
+- Fix issues with corrupt user data #536
+- Fix issues with live streams #530, #540
+- Fix issues with loading large playlists #545
+- Fix Recommendations, Related Videos, and Auto-play next #508
+- Fix queuing from current playlist #549
+- Fix issues with randomising playlists #485
+- Workaround for crashes #113, #540
         </news>
         <assets>
             <icon>resources/media/icon.png</icon>
@@ -49,6 +81,7 @@
         <summary lang="pl_PL">Wtyczka YouTube</summary>
         <summary lang="ru_RU">Видеодополнение YouTube</summary>
         <summary lang="sk_SK">Doplnok pre YouTube</summary>
+        <summary lang="sv_SE">Plugin för YouTube</summary>
         <summary lang="tr_TR">YouTube için eklenti</summary>
         <summary lang="vi_VN">Plugin dành cho YouTube</summary>
         <summary lang="zh_CN">油管插件</summary>
@@ -74,6 +107,7 @@
         <description lang="pl_PL">YouTube jest jednym z największych na świecie serwisów udostępniania wideo.</description>
         <description lang="ru_RU">YouTube - популярнейший видеохостинговый сайт, предоставляющий пользователям услуги хранения, доставки и показа видео.</description>
         <description lang="sk_SK">YouTube je jednou z najväčších stránok na zdieľanie videa na svete.</description>
+        <description lang="sv_SE">YouTube är en av de största videodelningssajterna i världen.</description>
         <description lang="tr_TR">YouTube, dünya üzerindeki en büyük video paylaşma platformlarından birisidir.</description>
         <description lang="vi_VN">YouTube là một trong những trang web chia sẻ video lớn nhất trên thế giới.</description>
         <description lang="zh_CN">油管是世界上最大的视频分享网站之一。</description>
@@ -95,10 +129,10 @@
         <disclaimer lang="pl_PL">Ta wtyczka nie jest zatwierdzona przez Google</disclaimer>
         <disclaimer lang="ru_RU">Плагин не поддерживается Google</disclaimer>
         <disclaimer lang="sk_SK">Tento doplnok nie je schválený spoločnosťou Google</disclaimer>
+        <disclaimer lang="sv_SE">Detta plugin är inte godkänt av Google</disclaimer>
         <disclaimer lang="tr_TR">Bu eklenti Google tarafından üretilmemiştir</disclaimer>
         <disclaimer lang="vi_VN">Plugin này không được xác nhận bởi Google</disclaimer>
         <disclaimer lang="zh_CN">此插件未被谷歌认可</disclaimer>
         <disclaimer lang="zh_TW">此附加元件未由Google支持</disclaimer>
     </extension>
 </addon>
-<!-- unofficial -->

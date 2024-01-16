@@ -8,18 +8,23 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
 
-import hashlib
-import datetime
+import json
+from datetime import date, datetime
+from hashlib import md5
 
-from html import unescape
+from ..compatibility import string_type, unescape
+from ..constants import MEDIA_PATH
 
 
 class BaseItem(object):
     VERSION = 3
     INFO_DATE = 'date'  # (string) iso 8601
 
-    def __init__(self, name, uri, image=u'', fanart=u''):
+    _playable = False
+
+    def __init__(self, name, uri, image='', fanart=''):
         self._version = BaseItem.VERSION
 
         try:
@@ -29,13 +34,18 @@ class BaseItem(object):
 
         self._uri = uri
 
-        self._image = u''
+        self._image = None
         self.set_image(image)
+        self._fanart = None
+        self.set_fanart(fanart)
 
-        self._fanart = fanart
         self._context_menu = None
         self._replace_context_menu = False
+        self._added_utc = None
+        self._count = None
         self._date = None
+        self._dateadded = None
+        self._short_details = None
 
         self._next_page = False
 
@@ -46,15 +56,47 @@ class BaseItem(object):
         obj_str = "------------------------------\n'%s'\nURI: %s\nImage: %s\n------------------------------" % (name, uri, image)
         return obj_str
 
+    def to_dict(self):
+        return {'type': self.__class__.__name__, 'data': self.__dict__}
+
+    def dumps(self):
+        def _encoder(obj):
+            if isinstance(obj, (date, datetime)):
+                class_name = obj.__class__.__name__
+
+                if 'fromisoformat' in dir(obj):
+                    return {
+                        '__class__': class_name,
+                        '__isoformat__': obj.isoformat(),
+                    }
+
+                if class_name == 'datetime':
+                    if obj.tzinfo:
+                        format_string = '%Y-%m-%dT%H:%M:%S%z'
+                    else:
+                        format_string = '%Y-%m-%dT%H:%M:%S'
+                else:
+                    format_string = '%Y-%m-%d'
+
+                return {
+                    '__class__': class_name,
+                    '__format_string__': format_string,
+                    '__value__': obj.strftime(format_string)
+                }
+
+            return json.JSONEncoder().default(obj)
+
+        return json.dumps(self.to_dict(), ensure_ascii=False, default=_encoder)
+
     def get_id(self):
         """
         Returns a unique id of the item.
         :return: unique id of the item.
         """
-        m = hashlib.md5()
-        m.update(self._name.encode('utf-8'))
-        m.update(self._uri.encode('utf-8'))
-        return m.hexdigest()
+        md5_hash = md5()
+        md5_hash.update(self._name.encode('utf-8'))
+        md5_hash.update(self._uri.encode('utf-8'))
+        return md5_hash.hexdigest()
 
     def get_name(self):
         """
@@ -64,10 +106,7 @@ class BaseItem(object):
         return self._name
 
     def set_uri(self, uri):
-        if isinstance(uri, str):
-            self._uri = uri
-        else:
-            self._uri = ''
+        self._uri = uri if uri and isinstance(uri, string_type) else ''
 
     def get_uri(self):
         """
@@ -77,8 +116,12 @@ class BaseItem(object):
         return self._uri
 
     def set_image(self, image):
-        if image is None:
+        if not image:
             self._image = ''
+            return
+
+        if '{media}/' in image:
+            self._image = image.format(media=MEDIA_PATH)
         else:
             self._image = image
 
@@ -86,7 +129,14 @@ class BaseItem(object):
         return self._image
 
     def set_fanart(self, fanart):
-        self._fanart = fanart
+        if not fanart:
+            self._fanart = '{0}/fanart.jpg'.format(MEDIA_PATH)
+            return
+
+        if '{media}/' in fanart:
+            self._fanart = fanart.format(media=MEDIA_PATH)
+        else:
+            self._fanart = fanart
 
     def get_fanart(self):
         return self._fanart
@@ -102,15 +152,55 @@ class BaseItem(object):
         return self._replace_context_menu
 
     def set_date(self, year, month, day, hour=0, minute=0, second=0):
-        date = datetime.datetime(year, month, day, hour, minute, second)
-        self._date = date.isoformat(sep=' ')
+        self._date = datetime(year, month, day, hour, minute, second)
 
     def set_date_from_datetime(self, date_time):
-        self.set_date(year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour,
-                      minute=date_time.minute, second=date_time.second)
+        self._date = date_time
 
-    def get_date(self):
+    def get_date(self, as_text=False, short=False):
+        if not self._date:
+            return ''
+        if short:
+            return self._date.date().strftime('%x')
+        if as_text:
+            return self._date.strftime('%x %X')
         return self._date
+
+    def set_dateadded(self, year, month, day, hour=0, minute=0, second=0):
+        self._dateadded = datetime(year,
+                                   month,
+                                   day,
+                                   hour,
+                                   minute,
+                                   second)
+
+    def set_dateadded_from_datetime(self, date_time):
+        self._dateadded = date_time
+
+    def get_dateadded(self, as_text=False):
+        if not self._dateadded:
+            return ''
+        if as_text:
+            return self._dateadded.strftime('%x %X')
+        return self._dateadded
+
+    def set_added_utc(self, date_time):
+        self._added_utc = date_time
+
+    def get_added_utc(self):
+        return self._added_utc
+
+    def get_short_details(self):
+        return self._short_details
+
+    def set_short_details(self, details):
+        self._short_details = details or ''
+
+    def get_count(self):
+        return self._count
+
+    def set_count(self, count):
+        self._count = int(count or 0)
 
     @property
     def next_page(self):
@@ -119,3 +209,7 @@ class BaseItem(object):
     @next_page.setter
     def next_page(self, value):
         self._next_page = bool(value)
+
+    @property
+    def playable(cls):
+        return cls._playable

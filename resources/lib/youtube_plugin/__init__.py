@@ -8,6 +8,9 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
+
 key_sets = {
     'youtube-tv': {
         'id': 'ODYxNTU2NzA4NDU0LWQ2ZGxtM2xoMDVpZGQ4bnBlazE4azZiZThiYTNvYzY4',
@@ -23,4 +26,4 @@ key_sets = {
     }
 }
 
-__all__ = ['kodion', 'youtube', 'key_sets', 'refresh']
+__all__ = ['kodion', 'youtube', 'key_sets', 'script']

@@ -8,6 +8,12 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
+VIDEO_CONTENT = 'videos'
+LIST_CONTENT = 'files'
+VIDEO_TYPE = 'video'
+
 FILES = 'files'
 SONGS = 'songs'
 ARTISTS = 'artists'

@@ -8,16 +8,23 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from .. import kodion
+from __future__ import absolute_import, division, unicode_literals
+
+from ..kodion import KodionException
+from ..kodion.network import InvalidJSONError
 
 
-class LoginException(kodion.KodionException):
+class LoginException(KodionException):
     pass
 
 
-class YouTubeException(kodion.KodionException):
+class YouTubeException(KodionException):
     pass
 
 
-class InvalidGrant(kodion.KodionException):
+class InvalidGrant(KodionException):
+    pass
+
+
+class InvalidJSON(KodionException, InvalidJSONError):
     pass

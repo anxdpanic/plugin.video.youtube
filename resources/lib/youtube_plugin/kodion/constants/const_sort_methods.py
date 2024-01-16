@@ -8,62 +8,66 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-_xbmc = True
+from __future__ import absolute_import, division, unicode_literals
 
-try:
-    from xbmcplugin import *
-except:
-    _xbmc = False
-    _count = 0
+import sys
+
+from ..compatibility import xbmcplugin
 
 
-def _const(name):
-    if _xbmc:
-        return eval(name)
-    else:
-        global _count
-        _count += 1
-        return _count
+xbmcplugin = xbmcplugin.__dict__
+namespace = sys.modules[__name__]
+names = [
+    'NONE',                             # 0
+    'LABEL',                            # 1
+    'LABEL_IGNORE_THE',                 # 2
+    'DATE',                             # 3
+    'SIZE',                             # 4
+    'FILE',                             # 5
+    'DRIVE_TYPE',                       # 6
+    'TRACKNUM',                         # 7
+    'DURATION',                         # 8
+    'TITLE',                            # 9
+    'TITLE_IGNORE_THE',                 # 10
+    'ARTIST',                           # 11
+    'ARTIST_IGNORE_THE',                # 13
+    'ALBUM',                            # 14
+    'ALBUM_IGNORE_THE',                 # 15
+    'GENRE',                            # 16
+    'COUNTRY',                          # 17
+    'VIDEO_YEAR',                       # 18
+    'VIDEO_RATING',                     # 19
+    'VIDEO_USER_RATING',                # 20
+    'DATEADDED',                        # 21
+    'PROGRAM_COUNT',                    # 22
+    'PLAYLIST_ORDER',                   # 23
+    'EPISODE',                          # 24
+    'VIDEO_TITLE',                      # 25
+    'VIDEO_SORT_TITLE',                 # 26
+    'VIDEO_SORT_TITLE_IGNORE_THE',      # 27
+    'PRODUCTIONCODE',                   # 28
+    'SONG_RATING',                      # 29
+    'SONG_USER_RATING',                 # 30
+    'MPAA_RATING',                      # 31
+    'VIDEO_RUNTIME',                    # 32
+    'STUDIO',                           # 33
+    'STUDIO_IGNORE_THE',                # 34
+    'FULLPATH',                         # 35
+    'LABEL_IGNORE_FOLDERS',             # 36
+    'LASTPLAYED',                       # 37
+    'PLAYCOUNT',                        # 38
+    'LISTENERS',                        # 39
+    'UNSORTED',                         # 40
+    'CHANNEL',                          # 41
+    'BITRATE',                          # 43
+    'DATE_TAKEN',                       # 44
+    'VIDEO_ORIGINAL_TITLE',             # 49
+    'VIDEO_ORIGINAL_TITLE_IGNORE_THE',  # 50
+]
 
+for name in names:
+    fullname = 'SORT_METHOD_' + name
+    setattr(namespace, name,
+            xbmcplugin[fullname] if fullname in xbmcplugin else -1)
 
-ALBUM = _const('SORT_METHOD_ALBUM')
-ALBUM_IGNORE_THE = _const('SORT_METHOD_ALBUM_IGNORE_THE')
-ARTIST = _const('SORT_METHOD_ARTIST')
-ARTIST_IGNORE_THE = _const('SORT_METHOD_ARTIST_IGNORE_THE')
-BIT_RATE = _const('SORT_METHOD_BITRATE')
-# CHANNEL = _const('SORT_METHOD_CHANNEL')
-# COUNTRY = _const('SORT_METHOD_COUNTRY')
-DATE = _const('SORT_METHOD_DATE')
-DATE_ADDED = _const('SORT_METHOD_DATEADDED')
-# DATE_TAKEN = _const('SORT_METHOD_DATE_TAKEN')
-DRIVE_TYPE = _const('SORT_METHOD_DRIVE_TYPE')
-DURATION = _const('SORT_METHOD_DURATION')
-EPISODE = _const('SORT_METHOD_EPISODE')
-FILE = _const('SORT_METHOD_FILE')
-# FULL_PATH = _const('SORT_METHOD_FULLPATH')
-GENRE = _const('SORT_METHOD_GENRE')
-LABEL = _const('SORT_METHOD_LABEL')
-# LABEL_IGNORE_FOLDERS = _const('SORT_METHOD_LABEL_IGNORE_FOLDERS')
-LABEL_IGNORE_THE = _const('SORT_METHOD_LABEL_IGNORE_THE')
-# LAST_PLAYED = _const('SORT_METHOD_LASTPLAYED')
-LISTENERS = _const('SORT_METHOD_LISTENERS')
-MPAA_RATING = _const('SORT_METHOD_MPAA_RATING')
-NONE = _const('SORT_METHOD_NONE')
-# PLAY_COUNT = _const('SORT_METHOD_PLAYCOUNT')
-PLAYLIST_ORDER = _const('SORT_METHOD_PLAYLIST_ORDER')
-PRODUCTION_CODE = _const('SORT_METHOD_PRODUCTIONCODE')
-PROGRAM_COUNT = _const('SORT_METHOD_PROGRAM_COUNT')
-SIZE = _const('SORT_METHOD_SIZE')
-SONG_RATING = _const('SORT_METHOD_SONG_RATING')
-STUDIO = _const('SORT_METHOD_STUDIO')
-STUDIO_IGNORE_THE = _const('SORT_METHOD_STUDIO_IGNORE_THE')
-TITLE = _const('SORT_METHOD_TITLE')
-TITLE_IGNORE_THE = _const('SORT_METHOD_TITLE_IGNORE_THE')
-TRACK_NUMBER = _const('SORT_METHOD_TRACKNUM')
-UNSORTED = _const('SORT_METHOD_UNSORTED')
-VIDEO_RATING = _const('SORT_METHOD_VIDEO_RATING')
-VIDEO_RUNTIME = _const('SORT_METHOD_VIDEO_RUNTIME')
-VIDEO_SORT_TITLE = _const('SORT_METHOD_VIDEO_SORT_TITLE')
-VIDEO_SORT_TITLE_IGNORE_THE = _const('SORT_METHOD_VIDEO_SORT_TITLE_IGNORE_THE')
-VIDEO_TITLE = _const('SORT_METHOD_VIDEO_TITLE')
-VIDEO_YEAR = _const('SORT_METHOD_VIDEO_YEAR')
+del sys, xbmcplugin, namespace, names, name, fullname

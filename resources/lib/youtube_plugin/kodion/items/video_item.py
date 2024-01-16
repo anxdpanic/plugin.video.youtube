@@ -8,24 +8,28 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import re
+from __future__ import absolute_import, division, unicode_literals
+
 import datetime
+import re
 
 from .base_item import BaseItem
+from ..compatibility import unescape
+from ..utils import duration_to_seconds, seconds_to_duration
 
-from html import unescape
 
 __RE_IMDB__ = re.compile(r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?')
 
 
 class VideoItem(BaseItem):
-    def __init__(self, name, uri, image=u'', fanart=u''):
-        BaseItem.__init__(self, name, uri, image, fanart)
+    _playable = True
+
+    def __init__(self, name, uri, image='', fanart=''):
+        super(VideoItem, self).__init__(name, uri, image, fanart)
         self._genre = None
         self._aired = None
-        self._aired_utc = None
         self._scheduled_start_utc = None
-        self._duration = None
+        self._duration = -1
         self._director = None
         self._premiered = None
         self._episode = None
@@ -40,12 +44,13 @@ class VideoItem(BaseItem):
         self._studio = None
         self._artist = None
         self._play_count = None
-        self._uses_dash = None
+        self._uses_isa = None
         self._mediatype = None
         self._last_played = None
         self._start_percent = None
         self._start_time = None
         self._live = False
+        self._upcoming = False
         self.subtitles = None
         self._headers = None
         self.license_key = None
@@ -54,9 +59,10 @@ class VideoItem(BaseItem):
         self._subscription_id = None
         self._playlist_id = None
         self._playlist_item_id = None
+        self._production_code = None
 
     def set_play_count(self, play_count):
-        self._play_count = int(play_count)
+        self._play_count = int(play_count or 0)
 
     def get_play_count(self):
         return self._play_count
@@ -103,13 +109,16 @@ class VideoItem(BaseItem):
         return self._year
 
     def set_premiered(self, year, month, day):
-        date = datetime.date(year, month, day)
-        self._premiered = date.isoformat()
+        self._premiered = datetime.date(year, month, day)
 
     def set_premiered_from_datetime(self, date_time):
-        self.set_premiered(year=date_time.year, month=date_time.month, day=date_time.day)
+        self._premiered = date_time.date()
 
-    def get_premiered(self):
+    def get_premiered(self, as_text=True):
+        if not self._premiered:
+            return ''
+        if as_text:
+            return self._premiered.strftime('%x')
         return self._premiered
 
     def set_plot(self, plot):
@@ -165,36 +174,39 @@ class VideoItem(BaseItem):
     def get_season(self):
         return self._season
 
-    def set_duration(self, hours, minutes, seconds=0):
-        _seconds = seconds
-        _seconds += minutes * 60
-        _seconds += hours * 60 * 60
-        self.set_duration_from_seconds(_seconds)
+    def set_duration(self, hours=0, minutes=0, seconds=0, duration=''):
+        if duration:
+            _seconds = duration_to_seconds(duration)
+        else:
+            _seconds = seconds + minutes * 60 + hours * 3600
+        self._duration = _seconds or 0
 
     def set_duration_from_minutes(self, minutes):
-        self.set_duration_from_seconds(int(minutes) * 60)
+        self._duration = int(minutes) * 60
 
     def set_duration_from_seconds(self, seconds):
-        self._duration = int(seconds)
+        self._duration = int(seconds or 0)
 
-    def get_duration(self):
+    def get_duration(self, as_text=False):
+        if as_text:
+            return seconds_to_duration(self._duration)
         return self._duration
 
     def set_aired(self, year, month, day):
-        date = datetime.date(year, month, day)
-        self._aired = date.isoformat()
-
-    def set_aired_utc(self, dt):
-        self._aired_utc = dt
-
-    def get_aired_utc(self):
-        return self._aired_utc
+        self._aired = datetime.date(year, month, day)
 
     def set_aired_from_datetime(self, date_time):
-        self.set_aired(year=date_time.year, month=date_time.month, day=date_time.day)
+        self._aired = date_time.date()
 
-    def set_scheduled_start_utc(self, dt):
-        self._scheduled_start_utc = dt
+    def get_aired(self, as_text=True):
+        if not self._aired:
+            return ''
+        if as_text:
+            return self._aired.strftime('%x')
+        return self._aired
+
+    def set_scheduled_start_utc(self, date_time):
+        self._scheduled_start_utc = date_time
 
     def get_scheduled_start_utc(self):
         return self._scheduled_start_utc
@@ -207,8 +219,13 @@ class VideoItem(BaseItem):
     def live(self, value):
         self._live = value
 
-    def get_aired(self):
-        return self._aired
+    @property
+    def upcoming(self):
+        return self._upcoming
+
+    @upcoming.setter
+    def upcoming(self, value):
+        self._upcoming = value
 
     def set_genre(self, genre):
         self._genre = genre
@@ -216,33 +233,38 @@ class VideoItem(BaseItem):
     def get_genre(self):
         return self._genre
 
-    def set_date(self, year, month, day, hour=0, minute=0, second=0):
-        date = datetime.datetime(year, month, day, hour, minute, second)
-        self._date = date.isoformat(sep=' ')
+    def set_isa_video(self, value=True):
+        self._uses_isa = value
 
-    def set_date_from_datetime(self, date_time):
-        self.set_date(year=date_time.year, month=date_time.month, day=date_time.day, hour=date_time.hour,
-                      minute=date_time.minute, second=date_time.second)
+    def use_isa_video(self):
+        return self._uses_isa
 
-    def get_date(self):
-        return self._date
+    def use_hls_video(self):
+        uri = self.get_uri()
+        if 'manifest/hls' in uri or uri.endswith('.m3u8'):
+            return True
+        return False
 
-    def set_use_dash(self, value=True):
-        self._uses_dash = value
-
-    def use_dash(self):
-        return self._uses_dash is True and ('manifest/dash' in self.get_uri() or self.get_uri().endswith('.mpd'))
+    def use_mpd_video(self):
+        uri = self.get_uri()
+        if 'manifest/dash' in uri or uri.endswith('.mpd'):
+            return True
+        return False
 
     def set_mediatype(self, mediatype):
         self._mediatype = mediatype
 
     def get_mediatype(self):
-        if self._mediatype not in ['video', 'movie', 'tvshow', 'season', 'episode', 'musicvideo']:
+        if (self._mediatype not in {'video',
+                                    'movie',
+                                    'tvshow', 'season', 'episode',
+                                    'musicvideo'}):
             self._mediatype = 'video'
         return self._mediatype
 
     def set_subtitles(self, value):
-        self.subtitles = value if value and isinstance(value, list) else None
+        if value and isinstance(value, (list, tuple)):
+            self.subtitles = value
 
     def set_headers(self, value):
         self._headers = value
@@ -263,13 +285,13 @@ class VideoItem(BaseItem):
         return self._last_played
 
     def set_start_percent(self, start_percent):
-        self._start_percent = start_percent
+        self._start_percent = start_percent or 0
 
     def get_start_percent(self):
         return self._start_percent
 
     def set_start_time(self, start_time):
-        self._start_time = start_time
+        self._start_time = start_time or 0
 
     def get_start_time(self):
         return self._start_time
@@ -305,3 +327,9 @@ class VideoItem(BaseItem):
 
     def set_playlist_item_id(self, value):
         self._playlist_item_id = value
+
+    def get_code(self):
+        return self._production_code
+
+    def set_code(self, value):
+        self._production_code = value or ''

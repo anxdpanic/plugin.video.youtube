@@ -8,270 +8,307 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-from ..youtube_exceptions import YouTubeException
-from ...kodion.utils import FunctionCache, DataCache, strip_html_from_text
+from __future__ import absolute_import, division, unicode_literals
 
 
 class ResourceManager(object):
-    def __init__(self, context, youtube_client):
+    def __init__(self, context, client):
         self._context = context
-        self._youtube_client = youtube_client
-        self._channel_data = {}
-        self._video_data = {}
-        self._playlist_data = {}
-        self._enable_channel_fanart = context.get_settings().get_bool('youtube.channel.fanart.show', True)
-
-    def clear(self):
-        self._context.get_function_cache().clear()
-        self._context.get_data_cache().clear()
-
-    def _get_channel_data(self, channel_id):
-        return self._channel_data.get(channel_id, {})
-
-    def _get_video_data(self, video_id):
-        return self._video_data.get(video_id, {})
-
-    def _get_playlist_data(self, playlist_id):
-        return self._playlist_data.get(playlist_id, {})
-
-    def _update_channels(self, channel_ids):
-        result = dict()
-        json_data = dict()
-        channel_ids_to_update = list()
-        channel_ids_cached = list()
-        updated_channel_ids = list()
-
-        data_cache = self._context.get_data_cache()
-        function_cache = self._context.get_function_cache()
-
-        for channel_id in channel_ids:
-            if channel_id == 'mine':
-                json_data = function_cache.get(FunctionCache.ONE_DAY, self._youtube_client.get_channel_by_username, channel_id)
-                items = json_data.get('items', [{'id': 'mine'}])
-
-                try:
-                    channel_id = items[0]['id']
-                except IndexError:
-                    self._context.log_debug('Channel "mine" not found: %s' % json_data)
-                    channel_id = None
-
-                json_data = dict()
-
-            if channel_id:
-                updated_channel_ids.append(channel_id)
-
-        channel_ids = updated_channel_ids
-
-        channel_data = data_cache.get_items(DataCache.ONE_MONTH, channel_ids)
-        for channel_id in channel_ids:
-            if not channel_data.get(channel_id):
-                channel_ids_to_update.append(channel_id)
-            else:
-                channel_ids_cached.append(channel_id)
-        result.update(channel_data)
-        if len(channel_ids_cached) > 0:
-            self._context.log_debug('Found cached data for channels |%s|' % ', '.join(channel_ids_cached))
-
-        if len(channel_ids_to_update) > 0:
-            self._context.log_debug('No data for channels |%s| cached' % ', '.join(channel_ids_to_update))
-
-            data = []
-            list_of_50s = self._make_list_of_50(channel_ids_to_update)
-            for list_of_50 in list_of_50s:
-                data.append(self._youtube_client.get_channels(list_of_50))
-
-            channel_data = dict()
-            yt_items = []
-            for response in data:
-                yt_items += response.get('items', [])
-
-            for yt_item in yt_items:
-                channel_id = str(yt_item['id'])
-                channel_data[channel_id] = yt_item
-                result[channel_id] = yt_item
-
-            data_cache.set_all(channel_data)
-            self._context.log_debug('Cached data for channels |%s|' % ', '.join(list(channel_data.keys())))
-
-        if self.handle_error(json_data):
-            return result
-
-        return result
-
-    def _update_videos(self, video_ids, live_details=False, suppress_errors=False):
-        result = dict()
-        json_data = dict()
-        video_ids_to_update = list()
-        video_ids_cached = list()
-
-        data_cache = self._context.get_data_cache()
-
-        video_data = data_cache.get_items(DataCache.ONE_MONTH, video_ids)
-        for video_id in video_ids:
-            if not video_data.get(video_id):
-                video_ids_to_update.append(video_id)
-            else:
-                video_ids_cached.append(video_id)
-        result.update(video_data)
-        if len(video_ids_cached) > 0:
-            self._context.log_debug('Found cached data for videos |%s|' % ', '.join(video_ids_cached))
-
-        if len(video_ids_to_update) > 0:
-            self._context.log_debug('No data for videos |%s| cached' % ', '.join(video_ids_to_update))
-            json_data = self._youtube_client.get_videos(video_ids_to_update, live_details)
-            video_data = dict()
-            yt_items = json_data.get('items', [])
-            for yt_item in yt_items:
-                video_id = str(yt_item['id'])
-                video_data[video_id] = yt_item
-                result[video_id] = yt_item
-            data_cache.set_all(video_data)
-            self._context.log_debug('Cached data for videos |%s|' % ', '.join(list(video_data.keys())))
-
-        played_items = dict()
-        if self._context.get_settings().use_playback_history():
-            playback_history = self._context.get_playback_history()
-            played_items = playback_history.get_items(video_ids)
-
-        for k in list(result.keys()):
-            result[k]['play_data'] = played_items.get(k, dict())
-
-        if self.handle_error(json_data, suppress_errors) or suppress_errors:
-            return result
+        self._client = client
+        self._data_cache = context.get_data_cache()
+        self._func_cache = context.get_function_cache()
+        self._show_fanart = context.get_settings().get_bool(
+            'youtube.channel.fanart.show', True
+        )
+        self.new_data = {}
 
     @staticmethod
-    def _make_list_of_50(list_of_ids):
-        list_of_50 = []
-        pos = 0
-        while pos < len(list_of_ids):
-            list_of_50.append(list_of_ids[pos:pos + 50])
-            pos += 50
-        return list_of_50
+    def _list_batch(input_list, n=50):
+        if not isinstance(input_list, (list, tuple)):
+            input_list = list(input_list)
+        for i in range(0, len(input_list), n):
+            yield input_list[i:i + n]
 
-    def get_videos(self, video_ids, live_details=False, suppress_errors=False):
-        list_of_50s = self._make_list_of_50(video_ids)
+    def clear(self):
+        self._func_cache.clear()
+        self._data_cache.clear()
 
-        result = {}
-        for list_of_50 in list_of_50s:
-            result.update(self._update_videos(list_of_50, live_details, suppress_errors))
+    def get_channels(self, ids, defer_cache=False):
+        updated = []
+        for channel_id in ids:
+            if not channel_id:
+                continue
+
+            if channel_id != 'mine':
+                updated.append(channel_id)
+                continue
+
+            data = self._func_cache.get(self._client.get_channel_by_username,
+                                        self._func_cache.ONE_DAY,
+                                        channel_id)
+            items = data.get('items', [{'id': 'mine'}])
+
+            try:
+                channel_id = items[0]['id']
+                updated.append(channel_id)
+            except IndexError:
+                self._context.log_error('Channel not found:\n{data}'
+                                        .format(data=data))
+
+        ids = updated
+        result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
+        to_update = [id_ for id_ in ids
+                     if id_ not in result or result[id_].get('partial')]
+
+        if result:
+            self._context.log_debug('Found cached data for channels:\n|{ids}|'
+                                    .format(ids=list(result)))
+
+        if to_update:
+            new_data = [self._client.get_channels(list_of_50)
+                        for list_of_50 in self._list_batch(to_update, n=50)]
+            if not any(new_data):
+                new_data = None
+        else:
+            new_data = None
+
+        if new_data:
+            self._context.log_debug('Got data for channels:\n|{ids}|'
+                                    .format(ids=to_update))
+            new_data = {
+                yt_item['id']: yt_item
+                for batch in new_data
+                for yt_item in batch.get('items', [])
+                if yt_item
+            }
+            result.update(new_data)
+            self.cache_data(new_data, defer=defer_cache)
+
+        # Re-sort result to match order of requested IDs
+        # Will only work in Python v3.7+
+        if list(result) != ids[:len(result)]:
+            result = {
+                id_: result[id_]
+                for id_ in ids
+                if id_ in result
+            }
+
         return result
 
-    def _update_playlists(self, playlists_ids):
-        result = dict()
-        json_data = dict()
-        playlist_ids_to_update = list()
-        playlists_ids_cached = list()
+    def get_fanarts(self, channel_ids, defer_cache=False):
+        if not self._show_fanart:
+            return {}
 
-        data_cache = self._context.get_data_cache()
-
-        playlist_data = data_cache.get_items(DataCache.ONE_MONTH, playlists_ids)
-        for playlist_id in playlists_ids:
-            if not playlist_data.get(playlist_id):
-                playlist_ids_to_update.append(playlist_id)
+        result = self.get_channels(channel_ids, defer_cache=defer_cache)
+        banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl',
+                   'bannerTvImageUrl', 'bannerExternalUrl']
+        # transform
+        for key, item in result.items():
+            images = item.get('brandingSettings', {}).get('image', {})
+            for banner in banners:
+                image = images.get(banner)
+                if not image:
+                    continue
+                result[key] = image
+                break
             else:
-                playlists_ids_cached.append(playlist_id)
-        result.update(playlist_data)
-        if len(playlists_ids_cached) > 0:
-            self._context.log_debug('Found cached data for playlists |%s|' % ', '.join(playlists_ids_cached))
+                # set an empty url
+                result[key] = ''
 
-        if len(playlist_ids_to_update) > 0:
-            self._context.log_debug('No data for playlists |%s| cached' % ', '.join(playlist_ids_to_update))
-            json_data = self._youtube_client.get_playlists(playlist_ids_to_update)
-            playlist_data = dict()
-            yt_items = json_data.get('items', [])
-            for yt_item in yt_items:
-                playlist_id = str(yt_item['id'])
-                playlist_data[playlist_id] = yt_item
-                result[playlist_id] = yt_item
-            data_cache.set_all(playlist_data)
-            self._context.log_debug('Cached data for playlists |%s|' % ', '.join(list(playlist_data.keys())))
-
-        if self.handle_error(json_data):
-            return result
-
-    def get_playlists(self, playlists_ids):
-        list_of_50s = self._make_list_of_50(playlists_ids)
-
-        result = {}
-        for list_of_50 in list_of_50s:
-            result.update(self._update_playlists(list_of_50))
         return result
 
-    def get_related_playlists(self, channel_id):
-        result = self._update_channels([channel_id])
+    def get_playlists(self, ids, defer_cache=False):
+        ids = tuple(ids)
+        result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
+        to_update = [id_ for id_ in ids
+                     if id_ not in result or result[id_].get('partial')]
+
+        if result:
+            self._context.log_debug('Found cached data for playlists:\n|{ids}|'
+                                    .format(ids=list(result)))
+
+        if to_update:
+            new_data = [self._client.get_playlists(list_of_50)
+                        for list_of_50 in self._list_batch(to_update, n=50)]
+            if not any(new_data):
+                new_data = None
+        else:
+            new_data = None
+
+        if new_data:
+            self._context.log_debug('Got data for playlists:\n|{ids}|'
+                                    .format(ids=to_update))
+            new_data = {
+                yt_item['id']: yt_item
+                for batch in new_data
+                for yt_item in batch.get('items', [])
+                if yt_item
+            }
+            result.update(new_data)
+            self.cache_data(new_data, defer=defer_cache)
+
+        # Re-sort result to match order of requested IDs
+        # Will only work in Python v3.7+
+        if list(result) != ids[:len(result)]:
+            result = {
+                id_: result[id_]
+                for id_ in ids
+                if id_ in result
+            }
+
+        return result
+
+    def get_playlist_items(self, ids=None, batch_id=None, defer_cache=False):
+        if not ids and not batch_id:
+            return None
+
+        if batch_id:
+            ids = [batch_id[0]]
+            page_token = batch_id[1]
+            fetch_next = False
+        else:
+            page_token = None
+            fetch_next = True
+
+        batch_ids = []
+        to_update = []
+        result = {}
+        for playlist_id in ids:
+            page_token = page_token or 0
+            while 1:
+                batch_id = (playlist_id, page_token)
+                batch_ids.append(batch_id)
+                batch = self._data_cache.get_item(batch_id,
+                                                  self._data_cache.ONE_HOUR)
+                if not batch:
+                    to_update.append(batch_id)
+                    break
+                result[batch_id] = batch
+                page_token = batch.get('nextPageToken') if fetch_next else None
+                if page_token is None:
+                    break
+
+        if result:
+            self._context.log_debug('Found cached items for playlists:\n|{ids}|'
+                                    .format(ids=list(result)))
+
+        new_data = {}
+        insert_point = 0
+        for playlist_id, page_token in to_update:
+            new_batch_ids = []
+            batch_id = (playlist_id, page_token)
+            insert_point = batch_ids.index(batch_id, insert_point)
+            while 1:
+                batch_id = (playlist_id, page_token)
+                new_batch_ids.append(batch_id)
+                batch = self._client.get_playlist_items(*batch_id)
+                new_data[batch_id] = batch
+                page_token = batch.get('nextPageToken') if fetch_next else None
+                if page_token is None:
+                    batch_ids[insert_point:insert_point] = new_batch_ids
+                    insert_point += len(new_batch_ids)
+                    break
+
+        if new_data:
+            to_update = list(new_data)
+            self._context.log_debug('Got items for playlists:\n|{ids}|'
+                                    .format(ids=to_update))
+            result.update(new_data)
+            self.cache_data(new_data, defer=defer_cache)
+
+        # Re-sort result to match order of requested IDs
+        # Will only work in Python v3.7+
+        if list(result) != batch_ids[:len(result)]:
+            result = {
+                id_: result[id_]
+                for id_ in batch_ids
+                if id_ in result
+            }
+
+        return result
+
+    def get_related_playlists(self, channel_id, defer_cache=False):
+        result = self.get_channels([channel_id], defer_cache=defer_cache)
 
         # transform
         item = None
         if channel_id != 'mine':
             item = result.get(channel_id, {})
         else:
-            for key in list(result.keys()):
-                item = result[key]
+            for item in result.values():
+                if item:
+                    break
 
         if item is None:
             return {}
 
         return item.get('contentDetails', {}).get('relatedPlaylists', {})
 
-    def get_channels(self, channel_ids):
-        list_of_50s = self._make_list_of_50(channel_ids)
+    def get_videos(self,
+                   ids,
+                   live_details=False,
+                   suppress_errors=False,
+                   defer_cache=False):
+        ids = tuple(ids)
+        result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
+        to_update = [id_ for id_ in ids
+                     if id_ not in result or result[id_].get('partial')]
 
-        result = {}
-        for list_of_50 in list_of_50s:
-            result.update(self._update_channels(list_of_50))
+        if result:
+            self._context.log_debug('Found cached data for videos:\n|{ids}|'
+                                    .format(ids=list(result)))
+
+        if to_update:
+            notify_and_raise = not suppress_errors
+            new_data = [self._client.get_videos(list_of_50,
+                                                live_details,
+                                                notify=notify_and_raise,
+                                                raise_exc=notify_and_raise)
+                        for list_of_50 in self._list_batch(to_update, n=50)]
+            if not any(new_data):
+                new_data = None
+        else:
+            new_data = None
+
+        if new_data:
+            self._context.log_debug('Got data for videos:\n|{ids}|'
+                                    .format(ids=to_update))
+            new_data = {
+                yt_item['id']: yt_item
+                for batch in new_data
+                for yt_item in batch.get('items', [])
+                if yt_item
+            }
+            new_data = dict(dict.fromkeys(to_update, {}), **new_data)
+            result.update(new_data)
+            self.cache_data(new_data, defer=defer_cache)
+
+        # Re-sort result to match order of requested IDs
+        # Will only work in Python v3.7+
+        if list(result) != ids[:len(result)]:
+            result = {
+                id_: result[id_]
+                for id_ in ids
+                if id_ in result
+            }
+
+        if self._context.get_settings().use_local_history():
+            playback_history = self._context.get_playback_history()
+            played_items = playback_history.get_items(ids)
+            for video_id, play_data in played_items.items():
+                if video_id in result:
+                    result[video_id]['play_data'] = play_data
+
         return result
 
-    def get_fanarts(self, channel_ids):
-        if not self._enable_channel_fanart:
-            return {}
+    def cache_data(self, data=None, defer=False):
+        if defer:
+            if data:
+                self.new_data.update(data)
+            return
 
-        result = self._update_channels(channel_ids)
-
-        # transform
-        for key in list(result.keys()):
-            item = result[key]
-
-            # set an empty url
-            result[key] = u''
-            images = item.get('brandingSettings', {}).get('image', {})
-            banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl', 'bannerTvImageUrl', 'bannerExternalUrl']
-            for banner in banners:
-                image = images.get(banner, '')
-                if image:
-                    result[key] = image
-                    break
-
-        return result
-
-    def handle_error(self, json_data, suppress_errors=False):
-        context = self._context
-        if json_data and 'error' in json_data:
-            ok_dialog = False
-            message_timeout = 5000
-            message = json_data['error'].get('message', '')
-            message = strip_html_from_text(message)
-            reason = json_data['error']['errors'][0].get('reason', '')
-            title = '%s: %s' % (context.get_name(), reason)
-            error_message = 'Error reason: |%s| with message: |%s|' % (reason, message)
-
-            context.log_error(error_message)
-
-            if reason == 'accessNotConfigured':
-                message = context.localize(30731)
-                ok_dialog = True
-
-            if reason == 'quotaExceeded' or reason == 'dailyLimitExceeded':
-                message_timeout = 7000
-
-            if not suppress_errors:
-                if ok_dialog:
-                    context.get_ui().on_ok(title, message)
-                else:
-                    context.get_ui().show_notification(message, title,
-                                                       time_milliseconds=message_timeout)
-
-                raise YouTubeException(error_message)
-
-            return False
-
-        return True
+        data = data or self.new_data
+        if data:
+            self._data_cache.set_items(data)
+            self._context.log_debug('Cached data for items:\n|{ids}|'
+                                    .format(ids=list(data)))

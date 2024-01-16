@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-04-28 16:34+0000\n"
+"PO-Revision-Date: 2023-09-21 13:11+0000\n"
 "Last-Translator: José Antonio Alvarado <jalvarado0.eses@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.15.2\n"
+"X-Generator: Weblate 5.0.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -62,8 +62,8 @@ msgid "Always ask for the video quality"
 msgstr "Preguntar siempre por calidad de vídeo"
 
 msgctxt "#30010"
-msgid "Video quality"
-msgstr "Calidad de vídeo"
+msgid "Maximum video quality"
+msgstr "Máxima calidad de vídeo"
 
 msgctxt "#30011"
 msgid "480p"
@@ -74,16 +74,16 @@ msgid "720p (HD)"
 msgstr "720p (HD)"
 
 msgctxt "#30013"
-msgid "1080p (HD)"
-msgstr "1080p (HD)"
+msgid "1080p (FHD)"
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
-msgid "2160p (4k)"
-msgstr "2160p (4k)"
+msgid "2160p (4K)"
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
-msgid "4320p (8k)"
-msgstr "4320p (8k)"
+msgid "4320p (8K)"
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -96,6 +96,10 @@ msgstr "360p"
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr "1080p En Directo / 720p (HD)"
+
+msgctxt "#30019"
+msgid "144p"
+msgstr "144p"
 
 # empty strings 30019
 msgctxt "#30020"
@@ -598,7 +602,7 @@ msgstr "¡Vaya! Algo ha fallado"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr "Configuración"
+msgstr "Ajustes"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -718,7 +722,7 @@ msgstr "Búsqueda Rápida (Incógnito)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr "Reproducir solo audio"
+msgstr "Sólo audio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
@@ -989,8 +993,8 @@ msgid "Reset resume point"
 msgstr "Restablecer punto de reanudación"
 
 msgctxt "#30675"
-msgid "Use playback history (watched, resume tracking)"
-msgstr "Usar historial de reproducción (visto, seguimiento de reanudación)"
+msgid "Use local playback history (watched, resume tracking)"
+msgstr "Usar historial de reproducción local (vistos, puntos de reanudación)"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1049,8 +1053,8 @@ msgid "Use for live streams"
 msgstr "Usar para streams en directo"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
-msgstr "Para emisiones en directo es necesario InputStream Adaptive 2.0.12 o superior"
+msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr "Se requiere InputStream Adaptive >=2.0.12 para los emisiones adaptativas en directo"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1122,7 +1126,7 @@ msgstr "Sin título"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr "Reproducir solo audio"
+msgstr "Reproducir sólo audio"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
@@ -1177,32 +1181,32 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr "Establecer por defecto WEBM adaptativo (4K)"
 
 msgctxt "#30722"
-msgid "HDR"
-msgstr "HDR"
+msgid "Enable HDR video"
+msgstr "Habilitar vídeo HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]> 1080p y HDR requieren InputStream Adaptive 2.3.14 o superior"
 
 msgctxt "#30724"
-msgid "Limit to 30fps"
-msgstr "Limitar a 30fps"
+msgid "Enable high framerate video"
+msgstr "Habilitar vídeo con tasas altas de fotogramas"
 
 msgctxt "#30725"
-msgid "1440p (HD)"
-msgstr "1440p (HD)"
+msgid "1440p (QHD)"
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
 msgstr "Subidas"
 
 msgctxt "#30727"
-msgid "Adaptive (MP4/H264)"
-msgstr "Adaptativo (MP4/H264)"
+msgid "Enable H.264 video"
+msgstr "Habilitar vídeo H.264"
 
 msgctxt "#30728"
-msgid "Adaptive (WEBM/VP9)"
-msgstr "Adaptativo (WEBM/VP9)"
+msgid "Enable VP9 video"
+msgstr "Habilitar vídeo VP9"
 
 msgctxt "#30729"
 msgid "Remote friendly search"
@@ -1242,11 +1246,151 @@ msgstr "Utilizar datos alternativos del cliente"
 
 msgctxt "#30738"
 msgid "Alternate #1"
-msgstr ""
+msgstr "Alternativa #1"
 
 msgctxt "#30739"
 msgid "Alternate #2"
-msgstr ""
+msgstr "Alternativa #2"
+
+msgctxt "#30740"
+msgid "HLS"
+msgstr "HLS"
+
+msgctxt "#30741"
+msgid "Multi-stream HLS"
+msgstr "HLS Multi-emisión"
+
+msgctxt "#30742"
+msgid "Adaptive HLS"
+msgstr "HLS Adaptativo"
+
+msgctxt "#30743"
+msgid "MPEG-DASH"
+msgstr "MPEG-DASH"
+
+msgctxt "#30744"
+msgid "Original"
+msgstr "Original"
+
+msgctxt "#30745"
+msgid "Dubbed"
+msgstr "Doblado"
+
+msgctxt "#30746"
+msgid "Descriptive"
+msgstr "Descriptivo"
+
+msgctxt "#30747"
+msgid "Alternate"
+msgstr "Alternativo"
+
+msgctxt "#30748"
+msgid "Stream features"
+msgstr "Funcionalidades de emisión"
+
+msgctxt "#30749"
+msgid "Enable AV1 video"
+msgstr "Habilitar vídeo AV1"
+
+msgctxt "#30750"
+msgid "Enable Vorbis audio"
+msgstr "Habilitar audio Vorbis"
+
+msgctxt "#30751"
+msgid "Enable Opus audio"
+msgstr "Habilitar audio Opus"
+
+msgctxt "#30752"
+msgid "Enable AAC audio"
+msgstr "Habilitar audio AAC"
+
+msgctxt "#30753"
+msgid "Enable surround sound audio"
+msgstr "Habilitar audio Surround"
+
+msgctxt "#30754"
+msgid "Enable AC-3 audio"
+msgstr "Habilitar audio AC-3"
+
+msgctxt "#30755"
+msgid "Enable EAC-3 audio"
+msgstr "Habilitar audio EAC-3"
+
+msgctxt "#30756"
+msgid "Enable DTS audio"
+msgstr "Habilitar audio DTS"
+
+msgctxt "#30757"
+msgid "Remove similar/duplicate streams"
+msgstr "Eliminar emisiones similares/duplicadas"
+
+msgctxt "#30758"
+msgid "Stream selection"
+msgstr "Selección de emisión"
+
+msgctxt "#30759"
+msgid "Quality selection"
+msgstr "Selección de calidad"
+
+msgctxt "#30760"
+msgid "Automatic + Quality selection"
+msgstr "Selección de calidad automática"
+
+msgctxt "#30761"
+msgid "Update playback history on Youtube"
+msgstr "Actualizar historial de reproducción en Youtube"
+
+msgctxt "#30762"
+msgid "Multi-language"
+msgstr "Multi-idioma"
+
+msgctxt "#30763"
+msgid "Multi-audio"
+msgstr "Multiaudio"
+
+#~ msgctxt "#30010"
+#~ msgid "Video quality"
+#~ msgstr "Calidad de vídeo"
+
+#~ msgctxt "#30013"
+#~ msgid "1080p (HD)"
+#~ msgstr "1080p (HD)"
+
+#~ msgctxt "#30014"
+#~ msgid "2160p (4k)"
+#~ msgstr "2160p (4k)"
+
+#~ msgctxt "#30015"
+#~ msgid "4320p (8k)"
+#~ msgstr "4320p (8k)"
+
+#~ msgctxt "#30675"
+#~ msgid "Use playback history (watched, resume tracking)"
+#~ msgstr "Usar historial de reproducción (visto, seguimiento de reanudación)"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+#~ msgstr "Para emisiones en directo es necesario InputStream Adaptive 2.0.12 o superior"
+
+#~ msgctxt "#30722"
+#~ msgid "HDR"
+#~ msgstr "HDR"
+
+#~ msgctxt "#30724"
+#~ msgid "Limit to 30fps"
+#~ msgstr "Limitar a 30fps"
+
+#~ msgctxt "#30725"
+#~ msgid "1440p (HD)"
+#~ msgstr "1440p (HD)"
+
+#~ msgctxt "#30727"
+#~ msgid "Adaptive (MP4/H264)"
+#~ msgstr "Adaptativo (MP4/H264)"
+
+#~ msgctxt "#30728"
+#~ msgid "Adaptive (WEBM/VP9)"
+#~ msgstr "Adaptativo (WEBM/VP9)"
 
 #~ msgctxt "#30900"
 #~ msgid "Subscriptions groups"

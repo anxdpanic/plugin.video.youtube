@@ -34,7 +34,9 @@ msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
+
 # Kodion Settings
+
 msgctxt "#30000"
 msgid "General"
 msgstr ""
@@ -47,9 +49,14 @@ msgctxt "#30002"
 msgid "Password"
 msgstr ""
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr ""
+
+# empty strings from id 30004 to 30006
+
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
+msgid "Use InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30008"
@@ -61,7 +68,7 @@ msgid "Always ask for the video quality"
 msgstr ""
 
 msgctxt "#30010"
-msgid "Video quality"
+msgid "Maximum video quality"
 msgstr ""
 
 msgctxt "#30011"
@@ -73,15 +80,15 @@ msgid "720p (HD)"
 msgstr ""
 
 msgctxt "#30013"
-msgid "1080p (HD)"
+msgid "1080p (FHD)"
 msgstr ""
 
 msgctxt "#30014"
-msgid "2160p (4k)"
+msgid "2160p (4K)"
 msgstr ""
 
 msgctxt "#30015"
-msgid "4320p (8k)"
+msgid "4320p (8K)"
 msgstr ""
 
 msgctxt "#30016"
@@ -96,7 +103,10 @@ msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
 msgstr ""
 
-# empty strings 30019
+msgctxt "#30019"
+msgid "144p"
+msgstr ""
+
 msgctxt "#30020"
 msgid "Allow 3D"
 msgstr ""
@@ -340,7 +350,7 @@ msgid "Browse Channels"
 msgstr ""
 
 msgctxt "#30513"
-msgid "Popular right now"
+msgid "Trending"
 msgstr ""
 
 msgctxt "#30514"
@@ -452,7 +462,7 @@ msgid "Play with..."
 msgstr ""
 
 msgctxt "#30541"
-msgid "Show channel name in description"
+msgid "Show channel name and video details in description"
 msgstr ""
 
 msgctxt "#30542"
@@ -604,7 +614,7 @@ msgid "Force SSL certificate verification"
 msgstr ""
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -756,11 +766,11 @@ msgid "Must be signed in."
 msgstr ""
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
+msgid "InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
+msgid "Enable MPEG-DASH proxy"
 msgstr ""
 
 msgctxt "#30619"
@@ -772,7 +782,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
@@ -988,7 +998,7 @@ msgid "Reset resume point"
 msgstr ""
 
 msgctxt "#30675"
-msgid "Use playback history (watched, resume tracking)"
+msgid "Use local playback history (watched, resume tracking)"
 msgstr ""
 
 msgctxt "#30676"
@@ -1040,7 +1050,7 @@ msgid "data cache"
 msgstr ""
 
 msgctxt "#30688"
-msgid "Use for videos"
+msgid "Use MPEG-DASH for videos"
 msgstr ""
 
 msgctxt "#30689"
@@ -1048,7 +1058,7 @@ msgid "Use for live streams"
 msgstr ""
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for live streams"
+msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1176,19 +1186,19 @@ msgid "Default to WEBM adaptation set (4K)"
 msgstr ""
 
 msgctxt "#30722"
-msgid "HDR"
+msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
-msgid "Limit to 30fps"
+msgid "Enable high framerate video"
 msgstr ""
 
 msgctxt "#30725"
-msgid "1440p (HD)"
+msgid "1440p (QHD)"
 msgstr ""
 
 msgctxt "#30726"
@@ -1196,11 +1206,11 @@ msgid "Uploads"
 msgstr ""
 
 msgctxt "#30727"
-msgid "Adaptive (MP4/H264)"
+msgid "Enable H.264 video"
 msgstr ""
 
 msgctxt "#30728"
-msgid "Adaptive (WEBM/VP9)"
+msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
@@ -1245,4 +1255,128 @@ msgstr ""
 
 msgctxt "#30739"
 msgid "Alternate #2"
+msgstr ""
+
+msgctxt "#30740"
+msgid "HLS"
+msgstr ""
+
+msgctxt "#30741"
+msgid "Multi-stream HLS"
+msgstr ""
+
+msgctxt "#30742"
+msgid "Adaptive HLS"
+msgstr ""
+
+msgctxt "#30743"
+msgid "MPEG-DASH"
+msgstr ""
+
+msgctxt "#30744"
+msgid "Original"
+msgstr ""
+
+msgctxt "#30745"
+msgid "Dubbed"
+msgstr ""
+
+msgctxt "#30746"
+msgid "Descriptive"
+msgstr ""
+
+msgctxt "#30747"
+msgid "Alternate"
+msgstr ""
+
+msgctxt "#30748"
+msgid "Stream features"
+msgstr ""
+
+msgctxt "#30749"
+msgid "Enable AV1 video"
+msgstr ""
+
+msgctxt "#30750"
+msgid "Enable Vorbis audio"
+msgstr ""
+
+msgctxt "#30751"
+msgid "Enable Opus audio"
+msgstr ""
+
+msgctxt "#30752"
+msgid "Enable AAC audio"
+msgstr ""
+
+msgctxt "#30753"
+msgid "Enable surround sound audio"
+msgstr ""
+
+msgctxt "#30754"
+msgid "Enable AC-3 audio"
+msgstr ""
+
+msgctxt "#30755"
+msgid "Enable EAC-3 audio"
+msgstr ""
+
+msgctxt "#30756"
+msgid "Enable DTS audio"
+msgstr ""
+
+msgctxt "#30757"
+msgid "Remove similar/duplicate streams"
+msgstr ""
+
+msgctxt "#30758"
+msgid "Stream selection"
+msgstr ""
+
+msgctxt "#30759"
+msgid "Quality selection"
+msgstr ""
+
+msgctxt "#30760"
+msgid "Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30761"
+msgid "Update playback history on Youtube"
+msgstr ""
+
+msgctxt "#30762"
+msgid "Multi-language"
+msgstr ""
+
+msgctxt "#30763"
+msgid "Multi-audio"
+msgstr ""
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr ""
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr ""
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr ""
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
 msgstr ""

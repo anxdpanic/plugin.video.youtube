@@ -8,15 +8,20 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-import json
-import re
-from urllib.parse import quote
-from urllib.parse import unquote
+from __future__ import absolute_import, division, unicode_literals
 
+import re
+
+from .constants import paths, content
+from .compatibility import quote, unquote
 from .exceptions import KodionException
-from . import items
-from . import constants
-from . import utils
+from .items import (
+    DirectoryItem,
+    NewSearchItem,
+    SearchHistoryItem,
+    menu_items
+)
+from .utils import to_unicode
 
 
 class AbstractProvider(object):
@@ -24,16 +29,6 @@ class AbstractProvider(object):
     RESULT_UPDATE_LISTING = 'update_listing'
 
     def __init__(self):
-        self._local_map = {
-            'kodion.wizard.view.default': 30027,
-            'kodion.wizard.view.episodes': 30028,
-            'kodion.wizard.view.movies': 30029,
-            'kodion.wizard.view.tvshows': 30032,
-            'kodion.wizard.view.songs': 30033,
-            'kodion.wizard.view.artists': 30034,
-            'kodion.wizard.view.albums': 30035
-        }
-
         # map for regular expression (path) to method (names)
         self._dict_path = {}
 
@@ -41,12 +36,33 @@ class AbstractProvider(object):
 
         # register some default paths
         self.register_path(r'^/$', '_internal_root')
-        self.register_path(r''.join(['^/', constants.paths.WATCH_LATER, '/(?P<command>add|remove|list)/?$']),
-                           '_internal_watch_later')
-        self.register_path(r''.join(['^/', constants.paths.FAVORITES, '/(?P<command>add|remove|list)/?$']), '_internal_favorite')
-        self.register_path(r''.join(['^/', constants.paths.SEARCH, '/(?P<command>input|query|list|remove|clear|rename)/?$']),
-                           '_internal_search')
-        self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$', '_internal_on_extra_fanart')
+
+        self.register_path(r''.join([
+            '^/',
+            paths.WATCH_LATER,
+            '/(?P<command>add|clear|list|remove)/?$'
+        ]), '_internal_watch_later')
+
+        self.register_path(r''.join([
+            '^/',
+            paths.FAVORITES,
+            '/(?P<command>add|clear|list|remove)/?$'
+        ]), '_internal_favorite')
+
+        self.register_path(r''.join([
+            '^/',
+            paths.SEARCH,
+            '/(?P<command>input|query|list|remove|clear|rename)/?$'
+        ]), '_internal_search')
+
+        self.register_path(r''.join([
+            '^/',
+            paths.HISTORY,
+            '/$'
+        ]), 'on_playback_history')
+
+        self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
+                           '_internal_on_extra_fanart')
 
         """
         Test each method of this class for the appended attribute '_re_match' by the
@@ -55,12 +71,10 @@ class AbstractProvider(object):
         """
 
         for method_name in dir(self):
-            method = getattr(self, method_name)
-            if hasattr(method, 'kodion_re_path'):
-                self.register_path(method.kodion_re_path, method_name)
-
-    def get_alternative_fanart(self, context):
-        return context.get_fanart()
+            method = getattr(self, method_name, None)
+            path = method and getattr(method, 'kodion_re_path', None)
+            if path:
+                self.register_path(path, method_name)
 
     def register_path(self, re_path, method_name):
         """
@@ -71,54 +85,33 @@ class AbstractProvider(object):
         """
         self._dict_path[re_path] = method_name
 
-    def _process_wizard(self, context):
-        def _setup_views(_context, _view):
-            view_manager = utils.ViewManager(_context)
-            if not view_manager.update_view_mode(_context.localize(self._local_map['kodion.wizard.view.%s' % _view]),
-                                                 _view):
-                return
+    def run_wizard(self, context):
+        settings = context.get_settings()
+        ui = context.get_ui()
 
-            _context.get_settings().set_bool(constants.setting.VIEW_OVERRIDE, True)
+        settings.set_bool(settings.SETUP_WIZARD, False)
 
-        # start the setup wizard
-        wizard_steps = []
-        if context.get_settings().is_setup_wizard_enabled():
-            context.get_settings().set_bool(constants.setting.SETUP_WIZARD, False)
-            if utils.ViewManager(context).has_supported_views():
-                views = self.get_wizard_supported_views()
-                for view in views:
-                    if view in utils.ViewManager.SUPPORTED_VIEWS:
-                        wizard_steps.append((_setup_views, [context, view]))
-                    else:
-                        context.log_warning('[Setup-Wizard] Unsupported view "%s"' % view)
-            else:
-                skin_id = context.get_ui().get_skin_id()
-                context.log("ViewManager: Unknown skin id '%s'" % skin_id)
+        wizard_steps = self.get_wizard_steps(context)
+        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
 
-            wizard_steps.extend(self.get_wizard_steps(context))
-
-        if wizard_steps and context.get_ui().on_yes_no_input(context.get_name(),
-                                                             context.localize(constants.localize.SETUP_WIZARD_EXECUTE)):
+        if (wizard_steps and ui.on_yes_no_input(
+            context.get_name(), context.localize('setup_wizard.execute')
+        )):
             for wizard_step in wizard_steps:
                 wizard_step[0](*wizard_step[1])
-
-    def get_wizard_supported_views(self):
-        return ['default']
 
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
         return []
 
     def navigate(self, context):
-        self._process_wizard(context)
-
         path = context.get_path()
 
         for key in self._dict_path:
             re_match = re.search(key, path, re.UNICODE)
             if re_match is not None:
                 method_name = self._dict_path.get(key, '')
-                method = getattr(self, method_name)
+                method = getattr(self, method_name, None)
                 if method is not None:
                     result = method(context, re_match)
                     if not isinstance(result, tuple):
@@ -136,12 +129,15 @@ class AbstractProvider(object):
         :param re_match:
         :return:
         """
-        return None
+        return
 
     def _internal_on_extra_fanart(self, context, re_match):
         path = re_match.group('path')
         new_context = context.clone(new_path=path)
         return self.on_extra_fanart(new_context, re_match)
+
+    def on_playback_history(self, context, re_match):
+        raise NotImplementedError()
 
     def on_search(self, search_text, context, re_match):
         raise NotImplementedError()
@@ -149,66 +145,94 @@ class AbstractProvider(object):
     def on_root(self, context, re_match):
         raise NotImplementedError()
 
-    def on_watch_later(self, context, re_match):
-        pass
-
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
 
     @staticmethod
     def _internal_favorite(context, re_match):
-        context.add_sort_method(constants.sort_method.LABEL_IGNORE_THE)
-
         params = context.get_params()
-
         command = re_match.group('command')
+        if not command:
+            return False
+
+        if command == 'list':
+            items = context.get_favorite_list().get_items()
+
+            for item in items:
+                context_menu = [
+                    menu_items.favorites_remove(
+                        context, item.video_id
+                    ),
+                ]
+                item.set_context_menu(context_menu)
+
+            return items
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
         if command == 'add':
-            fav_item = items.from_json(params['item'])
-            context.get_favorite_list().add(fav_item)
-        elif command == 'remove':
-            fav_item = items.from_json(params['item'])
-            context.get_favorite_list().remove(fav_item)
+            item = params.get('item')
+            if item:
+                context.get_favorite_list().add(video_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_favorite_list().remove(video_id)
             context.get_ui().refresh_container()
-        elif command == 'list':
+            return True
 
-            directory_items = context.get_favorite_list().list()
+        return False
 
-            for directory_item in directory_items:
-                context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
-                                 'RunPlugin(%s)' % context.create_uri([constants.paths.FAVORITES, 'remove'],
-                                                                      params={'item': items.to_jsons(directory_item)}))]
-                directory_item.set_context_menu(context_menu)
-
-            return directory_items
-        else:
-            pass
-
-    def _internal_watch_later(self, context, re_match):
-        self.on_watch_later(context, re_match)
-
+    @staticmethod
+    def _internal_watch_later(context, re_match):
         params = context.get_params()
-
         command = re_match.group('command')
-        if command == 'add':
-            item = items.from_json(params['item'])
-            context.get_watch_later_list().add(item)
-        elif command == 'remove':
-            item = items.from_json(params['item'])
-            context.get_watch_later_list().remove(item)
-            context.get_ui().refresh_container()
-        elif command == 'list':
-            video_items = context.get_watch_later_list().list()
+        if not command:
+            return False
+
+        if command == 'list':
+            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
+            video_items = context.get_watch_later_list().get_items()
 
             for video_item in video_items:
-                context_menu = [(context.localize(constants.localize.WATCH_LATER_REMOVE),
-                                 'RunPlugin(%s)' % context.create_uri([constants.paths.WATCH_LATER, 'remove'],
-                                                                      params={'item': items.to_jsons(video_item)}))]
+                context_menu = [
+                    menu_items.watch_later_local_remove(
+                        context, video_item.video_id
+                    ),
+                    menu_items.watch_later_local_clear(
+                        context
+                    )
+                ]
                 video_item.set_context_menu(context_menu)
 
             return video_items
-        else:
-            # do something
-            pass
+
+        if (command == 'clear' and context.get_ui().on_yes_no_input(
+                    context.get_name(),
+                    context.localize('watch_later.clear.confirm')
+                )):
+            context.get_watch_later_list().clear()
+            context.get_ui().refresh_container()
+            return True
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
+        if command == 'add':
+            item = params.get('item')
+            if item:
+                context.get_watch_later_list().add(video_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_watch_later_list().remove(video_id)
+            context.get_ui().refresh_container()
+            return True
+
+        return False
 
     @property
     def data_cache(self):
@@ -221,56 +245,76 @@ class AbstractProvider(object):
 
     def _internal_search(self, context, re_match):
         params = context.get_params()
+        ui = context.get_ui()
 
         command = re_match.group('command')
         search_history = context.get_search_history()
+
         if command == 'remove':
             query = params['q']
             search_history.remove(query)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
             return True
-        elif command == 'rename':
+
+        if command == 'rename':
             query = params['q']
-            result, new_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_RENAME),
-                                                                   query)
+            result, new_query = ui.on_keyboard_input(
+                context.localize('search.rename'), query
+            )
             if result:
                 search_history.rename(query, new_query)
-                context.get_ui().refresh_container()
+                ui.refresh_container()
             return True
-        elif command == 'clear':
+
+        if command == 'clear':
             search_history.clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
             return True
-        elif command == 'input':
+
+        if command == 'query':
+            incognito = context.get_param('incognito', False)
+            channel_id = context.get_param('channel_id', '')
+            query = params['q']
+            query = to_unicode(query)
+
+            if not incognito and not channel_id:
+                try:
+                    search_history.update(query)
+                except:
+                    pass
+            if isinstance(query, bytes):
+                query = query.decode('utf-8')
+            return self.on_search(query, context, re_match)
+
+        if command == 'input':
             self.data_cache = context
 
-            folder_path = context.get_ui().get_info_label('Container.FolderPath')
+            folder_path = context.get_infolabel('Container.FolderPath')
             query = None
+            #  came from page 1 of search query by '..'/back
+            #  user doesn't want to input on this path
             if (folder_path.startswith('plugin://%s' % context.get_id()) and
                     re.match('.+/(?:query|input)/.*', folder_path)):
-                cached_query = self.data_cache.get_item(self.data_cache.ONE_DAY, 'search_query')
-                #  came from page 1 of search query by '..'/back, user doesn't want to input on this path
-                if cached_query and cached_query.get('search_query', {}).get('query'):
-                    query = cached_query.get('search_query', {}).get('query')
-                    query = utils.to_unicode(query)
-                    query = unquote(query)
+                cached = self.data_cache.get_item('search_query',
+                                                  self.data_cache.ONE_DAY)
+                cached = cached and cached.get('query')
+                if cached:
+                    query = unquote(to_unicode(cached))
             else:
-                result, input_query = context.get_ui().on_keyboard_input(context.localize(constants.localize.SEARCH_TITLE))
+                result, input_query = ui.on_keyboard_input(
+                    context.localize('search.title')
+                )
                 if result:
                     query = input_query
 
             if not query:
                 return False
 
-            incognito = str(context.get_param('incognito', False)).lower() == 'true'
+            incognito = context.get_param('incognito', False)
             channel_id = context.get_param('channel_id', '')
 
-            query = utils.to_utf8(query)
-            try:
-                self._data_cache.set('search_query', json.dumps({'query': quote(query)}))
-            except KeyError:
-                encoded = json.dumps({'query': quote(query.encode('utf8'))})
-                self._data_cache.set('search_query', encoded)
+            self._data_cache.set_item('search_query',
+                                      {'query': quote(query)})
 
             if not incognito and not channel_id:
                 try:
@@ -282,44 +326,29 @@ class AbstractProvider(object):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
-        elif command == 'query':
-            incognito = str(context.get_param('incognito', False)).lower() == 'true'
-            channel_id = context.get_param('channel_id', '')
-            query = params['q']
-            query = utils.to_unicode(query)
+        context.set_content(content.VIDEO_CONTENT)
+        result = []
 
-            if not incognito and not channel_id:
-                try:
-                    search_history.update(query)
-                except:
-                    pass
-            if isinstance(query, bytes):
-                query = query.decode('utf-8')
-            return self.on_search(query, context, re_match)
-        else:
-            context.set_content_type(constants.content_type.VIDEOS)
-            result = []
+        location = context.get_param('location', False)
 
-            location = str(context.get_param('location', False)).lower() == 'true'
+        # 'New Search...'
+        new_search_item = NewSearchItem(
+            context, location=location
+        )
+        result.append(new_search_item)
 
-            # 'New Search...'
-            new_search_item = items.NewSearchItem(context, fanart=self.get_alternative_fanart(context), location=location)
-            result.append(new_search_item)
+        for search in search_history.get_items():
+            # little fallback for old history entries
+            if isinstance(search, DirectoryItem):
+                search = search.get_name()
 
-            for search in search_history.list():
-                # little fallback for old history entries
-                if isinstance(search, items.DirectoryItem):
-                    search = search.get_name()
+            # we create a new instance of the SearchItem
+            search_history_item = SearchHistoryItem(
+                context, search, location=location
+            )
+            result.append(search_history_item)
 
-                # we create a new instance of the SearchItem
-                search_history_item = items.SearchHistoryItem(context, search, fanart=self.get_alternative_fanart(context), location=location)
-                result.append(search_history_item)
-
-            if search_history.is_empty():
-                #  context.execute('RunPlugin(%s)' % context.create_uri([constants.paths.SEARCH, 'input']))
-                pass
-
-            return result, {self.RESULT_CACHE_TO_DISC: False}
+        return result, {self.RESULT_CACHE_TO_DISC: False}
 
     def handle_exception(self, context, exception_to_handle):
         return True

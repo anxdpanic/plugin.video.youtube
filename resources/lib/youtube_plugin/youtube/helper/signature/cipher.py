@@ -8,9 +8,10 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import re
 
-from ....kodion.utils import FunctionCache
 from .json_script_engine import JsonScriptEngine
 
 
@@ -24,15 +25,18 @@ class Cipher(object):
 
     def get_signature(self, signature):
         function_cache = self._context.get_function_cache()
-        json_script = function_cache.get_cached_only(self._load_javascript, self._javascript)
+        json_script = function_cache.get_cached_only(self._load_javascript,
+                                                     self._javascript)
         if not json_script:
-            json_script = function_cache.get(FunctionCache.ONE_DAY, self._load_javascript, self._javascript)
+            json_script = function_cache.get(self._load_javascript,
+                                             function_cache.ONE_DAY,
+                                             self._javascript)
 
         if json_script:
             json_script_engine = JsonScriptEngine(json_script)
             return json_script_engine.execute(signature)
 
-        return u''
+        return ''
 
     def _load_javascript(self, javascript):
         function_name = self._find_signature_function_name(javascript)
@@ -121,7 +125,7 @@ class Cipher(object):
             r'yt\.akamaized\.net/\)\s*\|\|\s*.*?\s*[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?:encodeURIComponent\s*\()?\s*(?P<sig>[a-zA-Z0-9$]+)\(',
             r'\b[cs]\s*&&\s*[adf]\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
             r'\b[a-zA-Z0-9]+\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*(?P<sig>[a-zA-Z0-9$]+)\(',
-             r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\('
+            r'\bc\s*&&\s*[a-zA-Z0-9]+\.set\([^,]+\s*,\s*\([^)]*\)\s*\(\s*(?P<sig>[a-zA-Z0-9$]+)\('
         )
 
         for pattern in match_patterns:
@@ -160,7 +164,7 @@ class Cipher(object):
         _object_body = _object_body.split('},')
         for _function in _object_body:
             if not _function.endswith('}'):
-                _function = ''.join([_function, '}'])
+                _function = ''.join((_function, '}'))
             _function = _function.strip()
 
             match = re.match(r'(?P<name>[^:]*):function\((?P<parameter>[^)]*)\){(?P<body>[^}]+)}', _function)

@@ -8,6 +8,8 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 from ... import kodion
 
 
@@ -53,7 +55,7 @@ def process_old_action(provider, context, re_match):
     """
     if context.get_system_version().get_version() >= (15, 0):
         message = u"You're using old YouTube-Plugin calls - please review the log for updated end points starting with Isengard"
-        context.get_ui().show_notification(message, time_milliseconds=15000)
+        context.get_ui().show_notification(message, time_ms=15000)
     """
 
     action = context.get_param('action', '')

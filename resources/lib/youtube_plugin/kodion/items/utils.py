@@ -8,73 +8,62 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
+from datetime import date, datetime
 
-from .video_item import VideoItem
-from .directory_item import DirectoryItem
 from .audio_item import AudioItem
+from .directory_item import DirectoryItem
 from .image_item import ImageItem
+from .video_item import VideoItem
+from ..compatibility import string_type
+from ..utils.datetime_parser import strptime
 
 
-def from_json(json_data):
+_ITEM_TYPES = {
+    'AudioItem': AudioItem,
+    'DirectoryItem': DirectoryItem,
+    'ImageItem': ImageItem,
+    'VideoItem': VideoItem,
+}
+
+
+def _decoder(obj):
+    date_in_isoformat = obj.get('__isoformat__')
+    if date_in_isoformat:
+        if obj['__class__'] == 'date':
+            return date.fromisoformat(date_in_isoformat)
+        return datetime.fromisoformat(date_in_isoformat)
+
+    format_string = obj.get('__format_string__')
+    if format_string:
+        value = obj['__value__']
+        value = strptime(value, format_string)
+        if obj['__class__'] == 'date':
+            return value.date()
+        return value
+
+    return obj
+
+
+def from_json(json_data, *_args):
     """
-    Creates a instance of the given json dump or dict.
+    Creates an instance of the given json dump or dict.
     :param json_data:
     :return:
     """
+    if isinstance(json_data, string_type):
+        json_data = json.loads(json_data, object_hook=_decoder)
 
-    def _from_json(_json_data):
-        mapping = {'VideoItem': lambda: VideoItem(u'', u''),
-                   'DirectoryItem': lambda: DirectoryItem(u'', u''),
-                   'AudioItem': lambda: AudioItem(u'', u''),
-                   'ImageItem': lambda: ImageItem(u'', u'')}
+    item_type = json_data.get('type')
+    if not item_type or item_type not in _ITEM_TYPES:
+        return json_data
 
-        item = None
-        item_type = _json_data.get('type', None)
-        for key in mapping:
-            if item_type == key:
-                item = mapping[key]()
-                break
+    item = _ITEM_TYPES[item_type](name='', uri='')
 
-        if item is None:
-            return _json_data
+    for key, value in json_data.get('data', {}).items():
+        if hasattr(item, key):
+            setattr(item, key, value)
 
-        data = _json_data.get('data', {})
-        for key in data:
-            if hasattr(item, key):
-                setattr(item, key, data[key])
-
-        return item
-
-    if isinstance(json_data, str):
-        json_data = json.loads(json_data)
-    return _from_json(json_data)
-
-
-def to_jsons(base_item):
-    return json.dumps(to_json(base_item))
-
-
-def to_json(base_item):
-    """
-    Convert the given @base_item to json
-    :param base_item:
-    :return: json string
-    """
-
-    def _to_json(obj):
-        if isinstance(obj, dict):
-            return obj.__dict__
-
-        mapping = {VideoItem: 'VideoItem',
-                   DirectoryItem: 'DirectoryItem',
-                   AudioItem: 'AudioItem',
-                   ImageItem: 'ImageItem'}
-
-        for key in mapping:
-            if isinstance(obj, key):
-                return {'type': mapping[key], 'data': obj.__dict__}
-
-        return obj.__dict__
-
-    return _to_json(base_item)
+    return item

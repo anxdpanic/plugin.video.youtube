@@ -1,6 +1,70 @@
-6.8.18
+7.0.2.2
+[fix] Fix Matrix compatibility
+[fix] Update unofficial patch
+
+7.0.2.1
+[fix] fix Matrix InputStream.Adaptive dependency version
+
+7.0.2
+[new] quality and stream feature selection
+[new] enable HLS live streams
+[new] stream and language labelling
+[chg] separately enable local/remote history
+[chg] restore unsupported compatibility for Kodi v19 (Matrix)
+[fix] fix various playback issues |contrib: various|
+[fix] Limit host connections getting subscription feeds |contrib: cas--|
+[fix] fix handling of connection failures
+[upd] Translations updated from Kodi Weblate
+
+7.0.1
+[fix] video duration not showing in lists
+[upd] Translations updated from Kodi Weblate
+
+7.0.0
+[rem] removed support for versions of Kodi pre-Nexus v20
+[rem] removed support for python 2
+[rem] removed dependency on six
+[upd] Translations updated from Kodi Weblate
+
+6.8.25
+[fix] Nexus compatibility with InfoTagVideo |contrib: jurialmunkey|
+[chg] make httpd /api url case insensitive due to skin choice of uppercase settings text
+[chg] use listitem property for Inputstream Adaptive headers instead of url piped on Nexus+
+[upd] Translations updated from Kodi Weblate
+
+6.8.24
+[fixup] resolve playback history not being updated
+[add] add opus audio support
+[upd] use more descript reasons for failed playback
+[upd] Translations updated from Kodi Weblate
+
+6.8.23
+[revert] subscription groups/tags - causing breaking issues
+
+6.8.21
+[chg] Icons and Fanart updated |contrib: papercore-dev|
+[add] Add setting General - Hide short videos (1 minute or less)
+[add] Add support for /shorts/video_id format links |contrib: jmbreuer|
+[add] Add Fanart to Subscriptions
+[add] Access to Saved Playlists
+[fix] Display of channel fanart
+[fix] Misc missing fanart
+[lang] translation updates from Weblate
+
+6.8.20
+[fix] Fix to_str |contrib: RNavega|
+[fix] Fix playback buffering |contrib: RNavega|
+[fix] Subtitle language names
+[lang] translation updates from Weblate
+
+6.8.19
 [fix] /uri2addon/ endpoint for playback of youtube.com urls
 [fix] Don't assume addon is installed in home directory |contrib: jfly|
+[lang] translation updates from Weblate
+
+6.8.18
+[fix] Fix to_str |contrib: RNavega|
+[fix] Fix playback buffering |contrib: RNavega|
 [lang] translation updates from Weblate
 
 6.8.17

@@ -8,46 +8,54 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+from __future__ import absolute_import, division, unicode_literals
+
 import json
 
-import xbmc
+from ..compatibility import string_type, xbmc
 
 
 class SystemVersion(object):
-    def __init__(self, version, releasename, appname):
-        if not isinstance(version, tuple):
-            self._version = (0, 0, 0, 0)
-        else:
-            self._version = version
+    def __init__(self, version=None, releasename=None, appname=None):
+        self._version = (
+            version if version and isinstance(version, tuple)
+            else (0, 0, 0, 0)
+        )
 
-        if not releasename or not isinstance(releasename, str):
-            self._releasename = 'UNKNOWN'
-        else:
-            self._releasename = releasename
+        self._releasename = (
+            releasename if releasename and isinstance(releasename, string_type)
+            else 'UNKNOWN'
+        )
 
-        if not appname or not isinstance(appname, str):
-            self._appname = 'UNKNOWN'
-        else:
-            self._appname = appname
+        self._appname = (
+            appname if appname and isinstance(appname, string_type)
+            else 'UNKNOWN'
+        )
 
         try:
-            json_query = xbmc.executeJSONRPC('{ "jsonrpc": "2.0", "method": "Application.GetProperties", '
-                                             '"params": {"properties": ["version", "name"]}, "id": 1 }')
+            json_query = xbmc.executeJSONRPC(json.dumps({
+                'jsonrpc': '2.0',
+                'method': 'Application.GetProperties',
+                'params': {
+                    'properties': ['version', 'name']
+                },
+                'id': 1,
+            }))
             json_query = str(json_query)
             json_query = json.loads(json_query)
 
             version_installed = json_query['result']['version']
-            self._version = (version_installed.get('major', 1), version_installed.get('minor', 0))
+            self._version = (version_installed.get('major', 1),
+                             version_installed.get('minor', 0))
             self._appname = json_query['result']['name']
         except:
             self._version = (1, 0)  # Frodo
             self._appname = 'Unknown Application'
 
-        self._releasename = 'Unknown Release'
         if self._version >= (21, 0):
-            self._releasename = 'O*****'
+            self._releasename = 'Omega'
         elif self._version >= (20, 0):
-            self._releasename = 'N*****'
+            self._releasename = 'Nexus'
         elif self._version >= (19, 0):
             self._releasename = 'Matrix'
         elif self._version >= (18, 0):
@@ -64,9 +72,15 @@ class SystemVersion(object):
             self._releasename = 'Gotham'
         elif self._version >= (12, 0):
             self._releasename = 'Frodo'
+        else:
+            self._releasename = 'Unknown Release'
 
     def __str__(self):
-        obj_str = "%s (%s-%s)" % (self._releasename, self._appname, '.'.join(map(str, self._version)))
+        obj_str = '{releasename} ({appname}-{version[0]}.{version[1]})'.format(
+            releasename=self._releasename,
+            appname=self._appname,
+            version=self._version
+        )
         return obj_str
 
     def get_release_name(self):
@@ -77,3 +91,9 @@ class SystemVersion(object):
 
     def get_app_name(self):
         return self._appname
+
+    def compatible(self, *version):
+        return self._version >= version
+
+
+current_system_version = SystemVersion()

@@ -18,12 +18,19 @@ from .register_provider_path import RegisterProviderPath
 from .abstract_provider import AbstractProvider
 
 # import specialized implementation into the kodion namespace
-from .impl import Context
-
-from .constants import *
+from .context import Context
 
 from . import logger
 
-__all__ = ['KodionException', 'RegisterProviderPath', 'AbstractProvider', 'Context', 'utils', 'json_store', 'logger']
+
+__all__ = (
+    'AbstractProvider',
+    'Context',
+    'KodionException',
+    'RegisterProviderPath',
+    'json_store',
+    'logger',
+    'utils',
+)
 
 __version__ = '1.5.4'
