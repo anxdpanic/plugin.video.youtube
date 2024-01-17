@@ -1578,10 +1578,12 @@ class YouTube(LoginClient):
         try:
             json_data = response.json()
             if 'error' in json_data:
+                kwargs.setdefault('pass_data', True)
                 raise YouTubeException('"error" in response JSON data',
                                        json_data=json_data,
                                        **kwargs)
         except ValueError as exc:
+            kwargs.setdefault('raise_exc', True)
             raise InvalidJSON(exc, **kwargs)
         response.raise_for_status()
         return json_data
@@ -1589,8 +1591,14 @@ class YouTube(LoginClient):
     def _error_hook(self, **kwargs):
         exc = kwargs['exc']
         json_data = getattr(exc, 'json_data', None)
-        data = getattr(exc, 'pass_data', None) and json_data
-        exception = getattr(exc, 'raise_exc', None) and YouTubeException
+        if getattr(exc, 'pass_data', False):
+            data = json_data
+        else:
+            data = None
+        if getattr(exc, 'raise_exc', False):
+            exception = YouTubeException
+        else:
+            exception = None
 
         if not json_data or 'error' not in json_data:
             return None, None, None, data, None, exception
@@ -1599,8 +1607,7 @@ class YouTube(LoginClient):
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
         message = strip_html_from_text(details.get('message', 'Unknown error'))
 
-        notify = getattr(exc, 'notify', True)
-        if notify:
+        if getattr(exc, 'notify', True):
             ok_dialog = False
             timeout = 5000
             if reason == 'accessNotConfigured':
