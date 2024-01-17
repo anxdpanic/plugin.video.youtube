@@ -173,10 +173,15 @@ class Provider(AbstractProvider):
                 access_tokens = access_manager.get_dev_access_token(dev_id)
                 if access_tokens:
                     access_tokens = access_tokens.split('|')
+                else:
+                    access_tokens = []
 
                 refresh_tokens = access_manager.get_dev_refresh_token(dev_id)
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
+                else:
+                    refresh_tokens = []
+
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
         else:
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
@@ -190,10 +195,15 @@ class Provider(AbstractProvider):
                 access_tokens = access_manager.get_access_token()
                 if access_tokens:
                     access_tokens = access_tokens.split('|')
+                else:
+                    access_tokens = []
 
                 refresh_tokens = access_manager.get_refresh_token()
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
+                else:
+                    refresh_tokens = []
+
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
 
         client = YouTube(context=context,
@@ -220,7 +230,6 @@ class Provider(AbstractProvider):
                         access_manager.update_access_token(access_token, expires_in)
                 except (InvalidGrant, LoginException) as exc:
                     self.handle_exception(context, exc)
-                    access_tokens = ['', '']
                     # reset access_token
                     if isinstance(exc, InvalidGrant):
                         if dev_id:
@@ -236,13 +245,14 @@ class Provider(AbstractProvider):
 
             # in debug log the login status
             self._logged_in = len(access_tokens) == 2
-            context.log_debug('User is logged in' if self._logged_in else
-                              'User is not logged in')
-
-            if not access_tokens:
-                access_tokens = ['', '']
-            client.set_access_token(access_token=access_tokens[1])
-            client.set_access_token_tv(access_token_tv=access_tokens[0])
+            if self._logged_in:
+                context.log_debug('User is logged in')
+                client.set_access_token_tv(access_token_tv=access_tokens[0])
+                client.set_access_token(access_token=access_tokens[1])
+            else:
+                context.log_debug('User is not logged in')
+                client.set_access_token_tv(access_token_tv='')
+                client.set_access_token(access_token='')
 
         self._client = client
         return self._client
