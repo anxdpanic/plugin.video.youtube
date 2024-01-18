@@ -834,5 +834,5 @@ def filter_short_videos(items):
     return [
         item
         for item in items
-        if item.playable and not 0 <= item.get_duration() <= 60
+        if not item.playable or not 0 <= item.get_duration() <= 60
     ]
