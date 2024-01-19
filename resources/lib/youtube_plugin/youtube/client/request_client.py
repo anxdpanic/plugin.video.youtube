@@ -258,13 +258,21 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self, exc_type=None):
+    def __init__(self, language='en_US', region='US', exc_type=None, **_kwargs):
+        common_client = self.CLIENTS['_common']['json']['context']['client']
+        # the default language is always en_US (like YouTube on the WEB)
+        if language:
+            language = language.replace('-', '_')
+        self._language = common_client['hl'] = language
+        self._region = common_client['gl'] = region
+
         if isinstance(exc_type, tuple):
             exc_type = (YouTubeException,) + exc_type
         elif exc_type:
             exc_type = (YouTubeException, exc_type)
         else:
             exc_type = (YouTubeException,)
+
         super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
 
     @classmethod

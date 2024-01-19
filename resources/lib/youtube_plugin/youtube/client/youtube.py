@@ -52,6 +52,14 @@ class YouTube(LoginClient):
         },
         '_common': {
             '_access_token': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'gl': None,
+                        'hl': None,
+                    },
+                },
+            },
             'headers': {
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
@@ -72,8 +80,6 @@ class YouTube(LoginClient):
 
     def __init__(self, context, **kwargs):
         self._context = context
-        if not kwargs.get('config'):
-            kwargs['config'] = {}
         if 'items_per_page' in kwargs:
             self._max_results = kwargs.pop('items_per_page')
 
@@ -1651,7 +1657,7 @@ class YouTube(LoginClient):
         }
         if headers:
             client_data['headers'] = headers
-        if post_data:
+        if post_data and method == 'POST':
             client_data['json'] = post_data
         if params:
             client_data['params'] = params
@@ -1665,6 +1671,9 @@ class YouTube(LoginClient):
 
         if 'key' in client['params'] and not client['params']['key']:
             client['params']['key'] = self._config_tv['key']
+
+        if method != 'POST' and 'json' in client:
+            del client['json']
 
         params = client.get('params')
         if params:

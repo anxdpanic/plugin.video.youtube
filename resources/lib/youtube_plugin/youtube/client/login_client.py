@@ -64,24 +64,16 @@ class LoginClient(YouTubeRequestClient):
 
     def __init__(self,
                  config=None,
-                 language='en_US',
-                 region='',
                  access_token='',
-                 access_token_tv=''):
+                 access_token_tv='',
+                 **kwargs):
         self._config = self.CONFIGS['main'] if config is None else config
         self._config_tv = self.CONFIGS['youtube-tv']
-        # the default language is always en_US (like YouTube on the WEB)
-        if not language:
-            language = 'en_US'
-        else:
-            language = language.replace('-', '_')
-        self._language = language
-        self._region = region
 
         self._access_token = access_token
         self._access_token_tv = access_token_tv
 
-        super(LoginClient, self).__init__(exc_type=LoginException)
+        super(LoginClient, self).__init__(exc_type=LoginException, **kwargs)
 
     @staticmethod
     def _response_hook(**kwargs):

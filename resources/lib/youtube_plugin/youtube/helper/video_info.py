@@ -588,22 +588,18 @@ class VideoInfo(YouTubeRequestClient):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
-    def __init__(self, context, access_token='', language='en-US'):
-        settings = context.get_settings()
-
+    def __init__(self, context, access_token='', **kwargs):
         self.video_id = None
         self._context = context
         self._data_cache = self._context.get_data_cache()
-        self._language = (settings.get_string('youtube.language', language)
-                          .replace('-', '_'))
-        self._language_base = self._language[0:2]
+        self._language_base = kwargs.get('language', 'en_US')[0:2]
         self._access_token = access_token
         self._player_js = None
         self._calculate_n = True
         self._cipher = None
 
         self._selected_client = None
-        client_selection = settings.client_selection()
+        client_selection = context.get_settings().client_selection()
 
         # Default client selection uses the Android or iOS client as the first
         # option to ensure that the age gate setting is enforced, regardless of
@@ -642,12 +638,7 @@ class VideoInfo(YouTubeRequestClient):
                 'android_embedded',
             )
 
-        self.CLIENTS['_common']['json']['context']['client'] = {
-            'hl': self._language,
-            'gl': settings.get_string('youtube.region', 'US'),
-        }
-
-        super(VideoInfo, self).__init__()
+        super(VideoInfo, self).__init__(**kwargs)
 
     @staticmethod
     def _generate_cpn():
