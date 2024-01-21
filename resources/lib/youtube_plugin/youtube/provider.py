@@ -21,7 +21,6 @@ from .helper import (
     UrlToItemConverter,
     v3,
     yt_login,
-    yt_old_actions,
     yt_play,
     yt_playlist,
     yt_setup_wizard,
@@ -1027,13 +1026,6 @@ class Provider(AbstractProvider):
         return True
 
     def on_root(self, context, re_match):
-        """
-        Support old YouTube url calls, but also log a deprecation warnings.
-        """
-        old_action = context.get_param('action')
-        if old_action:
-            return yt_old_actions.process_old_action(self, context, re_match)
-
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
