@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 
-    Copyright (C) 2018-2018 plugin.video.youtube
+    Copyright (C) 2024-present plugin.video.youtube
 
     SPDX-License-Identifier: GPL-2.0-only
     See LICENSES/GPL-2.0-only for more information.
@@ -11,13 +11,12 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 import socket
-import sys
 
-from kodion.compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
-from kodion.constants import DATA_PATH, TEMP_PATH
-from kodion.context import Context
-from kodion.network import get_client_ip_address, is_httpd_live
-from kodion.utils import rm_dir
+from .kodion.compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
+from .kodion.constants import DATA_PATH, TEMP_PATH
+from .kodion.context import Context
+from .kodion.network import get_client_ip_address, is_httpd_live
+from .kodion.utils import rm_dir
 
 
 def _config_actions(action, *_args):
@@ -271,22 +270,36 @@ def _user_actions(action, params):
     return True
 
 
-if __name__ == '__main__':
-    args = sys.argv[1:]
+def run(argv):
+    args = argv[1:]
     if args:
         args = args[0].split('/')
-    num_args = len(args)
-    category = args[0] if num_args else None
-    action = args[1] if num_args > 1 else None
-    params = args[2] if num_args > 2 else None
 
-    if not category:
+    num_args = len(args)
+    if num_args > 2:
+        category, action, params = args[:3]
+    elif num_args == 2:
+        category, action = args
+        params = None
+    elif num_args:
+        category = args[0]
+        action = params = None
+    else:
         xbmcaddon.Addon().openSettings()
-    elif action == 'refresh':
+        return
+
+    if action == 'refresh':
         xbmc.executebuiltin('Container.Refresh')
-    elif category == 'config':
+        return
+
+    if category == 'config':
         _config_actions(action, params)
-    elif category == 'maintenance':
+        return
+
+    if category == 'maintenance':
         _maintenance_actions(action, params)
-    elif category == 'users':
+        return
+
+    if category == 'users':
         _user_actions(action, params)
+        return
