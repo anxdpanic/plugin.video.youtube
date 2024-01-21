@@ -1679,11 +1679,10 @@ class YouTube(LoginClient):
         if params:
             log_params = deepcopy(params)
             if 'location' in log_params:
-                log_params['location'] = 'xx.xxxx,xx.xxxx'
+                log_params['location'] = '|xx.xxxx,xx.xxxx|'
             if 'key' in log_params:
-                key = list(log_params['key'])
-                key[5:-5] = '...'
-                log_params['key'] = ''.join(key)
+                key = log_params['key']
+                log_params['key'] = '...'.join((key[:3], key[-3:]))
         else:
             log_params = None
 
@@ -1691,7 +1690,7 @@ class YouTube(LoginClient):
         if headers:
             log_headers = deepcopy(headers)
             if 'Authorization' in log_headers:
-                log_headers['Authorization'] = 'logged in'
+                log_headers['Authorization'] = '|logged in|'
         else:
             log_headers = None
 

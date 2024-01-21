@@ -156,8 +156,8 @@ class LoginClient(YouTubeRequestClient):
         config_type = self._get_config_type(client_id, client_secret)
         client = ''.join([
             '(config_type: |', config_type,
-            '| client_id: |', client_id[:5], '...', client_id[-5:],
-            '| client_secret: |', client_secret[:5], '...', client_secret[-5:],
+            '| client_id: |', client_id[:3], '...', client_id[-5:],
+            '| client_secret: |', client_secret[:3], '...', client_secret[-3:],
             '|)'
         ])
         log_debug('Refresh token for {0}'.format(client))
@@ -205,8 +205,8 @@ class LoginClient(YouTubeRequestClient):
         config_type = self._get_config_type(client_id, client_secret)
         client = ''.join([
             '(config_type: |', config_type,
-            '| client_id: |', client_id[:5], '...', client_id[-5:],
-            '| client_secret: |', client_secret[:5], '...', client_secret[-5:],
+            '| client_id: |', client_id[:3], '...', client_id[-5:],
+            '| client_secret: |', client_secret[:3], '...', client_secret[-3:],
             '|)'
         ])
         log_debug('Requesting access token for {0}'.format(client))
