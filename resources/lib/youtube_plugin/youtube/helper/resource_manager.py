@@ -29,10 +29,6 @@ class ResourceManager(object):
         for i in range(0, len(input_list), n):
             yield input_list[i:i + n]
 
-    def clear(self):
-        self._func_cache.clear()
-        self._data_cache.clear()
-
     def get_channels(self, ids, defer_cache=False):
         updated = []
         for channel_id in ids:

@@ -215,9 +215,6 @@ class UrlResolver(object):
             'youtube_resolver',
         ]
 
-    def clear(self):
-        self._cache.clear()
-
     def _resolve(self, url):
         # try one of the resolvers
         resolved_url = url

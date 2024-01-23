@@ -199,8 +199,6 @@ def _user_actions(action, params):
             localize('user.changed') % access_manager.get_username(user),
             localize('user.switch')
         )
-        context.get_data_cache().clear()
-        context.get_function_cache().clear()
         if context.get_param('refresh') is not False:
             ui.refresh_container()
 

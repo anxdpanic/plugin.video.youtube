@@ -135,9 +135,9 @@ class Provider(AbstractProvider):
             origin = ADDON_ID
 
         if api_last_origin != origin:
-            context.log_debug('API key origin changed, clearing cache. |%s|' % origin)
+            context.log_debug('API key origin changed: |{old}| to |{new}|'
+                              .format(old=api_last_origin, new=origin))
             access_manager.set_last_origin(origin)
-            self.get_resource_manager(context).clear()
 
         if dev_id:
             access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
@@ -239,8 +239,6 @@ class Provider(AbstractProvider):
                         access_manager.update_dev_access_token(dev_id, '')
                     else:
                         access_manager.update_access_token('')
-                    # we clear the cache, so none cached data of an old account will be displayed.
-                    self.get_resource_manager(context).clear()
 
             # in debug log the login status
             self._logged_in = len(access_tokens) == 2
@@ -869,7 +867,6 @@ class Provider(AbstractProvider):
             context.get_name(), localize('reset.access_manager.confirm')
         )):
             try:
-                context.get_function_cache().clear()
                 access_manager = context.get_access_manager()
                 client = self.get_client(context)
                 if access_manager.has_refresh_token():
@@ -1050,11 +1047,6 @@ class Provider(AbstractProvider):
 
         if logged_in and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
-
-            # clear cache
-            cache = context.get_data_cache()
-            cache.set_item('my-subscriptions-items', [])
-
             my_subscriptions_item = DirectoryItem(
                 ui.bold(localize('my_subscriptions')),
                 create_uri(('special', 'new_uploaded_videos_tv')),
