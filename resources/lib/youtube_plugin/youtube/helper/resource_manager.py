@@ -16,7 +16,7 @@ class ResourceManager(object):
         self._context = context
         self._client = client
         self._data_cache = context.get_data_cache()
-        self._func_cache = context.get_function_cache()
+        self._function_cache = context.get_function_cache()
         self._show_fanart = context.get_settings().get_bool(
             'youtube.channel.fanart.show', True
         )
@@ -30,6 +30,7 @@ class ResourceManager(object):
             yield input_list[i:i + n]
 
     def get_channels(self, ids, defer_cache=False):
+        refresh = self._context.get_param('refresh')
         updated = []
         for channel_id in ids:
             if not channel_id:
@@ -39,9 +40,12 @@ class ResourceManager(object):
                 updated.append(channel_id)
                 continue
 
-            data = self._func_cache.get(self._client.get_channel_by_username,
-                                        self._func_cache.ONE_DAY,
-                                        channel_id)
+            data = self._function_cache.run(
+                self._client.get_channel_by_username,
+                self._function_cache.ONE_DAY,
+                _refresh=refresh,
+                username=channel_id
+            )
             items = data.get('items', [{'id': 'mine'}])
 
             try:
@@ -52,7 +56,10 @@ class ResourceManager(object):
                                         .format(data=data))
 
         ids = updated
-        result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
+        if refresh:
+            result = {}
+        else:
+            result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
                      if id_ not in result or result[id_].get('partial')]
 
@@ -115,7 +122,11 @@ class ResourceManager(object):
 
     def get_playlists(self, ids, defer_cache=False):
         ids = tuple(ids)
-        result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
+        refresh = self._context.get_param('refresh')
+        if refresh:
+            result = {}
+        else:
+            result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
                      if id_ not in result or result[id_].get('partial')]
 
@@ -158,6 +169,8 @@ class ResourceManager(object):
         if not ids and not batch_id:
             return None
 
+        refresh = self._context.get_param('refresh')
+
         if batch_id:
             ids = [batch_id[0]]
             page_token = batch_id[1]
@@ -174,8 +187,14 @@ class ResourceManager(object):
             while 1:
                 batch_id = (playlist_id, page_token)
                 batch_ids.append(batch_id)
-                batch = self._data_cache.get_item(batch_id,
-                                                  self._data_cache.ONE_HOUR)
+                if refresh:
+                    batch = None
+                else:
+                    batch = self._data_cache.get_item(
+                        batch_id,
+                        self._data_cache.ONE_HOUR if page_token
+                        else self._data_cache.ONE_MINUTE * 5
+                    )
                 if not batch:
                     to_update.append(batch_id)
                     break
@@ -246,7 +265,11 @@ class ResourceManager(object):
                    suppress_errors=False,
                    defer_cache=False):
         ids = tuple(ids)
-        result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
+        refresh = self._context.get_param('refresh')
+        if refresh:
+            result = {}
+        else:
+            result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
                      if id_ not in result or result[id_].get('partial')]
 

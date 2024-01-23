@@ -22,13 +22,6 @@ def run():
     context = Context()
     context.log_debug('YouTube service initialization...')
     context.get_ui().clear_property('abort_requested')
-    # wipe function cache on updates/restarts to fix cipher related issues on
-    # update, valid for one day otherwise
-    try:
-        context.get_function_cache().clear()
-    except Exception:
-        # prevent service failing due to cache related issues
-        pass
 
     monitor = ServiceMonitor()
     player = PlayerMonitor(provider=Provider(), context=context)

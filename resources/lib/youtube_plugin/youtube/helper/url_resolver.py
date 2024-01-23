@@ -205,7 +205,7 @@ class CommonResolver(AbstractResolver):
 class UrlResolver(object):
     def __init__(self, context):
         self._context = context
-        self._cache = context.get_function_cache()
+        self._function_cache = context.get_function_cache()
         self._resolver_map = {
             'common_resolver': CommonResolver(context),
             'youtube_resolver': YouTubeResolver(context),
@@ -236,7 +236,12 @@ class UrlResolver(object):
         return resolved_url
 
     def resolve(self, url):
-        resolved_url = self._cache.get(self._resolve, self._cache.ONE_DAY, url)
+        resolved_url = self._function_cache.run(
+            self._resolve,
+            self._function_cache.ONE_DAY,
+            _refresh=self._context.get_param('refresh'),
+            url=url
+        )
         if not resolved_url or resolved_url == '/':
             return url
 

@@ -391,6 +391,7 @@ class Provider(AbstractProvider):
         localize = context.localize
         create_uri = context.create_uri
         function_cache = context.get_function_cache()
+        params = context.get_params()
         ui = context.get_ui()
 
         method = re_match.group('method')
@@ -421,9 +422,10 @@ class Provider(AbstractProvider):
         if method == 'user' or channel_id == 'mine':
             context.log_debug('Trying to get channel id for user "%s"' % channel_id)
 
-            json_data = function_cache.get(client.get_channel_by_username,
+            json_data = function_cache.run(client.get_channel_by_username,
                                            function_cache.ONE_DAY,
-                                           channel_id)
+                                           _refresh=params.get('refresh'),
+                                           username=channel_id)
             if not json_data:
                 return False
 
@@ -441,7 +443,6 @@ class Provider(AbstractProvider):
 
         channel_fanarts = resource_manager.get_fanarts((channel_id, ))
 
-        params = context.get_params()
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
         incognito = params.get('incognito')
@@ -491,9 +492,10 @@ class Provider(AbstractProvider):
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
         if upload_playlist:
-            json_data = function_cache.get(client.get_playlist_items,
+            json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
-                                           upload_playlist,
+                                           _refresh=params.get('refresh'),
+                                           playlist_id=upload_playlist,
                                            page_token=page_token)
             if not json_data:
                 return result
@@ -787,8 +789,9 @@ class Provider(AbstractProvider):
                 result.append(live_item)
 
         function_cache = context.get_function_cache()
-        json_data = function_cache.get(self.get_client(context).search,
+        json_data = function_cache.run(self.get_client(context).search,
                                        function_cache.ONE_MINUTE * 10,
+                                       _refresh=params.get('refresh'),
                                        q=search_text,
                                        search_type=search_type,
                                        event_type=event_type,
