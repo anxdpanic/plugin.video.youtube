@@ -47,9 +47,9 @@ class XbmcRunner(AbstractProviderRunner):
                 items = ui.get_property('playlist')
                 if items:
                     ui.clear_property('playlist')
-                    context.log_error('Multiple busy dialogs active - playlist'
-                                      ' reloading to prevent Kodi crashing')
                     playlist.add_items(items, loads=True)
+                    context.log_error('Multiple busy dialogs active - '
+                                      'playlist reloaded to prevent Kodi crash')
                 return False
 
         if settings.is_setup_wizard_enabled():

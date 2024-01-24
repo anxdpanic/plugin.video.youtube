@@ -243,7 +243,7 @@ class ResourceManager(object):
         return result
 
     def get_related_playlists(self, channel_id, defer_cache=False):
-        result = self.get_channels([channel_id], defer_cache=defer_cache)
+        result = self.get_channels((channel_id,), defer_cache=defer_cache)
 
         # transform
         item = None

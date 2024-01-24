@@ -154,12 +154,12 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'refresh_token'}
 
         config_type = self._get_config_type(client_id, client_secret)
-        client = ''.join([
+        client = ''.join((
             '(config_type: |', config_type,
             '| client_id: |', client_id[:3], '...', client_id[-5:],
             '| client_secret: |', client_secret[:3], '...', client_secret[-3:],
             '|)'
-        ])
+        ))
         log_debug('Refresh token for {0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
@@ -203,12 +203,12 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
         config_type = self._get_config_type(client_id, client_secret)
-        client = ''.join([
+        client = ''.join((
             '(config_type: |', config_type,
             '| client_id: |', client_id[:3], '...', client_id[-5:],
             '| client_secret: |', client_secret[:3], '...', client_secret[-3:],
             '|)'
-        ])
+        ))
         log_debug('Requesting access token for {0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
@@ -241,10 +241,10 @@ class LoginClient(YouTubeRequestClient):
                      'scope': 'https://www.googleapis.com/auth/youtube'}
 
         config_type = self._get_config_type(client_id)
-        client = ''.join([
+        client = ''.join((
             '(config_type: |', config_type, '|',
             ' client_id: |', client_id[:5], '...|)',
-        ])
+        ))
         log_debug('Requesting device and user code for {0}'.format(client))
 
         json_data = self.request(self.DEVICE_CODE_URL,

@@ -24,7 +24,7 @@ class WatchLaterItem(DirectoryItem):
 
         super(WatchLaterItem, self).__init__(name,
                                              context.create_uri(
-                                                 [paths.WATCH_LATER, 'list']
+                                                 (paths.WATCH_LATER, 'list',),
                                              ),
                                              image=image)
 

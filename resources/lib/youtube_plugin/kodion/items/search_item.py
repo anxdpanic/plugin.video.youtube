@@ -33,8 +33,8 @@ class SearchItem(DirectoryItem):
 
         super(SearchItem, self).__init__(name,
                                          context.create_uri(
-                                             [paths.SEARCH, 'list'],
-                                             params=params
+                                             (paths.SEARCH, 'list',),
+                                             params=params,
                                          ),
                                          image=image)
 

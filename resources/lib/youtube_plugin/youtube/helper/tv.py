@@ -41,7 +41,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
                 or (not black_list and channel in filter_list)):
             video_id = item['id']
             item_params['video_id'] = video_id
-            item_uri = context.create_uri(['play'], item_params)
+            item_uri = context.create_uri(('play',), item_params)
             video_item = VideoItem(item['title'], uri=item_uri)
             if incognito:
                 video_item.set_play_count(0)
@@ -89,7 +89,7 @@ def tv_videos_to_items(provider, context, json_data):
     for item in items:
         video_id = item['id']
         item_params['video_id'] = video_id
-        item_uri = context.create_uri(['play'], item_params)
+        item_uri = context.create_uri(('play',), item_params)
         video_item = VideoItem(item['title'], uri=item_uri)
         if incognito:
             video_item.set_play_count(0)
@@ -144,12 +144,12 @@ def saved_playlists_to_items(provider, context, json_data):
 
         if channel_id:
             item_uri = context.create_uri(
-                ['channel', channel_id, 'playlist', playlist_id],
+                ('channel', channel_id, 'playlist', playlist_id,),
                 item_params,
             )
         else:
             item_uri = context.create_uri(
-                ['playlist', playlist_id],
+                ('playlist', playlist_id),
                 item_params,
             )
 

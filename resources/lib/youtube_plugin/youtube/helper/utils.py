@@ -607,8 +607,8 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-            # provide 'remove' for videos in my playlists
-            # we support all playlist except 'Watch History'
+        # provide 'remove' for videos in my playlists
+        # we support all playlist except 'Watch History'
         if (logged_in and video_id in playlist_item_id_dict and playlist_id
                 and playlist_channel_id == 'mine'
                 and playlist_id.strip().lower() not in ('hl', 'wl')):
@@ -620,7 +620,6 @@ def update_video_infos(provider, context, video_id_dict,
                     context, playlist_id, video_id, video_item.get_name()
                 )
             )
-
 
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and

@@ -332,8 +332,8 @@ class Provider(AbstractProvider):
             uploads_item = DirectoryItem(
                 context.get_ui().bold(context.localize('uploads')),
                 context.create_uri(
-                    ['channel', channel_id, 'playlist', uploads_playlist],
-                    new_params
+                    ('channel', channel_id, 'playlist', uploads_playlist),
+                    new_params,
                 ),
                 image='{media}/playlist.png',
             )
@@ -464,7 +464,10 @@ class Provider(AbstractProvider):
             if not hide_playlists:
                 playlists_item = DirectoryItem(
                     ui.bold(localize('playlists')),
-                    create_uri(['channel', channel_id, 'playlists'], new_params),
+                    create_uri(
+                        ('channel', channel_id, 'playlists'),
+                        new_params,
+                    ),
                     image='{media}/playlist.png',
                     fanart=channel_fanarts.get(channel_id),
                 )
@@ -484,7 +487,7 @@ class Provider(AbstractProvider):
             if not hide_live:
                 live_item = DirectoryItem(
                     ui.bold(localize('live')),
-                    create_uri(['channel', search_live_id, 'live'], new_params),
+                    create_uri(('channel', search_live_id, 'live'), new_params),
                     image='{media}/live.png',
                 )
                 result.append(live_item)
@@ -527,8 +530,8 @@ class Provider(AbstractProvider):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
                 create_uri(
-                    ['special', 'completed_live'],
-                    params={'location': True}
+                    ('special', 'completed_live'),
+                    params={'location': True},
                 ),
                 image='{media}/live.png',
             )
@@ -539,8 +542,8 @@ class Provider(AbstractProvider):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
                 create_uri(
-                    ['special', 'upcoming_live'],
-                    params={'location': True}
+                    ('special', 'upcoming_live'),
+                    params={'location': True},
                 ),
                 image='{media}/live.png',
             )
@@ -550,8 +553,8 @@ class Provider(AbstractProvider):
         live_events_item = DirectoryItem(
             localize('live'),
             create_uri(
-                ['special', 'live'],
-                params={'location': True}
+                ('special', 'live'),
+                params={'location': True},
             ),
             image='{media}/live.png',
         )
@@ -636,7 +639,7 @@ class Provider(AbstractProvider):
 
             if builtin:
                 context.execute(builtin.format(
-                    context.create_uri(['play'], params)
+                    context.create_uri(('play',), params)
                 ))
                 return False
             return yt_play.play_video(self, context)
@@ -759,7 +762,7 @@ class Provider(AbstractProvider):
                 channel_params = dict(params, search_type='channel')
                 channel_item = DirectoryItem(
                     context.get_ui().bold(context.localize('channels')),
-                    context.create_uri([context.get_path()], channel_params),
+                    context.create_uri((context.get_path(),), channel_params),
                     image='{media}/channels.png',
                 )
                 result.append(channel_item)
@@ -768,7 +771,7 @@ class Provider(AbstractProvider):
                 playlist_params = dict(params, search_type='playlist')
                 playlist_item = DirectoryItem(
                     context.get_ui().bold(context.localize('playlists')),
-                    context.create_uri([context.get_path()], playlist_params),
+                    context.create_uri((context.get_path(),), playlist_params),
                     image='{media}/playlist.png',
                 )
                 result.append(playlist_item)
@@ -781,8 +784,8 @@ class Provider(AbstractProvider):
                 live_item = DirectoryItem(
                     context.get_ui().bold(context.localize('live')),
                     context.create_uri(
-                        [context.get_path().replace('input', 'query')],
-                        live_params
+                        (context.get_path().replace('input', 'query'),),
+                        live_params,
                     ),
                     image='{media}/live.png',
                 )
@@ -1209,7 +1212,7 @@ class Provider(AbstractProvider):
             elif local_history:
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri([paths.HISTORY], params={'action': 'list'}),
+                    create_uri((paths.HISTORY,), params={'action': 'list'}),
                     image='{media}/history.png',
                 )
                 result.append(watch_history_item)

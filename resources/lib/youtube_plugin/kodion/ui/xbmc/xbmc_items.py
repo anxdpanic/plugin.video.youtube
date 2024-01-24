@@ -111,9 +111,9 @@ def video_playback_item(context, video_item, show_fanart=None):
 
     if show_fanart is None:
         show_fanart = settings.show_fanart()
-    image = video_item.get_image() or 'DefaultVideo.png'
+    image = video_item.get_image()
     list_item.setArt({
-        'icon': image,
+        'icon': image or 'DefaultVideo.png',
         'fanart': show_fanart and video_item.get_fanart() or '',
         'thumb': image,
     })
