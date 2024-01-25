@@ -329,13 +329,15 @@ class Provider(AbstractProvider):
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads_playlist = playlists.get('uploads', '')
         if uploads_playlist:
+            item_label = context.localize('uploads')
             uploads_item = DirectoryItem(
-                context.get_ui().bold(context.localize('uploads')),
+                context.get_ui().bold(item_label),
                 context.create_uri(
                     ('channel', channel_id, 'playlist', uploads_playlist),
                     new_params,
                 ),
                 image='{media}/playlist.png',
+                category_label=item_label,
             )
             result.append(uploads_item)
 
@@ -462,14 +464,16 @@ class Provider(AbstractProvider):
             hide_live = params.get('hide_live')
 
             if not hide_playlists:
+                item_label = localize('playlists')
                 playlists_item = DirectoryItem(
-                    ui.bold(localize('playlists')),
+                    ui.bold(item_label),
                     create_uri(
                         ('channel', channel_id, 'playlists'),
                         new_params,
                     ),
                     image='{media}/playlist.png',
                     fanart=channel_fanarts.get(channel_id),
+                    category_label=item_label,
                 )
                 result.append(playlists_item)
 
@@ -485,10 +489,12 @@ class Provider(AbstractProvider):
                 result.append(search_item)
 
             if not hide_live:
+                item_label = localize('live')
                 live_item = DirectoryItem(
-                    ui.bold(localize('live')),
+                    ui.bold(item_label),
                     create_uri(('channel', search_live_id, 'live'), new_params),
                     image='{media}/live.png',
+                    category_label=item_label,
                 )
                 result.append(live_item)
 
@@ -760,19 +766,23 @@ class Provider(AbstractProvider):
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
                 channel_params = dict(params, search_type='channel')
+                item_label = context.localize('channels')
                 channel_item = DirectoryItem(
-                    context.get_ui().bold(context.localize('channels')),
+                    context.get_ui().bold(item_label),
                     context.create_uri((context.get_path(),), channel_params),
                     image='{media}/channels.png',
+                    category_label=item_label,
                 )
                 result.append(channel_item)
 
             if not location:
                 playlist_params = dict(params, search_type='playlist')
+                item_label = context.localize('playlists')
                 playlist_item = DirectoryItem(
-                    context.get_ui().bold(context.localize('playlists')),
+                    context.get_ui().bold(item_label),
                     context.create_uri((context.get_path(),), playlist_params),
                     image='{media}/playlist.png',
+                    category_label=item_label,
                 )
                 result.append(playlist_item)
 
@@ -781,13 +791,15 @@ class Provider(AbstractProvider):
                 live_params = dict(params,
                                    search_type='video',
                                    event_type='live')
+                item_label = context.localize('live')
                 live_item = DirectoryItem(
-                    context.get_ui().bold(context.localize('live')),
+                    context.get_ui().bold(item_label),
                     context.create_uri(
                         (context.get_path().replace('input', 'query'),),
                         live_params,
                     ),
                     image='{media}/live.png',
+                    category_label=item_label,
                 )
                 result.append(live_item)
 
@@ -1043,20 +1055,24 @@ class Provider(AbstractProvider):
 
         # sign in
         if not logged_in and settings.get_bool('youtube.folder.sign.in.show', True):
+            item_label = localize('sign.in')
             sign_in_item = DirectoryItem(
-                ui.bold(localize('sign.in')),
+                ui.bold(item_label),
                 create_uri(('sign', 'in')),
                 image='{media}/sign_in.png',
-                action=True
+                action=True,
+                category_label=item_label,
             )
             result.append(sign_in_item)
 
         if logged_in and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
+            item_label = localize('my_subscriptions')
             my_subscriptions_item = DirectoryItem(
-                ui.bold(localize('my_subscriptions')),
+                ui.bold(item_label),
                 create_uri(('special', 'new_uploaded_videos_tv')),
                 image='{media}/new_uploads.png',
+                category_label=item_label,
             )
             result.append(my_subscriptions_item)
 
