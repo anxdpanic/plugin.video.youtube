@@ -16,7 +16,6 @@
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <news></news>
         <assets>
             <icon>resources/media/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>
