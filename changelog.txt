@@ -1,3 +1,20 @@
+## v7.0.3+beta.2
+### Changed
+- Function and data cache are now created per user
+- Video channel no longer used as studio infolabel
+- Since v7.0.3+beta.1 setting values are logged to the debug log
+  - Now sensitive details (location, API key, etc.) are masked
+- Deprecated plugin actions removed
+- Changed caching of playlists
+  - First page of playlists are only cached for 5 minutes
+  - Following pages are cached for 1 hour
+
+### Fixed
+- Fix error when opening My Subscriptions after login #555
+- Fix directory items being treated as short videos #556
+- Fix error with Setup Wizard not loading #557
+- Refresh context menu item will now actually refresh listings #558
+
 ## v7.0.3+beta.1
 ### New
 - Add display of extra video information (premieres, views, comments, likes) #18, #464, #503
