@@ -52,6 +52,10 @@ jobs:
           rm *.md
           git add .
           git commit -m "Remove Unwanted Files"
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          xmlstarlet ed -L -P -u '/addon/extension[@point="xbmc.addon.metadata"]/news' -v "${news:0:1500}" addon.xml
+          git add .
+          git commit -m "Update news"
         working-directory: ${{ github.event.repository.name }}
 
       - name: Submit to Official Repository (Nexus)
@@ -74,11 +78,17 @@ jobs:
           rm -rf .??*
           mv ../.git .
           rm *.md
+          git add .
+          git commit -m "Remove Unwanted Files"
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          xmlstarlet ed -L -P -u '/addon/extension[@point="xbmc.addon.metadata"]/news' -v "${news:0:1500}" addon.xml
+          git add .
+          git commit -m "Update news"
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -u '/addon/@version' -v "${version}+matrix.1" addon.xml
-          xmlstarlet ed -L -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
-          xmlstarlet ed -L -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' addon.xml
-          xmlstarlet ed -L -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
+          xmlstarlet ed -L -P -u '/addon/@version' -v "${version}+matrix.1" addon.xml
+          xmlstarlet ed -L -P -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
+          xmlstarlet ed -L -P -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' addon.xml
+          xmlstarlet ed -L -P -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
           git add .
           git commit -m "Kodi 19 Patch"
         working-directory: ${{ github.event.repository.name }}
