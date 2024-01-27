@@ -38,6 +38,10 @@ class DirectoryItem(BaseItem):
         return name
 
     def set_category_label(self, label):
+        if label == '__inherit__':
+            self._category_label = None
+            return
+
         if self._category_label and self._category_label != label:
             uri = self.get_uri()
             self.set_uri(uri.replace(
