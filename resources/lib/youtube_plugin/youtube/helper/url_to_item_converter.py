@@ -85,7 +85,7 @@ class UrlToItemConverter(object):
             video_id = new_params['video_id']
 
             video_item = VideoItem(
-                '', context.create_uri(['play'], new_params)
+                '', context.create_uri(('play',), new_params)
             )
             self._video_id_dict[video_id] = video_item
 
@@ -97,7 +97,7 @@ class UrlToItemConverter(object):
                 return
 
             playlist_item = DirectoryItem(
-                '', context.create_uri(['playlist', playlist_id], new_params),
+                '', context.create_uri(('playlist', playlist_id,), new_params),
             )
             self._playlist_id_dict[playlist_id] = playlist_item
 
@@ -110,9 +110,9 @@ class UrlToItemConverter(object):
                 return
 
             channel_item = VideoItem(
-                '', context.create_uri(['play'], new_params)
+                '', context.create_uri(('play',), new_params)
             ) if live else DirectoryItem(
-                '', context.create_uri(['channel', channel_id], new_params)
+                '', context.create_uri(('channel', channel_id,), new_params)
             )
             self._channel_id_dict[channel_id] = channel_item
 
@@ -130,12 +130,17 @@ class UrlToItemConverter(object):
             # remove duplicates
             self._channel_ids = list(set(self._channel_ids))
 
+            item_label = context.localize('channels')
             channels_item = DirectoryItem(
-                context.get_ui().bold(context.localize('channels')),
-                context.create_uri(['special', 'description_links'], {
-                    'channel_ids': ','.join(self._channel_ids),
-                }),
-                image='{media}/playlist.png'
+                context.get_ui().bold(item_label),
+                context.create_uri(
+                    ('special', 'description_links',),
+                    {
+                        'channel_ids': ','.join(self._channel_ids),
+                    },
+                ),
+                image='{media}/playlist.png',
+                category_label=item_label,
             )
             result.append(channels_item)
 
@@ -143,19 +148,30 @@ class UrlToItemConverter(object):
             # remove duplicates
             self._playlist_ids = list(set(self._playlist_ids))
 
-            playlists_item = UriItem(
-                context.create_uri(['play'], {
-                    'playlist_ids': ','.join(self._playlist_ids),
-                    'play': True,
-                }),
-                playable=True
-            ) if context.get_param('uri') else DirectoryItem(
-                context.get_ui().bold(context.localize('playlists')),
-                context.create_uri(['special', 'description_links'], {
-                    'playlist_ids': ','.join(self._playlist_ids),
-                }),
-                image='{media}/playlist.png'
-            )
+            if context.get_param('uri'):
+                playlists_item = UriItem(
+                    context.create_uri(
+                        ('play',),
+                        {
+                            'playlist_ids': ','.join(self._playlist_ids),
+                            'play': True,
+                        },
+                    ),
+                    playable=True,
+                )
+            else:
+                item_label = context.localize('playlists')
+                playlists_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri(
+                        ('special', 'description_links',),
+                        {
+                            'playlist_ids': ','.join(self._playlist_ids),
+                        },
+                    ),
+                    image='{media}/playlist.png',
+                    category_label=item_label,
+                )
             result.append(playlists_item)
 
         if self._channel_id_dict:

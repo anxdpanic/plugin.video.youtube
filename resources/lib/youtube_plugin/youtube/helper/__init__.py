@@ -13,4 +13,3 @@ from __future__ import absolute_import, division, unicode_literals
 from .resource_manager import ResourceManager
 from .url_resolver import UrlResolver
 from .url_to_item_converter import UrlToItemConverter
-from .utils import extract_urls

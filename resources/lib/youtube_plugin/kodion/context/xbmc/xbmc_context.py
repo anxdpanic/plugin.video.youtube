@@ -270,7 +270,6 @@ class XbmcContext(AbstractContext):
             is_plugin_invocation = uri.startswith('plugin://')
             if is_plugin_invocation:
                 # first the path of the uri
-                self._uri = uri
                 parsed_url = urlsplit(uri)
                 self._path = unquote(parsed_url.path)
 
@@ -278,12 +277,13 @@ class XbmcContext(AbstractContext):
                 if num_args > 2:
                     params = sys.argv[2][1:]
                     if params:
-                        self._uri = '?'.join((self._uri, params))
                         self.parse_params(dict(parse_qsl(params)))
 
                 # then Kodi resume status
                 if num_args > 3 and sys.argv[3].lower() == 'resume:true':
                     self._params['resume'] = True
+
+                self._uri = self.create_uri(self._path, self._params)
         elif num_args:
             uri = sys.argv[0]
             is_plugin_invocation = uri.startswith('plugin://')

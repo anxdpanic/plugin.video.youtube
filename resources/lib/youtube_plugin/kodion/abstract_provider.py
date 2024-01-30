@@ -37,29 +37,29 @@ class AbstractProvider(object):
         # register some default paths
         self.register_path(r'^/$', '_internal_root')
 
-        self.register_path(r''.join([
+        self.register_path(r''.join((
             '^/',
             paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
-        ]), '_internal_watch_later')
+        )), '_internal_watch_later')
 
-        self.register_path(r''.join([
+        self.register_path(r''.join((
             '^/',
             paths.FAVORITES,
             '/(?P<command>add|clear|list|remove)/?$'
-        ]), '_internal_favorite')
+        )), '_internal_favorite')
 
-        self.register_path(r''.join([
+        self.register_path(r''.join((
             '^/',
             paths.SEARCH,
             '/(?P<command>input|query|list|remove|clear|rename)/?$'
-        ]), '_internal_search')
+        )), '_internal_search')
 
-        self.register_path(r''.join([
+        self.register_path(r''.join((
             '^/',
             paths.HISTORY,
             '/$'
-        ]), 'on_playback_history')
+        )), 'on_playback_history')
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
                            '_internal_on_extra_fanart')
@@ -92,7 +92,6 @@ class AbstractProvider(object):
         settings.set_bool(settings.SETUP_WIZARD, False)
 
         wizard_steps = self.get_wizard_steps(context)
-        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
 
         if (wizard_steps and ui.on_yes_no_input(
             context.get_name(), context.localize('setup_wizard.execute')

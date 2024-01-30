@@ -20,9 +20,6 @@ def process(mode, provider, context, sign_out_refresh=True):
     addon_id = context.get_param('addon_id', None)
 
     def _do_logout():
-        # we clear the cache, so none cached data of an old account will be displayed.
-        provider.get_resource_manager(context).clear()
-
         signout_access_manager = context.get_access_manager()
         if addon_id:
             if signout_access_manager.developer_has_refresh_token(addon_id):
@@ -153,9 +150,6 @@ def process(mode, provider, context, sign_out_refresh=True):
         access_token = '%s|%s' % (access_token_tv, access_token_kodi)
         refresh_token = '%s|%s' % (refresh_token_tv, refresh_token_kodi)
         expires_in = min(expires_in_tv, expires_in_kodi)
-
-        # we clear the cache, so none cached data of an old account will be displayed.
-        provider.get_resource_manager(context).clear()
 
         provider.reset_client()
 

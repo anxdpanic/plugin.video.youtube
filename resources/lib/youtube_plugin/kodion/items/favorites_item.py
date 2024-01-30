@@ -24,7 +24,7 @@ class FavoritesItem(DirectoryItem):
 
         super(FavoritesItem, self).__init__(name,
                                             context.create_uri(
-                                                [paths.FAVORITES, 'list']
+                                                (paths.FAVORITES, 'list',),
                                             ),
                                             image=image)
 

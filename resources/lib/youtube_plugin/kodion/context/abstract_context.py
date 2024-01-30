@@ -134,11 +134,6 @@ class AbstractContext(object):
     def get_region(self):
         raise NotImplementedError()
 
-    def get_cache_path(self):
-        if not self._cache_path:
-            self._cache_path = os.path.join(self.get_data_path(), 'kodion')
-        return self._cache_path
-
     def get_playback_history(self):
         if not self._playback_history:
             uuid = self.get_access_manager().get_current_user_id()
@@ -155,8 +150,9 @@ class AbstractContext(object):
                 cache_size = 10
             else:
                 cache_size /= 2.0
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'data_cache.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._data_cache = DataCache(filepath, max_file_size_mb=cache_size)
         return self._data_cache
 
@@ -168,8 +164,9 @@ class AbstractContext(object):
                 cache_size = 10
             else:
                 cache_size /= 2.0
+            uuid = self.get_access_manager().get_current_user_id()
             filename = 'cache.sqlite'
-            filepath = os.path.join(self.get_cache_path(), filename)
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._function_cache = FunctionCache(filepath,
                                                  max_file_size_mb=cache_size)
         return self._function_cache
