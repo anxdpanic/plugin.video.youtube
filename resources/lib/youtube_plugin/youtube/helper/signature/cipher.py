@@ -25,12 +25,9 @@ class Cipher(object):
 
     def get_signature(self, signature):
         function_cache = self._context.get_function_cache()
-        json_script = function_cache.get_cached_only(self._load_javascript,
-                                                     self._javascript)
-        if not json_script:
-            json_script = function_cache.get(self._load_javascript,
-                                             function_cache.ONE_DAY,
-                                             self._javascript)
+        json_script = function_cache.run(self._load_javascript,
+                                         function_cache.ONE_DAY,
+                                         javascript=self._javascript)
 
         if json_script:
             json_script_engine = JsonScriptEngine(json_script)

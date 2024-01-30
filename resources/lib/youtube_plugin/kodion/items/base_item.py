@@ -27,10 +27,8 @@ class BaseItem(object):
     def __init__(self, name, uri, image='', fanart=''):
         self._version = BaseItem.VERSION
 
-        try:
-            self._name = unescape(name)
-        except:
-            self._name = name
+        self._name = None
+        self.set_name(name)
 
         self._uri = uri
 
@@ -97,6 +95,13 @@ class BaseItem(object):
         md5_hash.update(self._name.encode('utf-8'))
         md5_hash.update(self._uri.encode('utf-8'))
         return md5_hash.hexdigest()
+
+    def set_name(self, name):
+        try:
+            self._name = unescape(name)
+        except:
+            self._name = name
+        return self._name
 
     def get_name(self):
         """

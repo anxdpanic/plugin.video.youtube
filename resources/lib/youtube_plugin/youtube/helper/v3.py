@@ -28,7 +28,7 @@ from ...kodion.items import DirectoryItem, NextPageItem, VideoItem, menu_items
 def _process_list_response(provider, context, json_data):
     yt_items = json_data.get('items', [])
     if not yt_items:
-        context.log_warning('List of search result is empty')
+        context.log_warning('v3 response: Items list is empty')
         return []
 
     video_id_dict = {}

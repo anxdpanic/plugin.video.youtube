@@ -25,7 +25,7 @@ class NextPageItem(DirectoryItem):
                                                new_params
                                            ),
                                            image=image,
-                                           category_label=False)
+                                           category_label='__inherit__')
 
         if fanart:
             self.set_fanart(fanart)

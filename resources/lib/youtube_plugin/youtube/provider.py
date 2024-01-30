@@ -21,7 +21,6 @@ from .helper import (
     UrlToItemConverter,
     v3,
     yt_login,
-    yt_old_actions,
     yt_play,
     yt_playlist,
     yt_setup_wizard,
@@ -136,9 +135,9 @@ class Provider(AbstractProvider):
             origin = ADDON_ID
 
         if api_last_origin != origin:
-            context.log_debug('API key origin changed, clearing cache. |%s|' % origin)
+            context.log_debug('API key origin changed: |{old}| to |{new}|'
+                              .format(old=api_last_origin, new=origin))
             access_manager.set_last_origin(origin)
-            self.get_resource_manager(context).clear()
 
         if dev_id:
             access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
@@ -173,10 +172,15 @@ class Provider(AbstractProvider):
                 access_tokens = access_manager.get_dev_access_token(dev_id)
                 if access_tokens:
                     access_tokens = access_tokens.split('|')
+                else:
+                    access_tokens = []
 
                 refresh_tokens = access_manager.get_dev_refresh_token(dev_id)
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
+                else:
+                    refresh_tokens = []
+
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
         else:
             context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
@@ -190,10 +194,15 @@ class Provider(AbstractProvider):
                 access_tokens = access_manager.get_access_token()
                 if access_tokens:
                     access_tokens = access_tokens.split('|')
+                else:
+                    access_tokens = []
 
                 refresh_tokens = access_manager.get_refresh_token()
                 if refresh_tokens:
                     refresh_tokens = refresh_tokens.split('|')
+                else:
+                    refresh_tokens = []
+
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
 
         client = YouTube(context=context,
@@ -220,7 +229,6 @@ class Provider(AbstractProvider):
                         access_manager.update_access_token(access_token, expires_in)
                 except (InvalidGrant, LoginException) as exc:
                     self.handle_exception(context, exc)
-                    access_tokens = ['', '']
                     # reset access_token
                     if isinstance(exc, InvalidGrant):
                         if dev_id:
@@ -231,18 +239,17 @@ class Provider(AbstractProvider):
                         access_manager.update_dev_access_token(dev_id, '')
                     else:
                         access_manager.update_access_token('')
-                    # we clear the cache, so none cached data of an old account will be displayed.
-                    self.get_resource_manager(context).clear()
 
             # in debug log the login status
             self._logged_in = len(access_tokens) == 2
-            context.log_debug('User is logged in' if self._logged_in else
-                              'User is not logged in')
-
-            if not access_tokens:
-                access_tokens = ['', '']
-            client.set_access_token(access_token=access_tokens[1])
-            client.set_access_token_tv(access_token_tv=access_tokens[0])
+            if self._logged_in:
+                context.log_debug('User is logged in')
+                client.set_access_token_tv(access_token_tv=access_tokens[0])
+                client.set_access_token(access_token=access_tokens[1])
+            else:
+                context.log_debug('User is not logged in')
+                client.set_access_token_tv(access_token_tv='')
+                client.set_access_token(access_token='')
 
         self._client = client
         return self._client
@@ -322,13 +329,15 @@ class Provider(AbstractProvider):
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads_playlist = playlists.get('uploads', '')
         if uploads_playlist:
+            item_label = context.localize('uploads')
             uploads_item = DirectoryItem(
-                context.get_ui().bold(context.localize('uploads')),
+                context.get_ui().bold(item_label),
                 context.create_uri(
-                    ['channel', channel_id, 'playlist', uploads_playlist],
-                    new_params
+                    ('channel', channel_id, 'playlist', uploads_playlist),
+                    new_params,
                 ),
                 image='{media}/playlist.png',
+                category_label=item_label,
             )
             result.append(uploads_item)
 
@@ -384,6 +393,7 @@ class Provider(AbstractProvider):
         localize = context.localize
         create_uri = context.create_uri
         function_cache = context.get_function_cache()
+        params = context.get_params()
         ui = context.get_ui()
 
         method = re_match.group('method')
@@ -414,9 +424,10 @@ class Provider(AbstractProvider):
         if method == 'user' or channel_id == 'mine':
             context.log_debug('Trying to get channel id for user "%s"' % channel_id)
 
-            json_data = function_cache.get(client.get_channel_by_username,
+            json_data = function_cache.run(client.get_channel_by_username,
                                            function_cache.ONE_DAY,
-                                           channel_id)
+                                           _refresh=params.get('refresh'),
+                                           username=channel_id)
             if not json_data:
                 return False
 
@@ -434,7 +445,6 @@ class Provider(AbstractProvider):
 
         channel_fanarts = resource_manager.get_fanarts((channel_id, ))
 
-        params = context.get_params()
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
         incognito = params.get('incognito')
@@ -454,11 +464,16 @@ class Provider(AbstractProvider):
             hide_live = params.get('hide_live')
 
             if not hide_playlists:
+                item_label = localize('playlists')
                 playlists_item = DirectoryItem(
-                    ui.bold(localize('playlists')),
-                    create_uri(['channel', channel_id, 'playlists'], new_params),
+                    ui.bold(item_label),
+                    create_uri(
+                        ('channel', channel_id, 'playlists'),
+                        new_params,
+                    ),
                     image='{media}/playlist.png',
                     fanart=channel_fanarts.get(channel_id),
+                    category_label=item_label,
                 )
                 result.append(playlists_item)
 
@@ -474,19 +489,22 @@ class Provider(AbstractProvider):
                 result.append(search_item)
 
             if not hide_live:
+                item_label = localize('live')
                 live_item = DirectoryItem(
-                    ui.bold(localize('live')),
-                    create_uri(['channel', search_live_id, 'live'], new_params),
+                    ui.bold(item_label),
+                    create_uri(('channel', search_live_id, 'live'), new_params),
                     image='{media}/live.png',
+                    category_label=item_label,
                 )
                 result.append(live_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
         upload_playlist = playlists.get('uploads', '')
         if upload_playlist:
-            json_data = function_cache.get(client.get_playlist_items,
+            json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
-                                           upload_playlist,
+                                           _refresh=params.get('refresh'),
+                                           playlist_id=upload_playlist,
                                            page_token=page_token)
             if not json_data:
                 return result
@@ -518,8 +536,8 @@ class Provider(AbstractProvider):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
                 create_uri(
-                    ['special', 'completed_live'],
-                    params={'location': True}
+                    ('special', 'completed_live'),
+                    params={'location': True},
                 ),
                 image='{media}/live.png',
             )
@@ -530,8 +548,8 @@ class Provider(AbstractProvider):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
                 create_uri(
-                    ['special', 'upcoming_live'],
-                    params={'location': True}
+                    ('special', 'upcoming_live'),
+                    params={'location': True},
                 ),
                 image='{media}/live.png',
             )
@@ -541,8 +559,8 @@ class Provider(AbstractProvider):
         live_events_item = DirectoryItem(
             localize('live'),
             create_uri(
-                ['special', 'live'],
-                params={'location': True}
+                ('special', 'live'),
+                params={'location': True},
             ),
             image='{media}/live.png',
         )
@@ -627,7 +645,7 @@ class Provider(AbstractProvider):
 
             if builtin:
                 context.execute(builtin.format(
-                    context.create_uri(['play'], params)
+                    context.create_uri(('play',), params)
                 ))
                 return False
             return yt_play.play_video(self, context)
@@ -748,19 +766,23 @@ class Provider(AbstractProvider):
         if page == 1 and search_type == 'video' and not event_type and not hide_folders:
             if not channel_id and not location:
                 channel_params = dict(params, search_type='channel')
+                item_label = context.localize('channels')
                 channel_item = DirectoryItem(
-                    context.get_ui().bold(context.localize('channels')),
-                    context.create_uri([context.get_path()], channel_params),
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), channel_params),
                     image='{media}/channels.png',
+                    category_label=item_label,
                 )
                 result.append(channel_item)
 
             if not location:
                 playlist_params = dict(params, search_type='playlist')
+                item_label = context.localize('playlists')
                 playlist_item = DirectoryItem(
-                    context.get_ui().bold(context.localize('playlists')),
-                    context.create_uri([context.get_path()], playlist_params),
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), playlist_params),
                     image='{media}/playlist.png',
+                    category_label=item_label,
                 )
                 result.append(playlist_item)
 
@@ -769,19 +791,22 @@ class Provider(AbstractProvider):
                 live_params = dict(params,
                                    search_type='video',
                                    event_type='live')
+                item_label = context.localize('live')
                 live_item = DirectoryItem(
-                    context.get_ui().bold(context.localize('live')),
+                    context.get_ui().bold(item_label),
                     context.create_uri(
-                        [context.get_path().replace('input', 'query')],
-                        live_params
+                        (context.get_path().replace('input', 'query'),),
+                        live_params,
                     ),
                     image='{media}/live.png',
+                    category_label=item_label,
                 )
                 result.append(live_item)
 
         function_cache = context.get_function_cache()
-        json_data = function_cache.get(self.get_client(context).search,
+        json_data = function_cache.run(self.get_client(context).search,
                                        function_cache.ONE_MINUTE * 10,
+                                       _refresh=params.get('refresh'),
                                        q=search_text,
                                        search_type=search_type,
                                        event_type=event_type,
@@ -860,7 +885,6 @@ class Provider(AbstractProvider):
             context.get_name(), localize('reset.access_manager.confirm')
         )):
             try:
-                context.get_function_cache().clear()
                 access_manager = context.get_access_manager()
                 client = self.get_client(context)
                 if access_manager.has_refresh_token():
@@ -1017,13 +1041,6 @@ class Provider(AbstractProvider):
         return True
 
     def on_root(self, context, re_match):
-        """
-        Support old YouTube url calls, but also log a deprecation warnings.
-        """
-        old_action = context.get_param('action')
-        if old_action:
-            return yt_old_actions.process_old_action(self, context, re_match)
-
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
@@ -1038,25 +1055,24 @@ class Provider(AbstractProvider):
 
         # sign in
         if not logged_in and settings.get_bool('youtube.folder.sign.in.show', True):
+            item_label = localize('sign.in')
             sign_in_item = DirectoryItem(
-                ui.bold(localize('sign.in')),
+                ui.bold(item_label),
                 create_uri(('sign', 'in')),
                 image='{media}/sign_in.png',
-                action=True
+                action=True,
+                category_label=item_label,
             )
             result.append(sign_in_item)
 
         if logged_in and settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
-
-            # clear cache
-            cache = context.get_data_cache()
-            cache.set_item('my-subscriptions-items', '[]')
-
+            item_label = localize('my_subscriptions')
             my_subscriptions_item = DirectoryItem(
-                ui.bold(localize('my_subscriptions')),
+                ui.bold(item_label),
                 create_uri(('special', 'new_uploaded_videos_tv')),
                 image='{media}/new_uploads.png',
+                category_label=item_label,
             )
             result.append(my_subscriptions_item)
 
@@ -1212,7 +1228,7 @@ class Provider(AbstractProvider):
             elif local_history:
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri([paths.HISTORY], params={'action': 'list'}),
+                    create_uri((paths.HISTORY,), params={'action': 'list'}),
                     image='{media}/history.png',
                 )
                 result.append(watch_history_item)

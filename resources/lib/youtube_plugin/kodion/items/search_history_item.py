@@ -26,8 +26,8 @@ class SearchHistoryItem(DirectoryItem):
 
         super(SearchHistoryItem, self).__init__(query,
                                                 context.create_uri(
-                                                    [paths.SEARCH, 'query'],
-                                                    params=params
+                                                    (paths.SEARCH, 'query',),
+                                                    params=params,
                                                 ),
                                                 image=image)
 

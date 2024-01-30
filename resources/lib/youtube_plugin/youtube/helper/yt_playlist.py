@@ -141,12 +141,13 @@ def _process_select_playlist(provider, context):
     # Get listitem path asap, relies on listitems focus
     path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
 
+    params = context.get_params()
     ui = context.get_ui()
     keymap_action = False
     page_token = ''
     current_page = 0
 
-    video_id = context.get_param('video_id', '')
+    video_id = params.get('video_id', '')
     if not video_id:
         if context.is_plugin_path(path, 'play/'):
             video_id = find_video_id(path)
@@ -160,18 +161,14 @@ def _process_select_playlist(provider, context):
     client = provider.get_client(context)
     while True:
         current_page += 1
-        if not page_token:
-            json_data = function_cache.get(client.get_playlists_of_channel,
-                                           function_cache.ONE_MINUTE // 3,
-                                           channel_id='mine')
-        else:
-            json_data = function_cache.get(client.get_playlists_of_channel,
-                                           function_cache.ONE_MINUTE // 3,
-                                           channel_id='mine',
-                                           page_token=page_token)
+        json_data = function_cache.run(client.get_playlists_of_channel,
+                                       function_cache.ONE_MINUTE // 3,
+                                       _refresh=params.get('refresh'),
+                                       channel_id='mine',
+                                       page_token=page_token)
 
         playlists = json_data.get('items', [])
-        page_token = json_data.get('nextPageToken', False)
+        page_token = json_data.get('nextPageToken', '')
 
         items = []
         if current_page == 1:

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="7.0.3+beta.1" provider-name="anxdpanic, bromix">
+<addon id="plugin.video.youtube" name="YouTube" version="7.0.3+beta.2" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
         <import addon="script.module.requests" version="2.12.4"/>
@@ -12,44 +12,10 @@
     </extension>
     <extension point="xbmc.service" library="resources/lib/service.py"/>
     <extension point="xbmc.python.module" library="resources/lib/"/>
-    <extension point="xbmc.python.script" library="resources/lib/youtube_plugin/script.py">
+    <extension point="xbmc.python.script" library="resources/lib/script.py">
         <provides>executable</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <news>
-### New
-- Add display of extra video information (premieres, views, comments, likes) #18, #464, #503
-- Add support for Clips #450
-- Add ability to combine playlists #480
-- Add support for timestamps in links #502
-- Add initial support for higher bitrate streams #505
-- Add ability to limit video FPS at max resolution #539
-- Add local Watch Later and History for use when not logged in or custom playlist not set
-- Update main menu items:
-  - New Recommended videos (similar to YouTube home page, will use login if available)
-  - Old Recommended videos renamed to Related videos (requires local/remote history enabled)
-  - Popular right now renamed to Trending
-
-### Changed
-- Local history made optional and enabled by default
-- Existing user data will be lost due to changes in data format:
-  - Search, local history, and local watch later is stored per user
-  - Function and data cache will be wiped (will also become per user in future)
-- Disable OPUS audio by default #537
-
-### Fixed
-- Fix sharing links #115, #250, #538
-- Fix date and sorting issues #411, #425, #434
-- Fix issue with switching between H264/AV1 streams #532
-- Fix prompt for subtitles #534
-- Fix issues with corrupt user data #536
-- Fix issues with live streams #530, #540
-- Fix issues with loading large playlists #545
-- Fix Recommendations, Related Videos, and Auto-play next #508
-- Fix queuing from current playlist #549
-- Fix issues with randomising playlists #485
-- Workaround for crashes #113, #540
-        </news>
         <assets>
             <icon>resources/media/icon.png</icon>
             <fanart>resources/media/fanart.jpg</fanart>

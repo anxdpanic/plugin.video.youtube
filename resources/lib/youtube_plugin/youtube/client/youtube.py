@@ -52,6 +52,14 @@ class YouTube(LoginClient):
         },
         '_common': {
             '_access_token': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'gl': None,
+                        'hl': None,
+                    },
+                },
+            },
             'headers': {
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
@@ -72,8 +80,6 @@ class YouTube(LoginClient):
 
     def __init__(self, context, **kwargs):
         self._context = context
-        if not kwargs.get('config'):
-            kwargs['config'] = {}
         if 'items_per_page' in kwargs:
             self._max_results = kwargs.pop('items_per_page')
 
@@ -1578,10 +1584,12 @@ class YouTube(LoginClient):
         try:
             json_data = response.json()
             if 'error' in json_data:
+                kwargs.setdefault('pass_data', True)
                 raise YouTubeException('"error" in response JSON data',
                                        json_data=json_data,
                                        **kwargs)
         except ValueError as exc:
+            kwargs.setdefault('raise_exc', True)
             raise InvalidJSON(exc, **kwargs)
         response.raise_for_status()
         return json_data
@@ -1589,8 +1597,14 @@ class YouTube(LoginClient):
     def _error_hook(self, **kwargs):
         exc = kwargs['exc']
         json_data = getattr(exc, 'json_data', None)
-        data = getattr(exc, 'pass_data', None) and json_data
-        exception = getattr(exc, 'raise_exc', None) and YouTubeException
+        if getattr(exc, 'pass_data', False):
+            data = json_data
+        else:
+            data = None
+        if getattr(exc, 'raise_exc', False):
+            exception = YouTubeException
+        else:
+            exception = None
 
         if not json_data or 'error' not in json_data:
             return None, None, None, data, None, exception
@@ -1599,8 +1613,7 @@ class YouTube(LoginClient):
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
         message = strip_html_from_text(details.get('message', 'Unknown error'))
 
-        notify = getattr(exc, 'notify', True)
-        if notify:
+        if getattr(exc, 'notify', True):
             ok_dialog = False
             timeout = 5000
             if reason == 'accessNotConfigured':
@@ -1644,7 +1657,7 @@ class YouTube(LoginClient):
         }
         if headers:
             client_data['headers'] = headers
-        if post_data:
+        if post_data and method == 'POST':
             client_data['json'] = post_data
         if params:
             client_data['params'] = params
@@ -1659,15 +1672,17 @@ class YouTube(LoginClient):
         if 'key' in client['params'] and not client['params']['key']:
             client['params']['key'] = self._config_tv['key']
 
+        if method != 'POST' and 'json' in client:
+            del client['json']
+
         params = client.get('params')
         if params:
             log_params = deepcopy(params)
             if 'location' in log_params:
-                log_params['location'] = 'xx.xxxx,xx.xxxx'
+                log_params['location'] = '|xx.xxxx,xx.xxxx|'
             if 'key' in log_params:
-                key = list(log_params['key'])
-                key[5:-5] = '...'
-                log_params['key'] = ''.join(key)
+                key = log_params['key']
+                log_params['key'] = '...'.join((key[:3], key[-3:]))
         else:
             log_params = None
 
@@ -1675,7 +1690,7 @@ class YouTube(LoginClient):
         if headers:
             log_headers = deepcopy(headers)
             if 'Authorization' in log_headers:
-                log_headers['Authorization'] = 'logged in'
+                log_headers['Authorization'] = '|logged in|'
         else:
             log_headers = None
 

@@ -57,39 +57,37 @@ class FunctionCache(Storage):
         md5_hash.update(str(partial_func.keywords).encode('utf-8'))
         return md5_hash.hexdigest()
 
-    def _get_cached_data(self, partial_func, seconds=None):
-        cache_id = self._create_id_from_func(partial_func)
-        return self._get(cache_id, seconds=seconds), cache_id
-
-    def get_cached_only(self, func, *args, **keywords):
-        partial_func = partial(func, *args, **keywords)
+    def get_result(self, func, *args, **kwargs):
+        partial_func = partial(func, *args, **kwargs)
 
         # if caching is disabled call the function
         if not self._enabled:
             return partial_func()
 
         # only return before cached data
-        data, _ = self._get_cached_data(partial_func)
-        return data
+        cache_id = self._create_id_from_func(partial_func)
+        return self._get(cache_id)
 
-    def get(self, func, seconds, *args, **keywords):
+    def run(self, func, seconds, *args, _refresh=False, **kwargs):
         """
         Returns the cached data of the given function.
         :param func, function to cache
-        :param seconds: time to live in seconds
+        :param seconds: time to live in
+        :param _refresh: bool, updates cache with new func result
         :return:
         """
-
-        partial_func = partial(func, *args, **keywords)
+        partial_func = partial(func, *args, **kwargs)
 
         # if caching is disabled call the function
         if not self._enabled:
             return partial_func()
 
-        data, cache_id = self._get_cached_data(partial_func, seconds=seconds)
+        cache_id = self._create_id_from_func(partial_func)
+        data = None if _refresh else self._get(cache_id, seconds=seconds)
         if data is None:
             data = partial_func()
             self._set(cache_id, data)
+
         return data
 
     def _optimize_item_count(self, limit=-1, defer=False):

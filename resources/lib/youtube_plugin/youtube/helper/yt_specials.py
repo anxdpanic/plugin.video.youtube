@@ -10,14 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from . import utils
-from ..helper import (
-    UrlResolver,
-    UrlToItemConverter,
-    extract_urls,
-    tv,
-    v3,
-)
+from . import UrlResolver, UrlToItemConverter, tv, utils, v3
 from ...kodion import KodionException
 from ...kodion.constants import content
 from ...kodion.items import DirectoryItem, UriItem
@@ -28,19 +21,22 @@ def _process_related_videos(provider, context):
     context.set_content(content.VIDEO_CONTENT)
     function_cache = context.get_function_cache()
 
-    video_id = context.get_param('video_id', '')
+    params = context.get_params()
+    video_id = params.get('video_id', '')
     if video_id:
-        json_data = function_cache.get(
+        json_data = function_cache.run(
             provider.get_client(context).get_related_videos,
             function_cache.ONE_HOUR,
+            _refresh=params.get('refresh'),
             video_id=video_id,
-            page_token=context.get_param('page_token', ''),
+            page_token=params.get('page_token', ''),
         )
     else:
-        json_data = function_cache.get(
+        json_data = function_cache.run(
             provider.get_client(context).get_related_for_home,
             function_cache.ONE_HOUR,
-            page_token=context.get_param('page_token', ''),
+            _refresh=params.get('refresh'),
+            page_token=params.get('page_token', ''),
         )
 
     if not json_data:
@@ -85,9 +81,10 @@ def _process_recommendations(provider, context):
     params = context.get_params()
     function_cache = context.get_function_cache()
 
-    json_data = function_cache.get(
+    json_data = function_cache.run(
         provider.get_client(context).get_recommended_for_home,
         function_cache.ONE_HOUR,
+        _refresh=params.get('refresh'),
         visitor=params.get('visitor', ''),
         page_token=params.get('page_token', ''),
         click_tracking=params.get('click_tracking', ''),
@@ -119,7 +116,7 @@ def _process_browse_channels(provider, context):
         json_data = client.get_guide_category(guide_id)
     else:
         function_cache = context.get_function_cache()
-        json_data = function_cache.get(client.get_guide_categories,
+        json_data = function_cache.run(client.get_guide_categories,
                                        function_cache.ONE_MONTH)
 
     if not json_data:
@@ -183,9 +180,10 @@ def _process_description_links(provider, context):
             description = strip_html_from_text(snippet['description'])
 
             function_cache = context.get_function_cache()
-            urls = function_cache.get(extract_urls,
-                                      function_cache.ONE_WEEK,
-                                      description)
+            urls = function_cache.run(utils.extract_urls,
+                                      function_cache.ONE_DAY,
+                                      _refresh=params.get('refresh'),
+                                      text=description)
 
             progress_dialog.set_total(len(urls))
 
@@ -221,7 +219,7 @@ def _process_description_links(provider, context):
         channel_id_dict = {}
         for channel_id in channel_ids:
             channel_item = DirectoryItem(
-                '', context.create_uri(['channel', channel_id], item_params)
+                '', context.create_uri(('channel', channel_id,), item_params)
             )
             channel_id_dict[channel_id] = channel_item
 
@@ -246,7 +244,7 @@ def _process_description_links(provider, context):
         playlist_id_dict = {}
         for playlist_id in playlist_ids:
             playlist_item = DirectoryItem(
-                '', context.create_uri(['playlist', playlist_id], item_params)
+                '', context.create_uri(('playlist', playlist_id,), item_params)
             )
             playlist_id_dict[playlist_id] = playlist_item
 

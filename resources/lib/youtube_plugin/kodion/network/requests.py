@@ -170,9 +170,10 @@ class BaseRequestsClass(object):
             ] if part]))
 
             if raise_exc:
-                if not callable(raise_exc):
-                    raise_exc = self._default_exc[-1]
-                raise_exc = raise_exc(error_title)
+                if not isinstance(raise_exc, BaseException):
+                    if not callable(raise_exc):
+                        raise_exc = self._default_exc[-1]
+                    raise_exc = raise_exc(error_title)
 
                 if isinstance(raise_exc, BaseException):
                     raise_exc.__cause__ = exc

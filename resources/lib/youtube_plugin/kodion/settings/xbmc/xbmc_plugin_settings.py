@@ -172,9 +172,17 @@ class XbmcPluginSettings(AbstractSettings):
             value = default
 
         if self._echo and echo is not False:
-            log_debug('Get |{setting}|: "{value}" (str, {status})'.format(
+            if setting == 'youtube.location':
+                echo = '|xx.xxxx,xx.xxxx|'
+            elif setting == 'youtube.api.id':
+                echo = '...'.join((value[:3], value[-5:]))
+            elif setting in ('youtube.api.key', 'youtube.api.secret'):
+                echo = '...'.join((value[:3], value[-3:]))
+            else:
+                echo = value
+            log_debug('Get |{setting}|: "{echo}" (str, {status})'.format(
                 setting=setting,
-                value=value,
+                echo=echo,
                 status=error if error else 'success'
             ))
         self._cache[setting] = value
@@ -191,9 +199,17 @@ class XbmcPluginSettings(AbstractSettings):
             error = exc
 
         if self._echo and echo is not False:
-            log_debug('Set |{setting}|: "{value}" (str, {status})'.format(
+            if setting == 'youtube.location':
+                echo = '|xx.xxxx,xx.xxxx|'
+            elif setting == 'youtube.api.id':
+                echo = '...'.join((value[:3], value[-5:]))
+            elif setting in ('youtube.api.key', 'youtube.api.secret'):
+                echo = '...'.join((value[:3], value[-3:]))
+            else:
+                echo = value
+            log_debug('Set |{setting}|: "{echo}" (str, {status})'.format(
                 setting=setting,
-                value=value,
+                echo=echo,
                 status=error if error else 'success'
             ))
         return not error

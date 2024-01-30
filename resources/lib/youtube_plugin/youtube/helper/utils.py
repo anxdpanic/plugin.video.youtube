@@ -524,7 +524,7 @@ def update_video_infos(provider, context, video_id_dict,
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 description,
             ))
-        video_item.set_studio(channel_name)
+        # video_item.set_studio(channel_name)
         # video_item.add_cast(channel_name)
         video_item.add_artist(channel_name)
         video_item.set_plot(description)
@@ -607,8 +607,8 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-            # provide 'remove' for videos in my playlists
-            # we support all playlist except 'Watch History'
+        # provide 'remove' for videos in my playlists
+        # we support all playlist except 'Watch History'
         if (logged_in and video_id in playlist_item_id_dict and playlist_id
                 and playlist_channel_id == 'mine'
                 and playlist_id.strip().lower() not in ('hl', 'wl')):
@@ -620,7 +620,6 @@ def update_video_infos(provider, context, video_id_dict,
                     context, playlist_id, video_id, video_item.get_name()
                 )
             )
-
 
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and
@@ -834,5 +833,5 @@ def filter_short_videos(items):
     return [
         item
         for item in items
-        if item.playable and not 0 <= item.get_duration() <= 60
+        if not item.playable or not 0 <= item.get_duration() <= 60
     ]
