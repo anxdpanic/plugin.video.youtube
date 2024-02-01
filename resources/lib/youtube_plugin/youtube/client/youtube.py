@@ -1039,7 +1039,7 @@ class YouTube(LoginClient):
                                   post_data=post_data,
                                   no_login=True)
         if not result:
-            return []
+            return {}
 
         related_videos = self.json_traverse(
             result,
@@ -1073,7 +1073,7 @@ class YouTube(LoginClient):
                  )
         )
         if not related_videos:
-            return []
+            return {}
 
         channel_id = self.json_traverse(
             result,
