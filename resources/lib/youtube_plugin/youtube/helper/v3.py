@@ -382,6 +382,7 @@ def response_to_items(provider,
     yt_total_results = int(page_info.get('totalResults', 0))
     yt_results_per_page = int(page_info.get('resultsPerPage', 0))
     page = int(context.get_param('page', 1))
+    offset = int(json_data.get('offset', 0))
     yt_visitor_data = json_data.get('visitorData', '')
     yt_next_page_token = json_data.get('nextPageToken', '')
     yt_click_tracking = json_data.get('clickTracking', '')
@@ -398,6 +399,8 @@ def response_to_items(provider,
             new_params['visitor'] = yt_visitor_data
         if yt_click_tracking:
             new_params['click_tracking'] = yt_click_tracking
+        if offset:
+            new_params['offset'] = offset
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)

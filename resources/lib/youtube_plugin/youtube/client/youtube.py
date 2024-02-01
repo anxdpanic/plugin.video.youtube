@@ -694,9 +694,10 @@ class YouTube(LoginClient):
 
         # Fetch related videos. Use threads for faster execution.
         def threaded_get_related(video_id, func, *args, **kwargs):
-            related_videos = self.get_related_videos(video_id).get('items')
-            if related_videos:
-                func(related_videos[:items_per_page], *args, **kwargs)
+            related = self.get_related_videos(video_id,
+                                              max_results=items_per_page)
+            if related and 'items' in related:
+                func(related['items'][:items_per_page], *args, **kwargs)
 
         running = 0
         threads = []
@@ -1024,6 +1025,7 @@ class YouTube(LoginClient):
                            video_id,
                            page_token='',
                            max_results=0,
+                           offset=0,
                            **kwargs):
         # TODO: Improve handling of InnerTube requests, including automatic
         # continuation processing to retrieve max_results number of results
@@ -1058,7 +1060,7 @@ class YouTube(LoginClient):
                          'results',
                      )
                  ) + (
-                     slice(None),
+                     slice(offset, None, None),
                      (
                          (
                              'compactVideoRenderer',
@@ -1097,40 +1099,68 @@ class YouTube(LoginClient):
             )
         )
 
+        items = [{
+            'kind': "youtube#video",
+            'id': video['videoId'],
+            'related_video_id': video_id,
+            'related_channel_id': channel_id,
+            'partial': True,
+            'snippet': {
+                'title': video['title']['simpleText'],
+                'thumbnails': dict(zip(
+                    ('default', 'high'),
+                    video['thumbnail']['thumbnails'],
+                )),
+                'channelId': self.json_traverse(video, (
+                    ('longBylineText', 'shortBylineText'),
+                    'runs',
+                    0,
+                    'navigationEndpoint',
+                    'browseEndpoint',
+                    'browseId',
+                )),
+            }
+        } for video in related_videos if video and 'videoId' in video]
+
         v3_response = {
             'kind': 'youtube#videoListResponse',
-            'items': [
-                {
-                    'kind': "youtube#video",
-                    'id': video['videoId'],
-                    'related_video_id': video_id,
-                    'related_channel_id': channel_id,
-                    'partial': True,
-                    'snippet': {
-                        'title': video['title']['simpleText'],
-                        'thumbnails': dict(zip(
-                            ('default', 'high'),
-                            video['thumbnail']['thumbnails'],
-                        )),
-                        'channelId': self.json_traverse(video, (
-                            ('longBylineText', 'shortBylineText'),
-                            'runs',
-                            0,
-                            'navigationEndpoint',
-                            'browseEndpoint',
-                            'browseId',
-                        )),
-                    }
-                }
-                for video in related_videos
-                if video and 'videoId' in video
-            ]
+            'items': [],
         }
 
         last_item = related_videos[-1]
         if last_item and 'token' in last_item:
-            v3_response['nextPageToken'] = last_item['token']
+            page_token = last_item['token']
 
+        while 1:
+            remaining = max_results - len(items)
+            if remaining < 0:
+                items = items[:max_results]
+                if page_token:
+                    v3_response['nextPageToken'] = page_token
+                v3_response['offset'] = remaining
+                break
+
+            if not page_token:
+                break
+
+            if not remaining:
+                v3_response['nextPageToken'] = page_token
+                break
+
+            continuation = self.get_related_videos(
+                video_id,
+                page_token=page_token,
+                max_results=remaining,
+                **kwargs
+            )
+            if 'nextPageToken' in continuation:
+                page_token = continuation['nextPageToken']
+            else:
+                page_token = ''
+            if 'items' in continuation:
+                items.extend(continuation['items'])
+
+        v3_response['items'] = items
         return v3_response
 
     def get_parent_comments(self,
