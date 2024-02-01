@@ -395,7 +395,7 @@ def response_to_items(provider,
 
         new_params = dict(context.get_params(),
                           page_token=yt_next_page_token)
-        if yt_click_tracking:
+        if yt_visitor_data:
             new_params['visitor'] = yt_visitor_data
         if yt_click_tracking:
             new_params['click_tracking'] = yt_click_tracking
