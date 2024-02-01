@@ -210,6 +210,7 @@ class YouTube(LoginClient):
         return self.api_request(method='DELETE',
                                 path='playlists',
                                 params=params,
+                                no_content=True,
                                 **kwargs)
 
     def get_supported_languages(self, language=None, **kwargs):
@@ -285,6 +286,7 @@ class YouTube(LoginClient):
         return self.api_request(method='POST',
                                 path='videos/rate',
                                 params=params,
+                                no_content=True,
                                 **kwargs)
 
     def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
@@ -317,6 +319,7 @@ class YouTube(LoginClient):
         return self.api_request(method='DELETE',
                                 path='subscriptions',
                                 params=params,
+                                no_content=True,
                                 **kwargs)
 
     def subscribe(self, channel_id, **kwargs):
