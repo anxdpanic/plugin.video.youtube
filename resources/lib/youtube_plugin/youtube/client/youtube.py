@@ -309,6 +309,7 @@ class YouTube(LoginClient):
         return self.api_request(method='DELETE',
                                 path='playlistItems',
                                 params=params,
+                                no_content=True,
                                 **kwargs)
 
     def unsubscribe(self, subscription_id, **kwargs):
@@ -1581,6 +1582,8 @@ class YouTube(LoginClient):
         response = kwargs['response']
         self._context.log_debug('API response: |{0.status_code}|\n'
                                 'headers: |{0.headers}|'.format(response))
+        if response.status_code == 204 and 'no_content' in kwargs:
+            return True
         try:
             json_data = response.json()
             if 'error' in json_data:
@@ -1707,9 +1710,8 @@ class YouTube(LoginClient):
                                         params=log_params,
                                         data=client.get('json'),
                                         headers=log_headers))
-
-        json_data = self.request(response_hook=self._response_hook,
-                                 response_hook_kwargs=kwargs,
-                                 error_hook=self._error_hook,
-                                 **client)
-        return json_data
+        response = self.request(response_hook=self._response_hook,
+                                response_hook_kwargs=kwargs,
+                                error_hook=self._error_hook,
+                                **client)
+        return response

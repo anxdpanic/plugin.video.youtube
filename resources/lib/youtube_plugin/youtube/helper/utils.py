@@ -617,7 +617,10 @@ def update_video_infos(provider, context, video_id_dict,
             video_item.set_playlist_item_id(playlist_item_id)
             context_menu.append(
                 menu_items.remove_video_from_playlist(
-                    context, playlist_id, video_id, video_item.get_name()
+                    context,
+                    playlist_id=playlist_id,
+                    video_id=playlist_item_id,
+                    video_name=video_item.get_name(),
                 )
             )
 
