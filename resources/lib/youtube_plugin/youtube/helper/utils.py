@@ -807,8 +807,13 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
             result_items = []
 
             try:
-                json_data = client.get_related_videos(video_id, page_token=page_token, max_results=17)
-                result_items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+                json_data = client.get_related_videos(video_id,
+                                                      page_token=page_token,
+                                                      max_results=5)
+                result_items = v3.response_to_items(provider,
+                                                    context,
+                                                    json_data,
+                                                    process_next_page=False)
                 page_token = json_data.get('nextPageToken', '')
             except:
                 context.get_ui().show_notification('Failed to add a suggested video.', time_ms=5000)
