@@ -14,6 +14,7 @@ import threading
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from itertools import chain, islice
+from operator import itemgetter
 from random import randint
 
 from .login_client import LoginClient
@@ -48,6 +49,42 @@ class YouTube(LoginClient):
             'method': None,
             'headers': {
                 'Host': 'www.googleapis.com',
+            },
+        },
+        'tv': {
+            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5',
+                        'clientVersion': '5.20150304',
+                    },
+                },
+            },
+            'headers': {
+                'Host': 'www.youtube.com',
+            },
+            'params': {
+                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+            },
+        },
+        'tv_embed': {
+            'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
+            'method': None,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
+                        'clientVersion': '2.0',
+                    },
+                },
+            },
+            'headers': {
+                'Host': 'www.youtube.com',
+            },
+            'params': {
+                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
             },
         },
         '_common': {
@@ -1029,17 +1066,16 @@ class YouTube(LoginClient):
                            page_token='',
                            max_results=0,
                            offset=0,
+                           retry=0,
                            **kwargs):
-        # TODO: Improve handling of InnerTube requests, including automatic
-        # continuation processing to retrieve max_results number of results
-        # See Youtube.get_saved_playlists for existing implementation
         max_results = self._max_results if max_results <= 0 else max_results
 
         post_data = {'videoId': video_id}
         if page_token:
             post_data['continuation'] = page_token
 
-        result = self.api_request(version=1,
+        result = self.api_request(version=('tv' if retry == 1 else
+                                           'tv_embed' if retry == 2 else 1),
                                   method='POST',
                                   path='next',
                                   post_data=post_data,
@@ -1047,60 +1083,106 @@ class YouTube(LoginClient):
         if not result:
             return {}
 
-        related_videos = self.json_traverse(
-            result,
-            path=(
-                     (
-                         'onResponseReceivedEndpoints',
-                         0,
-                         'appendContinuationItemsAction',
-                         'continuationItems',
-                     ) if page_token else (
-                         'contents',
-                         'twoColumnWatchNextResults',
-                         'secondaryResults',
-                         'secondaryResults',
-                         'results',
-                     )
-                 ) + (
-                     slice(offset, None, None),
-                     (
-                         (
-                             'compactVideoRenderer',
-                             # 'videoId',
-                         ),
-                         (
-                             'continuationItemRenderer',
-                             'continuationEndpoint',
-                             'continuationCommand',
-                             # 'token',
-                         ),
-                     ),
-                 )
-        )
-        if not related_videos:
-            return {}
-
-        channel_id = self.json_traverse(
-            result,
-            path=(
+        related_videos = self.json_traverse(result, path=(
+            (
+                'onResponseReceivedEndpoints',
+                0,
+                'appendContinuationItemsAction',
+                'continuationItems',
+            ) if page_token else (
+                'contents',
+                'singleColumnWatchNextResults',
+                'pivot',
+                'pivot',
+                'contents',
+                slice(0, None, None),
+                'pivotShelfRenderer',
+                'content',
+                'pivotHorizontalListRenderer',
+                'items',
+            ) if retry == 1 else (
+               'contents',
+               'singleColumnWatchNextResults',
+               'results',
+               'results',
+               'contents',
+               2,
+               'shelfRenderer',
+               'content',
+               'horizontalListRenderer',
+               'items',
+            ) if retry == 2 else (
                 'contents',
                 'twoColumnWatchNextResults',
+                'secondaryResults',
+                'secondaryResults',
                 'results',
-                'results',
-                'contents',
-                1,
-                'videoSecondaryInfoRenderer',
-                'owner',
-                'videoOwnerRenderer',
-                'title',
-                'runs',
-                0,
-                'navigationEndpoint',
-                'browseEndpoint',
-                'browseId'
             )
-        )
+        ) + (
+            slice(offset, None, None),
+            (
+                'pivotVideoRenderer',
+                # 'videoId',
+            ) if retry == 1 else (
+                'compactVideoRenderer',
+                # 'videoId',
+            ) if retry == 2 else (
+                (
+                    'compactVideoRenderer',
+                    # 'videoId',
+                ),
+                (
+                    'continuationItemRenderer',
+                    'continuationEndpoint',
+                    'continuationCommand',
+                    # 'token',
+                ),
+            ),
+        ), default=[])
+        if not related_videos or not any(related_videos):
+            return {} if retry > 1 else self.get_related_videos(
+                video_id,
+                page_token=page_token,
+                max_results=max_results,
+                retry=(retry + 1),
+                **kwargs
+            )
+
+        channel_id = self.json_traverse(result, path=(
+            'contents',
+            'singleColumnWatchNextResults',
+            'results',
+            'results',
+            'contents',
+            1,
+            'itemSectionRenderer',
+            'contents',
+            0,
+            'videoOwnerRenderer',
+            'navigationEndpoint',
+            'browseEndpoint',
+            'browseId'
+        ) if retry else (
+            'contents',
+            'twoColumnWatchNextResults',
+            'results',
+            'results',
+            'contents',
+            1,
+            'videoSecondaryInfoRenderer',
+            'owner',
+            'videoOwnerRenderer',
+            'title',
+            'runs',
+            0,
+            'navigationEndpoint',
+            'browseEndpoint',
+            'browseId'
+        ))
+
+        thumb_getter = itemgetter(0, -1)
+        if retry == 1:
+            related_videos = chain.from_iterable(related_videos)
 
         items = [{
             'kind': "youtube#video",
@@ -1109,12 +1191,24 @@ class YouTube(LoginClient):
             'related_channel_id': channel_id,
             'partial': True,
             'snippet': {
-                'title': video['title']['simpleText'],
+                'title': self.json_traverse(video, path=(
+                    'title',
+                    (
+                        (
+                            'simpleText',
+                        ),
+                        (
+                            'runs',
+                            0,
+                            'text'
+                        ),
+                    )
+                )),
                 'thumbnails': dict(zip(
                     ('default', 'high'),
-                    video['thumbnail']['thumbnails'],
+                    thumb_getter(video['thumbnail']['thumbnails']),
                 )),
-                'channelId': self.json_traverse(video, (
+                'channelId': self.json_traverse(video, path=(
                     ('longBylineText', 'shortBylineText'),
                     'runs',
                     0,
@@ -1130,9 +1224,10 @@ class YouTube(LoginClient):
             'items': [],
         }
 
-        last_item = related_videos[-1]
-        if last_item and 'token' in last_item:
-            page_token = last_item['token']
+        if not retry:
+            last_item = related_videos[-1]
+            if last_item and 'token' in last_item:
+                page_token = last_item['token']
 
         while 1:
             remaining = max_results - len(items)
