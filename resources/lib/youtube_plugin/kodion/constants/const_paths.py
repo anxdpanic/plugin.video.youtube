@@ -15,6 +15,7 @@ SEARCH = 'kodion/search'
 FAVORITES = 'kodion/favorites'
 WATCH_LATER = 'kodion/watch_later'
 HISTORY = 'kodion/playback_history'
+MY_SUBSCRIPTIONS = '/special/new_uploaded_videos'
 
 API = '/youtube/api'
 API_SUBMIT = '/youtube/api/submit'

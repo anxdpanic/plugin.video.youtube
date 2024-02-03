@@ -14,7 +14,7 @@ import re
 import time
 from math import log10
 
-from ...kodion.constants import content
+from ...kodion.constants import content, paths
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     create_path,
@@ -377,6 +377,13 @@ def update_video_infos(provider, context, video_id_dict,
     path = context.get_path()
     ui = context.get_ui()
 
+    if path.startswith(paths.MY_SUBSCRIPTIONS):
+        in_my_subscriptions_list = True
+        playlist_match = False
+    else:
+        in_my_subscriptions_list = False
+        playlist_match = __RE_PLAYLIST_MATCH.match(path)
+
     for video_id, yt_item in data.items():
         video_item = video_id_dict[video_id]
 
@@ -572,7 +579,6 @@ def update_video_infos(provider, context, video_id_dict,
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        playlist_match = __RE_PLAYLIST_MATCH.match(path)
         playlist_id = playlist_channel_id = ''
         if playlist_match:
             replace_context_menu = True
@@ -634,7 +640,7 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-        if logged_in:
+        if logged_in and not in_my_subscriptions_list:
             # subscribe to the channel of the video
             context_menu.append(
                 menu_items.subscribe_to_channel(
