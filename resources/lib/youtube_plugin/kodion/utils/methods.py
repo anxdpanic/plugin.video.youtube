@@ -184,7 +184,7 @@ def create_path(*args):
         if isinstance(arg, (list, tuple)):
             return create_path(*arg)
 
-        comps.append(str(arg.strip('/').replace('\\', '/').replace('//', '/')))
+        comps.append(str(arg).strip('/').replace('\\', '/').replace('//', '/'))
 
     uri_path = '/'.join(comps)
     if uri_path:
@@ -199,7 +199,7 @@ def create_uri_path(*args):
         if isinstance(arg, (list, tuple)):
             return create_uri_path(*arg)
 
-        comps.append(str(arg.strip('/').replace('\\', '/').replace('//', '/')))
+        comps.append(str(arg).strip('/').replace('\\', '/').replace('//', '/'))
 
     uri_path = '/'.join(comps)
     if uri_path:

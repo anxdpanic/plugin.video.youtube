@@ -167,7 +167,7 @@ def update_channel_infos(provider, context, channel_id_dict,
     path = context.get_path()
 
     filter_list = None
-    if path == '/subscriptions/list/':
+    if path.startswith(paths.SUBSCRIPTIONS):
         in_subscription_list = True
         if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
                              False):
@@ -282,7 +282,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
         channel_id = snippet['channelId']
         # if the path directs to a playlist of our own, set channel id to 'mine'
-        if path == '/channel/mine/playlists/':
+        if path.startswith(paths.MY_PLAYLISTS):
             channel_id = 'mine'
         channel_name = snippet.get('channelTitle', '')
 
@@ -667,8 +667,8 @@ def update_video_infos(provider, context, video_id_dict,
                 )
 
         # more...
-        refresh_container = (path.startswith('/channel/mine/playlist/LL')
-                             or path == '/special/disliked_videos/')
+        refresh_container = path.startswith((paths.LIKED_VIDEOS,
+                                             paths.DISLIKED_VIDEOS))
         context_menu.extend((
             menu_items.more_for_video(
                 context,

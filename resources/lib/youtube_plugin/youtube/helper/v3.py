@@ -21,6 +21,7 @@ from .utils import (
     update_playlist_infos,
     update_video_infos,
 )
+from ...kodion.constants import paths
 from ...kodion import KodionException
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem, menu_items
 
@@ -118,7 +119,7 @@ def _process_list_response(provider, context, json_data):
 
         elif kind == 'playlist':
             # set channel id to 'mine' if the path is for a playlist of our own
-            if context.get_path() == '/channel/mine/playlists/':
+            if context.get_path().startswith(paths.MY_PLAYLISTS):
                 channel_id = 'mine'
             else:
                 channel_id = snippet['channelId']
