@@ -54,27 +54,33 @@ def _process_add(provider, context):
 
 def _process_remove(provider, context):
     listitem_subscription_id = context.get_listitem_detail('channel_subscription_id')
+    listitem_channel_id = context.get_listitem_detail('channel_id')
 
     subscription_id = context.get_param('subscription_id', '')
     if not subscription_id and listitem_subscription_id:
         subscription_id = listitem_subscription_id
 
+    channel_id = context.get_param('channel_id', '')
+    if not channel_id and listitem_channel_id:
+        channel_id = listitem_channel_id
+
     if subscription_id:
-        json_data = provider.get_client(context).unsubscribe(subscription_id)
-        if not json_data:
-            return False
+        success = provider.get_client(context).unsubscribe(subscription_id)
+    elif channel_id:
+        success = provider.get_client(context).unsubscribe_channel(channel_id)
+    else:
+        success = False
 
-        context.get_ui().refresh_container()
+    if not success:
+        return False
 
-        context.get_ui().show_notification(
-            context.localize('unsubscribed.from.channel'),
-            time_ms=2500,
-            audible=False
-        )
-
-        return True
-
-    return False
+    context.get_ui().refresh_container()
+    context.get_ui().show_notification(
+        context.localize('unsubscribed.from.channel'),
+        time_ms=2500,
+        audible=False
+    )
+    return True
 
 
 def process(method, provider, context):

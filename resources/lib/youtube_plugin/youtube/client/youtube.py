@@ -359,6 +359,14 @@ class YouTube(LoginClient):
                                 no_content=True,
                                 **kwargs)
 
+    def unsubscribe_channel(self, channel_id, **kwargs):
+        post_data = {'channelIds': [channel_id]}
+        return self.api_request(version=1,
+                                method='POST',
+                                path='subscription/unsubscribe',
+                                post_data=post_data,
+                                **kwargs)
+
     def subscribe(self, channel_id, **kwargs):
         params = {'part': 'snippet'}
         post_data = {'kind': 'youtube#subscription',

@@ -209,7 +209,7 @@ def update_channel_infos(provider, context, channel_id_dict,
             channel_item.set_channel_subscription_id(subscription_id)
             context_menu.append(
                 menu_items.unsubscribe_from_channel(
-                    context, subscription_id
+                    context, subscription_id=subscription_id
                 )
             )
 
@@ -640,9 +640,13 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-        if logged_in and not in_my_subscriptions_list:
-            # subscribe to the channel of the video
+        if logged_in:
             context_menu.append(
+                # unsubscribe from the channel of the video
+                menu_items.unsubscribe_from_channel(
+                    context, channel_id=channel_id
+                ) if in_my_subscriptions_list else
+                # subscribe to the channel of the video
                 menu_items.subscribe_to_channel(
                     context, channel_id, channel_name
                 )

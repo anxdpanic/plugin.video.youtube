@@ -333,13 +333,19 @@ def subscribe_to_channel(context, channel_id, channel_name=''):
     )
 
 
-def unsubscribe_from_channel(context, channel_id):
+def unsubscribe_from_channel(context, channel_id=None, subscription_id=None):
     return (
         context.localize('unsubscribe'),
         'RunPlugin({0})'.format(context.create_uri(
             ('subscriptions', 'remove',),
             {
-                'subscription_id': channel_id,
+                'subscription_id': subscription_id,
+            },
+        )) if subscription_id else
+        'RunPlugin({0})'.format(context.create_uri(
+            ('subscriptions', 'remove',),
+            {
+                'channel_id': channel_id,
             },
         ))
     )
