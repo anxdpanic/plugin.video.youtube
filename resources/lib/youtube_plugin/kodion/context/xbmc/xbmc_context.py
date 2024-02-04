@@ -592,3 +592,11 @@ class XbmcContext(AbstractContext):
     @staticmethod
     def get_infolabel(name):
         return xbmc.getInfoLabel(name)
+
+    @staticmethod
+    def get_listitem_detail(detail_name, attr=False):
+        return xbmc.getInfoLabel(
+            'Container.ListItem(0).{0}'.format(detail_name)
+            if attr else
+            'Container.ListItem(0).Property({0})'.format(detail_name)
+        )

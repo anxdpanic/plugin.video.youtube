@@ -370,3 +370,7 @@ class AbstractContext(object):
     @staticmethod
     def get_infolabel(name):
         raise NotImplementedError()
+
+    @staticmethod
+    def get_listitem_detail(detail_name, attr=False):
+        raise NotImplementedError()
