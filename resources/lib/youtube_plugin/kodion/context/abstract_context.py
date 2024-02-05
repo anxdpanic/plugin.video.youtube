@@ -239,8 +239,8 @@ class AbstractContext(object):
     def get_path(self):
         return self._path
 
-    def set_path(self, path):
-        self._path = create_path(path)
+    def set_path(self, *path):
+        self._path = create_path(*path)
 
     def get_params(self):
         return self._params
