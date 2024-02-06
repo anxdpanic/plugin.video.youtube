@@ -82,6 +82,8 @@ def parse(datetime_string):
             for group, value in match.groupdict().items()
             if value
         }
+        if timezone:
+            match['tzinfo'] = timezone.utc
         return datetime.combine(
             date=date.today(),
             time=dt_time(**match)
@@ -95,6 +97,8 @@ def parse(datetime_string):
             for group, value in match.groupdict().items()
             if value
         }
+        if timezone:
+            match['tzinfo'] = timezone.utc
         return datetime(**match)
 
     # full date time
@@ -105,6 +109,8 @@ def parse(datetime_string):
             for group, value in match.groupdict().items()
             if value
         }
+        if timezone:
+            match['tzinfo'] = timezone.utc
         return datetime(**match)
 
     # period - at the moment we support only hours, minutes and seconds
@@ -129,6 +135,8 @@ def parse(datetime_string):
             for group, value in match.groupdict().items()
             if value
         }
+        if timezone:
+            match['tzinfo'] = timezone.utc
         return datetime(**match)
 
     raise KodionException('Could not parse |{datetime}| as ISO 8601'
