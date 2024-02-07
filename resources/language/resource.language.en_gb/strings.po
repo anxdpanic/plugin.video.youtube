@@ -1384,3 +1384,11 @@ msgstr ""
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
 msgstr ""
+
+msgctxt "#30771"
+msgid "Enable framerate hinting"
+msgstr ""
+
+msgctxt "#30772"
+msgid "Enable fractional framerate hinting"
+msgstr ""
