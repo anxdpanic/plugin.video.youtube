@@ -174,7 +174,6 @@ class YouTubeRequestClient(BaseRequestsClass):
         'smarttv_embedded': {
             '_id': 85,
             'json': {
-                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
                         'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',

@@ -312,18 +312,10 @@ def go_to_channel(context, channel_id, channel_name):
 
 
 def subscribe_to_channel(context, channel_id, channel_name=''):
-    if not channel_name:
-        return (
-            context.localize('subscribe'),
-            'RunPlugin({0})'.format(context.create_uri(
-                ('subscriptions', 'add',),
-                {
-                    'subscription_id': channel_id,
-                },
-            ))
-        )
     return (
-        context.localize('subscribe_to') % context.get_ui().bold(channel_name),
+        context.localize('subscribe_to') % context.get_ui().bold(channel_name)
+        if channel_name else
+        context.localize('subscribe'),
         'RunPlugin({0})'.format(context.create_uri(
             ('subscriptions', 'add',),
             {
