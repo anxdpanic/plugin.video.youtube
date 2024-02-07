@@ -1344,18 +1344,10 @@ class VideoInfo(YouTubeRequestClient):
         allow_hfr = 'hfr' in stream_features
         disable_hfr_max = 'no_hfr_max' in stream_features
         allow_ssa = 'ssa' in stream_features
-        fractional_frame_rate_hint = 'frac_hint' in stream_features
+        integer_frame_rate_hint = 'no_frac_fr_hint' in stream_features
         stream_select = _settings.stream_select()
 
         fps_scale_map = {
-            0: '{0}000/1000',  # --.00 fps
-            24: '24000/1001',  # 23.976 fps
-            25: '25000/1000',  # 25.00 fps
-            30: '30000/1001',  # 29.976 fps
-            48: '48000/1000',  # 48.00 fps
-            50: '50000/1000',  # 50.00 fps
-            60: '60000/1001',  # 59.976 fps
-        } if fractional_frame_rate_hint else {
             0: '{0}000/1000',  # --.00 fps
             24: '24000/1000',  # 24.00 fps
             25: '25000/1000',  # 25.00 fps
@@ -1363,6 +1355,14 @@ class VideoInfo(YouTubeRequestClient):
             48: '48000/1000',  # 48.00 fps
             50: '50000/1000',  # 50.00 fps
             60: '60000/1000',  # 60.00 fps
+        } if integer_frame_rate_hint else {
+            0: '{0}000/1000',  # --.00 fps
+            24: '24000/1001',  # 23.976 fps
+            25: '25000/1000',  # 25.00 fps
+            30: '30000/1001',  # 29.976 fps
+            48: '48000/1000',  # 48.00 fps
+            50: '50000/1000',  # 50.00 fps
+            60: '60000/1001',  # 59.976 fps
         }
 
         quality_factor_map = {
@@ -1684,7 +1684,7 @@ class VideoInfo(YouTubeRequestClient):
         _settings = self._context.get_settings()
         stream_features = _settings.stream_features()
         do_filter = 'filter' in stream_features
-        frame_rate_hint = 'fr_hint' in stream_features
+        frame_rate_hint = 'no_fr_hint' not in stream_features
         stream_select = _settings.stream_select()
 
         main_stream = {
@@ -1835,8 +1835,8 @@ class VideoInfo(YouTubeRequestClient):
                         ' mimeType="{mimeType}"'
                         ' bandwidth="{bitrate}"'
                         ' width="{width}"'
-                        ' height="{height}"'
-                        ' frameRate="{frameRate}"' if frame_rate_hint else ''
+                        ' height="{height}"' +
+                        (' frameRate="{frameRate}"' if frame_rate_hint else '') +
                         # quality and priority attributes are not used by ISA
                         ' qualityRanking="{quality}"'
                         ' selectionPriority="{priority}"'

@@ -1387,9 +1387,9 @@ msgid "Are you sure you want to clear your Watch Later list?"
 msgstr ""
 
 msgctxt "#30771"
-msgid "Enable framerate hinting"
+msgid "Disable fractional framerate hinting"
 msgstr ""
 
 msgctxt "#30772"
-msgid "Enable fractional framerate hinting"
+msgid "Disable all framerate hinting"
 msgstr ""
