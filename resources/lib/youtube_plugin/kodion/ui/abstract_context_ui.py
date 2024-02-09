@@ -18,9 +18,6 @@ class AbstractContextUI(object):
     def create_progress_dialog(self, heading, text=None, background=False):
         raise NotImplementedError()
 
-    def get_view_manager(self):
-        raise NotImplementedError()
-
     def on_keyboard_input(self, title, default='', hidden=False):
         raise NotImplementedError()
 
