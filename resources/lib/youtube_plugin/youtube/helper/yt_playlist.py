@@ -15,7 +15,7 @@ from ...kodion.utils import find_video_id
 
 
 def _process_add_video(provider, context, keymap_action=False):
-    path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
+    path = context.get_listitem_detail('FileNameAndPath', attr=True)
 
     client = provider.get_client(context)
     logged_in = provider.is_logged_in()
@@ -64,9 +64,9 @@ def _process_add_video(provider, context, keymap_action=False):
 
 
 def _process_remove_video(provider, context):
-    listitem_playlist_id = context.get_infolabel('Container.ListItem(0).Property(playlist_id)')
-    listitem_playlist_item_id = context.get_infolabel('Container.ListItem(0).Property(playlist_item_id)')
-    listitem_title = context.get_infolabel('Container.ListItem(0).Title')
+    listitem_playlist_id = context.get_listitem_detail('playlist_id')
+    listitem_playlist_item_id = context.get_listitem_detail('playlist_item_id')
+    listitem_title = context.get_listitem_detail('Title', attr=True)
     keymap_action = False
 
     playlist_id = context.get_param('playlist_id', '')
@@ -96,9 +96,11 @@ def _process_remove_video(provider, context):
 
     if playlist_id.strip().lower() not in ('wl', 'hl'):
         if context.get_ui().on_remove_content(video_name):
-            json_data = provider.get_client(context).remove_video_from_playlist(playlist_id=playlist_id,
-                                                                                playlist_item_id=video_id)
-            if not json_data:
+            success = provider.get_client(context).remove_video_from_playlist(
+                playlist_id=playlist_id,
+                playlist_item_id=video_id,
+            )
+            if not success:
                 return False
 
             context.get_ui().refresh_container()
@@ -139,7 +141,7 @@ def _process_remove_playlist(provider, context):
 
 def _process_select_playlist(provider, context):
     # Get listitem path asap, relies on listitems focus
-    path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
+    path = context.get_listitem_detail('FileNameAndPath', attr=True)
 
     params = context.get_params()
     ui = context.get_ui()

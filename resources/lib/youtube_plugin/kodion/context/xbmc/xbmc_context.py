@@ -327,24 +327,10 @@ class XbmcContext(AbstractContext):
         return time_obj.strftime(str_format)
 
     def get_language(self):
-        """
-        The xbmc.getLanguage() method is fucked up!!! We always return 'en-US' for now
-        """
-
-        """
-        if self.get_system_version().get_release_name() == 'Frodo':
-            return 'en-US'
-
-        try:
-            language = xbmc.getLanguage(0, region=True)
-            language = language.split('-')
-            language = '%s-%s' % (language[0].lower(), language[1].upper())
-            return language
-        except Exception as exc:
-            self.log_error('Failed to get system language (%s)', exc.__str__())
-            return 'en-US'
-        """
-
+        kodi_language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
+        lang_code, seperator, region = kodi_language.partition('-')
+        if region:
+            return seperator.join((lang_code.lower(), region.upper()))
         return 'en-US'
 
     def get_language_name(self, lang_id=None):
@@ -607,3 +593,11 @@ class XbmcContext(AbstractContext):
     @staticmethod
     def get_infolabel(name):
         return xbmc.getInfoLabel(name)
+
+    @staticmethod
+    def get_listitem_detail(detail_name, attr=False):
+        return xbmc.getInfoLabel(
+            'Container.ListItem(0).{0}'.format(detail_name)
+            if attr else
+            'Container.ListItem(0).Property({0})'.format(detail_name)
+        )

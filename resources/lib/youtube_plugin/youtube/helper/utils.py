@@ -14,7 +14,7 @@ import re
 import time
 from math import log10
 
-from ...kodion.constants import content
+from ...kodion.constants import content, paths
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     create_path,
@@ -167,7 +167,7 @@ def update_channel_infos(provider, context, channel_id_dict,
     path = context.get_path()
 
     filter_list = None
-    if path == '/subscriptions/list/':
+    if path.startswith(paths.SUBSCRIPTIONS):
         in_subscription_list = True
         if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
                              False):
@@ -209,7 +209,7 @@ def update_channel_infos(provider, context, channel_id_dict,
             channel_item.set_channel_subscription_id(subscription_id)
             context_menu.append(
                 menu_items.unsubscribe_from_channel(
-                    context, subscription_id
+                    context, subscription_id=subscription_id
                 )
             )
 
@@ -282,7 +282,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
         channel_id = snippet['channelId']
         # if the path directs to a playlist of our own, set channel id to 'mine'
-        if path == '/channel/mine/playlists/':
+        if path.startswith(paths.MY_PLAYLISTS):
             channel_id = 'mine'
         channel_name = snippet.get('channelTitle', '')
 
@@ -376,6 +376,13 @@ def update_video_infos(provider, context, video_id_dict,
 
     path = context.get_path()
     ui = context.get_ui()
+
+    if path.startswith(paths.MY_SUBSCRIPTIONS):
+        in_my_subscriptions_list = True
+        playlist_match = False
+    else:
+        in_my_subscriptions_list = False
+        playlist_match = __RE_PLAYLIST_MATCH.match(path)
 
     for video_id, yt_item in data.items():
         video_item = video_id_dict[video_id]
@@ -572,7 +579,6 @@ def update_video_infos(provider, context, video_id_dict,
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        playlist_match = __RE_PLAYLIST_MATCH.match(path)
         playlist_id = playlist_channel_id = ''
         if playlist_match:
             replace_context_menu = True
@@ -617,7 +623,10 @@ def update_video_infos(provider, context, video_id_dict,
             video_item.set_playlist_item_id(playlist_item_id)
             context_menu.append(
                 menu_items.remove_video_from_playlist(
-                    context, playlist_id, video_id, video_item.get_name()
+                    context,
+                    playlist_id=playlist_id,
+                    video_id=playlist_item_id,
+                    video_name=video_item.get_name(),
                 )
             )
 
@@ -632,8 +641,12 @@ def update_video_infos(provider, context, video_id_dict,
             )
 
         if logged_in:
-            # subscribe to the channel of the video
             context_menu.append(
+                # unsubscribe from the channel of the video
+                menu_items.unsubscribe_from_channel(
+                    context, channel_id=channel_id
+                ) if in_my_subscriptions_list else
+                # subscribe to the channel of the video
                 menu_items.subscribe_to_channel(
                     context, channel_id, channel_name
                 )
@@ -658,8 +671,8 @@ def update_video_infos(provider, context, video_id_dict,
                 )
 
         # more...
-        refresh_container = (path.startswith('/channel/mine/playlist/LL')
-                             or path == '/special/disliked_videos/')
+        refresh_container = path.startswith((paths.LIKED_VIDEOS,
+                                             paths.DISLIKED_VIDEOS))
         context_menu.extend((
             menu_items.more_for_video(
                 context,
@@ -804,8 +817,13 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
             result_items = []
 
             try:
-                json_data = client.get_related_videos(video_id, page_token=page_token, max_results=17)
-                result_items = v3.response_to_items(provider, context, json_data, process_next_page=False)
+                json_data = client.get_related_videos(video_id,
+                                                      page_token=page_token,
+                                                      max_results=5)
+                result_items = v3.response_to_items(provider,
+                                                    context,
+                                                    json_data,
+                                                    process_next_page=False)
                 page_token = json_data.get('nextPageToken', '')
             except:
                 context.get_ui().show_notification('Failed to add a suggested video.', time_ms=5000)

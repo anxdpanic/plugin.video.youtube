@@ -173,15 +173,21 @@ class Storage(object):
             self.__class__._table_created = False
             self.__class__._table_updated = True
 
-        try:
-            db = sqlite3.connect(self._filepath,
-                                 check_same_thread=False,
-                                 timeout=1,
-                                 isolation_level=None)
-        except sqlite3.OperationalError as exc:
-            log_error('SQLStorage._execute - {exc}:\n{details}'.format(
-                exc=exc, details=''.join(format_stack())
-            ))
+        for _ in range(3):
+            try:
+                db = sqlite3.connect(self._filepath,
+                                     check_same_thread=False,
+                                     timeout=1,
+                                     isolation_level=None)
+                break
+            except (sqlite3.Error, sqlite3.OperationalError) as exc:
+                log_error('SQLStorage._open - {exc}:\n{details}'.format(
+                    exc=exc, details=''.join(format_stack())
+                ))
+                if isinstance(exc, sqlite3.Error):
+                    return False
+                time.sleep(0.1)
+        else:
             return False
 
         cursor = db.cursor()
@@ -207,7 +213,7 @@ class Storage(object):
             )
 
         if not self._table_updated:
-            for result in cursor.execute(self._sql['has_old_table']):
+            for result in self._execute(cursor, self._sql['has_old_table']):
                 if result[0] == 1:
                     statements.extend((
                         'PRAGMA writable_schema = 1;',
@@ -220,7 +226,7 @@ class Storage(object):
             transaction_begin = len(sql_script) + 1
             sql_script.extend(('BEGIN;', 'COMMIT;', 'VACUUM;'))
             sql_script[transaction_begin:transaction_begin] = statements
-        cursor.executescript('\n'.join(sql_script))
+        self._execute(cursor, '\n'.join(sql_script), script=True)
 
         self.__class__._table_created = True
         self.__class__._table_updated = True
@@ -239,7 +245,7 @@ class Storage(object):
             self._db = None
 
     @staticmethod
-    def _execute(cursor, query, values=None, many=False):
+    def _execute(cursor, query, values=None, many=False, script=False):
         if values is None:
             values = ()
         """
@@ -251,17 +257,16 @@ class Storage(object):
             try:
                 if many:
                     return cursor.executemany(query, values)
+                if script:
+                    return cursor.executescript(query)
                 return cursor.execute(query, values)
-            except sqlite3.OperationalError as exc:
+            except (sqlite3.Error, sqlite3.OperationalError) as exc:
                 log_error('SQLStorage._execute - {exc}:\n{details}'.format(
                     exc=exc, details=''.join(format_stack())
                 ))
+                if isinstance(exc, sqlite3.Error):
+                    return []
                 time.sleep(0.1)
-            except sqlite3.Error as exc:
-                log_error('SQLStorage._execute - {exc}:\n{details}'.format(
-                    exc=exc, details=''.join(format_stack())
-                ))
-                return []
         return []
 
     def _optimize_file_size(self, defer=False):

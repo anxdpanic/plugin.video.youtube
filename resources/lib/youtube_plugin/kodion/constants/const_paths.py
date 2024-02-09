@@ -11,10 +11,16 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
-SEARCH = 'kodion/search'
-FAVORITES = 'kodion/favorites'
-WATCH_LATER = 'kodion/watch_later'
-HISTORY = 'kodion/playback_history'
+SEARCH = '/kodion/search'
+FAVORITES = '/kodion/favorites'
+WATCH_LATER = '/kodion/watch_later'
+HISTORY = '/kodion/playback_history'
+
+DISLIKED_VIDEOS = '/special/disliked_videos'
+LIKED_VIDEOS = '/channel/mine/playlist/LL'
+MY_PLAYLISTS = '/channel/mine/playlists'
+MY_SUBSCRIPTIONS = '/special/new_uploaded_videos'
+SUBSCRIPTIONS = '/subscriptions/list'
 
 API = '/youtube/api'
 API_SUBMIT = '/youtube/api/submit'

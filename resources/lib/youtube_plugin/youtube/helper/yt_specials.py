@@ -30,6 +30,7 @@ def _process_related_videos(provider, context):
             _refresh=params.get('refresh'),
             video_id=video_id,
             page_token=params.get('page_token', ''),
+            offset=params.get('offset', 0),
         )
     else:
         json_data = function_cache.run(
