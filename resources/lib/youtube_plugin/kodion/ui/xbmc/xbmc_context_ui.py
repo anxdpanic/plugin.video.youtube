@@ -73,38 +73,40 @@ class XbmcContextUI(AbstractContextUI):
         text = self._context.localize('content.delete') % to_unicode(content_name)
         return self.on_yes_no_input(self._context.localize('content.delete.confirm'), text)
 
-    def on_select(self, title, items=None):
+    def on_select(self, title, items=None, preselect=-1, use_details=False):
         if items is None:
             items = []
 
-        use_details = (isinstance(items[0], tuple) and len(items[0]) == 4)
-
-        _dict = {}
-        _items = []
-        i = 0
-        for item in items:
+        result_map = {}
+        dialog_items = []
+        for idx, item in enumerate(items):
             if isinstance(item, tuple):
-                if use_details:
-                    new_item = xbmcgui.ListItem(label=item[0], label2=item[1])
-                    new_item.setArt({'icon': item[3], 'thumb': item[3]})
-                    _items.append(new_item)
-                    _dict[i] = item[2]
+                num_details = len(item)
+                if num_details > 2:
+                    list_item = xbmcgui.ListItem(label=item[0],
+                                                 label2=item[1],
+                                                 offscreen=True)
+                    if num_details > 3:
+                        use_details = True
+                        icon = item[3]
+                        list_item.setArt({'icon': icon, 'thumb': icon})
+                        if num_details > 4 and item[4]:
+                            preselect = idx
+                    result_map[idx] = item[2]
+                    dialog_items.append(list_item)
                 else:
-                    _dict[i] = item[1]
-                    _items.append(item[0])
+                    result_map[idx] = item[1]
+                    dialog_items.append(item[0])
             else:
-                _dict[i] = i
-                _items.append(item)
-
-            i += 1
+                result_map[idx] = idx
+                dialog_items.append(item)
 
         dialog = xbmcgui.Dialog()
-        if use_details:
-            result = dialog.select(title, _items, useDetails=use_details)
-        else:
-            result = dialog.select(title, _items)
-
-        return _dict.get(result, -1)
+        result = dialog.select(title,
+                               dialog_items,
+                               preselect=preselect,
+                               useDetails=use_details)
+        return result_map.get(result, -1)
 
     def show_notification(self,
                           message,

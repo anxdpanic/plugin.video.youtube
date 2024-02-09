@@ -385,9 +385,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
     def _on_channel(self, context, re_match):
-        listitem_channel_id = context.get_infolabel(
-            'Container.ListItem(0).Property(channel_id)'
-        )
+        listitem_channel_id = context.get_listitem_detail('channel_id')
 
         client = self.get_client(context)
         localize = context.localize
@@ -591,7 +589,7 @@ class Provider(AbstractProvider):
 
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
-            path = context.get_infolabel('Container.ListItem(0).FileNameAndPath')
+            path = context.get_listitem_detail('FileNameAndPath', attr=True)
             if context.is_plugin_path(path, 'play/'):
                 video_id = find_video_id(path)
                 if video_id:

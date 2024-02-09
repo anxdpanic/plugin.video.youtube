@@ -218,7 +218,7 @@ class ViewManager(object):
                 (view_data['name'], view_data['id'])
                 for view_data in view_type_data
             ]
-            view_id = ui.on_select(title, items)
+            view_id = ui.on_select(title, items, preselect=current_value)
         else:
             log_info('ViewManager: Unsupported view |{view_type}|'
                      .format(view_type=view_type))

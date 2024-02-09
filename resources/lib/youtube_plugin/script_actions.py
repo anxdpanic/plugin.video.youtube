@@ -58,7 +58,9 @@ def _config_actions(action, *_args):
         ]
         sub_opts[sub_setting] = ui.bold(sub_opts[sub_setting])
 
-        result = ui.on_select(localize('subtitles.language'), sub_opts)
+        result = ui.on_select(localize('subtitles.language'),
+                              sub_opts,
+                              preselect=sub_setting)
         if result > -1:
             settings.set_subtitle_languages(result)
 
@@ -182,7 +184,10 @@ def _user_actions(action, params):
             usernames.append(username)
         if new_user:
             usernames.append(ui.italic(localize('user.new')))
-        return ui.on_select(reason, usernames), sorted(current_users.keys())
+        return (
+            ui.on_select(reason, usernames, preselect=current_user),
+            sorted(current_users.keys()),
+        )
 
     def add_user():
         results = ui.on_keyboard_input(localize('user.enter_name'))

@@ -36,7 +36,7 @@ class AbstractContextUI(object):
     def on_remove_content(self, content_name):
         raise NotImplementedError()
 
-    def on_select(self, title, items=None):
+    def on_select(self, title, items=None, preselect=-1, use_details=False):
         raise NotImplementedError()
 
     def open_settings(self):

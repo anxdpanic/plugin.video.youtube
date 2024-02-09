@@ -174,7 +174,6 @@ class YouTubeRequestClient(BaseRequestsClass):
         'smarttv_embedded': {
             '_id': 85,
             'json': {
-                'params': '2AMBCgIQBg',
                 'context': {
                     'client': {
                         'clientName': 'TVHTML5_SIMPLY_EMBEDDED_PLAYER',
@@ -275,18 +274,18 @@ class YouTubeRequestClient(BaseRequestsClass):
         super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
 
     @classmethod
-    def json_traverse(cls, json_data, path):
+    def json_traverse(cls, json_data, path, default=None):
         if not json_data or not path:
-            return None
+            return default
 
         result = json_data
         for idx, keys in enumerate(path):
             if not isinstance(result, (dict, list, tuple)):
-                return None
+                return default
 
             if isinstance(keys, slice):
                 return [
-                    cls.json_traverse(part, path[idx + 1:])
+                    cls.json_traverse(part, path[idx + 1:], default=default)
                     for part in result[keys]
                     if part
                 ]
@@ -296,7 +295,7 @@ class YouTubeRequestClient(BaseRequestsClass):
 
             for key in keys:
                 if isinstance(key, (list, tuple)):
-                    new_result = cls.json_traverse(result, key)
+                    new_result = cls.json_traverse(result, key, default=default)
                     if new_result:
                         result = new_result
                         break
@@ -308,10 +307,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                     continue
                 break
             else:
-                return None
+                return default
 
         if result == json_data:
-            return None
+            return default
         return result
 
     @classmethod

@@ -239,8 +239,8 @@ class AbstractContext(object):
     def get_path(self):
         return self._path
 
-    def set_path(self, value):
-        self._path = value
+    def set_path(self, *path):
+        self._path = create_path(*path)
 
     def get_params(self):
         return self._params
@@ -369,4 +369,8 @@ class AbstractContext(object):
 
     @staticmethod
     def get_infolabel(name):
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_listitem_detail(detail_name, attr=False):
         raise NotImplementedError()
