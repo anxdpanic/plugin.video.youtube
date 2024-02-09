@@ -38,25 +38,25 @@ class AbstractProvider(object):
         self.register_path(r'^/$', '_internal_root')
 
         self.register_path(r''.join((
-            '^/',
+            '^',
             paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
         )), '_internal_watch_later')
 
         self.register_path(r''.join((
-            '^/',
+            '^',
             paths.FAVORITES,
             '/(?P<command>add|clear|list|remove)/?$'
         )), '_internal_favorite')
 
         self.register_path(r''.join((
-            '^/',
+            '^',
             paths.SEARCH,
             '/(?P<command>input|query|list|remove|clear|rename)/?$'
         )), '_internal_search')
 
         self.register_path(r''.join((
-            '^/',
+            '^',
             paths.HISTORY,
             '/$'
         )), 'on_playback_history')
@@ -320,7 +320,7 @@ class AbstractProvider(object):
                     search_history.update(query)
                 except:
                     pass
-            context.set_path('/kodion/search/query/')
+            context.set_path(paths.SEARCH, 'query')
             if isinstance(query, bytes):
                 query = query.decode('utf-8')
             return self.on_search(query, context, re_match)

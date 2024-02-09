@@ -292,7 +292,7 @@ class AbstractSettings(object):
                 if selected >= key]
 
     def stream_features(self):
-        return self.get_string_list(settings.MPD_STREAM_FEATURES)
+        return frozenset(self.get_string_list(settings.MPD_STREAM_FEATURES))
 
     _STREAM_SELECT = {
         1: 'auto',
