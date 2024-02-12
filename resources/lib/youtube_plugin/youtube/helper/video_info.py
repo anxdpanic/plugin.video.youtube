@@ -1123,7 +1123,8 @@ class VideoInfo(YouTubeRequestClient):
         microformat = (response.get('microformat', {})
                        .get('playerMicroformatRenderer', {}))
         streaming_data = response.get('streamingData', {})
-        is_live = '_live' if video_details.get('isLiveContent') else ''
+        is_live = video_details.get('isLiveContent', False)
+        thumb_suffix = '_live' if is_live else ''
 
         captions = response.get('captions')
         if captions:
@@ -1159,7 +1160,7 @@ class VideoInfo(YouTubeRequestClient):
                     'private': video_details.get('isPrivate', False),
                     'crawlable': video_details.get('isCrawlable', False),
                     'family_safe': microformat.get('isFamilySafe', False),
-                    'live': bool(is_live),
+                    'live': is_live,
                 },
             },
             'channel': {
@@ -1170,13 +1171,13 @@ class VideoInfo(YouTubeRequestClient):
             },
             'images': {
                 'high': ('https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg'
-                         .format(self.video_id, is_live)),
+                         .format(self.video_id, thumb_suffix)),
                 'medium': ('https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg'
-                           .format(self.video_id, is_live)),
+                           .format(self.video_id, thumb_suffix)),
                 'standard': ('https://i.ytimg.com/vi/{0}/sddefault{1}.jpg'
-                             .format(self.video_id, is_live)),
+                             .format(self.video_id, thumb_suffix)),
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
-                            .format(self.video_id, is_live)),
+                            .format(self.video_id, thumb_suffix)),
             },
             'subtitles': captions,
         }
@@ -1249,7 +1250,7 @@ class VideoInfo(YouTubeRequestClient):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         manifest_url = main_stream = None
-        live_type = is_live and _settings.get_live_stream_type()
+        live_type = _settings.get_live_stream_type() if is_live else None
 
         if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']
@@ -1258,8 +1259,7 @@ class VideoInfo(YouTubeRequestClient):
                 streaming_data['hlsManifestUrl'],
                 live_type, meta_info, client['headers'], playback_stats
             ))
-        else:
-            live_type = None
+
 
         # extract adaptive streams and create MPEG-DASH manifest
         if not manifest_url and httpd_is_live and adaptive_fmts:
@@ -1269,6 +1269,7 @@ class VideoInfo(YouTubeRequestClient):
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, license_info.get('url')
             )
+            live_type = None
 
         # extract non-adaptive streams
         if all_fmts:
