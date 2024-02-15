@@ -43,10 +43,7 @@ __all__ = (
 
 
 def loose_version(v):
-    filled = []
-    for point in v.split("."):
-        filled.append(point.zfill(8))
-    return tuple(filled)
+    return [point.zfill(8) for point in v.split('.')]
 
 
 def to_unicode(text):

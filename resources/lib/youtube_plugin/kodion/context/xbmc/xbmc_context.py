@@ -546,31 +546,32 @@ class XbmcContext(AbstractContext):
         return success
 
     # Values of capability map can be any of the following:
-    # - required version number, as string for comparison with actual installed
-    #   InputStream.Adaptive version
+    # - required version number, as string param to loose_version() to compare
+    # against installed InputStream.Adaptive version
     # - any Falsy value to exclude capability regardless of version
     # - True to include capability regardless of version
     _ISA_CAPABILITIES = {
-        'live': '2.0.12',
-        'drm': '2.2.12',
+        'live': loose_version('2.0.12'),
+        'drm': loose_version('2.2.12'),
         # audio codecs
-        'vorbis': '2.3.14',
-        'opus': '19.0.0',  # unknown when Opus audio support was implemented
+        'vorbis': loose_version('2.3.14'),
+        # unknown when Opus audio support was implemented
+        'opus': loose_version('19.0.0'),
         'mp4a': True,
-        'ac-3': '2.1.15',
-        'ec-3': '2.1.15',
-        'dts': '2.1.15',
+        'ac-3': loose_version('2.1.15'),
+        'ec-3': loose_version('2.1.15'),
+        'dts': loose_version('2.1.15'),
         # video codecs
         'avc1': True,
-        'av01': '20.3.0',
+        'av01': loose_version('20.3.0'),
         'vp8': False,
-        'vp9': '2.3.14',
+        'vp9': loose_version('2.3.14'),
     }
 
     def inputstream_adaptive_capabilities(self, capability=None):
-        # Returns a list of inputstream.adaptive capabilities
-        # If capability param is provided, returns version of ISA where the
-        # capability is available
+        # Returns a frozenset of capabilities supported by installed ISA version
+        # If capability param is provided, returns True if the installed version
+        # of ISA supports the nominated capability, False otherwise
 
         try:
             addon = xbmcaddon.Addon('inputstream.adaptive')
@@ -582,17 +583,16 @@ class XbmcContext(AbstractContext):
             return frozenset() if capability is None else None
 
         isa_loose_version = loose_version(inputstream_version)
-        if capability is None:
-            capabilities = frozenset(
-                capability
-                for (capability, version) in self._ISA_CAPABILITIES.items()
-                if version is True
-                or version and isa_loose_version >= loose_version(version)
-            )
-            return capabilities
-        version = self._ISA_CAPABILITIES.get(capability)
-        return (version is True
-                or version and isa_loose_version >= loose_version(version))
+
+        if capability:
+            version = self._ISA_CAPABILITIES.get(capability)
+            return version is True or version and isa_loose_version >= version
+
+        return frozenset(
+            capability
+            for (capability, version) in self._ISA_CAPABILITIES.items()
+            if version is True or version and isa_loose_version >= version
+        )
 
     @staticmethod
     def inputstream_adaptive_auto_stream_selection():
