@@ -304,9 +304,6 @@ class AbstractSettings(object):
         select_type = self.get_int(settings.MPD_STREAM_SELECT, 1)
         return self._STREAM_SELECT.get(select_type) or self._STREAM_SELECT[1]
 
-    def remote_friendly_search(self):
-        return self.get_bool(settings.REMOTE_FRIENDLY_SEARCH, False)
-
     def hide_short_videos(self):
         return self.get_bool(settings.HIDE_SHORT_VIDEOS, False)
 

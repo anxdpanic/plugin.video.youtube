@@ -1204,7 +1204,7 @@ msgid "Enable VP9 video"
 msgstr "Tue VP9-videota"
 
 msgctxt "#30729"
-msgid "Remote friendly search"
+msgid ""
 msgstr "Kaukosäätimelle soveltuva haku"
 
 msgctxt "#30730"

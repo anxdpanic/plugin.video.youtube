@@ -28,7 +28,6 @@ LOCATION_RADIUS = 'youtube.location.radius'  # (int)
 PLAY_COUNT_MIN_PERCENT = 'kodion.play_count.percent'  # (int)
 USE_LOCAL_HISTORY = 'kodion.history.local'  # (bool)
 USE_REMOTE_HISTORY = 'kodion.history.remote'  # (bool)
-REMOTE_FRIENDLY_SEARCH = 'youtube.search.remote.friendly'  # (bool)
 HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
 DETAILED_DESCRIPTION = 'youtube.view.description.details'  # (bool)
 
