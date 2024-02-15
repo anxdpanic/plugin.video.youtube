@@ -18,7 +18,7 @@ import shutil
 from datetime import timedelta
 from math import floor, log
 
-from ..compatibility import quote, string_type, xbmc, xbmcvfs
+from ..compatibility import byte_string_type, quote, string_type, xbmc, xbmcvfs
 from ..logger import log_error
 
 
@@ -50,14 +50,12 @@ def loose_version(v):
 
 
 def to_unicode(text):
-    result = text
-    if isinstance(text, (bytes, str)):
+    if isinstance(text, byte_string_type):
         try:
-            result = text.decode('utf-8', 'ignore')
-        except (AttributeError, UnicodeError):
+            return text.decode('utf-8', 'ignore')
+        except UnicodeError:
             pass
-
-    return result
+    return text
 
 
 def find_best_fit(data, compare_method=None):

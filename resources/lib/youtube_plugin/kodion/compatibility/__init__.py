@@ -32,6 +32,7 @@ try:
     xbmc.LOGSEVERE = xbmc.LOGFATAL
 
     string_type = str
+    byte_string_type = bytes
 
 except ImportError:
     import BaseHTTPServer
@@ -124,9 +125,11 @@ except ImportError:
 
 
     string_type = basestring
+    byte_string_type = (bytes, str)
 
 __all__ = (
     'BaseHTTPServer',
+    'byte_string_type',
     'parse_qs',
     'parse_qsl',
     'quote',
