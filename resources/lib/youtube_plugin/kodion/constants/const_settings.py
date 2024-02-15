@@ -30,6 +30,7 @@ USE_LOCAL_HISTORY = 'kodion.history.local'  # (bool)
 USE_REMOTE_HISTORY = 'kodion.history.remote'  # (bool)
 HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
 DETAILED_DESCRIPTION = 'youtube.view.description.details'  # (bool)
+DETAILED_LABELS = 'youtube.view.label.details'  # (bool)
 
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web.urls'  # (bool)

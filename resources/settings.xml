@@ -689,6 +689,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.view.label.details" type="boolean" label="30773" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
             <group id="2">
                 <setting id="kodion.history.local" type="boolean" label="30675" help="">

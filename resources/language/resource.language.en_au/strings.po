@@ -1392,3 +1392,7 @@ msgstr ""
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
 msgstr ""
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr ""

@@ -417,17 +417,26 @@ class XbmcContext(AbstractContext):
             category_label = self.get_param('category_label')
         if category_label:
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
+        detailed_labels = self.get_settings().show_detailed_labels()
         if sub_type == 'history':
             self.add_sort_method(
                 (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
                 (sort.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
                 (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            ) if detailed_labels else self.add_sort_method(
+                (sort.LASTPLAYED,),
+                (sort.PLAYCOUNT,),
+                (sort.UNSORTED,),
+                (sort.LABEL_IGNORE_THE,),
             )
         else:
             self.add_sort_method(
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
                 (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+            ) if detailed_labels else self.add_sort_method(
+                (sort.UNSORTED,),
+                (sort.LABEL_IGNORE_THE,),
             )
         if content_type == content.VIDEO_CONTENT:
             self.add_sort_method(
@@ -437,6 +446,13 @@ class XbmcContext(AbstractContext):
                 (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
                 (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
                 (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
+            ) if detailed_labels else self.add_sort_method(
+                (sort.PROGRAM_COUNT,),
+                (sort.VIDEO_RATING,),
+                (sort.DATE,),
+                (sort.DATEADDED,),
+                (sort.VIDEO_RUNTIME,),
+                (sort.TRACKNUM,),
             )
 
     def add_sort_method(self, *sort_methods):
