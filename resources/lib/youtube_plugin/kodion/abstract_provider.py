@@ -13,7 +13,6 @@ from __future__ import absolute_import, division, unicode_literals
 import re
 
 from .constants import content, paths
-from .compatibility import quote, unquote
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -31,8 +30,6 @@ class AbstractProvider(object):
     def __init__(self):
         # map for regular expression (path) to method (names)
         self._dict_path = {}
-
-        self._data_cache = None
 
         # register some default paths
         self.register_path(r'^/$', '_internal_root')
@@ -233,15 +230,6 @@ class AbstractProvider(object):
 
         return False
 
-    @property
-    def data_cache(self):
-        return self._data_cache
-
-    @data_cache.setter
-    def data_cache(self, context):
-        if not self._data_cache:
-            self._data_cache = context.get_data_cache()
-
     def _internal_search(self, context, re_match):
         params = context.get_params()
         ui = context.get_ui()
@@ -250,13 +238,13 @@ class AbstractProvider(object):
         search_history = context.get_search_history()
 
         if command == 'remove':
-            query = params['q']
+            query = params.get('q', '')
             search_history.remove(query)
             ui.refresh_container()
             return True
 
         if command == 'rename':
-            query = params['q']
+            query = params.get('q', '')
             result, new_query = ui.on_keyboard_input(
                 context.localize('search.rename'), query
             )
@@ -271,22 +259,13 @@ class AbstractProvider(object):
             return True
 
         if command == 'query':
-            incognito = context.get_param('incognito', False)
-            channel_id = context.get_param('channel_id', '')
-            query = params['q']
-            query = to_unicode(query)
-
-            if not incognito and not channel_id:
-                try:
-                    search_history.update(query)
-                except:
-                    pass
-            if isinstance(query, bytes):
-                query = query.decode('utf-8')
+            query = to_unicode(params.get('q', ''))
+            if not params.get('incognito') and not params.get('channel_id'):
+                search_history.update(query)
             return self.on_search(query, context, re_match)
 
         if command == 'input':
-            self.data_cache = context
+            data_cache = context.get_data_cache()
 
             folder_path = context.get_infolabel('Container.FolderPath')
             query = None
@@ -294,11 +273,9 @@ class AbstractProvider(object):
             #  user doesn't want to input on this path
             if (folder_path.startswith('plugin://%s' % context.get_id()) and
                     re.match('.+/(?:query|input)/.*', folder_path)):
-                cached = self.data_cache.get_item('search_query',
-                                                  self.data_cache.ONE_DAY)
-                cached = cached and cached.get('query')
+                cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
-                    query = unquote(to_unicode(cached))
+                    query = to_unicode(cached)
             else:
                 result, input_query = ui.on_keyboard_input(
                     context.localize('search.title')
@@ -309,20 +286,11 @@ class AbstractProvider(object):
             if not query:
                 return False
 
-            incognito = context.get_param('incognito', False)
-            channel_id = context.get_param('channel_id', '')
+            data_cache.set_item('search_query', query)
 
-            self._data_cache.set_item('search_query',
-                                      {'query': quote(query)})
-
-            if not incognito and not channel_id:
-                try:
-                    search_history.update(query)
-                except:
-                    pass
+            if not params.get('incognito') and not params.get('channel_id'):
+                search_history.update(query)
             context.set_path(paths.SEARCH, 'query')
-            if isinstance(query, bytes):
-                query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
         context.set_content(content.VIDEO_CONTENT)
