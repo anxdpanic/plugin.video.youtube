@@ -38,7 +38,6 @@ __all__ = (
     'seconds_to_duration',
     'select_stream',
     'strip_html_from_text',
-    'to_str',
     'to_unicode',
 )
 
@@ -48,12 +47,6 @@ def loose_version(v):
     for point in v.split("."):
         filled.append(point.zfill(8))
     return tuple(filled)
-
-
-def to_str(text):
-    if isinstance(text, bytes):
-        return text.decode('utf-8', 'ignore')
-    return text
 
 
 def to_unicode(text):
