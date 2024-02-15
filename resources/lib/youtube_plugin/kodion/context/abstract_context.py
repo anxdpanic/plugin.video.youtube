@@ -218,7 +218,8 @@ class AbstractContext(object):
     def get_ui(self):
         raise NotImplementedError()
 
-    def get_system_version(self):
+    @staticmethod
+    def get_system_version():
         return current_system_version
 
     def create_uri(self, path='/', params=None):

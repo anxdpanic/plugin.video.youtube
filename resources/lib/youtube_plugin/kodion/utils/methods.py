@@ -260,6 +260,7 @@ def rm_dir(path):
     log_error('Failed to remove directory: {0}'.format(path))
     return False
 
+
 def find_video_id(plugin_path):
     match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', plugin_path)
     if match:
@@ -321,6 +322,7 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
             templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
         new[key] = value
     return new or _
+
 
 def get_kodi_setting(setting):
     json_query = xbmc.executeJSONRPC(json.dumps({

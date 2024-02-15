@@ -441,7 +441,7 @@ class Provider(AbstractProvider):
                 if method == 'user':
                     return False
 
-        channel_fanarts = resource_manager.get_fanarts((channel_id, ))
+        channel_fanarts = resource_manager.get_fanarts((channel_id,))
 
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
@@ -674,9 +674,6 @@ class Provider(AbstractProvider):
 
         if method == 'list':
             context.set_content(content.LIST_CONTENT)
-            channel_ids = []
-            for subscription in subscriptions:
-                channel_ids.append(subscription.get_channel_id())
             channel_ids = {subscription.get_channel_id(): subscription
                            for subscription in subscriptions}
             channel_fanarts = resource_manager.get_fanarts(channel_ids)

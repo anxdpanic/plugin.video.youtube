@@ -756,7 +756,7 @@ class VideoInfo(YouTubeRequestClient):
                 '{0.name}={0.value}'.format(cookie)
                 for cookie in cookies
             ))))
-        # Headers to be used in function 'to_play_item' of 'xbmc_items.py'
+        # Headers used in xbmc_items.video_playback_item'
         output.extend('{0}={1}'.format(key, quote(value))
                       for key, value in headers.items())
         return '&'.join(output)
@@ -1259,7 +1259,6 @@ class VideoInfo(YouTubeRequestClient):
                 streaming_data['hlsManifestUrl'],
                 live_type, meta_info, client['headers'], playback_stats
             ))
-
 
         # extract adaptive streams and create MPEG-DASH manifest
         if not manifest_url and httpd_is_live and adaptive_fmts:

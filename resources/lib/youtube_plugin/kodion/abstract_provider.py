@@ -12,14 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import paths, content
+from .constants import content, paths
 from .compatibility import quote, unquote
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
     NewSearchItem,
     SearchHistoryItem,
-    menu_items
+    menu_items,
 )
 from .utils import to_unicode
 

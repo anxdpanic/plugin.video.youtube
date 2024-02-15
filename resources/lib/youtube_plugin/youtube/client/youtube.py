@@ -560,7 +560,7 @@ class YouTube(LoginClient):
             'kind': 'youtube#activityListResponse',
             'items': [
                 {
-                    'kind': "youtube#video",
+                    'kind': 'youtube#video',
                     'id': video['videoId'],
                     'partial': True,
                     'snippet': {

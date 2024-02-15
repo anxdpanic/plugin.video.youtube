@@ -262,16 +262,16 @@
                     <control format="string" type="spinner"/>
                 </setting>
                 <setting id="kodion.mpd.stream.features" type="list[string]" parent="kodion.mpd.videos" label="30748" help="">
-                   <level>0</level>
-                   <!--
-                   All selections enabled except:
+                    <level>0</level>
+                    <!--
+                    All selections enabled except:
                         - Opus audio
                         - no HFR at max quality
                         - no fractional framerate hinting
                         - no framerate hinting
-                   -->
-                   <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>
-                   <constraints>
+                    -->
+                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>
+                    <constraints>
                         <options>
                             <option label="30727">avc1</option>
                             <option label="30728">vp9</option>
@@ -292,16 +292,16 @@
                         </options>
                         <delimiter>,</delimiter>
                         <minimumitems>1</minimumitems>
-                   </constraints>
-                   <dependencies>
+                    </constraints>
+                    <dependencies>
                         <dependency type="enable">
                             <condition setting="kodion.mpd.videos" operator="is">true</condition>
                         </dependency>
                     </dependencies>
-                   <control type="list" format="string">
-                       <multiselect>true</multiselect>
-                       <hidevalue>true</hidevalue>
-                   </control>
+                    <control type="list" format="string">
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
                 </setting>
                 <setting id="kodion.mpd.stream.select" type="integer" parent="kodion.mpd.videos" label="30758" help="">
                     <level>0</level>
