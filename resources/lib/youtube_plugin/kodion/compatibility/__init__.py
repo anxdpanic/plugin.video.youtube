@@ -7,6 +7,16 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
+# Kodi v20+
+try:
+    from infotagger.listitem import set_info_tag
+# Compatibility shims for Kodi v18 and v19
+except ImportError:
+    def set_info_tag(listitem, infolabels, tag_type, *_args, **_kwargs):
+        listitem.setInfo(tag_type, infolabels)
+        return ListItemInfoTag(listitem, tag_type)
+
+# Kodi v19+ and Python v3.x
 try:
     from html import unescape
     from http import server as BaseHTTPServer
@@ -26,14 +36,12 @@ try:
     import xbmcplugin
     import xbmcvfs
 
-    from infotagger.listitem import set_info_tag
-
     xbmc.LOGNOTICE = xbmc.LOGINFO
     xbmc.LOGSEVERE = xbmc.LOGFATAL
 
     string_type = str
     byte_string_type = bytes
-
+# Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
     import BaseHTTPServer
     from contextlib import contextmanager as _contextmanager
@@ -98,11 +106,6 @@ except ImportError:
 
     xbmcvfs.File = _file_closer
     xbmcvfs.translatePath = xbmc.translatePath
-
-
-    def set_info_tag(listitem, infolabels, tag_type, *_args, **_kwargs):
-        listitem.setInfo(tag_type, infolabels)
-        return ListItemInfoTag(listitem, tag_type)
 
 
     class ListItemInfoTag(object):
