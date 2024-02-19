@@ -8,19 +8,20 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-# import base exception of kodion directly into the kodion namespace
-from .exceptions import KodionException
-
-# decorator for registering paths for navigating of a provider
-from .register_provider_path import RegisterProviderPath
-
-# Abstract provider for implementation by the user
-from .abstract_provider import AbstractProvider
+from __future__ import absolute_import, division, unicode_literals
 
 # import specialized implementation into the kodion namespace
 from .context import Context
 
 from . import logger
+from .abstract_provider import (
+    # Abstract provider for implementation by the user
+    AbstractProvider,
+    # Decorator for registering paths for navigating of a provider
+    RegisterProviderPath,
+)
+# import base exception of kodion directly into the kodion namespace
+from .exceptions import KodionException
 
 
 __all__ = (
