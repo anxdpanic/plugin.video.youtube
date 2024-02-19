@@ -16,11 +16,11 @@ from ..compatibility import unquote, xbmc, xbmcaddon
 from ..constants import ADDON_ID
 from ..logger import log_debug
 from ..network import get_http_server, is_httpd_live
-from ..settings import Settings
+from ..settings import XbmcPluginSettings
 
 
 class ServiceMonitor(xbmc.Monitor):
-    _settings = Settings(xbmcaddon.Addon(ADDON_ID))
+    _settings = XbmcPluginSettings(xbmcaddon.Addon(ADDON_ID))
 
     def __init__(self):
         settings = self._settings

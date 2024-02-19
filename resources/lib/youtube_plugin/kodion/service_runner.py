@@ -12,14 +12,17 @@ from __future__ import absolute_import, division, unicode_literals
 
 from datetime import datetime
 
-from .context import Context
 from .constants import TEMP_PATH
+from .context import XbmcContext
 from .utils import PlayerMonitor, ServiceMonitor, rm_dir
 from ..youtube.provider import Provider
 
 
+__all__ = ('run',)
+
+
 def run():
-    context = Context()
+    context = XbmcContext()
     context.log_debug('YouTube service initialization...')
     context.get_ui().clear_property('abort_requested')
 

@@ -28,11 +28,11 @@ from ..compatibility import (
 )
 from ..constants import ADDON_ID, TEMP_PATH, paths
 from ..logger import log_debug, log_error
-from ..settings import Settings
+from ..settings import XbmcPluginSettings
 
 
 _addon = xbmcaddon.Addon(ADDON_ID)
-_settings = Settings(_addon)
+_settings = XbmcPluginSettings(_addon)
 _i18n = _addon.getLocalizedString
 _addon_name = _addon.getAddonInfo('name')
 _addon_icon = _addon.getAddonInfo('icon')

@@ -27,10 +27,9 @@ from ...compatibility import (
     xbmcvfs,
 )
 from ...constants import ADDON_ID, content, sort
-from ...player.xbmc.xbmc_player import XbmcPlayer
-from ...player.xbmc.xbmc_playlist import XbmcPlaylist
-from ...settings.xbmc.xbmc_plugin_settings import XbmcPluginSettings
-from ...ui.xbmc.xbmc_context_ui import XbmcContextUI
+from ...player import XbmcPlayer, XbmcPlaylist
+from ...settings import XbmcPluginSettings
+from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
     loose_version,

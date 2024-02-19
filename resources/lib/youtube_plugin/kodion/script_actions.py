@@ -12,15 +12,15 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import socket
 
-from .kodion.compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
-from .kodion.constants import DATA_PATH, TEMP_PATH
-from .kodion.context import Context
-from .kodion.network import get_client_ip_address, is_httpd_live
-from .kodion.utils import rm_dir
+from .compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
+from .constants import DATA_PATH, TEMP_PATH
+from .context import XbmcContext
+from .network import get_client_ip_address, is_httpd_live
+from .utils import rm_dir
 
 
 def _config_actions(action, *_args):
-    context = Context()
+    context = XbmcContext()
     localize = context.localize
     settings = context.get_settings()
     ui = context.get_ui()
@@ -96,7 +96,7 @@ def _config_actions(action, *_args):
 
 
 def _maintenance_actions(action, target):
-    context = Context()
+    context = XbmcContext()
     ui = context.get_ui()
     localize = context.localize
 
@@ -164,7 +164,7 @@ def _maintenance_actions(action, target):
 
 
 def _user_actions(action, params):
-    context = Context()
+    context = XbmcContext()
     if params:
         context.parse_params(dict(parse_qsl(params)))
     localize = context.localize

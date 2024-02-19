@@ -12,23 +12,27 @@ from __future__ import absolute_import, division, unicode_literals
 
 from traceback import format_stack
 
-from ..abstract_provider_runner import AbstractProviderRunner
+from ..abstract_plugin import AbstractPlugin
 from ...compatibility import xbmcgui, xbmcplugin
 from ...exceptions import KodionException
-from ...items import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
-from ...player import Playlist
-from ...ui.xbmc.xbmc_items import (
+from ...items import (
+    AudioItem,
+    DirectoryItem,
+    ImageItem,
+    UriItem,
+    VideoItem,
     audio_listitem,
     directory_listitem,
     image_listitem,
     playback_item,
-    video_listitem
+    video_listitem,
 )
+from ...player import XbmcPlaylist
 
 
-class XbmcRunner(AbstractProviderRunner):
+class XbmcPlugin(AbstractPlugin):
     def __init__(self):
-        super(XbmcRunner, self).__init__()
+        super(XbmcPlugin, self).__init__()
         self.handle = None
 
     def run(self, provider, context):
@@ -39,7 +43,7 @@ class XbmcRunner(AbstractProviderRunner):
         if ui.get_property('busy').lower() == 'true':
             ui.clear_property('busy')
             if ui.busy_dialog_active():
-                playlist = Playlist('video', context)
+                playlist = XbmcPlaylist('video', context)
                 playlist.clear()
 
                 xbmcplugin.endOfDirectory(self.handle, succeeded=False)
@@ -115,7 +119,7 @@ class XbmcRunner(AbstractProviderRunner):
             ui = context.get_ui()
             if not context.is_plugin_path(uri) and ui.busy_dialog_active():
                 ui.set_property('busy', 'true')
-                playlist = Playlist('video', context)
+                playlist = XbmcPlaylist('video', context)
                 ui.set_property('playlist', playlist.get_items(dumps=True))
 
             item = playback_item(context, base_item, show_fanart)

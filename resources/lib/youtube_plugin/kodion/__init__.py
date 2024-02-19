@@ -10,9 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-# import specialized implementation into the kodion namespace
-from .context import Context
-
 from . import logger
 from .abstract_provider import (
     # Abstract provider for implementation by the user
@@ -26,12 +23,8 @@ from .exceptions import KodionException
 
 __all__ = (
     'AbstractProvider',
-    'Context',
     'KodionException',
     'RegisterProviderPath',
-    'json_store',
-    'logger',
-    'utils',
 )
 
 __version__ = '1.5.4'

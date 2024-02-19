@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc.xbmc_runner import XbmcRunner as Runner
+from .xbmc.xbmc_plugin import XbmcPlugin
 
 
-__all__ = ('Runner',)
+__all__ = ('XbmcPlugin',)
