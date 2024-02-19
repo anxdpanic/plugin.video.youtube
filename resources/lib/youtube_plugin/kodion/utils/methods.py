@@ -24,7 +24,6 @@ from ..logger import log_error
 
 __all__ = (
     'create_path',
-    'create_uri_path',
     'duration_to_seconds',
     'find_best_fit',
     'find_video_id',
@@ -166,34 +165,22 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     return selected_stream_data
 
 
-def create_path(*args):
-    comps = []
-    for arg in args:
-        if isinstance(arg, (list, tuple)):
-            return create_path(*arg)
+def create_path(*args, is_uri=False):
+    path = '/'.join([
+        part
+        for part in [
+            str(arg).strip('/').replace('\\', '/').replace('//', '/')
+            for arg in args
+        ] if part
+    ])
+    if path:
+        path = path.join(('/', '/'))
+    else:
+        return '/'
 
-        comps.append(str(arg).strip('/').replace('\\', '/').replace('//', '/'))
-
-    uri_path = '/'.join(comps)
-    if uri_path:
-        return '/%s/' % uri_path
-
-    return '/'
-
-
-def create_uri_path(*args):
-    comps = []
-    for arg in args:
-        if isinstance(arg, (list, tuple)):
-            return create_uri_path(*arg)
-
-        comps.append(str(arg).strip('/').replace('\\', '/').replace('//', '/'))
-
-    uri_path = '/'.join(comps)
-    if uri_path:
-        return quote('/%s/' % uri_path)
-
-    return '/'
+    if is_uri:
+        return quote(path)
+    return path
 
 
 def strip_html_from_text(text):

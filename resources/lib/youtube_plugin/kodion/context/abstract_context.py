@@ -23,7 +23,7 @@ from ..sql_store import (
     SearchHistory,
     WatchLaterList,
 )
-from ..utils import create_path, create_uri_path, current_system_version
+from ..utils import create_path, current_system_version
 
 
 class AbstractContext(object):
@@ -222,15 +222,15 @@ class AbstractContext(object):
     def get_system_version():
         return current_system_version
 
-    def create_uri(self, path='/', params=None):
-        if not params:
-            params = {}
-
-        uri = create_uri_path(path)
-        if uri:
-            uri = "%s://%s%s" % ('plugin', str(self._plugin_id), uri)
+    def create_uri(self, path=None, params=None):
+        if isinstance(path, (list, tuple)):
+            uri = create_path(*path, is_uri=True)
+        elif path:
+            uri = path
         else:
-            uri = "%s://%s/" % ('plugin', str(self._plugin_id))
+            uri = '/'
+
+        uri = self._plugin_id.join(('plugin://', uri))
 
         if params:
             uri = '?'.join((uri, urlencode(params)))
