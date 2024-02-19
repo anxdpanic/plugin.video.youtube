@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from datetime import datetime
-
 from .constants import TEMP_PATH
 from .context import XbmcContext
 from .utils import PlayerMonitor, ServiceMonitor, rm_dir
@@ -32,19 +30,18 @@ def run():
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
 
-    sleep_time = 10
-    ping_delay = 60
-    ping_time = None
+    wait_interval = 10
+    ping_period = waited = 60
     while not monitor.abortRequested():
-        now = datetime.now()
-        if not ping_time or (ping_time - now).total_seconds() >= ping_delay:
-            ping_time = now
+        if waited >= ping_period:
+            waited = 0
 
             if monitor.httpd and not monitor.ping_httpd():
                 monitor.restart_httpd()
 
-        if monitor.waitForAbort(sleep_time):
+        if monitor.waitForAbort(wait_interval):
             break
+        waited += wait_interval
 
     context.get_ui().set_property('abort_requested', 'true')
 
