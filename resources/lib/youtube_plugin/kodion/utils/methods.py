@@ -208,17 +208,17 @@ def print_items(items):
 def make_dirs(path):
     if not path.endswith('/'):
         path = ''.join((path, '/'))
+    path = xbmcvfs.translatePath(path)
 
     succeeded = xbmcvfs.exists(path) or xbmcvfs.mkdirs(path)
     if succeeded:
-        return xbmcvfs.translatePath(path)
+        return path
 
-    path = xbmcvfs.translatePath(path)
     try:
         os.makedirs(path)
         succeeded = True
     except OSError:
-        pass
+        succeeded = xbmcvfs.exists(path)
 
     if succeeded:
         return path
@@ -227,15 +227,18 @@ def make_dirs(path):
 
 
 def rm_dir(path):
+    if not path.endswith('/'):
+        path = ''.join((path, '/'))
+    path = xbmcvfs.translatePath(path)
+
     succeeded = (not xbmcvfs.exists(path)
                  or xbmcvfs.rmdir(path, force=True))
     if not succeeded:
-        path = xbmcvfs.translatePath(path)
         try:
             shutil.rmtree(path)
-            succeeded = not xbmcvfs.exists(path)
         except OSError:
             pass
+        succeeded = not xbmcvfs.exists(path)
 
     if succeeded:
         return True
