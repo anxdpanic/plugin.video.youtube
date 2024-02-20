@@ -25,7 +25,9 @@ def run():
     context.get_ui().clear_property('abort_requested')
 
     monitor = ServiceMonitor()
-    player = PlayerMonitor(provider=Provider(), context=context)
+    player = PlayerMonitor(provider=Provider(),
+                           context=context,
+                           monitor=monitor)
 
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
