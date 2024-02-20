@@ -373,6 +373,7 @@ def update_video_infos(provider, context, video_id_dict,
     show_details = settings.show_detailed_description()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+    untitled = context.localize('untitled')
 
     path = context.get_path()
     ui = context.get_ui()
@@ -500,7 +501,9 @@ def update_video_infos(provider, context, video_id_dict,
         video_item.set_code(label_stats)
 
         # update and set the title
-        title = video_item.get_title() or snippet['title'] or ''
+        title = video_item.get_title()
+        if not title or title == untitled:
+            title = snippet.get('title') or untitled
         video_item.set_title(ui.italic(title) if video_item.upcoming else title)
 
         """
