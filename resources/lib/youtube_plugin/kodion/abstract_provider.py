@@ -38,7 +38,7 @@ class AbstractProvider(object):
             '^',
             paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), '_internal_watch_later')
+        )), 'on_watch_later')
 
         self.register_path(r''.join((
             '^',
@@ -159,8 +159,9 @@ class AbstractProvider(object):
                     menu_items.favorites_remove(
                         context, item.video_id
                     ),
+                    ('--------', 'noop'),
                 ]
-                item.set_context_menu(context_menu)
+                item.add_context_menu(context_menu)
 
             return items
 
@@ -181,54 +182,8 @@ class AbstractProvider(object):
 
         return False
 
-    @staticmethod
-    def _internal_watch_later(context, re_match):
-        params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False
-
-        if command == 'list':
-            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
-            video_items = context.get_watch_later_list().get_items()
-
-            for video_item in video_items:
-                context_menu = [
-                    menu_items.watch_later_local_remove(
-                        context, video_item.video_id
-                    ),
-                    menu_items.watch_later_local_clear(
-                        context
-                    )
-                ]
-                video_item.set_context_menu(context_menu)
-
-            return video_items
-
-        if (command == 'clear' and context.get_ui().on_yes_no_input(
-                    context.get_name(),
-                    context.localize('watch_later.clear.confirm')
-                )):
-            context.get_watch_later_list().clear()
-            context.get_ui().refresh_container()
-            return True
-
-        video_id = params.get('video_id')
-        if not video_id:
-            return False
-
-        if command == 'add':
-            item = params.get('item')
-            if item:
-                context.get_watch_later_list().add(video_id, item)
-            return True
-
-        if command == 'remove':
-            context.get_watch_later_list().remove(video_id)
-            context.get_ui().refresh_container()
-            return True
-
-        return False
+    def on_watch_later(self, context, re_match):
+        raise NotImplementedError()
 
     def _internal_search(self, context, re_match):
         params = context.get_params()

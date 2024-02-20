@@ -692,6 +692,7 @@ def update_video_infos(provider, context, video_id_dict,
             menu_items.play_ask_for_quality(
                 context, video_id
             ),
+            ('--------', 'noop'),
         ))
 
         if context_menu:

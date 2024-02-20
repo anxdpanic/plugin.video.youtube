@@ -963,8 +963,8 @@ class Provider(AbstractProvider):
 
         if action == 'list':
             context.set_content(content.VIDEO_CONTENT, sub_type='history')
-            play_data = playback_history.get_items()
-            if not play_data:
+            items = playback_history.get_items()
+            if not items:
                 return True
 
             v3_response = {
@@ -975,30 +975,24 @@ class Provider(AbstractProvider):
                         'id': video_id,
                         'partial': True,
                     }
-                    for video_id in play_data.keys()
+                    for video_id in items.keys()
                 ]
             }
-            items = v3.response_to_items(self, context, v3_response)
+            video_items = v3.response_to_items(self, context, v3_response)
 
-            for item in items:
-                video_id = item.video_id
+            for video_item in video_items:
                 context_menu = [
                     menu_items.history_remove(
-                        context, video_id
-                    ),
-                    menu_items.history_mark_unwatched(
-                        context, video_id
-                    ) if play_data[video_id]['play_count'] else
-                    menu_items.history_mark_watched(
-                        context, video_id
+                        context, video_item.video_id
                     ),
                     menu_items.history_clear(
                         context
                     ),
+                    ('--------', 'noop'),
                 ]
-                item.set_context_menu(context_menu)
+                video_item.add_context_menu(context_menu)
 
-            return items
+            return video_items
 
         if (action == 'clear' and context.get_ui().on_yes_no_input(
                     context.get_name(),
@@ -1330,6 +1324,70 @@ class Provider(AbstractProvider):
             result.append(settings_menu_item)
 
         return result
+
+    def on_watch_later(self, context, re_match):
+        params = context.get_params()
+        command = re_match.group('command')
+        if not command:
+            return False
+
+        if command == 'list':
+            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
+            items = context.get_watch_later_list().get_items()
+            if not items:
+                return True
+
+            v3_response = {
+                'kind': 'youtube#videoListResponse',
+                'items': [
+                    {
+                        'kind': 'youtube#video',
+                        'id': video_id,
+                        'partial': True,
+                    }
+                    for video_id in items.keys()
+                ]
+            }
+            video_items = v3.response_to_items(self, context, v3_response)
+
+            for video_item in video_items:
+                context_menu = [
+                    menu_items.watch_later_local_remove(
+                        context, video_item.video_id
+                    ),
+                    menu_items.watch_later_local_clear(
+                        context
+                    ),
+                    ('--------', 'noop'),
+                ]
+                video_item.add_context_menu(context_menu)
+
+            return video_items
+
+        if (command == 'clear' and context.get_ui().on_yes_no_input(
+                    context.get_name(),
+                    context.localize('watch_later.clear.confirm')
+                )):
+            context.get_watch_later_list().clear()
+            context.get_ui().refresh_container()
+            return True
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
+        if command == 'add':
+            item = params.get('item')
+            if item:
+                context.get_watch_later_list().add(video_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_watch_later_list().remove(video_id)
+            context.get_ui().refresh_container()
+            return True
+
+        return False
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, (InvalidGrant, LoginException)):
