@@ -966,10 +966,19 @@ class Provider(AbstractProvider):
             play_data = playback_history.get_items()
             if not play_data:
                 return True
-            json_data = self.get_client(context).get_videos(play_data)
-            if not json_data:
-                return True
-            items = v3.response_to_items(self, context, json_data)
+
+            v3_response = {
+                'kind': 'youtube#videoListResponse',
+                'items': [
+                    {
+                        'kind': 'youtube#video',
+                        'id': video_id,
+                        'partial': True,
+                    }
+                    for video_id in play_data.keys()
+                ]
+            }
+            items = v3.response_to_items(self, context, v3_response)
 
             for item in items:
                 video_id = item.video_id
