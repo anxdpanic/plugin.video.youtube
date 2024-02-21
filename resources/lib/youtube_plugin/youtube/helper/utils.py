@@ -380,9 +380,15 @@ def update_video_infos(provider, context, video_id_dict,
 
     if path.startswith(paths.MY_SUBSCRIPTIONS):
         in_my_subscriptions_list = True
+        in_watched_later_list = False
+        playlist_match = False
+    elif path.startswith(paths.WATCH_LATER):
+        in_my_subscriptions_list = False
+        in_watched_later_list = True
         playlist_match = False
     else:
         in_my_subscriptions_list = False
+        in_watched_later_list = False
         playlist_match = __RE_PLAYLIST_MATCH.match(path)
 
     for video_id, yt_item in data.items():
@@ -609,7 +615,7 @@ def update_video_infos(provider, context, video_id_dict,
                         context, watch_later_id, video_id
                     )
                 )
-        else:
+        elif not in_watched_later_list:
             context_menu.append(
                 menu_items.watch_later_local_add(
                     context, video_item
