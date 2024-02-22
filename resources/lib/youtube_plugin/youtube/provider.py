@@ -262,8 +262,15 @@ class Provider(AbstractProvider):
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/uri2addon/$')
-    def on_uri2addon(self, context, re_match):
-        uri = context.get_param('uri')
+    def on_uri2addon(self, context, re_match, uri=None):
+        if uri is None:
+            uri = context.get_param('uri')
+            skip_title = True
+            listing = False
+        else:
+            skip_title = False
+            listing = True
+
         if not uri:
             return False
 
@@ -271,9 +278,9 @@ class Provider(AbstractProvider):
         res_url = resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
         url_converter.add_url(res_url, context)
-        items = url_converter.get_items(self, context, skip_title=True)
+        items = url_converter.get_items(self, context, skip_title=skip_title)
         if items:
-            return items[0]
+            return items if listing else items[0]
 
         return False
 
@@ -736,6 +743,10 @@ class Provider(AbstractProvider):
         return result
 
     def on_search(self, search_text, context, re_match):
+        # Search by url to access unlisted videos
+        if search_text.startswith(('https://', 'http://')):
+            return self.on_uri2addon(context, None, search_text)
+
         result = self._search_channel_or_playlist(context, search_text)
         if result:  # found a channel or playlist matching search_text
             return result
