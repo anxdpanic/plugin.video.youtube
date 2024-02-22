@@ -49,7 +49,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             paths.SEARCH,
-            '/(?P<command>input|query|list|remove|clear|rename)/?$'
+            '/(?P<command>input|query|list|remove|clear|rename)?/?$'
         )), '_internal_search')
 
         self.register_path(r''.join((
@@ -192,6 +192,12 @@ class AbstractProvider(object):
         command = re_match.group('command')
         search_history = context.get_search_history()
 
+        if not command or command == 'query':
+            query = to_unicode(params.get('q', ''))
+            if not params.get('incognito') and not params.get('channel_id'):
+                search_history.update(query)
+            return self.on_search(query, context, re_match)
+
         if command == 'remove':
             query = params.get('q', '')
             search_history.remove(query)
@@ -212,12 +218,6 @@ class AbstractProvider(object):
             search_history.clear()
             ui.refresh_container()
             return True
-
-        if command == 'query':
-            query = to_unicode(params.get('q', ''))
-            if not params.get('incognito') and not params.get('channel_id'):
-                search_history.update(query)
-            return self.on_search(query, context, re_match)
 
         if command == 'input':
             data_cache = context.get_data_cache()

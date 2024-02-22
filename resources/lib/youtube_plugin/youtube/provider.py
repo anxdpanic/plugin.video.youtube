@@ -718,14 +718,6 @@ class Provider(AbstractProvider):
             yt_login.process(mode, self, context)
         return False
 
-    @RegisterProviderPath('^/search/$')
-    def endpoint_search(self, context, re_match):
-        query = context.get_param('q')
-        if not query:
-            return []
-
-        return self.on_search(query, context, re_match)
-
     def _search_channel_or_playlist(self, context, id_string):
         json_data = {}
         result = []
@@ -1057,6 +1049,7 @@ class Provider(AbstractProvider):
 
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
+        # _.get_my_playlists()
 
         # context.set_content(content.LIST_CONTENT)
 
