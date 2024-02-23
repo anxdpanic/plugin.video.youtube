@@ -12,14 +12,13 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import paths, content
-from .compatibility import quote, unquote
+from .constants import content, paths
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
     NewSearchItem,
     SearchHistoryItem,
-    menu_items
+    menu_items,
 )
 from .utils import to_unicode
 
@@ -32,8 +31,6 @@ class AbstractProvider(object):
         # map for regular expression (path) to method (names)
         self._dict_path = {}
 
-        self._data_cache = None
-
         # register some default paths
         self.register_path(r'^/$', '_internal_root')
 
@@ -41,7 +38,7 @@ class AbstractProvider(object):
             '^',
             paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), '_internal_watch_later')
+        )), 'on_watch_later')
 
         self.register_path(r''.join((
             '^',
@@ -52,7 +49,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             paths.SEARCH,
-            '/(?P<command>input|query|list|remove|clear|rename)/?$'
+            '/(?P<command>input|query|list|remove|clear|rename)?/?$'
         )), '_internal_search')
 
         self.register_path(r''.join((
@@ -163,8 +160,9 @@ class AbstractProvider(object):
                     menu_items.favorites_remove(
                         context, item.video_id
                     ),
+                    ('--------', 'noop'),
                 ]
-                item.set_context_menu(context_menu)
+                item.add_context_menu(context_menu)
 
             return items
 
@@ -185,63 +183,8 @@ class AbstractProvider(object):
 
         return False
 
-    @staticmethod
-    def _internal_watch_later(context, re_match):
-        params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False
-
-        if command == 'list':
-            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
-            video_items = context.get_watch_later_list().get_items()
-
-            for video_item in video_items:
-                context_menu = [
-                    menu_items.watch_later_local_remove(
-                        context, video_item.video_id
-                    ),
-                    menu_items.watch_later_local_clear(
-                        context
-                    )
-                ]
-                video_item.set_context_menu(context_menu)
-
-            return video_items
-
-        if (command == 'clear' and context.get_ui().on_yes_no_input(
-                    context.get_name(),
-                    context.localize('watch_later.clear.confirm')
-                )):
-            context.get_watch_later_list().clear()
-            context.get_ui().refresh_container()
-            return True
-
-        video_id = params.get('video_id')
-        if not video_id:
-            return False
-
-        if command == 'add':
-            item = params.get('item')
-            if item:
-                context.get_watch_later_list().add(video_id, item)
-            return True
-
-        if command == 'remove':
-            context.get_watch_later_list().remove(video_id)
-            context.get_ui().refresh_container()
-            return True
-
-        return False
-
-    @property
-    def data_cache(self):
-        return self._data_cache
-
-    @data_cache.setter
-    def data_cache(self, context):
-        if not self._data_cache:
-            self._data_cache = context.get_data_cache()
+    def on_watch_later(self, context, re_match):
+        raise NotImplementedError()
 
     def _internal_search(self, context, re_match):
         params = context.get_params()
@@ -250,14 +193,20 @@ class AbstractProvider(object):
         command = re_match.group('command')
         search_history = context.get_search_history()
 
+        if not command or command == 'query':
+            query = to_unicode(params.get('q', ''))
+            if not params.get('incognito') and not params.get('channel_id'):
+                search_history.update(query)
+            return self.on_search(query, context, re_match)
+
         if command == 'remove':
-            query = params['q']
+            query = params.get('q', '')
             search_history.remove(query)
             ui.refresh_container()
             return True
 
         if command == 'rename':
-            query = params['q']
+            query = params.get('q', '')
             result, new_query = ui.on_keyboard_input(
                 context.localize('search.rename'), query
             )
@@ -271,23 +220,8 @@ class AbstractProvider(object):
             ui.refresh_container()
             return True
 
-        if command == 'query':
-            incognito = context.get_param('incognito', False)
-            channel_id = context.get_param('channel_id', '')
-            query = params['q']
-            query = to_unicode(query)
-
-            if not incognito and not channel_id:
-                try:
-                    search_history.update(query)
-                except:
-                    pass
-            if isinstance(query, bytes):
-                query = query.decode('utf-8')
-            return self.on_search(query, context, re_match)
-
         if command == 'input':
-            self.data_cache = context
+            data_cache = context.get_data_cache()
 
             folder_path = context.get_infolabel('Container.FolderPath')
             query = None
@@ -295,11 +229,9 @@ class AbstractProvider(object):
             #  user doesn't want to input on this path
             if (folder_path.startswith('plugin://%s' % context.get_id()) and
                     re.match('.+/(?:query|input)/.*', folder_path)):
-                cached = self.data_cache.get_item('search_query',
-                                                  self.data_cache.ONE_DAY)
-                cached = cached and cached.get('query')
+                cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
-                    query = unquote(to_unicode(cached))
+                    query = to_unicode(cached)
             else:
                 result, input_query = ui.on_keyboard_input(
                     context.localize('search.title')
@@ -310,20 +242,11 @@ class AbstractProvider(object):
             if not query:
                 return False
 
-            incognito = context.get_param('incognito', False)
-            channel_id = context.get_param('channel_id', '')
+            data_cache.set_item('search_query', query)
 
-            self._data_cache.set_item('search_query',
-                                      {'query': quote(query)})
-
-            if not incognito and not channel_id:
-                try:
-                    search_history.update(query)
-                except:
-                    pass
+            if not params.get('incognito') and not params.get('channel_id'):
+                search_history.update(query)
             context.set_path(paths.SEARCH, 'query')
-            if isinstance(query, bytes):
-                query = query.decode('utf-8')
             return self.on_search(query, context, re_match)
 
         context.set_content(content.VIDEO_CONTENT)
@@ -355,3 +278,16 @@ class AbstractProvider(object):
 
     def tear_down(self, context):
         pass
+
+
+class RegisterProviderPath(object):
+    def __init__(self, re_path):
+        self._kodion_re_path = re_path
+
+    def __call__(self, func):
+        def wrapper(*args, **kwargs):
+            # only use a wrapper if you need extra code to be run here
+            return func(*args, **kwargs)
+
+        wrapper.kodion_re_path = self._kodion_re_path
+        return wrapper

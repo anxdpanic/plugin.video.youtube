@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc.xbmc_context import XbmcContext as Context
+from .xbmc.xbmc_context import XbmcContext
 
 
-__all__ = ('Context',)
+__all__ = ('XbmcContext',)

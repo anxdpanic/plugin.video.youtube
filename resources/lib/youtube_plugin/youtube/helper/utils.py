@@ -373,15 +373,22 @@ def update_video_infos(provider, context, video_id_dict,
     show_details = settings.show_detailed_description()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+    untitled = context.localize('untitled')
 
     path = context.get_path()
     ui = context.get_ui()
 
     if path.startswith(paths.MY_SUBSCRIPTIONS):
         in_my_subscriptions_list = True
+        in_watched_later_list = False
+        playlist_match = False
+    elif path.startswith(paths.WATCH_LATER):
+        in_my_subscriptions_list = False
+        in_watched_later_list = True
         playlist_match = False
     else:
         in_my_subscriptions_list = False
+        in_watched_later_list = False
         playlist_match = __RE_PLAYLIST_MATCH.match(path)
 
     for video_id, yt_item in data.items():
@@ -500,7 +507,9 @@ def update_video_infos(provider, context, video_id_dict,
         video_item.set_code(label_stats)
 
         # update and set the title
-        title = video_item.get_title() or snippet['title'] or ''
+        title = video_item.get_title()
+        if not title or title == untitled:
+            title = snippet.get('title') or untitled
         video_item.set_title(ui.italic(title) if video_item.upcoming else title)
 
         """
@@ -606,7 +615,7 @@ def update_video_infos(provider, context, video_id_dict,
                         context, watch_later_id, video_id
                     )
                 )
-        else:
+        elif not in_watched_later_list:
             context_menu.append(
                 menu_items.watch_later_local_add(
                     context, video_item
@@ -689,6 +698,7 @@ def update_video_infos(provider, context, video_id_dict,
             menu_items.play_ask_for_quality(
                 context, video_id
             ),
+            ('--------', 'noop'),
         ))
 
         if context_menu:

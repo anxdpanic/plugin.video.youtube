@@ -26,4 +26,4 @@ key_sets = {
     }
 }
 
-__all__ = ['kodion', 'youtube', 'key_sets', 'script_actions']
+__all__ = ('kodion', 'youtube', 'key_sets',)

@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc.xbmc_context_ui import XbmcContextUI as ContextUI
+from .xbmc.xbmc_context_ui import XbmcContextUI
 
 
-__all__ = ('ContextUI',)
+__all__ = ('XbmcContextUI',)

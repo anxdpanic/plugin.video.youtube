@@ -87,8 +87,7 @@ class VideoItem(BaseItem):
             title = unescape(title)
         except:
             pass
-        self._title = title
-        self._name = self._title
+        self._name = self._title = title
 
     def get_title(self):
         return self._title

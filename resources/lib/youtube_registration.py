@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from base64 import b64encode
 
 from youtube_plugin.kodion.constants import ADDON_ID
-from youtube_plugin.kodion.context import Context
+from youtube_plugin.kodion.context import XbmcContext
 from youtube_plugin.kodion.json_store import APIKeyStore
 
 
@@ -44,7 +44,7 @@ def register_api_keys(addon_id, api_key, client_id, client_secret):
     :param client_secret: YouTube Data v3 Client secret
     """
 
-    context = Context()
+    context = XbmcContext()
 
     if not addon_id or addon_id == ADDON_ID:
         context.log_error('Register API Keys: |%s| Invalid addon_id' % addon_id)

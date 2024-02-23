@@ -1209,7 +1209,7 @@ msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
-msgid "Remote friendly search"
+msgid ""
 msgstr "Pencarian ramah jarak jauh"
 
 msgctxt "#30730"

@@ -24,19 +24,37 @@ from .uri_item import UriItem
 from .utils import from_json
 from .video_item import VideoItem
 from .watch_later_item import WatchLaterItem
+from .xbmc.xbmc_items import (
+    audio_listitem,
+    directory_listitem,
+    image_listitem,
+    playback_item,
+    uri_listitem,
+    video_listitem,
+    video_playback_item,
+)
 
 
-__all__ = ('AudioItem',
-           'BaseItem',
-           'DirectoryItem',
-           'FavoritesItem',
-           'ImageItem',
-           'NewSearchItem',
-           'NextPageItem',
-           'SearchHistoryItem',
-           'SearchItem',
-           'UriItem',
-           'VideoItem',
-           'WatchLaterItem',
-           'from_json',
-           'menu_items',)
+__all__ = (
+    'AudioItem',
+    'BaseItem',
+    'DirectoryItem',
+    'FavoritesItem',
+    'ImageItem',
+    'NewSearchItem',
+    'NextPageItem',
+    'SearchHistoryItem',
+    'SearchItem',
+    'UriItem',
+    'VideoItem',
+    'WatchLaterItem',
+    'from_json',
+    'menu_items',
+    'audio_listitem',
+    'directory_listitem',
+    'image_listitem',
+    'playback_item',
+    'uri_listitem',
+    'video_listitem',
+    'video_playback_item',
+)

@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc.xbmc_plugin_settings import XbmcPluginSettings as Settings
+from .xbmc.xbmc_plugin_settings import XbmcPluginSettings
 
 
-__all__ = ('Settings',)
+__all__ = ('XbmcPluginSettings',)

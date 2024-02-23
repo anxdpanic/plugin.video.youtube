@@ -206,20 +206,15 @@ class UrlResolver(object):
     def __init__(self, context):
         self._context = context
         self._function_cache = context.get_function_cache()
-        self._resolver_map = {
-            'common_resolver': CommonResolver(context),
-            'youtube_resolver': YouTubeResolver(context),
-        }
-        self._resolvers = [
-            'common_resolver',
-            'youtube_resolver',
-        ]
+        self._resolvers = (
+            ('common_resolver', CommonResolver(context)),
+            ('youtube_resolver', YouTubeResolver(context)),
+        )
 
     def _resolve(self, url):
         # try one of the resolvers
         resolved_url = url
-        for resolver_name in self._resolvers:
-            resolver = self._resolver_map[resolver_name]
+        for resolver_name, resolver in self._resolvers:
             url_components = urlsplit(resolved_url)
             method = resolver.supports_url(resolved_url, url_components)
             if not method:

@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from youtube_plugin.kodion import service
+from youtube_plugin.kodion import service_runner
 
-service.run()
+
+service_runner.run()

@@ -19,7 +19,7 @@ from requests.exceptions import InvalidJSONError, RequestException
 from ..compatibility import xbmcaddon
 from ..constants import ADDON_ID
 from ..logger import log_error
-from ..settings import Settings
+from ..settings import XbmcPluginSettings
 
 
 __all__ = (
@@ -27,7 +27,7 @@ __all__ = (
     'InvalidJSONError'
 )
 
-_settings = Settings(xbmcaddon.Addon(id=ADDON_ID))
+_settings = XbmcPluginSettings(xbmcaddon.Addon(id=ADDON_ID))
 
 
 class BaseRequestsClass(object):
