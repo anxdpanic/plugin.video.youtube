@@ -54,22 +54,33 @@ def _config_actions(action, *_args):
                 (language, 'en')
             )),
             language,
-            '%s (%s)' % (language, localize('subtitles.no_auto_generated'))
+            '%s (%s)' % (language, localize('subtitles.no_auto_generated')),
         ]
+
+        if settings.use_mpd_videos():
+            sub_opts.append(localize('subtitles.all'))
+        elif sub_setting == 5:
+            sub_setting = 0
+            settings.set_subtitle_languages(sub_setting)
+
         sub_opts[sub_setting] = ui.bold(sub_opts[sub_setting])
 
         result = ui.on_select(localize('subtitles.language'),
                               sub_opts,
                               preselect=sub_setting)
         if result > -1:
-            settings.set_subtitle_languages(result)
+            sub_setting = result
+            settings.set_subtitle_languages(sub_setting)
 
-        result = ui.on_yes_no_input(
-            localize('subtitles.download'),
-            localize('subtitles.download.pre')
-        )
-        if result > -1:
-            settings.set_subtitle_download(result == 1)
+        if not sub_setting or sub_setting == 5:
+            settings.set_subtitle_download(False)
+        else:
+            result = ui.on_yes_no_input(
+                localize('subtitles.download'),
+                localize('subtitles.download.pre')
+            )
+            if result > -1:
+                settings.set_subtitle_download(result == 1)
 
     elif action == 'listen_ip':
         local_ranges = ('10.', '172.16.', '192.168.')

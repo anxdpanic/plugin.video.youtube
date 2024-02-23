@@ -1396,3 +1396,7 @@ msgstr ""
 msgctxt "#30773"
 msgid "Show video details in video lists"
 msgstr ""
+
+msgctxt "#30774"
+msgid "All available"
+msgstr ""

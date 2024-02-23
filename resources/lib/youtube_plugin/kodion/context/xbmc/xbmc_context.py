@@ -191,6 +191,7 @@ class XbmcContext(AbstractContext):
         'subscriptions': 30504,
         'subtitles.download': 30705,
         'subtitles.download.pre': 30706,
+        'subtitles.all': 30774,
         'subtitles.language': 30560,
         'subtitles.no_auto_generated': 30602,
         'subtitles.with_fallback': 30601,

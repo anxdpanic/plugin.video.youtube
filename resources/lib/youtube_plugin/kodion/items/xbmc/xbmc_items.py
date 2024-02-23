@@ -216,6 +216,7 @@ def video_playback_item(context, video_item, show_fanart=None):
         'isPlayable': str(video_item.playable).lower(),
     }
 
+    manifest_type = None
     if (alternative_player
             and settings.alternative_player_web_urls()
             and not license_key):
@@ -291,7 +292,7 @@ def video_playback_item(context, video_item, show_fanart=None):
         'thumb': image,
     })
 
-    if video_item.subtitles:
+    if video_item.subtitles and manifest_type != 'mpd':
         list_item.setSubtitles(video_item.subtitles)
 
     item_info = create_info_labels(video_item)

@@ -1126,10 +1126,7 @@ class VideoInfo(YouTubeRequestClient):
         is_live = video_details.get('isLiveContent', False)
         thumb_suffix = '_live' if is_live else ''
 
-        captions = response.get('captions')
-        if captions:
-            captions['headers'] = client['headers']
-        elif client.get('_query_subtitles'):
+        if client.get('_query_subtitles'):
             result = self.request(
                 video_info_url, 'POST',
                 error_msg=('Caption request failed to get player response for'
@@ -1140,14 +1137,19 @@ class VideoInfo(YouTubeRequestClient):
             captions = response.get('captions')
             if captions:
                 captions['headers'] = result.request.headers
+        else:
+            captions = response.get('captions')
+            if captions:
+                captions['headers'] = client['headers']
         if captions:
             captions = Subtitles(
                 self._context, self.video_id, captions
             )
             default_lang = captions.get_default_lang()
-            captions = captions.get_subtitles()
+            subs_data = captions.get_subtitles()
         else:
             default_lang = {'code': 'und', 'is_asr': False}
+            subs_data = None
 
         meta_info = {
             'video': {
@@ -1179,7 +1181,9 @@ class VideoInfo(YouTubeRequestClient):
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
                             .format(self.video_id, thumb_suffix)),
             },
-            'subtitles': captions,
+            'subtitles': [
+                subtitle['url'] for subtitle in subs_data.values()
+            ] if subs_data else None,
         }
 
         if _settings.use_remote_history():
@@ -1266,7 +1270,7 @@ class VideoInfo(YouTubeRequestClient):
                 adaptive_fmts, default_lang['code']
             )
             manifest_url, main_stream = self._generate_mpd_manifest(
-                video_data, audio_data, license_info.get('url')
+                video_data, audio_data, subs_data, license_info.get('url')
             )
             live_type = None
 
@@ -1628,7 +1632,11 @@ class VideoInfo(YouTubeRequestClient):
 
         return video_data, audio_data
 
-    def _generate_mpd_manifest(self, video_data, audio_data, license_url):
+    def _generate_mpd_manifest(self,
+                               video_data,
+                               audio_data,
+                               subs_data,
+                               license_url):
         if not video_data or not audio_data:
             return None, None
 
@@ -1854,6 +1862,45 @@ class VideoInfo(YouTubeRequestClient):
 
             output.append('\t\t</AdaptationSet>\n')
             set_id += 1
+
+        if subs_data:
+            for lang_code, subtitle in subs_data.items():
+                label = language = subtitle['language']
+                kind = subtitle['kind']
+                if kind:
+                    if kind == 'translation':
+                        label = '{0} ({1})'.format(language, kind)
+                    kind = '_'.join((lang_code, kind))
+                else:
+                    kind = lang_code
+
+                output.extend((
+                    '\t\t<AdaptationSet'
+                        ' id="', str(set_id), '"'
+                        ' mimeType="', subtitle['mime_type'], '"'
+                        ' lang="', lang_code, '"'
+                        # name attribute is ISA specific and does not exist in
+                        # the MPD spec. Should be a child Label element instead
+                        ' name="[B]', label, '[/B]"'
+                        # default is an ISA specific attributes
+                        ' default="', str(subtitle['default']).lower(), '"'
+                        '>\n'
+                    # AdaptationSet Label element not currently used by ISA
+                    '\t\t\t<Label>', label, '</Label>\n'
+                    '\t\t\t<Role'
+                        ' schemeIdUri="urn:mpeg:dash:role:2011"'
+                        ' value="subtitle"'
+                        '/>\n'
+                    '\t\t\t<Representation'
+                        ' id="subs_', kind, '"'
+                        # unsure about what value to use for bandwidth
+                        ' bandwidth="268"'
+                        '>\n'
+                    '\t\t\t\t<BaseURL>', subtitle['url'], '</BaseURL>\n'
+                    '\t\t\t</Representation>\n'
+                    '\t\t</AdaptationSet>\n'
+                ))
+                set_id += 1
 
         output.append('\t</Period>\n'
                       '</MPD>\n')
