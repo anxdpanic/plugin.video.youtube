@@ -129,7 +129,7 @@ class Subtitles(object):
             return None
 
         if languages == self.LANG_ALL:
-            return self.get_all(sub_format='ttml')
+            return self.get_all(sub_format='vtt')
 
         if languages == self.LANG_PROMPT:
             return self._prompt()
