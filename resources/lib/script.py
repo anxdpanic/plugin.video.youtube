@@ -11,7 +11,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import sys
 
-from youtube_plugin import script_actions
+from youtube_plugin.kodion import script_actions
 
 
 script_actions.run(sys.argv)

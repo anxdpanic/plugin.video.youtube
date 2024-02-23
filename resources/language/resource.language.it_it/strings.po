@@ -1211,7 +1211,7 @@ msgid "Enable VP9 video"
 msgstr "Abilita video VP9"
 
 msgctxt "#30729"
-msgid "Remote friendly search"
+msgid ""
 msgstr "Ricerca amichevole a distanza"
 
 msgctxt "#30730"

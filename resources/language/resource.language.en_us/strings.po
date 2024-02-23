@@ -1219,7 +1219,7 @@ msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
-msgid "Remote friendly search"
+msgid ""
 msgstr ""
 
 msgctxt "#30730"
@@ -1392,4 +1392,12 @@ msgstr ""
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
+msgstr ""
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr ""
+
+msgctxt "#30774"
+msgid "All available"
 msgstr ""

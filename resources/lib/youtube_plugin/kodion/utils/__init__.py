@@ -13,7 +13,6 @@ from __future__ import absolute_import, division, unicode_literals
 from . import datetime_parser
 from .methods import (
     create_path,
-    create_uri_path,
     duration_to_seconds,
     find_best_fit,
     find_video_id,
@@ -26,7 +25,6 @@ from .methods import (
     seconds_to_duration,
     select_stream,
     strip_html_from_text,
-    to_str,
     to_unicode,
 )
 from .player_monitor import PlayerMonitor
@@ -38,7 +36,6 @@ __all__ = (
     'PlayerMonitor',
     'ServiceMonitor',
     'create_path',
-    'create_uri_path',
     'current_system_version',
     'datetime_parser',
     'duration_to_seconds',
@@ -53,6 +50,5 @@ __all__ = (
     'seconds_to_duration',
     'select_stream',
     'strip_html_from_text',
-    'to_str',
     'to_unicode',
 )

@@ -12,15 +12,15 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import socket
 
-from .kodion.compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
-from .kodion.constants import DATA_PATH, TEMP_PATH
-from .kodion.context import Context
-from .kodion.network import get_client_ip_address, is_httpd_live
-from .kodion.utils import rm_dir
+from .compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
+from .constants import DATA_PATH, TEMP_PATH
+from .context import XbmcContext
+from .network import get_client_ip_address, is_httpd_live
+from .utils import rm_dir
 
 
 def _config_actions(action, *_args):
-    context = Context()
+    context = XbmcContext()
     localize = context.localize
     settings = context.get_settings()
     ui = context.get_ui()
@@ -54,22 +54,33 @@ def _config_actions(action, *_args):
                 (language, 'en')
             )),
             language,
-            '%s (%s)' % (language, localize('subtitles.no_auto_generated'))
+            '%s (%s)' % (language, localize('subtitles.no_auto_generated')),
         ]
+
+        if settings.use_mpd_videos():
+            sub_opts.append(localize('subtitles.all'))
+        elif sub_setting == 5:
+            sub_setting = 0
+            settings.set_subtitle_languages(sub_setting)
+
         sub_opts[sub_setting] = ui.bold(sub_opts[sub_setting])
 
         result = ui.on_select(localize('subtitles.language'),
                               sub_opts,
                               preselect=sub_setting)
         if result > -1:
-            settings.set_subtitle_languages(result)
+            sub_setting = result
+            settings.set_subtitle_languages(sub_setting)
 
-        result = ui.on_yes_no_input(
-            localize('subtitles.download'),
-            localize('subtitles.download.pre')
-        )
-        if result > -1:
-            settings.set_subtitle_download(result == 1)
+        if not sub_setting or sub_setting == 5:
+            settings.set_subtitle_download(False)
+        else:
+            result = ui.on_yes_no_input(
+                localize('subtitles.download'),
+                localize('subtitles.download.pre')
+            )
+            if result > -1:
+                settings.set_subtitle_download(result == 1)
 
     elif action == 'listen_ip':
         local_ranges = ('10.', '172.16.', '192.168.')
@@ -96,7 +107,7 @@ def _config_actions(action, *_args):
 
 
 def _maintenance_actions(action, target):
-    context = Context()
+    context = XbmcContext()
     ui = context.get_ui()
     localize = context.localize
 
@@ -164,7 +175,7 @@ def _maintenance_actions(action, target):
 
 
 def _user_actions(action, params):
-    context = Context()
+    context = XbmcContext()
     if params:
         context.parse_params(dict(parse_qsl(params)))
     localize = context.localize

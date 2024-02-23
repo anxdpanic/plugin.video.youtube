@@ -1,18 +1,33 @@
-## v7.0.3+beta.3
+## v7.0.3+beta.4
 ### Fixed
-Fix invalid error when removing subscriptions #568
-Fix removing item from playlist #570
-Fix related videos and respect pagination limits #572
-Fix not correctly including visitor data in continuation requests
-Fix for possible database locks during setup
-Fix incorrect timezone details for premiered time #574
-
-### Changed
-Don't show subscribe context menu item in My Subscriptions #568
+- Fix handling of isPostLiveDrv streams #579
+- Fix infotagger error with Kodi v19
+- Fix errors with creating and deleting temporary folders
+- Fix listing more than 50 items in local history list
+- Fix context menus in local history and local watch later list
+- Fix not using user API key when not logged in #585, #587
+- Fix unofficial version not using correct content type for videos #586, #589
 
 ### New
-Add ability to unsubscribe from My Subscriptions #240, #568
-Make MPEG-DASH frame rate details configurable #336
+- Add setting to disable label details #559
+- Allow searching by Youtube url to access unlisted videos that can't be searched for
+- New option to list all subtitles in Kodi subtitle dialog when MPEG-DASH is enabled #121, #201, #247, #305, #489
+
+## v7.0.3+beta.3
+### Fixed
+- Fix invalid error when removing subscriptions #568
+- Fix removing item from playlist #570
+- Fix related videos and respect pagination limits #572
+- Fix not correctly including visitor data in continuation requests
+- Fix for possible database locks during setup
+- Fix incorrect timezone details for premiered time #574
+
+### Changed
+- Don't show subscribe context menu item in My Subscriptions #568
+
+### New
+- Add ability to unsubscribe from My Subscriptions #240, #568
+- Make MPEG-DASH frame rate details configurable #336
 
 ## v7.0.3+beta.2
 ### Changed

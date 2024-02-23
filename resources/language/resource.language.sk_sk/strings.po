@@ -1207,7 +1207,7 @@ msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
-msgid "Remote friendly search"
+msgid ""
 msgstr "Vyhľadávanie prispôsobené pre diaľkové ovládače"
 
 msgctxt "#30730"

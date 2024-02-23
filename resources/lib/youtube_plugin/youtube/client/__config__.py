@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from base64 import b64decode
 
 from ... import key_sets
-from ...kodion import Context
+from ...kodion.context import XbmcContext
 from ...kodion.json_store import APIKeyStore, AccessManager
 
 
@@ -192,7 +192,7 @@ class APICheck(object):
         return return_key, return_id, return_secret
 
 
-_api_check = APICheck(Context())
+_api_check = APICheck(XbmcContext())
 
 keys_changed = _api_check.changed
 current_user = _api_check.get_current_user()

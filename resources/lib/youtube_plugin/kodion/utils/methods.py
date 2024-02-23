@@ -18,13 +18,12 @@ import shutil
 from datetime import timedelta
 from math import floor, log
 
-from ..compatibility import quote, string_type, xbmc, xbmcvfs
+from ..compatibility import byte_string_type, quote, string_type, xbmc, xbmcvfs
 from ..logger import log_error
 
 
 __all__ = (
     'create_path',
-    'create_uri_path',
     'duration_to_seconds',
     'find_best_fit',
     'find_video_id',
@@ -38,33 +37,21 @@ __all__ = (
     'seconds_to_duration',
     'select_stream',
     'strip_html_from_text',
-    'to_str',
     'to_unicode',
 )
 
 
 def loose_version(v):
-    filled = []
-    for point in v.split("."):
-        filled.append(point.zfill(8))
-    return tuple(filled)
-
-
-def to_str(text):
-    if isinstance(text, bytes):
-        return text.decode('utf-8', 'ignore')
-    return text
+    return [point.zfill(8) for point in v.split('.')]
 
 
 def to_unicode(text):
-    result = text
-    if isinstance(text, (bytes, str)):
+    if isinstance(text, byte_string_type):
         try:
-            result = text.decode('utf-8', 'ignore')
-        except (AttributeError, UnicodeError):
+            return text.decode('utf-8', 'ignore')
+        except UnicodeError:
             pass
-
-    return result
+    return text
 
 
 def find_best_fit(data, compare_method=None):
@@ -178,34 +165,22 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     return selected_stream_data
 
 
-def create_path(*args):
-    comps = []
-    for arg in args:
-        if isinstance(arg, (list, tuple)):
-            return create_path(*arg)
+def create_path(*args, is_uri=False):
+    path = '/'.join([
+        part
+        for part in [
+            str(arg).strip('/').replace('\\', '/').replace('//', '/')
+            for arg in args
+        ] if part
+    ])
+    if path:
+        path = path.join(('/', '/'))
+    else:
+        return '/'
 
-        comps.append(str(arg).strip('/').replace('\\', '/').replace('//', '/'))
-
-    uri_path = '/'.join(comps)
-    if uri_path:
-        return '/%s/' % uri_path
-
-    return '/'
-
-
-def create_uri_path(*args):
-    comps = []
-    for arg in args:
-        if isinstance(arg, (list, tuple)):
-            return create_uri_path(*arg)
-
-        comps.append(str(arg).strip('/').replace('\\', '/').replace('//', '/'))
-
-    uri_path = '/'.join(comps)
-    if uri_path:
-        return quote('/%s/' % uri_path)
-
-    return '/'
+    if is_uri:
+        return quote(path)
+    return path
 
 
 def strip_html_from_text(text):
@@ -233,17 +208,17 @@ def print_items(items):
 def make_dirs(path):
     if not path.endswith('/'):
         path = ''.join((path, '/'))
+    path = xbmcvfs.translatePath(path)
 
     succeeded = xbmcvfs.exists(path) or xbmcvfs.mkdirs(path)
     if succeeded:
-        return xbmcvfs.translatePath(path)
+        return path
 
-    path = xbmcvfs.translatePath(path)
     try:
         os.makedirs(path)
         succeeded = True
     except OSError:
-        pass
+        succeeded = xbmcvfs.exists(path)
 
     if succeeded:
         return path
@@ -252,20 +227,24 @@ def make_dirs(path):
 
 
 def rm_dir(path):
+    if not path.endswith('/'):
+        path = ''.join((path, '/'))
+    path = xbmcvfs.translatePath(path)
+
     succeeded = (not xbmcvfs.exists(path)
                  or xbmcvfs.rmdir(path, force=True))
     if not succeeded:
-        path = xbmcvfs.translatePath(path)
         try:
             shutil.rmtree(path)
-            succeeded = not xbmcvfs.exists(path)
         except OSError:
             pass
+        succeeded = not xbmcvfs.exists(path)
 
     if succeeded:
         return True
     log_error('Failed to remove directory: {0}'.format(path))
     return False
+
 
 def find_video_id(plugin_path):
     match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', plugin_path)
@@ -328,6 +307,7 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
             templates['{0}.{1}'.format(id(new), key)] = (new, key, value)
         new[key] = value
     return new or _
+
 
 def get_kodi_setting(setting):
     json_query = xbmc.executeJSONRPC(json.dumps({

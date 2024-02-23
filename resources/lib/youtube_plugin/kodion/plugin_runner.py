@@ -15,23 +15,23 @@ import platform
 import timeit
 
 from . import debug
-from .context import Context
-from .plugin import Runner
+from .context import XbmcContext
+from .plugin import XbmcPlugin
 
 
-__all__ = ['run']
+__all__ = ('run',)
 
 __DEBUG_RUNTIME = False
 __DEBUG_RUNTIME_SINGLE_FILE = False
 
-__RUNNER__ = Runner()
+__PLUGIN__ = XbmcPlugin()
 
 
 def run(provider, context=None):
     start_time = timeit.default_timer()
 
     if not context:
-        context = Context()
+        context = XbmcContext()
 
     context.log_debug('Starting Kodion framework by bromix...')
 
@@ -57,7 +57,7 @@ def run(provider, context=None):
                                path=context.get_path(),
                                params=params))
 
-    __RUNNER__.run(provider, context)
+    __PLUGIN__.run(provider, context)
     provider.tear_down(context)
 
     elapsed = timeit.default_timer() - start_time

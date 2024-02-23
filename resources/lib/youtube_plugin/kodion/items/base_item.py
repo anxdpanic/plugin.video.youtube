@@ -150,6 +150,16 @@ class BaseItem(object):
         self._context_menu = context_menu
         self._replace_context_menu = replace
 
+    def add_context_menu(self, context_menu, position=0, replace=None):
+        if self._context_menu is None:
+            self._context_menu = context_menu
+        elif position == 'end':
+            self._context_menu.extend(context_menu)
+        else:
+            self._context_menu[position:position] = context_menu
+        if replace is not None:
+            self._replace_context_menu = replace
+
     def get_context_menu(self):
         return self._context_menu
 

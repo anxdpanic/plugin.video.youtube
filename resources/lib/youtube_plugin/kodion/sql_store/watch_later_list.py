@@ -24,7 +24,7 @@ class WatchLaterList(Storage):
         super(WatchLaterList, self).__init__(filepath)
 
     def get_items(self):
-        result = self._get_by_ids(process=from_json, values_only=True)
+        result = self._get_by_ids(process=from_json, as_dict=True)
         return result
 
     def add(self, video_id, item):

@@ -262,8 +262,15 @@ class Provider(AbstractProvider):
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/uri2addon/$')
-    def on_uri2addon(self, context, re_match):
-        uri = context.get_param('uri')
+    def on_uri2addon(self, context, re_match, uri=None):
+        if uri is None:
+            uri = context.get_param('uri')
+            skip_title = True
+            listing = False
+        else:
+            skip_title = False
+            listing = True
+
         if not uri:
             return False
 
@@ -271,9 +278,9 @@ class Provider(AbstractProvider):
         res_url = resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
         url_converter.add_url(res_url, context)
-        items = url_converter.get_items(self, context, skip_title=True)
+        items = url_converter.get_items(self, context, skip_title=skip_title)
         if items:
-            return items[0]
+            return items if listing else items[0]
 
         return False
 
@@ -441,7 +448,7 @@ class Provider(AbstractProvider):
                 if method == 'user':
                     return False
 
-        channel_fanarts = resource_manager.get_fanarts((channel_id, ))
+        channel_fanarts = resource_manager.get_fanarts((channel_id,))
 
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
@@ -674,9 +681,6 @@ class Provider(AbstractProvider):
 
         if method == 'list':
             context.set_content(content.LIST_CONTENT)
-            channel_ids = []
-            for subscription in subscriptions:
-                channel_ids.append(subscription.get_channel_id())
             channel_ids = {subscription.get_channel_id(): subscription
                            for subscription in subscriptions}
             channel_fanarts = resource_manager.get_fanarts(channel_ids)
@@ -714,14 +718,6 @@ class Provider(AbstractProvider):
             yt_login.process(mode, self, context)
         return False
 
-    @RegisterProviderPath('^/search/$')
-    def endpoint_search(self, context, re_match):
-        query = context.get_param('q')
-        if not query:
-            return []
-
-        return self.on_search(query, context, re_match)
-
     def _search_channel_or_playlist(self, context, id_string):
         json_data = {}
         result = []
@@ -739,6 +735,10 @@ class Provider(AbstractProvider):
         return result
 
     def on_search(self, search_text, context, re_match):
+        # Search by url to access unlisted videos
+        if search_text.startswith(('https://', 'http://')):
+            return self.on_uri2addon(context, None, search_text)
+
         result = self._search_channel_or_playlist(context, search_text)
         if result:  # found a channel or playlist matching search_text
             return result
@@ -966,33 +966,36 @@ class Provider(AbstractProvider):
 
         if action == 'list':
             context.set_content(content.VIDEO_CONTENT, sub_type='history')
-            play_data = playback_history.get_items()
-            if not play_data:
+            items = playback_history.get_items()
+            if not items:
                 return True
-            json_data = self.get_client(context).get_videos(play_data)
-            if not json_data:
-                return True
-            items = v3.response_to_items(self, context, json_data)
 
-            for item in items:
-                video_id = item.video_id
+            v3_response = {
+                'kind': 'youtube#videoListResponse',
+                'items': [
+                    {
+                        'kind': 'youtube#video',
+                        'id': video_id,
+                        'partial': True,
+                    }
+                    for video_id in items.keys()
+                ]
+            }
+            video_items = v3.response_to_items(self, context, v3_response)
+
+            for video_item in video_items:
                 context_menu = [
                     menu_items.history_remove(
-                        context, video_id
-                    ),
-                    menu_items.history_mark_unwatched(
-                        context, video_id
-                    ) if play_data[video_id]['play_count'] else
-                    menu_items.history_mark_watched(
-                        context, video_id
+                        context, video_item.video_id
                     ),
                     menu_items.history_clear(
                         context
                     ),
+                    ('--------', 'noop'),
                 ]
-                item.set_context_menu(context_menu)
+                video_item.add_context_menu(context_menu)
 
-            return items
+            return video_items
 
         if (action == 'clear' and context.get_ui().on_yes_no_input(
                     context.get_name(),
@@ -1046,6 +1049,7 @@ class Provider(AbstractProvider):
 
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
+        # _.get_my_playlists()
 
         # context.set_content(content.LIST_CONTENT)
 
@@ -1324,6 +1328,70 @@ class Provider(AbstractProvider):
             result.append(settings_menu_item)
 
         return result
+
+    def on_watch_later(self, context, re_match):
+        params = context.get_params()
+        command = re_match.group('command')
+        if not command:
+            return False
+
+        if command == 'list':
+            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
+            items = context.get_watch_later_list().get_items()
+            if not items:
+                return True
+
+            v3_response = {
+                'kind': 'youtube#videoListResponse',
+                'items': [
+                    {
+                        'kind': 'youtube#video',
+                        'id': video_id,
+                        'partial': True,
+                    }
+                    for video_id in items.keys()
+                ]
+            }
+            video_items = v3.response_to_items(self, context, v3_response)
+
+            for video_item in video_items:
+                context_menu = [
+                    menu_items.watch_later_local_remove(
+                        context, video_item.video_id
+                    ),
+                    menu_items.watch_later_local_clear(
+                        context
+                    ),
+                    ('--------', 'noop'),
+                ]
+                video_item.add_context_menu(context_menu)
+
+            return video_items
+
+        if (command == 'clear' and context.get_ui().on_yes_no_input(
+                    context.get_name(),
+                    context.localize('watch_later.clear.confirm')
+                )):
+            context.get_watch_later_list().clear()
+            context.get_ui().refresh_container()
+            return True
+
+        video_id = params.get('video_id')
+        if not video_id:
+            return False
+
+        if command == 'add':
+            item = params.get('item')
+            if item:
+                context.get_watch_later_list().add(video_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_watch_later_list().remove(video_id)
+            context.get_ui().refresh_container()
+            return True
+
+        return False
 
     def handle_exception(self, context, exception_to_handle):
         if isinstance(exception_to_handle, (InvalidGrant, LoginException)):

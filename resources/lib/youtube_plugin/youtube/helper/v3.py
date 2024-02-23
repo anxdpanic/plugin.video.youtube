@@ -89,11 +89,11 @@ def _process_list_response(provider, context, json_data):
             channel_id_dict[item_id] = item
             # if logged in => provide subscribing to the channel
             if provider.is_logged_in():
-                context_menu = (
+                context_menu = [
                     menu_items.subscribe_to_channel(
                         context, item_id
                     ),
-                )
+                ]
                 item.set_context_menu(context_menu)
 
         elif kind == 'guidecategory':
