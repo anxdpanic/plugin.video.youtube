@@ -1809,7 +1809,8 @@ class YouTube(LoginClient):
         client = self.build_client(version, client_data)
 
         if 'key' in client['params'] and not client['params']['key']:
-            client['params']['key'] = self._config_tv['key']
+            client['params']['key'] = (self._config.get('key')
+                                       or self._config_tv['key'])
 
         if method != 'POST' and 'json' in client:
             del client['json']
