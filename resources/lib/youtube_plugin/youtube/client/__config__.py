@@ -84,13 +84,19 @@ class APICheck(object):
         user_details = self._access_manager.get_current_user_details()
         last_hash = user_details.get('last_key_hash', '')
         current_set_hash = self._get_key_set_hash(switch)
-        self.changed = current_set_hash != last_hash
+
+        changed = current_set_hash != last_hash
+        if changed and switch == 'own':
+            changed = self._get_key_set_hash('own_old') != last_hash
+            if not changed:
+                self._access_manager.set_last_key_hash(current_set_hash)
+        self.changed = changed
 
         self._context.log_debug('User: |{user}|, '
                                 'Using API key set: |{switch}|'
                                 .format(user=self.get_current_user(),
                                         switch=switch))
-        if self.changed:
+        if changed:
             self._context.log_debug('API key set changed: Signing out')
             self._context.execute('RunPlugin(plugin://plugin.video.youtube/'
                                   'sign/out/?confirmed=true)')
@@ -121,7 +127,7 @@ class APICheck(object):
             client_id = key_sets[switch]['id']
             client_secret = key_sets[switch]['secret']
 
-        elif switch == 'own':
+        elif switch.startswith('own'):
             decode = False
             api_key = self._json_api['keys']['personal']['api_key']
             client_id = self._json_api['keys']['personal']['client_id']
@@ -144,9 +150,10 @@ class APICheck(object):
 
     def _get_key_set_hash(self, switch):
         key_set = self.get_api_keys(switch)
-        if switch == 'own':
-            client_id = key_set['id'].replace('.apps.googleusercontent.com',
-                                              '')
+        if switch.startswith('own'):
+            client_id = key_set['id'].replace('.apps.googleusercontent.com', '')
+            if switch == 'own_old':
+                client_id += '.apps.googleusercontent.com'
             key_set['id'] = client_id
         return self._access_manager.calc_key_hash(**key_set)
 
