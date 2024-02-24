@@ -1869,6 +1869,12 @@ class VideoInfo(YouTubeRequestClient):
                 else:
                     kind = lang_code
 
+                url = (unquote(subtitle['url'])
+                       .replace("&", "&amp;")
+                       .replace('"', "&quot;")
+                       .replace("<", "&lt;")
+                       .replace(">", "&gt;"))
+
                 output.extend((
                     '\t\t<AdaptationSet'
                         ' id="', str(set_id), '"'
@@ -1891,7 +1897,7 @@ class VideoInfo(YouTubeRequestClient):
                         # unsure about what value to use for bandwidth
                         ' bandwidth="268"'
                         '>\n'
-                    '\t\t\t\t<BaseURL>', subtitle['url'], '</BaseURL>\n'
+                    '\t\t\t\t<BaseURL>', url, '</BaseURL>\n'
                     '\t\t\t</Representation>\n'
                     '\t\t</AdaptationSet>\n'
                 ))
