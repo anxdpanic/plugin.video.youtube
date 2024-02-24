@@ -155,42 +155,51 @@ class YouTube(LoginClient):
 
         return 'C%s%s%sAA' % (high[high_iteration], low[low_iteration], overflow_token)
 
-    def update_watch_history(self,
-                             context,
-                             video_id,
-                             url,
-                             st=None,
-                             et=None,
-                             state=None):
-        if None not in (st, et, state):
-            url.format(st=st, et=et, state=state)
+    def update_watch_history(self, context, video_id, url, status=None):
+        if status is None:
+            cmt = st = et = state = None
         else:
-            st = et = state = 'N/A'
+            cmt, st, et, state = status
 
         context.log_debug('Playback reported [{video_id}]:'
-                          ' {st} segment start,'
-                          ' {et} segment end,'
+                          ' current time={cmt},'
+                          ' segment start={st},'
+                          ' segment end={et},'
                           ' state={state}'.format(
-            video_id=video_id, st=st, et=et, state=state
+            video_id=video_id, cmt=cmt, st=st, et=et, state=state
         ))
 
-        headers = {'Host': 'www.youtube.com',
-                   'Connection': 'keep-alive',
-                   'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.36 Safari/537.36',
-                   'Accept': 'image/webp,*/*;q=0.8',
-                   'DNT': '1',
-                   'Referer': 'https://www.youtube.com/tv',
-                   'Accept-Encoding': 'gzip, deflate',
-                   'Accept-Language': 'en-US,en;q=0.8,de;q=0.6'}
-        params = {'noflv': '1',
-                  'html5': '1',
-                  'video_id': video_id,
-                  'referrer': '',
-                  'eurl': 'https://www.youtube.com/tv#/watch?v=%s' % video_id,
-                  'skl': 'false',
-                  'ns': 'yt',
-                  'el': 'leanback',
-                  'ps': 'leanback'}
+        headers = {
+            'Host': 's.youtube.com',
+            'Connection': 'keep-alive',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'DNT': '1',
+            'Referer': 'https://www.youtube.com/watch?v={0}'.format(video_id),
+            'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                           ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                           ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
+        }
+        params = {
+            'docid': video_id,
+            'referrer': 'https://accounts.google.com/',
+            'ns': 'yt',
+            'el': 'detailpage',
+            'ver': '2',
+            'fs': '0',
+            'volume': '100',
+            'muted': '0',
+        }
+        if cmt is not None:
+            params['cmt'] = format(cmt, '.3f')
+        if st is not None:
+            params['st'] = format(st, '.3f')
+        if et is not None:
+            params['et'] = format(et, '.3f')
+        if state is not None:
+            params['state'] = state
         if self._access_token:
             params['access_token'] = self._access_token
 
