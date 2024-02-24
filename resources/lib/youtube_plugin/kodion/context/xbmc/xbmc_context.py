@@ -194,6 +194,7 @@ class XbmcContext(AbstractContext):
         'subtitles.all': 30774,
         'subtitles.language': 30560,
         'subtitles.no_auto_generated': 30602,
+        'subtitles.translation': 30775,
         'subtitles.with_fallback': 30601,
         'succeeded': 30575,
         'trending': 30513,

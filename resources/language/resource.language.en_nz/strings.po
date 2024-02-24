@@ -1396,3 +1396,7 @@ msgstr ""
 msgctxt "#30774"
 msgid "All available"
 msgstr ""
+
+msgctxt "#30775"
+msgid "%s (translation)"
+msgstr ""

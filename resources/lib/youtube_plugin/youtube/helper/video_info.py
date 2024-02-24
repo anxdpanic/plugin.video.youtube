@@ -1858,12 +1858,13 @@ class VideoInfo(YouTubeRequestClient):
             set_id += 1
 
         if subs_data:
+            translation_lang = self._context.localize('subtitles.translation')
             for lang_code, subtitle in subs_data.items():
                 label = language = subtitle['language']
                 kind = subtitle['kind']
                 if kind:
                     if kind == 'translation':
-                        label = '{0} ({1})'.format(language, kind)
+                        label = translation_lang % language
                     kind = '_'.join((lang_code, kind))
                 else:
                     kind = lang_code

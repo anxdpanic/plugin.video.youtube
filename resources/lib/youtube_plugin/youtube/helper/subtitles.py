@@ -231,26 +231,26 @@ class Subtitles(object):
         if not num_total:
             self._context.log_debug('No subtitles found for prompt')
         else:
+            translation_lang = self._context.localize('subtitles.translation')
             choice = self._context.get_ui().on_select(
                 self._context.localize('subtitles.language'),
                 [name for _, name in captions] +
-                [name + ' *' for _, name in translations]
+                [translation_lang % name for _, name in translations]
             )
-            if choice == -1:
-                self._context.log_debug('Subtitle selection cancelled')
-                return None
 
-            track = None
             if 0 <= choice < num_captions:
                 track = self.caption_tracks[choice]
                 kind = track.get('kind')
-                choice = translations[choice - num_captions]
+                choice = captions[choice - num_captions]
                 is_translation = False
             elif num_captions <= choice < num_total:
                 track = self.defaults['translation_base']
                 kind = 'translation'
                 choice = translations[choice - num_captions]
                 is_translation = True
+            else:
+                self._context.log_debug('Subtitle selection cancelled')
+                return None
 
             url = self._get_url(
                 caption_track=track,
