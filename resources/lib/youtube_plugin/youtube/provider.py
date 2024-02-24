@@ -1245,13 +1245,14 @@ class Provider(AbstractProvider):
             result.append(playlists_item)
 
         # saved playlists
-        if logged_in and settings.get_bool('youtube.folder.saved.playlists.show', True):
-            playlists_item = DirectoryItem(
-                localize('saved.playlists'),
-                create_uri(('special', 'saved_playlists')),
-                image='{media}/playlist.png',
-            )
-            result.append(playlists_item)
+        # TODO: re-enable once functionality is restored
+        # if logged_in and settings.get_bool('youtube.folder.saved.playlists.show', True):
+        #     playlists_item = DirectoryItem(
+        #         localize('saved.playlists'),
+        #         create_uri(('special', 'saved_playlists')),
+        #         image='{media}/playlist.png',
+        #     )
+        #     result.append(playlists_item)
 
         # subscriptions
         if logged_in and settings.get_bool('youtube.folder.subscriptions.show', True):
