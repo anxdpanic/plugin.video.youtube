@@ -1188,24 +1188,18 @@ class VideoInfo(YouTubeRequestClient):
 
         if _settings.use_remote_history():
             playback_stats = {
-                'playback_url': (
-                    'videostatsPlaybackUrl',
-                    '{0}&ver=2&fs=0&volume=100&muted=0&cpn={1}',
-                ),
-                'watchtime_url': (
-                    'videostatsWatchtimeUrl',
-                    ('{0}&ver=2&fs=0&volume=100&muted=0&cpn={1}'
-                     '&st={{st}}&et={{et}}&state={{state}}'),
-                )
+                'playback_url': 'videostatsPlaybackUrl',
+                'watchtime_url': 'videostatsWatchtimeUrl',
             }
             playback_tracking = response.get('playbackTracking', {})
             cpn = self._generate_cpn()
 
-            for key, (url, url_template) in playback_stats.items():
-                url = playback_tracking.get(url, {}).get('baseUrl')
-                if not url or not url.startswith('http'):
+            for key, url_key in playback_stats.items():
+                url = playback_tracking.get(url_key, {}).get('baseUrl')
+                if url and url.startswith('http'):
+                    playback_stats[key] = '&cpn='.join((url, cpn))
+                else:
                     playback_stats[key] = ''
-                playback_stats[key] = url_template.format(url, cpn)
         else:
             playback_stats = {
                 'playback_url': '',

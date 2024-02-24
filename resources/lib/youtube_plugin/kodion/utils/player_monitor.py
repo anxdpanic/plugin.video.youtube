@@ -35,7 +35,6 @@ class PlayerMonitorThread(threading.Thread):
 
         self.total_time = 0.0
         self.current_time = 0.0
-        self.segment_start = 0.0
         self.progress = 0
 
         self.daemon = True
@@ -90,9 +89,6 @@ class PlayerMonitorThread(threading.Thread):
                 self._context,
                 self.video_id,
                 report_url,
-                st=0,
-                et='N/A',
-                state=state
             )
 
         access_manager = self._context.get_access_manager()
@@ -101,6 +97,7 @@ class PlayerMonitorThread(threading.Thread):
         video_id_param = 'video_id=%s' % self.video_id
         report_url = use_remote_history and playback_stats.get('watchtime_url')
 
+        segment_start = 0
         played_time = -1.0
         wait_interval = 0.5
         report_period = waited = 10
@@ -153,38 +150,37 @@ class PlayerMonitorThread(threading.Thread):
                     state = 'playing'
                 played_time = self.current_time
 
-                # refresh client, tokens may need refreshing
                 if logged_in and report_url:
-                    self._provider.reset_client()
-                    client = self._provider.get_client(self._context)
-                    logged_in = self._provider.is_logged_in()
-
-                    if self.segment_start < 0:
-                        self.segment_start = 0.0
-
                     if state == 'playing':
                         segment_end = self.current_time
                     else:
-                        segment_end = self.segment_start
+                        segment_end = segment_start
 
-                    if self.segment_start > segment_end:
-                        segment_end = self.segment_start + report_period
+                    if segment_start > segment_end:
+                        segment_end = segment_start + report_period
 
                     if segment_end > self.total_time:
                         segment_end = self.total_time
 
                     # only report state='paused' once
                     if state == 'playing' or last_state == 'playing':
-                        client.update_watch_history(
-                            self._context,
-                            self.video_id,
-                            report_url,
-                            st=format(self.segment_start, '.3f'),
-                            et=format(segment_end, '.3f'),
-                            state=state
-                        )
+                        # refresh client, tokens may need refreshing
+                        self._provider.reset_client()
+                        client = self._provider.get_client(self._context)
+                        logged_in = self._provider.is_logged_in()
 
-                    self.segment_start = segment_end
+                        if logged_in:
+                            client.update_watch_history(
+                                self._context,
+                                self.video_id,
+                                report_url,
+                                status=(self.current_time,
+                                        segment_start,
+                                        segment_end,
+                                        state),
+                            )
+
+                    segment_start = segment_end
 
             self._monitor.waitForAbort(wait_interval)
             waited += wait_interval
@@ -212,9 +208,9 @@ class PlayerMonitorThread(threading.Thread):
         if self.progress >= settings.get_play_count_min_percent():
             play_count += 1
             self.current_time = 0.0
-            segment_end = format(self.total_time, '.3f')
+            segment_end = self.total_time
         else:
-            segment_end = format(self.current_time, '.3f')
+            segment_end = self.current_time
             refresh_only = True
 
         if logged_in and report_url:
@@ -222,9 +218,10 @@ class PlayerMonitorThread(threading.Thread):
                 self._context,
                 self.video_id,
                 report_url,
-                st=segment_end,
-                et=segment_end,
-                state=state
+                status=(segment_end,
+                        segment_end,
+                        segment_end,
+                        state),
             )
         if use_local_history:
             play_data = {

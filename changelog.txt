@@ -1,3 +1,10 @@
+## v7.0.3+beta.5
+### Fixed
+- Properly fix infotagger error with Kodi v19
+- Disable non-functioning saved playlists menu item #569
+- Fix forced logout on upgrade from v7.0.2.2 or below
+- Fix Youtube progress tracking #581
+
 ## v7.0.3+beta.4
 ### Fixed
 - Fix handling of isPostLiveDrv streams #579
