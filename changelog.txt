@@ -1,3 +1,9 @@
+## v7.0.3
+### Fixed
+- Fix incorrect labelling of subtitle language in Kodi subtitle selection dialog #595
+- Fix failure to play videos when MPEG-DASH and subtitles were enabled in Kodi 20 and lower #595
+- Fix Python 2 compatibility
+
 ## v7.0.3+beta.5
 ### Fixed
 - Properly fix infotagger error with Kodi v19
