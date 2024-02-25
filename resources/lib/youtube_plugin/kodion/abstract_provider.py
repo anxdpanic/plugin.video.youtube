@@ -48,7 +48,7 @@ class AbstractProvider(object):
 
         self.register_path(r''.join((
             '^',
-            paths.SEARCH,
+            '(', paths.SEARCH, '|', paths.EXTERNAL_SEARCH, ')',
             '/(?P<command>input|query|list|remove|clear|rename)?/?$'
         )), '_internal_search')
 
