@@ -268,6 +268,18 @@ class AbstractContext(object):
                     ]
                 elif param in self._STRING_PARAMS:
                     parsed_value = str(value)
+                    # process and translate deprecated parameters
+                    if param == 'action':
+                        if parsed_value in ('play_all', 'play_video'):
+                            to_delete.append(param)
+                            self.set_path('play')
+                            continue
+                    elif param == 'videoid':
+                        to_delete.append(param)
+                        param = 'video_id'
+                    elif params == 'playlist':
+                        to_delete.append(param)
+                        param = 'playlist_id'
                 else:
                     self.log_debug('Unknown parameter - |{0}: {1}|'.format(
                         param, value
