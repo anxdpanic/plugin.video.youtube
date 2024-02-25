@@ -1858,15 +1858,22 @@ class VideoInfo(YouTubeRequestClient):
             set_id += 1
 
         if subs_data:
+            translation_lang = self._context.localize('subtitles.translation')
             for lang_code, subtitle in subs_data.items():
                 label = language = subtitle['language']
                 kind = subtitle['kind']
                 if kind:
                     if kind == 'translation':
-                        label = '{0} ({1})'.format(language, kind)
+                        label = translation_lang % language
                     kind = '_'.join((lang_code, kind))
                 else:
                     kind = lang_code
+
+                url = (unquote(subtitle['url'])
+                       .replace("&", "&amp;")
+                       .replace('"', "&quot;")
+                       .replace("<", "&lt;")
+                       .replace(">", "&gt;"))
 
                 output.extend((
                     '\t\t<AdaptationSet'
@@ -1890,7 +1897,7 @@ class VideoInfo(YouTubeRequestClient):
                         # unsure about what value to use for bandwidth
                         ' bandwidth="268"'
                         '>\n'
-                    '\t\t\t\t<BaseURL>', subtitle['url'], '</BaseURL>\n'
+                    '\t\t\t\t<BaseURL>', url, '</BaseURL>\n'
                     '\t\t\t</Representation>\n'
                     '\t\t</AdaptationSet>\n'
                 ))

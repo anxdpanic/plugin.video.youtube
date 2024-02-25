@@ -68,7 +68,7 @@ class FunctionCache(Storage):
         cache_id = self._create_id_from_func(partial_func)
         return self._get(cache_id)
 
-    def run(self, func, seconds, *args, _refresh=False, **kwargs):
+    def run(self, func, seconds, *args, **kwargs):
         """
         Returns the cached data of the given function.
         :param func, function to cache
@@ -76,6 +76,7 @@ class FunctionCache(Storage):
         :param _refresh: bool, updates cache with new func result
         :return:
         """
+        refresh = kwargs.pop('_refresh', False)
         partial_func = partial(func, *args, **kwargs)
 
         # if caching is disabled call the function
@@ -83,7 +84,7 @@ class FunctionCache(Storage):
             return partial_func()
 
         cache_id = self._create_id_from_func(partial_func)
-        data = None if _refresh else self._get(cache_id, seconds=seconds)
+        data = None if refresh else self._get(cache_id, seconds=seconds)
         if data is None:
             data = partial_func()
             self._set(cache_id, data)

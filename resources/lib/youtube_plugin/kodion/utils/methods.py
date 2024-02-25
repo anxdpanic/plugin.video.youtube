@@ -165,7 +165,7 @@ def select_stream(context, stream_data_list, quality_map_override=None, ask_for_
     return selected_stream_data
 
 
-def create_path(*args, is_uri=False):
+def create_path(*args, **kwargs):
     path = '/'.join([
         part
         for part in [
@@ -178,7 +178,7 @@ def create_path(*args, is_uri=False):
     else:
         return '/'
 
-    if is_uri:
+    if kwargs.get('is_uri', False):
         return quote(path)
     return path
 
