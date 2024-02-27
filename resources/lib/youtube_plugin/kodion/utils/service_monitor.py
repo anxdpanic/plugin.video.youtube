@@ -83,6 +83,10 @@ class ServiceMonitor(xbmc.Monitor):
 
     def onSettingsChanged(self):
         self._settings.flush(xbmcaddon.Addon(ADDON_ID))
+        if xbmc.getInfoLabel('Container.FolderPath').startswith(
+            'plugin://{0}/'.format(ADDON_ID)
+        ):
+            xbmc.executebuiltin('Container.Refresh')
 
         data = {
             'use_httpd': (self._settings.use_mpd_videos()
