@@ -23,7 +23,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         self.flush(xbmc_addon)
 
-        if current_system_version.compatible(20, 0):
+        if current_system_version.compatible(21, 0):
             _class = xbmcaddon.Settings
 
             # set methods in new Settings class are documented as returning a
@@ -68,7 +68,7 @@ class XbmcPluginSettings(AbstractSettings):
     def flush(cls, xbmc_addon):
         cls._echo = get_kodi_setting('debug.showloginfo')
         cls._cache = {}
-        if current_system_version.compatible(20, 0):
+        if current_system_version.compatible(21, 0):
             cls._type = xbmc_addon.getSettings
         else:
             cls._type = xbmcaddon.Addon
