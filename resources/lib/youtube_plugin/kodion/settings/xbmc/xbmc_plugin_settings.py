@@ -23,8 +23,15 @@ class XbmcPluginSettings(AbstractSettings):
 
         self.flush(xbmc_addon)
 
-        if current_system_version.compatible(20, 0):
+        if current_system_version.compatible(21, 0):
             _class = xbmcaddon.Settings
+
+            # set methods in new Settings class are documented as returning a
+            # bool, True if value was set, False otherwise, similar to how the
+            # old set setting methods of the Addon class function. Except they
+            # don't actually return anything...
+            # Ignore return value until bug is fixed in Kodi
+            XbmcPluginSettings._check_set = False
 
             self.__dict__.update({
                 '_get_bool': _class.getBool,
@@ -61,7 +68,7 @@ class XbmcPluginSettings(AbstractSettings):
     def flush(cls, xbmc_addon):
         cls._echo = get_kodi_setting('debug.showloginfo')
         cls._cache = {}
-        if current_system_version.compatible(20, 0):
+        if current_system_version.compatible(21, 0):
             cls._type = xbmc_addon.getSettings
         else:
             cls._type = xbmcaddon.Addon
@@ -97,9 +104,10 @@ class XbmcPluginSettings(AbstractSettings):
     def set_bool(self, setting, value, echo=None):
         try:
             error = not self._set_bool(self._type(), setting, value)
-            if error:
+            if error and self._check_set:
                 error = 'failed'
             else:
+                error = False
                 self._cache[setting] = value
         except (RuntimeError, TypeError) as exc:
             error = exc
@@ -145,9 +153,10 @@ class XbmcPluginSettings(AbstractSettings):
     def set_int(self, setting, value, echo=None):
         try:
             error = not self._set_int(self._type(), setting, value)
-            if error:
+            if error and self._check_set:
                 error = 'failed'
             else:
+                error = False
                 self._cache[setting] = value
         except (RuntimeError, TypeError) as exc:
             error = exc
@@ -191,9 +200,10 @@ class XbmcPluginSettings(AbstractSettings):
     def set_string(self, setting, value, echo=None):
         try:
             error = not self._set_str(self._type(), setting, value)
-            if error:
+            if error and self._check_set:
                 error = 'failed'
             else:
+                error = False
                 self._cache[setting] = value
         except (RuntimeError, TypeError) as exc:
             error = exc
@@ -239,9 +249,10 @@ class XbmcPluginSettings(AbstractSettings):
     def set_string_list(self, setting, value, echo=None):
         try:
             error = not self._set_str_list(self._type(), setting, value)
-            if error:
+            if error and self._check_set:
                 error = 'failed'
             else:
+                error = False
                 self._cache[setting] = value
         except (RuntimeError, TypeError) as exc:
             error = exc

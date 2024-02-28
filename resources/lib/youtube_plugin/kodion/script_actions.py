@@ -27,7 +27,6 @@ def _config_actions(action, *_args):
 
     if action == 'youtube':
         xbmcaddon.Addon().openSettings()
-        xbmc.executebuiltin('Container.Refresh')
 
     elif action == 'isa':
         if context.use_inputstream_adaptive():
