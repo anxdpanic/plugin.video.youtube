@@ -1,21 +1,20 @@
 name: Submit Release
 on:
-  push:
-    tags:
-      - 'v*'
-      - '!*dev*'
-      - '!*alpha*'
-      - '!*beta*'
+  workflow_dispatch:
+#  push:
+#    tags:
+#      - 'v*'
+#      - '!*dev*'
+#      - '!*alpha*'
+#      - '!*beta*'
 
 jobs:
   release:
-    if: github.repository == 'anxdpanic/plugin.video.youtube'
-
+    if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
     name: Submit Release
     runs-on: ubuntu-20.04
 
     strategy:
-
       fail-fast: false
       matrix:
         python-version: [ 3.9 ]
