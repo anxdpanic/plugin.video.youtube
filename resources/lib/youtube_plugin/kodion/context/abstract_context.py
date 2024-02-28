@@ -76,6 +76,7 @@ class AbstractContext(object):
         'item',
         'item_id',
         'next_page_token',
+        'order',
         'page_token',
         'parent_id',
         'playlist',  # deprecated
