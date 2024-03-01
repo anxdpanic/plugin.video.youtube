@@ -134,11 +134,17 @@ class Subtitles(object):
         if languages == self.LANG_PROMPT:
             return self._prompt()
 
-        no_asr = languages == self.LANG_CURR_NO_ASR
-        if languages == self.LANG_CURR_FALLBACK:
-            lang_codes = ('en', 'en-US', 'en-GB')
+        if '-' in self.lang_code:
+            lang_codes = [self.lang_code, self.lang_code.partition('-')[0]]
         else:
-            lang_codes = {self.lang_code, self.lang_code.partition('-')[0]}
+            lang_codes = [self.lang_code]
+        no_asr = False
+        if languages == self.LANG_CURR_NO_ASR:
+            no_asr = True
+        elif languages == self.LANG_CURR_FALLBACK:
+            for lang_code in ('en', 'en-US', 'en-GB'):
+                if lang_code not in lang_codes:
+                    lang_codes.append(lang_code)
 
         subtitles = {}
         default_lang_code = self.defaults['lang_code']
