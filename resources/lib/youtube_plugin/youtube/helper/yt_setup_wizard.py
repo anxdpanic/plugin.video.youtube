@@ -205,32 +205,77 @@ def process_language(provider, context, step, steps):
         return step
 
     client = provider.get_client(context)
+    settings = context.get_settings()
+
+    plugin_language = settings.get_language()
+    plugin_region = settings.get_region()
 
     kodi_language = context.get_language()
+    base_kodi_language = kodi_language.partition('-')[0]
+
     json_data = client.get_supported_languages(kodi_language)
     items = json_data.get('items') or DEFAULT_LANGUAGES['items']
-    invalid_ids = ['es-419']  # causes hl not a valid language error. Issue #418
+    
+    selected_language = [None]
+
+    def _get_selected_language(item):
+        item_lang = item[1]
+        base_item_lang = item_lang.partition('-')[0]
+        if item_lang == kodi_language or item_lang == plugin_language:
+            selected_language[0] = item
+        elif not selected_language[0] and base_item_lang == base_kodi_language:
+            selected_language.append(item)
+        return item
+
+    # Ignore es-419 as it causes hl not a valid language error
+    # https://github.com/jdf76/plugin.video.youtube/issues/418
+    invalid_ids = ('es-419',)
     language_list = sorted([
         (item['snippet']['name'], item['snippet']['hl'])
         for item in items
         if item['id'] not in invalid_ids
-    ])
+    ], key=_get_selected_language)
+
+    if selected_language[0]:
+        selected_language = language_list.index(selected_language[0])
+    elif len(selected_language) > 1:
+        selected_language = language_list.index(selected_language[1])
+    else:
+        selected_language = None
+
     language_id = ui.on_select(
         localize('setup_wizard.locale.language'),
         language_list,
+        preselect=selected_language
     )
     if language_id == -1:
         return step
 
     json_data = client.get_supported_regions(language=language_id)
     items = json_data.get('items') or DEFAULT_REGIONS['items']
+
+    selected_region = [None]
+
+    def _get_selected_region(item):
+        item_region = item[1]
+        if item_region == plugin_region:
+            selected_region[0] = item
+        return item
+
     region_list = sorted([
         (item['snippet']['name'], item['snippet']['gl'])
         for item in items
-    ])
+    ], key=_get_selected_region)
+
+    if selected_region[0]:
+        selected_region = region_list.index(selected_region[0])
+    else:
+        selected_region = None
+
     region_id = ui.on_select(
         localize('setup_wizard.locale.region'),
         region_list,
+        preselect=selected_region
     )
     if region_id == -1:
         return step
