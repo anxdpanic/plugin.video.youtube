@@ -214,11 +214,14 @@ class ViewManager(object):
         skin_data = self.SKIN_DATA.get(skin_id, {})
         view_type_data = skin_data.get(view_type) or skin_data.get(content_type)
         if view_type_data:
-            items = [
-                (view_data['name'], view_data['id'])
-                for view_data in view_type_data
-            ]
-            view_id = ui.on_select(title, items, preselect=current_value)
+            items = []
+            preselect = None
+            for view_data in view_type_data:
+                view_id = view_data['id']
+                items.append((view_data['name'], view_id))
+                if view_id == current_value:
+                    preselect = len(items) - 1
+            view_id = ui.on_select(title, items, preselect=preselect)
         else:
             log_info('ViewManager: Unsupported view |{view_type}|'
                      .format(view_type=view_type))
