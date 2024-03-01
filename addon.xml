@@ -2,7 +2,7 @@
 <addon id="plugin.video.youtube" name="YouTube" version="7.0.3.1" provider-name="anxdpanic, bromix">
     <requires>
         <import addon="xbmc.python" version="3.0.1"/>
-        <import addon="script.module.requests" version="2.12.4"/>
+        <import addon="script.module.requests" version="2.27.1"/>
         <import addon="inputstream.adaptive" version="20.0.0"/>
         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
         <import addon="script.module.infotagger" version="0.0.5"/>
