@@ -343,11 +343,16 @@ class XbmcContext(AbstractContext):
         return time_obj.strftime(str_format)
 
     def get_language(self):
-        kodi_language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
-        lang_code, seperator, region = kodi_language.partition('-')
+        language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
+        lang_code, seperator, region = language.partition('-')
+        if not lang_code:
+            language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
+            lang_code, seperator, region = language.partition('-')
+        if not lang_code:
+            return 'en-US'
         if region:
             return seperator.join((lang_code.lower(), region.upper()))
-        return 'en-US'
+        return lang_code
 
     def get_language_name(self, lang_id=None):
         if lang_id is None:
@@ -575,6 +580,7 @@ class XbmcContext(AbstractContext):
     _ISA_CAPABILITIES = {
         'live': loose_version('2.0.12'),
         'drm': loose_version('2.2.12'),
+        'mpd_subs': loose_version('21.0.0'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
         # unknown when Opus audio support was implemented
