@@ -1950,15 +1950,15 @@ class VideoInfo(YouTubeRequestClient):
 
         if subs_data:
             translation_lang = self._context.localize('subtitles.translation')
-            for lang_code, subtitle in subs_data.items():
+            for lang_id, subtitle in subs_data.items():
+                lang_code = subtitle['lang_code']
                 label = language = subtitle['language']
                 kind = subtitle['kind']
-                if kind:
-                    if kind == 'translation':
-                        label = translation_lang % language
+                if kind == 'translation':
+                    label = translation_lang % language
                     kind = '_'.join((lang_code, kind))
                 else:
-                    kind = lang_code
+                    kind = lang_id
 
                 url = (unquote(subtitle['url'])
                        .replace("&", "&amp;")
@@ -1974,7 +1974,8 @@ class VideoInfo(YouTubeRequestClient):
                         # name attribute is ISA specific and does not exist in
                         # the MPD spec. Should be a child Label element instead
                         ' name="[B]', label, '[/B]"'
-                        # default is an ISA specific attributes
+                        # original / default are ISA specific attributes
+                        ' original="', str(subtitle['original']).lower(), '"'
                         ' default="', str(subtitle['default']).lower(), '"'
                         '>\n'
                     # AdaptationSet Label element not currently used by ISA
