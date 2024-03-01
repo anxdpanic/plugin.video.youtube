@@ -364,6 +364,9 @@ class AbstractSettings(object):
     def get_language(self):
         return self.get_string(settings.LANGUAGE, 'en_US').replace('_', '-')
 
+    def get_region(self):
+        return self.get_string(settings.REGION, 'US')
+
     def get_watch_later_playlist(self):
         return self.get_string(settings.WATCH_LATER_PLAYLIST, '').strip()
 

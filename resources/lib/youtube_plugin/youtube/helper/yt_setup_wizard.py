@@ -237,8 +237,8 @@ def process_language(provider, context, step, steps):
 
     # set new language id and region id
     settings = context.get_settings()
-    settings.set_string('youtube.language', language_id)
-    settings.set_string('youtube.region', region_id)
+    settings.set_string(settings.LANGUAGE, language_id)
+    settings.set_string(settings.REGION, region_id)
     provider.reset_client()
     return step
 
