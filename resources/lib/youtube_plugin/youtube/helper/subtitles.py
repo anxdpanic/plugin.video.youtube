@@ -68,7 +68,8 @@ class Subtitles(object):
             'caption': {},
             'lang_code': 'und',
             'is_asr': False,
-            'translation_base': None,
+            'base': None,
+            'base_code': None
         }
         if default_audio is None:
             return
@@ -95,15 +96,19 @@ class Subtitles(object):
             'caption': default_caption,
             'lang_code': default_caption.get('languageCode') or 'und',
             'is_asr': default_caption.get('kind') == 'asr',
-            'translation_base': None,
+            'base': None,
+            'base_code': None,
         }
         if default_caption.get('isTranslatable'):
-            self.defaults['translation_base'] = default_caption
+            self.defaults['base'] = default_caption
+            self.defaults['base_code'] = self.defaults['lang_code']
         else:
             for track in self.caption_tracks:
-                if track.get('isTranslatable'):
-                    self.defaults['translation_base'] = track
-                    break
+                if not track.get('isTranslatable'):
+                    continue
+                self.defaults['base'] = track
+                self.defaults['base_code'] = track.get('languageCode') or 'und'
+                break
 
     def _unescape(self, text):
         try:
@@ -150,12 +155,17 @@ class Subtitles(object):
                     lang_codes.append(lang_code)
 
         subtitles = {}
+        has_asr = False
         for lang_code in lang_codes:
             track, language, kind, is_translation = self._get_track(
                 lang_code, use_asr=use_asr
             )
             if not track:
                 continue
+            if kind == 'asr':
+                if has_asr:
+                    continue
+                has_asr = True
             lang_key = lang_code
             lang_code = track.get('languageCode')
             subtitles[lang_key] = {
@@ -211,7 +221,7 @@ class Subtitles(object):
                     'url': url,
                 }
 
-        translation_base = self.defaults['translation_base']
+        translation_base = self.defaults['base']
         if translation_base:
             for track in self.translation_langs:
                 track_lang_code = track.get('languageCode')
@@ -246,7 +256,7 @@ class Subtitles(object):
         translations = [
             (track.get('languageCode'), self._get_language_name(track))
             for track in self.translation_langs
-        ] if self.defaults['translation_base'] else []
+        ] if self.defaults['base'] else []
         num_captions = len(captions)
         num_translations = len(translations)
         num_total = num_captions + num_translations
@@ -267,7 +277,7 @@ class Subtitles(object):
                 choice = captions[choice - num_captions]
                 is_translation = False
             elif num_captions <= choice < num_total:
-                track = self.defaults['translation_base']
+                track = self.defaults['base']
                 kind = 'translation'
                 choice = translations[choice - num_captions]
                 is_translation = True
@@ -390,19 +400,21 @@ class Subtitles(object):
                         caption_language = track_language
                         caption_kind = track_kind
                         break
-                elif use_asr is False and is_asr:
+                elif (use_asr is False and is_asr) or (use_asr and not is_asr):
                     continue
                 elif (not caption_track
-                      or (not use_asr and caption_kind == 'asr')
+                      or (use_asr is None and caption_kind == 'asr')
                       or (use_asr and is_asr)):
                     caption_track = track
                     caption_language = track_language
                     caption_kind = track_kind
 
-        if not caption_track and self.defaults['translation_base']:
+        if (not caption_track
+                and self.defaults['base']
+                and lang_code != self.defaults['base_code']):
             for track in self.translation_langs:
                 if lang_code == track.get('languageCode'):
-                    caption_track = self.defaults['translation_base']
+                    caption_track = self.defaults['base']
                     caption_language = self._get_language_name(track)
                     caption_kind = 'translation'
                     is_translation = True
