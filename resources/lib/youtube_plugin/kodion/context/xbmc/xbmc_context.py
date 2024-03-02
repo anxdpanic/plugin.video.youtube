@@ -342,7 +342,8 @@ class XbmcContext(AbstractContext):
                           .replace(':%S', ''))
         return time_obj.strftime(str_format)
 
-    def get_language(self):
+    @staticmethod
+    def get_language():
         language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
         lang_code, seperator, region = language.partition('-')
         if not lang_code:
