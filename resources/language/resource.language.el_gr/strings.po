@@ -825,8 +825,8 @@ msgid "Enable API configuration page"
 msgstr "Επέτρεψε την σελίδα ρυθμίσεων κλειδιών API"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://διεύθυνσηIP:θύρα/api (βλέπε εξυπηρετητής HTTP)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+msgstr "http://διεύθυνσηIP:θύρα/youtube/api (βλέπε εξυπηρετητής HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"

@@ -823,8 +823,8 @@ msgid "Enable API configuration page"
 msgstr "Zapnúť konfiguračnú stránku API"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ip_adresa>:<port>/api (viď server HTTP)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+msgstr "http://<ip_adresa>:<port>/youtube/api (viď server HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"

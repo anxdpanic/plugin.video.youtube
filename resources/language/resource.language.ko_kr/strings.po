@@ -823,8 +823,8 @@ msgid "Enable API configuration page"
 msgstr "API 설정 페이지 사용"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ipaddress>:<port>/api (HTTP 서버 참고)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+msgstr "http://<ipaddress>:<port>/youtube/api (HTTP 서버 참고)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
