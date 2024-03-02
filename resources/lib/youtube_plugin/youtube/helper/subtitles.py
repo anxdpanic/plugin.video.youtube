@@ -38,7 +38,7 @@ class Subtitles(object):
         self._context = context
 
         settings = context.get_settings()
-        self.lang_code = settings.get_language()
+        self.lang_code = context.get_subtitle_language()
         self.pre_download = settings.subtitle_download()
         self.subtitle_languages = settings.subtitle_languages()
 

@@ -41,7 +41,7 @@ def _config_actions(context, action, *_args):
             xbmc.executebuiltin('InstallAddon(script.module.inputstreamhelper)')
 
     elif action == 'subtitles':
-        language = settings.get_language()
+        language = context.get_subtitle_language()
         sub_setting = settings.subtitle_languages()
 
         sub_opts = [

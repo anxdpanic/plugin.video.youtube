@@ -33,6 +33,7 @@ from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
     loose_version,
+    get_kodi_setting_value,
     make_dirs,
     to_unicode,
 )
@@ -359,6 +360,19 @@ class XbmcContext(AbstractContext):
         if lang_id is None:
             lang_id = self.get_language()
         return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
+
+    def get_subtitle_language(self):
+        sub_language = get_kodi_setting_value('locale.subtitlelanguage')
+        # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
+        if sub_language not in (None,  # No setting value
+                                self.localize(231),  # None
+                                self.localize(13207),  # Forced only
+                                self.localize(308),  # Original language
+                                self.localize(309)):  # UI language
+            sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
+        else:
+            sub_language = None
+        return sub_language or self._settings.get_language()
 
     def get_video_playlist(self):
         if not self._video_playlist:
