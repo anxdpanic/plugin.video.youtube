@@ -830,7 +830,7 @@ msgid "Enable API configuration page"
 msgstr ""
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
 msgstr ""
 
 msgctxt "#30634"

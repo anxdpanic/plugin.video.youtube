@@ -820,8 +820,8 @@ msgid "Enable API configuration page"
 msgstr "Activer la page de configuration de l'API"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ipaddress>:<port>/api (voir serveur HTTP)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+msgstr "http://<ipaddress>:<port>/youtube/api (voir serveur HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"

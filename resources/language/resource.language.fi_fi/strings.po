@@ -820,8 +820,8 @@ msgid "Enable API configuration page"
 msgstr "Käytä API:n määrityssivua"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ip-osoite>:<portti>/api (katso HTTP-palvelin)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+msgstr "http://<ip-osoite>:<portti>/youtube/api (katso HTTP-palvelin)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"

@@ -823,8 +823,8 @@ msgid "Enable API configuration page"
 msgstr "允许 API 配置页面"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ipaddress>:<port>/api (请参阅 HTTP 服务器)"
+msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+msgstr "http://<ipaddress>:<port>/youtube/api (请参阅 HTTP 服务器)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
