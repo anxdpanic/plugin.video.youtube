@@ -118,17 +118,17 @@ class AbstractSettings(object):
             return self.set_bool(settings.USE_ISA, value)
         return self.get_bool(settings.USE_ISA, False)
 
-    def subtitle_languages(self):
-        return self.get_int(settings.SUBTITLE_LANGUAGE, 0)
-
     def subtitle_download(self):
         return self.get_bool(settings.SUBTITLE_DOWNLOAD, False)
 
     def audio_only(self):
         return self.get_bool(settings.AUDIO_ONLY, False)
 
-    def set_subtitle_languages(self, value):
-        return self.set_int(settings.SUBTITLE_LANGUAGE, value)
+    def get_subtitle_selection(self):
+        return self.get_int(settings.SUBTITLE_SELECTION, 0)
+
+    def set_subtitle_selection(self, value):
+        return self.set_int(settings.SUBTITLE_SELECTION, value)
 
     def set_subtitle_download(self, value):
         return self.set_bool(settings.SUBTITLE_DOWNLOAD, value)

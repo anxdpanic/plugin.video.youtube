@@ -1229,10 +1229,14 @@ class VideoInfo(YouTubeRequestClient):
             captions = Subtitles(
                 self._context, self.video_id, captions
             )
-            default_lang = captions.get_default_lang()
+            default_lang = captions.get_lang_details()
             subs_data = captions.get_subtitles()
         else:
-            default_lang = {'code': 'und', 'is_asr': False}
+            default_lang = {
+                'default': 'und',
+                'original': 'und',
+                'is_asr': False,
+            }
             subs_data = None
 
         meta_info = {
@@ -1352,7 +1356,10 @@ class VideoInfo(YouTubeRequestClient):
         # extract adaptive streams and create MPEG-DASH manifest
         if not live_type and not manifest_url and adaptive_fmts:
             video_data, audio_data = self._process_stream_data(
-                adaptive_fmts, default_lang['code']
+                adaptive_fmts,
+                default_lang['default']
+                if default_lang['original'] == 'und' else
+                default_lang['original']
             )
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, subs_data, license_info.get('url')
@@ -1399,7 +1406,13 @@ class VideoInfo(YouTubeRequestClient):
                     details['audio']['bitrate'] = audio_info['bitrate'] // 1000
                     if audio_info['langCode'] not in {'', 'und'}:
                         details['title'].extend((' ', audio_info['langName']))
-                    if default_lang['is_asr']:
+                    if default_lang['default'] != 'und':
+                        details['title'].extend((
+                            ' [',
+                            default_lang['default'],
+                            ']'
+                        ))
+                    elif default_lang['is_asr']:
                         details['title'].append(' [ASR]')
                     if main_stream['multi_lang']:
                         details['title'].extend((
@@ -1951,7 +1964,7 @@ class VideoInfo(YouTubeRequestClient):
         if subs_data:
             translation_lang = self._context.localize('subtitles.translation')
             for lang_id, subtitle in subs_data.items():
-                lang_code = subtitle['lang_code']
+                lang_code = subtitle['lang']
                 label = language = subtitle['language']
                 kind = subtitle['kind']
                 if kind == 'translation':
