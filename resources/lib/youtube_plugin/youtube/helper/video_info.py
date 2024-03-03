@@ -1211,16 +1211,18 @@ class VideoInfo(YouTubeRequestClient):
         thumb_suffix = '_live' if is_live else ''
 
         if client.get('_query_subtitles'):
-            result = self.request(
-                video_info_url, 'POST',
-                error_msg=('Caption request failed to get player response for'
-                           'video_id: {0}'.format(self.video_id)),
-                **self.build_client('smarttv_embedded', client_data)
-            )
-            response = result and result.json() or {}
-            captions = response.get('captions')
-            if captions:
-                captions['headers'] = result.request.headers
+            for client_name in ('smarttv_embedded', 'web', 'android'):
+                result = self.request(
+                    video_info_url, 'POST',
+                    error_msg=('Caption request failed to get player response for'
+                               'video_id: {0}'.format(self.video_id)),
+                    **self.build_client(client_name, client_data)
+                )
+                response = result and result.json() or {}
+                captions = response.get('captions')
+                if captions:
+                    captions['headers'] = result.request.headers
+                    break
         else:
             captions = response.get('captions')
             if captions:
