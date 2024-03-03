@@ -42,17 +42,26 @@ def _config_actions(context, action, *_args):
 
     elif action == 'subtitles':
         sub_lang = context.get_subtitle_language()
+        plugin_lang = settings.get_language()
         sub_selection = settings.get_subtitle_selection()
+
+        if not sub_lang:
+            preferred = (plugin_lang,)
+        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
+            preferred = (sub_lang, plugin_lang)
+        else:
+            preferred = (sub_lang,)
+
+        fallback = ('ASR' if preferred[0].startswith('en') else
+                    context.get_language_name('en'))
+        preferred = '/'.join(map(context.get_language_name, preferred))
 
         sub_opts = [
             localize('none'),
             localize('prompt'),
-            (localize('subtitles.with_fallback') % (
-                ('en', 'en-US/en-GB') if sub_lang.startswith('en') else
-                (sub_lang, 'en')
-            )),
-            sub_lang,
-            '%s (%s)' % (sub_lang, localize('subtitles.no_auto_generated')),
+            localize('subtitles.with_fallback') % (preferred, fallback),
+            preferred,
+            '%s (%s)' % (preferred, localize('subtitles.no_asr')),
         ]
 
         if settings.use_mpd_videos():

@@ -38,7 +38,8 @@ class Subtitles(object):
         self._context = context
 
         settings = context.get_settings()
-        self.preferred_lang = context.get_subtitle_language()
+        self.sub_lang = context.get_subtitle_language()
+        self.plugin_lang = settings.get_language()
         self.pre_download = settings.subtitle_download()
         self.sub_selection = settings.get_subtitle_selection()
 
@@ -151,24 +152,34 @@ class Subtitles(object):
         if selection == self.LANG_PROMPT:
             return self._prompt()
 
-        preferred_lang = self.preferred_lang
+        sub_lang = self.sub_lang
+        plugin_lang = self.plugin_lang
         original_lang = self.defaults['original_lang']
 
-        if '-' in preferred_lang:
-            preferred_langs = [preferred_lang, preferred_lang.partition('-')[0]]
+        if not sub_lang:
+            preferred_lang = (plugin_lang,)
+        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
+            preferred_lang = (sub_lang, plugin_lang)
         else:
-            preferred_langs = [preferred_lang]
+            preferred_lang = (sub_lang,)
+
+        allowed_langs = []
+        for lang in preferred_lang:
+            allowed_langs.append(lang)
+            if '_' in lang:
+                allowed_langs.append(lang.partition('-')[0])
+
         use_asr = None
         if selection == self.LANG_CURR_NO_ASR:
             use_asr = False
         elif selection == self.LANG_CURR_FALLBACK:
             for lang in (original_lang, 'en', 'en-US', 'en-GB', 'ASR'):
-                if lang not in preferred_langs:
-                    preferred_langs.append(lang)
+                if lang not in preferred_lang:
+                    allowed_langs.append(lang)
 
         subtitles = {}
         has_asr = False
-        for lang in preferred_langs:
+        for lang in allowed_langs:
             track, track_lang, track_language, track_kind, is_translation = (
                 self._get_track(lang, use_asr=use_asr)
             )
@@ -179,7 +190,7 @@ class Subtitles(object):
                     continue
                 has_asr = True
             subtitles[lang] = {
-                'default': track_lang == preferred_lang,
+                'default': track_lang in preferred_lang,
                 'original': track_lang == original_lang,
                 'kind': track_kind,
                 'lang': track_lang,
@@ -203,8 +214,16 @@ class Subtitles(object):
 
         subtitles = {}
 
-        preferred_lang = self.preferred_lang
+        sub_lang = self.sub_lang
+        plugin_lang = self.plugin_lang
         original_lang = self.defaults['original_lang']
+
+        if not sub_lang:
+            preferred_lang = (plugin_lang,)
+        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
+            preferred_lang = (sub_lang, plugin_lang)
+        else:
+            preferred_lang = (sub_lang,)
 
         for track in self.caption_tracks:
             track_lang = track.get('languageCode')
@@ -222,7 +241,7 @@ class Subtitles(object):
                 else:
                     track_key = track_lang
                 subtitles[track_key] = {
-                    'default': track_lang == preferred_lang,
+                    'default': track_lang in preferred_lang,
                     'original': track_lang == original_lang,
                     'kind': track_kind,
                     'lang': track_lang,
@@ -247,7 +266,7 @@ class Subtitles(object):
                 )
                 if url:
                     subtitles[track_lang] = {
-                        'default': track_lang == preferred_lang,
+                        'default': track_lang in preferred_lang,
                         'original': track_lang == original_lang,
                         'kind': 'translation',
                         'lang': track_lang,

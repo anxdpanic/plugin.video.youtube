@@ -209,7 +209,7 @@ class XbmcContext(AbstractContext):
         'subtitles.download.pre': 30706,
         'subtitles.all': 30774,
         'subtitles.language': 30560,
-        'subtitles.no_auto_generated': 30602,
+        'subtitles.no_asr': 30602,
         'subtitles.translation': 30775,
         'subtitles.with_fallback': 30601,
         'succeeded': 30575,
@@ -372,7 +372,7 @@ class XbmcContext(AbstractContext):
             sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
         else:
             sub_language = None
-        return sub_language or self._settings.get_language()
+        return sub_language
 
     def get_video_playlist(self):
         if not self._video_playlist:
