@@ -38,10 +38,21 @@ class Subtitles(object):
         self._context = context
 
         settings = context.get_settings()
-        self.sub_lang = context.get_subtitle_language()
-        self.plugin_lang = settings.get_language()
         self.pre_download = settings.subtitle_download()
         self.sub_selection = settings.get_subtitle_selection()
+
+        sub_lang = context.get_subtitle_language()
+        ui_lang = settings.get_language()
+        if not sub_lang and ui_lang:
+            self.preferred_lang = (ui_lang,)
+        elif sub_lang:
+            if (ui_lang and
+                    sub_lang.partition('-')[0] != ui_lang.partition('-')[0]):
+                self.preferred_lang = (sub_lang, ui_lang)
+            else:
+                self.preferred_lang = (sub_lang,)
+        else:
+            self.preferred_lang = ('en',)
 
         if not headers and 'headers' in captions:
             headers = captions['headers']
@@ -152,16 +163,8 @@ class Subtitles(object):
         if selection == self.LANG_PROMPT:
             return self._prompt()
 
-        sub_lang = self.sub_lang
-        plugin_lang = self.plugin_lang
+        preferred_lang = self.preferred_lang
         original_lang = self.defaults['original_lang']
-
-        if not sub_lang:
-            preferred_lang = (plugin_lang,)
-        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
-            preferred_lang = (sub_lang, plugin_lang)
-        else:
-            preferred_lang = (sub_lang,)
 
         allowed_langs = []
         for lang in preferred_lang:
@@ -214,16 +217,8 @@ class Subtitles(object):
 
         subtitles = {}
 
-        sub_lang = self.sub_lang
-        plugin_lang = self.plugin_lang
+        preferred_lang = self.preferred_lang
         original_lang = self.defaults['original_lang']
-
-        if not sub_lang:
-            preferred_lang = (plugin_lang,)
-        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
-            preferred_lang = (sub_lang, plugin_lang)
-        else:
-            preferred_lang = (sub_lang,)
 
         for track in self.caption_tracks:
             track_lang = track.get('languageCode')
