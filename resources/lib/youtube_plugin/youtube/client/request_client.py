@@ -55,10 +55,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '17.31.35',
-                        'androidSdkVersion': '30',
+                        'clientVersion': '18.11.34',
+                        'androidSdkVersion': '29',
                         'osName': 'Android',
-                        'osVersion': '11',
+                        'osVersion': '10',
                         'platform': 'MOBILE',
                     },
                 },
@@ -86,7 +86,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '17.36.4',
+                        'clientVersion': '18.11.34',
                         'clientScreen': 'EMBED',
                         'androidSdkVersion': '29',
                         'osName': 'Android',
@@ -149,7 +149,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '17.33.2',
+                        'clientVersion': '18.11.34',
                         'deviceModel': 'iPhone14,3',
                         'osName': 'iOS',
                         'osVersion': '15_6',
