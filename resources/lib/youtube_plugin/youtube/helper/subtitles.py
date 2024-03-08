@@ -20,7 +20,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import TEMP_PATH
 from ...kodion.network import BaseRequestsClass
-from ...kodion.utils import make_dirs, current_system_version
+from ...kodion.utils import make_dirs
 
 
 class Subtitles(object):
@@ -34,7 +34,7 @@ class Subtitles(object):
     BASE_PATH = make_dirs(TEMP_PATH)
 
     FORMATS = {
-        '_default': 'ttml' if current_system_version.compatible(20) else 'vtt',
+        '_default': None,
         'vtt': {
             'mime_type': 'text/vtt',
             'extension': 'vtt',
@@ -53,6 +53,13 @@ class Subtitles(object):
         self.pre_download = settings.subtitle_download()
         self.sub_selection = settings.get_subtitle_selection()
 
+        if (not self.pre_download
+                and settings.use_mpd_videos()
+                and context.inputstream_adaptive_capabilities('ttml')):
+            self.FORMATS['_default'] = 'ttml'
+        else:
+            self.FORMATS['_default'] = 'vtt'
+
         sub_lang = context.get_subtitle_language()
         ui_lang = settings.get_language()
         if not sub_lang and ui_lang:
@@ -66,8 +73,7 @@ class Subtitles(object):
         else:
             self.preferred_lang = ('en',)
 
-        if not headers and 'headers' in captions:
-            headers = captions['headers']
+        if headers:
             headers.pop('Authorization', None)
             headers.pop('Content-Length', None)
             headers.pop('Content-Type', None)
@@ -326,23 +332,21 @@ class Subtitles(object):
                                     .format(lang=lang))
         return None
 
-    def _get_url(self, track, lang=None, download=None):
+    def _get_url(self, track, lang=None):
         sub_format = self.FORMATS['_default']
         tlang = None
         base_lang = track.get('languageCode')
         kind = track.get('kind')
         if lang and lang != base_lang:
             tlang = lang
-            lang = '_'.join((base_lang, tlang))
+            lang = '-'.join((base_lang, tlang))
         elif kind == 'asr':
-            lang = '_'.join((base_lang, kind))
+            lang = '-'.join((base_lang, kind))
             sub_format = 'vtt'
         else:
             lang = base_lang
-        mime_type = self.FORMATS[sub_format]['mime_type']
 
-        if download is None:
-            download = self.pre_download
+        download = self.pre_download
         if download:
             filename = '.'.join((
                 self.video_id,
@@ -359,7 +363,7 @@ class Subtitles(object):
                 self._context.log_debug('Subtitles._get_url'
                                         ' - use existing: |{lang}: {file}|'
                                         .format(lang=lang, file=filepath))
-                return filepath, mime_type
+                return filepath, self.FORMATS[sub_format]['mime_type']
 
         base_url = self._normalize_url(track.get('baseUrl'))
         if not base_url:
@@ -378,7 +382,7 @@ class Subtitles(object):
                                     .format(lang=lang, url=subtitle_url))
 
         if not download:
-            return subtitle_url, mime_type
+            return subtitle_url, self.FORMATS[sub_format]['mime_type']
 
         response = BaseRequestsClass().request(
             subtitle_url,
@@ -401,7 +405,7 @@ class Subtitles(object):
                                     ' - write failed for: {file}'
                                     .format(file=filepath))
         if success:
-            return filepath, mime_type
+            return filepath, self.FORMATS[sub_format]['mime_type']
         return None, None
 
     def _get_track(self,

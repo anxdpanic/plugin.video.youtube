@@ -1210,37 +1210,6 @@ class VideoInfo(YouTubeRequestClient):
         is_live = video_details.get('isLiveContent', False)
         thumb_suffix = '_live' if is_live else ''
 
-        if client.get('_query_subtitles'):
-            for client_name in ('smarttv_embedded', 'web', 'android'):
-                result = self.request(
-                    video_info_url, 'POST',
-                    error_msg=('Caption request failed to get player response for'
-                               'video_id: {0}'.format(self.video_id)),
-                    **self.build_client(client_name, client_data)
-                )
-                response = result and result.json() or {}
-                captions = response.get('captions')
-                if captions:
-                    captions['headers'] = result.request.headers
-                    break
-        else:
-            captions = response.get('captions')
-            if captions:
-                captions['headers'] = client['headers']
-        if captions:
-            captions = Subtitles(
-                self._context, self.video_id, captions
-            )
-            default_lang = captions.get_lang_details()
-            subs_data = captions.get_subtitles()
-        else:
-            default_lang = {
-                'default': 'und',
-                'original': 'und',
-                'is_asr': False,
-            }
-            subs_data = None
-
         meta_info = {
             'video': {
                 'id': video_details.get('videoId', self.video_id),
@@ -1271,9 +1240,7 @@ class VideoInfo(YouTubeRequestClient):
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
                             .format(self.video_id, thumb_suffix)),
             },
-            'subtitles': [
-                subtitle['url'] for subtitle in subs_data.values()
-            ] if subs_data else None,
+            'subtitles': None,
         }
 
         if _settings.use_remote_history():
@@ -1354,6 +1321,50 @@ class VideoInfo(YouTubeRequestClient):
             ))
         else:
             live_type = None
+
+        if not live_type and client.get('_query_subtitles'):
+            for client_name in ('smarttv_embedded', 'web', 'android'):
+                caption_client = self.build_client(client_name, client_data)
+                result = self.request(
+                    video_info_url,
+                    'POST',
+                    response_hook=self._response_hook_json,
+                    error_title='Caption player request failed',
+                    error_hook=self._error_hook,
+                    error_hook_kwargs={
+                        'video_id': self.video_id,
+                        'client': client_name,
+                        'auth': '_access_token' in client_data,
+                    },
+                    **caption_client
+                )
+                captions = result and result.get('captions')
+                if captions:
+                    break
+        else:
+            captions = result.get('captions')
+            caption_client = client
+        if captions:
+            captions = Subtitles(
+                self._context,
+                self.video_id,
+                captions,
+                caption_client['headers']
+            )
+            default_lang = captions.get_lang_details()
+            subs_data = captions.get_subtitles()
+            if subs_data and (not use_mpd_vod or captions.pre_download):
+                meta_info['subtitles'] = [
+                    subtitle['url'] for subtitle in subs_data.values()
+                ]
+                subs_data = None
+        else:
+            default_lang = {
+                'default': 'und',
+                'original': 'und',
+                'is_asr': False,
+            }
+            subs_data = None
 
         # extract adaptive streams and create MPEG-DASH manifest
         if not live_type and not manifest_url and adaptive_fmts:

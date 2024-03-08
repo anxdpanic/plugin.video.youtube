@@ -595,7 +595,7 @@ class XbmcContext(AbstractContext):
     _ISA_CAPABILITIES = {
         'live': loose_version('2.0.12'),
         'drm': loose_version('2.2.12'),
-        'mpd_subs': loose_version('21.0.0'),
+        'ttml': loose_version('20.0.0'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
         # unknown when Opus audio support was implemented
