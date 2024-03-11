@@ -12,15 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import socket
 
-from .compatibility import parse_qsl, xbmc, xbmcaddon, xbmcvfs
 from .constants import DATA_PATH, TEMP_PATH
+from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .context import XbmcContext
 from .network import get_client_ip_address, is_httpd_live
 from .utils import rm_dir
 
 
-def _config_actions(action, *_args):
-    context = XbmcContext()
+def _config_actions(context, action, *_args):
     localize = context.localize
     settings = context.get_settings()
     ui = context.get_ui()
@@ -105,78 +104,78 @@ def _config_actions(action, *_args):
             ui.show_notification(context.localize('httpd.not.running'))
 
 
-def _maintenance_actions(action, target):
-    context = XbmcContext()
+def _maintenance_actions(context, action, params):
+    target = params.get('target')
+
     ui = context.get_ui()
     localize = context.localize
 
     if action == 'clear':
-        if target == 'function_cache':
-            if ui.on_remove_content(localize('cache.function')):
-                context.get_function_cache().clear()
-                ui.show_notification(localize('succeeded'))
-        elif target == 'data_cache':
-            if ui.on_remove_content(localize('cache.data')):
-                context.get_data_cache().clear()
-                ui.show_notification(localize('succeeded'))
-        elif target == 'search_cache':
-            if ui.on_remove_content(localize('search.history')):
-                context.get_search_history().clear()
-                ui.show_notification(localize('succeeded'))
-        elif (target == 'playback_history' and ui.on_remove_content(
-            localize('playback.history')
-        )):
-            context.get_playback_history().clear()
+        targets = {
+            'data_cache': context.get_data_cache,
+            'function_cache': context.get_function_cache,
+            'playback_history': context.get_playback_history,
+            'search_history': context.get_search_history,
+            'watch_later': context.get_watch_later_list,
+        }
+        if target not in targets:
+            return
+
+        if ui.on_remove_content(
+            localize('maintenance.{0}'.format(target))
+        ):
+            targets[target]().clear()
             ui.show_notification(localize('succeeded'))
 
     elif action == 'delete':
-        _maint_files = {'function_cache': 'cache.sqlite',
-                        'search_cache': 'search.sqlite',
-                        'data_cache': 'data_cache.sqlite',
-                        'playback_history': 'playback_history',
-                        'settings_xml': 'settings.xml',
-                        'api_keys': 'api_keys.json',
-                        'access_manager': 'access_manager.json',
-                        'temp_files': TEMP_PATH}
-        _file = _maint_files.get(target)
-        succeeded = False
-
-        if not _file:
+        path = params.get('path')
+        targets = {
+            'data_cache': 'data_cache.sqlite',
+            'function_cache': 'cache.sqlite',
+            'playback_history': 'history.sqlite',
+            'search_history': 'search.sqlite',
+            'watch_later': 'watch_later.sqlite',
+            'api_keys': 'api_keys.json',
+            'access_manager': 'access_manager.json',
+            'settings_xml': 'settings.xml',
+            'temp_dir': (TEMP_PATH,),
+        }
+        path = targets.get(target)
+        if not path:
             return
 
-        data_path = xbmcvfs.translatePath(DATA_PATH)
-        if 'sqlite' in _file:
-            _file_w_path = os.path.join(data_path, 'kodion', _file)
-        elif target == 'temp_files':
-            _file_w_path = _file
-        elif target == 'playback_history':
-            _file = ''.join((
+        if target == 'temp_dir':
+            target = path[0]
+        else:
+            target = path
+        if not ui.on_delete_content(target):
+            return
+
+        if isinstance(path, tuple):
+            pass
+        elif path.endswith('.sqlite'):
+            path = (
+                DATA_PATH,
                 context.get_access_manager().get_current_user_id(),
-                '.sqlite'
-            ))
-            _file_w_path = os.path.join(data_path, 'playback', _file)
+                path,
+            )
         else:
-            _file_w_path = os.path.join(data_path, _file)
+            path = (
+                DATA_PATH,
+                path,
+            )
 
-        if not ui.on_delete_content(_file):
-            return
-
-        if target == 'temp_files':
-            succeeded = rm_dir(_file_w_path)
-
-        elif _file_w_path:
-            succeeded = xbmcvfs.delete(_file_w_path)
-
-        if succeeded:
-            ui.show_notification(localize('succeeded'))
+        if len(path) == 1:
+            succeeded = rm_dir(path[0])
         else:
-            ui.show_notification(localize('failed'))
+            succeeded = xbmcvfs.delete(os.path.join(*path))
+        ui.show_notification(localize('succeeded' if succeeded else 'failed'))
 
 
-def _user_actions(action, params):
-    context = XbmcContext()
+def _user_actions(context, action, params):
     if params:
-        context.parse_params(dict(parse_qsl(params)))
+        context.parse_params(params)
+
     localize = context.localize
     access_manager = context.get_access_manager()
     ui = context.get_ui()
@@ -284,20 +283,25 @@ def _user_actions(action, params):
 
 
 def run(argv):
+    context = XbmcContext()
+
+    category = action = params = None
     args = argv[1:]
     if args:
-        args = args[0].split('/')
+        args = urlsplit(args[0])
 
-    num_args = len(args)
-    if num_args > 2:
-        category, action, params = args[:3]
-    elif num_args == 2:
-        category, action = args
-        params = None
-    elif num_args:
-        category = args[0]
-        action = params = None
-    else:
+        path = args.path
+        if path:
+            path = path.split('/')
+            category = path[0]
+            if len(path) >= 2:
+                action = path[1]
+
+        params = args.query
+        if params:
+            params = dict(parse_qsl(args.query))
+
+    if not category:
         xbmcaddon.Addon().openSettings()
         return
 
@@ -306,13 +310,13 @@ def run(argv):
         return
 
     if category == 'config':
-        _config_actions(action, params)
+        _config_actions(context, action, params)
         return
 
     if category == 'maintenance':
-        _maintenance_actions(action, params)
+        _maintenance_actions(context, action, params)
         return
 
     if category == 'users':
-        _user_actions(action, params)
+        _user_actions(context, action, params)
         return

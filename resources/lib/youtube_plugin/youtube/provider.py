@@ -820,6 +820,9 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/config/(?P<action>[^/]+)/$')
     def configure_addon(self, context, re_match):
         action = re_match.group('action')
+        if action == 'setup_wizard':
+            self.run_wizard(context)
+            return False
         return UriItem('{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
@@ -872,9 +875,11 @@ class Provider(AbstractProvider):
         action = re_match.group('action')
 
         if action != 'reset':
-            return UriItem('{addon},maintenance/{action}/{target}'.format(
-                addon=ADDON_ID, action=action, target=target
-            ))
+            return UriItem(
+                '{addon},maintenance/{action}/?target={target}'.format(
+                    addon=ADDON_ID, action=action, target=target,
+                )
+            )
 
         ui = context.get_ui()
         localize = context.localize
@@ -1320,6 +1325,15 @@ class Provider(AbstractProvider):
             result.append(sign_out_item)
 
         if settings.get_bool('youtube.folder.settings.show', True):
+            settings_menu_item = DirectoryItem(
+                localize('setup_wizard'),
+                create_uri(('config', 'setup_wizard')),
+                image='{media}/settings.png',
+                action=True,
+            )
+            result.append(settings_menu_item)
+
+        if settings.get_bool('youtube.folder.settings.advanced.show', True):
             settings_menu_item = DirectoryItem(
                 localize('settings'),
                 create_uri(('config', 'youtube')),
