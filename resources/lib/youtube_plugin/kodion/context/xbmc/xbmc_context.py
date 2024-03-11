@@ -486,9 +486,15 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    @staticmethod
-    def execute(command):
-        xbmc.executebuiltin(command)
+    def execute(self, command, wait=True, wait_for=None):
+        xbmc.executebuiltin(command, wait)
+        if wait_for:
+            ui = self.get_ui()
+            monitor = xbmc.Monitor()
+            while not monitor.abortRequested():
+                monitor.waitForAbort(1)
+                if not ui.get_property(wait_for):
+                    break
 
     @staticmethod
     def sleep(milli_seconds):

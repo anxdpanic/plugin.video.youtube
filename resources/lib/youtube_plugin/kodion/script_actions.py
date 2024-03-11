@@ -12,8 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import socket
 
-from .constants import DATA_PATH, TEMP_PATH
 from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
+from .constants import DATA_PATH, TEMP_PATH, WAIT_FLAG
 from .context import XbmcContext
 from .network import get_client_ip_address, is_httpd_live
 from .utils import rm_dir
@@ -284,39 +284,43 @@ def _user_actions(context, action, params):
 
 def run(argv):
     context = XbmcContext()
+    ui = context.get_ui()
+    ui.set_property(WAIT_FLAG, 'true')
+    try:
+        category = action = params = None
+        args = argv[1:]
+        if args:
+            args = urlsplit(args[0])
 
-    category = action = params = None
-    args = argv[1:]
-    if args:
-        args = urlsplit(args[0])
+            path = args.path
+            if path:
+                path = path.split('/')
+                category = path[0]
+                if len(path) >= 2:
+                    action = path[1]
 
-        path = args.path
-        if path:
-            path = path.split('/')
-            category = path[0]
-            if len(path) >= 2:
-                action = path[1]
+            params = args.query
+            if params:
+                params = dict(parse_qsl(args.query))
 
-        params = args.query
-        if params:
-            params = dict(parse_qsl(args.query))
+        if not category:
+            xbmcaddon.Addon().openSettings()
+            return
 
-    if not category:
-        xbmcaddon.Addon().openSettings()
-        return
+        if action == 'refresh':
+            xbmc.executebuiltin('Container.Refresh')
+            return
 
-    if action == 'refresh':
-        xbmc.executebuiltin('Container.Refresh')
-        return
+        if category == 'config':
+            _config_actions(context, action, params)
+            return
 
-    if category == 'config':
-        _config_actions(context, action, params)
-        return
+        if category == 'maintenance':
+            _maintenance_actions(context, action, params)
+            return
 
-    if category == 'maintenance':
-        _maintenance_actions(context, action, params)
-        return
-
-    if category == 'users':
-        _user_actions(context, action, params)
-        return
+        if category == 'users':
+            _user_actions(context, action, params)
+            return
+    finally:
+        ui.clear_property(WAIT_FLAG)
