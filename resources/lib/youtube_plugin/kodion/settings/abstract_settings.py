@@ -79,7 +79,8 @@ class AbstractSettings(object):
         return vq_dict[vq]
 
     def ask_for_video_quality(self):
-        return self.get_bool(settings.VIDEO_QUALITY_ASK, False)
+        return (self.get_bool(settings.VIDEO_QUALITY_ASK, False)
+                or self.get_int(settings.MPD_STREAM_SELECT) == 4)
 
     def show_fanart(self):
         return self.get_bool(settings.SHOW_FANART, True)
@@ -299,6 +300,7 @@ class AbstractSettings(object):
         1: 'auto',
         2: 'list',
         3: 'auto+list',
+        4: 'ask+auto+list',
     }
 
     def stream_select(self):
