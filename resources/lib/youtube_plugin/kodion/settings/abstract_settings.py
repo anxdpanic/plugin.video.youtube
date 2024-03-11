@@ -304,8 +304,8 @@ class AbstractSettings(object):
     }
 
     def stream_select(self):
-        select_type = self.get_int(settings.MPD_STREAM_SELECT, 1)
-        return self._STREAM_SELECT.get(select_type) or self._STREAM_SELECT[1]
+        select_type = self.get_int(settings.MPD_STREAM_SELECT, 3)
+        return self._STREAM_SELECT.get(select_type) or self._STREAM_SELECT[3]
 
     def hide_short_videos(self):
         return self.get_bool(settings.HIDE_SHORT_VIDEOS, False)
