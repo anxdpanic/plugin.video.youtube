@@ -242,8 +242,9 @@ class LoginClient(YouTubeRequestClient):
 
         config_type = self._get_config_type(client_id)
         client = ''.join((
-            '(config_type: |', config_type, '|',
-            ' client_id: |', client_id[:5], '...|)',
+            '(config_type: |', config_type,
+            '| client_id: |', client_id[:3], '...', client_id[-5:],
+            '|)'
         ))
         log_debug('Requesting device and user code for {0}'.format(client))
 
