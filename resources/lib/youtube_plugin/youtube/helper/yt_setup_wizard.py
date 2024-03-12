@@ -10,7 +10,14 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import os
+
+from ...kodion.compatibility import urlencode, xbmcvfs
+from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_FLAG
 from ...kodion.network import Locator
+from ...kodion.sql_store import PlaybackHistory, SearchHistory
+from ...kodion.utils.datetime_parser import strptime
+from ...kodion.utils.methods import to_unicode
 
 
 DEFAULT_LANGUAGES = {'items': [
@@ -256,3 +263,90 @@ def process_geo_location(_provider, context, step, steps):
     ):
 
 
+
+
+def process_old_search_db(_provider, context, step, steps):
+    localize = context.localize
+    ui = context.get_ui()
+
+    search_db_path = os.path.join(
+        DATA_PATH,
+        'kodion',
+        'search.sqlite'
+    )
+    step += 1
+    if xbmcvfs.exists(search_db_path) and ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        localize('setup_wizard.prompt.import_search_history'),
+    ):
+        def _convert_old_search_item(value, item):
+            return {
+                'text': to_unicode(value),
+                'timestamp': strptime(item[1]).timestamp(),
+            }
+
+        search_history = context.get_search_history()
+        old_search_db = SearchHistory(
+            xbmcvfs.translatePath(search_db_path),
+            migrate='storage',
+        )
+        items = old_search_db.get_items(process=_convert_old_search_item)
+        for search in items:
+            search_history.update(search['text'], search['timestamp'])
+
+        ui.show_notification(localize('succeeded'))
+        context.execute(
+            'RunScript({addon},maintenance/{action}?{query})'
+            .format(addon=ADDON_ID,
+                    action='delete',
+                    query=urlencode({'target': 'other_file',
+                                     'path': search_db_path})),
+            wait_for=WAIT_FLAG,
+        )
+    return step
+
+
+def process_old_history_db(_provider, context, step, steps):
+    localize = context.localize
+    ui = context.get_ui()
+
+    history_db_path = os.path.join(
+        DATA_PATH,
+        'playback',
+        context.get_access_manager().get_current_user_id() + '.sqlite',
+    )
+    step += 1
+    if xbmcvfs.exists(history_db_path) and ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        localize('setup_wizard.prompt.import_playback_history'),
+    ):
+        def _convert_old_history_item(value, item):
+            values = value.split(',')
+            return {
+                'play_count': int(values[0]),
+                'total_time': float(values[1]),
+                'played_time': float(values[2]),
+                'played_percent': int(values[3]),
+                'timestamp': strptime(item[1]).timestamp(),
+            }
+
+        playback_history = context.get_playback_history()
+        old_history_db = PlaybackHistory(
+            xbmcvfs.translatePath(history_db_path),
+            migrate='storage',
+        )
+        items = old_history_db.get_items(process=_convert_old_history_item)
+        for video_id, history in items.items():
+            timestamp = history.pop('timestamp', None)
+            playback_history.update(video_id, history, timestamp)
+
+        ui.show_notification(localize('succeeded'))
+        context.execute(
+            'RunScript({addon},maintenance/{action}?{query})'
+            .format(addon=ADDON_ID,
+                    action='delete',
+                    query=urlencode({'target': 'other_file',
+                                     'path': history_db_path})),
+            wait_for=WAIT_FLAG,
+        )
+    return step

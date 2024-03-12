@@ -59,6 +59,8 @@ class Provider(AbstractProvider):
         steps = [
             yt_setup_wizard.process_language,
             yt_setup_wizard.process_geo_location,
+            yt_setup_wizard.process_old_search_db,
+            yt_setup_wizard.process_old_history_db,
         ]
         return steps
 

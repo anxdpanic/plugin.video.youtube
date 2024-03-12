@@ -139,6 +139,8 @@ def _maintenance_actions(context, action, params):
             'access_manager': 'access_manager.json',
             'settings_xml': 'settings.xml',
             'temp_dir': (TEMP_PATH,),
+            'other_file': ('', path) if path else None,
+            'other_dir': (path,) if path else None,
         }
         path = targets.get(target)
         if not path:
@@ -146,6 +148,10 @@ def _maintenance_actions(context, action, params):
 
         if target == 'temp_dir':
             target = path[0]
+        elif target == 'other_dir':
+            target = os.path.basename(os.path.dirname(path[0]))
+        elif target == 'other_file':
+            target = os.path.basename(path[1])
         else:
             target = path
         if not ui.on_delete_content(target):

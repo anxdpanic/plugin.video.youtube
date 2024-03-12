@@ -167,6 +167,8 @@ class XbmcContext(AbstractContext):
         'setup_wizard.locale.language': 30524,
         'setup_wizard.locale.region': 30525,
         'setup_wizard.prompt': 30030,
+        'setup_wizard.prompt.import_playback_history': 30778,
+        'setup_wizard.prompt.import_search_history': 30779,
         'setup_wizard.prompt.locale': 30527,
         'setup_wizard.prompt.my_location': 30653,
         'setup_wizard.prompt.settings': 30577,

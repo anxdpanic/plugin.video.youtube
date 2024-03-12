@@ -1410,6 +1410,14 @@ msgid "Ask + Automatic + Quality selection"
 msgstr ""
 
 
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr ""
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr ""
+
 msgctxt "#30780"
 msgid "Clear local watch later list"
 msgstr ""
