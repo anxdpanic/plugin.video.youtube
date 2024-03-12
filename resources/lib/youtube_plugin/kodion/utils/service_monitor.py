@@ -82,18 +82,18 @@ class ServiceMonitor(xbmc.Monitor):
                       .format(method=method))
 
     def onSettingsChanged(self):
-        self._settings.flush(xbmcaddon.Addon(ADDON_ID))
+        settings = self._settings
+        settings.flush(xbmcaddon.Addon(ADDON_ID))
         if xbmc.getInfoLabel('Container.FolderPath').startswith(
             'plugin://{0}/'.format(ADDON_ID)
         ):
             xbmc.executebuiltin('Container.Refresh')
 
         data = {
-            'use_httpd': (self._settings.use_mpd_videos()
-                          or self._settings.api_config_page()),
-            'httpd_port': self._settings.httpd_port(),
-            'whitelist': self._settings.httpd_whitelist(),
-            'httpd_address': self._settings.httpd_listen()
+            'use_httpd': (settings.use_isa() or settings.api_config_page()),
+            'httpd_port': settings.httpd_port(),
+            'whitelist': settings.httpd_whitelist(),
+            'httpd_address': settings.httpd_listen()
         }
         self.onNotification(ADDON_ID, 'Other.check_settings', data)
 
