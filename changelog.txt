@@ -1,3 +1,28 @@
+## v7.0.4+beta.1
+### Fixed
+- Workarounds for buggy language and region details in Kodi
+- Incorrect language fallbacks for subtitles
+- Trying to use InputStream.Adaptive to load downloaded subtitles #624
+- Duplicated/overridden subtitles with same language but different type
+- Missing order parameter used when loading playlists #607
+
+### Changed
+- Setup Wizard replaces Settings in main menu
+  - Settings available as seperate item
+- Settings have been re-organised to group similar settings together
+  - Less commonly changed settings have all been moved to Advanced settings tab
+- Updated client versions used for API, login, and player requests
+- Improve language display for subtitles loaded through InputStream.Adaptive
+- Updated translatons to reflect API config page moving to http://<ipaddress>:<port>/youtube/api #618
+- Update script.module.requests min version required #610
+
+### New
+- Setup Wizard now provides ability to set recommended setting values
+- Old search history and playback history will be imported when Setup Wizard is run #619
+- Respect Kodi preferred subtitle language setting when attempting to load subtitles
+- Include original video language as a default fallback language for subtitles
+- Enable profiler when Kodi debug logging is enabled
+
 ## v7.0.3.2
 ### Fixed
 - Fix settings not being saved and setup wizard repeatedly activating in Kodi 20 and lower #604
