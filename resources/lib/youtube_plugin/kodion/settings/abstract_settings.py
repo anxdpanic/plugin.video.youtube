@@ -99,6 +99,12 @@ class AbstractSettings(object):
         return self.get_int(settings.SEARCH_SIZE, 10)
 
     def is_setup_wizard_enabled(self):
+        # Increment min_required on new release to enable oneshot on first run
+        min_required = 1
+        forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, min_required - 1)
+        if forced_runs < min_required:
+            self.set_int(settings.SETUP_WIZARD_RUNS, forced_runs + 1)
+            return True
         return self.get_bool(settings.SETUP_WIZARD, False)
 
     def is_support_alternative_player_enabled(self):
