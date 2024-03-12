@@ -1337,7 +1337,7 @@ class VideoInfo(YouTubeRequestClient):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         manifest_url = main_stream = None
-        live_type = _settings.get_live_stream_type() if is_live else None
+        live_type = _settings.live_stream_type() if is_live else None
 
         if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']
@@ -1426,7 +1426,7 @@ class VideoInfo(YouTubeRequestClient):
 
     def _process_stream_data(self, stream_data, default_lang_code='und'):
         _settings = self._context.get_settings()
-        qualities = _settings.get_mpd_video_qualities()
+        qualities = _settings.mpd_video_qualities()
         isa_capabilities = self._context.inputstream_adaptive_capabilities()
         stream_features = _settings.stream_features()
         allow_hdr = 'hdr' in stream_features

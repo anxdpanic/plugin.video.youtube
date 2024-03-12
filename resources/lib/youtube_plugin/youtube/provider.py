@@ -120,7 +120,7 @@ class Provider(AbstractProvider):
         settings = context.get_settings()
         access_manager = context.get_access_manager()
 
-        items_per_page = settings.get_items_per_page()
+        items_per_page = settings.items_per_page()
 
         language = settings.get_string('youtube.language', 'en_US')
         region = settings.get_string('youtube.region', 'US')

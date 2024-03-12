@@ -146,11 +146,7 @@ class AbstractContext(object):
     def get_data_cache(self):
         if not self._data_cache:
             settings = self.get_settings()
-            cache_size = settings.get_int(settings.CACHE_SIZE, -1)
-            if cache_size <= 0:
-                cache_size = 10
-            else:
-                cache_size /= 2.0
+            cache_size = settings.cache_size() / 2
             uuid = self.get_access_manager().get_current_user_id()
             filename = 'data_cache.sqlite'
             filepath = os.path.join(self.get_data_path(), uuid, filename)
@@ -160,11 +156,7 @@ class AbstractContext(object):
     def get_function_cache(self):
         if not self._function_cache:
             settings = self.get_settings()
-            cache_size = settings.get_int(settings.CACHE_SIZE, -1)
-            if cache_size <= 0:
-                cache_size = 10
-            else:
-                cache_size /= 2.0
+            cache_size = settings.cache_size() / 2
             uuid = self.get_access_manager().get_current_user_id()
             filename = 'cache.sqlite'
             filepath = os.path.join(self.get_data_path(), uuid, filename)

@@ -62,21 +62,26 @@ class AbstractSettings(object):
     def open_settings(self):
         raise NotImplementedError()
 
-    def get_items_per_page(self):
+    def items_per_page(self, value=None):
+        if value is not None:
+            return self.set_int(settings.ITEMS_PER_PAGE, value)
         return self.get_int(settings.ITEMS_PER_PAGE, 50)
 
+    _VIDEO_QUALITY_MAP = {
+        0: 240,
+        1: 360,
+        2: 480,  # 576 seems not to work well
+        3: 720,
+        4: 1080,
+    }
+
     def get_video_quality(self, quality_map_override=None):
-        vq_dict = {0: 240,
-                   1: 360,
-                   2: 480,  # 576 seems not to work well
-                   3: 720,
-                   4: 1080}
-
         if quality_map_override is not None:
-            vq_dict = quality_map_override
-
-        vq = self.get_int(settings.VIDEO_QUALITY, 1)
-        return vq_dict[vq]
+            video_quality_map = quality_map_override
+        else:
+            video_quality_map = self._VIDEO_QUALITY_MAP
+        value = self.get_int(settings.VIDEO_QUALITY, 3)
+        return video_quality_map[value]
 
     def ask_for_video_quality(self):
         return (self.get_bool(settings.VIDEO_QUALITY_ASK, False)
@@ -85,8 +90,13 @@ class AbstractSettings(object):
     def show_fanart(self):
         return self.get_bool(settings.SHOW_FANART, True)
 
+    def cache_size(self, value=None):
+        if value is not None:
+            return self.set_int(settings.CACHE_SIZE, value)
+        return self.get_int(settings.CACHE_SIZE, 20)
+
     def get_search_history_size(self):
-        return self.get_int(settings.SEARCH_SIZE, 50)
+        return self.get_int(settings.SEARCH_SIZE, 10)
 
     def is_setup_wizard_enabled(self):
         return self.get_bool(settings.SETUP_WIZARD, False)
@@ -97,7 +107,9 @@ class AbstractSettings(object):
     def alternative_player_web_urls(self):
         return self.get_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, False)
 
-    def use_isa(self):
+    def use_isa(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.USE_ISA, value)
         return self.get_bool(settings.USE_ISA, False)
 
     def subtitle_languages(self):
@@ -142,9 +154,11 @@ class AbstractSettings(object):
     def allow_dev_keys(self):
         return self.get_bool(settings.ALLOW_DEV_KEYS, False)
 
-    def use_mpd_videos(self):
+    def use_mpd_videos(self, value=None):
         if self.use_isa():
-            return self.get_bool(settings.MPD_VIDEOS, False)
+            if value is not None:
+                return self.set_bool(settings.MPD_VIDEOS, value)
+            return self.get_bool(settings.MPD_VIDEOS, True)
         return False
 
     _LIVE_STREAM_TYPES = {
@@ -154,21 +168,28 @@ class AbstractSettings(object):
         3: 'isa_mpd',
     }
 
-    def get_live_stream_type(self):
+    def live_stream_type(self, value=None):
         if self.use_isa():
-            stream_type = self.get_int(settings.LIVE_STREAMS + '.1', 0)
+            default = 2
+            setting = settings.LIVE_STREAMS + '.1'
         else:
-            stream_type = self.get_int(settings.LIVE_STREAMS + '.2', 0)
-        return self._LIVE_STREAM_TYPES.get(stream_type) or self._LIVE_STREAM_TYPES[0]
+            default = 0
+            setting = settings.LIVE_STREAMS + '.2'
+        if value is not None:
+            return self.set_int(setting, value)
+        value = self.get_int(setting, default)
+        if value in self._LIVE_STREAM_TYPES:
+            return self._LIVE_STREAM_TYPES[value]
+        return self._LIVE_STREAM_TYPES[default]
 
     def use_isa_live_streams(self):
         if self.use_isa():
-            return self.get_int(settings.LIVE_STREAMS + '.1', 0) > 1
+            return self.get_int(settings.LIVE_STREAMS + '.1', 2) > 1
         return False
 
     def use_mpd_live_streams(self):
         if self.use_isa():
-            return self.get_int(settings.LIVE_STREAMS + '.1', 0) == 3
+            return self.get_int(settings.LIVE_STREAMS + '.1', 2) == 3
         return False
 
     def httpd_port(self, port=None):
@@ -185,7 +206,7 @@ class AbstractSettings(object):
 
     def httpd_listen(self, for_request=False, ip_address=None):
         default_address = '0.0.0.0'
-        default_octets = [0, 0, 0, 0,]
+        default_octets = [0, 0, 0, 0]
 
         if not ip_address:
             ip_address = self.get_string(settings.HTTPD_LISTEN,
@@ -284,16 +305,20 @@ class AbstractSettings(object):
         -2:  {'width': 0, 'height': 0, 'label': '{2}p{0}{1}'},              #   N/A   |   Custom
     }
 
-    def get_mpd_video_qualities(self):
+    def mpd_video_qualities(self, value=None):
+        if value is not None:
+            return self.set_int(settings.MPD_QUALITY_SELECTION, value)
         if not self.use_mpd_videos():
             return []
-        selected = self.get_int(settings.MPD_QUALITY_SELECTION, 4)
+        value = self.get_int(settings.MPD_QUALITY_SELECTION, 4)
         return [quality
                 for key, quality in sorted(self._QUALITY_SELECTIONS.items(),
                                            reverse=True)
-                if selected >= key]
+                if value >= key]
 
-    def stream_features(self):
+    def stream_features(self, value=None):
+        if value is not None:
+            return self.set_string_list(settings.MPD_STREAM_FEATURES, value)
         return frozenset(self.get_string_list(settings.MPD_STREAM_FEATURES))
 
     _STREAM_SELECT = {
@@ -303,20 +328,31 @@ class AbstractSettings(object):
         4: 'ask+auto+list',
     }
 
-    def stream_select(self):
-        select_type = self.get_int(settings.MPD_STREAM_SELECT, 3)
-        return self._STREAM_SELECT.get(select_type) or self._STREAM_SELECT[3]
+    def stream_select(self, value=None):
+        if value is not None:
+            return self.get_int(settings.MPD_STREAM_SELECT, value)
+        default = 3
+        value = self.get_int(settings.MPD_STREAM_SELECT, default)
+        if value in self._STREAM_SELECT:
+            return self._STREAM_SELECT[value]
+        self._STREAM_SELECT[default]
 
     def hide_short_videos(self):
         return self.get_bool(settings.HIDE_SHORT_VIDEOS, False)
 
-    def client_selection(self):
+    def client_selection(self, value=None):
+        if value is not None:
+            return self.set_int(settings.CLIENT_SELECTION, value)
         return self.get_int(settings.CLIENT_SELECTION, 0)
 
-    def show_detailed_description(self):
+    def show_detailed_description(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.DETAILED_DESCRIPTION, value)
         return self.get_bool(settings.DETAILED_DESCRIPTION, True)
 
-    def show_detailed_labels(self):
+    def show_detailed_labels(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.DETAILED_LABELS, value)
         return self.get_bool(settings.DETAILED_LABELS, True)
 
     def get_language(self):
