@@ -41,36 +41,45 @@ def _config_actions(context, action, *_args):
             xbmc.executebuiltin('InstallAddon(script.module.inputstreamhelper)')
 
     elif action == 'subtitles':
-        language = settings.get_string('youtube.language', 'en-US')
-        sub_setting = settings.subtitle_languages()
+        sub_lang = context.get_subtitle_language()
+        plugin_lang = settings.get_language()
+        sub_selection = settings.get_subtitle_selection()
+
+        if not sub_lang:
+            preferred = (plugin_lang,)
+        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
+            preferred = (sub_lang, plugin_lang)
+        else:
+            preferred = (sub_lang,)
+
+        fallback = ('ASR' if preferred[0].startswith('en') else
+                    context.get_language_name('en'))
+        preferred = '/'.join(map(context.get_language_name, preferred))
 
         sub_opts = [
             localize('none'),
             localize('prompt'),
-            (localize('subtitles.with_fallback') % (
-                ('en', 'en-US/en-GB') if language.startswith('en') else
-                (language, 'en')
-            )),
-            language,
-            '%s (%s)' % (language, localize('subtitles.no_auto_generated')),
+            localize('subtitles.with_fallback') % (preferred, fallback),
+            preferred,
+            '%s (%s)' % (preferred, localize('subtitles.no_asr')),
         ]
 
         if settings.use_mpd_videos():
             sub_opts.append(localize('subtitles.all'))
-        elif sub_setting == 5:
-            sub_setting = 0
-            settings.set_subtitle_languages(sub_setting)
+        elif sub_selection == 5:
+            sub_selection = 0
+            settings.set_subtitle_selection(sub_selection)
 
-        sub_opts[sub_setting] = ui.bold(sub_opts[sub_setting])
+        sub_opts[sub_selection] = ui.bold(sub_opts[sub_selection])
 
         result = ui.on_select(localize('subtitles.language'),
                               sub_opts,
-                              preselect=sub_setting)
+                              preselect=sub_selection)
         if result > -1:
-            sub_setting = result
-            settings.set_subtitle_languages(sub_setting)
+            sub_selection = result
+            settings.set_subtitle_selection(sub_selection)
 
-        if not sub_setting or sub_setting == 5:
+        if not sub_selection or sub_selection == 5:
             settings.set_subtitle_download(False)
         else:
             result = ui.on_yes_no_input(

@@ -126,10 +126,14 @@ class AbstractContext(object):
     def format_time(time_obj, str_format=None):
         raise NotImplementedError()
 
-    def get_language(self):
+    @staticmethod
+    def get_language():
         raise NotImplementedError()
 
     def get_language_name(self, lang_id=None):
+        raise NotImplementedError()
+
+    def get_subtitle_language(self):
         raise NotImplementedError()
 
     def get_region(self):

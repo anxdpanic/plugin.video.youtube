@@ -125,8 +125,8 @@ class Provider(AbstractProvider):
 
         items_per_page = settings.items_per_page()
 
-        language = settings.get_string('youtube.language', 'en_US')
-        region = settings.get_string('youtube.region', 'US')
+        language = settings.get_language()
+        region = settings.get_region()
 
         api_last_origin = access_manager.get_last_origin()
 

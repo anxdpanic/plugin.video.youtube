@@ -118,17 +118,17 @@ class AbstractSettings(object):
             return self.set_bool(settings.USE_ISA, value)
         return self.get_bool(settings.USE_ISA, False)
 
-    def subtitle_languages(self):
-        return self.get_int(settings.SUBTITLE_LANGUAGE, 0)
-
     def subtitle_download(self):
         return self.get_bool(settings.SUBTITLE_DOWNLOAD, False)
 
     def audio_only(self):
         return self.get_bool(settings.AUDIO_ONLY, False)
 
-    def set_subtitle_languages(self, value):
-        return self.set_int(settings.SUBTITLE_LANGUAGE, value)
+    def get_subtitle_selection(self):
+        return self.get_int(settings.SUBTITLE_SELECTION, 0)
+
+    def set_subtitle_selection(self, value):
+        return self.set_int(settings.SUBTITLE_SELECTION, value)
 
     def set_subtitle_download(self, value):
         return self.set_bool(settings.SUBTITLE_DOWNLOAD, value)
@@ -363,6 +363,9 @@ class AbstractSettings(object):
 
     def get_language(self):
         return self.get_string(settings.LANGUAGE, 'en_US').replace('_', '-')
+
+    def get_region(self):
+        return self.get_string(settings.REGION, 'US')
 
     def get_watch_later_playlist(self):
         return self.get_string(settings.WATCH_LATER_PLAYLIST, '').strip()

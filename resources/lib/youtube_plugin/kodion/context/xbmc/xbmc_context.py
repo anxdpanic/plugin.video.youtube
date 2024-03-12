@@ -33,6 +33,7 @@ from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
     loose_version,
+    get_kodi_setting_value,
     make_dirs,
     to_unicode,
 )
@@ -208,7 +209,7 @@ class XbmcContext(AbstractContext):
         'subtitles.download.pre': 30706,
         'subtitles.all': 30774,
         'subtitles.language': 30560,
-        'subtitles.no_auto_generated': 30602,
+        'subtitles.no_asr': 30602,
         'subtitles.translation': 30775,
         'subtitles.with_fallback': 30601,
         'succeeded': 30575,
@@ -342,17 +343,36 @@ class XbmcContext(AbstractContext):
                           .replace(':%S', ''))
         return time_obj.strftime(str_format)
 
-    def get_language(self):
-        kodi_language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
-        lang_code, seperator, region = kodi_language.partition('-')
+    @staticmethod
+    def get_language():
+        language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
+        lang_code, seperator, region = language.partition('-')
+        if not lang_code:
+            language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
+            lang_code, seperator, region = language.partition('-')
+        if not lang_code:
+            return 'en-US'
         if region:
             return seperator.join((lang_code.lower(), region.upper()))
-        return 'en-US'
+        return lang_code
 
     def get_language_name(self, lang_id=None):
         if lang_id is None:
             lang_id = self.get_language()
         return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
+
+    def get_subtitle_language(self):
+        sub_language = get_kodi_setting_value('locale.subtitlelanguage')
+        # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
+        if sub_language not in (None,  # No setting value
+                                self.localize(231),  # None
+                                self.localize(13207),  # Forced only
+                                self.localize(308),  # Original language
+                                self.localize(309)):  # UI language
+            sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
+        else:
+            sub_language = None
+        return sub_language
 
     def get_video_playlist(self):
         if not self._video_playlist:
@@ -575,6 +595,7 @@ class XbmcContext(AbstractContext):
     _ISA_CAPABILITIES = {
         'live': loose_version('2.0.12'),
         'drm': loose_version('2.2.12'),
+        'ttml': loose_version('20.0.0'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
         # unknown when Opus audio support was implemented
