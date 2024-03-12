@@ -20,12 +20,18 @@ def debug_here(host='localhost'):
 
     for comp in sys.path:
         if comp.find('addons') != -1:
-            pydevd_path = os.path.normpath(os.path.join(comp, os.pardir, 'script.module.pydevd', 'lib'))
+            pydevd_path = os.path.normpath(os.path.join(
+                comp,
+                os.pardir,
+                'script.module.pydevd',
+                'lib',
+            ))
             sys.path.append(pydevd_path)
             break
 
     # noinspection PyUnresolvedReferences,PyPackageRequirements
     import pydevd
+
     pydevd.settrace(host, stdoutToServer=True, stderrToServer=True)
 
 
@@ -36,11 +42,13 @@ class Profiler(object):
 
     from cProfile import Profile as _Profile
     from pstats import Stats as _Stats
+
     try:
         from StringIO import StringIO as _StringIO
     except ImportError:
         from io import StringIO as _StringIO
     from functools import wraps as _wraps
+
     _wraps = staticmethod(_wraps)
     from weakref import ref as _ref
 
@@ -80,7 +88,8 @@ class Profiler(object):
             self._create_profiler()
 
     def __del__(self):
-        self.__class__._instances.discard(self)  # pylint: disable=protected-access
+        # pylint: disable=protected-access
+        self.__class__._instances.discard(self)
 
     def __enter__(self):
         if not self._enabled:
