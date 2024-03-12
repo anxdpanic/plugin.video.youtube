@@ -57,6 +57,9 @@ class Provider(AbstractProvider):
 
     def get_wizard_steps(self, context):
         steps = [
+            yt_setup_wizard.process_default_settings,
+            yt_setup_wizard.process_list_detail_settings,
+            yt_setup_wizard.process_performance_settings,
             yt_setup_wizard.process_language,
             yt_setup_wizard.process_subtitles,
             yt_setup_wizard.process_geo_location,

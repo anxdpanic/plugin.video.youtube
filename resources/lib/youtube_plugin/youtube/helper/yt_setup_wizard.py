@@ -260,9 +260,97 @@ def process_geo_location(_provider, context, step, steps):
                 '{0[lat]},{0[lon]}'.format(coords)
             )
     return step
+
+
+def process_default_settings(_provider, context, step, steps):
+    localize = context.localize
+    settings = context.get_settings()
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.settings.defaults'))
     ):
+        settings.client_selection(0)
+        settings.use_isa(True)
+        settings.use_mpd_videos(True)
+        settings.stream_select(4 if settings.ask_for_video_quality() else 3)
+        settings.live_stream_type(2)
+        settings.cache_size(20)
+    return step
 
 
+def process_list_detail_settings(_provider, context, step, steps):
+    localize = context.localize
+    settings = context.get_settings()
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.settings.list_details'))
+    ):
+        settings.show_detailed_description(False)
+        settings.show_detailed_labels(False)
+    else:
+        settings.show_detailed_description(True)
+        settings.show_detailed_labels(True)
+    return step
+
+
+def process_performance_settings(_provider, context, step, steps):
+    localize = context.localize
+    settings = context.get_settings()
+    ui = context.get_ui()
+
+    step += 1
+    if ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.settings.performance'))
+    ):
+        items = [
+            localize('setup_wizard.capabilities.' + item).split(' | ') + [item]
+            for item in ('old', 'low', 'medium', 'high', 'recent', 'max')
+        ]
+        device_type = ui.on_select(
+            localize('setup_wizard.capabilities'),
+            items=items,
+            use_details=True,
+        )
+        if device_type == -1:
+            return step
+
+        video_qualities = {
+            'old': 3,
+            'low': 4,
+            'medium': 6,
+            'high': 6,
+            'recent': 6,
+            'max': 7,
+        }
+        stream_features = {
+            'old': ['avc1', 'mp4a', 'filter'],
+            'low': ['avc1', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'medium': ['avc1', 'vp9', 'hdr', 'hfr', 'no_hfr_max', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'high': ['avc1', 'vp9', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'recent': ['avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'max': ['avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+        }
+        num_items = {
+            'old': 10,
+            'low': 20,
+            'medium': 50,
+            'high': 50,
+            'recent': 50,
+            'max': 50,
+        }
+
+        settings.mpd_video_qualities(video_qualities[device_type])
+        settings.stream_features(stream_features[device_type])
+        settings.items_per_page(num_items[device_type])
+    return step
 
 
 def process_subtitles(_provider, context, step, steps):

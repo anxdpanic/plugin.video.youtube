@@ -1429,3 +1429,43 @@ msgstr ""
 msgctxt "#30782"
 msgid "local watch later list"
 msgstr ""
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr ""
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr ""
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr ""
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr ""
+
+msgctxt "#30787"
+msgid "720p | Limited or older devices"
+msgstr ""
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Rasberry Pi 4B or similar"
+msgstr ""
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Rasberry Pi 5, or similar"
+msgstr ""
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Amlogic S905X3 based device, Shield TV, or similar"
+msgstr ""
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Amlogic S905X4 based device, Fire TV Cube 3rd Gen, or similar"
+msgstr ""
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities "
+msgstr ""
