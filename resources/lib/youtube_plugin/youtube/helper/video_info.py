@@ -20,7 +20,7 @@ from .ratebypass import ratebypass
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
 from ..client.request_client import YouTubeRequestClient
-from ..youtube_exceptions import YouTubeException
+from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import (
     parse_qs,
     quote,
@@ -641,6 +641,61 @@ class VideoInfo(YouTubeRequestClient):
         super(VideoInfo, self).__init__(**kwargs)
 
     @staticmethod
+    def _response_hook_json(**kwargs):
+        response = kwargs['response']
+        try:
+            json_data = response.json()
+            if 'error' in json_data:
+                kwargs.setdefault('pass_data', True)
+                raise YouTubeException('"error" in response JSON data',
+                                       json_data=json_data,
+                                       **kwargs)
+        except ValueError as exc:
+            kwargs.setdefault('raise_exc', True)
+            raise InvalidJSON(exc, **kwargs)
+        response.raise_for_status()
+        return json_data
+
+    @staticmethod
+    def _response_hook_text(**kwargs):
+        response = kwargs['response']
+        response.raise_for_status()
+        result = response and response.text
+        if not result:
+            raise YouTubeException('Empty response text', **kwargs)
+        return result
+
+    @staticmethod
+    def _error_hook(**kwargs):
+        exc = kwargs.pop('exc')
+        json_data = getattr(exc, 'json_data', None)
+        if getattr(exc, 'pass_data', False):
+            data = json_data
+        else:
+            data = None
+        if getattr(exc, 'raise_exc', False):
+            exception = YouTubeException
+        else:
+            exception = None
+
+        if not json_data or 'error' not in json_data:
+            info = ('exc: |{exc}|\n'
+                    'video_id: {video_id}, client: {client}, auth: {auth}')
+            return None, info, kwargs, data, None, exception
+
+        details = json_data['error']
+        reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
+        message = details.get('message', 'Unknown error')
+
+        info = ('exc: |{exc}|\n'
+                'reason: {reason}\n'
+                'message: |{message}|\n'
+                'video_id: {video_id}, client: {client}, auth: {auth}')
+        kwargs['message'] = message
+        kwargs['reason'] = reason
+        return None, info, kwargs, data, None, exception
+
+    @staticmethod
     def _generate_cpn():
         # https://github.com/rg3/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L1381
         # LICENSE: The Unlicense
@@ -655,21 +710,29 @@ class VideoInfo(YouTubeRequestClient):
         self.video_id = video_id
         return self._get_video_info()
 
-    def _get_player_page(self, client='web', embed=False):
+    def _get_player_page(self, client_name='web', embed=False):
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
             url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
         cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
 
+        client = self.build_client(client_name)
+
         result = self.request(
-            url, cookies=cookies, headers=self.build_client(client)['headers'],
-            error_msg=('Failed to get player html for video_id: {0}'
-                       .format(self.video_id))
+            url,
+            cookies=cookies,
+            headers=client['headers'],
+            response_hook=self._response_hook_text,
+            error_title='Failed to get player html',
+            error_hook=self._error_hook,
+            error_hook_kwargs={
+                'video_id': self.video_id,
+                'client': client_name,
+                'auth': False,
+            },
         )
-        if result:
-            return result
-        return None
+        return result
 
     @staticmethod
     def _get_player_client(config):
@@ -690,14 +753,14 @@ class VideoInfo(YouTubeRequestClient):
         return None
 
     @staticmethod
-    def _get_player_config(page):
-        if not page:
+    def _get_player_config(page_text):
+        if not page_text:
             return None
 
         # pattern source is from youtube-dl
         # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
         # LICENSE: The Unlicense
-        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page.text)
+        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page_text)
 
         if found:
             return json.loads(found.group(1))
@@ -710,8 +773,8 @@ class VideoInfo(YouTubeRequestClient):
         js_url = cached if cached not in {'', 'http://', 'https://'} else None
 
         if not js_url:
-            player_page = self._get_player_page()
-            player_config = self._get_player_config(player_page)
+            player_page_text = self._get_player_page()
+            player_config = self._get_player_config(player_page_text)
             if not player_config:
                 return ''
             js_url = player_config.get('PLAYER_JS_URL')
@@ -736,12 +799,21 @@ class VideoInfo(YouTubeRequestClient):
         if cached:
             return cached
 
+        client_name = 'web'
+        client = self.build_client(client_name)
+
         result = self.request(
-            js_url, headers=self.build_client('web')['headers'],
-            error_msg=('Failed to get player js for video_id: {0}'
-                       .format(self.video_id))
+            js_url,
+            headers=client['headers'],
+            response_hook=self._response_hook_text,
+            error_title='Failed to get player JavaScript',
+            error_hook=self._error_hook,
+            error_hook_kwargs={
+                'video_id': self.video_id,
+                'client': client_name,
+                'auth': False,
+            },
         )
-        result = result and result.text
         if not result:
             return ''
 
@@ -779,17 +851,26 @@ class VideoInfo(YouTubeRequestClient):
             return []
 
         if not headers and self._selected_client:
+            client_name = self._selected_client['_name']
             headers = self._selected_client['headers'].copy()
             if 'Authorization' in headers:
                 del headers['Authorization']
         else:
-            headers = self.build_client('web')['headers']
+            client_name = 'web'
+            headers = self.build_client(client_name)['headers']
         curl_headers = self._make_curl_headers(headers, cookies=None)
 
         result = self.request(
-            url, headers=headers,
-            error_msg=('Failed to get manifest for video_id: {0}'
-                       .format(self.video_id))
+            url,
+            headers=headers,
+            response_hook=self._response_hook_text,
+            error_title='Failed to get HLS manifest',
+            error_hook=self._error_hook,
+            error_hook_kwargs={
+                'video_id': self.video_id,
+                'client': client_name,
+                'auth': False,
+            },
         )
         if not result:
             return ()
@@ -828,7 +909,7 @@ class VideoInfo(YouTubeRequestClient):
             r'#EXT-X-STREAM-INF[^#]+'
             r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
         )
-        for match in re_playlist_data.finditer(result.text):
+        for match in re_playlist_data.finditer(result):
             playlist_url = match.group('url')
             itag = match.group('itag')
 
@@ -1016,7 +1097,8 @@ class VideoInfo(YouTubeRequestClient):
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         _settings = self._context.get_settings()
-        playability_status = status = reason = None
+        client_name = reason = status = None
+        client = playability_status = result = None
 
         client_data = {'json': {'videoId': self.video_id}}
         if self._access_token:
@@ -1027,21 +1109,20 @@ class VideoInfo(YouTubeRequestClient):
                 client = self.build_client(client_name, client_data)
 
                 result = self.request(
-                    video_info_url, 'POST',
-                    error_msg=(
-                        'Player response failed for video_id: {0},'
-                        ' using {1} client ({2})'
-                        .format(self.video_id,
-                                client_name,
-                                'logged in' if '_access_token' in client_data
-                                else 'logged out')
-                    ),
-                    raise_error=True,
+                    video_info_url,
+                    'POST',
+                    response_hook=self._response_hook_json,
+                    error_title='Player request failed',
+                    error_hook=self._error_hook,
+                    error_hook_kwargs={
+                        'video_id': self.video_id,
+                        'client': client_name,
+                        'auth': '_access_token' in client_data,
+                    },
                     **client
                 )
 
-                response = result.json()
-                playability_status = response.get('playabilityStatus', {})
+                playability_status = result.get('playabilityStatus', {})
                 status = playability_status.get('status', '').upper()
                 reason = playability_status.get('reason', '')
 
@@ -1104,12 +1185,15 @@ class VideoInfo(YouTubeRequestClient):
             raise YouTubeException(reason or 'UNKNOWN')
 
         self._context.log_debug(
-            'Retrieved video info for video_id: {0}, using {1} client ({2})'
-            .format(self.video_id, client_name,
-                    'logged in' if '_access_token' in client_data
-                    else 'logged out')
+            'Retrieved video info - '
+            'video_id: {0}, client: {1}, auth: {2}'.format(
+                self.video_id,
+                client_name,
+                '_access_token' in client_data,
+            )
         )
         self._selected_client = client.copy()
+        self._selected_client['_name'] = client_name
 
         if 'Authorization' in client['headers']:
             del client['headers']['Authorization']
@@ -1119,10 +1203,10 @@ class VideoInfo(YouTubeRequestClient):
         # curl_headers = self._make_curl_headers(headers, cookies)
         curl_headers = self._make_curl_headers(client['headers'], cookies=None)
 
-        video_details = response.get('videoDetails', {})
-        microformat = (response.get('microformat', {})
+        video_details = result.get('videoDetails', {})
+        microformat = (result.get('microformat', {})
                        .get('playerMicroformatRenderer', {}))
-        streaming_data = response.get('streamingData', {})
+        streaming_data = result.get('streamingData', {})
         is_live = video_details.get('isLiveContent', False)
         thumb_suffix = '_live' if is_live else ''
 
@@ -1191,7 +1275,7 @@ class VideoInfo(YouTubeRequestClient):
                 'playback_url': 'videostatsPlaybackUrl',
                 'watchtime_url': 'videostatsWatchtimeUrl',
             }
-            playback_tracking = response.get('playbackTracking', {})
+            playback_tracking = result.get('playbackTracking', {})
             cpn = self._generate_cpn()
 
             for key, url_key in playback_stats.items():
