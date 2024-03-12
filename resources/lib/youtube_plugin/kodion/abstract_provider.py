@@ -89,6 +89,7 @@ class AbstractProvider(object):
         settings.set_bool(settings.SETUP_WIZARD, False)
 
         wizard_steps = self.get_wizard_steps(context)
+        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
         step = 0
         steps = len(wizard_steps)
 
