@@ -772,7 +772,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Portti %s on jo käytössä. HTTP-palvelimen käynnistys ei onnistu."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
 msgstr "MPEG-DASH VOD -videot edellyttävät välityspalvelimen käyttöä (katso HTTP-palvelin)."
 
 msgctxt "#30622"
@@ -820,8 +820,8 @@ msgid "Enable API configuration page"
 msgstr "Käytä API:n määrityssivua"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ip-osoite>:<portti>/api (katso HTTP-palvelin)"
+msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
+msgstr "http://<ip-osoite>:<portti>/youtube/api (katso HTTP-palvelin)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -1180,7 +1180,7 @@ msgid "Enable HDR video"
 msgstr "Tue HDR-videota"
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "MPEG-DASH VOD -videot edellyttävät välityspalvelimen käyttöä (katso HTTP-palvelin).[CR]1080p ja sitä suuremmat tarkkudet sekä HDR tarvitsevat vähintään InputStream Adaptive -versiota 2.3.14."
 
 msgctxt "#30724"

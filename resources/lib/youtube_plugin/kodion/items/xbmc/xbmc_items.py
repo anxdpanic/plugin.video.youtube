@@ -292,7 +292,7 @@ def video_playback_item(context, video_item, show_fanart=None):
         'thumb': image,
     })
 
-    if video_item.subtitles and manifest_type != 'mpd':
+    if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
     item_info = create_info_labels(video_item)

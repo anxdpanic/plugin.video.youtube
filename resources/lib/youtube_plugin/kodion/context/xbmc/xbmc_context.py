@@ -11,7 +11,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import os
 import sys
 import weakref
 
@@ -24,7 +23,6 @@ from ...compatibility import (
     xbmc,
     xbmcaddon,
     xbmcplugin,
-    xbmcvfs,
 )
 from ...constants import ADDON_ID, content, sort
 from ...player import XbmcPlayer, XbmcPlaylist
@@ -33,6 +31,7 @@ from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
     loose_version,
+    get_kodi_setting_value,
     make_dirs,
     to_unicode,
 )
@@ -50,8 +49,6 @@ class XbmcContext(AbstractContext):
         'are_you_sure': 30703,
         'auto_remove_watch_later': 30515,
         'browse_channels': 30512,
-        'cache.data': 30687,
-        'cache.function': 30557,
         'cancel': 30615,
         'channels': 30500,
         'client.id.incorrect': 30649,
@@ -112,6 +109,11 @@ class XbmcContext(AbstractContext):
         'live': 30539,
         'live.completed': 30647,
         'live.upcoming': 30646,
+        'maintenance.data_cache': 30687,
+        'maintenance.function_cache': 30557,
+        'maintenance.playback_history': 30673,
+        'maintenance.search_history': 30558,
+        'maintenance.watch_later': 30782,
         'must_be_signed_in': 30616,
         'my_channel': 30507,
         'my_location': 30654,
@@ -123,8 +125,6 @@ class XbmcContext(AbstractContext):
         'my_subscriptions.filtered': 30584,
         'next_page': 30106,
         'none': 30561,
-        'perform_geolocation': 30653,
-        'playback.history': 30673,
         'playlist.added_to': 30714,
         'playlist.create': 30522,
         'playlist.play.all': 30531,
@@ -153,7 +153,6 @@ class XbmcContext(AbstractContext):
         'saved.playlists': 30611,
         'search': 30102,
         'search.clear': 30120,
-        'search.history': 30558,
         'search.new': 30110,
         'search.quick': 30605,
         'search.quick.incognito': 30606,
@@ -163,11 +162,26 @@ class XbmcContext(AbstractContext):
         'select.listen.ip': 30644,
         'select_video_quality': 30010,
         'settings': 30577,
-        'setup_wizard.adjust': 30526,
-        'setup_wizard.adjust.language_and_region': 30527,
-        'setup_wizard.execute': 30030,
-        'setup_wizard.select_language': 30524,
-        'setup_wizard.select_region': 30525,
+        'setup_wizard': 30526,
+        'setup_wizard.capabilities': 30786,
+        'setup_wizard.capabilities.old': 30787,
+        'setup_wizard.capabilities.low': 30788,
+        'setup_wizard.capabilities.medium': 30789,
+        'setup_wizard.capabilities.high': 30790,
+        'setup_wizard.capabilities.recent': 30791,
+        'setup_wizard.capabilities.max': 30792,
+        'setup_wizard.locale.language': 30524,
+        'setup_wizard.locale.region': 30525,
+        'setup_wizard.prompt': 30030,
+        'setup_wizard.prompt.import_playback_history': 30778,
+        'setup_wizard.prompt.import_search_history': 30779,
+        'setup_wizard.prompt.locale': 30527,
+        'setup_wizard.prompt.my_location': 30653,
+        'setup_wizard.prompt.settings': 30577,
+        'setup_wizard.prompt.settings.defaults': 30783,
+        'setup_wizard.prompt.settings.list_details': 30784,
+        'setup_wizard.prompt.settings.performance': 30785,
+        'setup_wizard.prompt.subtitles': 30600,
         'sign.enter_code': 30519,
         'sign.go_to': 30518,
         'sign.in': 30111,
@@ -193,7 +207,7 @@ class XbmcContext(AbstractContext):
         'subtitles.download.pre': 30706,
         'subtitles.all': 30774,
         'subtitles.language': 30560,
-        'subtitles.no_auto_generated': 30602,
+        'subtitles.no_asr': 30602,
         'subtitles.translation': 30775,
         'subtitles.with_fallback': 30601,
         'succeeded': 30575,
@@ -327,17 +341,36 @@ class XbmcContext(AbstractContext):
                           .replace(':%S', ''))
         return time_obj.strftime(str_format)
 
-    def get_language(self):
-        kodi_language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
-        lang_code, seperator, region = kodi_language.partition('-')
+    @staticmethod
+    def get_language():
+        language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
+        lang_code, seperator, region = language.partition('-')
+        if not lang_code:
+            language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
+            lang_code, seperator, region = language.partition('-')
+        if not lang_code:
+            return 'en-US'
         if region:
             return seperator.join((lang_code.lower(), region.upper()))
-        return 'en-US'
+        return lang_code
 
     def get_language_name(self, lang_id=None):
         if lang_id is None:
             lang_id = self.get_language()
         return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
+
+    def get_subtitle_language(self):
+        sub_language = get_kodi_setting_value('locale.subtitlelanguage')
+        # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
+        if sub_language not in (None,  # No setting value
+                                self.localize(231),  # None
+                                self.localize(13207),  # Forced only
+                                self.localize(308),  # Original language
+                                self.localize(309)):  # UI language
+            sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
+        else:
+            sub_language = None
+        return sub_language
 
     def get_video_playlist(self):
         if not self._video_playlist:
@@ -369,13 +402,6 @@ class XbmcContext(AbstractContext):
 
     def get_data_path(self):
         return self._data_path
-
-    def get_debug_path(self):
-        if not self._debug_path:
-            self._debug_path = os.path.join(self.get_data_path(), 'debug')
-            if not xbmcvfs.exists(self._debug_path):
-                xbmcvfs.mkdir(self._debug_path)
-        return self._debug_path
 
     def get_addon_path(self):
         return self._addon_path
@@ -485,9 +511,15 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    @staticmethod
-    def execute(command):
-        xbmc.executebuiltin(command)
+    def execute(self, command, wait=True, wait_for=None):
+        xbmc.executebuiltin(command, wait)
+        if wait_for:
+            ui = self.get_ui()
+            monitor = xbmc.Monitor()
+            while not monitor.abortRequested():
+                monitor.waitForAbort(1)
+                if not ui.get_property(wait_for):
+                    break
 
     @staticmethod
     def sleep(milli_seconds):
@@ -555,6 +587,7 @@ class XbmcContext(AbstractContext):
     _ISA_CAPABILITIES = {
         'live': loose_version('2.0.12'),
         'drm': loose_version('2.2.12'),
+        'ttml': loose_version('20.0.0'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
         # unknown when Opus audio support was implemented

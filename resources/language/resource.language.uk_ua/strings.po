@@ -774,7 +774,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
@@ -822,7 +822,7 @@ msgid "Enable API configuration page"
 msgstr ""
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
+msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
 msgstr ""
 
 msgctxt "#30634"
@@ -1182,7 +1182,7 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"

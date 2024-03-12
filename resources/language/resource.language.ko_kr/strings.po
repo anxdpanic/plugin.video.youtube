@@ -775,7 +775,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "$s 포트는 이미 사용 중입니다. http 서버를 시작할 수 없습니다."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
 msgstr "mpeg-dash vod에 프록시가 필요함 (HTTP 서버 참고)"
 
 msgctxt "#30622"
@@ -823,8 +823,8 @@ msgid "Enable API configuration page"
 msgstr "API 설정 페이지 사용"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ipaddress>:<port>/api (HTTP 서버 참고)"
+msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
+msgstr "http://<ipaddress>:<port>/youtube/api (HTTP 서버 참고)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -1183,7 +1183,7 @@ msgid "Enable HDR video"
 msgstr "HDR 비디오 사용"
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "mpeg-dash vods (HTTP 서버 참고)[CR]> 1080p에 프록시가 필요하고 HDR에 InputStream Adaptive >= 2.3.14 필요함"
 
 msgctxt "#30724"

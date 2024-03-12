@@ -56,7 +56,17 @@ class Provider(AbstractProvider):
         self.yt_video = yt_video
 
     def get_wizard_steps(self, context):
-        return [(yt_setup_wizard.process, (self, context))]
+        steps = [
+            yt_setup_wizard.process_default_settings,
+            yt_setup_wizard.process_list_detail_settings,
+            yt_setup_wizard.process_performance_settings,
+            yt_setup_wizard.process_language,
+            yt_setup_wizard.process_subtitles,
+            yt_setup_wizard.process_geo_location,
+            yt_setup_wizard.process_old_search_db,
+            yt_setup_wizard.process_old_history_db,
+        ]
+        return steps
 
     def is_logged_in(self):
         return self._logged_in
@@ -113,10 +123,10 @@ class Provider(AbstractProvider):
         settings = context.get_settings()
         access_manager = context.get_access_manager()
 
-        items_per_page = settings.get_items_per_page()
+        items_per_page = settings.items_per_page()
 
-        language = settings.get_string('youtube.language', 'en_US')
-        region = settings.get_string('youtube.region', 'US')
+        language = settings.get_language()
+        region = settings.get_region()
 
         api_last_origin = access_manager.get_last_origin()
 
@@ -820,6 +830,9 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/config/(?P<action>[^/]+)/$')
     def configure_addon(self, context, re_match):
         action = re_match.group('action')
+        if action == 'setup_wizard':
+            self.run_wizard(context)
+            return False
         return UriItem('{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
@@ -872,9 +885,11 @@ class Provider(AbstractProvider):
         action = re_match.group('action')
 
         if action != 'reset':
-            return UriItem('{addon},maintenance/{action}/{target}'.format(
-                addon=ADDON_ID, action=action, target=target
-            ))
+            return UriItem(
+                '{addon},maintenance/{action}/?target={target}'.format(
+                    addon=ADDON_ID, action=action, target=target,
+                )
+            )
 
         ui = context.get_ui()
         localize = context.localize
@@ -1320,6 +1335,15 @@ class Provider(AbstractProvider):
             result.append(sign_out_item)
 
         if settings.get_bool('youtube.folder.settings.show', True):
+            settings_menu_item = DirectoryItem(
+                localize('setup_wizard'),
+                create_uri(('config', 'setup_wizard')),
+                image='{media}/settings.png',
+                action=True,
+            )
+            result.append(settings_menu_item)
+
+        if settings.get_bool('youtube.folder.settings.advanced.show', True):
             settings_menu_item = DirectoryItem(
                 localize('settings'),
                 create_uri(('config', 'youtube')),

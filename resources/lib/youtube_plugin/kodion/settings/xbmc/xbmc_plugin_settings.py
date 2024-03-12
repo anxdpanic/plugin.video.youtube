@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from ..abstract_settings import AbstractSettings
 from ...compatibility import xbmcaddon
 from ...logger import log_debug
-from ...utils.methods import get_kodi_setting
+from ...utils.methods import get_kodi_setting_bool
 from ...utils.system_version import current_system_version
 
 
@@ -66,7 +66,7 @@ class XbmcPluginSettings(AbstractSettings):
 
     @classmethod
     def flush(cls, xbmc_addon):
-        cls._echo = get_kodi_setting('debug.showloginfo')
+        cls._echo = get_kodi_setting_bool('debug.showloginfo')
         cls._cache = {}
         if current_system_version.compatible(21, 0):
             cls._type = xbmc_addon.getSettings

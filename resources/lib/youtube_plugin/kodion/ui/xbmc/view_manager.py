@@ -26,7 +26,10 @@ class ViewManager(object):
         content.VIDEO_CONTENT: 'episodes',
     }
 
-    TYPES_STRING_MAP = {
+    STRING_MAP = {
+        'prompt': 30777,
+        'unsupported_skin': 10109,
+        'supported_skin': 14240,
         'albums': 30035,
         'artists': 30034,
         'default': 30027,
@@ -163,15 +166,26 @@ class ViewManager(object):
         return self._context.get_settings().get_bool(self.SETTINGS['override'])
 
     def get_wizard_steps(self):
+        return (self.run,)
+
+    def run(self, _provider, context, step, steps):
+        localize = context.localize
+
         skin_id = xbmc.getSkinDir()
-        if skin_id not in self.SKIN_DATA:
-            self._context.log_info('ViewManager: Unsupported skin |{skin}|'.format(
-                skin=skin_id
-            ))
-        return [
-            (self.update_view_mode, (skin_id, view_type,))
-            for view_type in self.SUPPORTED_TYPES_MAP
-        ]
+        if skin_id in self.SKIN_DATA:
+            status = localize(self.STRING_MAP['supported_skin'])
+        else:
+            status = localize(self.STRING_MAP['unsupported_skin'])
+        prompt_text = localize(self.STRING_MAP['prompt']) % (skin_id, status)
+
+        step += 1
+        if context.get_ui().on_yes_no_input(
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            localize('setup_wizard.prompt') % prompt_text,
+        ):
+            for view_type in self.SUPPORTED_TYPES_MAP:
+                self.update_view_mode(skin_id, view_type)
+        return step
 
     def get_view_mode(self):
         if self._view_mode is None:
@@ -198,11 +212,11 @@ class ViewManager(object):
 
         content_type = self.SUPPORTED_TYPES_MAP[view_type]
 
-        if content_type not in self.TYPES_STRING_MAP:
+        if content_type not in self.STRING_MAP:
             log_info('ViewManager: Unsupported content type |{content_type}|'
                      .format(content_type=content_type))
             return
-        title = self._context.localize(self.TYPES_STRING_MAP[content_type])
+        title = self._context.localize(self.STRING_MAP[content_type])
 
         view_setting = self.SETTINGS['view_type'].format(content_type)
         current_value = settings.get_int(view_setting)
@@ -214,11 +228,14 @@ class ViewManager(object):
         skin_data = self.SKIN_DATA.get(skin_id, {})
         view_type_data = skin_data.get(view_type) or skin_data.get(content_type)
         if view_type_data:
-            items = [
-                (view_data['name'], view_data['id'])
-                for view_data in view_type_data
-            ]
-            view_id = ui.on_select(title, items, preselect=current_value)
+            items = []
+            preselect = None
+            for view_data in view_type_data:
+                view_id = view_data['id']
+                items.append((view_data['name'], view_id))
+                if view_id == current_value:
+                    preselect = len(items) - 1
+            view_id = ui.on_select(title, items, preselect=preselect)
         else:
             log_info('ViewManager: Unsupported view |{view_type}|'
                      .format(view_type=view_type))

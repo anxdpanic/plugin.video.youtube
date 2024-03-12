@@ -129,11 +129,11 @@ msgid "Cache size (MB)"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Enable setup-wizard"
+msgid "Enable Setup Wizard"
 msgstr ""
 
 msgctxt "#30026"
-msgid "Override view"
+msgid "Override views"
 msgstr ""
 
 msgctxt "#30027"
@@ -149,7 +149,7 @@ msgid "View: Movies"
 msgstr ""
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
+msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
@@ -406,11 +406,11 @@ msgid "Select region"
 msgstr ""
 
 msgctxt "#30526"
-msgid "Adjust"
+msgid "Setup Wizard"
 msgstr ""
 
 msgctxt "#30527"
-msgid "Language and region?"
+msgid "Language and Region"
 msgstr ""
 
 msgctxt "#30528"
@@ -702,11 +702,11 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid "Configure subtitles"
+msgid "Subtitles"
 msgstr ""
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
+msgid "%s with Original/%s fallback"
 msgstr ""
 
 msgctxt "#30602"
@@ -786,7 +786,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
@@ -834,7 +834,7 @@ msgid "Enable API configuration page"
 msgstr ""
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
+msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
 msgstr ""
 
 msgctxt "#30634"
@@ -914,7 +914,7 @@ msgid "Location radius (km)"
 msgstr ""
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
+msgid "My Location using IP geolocation lookup"
 msgstr ""
 
 msgctxt "#30654"
@@ -990,7 +990,7 @@ msgid "Clear playback history"
 msgstr ""
 
 msgctxt "#30672"
-msgid "Delete playback history"
+msgid "Delete playback history database"
 msgstr ""
 
 msgctxt "#30673"
@@ -1194,7 +1194,7 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1403,4 +1403,72 @@ msgstr ""
 
 msgctxt "#30775"
 msgid "%s (translation)"
+msgstr ""
+
+msgctxt "#30776"
+msgid "Ask + Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr ""
+
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr ""
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr ""
+
+msgctxt "#30780"
+msgid "Clear local watch later list"
+msgstr ""
+
+msgctxt "#30781"
+msgid "Delete watch later database"
+msgstr ""
+
+msgctxt "#30782"
+msgid "local watch later list"
+msgstr ""
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr ""
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr ""
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr ""
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr ""
+
+msgctxt "#30787"
+msgid "720p | Limited or older devices"
+msgstr ""
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Rasberry Pi 4B, or similar"
+msgstr ""
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Rasberry Pi 5, or similar"
+msgstr ""
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
+msgstr ""
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
+msgstr ""
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities "
 msgstr ""

@@ -10,7 +10,14 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import os
+
+from ...kodion.compatibility import urlencode, xbmcvfs
+from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_FLAG
 from ...kodion.network import Locator
+from ...kodion.sql_store import PlaybackHistory, SearchHistory
+from ...kodion.utils.datetime_parser import strptime
+from ...kodion.utils.methods import to_unicode
 
 
 DEFAULT_LANGUAGES = {'items': [
@@ -185,63 +192,309 @@ DEFAULT_REGIONS = {'items': [
 ]}
 
 
-def _process_language(provider, context):
-    if not context.get_ui().on_yes_no_input(
-        context.localize('setup_wizard.adjust'),
-        context.localize('setup_wizard.adjust.language_and_region')
+def process_language(provider, context, step, steps):
+    localize = context.localize
+    ui = context.get_ui()
+
+    step += 1
+    if not ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.locale')),
     ):
-        return
+        return step
 
     client = provider.get_client(context)
+    settings = context.get_settings()
+
+    plugin_language = settings.get_language()
+    plugin_region = settings.get_region()
 
     kodi_language = context.get_language()
+    base_kodi_language = kodi_language.partition('-')[0]
+
     json_data = client.get_supported_languages(kodi_language)
     items = json_data.get('items') or DEFAULT_LANGUAGES['items']
-    invalid_ids = ['es-419']  # causes hl not a valid language error. Issue #418
+    
+    selected_language = [None]
+
+    def _get_selected_language(item):
+        item_lang = item[1]
+        base_item_lang = item_lang.partition('-')[0]
+        if item_lang == kodi_language or item_lang == plugin_language:
+            selected_language[0] = item
+        elif not selected_language[0] and base_item_lang == base_kodi_language:
+            selected_language.append(item)
+        return item
+
+    # Ignore es-419 as it causes hl not a valid language error
+    # https://github.com/jdf76/plugin.video.youtube/issues/418
+    invalid_ids = ('es-419',)
     language_list = sorted([
         (item['snippet']['name'], item['snippet']['hl'])
         for item in items
         if item['id'] not in invalid_ids
-    ])
-    language_id = context.get_ui().on_select(
-        context.localize('setup_wizard.select_language'),
+    ], key=_get_selected_language)
+
+    if selected_language[0]:
+        selected_language = language_list.index(selected_language[0])
+    elif len(selected_language) > 1:
+        selected_language = language_list.index(selected_language[1])
+    else:
+        selected_language = None
+
+    language_id = ui.on_select(
+        localize('setup_wizard.locale.language'),
         language_list,
+        preselect=selected_language
     )
     if language_id == -1:
-        return
+        return step
 
     json_data = client.get_supported_regions(language=language_id)
     items = json_data.get('items') or DEFAULT_REGIONS['items']
+
+    selected_region = [None]
+
+    def _get_selected_region(item):
+        item_region = item[1]
+        if item_region == plugin_region:
+            selected_region[0] = item
+        return item
+
     region_list = sorted([
         (item['snippet']['name'], item['snippet']['gl'])
         for item in items
-    ])
-    region_id = context.get_ui().on_select(
-        context.localize('setup_wizard.select_region'),
+    ], key=_get_selected_region)
+
+    if selected_region[0]:
+        selected_region = region_list.index(selected_region[0])
+    else:
+        selected_region = None
+
+    region_id = ui.on_select(
+        localize('setup_wizard.locale.region'),
         region_list,
+        preselect=selected_region
     )
     if region_id == -1:
-        return
+        return step
 
     # set new language id and region id
-    context.get_settings().set_string('youtube.language', language_id)
-    context.get_settings().set_string('youtube.region', region_id)
+    settings = context.get_settings()
+    settings.set_string(settings.LANGUAGE, language_id)
+    settings.set_string(settings.REGION, region_id)
     provider.reset_client()
+    return step
 
 
-def _process_geo_location(context):
-    if not context.get_ui().on_yes_no_input(
-        context.get_name(), context.localize('perform_geolocation')
+def process_geo_location(_provider, context, step, steps):
+    localize = context.localize
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.my_location')),
     ):
-        return
+        locator = Locator()
+        locator.locate_requester()
+        coords = locator.coordinates()
+        if coords:
+            context.get_settings().set_location(
+                '{0[lat]},{0[lon]}'.format(coords)
+            )
+    return step
 
-    locator = Locator()
-    locator.locate_requester()
-    coords = locator.coordinates()
-    if coords:
-        context.get_settings().set_location('{0[lat]},{0[lon]}'.format(coords))
+
+def process_default_settings(_provider, context, step, steps):
+    localize = context.localize
+    settings = context.get_settings()
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.settings.defaults'))
+    ):
+        settings.client_selection(0)
+        settings.use_isa(True)
+        settings.use_mpd_videos(True)
+        settings.stream_select(4 if settings.ask_for_video_quality() else 3)
+        settings.live_stream_type(2)
+        settings.cache_size(20)
+    return step
 
 
-def process(provider, context):
-    _process_language(provider, context)
-    _process_geo_location(context)
+def process_list_detail_settings(_provider, context, step, steps):
+    localize = context.localize
+    settings = context.get_settings()
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.settings.list_details'))
+    ):
+        settings.show_detailed_description(False)
+        settings.show_detailed_labels(False)
+    else:
+        settings.show_detailed_description(True)
+        settings.show_detailed_labels(True)
+    return step
+
+
+def process_performance_settings(_provider, context, step, steps):
+    localize = context.localize
+    settings = context.get_settings()
+    ui = context.get_ui()
+
+    step += 1
+    if ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.settings.performance'))
+    ):
+        items = [
+            localize('setup_wizard.capabilities.' + item).split(' | ') + [item]
+            for item in ('old', 'low', 'medium', 'high', 'recent', 'max')
+        ]
+        device_type = ui.on_select(
+            localize('setup_wizard.capabilities'),
+            items=items,
+            use_details=True,
+        )
+        if device_type == -1:
+            return step
+
+        video_qualities = {
+            'old': 3,
+            'low': 4,
+            'medium': 6,
+            'high': 6,
+            'recent': 6,
+            'max': 7,
+        }
+        stream_features = {
+            'old': ['avc1', 'mp4a', 'filter'],
+            'low': ['avc1', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'medium': ['avc1', 'vp9', 'hdr', 'hfr', 'no_hfr_max', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'high': ['avc1', 'vp9', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'recent': ['avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'max': ['avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+        }
+        num_items = {
+            'old': 10,
+            'low': 20,
+            'medium': 50,
+            'high': 50,
+            'recent': 50,
+            'max': 50,
+        }
+
+        settings.mpd_video_qualities(video_qualities[device_type])
+        settings.stream_features(stream_features[device_type])
+        settings.items_per_page(num_items[device_type])
+    return step
+
+
+def process_subtitles(_provider, context, step, steps):
+    localize = context.localize
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.subtitles'))
+    ):
+        context.execute('RunScript({addon_id},config/subtitles)'.format(
+            addon_id=ADDON_ID
+        ), wait_for=WAIT_FLAG)
+    return step
+
+
+def process_old_search_db(_provider, context, step, steps):
+    localize = context.localize
+    ui = context.get_ui()
+
+    search_db_path = os.path.join(
+        DATA_PATH,
+        'kodion',
+        'search.sqlite'
+    )
+    step += 1
+    if xbmcvfs.exists(search_db_path) and ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        localize('setup_wizard.prompt.import_search_history'),
+    ):
+        def _convert_old_search_item(value, item):
+            return {
+                'text': to_unicode(value),
+                'timestamp': strptime(item[1]).timestamp(),
+            }
+
+        search_history = context.get_search_history()
+        old_search_db = SearchHistory(
+            xbmcvfs.translatePath(search_db_path),
+            migrate='storage',
+        )
+        items = old_search_db.get_items(process=_convert_old_search_item)
+        for search in items:
+            search_history.update(search['text'], search['timestamp'])
+
+        ui.show_notification(localize('succeeded'))
+        context.execute(
+            'RunScript({addon},maintenance/{action}?{query})'
+            .format(addon=ADDON_ID,
+                    action='delete',
+                    query=urlencode({'target': 'other_file',
+                                     'path': search_db_path})),
+            wait_for=WAIT_FLAG,
+        )
+    return step
+
+
+def process_old_history_db(_provider, context, step, steps):
+    localize = context.localize
+    ui = context.get_ui()
+
+    history_db_path = os.path.join(
+        DATA_PATH,
+        'playback',
+        context.get_access_manager().get_current_user_id() + '.sqlite',
+    )
+    step += 1
+    if xbmcvfs.exists(history_db_path) and ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        localize('setup_wizard.prompt.import_playback_history'),
+    ):
+        def _convert_old_history_item(value, item):
+            values = value.split(',')
+            return {
+                'play_count': int(values[0]),
+                'total_time': float(values[1]),
+                'played_time': float(values[2]),
+                'played_percent': int(values[3]),
+                'timestamp': strptime(item[1]).timestamp(),
+            }
+
+        playback_history = context.get_playback_history()
+        old_history_db = PlaybackHistory(
+            xbmcvfs.translatePath(history_db_path),
+            migrate='storage',
+        )
+        items = old_history_db.get_items(process=_convert_old_history_item)
+        for video_id, history in items.items():
+            timestamp = history.pop('timestamp', None)
+            playback_history.update(video_id, history, timestamp)
+
+        ui.show_notification(localize('succeeded'))
+        context.execute(
+            'RunScript({addon},maintenance/{action}?{query})'
+            .format(addon=ADDON_ID,
+                    action='delete',
+                    query=urlencode({'target': 'other_file',
+                                     'path': history_db_path})),
+            wait_for=WAIT_FLAG,
+        )
+    return step

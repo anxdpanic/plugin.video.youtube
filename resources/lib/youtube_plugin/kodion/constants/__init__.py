@@ -25,6 +25,8 @@ MEDIA_PATH = ADDON_PATH + '/resources/media'
 RESOURCE_PATH = ADDON_PATH + '/resources'
 TEMP_PATH = 'special://temp/{id}'.format(id=ADDON_ID)
 
+WAIT_FLAG = 'builtin_running'
+
 __all__ = (
     'ADDON_ID',
     'ADDON_PATH',
@@ -32,6 +34,7 @@ __all__ = (
     'MEDIA_PATH',
     'RESOURCE_PATH',
     'TEMP_PATH',
+    'WAIT_FLAG',
     'content',
     'paths',
     'settings',

@@ -9,7 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .http_server import get_client_ip_address, get_http_server, is_httpd_live
+from .http_server import get_client_ip_address, get_http_server, httpd_status
 from .ip_api import Locator
 from .requests import BaseRequestsClass, InvalidJSONError
 
@@ -17,7 +17,7 @@ from .requests import BaseRequestsClass, InvalidJSONError
 __all__ = (
     'get_client_ip_address',
     'get_http_server',
-    'is_httpd_live',
+    'httpd_status',
     'BaseRequestsClass',
     'InvalidJSONError',
     'Locator',

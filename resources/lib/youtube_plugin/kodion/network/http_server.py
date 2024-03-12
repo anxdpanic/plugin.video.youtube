@@ -67,8 +67,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             log_lines.append('Whitelisted: |%s|' % str(conn_allowed))
 
         if not conn_allowed:
-            log_debug('HTTPServer: Connection from |{client_ip| not allowed'.
-                      format(client_ip=client_ip))
+            log_debug('HTTPServer: Connection from |{client_ip| not allowed'
+                      .format(client_ip=client_ip))
         elif self.path != paths.PING:
             log_debug(' '.join(log_lines))
         return conn_allowed
@@ -80,7 +80,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         # Strip trailing slash if present
         stripped_path = self.path.rstrip('/')
         if stripped_path != paths.PING:
-            log_debug('HTTPServer: GET uri path |{path}|'.format(path=self.path))
+            log_debug('HTTPServer: GET |{path}|'.format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -97,7 +97,6 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         elif self.path.startswith(paths.MPD):
             filepath = os.path.join(self.BASE_PATH, self.path[len(paths.MPD):])
             file_chunk = True
-            log_debug('HTTPServer: GET filepath |{path}|'.format(path=filepath))
             try:
                 with open(filepath, 'rb') as f:
                     self.send_response(200)
@@ -189,7 +188,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        log_debug('HTTPServer: HEAD uri path |{path}|'.format(path=self.path))
+        log_debug('HTTPServer: HEAD |{path}|'.format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -212,7 +211,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_POST(self):
-        log_debug('HTTPServer: POST uri path |{path}|'.format(path=self.path))
+        log_debug('HTTPServer: POST |{path}|'.format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -542,7 +541,7 @@ def get_http_server(address=None, port=None):
         return None
 
 
-def is_httpd_live(address=None, port=None):
+def httpd_status(address=None, port=None):
     address = _settings.httpd_listen(for_request=True, ip_address=address)
     port = _settings.httpd_port(port=port)
     url = 'http://{address}:{port}{path}'.format(address=address,
@@ -553,7 +552,7 @@ def is_httpd_live(address=None, port=None):
     if result == 204:
         return True
 
-    log_debug('HTTPServer: Ping |{address}:{port}| |{response}|'
+    log_debug('HTTPServer: Ping |{address}:{port}| - |{response}|'
               .format(address=address,
                       port=port,
                       response=result or 'failed'))

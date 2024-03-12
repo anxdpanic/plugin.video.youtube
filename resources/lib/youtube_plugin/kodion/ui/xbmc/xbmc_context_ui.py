@@ -80,7 +80,7 @@ class XbmcContextUI(AbstractContextUI):
         result_map = {}
         dialog_items = []
         for idx, item in enumerate(items):
-            if isinstance(item, tuple):
+            if isinstance(item, (list, tuple)):
                 num_details = len(item)
                 if num_details > 2:
                     list_item = xbmcgui.ListItem(label=item[0],

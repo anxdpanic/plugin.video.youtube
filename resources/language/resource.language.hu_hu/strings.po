@@ -775,7 +775,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "%s port használatban van. Nem lehet elindítani a http kiszolgálót."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
 msgstr "Proxy szükséges az mpeg-dash formátumhoz (lásd HTTP kiszolgáló)"
 
 msgctxt "#30622"
@@ -823,8 +823,8 @@ msgid "Enable API configuration page"
 msgstr "API beállítások oldal engedélyezése"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ipaddress>:<port>/api (lásd HTTP kiszolgáló)"
+msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
+msgstr "http://<ipaddress>:<port>/youtube/api (lásd HTTP kiszolgáló)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -1183,7 +1183,7 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "A Proxyra van szükség az mpeg-dash vod esetén (lásd a HTTP szervert) [CR]> 1080p, és a HDR-hez pedig az InputStream Adaptive kiegészítő szükséges >= 2.3.14"
 
 msgctxt "#30724"

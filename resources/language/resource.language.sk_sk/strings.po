@@ -775,7 +775,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Port %s už je používaný. Nepodarilo sa spustiť http server."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
 msgstr "MPEG-DASH vyžaduje proxy (viď server HTTP)"
 
 msgctxt "#30622"
@@ -823,8 +823,8 @@ msgid "Enable API configuration page"
 msgstr "Zapnúť konfiguračnú stránku API"
 
 msgctxt "#30633"
-msgid "http://<ipaddress>:<port>/api (see HTTP Server)"
-msgstr "http://<ip_adresa>:<port>/api (viď server HTTP)"
+msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
+msgstr "http://<ip_adresa>:<port>/youtube/api (viď server HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -1183,7 +1183,7 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
 msgstr "Videá MPEG-DASH vyžadujú proxy (viď server HTTP)[CR]> 1080p a HDR videá vyžadujú InputStream Adaptive aspoň vo verzii 2.3.14"
 
 msgctxt "#30724"

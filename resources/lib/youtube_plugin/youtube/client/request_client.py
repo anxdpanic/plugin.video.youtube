@@ -55,7 +55,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '17.31.35',
+                        'clientVersion': '19.09.37',
                         'androidSdkVersion': '30',
                         'osName': 'Android',
                         'osVersion': '11',
@@ -86,11 +86,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '17.36.4',
+                        'clientVersion': '19.09.37',
                         'clientScreen': 'EMBED',
-                        'androidSdkVersion': '29',
+                        'androidSdkVersion': '30',
                         'osName': 'Android',
-                        'osVersion': '10',
+                        'osVersion': '11',
                         'platform': 'MOBILE',
                     },
                 },
@@ -149,10 +149,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '17.33.2',
-                        'deviceModel': 'iPhone14,3',
+                        'clientVersion': '19.09.3',
+                        'deviceModel': 'iPhone14,5',
                         'osName': 'iOS',
-                        'osVersion': '15_6',
+                        'osVersion': '17_4',
                         'platform': 'MOBILE',
                     },
                 },
@@ -205,7 +205,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'WEB',
-                        'clientVersion': '2.20220801.00.00',
+                        'clientVersion': '2.20240304.00.00',
                     },
                 },
             },
