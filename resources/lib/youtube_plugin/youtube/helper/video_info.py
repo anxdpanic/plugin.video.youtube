@@ -32,7 +32,7 @@ from ...kodion.compatibility import (
     xbmcvfs,
 )
 from ...kodion.constants import TEMP_PATH, paths
-from ...kodion.network import is_httpd_live
+from ...kodion.network import httpd_status
 from ...kodion.utils import make_dirs
 
 
@@ -1292,7 +1292,7 @@ class VideoInfo(YouTubeRequestClient):
 
         use_mpd_vod = _settings.use_mpd_videos()
         httpd_running = (_settings.use_isa() and
-                         is_httpd_live(port=_settings.httpd_port()))
+                         httpd_status(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not httpd_running:

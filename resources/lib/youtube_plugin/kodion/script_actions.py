@@ -15,7 +15,7 @@ import socket
 from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .constants import DATA_PATH, TEMP_PATH, WAIT_FLAG
 from .context import XbmcContext
-from .network import get_client_ip_address, is_httpd_live
+from .network import get_client_ip_address, httpd_status
 from .utils import rm_dir
 
 
@@ -93,7 +93,7 @@ def _config_actions(context, action, *_args):
     elif action == 'show_client_ip':
         port = settings.httpd_port()
 
-        if is_httpd_live(port=port):
+        if httpd_status(port=port):
             client_ip = get_client_ip_address(port=port)
             if client_ip:
                 ui.on_ok(context.get_name(),

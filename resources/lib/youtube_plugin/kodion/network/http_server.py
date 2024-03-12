@@ -541,7 +541,7 @@ def get_http_server(address=None, port=None):
         return None
 
 
-def is_httpd_live(address=None, port=None):
+def httpd_status(address=None, port=None):
     address = _settings.httpd_listen(for_request=True, ip_address=address)
     port = _settings.httpd_port(port=port)
     url = 'http://{address}:{port}{path}'.format(address=address,
