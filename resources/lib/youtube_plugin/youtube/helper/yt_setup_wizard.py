@@ -265,6 +265,21 @@ def process_geo_location(_provider, context, step, steps):
 
 
 
+def process_subtitles(_provider, context, step, steps):
+    localize = context.localize
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.subtitles'))
+    ):
+        context.execute('RunScript({addon_id},config/subtitles)'.format(
+            addon_id=ADDON_ID
+        ), wait_for=WAIT_FLAG)
+    return step
+
+
 def process_old_search_db(_provider, context, step, steps):
     localize = context.localize
     ui = context.get_ui()

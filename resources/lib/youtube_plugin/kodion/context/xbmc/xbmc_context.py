@@ -172,6 +172,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard.prompt.locale': 30527,
         'setup_wizard.prompt.my_location': 30653,
         'setup_wizard.prompt.settings': 30577,
+        'setup_wizard.prompt.subtitles': 30600,
         'sign.enter_code': 30519,
         'sign.go_to': 30518,
         'sign.in': 30111,
