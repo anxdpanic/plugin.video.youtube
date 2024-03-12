@@ -28,7 +28,8 @@ __all__ = (
     'find_best_fit',
     'find_video_id',
     'friendly_number',
-    'get_kodi_setting',
+    'get_kodi_setting_bool',
+    'get_kodi_setting_value',
     'loose_version',
     'make_dirs',
     'merge_dicts',
@@ -309,7 +310,7 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
     return new or _
 
 
-def get_kodi_setting(setting):
+def get_kodi_setting_value(setting):
     json_query = xbmc.executeJSONRPC(json.dumps({
         'jsonrpc': '2.0',
         'method': 'Settings.GetSettingValue',
@@ -318,3 +319,7 @@ def get_kodi_setting(setting):
     }))
     json_query = json.loads(json_query)
     return json_query.get('result', {}).get('value')
+
+
+def get_kodi_setting_bool(setting):
+    return xbmc.getCondVisibility('System.GetBool({0})'.format(setting))

@@ -21,13 +21,15 @@ class SearchHistory(Storage):
     _table_updated = False
     _sql = {}
 
-    def __init__(self, filepath, max_item_count=10):
+    def __init__(self, filepath, max_item_count=10, migrate=False):
         super(SearchHistory, self).__init__(filepath,
-                                            max_item_count=max_item_count)
+                                            max_item_count=max_item_count,
+                                            migrate=migrate)
 
-    def get_items(self):
+    def get_items(self, process=None):
         result = self._get_by_ids(oldest_first=False,
                                   limit=self._max_item_count,
+                                  process=process,
                                   values_only=True)
         return result
 
@@ -44,5 +46,5 @@ class SearchHistory(Storage):
     def remove(self, search_text):
         self._remove(self._make_id(search_text))
 
-    def update(self, search_text):
-        self._set(self._make_id(search_text), search_text)
+    def update(self, search_text, timestamp=None):
+        self._set(self._make_id(search_text), search_text, timestamp)

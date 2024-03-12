@@ -50,8 +50,6 @@ class XbmcContext(AbstractContext):
         'are_you_sure': 30703,
         'auto_remove_watch_later': 30515,
         'browse_channels': 30512,
-        'cache.data': 30687,
-        'cache.function': 30557,
         'cancel': 30615,
         'channels': 30500,
         'client.id.incorrect': 30649,
@@ -112,6 +110,11 @@ class XbmcContext(AbstractContext):
         'live': 30539,
         'live.completed': 30647,
         'live.upcoming': 30646,
+        'maintenance.data_cache': 30687,
+        'maintenance.function_cache': 30557,
+        'maintenance.playback_history': 30673,
+        'maintenance.search_history': 30558,
+        'maintenance.watch_later': 30782,
         'must_be_signed_in': 30616,
         'my_channel': 30507,
         'my_location': 30654,
@@ -123,8 +126,6 @@ class XbmcContext(AbstractContext):
         'my_subscriptions.filtered': 30584,
         'next_page': 30106,
         'none': 30561,
-        'perform_geolocation': 30653,
-        'playback.history': 30673,
         'playlist.added_to': 30714,
         'playlist.create': 30522,
         'playlist.play.all': 30531,
@@ -153,7 +154,6 @@ class XbmcContext(AbstractContext):
         'saved.playlists': 30611,
         'search': 30102,
         'search.clear': 30120,
-        'search.history': 30558,
         'search.new': 30110,
         'search.quick': 30605,
         'search.quick.incognito': 30606,
@@ -163,11 +163,26 @@ class XbmcContext(AbstractContext):
         'select.listen.ip': 30644,
         'select_video_quality': 30010,
         'settings': 30577,
-        'setup_wizard.adjust': 30526,
-        'setup_wizard.adjust.language_and_region': 30527,
-        'setup_wizard.execute': 30030,
-        'setup_wizard.select_language': 30524,
-        'setup_wizard.select_region': 30525,
+        'setup_wizard': 30526,
+        'setup_wizard.capabilities': 30786,
+        'setup_wizard.capabilities.old': 30787,
+        'setup_wizard.capabilities.low': 30788,
+        'setup_wizard.capabilities.medium': 30789,
+        'setup_wizard.capabilities.high': 30790,
+        'setup_wizard.capabilities.recent': 30791,
+        'setup_wizard.capabilities.max': 30792,
+        'setup_wizard.locale.language': 30524,
+        'setup_wizard.locale.region': 30525,
+        'setup_wizard.prompt': 30030,
+        'setup_wizard.prompt.import_playback_history': 30778,
+        'setup_wizard.prompt.import_search_history': 30779,
+        'setup_wizard.prompt.locale': 30527,
+        'setup_wizard.prompt.my_location': 30653,
+        'setup_wizard.prompt.settings': 30577,
+        'setup_wizard.prompt.settings.defaults': 30783,
+        'setup_wizard.prompt.settings.list_details': 30784,
+        'setup_wizard.prompt.settings.performance': 30785,
+        'setup_wizard.prompt.subtitles': 30600,
         'sign.enter_code': 30519,
         'sign.go_to': 30518,
         'sign.in': 30111,
@@ -484,9 +499,15 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    @staticmethod
-    def execute(command):
-        xbmc.executebuiltin(command)
+    def execute(self, command, wait=True, wait_for=None):
+        xbmc.executebuiltin(command, wait)
+        if wait_for:
+            ui = self.get_ui()
+            monitor = xbmc.Monitor()
+            while not monitor.abortRequested():
+                monitor.waitForAbort(1)
+                if not ui.get_property(wait_for):
+                    break
 
     @staticmethod
     def sleep(milli_seconds):

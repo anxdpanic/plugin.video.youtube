@@ -28,6 +28,7 @@ class Storage(object):
     ONE_WEEK = 7 * ONE_DAY
     ONE_MONTH = 4 * ONE_WEEK
 
+    _base = None
     _table_name = 'storage_v2'
     _table_created = False
     _table_updated = False
@@ -65,13 +66,13 @@ class Storage(object):
         'get_many': (
             'SELECT *'
             ' FROM {table}'
-            ' ORDER BY timestamp'
+            ' ORDER BY {order_col}'
             ' LIMIT {{0}};'
         ),
         'get_many_desc': (
             'SELECT *'
             ' FROM {table}'
-            ' ORDER BY timestamp DESC'
+            ' ORDER BY {order_col} DESC'
             ' LIMIT {{0}};'
         ),
         'has_old_table': (
@@ -136,19 +137,33 @@ class Storage(object):
         ),
     }
 
-    def __init__(self, filepath, max_item_count=-1, max_file_size_kb=-1):
+    def __init__(self,
+                 filepath,
+                 max_item_count=-1,
+                 max_file_size_kb=-1,
+                 migrate=False):
         self._filepath = filepath
         self._db = None
         self._cursor = None
-        self._max_item_count = max_item_count
-        self._max_file_size_kb = max_file_size_kb
+        self._max_item_count = -1 if migrate else max_item_count
+        self._max_file_size_kb = -1 if migrate else max_file_size_kb
 
-        if not self._sql:
+        if migrate:
+            self._base = self
+            self._sql = {}
+            self._table_name = migrate
+            self._table_created = True
+            self._table_updated = True
+        else:
+            self._base = self.__class__
+
+        if migrate or not self._sql:
             statements = {
-                name: sql.format(table=self._table_name)
+                name: sql.format(table=self._table_name,
+                                 order_col='time' if migrate else 'timestamp')
                 for name, sql in Storage._sql.items()
             }
-            self.__class__._sql.update(statements)
+            self._base._sql.update(statements)
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
@@ -170,8 +185,8 @@ class Storage(object):
     def _open(self):
         if not os.path.exists(self._filepath):
             make_dirs(os.path.dirname(self._filepath))
-            self.__class__._table_created = False
-            self.__class__._table_updated = True
+            self._base._table_created = False
+            self._base._table_updated = True
 
         for _ in range(3):
             try:
@@ -228,8 +243,8 @@ class Storage(object):
             sql_script[transaction_begin:transaction_begin] = statements
         self._execute(cursor, '\n'.join(sql_script), script=True)
 
-        self.__class__._table_created = True
-        self.__class__._table_updated = True
+        self._base._table_created = True
+        self._base._table_updated = True
         self._db = db
         self._cursor = cursor
 
@@ -311,8 +326,8 @@ class Storage(object):
             self._execute(cursor, 'VACUUM')
         return True
 
-    def _set(self, item_id, item):
-        values = self._encode(item_id, item)
+    def _set(self, item_id, item, timestamp=None):
+        values = self._encode(item_id, item, timestamp)
         optimize_query = self._optimize_item_count(1, defer=True)
         with self as (db, cursor), db:
             if optimize_query:

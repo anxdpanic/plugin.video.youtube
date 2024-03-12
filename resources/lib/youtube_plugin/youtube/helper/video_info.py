@@ -32,7 +32,7 @@ from ...kodion.compatibility import (
     xbmcvfs,
 )
 from ...kodion.constants import TEMP_PATH, paths
-from ...kodion.network import is_httpd_live
+from ...kodion.network import httpd_status
 from ...kodion.utils import make_dirs
 
 
@@ -1292,7 +1292,7 @@ class VideoInfo(YouTubeRequestClient):
 
         use_mpd_vod = _settings.use_mpd_videos()
         httpd_running = (_settings.use_isa() and
-                         is_httpd_live(port=_settings.httpd_port()))
+                         httpd_status(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not httpd_running:
@@ -1337,7 +1337,7 @@ class VideoInfo(YouTubeRequestClient):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         manifest_url = main_stream = None
-        live_type = _settings.get_live_stream_type() if is_live else None
+        live_type = _settings.live_stream_type() if is_live else None
 
         if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']
@@ -1426,7 +1426,7 @@ class VideoInfo(YouTubeRequestClient):
 
     def _process_stream_data(self, stream_data, default_lang_code='und'):
         _settings = self._context.get_settings()
-        qualities = _settings.get_mpd_video_qualities()
+        qualities = _settings.mpd_video_qualities()
         isa_capabilities = self._context.inputstream_adaptive_capabilities()
         stream_features = _settings.stream_features()
         allow_hdr = 'hdr' in stream_features

@@ -15,7 +15,7 @@ import threading
 from ..compatibility import unquote, xbmc, xbmcaddon
 from ..constants import ADDON_ID
 from ..logger import log_debug
-from ..network import get_http_server, is_httpd_live
+from ..network import get_http_server, httpd_status
 from ..settings import XbmcPluginSettings
 
 
@@ -158,4 +158,4 @@ class ServiceMonitor(xbmc.Monitor):
         self.start_httpd()
 
     def ping_httpd(self):
-        return is_httpd_live(port=self.httpd_port())
+        return httpd_status(port=self.httpd_port())
