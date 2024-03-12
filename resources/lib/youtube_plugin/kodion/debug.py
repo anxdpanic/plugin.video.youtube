@@ -10,9 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
 import os
-from io import open
 
 from .logger import log_debug
 
@@ -22,42 +20,19 @@ def debug_here(host='localhost'):
 
     for comp in sys.path:
         if comp.find('addons') != -1:
-            pydevd_path = os.path.normpath(os.path.join(comp, os.pardir, 'script.module.pydevd', 'lib'))
+            pydevd_path = os.path.normpath(os.path.join(
+                comp,
+                os.pardir,
+                'script.module.pydevd',
+                'lib',
+            ))
             sys.path.append(pydevd_path)
             break
 
     # noinspection PyUnresolvedReferences,PyPackageRequirements
     import pydevd
+
     pydevd.settrace(host, stdoutToServer=True, stderrToServer=True)
-
-
-def runtime(context, addon_version, elapsed, single_file=True):
-    if not single_file:
-        filename_path_part = context.get_path().lstrip('/').rstrip('/').replace('/', '_')
-        debug_file_name = 'runtime_%s-%s.json' % (filename_path_part, addon_version)
-        default_contents = {"runtimes": []}
-    else:
-        debug_file_name = 'runtime-%s.json' % addon_version
-        default_contents = {"runtimes": {}}
-
-    debug_file = os.path.join(context.get_debug_path(), debug_file_name)
-    with open(debug_file, 'a') as _:
-        pass  # touch
-
-    with open(debug_file, 'r', encoding='utf-8') as f:
-        contents = f.read()
-
-    with open(debug_file, 'w', encoding='utf-8') as f:
-        contents = json.loads(contents) if contents else default_contents
-        if not single_file:
-            items = contents.get('runtimes', [])
-            items.append({"path": context.get_path(), "parameters": context.get_params(), "runtime": round(elapsed, 4)})
-            contents['runtimes'] = items
-        else:
-            items = contents.get('runtimes', {}).get(context.get_path(), [])
-            items.append({"parameters": context.get_params(), "runtime": round(elapsed, 4)})
-            contents['runtimes'][context.get_path()] = items
-        f.write(json.dumps(contents, indent=4))
 
 
 class Profiler(object):
@@ -67,11 +42,13 @@ class Profiler(object):
 
     from cProfile import Profile as _Profile
     from pstats import Stats as _Stats
+
     try:
         from StringIO import StringIO as _StringIO
     except ImportError:
         from io import StringIO as _StringIO
     from functools import wraps as _wraps
+
     _wraps = staticmethod(_wraps)
     from weakref import ref as _ref
 
@@ -111,7 +88,8 @@ class Profiler(object):
             self._create_profiler()
 
     def __del__(self):
-        self.__class__._instances.discard(self)  # pylint: disable=protected-access
+        # pylint: disable=protected-access
+        self.__class__._instances.discard(self)
 
     def __enter__(self):
         if not self._enabled:

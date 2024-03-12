@@ -11,7 +11,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import os
 import sys
 import weakref
 
@@ -24,7 +23,6 @@ from ...compatibility import (
     xbmc,
     xbmcaddon,
     xbmcplugin,
-    xbmcvfs,
 )
 from ...constants import ADDON_ID, content, sort
 from ...player import XbmcPlayer, XbmcPlaylist
@@ -404,13 +402,6 @@ class XbmcContext(AbstractContext):
 
     def get_data_path(self):
         return self._data_path
-
-    def get_debug_path(self):
-        if not self._debug_path:
-            self._debug_path = os.path.join(self.get_data_path(), 'debug')
-            if not xbmcvfs.exists(self._debug_path):
-                xbmcvfs.mkdir(self._debug_path)
-        return self._debug_path
 
     def get_addon_path(self):
         return self._addon_path
