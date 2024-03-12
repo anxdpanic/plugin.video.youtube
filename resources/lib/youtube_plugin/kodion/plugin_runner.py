@@ -10,31 +10,37 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import copy
-import platform
-
-from .context import XbmcContext
-from .plugin import XbmcPlugin
-
 
 __all__ = ('run',)
 
 
-__PLUGIN__ = XbmcPlugin()
-
-
 def run(provider, context=None):
+    from .compatibility import xbmc
 
+    profiler = xbmc.getCondVisibility('System.GetBool(debug.showloginfo)')
+    if profiler:
+        from .debug import Profiler
+
+        profiler = Profiler(enabled=True, lazy=False)
+
+    from copy import deepcopy
+    from platform import python_version
+
+    from .plugin import XbmcPlugin
+
+    plugin = XbmcPlugin()
     if not context:
+        from .context import XbmcContext
+
         context = XbmcContext()
 
     context.log_debug('Starting Kodion framework by bromix...')
 
     addon_version = context.get_version()
-    python_version = 'Python {0}'.format(platform.python_version())
+    python_version = 'Python {0}'.format(python_version())
 
     redacted = '<redacted>'
-    params = copy.deepcopy(context.get_params())
+    params = deepcopy(context.get_params())
     if 'api_key' in params:
         params['api_key'] = redacted
     if 'client_id' in params:
@@ -52,6 +58,8 @@ def run(provider, context=None):
                                path=context.get_path(),
                                params=params))
 
-    __PLUGIN__.run(provider, context)
+    plugin.run(provider, context)
     provider.tear_down(context)
 
+    if profiler:
+        profiler.print_stats()
