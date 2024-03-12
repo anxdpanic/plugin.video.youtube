@@ -12,23 +12,18 @@ from __future__ import absolute_import, division, unicode_literals
 
 import copy
 import platform
-import timeit
 
-from . import debug
 from .context import XbmcContext
 from .plugin import XbmcPlugin
 
 
 __all__ = ('run',)
 
-__DEBUG_RUNTIME = False
-__DEBUG_RUNTIME_SINGLE_FILE = False
 
 __PLUGIN__ = XbmcPlugin()
 
 
 def run(provider, context=None):
-    start_time = timeit.default_timer()
 
     if not context:
         context = XbmcContext()
@@ -60,13 +55,3 @@ def run(provider, context=None):
     __PLUGIN__.run(provider, context)
     provider.tear_down(context)
 
-    elapsed = timeit.default_timer() - start_time
-
-    if __DEBUG_RUNTIME:
-        debug.runtime(context,
-                      addon_version,
-                      elapsed,
-                      single_file=__DEBUG_RUNTIME_SINGLE_FILE)
-
-    context.log_debug('Shutdown of Kodion after |{elapsed:.4}| seconds'
-                      .format(elapsed=elapsed))
