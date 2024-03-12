@@ -1290,11 +1290,12 @@ class VideoInfo(YouTubeRequestClient):
                 'watchtime_url': '',
             }
 
-        httpd_is_live = (_settings.use_isa() and
+        use_mpd_vod = _settings.use_mpd_videos()
+        httpd_running = (_settings.use_isa() and
                          is_httpd_live(port=_settings.httpd_port()))
 
         pa_li_info = streaming_data.get('licenseInfos', [])
-        if any(pa_li_info) and not httpd_is_live:
+        if any(pa_li_info) and not httpd_running:
             raise YouTubeException('Proxy is not running')
         for li_info in pa_li_info:
             if li_info.get('drmFamily') != 'WIDEVINE':
@@ -1322,8 +1323,12 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         stream_list = []
-        adaptive_fmts = streaming_data.get('adaptiveFormats', [])
-        all_fmts = streaming_data.get('formats', []) + adaptive_fmts
+        if httpd_running and use_mpd_vod:
+            adaptive_fmts = streaming_data.get('adaptiveFormats', [])
+            all_fmts = streaming_data.get('formats', []) + adaptive_fmts
+        else:
+            adaptive_fmts = None
+            all_fmts = streaming_data.get('formats', [])
 
         if any(True for fmt in all_fmts
                if fmt and 'url' not in fmt and 'signatureCipher' in fmt):
@@ -1341,9 +1346,11 @@ class VideoInfo(YouTubeRequestClient):
                 streaming_data['hlsManifestUrl'],
                 live_type, meta_info, client['headers'], playback_stats
             ))
+        else:
+            live_type = None
 
         # extract adaptive streams and create MPEG-DASH manifest
-        if not manifest_url and httpd_is_live and adaptive_fmts:
+        if not live_type and not manifest_url and adaptive_fmts:
             video_data, audio_data = self._process_stream_data(
                 adaptive_fmts, default_lang['code']
             )
