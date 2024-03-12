@@ -33,7 +33,7 @@ class YouTube(LoginClient):
                 'context': {
                     'client': {
                         'clientName': 'WEB',
-                        'clientVersion': '2.20220801.00.00',
+                        'clientVersion': '2.20240304.00.00',
                     },
                 },
             },
@@ -58,7 +58,7 @@ class YouTube(LoginClient):
                 'context': {
                     'client': {
                         'clientName': 'TVHTML5',
-                        'clientVersion': '5.20150304',
+                        'clientVersion': '7.20240304.10.00',
                     },
                 },
             },
