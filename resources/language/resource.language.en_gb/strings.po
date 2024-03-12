@@ -149,7 +149,7 @@ msgid "View: Movies"
 msgstr ""
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
+msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
@@ -914,7 +914,7 @@ msgid "Location radius (km)"
 msgstr ""
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
+msgid "My Location using IP geolocation lookup"
 msgstr ""
 
 msgctxt "#30654"

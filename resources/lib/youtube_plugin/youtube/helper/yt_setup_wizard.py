@@ -185,12 +185,17 @@ DEFAULT_REGIONS = {'items': [
 ]}
 
 
-def _process_language(provider, context):
-    if not context.get_ui().on_yes_no_input(
-        context.localize('setup_wizard.adjust'),
-        context.localize('setup_wizard.adjust.language_and_region')
+def process_language(provider, context, step, steps):
+    localize = context.localize
+    ui = context.get_ui()
+
+    step += 1
+    if not ui.on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.locale')),
     ):
-        return
+        return step
 
     client = provider.get_client(context)
 
@@ -203,12 +208,12 @@ def _process_language(provider, context):
         for item in items
         if item['id'] not in invalid_ids
     ])
-    language_id = context.get_ui().on_select(
-        context.localize('setup_wizard.select_language'),
+    language_id = ui.on_select(
+        localize('setup_wizard.locale.language'),
         language_list,
     )
     if language_id == -1:
-        return
+        return step
 
     json_data = client.get_supported_regions(language=language_id)
     items = json_data.get('items') or DEFAULT_REGIONS['items']
@@ -216,32 +221,38 @@ def _process_language(provider, context):
         (item['snippet']['name'], item['snippet']['gl'])
         for item in items
     ])
-    region_id = context.get_ui().on_select(
-        context.localize('setup_wizard.select_region'),
+    region_id = ui.on_select(
+        localize('setup_wizard.locale.region'),
         region_list,
     )
     if region_id == -1:
-        return
+        return step
 
     # set new language id and region id
-    context.get_settings().set_string('youtube.language', language_id)
-    context.get_settings().set_string('youtube.region', region_id)
+    settings = context.get_settings()
+    settings.set_string('youtube.language', language_id)
+    settings.set_string('youtube.region', region_id)
     provider.reset_client()
+    return step
 
 
-def _process_geo_location(context):
-    if not context.get_ui().on_yes_no_input(
-        context.get_name(), context.localize('perform_geolocation')
+def process_geo_location(_provider, context, step, steps):
+    localize = context.localize
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+        (localize('setup_wizard.prompt')
+         % localize('setup_wizard.prompt.my_location')),
     ):
-        return
+        locator = Locator()
+        locator.locate_requester()
+        coords = locator.coordinates()
+        if coords:
+            context.get_settings().set_location(
+                '{0[lat]},{0[lon]}'.format(coords)
+            )
+    return step
+    ):
 
-    locator = Locator()
-    locator.locate_requester()
-    coords = locator.coordinates()
-    if coords:
-        context.get_settings().set_location('{0[lat]},{0[lon]}'.format(coords))
 
-
-def process(provider, context):
-    _process_language(provider, context)
-    _process_geo_location(context)

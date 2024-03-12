@@ -56,7 +56,11 @@ class Provider(AbstractProvider):
         self.yt_video = yt_video
 
     def get_wizard_steps(self, context):
-        return [(yt_setup_wizard.process, (self, context))]
+        steps = [
+            yt_setup_wizard.process_language,
+            yt_setup_wizard.process_geo_location,
+        ]
+        return steps
 
     def is_logged_in(self):
         return self._logged_in
