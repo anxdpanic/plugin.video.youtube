@@ -706,7 +706,7 @@ msgid "Subtitles"
 msgstr ""
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
+msgid "%s with Original/%s fallback"
 msgstr ""
 
 msgctxt "#30602"
@@ -1409,6 +1409,9 @@ msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
 msgstr ""
 
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr ""
 
 msgctxt "#30778"
 msgid "Import old playback history?"
@@ -1451,7 +1454,7 @@ msgid "720p | Limited or older devices"
 msgstr ""
 
 msgctxt "#30788"
-msgid "1080p/30 fps | Rasberry Pi 4B or similar"
+msgid "1080p/30 fps | Rasberry Pi 4B, or similar"
 msgstr ""
 
 msgctxt "#30789"
@@ -1459,11 +1462,11 @@ msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Rasberry Pi 5, or similar"
 msgstr ""
 
 msgctxt "#30790"
-msgid "4K/60 fps, HDR if compatible | Amlogic S905X3 based device, Shield TV, or similar"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
 msgstr ""
 
 msgctxt "#30791"
-msgid "4K/60 fps, HDR, using AV1 | Amlogic S905X4 based device, Fire TV Cube 3rd Gen, or similar"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
 msgstr ""
 
 msgctxt "#30792"
