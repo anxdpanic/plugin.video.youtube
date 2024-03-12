@@ -783,7 +783,7 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="kodion.view.default" type="integer" label="30027" help="">
+                <setting id="kodion.view.default" type="integer" parent="kodion.view.override" label="30027" help="">
                     <level>0</level>
                     <default>55</default>
                     <dependencies>
@@ -795,7 +795,7 @@
                         <heading>30027</heading>
                     </control>
                 </setting>
-                <setting id="kodion.view.episodes" type="integer" label="30028" help="">
+                <setting id="kodion.view.episodes" type="integer" parent="kodion.view.override" label="30028" help="">
                     <level>0</level>
                     <default>55</default>
                     <dependencies>
