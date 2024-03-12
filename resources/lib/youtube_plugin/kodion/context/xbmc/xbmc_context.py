@@ -438,6 +438,7 @@ class XbmcContext(AbstractContext):
             type=(sub_type or content_type), path=self.get_path()
         ))
         xbmcplugin.setContent(self._plugin_handle, content_type)
+        self.get_ui().get_view_manager().set_view_mode(content_type)
         if category_label is None:
             category_label = self.get_param('category_label')
         if category_label:
