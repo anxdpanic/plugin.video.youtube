@@ -1038,9 +1038,10 @@ class YouTube(LoginClient):
 
     def get_live_events(self,
                         event_type='live',
-                        order='relevance',
+                        order='date',
                         page_token='',
                         location=False,
+                        after=None,
                         **kwargs):
         """
         :param event_type: one of: 'live', 'completed', 'upcoming'
@@ -1072,6 +1073,9 @@ class YouTube(LoginClient):
 
         if page_token:
             params['pageToken'] = page_token
+
+        if after:
+            params['publishedAfter'] = after
 
         return self.api_request(method='GET',
                                 path='search',

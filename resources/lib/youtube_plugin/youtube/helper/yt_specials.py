@@ -15,6 +15,7 @@ from ...kodion import KodionException
 from ...kodion.constants import content
 from ...kodion.items import DirectoryItem, UriItem
 from ...kodion.utils import strip_html_from_text
+from ...kodion.utils.datetime_parser import yt_datetime_offset
 
 
 def _process_related_videos(provider, context):
@@ -138,21 +139,22 @@ def _process_disliked_videos(provider, context):
 
 
 def _process_live_events(provider, context, event_type='live'):
-    def _sort(x):
-        return x.get_date()
-
     context.set_content(content.VIDEO_CONTENT)
 
     # TODO: cache result
     json_data = provider.get_client(context).get_live_events(
         event_type=event_type,
+        order='date' if event_type == 'upcoming' else 'viewCount',
         page_token=context.get_param('page_token', ''),
         location=context.get_param('location', False),
+        after=(yt_datetime_offset(days=3)
+               if event_type == 'completed' else
+               None),
     )
 
     if not json_data:
         return False
-    return v3.response_to_items(provider, context, json_data, sort=_sort)
+    return v3.response_to_items(provider, context, json_data)
 
 
 def _process_description_links(provider, context):
@@ -329,7 +331,7 @@ def process(category, provider, context):
     if category == 'disliked_videos':
         return _process_disliked_videos(provider, context)
     if category == 'live':
-        return _process_live_events(provider, context)
+        return _process_live_events(provider, context, event_type='live')
     if category == 'upcoming_live':
         return _process_live_events(provider, context, event_type='upcoming')
     if category == 'completed_live':

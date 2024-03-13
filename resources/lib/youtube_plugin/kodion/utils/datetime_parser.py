@@ -291,3 +291,12 @@ def since_epoch(dt_object=None):
     if dt_object is None:
         dt_object = now(tz=timezone.utc) if timezone else datetime.utcnow()
     return (dt_object - __INTERNAL_CONSTANTS__['epoch_dt']).total_seconds()
+
+
+def yt_datetime_offset(**kwargs):
+    if timezone:
+        _now = now(tz=timezone.utc)
+    else:
+        _now = datetime.utcnow()
+
+    return (_now - timedelta(**kwargs)).strftime('%Y-%m-%dT%H:%M:%SZ')
