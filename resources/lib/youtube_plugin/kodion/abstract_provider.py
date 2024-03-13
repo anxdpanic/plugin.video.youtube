@@ -55,7 +55,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             paths.HISTORY,
-            '/$'
+            '/?$'
         )), 'on_playback_history')
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',

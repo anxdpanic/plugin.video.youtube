@@ -37,7 +37,7 @@ __COLOR_MAP = {
 }
 
 __RE_PLAYLIST_MATCH = re.compile(
-    r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/$'
+    r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
 
 __RE_SEASON_EPISODE_MATCHES__ = [
