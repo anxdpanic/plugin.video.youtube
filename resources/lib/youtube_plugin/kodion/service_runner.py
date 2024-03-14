@@ -34,12 +34,20 @@ def run():
 
     wait_interval = 10
     ping_period = waited = 60
+    restart_attempts = 0
     while not monitor.abortRequested():
         if waited >= ping_period:
             waited = 0
 
             if monitor.httpd and not monitor.ping_httpd():
-                monitor.restart_httpd()
+                restart_attempts += 1
+                if restart_attempts > 5:
+                    monitor.shutdown_httpd()
+                    restart_attempts = 0
+                else:
+                    monitor.restart_httpd()
+            else:
+                restart_attempts = 0
 
         if monitor.waitForAbort(wait_interval):
             break
