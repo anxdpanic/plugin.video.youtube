@@ -196,7 +196,7 @@ def video_playback_item(context, video_item, show_fanart=None):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
-    alternative_player = settings.is_support_alternative_player_enabled()
+    alternative_player = settings.support_alternative_player()
     is_strm = context.get_param('strm')
     mime_type = None
 
@@ -216,7 +216,6 @@ def video_playback_item(context, video_item, show_fanart=None):
         'isPlayable': str(video_item.playable).lower(),
     }
 
-    manifest_type = None
     if (alternative_player
             and settings.alternative_player_web_urls()
             and not license_key):

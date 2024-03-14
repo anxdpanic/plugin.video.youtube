@@ -215,7 +215,7 @@ def process_language(provider, context, step, steps):
 
     json_data = client.get_supported_languages(kodi_language)
     items = json_data.get('items') or DEFAULT_LANGUAGES['items']
-    
+
     selected_language = [None]
 
     def _get_selected_language(item):
@@ -322,6 +322,8 @@ def process_default_settings(_provider, context, step, steps):
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.live_stream_type(2)
+        if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
+            settings.alternative_player_web_urls(False)
         settings.cache_size(20)
     return step
 

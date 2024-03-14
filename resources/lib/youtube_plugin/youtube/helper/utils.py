@@ -369,7 +369,7 @@ def update_video_infos(provider, context, video_id_dict,
 
     settings = context.get_settings()
     hide_shorts = settings.hide_short_videos()
-    alternate_player = settings.is_support_alternative_player_enabled()
+    alternate_player = settings.support_alternative_player()
     show_details = settings.show_detailed_description()
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()

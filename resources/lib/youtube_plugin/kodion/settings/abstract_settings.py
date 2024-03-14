@@ -107,10 +107,14 @@ class AbstractSettings(object):
             return True
         return self.get_bool(settings.SETUP_WIZARD, False)
 
-    def is_support_alternative_player_enabled(self):
+    def support_alternative_player(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.SUPPORT_ALTERNATIVE_PLAYER, value)
         return self.get_bool(settings.SUPPORT_ALTERNATIVE_PLAYER, False)
 
-    def alternative_player_web_urls(self):
+    def alternative_player_web_urls(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, value)
         return self.get_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, False)
 
     def use_isa(self, value=None):
