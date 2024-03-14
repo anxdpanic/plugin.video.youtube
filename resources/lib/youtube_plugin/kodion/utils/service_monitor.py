@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import threading
 
-from ..compatibility import unquote, xbmc, xbmcaddon
+from ..compatibility import xbmc, xbmcaddon
 from ..constants import ADDON_ID
 from ..logger import log_debug
 from ..network import get_http_server, httpd_status
@@ -36,10 +36,12 @@ class ServiceMonitor(xbmc.Monitor):
         super(ServiceMonitor, self).__init__()
 
     def onNotification(self, sender, method, data):
-        if sender == ADDON_ID and method.endswith('.check_settings'):
+        if sender != ADDON_ID:
+            return
+
+        if method.endswith('.check_settings'):
             if not isinstance(data, dict):
                 data = json.loads(data)
-                data = json.loads(unquote(data[0]))
             log_debug('onNotification: |check_settings| -> |{data}|'
                       .format(data=data))
 
@@ -76,8 +78,7 @@ class ServiceMonitor(xbmc.Monitor):
                     self.restart_httpd()
                 else:
                     self.start_httpd()
-
-        elif sender == ADDON_ID:
+        else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
 
