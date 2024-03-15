@@ -15,24 +15,29 @@ import threading
 from ..compatibility import xbmc, xbmcaddon
 from ..constants import ADDON_ID
 from ..logger import log_debug
-from ..network import get_http_server, httpd_status
+from ..network import get_connect_address, get_http_server, httpd_status
 from ..settings import XbmcPluginSettings
 
 
 class ServiceMonitor(xbmc.Monitor):
     _settings = XbmcPluginSettings(xbmcaddon.Addon(ADDON_ID))
+    _settings_changes = 0
+    _settings_state = None
 
     def __init__(self):
         settings = self._settings
+        self._use_httpd = settings.use_isa() or settings.api_config_page()
+        address, port = get_connect_address()
+        self._old_httpd_address = self._httpd_address = address
+        self._old_httpd_port = self._httpd_port = port
         self._whitelist = settings.httpd_whitelist()
-        self._old_httpd_port = self._httpd_port = int(settings.httpd_port())
-        self._use_httpd = (settings.use_mpd_videos()
-                           or settings.api_config_page())
-        self._old_httpd_address = self._httpd_address = settings.httpd_listen()
+
         self.httpd = None
         self.httpd_thread = None
-        if self.use_httpd():
+
+        if self._use_httpd:
             self.start_httpd()
+
         super(ServiceMonitor, self).__init__()
 
     def onNotification(self, sender, method, data):
@@ -45,44 +50,30 @@ class ServiceMonitor(xbmc.Monitor):
             log_debug('onNotification: |check_settings| -> |{data}|'
                       .format(data=data))
 
-            _use_httpd = data.get('use_httpd')
-            _httpd_port = data.get('httpd_port')
-            _whitelist = data.get('whitelist')
-            _httpd_address = data.get('httpd_address')
-
-            whitelist_changed = _whitelist != self._whitelist
-            port_changed = self._httpd_port != _httpd_port
-            address_changed = self._httpd_address != _httpd_address
-
-            if whitelist_changed:
-                self._whitelist = _whitelist
-
-            if self._use_httpd != _use_httpd:
-                self._use_httpd = _use_httpd
-
-            if port_changed:
-                self._old_httpd_port = self._httpd_port
-                self._httpd_port = _httpd_port
-
-            if address_changed:
-                self._old_httpd_address = self._httpd_address
-                self._httpd_address = _httpd_address
-
-            if not _use_httpd:
-                if self.httpd:
-                    self.shutdown_httpd()
-            elif not self.httpd:
-                self.start_httpd()
-            elif port_changed or whitelist_changed or address_changed:
-                if self.httpd:
-                    self.restart_httpd()
-                else:
-                    self.start_httpd()
+            if data == 'defer':
+                self._settings_state = data
+                return
+            if data == 'process':
+                self._settings_state = data
+                self.onSettingsChanged()
+                self._settings_state = None
+                return
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
 
     def onSettingsChanged(self):
+        self._settings_changes += 1
+        if self._settings_state == 'defer':
+            return
+        changes = self._settings_changes
+        if self._settings_state != 'process':
+            self.waitForAbort(1)
+            if changes != self._settings_changes:
+                return
+        if changes > 1:
+            log_debug('onSettingsChanged: {0} changes'.format(changes))
+
         settings = self._settings
         settings.flush(xbmcaddon.Addon(ADDON_ID))
         if xbmc.getInfoLabel('Container.FolderPath').startswith(
@@ -90,30 +81,41 @@ class ServiceMonitor(xbmc.Monitor):
         ):
             xbmc.executebuiltin('Container.Refresh')
 
-        data = {
-            'use_httpd': (settings.use_isa() or settings.api_config_page()),
-            'httpd_port': settings.httpd_port(),
-            'whitelist': settings.httpd_whitelist(),
-            'httpd_address': settings.httpd_listen()
-        }
-        self.onNotification(ADDON_ID, 'Other.check_settings', data)
+        use_httpd = settings.use_isa() or settings.api_config_page()
+        address, port = get_connect_address()
+        whitelist = settings.httpd_whitelist()
 
-    def use_httpd(self):
-        return self._use_httpd
+        whitelist_changed = whitelist != self._whitelist
+        port_changed = port != self._httpd_port
+        address_changed = address != self._httpd_address
 
-    def httpd_port(self):
-        return int(self._httpd_port)
+        if whitelist_changed:
+            self._whitelist = whitelist
 
-    def httpd_address(self):
-        return self._httpd_address
+        if self._use_httpd != use_httpd:
+            self._use_httpd = use_httpd
 
-    def old_httpd_address(self):
-        return self._old_httpd_address
+        if port_changed:
+            self._old_httpd_port = self._httpd_port
+            self._httpd_port = port
 
-    def old_httpd_port(self):
-        return int(self._old_httpd_port)
+        if address_changed:
+            self._old_httpd_address = self._httpd_address
+            self._httpd_address = address
 
-    def httpd_port_sync(self):
+        if not use_httpd:
+            if self.httpd:
+                self.shutdown_httpd()
+        elif not self.httpd:
+            self.start_httpd()
+        elif port_changed or whitelist_changed or address_changed:
+            if self.httpd:
+                self.restart_httpd()
+            else:
+                self.start_httpd()
+
+    def httpd_address_sync(self):
+        self._old_httpd_address = self._httpd_address
         self._old_httpd_port = self._httpd_port
 
     def start_httpd(self):
@@ -121,28 +123,27 @@ class ServiceMonitor(xbmc.Monitor):
             return
 
         log_debug('HTTPServer: Starting |{ip}:{port}|'
-                  .format(ip=self.httpd_address(), port=str(self.httpd_port())))
-        self.httpd_port_sync()
-        self.httpd = get_http_server(address=self.httpd_address(),
-                                     port=self.httpd_port())
+                  .format(ip=self._httpd_address, port=self._httpd_port))
+        self.httpd_address_sync()
+        self.httpd = get_http_server(address=self._httpd_address,
+                                     port=self._httpd_port)
         if not self.httpd:
             return
 
         self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
         self.httpd_thread.daemon = True
         self.httpd_thread.start()
-        sock_name = self.httpd.socket.getsockname()
-        log_debug('HTTPServer: Serving on |{ip}:{port}|'.format(
-            ip=str(sock_name[0]),
-            port=str(sock_name[1])
-        ))
+
+        address = self.httpd.socket.getsockname()
+        log_debug('HTTPServer: Serving on |{ip}:{port}|'
+                  .format(ip=address[0], port=address[1]))
 
     def shutdown_httpd(self):
         if self.httpd:
             log_debug('HTTPServer: Shutting down |{ip}:{port}|'
-                      .format(ip=self.old_httpd_address(),
-                              port=self.old_httpd_port()))
-            self.httpd_port_sync()
+                      .format(ip=self._old_httpd_address,
+                              port=self._old_httpd_port))
+            self.httpd_address_sync()
             self.httpd.shutdown()
             self.httpd.socket.close()
             self.httpd_thread.join()
@@ -151,12 +152,13 @@ class ServiceMonitor(xbmc.Monitor):
 
     def restart_httpd(self):
         log_debug('HTTPServer: Restarting |{old_ip}:{old_port}| > |{ip}:{port}|'
-                  .format(old_ip=self.old_httpd_address(),
-                          old_port=self.old_httpd_port(),
-                          ip=self.httpd_address(),
-                          port=self.httpd_port()))
+                  .format(old_ip=self._old_httpd_address,
+                          old_port=self._old_httpd_port,
+                          ip=self._httpd_address,
+                          port=self._httpd_port))
         self.shutdown_httpd()
         self.start_httpd()
 
-    def ping_httpd(self):
-        return httpd_status(port=self.httpd_port())
+    @staticmethod
+    def ping_httpd():
+        return httpd_status()

@@ -14,7 +14,7 @@ import os
 
 from ...kodion.compatibility import urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_FLAG
-from ...kodion.network import Locator
+from ...kodion.network import Locator, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils.datetime_parser import strptime
 from ...kodion.utils.methods import to_unicode
@@ -325,6 +325,8 @@ def process_default_settings(_provider, context, step, steps):
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
             settings.alternative_player_web_urls(False)
         settings.cache_size(20)
+        if settings.use_isa() and not httpd_status():
+            settings.httpd_listen('0.0.0.0')
     return step
 
 

@@ -86,23 +86,28 @@ class AbstractProvider(object):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        settings.set_bool(settings.SETUP_WIZARD, False)
+        context.send_notification('check_settings', 'defer')
 
         wizard_steps = self.get_wizard_steps(context)
 
         step = 0
         steps = len(wizard_steps)
 
-        if (wizard_steps and ui.on_yes_no_input(
-            context.localize('setup_wizard'),
-            (context.localize('setup_wizard.prompt')
-             % context.localize('setup_wizard.prompt.settings'))
-        )):
-            for wizard_step in wizard_steps:
-                if callable(wizard_step):
-                    step = wizard_step(self, context, step, steps)
-                else:
-                    step += 1
+        try:
+            if (wizard_steps and ui.on_yes_no_input(
+                context.localize('setup_wizard'),
+                (context.localize('setup_wizard.prompt')
+                 % context.localize('setup_wizard.prompt.settings'))
+            )):
+                for wizard_step in wizard_steps:
+                    if callable(wizard_step):
+                        step = wizard_step(self, context, step, steps)
+                    else:
+                        step += 1
+        finally:
+            settings.set_bool(settings.SETUP_WIZARD, False)
+            context.send_notification('check_settings', 'process')
+
 
     def get_wizard_steps(self, context):
         # can be overridden by the derived class

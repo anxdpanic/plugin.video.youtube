@@ -16,7 +16,7 @@ from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .constants import DATA_PATH, TEMP_PATH, WAIT_FLAG
 from .context import XbmcContext
 from .network import get_client_ip_address, httpd_status
-from .utils import rm_dir
+from .utils import rm_dir, validate_ip_address
 
 
 def _config_actions(context, action, *_args):
@@ -90,20 +90,29 @@ def _config_actions(context, action, *_args):
                 settings.set_subtitle_download(result == 1)
 
     elif action == 'listen_ip':
-        local_ranges = ('10.', '172.16.', '192.168.')
-        addresses = [iface[4][0]
-                     for iface in socket.getaddrinfo(socket.gethostname(), None)
-                     if iface[4][0].startswith(local_ranges)]
+        local_ranges = (
+            ((10, 0, 0, 0), (10, 255, 255, 255)),
+            ((172, 16, 0, 0), (172, 31, 255, 255)),
+            ((192, 168, 0, 0), (192, 168, 255, 255)),
+        )
+        addresses = [xbmc.getIPAddress()]
+        for interface in socket.getaddrinfo(socket.gethostname(), None):
+            address = interface[4][0]
+            if interface[0] != socket.AF_INET or address in addresses:
+                continue
+            octets = validate_ip_address(address)
+            if not any(octets):
+                continue
+            if any(lo <= octets <= hi for lo, hi in local_ranges):
+                addresses.append(address)
         addresses += ['127.0.0.1', '0.0.0.0']
         selected_address = ui.on_select(localize('select.listen.ip'), addresses)
         if selected_address != -1:
-            settings.set_httpd_listen(addresses[selected_address])
+            settings.httpd_listen(addresses[selected_address])
 
     elif action == 'show_client_ip':
-        port = settings.httpd_port()
-
-        if httpd_status(port=port):
-            client_ip = get_client_ip_address(port=port)
+        if httpd_status():
+            client_ip = get_client_ip_address()
             if client_ip:
                 ui.on_ok(context.get_name(),
                          context.localize('client.ip') % client_ip)
