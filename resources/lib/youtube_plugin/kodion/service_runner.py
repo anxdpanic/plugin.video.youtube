@@ -12,7 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .constants import TEMP_PATH
 from .context import XbmcContext
-from .utils import PlayerMonitor, ServiceMonitor, rm_dir
+from .monitors import PlayerMonitor, ServiceMonitor
+from .utils import rm_dir
 from ..youtube.provider import Provider
 
 

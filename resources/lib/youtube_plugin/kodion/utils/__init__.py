@@ -28,14 +28,10 @@ from .methods import (
     strip_html_from_text,
     to_unicode,
 )
-from .player_monitor import PlayerMonitor
-from .service_monitor import ServiceMonitor
 from .system_version import current_system_version
 
 
 __all__ = (
-    'PlayerMonitor',
-    'ServiceMonitor',
     'create_path',
     'current_system_version',
     'datetime_parser',
