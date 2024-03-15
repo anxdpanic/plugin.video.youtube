@@ -821,8 +821,7 @@ class YouTube(LoginClient):
                    or (related_channel and related_channel in page_count
                        and page_count[related_channel] >= diversity_limits)
                    or (channel_id and channel_id in page_count
-                       and page_count[channel_id] >= diversity_limits)
-            ):
+                       and page_count[channel_id] >= diversity_limits)):
                 page += 1
                 page_count = counts['_pages'].setdefault(page, {'_counter': 0})
 

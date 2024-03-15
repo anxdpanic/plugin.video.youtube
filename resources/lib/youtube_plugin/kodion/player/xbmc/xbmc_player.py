@@ -45,11 +45,14 @@ class XbmcPlayer(AbstractPlayer):
             xbmc.Player().play(item=playlist)
         """
 
-    def stop(self):
+    @staticmethod
+    def stop():
         xbmc.Player().stop()
 
-    def pause(self):
+    @staticmethod
+    def pause():
         xbmc.Player().pause()
 
-    def is_playing(self):
+    @staticmethod
+    def is_playing():
         return xbmc.Player().isPlaying()

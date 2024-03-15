@@ -1395,9 +1395,6 @@ class VideoInfo(YouTubeRequestClient):
             }
 
             if live_type:
-                # MPD structure has segments with additional attributes
-                # and url has changed from using a query string to using url params
-                # This breaks the InputStream.Adaptive partial manifest update
                 if '?' in manifest_url:
                     video_stream['url'] = manifest_url + '&mpd_version=5'
                 elif manifest_url.endswith('/'):

@@ -705,7 +705,7 @@ class Provider(AbstractProvider):
         return yt_specials.process(category, self, context)
 
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
-    def _on_users(self, context, re_match):
+    def _on_users(self, _context, re_match):
         action = re_match.group('action')
         return UriItem('{addon},users/{action}'.format(
             addon=ADDON_ID, action=action
@@ -914,7 +914,6 @@ class Provider(AbstractProvider):
                 ui.show_notification(localize('succeeded'))
             except:
                 ui.show_notification(localize('failed'))
-
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/api/update/?$')

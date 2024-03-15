@@ -227,12 +227,6 @@ def video_playback_item(context, video_item, show_fanart=None):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'
-            """
-            # MPD manifest update is currently broken
-            # Following line will force a full update but restart live stream
-            if video_item.live:
-                props['inputstream.adaptive.manifest_update_parameter'] = 'full'
-            """
             if 'auto' in settings.stream_select():
                 props['inputstream.adaptive.stream_selection_type'] = 'adaptive'
         else:
