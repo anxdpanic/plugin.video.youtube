@@ -340,7 +340,7 @@ class AbstractSettings(object):
 
     def stream_select(self, value=None):
         if value is not None:
-            return self.get_int(settings.MPD_STREAM_SELECT, value)
+            return self.set_int(settings.MPD_STREAM_SELECT, value)
         default = 3
         value = self.get_int(settings.MPD_STREAM_SELECT, default)
         if value in self._STREAM_SELECT:
