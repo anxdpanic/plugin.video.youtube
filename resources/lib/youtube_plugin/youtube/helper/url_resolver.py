@@ -191,6 +191,12 @@ class CommonResolver(AbstractResolver):
         super(CommonResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
+        if url_components.hostname in (
+                'www.youtube.com',
+                'youtube.com',
+                'm.youtube.com',
+        ):
+            return False
         return 'HEAD'
 
     def resolve(self, url, url_components, method='HEAD'):
