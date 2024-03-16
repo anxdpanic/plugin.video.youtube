@@ -381,7 +381,7 @@ def process_performance_settings(_provider, context, step, steps):
         }
         stream_features = {
             'old': ['avc1', 'mp4a', 'filter'],
-            'low': ['avc1', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'low': ['avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
             'medium': ['avc1', 'vp9', 'hdr', 'hfr', 'no_hfr_max', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
             'high': ['avc1', 'vp9', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
             'recent': ['avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
@@ -395,6 +395,11 @@ def process_performance_settings(_provider, context, step, steps):
             'recent': 50,
             'max': 50,
         }
+
+        if device_type == 'old':
+            settings.use_isa(True)
+            settings.use_mpd_videos(False)
+            settings.live_stream_type(2)
 
         settings.mpd_video_qualities(video_qualities[device_type])
         settings.stream_features(stream_features[device_type])
