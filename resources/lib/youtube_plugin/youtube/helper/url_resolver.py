@@ -126,6 +126,7 @@ class YouTubeResolver(AbstractResolver):
         response = self.request(url,
                                 method=method,
                                 headers=self._HEADERS,
+                                cookies={'SOCS': 'CAISAiAD'},
                                 allow_redirects=True)
         if not response or not response.ok:
             return url
