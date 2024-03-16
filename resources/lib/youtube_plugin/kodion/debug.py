@@ -38,7 +38,14 @@ def debug_here(host='localhost'):
 class Profiler(object):
     """Class used to profile a block of code"""
 
-    __slots__ = ('__weakref__', '_enabled', '_profiler', '_reuse', 'name',)
+    __slots__ = (
+        '__weakref__',
+        '_enabled',
+        '_profiler',
+        '_reuse',
+        '_timer',
+        'name',
+    )
 
     from cProfile import Profile as _Profile
     from pstats import Stats as _Stats
@@ -78,10 +85,16 @@ class Profiler(object):
             return cls.Proxy(self)
         return self
 
-    def __init__(self, enabled=True, lazy=True, name=__name__, reuse=False):
+    def __init__(self,
+                 enabled=True,
+                 lazy=True,
+                 name=__name__,
+                 reuse=False,
+                 timer=None):
         self._enabled = enabled
         self._profiler = None
         self._reuse = reuse
+        self._timer = timer
         self.name = name
 
         if enabled and not lazy:
@@ -159,8 +172,13 @@ class Profiler(object):
         return wrapper
 
     def _create_profiler(self):
-        self._profiler = self._Profile()
+        self._profiler = self._Profile(timer=self._timer)
         self._profiler.enable()
+
+    @classmethod
+    def wait_timer(cls):
+        times = os.times()
+        return times.elapsed - (times.system + times.user)
 
     def disable(self):
         if self._profiler:
