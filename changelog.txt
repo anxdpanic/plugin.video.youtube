@@ -1,3 +1,22 @@
+## v7.0.4+beta.2
+### Fixed
+- Overhaul of http server settings to try and fix #633
+
+### Changed
+- Live stream sorting changed
+  - Upcoming sorted by date
+  - Live sorted by most viewed
+  - Completed by most viewed in last 3 days
+
+### New
+- Kodi 18 (Leia) release available
+  - These releases are unsupported and not completely functional
+  - If they work, then that is good
+  - If they don't work, then that is no different to current state of affairs
+  - Known issues:
+    - accessing script actions through settings does not work (e.g. maintenance and user actions)
+- Setup wizard will disable use of website urls if no playercorefactory.xml is found
+
 ## v7.0.4+beta.1
 ### Fixed
 - Workarounds for buggy language and region details in Kodi
