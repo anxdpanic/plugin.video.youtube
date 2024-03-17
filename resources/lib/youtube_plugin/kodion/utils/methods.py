@@ -39,6 +39,7 @@ __all__ = (
     'select_stream',
     'strip_html_from_text',
     'to_unicode',
+    'validate_ip_address',
 )
 
 
@@ -323,3 +324,14 @@ def get_kodi_setting_value(setting):
 
 def get_kodi_setting_bool(setting):
     return xbmc.getCondVisibility('System.GetBool({0})'.format(setting))
+
+
+def validate_ip_address(ip_address):
+    try:
+        octets = [octet for octet in map(int, ip_address.split('.'))
+                  if 0 <= octet <= 255]
+        if len(octets) != 4:
+            raise ValueError
+    except ValueError:
+        return (0, 0, 0, 0)
+    return tuple(octets)

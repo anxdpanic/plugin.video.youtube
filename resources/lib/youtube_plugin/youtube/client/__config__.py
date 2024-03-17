@@ -21,15 +21,8 @@ DEFAULT_SWITCH = 1
 
 class APICheck(object):
     def __init__(self, context):
-        settings = context.get_settings()
-        context.send_notification('check_settings', {
-            'use_httpd': settings.use_mpd_videos() or settings.api_config_page(),
-            'httpd_port': settings.httpd_port(),
-            'whitelist': settings.httpd_whitelist(),
-            'httpd_address': settings.httpd_listen()
-        })
         self._context = context
-        self._settings = settings
+        self._settings = context.get_settings()
         self._ui = context.get_ui()
         self._api_jstore = APIKeyStore()
         self._json_api = self._api_jstore.get_data()

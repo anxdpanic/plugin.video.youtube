@@ -21,7 +21,12 @@ from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import string_type
-from ...kodion.utils import datetime_parser, strip_html_from_text, to_unicode
+from ...kodion.utils import (
+    current_system_version,
+    datetime_parser,
+    strip_html_from_text,
+    to_unicode,
+)
 
 
 class YouTube(LoginClient):
@@ -821,8 +826,7 @@ class YouTube(LoginClient):
                    or (related_channel and related_channel in page_count
                        and page_count[related_channel] >= diversity_limits)
                    or (channel_id and channel_id in page_count
-                       and page_count[channel_id] >= diversity_limits)
-            ):
+                       and page_count[channel_id] >= diversity_limits)):
                 page += 1
                 page_count = counts['_pages'].setdefault(page, {'_counter': 0})
 
@@ -1038,9 +1042,10 @@ class YouTube(LoginClient):
 
     def get_live_events(self,
                         event_type='live',
-                        order='relevance',
+                        order='date',
                         page_token='',
                         location=False,
+                        after=None,
                         **kwargs):
         """
         :param event_type: one of: 'live', 'completed', 'upcoming'
@@ -1072,6 +1077,9 @@ class YouTube(LoginClient):
 
         if page_token:
             params['pageToken'] = page_token
+
+        if after:
+            params['publishedAfter'] = after
 
         return self.api_request(method='GET',
                                 path='search',
@@ -1528,7 +1536,10 @@ class YouTube(LoginClient):
                 for response in responses:
                     if response:
                         response.encoding = 'utf-8'
-                        xml_data = to_unicode(response.content).replace('\n', '')
+                        xml_data = to_unicode(response.content)
+                        if not current_system_version.compatible(19, 0):
+                            xml_data = xml_data.encode('utf-8')
+                        xml_data = xml_data.replace('\n', '')
 
                         root = ET.fromstring(xml_data)
 

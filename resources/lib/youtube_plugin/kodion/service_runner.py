@@ -12,7 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .constants import TEMP_PATH
 from .context import XbmcContext
-from .utils import PlayerMonitor, ServiceMonitor, rm_dir
+from .monitors import PlayerMonitor, ServiceMonitor
+from .utils import rm_dir
 from ..youtube.provider import Provider
 
 
@@ -34,12 +35,20 @@ def run():
 
     wait_interval = 10
     ping_period = waited = 60
+    restart_attempts = 0
     while not monitor.abortRequested():
         if waited >= ping_period:
             waited = 0
 
             if monitor.httpd and not monitor.ping_httpd():
-                monitor.restart_httpd()
+                restart_attempts += 1
+                if restart_attempts > 5:
+                    monitor.shutdown_httpd()
+                    restart_attempts = 0
+                else:
+                    monitor.restart_httpd()
+            else:
+                restart_attempts = 0
 
         if monitor.waitForAbort(wait_interval):
             break

@@ -28,7 +28,7 @@ jobs:
           fi
 
       - name: Checkout Add-on
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: ${{ github.event.repository.name }}
 
@@ -56,8 +56,11 @@ jobs:
           rm -rf .??*
           rm *.md
           news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          xmlstarlet ed -L -P -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" addon.xml
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -P \
+            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}" \
+            addon.xml
           filename=${{ github.event.repository.name }}-${version}.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
@@ -79,9 +82,11 @@ jobs:
           rm -rf .??*
           rm *.md
           news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          xmlstarlet ed -L -P -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" addon.xml
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -P -u '/addon/@version' -v "${version}+unofficial.1" addon.xml
+          xmlstarlet ed -L -P \
+            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}+unofficial.1" \
+            addon.xml
           filename=${{ github.event.repository.name }}-${version}.unofficial.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
@@ -99,12 +104,14 @@ jobs:
           rm -rf .??*
           rm *.md
           news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          xmlstarlet ed -L -P -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" addon.xml
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -P -u '/addon/@version' -v "${version}+matrix.1" addon.xml
-          xmlstarlet ed -L -P -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
-          xmlstarlet ed -L -P -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' addon.xml
-          xmlstarlet ed -L -P -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
+          xmlstarlet ed -L -P \
+            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}+matrix.1" \
+            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' \
+            -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' \
+            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
+            addon.xml
           filename=${{ github.event.repository.name }}-${version}.matrix.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
@@ -126,13 +133,79 @@ jobs:
           rm -rf .??*
           rm *.md
           news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          xmlstarlet ed -L -P -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" addon.xml
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -P -u '/addon/@version' -v "${version}+matrix.unofficial.1" addon.xml
-          xmlstarlet ed -L -P -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' addon.xml
-          xmlstarlet ed -L -P -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' addon.xml
-          xmlstarlet ed -L -P -d '/addon/requires/import[@addon="script.module.infotagger"]' addon.xml
+          xmlstarlet ed -L -P \
+            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}+matrix.unofficial.1" \
+            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' \
+            -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' \
+            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
+            addon.xml
           filename=${{ github.event.repository.name }}-${version}.matrix.unofficial.1.zip
+          cd ..
+          zip -r $filename ${{ github.event.repository.name }}
+          mv .git ${{ github.event.repository.name }}
+          echo "filename=$filename" >> $GITHUB_OUTPUT
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Create Zip (Leia)
+        id: zip-leia
+        run: |
+          git reset
+          git checkout .
+          git clean -fdx
+          mv .git ..
+          rm -rf .??*
+          rm *.md
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -P \
+            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}+leia.1" \
+            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '2.26.0' \
+            -d '/addon/requires/import[@addon="script.module.requests"]/@version' \
+            -d '/addon/requires/import[@addon="inputstream.adaptive"]/@version' \
+            -d '/addon/requires/import[@addon="script.module.inputstreamhelper"]/@version' \
+            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
+            -s '/addon/requires' -t elem -n import_temp \
+            -s '/addon/requires/import_temp' -t attr -n addon -v 'script.module.kodi-six' \
+            -r '/addon/requires/import_temp' -v import \
+            addon.xml
+          filename=${{ github.event.repository.name }}-${version}.leia.1.zip
+          cd ..
+          zip -r $filename ${{ github.event.repository.name }}
+          mv .git ${{ github.event.repository.name }}
+          echo "filename=$filename" >> $GITHUB_OUTPUT
+        working-directory: ${{ github.event.repository.name }}
+
+      - name: Create Zip (Leia-Unofficial)
+        id: zip-unofficial-leia
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git reset
+          git checkout .
+          git fetch origin nexus-unofficial
+          git -c user.email="\<\>" -c user.name="make-release" merge -X theirs --allow-unrelated-histories origin/nexus-unofficial
+          git clean -fdx
+          mv .git ..
+          rm -rf .??*
+          rm *.md
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
+          xmlstarlet ed -L -P \
+            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}+leia.unofficial.1" \
+            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '2.26.0' \
+            -d '/addon/requires/import[@addon="script.module.requests"]/@version' \
+            -d '/addon/requires/import[@addon="inputstream.adaptive"]/@version' \
+            -d '/addon/requires/import[@addon="script.module.inputstreamhelper"]/@version' \
+            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
+            -s '/addon/requires' -t elem -n import_temp \
+            -s '/addon/requires/import_temp' -t attr -n addon -v 'script.module.kodi-six' \
+            -r '/addon/requires/import_temp' -v import \
+            addon.xml
+          filename=${{ github.event.repository.name }}-${version}.leia.unofficial.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
@@ -193,4 +266,26 @@ jobs:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
           asset_name: ${{ steps.zip-unofficial-matrix.outputs.filename }}
           asset_path: ${{ steps.zip-unofficial-matrix.outputs.filename }}
+          asset_content_type: application/zip
+
+      - name: Upload Zip (Leia)
+        id: upload-leia
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_name: ${{ steps.zip-leia.outputs.filename }}
+          asset_path: ${{ steps.zip-leia.outputs.filename }}
+          asset_content_type: application/zip
+
+      - name: Upload Zip (Leia-Unofficial)
+        id: upload-unofficial-leia
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create-release.outputs.upload_url }}
+          asset_name: ${{ steps.zip-unofficial-leia.outputs.filename }}
+          asset_path: ${{ steps.zip-unofficial-leia.outputs.filename }}
           asset_content_type: application/zip

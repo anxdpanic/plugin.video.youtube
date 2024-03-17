@@ -32,7 +32,7 @@ from ...kodion.compatibility import (
     xbmcvfs,
 )
 from ...kodion.constants import TEMP_PATH, paths
-from ...kodion.network import httpd_status
+from ...kodion.network import get_connect_address, httpd_status
 from ...kodion.utils import make_dirs
 
 
@@ -715,7 +715,7 @@ class VideoInfo(YouTubeRequestClient):
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
             url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
-        cookies = {'CONSENT': 'YES+cb.20210615-14-p0.en+FX+294'}
+        cookies = {'SOCS': 'CAISAiAD'}
 
         client = self.build_client(client_name)
 
@@ -1264,8 +1264,7 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         use_mpd_vod = _settings.use_mpd_videos()
-        httpd_running = (_settings.use_isa() and
-                         httpd_status(port=_settings.httpd_port()))
+        httpd_running = _settings.use_isa() and httpd_status()
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not httpd_running:
@@ -1278,11 +1277,12 @@ class VideoInfo(YouTubeRequestClient):
                 continue
             self._context.log_debug('Found widevine license url: {0}'
                                     .format(url))
+            address, port = get_connect_address()
             license_info = {
                 'url': url,
                 'proxy': 'http://{address}:{port}{path}||R{{SSM}}|'.format(
-                    address=_settings.httpd_listen(for_request=True),
-                    port=_settings.httpd_port(),
+                    address=address,
+                    port=port,
                     path=paths.DRM,
                 ),
                 'token': self._access_token,
@@ -1395,9 +1395,6 @@ class VideoInfo(YouTubeRequestClient):
             }
 
             if live_type:
-                # MPD structure has segments with additional attributes
-                # and url has changed from using a query string to using url params
-                # This breaks the InputStream.Adaptive partial manifest update
                 if '?' in manifest_url:
                     video_stream['url'] = manifest_url + '&mpd_version=5'
                 elif manifest_url.endswith('/'):
@@ -2041,9 +2038,10 @@ class VideoInfo(YouTubeRequestClient):
                                     .format(file=filepath))
             success = False
         if success:
+            address, port = get_connect_address()
             return 'http://{address}:{port}{path}{file}'.format(
-                address=_settings.httpd_listen(for_request=True),
-                port=_settings.httpd_port(),
+                address=address,
+                port=port,
                 path=paths.MPD,
                 file=filename,
             ), main_stream
