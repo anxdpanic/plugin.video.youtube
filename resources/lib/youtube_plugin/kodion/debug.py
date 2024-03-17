@@ -172,7 +172,10 @@ class Profiler(object):
         return wrapper
 
     def _create_profiler(self):
-        self._profiler = self._Profile(timer=self._timer)
+        if self._timer:
+            self._profiler = self._Profile(timer=self._timer)
+        else:
+            self._profiler = self._Profile()
         self._profiler.enable()
 
     @classmethod
