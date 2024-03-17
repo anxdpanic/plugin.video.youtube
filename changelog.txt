@@ -1,21 +1,28 @@
 ## v7.0.4+beta.2
 ### Fixed
 - Overhaul of http server settings to try and fix #633
+- Fix unicode handling error when accessing My Subscriptions in Kodi 18 #636
+- Update url resolver
+  - remove redundant resolving attempt
+  - attempt to bypass cookie consent redirect #631
 
 ### Changed
 - Live stream sorting changed
   - Upcoming sorted by date
   - Live sorted by most viewed
   - Completed by most viewed in last 3 days
+- Update setup wizard performance tier settings
+  - Disable MPEG-DASH for old devices
+  - Enable VP9 for low powered devices
 
 ### New
 - Kodi 18 (Leia) release available
-  - These releases are unsupported and not completely functional
-  - If they work, then that is good
-  - If they don't work, then that is no different to current state of affairs
+  - These releases are unsupported and may not be completely functional
+  - If something works, then that is good
+  - If something doesn't work, it will not be addressed unless it applies to Kodi 19+
   - Known issues:
     - accessing script actions through settings does not work (e.g. maintenance and user actions)
-- Setup wizard will disable use of website urls if no playercorefactory.xml is found
+- Setup wizard will disable use of website urls if no playercorefactory.xml is found #632
 
 ## v7.0.4+beta.1
 ### Fixed
