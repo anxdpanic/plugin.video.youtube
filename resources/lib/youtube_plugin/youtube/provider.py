@@ -271,7 +271,7 @@ class Provider(AbstractProvider):
         return self._resource_manager
 
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/uri2addon/$')
+    @RegisterProviderPath('^/uri2addon/?$')
     def on_uri2addon(self, context, re_match, uri=None):
         if uri is None:
             uri = context.get_param('uri')
@@ -303,7 +303,7 @@ class Provider(AbstractProvider):
     playlist_id: <PLAYLIST_ID>
     """
 
-    @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/$')
+    @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/?$')
     def _on_playlist(self, context, re_match):
         context.set_content(content.VIDEO_CONTENT)
         resource_manager = self.get_resource_manager(context)
@@ -323,7 +323,7 @@ class Provider(AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/$')
+    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/?$')
     def _on_channel_playlists(self, context, re_match):
         context.set_content(content.LIST_CONTENT)
         result = []
@@ -372,7 +372,7 @@ class Provider(AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/$')
+    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/?$')
     def _on_channel_live(self, context, re_match):
         context.set_content(content.VIDEO_CONTENT)
         result = []
@@ -400,7 +400,7 @@ class Provider(AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/$')
+    @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/?$')
     def _on_channel(self, context, re_match):
         listitem_channel_id = context.get_listitem_detail('channel_id')
 
@@ -529,7 +529,7 @@ class Provider(AbstractProvider):
         return result
 
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/location/mine/$')
+    @RegisterProviderPath('^/location/mine/?$')
     def _on_my_location(self, context, re_match):
         context.set_content(content.LIST_CONTENT)
 
@@ -597,7 +597,7 @@ class Provider(AbstractProvider):
     """
 
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/play/$')
+    @RegisterProviderPath('^/play/?$')
     def on_play(self, context, re_match):
         ui = context.get_ui()
 
@@ -672,18 +672,18 @@ class Provider(AbstractProvider):
             return yt_play.play_channel_live(self, context)
         return False
 
-    @RegisterProviderPath('^/video/(?P<method>[^/]+)/$')
+    @RegisterProviderPath('^/video/(?P<method>[^/]+)/?$')
     def _on_video_x(self, context, re_match):
         method = re_match.group('method')
         return yt_video.process(method, self, context, re_match)
 
-    @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/$')
+    @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$')
     def _on_playlist_x(self, context, re_match):
         method = re_match.group('method')
         category = re_match.group('category')
         return yt_playlist.process(method, category, self, context)
 
-    @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/$')
+    @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/?$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
         resource_manager = self.get_resource_manager(context)
@@ -699,19 +699,19 @@ class Provider(AbstractProvider):
 
         return subscriptions
 
-    @RegisterProviderPath('^/special/(?P<category>[^/]+)/$')
+    @RegisterProviderPath('^/special/(?P<category>[^/]+)/?$')
     def _on_yt_specials(self, context, re_match):
         category = re_match.group('category')
         return yt_specials.process(category, self, context)
 
-    @RegisterProviderPath('^/users/(?P<action>[^/]+)/$')
-    def _on_users(self, context, re_match):
+    @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
+    def _on_users(self, _context, re_match):
         action = re_match.group('action')
         return UriItem('{addon},users/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
-    @RegisterProviderPath('^/sign/(?P<mode>[^/]+)/$')
+    @RegisterProviderPath('^/sign/(?P<mode>[^/]+)/?$')
     def _on_sign(self, context, re_match):
         sign_out_confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
@@ -827,7 +827,7 @@ class Provider(AbstractProvider):
         result.extend(v3.response_to_items(self, context, json_data))
         return result
 
-    @RegisterProviderPath('^/config/(?P<action>[^/]+)/$')
+    @RegisterProviderPath('^/config/(?P<action>[^/]+)/?$')
     def configure_addon(self, context, re_match):
         action = re_match.group('action')
         if action == 'setup_wizard':
@@ -838,7 +838,7 @@ class Provider(AbstractProvider):
         ))
 
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/my_subscriptions/filter/$')
+    @RegisterProviderPath('^/my_subscriptions/filter/?$')
     def manage_my_subscription_filter(self, context, re_match):
         settings = context.get_settings()
         ui = context.get_ui()
@@ -879,7 +879,7 @@ class Provider(AbstractProvider):
                 ui.show_notification(message=message)
         ui.refresh_container()
 
-    @RegisterProviderPath('^/maintenance/(?P<action>[^/]+)/(?P<target>[^/]+)/$')
+    @RegisterProviderPath('^/maintenance/(?P<action>[^/]+)/(?P<target>[^/]+)/?$')
     def maintenance_actions(self, context, re_match):
         target = re_match.group('target')
         action = re_match.group('action')
@@ -915,9 +915,8 @@ class Provider(AbstractProvider):
             except:
                 ui.show_notification(localize('failed'))
 
-
     # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/api/update/$')
+    @RegisterProviderPath('^/api/update/?$')
     def api_key_update(self, context, re_match):
         localize = context.localize
         settings = context.get_settings()

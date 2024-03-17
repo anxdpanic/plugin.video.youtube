@@ -14,7 +14,7 @@ import os
 
 from ...kodion.compatibility import urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_FLAG
-from ...kodion.network import Locator
+from ...kodion.network import Locator, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils.datetime_parser import strptime
 from ...kodion.utils.methods import to_unicode
@@ -215,7 +215,7 @@ def process_language(provider, context, step, steps):
 
     json_data = client.get_supported_languages(kodi_language)
     items = json_data.get('items') or DEFAULT_LANGUAGES['items']
-    
+
     selected_language = [None]
 
     def _get_selected_language(item):
@@ -322,7 +322,11 @@ def process_default_settings(_provider, context, step, steps):
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.live_stream_type(2)
+        if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
+            settings.alternative_player_web_urls(False)
         settings.cache_size(20)
+        if settings.use_isa() and not httpd_status():
+            settings.httpd_listen('0.0.0.0')
     return step
 
 
@@ -377,7 +381,7 @@ def process_performance_settings(_provider, context, step, steps):
         }
         stream_features = {
             'old': ['avc1', 'mp4a', 'filter'],
-            'low': ['avc1', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
+            'low': ['avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
             'medium': ['avc1', 'vp9', 'hdr', 'hfr', 'no_hfr_max', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
             'high': ['avc1', 'vp9', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
             'recent': ['avc1', 'vp9', 'av01', 'hdr', 'hfr', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'],
@@ -391,6 +395,11 @@ def process_performance_settings(_provider, context, step, steps):
             'recent': 50,
             'max': 50,
         }
+
+        if device_type == 'old':
+            settings.use_isa(True)
+            settings.use_mpd_videos(False)
+            settings.live_stream_type(2)
 
         settings.mpd_video_qualities(video_qualities[device_type])
         settings.stream_features(stream_features[device_type])

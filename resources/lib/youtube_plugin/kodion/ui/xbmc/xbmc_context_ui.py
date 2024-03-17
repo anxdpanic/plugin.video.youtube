@@ -216,7 +216,7 @@ class XbmcContextUI(AbstractContextUI):
     def set_focus_next_item(self):
         list_id = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
         try:
-            position = self._context.get_infolabel('Container.Position')
+            position = xbmc.getInfoLabel('Container.Position')
             next_position = int(position) + 1
             self._context.execute('SetFocus({list_id},{position})'.format(
                 list_id=list_id, position=next_position

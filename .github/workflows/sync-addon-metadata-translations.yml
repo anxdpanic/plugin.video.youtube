@@ -22,18 +22,18 @@ jobs:
     steps:
 
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: project
 
       - name: Checkout sync_addon_metadata_translations repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           repository: xbmc/sync_addon_metadata_translations
           path: sync_addon_metadata_translations
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
 

@@ -16,8 +16,14 @@ class AbstractPlayer(object):
     def play(self, playlist_index=-1):
         raise NotImplementedError()
 
-    def stop(self):
+    @staticmethod
+    def stop():
         raise NotImplementedError()
 
-    def pause(self):
+    @staticmethod
+    def pause():
+        raise NotImplementedError()
+
+    @staticmethod
+    def is_playing():
         raise NotImplementedError()

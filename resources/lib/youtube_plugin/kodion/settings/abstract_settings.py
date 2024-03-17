@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import sys
 
 from ..constants import settings
+from ..utils import validate_ip_address
 
 
 class AbstractSettings(object):
@@ -100,17 +101,21 @@ class AbstractSettings(object):
 
     def is_setup_wizard_enabled(self):
         # Increment min_required on new release to enable oneshot on first run
-        min_required = 1
+        min_required = 2
         forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, min_required - 1)
         if forced_runs < min_required:
-            self.set_int(settings.SETUP_WIZARD_RUNS, forced_runs + 1)
+            self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
             return True
         return self.get_bool(settings.SETUP_WIZARD, False)
 
-    def is_support_alternative_player_enabled(self):
+    def support_alternative_player(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.SUPPORT_ALTERNATIVE_PLAYER, value)
         return self.get_bool(settings.SUPPORT_ALTERNATIVE_PLAYER, False)
 
-    def alternative_player_web_urls(self):
+    def alternative_player_web_urls(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, value)
         return self.get_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, False)
 
     def use_isa(self, value=None):
@@ -198,48 +203,47 @@ class AbstractSettings(object):
             return self.get_int(settings.LIVE_STREAMS + '.1', 2) == 3
         return False
 
-    def httpd_port(self, port=None):
-        default_port = 50152
+    def httpd_port(self, value=None):
+        default = 50152
 
-        if port is None:
-            port = self.get_int(settings.HTTPD_PORT, default_port)
+        if value is None:
+            port = self.get_int(settings.HTTPD_PORT, default)
+        else:
+            port = value
 
         try:
             port = int(port)
         except ValueError:
-            return default_port
+            port = default
+
+        if value is not None:
+            return self.set_int(settings.HTTPD_PORT, port)
         return port
 
-    def httpd_listen(self, for_request=False, ip_address=None):
-        default_address = '0.0.0.0'
-        default_octets = [0, 0, 0, 0]
+    def httpd_listen(self, value=None):
+        default = '0.0.0.0'
 
-        if not ip_address:
-            ip_address = self.get_string(settings.HTTPD_LISTEN,
-                                         default_address)
+        if value is None:
+            ip_address = self.get_string(settings.HTTPD_LISTEN, default)
+        else:
+            ip_address = value
 
-        try:
-            octets = [octet for octet in map(int, ip_address.split('.'))
-                      if 0 <= octet <= 255]
-            if len(octets) != 4:
-                raise ValueError
-        except ValueError:
-            octets = default_octets
+        octets = validate_ip_address(ip_address)
+        ip_address = '.'.join(map(str, octets))
 
-        if for_request and octets == default_octets:
-            return '127.0.0.1'
-        return '.'.join(map(str, octets))
-
-    def set_httpd_listen(self, value):
-        return self.set_string(settings.HTTPD_LISTEN, value)
+        if value is not None:
+            return self.set_string(settings.HTTPD_LISTEN, ip_address)
+        return ip_address
 
     def httpd_whitelist(self):
-        allow_list = self.get_string(settings.HTTPD_WHITELIST, '')
-        allow_list = ''.join(allow_list.split()).split(',')
-        allow_list = [
-            self.httpd_listen(for_request=True, ip_address=ip_address)
-            for ip_address in allow_list
-        ]
+        whitelist = self.get_string(settings.HTTPD_WHITELIST, '')
+        whitelist = ''.join(whitelist.split()).split(',')
+        allow_list = []
+        for ip_address in whitelist:
+            octets = validate_ip_address(ip_address)
+            if not any(octets):
+                continue
+            allow_list.append('.'.join(map(str, octets)))
         return allow_list
 
     def api_config_page(self):
@@ -336,7 +340,7 @@ class AbstractSettings(object):
 
     def stream_select(self, value=None):
         if value is not None:
-            return self.get_int(settings.MPD_STREAM_SELECT, value)
+            return self.set_int(settings.MPD_STREAM_SELECT, value)
         default = 3
         value = self.get_int(settings.MPD_STREAM_SELECT, default)
         if value in self._STREAM_SELECT:

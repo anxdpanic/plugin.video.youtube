@@ -17,7 +17,6 @@ import weakref
 from ..abstract_context import AbstractContext
 from ...compatibility import (
     parse_qsl,
-    quote,
     unquote,
     urlsplit,
     xbmc,
@@ -30,8 +29,8 @@ from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
-    loose_version,
     get_kodi_setting_value,
+    loose_version,
     make_dirs,
     to_unicode,
 )
@@ -560,10 +559,17 @@ class XbmcContext(AbstractContext):
             return False
 
     def send_notification(self, method, data):
-        data = json.dumps(data)
         self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
-        data = '\\"[\\"%s\\"]\\"' % quote(data)
-        self.execute('NotifyAll({0},{1},{2})'.format(ADDON_ID, method, data))
+        xbmc.executeJSONRPC(json.dumps({
+            'jsonrpc': '2.0',
+            'id': 1,
+            'method': 'JSONRPC.NotifyAll',
+            'params': {
+                'sender': ADDON_ID,
+                'message': method,
+                'data': data,
+            },
+        }))
 
     def use_inputstream_adaptive(self):
         if self._settings.use_isa():
