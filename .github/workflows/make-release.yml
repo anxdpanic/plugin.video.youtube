@@ -59,7 +59,6 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            -u '/addon/@version' -v "${version}" \
             addon.xml
           filename=${{ github.event.repository.name }}-${version}.zip
           cd ..
