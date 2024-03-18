@@ -205,6 +205,7 @@ def video_playback_item(context, video_item, show_fanart=None):
             'path': uri,
             'offscreen': True,
         }
+        props = {}
     else:
         kwargs = {
             'label': video_item.get_title() or video_item.get_name(),
@@ -212,9 +213,9 @@ def video_playback_item(context, video_item, show_fanart=None):
             'path': uri,
             'offscreen': True,
         }
-    props = {
-        'isPlayable': str(video_item.playable).lower(),
-    }
+        props = {
+            'isPlayable': str(video_item.playable).lower(),
+        }
 
     if (alternative_player
             and settings.alternative_player_web_urls()
@@ -262,6 +263,7 @@ def video_playback_item(context, video_item, show_fanart=None):
         list_item.setMimeType(mime_type)
 
     if is_strm:
+        list_item.setProperties(props)
         return list_item
 
     if not context.get_param('resume'):
