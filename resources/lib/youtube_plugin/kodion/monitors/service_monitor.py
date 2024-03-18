@@ -73,6 +73,7 @@ class ServiceMonitor(xbmc.Monitor):
                 return
         if changes > 1:
             log_debug('onSettingsChanged: {0} changes'.format(changes))
+        self._settings_changes = 0
 
         settings = self._settings
         settings.flush(xbmcaddon.Addon(ADDON_ID))
