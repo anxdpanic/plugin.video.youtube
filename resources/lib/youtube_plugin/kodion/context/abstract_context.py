@@ -88,6 +88,7 @@ class AbstractContext(object):
         'uri',
         'videoid',  # deprecated
         'video_id',
+        'video_name',
         'visitor',
     }
 
