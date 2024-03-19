@@ -1470,7 +1470,7 @@ msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Ver
 msgstr ""
 
 msgctxt "#30792"
-msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities "
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
 msgstr ""
 
 msgctxt "#30793"
