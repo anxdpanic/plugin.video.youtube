@@ -1473,3 +1473,15 @@ msgstr ""
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities "
 msgstr ""
+
+msgctxt "#30793"
+msgid "Views count display color"
+msgstr ""
+
+msgctxt "#30794"
+msgid "Likes count display color"
+msgstr ""
+
+msgctxt "#30795"
+msgid "Comments count display color"
+msgstr ""

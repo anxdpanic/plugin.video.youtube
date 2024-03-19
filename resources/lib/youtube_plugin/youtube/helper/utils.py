@@ -29,13 +29,6 @@ except ImportError:
     ISHelper = None
 
 
-__COLOR_MAP = {
-    'commentCount': 'cyan',
-    'favoriteCount': 'gold',
-    'likeCount': 'lime',
-    'viewCount': 'lightblue',
-}
-
 __RE_PLAYLIST_MATCH = re.compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
@@ -65,6 +58,7 @@ def get_thumb_timestamp(minutes=15):
 
 
 def make_comment_item(context, snippet, uri, total_replies=0):
+    settings = context.get_settings()
     ui = context.get_ui()
 
     author = ui.bold(snippet['authorDisplayName'])
@@ -76,7 +70,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
     like_count = snippet['likeCount']
     if like_count:
         like_count = friendly_number(like_count)
-        color = __COLOR_MAP['likeCount']
+        color = settings.get_label_color('likeCount')
         label_likes = ui.color(color, ui.bold(like_count))
         plot_likes = ui.color(color, ui.bold(' '.join((
             like_count, context.localize('video.comments.likes')
@@ -86,7 +80,7 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     if total_replies:
         total_replies = friendly_number(total_replies)
-        color = __COLOR_MAP['commentCount']
+        color = settings.get_label_color('commentCount')
         label_replies = ui.color(color, ui.bold(total_replies))
         plot_replies = ui.color(color, ui.bold(' '.join((
             total_replies, context.localize('video.comments.replies')
@@ -471,7 +465,7 @@ def update_video_infos(provider, context, video_id_dict,
                 if not value:
                     continue
 
-                color = __COLOR_MAP.get(stat, 'white')
+                color = settings.get_label_color(stat)
                 label = context.localize(label)
                 if value == 1:
                     label = label.rstrip('s')
