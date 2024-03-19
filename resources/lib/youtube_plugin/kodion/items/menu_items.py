@@ -129,11 +129,13 @@ def remove_video_from_playlist(context, playlist_id, video_id, video_name):
         context.localize('remove'),
         'RunPlugin({0})'.format(context.create_uri(
             ('playlist', 'remove', 'video',),
-            {
-                'playlist_id': playlist_id,
-                'video_id': video_id,
-                'video_name': video_name,
-            },
+            dict(
+                context.get_params(),
+                playlist_id=playlist_id,
+                video_id=video_id,
+                video_name=video_name,
+                reload_path=context.get_path(),
+            ),
         ))
     )
 

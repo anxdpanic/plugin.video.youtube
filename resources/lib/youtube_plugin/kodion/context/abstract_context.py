@@ -83,6 +83,7 @@ class AbstractContext(object):
         'playlist_name',
         'q',
         'rating',
+        'reload_path',
         'search_type',
         'subscription_id',
         'uri',
