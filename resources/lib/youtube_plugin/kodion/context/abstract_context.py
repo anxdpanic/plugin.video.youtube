@@ -43,7 +43,6 @@ class AbstractContext(object):
         'play',
         'prompt_for_subtitles',
         'refresh',
-        'refresh_container'
         'resume',
         'screensaver',
         'strm',

@@ -674,14 +674,13 @@ def update_video_infos(provider, context, video_id_dict,
                 )
 
         # more...
-        refresh_container = path.startswith((paths.LIKED_VIDEOS,
-                                             paths.DISLIKED_VIDEOS))
+        refresh = path.startswith((paths.LIKED_VIDEOS, paths.DISLIKED_VIDEOS))
         context_menu.extend((
             menu_items.more_for_video(
                 context,
                 video_id,
                 logged_in=logged_in,
-                refresh_container=refresh_container,
+                refresh=refresh,
             ),
             menu_items.play_with_subtitles(
                 context, video_id
