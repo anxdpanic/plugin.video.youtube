@@ -182,7 +182,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         if self._echo and echo is not False:
             if setting == 'youtube.location':
-                echo = '|xx.xxxx,xx.xxxx|'
+                echo = 'xx.xxxx,xx.xxxx'
             elif setting == 'youtube.api.id':
                 echo = '...'.join((value[:3], value[-5:]))
             elif setting in ('youtube.api.key', 'youtube.api.secret'):
@@ -210,7 +210,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         if self._echo and echo is not False:
             if setting == 'youtube.location':
-                echo = '|xx.xxxx,xx.xxxx|'
+                echo = 'xx.xxxx,xx.xxxx'
             elif setting == 'youtube.api.id':
                 echo = '...'.join((value[:3], value[-5:]))
             elif setting in ('youtube.api.key', 'youtube.api.secret'):
