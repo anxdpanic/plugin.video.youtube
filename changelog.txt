@@ -1,4 +1,4 @@
-## v7.0.4+beta.3
+## v7.0.4
 ### Fixed
 - Fix issues with Profiler running without timer when debug logging was enabled
 - Fix additional Python 2 unicode handling issues when accessing My Subscription #639
