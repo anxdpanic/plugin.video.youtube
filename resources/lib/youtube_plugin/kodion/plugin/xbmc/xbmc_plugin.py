@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import xbmcgui, xbmcplugin
+from ...compatibility import xbmcplugin
 from ...exceptions import KodionException
 from ...items import (
     AudioItem,
@@ -66,7 +66,7 @@ class XbmcPlugin(AbstractPlugin):
                 context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
                     exc=exc, details=''.join(format_stack())
                 ))
-                xbmcgui.Dialog().ok("Error in ContentProvider", exc.__str__())
+                ui.on_ok("Error in ContentProvider", exc.__str__())
             xbmcplugin.endOfDirectory(self.handle, succeeded=False)
             return False
 

@@ -69,9 +69,10 @@ def _process_remove_video(provider, context):
     listitem_title = context.get_listitem_detail('Title', attr=True)
     keymap_action = False
 
-    playlist_id = context.get_param('playlist_id', '')
-    video_id = context.get_param('video_id', '')
-    video_name = context.get_param('video_name', '')
+    params = context.get_params()
+    playlist_id = params.pop('playlist_id', '')
+    video_id = params.pop('video_id', '')
+    video_name = params.pop('video_name', '')
 
     # keymap support
     if (not playlist_id and not video_id and listitem_playlist_id
@@ -103,7 +104,8 @@ def _process_remove_video(provider, context):
             if not success:
                 return False
 
-            context.get_ui().refresh_container()
+            path = params.pop('reload_path', None)
+            context.get_ui().reload_container(path)
 
             context.get_ui().show_notification(
                 message=context.localize('playlist.removed_from'),

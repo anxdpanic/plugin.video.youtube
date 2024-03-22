@@ -70,7 +70,7 @@ def _process_rate_video(provider, context, re_match):
 
         elif response.get('status_code') == 204:
             # this will be set if we are in the 'Liked Video' playlist
-            if context.get_param('refresh_container'):
+            if context.get_param('refresh'):
                 context.get_ui().refresh_container()
 
             if result == 'none':
@@ -104,7 +104,7 @@ def _process_more_for_video(context):
         menu_items.content_from_description(context, video_id),
         menu_items.rate_video(context,
                               video_id,
-                              params.get('refresh_container')),
+                              params.get('refresh')),
     ] if params.get('logged_in') else [
         menu_items.related_videos(context, video_id),
         menu_items.video_comments(context, video_id),

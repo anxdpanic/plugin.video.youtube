@@ -1537,9 +1537,9 @@ class YouTube(LoginClient):
                     if response:
                         response.encoding = 'utf-8'
                         xml_data = to_unicode(response.content)
+                        xml_data = xml_data.replace('\n', '')
                         if not current_system_version.compatible(19, 0):
                             xml_data = xml_data.encode('utf-8')
-                        xml_data = xml_data.replace('\n', '')
 
                         root = ET.fromstring(xml_data)
 
