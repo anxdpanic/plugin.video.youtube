@@ -59,8 +59,9 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
+            -u '/addon/@version' -v "${version}+nexus.1" \
             addon.xml
-          filename=${{ github.event.repository.name }}-${version}.zip
+          filename=${{ github.event.repository.name }}-${version}.nexus.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
@@ -84,9 +85,9 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            -u '/addon/@version' -v "${version}+unofficial.1" \
+            -u '/addon/@version' -v "${version}+nexus.unofficial.1" \
             addon.xml
-          filename=${{ github.event.repository.name }}-${version}.unofficial.1.zip
+          filename=${{ github.event.repository.name }}-${version}.nexus.unofficial.1.zip
           cd ..
           zip -r $filename ${{ github.event.repository.name }}
           mv .git ${{ github.event.repository.name }}
