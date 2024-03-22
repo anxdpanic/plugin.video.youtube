@@ -43,7 +43,6 @@ class AbstractContext(object):
         'play',
         'prompt_for_subtitles',
         'refresh',
-        'refresh_container'
         'resume',
         'screensaver',
         'strm',
@@ -84,11 +83,13 @@ class AbstractContext(object):
         'playlist_name',
         'q',
         'rating',
+        'reload_path',
         'search_type',
         'subscription_id',
         'uri',
         'videoid',  # deprecated
         'video_id',
+        'video_name',
         'visitor',
     }
 

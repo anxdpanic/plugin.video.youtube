@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from ..constants import paths
 
 
-def more_for_video(context, video_id, logged_in=False, refresh_container=False):
+def more_for_video(context, video_id, logged_in=False, refresh=False):
     return (
         context.localize('video.more'),
         'RunPlugin({0})'.format(context.create_uri(
@@ -21,7 +21,7 @@ def more_for_video(context, video_id, logged_in=False, refresh_container=False):
             {
                 'video_id': video_id,
                 'logged_in': logged_in,
-                'refresh_container': refresh_container,
+                'refresh': refresh,
             },
         ))
     )
@@ -129,11 +129,13 @@ def remove_video_from_playlist(context, playlist_id, video_id, video_name):
         context.localize('remove'),
         'RunPlugin({0})'.format(context.create_uri(
             ('playlist', 'remove', 'video',),
-            {
-                'playlist_id': playlist_id,
-                'video_id': video_id,
-                'video_name': video_name,
-            },
+            dict(
+                context.get_params(),
+                playlist_id=playlist_id,
+                video_id=video_id,
+                video_name=video_name,
+                reload_path=context.get_path(),
+            ),
         ))
     )
 
@@ -242,14 +244,14 @@ def add_my_subscriptions_filter(context, channel_name):
     )
 
 
-def rate_video(context, video_id, refresh_container=False):
+def rate_video(context, video_id, refresh=False):
     return (
         context.localize('video.rate'),
         'RunPlugin({0})'.format(context.create_uri(
             ('video', 'rate',),
             {
                 'video_id': video_id,
-                'refresh_container': refresh_container,
+                'refresh': refresh,
             },
         ))
     )

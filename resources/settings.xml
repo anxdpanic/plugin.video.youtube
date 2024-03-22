@@ -704,6 +704,54 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.view.label.color.viewCount" type="string" parent="youtube.view.label.details" label="30793" help="">
+                    <level>0</level>
+                    <default>ffadd8e6</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition on="property" name="infobool" operator="!is">String.StartsWith(System.BuildVersionShort,1)</condition>
+                        </dependency>
+                        <dependency type="enable">
+                            <or>
+                                <condition setting="youtube.view.description.details" operator="is">true</condition>
+                                <condition setting="youtube.view.label.details" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                    </dependencies>
+                    <control type="colorbutton"/>
+                </setting>
+                <setting id="youtube.view.label.color.likeCount" type="string" parent="youtube.view.label.details" label="30794" help="">
+                    <level>0</level>
+                    <default>ff00ff00</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition on="property" name="infobool" operator="!is">String.StartsWith(System.BuildVersionShort,1)</condition>
+                        </dependency>
+                        <dependency type="enable">
+                            <or>
+                                <condition setting="youtube.view.description.details" operator="is">true</condition>
+                                <condition setting="youtube.view.label.details" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                    </dependencies>
+                    <control type="colorbutton"/>
+                </setting>
+                <setting id="youtube.view.label.color.commentCount" type="string" parent="youtube.view.label.details" label="30795" help="">
+                    <level>0</level>
+                    <default>ff00ffff</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <condition on="property" name="infobool" operator="!is">String.StartsWith(System.BuildVersionShort,1)</condition>
+                        </dependency>
+                        <dependency type="enable">
+                            <or>
+                                <condition setting="youtube.view.description.details" operator="is">true</condition>
+                                <condition setting="youtube.view.label.details" operator="is">true</condition>
+                            </or>
+                        </dependency>
+                    </dependencies>
+                    <control type="colorbutton"/>
+                </setting>
                 <setting id="kodion.thumbnail.size" type="integer" label="30591" help="">
                     <level>0</level>
                     <default>1</default>

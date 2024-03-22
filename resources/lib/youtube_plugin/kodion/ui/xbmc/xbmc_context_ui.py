@@ -133,6 +133,15 @@ class XbmcContextUI(AbstractContextUI):
             addon_id=ADDON_ID
         ))
 
+    def reload_container(self, path=None):
+        context = self._context
+        xbmc.executebuiltin('ReplaceWindow(Videos, {0})'.format(
+            context.create_uri(
+                path or context.get_path(),
+                dict(context.get_params(), refresh=True),
+            )
+        ))
+
     @staticmethod
     def set_property(property_id, value):
         property_id = '-'.join((ADDON_ID, property_id))
