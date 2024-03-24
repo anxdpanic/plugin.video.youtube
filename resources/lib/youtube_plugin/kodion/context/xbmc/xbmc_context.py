@@ -510,7 +510,7 @@ class XbmcContext(AbstractContext):
 
         return new_context
 
-    def execute(self, command, wait=True, wait_for=None):
+    def execute(self, command, wait=False, wait_for=None):
         xbmc.executebuiltin(command, wait)
         if wait_for:
             ui = self.get_ui()
