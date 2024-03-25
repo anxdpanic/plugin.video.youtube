@@ -301,7 +301,7 @@ class AccessManager(JSONStore):
         if playlist_id.lower().strip() == 'wl':
             playlist_id = ''
 
-        self._settings.set_watch_later_playlist(playlist_id)
+        self._settings.set_watch_later_playlist('')
         data = {
             'access_manager': {
                 'users': {
@@ -339,7 +339,7 @@ class AccessManager(JSONStore):
         if playlist_id.lower().strip() == 'hl':
             playlist_id = ''
 
-        self._settings.set_history_playlist(playlist_id)
+        self._settings.set_history_playlist('')
         data = {
             'access_manager': {
                 'users': {
