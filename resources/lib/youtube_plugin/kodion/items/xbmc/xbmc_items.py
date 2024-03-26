@@ -11,182 +11,316 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .. import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
-from ...compatibility import set_info_tag, xbmcgui
+from ...compatibility import xbmc, xbmcgui
 from ...utils import current_system_version, datetime_parser
 
 
-def _process_date_value(info_labels, name, param):
-    if param:
-        info_labels[name] = param.isoformat()
+def set_info(list_item, item, properties):
+    if not current_system_version.compatible(20, 0):
+        is_video = False
 
+        if isinstance(item, VideoItem):
+            is_video = True
+            info_labels = {}
 
-def _process_datetime_value(info_labels, name, param):
-    if not param:
+            value = item.get_aired(as_info_label=True)
+            if value is not None:
+                info_labels['aired'] = value
+
+            value = item.get_artists()
+            if value is not None:
+                info_labels['artist'] = value
+
+            value = item.get_code()
+            if value is not None:
+                info_labels['code'] = value
+
+            value = item.get_count()
+            if value is not None:
+                info_labels['count'] = value
+
+            value = item.get_date(as_info_label=True)
+            if value is not None:
+                info_labels['date'] = value
+
+            value = item.get_dateadded(as_info_label=True)
+            if value is not None:
+                info_labels['dateadded'] = value
+
+            value = item.get_duration()
+            if value is not None:
+                info_labels['duration'] = value
+
+            value = item.get_episode()
+            if value is not None:
+                info_labels['episode'] = value
+
+            value = item.get_last_played(as_info_label=True)
+            if value is not None:
+                info_labels['lastplayed'] = value
+
+            value = item.get_mediatype()
+            if value is not None:
+                info_labels['mediatype'] = value
+
+            value = item.get_play_count()
+            if value is not None:
+                info_labels['playcount'] = value
+
+            value = item.get_plot()
+            if value is not None:
+                info_labels['plot'] = value
+
+            value = item.get_premiered(as_info_label=True)()
+            if value is not None:
+                info_labels['premiered'] = value
+
+            value = item.get_rating()
+            if value is not None:
+                info_labels['rating'] = value
+
+            value = item.get_season()
+            if value is not None:
+                info_labels['season'] = value
+
+            value = item.get_title()
+            if value is not None:
+                info_labels['title'] = value
+
+            value = item.get_track_number()
+            if value is not None:
+                info_labels['tracknumber'] = value
+
+            value = item.get_year()
+            if value is not None:
+                info_labels['year'] = value
+
+            if info_labels:
+                list_item.setInfo('video', info_labels)
+
+        elif isinstance(item, DirectoryItem):
+            value = item.get_plot()
+            if value is not None:
+                list_item.setInfo('picture', {'plot': value})
+
+            if properties:
+                list_item.setProperties(properties)
+            return
+
+        elif isinstance(item, AudioItem):
+            info_labels = {}
+
+            value = item.get_album_name()
+            if value is not None:
+                info_labels['album'] = value
+
+            value = item.get_artists()
+            if value is not None:
+                info_labels['artist'] = value
+
+            value = item.get_duration()
+            if value is not None:
+                info_labels['duration'] = value
+
+            value = item.get_rating()
+            if value is not None:
+                info_labels['rating'] = value
+
+            value = item.get_title()
+            if value is not None:
+                info_labels['title'] = value
+
+            value = item.get_track_number()
+            if value is not None:
+                info_labels['tracknumber'] = value
+
+            value = item.get_year()
+            if value is not None:
+                info_labels['year'] = value
+
+            if info_labels:
+                list_item.setInfo('music', info_labels)
+
+        elif isinstance(item, ImageItem):
+            value = item.get_title()
+            if value is not None:
+                list_item.setInfo('picture', {'title': value})
+
+            if properties:
+                list_item.setProperties(properties)
+            return
+
+        resume_time = item.get_start_time()
+        if resume_time:
+            properties['ResumeTime'] = str(resume_time)
+        duration = item.get_duration()
+        if duration:
+            properties['TotalTime'] = str(duration)
+            if is_video:
+                list_item.addStreamInfo('video', {'duration': duration})
+        if properties:
+            list_item.setProperties(properties)
         return
-    info_labels[name] = (param.replace(microsecond=0, tzinfo=None).isoformat()
-                         if current_system_version.compatible(19, 0) else
-                         param.strftime('%d.%m.%Y'))
 
+    if properties:
+        list_item.setProperties(properties)
 
-def _process_int_value(info_labels, name, param):
-    if param is not None:
-        info_labels[name] = int(param)
+    value = item.get_date(as_info_label=True)
+    if value is not None:
+        list_item.setDateTime(value)
 
+    info_tag = None
 
-def _process_string_value(info_labels, name, param):
-    if param is not None:
-        info_labels[name] = param
+    if isinstance(item, VideoItem):
+        is_video = True
+        info_tag = list_item.getVideoInfoTag()
 
+        value = item.get_dateadded(as_info_label=True)
+        if value is not None:
+            info_tag.setDateAdded(value)
 
-def _process_studios(info_labels, name, param):
-    if param is not None:
-        info_labels[name] = [param]
+        value = item.get_last_played(as_info_label=True)
+        if value is not None:
+            info_tag.setLastPlayed(value)
 
+        value = item.get_aired(as_info_label=True)
+        if value is not None:
+            info_tag.setFirstAired(value)
 
-def _process_audio_rating(info_labels, param):
-    if param is not None:
-        rating = int(param)
-        if rating > 5:
-            rating = 5
-        elif rating < 0:
-            rating = 0
-        info_labels['rating'] = rating
+        value = item.get_premiered(as_info_label=True)
+        if value is not None:
+            info_tag.setPremiered(value)
 
-
-def _process_video_duration(info_labels, param):
-    if param is not None:
-        info_labels['duration'] = '%d' % param
-
-
-def _process_video_rating(info_labels, param):
-    if param is not None:
-        rating = float(param)
-        if rating > 10.0:
-            rating = 10.0
-        elif rating < 0.0:
-            rating = 0.0
-        info_labels['rating'] = rating
-
-
-def _process_date_string(info_labels, name, param):
-    if param:
-        date = datetime_parser.parse(param)
-        info_labels[name] = date.isoformat()
-
-
-def _process_list_value(info_labels, name, param):
-    if param is not None and isinstance(param, list):
-        info_labels[name] = param
-
-
-def _process_mediatype(info_labels, name, param):
-    info_labels[name] = param
-
-
-def create_info_labels(base_item):
-    info_labels = {}
-
-    # 'date' = '1982-03-09' (string)
-    _process_datetime_value(info_labels, 'date', base_item.get_date())
-
-    # Directory
-    if isinstance(base_item, DirectoryItem):
-        _process_string_value(info_labels, 'plot', base_item.get_plot())
-
-    # Image
-    elif isinstance(base_item, ImageItem):
-        # 'title' = 'Blow Your Head Off' (string)
-        _process_string_value(info_labels, 'title', base_item.get_title())
-
-    # Audio
-    elif isinstance(base_item, AudioItem):
-        # 'duration' = 79 (int)
-        _process_int_value(info_labels, 'duration', base_item.get_duration())
-
-        # 'album' = 'Buckle Up' (string)
-        _process_string_value(info_labels, 'album', base_item.get_album_name())
-
-        # 'artist' = 'Angerfist' (string)
-        _process_string_value(info_labels, 'artist', base_item.get_artist_name())
-
-        # 'rating' = '0' - '5' (string)
-        _process_audio_rating(info_labels, base_item.get_rating())
-
-    # Video
-    elif isinstance(base_item, VideoItem):
-        # mediatype
-        _process_mediatype(info_labels, 'mediatype', base_item.get_mediatype())
-
-        # play count
-        _process_int_value(info_labels, 'playcount', base_item.get_play_count())
-
-        # 'count' = 12 (integer)
+        # count: int
+        # eg. 12
         # Can be used to store an id for later, or for sorting purposes
         # Used for Youtube video view count
-        _process_int_value(info_labels, 'count', base_item.get_count())
+        value = item.get_count()
+        if value is not None:
+            list_item.setInfo('video', {'count': value})
 
-        # studio
-        _process_studios(info_labels, 'studio', base_item.get_studio())
+        # cast: list[xbmc.Actor]
+        # From list[{member: str, role: str, order: int, thumbnail: str}]
+        # Currently unused
+        # info_tag.setCast(xbmc.Actor(**member) for member in item.get_cast())
 
-        # 'artist' = [] (list)
-        _process_list_value(info_labels, 'artist', base_item.get_artist())
-
-        # 'dateadded' = '2014-08-11 13:08:56' (string) will be taken from 'dateadded'
-        _process_datetime_value(info_labels, 'dateadded', base_item.get_dateadded())
-
-        # TODO: starting with Helix this could be seconds
-        # 'duration' = '3:18' (string)
-        _process_video_duration(info_labels, base_item.get_duration())
-
-        _process_datetime_value(info_labels, 'lastplayed', base_item.get_last_played())
-
-        # 'rating' = 4.5 (float)
-        _process_video_rating(info_labels, base_item.get_rating())
-
-        # 'aired' = '2013-12-12' (string)
-        _process_date_value(info_labels, 'aired', base_item.get_aired(as_text=False))
-
-        # 'director' = 'Steven Spielberg' (string)
-        _process_string_value(info_labels, 'director', base_item.get_director())
-
-        # 'premiered' = '2013-12-12' (string)
-        _process_date_value(info_labels, 'premiered', base_item.get_premiered(as_text=False))
-
-        # 'episode' = 12 (int)
-        _process_int_value(info_labels, 'episode', base_item.get_episode())
-
-        # 'season' = 12 (int)
-        _process_int_value(info_labels, 'season', base_item.get_season())
-
-        # 'plot' = '...' (string)
-        _process_string_value(info_labels, 'plot', base_item.get_plot())
-
-        # 'imdbnumber' = 'tt3458353' (string) - imdb id
-        _process_string_value(info_labels, 'imdbnumber', base_item.get_imdb_id())
-
-        # 'cast' = [] (list)
-        _process_list_value(info_labels, 'cast', base_item.get_cast())
-
-        # 'code' = '101' (string)
+        # code: str
+        # eg. "466K | 3.9K | 312"
         # Production code, currently used to store misc video data for label
         # formatting
-        _process_string_value(info_labels, 'code', base_item.get_code())
+        value = item.get_code()
+        if value is not None:
+            info_tag.setProductionCode(value)
 
-    # Audio and Video
-    if isinstance(base_item, (AudioItem, VideoItem)):
-        # 'title' = 'Blow Your Head Off' (string)
-        _process_string_value(info_labels, 'title', base_item.get_title())
+        # director: list[str]
+        # eg. "Steven Spielberg"
+        # Currently unused
+        # info_tag.setDirectors(item.get_directors())
 
-        # 'tracknumber' = 12 (int)
-        _process_int_value(info_labels, 'tracknumber', base_item.get_track_number())
+        # episode: int
+        value = item.get_episode()
+        if value is not None:
+            info_tag.setEpisode(value)
 
-        # 'year' = 1994 (int)
-        _process_int_value(info_labels, 'year', base_item.get_year())
+        # imdbnumber: str
+        # eg. "tt3458353"
+        # Currently unused
+        # info_tag.setIMDBNumber(item.get_imdb_id())
 
-        # 'genre' = 'Hardcore' (string)
-        _process_string_value(info_labels, 'genre', base_item.get_genre())
+        # mediatype: str
+        value = item.get_mediatype()
+        if value is not None:
+            info_tag.setMediaType(value)
 
-    return info_labels
+        # playcount: int
+        value = item.get_play_count()
+        if value is not None:
+            info_tag.setPlaycount(value)
+
+        # plot: str
+        value = item.get_plot()
+        if value is not None:
+            info_tag.setPlot(value)
+
+        # season: int
+        value = item.get_season()
+        if value is not None:
+            info_tag.setSeason(value)
+
+        # studio: list[str]
+        # Currently unused
+        # info_tag.setStudios(item.get_studios())
+
+    elif isinstance(item, DirectoryItem):
+        info_tag = list_item.getVideoInfoTag()
+
+        value = item.get_plot()
+        if value is not None:
+            info_tag.setPlot(value)
+        return
+
+    elif isinstance(item, ImageItem):
+        value = item.get_title()
+        if value is not None:
+            list_item.setInfo('picture', {'title': value})
+        return
+
+    elif isinstance(item, AudioItem):
+        info_tag = list_item.getMusicInfoTag()
+
+        # album: str
+        # eg. "Buckle Up"
+        value = item.get_album_name()
+        if value is not None:
+            info_tag.setAlbum(value)
+
+    resume_time = item.get_start_time()
+    duration = item.get_duration()
+    if resume_time and duration:
+        info_tag.setResumePoint(resume_time, float(duration))
+    elif resume_time:
+        info_tag.setResumePoint(resume_time)
+    if is_video and duration:
+        info_tag.addVideoStream(xbmc.VideoStreamDetail(duration=duration))
+
+    # artist: list[str]
+    # eg. ["Angerfist"]
+    value = item.get_artists()
+    if value is not None:
+        info_tag.setArtists(value)
+
+    # duration: int
+    # As seconds
+    if duration is not None:
+        info_tag.setDuration(duration)
+
+    # genre: list[str]
+    # eg. ["Hardcore"]
+    # Currently unused
+    # info_tag.setGenres(item.get_genres())
+
+    # rating: float
+    value = item.get_rating()
+    if value is not None:
+        info_tag.setRating(value)
+
+    # title: str
+    # eg. "Blow Your Head Off"
+    value = item.get_title()
+    if value is not None:
+        info_tag.setTitle(value)
+
+    # tracknumber: int
+    # eg. 12
+    value = item.get_track_number()
+    if value is not None:
+        info_tag.setTrackNumber(value)
+
+    # year: int
+    # eg. 1994
+    value = item.get_year()
+    if value is not None:
+        info_tag.setYear(value)
 
 
 def video_playback_item(context, video_item, show_fanart=None):
@@ -266,18 +400,6 @@ def video_playback_item(context, video_item, show_fanart=None):
         list_item.setProperties(props)
         return list_item
 
-    if not context.get_param('resume'):
-        if context.get_param('start'):
-            prop_value = video_item.get_start_time()
-            if prop_value:
-                props['ResumeTime'] = prop_value
-        elif 'ResumeTime' in props:
-            del props['ResumeTime']
-
-        prop_value = video_item.get_duration()
-        if prop_value:
-            props['TotalTime'] = prop_value
-
     if show_fanart is None:
         show_fanart = settings.show_fanart()
     image = video_item.get_image()
@@ -290,15 +412,7 @@ def video_playback_item(context, video_item, show_fanart=None):
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
-    item_info = create_info_labels(video_item)
-    info_tag = set_info_tag(list_item, item_info, 'video')
-    info_tag.set_resume_point(props)
-
-    # This should work for all versions of XBMC/KODI.
-    if 'duration' in item_info:
-        info_tag.add_stream_info('video', {'duration': item_info['duration']})
-
-    list_item.setProperties(props)
+    set_info(list_item, video_item, props)
 
     return list_item
 
@@ -329,10 +443,7 @@ def audio_listitem(context, audio_item, show_fanart=None):
         'thumb': image,
     })
 
-    item_info = create_info_labels(audio_item)
-    set_info_tag(list_item, item_info, 'music')
-
-    list_item.setProperties(props)
+    set_info(list_item, audio_item, props)
 
     context_menu = audio_item.get_context_menu()
     if context_menu:
@@ -373,8 +484,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
         'thumb': image,
     })
 
-    item_info = create_info_labels(directory_item)
-    set_info_tag(list_item, item_info, 'video')
+    set_info(list_item, directory_item, props)
 
     """
     # ListItems that do not open a lower level list should have the isFolder
@@ -386,8 +496,6 @@ def directory_listitem(context, directory_item, show_fanart=None):
     is_folder = not directory_item.is_action()
     """
     is_folder = True
-
-    list_item.setProperties(props)
 
     context_menu = directory_item.get_context_menu()
     if context_menu is not None:
@@ -423,10 +531,7 @@ def image_listitem(context, image_item, show_fanart=None):
         'thumb': image,
     })
 
-    item_info = create_info_labels(image_item)
-    set_info_tag(list_item, item_info, 'picture')
-
-    list_item.setProperties(props)
+    set_info(list_item, image_item, props)
 
     context_menu = image_item.get_context_menu()
     if context_menu is not None:
@@ -487,14 +592,6 @@ def video_listitem(context, video_item, show_fanart=None):
             context, local_datetime
         ))
 
-    prop_value = video_item.get_start_time()
-    if prop_value:
-        props['ResumeTime'] = prop_value
-
-    prop_value = video_item.get_duration()
-    if prop_value:
-        props['TotalTime'] = prop_value
-
     # make channel_id property available for keymapping
     prop_value = video_item.get_channel_id()
     if prop_value:
@@ -527,15 +624,7 @@ def video_listitem(context, video_item, show_fanart=None):
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
-    item_info = create_info_labels(video_item)
-    info_tag = set_info_tag(list_item, item_info, 'video')
-    info_tag.set_resume_point(props)
-
-    # This should work for all versions of XBMC/KODI.
-    if 'duration' in item_info:
-        info_tag.add_stream_info('video', {'duration': item_info['duration']})
-
-    list_item.setProperties(props)
+    set_info(list_item, video_item, props)
 
     context_menu = video_item.get_context_menu()
     if context_menu:

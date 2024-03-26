@@ -14,7 +14,7 @@ import json
 from datetime import date, datetime
 from hashlib import md5
 
-from ..compatibility import string_type, unescape
+from ..compatibility import datetime_infolabel, string_type, unescape
 from ..constants import MEDIA_PATH
 
 
@@ -172,13 +172,15 @@ class BaseItem(object):
     def set_date_from_datetime(self, date_time):
         self._date = date_time
 
-    def get_date(self, as_text=False, short=False):
+    def get_date(self, as_text=False, short=False, as_info_label=False):
         if not self._date:
             return ''
         if short:
             return self._date.date().strftime('%x')
         if as_text:
             return self._date.strftime('%x %X')
+        if as_info_label:
+            return datetime_infolabel(self._date)
         return self._date
 
     def set_dateadded(self, year, month, day, hour=0, minute=0, second=0):
@@ -192,11 +194,13 @@ class BaseItem(object):
     def set_dateadded_from_datetime(self, date_time):
         self._dateadded = date_time
 
-    def get_dateadded(self, as_text=False):
+    def get_dateadded(self, as_text=False, as_info_label=False):
         if not self._dateadded:
             return ''
         if as_text:
             return self._dateadded.strftime('%x %X')
+        if as_info_label:
+            return datetime_infolabel(self._date)
         return self._dateadded
 
     def set_added_utc(self, date_time):

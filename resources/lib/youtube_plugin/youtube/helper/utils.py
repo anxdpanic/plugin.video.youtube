@@ -534,7 +534,7 @@ def update_video_infos(provider, context, video_id_dict,
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 description,
             ))
-        # video_item.set_studio(channel_name)
+        # video_item.add_studio(channel_name)
         # video_item.add_cast(channel_name)
         video_item.add_artist(channel_name)
         video_item.set_plot(description)
