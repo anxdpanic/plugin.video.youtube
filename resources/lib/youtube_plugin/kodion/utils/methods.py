@@ -30,6 +30,7 @@ __all__ = (
     'friendly_number',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',
+    'jsonrpc',
     'loose_version',
     'make_dirs',
     'merge_dicts',
@@ -313,14 +314,9 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
 
 
 def get_kodi_setting_value(setting):
-    json_query = xbmc.executeJSONRPC(json.dumps({
-        'jsonrpc': '2.0',
-        'method': 'Settings.GetSettingValue',
-        'params': {'setting': setting},
-        'id': 1,
-    }))
-    json_query = json.loads(json_query)
-    return json_query.get('result', {}).get('value')
+    response = jsonrpc(method='Settings.GetSettingValue',
+                       params={'setting': setting})
+    return response.get('result', {}).get('value')
 
 
 def get_kodi_setting_bool(setting):
@@ -336,6 +332,26 @@ def validate_ip_address(ip_address):
     except ValueError:
         return (0, 0, 0, 0)
     return tuple(octets)
+
+
+def jsonrpc(batch=None, **kwargs):
+    """
+    Perform JSONRPC calls
+    """
+
+    if not batch and not kwargs:
+        return None
+
+    do_response = False
+    for request_id, kwargs in enumerate(batch or (kwargs, )):
+        do_response = (not kwargs.pop('no_response', False)) or do_response
+        if do_response and 'id' not in kwargs:
+            kwargs['id'] = request_id
+        kwargs['jsonrpc'] = '2.0'
+
+    request = json.dumps(batch or kwargs, default=tuple, ensure_ascii=False)
+    response = xbmc.executeJSONRPC(request)
+    return json.loads(response) if do_response else None
 
 
 def wait(timeout=None):

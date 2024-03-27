@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
 import sys
 import weakref
 
@@ -30,6 +29,7 @@ from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
     get_kodi_setting_value,
+    jsonrpc,
     loose_version,
     make_dirs,
     to_unicode,
@@ -526,51 +526,38 @@ class XbmcContext(AbstractContext):
         wait(timeout)
 
     def addon_enabled(self, addon_id):
-        rpc_request = json.dumps({"jsonrpc": "2.0",
-                                  "method": "Addons.GetAddonDetails",
-                                  "id": 1,
-                                  "params": {"addonid": "%s" % addon_id,
-                                             "properties": ["enabled"]}
-                                  })
-        response = json.loads(xbmc.executeJSONRPC(rpc_request))
+        response = jsonrpc(method='Addons.GetAddonDetails',
+                           params={'addonid': addon_id,
+                                   'properties': ['enabled']})
         try:
             return response['result']['addon']['enabled'] is True
         except KeyError:
-            message = response['error']['message']
-            code = response['error']['code']
-            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            self.log_error(error)
+            error = response.get('error', {})
+            self.log_error('XbmcContext.addon_enabled error - |{0}: {1}|'
+                           .format(error.get('code', 'unknown'),
+                                   error.get('message', 'unknown')))
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
-        rpc_request = json.dumps({"jsonrpc": "2.0",
-                                  "method": "Addons.SetAddonEnabled",
-                                  "id": 1,
-                                  "params": {"addonid": "%s" % addon_id,
-                                             "enabled": enabled}
-                                  })
-        response = json.loads(xbmc.executeJSONRPC(rpc_request))
+        response = jsonrpc(method='Addons.SetAddonEnabled',
+                           params={'addonid': addon_id,
+                                   'enabled': enabled})
         try:
             return response['result'] == 'OK'
         except KeyError:
-            message = response['error']['message']
-            code = response['error']['code']
-            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-            self.log_error(error)
+            error = response.get('error', {})
+            self.log_error('XbmcContext.set_addon_enabled error - |{0}: {1}|'
+                           .format(error.get('code', 'unknown'),
+                                   error.get('message', 'unknown')))
             return False
 
     def send_notification(self, method, data):
         self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
-        xbmc.executeJSONRPC(json.dumps({
-            'jsonrpc': '2.0',
-            'id': 1,
-            'method': 'JSONRPC.NotifyAll',
-            'params': {
-                'sender': ADDON_ID,
-                'message': method,
-                'data': data,
-            },
-        }))
+        jsonrpc(method='JSONRPC.NotifyAll',
+                params={'sender': ADDON_ID,
+                        'message': method,
+                        'data': data},
+                no_response=True)
 
     def use_inputstream_adaptive(self):
         if self._settings.use_isa():

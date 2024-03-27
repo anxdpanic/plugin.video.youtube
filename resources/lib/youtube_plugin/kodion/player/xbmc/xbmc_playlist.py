@@ -15,6 +15,7 @@ import json
 from ..abstract_playlist import AbstractPlaylist
 from ...compatibility import xbmc
 from ...items import VideoItem, video_listitem
+from ...utils.methods import jsonrpc, wait
 
 
 class XbmcPlaylist(AbstractPlaylist):
@@ -46,32 +47,22 @@ class XbmcPlaylist(AbstractPlaylist):
         return self._playlist.size()
 
     def get_items(self, properties=None, dumps=False):
-        rpc_request = json.dumps({
-            'jsonrpc': '2.0',
-            'method': 'Playlist.GetItems',
-            'params': {
-                'properties': properties if properties else ['title', 'file'],
-                'playlistid': self._playlist.getPlayListId()
-            },
-            'id': 1
-        })
+        if properties is None:
+            properties = ('title', 'file')
+        response = jsonrpc(method='Playlist.GetItems',
+                           params={
+                               'properties': properties,
+                               'playlistid': self._playlist.getPlayListId(),
+                           })
 
-        response = json.loads(xbmc.executeJSONRPC(rpc_request))
-
-        if 'result' in response:
-            if 'items' in response['result']:
-                result = response['result']['items']
-            else:
-                result = []
+        try:
+            result = response['result']['items']
             return json.dumps(result, ensure_ascii=False) if dumps else result
-
-        if 'error' in response:
-            message = response['error']['message']
-            code = response['error']['code']
-            error = 'Requested |%s| received error |%s| and code: |%s|' % (rpc_request, message, code)
-        else:
-            error = 'Requested |%s| received error |%s|' % (rpc_request, str(response))
-        self._context.log_error(error)
+        except KeyError:
+            error = response.get('error', {})
+            self._context.log_error('XbmcPlaylist.get_items error - |{0}: {1}|'
+                                    .format(error.get('code', 'unknown'),
+                                            error.get('message', 'unknown')))
         return '[]' if dumps else []
 
     def add_items(self, items, loads=False):
@@ -85,13 +76,9 @@ class XbmcPlaylist(AbstractPlaylist):
         for item in items:
             self.add(VideoItem(item.get('title', ''), item['file']))
 
-        # rpc_request = json.dumps({
-        #     'jsonrpc': '2.0',
-        #     'method': 'Playlist.Add',
-        #     'params': {
-        #         'playlistid': self._playlist.getPlayListId(),
-        #         'item': items,
-        #     },
-        #     'id': 1
-        # })
-        # response = json.loads(xbmc.executeJSONRPC(rpc_request))
+        # jsonrpc(method='Playlist.Add',
+        #         params={
+        #             'playlistid': self._playlist.getPlayListId(),
+        #             'item': items,
+        #         },
+        #         no_response=True)
