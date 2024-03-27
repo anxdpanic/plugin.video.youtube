@@ -43,17 +43,30 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property('busy').lower() == 'true':
             ui.clear_property('busy')
             if ui.busy_dialog_active():
-                playlist = XbmcPlaylist('video', context)
+                ui.show_notification('Multiple busy dialogs active - Kodi may crash')
+                playlist = XbmcPlaylist('auto', context)
                 playlist.clear()
 
-                xbmcplugin.endOfDirectory(self.handle, succeeded=False)
-
                 items = ui.get_property('playlist')
-                if items:
+                position = ui.get_property('position')
+                if position and items:
                     ui.clear_property('playlist')
                     playlist.add_items(items, loads=True)
-                    context.log_error('Multiple busy dialogs active - '
-                                      'playlist reloaded to prevent Kodi crash')
+                    context.log_warning('Multiple busy dialogs active - '
+                                        'playlist reloaded to avoid Kodi crash')
+
+                    max_wait_time = 5
+                    while ui.busy_dialog_active():
+                        context.sleep(1)
+                        max_wait_time -= 1
+                        if max_wait_time <= 0:
+                            context.log_error('Multiple busy dialogs active - '
+                                              'unable to restart playback')
+                            break
+                    else:
+                        playlist.play_playlist_item(int(position) + 1)
+
+                xbmcplugin.endOfDirectory(self.handle, succeeded=False)
                 return False
 
         if settings.is_setup_wizard_enabled():
@@ -119,8 +132,11 @@ class XbmcPlugin(AbstractPlugin):
             ui = context.get_ui()
             if not context.is_plugin_path(uri) and ui.busy_dialog_active():
                 ui.set_property('busy', 'true')
-                playlist = XbmcPlaylist('video', context)
-                ui.set_property('playlist', playlist.get_items(dumps=True))
+                playlist = XbmcPlaylist('auto', context)
+                position, remaining = playlist.get_position()
+                if remaining:
+                    ui.set_property('playlist', playlist.get_items(dumps=True))
+                    ui.set_property('position', str(position))
 
             item = playback_item(context, base_item, show_fanart)
             xbmcplugin.setResolvedUrl(self.handle,
