@@ -40,6 +40,7 @@ __all__ = (
     'strip_html_from_text',
     'to_unicode',
     'validate_ip_address',
+    'wait',
 )
 
 
@@ -335,3 +336,11 @@ def validate_ip_address(ip_address):
     except ValueError:
         return (0, 0, 0, 0)
     return tuple(octets)
+
+
+def wait(timeout=None):
+    if not timeout:
+        timeout = 0
+    elif timeout < 0:
+        timeout = 0.1
+    return xbmc.Monitor().waitForAbort(timeout)

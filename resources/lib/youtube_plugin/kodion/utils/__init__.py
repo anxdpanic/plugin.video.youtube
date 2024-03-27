@@ -28,6 +28,7 @@ from .methods import (
     strip_html_from_text,
     to_unicode,
     validate_ip_address,
+    wait,
 )
 from .system_version import current_system_version
 
@@ -51,4 +52,5 @@ __all__ = (
     'strip_html_from_text',
     'to_unicode',
     'validate_ip_address',
+    'wait',
 )

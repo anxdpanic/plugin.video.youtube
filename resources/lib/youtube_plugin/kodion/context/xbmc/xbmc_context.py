@@ -33,6 +33,7 @@ from ...utils import (
     loose_version,
     make_dirs,
     to_unicode,
+    wait,
 )
 
 
@@ -521,8 +522,8 @@ class XbmcContext(AbstractContext):
                     break
 
     @staticmethod
-    def sleep(milli_seconds):
-        xbmc.sleep(milli_seconds)
+    def sleep(timeout=None):
+        wait(timeout)
 
     def addon_enabled(self, addon_id):
         rpc_request = json.dumps({"jsonrpc": "2.0",
