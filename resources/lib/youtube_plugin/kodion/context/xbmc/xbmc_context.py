@@ -270,10 +270,7 @@ class XbmcContext(AbstractContext):
                  override=True):
         super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
 
-        if plugin_id:
-            self._addon = xbmcaddon.Addon(id=plugin_id)
-        else:
-            self._addon = xbmcaddon.Addon(id=ADDON_ID)
+        self._addon = xbmcaddon.Addon(id=(plugin_id if plugin_id else ADDON_ID))
 
         """
         I don't know what xbmc/kodi is doing with a simple uri, but we have to extract the information from the
@@ -338,7 +335,7 @@ class XbmcContext(AbstractContext):
     def format_time(time_obj, str_format=None):
         if str_format is None:
             str_format = (xbmc.getRegion('time')
-                          .replace("%H%H", "%H")
+                          .replace('%H%H', '%H')
                           .replace(':%S', ''))
         return time_obj.strftime(str_format)
 

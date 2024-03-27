@@ -715,6 +715,7 @@ class VideoInfo(YouTubeRequestClient):
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
             url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
+        # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
         client = self.build_client(client_name)
