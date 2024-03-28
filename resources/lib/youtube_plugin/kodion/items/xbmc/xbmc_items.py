@@ -16,9 +16,8 @@ from ...utils import current_system_version, datetime_parser
 
 
 def set_info(list_item, item, properties):
+    is_video = False
     if not current_system_version.compatible(20, 0):
-        is_video = False
-
         if isinstance(item, VideoItem):
             is_video = True
             info_labels = {}
