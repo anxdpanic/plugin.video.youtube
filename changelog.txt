@@ -15,8 +15,9 @@
 - Shared playlist play using default order without prompting
 - Removed dependency on script.module.infotagger #479
 - Removed Nexus specific releases
-  - Matrix releases will now work Kodi v19+
-  - Leia releases will work, but are unsupported, for Kodi v18
+  - Matrix releases will now work in Kodi v19+
+  - Leia releases will work, but are unsupported, for Kodi v18 only
+- Updated client versions used for player requests
 
 ## v7.0.4
 ### Fixed
