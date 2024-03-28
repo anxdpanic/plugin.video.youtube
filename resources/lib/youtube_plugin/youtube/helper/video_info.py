@@ -1101,10 +1101,11 @@ class VideoInfo(YouTubeRequestClient):
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         _settings = self._context.get_settings()
+        video_id = self.video_id
         client_name = reason = status = None
         client = playability_status = result = None
 
-        client_data = {'json': {'videoId': self.video_id}}
+        client_data = {'json': {'videoId': video_id}}
         if self._access_token:
             client_data['_access_token'] = self._access_token
 
@@ -1119,13 +1120,14 @@ class VideoInfo(YouTubeRequestClient):
                     error_title='Player request failed',
                     error_hook=self._error_hook,
                     error_hook_kwargs={
-                        'video_id': self.video_id,
+                        'video_id': video_id,
                         'client': client_name,
                         'auth': '_access_token' in client_data,
                     },
                     **client
                 )
 
+                video_details = result.get('videoDetails', {})
                 playability_status = result.get('playabilityStatus', {})
                 status = playability_status.get('status', '').upper()
                 reason = playability_status.get('reason', '')
@@ -1161,6 +1163,8 @@ class VideoInfo(YouTubeRequestClient):
                     )
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
+                if video_id != video_details.get('videoId'):
+                    continue
                 break
             # Only attempt to remove Authorization header if clients iterable
             # was exhausted i.e. request attempted using all clients
@@ -1191,7 +1195,7 @@ class VideoInfo(YouTubeRequestClient):
         self._context.log_debug(
             'Retrieved video info - '
             'video_id: {0}, client: {1}, auth: {2}'.format(
-                self.video_id,
+                video_id,
                 client_name,
                 '_access_token' in client_data,
             )
@@ -1207,7 +1211,6 @@ class VideoInfo(YouTubeRequestClient):
         # curl_headers = self._make_curl_headers(headers, cookies)
         curl_headers = self._make_curl_headers(client['headers'], cookies=None)
 
-        video_details = result.get('videoDetails', {})
         microformat = (result.get('microformat', {})
                        .get('playerMicroformatRenderer', {}))
         streaming_data = result.get('streamingData', {})
@@ -1216,7 +1219,7 @@ class VideoInfo(YouTubeRequestClient):
 
         meta_info = {
             'video': {
-                'id': video_details.get('videoId', self.video_id),
+                'id': video_id,
                 'title': unescape(video_details.get('title', '')
                                   .encode('raw_unicode_escape')
                                   .decode('raw_unicode_escape')),
@@ -1236,13 +1239,13 @@ class VideoInfo(YouTubeRequestClient):
             },
             'images': {
                 'high': ('https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg'
-                         .format(self.video_id, thumb_suffix)),
+                         .format(video_id, thumb_suffix)),
                 'medium': ('https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg'
-                           .format(self.video_id, thumb_suffix)),
+                           .format(video_id, thumb_suffix)),
                 'standard': ('https://i.ytimg.com/vi/{0}/sddefault{1}.jpg'
-                             .format(self.video_id, thumb_suffix)),
+                             .format(video_id, thumb_suffix)),
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
-                            .format(self.video_id, thumb_suffix)),
+                            .format(video_id, thumb_suffix)),
             },
             'subtitles': None,
         }
@@ -1336,7 +1339,7 @@ class VideoInfo(YouTubeRequestClient):
                     error_title='Caption player request failed',
                     error_hook=self._error_hook,
                     error_hook_kwargs={
-                        'video_id': self.video_id,
+                        'video_id': video_id,
                         'client': client_name,
                         'auth': '_access_token' in client_data,
                     },
@@ -1351,7 +1354,7 @@ class VideoInfo(YouTubeRequestClient):
         if captions:
             captions = Subtitles(
                 self._context,
-                self.video_id,
+                video_id,
                 captions,
                 caption_client['headers']
             )
