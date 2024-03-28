@@ -7,33 +7,25 @@
     See LICENSES/GPL-2.0-only for more information.
 """
 
-# Kodi v20+
-try:
-    from infotagger.listitem import set_info_tag
-# Compatibility shims for Kodi v18 and v19
-except ImportError:
-    class ListItemInfoTag(object):
-        __slots__ = ('__li__',)
-
-        def __init__(self, listitem, *_args, **_kwargs):
-            self.__li__ = listitem
-
-        def add_stream_info(self, *args, **kwargs):
-            return self.__li__.addStreamInfo(*args, **kwargs)
-
-        def set_resume_point(self,
-                             infoproperties,
-                             resume_key='ResumeTime',
-                             total_key='TotalTime'):
-            if resume_key in infoproperties:
-                infoproperties[resume_key] = str(infoproperties[resume_key])
-            if total_key in infoproperties:
-                infoproperties[total_key] = str(infoproperties[total_key])
-
-
-    def set_info_tag(listitem, infolabels, tag_type, *_args, **_kwargs):
-        listitem.setInfo(tag_type, infolabels)
-        return ListItemInfoTag(listitem, tag_type)
+__all__ = (
+    'BaseHTTPServer',
+    'byte_string_type',
+    'datetime_infolabel',
+    'parse_qs',
+    'parse_qsl',
+    'quote',
+    'string_type',
+    'unescape',
+    'unquote',
+    'urlencode',
+    'urljoin',
+    'urlsplit',
+    'xbmc',
+    'xbmcaddon',
+    'xbmcgui',
+    'xbmcplugin',
+    'xbmcvfs',
+)
 
 # Kodi v19+ and Python v3.x
 try:
@@ -129,22 +121,15 @@ except ImportError:
     string_type = basestring
     byte_string_type = (bytes, str)
 
-__all__ = (
-    'BaseHTTPServer',
-    'byte_string_type',
-    'parse_qs',
-    'parse_qsl',
-    'quote',
-    'set_info_tag',
-    'string_type',
-    'unescape',
-    'unquote',
-    'urlencode',
-    'urljoin',
-    'urlsplit',
-    'xbmc',
-    'xbmcaddon',
-    'xbmcgui',
-    'xbmcplugin',
-    'xbmcvfs',
-)
+# Kodi v20+
+if hasattr(xbmcgui.ListItem, 'setDateTime'):
+    def datetime_infolabel(datetime_obj):
+        if datetime_obj:
+            return datetime_obj.replace(microsecond=0, tzinfo=None).isoformat()
+        return ''
+# Compatibility shims for Kodi v18 and v19
+else:
+    def datetime_infolabel(datetime_obj):
+        if datetime_obj:
+            return datetime_obj.strftime('%d.%m.%Y')
+        return ''

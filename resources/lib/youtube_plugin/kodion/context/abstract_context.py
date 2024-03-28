@@ -375,7 +375,7 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     @staticmethod
-    def sleep(milli_seconds):
+    def sleep(timeout=None):
         raise NotImplementedError()
 
     @staticmethod

@@ -52,9 +52,9 @@ def process(mode, provider, context, sign_out_refresh=True):
             _do_logout()
             raise
 
-        interval = int(json_data.get('interval', 5)) * 1000
-        if interval > 60000:
-            interval = 5000
+        interval = int(json_data.get('interval', 5))
+        if interval > 60:
+            interval = 5
         device_code = json_data['device_code']
         user_code = json_data['user_code']
         verification_url = json_data.get('verification_url', 'youtube.com/activate').lstrip('https://www.')
@@ -67,7 +67,7 @@ def process(mode, provider, context, sign_out_refresh=True):
         with context.get_ui().create_progress_dialog(
             heading=context.localize('sign.in'), text=text, background=False
         ) as dialog:
-            steps = ((10 * 60 * 1000) // interval)  # 10 Minutes
+            steps = ((10 * 60) // interval)  # 10 Minutes
             dialog.set_total(steps)
             for _ in range(steps):
                 dialog.update()

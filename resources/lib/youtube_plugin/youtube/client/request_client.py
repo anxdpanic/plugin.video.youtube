@@ -27,9 +27,9 @@ class YouTubeRequestClient(BaseRequestsClass):
                     'client': {
                         'clientName': 'ANDROID_TESTSUITE',
                         'clientVersion': '1.9',
-                        'androidSdkVersion': '29',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '10',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -55,10 +55,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '19.09.37',
-                        'androidSdkVersion': '30',
+                        'clientVersion': '19.12.36',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '11',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -86,11 +86,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '19.09.37',
+                        'clientVersion': '19.12.36',
                         'clientScreen': 'EMBED',
-                        'androidSdkVersion': '30',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '11',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -122,10 +122,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '6.36',
-                        'androidSdkVersion': '29',
+                        'clientVersion': '8.12.0',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '10',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -145,14 +145,20 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'ios': {
             '_id': 5,
+            '_os': {
+                'major': '17',
+                'minor': '4',
+                'patch': '1',
+                'build': '21E236',
+            },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.09.3',
-                        'deviceModel': 'iPhone14,5',
+                        'clientVersion': '19.12.3',
+                        'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
-                        'osVersion': '17_4',
+                        'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
                         'platform': 'MOBILE',
                     },
                 },
@@ -162,7 +168,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                                '{json[context][client][clientVersion]}'
                                ' ({json[context][client][deviceModel]};'
                                ' U; CPU {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}'
+                               ' {_os[major]}_{_os[minor]}_{_os[patch]}'
                                ' like Mac OS X)'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
@@ -230,6 +236,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'gl': None,
                         'hl': None,
                     },
+                    'request': {
+                        'internalExperimentFlags': [],
+                        'useSsl': True,
+                    }
                 },
                 'playbackContext': {
                     'contentPlaybackContext': {

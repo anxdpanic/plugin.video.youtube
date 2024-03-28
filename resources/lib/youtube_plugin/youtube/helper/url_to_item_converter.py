@@ -155,6 +155,7 @@ class UrlToItemConverter(object):
                         {
                             'playlist_ids': ','.join(self._playlist_ids),
                             'play': True,
+                            'order': 'default',
                         },
                     ),
                     playable=True,

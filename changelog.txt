@@ -1,14 +1,37 @@
+## v7.0.5+beta.1
+### Fixed
+- Try to prevent Kodi freezing when settings are updated and container is reloaded
+- Fix lockups when using xbmc.executebuiltin #647, #653
+- Fix searching for preferred language subtitles not using non-region specific subtitles
+- Fix not being able to set custom watch later history playlist per user #646
+- Update workarounds for multiple busy dialog crashes #640, #649
+- Fix playing incorrect video when player request is blocked #654
+
+### Changed
+- Display search history as list rather than videos
+- Update Setup Wizard
+  - Add settings for Rasberry Pi 3 class devices (1080p30, VP9 enabled)
+  - Update settings for Rasberry Pi 4 class devices (1080p60, VP9 enabled)
+  - Move option to disable list details to last step in wizard
+- Shared playlist play using default order without prompting
+- Removed dependency on script.module.infotagger #479
+- Removed Nexus specific releases
+  - Matrix releases will now work in Kodi v19+
+  - Leia releases will work, but are unsupported, for Kodi v18 only
+- Updated client versions used for player requests
+  - Use iOS client as fallback for default client selection
+
 ## v7.0.4
 ### Fixed
 - Fix issues with Profiler running without timer when debug logging was enabled
 - Fix additional Python 2 unicode handling issues when accessing My Subscription #639
 
- ### Changed
- - Only set combined cache size to 20 MB in Setup Wizard if value is not already larger
- - Cached playlist items will be forced to reload when deleting item from playlist rather than waiting 5 minutes
+### Changed
+- Only set combined cache size to 20 MB in Setup Wizard if value is not already larger
+- Cached playlist items will be forced to reload when deleting item from playlist rather than waiting 5 minutes
 
- ### New
- - Make colours used for extra details in video listings customisable in Kodi 20+
+### New
+- Make colours used for extra details in video listings customisable in Kodi 20+
 
 ## v7.0.4+beta.2
 ### Fixed

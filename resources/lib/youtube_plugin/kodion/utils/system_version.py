@@ -10,9 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
-
-from ..compatibility import string_type, xbmc
+from .methods import jsonrpc
+from ..compatibility import string_type
 
 
 class SystemVersion(object):
@@ -33,21 +32,12 @@ class SystemVersion(object):
         )
 
         try:
-            json_query = xbmc.executeJSONRPC(json.dumps({
-                'jsonrpc': '2.0',
-                'method': 'Application.GetProperties',
-                'params': {
-                    'properties': ['version', 'name']
-                },
-                'id': 1,
-            }))
-            json_query = str(json_query)
-            json_query = json.loads(json_query)
-
-            version_installed = json_query['result']['version']
+            response = jsonrpc(method='Application.GetProperties',
+                               params={'properties': ['version', 'name']})
+            version_installed = response['result']['version']
             self._version = (version_installed.get('major', 1),
                              version_installed.get('minor', 0))
-            self._appname = json_query['result']['name']
+            self._appname = response['result']['name']
         except:
             self._version = (1, 0)  # Frodo
             self._appname = 'Unknown Application'

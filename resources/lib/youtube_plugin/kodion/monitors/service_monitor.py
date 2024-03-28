@@ -77,9 +77,10 @@ class ServiceMonitor(xbmc.Monitor):
 
         settings = self._settings
         settings.flush(xbmcaddon.Addon(ADDON_ID))
-        if xbmc.getInfoLabel('Container.FolderPath').startswith(
-            'plugin://{0}/'.format(ADDON_ID)
-        ):
+        if (not xbmc.getCondVisibility('Container.IsUpdating')
+                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
+                and xbmc.getInfoLabel('Container.FolderPath').startswith(
+                    'plugin://{0}/'.format(ADDON_ID))):
             xbmc.executebuiltin('Container.Refresh')
 
         use_httpd = settings.use_isa() or settings.api_config_page()
