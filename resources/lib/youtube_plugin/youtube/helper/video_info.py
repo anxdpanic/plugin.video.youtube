@@ -588,6 +588,40 @@ class VideoInfo(YouTubeRequestClient):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
+    INTEGER_FPS_SCALE = {
+        0: '{0}000/1000',  # --.00 fps
+        24: '24000/1000',  # 24.00 fps
+        25: '25000/1000',  # 25.00 fps
+        30: '30000/1000',  # 30.00 fps
+        48: '48000/1000',  # 48.00 fps
+        50: '50000/1000',  # 50.00 fps
+        60: '60000/1000',  # 60.00 fps
+    },
+    FRACTIONAL_FPS_SCALE = {
+        0: '{0}000/1000',  # --.00 fps
+        24: '24000/1001',  # 23.976 fps
+        25: '25000/1000',  # 25.00 fps
+        30: '30000/1001',  # 29.97 fps
+        48: '48000/1000',  # 48.00 fps
+        50: '50000/1000',  # 50.00 fps
+        60: '60000/1001',  # 59.94 fps
+    }
+
+    QUALITY_FACTOR = {
+        # video - order based on comparative compression ratio
+        'av01': 1,
+        'vp9': 0.75,
+        'vp8': 0.55,
+        'avc1': 0.5,
+        # audio - order based on preference
+        'vorbis': 0.75,
+        'mp4a': 0.9,
+        'opus': 1,
+        'ac-3': 1.1,
+        'ec-3': 1.2,
+        'dts': 1.3,
+    }
+
     def __init__(self, context, access_token='', **kwargs):
         self.video_id = None
         self._context = context
@@ -1463,41 +1497,12 @@ class VideoInfo(YouTubeRequestClient):
         allow_hfr = 'hfr' in stream_features
         disable_hfr_max = 'no_hfr_max' in stream_features
         allow_ssa = 'ssa' in stream_features
-        integer_frame_rate_hint = 'no_frac_fr_hint' in stream_features
+        fps_map = (self.INTEGER_FPS_SCALE
+                   if 'no_frac_fr_hint' in stream_features else
+                   self.FRACTIONAL_FPS_SCALE)
         stream_select = _settings.stream_select()
 
-        fps_scale_map = {
-            0: '{0}000/1000',  # --.00 fps
-            24: '24000/1000',  # 24.00 fps
-            25: '25000/1000',  # 25.00 fps
-            30: '30000/1000',  # 30.00 fps
-            48: '48000/1000',  # 48.00 fps
-            50: '50000/1000',  # 50.00 fps
-            60: '60000/1000',  # 60.00 fps
-        } if integer_frame_rate_hint else {
-            0: '{0}000/1000',  # --.00 fps
-            24: '24000/1001',  # 23.976 fps
-            25: '25000/1000',  # 25.00 fps
-            30: '30000/1001',  # 29.97 fps
-            48: '48000/1000',  # 48.00 fps
-            50: '50000/1000',  # 50.00 fps
-            60: '60000/1001',  # 59.94 fps
-        }
 
-        quality_factor_map = {
-            # video - order based on comparative compression ratio
-            'av01': 1,
-            'vp9': 0.75,
-            'vp8': 0.55,
-            'avc1': 0.5,
-            # audio - order based on preference
-            'vorbis': 0.75,
-            'mp4a': 0.9,
-            'opus': 1,
-            'ac-3': 1.1,
-            'ec-3': 1.2,
-            'dts': 1.3,
-        }
 
         audio_data = {}
         video_data = {}
@@ -1647,8 +1652,7 @@ class VideoInfo(YouTubeRequestClient):
                 # map frame rates to a more common representation to lessen the
                 # chance of double refresh changes
                 if fps:
-                    frame_rate = (fps_scale_map.get(fps)
-                                  or fps_scale_map[0].format(fps))
+                    frame_rate = fps_map.get(fps) or fps_map[0].format(fps)
                 else:
                     frame_rate = None
 
@@ -1687,7 +1691,7 @@ class VideoInfo(YouTubeRequestClient):
                 'height': height,
                 'label': label,
                 'bitrate': bitrate,
-                'biasedBitrate': bitrate * quality_factor_map.get(codec, 1),
+                'biasedBitrate': bitrate * self.QUALITY_FACTOR.get(codec, 1),
                 # integer round up
                 'duration': -(-int(stream.get('approxDurationMs', 0)) // 1000),
                 'fps': fps,
