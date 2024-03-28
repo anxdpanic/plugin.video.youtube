@@ -183,7 +183,7 @@ def js_splice(arr, start, delete_count=None, *items):
         Index at which to start changing the array
     :param int delete_count:
         Number of elements to delete from the array
-    :param *items:
+    :param items:
         Items to add to the array
     Reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/splice  # noqa:E501
     """

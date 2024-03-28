@@ -43,17 +43,49 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property('busy').lower() == 'true':
             ui.clear_property('busy')
             if ui.busy_dialog_active():
-                playlist = XbmcPlaylist('video', context)
+                playlist = XbmcPlaylist('auto', context)
                 playlist.clear()
-
                 xbmcplugin.endOfDirectory(self.handle, succeeded=False)
 
+                context.log_warning('Multiple busy dialogs active - '
+                                    'playlist cleared to avoid Kodi crash')
+                ui.show_notification('Multiple busy dialogs active - '
+                                     'Kodi may crash')
+
+                num_items = 0
                 items = ui.get_property('playlist')
-                if items:
+                position = ui.get_property('position')
+
+                if position and items:
+                    position = int(position)
                     ui.clear_property('playlist')
-                    playlist.add_items(items, loads=True)
-                    context.log_error('Multiple busy dialogs active - '
-                                      'playlist reloaded to prevent Kodi crash')
+
+                    max_wait_time = 30
+                    while ui.busy_dialog_active():
+                        max_wait_time -= 1
+                        if max_wait_time < 0:
+                            context.log_error('Multiple busy dialogs active - '
+                                              'extended busy period')
+                            break
+                        context.sleep(1)
+
+                    context.log_warning('Multiple busy dialogs active - '
+                                        'reloading playlist')
+                    num_items = playlist.add_items(items, loads=True)
+
+                if position and num_items:
+                    position += 1
+                    max_wait_time = min(position, num_items)
+                    while ui.busy_dialog_active() or playlist.size() < position:
+                        max_wait_time -= 1
+                        if max_wait_time < 0:
+                            context.log_error('Multiple busy dialogs active - '
+                                              'unable to restart playback')
+                            break
+                        context.sleep(1)
+                    else:
+                        playlist.play_playlist_item(position)
+
                 return False
 
         if settings.is_setup_wizard_enabled():
@@ -119,8 +151,11 @@ class XbmcPlugin(AbstractPlugin):
             ui = context.get_ui()
             if not context.is_plugin_path(uri) and ui.busy_dialog_active():
                 ui.set_property('busy', 'true')
-                playlist = XbmcPlaylist('video', context)
-                ui.set_property('playlist', playlist.get_items(dumps=True))
+                playlist = XbmcPlaylist('auto', context)
+                position, remaining = playlist.get_position()
+                if remaining:
+                    ui.set_property('playlist', playlist.get_items(dumps=True))
+                    ui.set_property('position', str(position))
 
             item = playback_item(context, base_item, show_fanart)
             xbmcplugin.setResolvedUrl(self.handle,

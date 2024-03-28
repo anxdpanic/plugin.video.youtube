@@ -192,7 +192,7 @@ def play_playlist(provider, context):
         # select order
         order = params.get('order', '')
         if not order:
-            order_list = ['default', 'reverse', 'shuffle']
+            order_list = ('default', 'reverse', 'shuffle')
             items = [(context.localize('playlist.play.%s' % order), order)
                      for order in order_list]
             order = ui.on_select(context.localize('playlist.play.select'),

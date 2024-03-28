@@ -187,7 +187,7 @@ class Subtitles(object):
         allowed_langs = []
         for lang in preferred_lang:
             allowed_langs.append(lang)
-            if '_' in lang:
+            if '-' in lang:
                 allowed_langs.append(lang.partition('-')[0])
 
         use_asr = None

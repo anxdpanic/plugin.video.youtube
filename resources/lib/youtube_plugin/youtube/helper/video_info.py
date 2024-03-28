@@ -588,6 +588,40 @@ class VideoInfo(YouTubeRequestClient):
                  'video': {'height': 0, 'encoding': ''}}
     }
 
+    INTEGER_FPS_SCALE = {
+        0: '{0}000/1000',  # --.00 fps
+        24: '24000/1000',  # 24.00 fps
+        25: '25000/1000',  # 25.00 fps
+        30: '30000/1000',  # 30.00 fps
+        48: '48000/1000',  # 48.00 fps
+        50: '50000/1000',  # 50.00 fps
+        60: '60000/1000',  # 60.00 fps
+    },
+    FRACTIONAL_FPS_SCALE = {
+        0: '{0}000/1000',  # --.00 fps
+        24: '24000/1001',  # 23.976 fps
+        25: '25000/1000',  # 25.00 fps
+        30: '30000/1001',  # 29.97 fps
+        48: '48000/1000',  # 48.00 fps
+        50: '50000/1000',  # 50.00 fps
+        60: '60000/1001',  # 59.94 fps
+    }
+
+    QUALITY_FACTOR = {
+        # video - order based on comparative compression ratio
+        'av01': 1,
+        'vp9': 0.75,
+        'vp8': 0.55,
+        'avc1': 0.5,
+        # audio - order based on preference
+        'vorbis': 0.75,
+        'mp4a': 0.9,
+        'opus': 1,
+        'ac-3': 1.1,
+        'ec-3': 1.2,
+        'dts': 1.3,
+    }
+
     def __init__(self, context, access_token='', **kwargs):
         self.video_id = None
         self._context = context
@@ -606,7 +640,7 @@ class VideoInfo(YouTubeRequestClient):
         # login status
 
         # Alternate #1
-        # Enable iOS client to access premium streams, however other stream
+        # Prefer iOS client to access premium streams, however other stream
         # types are limited
         if client_selection == 1:
             self._prioritised_clients = (
@@ -625,16 +659,19 @@ class VideoInfo(YouTubeRequestClient):
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
+                'ios',
                 'android_embedded',
             )
         # Default
         # Will play most videos with subtitles at full resolution with HDR
         # Some restricted videos require additional requests for subtitles
+        # Fallback to iOS client and embedded client
         else:
             self._prioritised_clients = (
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
+                'ios',
                 'android_embedded',
             )
 
@@ -715,6 +752,7 @@ class VideoInfo(YouTubeRequestClient):
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
         else:
             url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
+        # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
         client = self.build_client(client_name)
@@ -1097,10 +1135,11 @@ class VideoInfo(YouTubeRequestClient):
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         _settings = self._context.get_settings()
+        video_id = self.video_id
         client_name = reason = status = None
         client = playability_status = result = None
 
-        client_data = {'json': {'videoId': self.video_id}}
+        client_data = {'json': {'videoId': video_id}}
         if self._access_token:
             client_data['_access_token'] = self._access_token
 
@@ -1115,13 +1154,14 @@ class VideoInfo(YouTubeRequestClient):
                     error_title='Player request failed',
                     error_hook=self._error_hook,
                     error_hook_kwargs={
-                        'video_id': self.video_id,
+                        'video_id': video_id,
                         'client': client_name,
                         'auth': '_access_token' in client_data,
                     },
                     **client
                 )
 
+                video_details = result.get('videoDetails', {})
                 playability_status = result.get('playabilityStatus', {})
                 status = playability_status.get('status', '').upper()
                 reason = playability_status.get('reason', '')
@@ -1157,6 +1197,8 @@ class VideoInfo(YouTubeRequestClient):
                     )
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         continue
+                if video_id != video_details.get('videoId'):
+                    continue
                 break
             # Only attempt to remove Authorization header if clients iterable
             # was exhausted i.e. request attempted using all clients
@@ -1187,7 +1229,7 @@ class VideoInfo(YouTubeRequestClient):
         self._context.log_debug(
             'Retrieved video info - '
             'video_id: {0}, client: {1}, auth: {2}'.format(
-                self.video_id,
+                video_id,
                 client_name,
                 '_access_token' in client_data,
             )
@@ -1203,7 +1245,6 @@ class VideoInfo(YouTubeRequestClient):
         # curl_headers = self._make_curl_headers(headers, cookies)
         curl_headers = self._make_curl_headers(client['headers'], cookies=None)
 
-        video_details = result.get('videoDetails', {})
         microformat = (result.get('microformat', {})
                        .get('playerMicroformatRenderer', {}))
         streaming_data = result.get('streamingData', {})
@@ -1212,7 +1253,7 @@ class VideoInfo(YouTubeRequestClient):
 
         meta_info = {
             'video': {
-                'id': video_details.get('videoId', self.video_id),
+                'id': video_id,
                 'title': unescape(video_details.get('title', '')
                                   .encode('raw_unicode_escape')
                                   .decode('raw_unicode_escape')),
@@ -1232,13 +1273,13 @@ class VideoInfo(YouTubeRequestClient):
             },
             'images': {
                 'high': ('https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg'
-                         .format(self.video_id, thumb_suffix)),
+                         .format(video_id, thumb_suffix)),
                 'medium': ('https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg'
-                           .format(self.video_id, thumb_suffix)),
+                           .format(video_id, thumb_suffix)),
                 'standard': ('https://i.ytimg.com/vi/{0}/sddefault{1}.jpg'
-                             .format(self.video_id, thumb_suffix)),
+                             .format(video_id, thumb_suffix)),
                 'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
-                            .format(self.video_id, thumb_suffix)),
+                            .format(video_id, thumb_suffix)),
             },
             'subtitles': None,
         }
@@ -1332,7 +1373,7 @@ class VideoInfo(YouTubeRequestClient):
                     error_title='Caption player request failed',
                     error_hook=self._error_hook,
                     error_hook_kwargs={
-                        'video_id': self.video_id,
+                        'video_id': video_id,
                         'client': client_name,
                         'auth': '_access_token' in client_data,
                     },
@@ -1347,7 +1388,7 @@ class VideoInfo(YouTubeRequestClient):
         if captions:
             captions = Subtitles(
                 self._context,
-                self.video_id,
+                video_id,
                 captions,
                 caption_client['headers']
             )
@@ -1456,41 +1497,12 @@ class VideoInfo(YouTubeRequestClient):
         allow_hfr = 'hfr' in stream_features
         disable_hfr_max = 'no_hfr_max' in stream_features
         allow_ssa = 'ssa' in stream_features
-        integer_frame_rate_hint = 'no_frac_fr_hint' in stream_features
+        fps_map = (self.INTEGER_FPS_SCALE
+                   if 'no_frac_fr_hint' in stream_features else
+                   self.FRACTIONAL_FPS_SCALE)
         stream_select = _settings.stream_select()
 
-        fps_scale_map = {
-            0: '{0}000/1000',  # --.00 fps
-            24: '24000/1000',  # 24.00 fps
-            25: '25000/1000',  # 25.00 fps
-            30: '30000/1000',  # 30.00 fps
-            48: '48000/1000',  # 48.00 fps
-            50: '50000/1000',  # 50.00 fps
-            60: '60000/1000',  # 60.00 fps
-        } if integer_frame_rate_hint else {
-            0: '{0}000/1000',  # --.00 fps
-            24: '24000/1001',  # 23.976 fps
-            25: '25000/1000',  # 25.00 fps
-            30: '30000/1001',  # 29.97 fps
-            48: '48000/1000',  # 48.00 fps
-            50: '50000/1000',  # 50.00 fps
-            60: '60000/1001',  # 59.94 fps
-        }
 
-        quality_factor_map = {
-            # video - order based on comparative compression ratio
-            'av01': 1,
-            'vp9': 0.75,
-            'vp8': 0.55,
-            'avc1': 0.5,
-            # audio - order based on preference
-            'vorbis': 0.75,
-            'mp4a': 0.9,
-            'opus': 1,
-            'ac-3': 1.1,
-            'ec-3': 1.2,
-            'dts': 1.3,
-        }
 
         audio_data = {}
         video_data = {}
@@ -1640,8 +1652,7 @@ class VideoInfo(YouTubeRequestClient):
                 # map frame rates to a more common representation to lessen the
                 # chance of double refresh changes
                 if fps:
-                    frame_rate = (fps_scale_map.get(fps)
-                                  or fps_scale_map[0].format(fps))
+                    frame_rate = fps_map.get(fps) or fps_map[0].format(fps)
                 else:
                     frame_rate = None
 
@@ -1680,7 +1691,7 @@ class VideoInfo(YouTubeRequestClient):
                 'height': height,
                 'label': label,
                 'bitrate': bitrate,
-                'biasedBitrate': bitrate * quality_factor_map.get(codec, 1),
+                'biasedBitrate': bitrate * self.QUALITY_FACTOR.get(codec, 1),
                 # integer round up
                 'duration': -(-int(stream.get('approxDurationMs', 0)) // 1000),
                 'fps': fps,

@@ -19,6 +19,7 @@ from .methods import (
     friendly_number,
     get_kodi_setting_bool,
     get_kodi_setting_value,
+    jsonrpc,
     loose_version,
     make_dirs,
     merge_dicts,
@@ -28,6 +29,7 @@ from .methods import (
     strip_html_from_text,
     to_unicode,
     validate_ip_address,
+    wait,
 )
 from .system_version import current_system_version
 
@@ -42,6 +44,7 @@ __all__ = (
     'friendly_number',
     'get_kodi_setting_bool',
     'get_kodi_setting_value',
+    'jsonrpc',
     'loose_version',
     'make_dirs',
     'merge_dicts',
@@ -51,4 +54,5 @@ __all__ = (
     'strip_html_from_text',
     'to_unicode',
     'validate_ip_address',
+    'wait',
 )

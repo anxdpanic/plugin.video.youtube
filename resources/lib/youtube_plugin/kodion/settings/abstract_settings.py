@@ -30,7 +30,7 @@ class AbstractSettings(object):
     _echo = False
     _cache = {}
     _check_set = True
-    _type = None
+    _instance = None
 
     @classmethod
     def flush(cls, xbmc_addon):
@@ -345,7 +345,7 @@ class AbstractSettings(object):
         value = self.get_int(settings.MPD_STREAM_SELECT, default)
         if value in self._STREAM_SELECT:
             return self._STREAM_SELECT[value]
-        self._STREAM_SELECT[default]
+        return self._STREAM_SELECT[default]
 
     def hide_short_videos(self):
         return self.get_bool(settings.HIDE_SHORT_VIDEOS, False)

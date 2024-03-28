@@ -261,7 +261,7 @@ class AbstractProvider(object):
             context.set_path(paths.SEARCH, 'query')
             return self.on_search(query, context, re_match)
 
-        context.set_content(content.VIDEO_CONTENT)
+        context.set_content(content.LIST_CONTENT)
         result = []
 
         location = context.get_param('location', False)
