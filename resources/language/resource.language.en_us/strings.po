@@ -32,13 +32,10 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "General"
@@ -56,7 +53,6 @@ msgid "YouTube"
 msgstr ""
 
 # empty strings from id 30004 to 30006
-
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
 msgstr ""
@@ -187,7 +183,6 @@ msgstr ""
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
 msgid "Favourites"
 msgstr "Favorites"
@@ -274,7 +269,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30121 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr ""
@@ -301,7 +295,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Channels"
@@ -1475,15 +1468,15 @@ msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
 msgstr ""
 
 msgctxt "#30793"
-msgid "Views count display color"
+msgid "Views count display colour"
 msgstr ""
 
 msgctxt "#30794"
-msgid "Likes count display color"
+msgid "Likes count display colour"
 msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display color"
+msgid "Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
