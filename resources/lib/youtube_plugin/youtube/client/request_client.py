@@ -27,9 +27,9 @@ class YouTubeRequestClient(BaseRequestsClass):
                     'client': {
                         'clientName': 'ANDROID_TESTSUITE',
                         'clientVersion': '1.9',
-                        'androidSdkVersion': '29',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '10',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -55,10 +55,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '19.09.37',
-                        'androidSdkVersion': '30',
+                        'clientVersion': '19.12.36',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '11',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -86,11 +86,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '19.09.37',
+                        'clientVersion': '19.12.36',
                         'clientScreen': 'EMBED',
-                        'androidSdkVersion': '30',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '11',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -122,10 +122,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '6.36',
-                        'androidSdkVersion': '29',
+                        'clientVersion': '8.12.0',
+                        'androidSdkVersion': '34',
                         'osName': 'Android',
-                        'osVersion': '10',
+                        'osVersion': '14',
                         'platform': 'MOBILE',
                     },
                 },
@@ -149,10 +149,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.09.3',
+                        'clientVersion': '19.12.3',
                         'deviceModel': 'iPhone14,5',
                         'osName': 'iOS',
-                        'osVersion': '17_4',
+                        'osVersion': '17_4_1',
                         'platform': 'MOBILE',
                     },
                 },
