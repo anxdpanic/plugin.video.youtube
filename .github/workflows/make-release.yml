@@ -49,57 +49,9 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
-      - name: Create Zip (Nexus)
-        id: zip-nexus
+      - name: Create Zip
+        id: zip
         run: |
-          mv .git ..
-          rm -rf .??*
-          rm *.md
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -P \
-            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            -u '/addon/@version' -v "${version}+nexus.1" \
-            addon.xml
-          filename=${{ github.event.repository.name }}-${version}.nexus.1.zip
-          cd ..
-          zip -r $filename ${{ github.event.repository.name }}
-          mv .git ${{ github.event.repository.name }}
-          echo "filename=$filename" >> $GITHUB_OUTPUT
-        working-directory: ${{ github.event.repository.name }}
-
-      - name: Create Zip (Nexus-Unofficial)
-        id: zip-unofficial-nexus
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git reset
-          git checkout .
-          git fetch origin nexus-unofficial
-          git -c user.email="\<\>" -c user.name="make-release" merge -X theirs --allow-unrelated-histories origin/nexus-unofficial
-          git clean -fdx
-          mv .git ..
-          rm -rf .??*
-          rm *.md
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -P \
-            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            -u '/addon/@version' -v "${version}+nexus.unofficial.1" \
-            addon.xml
-          filename=${{ github.event.repository.name }}-${version}.nexus.unofficial.1.zip
-          cd ..
-          zip -r $filename ${{ github.event.repository.name }}
-          mv .git ${{ github.event.repository.name }}
-          echo "filename=$filename" >> $GITHUB_OUTPUT
-        working-directory: ${{ github.event.repository.name }}
-
-      - name: Create Zip (Matrix)
-        id: zip-matrix
-        run: |
-          git reset
-          git checkout .
-          git clean -fdx
           mv .git ..
           rm -rf .??*
           rm *.md
@@ -108,9 +60,6 @@ jobs:
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
             -u '/addon/@version' -v "${version}+matrix.1" \
-            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' \
-            -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' \
-            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
             addon.xml
           filename=${{ github.event.repository.name }}-${version}.matrix.1.zip
           cd ..
@@ -119,12 +68,12 @@ jobs:
           echo "filename=$filename" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
-      - name: Create Zip (Matrix-Unofficial)
-        id: zip-unofficial-matrix
+      - name: Create Zip (Unofficial)
+        id: zip-unofficial
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git reset
+          git reset --hard ${{ github.sha }}
           git checkout .
           git fetch origin nexus-unofficial
           git -c user.email="\<\>" -c user.name="make-release" merge -X theirs --allow-unrelated-histories origin/nexus-unofficial
@@ -137,9 +86,6 @@ jobs:
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
             -u '/addon/@version' -v "${version}+matrix.unofficial.1" \
-            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' \
-            -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' \
-            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
             addon.xml
           filename=${{ github.event.repository.name }}-${version}.matrix.unofficial.1.zip
           cd ..
@@ -151,7 +97,7 @@ jobs:
       - name: Create Zip (Leia)
         id: zip-leia
         run: |
-          git reset
+          git reset --hard ${{ github.sha }}
           git checkout .
           git clean -fdx
           mv .git ..
@@ -166,7 +112,6 @@ jobs:
             -d '/addon/requires/import[@addon="script.module.requests"]/@version' \
             -d '/addon/requires/import[@addon="inputstream.adaptive"]/@version' \
             -d '/addon/requires/import[@addon="script.module.inputstreamhelper"]/@version' \
-            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
             -s '/addon/requires' -t elem -n import_temp \
             -s '/addon/requires/import_temp' -t attr -n addon -v 'script.module.kodi-six' \
             -r '/addon/requires/import_temp' -v import \
@@ -183,7 +128,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          git reset
+          git reset --hard ${{ github.sha }}
           git checkout .
           git fetch origin nexus-unofficial
           git -c user.email="\<\>" -c user.name="make-release" merge -X theirs --allow-unrelated-histories origin/nexus-unofficial
@@ -200,7 +145,6 @@ jobs:
             -d '/addon/requires/import[@addon="script.module.requests"]/@version' \
             -d '/addon/requires/import[@addon="inputstream.adaptive"]/@version' \
             -d '/addon/requires/import[@addon="script.module.inputstreamhelper"]/@version' \
-            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
             -s '/addon/requires' -t elem -n import_temp \
             -s '/addon/requires/import_temp' -t attr -n addon -v 'script.module.kodi-six' \
             -r '/addon/requires/import_temp' -v import \
@@ -224,48 +168,26 @@ jobs:
           draft: false
           prerelease: ${{ steps.release.outputs.pre-release }}
 
-      - name: Upload Zip (Nexus)
-        id: upload-nexus
+      - name: Upload Zip
+        id: upload
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-nexus.outputs.filename }}
-          asset_path: ${{ steps.zip-nexus.outputs.filename }}
+          asset_name: ${{ steps.zip.outputs.filename }}
+          asset_path: ${{ steps.zip.outputs.filename }}
           asset_content_type: application/zip
 
-      - name: Upload Zip (Nexus-Unofficial)
-        id: upload-unofficial-nexus
+      - name: Upload Zip (Unofficial)
+        id: upload-unofficial
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-unofficial-nexus.outputs.filename }}
-          asset_path: ${{ steps.zip-unofficial-nexus.outputs.filename }}
-          asset_content_type: application/zip
-
-      - name: Upload Zip (Matrix)
-        id: upload-matrix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-matrix.outputs.filename }}
-          asset_path: ${{ steps.zip-matrix.outputs.filename }}
-          asset_content_type: application/zip
-
-      - name: Upload Zip (Matrix-Unofficial)
-        id: upload-unofficial-matrix
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create-release.outputs.upload_url }}
-          asset_name: ${{ steps.zip-unofficial-matrix.outputs.filename }}
-          asset_path: ${{ steps.zip-unofficial-matrix.outputs.filename }}
+          asset_name: ${{ steps.zip-unofficial.outputs.filename }}
+          asset_path: ${{ steps.zip-unofficial.outputs.filename }}
           asset_content_type: application/zip
 
       - name: Upload Zip (Leia)

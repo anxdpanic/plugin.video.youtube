@@ -42,8 +42,8 @@ jobs:
           git config --global user.name "anxdpanic"
           git config --global user.email "anxdpanic@users.noreply.github.com"
 
-      - name: Staging for Official Repository (Nexus)
-        id: stage-nexus
+      - name: Staging for Official Repository
+        id: stage
         run: |
           mv .git ..
           rm -rf .??*
@@ -55,53 +55,14 @@ jobs:
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            -u '/addon/@version' -v "${version}+nexus.1" \
+            -u '/addon/@version' -v "${version}+matrix.1" \
             addon.xml
           git add .
           git commit -m "Update news and repository identifier"
         working-directory: ${{ github.event.repository.name }}
 
-      - name: Submit to Official Repository (Nexus)
-        id: submit-nexus
-        run: |
-          submit-addon -r repo-plugins -b nexus --pull-request ${{ github.event.repository.name }}
-        working-directory: ${{ github.event.repository.name }}
-        env:
-          GH_USERNAME: anxdpanic
-          GH_TOKEN: ${{ secrets.ADDON_SUBMISSION_TOKEN }}
-          EMAIL: anxdpanic@users.noreply.github.com
-
-      - name: Staging for Official Repository (Matrix)
-        id: stage-matrix
-        run: |
-          git reset --hard ${{ github.sha }}
-          git checkout .
-          git clean -fdx
-          mv .git ..
-          rm -rf .??*
-          mv ../.git .
-          rm *.md
-          git add .
-          git commit -m "Remove Unwanted Files"
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          xmlstarlet ed -L -P \
-            -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            addon.xml
-          git add .
-          git commit -m "Update news"
-          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
-          xmlstarlet ed -L -P \
-            -u '/addon/@version' -v "${version}+matrix.1" \
-            -u '/addon/requires/import[@addon="xbmc.python"]/@version' -v '3.0.0' \
-            -u '/addon/requires/import[@addon="inputstream.adaptive"]/@version' -v '19.0.0' \
-            -d '/addon/requires/import[@addon="script.module.infotagger"]' \
-            addon.xml
-          git add .
-          git commit -m "Kodi 19 Patch"
-        working-directory: ${{ github.event.repository.name }}
-
-      - name: Submit to Official Repository (Matrix)
-        id: submit-matrix
+      - name: Submit to Official Repository
+        id: submit
         run: |
           submit-addon -r repo-plugins -b matrix --pull-request ${{ github.event.repository.name }}
         working-directory: ${{ github.event.repository.name }}
