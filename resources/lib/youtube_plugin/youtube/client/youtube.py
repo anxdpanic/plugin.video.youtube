@@ -1052,6 +1052,7 @@ class YouTube(LoginClient):
         :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
         :param page_token:
         :param location: bool, use geolocation
+        :param after: str, RFC 3339 formatted date-time value (1970-01-01T00:00:00Z)
         :return:
         """
         # prepare page token
