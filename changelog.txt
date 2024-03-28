@@ -5,6 +5,7 @@
 - Fix searching for preferred language subtitles not using non-region specific subtitles
 - Fix not being able to set custom watch later history playlist per user #646
 - Update workarounds for multiple busy dialog crashes #640, #649
+- Fix playing incorrect video when player request is blocked #654
 
 ### Changed
 - Display search history as list rather than videos
@@ -18,6 +19,7 @@
   - Matrix releases will now work in Kodi v19+
   - Leia releases will work, but are unsupported, for Kodi v18 only
 - Updated client versions used for player requests
+  - Use iOS client as fallback for default client selection
 
 ## v7.0.4
 ### Fixed
