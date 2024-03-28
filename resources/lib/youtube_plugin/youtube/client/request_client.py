@@ -145,14 +145,20 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'ios': {
             '_id': 5,
+            '_os': {
+                'major': '17',
+                'minor': '4',
+                'patch': '1',
+                'build': '21E236',
+            },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
                         'clientVersion': '19.12.3',
-                        'deviceModel': 'iPhone14,5',
+                        'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
-                        'osVersion': '17_4_1',
+                        'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
                         'platform': 'MOBILE',
                     },
                 },
@@ -162,7 +168,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                                '{json[context][client][clientVersion]}'
                                ' ({json[context][client][deviceModel]};'
                                ' U; CPU {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}'
+                               ' {_os[major]}_{_os[minor]}_{_os[patch]}'
                                ' like Mac OS X)'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
@@ -230,6 +236,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'gl': None,
                         'hl': None,
                     },
+                    'request': {
+                        'internalExperimentFlags': [],
+                        'useSsl': True,
+                    }
                 },
                 'playbackContext': {
                     'contentPlaybackContext': {

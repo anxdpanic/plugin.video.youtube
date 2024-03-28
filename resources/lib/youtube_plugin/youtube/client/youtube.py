@@ -99,7 +99,15 @@ class YouTube(LoginClient):
                     'client': {
                         'gl': None,
                         'hl': None,
+                        'utcOffsetMinutes': 0,
                     },
+                    'request': {
+                        'internalExperimentFlags': [],
+                        'useSsl': True,
+                    }
+                },
+                'user': {
+                    'lockedSafetyMode': False
                 },
             },
             'headers': {
