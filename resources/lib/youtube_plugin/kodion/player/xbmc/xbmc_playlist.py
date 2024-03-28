@@ -110,7 +110,7 @@ class XbmcPlaylist(AbstractPlaylist):
 
         try:
             playlistid = int(result['result']['playlistid'])
-        except KeyError:
+        except (KeyError, TypeError, ValueError):
             playlistid = cls._PLAYER_PLAYLIST['video']
 
         cls._CACHE['playlistid'] = playlistid
@@ -128,7 +128,7 @@ class XbmcPlaylist(AbstractPlaylist):
         try:
             result = response['result']['items']
             return json.dumps(result, ensure_ascii=False) if dumps else result
-        except KeyError:
+        except (KeyError, TypeError, ValueError):
             error = response.get('error', {})
             self._context.log_error('XbmcPlaylist.get_items error - |{0}: {1}|'
                                     .format(error.get('code', 'unknown'),
@@ -152,6 +152,8 @@ class XbmcPlaylist(AbstractPlaylist):
         #             'item': items,
         #         },
         #         no_response=True)
+
+        return len(items)
 
     def play_playlist_item(self, position, resume=False):
         """
