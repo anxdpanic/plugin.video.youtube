@@ -606,7 +606,7 @@ class VideoInfo(YouTubeRequestClient):
         # login status
 
         # Alternate #1
-        # Enable iOS client to access premium streams, however other stream
+        # Prefer iOS client to access premium streams, however other stream
         # types are limited
         if client_selection == 1:
             self._prioritised_clients = (
@@ -625,16 +625,19 @@ class VideoInfo(YouTubeRequestClient):
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
+                'ios',
                 'android_embedded',
             )
         # Default
         # Will play most videos with subtitles at full resolution with HDR
         # Some restricted videos require additional requests for subtitles
+        # Fallback to iOS client and embedded client
         else:
             self._prioritised_clients = (
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
+                'ios',
                 'android_embedded',
             )
 
