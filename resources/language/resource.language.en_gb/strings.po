@@ -268,11 +268,15 @@ msgid "Please wait..."
 msgstr ""
 
 msgctxt "#30120"
-msgid "Clear"
+msgid "Confirm clear"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Clear %s?"
 msgstr ""
 
 # YouTube
-# empty strings from id 30121 to 30199
+# empty strings from id 30122 to 30199
 
 msgctxt "#30200"
 msgid "API"
