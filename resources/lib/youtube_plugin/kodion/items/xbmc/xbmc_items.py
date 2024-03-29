@@ -70,7 +70,7 @@ def set_info(list_item, item, properties):
             if value is not None:
                 info_labels['plot'] = value
 
-            value = item.get_premiered(as_info_label=True)()
+            value = item.get_premiered(as_info_label=True)
             if value is not None:
                 info_labels['premiered'] = value
 
