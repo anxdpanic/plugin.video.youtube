@@ -10,8 +10,8 @@
 ### Changed
 - Display search history as list rather than videos
 - Update Setup Wizard
-  - Add settings for Rasberry Pi 3 class devices (1080p30, VP9 enabled)
-  - Update settings for Rasberry Pi 4 class devices (1080p60, VP9 enabled)
+  - Add settings for Raspberry Pi 3 class devices (1080p30, VP9 enabled)
+  - Update settings for Raspberry Pi 4 class devices (1080p60, VP9 enabled)
   - Move option to disable list details to last step in wizard
 - Shared playlist play using default order without prompting
 - Removed dependency on script.module.infotagger #479

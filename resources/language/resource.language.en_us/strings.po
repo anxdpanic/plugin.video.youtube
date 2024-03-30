@@ -1459,11 +1459,11 @@ msgid "720p | Limited or older devices"
 msgstr ""
 
 msgctxt "#30788"
-msgid "1080p/30 fps | Rasberry Pi 3, or similar"
+msgid "1080p/30 fps | Raspberry Pi 3, or similar"
 msgstr ""
 
 msgctxt "#30789"
-msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Rasberry Pi 5, or similar"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
 msgstr ""
 
 msgctxt "#30790"
@@ -1491,5 +1491,5 @@ msgid "Comments count display color"
 msgstr ""
 
 msgctxt "#30796"
-msgid "1080p/60 fps | Rasberry Pi 4, or similar"
+msgid "1080p/60 fps | Raspberry Pi 4, or similar"
 msgstr ""
