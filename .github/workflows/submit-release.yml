@@ -52,13 +52,11 @@ jobs:
           git add .
           git commit -m "Remove Unwanted Files"
           news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
-          version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
-            -u '/addon/@version' -v "${version}+matrix.1" \
             addon.xml
           git add .
-          git commit -m "Update news and repository identifier"
+          git commit -m "Update news"
         working-directory: ${{ github.event.repository.name }}
 
       - name: Submit to Official Repository
