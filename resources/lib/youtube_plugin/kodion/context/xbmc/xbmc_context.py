@@ -55,6 +55,8 @@ class XbmcContext(AbstractContext):
         'client.ip': 30700,
         'client.ip.failed': 30701,
         'client.secret.incorrect': 30650,
+        'content.clear': 30121,
+        'content.clear.confirm': 30120,
         'content.delete': 30116,
         'content.delete.confirm': 30114,
         'content.remove': 30117,
@@ -152,7 +154,7 @@ class XbmcContext(AbstractContext):
         'retry': 30612,
         'saved.playlists': 30611,
         'search': 30102,
-        'search.clear': 30120,
+        'search.clear': 30556,
         'search.new': 30110,
         'search.quick': 30605,
         'search.quick.incognito': 30606,
@@ -448,23 +450,25 @@ class XbmcContext(AbstractContext):
                 (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
                 (sort.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (sort.LASTPLAYED,),
                 (sort.PLAYCOUNT,),
                 (sort.UNSORTED,),
-                (sort.LABEL_IGNORE_THE,),
+                (sort.LABEL,),
             )
         else:
             self.add_sort_method(
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (sort.UNSORTED,),
-                (sort.LABEL_IGNORE_THE,),
+                (sort.LABEL,),
             )
         if content_type == content.VIDEO_CONTENT:
             self.add_sort_method(
+                (sort.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),
+                (sort.ARTIST,           '%T \u2022 %P | %D | %J', '%A'),
                 (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
                 (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
                 (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
@@ -472,12 +476,14 @@ class XbmcContext(AbstractContext):
                 (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
                 (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
+                (sort.CHANNEL,          '[%A - ]%T'),
+                (sort.ARTIST,),
                 (sort.PROGRAM_COUNT,),
                 (sort.VIDEO_RATING,),
                 (sort.DATE,),
                 (sort.DATEADDED,),
                 (sort.VIDEO_RUNTIME,),
-                (sort.TRACKNUM,),
+                (sort.TRACKNUM,         '[%N. ]%T '),
             )
 
     def add_sort_method(self, *sort_methods):

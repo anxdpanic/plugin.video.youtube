@@ -268,11 +268,15 @@ msgid "Please wait..."
 msgstr ""
 
 msgctxt "#30120"
-msgid "Clear"
+msgid "Confirm clear"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Clear %s?"
 msgstr ""
 
 # YouTube
-# empty strings from id 30121 to 30199
+# empty strings from id 30122 to 30199
 
 msgctxt "#30200"
 msgid "API"
@@ -1454,11 +1458,11 @@ msgid "720p | Limited or older devices"
 msgstr ""
 
 msgctxt "#30788"
-msgid "1080p/30 fps | Rasberry Pi 3, or similar"
+msgid "1080p/30 fps | Raspberry Pi 3, or similar"
 msgstr ""
 
 msgctxt "#30789"
-msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Rasberry Pi 5, or similar"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
 msgstr ""
 
 msgctxt "#30790"
@@ -1486,5 +1490,5 @@ msgid "Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
-msgid "1080p/60 fps | Rasberry Pi 4, or similar"
+msgid "1080p/60 fps | Raspberry Pi 4, or similar"
 msgstr ""

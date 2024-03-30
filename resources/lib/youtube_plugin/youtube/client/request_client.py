@@ -203,6 +203,22 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
             },
         },
+        'media_connect_frontend': {
+            '_id': 95,
+            '_access_token': KeyError,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'MEDIA_CONNECT_FRONTEND',
+                        'clientVersion': '0.1',
+                    },
+                },
+            },
+            'headers': {},
+            'params': {
+                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+            },
+        },
         # Used for misc api requests by default
         # Requires handling of nsig to overcome throttling (TODO)
         'web': {
@@ -335,7 +351,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             client = merge_dicts(client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
 
-        if data and '_access_token' in data:
+        if client.get('_access_token'):
             del client['params']['key']
         elif 'Authorization' in client['headers']:
             del client['headers']['Authorization']
