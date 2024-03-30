@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-09-21 13:11+0000\n"
+"PO-Revision-Date: 2024-03-30 13:59+0000\n"
 "Last-Translator: José Antonio Alvarado <jalvarado0.eses@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.0.2\n"
+"X-Generator: Weblate 5.4\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -48,10 +48,14 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Contraseña"
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr "YouTube"
+
+# empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
-msgstr "Usar MPEG-DASH"
+msgid "Use InputStream Adaptive"
+msgstr "Utilizar InputStream Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -123,12 +127,12 @@ msgid "Cache size (MB)"
 msgstr "Tamaño para caché de funciones (MB)"
 
 msgctxt "#30025"
-msgid "Enable setup-wizard"
-msgstr "Habilitar asistente de configuración"
+msgid "Enable Setup Wizard"
+msgstr "Activar Asistente de Configuración"
 
 msgctxt "#30026"
-msgid "Override view"
-msgstr "Invalidar vista"
+msgid "Override views"
+msgstr "Anular visionados"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -143,8 +147,8 @@ msgid "View: Movies"
 msgstr "Vista: Películas"
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
-msgstr "¿Desea ejecutar el asistente de configuración?"
+msgid "Configure %s?"
+msgstr "¿Configurar %s?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -345,8 +349,8 @@ msgid "Browse Channels"
 msgstr "Explorar Canales"
 
 msgctxt "#30513"
-msgid "Popular right now"
-msgstr "Popular en este momento"
+msgid "Trending"
+msgstr "Tendencias"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -397,12 +401,12 @@ msgid "Select region"
 msgstr "Seleccione una región"
 
 msgctxt "#30526"
-msgid "Adjust"
-msgstr "Ajustar"
+msgid "Setup Wizard"
+msgstr "Asistente de Configuración"
 
 msgctxt "#30527"
-msgid "Language and region?"
-msgstr "¿Idioma y región?"
+msgid "Language and Region"
+msgstr "Idioma y Región"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -457,8 +461,8 @@ msgid "Play with..."
 msgstr "Abrir con..."
 
 msgctxt "#30541"
-msgid "Show channel name in description"
-msgstr "Mostrar nombre del canal en la descripción"
+msgid "Show channel name and video details in description"
+msgstr "Mostrar el nombre del canal y los detalles del vídeo en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -609,8 +613,8 @@ msgid "Force SSL certificate verification"
 msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "MPEG-DASH ha sido activado en los ajustes para YouTube, sin embargo InputStream Adaptive parece estar deshabilitado. ¿Le gustaría habilitar ahora InputStream Adaptive?"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgstr "InputStream Adaptive está activado en los ajustes de YouTube, pero el complemento se ha desactivado. ¿Quieres activar InputStream Adaptive ahora?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -693,12 +697,12 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Error al habilitar claves API personales. No encontrado: %s"
 
 msgctxt "#30600"
-msgid "Configure subtitles"
-msgstr "Configurar subtítulos"
+msgid "Subtitles"
+msgstr "Subtítulos"
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
-msgstr "%s con %s como respaldo"
+msgid "%s with Original/%s fallback"
+msgstr "%s con Original/%s como alternativa"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -761,12 +765,12 @@ msgid "Must be signed in."
 msgstr "Debe estar registrado."
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
-msgstr "MPEG-DASH"
+msgid "InputStream Adaptive"
+msgstr "InputStream Adaptive"
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
-msgstr "Habilitar proxy mpeg-dash"
+msgid "Enable MPEG-DASH proxy"
+msgstr "Activar proxy MPEG-DASH"
 
 msgctxt "#30619"
 msgid "Port"
@@ -777,8 +781,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
-msgstr "Para mpeg-dash VODs es necesario proxy (ver Servidor HTTP)"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgstr "Se requiere proxy para Video Bajo Demanda MPEG-DASH (ver Avanzado > Servidor HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -830,7 +834,7 @@ msgstr "http://<direccion_ip>:<puerto>/youtube/api (ver Servidor HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr "Configuración API Add-on Youtube"
+msgstr "Configuración de API del Add-on Youtube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
@@ -838,11 +842,11 @@ msgstr "No se detectaron cambios, las claves API no se actualizaron."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
-msgstr "Claves API personales habilitadas."
+msgstr "Claves API personales activadas."
 
 msgctxt "#30637"
 msgid "Personal API keys are disabled."
-msgstr "Claves API personales deshabilitadas."
+msgstr "Claves API personales desactivadas."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
@@ -905,8 +909,8 @@ msgid "Location radius (km)"
 msgstr "Radio de ubicación (km)"
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "¿Desea usar la geolocalización? Será usado para [B]Mi Ubicación[/B]"
+msgid "My Location using IP geolocation lookup"
+msgstr "Mi Ubicación usa geolocalización de IP"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -981,8 +985,8 @@ msgid "Clear playback history"
 msgstr "Limpiar historial de reproducción"
 
 msgctxt "#30672"
-msgid "Delete playback history"
-msgstr "Eliminar historial de reproducción"
+msgid "Delete playback history database"
+msgstr "Borrar historial de reproducción"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1045,8 +1049,8 @@ msgid "data cache"
 msgstr "caché de datos"
 
 msgctxt "#30688"
-msgid "Use for videos"
-msgstr "Usar para vídeos"
+msgid "Use MPEG-DASH for videos"
+msgstr "Utilizar MPEG-DASH para los vídeos"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1185,8 +1189,8 @@ msgid "Enable HDR video"
 msgstr "Habilitar vídeo HDR"
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]> 1080p y HDR requieren InputStream Adaptive 2.3.14 o superior"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgstr "Se requiere proxy para Video Bajo Demanda MPEG-DASH (ver Avanzado > Servidor HTTP)[CR] Vídeos HDR o >1080p requieren InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1348,6 +1352,231 @@ msgctxt "#30763"
 msgid "Multi-audio"
 msgstr "Multiaudio"
 
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr "Tiempo de espera de las solicitudes de conexión"
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr "Tiempo de espera de las solicitudes de lectura"
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr "Estrenos"
+
+msgctxt "#30767"
+msgid "Views"
+msgstr "Visionados"
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr "Desactiva la alta tasa de fotogramas a máxima calidad de vídeo"
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr "Borrar la lista Ver Más Tarde"
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
+msgstr "¿Estás seguro de que quieres borrar tu lista de Ver Más Tarde?"
+
+msgctxt "#30771"
+msgid "Disable fractional framerate hinting"
+msgstr "Desactivar la sugerencia de tasa de fotogramas fraccional"
+
+msgctxt "#30772"
+msgid "Disable all framerate hinting"
+msgstr "Desactivar todas las sugerencias de la tasa de fotogramas"
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr "Mostrar detalles del vídeo en las listas de vídeos"
+
+msgctxt "#30774"
+msgid "All available"
+msgstr "Todos disponibles"
+
+msgctxt "#30775"
+msgid "%s (translation)"
+msgstr "%s (traducción)"
+
+msgctxt "#30776"
+msgid "Ask + Automatic + Quality selection"
+msgstr "Preguntar + Automático + Selector de calidad"
+
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr "Visionados de %s (%s)"
+
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr "¿Importar antiguo historial de reproducción?"
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr "¿Importar antiguo historial de búsquedas?"
+
+msgctxt "#30780"
+msgid "Clear local watch later list"
+msgstr "Vaciar lista local Ver Más Tarde"
+
+msgctxt "#30781"
+msgid "Delete watch later database"
+msgstr "Borrar base de datos Ver Más Tarde"
+
+msgctxt "#30782"
+msgid "local watch later list"
+msgstr "Lista local Ver Más Tarde"
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr "ajustar a los valores recomendados"
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr "listar mostrando detalles mínimos"
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr "ajustes de rendimiento"
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr "Escoger capacidades del dispositivo"
+
+msgctxt "#30787"
+msgid "720p | Limited or older devices"
+msgstr "720p | Dispositivos limitados o antiguos"
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Rasberry Pi 3, or similar"
+msgstr "1080p/30 fps | Rasberry Pi 3, o similar"
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Rasberry Pi 5, or similar"
+msgstr "4K/30 fps or 1080p/60 fps, HDR si es compatible | Raspberry Pi 5 o similar"
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
+msgstr "4K/60 fps, HDR si es compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 o similar"
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
+msgstr "4K/60 fps, HDR, con AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V o similar"
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
+msgstr "8K/60 fps, HDR, con AV1 | Dispositivo moderno o PC con todas las capacidades"
+
+msgctxt "#30793"
+msgid "Views count display colour"
+msgstr "Color del contador de visionados"
+
+msgctxt "#30794"
+msgid "Likes count display colour"
+msgstr "Color del contador de Me gusta"
+
+msgctxt "#30795"
+msgid "Comments count display colour"
+msgstr "Color del contador de comentarios"
+
+msgctxt "#30796"
+msgid "1080p/60 fps | Rasberry Pi 4, or similar"
+msgstr "1080p/60 fps | Rasberry Pi 4, o similar"
+
+#~ msgctxt "#30788"
+#~ msgid "1080p/30 fps | Rasberry Pi 4B, or similar"
+#~ msgstr "1080p/30 fps | Raspberry Pi 4B o similar"
+
+#~ msgctxt "#30792"
+#~ msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities "
+#~ msgstr "8K/60 fps, HDR, con AV1 | Dispositivo moderno o PC con todas las capacidades "
+
+# empty strings from id 30003 to 30006
+#~ msgctxt "#30007"
+#~ msgid "Use MPEG-DASH"
+#~ msgstr "Usar MPEG-DASH"
+
+#~ msgctxt "#30025"
+#~ msgid "Enable setup-wizard"
+#~ msgstr "Habilitar asistente de configuración"
+
+#~ msgctxt "#30026"
+#~ msgid "Override view"
+#~ msgstr "Invalidar vista"
+
+#~ msgctxt "#30030"
+#~ msgid "Execute setup-wizard?"
+#~ msgstr "¿Desea ejecutar el asistente de configuración?"
+
+#~ msgctxt "#30513"
+#~ msgid "Popular right now"
+#~ msgstr "Popular en este momento"
+
+#~ msgctxt "#30526"
+#~ msgid "Adjust"
+#~ msgstr "Ajustar"
+
+#~ msgctxt "#30527"
+#~ msgid "Language and region?"
+#~ msgstr "¿Idioma y región?"
+
+#~ msgctxt "#30541"
+#~ msgid "Show channel name in description"
+#~ msgstr "Mostrar nombre del canal en la descripción"
+
+#~ msgctxt "#30579"
+#~ msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+#~ msgstr "MPEG-DASH ha sido activado en los ajustes para YouTube, sin embargo InputStream Adaptive parece estar deshabilitado. ¿Le gustaría habilitar ahora InputStream Adaptive?"
+
+#~ msgctxt "#30600"
+#~ msgid "Configure subtitles"
+#~ msgstr "Configurar subtítulos"
+
+#~ msgctxt "#30601"
+#~ msgid "%s with %s fallback"
+#~ msgstr "%s con %s como respaldo"
+
+#~ msgctxt "#30617"
+#~ msgid "MPEG-DASH"
+#~ msgstr "MPEG-DASH"
+
+#~ msgctxt "#30618"
+#~ msgid "Enable mpeg-dash proxy"
+#~ msgstr "Habilitar proxy mpeg-dash"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
+#~ msgstr "Para mpeg-dash VODs es necesario proxy (ver Servidor HTTP)"
+
+#~ msgctxt "#30653"
+#~ msgid "Perform geolocation? Used for [B]My Location[/B]"
+#~ msgstr "¿Desea usar la geolocalización? Será usado para [B]Mi Ubicación[/B]"
+
+#~ msgctxt "#30672"
+#~ msgid "Delete playback history"
+#~ msgstr "Eliminar historial de reproducción"
+
+#~ msgctxt "#30688"
+#~ msgid "Use for videos"
+#~ msgstr "Usar para vídeos"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]> 1080p y HDR requieren InputStream Adaptive 2.3.14 o superior"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)"
+#~ msgstr "El proxy es necesario para los vídeos a la carta MPEG-DASH (véase Servidor HTTP)"
+
+#~ msgctxt "#30633"
+#~ msgid "http://<ipaddress>:<port>/youtube/api (see HTTP Server)"
+#~ msgstr "http://<direccion_ip>:<puerto>/youtube/api (ver Servidor HTTP)"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "Se requiere proxy para los vídeos a la carta MPEG-DASH (véase Servidor HTTP)[CR]Los vídeos HDR y >1080p requieren InputStream Adaptive >= 2.3.14"
+
 #~ msgctxt "#30010"
 #~ msgid "Video quality"
 #~ msgstr "Calidad de vídeo"
@@ -1477,3 +1706,11 @@ msgstr "Multiaudio"
 #~ msgctxt "#30100"
 #~ msgid "Favorites"
 #~ msgstr "Favoritos"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for mpeg-dash vods (see HTTP Server)"
+#~ msgstr "Para mpeg-dash VODs es necesario proxy (ver Servidor HTTP)"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for mpeg-dash vods (see HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "Para VODs mpeg-dash (ver Servidor HTTP)[CR]> 1080p y HDR requieren InputStream Adaptive 2.3.14 o superior"
