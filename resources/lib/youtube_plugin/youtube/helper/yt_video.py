@@ -65,10 +65,7 @@ def _process_rate_video(provider, context, re_match):
 
         response = provider.get_client(context).rate_video(video_id, result)
 
-        if response.get('status_code') != 204:
-            notify_message = context.localize('failed')
-
-        elif response.get('status_code') == 204:
+        if response:
             # this will be set if we are in the 'Liked Video' playlist
             if context.get_param('refresh'):
                 context.get_ui().refresh_container()
@@ -79,6 +76,8 @@ def _process_rate_video(provider, context, re_match):
                 notify_message = context.localize('liked.video')
             elif result == 'dislike':
                 notify_message = context.localize('disliked.video')
+        else:
+            notify_message = context.localize('failed')
 
         if notify_message:
             context.get_ui().show_notification(
