@@ -1,3 +1,16 @@
+## v7.0.5+beta.2
+### Fixed
+- Fix typos #661
+- Fix typo that prevented videos from being listed in Kodi versions prior to v20 #662
+
+### Changed
+- Update language used for maintenance action prompts that clear data
+
+### New
+- Add new client that may provide 1080p non-adaptive formats
+  - Can be accessed as Alternate #2
+- Allow channel name to be displayed/sorted in listing depending on sort order #644
+
 ## v7.0.5+beta.1
 ### Fixed
 - Try to prevent Kodi freezing when settings are updated and container is reloaded
