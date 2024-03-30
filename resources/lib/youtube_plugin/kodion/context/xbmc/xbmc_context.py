@@ -450,23 +450,25 @@ class XbmcContext(AbstractContext):
                 (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
                 (sort.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (sort.LASTPLAYED,),
                 (sort.PLAYCOUNT,),
                 (sort.UNSORTED,),
-                (sort.LABEL_IGNORE_THE,),
+                (sort.LABEL,),
             )
         else:
             self.add_sort_method(
                 (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (sort.LABEL_IGNORE_THE, '%T \u2022 %P',           '%D | %J'),
+                (sort.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
                 (sort.UNSORTED,),
-                (sort.LABEL_IGNORE_THE,),
+                (sort.LABEL,),
             )
         if content_type == content.VIDEO_CONTENT:
             self.add_sort_method(
+                (sort.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),
+                (sort.ARTIST,           '%T \u2022 %P | %D | %J', '%A'),
                 (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
                 (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
                 (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
@@ -474,12 +476,14 @@ class XbmcContext(AbstractContext):
                 (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
                 (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
+                (sort.CHANNEL,          '[%A - ]%T'),
+                (sort.ARTIST,),
                 (sort.PROGRAM_COUNT,),
                 (sort.VIDEO_RATING,),
                 (sort.DATE,),
                 (sort.DATEADDED,),
                 (sort.VIDEO_RUNTIME,),
-                (sort.TRACKNUM,),
+                (sort.TRACKNUM,         '[%N. ]%T '),
             )
 
     def add_sort_method(self, *sort_methods):
