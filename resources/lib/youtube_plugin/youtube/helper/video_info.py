@@ -651,11 +651,10 @@ class VideoInfo(YouTubeRequestClient):
                 'android_embedded',
             )
         # Alternate #2
-        # Used to bypass age restriction, however streams are obfuscated and
-        # throttled. Useful for testing n-sig de-obfuscation.
+        # Possibly provides 1080p non-adaptive formats.
         elif client_selection == 2:
             self._prioritised_clients = (
-                'smarttv_embedded',
+                'media_connect_frontend',
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
