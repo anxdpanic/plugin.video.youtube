@@ -648,10 +648,11 @@ class VideoInfo(YouTubeRequestClient):
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
+                'media_connect_frontend',
                 'android_embedded',
             )
         # Alternate #2
-        # Possibly provides 1080p non-adaptive formats.
+        # Prefer use of non-adaptive formats.
         elif client_selection == 2:
             self._prioritised_clients = (
                 'media_connect_frontend',
@@ -664,13 +665,14 @@ class VideoInfo(YouTubeRequestClient):
         # Default
         # Will play most videos with subtitles at full resolution with HDR
         # Some restricted videos require additional requests for subtitles
-        # Fallback to iOS client and embedded client
+        # Fallback to iOS, media connect, and embedded clients
         else:
             self._prioritised_clients = (
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
                 'ios',
+                'media_connect_frontend',
                 'android_embedded',
             )
 
@@ -1155,7 +1157,7 @@ class VideoInfo(YouTubeRequestClient):
                     error_hook_kwargs={
                         'video_id': video_id,
                         'client': client_name,
-                        'auth': '_access_token' in client_data,
+                        'auth': bool(client.get('_access_token')),
                     },
                     **client
                 )
@@ -1230,7 +1232,7 @@ class VideoInfo(YouTubeRequestClient):
             'video_id: {0}, client: {1}, auth: {2}'.format(
                 video_id,
                 client_name,
-                '_access_token' in client_data,
+                bool(client.get('_access_token')),
             )
         )
         self._selected_client = client.copy()
@@ -1374,7 +1376,7 @@ class VideoInfo(YouTubeRequestClient):
                     error_hook_kwargs={
                         'video_id': video_id,
                         'client': client_name,
-                        'auth': '_access_token' in client_data,
+                        'auth': bool(caption_client.get('_access_token')),
                     },
                     **caption_client
                 )
