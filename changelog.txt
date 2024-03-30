@@ -1,3 +1,16 @@
+## v7.0.5+beta.2
+### Fixed
+- Fix typos #661
+- Fix typo that prevented videos from being listed in Kodi versions prior to v20 #662
+
+### Changed
+- Update language used for maintenance action prompts that clear data
+
+### New
+- Add new client that may provide 1080p non-adaptive formats
+  - Can be accessed as Alternate #2
+- Allow channel name to be displayed/sorted in listing depending on sort order #644
+
 ## v7.0.5+beta.1
 ### Fixed
 - Try to prevent Kodi freezing when settings are updated and container is reloaded
@@ -10,8 +23,8 @@
 ### Changed
 - Display search history as list rather than videos
 - Update Setup Wizard
-  - Add settings for Rasberry Pi 3 class devices (1080p30, VP9 enabled)
-  - Update settings for Rasberry Pi 4 class devices (1080p60, VP9 enabled)
+  - Add settings for Raspberry Pi 3 class devices (1080p30, VP9 enabled)
+  - Update settings for Raspberry Pi 4 class devices (1080p60, VP9 enabled)
   - Move option to disable list details to last step in wizard
 - Shared playlist play using default order without prompting
 - Removed dependency on script.module.infotagger #479

@@ -65,13 +65,23 @@ class XbmcContextUI(AbstractContextUI):
         dialog = xbmcgui.Dialog()
         return dialog.ok(title, text)
 
-    def on_remove_content(self, content_name):
-        text = self._context.localize('content.remove') % to_unicode(content_name)
-        return self.on_yes_no_input(self._context.localize('content.remove.confirm'), text)
+    def on_remove_content(self, name):
+        return self.on_yes_no_input(
+            self._context.localize('content.remove.confirm'),
+            self._context.localize('content.remove') % to_unicode(name),
+        )
 
-    def on_delete_content(self, content_name):
-        text = self._context.localize('content.delete') % to_unicode(content_name)
-        return self.on_yes_no_input(self._context.localize('content.delete.confirm'), text)
+    def on_delete_content(self, name):
+        return self.on_yes_no_input(
+            self._context.localize('content.delete.confirm'),
+            self._context.localize('content.delete') % to_unicode(name),
+        )
+
+    def on_clear_content(self, name):
+        return self.on_yes_no_input(
+            self._context.localize('content.clear.confirm'),
+            self._context.localize('content.clear') % to_unicode(name),
+        )
 
     def on_select(self, title, items=None, preselect=-1, use_details=False):
         if items is None:
