@@ -350,6 +350,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         if data:
             client = merge_dicts(client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
+        client['_name'] = client_name
 
         if client.get('_access_token'):
             del client['params']['key']
