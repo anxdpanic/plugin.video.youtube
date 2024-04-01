@@ -65,7 +65,12 @@ class XbmcPluginSettings(AbstractSettings):
             })
 
     @classmethod
-    def flush(cls, xbmc_addon):
+    def flush(cls, xbmc_addon=None):
+        if not xbmc_addon:
+            del cls._instance
+            cls._instance = None
+            return
+
         cls._echo = get_kodi_setting_bool('debug.showloginfo')
         cls._cache = {}
         if current_system_version.compatible(21, 0):

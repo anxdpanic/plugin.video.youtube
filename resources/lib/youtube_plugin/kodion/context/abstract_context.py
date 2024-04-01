@@ -385,3 +385,6 @@ class AbstractContext(object):
     @staticmethod
     def get_listitem_detail(detail_name, attr=False):
         raise NotImplementedError()
+
+    def tear_down(self):
+        pass

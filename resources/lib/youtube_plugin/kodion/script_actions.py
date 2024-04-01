@@ -347,4 +347,5 @@ def run(argv):
             _user_actions(context, action, params)
             return
     finally:
+        context.tear_down()
         ui.clear_property(WAIT_FLAG)

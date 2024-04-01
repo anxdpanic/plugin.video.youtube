@@ -648,3 +648,8 @@ class XbmcContext(AbstractContext):
             if attr else
             'Container.ListItem(0).Property({0})'.format(detail_name)
         )
+
+    def tear_down(self):
+        self._settings.flush()
+        del self._addon
+        self._addon = None

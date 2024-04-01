@@ -58,8 +58,10 @@ def run(provider, context=None):
                                path=context.get_path(),
                                params=params))
 
-    plugin.run(provider, context)
-    provider.tear_down(context)
+    try:
+        plugin.run(provider, context)
+    finally:
+        if profiler:
+            profiler.print_stats()
 
-    if profiler:
-        profiler.print_stats()
+        provider.tear_down(context)
