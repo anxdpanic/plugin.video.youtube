@@ -49,8 +49,6 @@ class XbmcPlugin(AbstractPlugin):
 
                 context.log_warning('Multiple busy dialogs active - '
                                     'playlist cleared to avoid Kodi crash')
-                ui.show_notification('Multiple busy dialogs active - '
-                                     'Kodi may crash')
 
                 num_items = 0
                 items = ui.get_property('playlist')
