@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .base_item import BaseItem
-from ..compatibility import unescape
+from ..compatibility import to_str, unescape
 
 
 class AudioItem(BaseItem):
@@ -54,7 +54,7 @@ class AudioItem(BaseItem):
         if self._artists is None:
             self._artists = []
         if artist:
-            self._artists.append(str(artist))
+            self._artists.append(to_str(artist))
 
     def get_artists(self):
         return self._artists
@@ -72,7 +72,7 @@ class AudioItem(BaseItem):
         if self._genres is None:
             self._genres = []
         if genre:
-            self._genres.append(str(genre))
+            self._genres.append(to_str(genre))
 
     def get_genres(self):
         return self._genres

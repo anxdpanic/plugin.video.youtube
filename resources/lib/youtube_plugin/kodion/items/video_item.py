@@ -14,7 +14,7 @@ import datetime
 import re
 
 from .base_item import BaseItem
-from ..compatibility import datetime_infolabel, unescape
+from ..compatibility import datetime_infolabel, to_str, unescape
 from ..utils import duration_to_seconds, seconds_to_duration
 
 
@@ -71,7 +71,7 @@ class VideoItem(BaseItem):
         if self._artists is None:
             self._artists = []
         if artist:
-            self._artists.append(str(artist))
+            self._artists.append(to_str(artist))
 
     def get_artists(self):
         return self._artists
@@ -83,7 +83,7 @@ class VideoItem(BaseItem):
         if self._studios is None:
             self._studios = []
         if studio:
-            self._studios.append(str(studio))
+            self._studios.append(to_str(studio))
 
     def get_studios(self):
         return self._studios
@@ -156,7 +156,7 @@ class VideoItem(BaseItem):
         if self._directors is None:
             self._directors = []
         if director:
-            self._directors.append(str(director))
+            self._directors.append(to_str(director))
 
     def get_directors(self):
         return self._directors
@@ -169,10 +169,10 @@ class VideoItem(BaseItem):
             self._cast = []
         if member:
             self._cast.append({
-                'member': str(member),
-                'role': str(role) if role else '',
+                'member': to_str(member),
+                'role': to_str(role) if role else '',
                 'order': int(order) if order else len(self._cast) + 1,
-                'thumbnail': str(thumbnail) if thumbnail else '',
+                'thumbnail': to_str(thumbnail) if thumbnail else '',
             })
 
     def get_cast(self):
@@ -262,7 +262,7 @@ class VideoItem(BaseItem):
         if self._genres is None:
             self._genres = []
         if genre:
-            self._genres.append(str(genre))
+            self._genres.append(to_str(genre))
 
     def get_genres(self):
         return self._genres

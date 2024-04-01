@@ -15,6 +15,7 @@ __all__ = (
     'parse_qsl',
     'quote',
     'string_type',
+    'to_str',
     'unescape',
     'unquote',
     'urlencode',
@@ -52,6 +53,7 @@ try:
 
     string_type = str
     byte_string_type = bytes
+    to_str = str
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
     import BaseHTTPServer
@@ -79,23 +81,21 @@ except ImportError:
 
 
     def quote(data, *args, **kwargs):
-        return _quote(data.encode('utf-8'), *args, **kwargs)
+        return _quote(to_str(data), *args, **kwargs)
 
 
     def unquote(data):
-        return _unquote(data.encode('utf-8'))
+        return _unquote(to_str(data))
 
 
     def urlencode(data, *args, **kwargs):
         if isinstance(data, dict):
             data = data.items()
         return _urlencode({
-            key.encode('utf-8'): (
-                [part.encode('utf-8') if isinstance(part, unicode)
-                 else str(part)
-                 for part in value] if isinstance(value, (list, tuple))
-                else value.encode('utf-8') if isinstance(value, unicode)
-                else str(value)
+            to_str(key): (
+                [to_str(part) for part in value]
+                if isinstance(value, (list, tuple)) else
+                to_str(value)
             )
             for key, value in data
         }, *args, **kwargs)
@@ -120,6 +120,11 @@ except ImportError:
 
     string_type = basestring
     byte_string_type = (bytes, str)
+
+    def to_str(value):
+        if isinstance(value, unicode):
+            return value.encode('utf-8')
+        return str(value)
 
 # Kodi v20+
 if hasattr(xbmcgui.ListItem, 'setDateTime'):
