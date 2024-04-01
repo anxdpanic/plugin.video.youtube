@@ -1146,6 +1146,18 @@ class VideoInfo(YouTubeRequestClient):
 
         for _ in range(2):
             for client_name in self._prioritised_clients:
+                if status and status != 'OK':
+                    self._context.log_warning(
+                        'Failed to retrieved video info - '
+                        'video_id: {0}, client: {1}, auth: {2},\n'
+                        'status: {3}, reason: {4}'.format(
+                            video_id,
+                            client['_name'],
+                            bool(client.get('_access_token')),
+                            status,
+                            reason or 'UNKNOWN',
+                        )
+                    )
                 client = self.build_client(client_name, client_data)
 
                 result = self.request(
@@ -1197,8 +1209,11 @@ class VideoInfo(YouTubeRequestClient):
                         )
                     )
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
+                        status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
                         continue
                 if video_id != video_details.get('videoId'):
+                    status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
+                    reason = 'WATCH_ON_LATEST_VERSION_OF_YOUTUBE'
                     continue
                 break
             # Only attempt to remove Authorization header if clients iterable
@@ -1236,7 +1251,6 @@ class VideoInfo(YouTubeRequestClient):
             )
         )
         self._selected_client = client.copy()
-        self._selected_client['_name'] = client_name
 
         if 'Authorization' in client['headers']:
             del client['headers']['Authorization']

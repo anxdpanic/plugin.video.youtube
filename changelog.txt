@@ -1,3 +1,9 @@
+## v7.0.5+beta.3
+### Fixed
+- Fix error message when rating video #666
+- Fix various issues with Kodi 18 and Python 2 #668
+- Fix issues with video playback #654, #659, #663
+
 ## v7.0.5+beta.2
 ### Fixed
 - Fix typos #661

@@ -15,6 +15,11 @@ from ...kodion.utils import merge_dicts
 
 
 class YouTubeRequestClient(BaseRequestsClass):
+    _ANDROID_PARAMS = 'CgIIAdgDAQ==',
+    # yt-dlp has chosen the following value, but this results in the android
+    # player response not including adaptive formats
+    # _ANDROID_PARAMS = 'CgIIAQ==',
+
     CLIENTS = {
         # 4k no VP9 HDR
         # Limited subtitle availability
@@ -22,7 +27,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': 30,
             '_query_subtitles': True,
             'json': {
-                'params': '2AMBCgIQBg',
+                'params': _ANDROID_PARAMS,
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_TESTSUITE',
@@ -51,7 +56,10 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': 3,
             '_query_subtitles': True,
             'json': {
-                'params': '2AMBCgIQBg',
+                'params': _ANDROID_PARAMS,
+                # yt-dlp has chosen the following value, but this results in the
+                # player response not including adaptive formats
+                # 'params': 'CgIIAQ==',
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
@@ -82,7 +90,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': 55,
             '_query_subtitles': True,
             'json': {
-                'params': '2AMBCgIQBg',
+                'params': _ANDROID_PARAMS,
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
@@ -118,7 +126,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': 29,
             '_query_subtitles': True,
             'json': {
-                'params': '2AMBCgIQBg',
+                'params': _ANDROID_PARAMS,
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
@@ -350,6 +358,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         if data:
             client = merge_dicts(client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
+        client['_name'] = client_name
 
         if client.get('_access_token'):
             del client['params']['key']
