@@ -1264,7 +1264,14 @@ class VideoInfo(YouTubeRequestClient):
                        .get('playerMicroformatRenderer', {}))
         streaming_data = result.get('streamingData', {})
         is_live = video_details.get('isLiveContent', False)
-        thumb_suffix = '_live' if is_live else ''
+        if is_live:
+            live_type = _settings.live_stream_type()
+            live_dvr = video_details.get('isLiveDvrEnabled', False)
+            thumb_suffix = '_live'
+        else:
+            live_type = None
+            live_dvr = False
+            thumb_suffix = ''
 
         meta_info = {
             'video': {
@@ -1366,10 +1373,26 @@ class VideoInfo(YouTubeRequestClient):
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
         manifest_url = main_stream = None
-        live_type = _settings.live_stream_type() if is_live else None
 
         if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']
+            if '?' in manifest_url:
+                manifest_url += '&mpd_version=5'
+            elif manifest_url.endswith('/'):
+                manifest_url += 'mpd_version/5'
+            else:
+                manifest_url += '/mpd_version/5'
+
+            video_stream = {
+                'url': manifest_url,
+                'meta': meta_info,
+                'headers': curl_headers,
+                'license_info': license_info,
+                'playback_stats': playback_stats
+            }
+            details = self.FORMAT.get('9998')
+            video_stream.update(details)
+            stream_list.append(video_stream)
         elif 'hlsManifestUrl' in streaming_data:
             stream_list.extend(self._load_hls_manifest(
                 streaming_data['hlsManifestUrl'],
@@ -1433,15 +1456,7 @@ class VideoInfo(YouTubeRequestClient):
             manifest_url, main_stream = self._generate_mpd_manifest(
                 video_data, audio_data, subs_data, license_info.get('url')
             )
-            live_type = None
 
-        # extract non-adaptive streams
-        if all_fmts:
-            stream_list.extend(self._create_stream_list(
-                all_fmts, meta_info, client['headers'], playback_stats
-            ))
-
-        if manifest_url:
             video_stream = {
                 'url': manifest_url,
                 'meta': meta_info,
@@ -1449,16 +1464,7 @@ class VideoInfo(YouTubeRequestClient):
                 'license_info': license_info,
                 'playback_stats': playback_stats
             }
-
-            if live_type:
-                if '?' in manifest_url:
-                    video_stream['url'] = manifest_url + '&mpd_version=5'
-                elif manifest_url.endswith('/'):
-                    video_stream['url'] = manifest_url + 'mpd_version/5'
-                else:
-                    video_stream['url'] = manifest_url + '/mpd_version/5'
-                details = self.FORMAT.get('9998')
-            elif main_stream:
+            if main_stream:
                 details = self.FORMAT.get('9999').copy()
 
                 video_info = main_stream['video']
@@ -1495,8 +1501,14 @@ class VideoInfo(YouTubeRequestClient):
 
                 details['title'] = ''.join(details['title'])
 
-            video_stream.update(details)
-            stream_list.append(video_stream)
+                video_stream.update(details)
+                stream_list.append(video_stream)
+
+        # extract non-adaptive streams
+        if all_fmts:
+            stream_list.extend(self._create_stream_list(
+                all_fmts, meta_info, client['headers'], playback_stats
+            ))
 
         if not stream_list:
             raise YouTubeException('No streams found')
@@ -1516,8 +1528,6 @@ class VideoInfo(YouTubeRequestClient):
                    if 'no_frac_fr_hint' in stream_features else
                    self.FRACTIONAL_FPS_SCALE)
         stream_select = _settings.stream_select()
-
-
 
         audio_data = {}
         video_data = {}
@@ -1694,7 +1704,7 @@ class VideoInfo(YouTubeRequestClient):
                    .replace("<", "&lt;")
                    .replace(">", "&gt;"))
 
-            data[mime_group][itag] = data[quality_group][itag] = {
+            details = {
                 'mimeType': mime_type,
                 'baseUrl': url,
                 'mediaType': media_type,
@@ -1721,6 +1731,7 @@ class VideoInfo(YouTubeRequestClient):
                 'sampleRate': sample_rate,
                 'channels': channels,
             }
+            data[mime_group][itag] = data[quality_group][itag] = details
 
         if not video_data:
             self._context.log_debug('Generate MPD: No video mime-types found')
