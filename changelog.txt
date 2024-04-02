@@ -1,3 +1,7 @@
+## v7.0.5+beta.4
+### Fixed
+- Fix typo that caused android player requests to fail
+
 ## v7.0.5+beta.3
 ### Fixed
 - Fix error message when rating video #666
