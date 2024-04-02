@@ -15,10 +15,10 @@ from ...kodion.utils import merge_dicts
 
 
 class YouTubeRequestClient(BaseRequestsClass):
-    _ANDROID_PARAMS = 'CgIIAdgDAQ==',
+    _ANDROID_PARAMS = 'CgIIAdgDAQ=='
     # yt-dlp has chosen the following value, but this results in the android
-    # player response not including adaptive formats
-    # _ANDROID_PARAMS = 'CgIIAQ==',
+    # player response returning unexpected details sometimes. To be investigated
+    # _ANDROID_PARAMS = 'CgIIAQ=='
 
     CLIENTS = {
         # 4k no VP9 HDR
@@ -57,9 +57,6 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_query_subtitles': True,
             'json': {
                 'params': _ANDROID_PARAMS,
-                # yt-dlp has chosen the following value, but this results in the
-                # player response not including adaptive formats
-                # 'params': 'CgIIAQ==',
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
@@ -263,7 +260,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                     'request': {
                         'internalExperimentFlags': [],
                         'useSsl': True,
-                    }
+                    },
                 },
                 'playbackContext': {
                     'contentPlaybackContext': {
