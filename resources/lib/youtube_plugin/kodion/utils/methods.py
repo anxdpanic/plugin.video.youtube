@@ -323,10 +323,16 @@ def merge_dicts(item1, item2, templates=None, _=Ellipsis):
     return new or _
 
 
-def get_kodi_setting_value(setting):
+def get_kodi_setting_value(setting, process=None):
     response = jsonrpc(method='Settings.GetSettingValue',
                        params={'setting': setting})
-    return response.get('result', {}).get('value')
+    try:
+        value = response['result']['value']
+        if process:
+            return process(value)
+    except (KeyError, TypeError, ValueError):
+        return None
+    return value
 
 
 def get_kodi_setting_bool(setting):
