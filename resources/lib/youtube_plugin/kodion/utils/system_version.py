@@ -38,7 +38,7 @@ class SystemVersion(object):
             self._version = (version_installed.get('major', 1),
                              version_installed.get('minor', 0))
             self._appname = response['result']['name']
-        except:
+        except (KeyError, TypeError):
             self._version = (1, 0)  # Frodo
             self._appname = 'Unknown Application'
 
