@@ -535,7 +535,7 @@ class XbmcContext(AbstractContext):
                                    'properties': ['enabled']})
         try:
             return response['result']['addon']['enabled'] is True
-        except KeyError:
+        except (KeyError, TypeError):
             error = response.get('error', {})
             self.log_error('XbmcContext.addon_enabled error - |{0}: {1}|'
                            .format(error.get('code', 'unknown'),
@@ -548,7 +548,7 @@ class XbmcContext(AbstractContext):
                                    'enabled': enabled})
         try:
             return response['result'] == 'OK'
-        except KeyError:
+        except (KeyError, TypeError):
             error = response.get('error', {})
             self.log_error('XbmcContext.set_addon_enabled error - |{0}: {1}|'
                            .format(error.get('code', 'unknown'),

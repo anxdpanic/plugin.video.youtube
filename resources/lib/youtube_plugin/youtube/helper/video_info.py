@@ -596,7 +596,7 @@ class VideoInfo(YouTubeRequestClient):
         48: '48000/1000',  # 48.00 fps
         50: '50000/1000',  # 50.00 fps
         60: '60000/1000',  # 60.00 fps
-    },
+    }
     FRACTIONAL_FPS_SCALE = {
         0: '{0}000/1000',  # --.00 fps
         24: '24000/1001',  # 23.976 fps
