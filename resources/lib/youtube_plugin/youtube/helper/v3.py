@@ -85,7 +85,10 @@ def _process_list_response(provider, context, json_data):
                 ('channel', item_id),
                 item_params,
             )
-            item = DirectoryItem(title, item_uri, image=image)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 channel_id=item_id)
             channel_id_dict[item_id] = item
             # if logged in => provide subscribing to the channel
             if provider.is_logged_in():
@@ -113,9 +116,12 @@ def _process_list_response(provider, context, json_data):
                 ('channel', item_id),
                 item_params
             )
-            item = DirectoryItem(title, item_uri, image=image)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 channel_id=item_id,
+                                 subscription_id=subscription_id)
             channel_id_dict[item_id] = item
-            item.set_channel_id(item_id)
 
         elif kind == 'playlist':
             # set channel id to 'mine' if the path is for a playlist of our own
@@ -127,7 +133,10 @@ def _process_list_response(provider, context, json_data):
                 ('channel', channel_id, 'playlist', item_id),
                 item_params,
             )
-            item = DirectoryItem(title, item_uri, image=image)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 playlist_id=item_id)
             playlist_id_dict[item_id] = item
 
         elif kind == 'playlistitem':

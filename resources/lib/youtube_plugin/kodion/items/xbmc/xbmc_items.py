@@ -470,7 +470,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
     list_item = xbmcgui.ListItem(**kwargs)
 
     # make channel_subscription_id property available for keymapping
-    prop_value = directory_item.get_channel_subscription_id()
+    prop_value = directory_item.get_subscription_id()
     if prop_value:
         props['channel_subscription_id'] = prop_value
 
