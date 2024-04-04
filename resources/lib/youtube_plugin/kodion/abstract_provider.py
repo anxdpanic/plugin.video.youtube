@@ -108,7 +108,6 @@ class AbstractProvider(object):
             settings.set_bool(settings.SETUP_WIZARD, False)
             context.send_notification('check_settings', 'process')
 
-
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
         return []
