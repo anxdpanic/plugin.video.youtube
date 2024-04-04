@@ -277,7 +277,7 @@ def watch_later_local_add(context, item):
             (paths.WATCH_LATER, 'add',),
             {
                 'video_id': item.video_id,
-                'item': item.dumps(),
+                'item': repr(item),
             },
         ))
     )

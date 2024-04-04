@@ -55,11 +55,12 @@ class BaseItem(object):
                                                         self._uri,
                                                         self._image))
 
-    def to_dict(self):
-        return {'type': self.__class__.__name__, 'data': self.__dict__}
-
-    def dumps(self):
-        return json.dumps(self.to_dict(), ensure_ascii=False, cls=_Encoder)
+    def __repr__(self):
+        return json.dumps(
+            {'type': self.__class__.__name__, 'data': self.__dict__},
+            ensure_ascii=False,
+            cls=_Encoder
+        )
 
     def get_id(self):
         """
@@ -210,38 +211,34 @@ class BaseItem(object):
 
 
 class _Encoder(json.JSONEncoder):
-    def encode(self, obj):
+    def encode(self, obj, nested=False):
         if isinstance(obj, string_type):
-            return to_str(obj)
-
-        if isinstance(obj, dict):
-            return {to_str(key): self.encode(value)
-                    for key, value in obj.items()}
-
-        if isinstance(obj, (list, tuple)):
-            return [self.encode(item) for item in obj]
-
-        if isinstance(obj, (date, datetime)):
+            output = to_str(obj)
+        elif isinstance(obj, dict):
+            output = {to_str(key): self.encode(value, nested=True)
+                      for key, value in obj.items()}
+        elif isinstance(obj, (list, tuple)):
+            output = [self.encode(item, nested=True) for item in obj]
+        elif isinstance(obj, (date, datetime)):
             class_name = obj.__class__.__name__
-
             if 'fromisoformat' in dir(obj):
-                return {
+                output = {
                     '__class__': class_name,
                     '__isoformat__': obj.isoformat(),
                 }
-
-            if class_name == 'datetime':
-                if obj.tzinfo:
-                    format_string = '%Y-%m-%dT%H:%M:%S%z'
-                else:
-                    format_string = '%Y-%m-%dT%H:%M:%S'
             else:
-                format_string = '%Y-%m-%d'
-
-            return {
-                '__class__': class_name,
-                '__format_string__': format_string,
-                '__value__': obj.strftime(format_string)
-            }
-
-        return self.iterencode(obj)
+                if class_name == 'datetime':
+                    if obj.tzinfo:
+                        format_string = '%Y-%m-%dT%H:%M:%S%z'
+                    else:
+                        format_string = '%Y-%m-%dT%H:%M:%S'
+                else:
+                    format_string = '%Y-%m-%d'
+                output = {
+                    '__class__': class_name,
+                    '__format_string__': format_string,
+                    '__value__': obj.strftime(format_string)
+                }
+        else:
+            output = obj
+        return output if nested else super(_Encoder, self).encode(output)

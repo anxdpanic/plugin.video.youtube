@@ -54,11 +54,13 @@ def from_json(json_data, *_args):
     :return:
     """
     if isinstance(json_data, string_type):
+        if json_data == 'None':
+            return None
         json_data = json.loads(json_data, object_hook=_decoder)
 
     item_type = json_data.get('type')
     if not item_type or item_type not in _ITEM_TYPES:
-        return json_data
+        return None
 
     item = _ITEM_TYPES[item_type](name='', uri='')
 
