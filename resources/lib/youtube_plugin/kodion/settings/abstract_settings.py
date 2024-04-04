@@ -22,11 +22,6 @@ class AbstractSettings(object):
         _vars[name] = value
     del _vars
 
-    VALUE_FROM_STR = {
-        'false': False,
-        'true': True,
-    }
-
     _echo = False
     _cache = {}
     _check_set = True

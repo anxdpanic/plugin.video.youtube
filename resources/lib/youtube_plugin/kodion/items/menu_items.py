@@ -73,7 +73,7 @@ def play_with(context):
 def refresh(context):
     return (
         context.localize('refresh'),
-        'ReplaceWindow(Videos, {0})'.format(context.create_uri(
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
             context.get_path(),
             dict(context.get_params(), refresh=True),
         ))

@@ -14,6 +14,7 @@ import os
 
 from .. import logger
 from ..compatibility import to_str, urlencode
+from ..constants import VALUE_FROM_STR
 from ..json_store import AccessManager
 from ..sql_store import (
     DataCache,
@@ -91,6 +92,9 @@ class AbstractContext(object):
         'video_id',
         'video_name',
         'visitor',
+    }
+    _STRING_BOOL_PARAMS = {
+        'reload_path',
     }
 
     def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
@@ -255,7 +259,7 @@ class AbstractContext(object):
         for param, value in params.items():
             try:
                 if param in self._BOOL_PARAMS:
-                    parsed_value = str(value).lower() in ('true', '1')
+                    parsed_value = VALUE_FROM_STR.get(str(value).lower(), False)
                 elif param in self._INT_PARAMS:
                     parsed_value = int(value)
                 elif param in self._FLOAT_PARAMS:
@@ -266,8 +270,12 @@ class AbstractContext(object):
                     ]
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)
+                    if param in self._STRING_BOOL_PARAMS:
+                        parsed_value = VALUE_FROM_STR.get(
+                            parsed_value.lower(), parsed_value
+                        )
                     # process and translate deprecated parameters
-                    if param == 'action':
+                    elif param == 'action':
                         if parsed_value in ('play_all', 'play_video'):
                             to_delete.append(param)
                             self.set_path('play')

@@ -45,7 +45,11 @@ class XbmcPlugin(AbstractPlugin):
             if ui.busy_dialog_active():
                 playlist = XbmcPlaylist('auto', context)
                 playlist.clear()
-                xbmcplugin.endOfDirectory(self.handle, succeeded=False)
+                xbmcplugin.endOfDirectory(
+                    self.handle,
+                    succeeded=False,
+                    updateListing=True,
+                )
 
                 context.log_warning('Multiple busy dialogs active - '
                                     'playlist cleared to avoid Kodi crash')
@@ -97,12 +101,22 @@ class XbmcPlugin(AbstractPlugin):
                     exc=exc, details=''.join(format_stack())
                 ))
                 ui.on_ok("Error in ContentProvider", exc.__str__())
-            xbmcplugin.endOfDirectory(self.handle, succeeded=False)
+            xbmcplugin.endOfDirectory(
+                self.handle,
+                succeeded=False,
+                updateListing=True,
+            )
             return False
 
         result, options = results
+        if result is None:
+            result = False
         if isinstance(result, bool):
-            xbmcplugin.endOfDirectory(self.handle, succeeded=result)
+            xbmcplugin.endOfDirectory(
+                self.handle,
+                succeeded=result,
+                updateListing=True,
+            )
             return result
 
         show_fanart = settings.show_fanart()
@@ -128,7 +142,11 @@ class XbmcPlugin(AbstractPlugin):
                 for item in result
             ]
         else:
-            # handle exception
+            xbmcplugin.endOfDirectory(
+                self.handle,
+                succeeded=False,
+                updateListing=True,
+            )
             return False
 
         succeeded = xbmcplugin.addDirectoryItems(
@@ -170,6 +188,6 @@ class XbmcPlugin(AbstractPlugin):
 
         xbmcplugin.endOfDirectory(self.handle,
                                   succeeded=False,
-                                  updateListing=False,
+                                  updateListing=True,
                                   cacheToDisc=False)
         return False

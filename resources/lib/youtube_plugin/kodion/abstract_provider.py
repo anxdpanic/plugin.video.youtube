@@ -123,9 +123,17 @@ class AbstractProvider(object):
                 method = getattr(self, method_name, None)
                 if method is not None:
                     result = method(context, re_match)
+                    refresh = context.get_param('refresh', False)
                     if not isinstance(result, tuple):
-                        result = result, {}
-                    return result
+                        options = {
+                            self.RESULT_CACHE_TO_DISC: True,
+                            self.RESULT_UPDATE_LISTING: refresh,
+                        }
+                    else:
+                        result, options = result
+                        if refresh:
+                            options[self.RESULT_UPDATE_LISTING] = refresh
+                    return result, options
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
