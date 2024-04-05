@@ -368,7 +368,16 @@ def process_performance_settings(_provider, context, step, steps):
                 'settings': (
                     (settings.use_isa, (True,)),
                     (settings.use_mpd_videos, (False,)),
-                    (settings.live_stream_type, (2,)),
+                ),
+            },
+            '1080p30_avc': {
+                'max_resolution': 4,  # 1080p
+                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter'),
+                'num_items': 10,
+                'settings': (
+                    (settings.use_isa, (True,)),
+                    (settings.use_mpd_videos, (True,)),
+                    (settings.client_selection, (2,)),
                 ),
             },
             '1080p30': {

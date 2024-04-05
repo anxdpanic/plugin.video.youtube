@@ -167,6 +167,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard': 30526,
         'setup_wizard.capabilities': 30786,
         'setup_wizard.capabilities.720p30': 30787,
+        'setup_wizard.capabilities.1080p30_avc': 30797,
         'setup_wizard.capabilities.1080p30': 30788,
         'setup_wizard.capabilities.1080p60': 30796,
         'setup_wizard.capabilities.4k30': 30789,
