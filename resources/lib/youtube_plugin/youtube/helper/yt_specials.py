@@ -283,7 +283,7 @@ def _process_saved_playlists_tv(provider, context):
     context.set_content(content.LIST_CONTENT)
 
     json_data = provider.get_client(context).get_saved_playlists(
-        page_token=context.get_param('next_page_token', ''),
+        page_token=context.get_param('next_page_token', 0),
         offset=context.get_param('offset', 0)
     )
 
@@ -296,8 +296,8 @@ def _process_new_uploaded_videos_tv(provider, context, filtered=False):
     context.set_content(content.VIDEO_CONTENT)
 
     json_data = provider.get_client(context).get_my_subscriptions(
-        page_token=context.get_param('next_page_token', ''),
-        offset=context.get_param('offset', 0)
+        page_token=context.get_param('next_page_token', 0),
+        offset=context.get_param('offset', 0),
     )
 
     if not json_data:

@@ -50,6 +50,7 @@ class AbstractContext(object):
     }
     _INT_PARAMS = {
         'live',
+        'next_page_token',
         'offset',
         'page',
     }
@@ -75,7 +76,6 @@ class AbstractContext(object):
         'event_type',
         'item',
         'item_id',
-        'next_page_token',
         'order',
         'page_token',
         'parent_id',

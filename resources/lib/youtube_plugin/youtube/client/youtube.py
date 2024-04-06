@@ -1447,13 +1447,8 @@ class YouTube(LoginClient):
         modified by PureHemp, using YouTube RSS for fetching latest videos
         """
 
-        if not page_token:
-            page_token = ''
-
         result = {
             'items': [],
-            'next_page_token': page_token,
-            'offset': offset
         }
 
         def _perform(_page_token, _offset, _result):

@@ -63,11 +63,11 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', '')
+    next_page_token = json_data.get('next_page_token', 0)
     if next_page_token or json_data.get('continue', False):
         new_params = dict(context.get_params(),
                           next_page_token=next_page_token,
-                          offset=int(json_data.get('offset', 0)))
+                          offset=json_data.get('offset', 0))
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)
@@ -112,11 +112,11 @@ def tv_videos_to_items(provider, context, json_data):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', '')
+    next_page_token = json_data.get('next_page_token', 0)
     if next_page_token or json_data.get('continue', False):
         new_params = dict(context.get_params(),
                           next_page_token=next_page_token,
-                          offset=int(json_data.get('offset', 0)))
+                          offset=json_data.get('offset', 0))
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)
@@ -165,11 +165,11 @@ def saved_playlists_to_items(provider, context, json_data):
     utils.update_fanarts(provider, context, channel_items_dict)
 
     # next page
-    next_page_token = json_data.get('next_page_token', '')
+    next_page_token = json_data.get('next_page_token', 0)
     if next_page_token or json_data.get('continue', False):
         new_params = dict(context.get_params(),
                           next_page_token=next_page_token,
-                          offset=int(json_data.get('offset', 0)))
+                          offset=json_data.get('offset', 0))
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)
