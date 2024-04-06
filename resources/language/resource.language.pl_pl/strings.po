@@ -1416,7 +1416,7 @@ msgstr "Wyczyść lokalną listę obejrzyj później"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr "Delete watch later database"
+msgstr "Usuń bazę danych obejrzyj później"
 
 msgctxt "#30782"
 msgid "local watch later list"
