@@ -1479,10 +1479,10 @@ class Provider(AbstractProvider):
 
             return video_items
 
-        if (command == 'clear' and context.get_ui().on_yes_no_input(
-                    context.get_name(),
-                    context.localize('watch_later.clear.confirm')
-                )):
+        if command == 'clear' and context.get_ui().on_yes_no_input(
+            context.get_name(),
+            context.localize('watch_later.clear.confirm')
+        ):
             context.get_watch_later_list().clear()
             context.get_ui().refresh_container()
             return True
