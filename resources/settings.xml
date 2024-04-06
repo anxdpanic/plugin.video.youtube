@@ -475,6 +475,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.folder.bookmarks.show" type="boolean" label="30100" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
                 <setting id="youtube.folder.browse_channels.show" type="boolean" label="30512" help="">
                     <level>0</level>
                     <default>true</default>
@@ -967,6 +972,14 @@
                     <data>RunScript($ID,maintenance/clear?target=watch_later)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="kodion.maintain.clear.bookmarks" type="action" label="30798" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/clear?target=bookmarks)</data>
+                    <control format="action" type="button"/>
+                </setting>
             </group>
             <group id="2">
                 <setting id="kodion.maintain.delete.function_cache" type="action" label="30553" help="">
@@ -1007,6 +1020,14 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <data>RunScript($ID,maintenance/delete?target=watch_later)</data>
+                    <control format="action" type="button"/>
+                </setting>
+                <setting id="kodion.maintain.delete.bookmarks" type="action" label="30799" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/delete?target=bookmarks)</data>
                     <control format="action" type="button"/>
                 </setting>
             </group>

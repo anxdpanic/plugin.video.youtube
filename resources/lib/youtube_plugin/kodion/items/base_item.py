@@ -36,6 +36,7 @@ class BaseItem(object):
         self._fanart = None
         self.set_fanart(fanart)
 
+        self._bookmark_timestamp = None
         self._context_menu = None
         self._replace_context_menu = False
         self._added_utc = None
@@ -196,6 +197,12 @@ class BaseItem(object):
 
     def set_count(self, count):
         self._count = int(count or 0)
+
+    def set_bookmark_timestamp(self, timestamp):
+        self._bookmark_timestamp = timestamp
+
+    def get_bookmark_timestamp(self):
+        return self._bookmark_timestamp
 
     @property
     def next_page(self):

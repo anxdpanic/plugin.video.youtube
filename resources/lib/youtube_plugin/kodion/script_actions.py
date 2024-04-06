@@ -130,6 +130,7 @@ def _maintenance_actions(context, action, params):
 
     if action == 'clear':
         targets = {
+            'bookmarks': context.get_bookmarks_list,
             'data_cache': context.get_data_cache,
             'function_cache': context.get_function_cache,
             'playback_history': context.get_playback_history,
@@ -148,6 +149,7 @@ def _maintenance_actions(context, action, params):
     elif action == 'delete':
         path = params.get('path')
         targets = {
+            'bookmarks': 'bookmarks.sqlite',
             'data_cache': 'data_cache.sqlite',
             'function_cache': 'cache.sqlite',
             'playback_history': 'history.sqlite',

@@ -17,8 +17,8 @@ from ..compatibility import to_str, urlencode
 from ..constants import VALUE_FROM_STR
 from ..json_store import AccessManager
 from ..sql_store import (
+    BookmarksList,
     DataCache,
-    FavoriteList,
     FunctionCache,
     PlaybackHistory,
     SearchHistory,
@@ -108,7 +108,7 @@ class AbstractContext(object):
         self._data_cache = None
         self._search_history = None
         self._playback_history = None
-        self._favorite_list = None
+        self._bookmarks_list = None
         self._watch_later_list = None
         self._access_manager = None
 
@@ -184,13 +184,13 @@ class AbstractContext(object):
                                                  max_item_count=search_size)
         return self._search_history
 
-    def get_favorite_list(self):
-        if not self._favorite_list:
+    def get_bookmarks_list(self):
+        if not self._bookmarks_list:
             uuid = self.get_access_manager().get_current_user_id()
-            filename = 'favorites.sqlite'
+            filename = 'bookmarks.sqlite'
             filepath = os.path.join(self.get_data_path(), uuid, filename)
-            self._favorite_list = FavoriteList(filepath)
-        return self._favorite_list
+            self._bookmarks_list = BookmarksList(filepath)
+        return self._bookmarks_list
 
     def get_watch_later_list(self):
         if not self._watch_later_list:

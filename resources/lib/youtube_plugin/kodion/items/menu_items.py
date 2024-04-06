@@ -448,30 +448,54 @@ def history_reset_resume(context, video_id):
     )
 
 
-def favorites_add(context, item):
+def bookmarks_add(context, item):
     return (
-        context.localize('favorites.add'),
+        context.localize('bookmarks.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.FAVORITES, 'add',),
+            (paths.BOOKMARKS, 'add',),
             {
-                'video_id': item.video_id,
-                'item': item.dumps(),
+                'item_id': item.get_id(),
+                'item': repr(item),
             },
         ))
     )
 
 
-def favorites_remove(context, video_id):
+def bookmarks_add_channel(context, channel_id, channel_name=''):
     return (
-        context.localize('favorites.remove'),
+        (context.localize('bookmarks.add.channel') % (
+            context.get_ui().bold(channel_name) if channel_name else
+            context.localize(19029)
+        )),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.FAVORITES, 'remove',),
+            (paths.BOOKMARKS, 'add',),
             {
-                'vide_id': video_id,
+                'item_id': channel_id,
+                'item': None,
             },
         ))
     )
 
+
+def bookmarks_remove(context, item_id):
+    return (
+        context.localize('bookmarks.remove'),
+        'RunPlugin({0})'.format(context.create_uri(
+            (paths.BOOKMARKS, 'remove',),
+            {
+                'item_id': item_id,
+            },
+        ))
+    )
+
+
+def bookmarks_clear(context):
+    return (
+        context.localize('bookmarks.clear'),
+        'RunPlugin({0})'.format(context.create_uri(
+            (paths.BOOKMARKS, 'clear',),
+        ))
+    )
 
 def search_remove(context, query):
     return (

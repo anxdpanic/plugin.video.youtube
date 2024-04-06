@@ -42,9 +42,9 @@ class AbstractProvider(object):
 
         self.register_path(r''.join((
             '^',
-            paths.FAVORITES,
+            paths.BOOKMARKS,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), '_internal_favorite')
+        )), 'on_bookmarks')
 
         self.register_path(r''.join((
             '^',
@@ -164,43 +164,8 @@ class AbstractProvider(object):
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
 
-    @staticmethod
-    def _internal_favorite(context, re_match):
-        params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False
-
-        if command == 'list':
-            items = context.get_favorite_list().get_items()
-
-            for item in items:
-                context_menu = [
-                    menu_items.favorites_remove(
-                        context, item.video_id
-                    ),
-                    ('--------', 'noop'),
-                ]
-                item.add_context_menu(context_menu)
-
-            return items
-
-        video_id = params.get('video_id')
-        if not video_id:
-            return False
-
-        if command == 'add':
-            item = params.get('item')
-            if item:
-                context.get_favorite_list().add(video_id, item)
-            return True
-
-        if command == 'remove':
-            context.get_favorite_list().remove(video_id)
-            context.get_ui().refresh_container()
-            return True
-
-        return False
+    def on_bookmarks(self, context, re_match):
+        raise NotImplementedError()
 
     def on_watch_later(self, context, re_match):
         raise NotImplementedError()

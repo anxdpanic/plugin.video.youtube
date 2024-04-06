@@ -48,6 +48,12 @@ class XbmcContext(AbstractContext):
         'archive': 30105,
         'are_you_sure': 30703,
         'auto_remove_watch_later': 30515,
+        'bookmarks': 30100,
+        'bookmarks.add': 30101,
+        'bookmarks.add.channel': 30803,
+        'bookmarks.clear': 30801,
+        'bookmarks.clear.confirm': 30802,
+        'bookmarks.remove': 20404,
         'browse_channels': 30512,
         'cancel': 30615,
         'channels': 30500,
@@ -85,9 +91,6 @@ class XbmcContext(AbstractContext):
         'failed.watch_later.retry': 30614,
         'failed.watch_later.retry.2': 30709,
         'failed.watch_later.retry.3': 30710,
-        'favorites': 30100,
-        'favorites.add': 30101,
-        'favorites.remove': 30108,
         'go_to_channel': 30502,
         'highlights': 30104,
         'history': 30509,
@@ -111,6 +114,7 @@ class XbmcContext(AbstractContext):
         'live': 30539,
         'live.completed': 30647,
         'live.upcoming': 30646,
+        'maintenance.bookmarks': 30800,
         'maintenance.data_cache': 30687,
         'maintenance.function_cache': 30557,
         'maintenance.playback_history': 30673,
@@ -506,7 +510,7 @@ class XbmcContext(AbstractContext):
                                   override=False)
         new_context._function_cache = self._function_cache
         new_context._search_history = self._search_history
-        new_context._favorite_list = self._favorite_list
+        new_context._bookmarks_list = self._bookmarks_list
         new_context._watch_later_list = self._watch_later_list
         new_context._access_manager = self._access_manager
         new_context._ui = self._ui

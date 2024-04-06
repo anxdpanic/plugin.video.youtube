@@ -36,6 +36,7 @@ from ..kodion.constants import (
     paths,
 )
 from ..kodion.items import (
+    BaseItem,
     DirectoryItem,
     NewSearchItem,
     SearchItem,
@@ -1277,6 +1278,15 @@ class Provider(AbstractProvider):
             )
             result.append(subscriptions_item)
 
+        # bookmarks
+        if settings.get_bool('youtube.folder.bookmarks.show', True):
+            bookmarks_item = DirectoryItem(
+                localize('bookmarks'),
+                create_uri((paths.BOOKMARKS, 'list')),
+                image='{media}/bookmarks.png',
+            )
+            result.append(bookmarks_item)
+
         # browse channels
         if logged_in and settings.get_bool('youtube.folder.browse_channels.show', True):
             browse_channels_item = DirectoryItem(
@@ -1352,6 +1362,83 @@ class Provider(AbstractProvider):
             result.append(settings_menu_item)
 
         return result
+
+    def on_bookmarks(self, context, re_match):
+        params = context.get_params()
+        command = re_match.group('command')
+        if not command:
+            return False
+
+        if command == 'list':
+            context.set_content(content.VIDEO_CONTENT)
+            bookmarks_list = context.get_bookmarks_list()
+            items = bookmarks_list.get_items()
+            if not items:
+                return True
+
+            v3_response = {
+                'kind': 'youtube#channelListResponse',
+                'items': [
+                    {
+                        'kind': 'youtube#channel',
+                        'id': item_id,
+                        'partial': True,
+                    }
+                    for item_id, item in items.items()
+                    if isinstance(item, float)
+                ]
+            }
+            channel_items = v3.response_to_items(self, context, v3_response)
+            for channel_item in channel_items:
+                channel_id = channel_item.get_channel_id()
+                if channel_id not in items:
+                    continue
+                timestamp = items[channel_id]
+                channel_item.set_bookmark_timestamp(timestamp)
+                items[channel_id] = channel_item
+                bookmarks_list.update(channel_id, repr(channel_item), timestamp)
+
+            bookmarks = []
+            for item_id, item in items.items():
+                if not isinstance(item, BaseItem):
+                    continue
+                context_menu = [
+                    menu_items.bookmarks_remove(
+                        context, item_id
+                    ),
+                    menu_items.bookmarks_clear(
+                        context
+                    ),
+                    ('--------', 'noop'),
+                ]
+                item.add_context_menu(context_menu)
+                bookmarks.append(item)
+
+            return bookmarks
+
+        if command == 'clear' and context.get_ui().on_yes_no_input(
+            context.get_name(),
+            context.localize('bookmarks.clear.confirm')
+        ):
+            context.get_bookmarks_list().clear()
+            context.get_ui().refresh_container()
+            return True
+
+        item_id = params.get('item_id')
+        if not item_id:
+            return False
+
+        if command == 'add':
+            item = params.get('item')
+            context.get_bookmarks_list().add(item_id, item)
+            return True
+
+        if command == 'remove':
+            context.get_bookmarks_list().remove(item_id)
+            context.get_ui().refresh_container()
+            return True
+
+        return False
 
     def on_watch_later(self, context, re_match):
         params = context.get_params()

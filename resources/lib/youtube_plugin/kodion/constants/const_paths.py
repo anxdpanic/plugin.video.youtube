@@ -11,9 +11,9 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
+BOOKMARKS = '/kodion/bookmarks'
 EXTERNAL_SEARCH = '/search'
 SEARCH = '/kodion/search'
-FAVORITES = '/kodion/favorites'
 WATCH_LATER = '/kodion/watch_later'
 HISTORY = '/kodion/playback_history'
 

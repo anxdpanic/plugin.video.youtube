@@ -14,25 +14,30 @@ from .storage import Storage
 from ..items import from_json
 
 
-class FavoriteList(Storage):
+class BookmarksList(Storage):
     _table_name = 'storage_v2'
     _table_created = False
     _table_updated = False
     _sql = {}
 
     def __init__(self, filepath):
-        super(FavoriteList, self).__init__(filepath)
-
-    @staticmethod
-    def _sort_item(item):
-        return item.get_name().upper()
+        super(BookmarksList, self).__init__(filepath)
 
     def get_items(self):
-        result = self._get_by_ids(process=from_json, values_only=True)
-        return sorted(result, key=self._sort_item, reverse=False)
+        result = self._get_by_ids(process=from_json, as_dict=True)
+        return result
 
     def add(self, item_id, item):
         self._set(item_id, item)
 
     def remove(self, item_id):
         self._remove(item_id)
+
+    def update(self, item_id, item, timestamp=None):
+        self._set(item_id, item, timestamp)
+
+    def _optimize_item_count(self, limit=-1, defer=False):
+        return False
+
+    def _optimize_file_size(self, limit=-1, defer=False):
+        return False

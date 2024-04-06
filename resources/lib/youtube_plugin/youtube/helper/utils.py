@@ -162,6 +162,7 @@ def update_channel_infos(provider, context, channel_id_dict,
 
     filter_list = None
     if path.startswith(paths.SUBSCRIPTIONS):
+        in_bookmarks_list = False
         in_subscription_list = True
         if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
                              False):
@@ -171,7 +172,11 @@ def update_channel_infos(provider, context, channel_id_dict,
             filter_string = filter_string.replace(', ', ',')
             filter_list = filter_string.split(',')
             filter_list = [x.lower() for x in filter_list]
+    elif path.startswith(paths.BOOKMARKS):
+        in_bookmarks_list = True
+        in_subscription_list = False
     else:
+        in_bookmarks_list = False
         in_subscription_list = False
 
     thumb_size = settings.use_thumbnail_size
@@ -227,6 +232,13 @@ def update_channel_infos(provider, context, channel_id_dict,
                 )
             )
 
+        if not in_bookmarks_list:
+            context_menu.append(
+                menu_items.bookmarks_add(
+                    context, channel_item
+                )
+            )
+
         if context_menu:
             channel_item.set_context_menu(context_menu)
 
@@ -265,6 +277,17 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     path = context.get_path()
     thumb_size = context.get_settings().use_thumbnail_size()
 
+    # if the path directs to a playlist of our own, set channel id to 'mine'
+    if path.startswith(paths.MY_PLAYLISTS):
+        in_bookmarks_list = False
+        in_my_playlists = True
+    elif path.startswith(paths.BOOKMARKS):
+        in_bookmarks_list = True
+        in_my_playlists = False
+    else:
+        in_bookmarks_list = False
+        in_my_playlists = False
+
     for playlist_id, yt_item in data.items():
         playlist_item = playlist_id_dict[playlist_id]
 
@@ -274,10 +297,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         playlist_item.set_image(image)
 
-        channel_id = snippet['channelId']
-        # if the path directs to a playlist of our own, set channel id to 'mine'
-        if path.startswith(paths.MY_PLAYLISTS):
-            channel_id = 'mine'
+        channel_id = 'mine' if in_my_playlists else snippet['channelId']
         channel_name = snippet.get('channelTitle', '')
 
         # play all videos of the playlist
@@ -286,6 +306,13 @@ def update_playlist_infos(provider, context, playlist_id_dict,
                 context, playlist_id
             )
         ]
+
+        if not in_bookmarks_list and channel_id != 'mine':
+            context_menu.append(
+                menu_items.bookmarks_add(
+                    context, playlist_item
+                )
+            )
 
         if logged_in:
             if channel_id != 'mine':
@@ -322,6 +349,14 @@ def update_playlist_infos(provider, context, playlist_id_dict,
                         context, playlist_id, title
                     ),
                 ))
+
+        if not in_bookmarks_list and channel_id != 'mine':
+            context_menu.append(
+                # bookmark channel of the playlist
+                menu_items.bookmarks_add_channel(
+                    context, channel_id, channel_name
+                )
+            )
 
         if context_menu:
             playlist_item.set_context_menu(context_menu)
@@ -373,14 +408,22 @@ def update_video_infos(provider, context, video_id_dict,
     ui = context.get_ui()
 
     if path.startswith(paths.MY_SUBSCRIPTIONS):
+        in_bookmarks_list = False
         in_my_subscriptions_list = True
         in_watched_later_list = False
         playlist_match = False
     elif path.startswith(paths.WATCH_LATER):
+        in_bookmarks_list = False
         in_my_subscriptions_list = False
         in_watched_later_list = True
         playlist_match = False
+    elif path.startswith(paths.BOOKMARKS):
+        in_bookmarks_list = True
+        in_my_subscriptions_list = False
+        in_watched_later_list = False
+        playlist_match = False
     else:
+        in_bookmarks_list = False
         in_my_subscriptions_list = False
         in_watched_later_list = False
         playlist_match = __RE_PLAYLIST_MATCH.match(path)
@@ -616,6 +659,13 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
+        if not in_bookmarks_list:
+            context_menu.append(
+                menu_items.bookmarks_add(
+                    context, video_item
+                )
+            )
+
         # provide 'remove' for videos in my playlists
         # we support all playlist except 'Watch History'
         if (logged_in and video_id in playlist_item_id_dict and playlist_id
@@ -651,6 +701,18 @@ def update_video_infos(provider, context, video_id_dict,
                 ) if in_my_subscriptions_list else
                 # subscribe to the channel of the video
                 menu_items.subscribe_to_channel(
+                    context, channel_id, channel_name
+                )
+            )
+
+        if not in_bookmarks_list:
+            context_menu.append(
+                # remove bookmarked channel of the video
+                menu_items.bookmarks_remove(
+                    context, item_id=channel_id
+                ) if in_my_subscriptions_list else
+                # bookmark channel of the video
+                menu_items.bookmarks_add_channel(
                     context, channel_id, channel_name
                 )
             )
