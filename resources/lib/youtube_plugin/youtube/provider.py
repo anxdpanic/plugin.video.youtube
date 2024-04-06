@@ -1082,7 +1082,7 @@ class Provider(AbstractProvider):
             )
             result.append(sign_in_item)
 
-        if logged_in and settings.get_bool('youtube.folder.my_subscriptions.show', True):
+        if settings.get_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
             item_label = localize('my_subscriptions')
             my_subscriptions_item = DirectoryItem(
@@ -1093,7 +1093,7 @@ class Provider(AbstractProvider):
             )
             result.append(my_subscriptions_item)
 
-        if logged_in and settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
+        if settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
             # my subscriptions filtered
             my_subscriptions_filtered_item = DirectoryItem(
                 localize('my_subscriptions.filtered'),
