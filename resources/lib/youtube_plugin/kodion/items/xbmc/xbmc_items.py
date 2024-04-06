@@ -463,16 +463,23 @@ def directory_listitem(context, directory_item, show_fanart=None):
         'offscreen': True,
     }
     props = {
-        'specialSort': 'bottom' if directory_item.next_page else 'top',
         'ForceResolvePlugin': 'true',
     }
 
     list_item = xbmcgui.ListItem(**kwargs)
 
-    # make channel_subscription_id property available for keymapping
-    prop_value = directory_item.get_subscription_id()
-    if prop_value:
-        props['channel_subscription_id'] = prop_value
+    if directory_item.next_page:
+        props['specialSort'] = 'bottom'
+    else:
+        prop_value = directory_item.get_subscription_id()
+        if prop_value:
+            props['channel_subscription_id'] = prop_value
+        elif directory_item.get_channel_id():
+            pass
+        elif directory_item.get_playlist_id():
+            pass
+        else:
+            props['specialSort'] = 'top'
 
     if show_fanart is None:
         show_fanart = context.get_settings().show_fanart()
