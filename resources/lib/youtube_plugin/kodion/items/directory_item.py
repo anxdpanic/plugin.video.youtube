@@ -39,6 +39,7 @@ class DirectoryItem(BaseItem):
         name = super(DirectoryItem, self).set_name(name)
         if hasattr(self, '_category_label'):
             self.set_category_label(category_label or name)
+        self.set_plot(name)
         return name
 
     def set_category_label(self, label):
@@ -46,12 +47,14 @@ class DirectoryItem(BaseItem):
             self._category_label = None
             return
 
-        if self._category_label and self._category_label != label:
-            uri = self.get_uri()
-            self.set_uri(uri.replace(
-                urlencode({'category_label': self._category_label}),
-                urlencode({'category_label': label}) if label else '',
-            ))
+        current_label = self._category_label
+        if current_label:
+            if current_label != label:
+                uri = self.get_uri()
+                self.set_uri(uri.replace(
+                    urlencode({'category_label': current_label}),
+                    urlencode({'category_label': label}) if label else '',
+                ))
         elif label:
             uri = self.get_uri()
             self.set_uri(('&' if '?' in uri else '?').join((
