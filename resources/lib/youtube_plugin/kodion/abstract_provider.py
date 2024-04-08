@@ -94,11 +94,11 @@ class AbstractProvider(object):
         steps = len(wizard_steps)
 
         try:
-            if (wizard_steps and ui.on_yes_no_input(
-                context.localize('setup_wizard'),
-                (context.localize('setup_wizard.prompt')
-                 % context.localize('setup_wizard.prompt.settings'))
-            )):
+            if wizard_steps and ui.on_yes_no_input(
+                    context.localize('setup_wizard'),
+                    (context.localize('setup_wizard.prompt')
+                     % context.localize('setup_wizard.prompt.settings'))
+            ):
                 for wizard_step in wizard_steps:
                     if callable(wizard_step):
                         step = wizard_step(self, context, step, steps)

@@ -357,7 +357,7 @@ def video_playback_item(context, video_item, show_fanart=None):
             video_id=video_item.video_id
         ))
     elif (video_item.use_isa_video()
-            and context.addon_enabled('inputstream.adaptive')):
+          and context.addon_enabled('inputstream.adaptive')):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'

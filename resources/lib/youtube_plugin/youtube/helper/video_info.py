@@ -1144,7 +1144,7 @@ class VideoInfo(YouTubeRequestClient):
         if self._access_token:
             client_data['_access_token'] = self._access_token
 
-        for _ in range(2):
+        while 1:
             for client_name in self._prioritised_clients:
                 if status and status != 'OK':
                     self._context.log_warning(
@@ -1607,11 +1607,11 @@ class VideoInfo(YouTubeRequestClient):
                     mime_group = '{0}_{1}.{2}'.format(
                         mime_type, language_code, role_type
                     )
-                    if (language_code == self._language_base and (
+                    if language_code == self._language_base and (
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
-                    )):
+                    ):
                         preferred_audio = {
                             'id': '_{0}.{1}'.format(language_code, role_type),
                             'language_code': language_code,

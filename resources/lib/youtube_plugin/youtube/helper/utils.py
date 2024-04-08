@@ -23,11 +23,11 @@ from ...kodion.utils import (
     strip_html_from_text,
 )
 
+
 try:
     from inputstreamhelper import Helper as ISHelper
 except ImportError:
     ISHelper = None
-
 
 __RE_PLAYLIST_MATCH = re.compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
@@ -860,9 +860,8 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
             break
 
     if shelf_index is not None and 0 > shelf_index >= len(contents):
-        context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(
-            index=shelf_index, content_length=len(contents)
-        ))
+        context.log_debug('Shelf index |{0}| out of range |0-{1}|'
+                          .format(shelf_index, len(contents)))
         shelf_index = None
 
     return shelf_index

@@ -92,9 +92,12 @@ class Provider(AbstractProvider):
             return None
 
         if dev_config:
-            if not dev_config.get('main') or not dev_config['main'].get('key') \
-                    or not dev_config['main'].get('system') or not dev_config.get('origin') \
-                    or not dev_config['main'].get('id') or not dev_config['main'].get('secret'):
+            if (not dev_config.get('main')
+                    or not dev_config['main'].get('key')
+                    or not dev_config['main'].get('system')
+                    or not dev_config.get('origin')
+                    or not dev_config['main'].get('id')
+                    or not dev_config['main'].get('secret')):
                 context.log_error('Error loading developer config: |invalid structure| '
                                   'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
                 return {}
@@ -722,7 +725,8 @@ class Provider(AbstractProvider):
         if (not sign_out_confirmed and mode == 'out'
                 and context.get_ui().on_yes_no_input(
                     context.localize('sign.out'),
-                    context.localize('are_you_sure'))):
+                    context.localize('are_you_sure')
+                )):
             sign_out_confirmed = True
 
         if mode == 'in' or (mode == 'out' and sign_out_confirmed):
@@ -847,7 +851,7 @@ class Provider(AbstractProvider):
         params = context.get_params()
         action = params.get('action')
         channel = params.get('channel_name')
-        if (not channel) or (not action):
+        if not channel or not action:
             return
 
         filter_enabled = settings.get_bool('youtube.folder.my_subscriptions_filtered.show', False)
@@ -895,9 +899,9 @@ class Provider(AbstractProvider):
         ui = context.get_ui()
         localize = context.localize
 
-        if (target == 'access_manager' and ui.on_yes_no_input(
-            context.get_name(), localize('reset.access_manager.confirm')
-        )):
+        if target == 'access_manager' and ui.on_yes_no_input(
+                context.get_name(), localize('reset.access_manager.confirm')
+        ):
             try:
                 access_manager = context.get_access_manager()
                 client = self.get_client(context)
@@ -1012,10 +1016,10 @@ class Provider(AbstractProvider):
 
             return video_items
 
-        if (action == 'clear' and context.get_ui().on_yes_no_input(
-                    context.get_name(),
-                    context.localize('history.clear.confirm')
-                )):
+        if action == 'clear' and context.get_ui().on_yes_no_input(
+                context.get_name(),
+                context.localize('history.clear.confirm')
+        ):
             playback_history.clear()
             context.get_ui().refresh_container()
             return True
@@ -1417,8 +1421,8 @@ class Provider(AbstractProvider):
             return bookmarks
 
         if command == 'clear' and context.get_ui().on_yes_no_input(
-            context.get_name(),
-            context.localize('bookmarks.clear.confirm')
+                context.get_name(),
+                context.localize('bookmarks.clear.confirm')
         ):
             context.get_bookmarks_list().clear()
             context.get_ui().refresh_container()
@@ -1480,8 +1484,8 @@ class Provider(AbstractProvider):
             return video_items
 
         if command == 'clear' and context.get_ui().on_yes_no_input(
-            context.get_name(),
-            context.localize('watch_later.clear.confirm')
+                context.get_name(),
+                context.localize('watch_later.clear.confirm')
         ):
             context.get_watch_later_list().clear()
             context.get_ui().refresh_container()

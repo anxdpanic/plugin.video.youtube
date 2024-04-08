@@ -539,7 +539,7 @@ def get_http_server(address, port):
         return server
     except socket.error as exc:
         log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'
-                  .format(address=address, port=port, response=str(exc)))
+                  .format(address=address, port=port, response=exc))
         xbmcgui.Dialog().notification(_addon_name,
                                       str(exc),
                                       _addon_icon,

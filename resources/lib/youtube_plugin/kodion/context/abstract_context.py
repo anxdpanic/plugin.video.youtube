@@ -112,7 +112,7 @@ class AbstractContext(object):
         self._watch_later_list = None
         self._access_manager = None
 
-        self._plugin_name = str(plugin_name)
+        self._plugin_name = plugin_name
         self._version = 'UNKNOWN'
         self._plugin_id = plugin_id
         self._path = create_path(path)

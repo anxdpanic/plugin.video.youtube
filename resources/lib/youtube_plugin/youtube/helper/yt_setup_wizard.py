@@ -198,9 +198,9 @@ def process_language(provider, context, step, steps):
 
     step += 1
     if not ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.locale')),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.locale'))
     ):
         return step
 
@@ -293,9 +293,9 @@ def process_geo_location(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.my_location')),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.my_location'))
     ):
         locator = Locator()
         locator.locate_requester()
@@ -313,9 +313,9 @@ def process_default_settings(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.settings.defaults'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.defaults'))
     ):
         settings.client_selection(0)
         settings.use_isa(True)
@@ -337,9 +337,9 @@ def process_list_detail_settings(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.settings.list_details'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.list_details'))
     ):
         settings.show_detailed_description(False)
         settings.show_detailed_labels(False)
@@ -356,9 +356,9 @@ def process_performance_settings(_provider, context, step, steps):
 
     step += 1
     if ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.settings.performance'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.performance'))
     ):
         device_types = {
             '720p30': {
@@ -438,9 +438,9 @@ def process_subtitles(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.subtitles'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.subtitles'))
     ):
         context.execute('RunScript({addon_id},config/subtitles)'.format(
             addon_id=ADDON_ID
@@ -459,8 +459,8 @@ def process_old_search_db(_provider, context, step, steps):
     )
     step += 1
     if xbmcvfs.exists(search_db_path) and ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        localize('setup_wizard.prompt.import_search_history'),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            localize('setup_wizard.prompt.import_search_history'),
     ):
         def _convert_old_search_item(value, item):
             return {
@@ -500,8 +500,8 @@ def process_old_history_db(_provider, context, step, steps):
     )
     step += 1
     if xbmcvfs.exists(history_db_path) and ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        localize('setup_wizard.prompt.import_playback_history'),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            localize('setup_wizard.prompt.import_playback_history'),
     ):
         def _convert_old_history_item(value, item):
             values = value.split(',')

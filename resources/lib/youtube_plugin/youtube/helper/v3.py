@@ -335,6 +335,20 @@ def _process_list_response(provider, context, json_data):
     return result
 
 
+_KNOWN_RESPONSE_KINDS = {
+    'activitylistresponse',
+    'channellistresponse',
+    'commentlistresponse',
+    'commentthreadlistresponse',
+    'guidecategorylistresponse',
+    'playlistitemlistresponse',
+    'playlistlistresponse',
+    'searchlistresponse',
+    'subscriptionlistresponse',
+    'videolistresponse',
+}
+
+
 def response_to_items(provider,
                       context,
                       json_data,
@@ -346,18 +360,7 @@ def response_to_items(provider,
         context.log_debug('v3 response: Response discarded, is_youtube=False')
         return []
 
-    if kind in (
-            'activitylistresponse',
-            'channellistresponse',
-            'commentlistresponse',
-            'commentthreadlistresponse',
-            'guidecategorylistresponse',
-            'playlistitemlistresponse',
-            'playlistlistresponse',
-            'searchlistresponse',
-            'subscriptionlistresponse',
-            'videolistresponse',
-    ):
+    if kind in _KNOWN_RESPONSE_KINDS:
         result = _process_list_response(provider, context, json_data)
     else:
         raise KodionException("Unknown kind '%s'" % kind)
