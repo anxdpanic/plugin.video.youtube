@@ -397,11 +397,15 @@ def update_video_infos(provider, context, video_id_dict,
         watch_later_id = None
 
     settings = context.get_settings()
-    hide_shorts = settings.hide_short_videos()
     alternate_player = settings.support_alternative_player()
+    ask_quality = settings.ask_for_video_quality()
+    audio_only = settings.audio_only()
+    hide_shorts = settings.hide_short_videos()
     show_details = settings.show_detailed_description()
+    subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+
     untitled = context.localize('untitled')
 
     path = context.get_path()
@@ -737,26 +741,40 @@ def update_video_infos(provider, context, video_id_dict,
 
         # more...
         refresh = path.startswith((paths.LIKED_VIDEOS, paths.DISLIKED_VIDEOS))
-        context_menu.extend((
+        context_menu.append(
             menu_items.more_for_video(
                 context,
                 video_id,
                 logged_in=logged_in,
                 refresh=refresh,
-            ),
-            menu_items.play_with_subtitles(
-                context, video_id
-            ),
-            menu_items.play_audio_only(
-                context, video_id
-            ),
-            menu_items.play_ask_for_quality(
-                context, video_id
-            ),
-            ('--------', 'noop'),
-        ))
+            )
+        )
+
+        if not subtitles_prompt:
+            context_menu.append(
+                menu_items.play_with_subtitles(
+                    context, video_id
+                )
+            )
+
+        if not audio_only:
+            context_menu.append(
+                menu_items.play_audio_only(
+                    context, video_id
+                )
+            )
+
+        if not ask_quality:
+            context_menu.append(
+                menu_items.play_ask_for_quality(
+                    context, video_id
+                )
+            )
 
         if context_menu:
+            context_menu.append(
+                ('--------', 'noop')
+            )
             video_item.set_context_menu(
                 context_menu, replace=replace_context_menu
             )
