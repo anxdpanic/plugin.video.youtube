@@ -321,6 +321,7 @@ def process_default_settings(_provider, context, step, steps):
         settings.use_isa(True)
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
+        settings.set_subtitle_download(False)
         settings.live_stream_type(2)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
             settings.alternative_player_web_urls(False)
@@ -366,8 +367,8 @@ def process_performance_settings(_provider, context, step, steps):
                 'stream_features': ('avc1', 'mp4a', 'filter'),
                 'num_items': 10,
                 'settings': (
-                    (settings.use_isa, (True,)),
                     (settings.use_mpd_videos, (False,)),
+                    (settings.set_subtitle_download, (True,)),
                 ),
             },
             '1080p30_avc': {
@@ -375,8 +376,6 @@ def process_performance_settings(_provider, context, step, steps):
                 'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter'),
                 'num_items': 10,
                 'settings': (
-                    (settings.use_isa, (True,)),
-                    (settings.use_mpd_videos, (True,)),
                     (settings.client_selection, (2,)),
                 ),
             },
