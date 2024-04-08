@@ -329,7 +329,6 @@ def video_playback_item(context, video_item, show_fanart=None):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
-    alternative_player = settings.support_alternative_player()
     is_strm = context.get_param('strm')
     mime_type = None
 
@@ -350,14 +349,8 @@ def video_playback_item(context, video_item, show_fanart=None):
             'isPlayable': str(video_item.playable).lower(),
         }
 
-    if (alternative_player
-            and settings.alternative_player_web_urls()
-            and not license_key):
-        video_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(
-            video_id=video_item.video_id
-        ))
-    elif (video_item.use_isa_video()
-          and context.addon_enabled('inputstream.adaptive')):
+    if (video_item.use_isa_video()
+            and context.addon_enabled('inputstream.adaptive')):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'
@@ -386,8 +379,9 @@ def video_playback_item(context, video_item, show_fanart=None):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        if not alternative_player and headers and uri.startswith('http'):
-            video_item.set_uri('|'.join((uri, headers)))
+        if (not settings.support_alternative_player()
+                and headers and uri.startswith('http')):
+            kwargs['path'] = '|'.join((uri, headers))
 
     list_item = xbmcgui.ListItem(**kwargs)
 
@@ -571,6 +565,14 @@ def video_listitem(context, video_item, show_fanart=None):
     uri = video_item.get_uri()
     context.log_debug('Converting VideoItem |%s|' % uri)
 
+    settings = context.get_settings()
+
+    if (settings.alternative_player_web_urls()
+            and not video_item.get_license_key()):
+        uri = 'https://www.youtube.com/watch?v={video_id}'.format(
+            video_id=video_item.video_id
+        )
+
     kwargs = {
         'label': video_item.get_title() or video_item.get_name(),
         'label2': video_item.get_short_details(),
@@ -619,7 +621,7 @@ def video_listitem(context, video_item, show_fanart=None):
         props['playlist_item_id'] = prop_value
 
     if show_fanart is None:
-        show_fanart = context.get_settings().show_fanart()
+        show_fanart = settings.show_fanart()
     image = video_item.get_image()
     list_item.setArt({
         'icon': image or 'DefaultVideo.png',
