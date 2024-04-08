@@ -111,7 +111,9 @@ class AbstractSettings(object):
     def alternative_player_web_urls(self, value=None):
         if value is not None:
             return self.set_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, value)
-        return self.get_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, False)
+        if self.support_alternative_player():
+            return self.get_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, False)
+        return False
 
     def use_isa(self, value=None):
         if value is not None:
