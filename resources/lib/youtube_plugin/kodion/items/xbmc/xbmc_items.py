@@ -440,9 +440,7 @@ def audio_listitem(context, audio_item, show_fanart=None):
 
     context_menu = audio_item.get_context_menu()
     if context_menu:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=audio_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
 
@@ -499,9 +497,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
 
     context_menu = directory_item.get_context_menu()
     if context_menu is not None:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=directory_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, is_folder
 
@@ -535,9 +531,7 @@ def image_listitem(context, image_item, show_fanart=None):
 
     context_menu = image_item.get_context_menu()
     if context_menu is not None:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=image_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
 
@@ -636,9 +630,7 @@ def video_listitem(context, video_item, show_fanart=None):
 
     context_menu = video_item.get_context_menu()
     if context_menu:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=video_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
 

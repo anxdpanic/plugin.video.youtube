@@ -38,7 +38,6 @@ class BaseItem(object):
 
         self._bookmark_timestamp = None
         self._context_menu = None
-        self._replace_context_menu = False
         self._added_utc = None
         self._count = None
         self._date = None
@@ -123,25 +122,19 @@ class BaseItem(object):
     def get_fanart(self):
         return self._fanart
 
-    def set_context_menu(self, context_menu, replace=False):
+    def set_context_menu(self, context_menu):
         self._context_menu = context_menu
-        self._replace_context_menu = replace
 
-    def add_context_menu(self, context_menu, position=0, replace=None):
+    def add_context_menu(self, context_menu, position=0):
         if self._context_menu is None:
             self._context_menu = context_menu
         elif position == 'end':
             self._context_menu.extend(context_menu)
         else:
             self._context_menu[position:position] = context_menu
-        if replace is not None:
-            self._replace_context_menu = replace
 
     def get_context_menu(self):
         return self._context_menu
-
-    def replace_context_menu(self):
-        return self._replace_context_menu
 
     def set_date(self, year, month, day, hour=0, minute=0, second=0):
         self._date = datetime(year, month, day, hour, minute, second)

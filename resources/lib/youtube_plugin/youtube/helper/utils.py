@@ -622,7 +622,6 @@ def update_video_infos(provider, context, video_id_dict,
             # Queue Video
             menu_items.queue_video(context),
         ]
-        replace_context_menu = False
 
         """
         Play all videos of the playlist.
@@ -632,7 +631,6 @@ def update_video_infos(provider, context, video_id_dict,
         """
         playlist_id = playlist_channel_id = ''
         if playlist_match:
-            replace_context_menu = True
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
 
@@ -776,9 +774,7 @@ def update_video_infos(provider, context, video_id_dict,
             context_menu.append(
                 ('--------', 'noop')
             )
-            video_item.set_context_menu(
-                context_menu, replace=replace_context_menu
-            )
+            video_item.set_context_menu(context_menu)
 
 
 def update_play_info(provider, context, video_id, video_item, video_stream,
