@@ -97,8 +97,8 @@ jobs:
 
       - name: Copy Generator Script
         run: |
-          cp  ./official/${{ github.event.repository.name }}/.scripts/.prepare_repository.py .
-          cp  ./official/${{ github.event.repository.name }}/.scripts/.config.json .
+          cp  ./official_testing/${{ github.event.repository.name }}/.scripts/.prepare_repository.py .
+          cp  ./official_testing/${{ github.event.repository.name }}/.scripts/.config.json .
 
       - name: Generate Repository
         run: |
