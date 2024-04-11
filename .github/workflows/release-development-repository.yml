@@ -1,0 +1,131 @@
+name: Generate Development Repository
+on:
+  workflow_dispatch:
+    inputs:
+      prerelease:
+        description: 'Is this a pre-release? [true|false]'
+        required: false
+        default: 'true'
+
+  push:
+    tags:
+      - 'v*'
+      - '*-dev'
+
+jobs:
+  repo-gen:
+    if: github.repository == 'anxdpanic/plugin.video.youtube' || github.event_name == 'workflow_dispatch'
+    name: Generate development repository and upload to mirrors
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Release Status
+        id: release
+        run: |
+          version=${GITHUB_REF/refs\/tags\//}
+          if [[ ! -z ${{ github.event.inputs.prerelease }} ]] ;
+          then
+            echo "pre-release=${{ github.event.inputs.prerelease }}" >> $GITHUB_OUTPUT
+          elif [[ $version == *[-+]@(alpha|beta|dev)*([.0-9a-z]) ]] ;
+          then
+            echo "pre-release=true" >> $GITHUB_OUTPUT
+          else
+            echo "pre-release=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install lftp
+          python -m pip install --upgrade pip
+          pip install lxml
+
+      - name: Checkout Official Add-on
+        uses: actions/checkout@v4
+        with:
+          path: ./official_testing/${{ github.event.repository.name }}
+          ref: "master"
+
+      - name: Checkout Unofficial Add-on
+        uses: actions/checkout@v4
+        with:
+          path: ./unofficial_testing/${{ github.event.repository.name }}
+          ref: "nexus-unofficial"
+
+      - name: Checkout Unofficial Add-on
+        if: steps.release.outputs.pre-release == 'false'
+        uses: actions/checkout@v4
+        with:
+          path: ./unofficial/${{ github.event.repository.name }}
+          ref: "nexus-unofficial"
+
+      - name: Checkout Add-on
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.event.repository.name }}
+
+      - name: Download Repository Add-on Files from FTP
+        run: |
+          lftp -c "\
+          set ssl:verify-certificate false; \
+          set sftp:auto-confirm yes; \
+          open ${{ secrets.SFTP }}; \
+          cd /root/anxdpanic/kodi/youtube/; \
+          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_official ./official_testing/repository.yt.testing_official; \
+          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_unofficial ./unofficial_testing/repository.yt.testing_unofficial; \
+          bye \
+          "
+
+      - name: Download Unofficial Repository Add-on Files from FTP
+        if: steps.release.outputs.pre-release == 'false'
+        run: |
+          lftp -c "\
+          set ssl:verify-certificate false; \
+          set sftp:auto-confirm yes; \
+          open ${{ secrets.SFTP }}; \
+          cd /root/anxdpanic/kodi/youtube/; \
+          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_unofficial ./unofficial/repository.yt.unofficial; \
+          bye \
+          "
+
+      - name: Copy Generator Script
+        run: |
+          cp  ./official/${{ github.event.repository.name }}/.scripts/.prepare_repository.py .
+          cp  ./official/${{ github.event.repository.name }}/.scripts/.config.json .
+
+      - name: Generate Repository
+        run: |
+          python .prepare_repository.py --prerelease=${{ steps.release.outputs.pre-release }}
+
+      - name: Mirror Repository to FTP
+        run: |
+          lftp -c "\
+          set ssl:verify-certificate false; \
+          set sftp:auto-confirm yes; \
+          open ${{ secrets.SFTP }}; \
+          cd /root/anxdpanic/kodi/youtube/; \
+          lcd repository/; \
+          mirror --verbose --use-pget-n=8 -c --reverse --verbose official_testing official_testing; \
+          mirror --verbose --use-pget-n=8 -c --reverse --verbose unofficial_testing unofficial_testing; \
+          bye \
+          "
+
+      - name: Mirror Unofficial Repository to FTP
+        if: steps.release.outputs.pre-release == 'false'
+        run: |
+          lftp -c "\
+          set ssl:verify-certificate false; \
+          set sftp:auto-confirm yes; \
+          open ${{ secrets.SFTP }}; \
+          cd /root/anxdpanic/kodi/youtube/; \
+          lcd repository/; \
+          mirror --verbose --use-pget-n=8 -c --reverse --verbose unofficial unofficial; \
+          bye \
+          "

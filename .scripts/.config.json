@@ -1,0 +1,38 @@
+{
+  "compress_addons": true,
+  "path": {
+    "source": "./official_testing",
+    "source-unofficial-testing": "./unofficial_testing",
+    "source-unofficial": "./unofficial",
+    "repository": "./repository/official_testing",
+    "repository-unofficial-testing": "./repository/unofficial_testing",
+    "repository-unofficial": "./repository/unofficial"
+  },
+  "development_versions": true,
+  "ignored": {
+    "addons": [
+    ],
+    "files": [
+      "README.md",
+      "append_to_languages.py",
+      "new_strings.txt",
+      "convert_settings.py",
+      "core.po",
+      "changelog.txt"
+    ],
+    "file_starts_with": [
+      "."
+    ],
+    "file_ends_with": [
+      ".pyo",
+      ".pyc",
+      "template.md"
+    ],
+    "directories": [
+      ".git",
+      ".idea",
+      "test_youtube",
+      "mock"
+    ]
+  }
+}
