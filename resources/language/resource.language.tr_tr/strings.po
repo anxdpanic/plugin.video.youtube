@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-01-15 09:59+0000\n"
-"Last-Translator: Tmp341 <tmp341@gmail.com>\n"
+"PO-Revision-Date: 2024-04-12 15:14+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
 "Language-Team: Turkish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/tr_tr/>\n"
 "Language: tr_tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.15\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -67,7 +67,7 @@ msgstr "Her zaman video kalitesi için sor"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "En yüksek video kalitesi"
 
 msgctxt "#30011"
 msgid "480p"
@@ -79,15 +79,15 @@ msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -103,7 +103,7 @@ msgstr "1080p Canlı / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 # empty strings 30019
 msgctxt "#30020"
@@ -1002,7 +1002,7 @@ msgstr "Kaldığım yeri sıfırla"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Yerel oynatma geçmişini kullan (izlenmiş, takibe devam)"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1062,7 +1062,7 @@ msgstr "Canlı yayınlar için kullan"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "Uyarlanabilir canlı yayınlar için Uyarlanabilir InputStream >= 2.0.12 gereklidir"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1190,7 +1190,7 @@ msgstr "Varsayılan olarak WEBM uyarlama seti (4K)"
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "HDR videoyu Etkinleştir"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
@@ -1198,11 +1198,11 @@ msgstr ""
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "Yüksek kare sayılı videoyu etkinleştir"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1210,11 +1210,11 @@ msgstr "Yüklenenler"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "H.264 videoyu Etkinleştir"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "VP9 videoyu Etkinleştir"
 
 msgctxt "#30729"
 msgid ""
@@ -1250,39 +1250,39 @@ msgstr "Kısa Videoları Gizle (1 dk ya da daha az)"
 
 msgctxt "#30737"
 msgid "Use alternate client details"
-msgstr ""
+msgstr "Farklı istemci ayrıntıları kullan"
 
 msgctxt "#30738"
 msgid "Alternate #1"
-msgstr ""
+msgstr "Farklı #1"
 
 msgctxt "#30739"
 msgid "Alternate #2"
-msgstr ""
+msgstr "Farklı #2"
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HTTP Canlı Yayın"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "Çoklu HTTP Canlı Yayın"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "Uyarlanabilir HTTP Canlı Yayın"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "Orjinal"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "Dublajlı"
 
 msgctxt "#30746"
 msgid "Descriptive"

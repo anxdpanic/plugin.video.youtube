@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-12-12 13:11+0000\n"
+"PO-Revision-Date: 2024-04-12 15:19+0000\n"
 "Last-Translator: Christian Gade <gade@kodi.tv>\n"
 "Language-Team: Danish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/da_dk/>\n"
 "Language: da_dk\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.2.1\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -50,7 +50,7 @@ msgstr "Adgangskode"
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
@@ -128,7 +128,7 @@ msgstr "Størrelse på cache (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Aktiver opsætningsguide"
 
 msgctxt "#30026"
 msgid "Override views"
@@ -410,7 +410,7 @@ msgstr ""
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Sprog og område"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -702,7 +702,7 @@ msgstr "Kunne ikke aktivere personlige API-nøgler. Mangler: %s"
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Undertekster"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -834,7 +834,7 @@ msgstr "Aktiver side med API-konfiguration"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
-msgstr "http://<ip-adresse>:<port>/youtube/api (se HTTP-server)"
+msgstr "http://<ip-adresse>:<port>/youtube/api (se Avanceret > HTTP-server)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
