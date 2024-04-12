@@ -271,10 +271,6 @@ msgctxt "#30120"
 msgid "Confirm clear"
 msgstr ""
 
-msgctxt "#30121"
-msgid "Clear %s?"
-msgstr ""
-
 # YouTube
 # empty strings from id 30122 to 30199
 
