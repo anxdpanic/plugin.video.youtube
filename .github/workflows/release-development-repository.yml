@@ -91,7 +91,7 @@ jobs:
           set sftp:auto-confirm yes; \
           open ${{ secrets.SFTP }}; \
           cd /root/anxdpanic/kodi/youtube/; \
-          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.testing_unofficial ./unofficial/repository.yt.unofficial; \
+          mirror --verbose --use-pget-n=8 -c --verbose repository.yt.unofficial ./unofficial/repository.yt.unofficial; \
           bye \
           "
 
