@@ -44,7 +44,7 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(BUSY_FLAG).lower() == 'true':
             ui.clear_property(BUSY_FLAG)
             if ui.busy_dialog_active():
-                playlist = XbmcPlaylist('auto', context)
+                playlist = XbmcPlaylist('auto', context, retry=3)
                 playlist.clear()
                 xbmcplugin.endOfDirectory(
                     self.handle,
