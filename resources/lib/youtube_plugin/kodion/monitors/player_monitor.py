@@ -14,6 +14,7 @@ import re
 import threading
 
 from ..compatibility import xbmc
+from ..constants import BUSY_FLAG
 
 
 class PlayerMonitorThread(threading.Thread):
@@ -353,7 +354,7 @@ class PlayerMonitor(xbmc.Player):
 
     def onAVStarted(self):
         if not self._ui.busy_dialog_active():
-            self._ui.clear_property('busy')
+            self._ui.clear_property(BUSY_FLAG)
 
         playback_json = self._ui.get_property('playback_json')
         if not playback_json:
@@ -379,7 +380,7 @@ class PlayerMonitor(xbmc.Player):
 
     def onPlayBackEnded(self):
         if not self._ui.busy_dialog_active():
-            self._ui.clear_property('busy')
+            self._ui.clear_property(BUSY_FLAG)
 
         self.stop_threads()
         self.cleanup_threads()

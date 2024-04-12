@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
+from ...constants import BUSY_FLAG
 from ...compatibility import xbmcplugin
 from ...exceptions import KodionException
 from ...items import (
@@ -40,8 +41,8 @@ class XbmcPlugin(AbstractPlugin):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        if ui.get_property('busy').lower() == 'true':
-            ui.clear_property('busy')
+        if ui.get_property(BUSY_FLAG).lower() == 'true':
+            ui.clear_property(BUSY_FLAG)
             if ui.busy_dialog_active():
                 playlist = XbmcPlaylist('auto', context)
                 playlist.clear()
@@ -166,7 +167,7 @@ class XbmcPlugin(AbstractPlugin):
         if base_item.playable:
             ui = context.get_ui()
             if not context.is_plugin_path(uri) and ui.busy_dialog_active():
-                ui.set_property('busy', 'true')
+                ui.set_property(BUSY_FLAG, 'true')
                 playlist = XbmcPlaylist('auto', context)
                 position, remaining = playlist.get_position()
                 if remaining:

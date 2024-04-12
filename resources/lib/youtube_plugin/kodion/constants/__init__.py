@@ -32,11 +32,13 @@ VALUE_FROM_STR = {
     'true': True,
 }
 
+BUSY_FLAG = 'busy'
 WAIT_FLAG = 'builtin_running'
 
 __all__ = (
     'ADDON_ID',
     'ADDON_PATH',
+    'BUSY_FLAG',
     'DATA_PATH',
     'MEDIA_PATH',
     'RESOURCE_PATH',
