@@ -33,15 +33,9 @@ __RE_PLAYLIST_MATCH = re.compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
 
-__RE_SEASON_EPISODE_MATCHES__ = [
-    re.compile(r'Part (?P<episode>\d+)'),
-    re.compile(r'#(?P<episode>\d+)'),
-    re.compile(r'Ep.\W?(?P<episode>\d+)'),
-    re.compile(r'\[(?P<episode>\d+)]'),
-    re.compile(r'S(?P<season>\d+)E(?P<episode>\d+)'),
-    re.compile(r'Season (?P<season>\d+)(.+)Episode (?P<episode>\d+)'),
-    re.compile(r'Episode (?P<episode>\d+)'),
-]
+__RE_SEASON_EPISODE = re.compile(
+    r'(?:\b(?:Season\s*|S)(\d+))|(?:\b(?:(?:Part|Ep.|Episode)\s*)|#|E)(\d+)'
+)
 
 __RE_URL = re.compile(r'(https?://\S+)')
 
@@ -559,16 +553,25 @@ def update_video_infos(provider, context, video_id_dict,
         This is not based on any language. In some cases this won't work at all.
         TODO: via language and settings provide the regex for matching episode and season.
         """
-        # video_item.set_season(1)
-        # video_item.set_episode(1)
-        for regex in __RE_SEASON_EPISODE_MATCHES__:
-            re_match = regex.search(video_item.get_name())
-            if re_match:
-                if 'season' in re_match.groupdict():
-                    video_item.set_season(int(re_match.group('season')))
+        season = episode = None
+        for season_episode in __RE_SEASON_EPISODE.findall(title):
+            if not season:
+                value = season_episode[0]
+                if value:
+                    value = int(value)
+                    if value < 2 ** 31:
+                        season = value
+                        video_item.set_season(season)
 
-                if 'episode' in re_match.groupdict():
-                    video_item.set_episode(int(re_match.group('episode')))
+            if not episode:
+                value = season_episode[1]
+                if value:
+                    value = int(value)
+                    if value < 2 ** 31:
+                        episode = value
+                        video_item.set_episode(episode)
+
+            if season and episode:
                 break
 
         # plot
