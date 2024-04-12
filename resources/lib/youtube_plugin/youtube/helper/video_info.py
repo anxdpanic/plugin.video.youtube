@@ -1401,7 +1401,12 @@ class VideoInfo(YouTubeRequestClient):
         else:
             live_type = None
 
-        if not live_type and client.get('_query_subtitles'):
+        subtitles = Subtitles(self._context, video_id)
+        query_subtitles = client.get('_query_subtitles')
+        if (not live_type or live_dvr) and (
+                query_subtitles is True
+                or (query_subtitles
+                    and subtitles.sub_selection == subtitles.LANG_ALL)):
             for client_name in ('smarttv_embedded', 'web', 'android'):
                 caption_client = self.build_client(client_name, client_data)
                 result = self.request(
@@ -1424,15 +1429,10 @@ class VideoInfo(YouTubeRequestClient):
             captions = result.get('captions')
             caption_client = client
         if captions:
-            captions = Subtitles(
-                self._context,
-                video_id,
-                captions,
-                caption_client['headers']
-            )
-            default_lang = captions.get_lang_details()
-            subs_data = captions.get_subtitles()
-            if subs_data and (not use_mpd_vod or captions.pre_download):
+            subtitles.load(captions, caption_client['headers'])
+            default_lang = subtitles.get_lang_details()
+            subs_data = subtitles.get_subtitles()
+            if subs_data and (not use_mpd_vod or subtitles.pre_download):
                 meta_info['subtitles'] = [
                     subtitle['url'] for subtitle in subs_data.values()
                 ]
