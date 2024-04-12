@@ -17,6 +17,8 @@ class NextPageItem(DirectoryItem):
     def __init__(self, context, current_page=1, image=None, fanart=None):
         next_page = current_page + 1
         new_params = dict(context.get_params(), page=next_page)
+        if 'refresh' in new_params:
+            del new_params['refresh']
         name = context.localize('next_page') % next_page
 
         super(NextPageItem, self).__init__(name,
