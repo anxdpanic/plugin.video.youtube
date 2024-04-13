@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
+"PO-Revision-Date: 2024-04-13 02:11+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/it_it/>\n"
 "Language: it_it\n"
@@ -52,12 +52,12 @@ msgstr "Password"
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
-msgstr ""
+msgstr "Usa InputStream Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -130,11 +130,11 @@ msgstr "Dimensione cache (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Abilita configurazione guidata"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Sostituisci visualizzazioni"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -150,7 +150,7 @@ msgstr "Vista: Film"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Configurare %s?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -178,7 +178,7 @@ msgstr "Supporto player alternativi"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr "ID playlist guarda dopo personalizzato"
+msgstr "ID playlist Guarda più tardi personalizzato"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
@@ -216,7 +216,7 @@ msgstr "Pagina successiva (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr "Guarda dopo"
+msgstr "Guarda più tardi"
 
 msgctxt "#30108"
 msgid "Remove"
@@ -268,11 +268,11 @@ msgstr "Attendere prego..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Conferma cancellazione"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "Cancellare %s?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -352,11 +352,11 @@ msgstr "Coda video"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr "Sfoglia i canali"
+msgstr "Sfoglia canali"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "Tendenze"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -364,7 +364,7 @@ msgstr "Video correlati"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Rimozione automatica da \"Guarda più tardi\""
+msgstr "Rimozione automatica da Guarda più tardi"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -408,11 +408,11 @@ msgstr "Seleziona regione"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Configurazione guidata"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Lingua e regione"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -460,7 +460,7 @@ msgstr "Video non piaciuti"
 
 msgctxt "#30539"
 msgid "Live"
-msgstr "Dal vivo"
+msgstr "Live"
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -468,7 +468,7 @@ msgstr "Riproduci con..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Mostra nome del canale e dettagli del video nella descrizione"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -580,11 +580,11 @@ msgstr "Rimuovi da Guarda più tardi"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Sei sicuro di voler rimuovere '%s' dalla lista Guarda più tardi?"
+msgstr "Sei sicuro di voler rimuovere '%s' dall'elenco Guarda più tardi?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Sei sicuro di voler sostituire l'attuale lista Guarda più tardi con la lista '%s'?"
+msgstr "Sei sicuro di voler sostituire l'attuale elenco Guarda più tardi con l'elenco '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -592,15 +592,15 @@ msgstr "Imposta come cronologia"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr "Rimuovi dalla cronologia"
+msgstr "Rimuovi come cronologia"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Sei sicuro di voler rimuovere '%s' dalla tua lista cronologia?"
+msgstr "Sei sicuro di voler rimuovere '%s' dal tuo elenco cronologia?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Sei sicuro di voler sostituire l'attuale lista cronologia con la lista '%s'?"
+msgstr "Sei sicuro di voler sostituire l'attuale elenco cronologia con l'elenco '%s'?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -620,7 +620,7 @@ msgstr "Forza la verifica del certificato SSL"
 
 msgctxt "#30579"
 msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "InputStream Adaptive è attivato nelle impostazioni di YouTube, tuttavia l'add-on è stato disabilitato. Vuoi abilitare InputStream Adaptive adesso?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -704,11 +704,11 @@ msgstr "Impossibile abilitare chiavi API personali. Manca: %s"
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Sottotitoli"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s con originale/%s di riserva"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -772,11 +772,11 @@ msgstr "Devi essere registrato."
 
 msgctxt "#30617"
 msgid "InputStream Adaptive"
-msgstr ""
+msgstr "InputStream Adaptive"
 
 msgctxt "#30618"
 msgid "Enable MPEG-DASH proxy"
-msgstr ""
+msgstr "Abilita proxy MPEG-DASH"
 
 msgctxt "#30619"
 msgid "Port"
@@ -788,7 +788,7 @@ msgstr "Porta %s già in uso. Impossibile avviare il server http."
 
 msgctxt "#30621"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr ""
+msgstr "Per i VOD MPEG-DASH è richiesto il proxy (vedi Avanzate > Server HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -836,7 +836,7 @@ msgstr "Abilita pagina configurazione API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
-msgstr "http://<indirizzoip>:<porta>/youtube/api (vedi Server HTTP)"
+msgstr "http://<indirizzoip>:<porta>/youtube/api (vedi Avanzate > Server HTTP)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -916,7 +916,7 @@ msgstr "Raggio posizione (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "La mia posizione usando la ricerca di geolocalizzazione IP"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -992,7 +992,7 @@ msgstr "Pulisci cronologia riprodotti"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Elimina database cronologia di riproduzione"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1056,7 +1056,7 @@ msgstr "cache dati"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Usa MPEG-DASH per i video"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1196,7 +1196,7 @@ msgstr "Abilita video HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Per i VOD MPEG-DASH è richiesto il proxy (vedi Avanzate > Server HTTP)[CR]HDR e video >1080p richiedono InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1220,7 +1220,7 @@ msgstr "Abilita video VP9"
 
 msgctxt "#30729"
 msgid ""
-msgstr "Ricerca amichevole a distanza"
+msgstr " "
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
@@ -1360,135 +1360,135 @@ msgstr "Multi audio"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Timeout richieste di connessione"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Timeout richieste di lettura"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Première"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Visualizzazioni"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Disabilita video con frequenza fotogrammi elevata alla massima qualità video"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Cancella elenco Guarda più tardi"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "Sei sicuro di voler cancellare l'elenco Guarda più tardi?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Disabilita suggerimenti sul framerate frazionario"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Disabilita tutti i suggerimenti sul framerate"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Mostra dettagli del video negli elenchi video"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Tutto disponibile"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (traduzione)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Seleziona Chiedi + Automatico + Qualità"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Visualizzazioni per %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "Importare la vecchia cronologia di riproduzione?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "Importare la vecchia cronologia delle ricerche?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Cancella elenco locale Guarda più tardi"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Elimina database Guarda più tardi"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "elenco locale Guarda più tardi"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "impostazioni ai valori consigliati"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "elenchi per mostrare dettagli minimi"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "impostazioni prestazioni"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Scegli funzionalità del dispositivo"
 
 msgctxt "#30787"
 msgid "720p | Limited or older devices"
-msgstr ""
+msgstr "720p | Dispositivi limitati o vecchi"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30fps | Raspberry Pi 3 o simile"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 fps o 1080p/60 fps, HDR se compatibile | Raspberry Pi 5 o simile"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR se compatibile | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 o simili"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR, usando AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V o simili"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 fps, HDR, usando AV1 | Dispositivo o PC moderno con funzionalità complete"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Colore di visualizzazione del conteggio visualizzazioni"
 
 msgctxt "#30794"
 msgid "Likes count display colour"
-msgstr ""
+msgstr "Colore di visualizzazione del conteggio Mi piace"
 
 msgctxt "#30795"
 msgid "Comments count display colour"
-msgstr ""
+msgstr "Colore di visualizzazione del conteggio commenti"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60fps | Raspberry Pi 4 o simile"
 
 # empty strings from id 30003 to 30006
 #~ msgctxt "#30007"
