@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .. import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
+from ...constants import SWITCH_PLAYER_FLAG
 from ...compatibility import xbmc, xbmcgui
 from ...utils import current_system_version, datetime_parser
 
@@ -329,8 +330,18 @@ def video_playback_item(context, video_item, show_fanart=None):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
+    is_external = False
     is_strm = context.get_param('strm')
     mime_type = None
+
+    if context.get_ui().get_property(SWITCH_PLAYER_FLAG):
+        is_external = True
+    if (settings.alternative_player_web_urls()
+            and not video_item.get_license_key()):
+        is_external = True
+        uri = 'https://www.youtube.com/watch?v={video_id}'.format(
+            video_id=video_item.video_id
+        )
 
     if is_strm:
         kwargs = {
@@ -349,7 +360,7 @@ def video_playback_item(context, video_item, show_fanart=None):
             'isPlayable': str(video_item.playable).lower(),
         }
 
-    if (video_item.use_isa_video()
+    if (not is_external and video_item.use_isa_video()
             and context.addon_enabled('inputstream.adaptive')):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
@@ -559,14 +570,6 @@ def video_listitem(context, video_item, show_fanart=None):
     uri = video_item.get_uri()
     context.log_debug('Converting VideoItem |%s|' % uri)
 
-    settings = context.get_settings()
-
-    if (settings.alternative_player_web_urls()
-            and not video_item.get_license_key()):
-        uri = 'https://www.youtube.com/watch?v={video_id}'.format(
-            video_id=video_item.video_id
-        )
-
     kwargs = {
         'label': video_item.get_title() or video_item.get_name(),
         'label2': video_item.get_short_details(),
@@ -615,7 +618,7 @@ def video_listitem(context, video_item, show_fanart=None):
         props['playlist_item_id'] = prop_value
 
     if show_fanart is None:
-        show_fanart = settings.show_fanart()
+        show_fanart = context.get_settings().show_fanart()
     image = video_item.get_image()
     list_item.setArt({
         'icon': image or 'DefaultVideo.png',

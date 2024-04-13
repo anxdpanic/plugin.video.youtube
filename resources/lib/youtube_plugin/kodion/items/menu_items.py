@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ..constants import paths
+from ..constants import ADDON_ID, paths
 
 
 def more_for_video(context, video_id, logged_in=False, refresh=False):
@@ -66,7 +66,7 @@ def content_from_description(context, video_id):
 def play_with(context):
     return (
         context.localize('video.play.with'),
-        'Action(SwitchPlayer)'
+        'RunScript({addon_id},action/play_with)'.format(addon_id=ADDON_ID),
     )
 
 

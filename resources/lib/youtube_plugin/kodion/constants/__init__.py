@@ -33,6 +33,7 @@ VALUE_FROM_STR = {
 }
 
 BUSY_FLAG = 'busy'
+SWITCH_PLAYER_FLAG = 'switch_player'
 WAIT_FLAG = 'builtin_running'
 
 __all__ = (
@@ -42,6 +43,7 @@ __all__ = (
     'DATA_PATH',
     'MEDIA_PATH',
     'RESOURCE_PATH',
+    'SWITCH_PLAYER_FLAG',
     'TEMP_PATH',
     'VALUE_FROM_STR',
     'WAIT_FLAG',
