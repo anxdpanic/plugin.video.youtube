@@ -1372,7 +1372,7 @@ class VideoInfo(YouTubeRequestClient):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        manifest_url = main_stream = None
+        manifest_url = None
 
         if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']

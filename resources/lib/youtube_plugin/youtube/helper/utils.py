@@ -29,12 +29,12 @@ try:
 except ImportError:
     ISHelper = None
 
-__RE_PLAYLIST_MATCH = re.compile(
+__RE_PLAYLIST = re.compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
 
 __RE_SEASON_EPISODE = re.compile(
-    r'(?:\b(?:Season\s*|S)(\d+))|(?:\b(?:(?:Part|Ep.|Episode)\s*)|#|E)(\d+)'
+    r'\b(?:Season\s*|S)(\d+)|(?:\b(?:Part|Ep.|Episode)\s*|#|E)(\d+)'
 )
 
 __RE_URL = re.compile(r'(https?://\S+)')
@@ -425,7 +425,7 @@ def update_video_infos(provider, context, video_id_dict,
         in_bookmarks_list = False
         in_my_subscriptions_list = False
         in_watched_later_list = False
-        playlist_match = __RE_PLAYLIST_MATCH.match(path)
+        playlist_match = __RE_PLAYLIST.match(path)
 
     for video_id, yt_item in data.items():
         video_item = video_id_dict[video_id]
