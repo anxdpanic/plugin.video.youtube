@@ -5,10 +5,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
-"Last-Translator: Andrei Stepanov <adem4ik@gmail.com>\n"
+"PO-Revision-Date: 2024-04-14 19:47+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
 "Language-Team: Russian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ru_ru/>\n"
 "Language: ru_ru\n"
 "MIME-Version: 1.0\n"
@@ -185,12 +185,12 @@ msgstr "ID плейлиста для истории"
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
-msgstr "Избранное"
+msgid "Bookmarks"
+msgstr ""
 
 msgctxt "#30101"
-msgid "Add to addon favs"
-msgstr "Добавить в избранное дополнения"
+msgid "Bookmark"
+msgstr ""
 
 msgctxt "#30102"
 msgid "Search"
@@ -702,7 +702,7 @@ msgstr "Ошибка включения персонального API ключ�
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Субтитры"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -1117,8 +1117,8 @@ msgid "Are you sure?"
 msgstr "Вы уверены?"
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
-msgstr "Использовать ссылки сайта YouTube"
+msgid "Use YouTube website urls with default player"
+msgstr ""
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1370,7 +1370,7 @@ msgstr ""
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Просмотры"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
@@ -1449,7 +1449,7 @@ msgid "Choose device capabilities"
 msgstr ""
 
 msgctxt "#30787"
-msgid "720p | Limited or older devices"
+msgid "720p, H.264 only | Limited or older devices"
 msgstr ""
 
 msgctxt "#30788"
@@ -1487,6 +1487,56 @@ msgstr ""
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
 msgstr ""
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr ""
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr ""
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr ""
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr ""
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr ""
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favourites"
+#~ msgstr "Избранное"
+
+#~ msgctxt "#30101"
+#~ msgid "Add to addon favs"
+#~ msgstr "Добавить в избранное дополнения"
+
+#~ msgctxt "#30704"
+#~ msgid "Use YouTube website urls"
+#~ msgstr "Использовать ссылки сайта YouTube"
 
 # empty strings from id 30003 to 30006
 #~ msgctxt "#30007"
