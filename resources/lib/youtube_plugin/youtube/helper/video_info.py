@@ -1144,7 +1144,7 @@ class VideoInfo(YouTubeRequestClient):
         if self._access_token:
             client_data['_access_token'] = self._access_token
 
-        for _ in range(2):
+        while 1:
             for client_name in self._prioritised_clients:
                 if status and status != 'OK':
                     self._context.log_warning(
@@ -1372,7 +1372,7 @@ class VideoInfo(YouTubeRequestClient):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        manifest_url = main_stream = None
+        manifest_url = None
 
         if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']
@@ -1401,7 +1401,12 @@ class VideoInfo(YouTubeRequestClient):
         else:
             live_type = None
 
-        if not live_type and client.get('_query_subtitles'):
+        subtitles = Subtitles(self._context, video_id)
+        query_subtitles = client.get('_query_subtitles')
+        if (not live_type or live_dvr) and (
+                query_subtitles is True
+                or (query_subtitles
+                    and subtitles.sub_selection == subtitles.LANG_ALL)):
             for client_name in ('smarttv_embedded', 'web', 'android'):
                 caption_client = self.build_client(client_name, client_data)
                 result = self.request(
@@ -1424,15 +1429,10 @@ class VideoInfo(YouTubeRequestClient):
             captions = result.get('captions')
             caption_client = client
         if captions:
-            captions = Subtitles(
-                self._context,
-                video_id,
-                captions,
-                caption_client['headers']
-            )
-            default_lang = captions.get_lang_details()
-            subs_data = captions.get_subtitles()
-            if subs_data and (not use_mpd_vod or captions.pre_download):
+            subtitles.load(captions, caption_client['headers'])
+            default_lang = subtitles.get_lang_details()
+            subs_data = subtitles.get_subtitles()
+            if subs_data and (not use_mpd_vod or subtitles.pre_download):
                 meta_info['subtitles'] = [
                     subtitle['url'] for subtitle in subs_data.values()
                 ]
@@ -1607,11 +1607,11 @@ class VideoInfo(YouTubeRequestClient):
                     mime_group = '{0}_{1}.{2}'.format(
                         mime_type, language_code, role_type
                     )
-                    if (language_code == self._language_base and (
+                    if language_code == self._language_base and (
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
-                    )):
+                    ):
                         preferred_audio = {
                             'id': '_{0}.{1}'.format(language_code, role_type),
                             'language_code': language_code,

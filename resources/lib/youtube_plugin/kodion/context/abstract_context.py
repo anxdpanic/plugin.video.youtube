@@ -14,10 +14,11 @@ import os
 
 from .. import logger
 from ..compatibility import to_str, urlencode
+from ..constants import VALUE_FROM_STR
 from ..json_store import AccessManager
 from ..sql_store import (
+    BookmarksList,
     DataCache,
-    FavoriteList,
     FunctionCache,
     PlaybackHistory,
     SearchHistory,
@@ -49,6 +50,7 @@ class AbstractContext(object):
     }
     _INT_PARAMS = {
         'live',
+        'next_page_token',
         'offset',
         'page',
     }
@@ -74,7 +76,6 @@ class AbstractContext(object):
         'event_type',
         'item',
         'item_id',
-        'next_page_token',
         'order',
         'page_token',
         'parent_id',
@@ -92,6 +93,9 @@ class AbstractContext(object):
         'video_name',
         'visitor',
     }
+    _STRING_BOOL_PARAMS = {
+        'reload_path',
+    }
 
     def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
         if not params:
@@ -104,11 +108,11 @@ class AbstractContext(object):
         self._data_cache = None
         self._search_history = None
         self._playback_history = None
-        self._favorite_list = None
+        self._bookmarks_list = None
         self._watch_later_list = None
         self._access_manager = None
 
-        self._plugin_name = str(plugin_name)
+        self._plugin_name = plugin_name
         self._version = 'UNKNOWN'
         self._plugin_id = plugin_id
         self._path = create_path(path)
@@ -180,13 +184,13 @@ class AbstractContext(object):
                                                  max_item_count=search_size)
         return self._search_history
 
-    def get_favorite_list(self):
-        if not self._favorite_list:
+    def get_bookmarks_list(self):
+        if not self._bookmarks_list:
             uuid = self.get_access_manager().get_current_user_id()
-            filename = 'favorites.sqlite'
+            filename = 'bookmarks.sqlite'
             filepath = os.path.join(self.get_data_path(), uuid, filename)
-            self._favorite_list = FavoriteList(filepath)
-        return self._favorite_list
+            self._bookmarks_list = BookmarksList(filepath)
+        return self._bookmarks_list
 
     def get_watch_later_list(self):
         if not self._watch_later_list:
@@ -255,7 +259,7 @@ class AbstractContext(object):
         for param, value in params.items():
             try:
                 if param in self._BOOL_PARAMS:
-                    parsed_value = str(value).lower() in ('true', '1')
+                    parsed_value = VALUE_FROM_STR.get(str(value).lower(), False)
                 elif param in self._INT_PARAMS:
                     parsed_value = int(value)
                 elif param in self._FLOAT_PARAMS:
@@ -266,8 +270,12 @@ class AbstractContext(object):
                     ]
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)
+                    if param in self._STRING_BOOL_PARAMS:
+                        parsed_value = VALUE_FROM_STR.get(
+                            parsed_value.lower(), parsed_value
+                        )
                     # process and translate deprecated parameters
-                    if param == 'action':
+                    elif param == 'action':
                         if parsed_value in ('play_all', 'play_video'):
                             to_delete.append(param)
                             self.set_path('play')

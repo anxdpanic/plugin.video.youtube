@@ -25,15 +25,27 @@ MEDIA_PATH = ADDON_PATH + '/resources/media'
 RESOURCE_PATH = ADDON_PATH + '/resources'
 TEMP_PATH = 'special://temp/{id}'.format(id=ADDON_ID)
 
+VALUE_FROM_STR = {
+    '0': False,
+    '1': True,
+    'false': False,
+    'true': True,
+}
+
+BUSY_FLAG = 'busy'
+SWITCH_PLAYER_FLAG = 'switch_player'
 WAIT_FLAG = 'builtin_running'
 
 __all__ = (
     'ADDON_ID',
     'ADDON_PATH',
+    'BUSY_FLAG',
     'DATA_PATH',
     'MEDIA_PATH',
     'RESOURCE_PATH',
+    'SWITCH_PLAYER_FLAG',
     'TEMP_PATH',
+    'VALUE_FROM_STR',
     'WAIT_FLAG',
     'content',
     'paths',

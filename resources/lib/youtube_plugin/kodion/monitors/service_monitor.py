@@ -26,7 +26,9 @@ class ServiceMonitor(xbmc.Monitor):
 
     def __init__(self):
         settings = self._settings
-        self._use_httpd = settings.use_isa() or settings.api_config_page()
+        self._use_httpd = (settings.use_isa()
+                           or settings.api_config_page()
+                           or settings.support_alternative_player())
         address, port = get_connect_address()
         self._old_httpd_address = self._httpd_address = address
         self._old_httpd_port = self._httpd_port = port

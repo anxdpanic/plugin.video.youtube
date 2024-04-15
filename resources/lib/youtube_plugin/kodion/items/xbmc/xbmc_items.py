@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .. import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
+from ...constants import SWITCH_PLAYER_FLAG
 from ...compatibility import xbmc, xbmcgui
 from ...utils import current_system_version, datetime_parser
 
@@ -329,7 +330,7 @@ def video_playback_item(context, video_item, show_fanart=None):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
-    alternative_player = settings.support_alternative_player()
+    is_external = context.get_ui().get_property(SWITCH_PLAYER_FLAG)
     is_strm = context.get_param('strm')
     mime_type = None
 
@@ -350,13 +351,7 @@ def video_playback_item(context, video_item, show_fanart=None):
             'isPlayable': str(video_item.playable).lower(),
         }
 
-    if (alternative_player
-            and settings.alternative_player_web_urls()
-            and not license_key):
-        video_item.set_uri('https://www.youtube.com/watch?v={video_id}'.format(
-            video_id=video_item.video_id
-        ))
-    elif (video_item.use_isa_video()
+    if (video_item.use_isa_video()
             and context.addon_enabled('inputstream.adaptive')):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
@@ -386,14 +381,15 @@ def video_playback_item(context, video_item, show_fanart=None):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        if not alternative_player and headers and uri.startswith('http'):
-            video_item.set_uri('|'.join((uri, headers)))
+        if (not settings.support_alternative_player()
+                and headers and uri.startswith('http')):
+            kwargs['path'] = '|'.join((uri, headers))
 
     list_item = xbmcgui.ListItem(**kwargs)
 
-    if mime_type:
+    if mime_type or is_external:
         list_item.setContentLookup(False)
-        list_item.setMimeType(mime_type)
+        list_item.setMimeType(mime_type or '*/*')
 
     if is_strm:
         list_item.setProperties(props)
@@ -446,9 +442,7 @@ def audio_listitem(context, audio_item, show_fanart=None):
 
     context_menu = audio_item.get_context_menu()
     if context_menu:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=audio_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
 
@@ -463,16 +457,23 @@ def directory_listitem(context, directory_item, show_fanart=None):
         'offscreen': True,
     }
     props = {
-        'specialSort': 'bottom' if directory_item.next_page else 'top',
         'ForceResolvePlugin': 'true',
     }
 
     list_item = xbmcgui.ListItem(**kwargs)
 
-    # make channel_subscription_id property available for keymapping
-    prop_value = directory_item.get_channel_subscription_id()
-    if prop_value:
-        props['channel_subscription_id'] = prop_value
+    if directory_item.next_page:
+        props['specialSort'] = 'bottom'
+    else:
+        prop_value = directory_item.get_subscription_id()
+        if prop_value:
+            props['channel_subscription_id'] = prop_value
+        elif directory_item.get_channel_id():
+            pass
+        elif directory_item.get_playlist_id():
+            pass
+        else:
+            props['specialSort'] = 'top'
 
     if show_fanart is None:
         show_fanart = context.get_settings().show_fanart()
@@ -498,9 +499,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
 
     context_menu = directory_item.get_context_menu()
     if context_menu is not None:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=directory_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, is_folder
 
@@ -534,9 +533,7 @@ def image_listitem(context, image_item, show_fanart=None):
 
     context_menu = image_item.get_context_menu()
     if context_menu is not None:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=image_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
 
@@ -627,9 +624,7 @@ def video_listitem(context, video_item, show_fanart=None):
 
     context_menu = video_item.get_context_menu()
     if context_menu:
-        list_item.addContextMenuItems(
-            context_menu, replaceItems=video_item.replace_context_menu()
-        )
+        list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
 

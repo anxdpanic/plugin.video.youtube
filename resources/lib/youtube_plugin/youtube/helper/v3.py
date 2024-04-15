@@ -21,9 +21,9 @@ from .utils import (
     update_playlist_infos,
     update_video_infos,
 )
-from ...kodion.constants import paths
 from ...kodion import KodionException
-from ...kodion.items import DirectoryItem, NextPageItem, VideoItem, menu_items
+from ...kodion.constants import paths
+from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 
 
 def _process_list_response(provider, context, json_data):
@@ -85,16 +85,11 @@ def _process_list_response(provider, context, json_data):
                 ('channel', item_id),
                 item_params,
             )
-            item = DirectoryItem(title, item_uri, image=image)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 channel_id=item_id)
             channel_id_dict[item_id] = item
-            # if logged in => provide subscribing to the channel
-            if provider.is_logged_in():
-                context_menu = [
-                    menu_items.subscribe_to_channel(
-                        context, item_id
-                    ),
-                ]
-                item.set_context_menu(context_menu)
 
         elif kind == 'guidecategory':
             item_uri = context.create_uri(
@@ -113,9 +108,12 @@ def _process_list_response(provider, context, json_data):
                 ('channel', item_id),
                 item_params
             )
-            item = DirectoryItem(title, item_uri, image=image)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 channel_id=item_id,
+                                 subscription_id=subscription_id)
             channel_id_dict[item_id] = item
-            item.set_channel_id(item_id)
 
         elif kind == 'playlist':
             # set channel id to 'mine' if the path is for a playlist of our own
@@ -127,7 +125,10 @@ def _process_list_response(provider, context, json_data):
                 ('channel', channel_id, 'playlist', item_id),
                 item_params,
             )
-            item = DirectoryItem(title, item_uri, image=image)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 playlist_id=item_id)
             playlist_id_dict[item_id] = item
 
         elif kind == 'playlistitem':
@@ -334,6 +335,20 @@ def _process_list_response(provider, context, json_data):
     return result
 
 
+_KNOWN_RESPONSE_KINDS = {
+    'activitylistresponse',
+    'channellistresponse',
+    'commentlistresponse',
+    'commentthreadlistresponse',
+    'guidecategorylistresponse',
+    'playlistitemlistresponse',
+    'playlistlistresponse',
+    'searchlistresponse',
+    'subscriptionlistresponse',
+    'videolistresponse',
+}
+
+
 def response_to_items(provider,
                       context,
                       json_data,
@@ -345,18 +360,7 @@ def response_to_items(provider,
         context.log_debug('v3 response: Response discarded, is_youtube=False')
         return []
 
-    if kind in (
-            'activitylistresponse',
-            'channellistresponse',
-            'commentlistresponse',
-            'commentthreadlistresponse',
-            'guidecategorylistresponse',
-            'playlistitemlistresponse',
-            'playlistlistresponse',
-            'searchlistresponse',
-            'subscriptionlistresponse',
-            'videolistresponse',
-    ):
+    if kind in _KNOWN_RESPONSE_KINDS:
         result = _process_list_response(provider, context, json_data)
     else:
         raise KodionException("Unknown kind '%s'" % kind)
@@ -382,8 +386,8 @@ def response_to_items(provider,
     page_info = json_data.get('pageInfo', {})
     yt_total_results = int(page_info.get('totalResults', 0))
     yt_results_per_page = int(page_info.get('resultsPerPage', 0))
-    page = int(context.get_param('page', 1))
-    offset = int(json_data.get('offset', 0))
+    page = context.get_param('page', 1)
+    offset = json_data.get('offset', 0)
     yt_visitor_data = json_data.get('visitorData', '')
     yt_next_page_token = json_data.get('nextPageToken', '')
     yt_click_tracking = json_data.get('clickTracking', '')

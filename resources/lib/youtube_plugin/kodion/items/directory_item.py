@@ -21,20 +21,25 @@ class DirectoryItem(BaseItem):
                  image='',
                  fanart='',
                  action=False,
-                 category_label=None):
+                 category_label=None,
+                 channel_id=None,
+                 playlist_id=None,
+                 subscription_id=None):
         super(DirectoryItem, self).__init__(name, uri, image, fanart)
         name = self.get_name()
         self._category_label = None
         self.set_category_label(category_label or name)
         self._plot = name
         self._is_action = action
-        self._channel_subscription_id = None
-        self._channel_id = None
+        self._channel_id = channel_id
+        self._playlist_id = playlist_id
+        self._subscription_id = subscription_id
 
     def set_name(self, name, category_label=None):
         name = super(DirectoryItem, self).set_name(name)
         if hasattr(self, '_category_label'):
             self.set_category_label(category_label or name)
+        self.set_plot(name)
         return name
 
     def set_category_label(self, label):
@@ -42,12 +47,14 @@ class DirectoryItem(BaseItem):
             self._category_label = None
             return
 
-        if self._category_label and self._category_label != label:
-            uri = self.get_uri()
-            self.set_uri(uri.replace(
-                urlencode({'category_label': self._category_label}),
-                urlencode({'category_label': label}) if label else '',
-            ))
+        current_label = self._category_label
+        if current_label:
+            if current_label != label:
+                uri = self.get_uri()
+                self.set_uri(uri.replace(
+                    urlencode({'category_label': current_label}),
+                    urlencode({'category_label': label}) if label else '',
+                ))
         elif label:
             uri = self.get_uri()
             self.set_uri(('&' if '?' in uri else '?').join((
@@ -72,14 +79,20 @@ class DirectoryItem(BaseItem):
         if isinstance(value, bool):
             self._is_action = value
 
-    def get_channel_subscription_id(self):
-        return self._channel_subscription_id
+    def set_subscription_id(self, value):
+        self._subscription_id = value
 
-    def set_channel_subscription_id(self, value):
-        self._channel_subscription_id = value
+    def get_subscription_id(self):
+        return self._subscription_id
 
     def set_channel_id(self, value):
         self._channel_id = value
 
     def get_channel_id(self):
         return self._channel_id
+
+    def set_playlist_id(self, value):
+        self._playlist_id = value
+
+    def get_playlist_id(self):
+        return self._playlist_id

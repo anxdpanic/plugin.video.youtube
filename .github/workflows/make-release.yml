@@ -45,7 +45,6 @@ jobs:
           for change in "${changes[@]}"; do
               echo "${change}" >> $GITHUB_OUTPUT
           done
-          news=$(printf '%s\n' "${changes[@]}" | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
           echo "${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_OUTPUT
         working-directory: ${{ github.event.repository.name }}
 
@@ -55,7 +54,7 @@ jobs:
           mv .git ..
           rm -rf .??*
           rm *.md
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//g;s/\r//')
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           xmlstarlet ed -L -P \
             -s '/addon/extension[@point="xbmc.addon.metadata"]' -t elem -n news -v "${news:0:1500}" \
@@ -80,7 +79,7 @@ jobs:
           mv .git ..
           rm -rf .??*
           rm *.md
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//g;s/\r//')
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           version="${version}+unofficial.1"
           version=${version/+/!}; version=${version//+/.}; version=${version/!/+}
@@ -104,7 +103,7 @@ jobs:
           mv .git ..
           rm -rf .??*
           rm *.md
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//g;s/\r//')
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           version="${version}+leia.1"
           version=${version/+/!}; version=${version//+/.}; version=${version/!/+}
@@ -139,7 +138,7 @@ jobs:
           mv .git ..
           rm -rf .??*
           rm *.md
-          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//;s/\r//')
+          news=$(awk '/^## /{rel_num++} {if(rel_num==2){exit} if(rel_num==1){print}}' changelog.txt | sed -E 's/ ?#[[:digit:]]+[., ]?//g;s/\r//')
           version=$(xmlstarlet sel -t -v 'string(/addon/@version)' addon.xml)
           version="${version}+leia.unofficial.1"
           version=${version/+/!}; version=${version//+/.}; version=${version/!/+}

@@ -45,9 +45,15 @@ class Subtitles(object):
         },
     }
 
-    def __init__(self, context, video_id, captions, headers=None):
+    def __init__(self, context, video_id):
         self.video_id = video_id
         self._context = context
+
+        self.defaults = None
+        self.headers = None
+        self.renderer = None
+        self.caption_tracks = None
+        self.translation_langs = None
 
         settings = context.get_settings()
         self.pre_download = settings.subtitle_download()
@@ -73,16 +79,17 @@ class Subtitles(object):
         else:
             self.preferred_lang = ('en',)
 
+        ui = context.get_ui()
+        self.prompt_override = (ui.get_property('prompt_for_subtitles')
+                                == video_id)
+        ui.clear_property('prompt_for_subtitles')
+
+    def load(self, captions, headers=None):
         if headers:
             headers.pop('Authorization', None)
             headers.pop('Content-Length', None)
             headers.pop('Content-Type', None)
         self.headers = headers
-
-        ui = context.get_ui()
-        self.prompt_override = (ui.get_property('prompt_for_subtitles')
-                                == video_id)
-        ui.clear_property('prompt_for_subtitles')
 
         self.renderer = captions.get('playerCaptionsTracklistRenderer', {})
         self.caption_tracks = self.renderer.get('captionTracks', [])

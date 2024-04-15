@@ -23,25 +23,19 @@ from ...kodion.utils import (
     strip_html_from_text,
 )
 
+
 try:
     from inputstreamhelper import Helper as ISHelper
 except ImportError:
     ISHelper = None
 
-
-__RE_PLAYLIST_MATCH = re.compile(
+__RE_PLAYLIST = re.compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
 
-__RE_SEASON_EPISODE_MATCHES__ = [
-    re.compile(r'Part (?P<episode>\d+)'),
-    re.compile(r'#(?P<episode>\d+)'),
-    re.compile(r'Ep.\W?(?P<episode>\d+)'),
-    re.compile(r'\[(?P<episode>\d+)]'),
-    re.compile(r'S(?P<season>\d+)E(?P<episode>\d+)'),
-    re.compile(r'Season (?P<season>\d+)(.+)Episode (?P<episode>\d+)'),
-    re.compile(r'Episode (?P<episode>\d+)'),
-]
+__RE_SEASON_EPISODE = re.compile(
+    r'\b(?:Season\s*|S)(\d+)|(?:\b(?:Part|Ep.|Episode)\s*|#|E)(\d+)'
+)
 
 __RE_URL = re.compile(r'(https?://\S+)')
 
@@ -162,6 +156,7 @@ def update_channel_infos(provider, context, channel_id_dict,
 
     filter_list = None
     if path.startswith(paths.SUBSCRIPTIONS):
+        in_bookmarks_list = False
         in_subscription_list = True
         if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
                              False):
@@ -171,7 +166,11 @@ def update_channel_infos(provider, context, channel_id_dict,
             filter_string = filter_string.replace(', ', ',')
             filter_list = filter_string.split(',')
             filter_list = [x.lower() for x in filter_list]
+    elif path.startswith(paths.BOOKMARKS):
+        in_bookmarks_list = True
+        in_subscription_list = False
     else:
+        in_bookmarks_list = False
         in_subscription_list = False
 
     thumb_size = settings.use_thumbnail_size
@@ -200,7 +199,7 @@ def update_channel_infos(provider, context, channel_id_dict,
         # -- unsubscribe from channel
         subscription_id = subscription_id_dict.get(channel_id, '')
         if subscription_id:
-            channel_item.set_channel_subscription_id(subscription_id)
+            channel_item.set_subscription_id(subscription_id)
             context_menu.append(
                 menu_items.unsubscribe_from_channel(
                     context, subscription_id=subscription_id
@@ -224,6 +223,13 @@ def update_channel_infos(provider, context, channel_id_dict,
                 ) if channel in filter_list else
                 menu_items.add_my_subscriptions_filter(
                     context, title
+                )
+            )
+
+        if not in_bookmarks_list:
+            context_menu.append(
+                menu_items.bookmarks_add(
+                    context, channel_item
                 )
             )
 
@@ -265,6 +271,17 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     path = context.get_path()
     thumb_size = context.get_settings().use_thumbnail_size()
 
+    # if the path directs to a playlist of our own, set channel id to 'mine'
+    if path.startswith(paths.MY_PLAYLISTS):
+        in_bookmarks_list = False
+        in_my_playlists = True
+    elif path.startswith(paths.BOOKMARKS):
+        in_bookmarks_list = True
+        in_my_playlists = False
+    else:
+        in_bookmarks_list = False
+        in_my_playlists = False
+
     for playlist_id, yt_item in data.items():
         playlist_item = playlist_id_dict[playlist_id]
 
@@ -274,10 +291,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         playlist_item.set_image(image)
 
-        channel_id = snippet['channelId']
-        # if the path directs to a playlist of our own, set channel id to 'mine'
-        if path.startswith(paths.MY_PLAYLISTS):
-            channel_id = 'mine'
+        channel_id = 'mine' if in_my_playlists else snippet['channelId']
         channel_name = snippet.get('channelTitle', '')
 
         # play all videos of the playlist
@@ -286,6 +300,13 @@ def update_playlist_infos(provider, context, playlist_id_dict,
                 context, playlist_id
             )
         ]
+
+        if not in_bookmarks_list and channel_id != 'mine':
+            context_menu.append(
+                menu_items.bookmarks_add(
+                    context, playlist_item
+                )
+            )
 
         if logged_in:
             if channel_id != 'mine':
@@ -322,6 +343,14 @@ def update_playlist_infos(provider, context, playlist_id_dict,
                         context, playlist_id, title
                     ),
                 ))
+
+        if not in_bookmarks_list and channel_id != 'mine':
+            context_menu.append(
+                # bookmark channel of the playlist
+                menu_items.bookmarks_add_channel(
+                    context, channel_id, channel_name
+                )
+            )
 
         if context_menu:
             playlist_item.set_context_menu(context_menu)
@@ -362,28 +391,41 @@ def update_video_infos(provider, context, video_id_dict,
         watch_later_id = None
 
     settings = context.get_settings()
-    hide_shorts = settings.hide_short_videos()
     alternate_player = settings.support_alternative_player()
+    default_web_urls = settings.default_player_web_urls()
+    ask_quality = not default_web_urls and settings.ask_for_video_quality()
+    audio_only = settings.audio_only()
+    hide_shorts = settings.hide_short_videos()
     show_details = settings.show_detailed_description()
+    subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.use_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+
     untitled = context.localize('untitled')
 
     path = context.get_path()
     ui = context.get_ui()
 
     if path.startswith(paths.MY_SUBSCRIPTIONS):
+        in_bookmarks_list = False
         in_my_subscriptions_list = True
         in_watched_later_list = False
         playlist_match = False
     elif path.startswith(paths.WATCH_LATER):
+        in_bookmarks_list = False
         in_my_subscriptions_list = False
         in_watched_later_list = True
         playlist_match = False
-    else:
+    elif path.startswith(paths.BOOKMARKS):
+        in_bookmarks_list = True
         in_my_subscriptions_list = False
         in_watched_later_list = False
-        playlist_match = __RE_PLAYLIST_MATCH.match(path)
+        playlist_match = False
+    else:
+        in_bookmarks_list = False
+        in_my_subscriptions_list = False
+        in_watched_later_list = False
+        playlist_match = __RE_PLAYLIST.match(path)
 
     for video_id, yt_item in data.items():
         video_item = video_id_dict[video_id]
@@ -511,16 +553,25 @@ def update_video_infos(provider, context, video_id_dict,
         This is not based on any language. In some cases this won't work at all.
         TODO: via language and settings provide the regex for matching episode and season.
         """
-        # video_item.set_season(1)
-        # video_item.set_episode(1)
-        for regex in __RE_SEASON_EPISODE_MATCHES__:
-            re_match = regex.search(video_item.get_name())
-            if re_match:
-                if 'season' in re_match.groupdict():
-                    video_item.set_season(int(re_match.group('season')))
+        season = episode = None
+        for season_episode in __RE_SEASON_EPISODE.findall(title):
+            if not season:
+                value = season_episode[0]
+                if value:
+                    value = int(value)
+                    if value < 2 ** 31:
+                        season = value
+                        video_item.set_season(season)
 
-                if 'episode' in re_match.groupdict():
-                    video_item.set_episode(int(re_match.group('episode')))
+            if not episode:
+                value = season_episode[1]
+                if value:
+                    value = int(value)
+                    if value < 2 ** 31:
+                        episode = value
+                        video_item.set_episode(episode)
+
+            if season and episode:
                 break
 
         # plot
@@ -574,7 +625,6 @@ def update_video_infos(provider, context, video_id_dict,
             # Queue Video
             menu_items.queue_video(context),
         ]
-        replace_context_menu = False
 
         """
         Play all videos of the playlist.
@@ -584,7 +634,6 @@ def update_video_infos(provider, context, video_id_dict,
         """
         playlist_id = playlist_channel_id = ''
         if playlist_match:
-            replace_context_menu = True
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
 
@@ -612,6 +661,13 @@ def update_video_infos(provider, context, video_id_dict,
         elif not in_watched_later_list:
             context_menu.append(
                 menu_items.watch_later_local_add(
+                    context, video_item
+                )
+            )
+
+        if not in_bookmarks_list:
+            context_menu.append(
+                menu_items.bookmarks_add(
                     context, video_item
                 )
             )
@@ -655,6 +711,18 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
+        if not in_bookmarks_list:
+            context_menu.append(
+                # remove bookmarked channel of the video
+                menu_items.bookmarks_remove(
+                    context, item_id=channel_id
+                ) if in_my_subscriptions_list else
+                # bookmark channel of the video
+                menu_items.bookmarks_add_channel(
+                    context, channel_id, channel_name
+                )
+            )
+
         if not video_item.live and play_data:
             context_menu.append(
                 menu_items.history_mark_unwatched(
@@ -675,29 +743,41 @@ def update_video_infos(provider, context, video_id_dict,
 
         # more...
         refresh = path.startswith((paths.LIKED_VIDEOS, paths.DISLIKED_VIDEOS))
-        context_menu.extend((
+        context_menu.append(
             menu_items.more_for_video(
                 context,
                 video_id,
                 logged_in=logged_in,
                 refresh=refresh,
-            ),
-            menu_items.play_with_subtitles(
-                context, video_id
-            ),
-            menu_items.play_audio_only(
-                context, video_id
-            ),
-            menu_items.play_ask_for_quality(
-                context, video_id
-            ),
-            ('--------', 'noop'),
-        ))
+            )
+        )
+
+        if not subtitles_prompt:
+            context_menu.append(
+                menu_items.play_with_subtitles(
+                    context, video_id
+                )
+            )
+
+        if not audio_only:
+            context_menu.append(
+                menu_items.play_audio_only(
+                    context, video_id
+                )
+            )
+
+        if not ask_quality:
+            context_menu.append(
+                menu_items.play_ask_for_quality(
+                    context, video_id
+                )
+            )
 
         if context_menu:
-            video_item.set_context_menu(
-                context_menu, replace=replace_context_menu
+            context_menu.append(
+                ('--------', 'noop')
             )
+            video_item.set_context_menu(context_menu)
 
 
 def update_play_info(provider, context, video_id, video_item, video_stream,
@@ -798,9 +878,8 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
             break
 
     if shelf_index is not None and 0 > shelf_index >= len(contents):
-        context.log_debug('Shelf index |{index}| out of range |0-{content_length}|'.format(
-            index=shelf_index, content_length=len(contents)
-        ))
+        context.log_debug('Shelf index |{0}| out of range |0-{1}|'
+                          .format(shelf_index, len(contents)))
         shelf_index = None
 
     return shelf_index

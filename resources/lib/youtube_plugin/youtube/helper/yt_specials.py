@@ -283,7 +283,7 @@ def _process_saved_playlists_tv(provider, context):
     context.set_content(content.LIST_CONTENT)
 
     json_data = provider.get_client(context).get_saved_playlists(
-        page_token=context.get_param('next_page_token', ''),
+        page_token=context.get_param('next_page_token', 0),
         offset=context.get_param('offset', 0)
     )
 
@@ -296,8 +296,9 @@ def _process_new_uploaded_videos_tv(provider, context, filtered=False):
     context.set_content(content.VIDEO_CONTENT)
 
     json_data = provider.get_client(context).get_my_subscriptions(
-        page_token=context.get_param('next_page_token', ''),
-        offset=context.get_param('offset', 0)
+        page_token=context.get_param('next_page_token', 0),
+        offset=context.get_param('offset', 0),
+        logged_in=provider.is_logged_in(),
     )
 
     if not json_data:
@@ -310,11 +311,6 @@ def _process_new_uploaded_videos_tv(provider, context, filtered=False):
 
 def process(category, provider, context):
     _ = provider.get_client(context)  # required for provider.is_logged_in()
-    if (not provider.is_logged_in()
-            and category in ('new_uploaded_videos_tv',
-                             'new_uploaded_videos_tv_filtered',
-                             'disliked_videos')):
-        return UriItem(context.create_uri(('sign', 'in')))
 
     if category == 'related_videos':
         return _process_related_videos(provider, context)
@@ -329,7 +325,9 @@ def process(category, provider, context):
     if category == 'new_uploaded_videos_tv_filtered':
         return _process_new_uploaded_videos_tv(provider, context, filtered=True)
     if category == 'disliked_videos':
-        return _process_disliked_videos(provider, context)
+        if provider.is_logged_in():
+            return _process_disliked_videos(provider, context)
+        return UriItem(context.create_uri(('sign', 'in')))
     if category == 'live':
         return _process_live_events(provider, context, event_type='live')
     if category == 'upcoming_live':
