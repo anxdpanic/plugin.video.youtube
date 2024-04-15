@@ -324,7 +324,7 @@ def process_default_settings(_provider, context, step, steps):
         settings.set_subtitle_download(False)
         settings.live_stream_type(2)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
-            settings.alternative_player_web_urls(False)
+            settings.default_player_web_urls(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
         if settings.use_isa() and not httpd_status():

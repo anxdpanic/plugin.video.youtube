@@ -85,13 +85,14 @@ def select_stream(context,
                   stream_data_list,
                   quality_map_override=None,
                   ask_for_quality=None,
-                  audio_only=None):
+                  audio_only=None,
+                  use_adaptive_formats=True):
     # sort - best stream first
     def _sort_stream_data(_stream_data):
         return _stream_data.get('sort', (0, 0))
 
     settings = context.get_settings()
-    use_adaptive = context.use_inputstream_adaptive()
+    use_adaptive = use_adaptive_formats and context.use_inputstream_adaptive()
     if ask_for_quality is None:
         ask_for_quality = context.get_settings().ask_for_video_quality()
     video_quality = settings.get_video_quality(quality_map_override)

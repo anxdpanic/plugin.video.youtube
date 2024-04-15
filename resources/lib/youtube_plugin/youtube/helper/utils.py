@@ -392,8 +392,8 @@ def update_video_infos(provider, context, video_id_dict,
 
     settings = context.get_settings()
     alternate_player = settings.support_alternative_player()
-    alternate_web_urls = settings.alternative_player_web_urls()
-    ask_quality = not alternate_web_urls and settings.ask_for_video_quality()
+    default_web_urls = settings.default_player_web_urls()
+    ask_quality = not default_web_urls and settings.ask_for_video_quality()
     audio_only = settings.audio_only()
     hide_shorts = settings.hide_short_videos()
     show_details = settings.show_detailed_description()

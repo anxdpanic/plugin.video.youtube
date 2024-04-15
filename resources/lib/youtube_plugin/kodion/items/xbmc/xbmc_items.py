@@ -330,18 +330,9 @@ def video_playback_item(context, video_item, show_fanart=None):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
-    is_external = False
+    is_external = context.get_ui().get_property(SWITCH_PLAYER_FLAG)
     is_strm = context.get_param('strm')
     mime_type = None
-
-    if context.get_ui().get_property(SWITCH_PLAYER_FLAG):
-        is_external = True
-    if (settings.alternative_player_web_urls()
-            and not video_item.get_license_key()):
-        is_external = True
-        uri = 'https://www.youtube.com/watch?v={video_id}'.format(
-            video_id=video_item.video_id
-        )
 
     if is_strm:
         kwargs = {
@@ -360,7 +351,7 @@ def video_playback_item(context, video_item, show_fanart=None):
             'isPlayable': str(video_item.playable).lower(),
         }
 
-    if (not is_external and video_item.use_isa_video()
+    if (video_item.use_isa_video()
             and context.addon_enabled('inputstream.adaptive')):
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
@@ -396,9 +387,9 @@ def video_playback_item(context, video_item, show_fanart=None):
 
     list_item = xbmcgui.ListItem(**kwargs)
 
-    if mime_type:
+    if mime_type or is_external:
         list_item.setContentLookup(False)
-        list_item.setMimeType(mime_type)
+        list_item.setMimeType(mime_type or '*/*')
 
     if is_strm:
         list_item.setProperties(props)

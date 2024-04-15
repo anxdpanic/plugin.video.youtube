@@ -108,11 +108,27 @@ class AbstractSettings(object):
             return self.set_bool(settings.SUPPORT_ALTERNATIVE_PLAYER, value)
         return self.get_bool(settings.SUPPORT_ALTERNATIVE_PLAYER, False)
 
+    def default_player_web_urls(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.DEFAULT_PLAYER_WEB_URLS, value)
+        if self.support_alternative_player():
+            return self.get_bool(settings.DEFAULT_PLAYER_WEB_URLS, False)
+        return False
+
     def alternative_player_web_urls(self, value=None):
         if value is not None:
             return self.set_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, value)
-        if self.support_alternative_player():
+        if (self.support_alternative_player()
+                and not self.default_player_web_urls()
+                and not self.alternative_player_adaptive()):
             return self.get_bool(settings.ALTERNATIVE_PLAYER_WEB_URLS, False)
+        return False
+
+    def alternative_player_adaptive(self, value=None):
+        if value is not None:
+            return self.set_bool(settings.ALTERNATIVE_PLAYER_ADAPTIVE, value)
+        if self.support_alternative_player():
+            return self.get_bool(settings.ALTERNATIVE_PLAYER_ADAPTIVE, False)
         return False
 
     def use_isa(self, value=None):

@@ -16,62 +16,74 @@ from traceback import format_stack
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
+from ...kodion.compatibility import urlencode, urlunsplit
+from ...kodion.constants import SWITCH_PLAYER_FLAG, paths
 from ...kodion.items import VideoItem
+from ...kodion.network import get_connect_address
 from ...kodion.utils import select_stream
 
 
 def play_video(provider, context):
+    ui = context.get_ui()
     params = context.get_params()
     video_id = params.get('video_id')
-
-    client = provider.get_client(context)
-    settings = context.get_settings()
-    ui = context.get_ui()
-
-    ask_for_quality = None
-    if video_id and ui.get_property('ask_for_quality') == video_id:
-        ask_for_quality = True
-    ui.clear_property('ask_for_quality')
-
-    screensaver = False
-    if params.get('screensaver'):
-        ask_for_quality = False
-        screensaver = True
-
-    audio_only = None
-    if video_id and ui.get_property('audio_only') == video_id:
-        ask_for_quality = False
-        audio_only = True
-    ui.clear_property('audio_only')
-
-    try:
-        video_streams = client.get_video_streams(context, video_id)
-    except YouTubeException as exc:
-        context.log_error('yt_play.play_video - {exc}:\n{details}'.format(
-            exc=exc, details=''.join(format_stack())
-        ))
-        ui.show_notification(message=exc.get_message())
-        return False
-
-    if not video_streams:
+    if not video_id:
         message = context.localize('error.no_video_streams_found')
         ui.show_notification(message, time_ms=5000)
         return False
 
-    video_stream = select_stream(
-        context,
-        video_streams,
-        ask_for_quality=ask_for_quality,
-        audio_only=audio_only
-    )
+    client = provider.get_client(context)
+    settings = context.get_settings()
 
-    if video_stream is None:
-        return False
+    incognito = params.get('incognito', False)
+    screensaver = params.get('screensaver', False)
 
-    is_video = video_stream.get('video')
-    is_live = video_stream.get('Live')
+    is_external = ui.get_property(SWITCH_PLAYER_FLAG)
+    if ((is_external and settings.alternative_player_web_urls())
+            or (not is_external and settings.default_player_web_urls())):
+        video_stream = {
+            'url': 'https://www.youtube.com/watch?v={0}'.format(video_id),
+        }
+    else:
+        ask_for_quality = None
+        if not screensaver and ui.get_property('ask_for_quality') == video_id:
+            ask_for_quality = True
+        ui.clear_property('ask_for_quality')
 
-    if is_video and video_stream['video'].get('rtmpe', False):
+        audio_only = None
+        if ui.get_property('audio_only') == video_id:
+            ask_for_quality = False
+            audio_only = True
+        ui.clear_property('audio_only')
+
+        try:
+            video_streams = client.get_video_streams(context, video_id)
+        except YouTubeException as exc:
+            context.log_error('yt_play.play_video - {exc}:\n{details}'.format(
+                exc=exc, details=''.join(format_stack())
+            ))
+            ui.show_notification(message=exc.get_message())
+            return False
+
+        if not video_streams:
+            message = context.localize('error.no_video_streams_found')
+            ui.show_notification(message, time_ms=5000)
+            return False
+
+        video_stream = select_stream(
+            context,
+            video_streams,
+            ask_for_quality=ask_for_quality,
+            audio_only=audio_only,
+            use_adaptive_formats=(not is_external
+                                  or settings.alternative_player_adaptive()),
+        )
+
+        if video_stream is None:
+            return False
+
+    video_type = video_stream.get('video')
+    if video_type and video_type.get('rtmpe'):
         message = context.localize('error.rtmpe_not_supported')
         ui.show_notification(message, time_ms=5000)
         return False
@@ -85,12 +97,20 @@ def play_video(provider, context):
                                             video_id)
 
     metadata = video_stream.get('meta', {})
+    video_details = metadata.get('video', {})
 
-    title = metadata.get('video', {}).get('title', '')
-    video_item = VideoItem(title, video_stream['url'])
+    if is_external:
+        url = urlunsplit((
+            'http',
+            get_connect_address(as_netloc=True),
+            paths.REDIRECT,
+            urlencode({'url': video_stream['url']}),
+            '',
+        ))
+        video_stream['url'] = url
+    video_item = VideoItem(video_details.get('title', ''), video_stream['url'])
 
-    incognito = params.get('incognito', False)
-    use_history = not is_live and not screensaver and not incognito
+    use_history = not (screensaver or incognito or video_stream.get('Live'))
     use_remote_history = use_history and settings.use_remote_history()
     use_play_data = use_history and settings.use_local_history()
 
@@ -114,7 +134,7 @@ def play_video(provider, context):
     playback_json = {
         'video_id': video_id,
         'channel_id': metadata.get('channel', {}).get('id', ''),
-        'video_status': metadata.get('video', {}).get('status', {}),
+        'video_status': video_details.get('status', {}),
         'playing_file': video_item.get_uri(),
         'play_count': play_count,
         'use_remote_history': use_remote_history,
@@ -152,9 +172,9 @@ def play_playlist(provider, context):
     ui = context.get_ui()
 
     with ui.create_progress_dialog(
-        context.localize('playlist.progress.updating'),
-        context.localize('please_wait'),
-        background=True
+            context.localize('playlist.progress.updating'),
+            context.localize('please_wait'),
+            background=True
     ) as progress_dialog:
         json_data = resource_manager.get_playlist_items(playlist_ids)
 

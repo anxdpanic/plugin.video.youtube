@@ -354,7 +354,6 @@ class PlayerMonitor(xbmc.Player):
 
     def onPlayBackStarted(self):
         if self._ui.get_property(SWITCH_PLAYER_FLAG):
-            self._context.execute('Action(FullScreen)')
             self._context.execute('Action(SwitchPlayer)')
             self._context.execute('Action(Stop)')
 
