@@ -15,17 +15,23 @@ from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 
 
 def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
+    settings = context.get_settings()
     result = []
     video_id_dict = {}
 
     filter_list = []
     black_list = False
     if do_filter:
-        black_list = context.get_settings().get_bool('youtube.filter.my_subscriptions_filtered.blacklist', False)
-        filter_list = context.get_settings().get_string('youtube.filter.my_subscriptions_filtered.list', '')
-        filter_list = filter_list.replace(', ', ',')
-        filter_list = filter_list.split(',')
-        filter_list = [x.lower() for x in filter_list]
+        black_list = settings.get_bool(
+            'youtube.filter.my_subscriptions_filtered.blacklist', False
+        )
+        filter_list = settings.get_string(
+            'youtube.filter.my_subscriptions_filtered.list', ''
+        )
+        filter_list = {
+            filter_item.lower()
+            for filter_item in filter_list.replace(', ', ',').split(',')
+        }
 
     item_params = {'video_id': None}
     incognito = context.get_param('incognito', False)
@@ -34,8 +40,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
 
     items = json_data.get('items', [])
     for item in items:
-        channel = item['channel'].lower()
-        channel = channel.replace(',', '')
+        channel = item['channel'].lower().replace(',', '')
         if (not do_filter
                 or (black_list and channel not in filter_list)
                 or (not black_list and channel in filter_list)):
@@ -49,7 +54,7 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
 
             video_id_dict[video_id] = video_item
 
-    use_play_data = not incognito and context.get_settings().use_local_history()
+    use_play_data = not incognito and settings.use_local_history()
 
     channel_item_dict = {}
     utils.update_video_infos(provider,
@@ -63,11 +68,11 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', '')
+    next_page_token = json_data.get('next_page_token', 0)
     if next_page_token or json_data.get('continue', False):
         new_params = dict(context.get_params(),
                           next_page_token=next_page_token,
-                          offset=int(json_data.get('offset', 0)))
+                          offset=json_data.get('offset', 0))
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)
@@ -112,11 +117,11 @@ def tv_videos_to_items(provider, context, json_data):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', '')
+    next_page_token = json_data.get('next_page_token', 0)
     if next_page_token or json_data.get('continue', False):
         new_params = dict(context.get_params(),
                           next_page_token=next_page_token,
-                          offset=int(json_data.get('offset', 0)))
+                          offset=json_data.get('offset', 0))
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)
@@ -165,11 +170,11 @@ def saved_playlists_to_items(provider, context, json_data):
     utils.update_fanarts(provider, context, channel_items_dict)
 
     # next page
-    next_page_token = json_data.get('next_page_token', '')
+    next_page_token = json_data.get('next_page_token', 0)
     if next_page_token or json_data.get('continue', False):
         new_params = dict(context.get_params(),
                           next_page_token=next_page_token,
-                          offset=int(json_data.get('offset', 0)))
+                          offset=json_data.get('offset', 0))
         new_context = context.clone(new_params=new_params)
         current_page = new_context.get_param('page', 1)
         next_page_item = NextPageItem(new_context, current_page)

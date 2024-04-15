@@ -38,6 +38,10 @@ from ...utils import (
 
 
 class XbmcContext(AbstractContext):
+    _addon = None
+
+    _KODI_UI_SUBTITLE_OPTIONS = None
+
     LOCAL_MAP = {
         'api.id': 30202,
         'api.key': 30201,
@@ -48,6 +52,12 @@ class XbmcContext(AbstractContext):
         'archive': 30105,
         'are_you_sure': 30703,
         'auto_remove_watch_later': 30515,
+        'bookmarks': 30100,
+        'bookmarks.add': 30101,
+        'bookmarks.add.channel': 30803,
+        'bookmarks.clear': 30801,
+        'bookmarks.clear.confirm': 30802,
+        'bookmarks.remove': 20404,
         'browse_channels': 30512,
         'cancel': 30615,
         'channels': 30500,
@@ -85,9 +95,6 @@ class XbmcContext(AbstractContext):
         'failed.watch_later.retry': 30614,
         'failed.watch_later.retry.2': 30709,
         'failed.watch_later.retry.3': 30710,
-        'favorites': 30100,
-        'favorites.add': 30101,
-        'favorites.remove': 30108,
         'go_to_channel': 30502,
         'highlights': 30104,
         'history': 30509,
@@ -111,6 +118,7 @@ class XbmcContext(AbstractContext):
         'live': 30539,
         'live.completed': 30647,
         'live.upcoming': 30646,
+        'maintenance.bookmarks': 30800,
         'maintenance.data_cache': 30687,
         'maintenance.function_cache': 30557,
         'maintenance.playback_history': 30673,
@@ -167,6 +175,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard': 30526,
         'setup_wizard.capabilities': 30786,
         'setup_wizard.capabilities.720p30': 30787,
+        'setup_wizard.capabilities.1080p30_avc': 30797,
         'setup_wizard.capabilities.1080p30': 30788,
         'setup_wizard.capabilities.1080p60': 30796,
         'setup_wizard.capabilities.4k30': 30789,
@@ -264,6 +273,22 @@ class XbmcContext(AbstractContext):
         'youtube': 30003,
     }
 
+    def __new__(cls, *args, **kwargs):
+        if not cls._addon:
+            cls._addon = xbmcaddon.Addon(id=ADDON_ID)
+
+        if not cls._KODI_UI_SUBTITLE_OPTIONS:
+            cls._KODI_UI_SUBTITLE_OPTIONS = {
+                None,                 # No setting value
+                cls.localize(231),    # None
+                cls.localize(13207),  # Forced only
+                cls.localize(308),    # Original language
+                cls.localize(309),    # UI language
+            }
+
+        self = super(XbmcContext, cls).__new__(cls)
+        return self
+
     def __init__(self,
                  path='/',
                  params=None,
@@ -272,7 +297,8 @@ class XbmcContext(AbstractContext):
                  override=True):
         super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
 
-        self._addon = xbmcaddon.Addon(id=(plugin_id if plugin_id else ADDON_ID))
+        if plugin_id and plugin_id != ADDON_ID:
+            self._addon = xbmcaddon.Addon(id=plugin_id)
 
         """
         I don't know what xbmc/kodi is doing with a simple uri, but we have to extract the information from the
@@ -362,11 +388,7 @@ class XbmcContext(AbstractContext):
     def get_subtitle_language(self):
         sub_language = get_kodi_setting_value('locale.subtitlelanguage')
         # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
-        if sub_language not in (None,  # No setting value
-                                self.localize(231),  # None
-                                self.localize(13207),  # Forced only
-                                self.localize(308),  # Original language
-                                self.localize(309)):  # UI language
+        if sub_language not in self._KODI_UI_SUBTITLE_OPTIONS:
             sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
         else:
             sub_language = None
@@ -409,13 +431,14 @@ class XbmcContext(AbstractContext):
     def get_settings(self):
         return self._settings
 
-    def localize(self, text_id, default_text=None):
+    @classmethod
+    def localize(cls, text_id, default_text=None):
         if default_text is None:
             default_text = 'Undefined string ID: |{0}|'.format(text_id)
 
         if not isinstance(text_id, int):
             try:
-                text_id = self.LOCAL_MAP[text_id]
+                text_id = cls.LOCAL_MAP[text_id]
             except KeyError:
                 try:
                     text_id = int(text_id)
@@ -430,7 +453,7 @@ class XbmcContext(AbstractContext):
         (see: http://kodi.wiki/view/Language_support) but we do it anyway.
         I want some of the localized strings for the views of a skin.
         """
-        source = self._addon if 30000 <= text_id < 31000 else xbmc
+        source = cls._addon if 30000 <= text_id < 31000 else xbmc
         result = source.getLocalizedString(text_id)
         result = to_unicode(result) if result else default_text
         return result
@@ -505,7 +528,7 @@ class XbmcContext(AbstractContext):
                                   override=False)
         new_context._function_cache = self._function_cache
         new_context._search_history = self._search_history
-        new_context._favorite_list = self._favorite_list
+        new_context._bookmarks_list = self._bookmarks_list
         new_context._watch_later_list = self._watch_later_list
         new_context._access_manager = self._access_manager
         new_context._ui = self._ui
@@ -651,5 +674,7 @@ class XbmcContext(AbstractContext):
 
     def tear_down(self):
         self._settings.flush()
-        del self._addon
-        self._addon = None
+        try:
+            del self._addon
+        except AttributeError:
+            pass

@@ -42,9 +42,9 @@ class AbstractProvider(object):
 
         self.register_path(r''.join((
             '^',
-            paths.FAVORITES,
+            paths.BOOKMARKS,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), '_internal_favorite')
+        )), 'on_bookmarks')
 
         self.register_path(r''.join((
             '^',
@@ -94,11 +94,11 @@ class AbstractProvider(object):
         steps = len(wizard_steps)
 
         try:
-            if (wizard_steps and ui.on_yes_no_input(
-                context.localize('setup_wizard'),
-                (context.localize('setup_wizard.prompt')
-                 % context.localize('setup_wizard.prompt.settings'))
-            )):
+            if wizard_steps and ui.on_yes_no_input(
+                    context.localize('setup_wizard'),
+                    (context.localize('setup_wizard.prompt')
+                     % context.localize('setup_wizard.prompt.settings'))
+            ):
                 for wizard_step in wizard_steps:
                     if callable(wizard_step):
                         step = wizard_step(self, context, step, steps)
@@ -107,7 +107,6 @@ class AbstractProvider(object):
         finally:
             settings.set_bool(settings.SETUP_WIZARD, False)
             context.send_notification('check_settings', 'process')
-
 
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
@@ -123,9 +122,17 @@ class AbstractProvider(object):
                 method = getattr(self, method_name, None)
                 if method is not None:
                     result = method(context, re_match)
+                    refresh = context.get_param('refresh', False)
                     if not isinstance(result, tuple):
-                        result = result, {}
-                    return result
+                        options = {
+                            self.RESULT_CACHE_TO_DISC: True,
+                            self.RESULT_UPDATE_LISTING: refresh,
+                        }
+                    else:
+                        result, options = result
+                        if refresh:
+                            options[self.RESULT_UPDATE_LISTING] = refresh
+                    return result, options
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
@@ -157,43 +164,8 @@ class AbstractProvider(object):
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
 
-    @staticmethod
-    def _internal_favorite(context, re_match):
-        params = context.get_params()
-        command = re_match.group('command')
-        if not command:
-            return False
-
-        if command == 'list':
-            items = context.get_favorite_list().get_items()
-
-            for item in items:
-                context_menu = [
-                    menu_items.favorites_remove(
-                        context, item.video_id
-                    ),
-                    ('--------', 'noop'),
-                ]
-                item.add_context_menu(context_menu)
-
-            return items
-
-        video_id = params.get('video_id')
-        if not video_id:
-            return False
-
-        if command == 'add':
-            item = params.get('item')
-            if item:
-                context.get_favorite_list().add(video_id, item)
-            return True
-
-        if command == 'remove':
-            context.get_favorite_list().remove(video_id)
-            context.get_ui().refresh_container()
-            return True
-
-        return False
+    def on_bookmarks(self, context, re_match):
+        raise NotImplementedError()
 
     def on_watch_later(self, context, re_match):
         raise NotImplementedError()

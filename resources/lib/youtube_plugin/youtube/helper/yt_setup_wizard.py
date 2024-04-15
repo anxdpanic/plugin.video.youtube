@@ -198,9 +198,9 @@ def process_language(provider, context, step, steps):
 
     step += 1
     if not ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.locale')),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.locale'))
     ):
         return step
 
@@ -293,9 +293,9 @@ def process_geo_location(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.my_location')),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.my_location'))
     ):
         locator = Locator()
         locator.locate_requester()
@@ -313,17 +313,18 @@ def process_default_settings(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.settings.defaults'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.defaults'))
     ):
         settings.client_selection(0)
         settings.use_isa(True)
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
+        settings.set_subtitle_download(False)
         settings.live_stream_type(2)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
-            settings.alternative_player_web_urls(False)
+            settings.default_player_web_urls(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
         if settings.use_isa() and not httpd_status():
@@ -337,9 +338,9 @@ def process_list_detail_settings(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.settings.list_details'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.list_details'))
     ):
         settings.show_detailed_description(False)
         settings.show_detailed_labels(False)
@@ -356,9 +357,9 @@ def process_performance_settings(_provider, context, step, steps):
 
     step += 1
     if ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.settings.performance'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.performance'))
     ):
         device_types = {
             '720p30': {
@@ -366,9 +367,16 @@ def process_performance_settings(_provider, context, step, steps):
                 'stream_features': ('avc1', 'mp4a', 'filter'),
                 'num_items': 10,
                 'settings': (
-                    (settings.use_isa, (True,)),
                     (settings.use_mpd_videos, (False,)),
-                    (settings.live_stream_type, (2,)),
+                    (settings.set_subtitle_download, (True,)),
+                ),
+            },
+            '1080p30_avc': {
+                'max_resolution': 4,  # 1080p
+                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter'),
+                'num_items': 10,
+                'settings': (
+                    (settings.client_selection, (2,)),
                 ),
             },
             '1080p30': {
@@ -429,9 +437,9 @@ def process_subtitles(_provider, context, step, steps):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        (localize('setup_wizard.prompt')
-         % localize('setup_wizard.prompt.subtitles'))
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.subtitles'))
     ):
         context.execute('RunScript({addon_id},config/subtitles)'.format(
             addon_id=ADDON_ID
@@ -450,8 +458,8 @@ def process_old_search_db(_provider, context, step, steps):
     )
     step += 1
     if xbmcvfs.exists(search_db_path) and ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        localize('setup_wizard.prompt.import_search_history'),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            localize('setup_wizard.prompt.import_search_history'),
     ):
         def _convert_old_search_item(value, item):
             return {
@@ -491,8 +499,8 @@ def process_old_history_db(_provider, context, step, steps):
     )
     step += 1
     if xbmcvfs.exists(history_db_path) and ui.on_yes_no_input(
-        localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-        localize('setup_wizard.prompt.import_playback_history'),
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            localize('setup_wizard.prompt.import_playback_history'),
     ):
         def _convert_old_history_item(value, item):
             values = value.split(',')

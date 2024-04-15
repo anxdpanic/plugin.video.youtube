@@ -13,7 +13,7 @@ import os
 import socket
 
 from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
-from .constants import DATA_PATH, TEMP_PATH, WAIT_FLAG
+from .constants import DATA_PATH, SWITCH_PLAYER_FLAG, TEMP_PATH, WAIT_FLAG
 from .context import XbmcContext
 from .network import get_client_ip_address, httpd_status
 from .utils import rm_dir, validate_ip_address
@@ -130,6 +130,7 @@ def _maintenance_actions(context, action, params):
 
     if action == 'clear':
         targets = {
+            'bookmarks': context.get_bookmarks_list,
             'data_cache': context.get_data_cache,
             'function_cache': context.get_function_cache,
             'playback_history': context.get_playback_history,
@@ -148,6 +149,7 @@ def _maintenance_actions(context, action, params):
     elif action == 'delete':
         path = params.get('path')
         targets = {
+            'bookmarks': 'bookmarks.sqlite',
             'data_cache': 'data_cache.sqlite',
             'function_cache': 'cache.sqlite',
             'playback_history': 'history.sqlite',
@@ -333,6 +335,11 @@ def run(argv):
 
         if action == 'refresh':
             xbmc.executebuiltin('Container.Refresh')
+            return
+
+        if action == 'play_with':
+            ui.set_property(SWITCH_PLAYER_FLAG, 'true')
+            xbmc.executebuiltin('Action(Play)')
             return
 
         if category == 'config':

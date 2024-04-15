@@ -21,6 +21,7 @@ __all__ = (
     'urlencode',
     'urljoin',
     'urlsplit',
+    'urlunsplit',
     'xbmc',
     'xbmcaddon',
     'xbmcgui',
@@ -40,6 +41,7 @@ try:
         urlencode,
         urljoin,
         urlsplit,
+        urlunsplit,
     )
 
     import xbmc
@@ -68,6 +70,7 @@ except ImportError:
         parse_qsl,
         urljoin,
         urlsplit,
+        urlunsplit,
     )
     from xml.sax.saxutils import unescape
 

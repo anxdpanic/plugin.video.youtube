@@ -188,11 +188,11 @@ msgstr ""
 # empty strings from id 30039 to 30099
 
 msgctxt "#30100"
-msgid "Favourites"
+msgid "Bookmarks"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Add to addon favs"
+msgid "Bookmark"
 msgstr ""
 
 msgctxt "#30102"
@@ -1122,7 +1122,7 @@ msgid "Are you sure?"
 msgstr ""
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
+msgid "Use YouTube website urls with default player"
 msgstr ""
 
 msgctxt "#30705"
@@ -1454,7 +1454,7 @@ msgid "Choose device capabilities"
 msgstr ""
 
 msgctxt "#30787"
-msgid "720p | Limited or older devices"
+msgid "720p, H.264 only | Limited or older devices"
 msgstr ""
 
 msgctxt "#30788"
@@ -1491,4 +1491,40 @@ msgstr ""
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
+msgstr ""
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr ""
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr ""
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr ""
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr ""
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr ""
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
 msgstr ""

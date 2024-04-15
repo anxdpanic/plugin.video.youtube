@@ -11,9 +11,9 @@
 from __future__ import absolute_import, division, unicode_literals
 
 
+BOOKMARKS = '/kodion/bookmarks'
 EXTERNAL_SEARCH = '/search'
 SEARCH = '/kodion/search'
-FAVORITES = '/kodion/favorites'
 WATCH_LATER = '/kodion/watch_later'
 HISTORY = '/kodion/playback_history'
 
@@ -29,3 +29,4 @@ DRM = '/youtube/widevine'
 IP = '/youtube/client_ip'
 MPD = '/youtube/manifest/dash/'
 PING = '/youtube/ping'
+REDIRECT = '/youtube/redirect'

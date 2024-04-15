@@ -146,11 +146,11 @@ class XbmcContextUI(AbstractContextUI):
 
     def reload_container(self, path=None):
         context = self._context
-        xbmc.executebuiltin('ReplaceWindow(Videos, {0})'.format(
-            context.create_uri(
-                path or context.get_path(),
-                dict(context.get_params(), refresh=True),
-            )
+        if path in (True, None):
+            path = context.get_path()
+        params = dict(context.get_params(), refresh=True)
+        xbmc.executebuiltin('ActivateWindow(Videos, {0}, return)'.format(
+            context.create_uri(path, params)
         ))
 
     @staticmethod

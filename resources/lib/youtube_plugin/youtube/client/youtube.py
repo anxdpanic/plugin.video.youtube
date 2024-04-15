@@ -1442,18 +1442,17 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def get_my_subscriptions(self, page_token=None, offset=0, **kwargs):
+    def get_my_subscriptions(self,
+                             page_token=None,
+                             offset=0,
+                             logged_in=False,
+                             **kwargs):
         """
         modified by PureHemp, using YouTube RSS for fetching latest videos
         """
 
-        if not page_token:
-            page_token = ''
-
         result = {
             'items': [],
-            'next_page_token': page_token,
-            'offset': offset
         }
 
         def _perform(_page_token, _offset, _result):
@@ -1473,14 +1472,9 @@ class YouTube(LoginClient):
 
             """ no cache, get uploads data from web """
             if not _result['items']:
-                # get all subscriptions channel ids
-                sub_page_token = True
                 sub_channel_ids = []
 
-                while sub_page_token:
-                    if sub_page_token is True:
-                        sub_page_token = ''
-
+                if logged_in:
                     params = {
                         'part': 'snippet',
                         'maxResults': '50',
@@ -1488,29 +1482,36 @@ class YouTube(LoginClient):
                         'mine': 'true'
                     }
 
-                    if sub_page_token:
-                        params['pageToken'] = sub_page_token
+                    while 1:
+                        json_data = self.api_request(method='GET',
+                                                     path='subscriptions',
+                                                     params=params,
+                                                     **kwargs)
+                        if not json_data:
+                            break
 
-                    json_data = self.api_request(method='GET',
-                                                 path='subscriptions',
-                                                 params=params,
-                                                 **kwargs)
+                        sub_channel_ids.extend([
+                            item['snippet']['resourceId']['channelId']
+                            for item in json_data.get('items', [])
+                        ])
 
-                    if not json_data:
-                        json_data = {}
+                        # get next token if exists
+                        sub_page_token = json_data.get('nextPageToken')
+                        if sub_page_token:
+                            params['pageToken'] = sub_page_token
+                        # terminate loop when last page
+                        else:
+                            break
 
-                    items = json_data.get('items', [])
-
-                    for item in items:
-                        item = item.get('snippet', {}).get('resourceId', {}).get('channelId', '')
-                        sub_channel_ids.append(item)
-
-                    # get next token if exists
-                    sub_page_token = json_data.get('nextPageToken', '')
-
-                    # terminate loop when last page
-                    if not sub_page_token:
-                        break
+                items = self._context.get_bookmarks_list().get_items()
+                if items:
+                    sub_channel_ids.extend([
+                        item_id
+                        for item_id, item in items.items()
+                        if (item_id not in sub_channel_ids
+                            and (isinstance(item, float)
+                                 or getattr(item, 'get_channel_id', bool)()))
+                    ])
 
                 headers = {
                     'Host': 'www.youtube.com',
@@ -1544,30 +1545,29 @@ class YouTube(LoginClient):
 
                 do_encode = not current_system_version.compatible(19, 0)
 
+                ns = {
+                    'atom': 'http://www.w3.org/2005/Atom',
+                    'yt': 'http://www.youtube.com/xml/schemas/2015',
+                    'media': 'http://search.yahoo.com/mrss/',
+                }
+
                 for response in responses:
-                    if response:
-                        response.encoding = 'utf-8'
-                        xml_data = to_unicode(response.content)
-                        xml_data = xml_data.replace('\n', '')
-                        if do_encode:
-                            xml_data = to_str(xml_data)
+                    if not response:
+                        continue
 
-                        root = ET.fromstring(xml_data)
+                    response.encoding = 'utf-8'
+                    xml_data = to_unicode(response.content)
+                    xml_data = xml_data.replace('\n', '')
+                    if do_encode:
+                        xml_data = to_str(xml_data)
 
-                        ns = '{http://www.w3.org/2005/Atom}'
-                        yt_ns = '{http://www.youtube.com/xml/schemas/2015}'
-                        media_ns = '{http://search.yahoo.com/mrss/}'
-
-                        for entry in root.findall(ns + "entry"):
-                            # empty news dictionary
-                            entry_data = {
-                                'id': entry.find(yt_ns + 'videoId').text,
-                                'title': entry.find(media_ns + "group").find(media_ns + 'title').text,
-                                'channel': entry.find(ns + "author").find(ns + "name").text,
-                                'published': entry.find(ns + 'published').text,
-                            }
-                            # append items list
-                            _result['items'].append(entry_data)
+                    root = ET.fromstring(xml_data)
+                    _result['items'].extend([{
+                        'id': entry.find('yt:videoId', ns).text,
+                        'title': entry.find('media:group/media:title', ns).text,
+                        'channel': entry.find('atom:author/atom:name', ns).text,
+                        'published': entry.find('atom:published', ns).text,
+                    } for entry in root.findall('atom:entry', ns)])
 
                 # sorting by publish date
                 def _sort_by_date_time(item):
@@ -1585,15 +1585,10 @@ class YouTube(LoginClient):
             if not _page_token:
                 _page_token = 0
 
-            _page_token = int(_page_token)
-
             if len(_result['items']) > self._max_results:
-                _index_start = _page_token * self._max_results
-                _index_end = _index_start + self._max_results
-
-                _items = _result['items']
-                _items = _items[_index_start:_index_end]
-                _result['items'] = _items
+                start = _page_token * self._max_results
+                end = start + self._max_results
+                _result['items'] = _result['items'][start:end]
                 _result['next_page_token'] = _page_token + 1
 
             if len(_result['items']) < self._max_results:

@@ -29,7 +29,7 @@ from ..compatibility import (
 from ..constants import ADDON_ID, TEMP_PATH, paths
 from ..logger import log_debug, log_error
 from ..settings import XbmcPluginSettings
-from ..utils import validate_ip_address
+from ..utils import validate_ip_address, wait
 
 
 _addon = xbmcaddon.Addon(ADDON_ID)
@@ -103,7 +103,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             self.end_headers()
             self.wfile.write(client_json.encode('utf-8'))
 
-        elif self.path.startswith(paths.MPD):
+        elif stripped_path.startswith(paths.MPD):
             filepath = os.path.join(self.BASE_PATH, self.path[len(paths.MPD):])
             file_chunk = True
             try:
@@ -134,8 +134,8 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif api_config_enabled and self.path.startswith(paths.API_SUBMIT):
-            xbmc.executebuiltin('Dialog.Close(addonsettings, true)')
+        elif api_config_enabled and stripped_path.startswith(paths.API_SUBMIT):
+            xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
 
             query = urlsplit(self.path).query
             params = parse_qs(query)
@@ -192,6 +192,16 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
         elif stripped_path == paths.PING:
             self.send_error(204)
 
+        elif stripped_path.startswith(paths.REDIRECT):
+            url = parse_qs(urlsplit(self.path).query).get('url')
+            if url:
+                wait(1)
+                self.send_response(301)
+                self.send_header('Location', url[0])
+                self.end_headers()
+            else:
+                self.send_error(501)
+
         else:
             self.send_error(501)
 
@@ -214,6 +224,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
                 self.send_header('Content-Length',
                                  str(os.path.getsize(filepath)))
                 self.end_headers()
+
+        elif self.path.startswith(paths.REDIRECT):
+            self.send_error(404)
 
         else:
             self.send_error(501)
@@ -539,7 +552,7 @@ def get_http_server(address, port):
         return server
     except socket.error as exc:
         log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'
-                  .format(address=address, port=port, response=str(exc)))
+                  .format(address=address, port=port, response=exc))
         xbmcgui.Dialog().notification(_addon_name,
                                       str(exc),
                                       _addon_icon,
@@ -579,22 +592,28 @@ def get_client_ip_address():
     return ip_address
 
 
-def get_connect_address():
-    try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    except socket.error:
-        return xbmc.getIPAddress()
-
+def get_connect_address(as_netloc=False):
     address = _settings.httpd_listen()
     port = _settings.httpd_port()
     if address == '0.0.0.0':
         address = '127.0.0.1'
 
-    sock.settimeout(0)
+    sock = None
     try:
-        sock.connect((address, 0))
-        return sock.getsockname()[0], port
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     except socket.error:
-        return xbmc.getIPAddress(), port
-    finally:
-        sock.close()
+        address = xbmc.getIPAddress()
+
+    if sock:
+        sock.settimeout(0)
+        try:
+            sock.connect((address, 0))
+            address = sock.getsockname()[0]
+        except socket.error:
+            address = xbmc.getIPAddress()
+        finally:
+            sock.close()
+
+    if as_netloc:
+        return ':'.join((address, str(port)))
+    return address, port

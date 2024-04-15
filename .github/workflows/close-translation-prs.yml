@@ -1,7 +1,7 @@
 name: Close Translation Pull Requests
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [ master, main, dev ]
 
 jobs:
@@ -42,11 +42,10 @@ jobs:
           echo ::set-output name=close::${CLOSE}
 
       - name: Comment on the PR
-        uses: mshick/add-pr-comment@v1
+        uses: mshick/add-pr-comment@v2
         if: ${{ steps.check.outputs.close }}
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
-          repo-token-user-login: 'github-actions[bot]'
           allow-repeats: true
           message: |
             A modified strings.po file was detected.

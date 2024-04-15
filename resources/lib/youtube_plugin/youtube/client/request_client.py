@@ -54,7 +54,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'android': {
             '_id': 3,
-            '_query_subtitles': True,
+            '_query_subtitles': 'optional',
             'json': {
                 'params': _ANDROID_PARAMS,
                 'context': {
@@ -85,7 +85,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited to 720p on some videos
         'android_embedded': {
             '_id': 55,
-            '_query_subtitles': True,
+            '_query_subtitles': 'optional',
             'json': {
                 'params': _ANDROID_PARAMS,
                 'context': {

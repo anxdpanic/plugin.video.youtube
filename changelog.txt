@@ -1,3 +1,24 @@
+## v7.0.6+beta.1
+### Fixed
+- Improve updating containers and (re)loading windows #681
+- Fix refreshing video listing also forcing next pages to refresh when loaded
+- Fix overflow error resulting from parsing hashtags as episode numbers
+- Fix 6s delay on video playback start
+
+### Changed
+- Setup Wizard default settings now disable pre-downloading subtitles if MPEG-DASH is enabled
+- Ask for quality, Play with subtitles, Play audio only context menu items only displayed if
+  associated setting is not already enabled
+- Only make extra request for subtitles for Android client when all subtitle languages are enabled
+- Overhaul alternative player support due to Kodi changes and also improve external player support
+
+### New
+- Add recommended settings in Setup Wizard for Raspberry Pi 1/2 class devices #688
+- Added Bookmarks
+  - Save videos, channels, playlists to Bookmarks
+  - Bookmarked channels will be checked for updates in My Subscriptions
+  - Data is stored locally, without needing to be logged in
+
 ## v7.0.5
 ### Fixed
 - Fix typo causing no fractional frame rate hinting to fail #679
