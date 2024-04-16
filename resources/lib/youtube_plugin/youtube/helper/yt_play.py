@@ -40,7 +40,7 @@ def play_video(provider, context):
 
     is_external = ui.get_property(SWITCH_PLAYER_FLAG)
     if ((is_external and settings.alternative_player_web_urls())
-            or (not is_external and settings.default_player_web_urls())):
+            or settings.default_player_web_urls()):
         video_stream = {
             'url': 'https://www.youtube.com/watch?v={0}'.format(video_id),
         }

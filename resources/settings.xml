@@ -575,14 +575,12 @@
                 <setting id="kodion.support.alternative_player" type="boolean" label="30036" help="">
                     <level>0</level>
                     <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="kodion.default_player.web_urls" type="boolean" parent="kodion.support.alternative_player" label="30704" help="">
-                    <level>0</level>
-                    <default>false</default>
                     <dependencies>
                         <dependency type="enable">
-                            <condition setting="kodion.support.alternative_player" operator="is">true</condition>
+                            <or>
+                                <condition setting="kodion.support.alternative_player" operator="is">true</condition>
+                                <condition setting="kodion.default_player.web_urls" operator="is">false</condition>
+                            </or>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
@@ -595,7 +593,6 @@
                             <and>
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
                                 <condition setting="kodion.alternative_player.adaptive" operator="is">false</condition>
-                                <condition setting="kodion.default_player.web_urls" operator="is">false</condition>
                             </and>
                         </dependency>
                     </dependencies>
@@ -610,10 +607,19 @@
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
                                 <or>
                                     <condition setting="kodion.alternative_player.adaptive" operator="is">true</condition>
-                                    <condition setting="kodion.default_player.web_urls" operator="is">true</condition>
                                     <condition setting="kodion.alternative_player.web_urls" operator="is">false</condition>
                                 </or>
                             </and>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="kodion.default_player.web_urls" type="boolean" label="30704" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="kodion.support.alternative_player" operator="is">false</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
