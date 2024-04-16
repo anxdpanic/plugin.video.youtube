@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-14 19:47+0000\n"
+"PO-Revision-Date: 2024-04-16 10:14+0000\n"
 "Last-Translator: Kai Sommerfeld <ksooo@users.noreply.kodi.weblate.cloud>\n"
 "Language-Team: German <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/de_de/>\n"
 "Language: de_de\n"
@@ -186,11 +186,11 @@ msgstr "Eigene Verlaufs-Wiedergabeliste-ID"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Lesezeichen"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Lesezeichen"
 
 msgctxt "#30102"
 msgid "Search"
@@ -1118,7 +1118,7 @@ msgstr "Ganz sicher?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "YouTube-Webseiten-URLs mit Standardplayer verwenden"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1450,7 +1450,7 @@ msgstr "Gerätefähigkeiten auswählen"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, nur H.264 | Eingeschränkte oder ältere Geräte"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
@@ -1490,39 +1490,39 @@ msgstr "1080p/60 fps | Raspberry Pi 4 oder ähnlich"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 fps oder 720p/30 fps, nur H.264 | Raspberry Pi 1/2, oder ähnlich"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Lesezeichenliste leeren"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Lesezeichendatenbank löschen"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "Lesenzeichenliste"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Lesezeichenliste leeren"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "Soll die Lesezeichenliste wirklich geleert werden?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Lesezeichen ‚%s‘"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "YouTube-Webseiten-URLs mit externen Playern verwenden"
 
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
-msgstr ""
+msgstr "Adaptive Streamformate mit externen Playern verwenden"
 
 # Kodion Common
 # empty strings from id 30039 to 30099

@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-15 03:31+0000\n"
+"PO-Revision-Date: 2024-04-15 16:14+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
 "Language: ko_kr\n"
@@ -184,11 +184,11 @@ msgstr "사용자가 최근 본 재생목록 id"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "즐겨찾기"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "즐겨찾기"
 
 msgctxt "#30102"
 msgid "Search"
@@ -1116,7 +1116,7 @@ msgstr "확실합니까?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "기본 플레이어로 유튜브 웹사이트 URL 사용"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1448,7 +1448,7 @@ msgstr "장치 기능 선택"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, H.264 전용 | 제한적이거나 오래된 장치"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
@@ -1488,39 +1488,39 @@ msgstr "1080p/60fps | 라즈베리 파이 4 또는 유사"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30fps 또는 720p/30fps, H.264 전용 | 라즈베리 파이 1/2 또는 유사"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "즐겨찾기 목록 지우기"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "즐겨찾기 데이터베이스 삭제"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "즐겨찾기 목록"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "즐겨찾기 목록 지우기"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "즐겨찾기 목록을 지울까요?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "즐겨찾기 %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "외부 플레이어로 유튜브 웹사이트 URL 사용"
 
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
-msgstr ""
+msgstr "외부 플레이어로 적응형 스트리밍 형식 사용"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
