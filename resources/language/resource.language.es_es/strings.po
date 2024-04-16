@@ -5,10 +5,10 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-14 19:47+0000\n"
-"Last-Translator: José Antonio Alvarado <jalvarado0.eses@gmail.com>\n"
+"PO-Revision-Date: 2024-04-15 16:14+0000\n"
+"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
 "MIME-Version: 1.0\n"
@@ -186,11 +186,11 @@ msgstr "Personalizar ID para lista de reproducción 'Historial'"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Marcadores"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Marcador"
 
 msgctxt "#30102"
 msgid "Search"
@@ -1118,7 +1118,7 @@ msgstr "¿Está seguro?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "Usar el reproductor por defecto para las url de YouTube"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1450,7 +1450,7 @@ msgstr "Elija las capacidades del dispositivo"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, solo H.264 | Dispositivos viejos o limitados"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
@@ -1490,39 +1490,39 @@ msgstr "1080p/60 fps | Raspberry Pi 4, o similar"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 fps oo 720p/30 fps, solo H.264 | Raspberry Pi 1/2 o similar"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Limpiar lista de marcadores"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Borrar base de datos de marcadores"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "lista de marcadores"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Limpiar lista de Marcadores"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "¿Seguro que quieres borrar tu lista de Marcadores?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Marcador %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "Usar reproductor externo para urls de YouTube"
 
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
-msgstr ""
+msgstr "Usar reproductor externo para formatos de video Adaptativo"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
