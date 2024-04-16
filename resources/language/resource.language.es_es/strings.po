@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:58+0000\n"
-"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"PO-Revision-Date: 2024-04-15 16:14+0000\n"
+"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
 "MIME-Version: 1.0\n"
@@ -50,12 +50,12 @@ msgstr "Contraseña"
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
-msgstr ""
+msgstr "Utilizar InputStream Adaptativo"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -128,11 +128,11 @@ msgstr "Tamaño para caché de funciones (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Activar el Asistente de Configuración"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Anular visualizaciones"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -148,7 +148,7 @@ msgstr "Vista: Películas"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "¿Configurar %s?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -185,12 +185,12 @@ msgstr "Personalizar ID para lista de reproducción 'Historial'"
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
-msgstr "Favoritos"
+msgid "Bookmarks"
+msgstr "Marcadores"
 
 msgctxt "#30101"
-msgid "Add to addon favs"
-msgstr "Añadir a favoritos del Add-on"
+msgid "Bookmark"
+msgstr "Marcador"
 
 msgctxt "#30102"
 msgid "Search"
@@ -266,11 +266,11 @@ msgstr "Por favor, espere..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Confirmar borrar"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "¿Borrar %s?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -354,7 +354,7 @@ msgstr "Explorar Canales"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "Tendencias"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -406,11 +406,11 @@ msgstr "Seleccione una región"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Asistente de Configuración"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Idioma y Región"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -466,7 +466,7 @@ msgstr "Abrir con..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Mostrar el nombre del canal y los detalles del vídeo en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -618,7 +618,7 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "InputStream Adaptive está activado en los ajustes de YouTube, pero el complemento se ha desactivado. ¿Quieres activar InputStream Adaptive ahora?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -702,11 +702,11 @@ msgstr "Error al habilitar claves API personales. No encontrado: %s"
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Subtítulos"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s con original/%s de reserva"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -770,11 +770,11 @@ msgstr "Debe estar registrado."
 
 msgctxt "#30617"
 msgid "InputStream Adaptive"
-msgstr ""
+msgstr "InputStream Adaptive"
 
 msgctxt "#30618"
 msgid "Enable MPEG-DASH proxy"
-msgstr ""
+msgstr "Activar proxy MPEG-DASH"
 
 msgctxt "#30619"
 msgid "Port"
@@ -786,7 +786,7 @@ msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr ""
+msgstr "El proxy es necesario para VODs de MPEG-DASH (ver Avanzado > Servidor HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -914,7 +914,7 @@ msgstr "Radio de ubicación (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "Mi ubicación mediante la búsqueda de geolocalización por IP"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -990,7 +990,7 @@ msgstr "Limpiar historial de reproducción"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Borrar la base de datos del historial de reproducción"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1054,7 +1054,7 @@ msgstr "caché de datos"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Utilizar MPEG-DASH para los vídeos"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1117,8 +1117,8 @@ msgid "Are you sure?"
 msgstr "¿Está seguro?"
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
-msgstr "Usar urls del sitio web YouTube"
+msgid "Use YouTube website urls with default player"
+msgstr "Usar el reproductor por defecto para las url de YouTube"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1194,7 +1194,7 @@ msgstr "Habilitar vídeo HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Se necesita proxy para los VODs de MPEG-DASH (consulte Avanzado > Servidor HTTP)[CR]Los vídeos HDR y >1080p requieren InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1358,135 +1358,189 @@ msgstr "Multiaudio"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Tiempo de espera de la solicitud de conexión"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Tiempo de espera de solicitud de lectura"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Estrenos"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Vistas"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Desactiva la alta velocidad de fotogramas con la máxima calidad de vídeo"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Borrar lista de Seguimiento"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "¿Estás seguro de que quieres borrar tu lista de Seguimiento?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Desactivar la sugerencia de framerate fraccional"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Desactivar todas las sugerencias de velocidad de fotogramas"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Mostrar detalles del vídeo en las listas de vídeos"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Todos disponibles"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (traducción)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Preguntar + Automático + Selección de calidad"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Vistas para %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "¿Importar el antiguo historial de reproducción?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "¿Importar el antiguo historial de búsqueda?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Borrar la lista de seguimiento local"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Borrar la base de datos de seguimiento"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "lista de seguimiento local"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "ajustes a los valores recomendados"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "listados para mostrar detalles mínimos"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "ajustes de rendimiento"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Elija las capacidades del dispositivo"
 
 msgctxt "#30787"
-msgid "720p | Limited or older devices"
-msgstr ""
+msgid "720p, H.264 only | Limited or older devices"
+msgstr "720p, solo H.264 | Dispositivos viejos o limitados"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 fps | Raspberry Pi 3, o similar"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 fps o 1080p/60 fps, HDR si es compatible | Raspberry Pi 5, o similar"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR si es compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, o similar"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR, usando AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, o similar"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 fps, HDR, usando AV1 | Dispositivo moderno o PC con todas las capacidades"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Color de la pantalla de recuento de visitas"
 
 msgctxt "#30794"
 msgid "Likes count display colour"
-msgstr ""
+msgstr "Color de la pantalla de recuento de likes"
 
 msgctxt "#30795"
 msgid "Comments count display colour"
-msgstr ""
+msgstr "Color de la pantalla de recuento de comentarios"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 fps | Raspberry Pi 4, o similar"
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr "1080p/30 fps oo 720p/30 fps, solo H.264 | Raspberry Pi 1/2 o similar"
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr "Limpiar lista de marcadores"
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr "Borrar base de datos de marcadores"
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr "lista de marcadores"
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr "Limpiar lista de Marcadores"
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr "¿Seguro que quieres borrar tu lista de Marcadores?"
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr "Marcador %s"
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr "Usar reproductor externo para urls de YouTube"
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
+msgstr "Usar reproductor externo para formatos de video Adaptativo"
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favourites"
+#~ msgstr "Favoritos"
+
+#~ msgctxt "#30101"
+#~ msgid "Add to addon favs"
+#~ msgstr "Añadir a favoritos del Add-on"
+
+#~ msgctxt "#30704"
+#~ msgid "Use YouTube website urls"
+#~ msgstr "Usar urls del sitio web YouTube"
+
+#~ msgctxt "#30787"
+#~ msgid "720p | Limited or older devices"
+#~ msgstr "720p | Dispositivos limitados o más antiguos"
 
 # empty strings from id 30003 to 30006
 #~ msgctxt "#30007"

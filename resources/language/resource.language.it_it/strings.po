@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-13 02:11+0000\n"
+"PO-Revision-Date: 2024-04-15 05:59+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/it_it/>\n"
 "Language: it_it\n"
@@ -187,12 +187,12 @@ msgstr "ID playlist cronologa personalizzato"
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
-msgstr "Preferiti"
+msgid "Bookmarks"
+msgstr "Segnalibri"
 
 msgctxt "#30101"
-msgid "Add to addon favs"
-msgstr "Aggiungi ai Preferiti dell'add-on"
+msgid "Bookmark"
+msgstr "Segnalibro"
 
 msgctxt "#30102"
 msgid "Search"
@@ -1119,8 +1119,8 @@ msgid "Are you sure?"
 msgstr "Sei sicuro?"
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
-msgstr "Usa URL del sito web YouTube"
+msgid "Use YouTube website urls with default player"
+msgstr "Usa URL del sito web di YouTube con il lettore predefinito"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1451,8 +1451,8 @@ msgid "Choose device capabilities"
 msgstr "Scegli funzionalità del dispositivo"
 
 msgctxt "#30787"
-msgid "720p | Limited or older devices"
-msgstr "720p | Dispositivi limitati o vecchi"
+msgid "720p, H.264 only | Limited or older devices"
+msgstr "720p, solo H.264 | Dispositivi limitati o vecchi"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
@@ -1489,6 +1489,60 @@ msgstr "Colore di visualizzazione del conteggio commenti"
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
 msgstr "1080p/60fps | Raspberry Pi 4 o simile"
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr "1080p/30 fps o 720p/30 fps, solo H.264 | Raspberry Pi 1/2 o simile"
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr "Cancella elenco segnalibri"
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr "Elimina database segnalibri"
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr "elenco segnalibri"
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr "Cancella elenco segnalibri"
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr "Sei sicuro di voler cancellare l'elenco dei segnalibri?"
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr "Segnalibro %s"
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr "Usa gli URL del sito web di YouTube con un lettore esterno"
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
+msgstr "Usa formati di streaming adattivi con lettore esterno"
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favourites"
+#~ msgstr "Preferiti"
+
+#~ msgctxt "#30101"
+#~ msgid "Add to addon favs"
+#~ msgstr "Aggiungi ai Preferiti dell'add-on"
+
+#~ msgctxt "#30704"
+#~ msgid "Use YouTube website urls"
+#~ msgstr "Usa URL del sito web YouTube"
+
+#~ msgctxt "#30787"
+#~ msgid "720p | Limited or older devices"
+#~ msgstr "720p | Dispositivi limitati o vecchi"
 
 # empty strings from id 30003 to 30006
 #~ msgctxt "#30007"
