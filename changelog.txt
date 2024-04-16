@@ -1,3 +1,12 @@
+## v7.0.6+beta.2
+### Fixed
+- Further fixes for multiple busy dialog crash workaround
+  - Possibly fix issues reported in comments of #704
+- Update error checks to avoid unnecessary retries of player request
+
+### Changed
+- Make "Support alternative player" and "Use YouTube website urls with default player" mutually exclusive options
+
 ## v7.0.6+beta.1
 ### Fixed
 - Improve updating containers and (re)loading windows #681
@@ -7,8 +16,7 @@
 
 ### Changed
 - Setup Wizard default settings now disable pre-downloading subtitles if MPEG-DASH is enabled
-- Ask for quality, Play with subtitles, Play audio only context menu items only displayed if
-  associated setting is not already enabled
+- Ask for quality, Play with subtitles, Play audio only context menu items only displayed if associated setting is not already enabled
 - Only make extra request for subtitles for Android client when all subtitle languages are enabled
 - Overhaul alternative player support due to Kodi changes and also improve external player support
 
