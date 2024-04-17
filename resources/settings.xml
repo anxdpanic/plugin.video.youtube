@@ -115,12 +115,11 @@
                     <level>0</level>
                     <!--
                     All selections enabled except:
-                        - Opus audio
                         - no HFR at max quality
                         - no fractional framerate hinting
                         - no framerate hinting
                     -->
-                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>
+                    <default>avc1,vp9,av01,hdr,hfr,vorbis,opus,mp4a,ssa,ac-3,ec-3,dts,filter</default>
                     <constraints>
                         <options>
                             <option label="30727">avc1</option>
