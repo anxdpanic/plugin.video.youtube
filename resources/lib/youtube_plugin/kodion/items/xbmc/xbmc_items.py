@@ -366,7 +366,9 @@ def video_playback_item(context, video_item, show_fanart=None):
                                 if current_system_version.compatible(19, 0) else
                                 'inputstreamaddon')
         props[inputstream_property] = 'inputstream.adaptive'
-        props['inputstream.adaptive.manifest_type'] = manifest_type
+
+        if not current_system_version.compatible(21, 0):
+            props['inputstream.adaptive.manifest_type'] = manifest_type
 
         if headers:
             props['inputstream.adaptive.manifest_headers'] = headers
