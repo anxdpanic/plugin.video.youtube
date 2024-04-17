@@ -322,7 +322,7 @@ def process_default_settings(_provider, context, step, steps):
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.set_subtitle_download(False)
-        settings.live_stream_type(2)
+        settings.live_stream_type(3)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
             settings.default_player_web_urls(False)
         if settings.cache_size() < 20:
