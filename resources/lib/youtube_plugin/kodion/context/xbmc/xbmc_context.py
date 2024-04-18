@@ -370,14 +370,14 @@ class XbmcContext(AbstractContext):
     @staticmethod
     def get_language():
         language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
-        lang_code, seperator, region = language.partition('-')
+        lang_code, separator, region = language.partition('-')
         if not lang_code:
             language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
-            lang_code, seperator, region = language.partition('-')
+            lang_code, separator, region = language.partition('-')
         if not lang_code:
             return 'en-US'
         if region:
-            return seperator.join((lang_code.lower(), region.upper()))
+            return separator.join((lang_code.lower(), region.upper()))
         return lang_code
 
     def get_language_name(self, lang_id=None):
@@ -549,7 +549,7 @@ class XbmcContext(AbstractContext):
 
     @staticmethod
     def sleep(timeout=None):
-        wait(timeout)
+        return wait(timeout)
 
     def addon_enabled(self, addon_id):
         response = jsonrpc(method='Addons.GetAddonDetails',
@@ -590,7 +590,7 @@ class XbmcContext(AbstractContext):
             if self.addon_enabled('inputstream.adaptive'):
                 success = True
             elif self.get_ui().on_yes_no_input(
-                self.get_name(), self.localize('isa.enable.confirm')
+                    self.get_name(), self.localize('isa.enable.confirm')
             ):
                 success = self.set_addon_enabled('inputstream.adaptive')
             else:
