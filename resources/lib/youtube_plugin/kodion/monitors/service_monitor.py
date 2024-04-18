@@ -85,7 +85,9 @@ class ServiceMonitor(xbmc.Monitor):
                     'plugin://{0}/'.format(ADDON_ID))):
             xbmc.executebuiltin('Container.Refresh')
 
-        use_httpd = settings.use_isa() or settings.api_config_page()
+        use_httpd = (settings.use_isa()
+                     or settings.api_config_page()
+                     or settings.support_alternative_player())
         address, port = get_connect_address()
         whitelist = settings.httpd_whitelist()
 
