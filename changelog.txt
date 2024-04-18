@@ -2,10 +2,14 @@
 ### Fixed
 - Further fixes for multiple busy dialog crash workaround
   - Possibly fix issues reported in comments of #704
-- Update error checks to avoid unnecessary retries of player request
+- Update error checks to avoid unnecessary retries of player requests
 
 ### Changed
-- Make "Support alternative player" and "Use YouTube website urls with default player" mutually exclusive options
+- Make "Support alternative player" and "Use YouTube website urls with default player" mutually exclusive options #692
+- Enable OPUS audio by default #537
+- Enable MPEG-DASH for live streams by default #680
+- Setup Wizard will prompt to run when plugin first opens after updating, in order to update default settings
+- http server will shutdown on idle timeout #699
 
 ## v7.0.6+beta.1
 ### Fixed
