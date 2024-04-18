@@ -661,6 +661,10 @@ class XbmcContext(AbstractContext):
         return self.get_ui().get_property('abort_requested').lower() == 'true'
 
     @staticmethod
+    def get_infobool(name):
+        return xbmc.getCondVisibility(name)
+
+    @staticmethod
     def get_infolabel(name):
         return xbmc.getInfoLabel(name)
 
