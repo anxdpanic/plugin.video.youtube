@@ -41,16 +41,16 @@ def _config_actions(context, action, *_args):
             xbmc.executebuiltin('InstallAddon(script.module.inputstreamhelper)')
 
     elif action == 'subtitles':
-        sub_lang = context.get_subtitle_language()
+        kodi_sub_lang = context.get_subtitle_language()
         plugin_lang = settings.get_language()
         sub_selection = settings.get_subtitle_selection()
 
-        if not sub_lang:
+        if not kodi_sub_lang:
             preferred = (plugin_lang,)
-        elif sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
-            preferred = (sub_lang, plugin_lang)
+        elif kodi_sub_lang.partition('-')[0] != plugin_lang.partition('-')[0]:
+            preferred = (kodi_sub_lang, plugin_lang)
         else:
-            preferred = (sub_lang,)
+            preferred = (kodi_sub_lang,)
 
         fallback = ('ASR' if preferred[0].startswith('en') else
                     context.get_language_name('en'))

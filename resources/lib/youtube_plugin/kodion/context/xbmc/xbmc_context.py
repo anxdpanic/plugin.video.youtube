@@ -374,6 +374,9 @@ class XbmcContext(AbstractContext):
         if not lang_code:
             language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
             lang_code, separator, region = language.partition('-')
+            if lang_code != 'fil':
+                lang_code = lang_code[:2]
+            region = region[:2]
         if not lang_code:
             return 'en-US'
         if region:
