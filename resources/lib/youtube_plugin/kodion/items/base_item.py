@@ -239,4 +239,7 @@ class _Encoder(json.JSONEncoder):
                 }
         else:
             output = obj
-        return output if nested else super(_Encoder, self).encode(output)
+
+        if nested:
+            return to_str(output)
+        return super(_Encoder, self).encode(output)
