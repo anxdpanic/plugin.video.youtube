@@ -123,12 +123,11 @@ class VideoItem(BaseItem):
         self._premiered = date_time.date()
 
     def get_premiered(self, as_text=True, as_info_label=False):
-        if not self._premiered:
-            return ''
-        if as_info_label:
-            return self._premiered.isoformat()
-        if as_text:
-            return self._premiered.strftime('%x')
+        if self._premiered:
+            if as_info_label:
+                return self._premiered.isoformat()
+            if as_text:
+                return self._premiered.strftime('%x')
         return self._premiered
 
     def set_plot(self, plot):
@@ -228,12 +227,11 @@ class VideoItem(BaseItem):
         self._aired = date_time.date()
 
     def get_aired(self, as_text=True, as_info_label=False):
-        if not self._aired:
-            return ''
-        if as_info_label:
-            return self._aired.isoformat()
-        if as_text:
-            return self._aired.strftime('%x')
+        if self._aired:
+            if as_info_label:
+                return self._aired.isoformat()
+            if as_text:
+                return self._aired.strftime('%x')
         return self._aired
 
     def set_scheduled_start_utc(self, date_time):
@@ -319,8 +317,9 @@ class VideoItem(BaseItem):
         self._last_played = last_played
 
     def get_last_played(self, as_info_label=False):
-        if as_info_label:
-            return datetime_infolabel(self._last_played)
+        if self._last_played:
+            if as_info_label:
+                return datetime_infolabel(self._last_played)
         return self._last_played
 
     def set_start_percent(self, start_percent):
