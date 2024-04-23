@@ -535,3 +535,24 @@ def separator():
         '--------',
         'noop'
     )
+
+
+def goto_home(context):
+    return (
+        context.localize(10000),
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
+            (paths.HOME,),
+        ))
+    )
+
+
+def goto_quick_search(context):
+    return (
+        context.localize('search.quick'),
+        'ActivateWindow(Videos, {0}, return)'.format(context.create_uri(
+            (paths.SEARCH, 'input',),
+            {
+                'refresh': True,
+            },
+        ))
+    )

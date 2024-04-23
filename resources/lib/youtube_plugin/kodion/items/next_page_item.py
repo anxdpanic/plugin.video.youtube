@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import menu_items
 from .directory_item import DirectoryItem
 
 
@@ -29,3 +30,10 @@ class NextPageItem(DirectoryItem):
             self.set_fanart(fanart)
 
         self.next_page = True
+
+        context_menu = [
+            menu_items.goto_home(context),
+            menu_items.goto_quick_search(context),
+            menu_items.separator(),
+        ]
+        self.set_context_menu(context_menu)
