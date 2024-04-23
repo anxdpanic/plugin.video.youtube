@@ -646,10 +646,6 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             ))
 
-        # 'play with...' (external player)
-        if alternate_player:
-            context_menu.append(menu_items.play_with(context))
-
         # add 'Watch Later' only if we are not in my 'Watch Later' list
         if watch_later_id:
             if not playlist_id or watch_later_id != playlist_id:
@@ -751,6 +747,10 @@ def update_video_infos(provider, context, video_id_dict,
                 refresh=refresh,
             )
         )
+
+        # 'play with...' (external player)
+        if alternate_player:
+            context_menu.append(menu_items.play_with(context))
 
         if not subtitles_prompt:
             context_menu.append(
