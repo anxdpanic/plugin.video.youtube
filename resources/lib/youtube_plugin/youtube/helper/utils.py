@@ -775,7 +775,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         if context_menu:
             context_menu.append(
-                ('--------', 'noop')
+                menu_items.separator(),
             )
             video_item.set_context_menu(context_menu)
 

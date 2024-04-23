@@ -1010,7 +1010,7 @@ class Provider(AbstractProvider):
                     menu_items.history_clear(
                         context
                     ),
-                    ('--------', 'noop'),
+                    menu_items.separator(),
                 ]
                 video_item.add_context_menu(context_menu)
 
@@ -1413,7 +1413,7 @@ class Provider(AbstractProvider):
                     menu_items.bookmarks_clear(
                         context
                     ),
-                    ('--------', 'noop'),
+                    menu_items.separator(),
                 ]
                 item.add_context_menu(context_menu)
                 bookmarks.append(item)
@@ -1477,7 +1477,7 @@ class Provider(AbstractProvider):
                     menu_items.watch_later_local_clear(
                         context
                     ),
-                    ('--------', 'noop'),
+                    menu_items.separator(),
                 ]
                 video_item.add_context_menu(context_menu)
 

@@ -528,3 +528,10 @@ def search_clear(context):
             (paths.SEARCH, 'clear',),
         ))
     )
+
+
+def separator():
+    return (
+        '--------',
+        'noop'
+    )
