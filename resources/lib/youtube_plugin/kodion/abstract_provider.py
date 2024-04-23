@@ -18,7 +18,6 @@ from .items import (
     DirectoryItem,
     NewSearchItem,
     SearchHistoryItem,
-    menu_items,
 )
 from .utils import to_unicode
 

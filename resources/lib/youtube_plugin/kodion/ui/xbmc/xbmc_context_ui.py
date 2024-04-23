@@ -35,7 +35,9 @@ class XbmcContextUI(AbstractContextUI):
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
-        result = dialog.input(title, to_unicode(default), type=xbmcgui.INPUT_ALPHANUM)
+        result = dialog.input(title,
+                              to_unicode(default),
+                              type=xbmcgui.INPUT_ALPHANUM)
         if result:
             text = to_unicode(result)
             return True, text

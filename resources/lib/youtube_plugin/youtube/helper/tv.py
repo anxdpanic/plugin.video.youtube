@@ -68,8 +68,8 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', 0)
-    if next_page_token or json_data.get('continue', False):
+    next_page_token = json_data.get('next_page_token')
+    if next_page_token or json_data.get('continue'):
         params = context.get_params()
         new_params = dict(params,
                           next_page_token=next_page_token,
@@ -117,8 +117,8 @@ def tv_videos_to_items(provider, context, json_data):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', 0)
-    if next_page_token or json_data.get('continue', False):
+    next_page_token = json_data.get('next_page_token')
+    if next_page_token or json_data.get('continue'):
         params = context.get_params()
         new_params = dict(params,
                           next_page_token=next_page_token,
@@ -170,8 +170,8 @@ def saved_playlists_to_items(provider, context, json_data):
     utils.update_fanarts(provider, context, channel_items_dict)
 
     # next page
-    next_page_token = json_data.get('next_page_token', 0)
-    if next_page_token or json_data.get('continue', False):
+    next_page_token = json_data.get('next_page_token')
+    if next_page_token or json_data.get('continue'):
         params = context.get_params()
         new_params = dict(params,
                           next_page_token=next_page_token,

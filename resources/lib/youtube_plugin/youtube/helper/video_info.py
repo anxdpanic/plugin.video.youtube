@@ -1155,7 +1155,7 @@ class VideoInfo(YouTubeRequestClient):
             for client_name in self._prioritised_clients:
                 if status and status != 'OK':
                     self._context.log_warning(
-                        'Failed to retrieved video info - '
+                        'Failed to retrieve video info - '
                         'video_id: {0}, client: {1}, auth: {2},\n'
                         'status: {3}, reason: {4}'.format(
                             video_id,
