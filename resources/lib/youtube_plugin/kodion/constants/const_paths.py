@@ -18,6 +18,7 @@ WATCH_LATER = '/kodion/watch_later'
 HISTORY = '/kodion/playback_history'
 
 DISLIKED_VIDEOS = '/special/disliked_videos'
+HOME = '/home'
 LIKED_VIDEOS = '/channel/mine/playlist/LL'
 MY_PLAYLISTS = '/channel/mine/playlists'
 MY_SUBSCRIPTIONS = '/special/new_uploaded_videos'

@@ -32,7 +32,10 @@ class AbstractProvider(object):
         self._dict_path = {}
 
         # register some default paths
-        self.register_path(r'^/$', '_internal_root')
+        self.register_path(r''.join((
+            '^',
+            '(?:', paths.HOME, ')?/?$'
+        )), '_internal_root')
 
         self.register_path(r''.join((
             '^',
