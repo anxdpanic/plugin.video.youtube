@@ -230,7 +230,7 @@ class AbstractContext(object):
         elif path:
             uri = path
         else:
-            uri = '/'
+            uri = '/' if params else '/?'
 
         uri = self._plugin_id.join(('plugin://', uri))
 
