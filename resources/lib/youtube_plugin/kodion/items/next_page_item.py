@@ -14,20 +14,16 @@ from .directory_item import DirectoryItem
 
 
 class NextPageItem(DirectoryItem):
-    def __init__(self, context, current_page=1, image=None, fanart=None):
-        next_page = current_page + 1
-        new_params = dict(context.get_params(), page=next_page)
-        if 'refresh' in new_params:
-            del new_params['refresh']
-        name = context.localize('next_page') % next_page
+    def __init__(self, context, params, image=None, fanart=None):
+        if 'refresh' in params:
+            del params['refresh']
 
-        super(NextPageItem, self).__init__(name,
-                                           context.create_uri(
-                                               context.get_path(),
-                                               new_params
-                                           ),
-                                           image=image,
-                                           category_label='__inherit__')
+        super(NextPageItem, self).__init__(
+            context.localize('next_page') % params.get('page', 2),
+            context.create_uri(context.get_path(), params),
+            image=image,
+            category_label='__inherit__',
+        )
 
         if fanart:
             self.set_fanart(fanart)

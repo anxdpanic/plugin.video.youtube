@@ -406,9 +406,8 @@ def response_to_items(provider,
             new_params['click_tracking'] = yt_click_tracking
         if offset:
             new_params['offset'] = offset
-        new_context = context.clone(new_params=new_params)
-        current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page)
+
+        next_page_item = NextPageItem(context, new_params)
         result.append(next_page_item)
 
     return result
