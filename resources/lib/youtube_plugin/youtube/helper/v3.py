@@ -383,39 +383,37 @@ def response_to_items(provider,
     We implemented our own calculation for the token into the YouTube client
     This should work for up to ~2000 entries.
     """
-    page = context.get_param('page', 1)
+    params = context.get_params()
+    page = params.get('page', 1)
+    new_params = dict(params, page=page + 1)
+
     yt_next_page_token = json_data.get('nextPageToken')
-    if not yt_next_page_token:
+    if yt_next_page_token:
+        new_params['page_token'] = yt_next_page_token
+    else:
         page_info = json_data.get('pageInfo', {})
         yt_total_results = int(page_info.get('totalResults', 0))
-        yt_results_per_page = int(page_info.get('resultsPerPage', 0))
+        yt_results_per_page = int(page_info.get('resultsPerPage', 50))
 
         if page * yt_results_per_page < yt_total_results:
-            client = provider.get_client(context)
-            yt_next_page_token = client.calculate_next_page_token(
-                page + 1, yt_results_per_page
-            )
+            new_params['items_per_page'] = yt_results_per_page
+        else:
+            return result
 
-    if yt_next_page_token:
-        params = context.get_params()
-        new_params = dict(params,
-                          page_token=yt_next_page_token,
-                          page=page + 1)
+    yt_visitor_data = json_data.get('visitorData')
+    if yt_visitor_data:
+        new_params['visitor'] = yt_visitor_data
 
-        yt_visitor_data = json_data.get('visitorData')
-        if yt_visitor_data:
-            new_params['visitor'] = yt_visitor_data
+    yt_click_tracking = json_data.get('clickTracking')
+    if yt_click_tracking:
+        new_params['click_tracking'] = yt_click_tracking
 
-        yt_click_tracking = json_data.get('clickTracking')
-        if yt_click_tracking:
-            new_params['click_tracking'] = yt_click_tracking
+    offset = json_data.get('offset')
+    if offset:
+        new_params['offset'] = offset
 
-        offset = json_data.get('offset')
-        if offset:
-            new_params['offset'] = offset
-
-        next_page_item = NextPageItem(context, new_params)
-        result.append(next_page_item)
+    next_page_item = NextPageItem(context, new_params)
+    result.append(next_page_item)
 
     return result
 

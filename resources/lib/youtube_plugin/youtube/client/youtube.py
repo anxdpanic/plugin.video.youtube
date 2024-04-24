@@ -144,30 +144,6 @@ class YouTube(LoginClient):
     def get_region(self):
         return self._region
 
-    @staticmethod
-    def calculate_next_page_token(page, max_result):
-        page -= 1
-        low = 'AEIMQUYcgkosw048'
-        high = 'ABCDEFGHIJKLMNOP'
-        len_low = len(low)
-        len_high = len(high)
-
-        position = page * max_result
-
-        overflow_token = 'Q'
-        if position >= 128:
-            overflow_token_iteration = position // 128
-            overflow_token = '%sE' % high[overflow_token_iteration]
-        low_iteration = position % len_low
-
-        # at this position the iteration starts with 'I' again (after 'P')
-        if position >= 256:
-            multiplier = (position // 128) - 1
-            position -= 128 * multiplier
-        high_iteration = (position // len_low) % len_high
-
-        return 'C%s%s%sAA' % (high[high_iteration], low[low_iteration], overflow_token)
-
     def update_watch_history(self, context, video_id, url, status=None):
         if status is None:
             cmt = st = et = state = None

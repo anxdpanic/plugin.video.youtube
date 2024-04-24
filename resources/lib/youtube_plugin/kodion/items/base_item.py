@@ -44,8 +44,6 @@ class BaseItem(object):
         self._dateadded = None
         self._short_details = None
 
-        self._next_page = False
-
     def __str__(self):
         return ('------------------------------\n'
                 'Name: |{0}|\n'
@@ -194,14 +192,6 @@ class BaseItem(object):
 
     def get_bookmark_timestamp(self):
         return self._bookmark_timestamp
-
-    @property
-    def next_page(self):
-        return self._next_page
-
-    @next_page.setter
-    def next_page(self, value):
-        self._next_page = bool(value)
 
     @property
     def playable(self):

@@ -19,8 +19,15 @@ class NextPageItem(DirectoryItem):
         if 'refresh' in params:
             del params['refresh']
 
+        self.next_page = params.get('page', 2)
+        self.items_per_page = params.pop('items_per_page', 50)
+        if 'page_token' not in params:
+            params['page_token'] = self.calculate_next_page_token(
+                self.next_page, self.items_per_page
+            )
+
         super(NextPageItem, self).__init__(
-            context.localize('next_page') % params.get('page', 2),
+            context.localize('next_page') % self.next_page,
             context.create_uri(context.get_path(), params),
             image=image,
             category_label='__inherit__',
@@ -29,11 +36,36 @@ class NextPageItem(DirectoryItem):
         if fanart:
             self.set_fanart(fanart)
 
-        self.next_page = True
-
         context_menu = [
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context),
             menu_items.separator(),
         ]
         self.set_context_menu(context_menu)
+
+    @classmethod
+    def calculate_next_page_token(cls, page, items_per_page):
+        low = 'AEIMQUYcgkosw048'
+        high = 'ABCDEFGHIJKLMNOP'
+        len_low = len(low)
+        len_high = len(high)
+
+        position = (page - 1) * items_per_page
+
+        overflow_token = 'Q'
+        if position >= 128:
+            overflow_token_iteration = position // 128
+            overflow_token = '%sE' % high[overflow_token_iteration]
+        low_iteration = position % len_low
+
+        # at this position the iteration starts with 'I' again (after 'P')
+        if position >= 256:
+            multiplier = (position // 128) - 1
+            position -= 128 * multiplier
+        high_iteration = (position // len_low) % len_high
+
+        return 'C{high_token}{low_token}{overflow_token}AA'.format(
+            high_token=high[high_iteration],
+            low_token=low[low_iteration],
+            overflow_token=overflow_token
+        )
