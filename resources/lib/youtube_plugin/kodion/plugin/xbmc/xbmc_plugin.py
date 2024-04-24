@@ -13,25 +13,40 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...constants import BUSY_FLAG, PLAYLIST_POSITION
 from ...compatibility import xbmcplugin
+from ...constants import BUSY_FLAG, PLAYLIST_POSITION
 from ...exceptions import KodionException
 from ...items import (
-    AudioItem,
     DirectoryItem,
-    ImageItem,
-    UriItem,
-    VideoItem,
     audio_listitem,
     directory_listitem,
     image_listitem,
-    playback_item,
+    uri_listitem,
     video_listitem,
+    video_playback_item,
 )
 from ...player import XbmcPlaylist
 
 
 class XbmcPlugin(AbstractPlugin):
+    _LIST_ITEM_MAP = {
+        'AudioItem': audio_listitem,
+        'DirectoryItem': directory_listitem,
+        'ImageItem': image_listitem,
+        'SearchItem': directory_listitem,
+        'SearchHistoryItem': directory_listitem,
+        'NewSearchItem': directory_listitem,
+        'NextPageItem': directory_listitem,
+        'VideoItem': video_listitem,
+        'WatchLaterItem': directory_listitem,
+    }
+
+    _PLAY_ITEM_MAP = {
+        'AudioItem': audio_listitem,
+        'UriItem': uri_listitem,
+        'VideoItem': video_playback_item,
+    }
+
     def __init__(self):
         super(XbmcPlugin, self).__init__()
         self.handle = None
@@ -97,73 +112,50 @@ class XbmcPlugin(AbstractPlugin):
             provider.run_wizard(context)
 
         try:
-            results = provider.navigate(context)
+            result, options = provider.navigate(context)
         except KodionException as exc:
+            result = options = None
             if provider.handle_exception(context, exc):
                 context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
                     exc=exc, details=''.join(format_stack())
                 ))
                 ui.on_ok("Error in ContentProvider", exc.__str__())
-            xbmcplugin.endOfDirectory(
-                self.handle,
-                succeeded=False,
-                updateListing=True,
-            )
-            return False
 
-        result, options = results
-        if result is None:
-            result = False
-        if isinstance(result, bool):
-            xbmcplugin.endOfDirectory(
-                self.handle,
-                succeeded=result,
-                updateListing=True,
-            )
-            return result
-
-        show_fanart = settings.show_fanart()
-
-        if isinstance(result, (VideoItem, AudioItem, UriItem)):
-            return self._set_resolved_url(context, result, show_fanart)
-
-        if isinstance(result, DirectoryItem):
-            item_count = 1
-            items = [directory_listitem(context, result, show_fanart)]
-        elif isinstance(result, (list, tuple)):
-            item_count = len(result)
-            items = [
-                directory_listitem(context, item, show_fanart)
-                if isinstance(item, DirectoryItem)
-                else video_listitem(context, item, show_fanart)
-                if isinstance(item, VideoItem)
-                else audio_listitem(context, item, show_fanart)
-                if isinstance(item, AudioItem)
-                else image_listitem(context, item, show_fanart)
-                if isinstance(item, ImageItem)
-                else None
+        item_count = 0
+        if isinstance(result, (list, tuple)):
+            show_fanart = settings.show_fanart()
+            result = [
+                self._LIST_ITEM_MAP[item.__class__.__name__](
+                    context, item, show_fanart=show_fanart
+                )
                 for item in result
+                if item.__class__.__name__ in self._LIST_ITEM_MAP
             ]
-        else:
-            xbmcplugin.endOfDirectory(
-                self.handle,
-                succeeded=False,
-                updateListing=True,
-            )
-            return False
+            item_count = len(result)
+        elif result.__class__.__name__ in self._PLAY_ITEM_MAP:
+            result = self._set_resolved_url(context, result)
 
-        succeeded = xbmcplugin.addDirectoryItems(
-            self.handle, items, item_count
-        )
+        if item_count:
+            succeeded = xbmcplugin.addDirectoryItems(
+                self.handle, result, item_count
+            )
+            cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
+            update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
+        else:
+            succeeded = bool(result)
+            cache_to_disc = False
+            update_listing = True
+
         xbmcplugin.endOfDirectory(
             self.handle,
             succeeded=succeeded,
-            updateListing=options.get(provider.RESULT_UPDATE_LISTING, False),
-            cacheToDisc=options.get(provider.RESULT_CACHE_TO_DISC, True)
+            updateListing=update_listing,
+            cacheToDisc=cache_to_disc,
         )
         return succeeded
 
-    def _set_resolved_url(self, context, base_item, show_fanart):
+    def _set_resolved_url(self, context, base_item):
+        resolved = False
         uri = base_item.get_uri()
 
         if base_item.playable:
@@ -174,21 +166,21 @@ class XbmcPlugin(AbstractPlugin):
                 position, _ = playlist.get_position()
                 ui.set_property(PLAYLIST_POSITION, str(position))
 
-            item = playback_item(context, base_item, show_fanart)
+            item = self._PLAY_ITEM_MAP[base_item.__class__.__name__](
+                context,
+                base_item,
+                show_fanart=context.get_settings().show_fanart(),
+                for_playback=True,
+            )
             xbmcplugin.setResolvedUrl(self.handle,
                                       succeeded=True,
                                       listitem=item)
-            return True
-
-        if context.is_plugin_path(uri):
+            resolved = True
+        elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
             context.execute('RunPlugin({0})'.format(uri))
         else:
             context.log_debug('Running script: |{0}|'.format(uri))
             context.execute('RunScript({0})'.format(uri))
 
-        xbmcplugin.endOfDirectory(self.handle,
-                                  succeeded=False,
-                                  updateListing=True,
-                                  cacheToDisc=False)
-        return False
+        return resolved

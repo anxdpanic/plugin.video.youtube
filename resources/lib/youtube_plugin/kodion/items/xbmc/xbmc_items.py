@@ -10,9 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .. import AudioItem, DirectoryItem, ImageItem, UriItem, VideoItem
-from ...constants import SWITCH_PLAYER_FLAG
+from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...compatibility import xbmc, xbmcgui
+from ...constants import SWITCH_PLAYER_FLAG
 from ...utils import current_system_version, datetime_parser
 
 
@@ -323,7 +323,7 @@ def set_info(list_item, item, properties):
         info_tag.setYear(value)
 
 
-def video_playback_item(context, video_item, show_fanart=None):
+def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     uri = video_item.get_uri()
     context.log_debug('Converting VideoItem |%s|' % uri)
 
@@ -416,7 +416,7 @@ def video_playback_item(context, video_item, show_fanart=None):
     return list_item
 
 
-def audio_listitem(context, audio_item, show_fanart=None):
+def audio_listitem(context, audio_item, show_fanart=None, for_playback=False):
     uri = audio_item.get_uri()
     context.log_debug('Converting AudioItem |%s|' % uri)
 
@@ -448,6 +448,8 @@ def audio_listitem(context, audio_item, show_fanart=None):
     if context_menu:
         list_item.addContextMenuItems(context_menu)
 
+    if for_playback:
+        return list_item
     return uri, list_item, False
 
 
@@ -542,7 +544,7 @@ def image_listitem(context, image_item, show_fanart=None):
     return uri, list_item, False
 
 
-def uri_listitem(context, uri_item):
+def uri_listitem(context, uri_item, **_kwargs):
     uri = uri_item.get_uri()
     context.log_debug('Converting UriItem |%s|' % uri)
 
@@ -631,17 +633,3 @@ def video_listitem(context, video_item, show_fanart=None):
         list_item.addContextMenuItems(context_menu)
 
     return uri, list_item, False
-
-
-def playback_item(context, base_item, show_fanart=None):
-    if isinstance(base_item, UriItem):
-        return uri_listitem(context, base_item)
-
-    if isinstance(base_item, AudioItem):
-        _, item, _ = audio_listitem(context, base_item, show_fanart)
-        return item
-
-    if isinstance(base_item, VideoItem):
-        return video_playback_item(context, base_item, show_fanart)
-
-    return None
