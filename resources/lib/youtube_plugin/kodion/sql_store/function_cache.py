@@ -51,10 +51,13 @@ class FunctionCache(Storage):
         :return: id for the given function
         """
         md5_hash = md5()
-        md5_hash.update(partial_func.func.__module__.encode('utf-8'))
-        md5_hash.update(partial_func.func.__name__.encode('utf-8'))
-        md5_hash.update(str(partial_func.args).encode('utf-8'))
-        md5_hash.update(str(partial_func.keywords).encode('utf-8'))
+        signature = (
+            partial_func.func.__module__,
+            partial_func.func.__name__,
+            partial_func.args,
+            partial_func.keywords.items()
+        )
+        md5_hash.update(','.join(map(str, signature)).encode('utf-8'))
         return md5_hash.hexdigest()
 
     def get_result(self, func, *args, **kwargs):

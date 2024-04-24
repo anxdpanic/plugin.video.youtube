@@ -590,13 +590,5 @@ class AccessManager(JSONStore):
     @staticmethod
     def calc_key_hash(key, id, secret):
         md5_hash = md5()
-        try:
-            md5_hash.update(key.encode('utf-8'))
-            md5_hash.update(id.encode('utf-8'))
-            md5_hash.update(secret.encode('utf-8'))
-        except:
-            md5_hash.update(key)
-            md5_hash.update(id)
-            md5_hash.update(secret)
-
+        md5_hash.update(''.join((key, id, secret)).encode('utf-8'))
         return md5_hash.hexdigest()

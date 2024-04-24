@@ -66,8 +66,7 @@ class BaseItem(object):
         :return: unique id of the item.
         """
         md5_hash = md5()
-        md5_hash.update(self._name.encode('utf-8'))
-        md5_hash.update(self._uri.encode('utf-8'))
+        md5_hash.update(''.join((self._name, self._uri)).encode('utf-8'))
         return md5_hash.hexdigest()
 
     def set_name(self, name):
