@@ -372,7 +372,7 @@ def response_to_items(provider,
         result = filter_short_videos(result)
 
     # no processing of next page item
-    if not process_next_page:
+    if not result or not process_next_page:
         return result
 
     # next page
@@ -384,33 +384,39 @@ def response_to_items(provider,
     This should work for up to ~2000 entries.
     """
     params = context.get_params()
-    page = params.get('page', 1)
-    new_params = dict(params, page=page + 1)
+    current_page = params.get('page', 1)
+    next_page = current_page + 1
+    new_params = dict(params, page=next_page)
 
     yt_next_page_token = json_data.get('nextPageToken')
     if yt_next_page_token:
         new_params['page_token'] = yt_next_page_token
-    else:
+    elif 'page_token' in new_params:
+        del new_params['page_token']
         page_info = json_data.get('pageInfo', {})
         yt_total_results = int(page_info.get('totalResults', 0))
         yt_results_per_page = int(page_info.get('resultsPerPage', 50))
 
-        if page * yt_results_per_page < yt_total_results:
+        if current_page * yt_results_per_page < yt_total_results:
             new_params['items_per_page'] = yt_results_per_page
         else:
-            return result
+            next_page = 1
+            new_params['page'] = 1
+    else:
+        return result
 
     yt_visitor_data = json_data.get('visitorData')
     if yt_visitor_data:
         new_params['visitor'] = yt_visitor_data
 
-    yt_click_tracking = json_data.get('clickTracking')
-    if yt_click_tracking:
-        new_params['click_tracking'] = yt_click_tracking
+    if next_page > 1:
+        yt_click_tracking = json_data.get('clickTracking')
+        if yt_click_tracking:
+            new_params['click_tracking'] = yt_click_tracking
 
-    offset = json_data.get('offset')
-    if offset:
-        new_params['offset'] = offset
+        offset = json_data.get('offset')
+        if offset:
+            new_params['offset'] = offset
 
     next_page_item = NextPageItem(context, new_params)
     result.append(next_page_item)
