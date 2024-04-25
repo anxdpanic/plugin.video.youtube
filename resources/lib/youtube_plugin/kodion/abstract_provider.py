@@ -34,61 +34,65 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             '(?:', paths.HOME, ')?/?$'
-        )), '_internal_root')
+        )), self._internal_root)
 
         self.register_path(r''.join((
             '^',
             paths.ROUTE,
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
-        )), 'reroute')
+        )), self.reroute)
 
         self.register_path(r''.join((
             '^',
             paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), 'on_watch_later')
+        )), self.on_watch_later)
 
         self.register_path(r''.join((
             '^',
             paths.BOOKMARKS,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), 'on_bookmarks')
+        )), self.on_bookmarks)
 
         self.register_path(r''.join((
             '^',
             '(', paths.SEARCH, '|', paths.EXTERNAL_SEARCH, ')',
             '/(?P<command>input|query|list|remove|clear|rename)?/?$'
-        )), '_internal_search')
+        )), self._internal_search)
 
         self.register_path(r''.join((
             '^',
             paths.HISTORY,
             '/?$'
-        )), 'on_playback_history')
+        )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
-                           '_internal_on_extra_fanart')
+                           self._internal_on_extra_fanart)
 
         """
-        Test each method of this class for the appended attribute '_re_match' by the
-        decorator (RegisterProviderPath).
-        The '_re_match' attributes describes the path which must match for the decorated method.
+        Test each method of this class for the attribute 'kodion_re_path' added
+        by the decorator @RegisterProviderPath.
+        The 'kodion_re_path' attribute is a regular expression that must match
+        the current path in order for the decorated method to run.
         """
+        for attribute_name in dir(self):
+            if attribute_name.startswith('__'):
+                continue
+            attribute = getattr(self, attribute_name, None)
+            if not attribute or not callable(attribute):
+                continue
+            re_path = getattr(attribute, 'kodion_re_path', None)
+            if re_path:
+                self.register_path(re_path, attribute)
 
-        for method_name in dir(self):
-            method = getattr(self, method_name, None)
-            path = method and getattr(method, 'kodion_re_path', None)
-            if path:
-                self.register_path(path, method_name)
-
-    def register_path(self, re_path, method_name):
+    def register_path(self, re_path, method):
         """
-        Registers a new method by name (string) for the given regular expression
+        Registers a new method for the given regular expression
         :param re_path: regular expression of the path
-        :param method_name: name of the method
+        :param method: method to be registered
         :return:
         """
-        self._dict_path[re_path] = method_name
+        self._dict_path[re.compile(re_path, re.UNICODE)] = method
 
     def run_wizard(self, context):
         settings = context.get_settings()
@@ -122,13 +126,9 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         path = context.get_path()
-        for key, method_name in self._dict_path.items():
-            re_match = re.search(key, path, re.UNICODE)
+        for re_path, method in self._dict_path.items():
+            re_match = re_path.search(path)
             if not re_match:
-                continue
-
-            method = getattr(self, method_name, None)
-            if not method:
                 continue
 
             result = method(context, re_match)
