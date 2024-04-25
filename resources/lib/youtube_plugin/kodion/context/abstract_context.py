@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 
 from .. import logger
-from ..compatibility import to_str, urlencode
+from ..compatibility import quote, to_str, urlencode
 from ..constants import VALUE_FROM_STR
 from ..json_store import AccessManager
 from ..sql_store import (
@@ -24,7 +24,7 @@ from ..sql_store import (
     SearchHistory,
     WatchLaterList,
 )
-from ..utils import create_path, current_system_version
+from ..utils import current_system_version
 
 
 class AbstractContext(object):
@@ -115,7 +115,7 @@ class AbstractContext(object):
         self._plugin_name = plugin_name
         self._version = 'UNKNOWN'
         self._plugin_id = plugin_id
-        self._path = create_path(path)
+        self._path = self.create_path(path)
         self._params = params
         self._utils = None
 
@@ -226,7 +226,7 @@ class AbstractContext(object):
 
     def create_uri(self, path=None, params=None):
         if isinstance(path, (list, tuple)):
-            uri = create_path(*path, is_uri=True)
+            uri = self.create_path(*path, is_uri=True)
         elif path:
             uri = path
         else:
@@ -239,11 +239,32 @@ class AbstractContext(object):
 
         return uri
 
+    @staticmethod
+    def create_path(*args, **kwargs):
+        path = '/'.join([
+            part
+            for part in [
+                str(arg).strip('/').replace('\\', '/').replace('//', '/')
+                for arg in args
+            ] if part
+        ])
+        if path:
+            path = path.join(('/', '/'))
+        else:
+            return '/'
+
+        if kwargs.get('is_uri'):
+            return quote(path)
+        return path
+
     def get_path(self):
         return self._path
 
-    def set_path(self, *path):
-        self._path = create_path(*path)
+    def set_path(self, *path, **kwargs):
+        if kwargs.get('force'):
+            self._path = path[0]
+        else:
+            self._path = self.create_path(*path)
 
     def get_params(self):
         return self._params

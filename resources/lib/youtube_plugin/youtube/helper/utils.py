@@ -17,7 +17,6 @@ from math import log10
 from ...kodion.constants import content, paths
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
-    create_path,
     datetime_parser,
     friendly_number,
     strip_html_from_text,
@@ -687,7 +686,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and
-                create_path('channel', channel_id) != path):
+                context.create_path('channel', channel_id) != path):
             video_item.set_channel_id(channel_id)
             context_menu.append(
                 menu_items.go_to_channel(
