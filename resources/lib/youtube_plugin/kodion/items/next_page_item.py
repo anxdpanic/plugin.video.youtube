@@ -37,6 +37,7 @@ class NextPageItem(DirectoryItem):
             self.set_fanart(fanart)
 
         context_menu = [
+            menu_items.refresh(context),
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context),
             menu_items.separator(),
