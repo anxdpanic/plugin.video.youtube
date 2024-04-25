@@ -116,25 +116,29 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         path = context.get_path()
-
-        for key in self._dict_path:
+        for key, method_name in self._dict_path.items():
             re_match = re.search(key, path, re.UNICODE)
-            if re_match is not None:
-                method_name = self._dict_path.get(key, '')
-                method = getattr(self, method_name, None)
-                if method is not None:
-                    result = method(context, re_match)
-                    refresh = context.get_param('refresh', False)
-                    if not isinstance(result, tuple):
-                        options = {
-                            self.RESULT_CACHE_TO_DISC: True,
-                            self.RESULT_UPDATE_LISTING: refresh,
-                        }
-                    else:
-                        result, options = result
-                        if refresh:
-                            options[self.RESULT_UPDATE_LISTING] = refresh
-                    return result, options
+            if not re_match:
+                continue
+
+            method = getattr(self, method_name, None)
+            if not method:
+                continue
+
+            result = method(context, re_match)
+            if isinstance(result, tuple):
+                result, options = result
+            else:
+                options = {
+                    self.RESULT_CACHE_TO_DISC: True,
+                    self.RESULT_UPDATE_LISTING: False,
+                }
+
+            refresh = context.get_param('refresh')
+            if refresh:
+                options[self.RESULT_UPDATE_LISTING] = refresh
+
+            return result, options
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
