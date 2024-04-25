@@ -141,8 +141,8 @@ class AbstractProvider(object):
                 }
 
             refresh = context.get_param('refresh')
-            if refresh:
-                options[self.RESULT_UPDATE_LISTING] = refresh
+            if refresh is not None:
+                options[self.RESULT_UPDATE_LISTING] = bool(refresh)
 
             return result, options
 

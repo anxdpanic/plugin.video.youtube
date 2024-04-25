@@ -43,7 +43,6 @@ class AbstractContext(object):
         'logged_in',
         'play',
         'prompt_for_subtitles',
-        'refresh',
         'resume',
         'screensaver',
         'strm',
@@ -53,6 +52,10 @@ class AbstractContext(object):
         'next_page_token',
         'offset',
         'page',
+        'refresh',
+    }
+    _INT_BOOL_PARAMS = {
+        'refresh',
     }
     _FLOAT_PARAMS = {
         'seek',
@@ -282,7 +285,13 @@ class AbstractContext(object):
                 if param in self._BOOL_PARAMS:
                     parsed_value = VALUE_FROM_STR.get(str(value).lower(), False)
                 elif param in self._INT_PARAMS:
-                    parsed_value = int(value)
+                    parsed_value = None
+                    if param in self._INT_BOOL_PARAMS:
+                        parsed_value = VALUE_FROM_STR.get(str(value).lower())
+                    if parsed_value is None:
+                        parsed_value = int(value)
+                    else:
+                        parsed_value = int(parsed_value)
                 elif param in self._FLOAT_PARAMS:
                     parsed_value = float(value)
                 elif param in self._LIST_PARAMS:

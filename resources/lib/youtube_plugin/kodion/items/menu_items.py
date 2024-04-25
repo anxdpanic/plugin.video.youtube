@@ -14,15 +14,17 @@ from ..constants import ADDON_ID, paths
 
 
 def more_for_video(context, video_id, logged_in=False, refresh=False):
+    params = {
+        'video_id': video_id,
+        'logged_in': logged_in,
+    }
+    if refresh:
+        params['refresh'] = context.get_param('refresh', 0) + 1
     return (
         context.localize('video.more'),
         'RunPlugin({0})'.format(context.create_uri(
             ('video', 'more',),
-            {
-                'video_id': video_id,
-                'logged_in': logged_in,
-                'refresh': refresh,
-            },
+            params,
         ))
     )
 
@@ -71,11 +73,12 @@ def play_with(context):
 
 
 def refresh(context):
+    params = context.get_params()
     return (
         context.localize('refresh'),
         'RunPlugin({0})'.format(context.create_uri(
             (paths.ROUTE, context.get_path(),),
-            dict(context.get_params(), refresh=True),
+            dict(params, refresh=params.get('refresh', 0) + 1),
         ))
     )
 
@@ -245,14 +248,16 @@ def add_my_subscriptions_filter(context, channel_name):
 
 
 def rate_video(context, video_id, refresh=False):
+    params = {
+        'video_id': video_id,
+    }
+    if refresh:
+        params['refresh'] = context.get_param('refresh', 0) + 1
     return (
         context.localize('video.rate'),
         'RunPlugin({0})'.format(context.create_uri(
             ('video', 'rate',),
-            {
-                'video_id': video_id,
-                'refresh': refresh,
-            },
+            params,
         ))
     )
 

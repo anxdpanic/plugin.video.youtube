@@ -110,9 +110,11 @@ def _process_remove_video(provider, context):
             if keymap_action:
                 context.get_ui().set_focus_next_item()
             elif path is not False:
-                provider.reroute(context,
-                                 path=path,
-                                 params=dict(params, refresh=True))
+                provider.reroute(
+                    context,
+                    path=path,
+                    params=dict(params, refresh=params.get('refresh', 0) + 1),
+                )
 
             context.get_ui().show_notification(
                 message=context.localize('playlist.removed_from'),
