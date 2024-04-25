@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import content, paths
+from .constants import content, paths, ROUTE_FLAG
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -35,6 +35,12 @@ class AbstractProvider(object):
             '^',
             '(?:', paths.HOME, ')?/?$'
         )), '_internal_root')
+
+        self.register_path(r''.join((
+            '^',
+            paths.ROUTE,
+            '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
+        )), 'reroute')
 
         self.register_path(r''.join((
             '^',
@@ -169,6 +175,31 @@ class AbstractProvider(object):
 
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
+
+    def reroute(self, context, re_match=None, path=None, params=None):
+        if re_match:
+            path = re_match.group('path')
+        if params is None:
+            params = context.get_params()
+        if path:
+            result = None
+            function_cache = context.get_function_cache()
+            try:
+                result, options = function_cache.run(
+                    self.navigate,
+                    seconds=None,
+                    _cacheparams=function_cache.PARAMS_NONE,
+                    _refresh=True,
+                    context=context.clone(path, params),
+                )
+            finally:
+                if not result:
+                    return False
+                context.get_ui().set_property(ROUTE_FLAG, path)
+                context.execute('ActivateWindow(Videos, {0}, return)'.format(
+                    context.create_uri(path, params)
+                ))
+        return False
 
     def on_bookmarks(self, context, re_match):
         raise NotImplementedError()
