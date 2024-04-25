@@ -559,3 +559,13 @@ def goto_quick_search(context):
             (paths.ROUTE, paths.SEARCH, 'input',),
         ))
     )
+
+
+def goto_page(context):
+    return (
+        context.localize('page.choose'),
+        'RunPlugin({0})'.format(context.create_uri(
+            (paths.GOTO_PAGE, context.get_path(),),
+            context.get_params(),
+        ))
+    )

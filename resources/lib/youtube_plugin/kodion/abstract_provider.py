@@ -16,6 +16,7 @@ from .constants import content, paths, ROUTE_FLAG
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
+    NextPageItem,
     NewSearchItem,
     SearchHistoryItem,
 )
@@ -41,6 +42,13 @@ class AbstractProvider(object):
             paths.ROUTE,
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
         )), self.reroute)
+
+        self.register_path(r''.join((
+            '^',
+            paths.GOTO_PAGE,
+            '(?P<page>/[0-9]+)?'
+            '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
+        )), self._internal_goto_page)
 
         self.register_path(r''.join((
             '^',
@@ -175,6 +183,25 @@ class AbstractProvider(object):
 
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
+
+    def _internal_goto_page(self, context, re_match):
+        page = re_match.group('page')
+        if page:
+            page = int(page.lstrip('/'))
+        else:
+            result, page = context.get_ui().on_numeric_input(
+                context.localize('page.choose'), 1
+            )
+            if not result:
+                return False
+
+        path = re_match.group('path')
+        params = context.get_params()
+        page_token = NextPageItem.create_page_token(
+            page, params.get('items_per_page', 50)
+        )
+        params = dict(params, page=page, page_token=page_token)
+        return self.reroute(context, path=path, params=params)
 
     def reroute(self, context, re_match=None, path=None, params=None):
         if re_match:

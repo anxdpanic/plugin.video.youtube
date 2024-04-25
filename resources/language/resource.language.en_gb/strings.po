@@ -1528,3 +1528,7 @@ msgstr ""
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr ""
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr ""

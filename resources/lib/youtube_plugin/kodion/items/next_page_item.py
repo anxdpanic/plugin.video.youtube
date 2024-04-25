@@ -19,25 +19,27 @@ class NextPageItem(DirectoryItem):
         if 'refresh' in params:
             del params['refresh']
 
-        self.next_page = params.get('page', 2)
-        self.items_per_page = params.pop('items_per_page', 50)
+        page = params.get('page', 2)
+        items_per_page = params.get('items_per_page', 50)
         if 'page_token' not in params:
-            params['page_token'] = self.calculate_next_page_token(
-                self.next_page, self.items_per_page
-            )
+            params['page_token'] = self.create_page_token(page, items_per_page)
 
         super(NextPageItem, self).__init__(
-            context.localize('next_page') % self.next_page,
+            context.localize('page.next') % page,
             context.create_uri(context.get_path(), params),
             image=image,
             category_label='__inherit__',
         )
+
+        self.next_page = page
+        self.items_per_page = items_per_page
 
         if fanart:
             self.set_fanart(fanart)
 
         context_menu = [
             menu_items.refresh(context),
+            menu_items.goto_page(context),
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context),
             menu_items.separator(),
@@ -45,7 +47,7 @@ class NextPageItem(DirectoryItem):
         self.set_context_menu(context_menu)
 
     @classmethod
-    def calculate_next_page_token(cls, page, items_per_page):
+    def create_page_token(cls, page, items_per_page=50):
         low = 'AEIMQUYcgkosw048'
         high = 'ABCDEFGHIJKLMNOP'
         len_low = len(low)

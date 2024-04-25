@@ -223,7 +223,7 @@ def _process_select_playlist(provider, context):
         if page_token:
             next_page = current_page + 1
             items.append((
-                ui.bold(context.localize('next_page') % next_page), '',
+                ui.bold(context.localize('page.next') % next_page), '',
                 'playlist.next',
                 'DefaultFolder.png',
             ))
