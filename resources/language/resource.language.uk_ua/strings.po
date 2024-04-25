@@ -7,26 +7,27 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE\n"
-"Language: uk_UA\n"
+"PO-Revision-Date: 2024-04-12 15:14+0000\n"
+"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"Language-Team: Ukrainian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/uk_ua/>\n"
+"Language: uk_ua\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Додаток для YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr ""
+msgstr "YouTube є одним з найбільших відеохостингів в світі."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Цей плагін не має відношення до компанії Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -46,14 +47,18 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "Пароль"
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr ""
+
+# empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
+msgid "Use InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
-msgstr ""
+msgstr "Налаштувати InputStream Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -61,7 +66,7 @@ msgstr "Завжди запитувати про якість відео"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "Максимальна якість відео"
 
 msgctxt "#30011"
 msgid "480p"
@@ -73,7 +78,7 @@ msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
@@ -93,7 +98,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p для прямих ефірів / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
@@ -120,12 +125,12 @@ msgid "Cache size (MB)"
 msgstr "Розмір кешу (Мб)"
 
 msgctxt "#30025"
-msgid "Enable setup-wizard"
-msgstr "Запустити майстер налаштування"
+msgid "Enable Setup Wizard"
+msgstr ""
 
 msgctxt "#30026"
-msgid "Override view"
-msgstr "Користувацьки налаштування виду"
+msgid "Override views"
+msgstr ""
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -140,8 +145,8 @@ msgid "View: Movies"
 msgstr "Вид: Фільми"
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
-msgstr "Запустити майстер налаштування?"
+msgid "Configure %s?"
+msgstr ""
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -169,21 +174,21 @@ msgstr "Підтримка альтернативного програвача"
 
 msgctxt "#30037"
 msgid "Custom Watch Later playlist id"
-msgstr ""
+msgstr "ID плейлиста для відкладеного перегляду"
 
 msgctxt "#30038"
 msgid "Custom History playlist id"
-msgstr ""
+msgstr "ID плейлиста для історії"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
+msgid "Bookmarks"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Add to addon favs"
-msgstr "Додати в обране"
+msgid "Bookmark"
+msgstr ""
 
 msgctxt "#30102"
 msgid "Search"
@@ -258,8 +263,12 @@ msgid "Please wait..."
 msgstr "Будь ласка, почекайте..."
 
 msgctxt "#30120"
-msgid "Clear"
-msgstr "Очистити"
+msgid "Confirm clear"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Clear %s?"
+msgstr ""
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -269,7 +278,7 @@ msgstr ""
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API ключ"
 
 msgctxt "#30202"
 msgid "API Id"
@@ -281,11 +290,11 @@ msgstr ""
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr ""
+msgstr "Використовувати персональний API ключ"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr ""
+msgstr "Використовувати стандартний API ключ"
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -342,8 +351,8 @@ msgid "Browse Channels"
 msgstr "Перегляд каналів"
 
 msgctxt "#30513"
-msgid "Popular right now"
-msgstr "Популярне зараз"
+msgid "Trending"
+msgstr ""
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -394,12 +403,12 @@ msgid "Select region"
 msgstr "Виберіть регіон"
 
 msgctxt "#30526"
-msgid "Adjust"
-msgstr "Регіональні налаштування"
+msgid "Setup Wizard"
+msgstr ""
 
 msgctxt "#30527"
-msgid "Language and region?"
-msgstr "Налаштувати мову та регіон?"
+msgid "Language and Region"
+msgstr ""
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -454,8 +463,8 @@ msgid "Play with..."
 msgstr "Відтворити за допомогою..."
 
 msgctxt "#30541"
-msgid "Show channel name in description"
-msgstr "Показувати назву каналу в описі"
+msgid "Show channel name and video details in description"
+msgstr ""
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -495,47 +504,47 @@ msgstr "регіон"
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Рекомендації"
 
 msgctxt "#30552"
 msgid "Maintenance"
-msgstr ""
+msgstr "Обслуговування"
 
 msgctxt "#30553"
 msgid "Delete function cache database"
-msgstr ""
+msgstr "Видалити базу даних функціонального кеша"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr ""
+msgstr "Видалити базу даних історії пошуку"
 
 msgctxt "#30555"
 msgid "Clear function cache"
-msgstr ""
+msgstr "Очистити функціональний кеш"
 
 msgctxt "#30556"
 msgid "Clear search history"
-msgstr ""
+msgstr "Очистити історію пошуку"
 
 msgctxt "#30557"
 msgid "function cache"
-msgstr ""
+msgstr "функціональний кеш"
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "історія пошуку"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Видалити settings.xml"
 
 msgctxt "#30560"
 msgid "Subtitle language"
-msgstr ""
+msgstr "Мова субтитрів"
 
 msgctxt "#30561"
 msgid "None"
-msgstr ""
+msgstr "Жоден"
 
 msgctxt "#30562"
 msgid "All"
@@ -543,7 +552,7 @@ msgstr ""
 
 msgctxt "#30563"
 msgid "Setting"
-msgstr ""
+msgstr "Налаштування"
 
 msgctxt "#30564"
 msgid "Setting, English"
@@ -559,31 +568,31 @@ msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
-msgstr ""
+msgstr "Додати в \\\"Переглянути пізніше\\\""
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr ""
+msgstr "Видалити з \\\"Переглянути пізніше\\\""
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr ""
+msgstr "Бажаєте видалити '%s' зі списку \\\"Переглянути пізніше\\\"?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr ""
+msgstr "Бажаєте замініти поточний список \\\"Переглянути пізніше\\\" на '%s'?"
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Додати до переглянутих"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Видалити з історії переглянутих"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr ""
+msgstr "Бажаєте видалити '%s' з списку переглянутого?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
@@ -591,22 +600,22 @@ msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
-msgstr ""
+msgstr "Успішно"
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Помилка"
 
 msgctxt "#30577"
 msgid "Settings"
-msgstr ""
+msgstr "Налаштування"
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
 msgstr ""
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -619,15 +628,15 @@ msgstr ""
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
-msgstr ""
+msgstr "Автоматично відтворювати запропоновані відео"
 
 msgctxt "#30583"
 msgid "Automatic"
-msgstr ""
+msgstr "Автоматично"
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Підписки (відсортовані)"
 
 msgctxt "#30585"
 msgid "Filtered channel list (comma delimited)"
@@ -655,31 +664,31 @@ msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Розмір мініатюр"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Середній (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Високий (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
-msgstr ""
+msgstr "Безпечний пошук"
 
 msgctxt "#30595"
 msgid "Moderate"
-msgstr ""
+msgstr "Помірний"
 
 msgctxt "#30596"
 msgid "Strict"
-msgstr ""
+msgstr "Суровий"
 
 msgctxt "#30597"
 msgid "Updated: %s"
-msgstr ""
+msgstr "Оновлено: %s"
 
 msgctxt "#30598"
 msgid "Personal API keys enabled"
@@ -690,11 +699,11 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid "Configure subtitles"
+msgid "Subtitles"
 msgstr ""
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
+msgid "%s with Original/%s fallback"
 msgstr ""
 
 msgctxt "#30602"
@@ -711,79 +720,79 @@ msgstr ""
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr ""
+msgstr "Швидкий пошук"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr ""
+msgstr "Швидкий пошук (анонімно)"
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Тільки аудіо"
 
 msgctxt "#30608"
 msgid "Allow developer keys"
-msgstr ""
+msgstr "Дозволити ключі розробника"
 
 msgctxt "#30609"
 msgid "Clear watch history"
-msgstr ""
+msgstr "Очистити історію перегляду"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr ""
+msgstr "Ваша історія перегляду буде стерта з усіх пристроїв. Цю дію неможливо відмінити."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
-msgstr ""
+msgstr "Збережені плейлисти"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr ""
+msgstr "Повторити"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr ""
+msgstr "Отримати id плейлиста \\\"Переглянути пізніше\\\""
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr ""
+msgstr "Не вдалося отримати id плейлиста \\\"Переглянути пізніше\\\". Додайте кілька відео до плейлиста та спробуйте ще раз."
 
 msgctxt "#30615"
 msgid "Cancel"
-msgstr ""
+msgstr "Відмінити"
 
 msgctxt "#30616"
 msgid "Must be signed in."
-msgstr ""
+msgstr "Потрібна авторизація."
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
+msgid "InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
+msgid "Enable MPEG-DASH proxy"
 msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
-msgstr ""
+msgstr "Порт"
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
-msgstr ""
+msgstr "Порт %s зайнято. Не вдалося запустити HTTP сервер."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
-msgstr ""
+msgstr "Покупки"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr ""
+msgstr "Встановити InputStream Helper"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
@@ -791,19 +800,19 @@ msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
-msgstr ""
+msgstr "InputStream Helper вже встановлено."
 
 msgctxt "#30626"
 msgid "Delete temporary files"
-msgstr ""
+msgstr "Видалити тимчасові файли"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr ""
+msgstr "Оцінювати відео після перегляду"
 
 msgctxt "#30628"
 msgid "HTTP Server"
-msgstr ""
+msgstr "HTTP сервер"
 
 msgctxt "#30629"
 msgid "IP whitelist (comma delimited)"
@@ -811,15 +820,15 @@ msgstr ""
 
 msgctxt "#30630"
 msgid "Save"
-msgstr ""
+msgstr "Зберегти"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr ""
+msgstr "Успішно оновлено: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr ""
+msgstr "Ввімкнути сторінку налаштування API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
@@ -827,11 +836,11 @@ msgstr ""
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
-msgstr ""
+msgstr "Налаштування API додатку YouTube"
 
 msgctxt "#30635"
 msgid "No changes detected, API keys were not updated."
-msgstr ""
+msgstr "Змін не виявлено, ключі API не були оновлені."
 
 msgctxt "#30636"
 msgid "Personal API keys are enabled."
@@ -851,15 +860,15 @@ msgstr ""
 
 msgctxt "#30640"
 msgid "Restore"
-msgstr ""
+msgstr "Відновити"
 
 msgctxt "#30641"
 msgid "Delete api_keys.json"
-msgstr ""
+msgstr "Видалити api_keys.json"
 
 msgctxt "#30642"
 msgid "Delete access_manager.json"
-msgstr ""
+msgstr "Видалити access_manager.json"
 
 msgctxt "#30643"
 msgid "Listen on IP"
@@ -871,15 +880,15 @@ msgstr ""
 
 msgctxt "#30645"
 msgid "Refresh after watching"
-msgstr ""
+msgstr "Оновити після перегляду"
 
 msgctxt "#30646"
 msgid "Upcoming Live"
-msgstr ""
+msgstr "Анонсовані прямі ефіри"
 
 msgctxt "#30647"
 msgid "Completed Live"
-msgstr ""
+msgstr "Завершені прямі ефіри"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings - API - API Key"
@@ -895,27 +904,27 @@ msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
-msgstr ""
+msgstr "Розташування"
 
 msgctxt "#30652"
 msgid "Location radius (km)"
-msgstr ""
+msgstr "Радіус місцезнаходження (км)"
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
+msgid "My Location using IP geolocation lookup"
 msgstr ""
 
 msgctxt "#30654"
 msgid "My Location"
-msgstr ""
+msgstr "Моє місцезнаходження"
 
 msgctxt "#30655"
 msgid "Switch User"
-msgstr ""
+msgstr "Змінити користувача"
 
 msgctxt "#30656"
 msgid "New user"
-msgstr ""
+msgstr "Додати користувача"
 
 msgctxt "#30657"
 msgid "Unnamed"
@@ -923,75 +932,75 @@ msgstr ""
 
 msgctxt "#30658"
 msgid "Enter a name for this user"
-msgstr ""
+msgstr "Введіть ім'я користувача"
 
 msgctxt "#30659"
 msgid "User is now '%s'"
-msgstr ""
+msgstr "Поточний користувач: '%s'"
 
 msgctxt "#30660"
 msgid "Users"
-msgstr ""
+msgstr "Користувачі"
 
 msgctxt "#30661"
 msgid "Add a user"
-msgstr ""
+msgstr "Додати користувача"
 
 msgctxt "#30662"
 msgid "Remove a user"
-msgstr ""
+msgstr "Видалити користувача"
 
 msgctxt "#30663"
 msgid "Rename a user"
-msgstr ""
+msgstr "Змінити ім'я користувача"
 
 msgctxt "#30664"
 msgid "Switch user"
-msgstr ""
+msgstr "Змінити користувача"
 
 msgctxt "#30665"
 msgid "Switch to '%s' now?"
-msgstr ""
+msgstr "Змінити на '%s'?"
 
 msgctxt "#30666"
 msgid "Removed '%s'"
-msgstr ""
+msgstr "Видалено '%s'"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
-msgstr ""
+msgstr "'%s' перейменовано на '%s'"
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
-msgstr ""
+msgstr "Мінімальний відсоток для відмічення переглянутим"
 
 msgctxt "#30669"
 msgid "Mark unwatched"
-msgstr ""
+msgstr "Відмітити як непереглянуте"
 
 msgctxt "#30670"
 msgid "Mark watched"
-msgstr ""
+msgstr "Відмітити як переглянуте"
 
 msgctxt "#30671"
 msgid "Clear playback history"
-msgstr ""
+msgstr "Очистити історію відтворень"
 
 msgctxt "#30672"
-msgid "Delete playback history"
+msgid "Delete playback history database"
 msgstr ""
 
 msgctxt "#30673"
 msgid "playback history"
-msgstr ""
+msgstr "історія відтворень"
 
 msgctxt "#30674"
 msgid "Reset resume point"
-msgstr ""
+msgstr "Обнулити точку відновлення"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Використовувати локальну історію відтворень (переглянуті, відновлення перегляду)"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -999,55 +1008,55 @@ msgstr ""
 
 msgctxt "#30677"
 msgid "A minute ago"
-msgstr ""
+msgstr "Хвилину тому"
 
 msgctxt "#30678"
 msgid "Recently"
-msgstr ""
+msgstr "Нещодавно"
 
 msgctxt "#30679"
 msgid "An hour ago"
-msgstr ""
+msgstr "Годину тому"
 
 msgctxt "#30680"
 msgid "Two hours ago"
-msgstr ""
+msgstr "Дві години тому"
 
 msgctxt "#30681"
 msgid "Three hours ago"
-msgstr ""
+msgstr "Три години тому"
 
 msgctxt "#30682"
 msgid "Yesterday at"
-msgstr ""
+msgstr "Вчора о"
 
 msgctxt "#30683"
 msgid "Two days ago"
-msgstr ""
+msgstr "Два дні тому"
 
 msgctxt "#30684"
 msgid "Today at"
-msgstr ""
+msgstr "Сьогодні о"
 
 msgctxt "#30685"
 msgid "Delete data cache database"
-msgstr ""
+msgstr "Видалити базу даних кешу даних"
 
 msgctxt "#30686"
 msgid "Clear data cache"
-msgstr ""
+msgstr "Очистити кеш даних"
 
 msgctxt "#30687"
 msgid "data cache"
-msgstr ""
+msgstr "кеш даних"
 
 msgctxt "#30688"
-msgid "Use for videos"
+msgid "Use MPEG-DASH for videos"
 msgstr ""
 
 msgctxt "#30689"
 msgid "Use for live streams"
-msgstr ""
+msgstr "Використовувати для прямих ефірів"
 
 msgctxt "#30690"
 msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
@@ -1055,39 +1064,39 @@ msgstr ""
 
 msgctxt "#30691"
 msgid "Airing now"
-msgstr ""
+msgstr "Зараз в ефірі"
 
 msgctxt "#30692"
 msgid "In a minute"
-msgstr ""
+msgstr "Через хвилину"
 
 msgctxt "#30693"
 msgid "Airing soon"
-msgstr ""
+msgstr "Незабаром в ефірі"
 
 msgctxt "#30694"
 msgid "In over an hour"
-msgstr ""
+msgstr "Приблизно через годину"
 
 msgctxt "#30695"
 msgid "In over two hours"
-msgstr ""
+msgstr "Приблизно через дві години"
 
 msgctxt "#30696"
 msgid "Airing today at"
-msgstr ""
+msgstr "Сьогодні в ефірі о"
 
 msgctxt "#30697"
 msgid "Tomorrow at"
-msgstr ""
+msgstr "Завтра о"
 
 msgctxt "#30698"
 msgid "Check my IP"
-msgstr ""
+msgstr "Перевірити мій IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr ""
+msgstr "HTTP сервер не запущений"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1103,27 +1112,27 @@ msgstr ""
 
 msgctxt "#30703"
 msgid "Are you sure?"
-msgstr ""
+msgstr "Ви впевнені?"
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
+msgid "Use YouTube website urls with default player"
 msgstr ""
 
 msgctxt "#30705"
 msgid "Download subtitles"
-msgstr ""
+msgstr "Завантажити субтитри"
 
 msgctxt "#30706"
 msgid "Download subtitles before starting playback? (Default: No)"
-msgstr ""
+msgstr "Завантажувати субтитри перед відтворенням? (За замовчуванням: Ні)"
 
 msgctxt "#30707"
 msgid "Untitled"
-msgstr ""
+msgstr "Без назви"
 
 msgctxt "#30708"
 msgid "Play audio only"
-msgstr ""
+msgstr "Відтворювати тільки аудіо"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
@@ -1143,19 +1152,19 @@ msgstr ""
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr ""
+msgstr "Додано до \"Переглянути пізніше\""
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr ""
+msgstr "Додано в плейлист"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr ""
+msgstr "Видалено з плейлиста"
 
 msgctxt "#30716"
 msgid "Liked video"
-msgstr ""
+msgstr "Вподобані відео"
 
 msgctxt "#30717"
 msgid "Disliked video"
@@ -1163,15 +1172,15 @@ msgstr ""
 
 msgctxt "#30718"
 msgid "Rating removed"
-msgstr ""
+msgstr "Оцінка видалена"
 
 msgctxt "#30719"
 msgid "Subscribed to channel"
-msgstr ""
+msgstr "Підписано на канал"
 
 msgctxt "#30720"
 msgid "Unsubscribed from channel"
-msgstr ""
+msgstr "Відписано від каналу"
 
 msgctxt "#30721"
 msgid "Default to WEBM adaptation set (4K)"
@@ -1179,10 +1188,10 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "Ввімкнути HDR"
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1199,11 +1208,11 @@ msgstr ""
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "Ввімкнути H.264"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "Ввімкнути VP9"
 
 msgctxt "#30729"
 msgid ""
@@ -1211,7 +1220,7 @@ msgstr ""
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
-msgstr ""
+msgstr "Відтворити (Обрати якість)"
 
 msgctxt "#30731"
 msgid "The YouTube add-on now requires that you use your own API keys.[CR]For more information see the wiki: [B]https://ytaddon.page.link/keys[/B][CR][CR]Sorry for the inconvenience."
@@ -1219,15 +1228,15 @@ msgstr ""
 
 msgctxt "#30732"
 msgid "Comments"
-msgstr ""
+msgstr "Коментарі"
 
 msgctxt "#30733"
 msgid "Likes"
-msgstr ""
+msgstr "Лайки"
 
 msgctxt "#30734"
 msgid "Replies"
-msgstr ""
+msgstr "Відповіді"
 
 msgctxt "#30735"
 msgid "Edited"
@@ -1235,7 +1244,7 @@ msgstr ""
 
 msgctxt "#30736"
 msgid "Hide short videos (1 minute or less)"
-msgstr ""
+msgstr "Не показувати короткі відео (менше хвилини)"
 
 msgctxt "#30737"
 msgid "Use alternate client details"
@@ -1287,19 +1296,19 @@ msgstr ""
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "Ввімкнути AV1 кодек"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "Ввімкнути Vorbis аудіо"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "Ввімкнути Opus аудіо"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "Ввімкнути AAC аудіо"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
@@ -1344,6 +1353,216 @@ msgstr ""
 msgctxt "#30763"
 msgid "Multi-audio"
 msgstr ""
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr ""
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr ""
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr ""
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
+msgstr ""
+
+msgctxt "#30771"
+msgid "Disable fractional framerate hinting"
+msgstr ""
+
+msgctxt "#30772"
+msgid "Disable all framerate hinting"
+msgstr ""
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr ""
+
+msgctxt "#30774"
+msgid "All available"
+msgstr ""
+
+msgctxt "#30775"
+msgid "%s (translation)"
+msgstr ""
+
+msgctxt "#30776"
+msgid "Ask + Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr ""
+
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr ""
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr ""
+
+msgctxt "#30780"
+msgid "Clear local watch later list"
+msgstr ""
+
+msgctxt "#30781"
+msgid "Delete watch later database"
+msgstr ""
+
+msgctxt "#30782"
+msgid "local watch later list"
+msgstr ""
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr ""
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr ""
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr ""
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr ""
+
+msgctxt "#30787"
+msgid "720p, H.264 only | Limited or older devices"
+msgstr ""
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Raspberry Pi 3, or similar"
+msgstr ""
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
+msgstr ""
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
+msgstr ""
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
+msgstr ""
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
+msgstr ""
+
+msgctxt "#30793"
+msgid "Views count display colour"
+msgstr ""
+
+msgctxt "#30794"
+msgid "Likes count display colour"
+msgstr ""
+
+msgctxt "#30795"
+msgid "Comments count display colour"
+msgstr ""
+
+msgctxt "#30796"
+msgid "1080p/60 fps | Raspberry Pi 4, or similar"
+msgstr ""
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr ""
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr ""
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr ""
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr ""
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr ""
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favourites"
+#~ msgstr "Обране"
+
+#~ msgctxt "#30101"
+#~ msgid "Add to addon favs"
+#~ msgstr "Додати в обране"
+
+#~ msgctxt "#30025"
+#~ msgid "Enable setup-wizard"
+#~ msgstr "Запустити майстер налаштування"
+
+#~ msgctxt "#30026"
+#~ msgid "Override view"
+#~ msgstr "Користувацьки налаштування виду"
+
+#~ msgctxt "#30030"
+#~ msgid "Execute setup-wizard?"
+#~ msgstr "Запустити майстер налаштування?"
+
+#~ msgctxt "#30120"
+#~ msgid "Clear"
+#~ msgstr "Очистити"
+
+#~ msgctxt "#30513"
+#~ msgid "Popular right now"
+#~ msgstr "Популярне зараз"
+
+#~ msgctxt "#30526"
+#~ msgid "Adjust"
+#~ msgstr "Регіональні налаштування"
+
+#~ msgctxt "#30527"
+#~ msgid "Language and region?"
+#~ msgstr "Налаштувати мову та регіон?"
+
+#~ msgctxt "#30541"
+#~ msgid "Show channel name in description"
+#~ msgstr "Показувати назву каналу в описі"
 
 #~ msgctxt "#30010"
 #~ msgid "Video quality"

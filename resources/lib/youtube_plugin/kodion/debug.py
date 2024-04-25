@@ -206,11 +206,12 @@ class Profiler(object):
                 self._profiler,
                 stream=output_stream
             ).strip_dirs().sort_stats('cumulative', 'time').print_stats(50)
+            output = output_stream.getvalue()
         # Occurs when no stats were able to be generated from profiler
         except TypeError:
-            pass
-        output = output_stream.getvalue()
-        output_stream.close()
+            output = 'Profiler: unable to generate stats'
+        finally:
+            output_stream.close()
 
         if reuse:
             # If stats are accumulating then enable existing/new profiler

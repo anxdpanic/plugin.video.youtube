@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2022-03-09 20:53+0000\n"
+"PO-Revision-Date: 2024-04-12 14:58+0000\n"
 "Last-Translator: Christian Gade <gade@kodi.tv>\n"
 "Language-Team: English (United States) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/en_us/>\n"
 "Language: en_us\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 4.11.2\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -32,13 +32,10 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr "General"
@@ -56,7 +53,6 @@ msgid "YouTube"
 msgstr ""
 
 # empty strings from id 30004 to 30006
-
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
 msgstr ""
@@ -187,7 +183,6 @@ msgstr ""
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
 msgid "Bookmarks"
 msgstr ""
@@ -278,7 +273,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30122 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr ""
@@ -305,7 +299,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr "Channels"
@@ -1123,7 +1116,7 @@ msgid "Are you sure?"
 msgstr ""
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
+msgid "Use YouTube website urls with default player"
 msgstr ""
 
 msgctxt "#30705"
@@ -1479,15 +1472,15 @@ msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
 msgstr ""
 
 msgctxt "#30793"
-msgid "Views count display color"
+msgid "Views count display colour"
 msgstr ""
 
 msgctxt "#30794"
-msgid "Likes count display color"
+msgid "Likes count display colour"
 msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display color"
+msgid "Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
@@ -1520,4 +1513,12 @@ msgstr ""
 
 msgctxt "#30803"
 msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
 msgstr ""

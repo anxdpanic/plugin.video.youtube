@@ -366,7 +366,9 @@ def video_playback_item(context, video_item, show_fanart=None):
                                 if current_system_version.compatible(19, 0) else
                                 'inputstreamaddon')
         props[inputstream_property] = 'inputstream.adaptive'
-        props['inputstream.adaptive.manifest_type'] = manifest_type
+
+        if not current_system_version.compatible(21, 0):
+            props['inputstream.adaptive.manifest_type'] = manifest_type
 
         if headers:
             props['inputstream.adaptive.manifest_headers'] = headers
@@ -381,8 +383,10 @@ def video_playback_item(context, video_item, show_fanart=None):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        if (not settings.support_alternative_player()
-                and headers and uri.startswith('http')):
+        if (headers and uri.startswith('http') and not (
+                settings.default_player_web_urls()
+                or (is_external and settings.alternative_player_web_urls())
+        )):
             kwargs['path'] = '|'.join((uri, headers))
 
     list_item = xbmcgui.ListItem(**kwargs)

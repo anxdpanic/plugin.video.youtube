@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2024-04-12 14:59+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: English (Australia) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/en_au/>\n"
 "Language: en_au\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -31,13 +32,10 @@ msgstr ""
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
 # msgstr ""
-
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
-
 # Kodion Settings
-
 msgctxt "#30000"
 msgid "General"
 msgstr ""
@@ -55,7 +53,6 @@ msgid "YouTube"
 msgstr ""
 
 # empty strings from id 30004 to 30006
-
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
 msgstr ""
@@ -186,7 +183,6 @@ msgstr ""
 
 # Kodion Common
 # empty strings from id 30039 to 30099
-
 msgctxt "#30100"
 msgid "Bookmarks"
 msgstr ""
@@ -277,7 +273,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30122 to 30199
-
 msgctxt "#30200"
 msgid "API"
 msgstr ""
@@ -304,7 +299,6 @@ msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
-
 msgctxt "#30500"
 msgid "Channels"
 msgstr ""
@@ -1122,7 +1116,7 @@ msgid "Are you sure?"
 msgstr ""
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
+msgid "Use YouTube website urls with default player"
 msgstr ""
 
 msgctxt "#30705"
@@ -1519,4 +1513,12 @@ msgstr ""
 
 msgctxt "#30803"
 msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
 msgstr ""

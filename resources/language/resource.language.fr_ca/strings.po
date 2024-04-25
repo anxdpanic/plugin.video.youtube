@@ -7,14 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 2024-04-12 15:00+0000\n"
+"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"Language-Team: French (Canada) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/fr_ca/>\n"
 "Language: fr_ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -47,9 +48,13 @@ msgctxt "#30002"
 msgid "Password"
 msgstr ""
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr ""
+
+# empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
+msgid "Use InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30008"
@@ -122,11 +127,11 @@ msgid "Cache size (MB)"
 msgstr ""
 
 msgctxt "#30025"
-msgid "Enable setup-wizard"
+msgid "Enable Setup Wizard"
 msgstr ""
 
 msgctxt "#30026"
-msgid "Override view"
+msgid "Override views"
 msgstr ""
 
 msgctxt "#30027"
@@ -142,7 +147,7 @@ msgid "View: Movies"
 msgstr ""
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
+msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
@@ -180,11 +185,11 @@ msgstr ""
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
+msgid "Bookmarks"
 msgstr ""
 
 msgctxt "#30101"
-msgid "Add to addon favs"
+msgid "Bookmark"
 msgstr ""
 
 msgctxt "#30102"
@@ -260,7 +265,11 @@ msgid "Please wait..."
 msgstr ""
 
 msgctxt "#30120"
-msgid "Clear"
+msgid "Confirm clear"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Clear %s?"
 msgstr ""
 
 # YouTube
@@ -344,7 +353,7 @@ msgid "Browse Channels"
 msgstr ""
 
 msgctxt "#30513"
-msgid "Popular right now"
+msgid "Trending"
 msgstr ""
 
 msgctxt "#30514"
@@ -396,11 +405,11 @@ msgid "Select region"
 msgstr ""
 
 msgctxt "#30526"
-msgid "Adjust"
+msgid "Setup Wizard"
 msgstr ""
 
 msgctxt "#30527"
-msgid "Language and region?"
+msgid "Language and Region"
 msgstr ""
 
 msgctxt "#30528"
@@ -456,7 +465,7 @@ msgid "Play with..."
 msgstr ""
 
 msgctxt "#30541"
-msgid "Show channel name in description"
+msgid "Show channel name and video details in description"
 msgstr ""
 
 msgctxt "#30542"
@@ -608,7 +617,7 @@ msgid "Force SSL certificate verification"
 msgstr ""
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -692,11 +701,11 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid "Configure subtitles"
+msgid "Subtitles"
 msgstr ""
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
+msgid "%s with Original/%s fallback"
 msgstr ""
 
 msgctxt "#30602"
@@ -760,11 +769,11 @@ msgid "Must be signed in."
 msgstr ""
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
+msgid "InputStream Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
+msgid "Enable MPEG-DASH proxy"
 msgstr ""
 
 msgctxt "#30619"
@@ -776,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr ""
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
 msgstr ""
 
 msgctxt "#30622"
@@ -904,7 +913,7 @@ msgid "Location radius (km)"
 msgstr ""
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
+msgid "My Location using IP geolocation lookup"
 msgstr ""
 
 msgctxt "#30654"
@@ -980,7 +989,7 @@ msgid "Clear playback history"
 msgstr ""
 
 msgctxt "#30672"
-msgid "Delete playback history"
+msgid "Delete playback history database"
 msgstr ""
 
 msgctxt "#30673"
@@ -1044,7 +1053,7 @@ msgid "data cache"
 msgstr ""
 
 msgctxt "#30688"
-msgid "Use for videos"
+msgid "Use MPEG-DASH for videos"
 msgstr ""
 
 msgctxt "#30689"
@@ -1108,7 +1117,7 @@ msgid "Are you sure?"
 msgstr ""
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
+msgid "Use YouTube website urls with default player"
 msgstr ""
 
 msgctxt "#30705"
@@ -1184,7 +1193,7 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1345,4 +1354,172 @@ msgstr ""
 
 msgctxt "#30763"
 msgid "Multi-audio"
+msgstr ""
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr ""
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr ""
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr ""
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
+msgstr ""
+
+msgctxt "#30771"
+msgid "Disable fractional framerate hinting"
+msgstr ""
+
+msgctxt "#30772"
+msgid "Disable all framerate hinting"
+msgstr ""
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr ""
+
+msgctxt "#30774"
+msgid "All available"
+msgstr ""
+
+msgctxt "#30775"
+msgid "%s (translation)"
+msgstr ""
+
+msgctxt "#30776"
+msgid "Ask + Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr ""
+
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr ""
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr ""
+
+msgctxt "#30780"
+msgid "Clear local watch later list"
+msgstr ""
+
+msgctxt "#30781"
+msgid "Delete watch later database"
+msgstr ""
+
+msgctxt "#30782"
+msgid "local watch later list"
+msgstr ""
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr ""
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr ""
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr ""
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr ""
+
+msgctxt "#30787"
+msgid "720p, H.264 only | Limited or older devices"
+msgstr ""
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Raspberry Pi 3, or similar"
+msgstr ""
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
+msgstr ""
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
+msgstr ""
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
+msgstr ""
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
+msgstr ""
+
+msgctxt "#30793"
+msgid "Views count display colour"
+msgstr ""
+
+msgctxt "#30794"
+msgid "Likes count display colour"
+msgstr ""
+
+msgctxt "#30795"
+msgid "Comments count display colour"
+msgstr ""
+
+msgctxt "#30796"
+msgid "1080p/60 fps | Raspberry Pi 4, or similar"
+msgstr ""
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr ""
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr ""
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr ""
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr ""
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr ""
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
 msgstr ""

@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-04-28 16:20+0000\n"
+"PO-Revision-Date: 2024-04-12 14:59+0000\n"
 "Last-Translator: NicoYazawa <1161118059@qq.com>\n"
 "Language-Team: Chinese (China) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/zh_cn/>\n"
 "Language: zh_cn\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 4.15.2\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -47,10 +47,14 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "密码"
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr ""
+
+# empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
-msgstr "使用 MPEG-DASH"
+msgid "Use InputStream Adaptive"
+msgstr ""
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -121,12 +125,12 @@ msgid "Cache size (MB)"
 msgstr "缓存大小 (MB)"
 
 msgctxt "#30025"
-msgid "Enable setup-wizard"
-msgstr "启用设置向导"
+msgid "Enable Setup Wizard"
+msgstr ""
 
 msgctxt "#30026"
-msgid "Override view"
-msgstr "强制预览模式"
+msgid "Override views"
+msgstr ""
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -141,8 +145,8 @@ msgid "View: Movies"
 msgstr "视图：电影"
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
-msgstr "是否启动设置向导？"
+msgid "Configure %s?"
+msgstr ""
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -179,12 +183,12 @@ msgstr "定制 “历史记录” 播放列表 ID"
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
-msgstr "收藏夹"
+msgid "Bookmarks"
+msgstr ""
 
 msgctxt "#30101"
-msgid "Add to addon favs"
-msgstr "添加到收藏夹"
+msgid "Bookmark"
+msgstr ""
 
 msgctxt "#30102"
 msgid "Search"
@@ -259,8 +263,12 @@ msgid "Please wait..."
 msgstr "请稍候..."
 
 msgctxt "#30120"
-msgid "Clear"
-msgstr "清除"
+msgid "Confirm clear"
+msgstr ""
+
+msgctxt "#30121"
+msgid "Clear %s?"
+msgstr ""
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -343,8 +351,8 @@ msgid "Browse Channels"
 msgstr "浏览频道"
 
 msgctxt "#30513"
-msgid "Popular right now"
-msgstr "时下流行"
+msgid "Trending"
+msgstr ""
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -395,12 +403,12 @@ msgid "Select region"
 msgstr "选择区域"
 
 msgctxt "#30526"
-msgid "Adjust"
-msgstr "调整"
+msgid "Setup Wizard"
+msgstr ""
 
 msgctxt "#30527"
-msgid "Language and region?"
-msgstr "语言和区域吗？"
+msgid "Language and Region"
+msgstr ""
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -455,8 +463,8 @@ msgid "Play with..."
 msgstr "选用其他播放器..."
 
 msgctxt "#30541"
-msgid "Show channel name in description"
-msgstr "在描述内容中显示频道名称"
+msgid "Show channel name and video details in description"
+msgstr ""
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -607,8 +615,8 @@ msgid "Force SSL certificate verification"
 msgstr "强制 SSL 证书验证"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "已经在 YouTube 设置中启用 MPEG-DASH，但是 InputStream Adaptive 似乎被禁用。您想现在启用 InputStream Adaptive 吗？"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgstr ""
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -691,12 +699,12 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "允许私人 API 密钥失败。缺失：%s"
 
 msgctxt "#30600"
-msgid "Configure subtitles"
-msgstr "配置字幕"
+msgid "Subtitles"
+msgstr ""
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
-msgstr "%s 与 %s 回退"
+msgid "%s with Original/%s fallback"
+msgstr ""
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -759,12 +767,12 @@ msgid "Must be signed in."
 msgstr "必需先登录。"
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
-msgstr "MPEG-DASH"
+msgid "InputStream Adaptive"
+msgstr ""
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
-msgstr "允许 mpeg-dash 代理"
+msgid "Enable MPEG-DASH proxy"
+msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
@@ -775,8 +783,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "端口 %s 已经被占用，无法启动 HTTP 服务。"
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
-msgstr "MPEG-DASH 视频点播（VODS）需要代理（请参阅 HTTP 服务器）"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -903,8 +911,8 @@ msgid "Location radius (km)"
 msgstr "位置半径 (km)"
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "进行地理定位？使用 [B]我的位置[/B]"
+msgid "My Location using IP geolocation lookup"
+msgstr ""
 
 msgctxt "#30654"
 msgid "My Location"
@@ -979,8 +987,8 @@ msgid "Clear playback history"
 msgstr "清除播放历史"
 
 msgctxt "#30672"
-msgid "Delete playback history"
-msgstr "删除播放历史"
+msgid "Delete playback history database"
+msgstr ""
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1043,8 +1051,8 @@ msgid "data cache"
 msgstr "数据缓存"
 
 msgctxt "#30688"
-msgid "Use for videos"
-msgstr "用于视频"
+msgid "Use MPEG-DASH for videos"
+msgstr ""
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1107,8 +1115,8 @@ msgid "Are you sure?"
 msgstr "你确定吗？"
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
-msgstr "使用 YouTube 网站的网址"
+msgid "Use YouTube website urls with default player"
+msgstr ""
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1183,8 +1191,8 @@ msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr "MPEG-DASH 视频点播（VODS）需要代理（请参阅 HTTP 服务器）[CR]> 1080p 和 HDR 需要 InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgstr ""
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1345,6 +1353,265 @@ msgstr ""
 msgctxt "#30763"
 msgid "Multi-audio"
 msgstr ""
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr ""
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr ""
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr ""
+
+msgctxt "#30767"
+msgid "Views"
+msgstr ""
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr ""
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr ""
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
+msgstr ""
+
+msgctxt "#30771"
+msgid "Disable fractional framerate hinting"
+msgstr ""
+
+msgctxt "#30772"
+msgid "Disable all framerate hinting"
+msgstr ""
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr ""
+
+msgctxt "#30774"
+msgid "All available"
+msgstr ""
+
+msgctxt "#30775"
+msgid "%s (translation)"
+msgstr ""
+
+msgctxt "#30776"
+msgid "Ask + Automatic + Quality selection"
+msgstr ""
+
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr ""
+
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr ""
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr ""
+
+msgctxt "#30780"
+msgid "Clear local watch later list"
+msgstr ""
+
+msgctxt "#30781"
+msgid "Delete watch later database"
+msgstr ""
+
+msgctxt "#30782"
+msgid "local watch later list"
+msgstr ""
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr ""
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr ""
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr ""
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr ""
+
+msgctxt "#30787"
+msgid "720p, H.264 only | Limited or older devices"
+msgstr ""
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Raspberry Pi 3, or similar"
+msgstr ""
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
+msgstr ""
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
+msgstr ""
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
+msgstr ""
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
+msgstr ""
+
+msgctxt "#30793"
+msgid "Views count display colour"
+msgstr ""
+
+msgctxt "#30794"
+msgid "Likes count display colour"
+msgstr ""
+
+msgctxt "#30795"
+msgid "Comments count display colour"
+msgstr ""
+
+msgctxt "#30796"
+msgid "1080p/60 fps | Raspberry Pi 4, or similar"
+msgstr ""
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr ""
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr ""
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr ""
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr ""
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr ""
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr ""
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr ""
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr ""
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
+msgstr ""
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favourites"
+#~ msgstr "收藏夹"
+
+#~ msgctxt "#30101"
+#~ msgid "Add to addon favs"
+#~ msgstr "添加到收藏夹"
+
+#~ msgctxt "#30704"
+#~ msgid "Use YouTube website urls"
+#~ msgstr "使用 YouTube 网站的网址"
+
+# empty strings from id 30003 to 30006
+#~ msgctxt "#30007"
+#~ msgid "Use MPEG-DASH"
+#~ msgstr "使用 MPEG-DASH"
+
+#~ msgctxt "#30025"
+#~ msgid "Enable setup-wizard"
+#~ msgstr "启用设置向导"
+
+#~ msgctxt "#30026"
+#~ msgid "Override view"
+#~ msgstr "强制预览模式"
+
+#~ msgctxt "#30030"
+#~ msgid "Execute setup-wizard?"
+#~ msgstr "是否启动设置向导？"
+
+#~ msgctxt "#30120"
+#~ msgid "Clear"
+#~ msgstr "清除"
+
+#~ msgctxt "#30513"
+#~ msgid "Popular right now"
+#~ msgstr "时下流行"
+
+#~ msgctxt "#30526"
+#~ msgid "Adjust"
+#~ msgstr "调整"
+
+#~ msgctxt "#30527"
+#~ msgid "Language and region?"
+#~ msgstr "语言和区域吗？"
+
+#~ msgctxt "#30541"
+#~ msgid "Show channel name in description"
+#~ msgstr "在描述内容中显示频道名称"
+
+#~ msgctxt "#30579"
+#~ msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+#~ msgstr "已经在 YouTube 设置中启用 MPEG-DASH，但是 InputStream Adaptive 似乎被禁用。您想现在启用 InputStream Adaptive 吗？"
+
+#~ msgctxt "#30600"
+#~ msgid "Configure subtitles"
+#~ msgstr "配置字幕"
+
+#~ msgctxt "#30601"
+#~ msgid "%s with %s fallback"
+#~ msgstr "%s 与 %s 回退"
+
+#~ msgctxt "#30617"
+#~ msgid "MPEG-DASH"
+#~ msgstr "MPEG-DASH"
+
+#~ msgctxt "#30618"
+#~ msgid "Enable mpeg-dash proxy"
+#~ msgstr "允许 mpeg-dash 代理"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
+#~ msgstr "MPEG-DASH 视频点播（VODS）需要代理（请参阅 HTTP 服务器）"
+
+#~ msgctxt "#30653"
+#~ msgid "Perform geolocation? Used for [B]My Location[/B]"
+#~ msgstr "进行地理定位？使用 [B]我的位置[/B]"
+
+#~ msgctxt "#30672"
+#~ msgid "Delete playback history"
+#~ msgstr "删除播放历史"
+
+#~ msgctxt "#30688"
+#~ msgid "Use for videos"
+#~ msgstr "用于视频"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "MPEG-DASH 视频点播（VODS）需要代理（请参阅 HTTP 服务器）[CR]> 1080p 和 HDR 需要 InputStream Adaptive >= 2.3.14"
 
 #~ msgctxt "#30010"
 #~ msgid "Video quality"

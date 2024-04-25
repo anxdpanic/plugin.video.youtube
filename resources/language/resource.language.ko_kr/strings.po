@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2023-10-19 09:11+0000\n"
+"PO-Revision-Date: 2024-04-15 16:14+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
 "Language: ko_kr\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.0.2\n"
+"X-Generator: Weblate 5.4.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -47,10 +47,14 @@ msgctxt "#30002"
 msgid "Password"
 msgstr "비밀번호"
 
-# empty strings from id 30003 to 30006
+msgctxt "#30003"
+msgid "YouTube"
+msgstr "유튜브"
+
+# empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use MPEG-DASH"
-msgstr "MPEG-DASH 사용"
+msgid "Use InputStream Adaptive"
+msgstr "InputStream 적응형 사용"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -121,12 +125,12 @@ msgid "Cache size (MB)"
 msgstr "캐시 크기 (MB)"
 
 msgctxt "#30025"
-msgid "Enable setup-wizard"
-msgstr "설정 마법사 켬"
+msgid "Enable Setup Wizard"
+msgstr "설정 마법사 사용"
 
 msgctxt "#30026"
-msgid "Override view"
-msgstr "보기 형식 강제 적용"
+msgid "Override views"
+msgstr "조회수 재설정"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -141,8 +145,8 @@ msgid "View: Movies"
 msgstr "보기: 영화"
 
 msgctxt "#30030"
-msgid "Execute setup-wizard?"
-msgstr "설정 마법사를 실행할까요?"
+msgid "Configure %s?"
+msgstr "%s을(를) 설정할까요?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -179,12 +183,12 @@ msgstr "사용자가 최근 본 재생목록 id"
 # Kodion Common
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
-msgid "Favourites"
+msgid "Bookmarks"
 msgstr "즐겨찾기"
 
 msgctxt "#30101"
-msgid "Add to addon favs"
-msgstr "즐겨찾기 애드온에 추가"
+msgid "Bookmark"
+msgstr "즐겨찾기"
 
 msgctxt "#30102"
 msgid "Search"
@@ -259,8 +263,12 @@ msgid "Please wait..."
 msgstr "잠시만 기다리세요..."
 
 msgctxt "#30120"
-msgid "Clear"
-msgstr "지우기"
+msgid "Confirm clear"
+msgstr "삭제 확인"
+
+msgctxt "#30121"
+msgid "Clear %s?"
+msgstr "%s을(를) 지울까요?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -343,8 +351,8 @@ msgid "Browse Channels"
 msgstr "채널 탐색"
 
 msgctxt "#30513"
-msgid "Popular right now"
-msgstr "현재 인기"
+msgid "Trending"
+msgstr "인기 급상승"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -395,12 +403,12 @@ msgid "Select region"
 msgstr "지역 선택"
 
 msgctxt "#30526"
-msgid "Adjust"
-msgstr "조정"
+msgid "Setup Wizard"
+msgstr "설정 마법사"
 
 msgctxt "#30527"
-msgid "Language and region?"
-msgstr "언어와 지역?"
+msgid "Language and Region"
+msgstr "언어 및 지역"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -455,8 +463,8 @@ msgid "Play with..."
 msgstr "다음으로 재생..."
 
 msgctxt "#30541"
-msgid "Show channel name in description"
-msgstr "설명에 채널 이름 보기"
+msgid "Show channel name and video details in description"
+msgstr "설명에 채널 이름 및 동영상 상세정보 표시"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -607,8 +615,8 @@ msgid "Force SSL certificate verification"
 msgstr "SSL 보안 검증 강제함"
 
 msgctxt "#30579"
-msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "유튜브 설정에서 MPEG-DASH를 사용하지만, InputStream Adaptive는 사용하지 않습니다. 지금 InputStream Adaptive를 사용할까요?"
+msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgstr "InputStream 적응형은 유튜브 설정에서 사용하지만, 추가 기능은 사용하지 않습니다. 지금 InputStream 적응형을 사용할까요?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -691,12 +699,12 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "개인 API 키 사용 실패함. 없음: %s"
 
 msgctxt "#30600"
-msgid "Configure subtitles"
-msgstr "자막 설정"
+msgid "Subtitles"
+msgstr "자막"
 
 msgctxt "#30601"
-msgid "%s with %s fallback"
-msgstr "%s 에 %s 대비"
+msgid "%s with Original/%s fallback"
+msgstr "원본/%s 대체가 포함된 %s"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -759,12 +767,12 @@ msgid "Must be signed in."
 msgstr "기록해야 합니다."
 
 msgctxt "#30617"
-msgid "MPEG-DASH"
-msgstr "MPEG-DASH"
+msgid "InputStream Adaptive"
+msgstr "InputStream 적응형"
 
 msgctxt "#30618"
-msgid "Enable mpeg-dash proxy"
-msgstr "mpeg-dash 프록시 사용"
+msgid "Enable MPEG-DASH proxy"
+msgstr "MPEG-DASH 프록시 사용"
 
 msgctxt "#30619"
 msgid "Port"
@@ -775,8 +783,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "$s 포트는 이미 사용 중입니다. http 서버를 시작할 수 없습니다."
 
 msgctxt "#30621"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
-msgstr "mpeg-dash vod에 프록시가 필요함 (HTTP 서버 참고)"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgstr "MPEG-DASH VOD에는 프록시가 필요합니다 (고급 > HTTP 서버 참조)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -903,8 +911,8 @@ msgid "Location radius (km)"
 msgstr "위치 반경 (km)"
 
 msgctxt "#30653"
-msgid "Perform geolocation? Used for [B]My Location[/B]"
-msgstr "지리 위치를 실행할까요? [B]내 위치[/B]에 사용됨"
+msgid "My Location using IP geolocation lookup"
+msgstr "지리적 위치 조회 IP를 사용하는 내 위치"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -979,8 +987,8 @@ msgid "Clear playback history"
 msgstr "재생 이력 지우기"
 
 msgctxt "#30672"
-msgid "Delete playback history"
-msgstr "재생 이력 삭제"
+msgid "Delete playback history database"
+msgstr "재생 기록 데이터베이스 삭제"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1043,8 +1051,8 @@ msgid "data cache"
 msgstr "데이터 캐시"
 
 msgctxt "#30688"
-msgid "Use for videos"
-msgstr "동영상에 사용"
+msgid "Use MPEG-DASH for videos"
+msgstr "비디오에 MPEG-DASH 사용"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1107,8 +1115,8 @@ msgid "Are you sure?"
 msgstr "확실합니까?"
 
 msgctxt "#30704"
-msgid "Use YouTube website urls"
-msgstr "유튜브 웹사이트 url 사용"
+msgid "Use YouTube website urls with default player"
+msgstr "기본 플레이어로 유튜브 웹사이트 URL 사용"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1183,8 +1191,8 @@ msgid "Enable HDR video"
 msgstr "HDR 비디오 사용"
 
 msgctxt "#30723"
-msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
-msgstr "mpeg-dash vods (HTTP 서버 참고)[CR]> 1080p에 프록시가 필요하고 HDR에 InputStream Adaptive >= 2.3.14 필요함"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgstr "MPEG-DASH VOD에는 프록시가 필요합니다(고급 > HTTP 서버 참조)[CR]HDR 및 >1080p 비디오에는 InputStream 적응형 >= 2.3.14가 필요합니다"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1345,6 +1353,269 @@ msgstr "다국어"
 msgctxt "#30763"
 msgid "Multi-audio"
 msgstr "다중 오디오"
+
+msgctxt "#30764"
+msgid "Requests connect timeout"
+msgstr "연결 시간 초과 요청"
+
+msgctxt "#30765"
+msgid "Requests read timeout"
+msgstr "읽기 시간 초과 요청"
+
+msgctxt "#30766"
+msgid "Premieres"
+msgstr "프리미어"
+
+msgctxt "#30767"
+msgid "Views"
+msgstr "조회수"
+
+msgctxt "#30768"
+msgid "Disable high framerate video at maximum video quality"
+msgstr "최대 비디오 품질에서 높은 프레임 사용 안 함"
+
+msgctxt "#30769"
+msgid "Clear Watch Later list"
+msgstr "나중에 볼 목록 지우기"
+
+msgctxt "#30770"
+msgid "Are you sure you want to clear your Watch Later list?"
+msgstr "나중에 볼 동영상 목록을 지울까요?"
+
+msgctxt "#30771"
+msgid "Disable fractional framerate hinting"
+msgstr "부분 프레임 속도 힌팅 사용 안 함"
+
+msgctxt "#30772"
+msgid "Disable all framerate hinting"
+msgstr "모든 프레임 속도에서 힌팅 사용 안 함"
+
+msgctxt "#30773"
+msgid "Show video details in video lists"
+msgstr "동영상 목록에 상세정보 표시"
+
+msgctxt "#30774"
+msgid "All available"
+msgstr "모두 사용 가능"
+
+msgctxt "#30775"
+msgid "%s (translation)"
+msgstr "%s (번역)"
+
+msgctxt "#30776"
+msgid "Ask + Automatic + Quality selection"
+msgstr "질문 + 자동 + 품질 선택"
+
+msgctxt "#30777"
+msgid "Views for %s (%s)"
+msgstr "%s(%s)의 조회수"
+
+msgctxt "#30778"
+msgid "Import old playback history?"
+msgstr "이전 재생 기록을 가져올까요?"
+
+msgctxt "#30779"
+msgid "Import old search history?"
+msgstr "이전 검색 기록을 가져올까요?"
+
+msgctxt "#30780"
+msgid "Clear local watch later list"
+msgstr "나중에 볼 로컬 목록 지우기"
+
+msgctxt "#30781"
+msgid "Delete watch later database"
+msgstr "나중에 볼 데이터베이스 삭제"
+
+msgctxt "#30782"
+msgid "local watch later list"
+msgstr "나중에 볼 로컬 목록"
+
+msgctxt "#30783"
+msgid "settings to recommended values"
+msgstr "권장 값으로 설정"
+
+msgctxt "#30784"
+msgid "listings to show minimal details"
+msgstr "최소한의 세부정보를 표시하는 목록"
+
+msgctxt "#30785"
+msgid "performance settings"
+msgstr "성능 설정"
+
+msgctxt "#30786"
+msgid "Choose device capabilities"
+msgstr "장치 기능 선택"
+
+msgctxt "#30787"
+msgid "720p, H.264 only | Limited or older devices"
+msgstr "720p, H.264 전용 | 제한적이거나 오래된 장치"
+
+msgctxt "#30788"
+msgid "1080p/30 fps | Raspberry Pi 3, or similar"
+msgstr "1080p/30fps | 라즈베리 파이 3 또는 유사"
+
+msgctxt "#30789"
+msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
+msgstr "4K/30fps 또는 1080p/60fps, HDR(호환되는 경우) | 라즈베리 파이 5 또는 유사"
+
+msgctxt "#30790"
+msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
+msgstr "4K/60fps, HDR(호환되는 경우) | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 또는 유사 제품"
+
+msgctxt "#30791"
+msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
+msgstr "4K/60fps, HDR, AV1 사용 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V 또는 유사 제품"
+
+msgctxt "#30792"
+msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
+msgstr "8K/60fps, HDR, AV1 사용 | 모든 기능을 갖춘 최신 장치 또는 PC"
+
+msgctxt "#30793"
+msgid "Views count display colour"
+msgstr "조회수 표시 색상"
+
+msgctxt "#30794"
+msgid "Likes count display colour"
+msgstr "좋아요 개수 표시 색상"
+
+msgctxt "#30795"
+msgid "Comments count display colour"
+msgstr "댓글 수 표시 색상"
+
+msgctxt "#30796"
+msgid "1080p/60 fps | Raspberry Pi 4, or similar"
+msgstr "1080p/60fps | 라즈베리 파이 4 또는 유사"
+
+msgctxt "#30797"
+msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
+msgstr "1080p/30fps 또는 720p/30fps, H.264 전용 | 라즈베리 파이 1/2 또는 유사"
+
+msgctxt "#30798"
+msgid "Clear bookmarks list"
+msgstr "즐겨찾기 목록 지우기"
+
+msgctxt "#30799"
+msgid "Delete bookmarks database"
+msgstr "즐겨찾기 데이터베이스 삭제"
+
+msgctxt "#30800"
+msgid "bookmarks list"
+msgstr "즐겨찾기 목록"
+
+msgctxt "#30801"
+msgid "Clear Bookmarks list"
+msgstr "즐겨찾기 목록 지우기"
+
+msgctxt "#30802"
+msgid "Are you sure you want to clear your Bookmarks list?"
+msgstr "즐겨찾기 목록을 지울까요?"
+
+msgctxt "#30803"
+msgid "Bookmark %s"
+msgstr "즐겨찾기 %s"
+
+msgctxt "#30804"
+msgid "Use YouTube website urls with external player"
+msgstr "외부 플레이어로 유튜브 웹사이트 URL 사용"
+
+msgctxt "#30805"
+msgid "Use adaptive streaming formats with external player"
+msgstr "외부 플레이어로 적응형 스트리밍 형식 사용"
+
+# Kodion Common
+# empty strings from id 30039 to 30099
+#~ msgctxt "#30100"
+#~ msgid "Favourites"
+#~ msgstr "즐겨찾기"
+
+#~ msgctxt "#30101"
+#~ msgid "Add to addon favs"
+#~ msgstr "즐겨찾기 애드온에 추가"
+
+#~ msgctxt "#30704"
+#~ msgid "Use YouTube website urls"
+#~ msgstr "유튜브 웹사이트 url 사용"
+
+#~ msgctxt "#30787"
+#~ msgid "720p | Limited or older devices"
+#~ msgstr "720p | 제한적이거나 오래된 장치"
+
+# empty strings from id 30003 to 30006
+#~ msgctxt "#30007"
+#~ msgid "Use MPEG-DASH"
+#~ msgstr "MPEG-DASH 사용"
+
+#~ msgctxt "#30025"
+#~ msgid "Enable setup-wizard"
+#~ msgstr "설정 마법사 켬"
+
+#~ msgctxt "#30026"
+#~ msgid "Override view"
+#~ msgstr "보기 형식 강제 적용"
+
+#~ msgctxt "#30030"
+#~ msgid "Execute setup-wizard?"
+#~ msgstr "설정 마법사를 실행할까요?"
+
+#~ msgctxt "#30120"
+#~ msgid "Clear"
+#~ msgstr "지우기"
+
+#~ msgctxt "#30513"
+#~ msgid "Popular right now"
+#~ msgstr "현재 인기"
+
+#~ msgctxt "#30526"
+#~ msgid "Adjust"
+#~ msgstr "조정"
+
+#~ msgctxt "#30527"
+#~ msgid "Language and region?"
+#~ msgstr "언어와 지역?"
+
+#~ msgctxt "#30541"
+#~ msgid "Show channel name in description"
+#~ msgstr "설명에 채널 이름 보기"
+
+#~ msgctxt "#30579"
+#~ msgid "MPEG-DASH is enabled in the YouTube settings, however InputStream Adaptive appears to be disabled. Would you like to enable InputStream Adaptive now?"
+#~ msgstr "유튜브 설정에서 MPEG-DASH를 사용하지만, InputStream Adaptive는 사용하지 않습니다. 지금 InputStream Adaptive를 사용할까요?"
+
+#~ msgctxt "#30600"
+#~ msgid "Configure subtitles"
+#~ msgstr "자막 설정"
+
+#~ msgctxt "#30601"
+#~ msgid "%s with %s fallback"
+#~ msgstr "%s 에 %s 대비"
+
+#~ msgctxt "#30617"
+#~ msgid "MPEG-DASH"
+#~ msgstr "MPEG-DASH"
+
+#~ msgctxt "#30618"
+#~ msgid "Enable mpeg-dash proxy"
+#~ msgstr "mpeg-dash 프록시 사용"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)"
+#~ msgstr "mpeg-dash vod에 프록시가 필요함 (HTTP 서버 참고)"
+
+#~ msgctxt "#30653"
+#~ msgid "Perform geolocation? Used for [B]My Location[/B]"
+#~ msgstr "지리 위치를 실행할까요? [B]내 위치[/B]에 사용됨"
+
+#~ msgctxt "#30672"
+#~ msgid "Delete playback history"
+#~ msgstr "재생 이력 삭제"
+
+#~ msgctxt "#30688"
+#~ msgid "Use for videos"
+#~ msgstr "동영상에 사용"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for mpeg-dash vods (see Advanced > HTTP Server)[CR]> 1080p and HDR requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "mpeg-dash vods (HTTP 서버 참고)[CR]> 1080p에 프록시가 필요하고 HDR에 InputStream Adaptive >= 2.3.14 필요함"
 
 #~ msgctxt "#30010"
 #~ msgid "Video quality"

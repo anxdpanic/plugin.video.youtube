@@ -66,16 +66,18 @@ class Subtitles(object):
         else:
             self.FORMATS['_default'] = 'vtt'
 
-        sub_lang = context.get_subtitle_language()
-        ui_lang = settings.get_language()
-        if not sub_lang and ui_lang:
-            self.preferred_lang = (ui_lang,)
-        elif sub_lang:
-            if (ui_lang and
-                    sub_lang.partition('-')[0] != ui_lang.partition('-')[0]):
-                self.preferred_lang = (sub_lang, ui_lang)
+        kodi_sub_lang = context.get_subtitle_language()
+        plugin_lang = settings.get_language()
+        if not kodi_sub_lang and plugin_lang:
+            self.preferred_lang = (plugin_lang,)
+        elif kodi_sub_lang:
+            if not plugin_lang:
+                self.preferred_lang = (kodi_sub_lang,)
+            elif (plugin_lang.partition('-')[0]
+                  != kodi_sub_lang.partition('-')[0]):
+                self.preferred_lang = (kodi_sub_lang, plugin_lang)
             else:
-                self.preferred_lang = (sub_lang,)
+                self.preferred_lang = (kodi_sub_lang,)
         else:
             self.preferred_lang = ('en',)
 
