@@ -370,14 +370,17 @@ class XbmcContext(AbstractContext):
     @staticmethod
     def get_language():
         language = xbmc.getLanguage(format=xbmc.ISO_639_1, region=True)
-        lang_code, seperator, region = language.partition('-')
+        lang_code, separator, region = language.partition('-')
         if not lang_code:
             language = xbmc.getLanguage(format=xbmc.ISO_639_2, region=False)
-            lang_code, seperator, region = language.partition('-')
+            lang_code, separator, region = language.partition('-')
+            if lang_code != 'fil':
+                lang_code = lang_code[:2]
+            region = region[:2]
         if not lang_code:
             return 'en-US'
         if region:
-            return seperator.join((lang_code.lower(), region.upper()))
+            return separator.join((lang_code.lower(), region.upper()))
         return lang_code
 
     def get_language_name(self, lang_id=None):
@@ -549,7 +552,7 @@ class XbmcContext(AbstractContext):
 
     @staticmethod
     def sleep(timeout=None):
-        wait(timeout)
+        return wait(timeout)
 
     def addon_enabled(self, addon_id):
         response = jsonrpc(method='Addons.GetAddonDetails',
@@ -590,7 +593,7 @@ class XbmcContext(AbstractContext):
             if self.addon_enabled('inputstream.adaptive'):
                 success = True
             elif self.get_ui().on_yes_no_input(
-                self.get_name(), self.localize('isa.enable.confirm')
+                    self.get_name(), self.localize('isa.enable.confirm')
             ):
                 success = self.set_addon_enabled('inputstream.adaptive')
             else:
@@ -610,8 +613,8 @@ class XbmcContext(AbstractContext):
         'ttml': loose_version('20.0.0'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
-        # unknown when Opus audio support was implemented
-        'opus': loose_version('19.0.0'),
+        # Opus audio enabled in Kodi v21+ which fixes stalls after seek
+        'opus': loose_version('21.0.0'),
         'mp4a': True,
         'ac-3': loose_version('2.1.15'),
         'ec-3': loose_version('2.1.15'),
@@ -659,6 +662,10 @@ class XbmcContext(AbstractContext):
 
     def abort_requested(self):
         return self.get_ui().get_property('abort_requested').lower() == 'true'
+
+    @staticmethod
+    def get_infobool(name):
+        return xbmc.getCondVisibility(name)
 
     @staticmethod
     def get_infolabel(name):

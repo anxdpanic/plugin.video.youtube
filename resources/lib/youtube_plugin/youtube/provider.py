@@ -129,8 +129,8 @@ class Provider(AbstractProvider):
 
         items_per_page = settings.items_per_page()
 
-        language = settings.get_language()
-        region = settings.get_region()
+        plugin_lang = settings.get_language()
+        plugin_region = settings.get_region()
 
         api_last_origin = access_manager.get_last_origin()
 
@@ -220,8 +220,8 @@ class Provider(AbstractProvider):
                 context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
 
         client = YouTube(context=context,
-                         language=language,
-                         region=region,
+                         language=plugin_lang,
+                         region=plugin_region,
                          items_per_page=items_per_page,
                          config=dev_keys if dev_keys else youtube_config)
 

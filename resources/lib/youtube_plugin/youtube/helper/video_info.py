@@ -1140,6 +1140,11 @@ class VideoInfo(YouTubeRequestClient):
         client_name = reason = status = None
         client = playability_status = result = None
 
+        reasons = (
+            self._context.localize(574, 'country').lower(),
+            self._context.localize(10005, 'not available').lower(),
+        )
+
         client_data = {'json': {'videoId': video_id}}
         if self._access_token:
             client_data['_access_token'] = self._access_token
@@ -1188,14 +1193,18 @@ class VideoInfo(YouTubeRequestClient):
                     # Geo-blocked video with error reasons like:
                     # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
                     # "The uploader has not made this video available in your country"
-                    if status == 'UNPLAYABLE' and 'country' in reason:
+                    # Reason language will vary based on Accept-Language and
+                    # client hl, Kodi localised language is used for comparison
+                    # but may not match reason language
+                    if (status == 'UNPLAYABLE'
+                            and any(why in reason for why in reasons)):
                         break
                     if status != 'ERROR':
                         continue
                     # This is used to check for error like:
                     # "The following content is not available on this app."
-                    # Text will vary depending on Accept-Language and client hl
-                    # YouTube support url is checked instead
+                    # Reason language will vary based on Accept-Language and
+                    # client hl, so YouTube support url is checked instead
                     url = self._get_error_details(
                         playability_status,
                         details=(
@@ -1211,9 +1220,9 @@ class VideoInfo(YouTubeRequestClient):
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
                         continue
-                if video_id != video_details.get('videoId'):
+                if video_details and video_id != video_details.get('videoId'):
                     status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                    reason = 'WATCH_ON_LATEST_VERSION_OF_YOUTUBE'
+                    reason = 'Watch on the latest version of YouTube'
                     continue
                 break
             # Only attempt to remove Authorization header if clients iterable

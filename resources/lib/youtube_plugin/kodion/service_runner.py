@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .constants import TEMP_PATH
+from .constants import ADDON_ID, TEMP_PATH
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
 from .utils import rm_dir
@@ -36,19 +36,29 @@ def run():
     wait_interval = 10
     ping_period = waited = 60
     restart_attempts = 0
+    plugin_url = 'plugin://{0}/'.format(ADDON_ID)
     while not monitor.abortRequested():
-        if waited >= ping_period:
+        if not monitor.httpd:
+            if (monitor.httpd_required()
+                    and not context.get_infobool('System.IdleTime(10)')):
+                monitor.start_httpd()
+        elif context.get_infobool('System.IdleTime(30)'):
+            monitor.shutdown_httpd()
+        elif waited >= ping_period:
             waited = 0
-
-            if monitor.httpd and not monitor.ping_httpd():
-                restart_attempts += 1
-                if restart_attempts > 5:
-                    monitor.shutdown_httpd()
-                    restart_attempts = 0
-                else:
-                    monitor.restart_httpd()
-            else:
+            if monitor.ping_httpd():
                 restart_attempts = 0
+            elif restart_attempts < 5:
+                monitor.restart_httpd()
+                restart_attempts += 1
+            else:
+                monitor.shutdown_httpd()
+                restart_attempts = 0
+
+        if context.get_infolabel('Container.FolderPath').startswith(plugin_url):
+            wait_interval = 1
+        else:
+            wait_interval = 10
 
         if monitor.waitForAbort(wait_interval):
             break

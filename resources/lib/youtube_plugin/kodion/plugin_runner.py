@@ -15,9 +15,12 @@ __all__ = ('run',)
 
 
 def run(provider, context=None):
-    from .compatibility import xbmc
+    if not context:
+        from .context import XbmcContext
 
-    profiler = xbmc.getCondVisibility('System.GetBool(debug.showloginfo)')
+        context = XbmcContext()
+
+    profiler = context.get_infobool('System.GetBool(debug.showloginfo)')
     if profiler:
         from .debug import Profiler
 
@@ -29,10 +32,6 @@ def run(provider, context=None):
     from .plugin import XbmcPlugin
 
     plugin = XbmcPlugin()
-    if not context:
-        from .context import XbmcContext
-
-        context = XbmcContext()
 
     context.log_debug('Starting Kodion framework by bromix...')
 

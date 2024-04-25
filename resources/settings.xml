@@ -115,12 +115,11 @@
                     <level>0</level>
                     <!--
                     All selections enabled except:
-                        - Opus audio
                         - no HFR at max quality
                         - no fractional framerate hinting
                         - no framerate hinting
                     -->
-                    <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>
+                    <default>avc1,vp9,av01,hdr,hfr,vorbis,opus,mp4a,ssa,ac-3,ec-3,dts,filter</default>
                     <constraints>
                         <options>
                             <option label="30727">avc1</option>
@@ -575,14 +574,12 @@
                 <setting id="kodion.support.alternative_player" type="boolean" label="30036" help="">
                     <level>0</level>
                     <default>false</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="kodion.default_player.web_urls" type="boolean" parent="kodion.support.alternative_player" label="30704" help="">
-                    <level>0</level>
-                    <default>false</default>
                     <dependencies>
                         <dependency type="enable">
-                            <condition setting="kodion.support.alternative_player" operator="is">true</condition>
+                            <or>
+                                <condition setting="kodion.support.alternative_player" operator="is">true</condition>
+                                <condition setting="kodion.default_player.web_urls" operator="is">false</condition>
+                            </or>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
@@ -595,7 +592,6 @@
                             <and>
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
                                 <condition setting="kodion.alternative_player.adaptive" operator="is">false</condition>
-                                <condition setting="kodion.default_player.web_urls" operator="is">false</condition>
                             </and>
                         </dependency>
                     </dependencies>
@@ -610,10 +606,19 @@
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
                                 <or>
                                     <condition setting="kodion.alternative_player.adaptive" operator="is">true</condition>
-                                    <condition setting="kodion.default_player.web_urls" operator="is">true</condition>
                                     <condition setting="kodion.alternative_player.web_urls" operator="is">false</condition>
                                 </or>
                             </and>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="kodion.default_player.web_urls" type="boolean" label="30704" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="kodion.support.alternative_player" operator="is">false</condition>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
@@ -660,7 +665,7 @@
                 </setting>
                 <setting id="kodion.live_stream.selection.1" type="integer" label="30689" help="30690">
                     <level>0</level>
-                    <default>2</default>  <!-- isa_hls -->
+                    <default>3</default>  <!-- isa_mpd -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts -->

@@ -387,6 +387,10 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     @staticmethod
+    def get_infobool(name):
+        raise NotImplementedError()
+
+    @staticmethod
     def get_infolabel(name):
         raise NotImplementedError()
 
