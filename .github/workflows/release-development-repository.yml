@@ -2,7 +2,7 @@ name: Generate and Publish Development Repositories
 on:
   workflow_dispatch:
     inputs:
-      prerelease:
+      pre-release:
         description: 'Is this a pre-release? [true|false]'
         required: false
         default: 'true'
@@ -22,14 +22,15 @@ jobs:
 
     steps:
       - name: Get and set release status
-        # workflow_dispatch: use prerelease variable for release status
+        # workflow_dispatch: use pre-release variable for release status
         # push-tag: check tag for alpha|beta|dev to determine release status
         id: release
         run: |
           version=${GITHUB_REF/refs\/tags\//}
-          if [[ ! -z ${{ github.event.inputs.prerelease }} ]] ;
+          pre-release=${github.event.inputs.pre-release}
+          if [[ ! -z "${pre-release}" ]] ;
           then
-            echo "pre-release=${{ github.event.inputs.prerelease }}" >> $GITHUB_OUTPUT
+            echo "pre-release=${pre-release}" >> $GITHUB_OUTPUT
           elif [[ $version == *[-+]@(alpha|beta|dev)*([.0-9a-z]) ]] ;
           then
             echo "pre-release=true" >> $GITHUB_OUTPUT
