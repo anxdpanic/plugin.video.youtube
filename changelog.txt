@@ -1,3 +1,32 @@
+## v7.0.6
+### Fixed
+- Improve updating containers and (re)loading windows #681
+- Fix refreshing video listing also forcing next pages to refresh when loaded
+- Fix overflow error resulting from parsing hashtags as episode numbers
+- Fix 6s delay on video playback start
+- Further fixes for multiple busy dialog crash workaround
+  - Possibly fix issues reported in comments of #704
+- Update error checks to avoid unnecessary retries of player requests
+- Fix adding and viewing items to internal bookmarks and watchlater list #720
+
+### Changed
+- Setup Wizard default settings now disable pre-downloading subtitles if MPEG-DASH is enabled
+- Ask for quality, Play with subtitles, Play audio only context menu items only displayed if associated setting is not already enabled
+- Only make extra request for subtitles for Android client when all subtitle languages are enabled
+- Overhaul alternative player support due to Kodi changes and also improve external player support
+- Make "Support alternative player" and "Use YouTube website urls with default player" mutually exclusive options #692
+- Enable OPUS audio by default #537
+- Enable MPEG-DASH for live streams by default #680
+- Setup Wizard will prompt to run when plugin first opens after updating, in order to update default settings
+- http server will shutdown on idle timeout #699
+
+### New
+- Add recommended settings in Setup Wizard for Raspberry Pi 1/2 class devices #688
+- Added Bookmarks
+  - Save videos, channels, playlists to Bookmarks
+  - Bookmarked channels will be checked for updates in My Subscriptions
+  - Data is stored locally, without needing to be logged in
+
 ## v7.0.6+beta.3
 ### Fixed
 - Fix adding and viewing items to internal bookmarks and watchlater list #720
