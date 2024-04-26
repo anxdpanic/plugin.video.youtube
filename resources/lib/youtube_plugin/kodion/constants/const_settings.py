@@ -55,6 +55,7 @@ USE_REMOTE_HISTORY = 'kodion.history.remote'  # (bool)
 SEARCH_SIZE = 'kodion.search.size'  # (int)
 CACHE_SIZE = 'kodion.cache.size'  # (int)
 
+CHANNEL_NAME_ALIASES = 'youtube.view.channel_name.aliases'  # (list[string])
 DETAILED_DESCRIPTION = 'youtube.view.description.details'  # (bool)
 DETAILED_LABELS = 'youtube.view.label.details'  # (bool)
 LABEL_COLOR = 'youtube.view.label.color'  # (string)

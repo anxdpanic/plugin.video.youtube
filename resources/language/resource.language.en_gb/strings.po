@@ -1532,3 +1532,7 @@ msgstr ""
 msgctxt "#30806"
 msgid "Jump to page..."
 msgstr ""
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr ""

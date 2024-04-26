@@ -31,6 +31,11 @@ def set_info(list_item, item, properties):
             if value is not None:
                 info_labels['artist'] = value
 
+            value = item.get_cast()
+            if value is not None:
+                info_labels['castandrole'] = [(member['name'], member['role'])
+                                              for member in value]
+
             value = item.get_code()
             if value is not None:
                 info_labels['code'] = value
@@ -94,6 +99,10 @@ def set_info(list_item, item, properties):
             value = item.get_year()
             if value is not None:
                 info_labels['year'] = value
+
+            value = item.get_studios()
+            if value is not None:
+                info_labels['studio'] = value
 
             if info_labels:
                 list_item.setInfo('video', info_labels)
@@ -201,8 +210,10 @@ def set_info(list_item, item, properties):
 
         # cast: list[xbmc.Actor]
         # From list[{member: str, role: str, order: int, thumbnail: str}]
-        # Currently unused
-        # info_tag.setCast(xbmc.Actor(**member) for member in item.get_cast())
+        # Used as alias for channel name if enabled
+        value = item.get_cast()
+        if value is not None:
+            info_tag.setCast([xbmc.Actor(**member) for member in value])
 
         # code: str
         # eg. "466K | 3.9K | 312"
@@ -248,8 +259,10 @@ def set_info(list_item, item, properties):
             info_tag.setSeason(value)
 
         # studio: list[str]
-        # Currently unused
-        # info_tag.setStudios(item.get_studios())
+        # Used as alias for channel name if enabled
+        value = item.get_studios()
+        if value is not None:
+            info_tag.setStudios(value)
 
     elif isinstance(item, DirectoryItem):
         info_tag = list_item.getVideoInfoTag()
@@ -285,6 +298,7 @@ def set_info(list_item, item, properties):
 
     # artist: list[str]
     # eg. ["Angerfist"]
+    # Used as alias for channel name
     value = item.get_artists()
     if value is not None:
         info_tag.setArtists(value)

@@ -409,3 +409,6 @@ class AbstractSettings(object):
 
         def get_label_color(self, label_part):
             return self._COLOR_MAP.get(label_part, 'white')
+
+    def get_channel_name_aliases(self):
+        return frozenset(self.get_string_list(settings.CHANNEL_NAME_ALIASES))

@@ -745,6 +745,21 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.view.channel_name.aliases" type="list[string]" label="30807" help="">
+                    <level>0</level>
+                    <default>cast</default>
+                    <constraints>
+                        <options>
+                            <option label="206">cast</option>
+                            <option label="572">studio</option>
+                        </options>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
+                </setting>
                 <setting id="youtube.view.label.color.viewCount" type="string" parent="youtube.view.label.details" label="30793" help="">
                     <level>0</level>
                     <default>ffadd8e6</default>
