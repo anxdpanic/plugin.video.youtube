@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-15 16:14+0000\n"
-"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
+"PO-Revision-Date: 2024-04-26 02:42+0000\n"
+"Last-Translator: roliverosc <roliverosc@hotmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
 "MIME-Version: 1.0\n"
@@ -19,11 +19,11 @@ msgstr ""
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr "Plugin para YouTube"
+msgstr "Complemento para YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
-msgstr "YouTube es uno de los sitios web más grande del mundo para compartir vídeos."
+msgstr "YouTube es uno de los sitios web para compartir vídeos más grandes del mundo."
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
@@ -55,7 +55,7 @@ msgstr "YouTube"
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
-msgstr "Utilizar InputStream Adaptativo"
+msgstr "Usar InputStream Adaptativo"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -99,7 +99,7 @@ msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr "1080p En Directo / 720p (HD)"
+msgstr "1080p En directo / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
@@ -128,11 +128,11 @@ msgstr "Tamaño para caché de funciones (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr "Activar el Asistente de Configuración"
+msgstr "Activar el Asistente de configuración"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr "Anular visualizaciones"
+msgstr "Anular vistas"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -168,7 +168,7 @@ msgstr "Vista: Intérpretes"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr "Vista: Albums"
+msgstr "Vista: Álbumes"
 
 msgctxt "#30036"
 msgid "Support alternative player"
@@ -210,7 +210,7 @@ msgstr "Archivos"
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
-msgstr "Siguiente Página (%d)"
+msgstr "Siguiente página (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
@@ -218,11 +218,11 @@ msgstr "Ver más tarde"
 
 msgctxt "#30108"
 msgid "Remove"
-msgstr "Suprimir"
+msgstr "Borrar"
 
 msgctxt "#30109"
 msgid "Latest Videos"
-msgstr "Últimos Vídeos"
+msgstr "Últimos vídeos"
 
 msgctxt "#30110"
 msgid "New Search"
@@ -242,11 +242,11 @@ msgstr "Renombrar"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr "Confirmación para eliminar"
+msgstr "Confirmar eliminación"
 
 msgctxt "#30115"
 msgid "Confirm remove"
-msgstr "Confirmación para suprimir"
+msgstr "Confirmar borrado"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
@@ -254,7 +254,7 @@ msgstr "¿Está seguro de que desea eliminar \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
-msgstr "¿Está seguro de que desea suprimir \"%s\"?"
+msgstr "¿Está seguro de que desea borrar \"%s\"?"
 
 msgctxt "#30118"
 msgid "Delete"
@@ -266,11 +266,11 @@ msgstr "Por favor, espere..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr "Confirmar borrar"
+msgstr "Confirmar limpieza"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr "¿Borrar %s?"
+msgstr "¿Está seguro de que desea limpiar \"%s\"?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -292,11 +292,11 @@ msgstr "API Secret"
 
 msgctxt "#30204"
 msgid "Enable personal API keys"
-msgstr "Habilitar claves API personales"
+msgstr "Activar claves API personales"
 
 msgctxt "#30205"
 msgid "Use preset API key set"
-msgstr "Utilizar conjunto de claves API preestablecido"
+msgstr "Usar conjunto de claves API preestablecido"
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -362,7 +362,7 @@ msgstr "Vídeos relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto-Eliminar de 'Ver más tarde'"
+msgstr "Borrar automáticamente de 'Ver más tarde'"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -378,7 +378,7 @@ msgstr "Por favor, vaya a la URL '%s' desde"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
-msgstr "e introduce el siguiente código:"
+msgstr "e introduzca el siguiente código:"
 
 msgctxt "#30520"
 msgid "Add to..."
@@ -398,11 +398,11 @@ msgstr "Idioma"
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr "Seleccione el idioma"
+msgstr "Seleccionar idioma"
 
 msgctxt "#30525"
 msgid "Select region"
-msgstr "Seleccione una región"
+msgstr "Seleccionar región"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
@@ -470,7 +470,7 @@ msgstr "Mostrar el nombre del canal y los detalles del vídeo en la descripción
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
-msgstr "Los streams rtmpe no estan soportados"
+msgstr "Las transmisiones rtmpe no están soportadas"
 
 msgctxt "#30543"
 msgid "Refresh"
@@ -486,7 +486,7 @@ msgstr "No se encontraron enlaces."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
-msgstr "Por favor, inicie sesión dos veces!"
+msgstr "¡Por favor, inicie sesión dos veces!"
 
 msgctxt "#30547"
 msgid "You must enable two applications so that YouTube is functioning properly."
@@ -518,7 +518,7 @@ msgstr "Eliminar base de datos para caché de funciones"
 
 msgctxt "#30554"
 msgid "Delete search history database"
-msgstr "Eliminar base de datos para historial de búsquedas"
+msgstr "Eliminar base de datos para historial de búsqueda"
 
 msgctxt "#30555"
 msgid "Clear function cache"
@@ -578,7 +578,7 @@ msgstr "Eliminar como 'Ver más tarde'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "¿Está seguro de que desea eliminar '%s' como su lista 'Ver más tarde'?"
+msgstr "¿Está seguro de que desea borrar '%s' de su lista 'Ver más tarde'?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
@@ -590,11 +590,11 @@ msgstr "Establecer como 'Historial'"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr "Eliminar como 'Historial'"
+msgstr "Borrar como 'Historial'"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "¿Está seguro de que quiere eliminar '%s' como su lista 'Historial'?"
+msgstr "¿Está seguro de que quiere borrar '%s' como su lista 'Historial'?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with '%s'?"
@@ -618,7 +618,7 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "InputStream Adaptive está activado en los ajustes de YouTube, pero el complemento se ha desactivado. ¿Quieres activar InputStream Adaptive ahora?"
+msgstr "InputStream Adaptive está activado en los ajustes de YouTube, sin embargo, el complemento ha sido deshabilitado. ¿Quieres activar InputStream Adaptive ahora?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -654,7 +654,7 @@ msgstr "Añadir filtro a 'Mis Suscripciones'"
 
 msgctxt "#30588"
 msgid "Remove from My Subscriptions filter"
-msgstr "Eliminar filtro de 'Mis Suscripciones'"
+msgstr "Borrar filtro de 'Mis Suscripciones'"
 
 msgctxt "#30589"
 msgid "Added to My Subscriptions filter"
@@ -662,7 +662,7 @@ msgstr "Añadido a filtro de 'Mis Suscripciones'"
 
 msgctxt "#30590"
 msgid "Removed from My Subscriptions filter"
-msgstr "Eliminado de filtro de 'Mis Suscripciones'"
+msgstr "Borrado filtro de 'Mis Suscripciones'"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
@@ -714,7 +714,7 @@ msgstr "Sin autogenerado"
 
 msgctxt "#30603"
 msgid "Age gate"
-msgstr "Habilitar restricciones por edad"
+msgstr "Activar restricciones por edad"
 
 msgctxt "#30604"
 msgid "Allow offensive content"
@@ -722,11 +722,11 @@ msgstr "Permitir contenido ofensivo"
 
 msgctxt "#30605"
 msgid "Quick Search"
-msgstr "Búsqueda Rápida"
+msgstr "Búsqueda rápida"
 
 msgctxt "#30606"
 msgid "Quick Search (Incognito)"
-msgstr "Búsqueda Rápida (Incógnito)"
+msgstr "Búsqueda rápida (Incógnito)"
 
 msgctxt "#30607"
 msgid "Audio only"
@@ -742,7 +742,7 @@ msgstr "Limpiar historial de reproducción"
 
 msgctxt "#30610"
 msgid "This will clear your account's watch history from all devices. You can't undo this."
-msgstr "Esta acción borrará su historial de reproducción en todos los dispositivos asociados a su cuenta. Esta acción no se podrá deshacer."
+msgstr "Esta acción limpiará su historial de reproducción en todos los dispositivos asociados a su cuenta. Esta acción no se podrá deshacer."
 
 msgctxt "#30611"
 msgid "Saved Playlists"
@@ -786,7 +786,7 @@ msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr "El proxy es necesario para VODs de MPEG-DASH (ver Avanzado > Servidor HTTP)"
+msgstr "El proxy es necesario para VODs MPEG-DASH (ver Avanzado > Servidor HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -810,7 +810,7 @@ msgstr "Eliminar archivos temporales"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr "Calificar vídeo después de ver"
+msgstr "Valorar vídeo después de ver"
 
 msgctxt "#30628"
 msgid "HTTP Server"
@@ -830,7 +830,7 @@ msgstr "Actualizado correctamente: %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
-msgstr "Habilitar página de configuración API"
+msgstr "Activar página de configuración API"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
@@ -858,7 +858,7 @@ msgstr "Añada como marcador esta página para agregar sus claves rápidamente e
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
-msgstr "Encontradas claves API personales en api_keys.json, ¿Le gustaría restaurarlas? Seleccionar NO sobrescribirá este archivo."
+msgstr "Claves API personales encontradas en api_keys.json, ¿Le gustaría restaurarlas? Seleccionar NO sobrescribirá este archivo."
 
 msgctxt "#30640"
 msgid "Restore"
