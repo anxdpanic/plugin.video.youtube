@@ -240,37 +240,40 @@ def strptime(datetime_str, fmt=None):
     if fmt is None:
         fmt = '%Y-%m-%d%H%M%S'
 
-    if ' ' in datetime_str:
-        date_part, time_part = datetime_str.split(' ')
-    elif 'T' in datetime_str:
-        date_part, time_part = datetime_str.split('T')
-    else:
-        date_part = None
-        time_part = datetime_str
+        if ' ' in datetime_str:
+            date_part, time_part = datetime_str.split(' ')
+        elif 'T' in datetime_str:
+            date_part, time_part = datetime_str.split('T')
+        else:
+            date_part = None
+            time_part = datetime_str
 
-    if ':' in time_part:
-        time_part = time_part.replace(':', '')
+        if ':' in time_part:
+            time_part = time_part.replace(':', '')
 
-    if '+' in time_part:
-        time_part, offset, timezone_part = time_part.partition('+')
-    elif '-' in time_part:
-        time_part, offset, timezone_part = time_part.partition('+')
-    else:
-        offset = timezone_part = ''
+        if '+' in time_part:
+            time_part, offset, timezone_part = time_part.partition('+')
+        elif '-' in time_part:
+            time_part, offset, timezone_part = time_part.partition('+')
+        else:
+            offset = timezone_part = ''
 
-    if timezone and timezone_part and offset:
-        fmt = fmt.replace('%S', '%S%z')
-    else:
-        fmt = fmt.replace('%S%z', '%S')
+        if timezone and timezone_part and offset:
+            fmt = fmt.replace('%S', '%S%z')
+        else:
+            fmt = fmt.replace('%S%z', '%S')
 
-    if '.' in time_part:
-        fmt = fmt.replace('%S', '%S.%f')
-    else:
-        fmt = fmt.replace('%S.%f', '%S')
+        if '.' in time_part:
+            fmt = fmt.replace('%S', '%S.%f')
+        else:
+            fmt = fmt.replace('%S.%f', '%S')
 
-    if timezone and timezone_part and offset:
-        time_part = offset.join((time_part, timezone_part))
-    datetime_str = ''.join((date_part, time_part)) if date_part else time_part
+        if timezone and timezone_part and offset:
+            time_part = offset.join((time_part, timezone_part))
+        if date_part:
+            datetime_str = ''.join((date_part, time_part))
+        else:
+            datetime_str = time_part
 
     try:
         return datetime.strptime(datetime_str, fmt)
