@@ -67,6 +67,9 @@ def from_json(json_data, *args):
 
     item = _ITEM_TYPES[item_type](name='', uri='')
 
+    if 'data' in json_data and isinstance(json_data['data'], string_type):
+        return TypeError
+
     for key, value in json_data.get('data', {}).items():
         if hasattr(item, key):
             setattr(item, key, value)

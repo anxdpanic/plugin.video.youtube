@@ -429,6 +429,10 @@ class Storage(object):
                     item[0]: self._decode(item[2], process, item)
                     for item in result if not cut_off or item[1] >= cut_off
                 }
+                for item_id, value in list(result.items()):
+                    if value == TypeError:
+                        self._remove(item_id)
+                        del result[item_id]
             elif values_only:
                 result = [
                     self._decode(item[2], process, item)
