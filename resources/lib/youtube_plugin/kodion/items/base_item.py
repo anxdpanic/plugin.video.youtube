@@ -210,17 +210,10 @@ class BaseItem(object):
 
 class _Encoder(json.JSONEncoder):
     def encode(self, obj, nested=False):
-        if isinstance(obj, string_type):
-            output = to_str(obj)
-        elif isinstance(obj, dict):
-            output = {to_str(key): self.encode(value, nested=True)
-                      for key, value in obj.items()}
-        elif isinstance(obj, (list, tuple)):
-            output = [self.encode(item, nested=True) for item in obj]
-        elif isinstance(obj, (date, datetime)):
+        if isinstance(obj, (date, datetime)):
             class_name = obj.__class__.__name__
             if 'fromisoformat' in dir(obj):
-                output = {
+                obj = {
                     '__class__': class_name,
                     '__isoformat__': obj.isoformat(),
                 }
@@ -232,14 +225,22 @@ class _Encoder(json.JSONEncoder):
                         format_string = '%Y-%m-%dT%H:%M:%S'
                 else:
                     format_string = '%Y-%m-%d'
-                output = {
+                obj = {
                     '__class__': class_name,
                     '__format_string__': format_string,
                     '__value__': obj.strftime(format_string)
                 }
+
+        if isinstance(obj, string_type):
+            output = to_str(obj)
+        elif isinstance(obj, dict):
+            output = {to_str(key): self.encode(value, nested=True)
+                      for key, value in obj.items()}
+        elif isinstance(obj, (list, tuple)):
+            output = [self.encode(item, nested=True) for item in obj]
         else:
             output = obj
 
         if nested:
-            return to_str(output)
+            return output
         return super(_Encoder, self).encode(output)
