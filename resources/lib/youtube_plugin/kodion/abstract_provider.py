@@ -204,11 +204,15 @@ class AbstractProvider(object):
         return self.reroute(context, path=path, params=params)
 
     def reroute(self, context, re_match=None, path=None, params=None):
+        current_path = context.get_path()
+        current_params = context.get_params()
         if re_match:
             path = re_match.group('path')
         if params is None:
-            params = context.get_params()
-        if path:
+            params = current_params
+        if (path and path != current_path
+                or 'refresh' in params
+                or params != current_params):
             result = None
             function_cache = context.get_function_cache()
             try:
