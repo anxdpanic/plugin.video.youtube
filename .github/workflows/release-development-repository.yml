@@ -27,7 +27,7 @@ jobs:
         id: release
         run: |
           version=${GITHUB_REF/refs\/tags\//}
-          pre-release=${github.event.inputs.pre-release}
+          pre-release=${{ github.event.inputs.pre-release }}
           if [[ ! -z "${pre-release}" ]] ;
           then
             echo "pre-release=${pre-release}" >> $GITHUB_OUTPUT
