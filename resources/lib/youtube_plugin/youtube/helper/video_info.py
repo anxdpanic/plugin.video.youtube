@@ -1142,7 +1142,9 @@ class VideoInfo(YouTubeRequestClient):
 
         reasons = (
             self._context.localize(574, 'country').lower(),
-            self._context.localize(10005, 'not available').lower(),
+            # not available error appears to vary by language/region/video type
+            # disable this check for now
+            # self._context.localize(10005, 'not available').lower(),
         )
 
         client_data = {'json': {'videoId': video_id}}
