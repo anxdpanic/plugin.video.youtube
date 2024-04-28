@@ -94,10 +94,18 @@ class AbstractSettings(object):
     def get_search_history_size(self):
         return self.get_int(settings.SEARCH_SIZE, 10)
 
-    def is_setup_wizard_enabled(self):
+    def setup_wizard_enabled(self, value=None):
         # Increment min_required on new release to enable oneshot on first run
         min_required = 3
-        forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, min_required - 1)
+
+        if value is False:
+            self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
+            return self.set_bool(settings.SETUP_WIZARD, False)
+        if value is True:
+            self.set_int(settings.SETUP_WIZARD_RUNS, 0)
+            return self.set_bool(settings.SETUP_WIZARD, True)
+
+        forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, 0)
         if forced_runs < min_required:
             self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
             return True
@@ -380,8 +388,14 @@ class AbstractSettings(object):
     def get_language(self):
         return self.get_string(settings.LANGUAGE, 'en_US').replace('_', '-')
 
+    def set_language(self, language_id):
+        return self.set_string(settings.LANGUAGE, language_id)
+
     def get_region(self):
         return self.get_string(settings.REGION, 'US')
+
+    def set_region(self, region_id):
+        return self.set_string(settings.REGION, region_id)
 
     def get_watch_later_playlist(self):
         return self.get_string(settings.WATCH_LATER_PLAYLIST, '').strip()

@@ -937,24 +937,24 @@ class Provider(AbstractProvider):
         log_list = []
 
         if api_key:
-            settings.set_string('youtube.api.key', api_key)
+            settings.api_key(api_key)
             updated_list.append(localize('api.key'))
             log_list.append('Key')
         if client_id:
-            settings.set_string('youtube.api.id', client_id)
+            settings.api_id(client_id)
             updated_list.append(localize('api.id'))
             log_list.append('Id')
         if client_secret:
-            settings.set_string('youtube.api.secret', client_secret)
+            settings.api_secret(client_secret)
             updated_list.append(localize('api.secret'))
             log_list.append('Secret')
         if updated_list:
             ui.show_notification(localize('updated_') % ', '.join(updated_list))
         context.log_debug('Updated API keys: %s' % ', '.join(log_list))
 
-        client_id = settings.get_string('youtube.api.id', '')
-        client_secret = settings.get_string('youtube.api.secret', '')
-        api_key = settings.get_string('youtube.api.key', '')
+        client_id = settings.api_id()
+        client_secret = settings.api_secret()
+        api_key = settings.api_key
         missing_list = []
         log_list = []
 

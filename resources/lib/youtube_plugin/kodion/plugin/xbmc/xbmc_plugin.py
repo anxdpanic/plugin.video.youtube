@@ -108,7 +108,7 @@ class XbmcPlugin(AbstractPlugin):
             ui.clear_property(BUSY_FLAG)
             ui.clear_property(PLAYLIST_POSITION)
 
-        if settings.is_setup_wizard_enabled():
+        if settings.setup_wizard_enabled():
             provider.run_wizard(context)
 
         try:

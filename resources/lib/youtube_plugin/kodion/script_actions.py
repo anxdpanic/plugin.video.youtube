@@ -31,7 +31,7 @@ def _config_actions(context, action, *_args):
         if context.use_inputstream_adaptive():
             xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
         else:
-            settings.set_bool('kodion.video.quality.isa', False)
+            settings.use_isa(False)
 
     elif action == 'inputstreamhelper':
         try:

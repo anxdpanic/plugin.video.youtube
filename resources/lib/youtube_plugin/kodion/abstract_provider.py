@@ -125,7 +125,7 @@ class AbstractProvider(object):
                     else:
                         step += 1
         finally:
-            settings.set_bool(settings.SETUP_WIZARD, False)
+            settings.setup_wizard_enabled(False)
             context.send_notification('check_settings', 'process')
 
     def get_wizard_steps(self, context):

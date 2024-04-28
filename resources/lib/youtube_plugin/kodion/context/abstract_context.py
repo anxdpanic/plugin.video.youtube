@@ -179,7 +179,7 @@ class AbstractContext(object):
     def get_search_history(self):
         if not self._search_history:
             settings = self.get_settings()
-            search_size = settings.get_int(settings.SEARCH_SIZE, 50)
+            search_size = settings.get_search_history_size()
             uuid = self.get_access_manager().get_current_user_id()
             filename = 'search.sqlite'
             filepath = os.path.join(self.get_data_path(), uuid, filename)
