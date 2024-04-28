@@ -48,6 +48,7 @@ class AbstractContext(object):
         'strm',
     }
     _INT_PARAMS = {
+        'fanart_type',
         'live',
         'next_page_token',
         'offset',

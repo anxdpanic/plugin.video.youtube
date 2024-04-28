@@ -41,16 +41,25 @@ def _process_list_response(provider, context, json_data):
     result = []
 
     item_params = {}
-    incognito = context.get_param('incognito', False)
+    params = context.get_params()
+    incognito = params.get('incognito', False)
     if incognito:
         item_params['incognito'] = incognito
-    addon_id = context.get_param('addon_id', '')
+    addon_id = params.get('addon_id', '')
     if addon_id:
         item_params['addon_id'] = addon_id
 
     settings = context.get_settings()
-    thumb_size = settings.get_thumbnail_size()
     use_play_data = not incognito and settings.use_local_history()
+
+    thumb_size = settings.get_thumbnail_size()
+    fanart_type = params.get('fanart_type')
+    if fanart_type is None:
+        fanart_type = settings.fanart_selection()
+    if fanart_type == settings.FANART_THUMBNAIL:
+        fanart_type = settings.get_thumbnail_size(settings.THUMB_SIZE_BEST)
+    else:
+        fanart_type = False
 
     for yt_item in yt_items:
         is_youtube, kind = _parse_kind(yt_item)
@@ -61,7 +70,10 @@ def _process_list_response(provider, context, json_data):
         item_id = yt_item.get('id')
         snippet = yt_item.get('snippet', {})
         title = snippet.get('title', context.localize('untitled'))
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+
+        thumbnails = snippet.get('thumbnails', {})
+        image = get_thumbnail(thumb_size, thumbnails)
+        fanart = get_thumbnail(fanart_type, thumbnails) if fanart_type else None
 
         if kind == 'searchresult':
             _, kind = _parse_kind(item_id)
@@ -77,7 +89,7 @@ def _process_list_response(provider, context, json_data):
                 ('play',),
                 dict(item_params, video_id=item_id),
             )
-            item = VideoItem(title, item_uri, image=image)
+            item = VideoItem(title, item_uri, image=image, fanart=fanart)
             video_id_dict[item_id] = item
 
         elif kind == 'channel':
@@ -141,7 +153,7 @@ def _process_list_response(provider, context, json_data):
                 ('play',),
                 dict(item_params, video_id=item_id),
             )
-            item = VideoItem(title, item_uri, image=image)
+            item = VideoItem(title, item_uri, image=image, fanart=fanart)
             video_id_dict[item_id] = item
 
         elif kind == 'activity':
@@ -158,7 +170,7 @@ def _process_list_response(provider, context, json_data):
                 ('play',),
                 dict(item_params, video_id=item_id),
             )
-            item = VideoItem(title, item_uri, image=image)
+            item = VideoItem(title, item_uri, image=image, fanart=fanart)
             video_id_dict[item_id] = item
 
         elif kind == 'commentthread':

@@ -83,8 +83,8 @@ class AbstractSettings(object):
         return (self.get_bool(settings.VIDEO_QUALITY_ASK, False)
                 or self.get_int(settings.MPD_STREAM_SELECT) == 4)
 
-    def show_fanart(self):
-        return self.get_bool(settings.SHOW_FANART, True)
+    def fanart_selection(self):
+        return self.get_int(settings.FANART_SELECTION, 2)
 
     def cache_size(self, value=None):
         if value is not None:
@@ -173,9 +173,10 @@ class AbstractSettings(object):
         },
     }
 
-    def get_thumbnail_size(self):
+    def get_thumbnail_size(self, value=None):
         default = 1
-        value = self.get_int(settings.THUMB_SIZE, default)
+        if value is None:
+            value = self.get_int(settings.THUMB_SIZE, default)
         if value in self._THUMB_SIZES:
             return self._THUMB_SIZES[value]
         return self._THUMB_SIZES[default]

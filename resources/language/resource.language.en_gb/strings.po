@@ -318,7 +318,7 @@ msgid "Go to %s"
 msgstr ""
 
 msgctxt "#30503"
-msgid "Show channel fanart"
+msgid "Channel fanart"
 msgstr ""
 
 msgctxt "#30504"

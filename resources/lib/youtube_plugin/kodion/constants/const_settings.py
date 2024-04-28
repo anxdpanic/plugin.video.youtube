@@ -61,7 +61,10 @@ DETAILED_LABELS = 'youtube.view.label.details'  # (bool)
 LABEL_COLOR = 'youtube.view.label.color'  # (string)
 
 THUMB_SIZE = 'kodion.thumbnail.size'  # (int)
-SHOW_FANART = 'kodion.fanart.show'  # (bool)
+THUMB_SIZE_BEST = 2
+FANART_SELECTION = 'kodion.fanart.selection'  # (int)
+FANART_CHANNEL = 2
+FANART_THUMBNAIL = 3
 
 LANGUAGE = 'youtube.language'  # (str)
 REGION = 'youtube.region'  # (str)

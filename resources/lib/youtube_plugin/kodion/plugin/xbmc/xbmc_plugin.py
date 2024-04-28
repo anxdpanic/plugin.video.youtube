@@ -135,7 +135,7 @@ class XbmcPlugin(AbstractPlugin):
 
         item_count = 0
         if isinstance(result, (list, tuple)):
-            show_fanart = settings.show_fanart()
+            show_fanart = settings.fanart_selection()
             result = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](
                     context, item, show_fanart=show_fanart
@@ -181,7 +181,7 @@ class XbmcPlugin(AbstractPlugin):
             item = self._PLAY_ITEM_MAP[base_item.__class__.__name__](
                 context,
                 base_item,
-                show_fanart=context.get_settings().show_fanart(),
+                show_fanart=context.get_settings().fanart_selection(),
                 for_playback=True,
             )
             xbmcplugin.setResolvedUrl(self.handle,

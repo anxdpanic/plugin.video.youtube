@@ -414,7 +414,7 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
         return list_item
 
     if show_fanart is None:
-        show_fanart = settings.show_fanart()
+        show_fanart = settings.fanart_selection()
     image = video_item.get_image()
     list_item.setArt({
         'icon': image or 'DefaultVideo.png',
@@ -448,7 +448,7 @@ def audio_listitem(context, audio_item, show_fanart=None, for_playback=False):
     list_item = xbmcgui.ListItem(**kwargs)
 
     if show_fanart is None:
-        show_fanart = context.get_settings().show_fanart()
+        show_fanart = context.get_settings().fanart_selection()
     image = audio_item.get_image() or 'DefaultAudio.png'
     list_item.setArt({
         'icon': image,
@@ -496,7 +496,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
             props['specialSort'] = 'top'
 
     if show_fanart is None:
-        show_fanart = context.get_settings().show_fanart()
+        show_fanart = context.get_settings().fanart_selection()
     image = directory_item.get_image() or 'DefaultFolder.png'
     list_item.setArt({
         'icon': image,
@@ -541,7 +541,7 @@ def image_listitem(context, image_item, show_fanart=None):
     list_item = xbmcgui.ListItem(**kwargs)
 
     if show_fanart is None:
-        show_fanart = context.get_settings().show_fanart()
+        show_fanart = context.get_settings().fanart_selection()
     image = image_item.get_image() or 'DefaultPicture.png'
     list_item.setArt({
         'icon': image,
@@ -629,7 +629,7 @@ def video_listitem(context, video_item, show_fanart=None):
         props['playlist_item_id'] = prop_value
 
     if show_fanart is None:
-        show_fanart = context.get_settings().show_fanart()
+        show_fanart = context.get_settings().fanart_selection()
     image = video_item.get_image()
     list_item.setArt({
         'icon': image or 'DefaultVideo.png',

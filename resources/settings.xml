@@ -820,20 +820,18 @@
                     </constraints>
                     <control format="string" type="spinner"/>
                 </setting>
-                <setting id="kodion.fanart.show" type="boolean" label="30021" help="">
+                <setting id="kodion.fanart.selection" type="integer" label="30021" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="youtube.channel.fanart.show" type="boolean" parent="kodion.fanart.show" label="30503" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <dependencies>
-                        <dependency type="enable">
-                            <condition setting="kodion.fanart.show" operator="is">true</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
+                    <default>2</default>  <!-- channel fanart -->
+                    <constraints>
+                        <options>
+                            <option label="20439">0</option>  <!-- no fanart -->
+                            <option label="571">1</option>    <!-- default -->
+                            <option label="30503">2</option>  <!-- channel fanart -->
+                            <option label="21371">3</option>  <!-- thumbnail -->
+                        </options>
+                    </constraints>
+                    <control format="string" type="spinner"/>
                 </setting>
             </group>
             <group id="5" label="30527">

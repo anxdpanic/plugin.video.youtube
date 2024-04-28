@@ -17,9 +17,10 @@ class ResourceManager(object):
         self._client = client
         self._data_cache = context.get_data_cache()
         self._function_cache = context.get_function_cache()
-        self._show_fanart = context.get_settings().get_bool(
-            'youtube.channel.fanart.show', True
-        )
+        fanart_type = context.get_param('fanart_type')
+        if fanart_type is None:
+            fanart_type = context.get_settings().fanart_selection()
+        self._fanart_type = fanart_type
         self.new_data = {}
 
     @staticmethod
@@ -99,12 +100,16 @@ class ResourceManager(object):
         return result
 
     def get_fanarts(self, channel_ids, defer_cache=False):
-        if not self._show_fanart:
+        if self._fanart_type != self._context.get_settings().FANART_CHANNEL:
             return {}
 
         result = self.get_channels(channel_ids, defer_cache=defer_cache)
-        banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl',
-                   'bannerTvImageUrl', 'bannerExternalUrl']
+        banners = (
+            'bannerTvMediumImageUrl',
+            'bannerTvLowImageUrl',
+            'bannerTvImageUrl',
+            'bannerExternalUrl',
+        )
         # transform
         for key, item in result.items():
             images = item.get('brandingSettings', {}).get('image', {})
