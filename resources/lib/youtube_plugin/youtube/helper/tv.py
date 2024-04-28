@@ -134,7 +134,7 @@ def saved_playlists_to_items(provider, context, json_data):
     result = []
     playlist_id_dict = {}
 
-    thumb_size = context.get_settings().use_thumbnail_size()
+    thumb_size = context.get_settings().get_thumbnail_size()
     incognito = context.get_param('incognito', False)
     item_params = {}
     if incognito:

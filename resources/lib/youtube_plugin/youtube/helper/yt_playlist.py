@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from .utils import get_thumbnail
 from ...kodion import KodionException
 from ...kodion.utils import find_video_id
 
@@ -177,6 +178,7 @@ def _process_select_playlist(provider, context):
     else:
         watch_later_id = None
 
+    thumb_size = context.get_settings().get_thumb_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
     while True:
@@ -211,13 +213,13 @@ def _process_select_playlist(provider, context):
             snippet = playlist.get('snippet', {})
             title = snippet.get('title', '')
             description = snippet.get('description', '')
-            thumbnail = snippet.get('thumbnails', {}).get('default', {})
+            thumbnail = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             playlist_id = playlist.get('id', '')
             if title and playlist_id:
                 items.append((
                     title, description,
                     playlist_id,
-                    thumbnail.get('url') or default_thumb
+                    thumbnail or default_thumb
                 ))
 
         if page_token:

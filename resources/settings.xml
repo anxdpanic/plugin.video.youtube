@@ -810,11 +810,12 @@
                 </setting>
                 <setting id="kodion.thumbnail.size" type="integer" label="30591" help="">
                     <level>0</level>
-                    <default>1</default>
+                    <default>1</default>  <!-- High (4:3) -->
                     <constraints>
                         <options>
-                            <option label="30592">0</option>
-                            <option label="30593">1</option>
+                            <option label="30592">0</option>  <!-- Medium (16:9) -->
+                            <option label="30593">1</option>  <!-- High (4:3) -->
+                            <option label="20049">2</option>  <!-- Best available -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>

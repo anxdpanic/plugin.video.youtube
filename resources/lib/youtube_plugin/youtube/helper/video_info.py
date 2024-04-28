@@ -19,6 +19,7 @@ from traceback import format_stack
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
+from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import (
@@ -917,7 +918,7 @@ class VideoInfo(YouTubeRequestClient):
         if meta_info is None:
             meta_info = {'video': {},
                          'channel': {},
-                         'images': {},
+                         'thumbnails': {},
                          'subtitles': []}
 
         if playback_stats is None:
@@ -981,7 +982,7 @@ class VideoInfo(YouTubeRequestClient):
         if meta_info is None:
             meta_info = {'video': {},
                          'channel': {},
-                         'images': {},
+                         'thumbnails': {},
                          'subtitles': []}
         if playback_stats is None:
             playback_stats = {}
@@ -1306,15 +1307,13 @@ class VideoInfo(YouTubeRequestClient):
                                    .encode('raw_unicode_escape')
                                    .decode('raw_unicode_escape')),
             },
-            'images': {
-                'high': ('https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg'
-                         .format(video_id, thumb_suffix)),
-                'medium': ('https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg'
-                           .format(video_id, thumb_suffix)),
-                'standard': ('https://i.ytimg.com/vi/{0}/sddefault{1}.jpg'
-                             .format(video_id, thumb_suffix)),
-                'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
-                            .format(video_id, thumb_suffix)),
+            'thumbnails': {
+                thumb_type: {
+                    'url': thumb['url'].format(video_id, thumb_suffix),
+                    'size': thumb['size'],
+                    'ratio': thumb['ratio'],
+                }
+                for thumb_type, thumb in THUMB_TYPES.items()
             },
             'subtitles': None,
         }

@@ -14,7 +14,6 @@ import threading
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from itertools import chain, islice
-from operator import itemgetter
 from random import randint
 
 from .login_client import LoginClient
@@ -566,10 +565,7 @@ class YouTube(LoginClient):
                             ('title', 'runs', 0, 'text'),
                             ('headline', 'simpleText'),
                         )),
-                        'thumbnails': dict(zip(
-                            ('default', 'high'),
-                            video['thumbnail']['thumbnails'],
-                        )),
+                        'thumbnails': video['thumbnail']['thumbnails'],
                         'channelId': self.json_traverse(video, (
                             ('longBylineText', 'shortBylineText'),
                             'runs',
@@ -1190,7 +1186,6 @@ class YouTube(LoginClient):
             'browseId'
         ))
 
-        thumb_getter = itemgetter(0, -1)
         if retry == 1:
             related_videos = chain.from_iterable(related_videos)
 
@@ -1214,10 +1209,7 @@ class YouTube(LoginClient):
                         ),
                     )
                 )),
-                'thumbnails': dict(zip(
-                    ('default', 'high'),
-                    thumb_getter(video['thumbnail']['thumbnails']),
-                )),
+                'thumbnails': video['thumbnail']['thumbnails'],
                 'channelId': self.json_traverse(video, path=(
                     ('longBylineText', 'shortBylineText'),
                     'runs',
@@ -1637,20 +1629,8 @@ class YouTube(LoginClient):
                                    'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', ''),
                                    'channel_id': _item.get('shortBylineText', {}).get('runs', [{}])[0]
                                        .get('navigationEndpoint', {}).get('browseEndpoint', {}).get('browseId', ''),
-                                   'thumbnails': {'default': {'url': ''}, 'medium': {'url': ''}, 'high': {'url': ''}}}
-
-                    _thumbs = _item.get('thumbnail', {}).get('thumbnails', [{}])
-
-                    for _thumb in _thumbs:
-                        _thumb_url = _thumb.get('url', '')
-                        if _thumb_url.startswith('//'):
-                            _thumb_url = 'https:' + _thumb_url
-                        if _thumb_url.endswith('/default.jpg'):
-                            _video_item['thumbnails']['default']['url'] = _thumb_url
-                        elif _thumb_url.endswith('/mqdefault.jpg'):
-                            _video_item['thumbnails']['medium']['url'] = _thumb_url
-                        elif _thumb_url.endswith('/hqdefault.jpg'):
-                            _video_item['thumbnails']['high']['url'] = _thumb_url
+                                   'thumbnails': (_item.get('thumbnail', {})
+                                                  .get('thumbnails', [{}]))}
 
                     _result['items'].append(_video_item)
 

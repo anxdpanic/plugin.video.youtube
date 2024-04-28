@@ -158,10 +158,27 @@ class AbstractSettings(object):
     def set_subtitle_download(self, value):
         return self.set_bool(settings.SUBTITLE_DOWNLOAD, value)
 
-    def use_thumbnail_size(self):
-        size = self.get_int(settings.THUMB_SIZE, 0)
-        sizes = {0: 'medium', 1: 'high'}
-        return sizes[size]
+    _THUMB_SIZES = {
+        0: {  # Medium (16:9)
+            'size': 320 * 180,
+            'ratio': 320 / 180,
+        },
+        1: {  # High (4:3)
+            'size': 480 * 360,
+            'ratio': 480 / 360,
+        },
+        2: {  # Best available
+            'size': 0,
+            'ratio': 0,
+        },
+    }
+
+    def get_thumbnail_size(self):
+        default = 1
+        value = self.get_int(settings.THUMB_SIZE, default)
+        if value in self._THUMB_SIZES:
+            return self._THUMB_SIZES[value]
+        return self._THUMB_SIZES[default]
 
     def safe_search(self):
         index = self.get_int(settings.SAFE_SEARCH, 0)

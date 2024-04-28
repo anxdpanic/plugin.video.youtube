@@ -49,7 +49,7 @@ def _process_list_response(provider, context, json_data):
         item_params['addon_id'] = addon_id
 
     settings = context.get_settings()
-    thumb_size = settings.use_thumbnail_size()
+    thumb_size = settings.get_thumbnail_size()
     use_play_data = not incognito and settings.use_local_history()
 
     for yt_item in yt_items:
