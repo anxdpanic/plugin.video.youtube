@@ -341,7 +341,7 @@ def jsonrpc(batch=None, **kwargs):
         return None
 
     do_response = False
-    for request_id, kwargs in enumerate(batch or (kwargs, )):
+    for request_id, kwargs in enumerate(batch or (kwargs,)):
         do_response = (not kwargs.pop('no_response', False)) or do_response
         if do_response and 'id' not in kwargs:
             kwargs['id'] = request_id

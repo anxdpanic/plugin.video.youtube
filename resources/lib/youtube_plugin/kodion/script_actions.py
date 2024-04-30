@@ -29,7 +29,7 @@ def _config_actions(context, action, *_args):
 
     elif action == 'isa':
         if context.use_inputstream_adaptive():
-            xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
+            xbmcaddon.Addon('inputstream.adaptive').openSettings()
         else:
             settings.use_isa(False)
 

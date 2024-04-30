@@ -16,8 +16,8 @@ from .constants import CHECK_SETTINGS, REROUTE, content, paths
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
-    NextPageItem,
     NewSearchItem,
+    NextPageItem,
     SearchHistoryItem,
 )
 from .utils import to_unicode

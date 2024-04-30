@@ -184,6 +184,10 @@ def set_info(list_item, item, properties):
         is_video = True
         info_tag = list_item.getVideoInfoTag()
 
+        value = item.get_aired(as_info_label=True)
+        if value is not None:
+            info_tag.setFirstAired(value)
+
         value = item.get_dateadded(as_info_label=True)
         if value is not None:
             info_tag.setDateAdded(value)
@@ -192,21 +196,9 @@ def set_info(list_item, item, properties):
         if value is not None:
             info_tag.setLastPlayed(value)
 
-        value = item.get_aired(as_info_label=True)
-        if value is not None:
-            info_tag.setFirstAired(value)
-
         value = item.get_premiered(as_info_label=True)
         if value is not None:
             info_tag.setPremiered(value)
-
-        # count: int
-        # eg. 12
-        # Can be used to store an id for later, or for sorting purposes
-        # Used for Youtube video view count
-        value = item.get_count()
-        if value is not None:
-            list_item.setInfo('video', {'count': value})
 
         # cast: list[xbmc.Actor]
         # From list[{member: str, role: str, order: int, thumbnail: str}]
@@ -222,6 +214,14 @@ def set_info(list_item, item, properties):
         value = item.get_code()
         if value is not None:
             info_tag.setProductionCode(value)
+
+        # count: int
+        # eg. 12
+        # Can be used to store an id for later, or for sorting purposes
+        # Used for Youtube video view count
+        value = item.get_count()
+        if value is not None:
+            list_item.setInfo('video', {'count': value})
 
         # director: list[str]
         # eg. "Steven Spielberg"

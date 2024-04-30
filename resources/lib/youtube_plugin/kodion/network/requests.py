@@ -27,7 +27,7 @@ __all__ = (
     'InvalidJSONError'
 )
 
-_settings = XbmcPluginSettings(xbmcaddon.Addon(id=ADDON_ID))
+_settings = XbmcPluginSettings(xbmcaddon.Addon(ADDON_ID))
 
 
 class BaseRequestsClass(object):
