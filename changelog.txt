@@ -1,3 +1,37 @@
+## v7.0.7+beta.1
+### Fixed
+- Fixed not being able to re-refresh a directory listing that has already been refreshed
+- Fixed various window and history nagivation issues
+- Fixed http server idle shutdown not restarting if plugin is run but GUI is still idle
+- Additional improvements to busy dialog crash workaround
+- Workaround for new settings interface not updated correctly
+
+### Changed
+- Removed Settings > Advanced > Views > Show channel fanart
+  - Now included as option in Settings > Advanced > Views > Show fanart
+- MPEG-DASH for live streams only enabled by default in Kodi v21
+
+### New
+- Improvements to plugin page navigation #715
+  - Refresh added to context menu of Next page item
+  - Jump to page added to context menu of Next page item
+    - Can also be used in plugin url: plugin://plugin.video.youtube/goto_page/<PAGE>/<PATH> #317
+  - Home added to context menu of Next page item
+  - Quick search added to context menu of Next page item
+  - Next page item added to last page of directory list to go back to first page
+- Add option to use channel name as studio and/or cast #717
+  - Settings > Advanced > Views > Use channel name as
+- Add option to use best available thumbnail quality
+  - Settings > Advanced > Views > Thumbnail size
+- Added option to use video thumbnail as fanart in Settings > Advanced > Views > Show fanart #716
+  - Also added plugin url query parameter fanart_type to override settings
+    - Can be used to set fanart for specific widgets only: plugin://plugin.video.youtube/<PATH>?fanart_type=<0/1/2/3>
+    - Allowable values are the same as the setting:
+      - 0: No fanart
+      - 1: Default
+      - 2: Channel
+      - 3: Thumbnail
+
 ## v7.0.6.3
 ### Fixed
 - Improve updating containers and (re)loading windows #681
