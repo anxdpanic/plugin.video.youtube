@@ -168,9 +168,8 @@ class ServiceMonitor(xbmc.Monitor):
         self.shutdown_httpd()
         self.start_httpd()
 
-    @staticmethod
-    def ping_httpd():
-        return httpd_status()
+    def ping_httpd(self):
+        return self.httpd and httpd_status()
 
     def httpd_required(self):
         return self._use_httpd
