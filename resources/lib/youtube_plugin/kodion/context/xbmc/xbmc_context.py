@@ -586,8 +586,7 @@ class XbmcContext(AbstractContext):
         jsonrpc(method='JSONRPC.NotifyAll',
                 params={'sender': ADDON_ID,
                         'message': method,
-                        'data': data},
-                no_response=True)
+                        'data': data})
 
     def use_inputstream_adaptive(self):
         if self._settings.use_isa():
