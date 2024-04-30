@@ -14,7 +14,13 @@ from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
 from ...compatibility import xbmcplugin
-from ...constants import BUSY_FLAG, PLAYLIST_POSITION, REROUTE, SLEEPING
+from ...constants import (
+    BUSY_FLAG,
+    PLAYLIST_PATH,
+    PLAYLIST_POSITION,
+    REROUTE,
+    SLEEPING,
+)
 from ...exceptions import KodionException
 from ...items import (
     DirectoryItem,
@@ -66,11 +72,22 @@ class XbmcPlugin(AbstractPlugin):
 
                 playlist = XbmcPlaylist('auto', context, retry=3)
                 position, remaining = playlist.get_position()
-                items = playlist.get_items() if remaining else None
+                items = playlist.get_items()
                 playlist.clear()
 
                 context.log_warning('Multiple busy dialogs active - '
                                     'playlist cleared to avoid Kodi crash')
+
+                if position and items:
+                    path = items[position - 1]['file']
+                    old_path = ui.get_property(PLAYLIST_PATH)
+                    old_position = ui.get_property(PLAYLIST_POSITION)
+                    if (old_position and position == int(old_position)
+                            and old_path and path == old_path):
+                        if remaining:
+                            position += 1
+                        else:
+                            items = None
 
                 if items:
                     max_wait_time = 30
@@ -84,12 +101,8 @@ class XbmcPlugin(AbstractPlugin):
 
                     context.log_warning('Multiple busy dialogs active - '
                                         'reloading playlist')
+
                     num_items = playlist.add_items(items)
-
-                    old_position = ui.get_property(PLAYLIST_POSITION)
-                    if old_position and position == int(old_position):
-                        position += 1
-
                     max_wait_time = min(position, num_items)
                     while ui.busy_dialog_active() or playlist.size() < position:
                         max_wait_time -= 1
@@ -102,10 +115,12 @@ class XbmcPlugin(AbstractPlugin):
                         playlist.play_playlist_item(position)
 
                 ui.clear_property(BUSY_FLAG)
+                ui.clear_property(PLAYLIST_PATH)
                 ui.clear_property(PLAYLIST_POSITION)
                 return False
 
             ui.clear_property(BUSY_FLAG)
+            ui.clear_property(PLAYLIST_PATH)
             ui.clear_property(PLAYLIST_POSITION)
 
         if ui.get_property(SLEEPING):
@@ -180,7 +195,10 @@ class XbmcPlugin(AbstractPlugin):
                 ui.set_property(BUSY_FLAG, 'true')
                 playlist = XbmcPlaylist('auto', context)
                 position, _ = playlist.get_position()
-                ui.set_property(PLAYLIST_POSITION, str(position))
+                items = playlist.get_items()
+                if position and items:
+                    ui.set_property(PLAYLIST_PATH, items[position - 1]['file'])
+                    ui.set_property(PLAYLIST_POSITION, str(position))
 
             item = self._PLAY_ITEM_MAP[base_item.__class__.__name__](
                 context,

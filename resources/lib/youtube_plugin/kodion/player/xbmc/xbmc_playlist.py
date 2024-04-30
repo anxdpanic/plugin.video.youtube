@@ -133,7 +133,7 @@ class XbmcPlaylist(AbstractPlaylist):
             self._context.log_error('XbmcPlaylist.get_items error - |{0}: {1}|'
                                     .format(error.get('code', 'unknown'),
                                             error.get('message', 'unknown')))
-        return '[]' if dumps else []
+        return '' if dumps else []
 
     def add_items(self, items, loads=False):
         if loads:
@@ -206,7 +206,7 @@ class XbmcPlaylist(AbstractPlaylist):
         position += (offset + 1)
 
         # A playlist with only one element has no next item
-        if playlist_size > 1 and position <= playlist_size:
+        if playlist_size >= 1 and position <= playlist_size:
             self._context.log_debug('playlistid: {0}, position - {1}/{2}'
                                     .format(playlistid,
                                             position,
