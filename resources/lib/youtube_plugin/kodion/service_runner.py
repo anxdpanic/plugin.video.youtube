@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .constants import ABORT_FLAG, ADDON_ID, TEMP_PATH
+from .constants import ABORT_FLAG, ADDON_ID, SLEEPING, TEMP_PATH, WAKEUP
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
 from .utils import rm_dir
@@ -34,7 +34,6 @@ def run():
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
 
-    wait_interval = 10
     ping_period = waited = 60
     restart_attempts = 0
     plugin_url = 'plugin://{0}/'.format(ADDON_ID)
@@ -43,8 +42,14 @@ def run():
             if (monitor.httpd_required()
                     and not context.get_infobool('System.IdleTime(10)')):
                 monitor.start_httpd()
-        elif context.get_infobool('System.IdleTime(30)'):
-            monitor.shutdown_httpd()
+                waited = 0
+        elif context.get_infobool('System.IdleTime(10)'):
+            if ui.get_property(WAKEUP):
+                ui.clear_property(WAKEUP)
+                waited = 0
+            if waited >= 30:
+                monitor.shutdown_httpd()
+                ui.set_property(SLEEPING, 'true')
         elif waited >= ping_period:
             waited = 0
             if monitor.ping_httpd():
@@ -54,7 +59,6 @@ def run():
                 restart_attempts += 1
             else:
                 monitor.shutdown_httpd()
-                restart_attempts = 0
 
         if context.get_infolabel('Container.FolderPath').startswith(plugin_url):
             wait_interval = 1

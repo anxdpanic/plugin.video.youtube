@@ -22,7 +22,7 @@ from ...compatibility import (
     xbmcaddon,
     xbmcplugin,
 )
-from ...constants import ABORT_FLAG, ADDON_ID, content, sort
+from ...constants import ABORT_FLAG, ADDON_ID, WAKEUP, content, sort
 from ...player import XbmcPlayer, XbmcPlaylist
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
@@ -685,3 +685,7 @@ class XbmcContext(AbstractContext):
             del self._addon
         except AttributeError:
             pass
+
+    def wakeup(self):
+        self.get_ui().set_property(WAKEUP, 'true')
+        self.send_notification(WAKEUP, True)

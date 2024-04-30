@@ -431,3 +431,6 @@ class AbstractContext(object):
 
     def tear_down(self):
         pass
+
+    def wakeup(self):
+        raise NotImplementedError()

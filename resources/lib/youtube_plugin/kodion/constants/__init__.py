@@ -37,8 +37,10 @@ BUSY_FLAG = 'busy'
 CHECK_SETTINGS = 'check_settings'
 PLAYLIST_POSITION = 'playlist_position'
 REROUTE = 'reroute'
+SLEEPING = 'sleeping'
 SWITCH_PLAYER_FLAG = 'switch_player'
 WAIT_FLAG = 'builtin_running'
+WAKEUP = 'wakeup'
 
 __all__ = (
     'ABORT_FLAG',
@@ -51,10 +53,12 @@ __all__ = (
     'PLAYLIST_POSITION',
     'RESOURCE_PATH',
     'REROUTE',
+    'SLEEPING',
     'SWITCH_PLAYER_FLAG',
     'TEMP_PATH',
     'VALUE_FROM_STR',
     'WAIT_FLAG',
+    'WAKEUP',
     'content',
     'paths',
     'settings',

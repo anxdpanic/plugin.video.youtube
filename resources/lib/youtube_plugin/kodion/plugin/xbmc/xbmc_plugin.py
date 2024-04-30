@@ -14,7 +14,7 @@ from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
 from ...compatibility import xbmcplugin
-from ...constants import BUSY_FLAG, PLAYLIST_POSITION, REROUTE
+from ...constants import BUSY_FLAG, PLAYLIST_POSITION, REROUTE, SLEEPING
 from ...exceptions import KodionException
 from ...items import (
     DirectoryItem,
@@ -107,6 +107,10 @@ class XbmcPlugin(AbstractPlugin):
 
             ui.clear_property(BUSY_FLAG)
             ui.clear_property(PLAYLIST_POSITION)
+
+        if ui.get_property(SLEEPING):
+            context.wakeup()
+            ui.clear_property(SLEEPING)
 
         if settings.setup_wizard_enabled():
             provider.run_wizard(context)

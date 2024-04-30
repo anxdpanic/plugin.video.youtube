@@ -13,7 +13,7 @@ import json
 import threading
 
 from ..compatibility import xbmc, xbmcaddon
-from ..constants import ADDON_ID, CHECK_SETTINGS
+from ..constants import ADDON_ID, CHECK_SETTINGS, WAKEUP
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 from ..settings import XbmcPluginSettings
@@ -60,6 +60,9 @@ class ServiceMonitor(xbmc.Monitor):
                 self.onSettingsChanged()
                 self._settings_state = None
                 return
+        elif event == WAKEUP:
+            if not self.httpd and self.httpd_required():
+                self.start_httpd()
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
