@@ -16,6 +16,7 @@ from ..abstract_plugin import AbstractPlugin
 from ...compatibility import xbmcplugin
 from ...constants import (
     BUSY_FLAG,
+    CHECK_SETTINGS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     REROUTE,
@@ -59,7 +60,6 @@ class XbmcPlugin(AbstractPlugin):
 
     def run(self, provider, context):
         self.handle = context.get_handle()
-        settings = context.get_settings()
         ui = context.get_ui()
 
         if ui.get_property(BUSY_FLAG).lower() == 'true':
@@ -126,6 +126,12 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(SLEEPING):
             context.wakeup()
             ui.clear_property(SLEEPING)
+
+        if ui.get_property(CHECK_SETTINGS):
+            settings = context.get_settings(flush=True)
+            ui.clear_property(CHECK_SETTINGS)
+        else:
+            settings = context.get_settings()
 
         if settings.setup_wizard_enabled():
             provider.run_wizard(context)

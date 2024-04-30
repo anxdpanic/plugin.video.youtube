@@ -39,6 +39,7 @@ from ...utils import (
 
 class XbmcContext(AbstractContext):
     _addon = None
+    _settings = None
 
     _KODI_UI_SUBTITLE_OPTIONS = None
 
@@ -276,7 +277,8 @@ class XbmcContext(AbstractContext):
 
     def __new__(cls, *args, **kwargs):
         if not cls._addon:
-            cls._addon = xbmcaddon.Addon(id=ADDON_ID)
+            cls._addon = xbmcaddon.Addon(ADDON_ID)
+            cls._settings = XbmcPluginSettings(cls._addon)
 
         if not cls._KODI_UI_SUBTITLE_OPTIONS:
             cls._KODI_UI_SUBTITLE_OPTIONS = {
@@ -298,8 +300,10 @@ class XbmcContext(AbstractContext):
                  override=True):
         super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
 
-        if plugin_id and plugin_id != ADDON_ID:
-            self._addon = xbmcaddon.Addon(id=plugin_id)
+        self._plugin_id = plugin_id or ADDON_ID
+        if self._plugin_id != ADDON_ID:
+            self._addon = xbmcaddon.Addon(self._plugin_id)
+            self._settings = XbmcPluginSettings(self._addon)
 
         """
         I don't know what xbmc/kodi is doing with a simple uri, but we have to extract the information from the
@@ -338,12 +342,10 @@ class XbmcContext(AbstractContext):
         self._video_player = None
         self._audio_player = None
         self._plugin_handle = int(sys.argv[1]) if is_plugin_invocation else -1
-        self._plugin_id = plugin_id or ADDON_ID
         self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
         self._addon_path = make_dirs(self._addon.getAddonInfo('path'))
         self._data_path = make_dirs(self._addon.getAddonInfo('profile'))
-        self._settings = XbmcPluginSettings(self._addon)
 
     def get_region(self):
         pass  # implement from abstract
@@ -432,7 +434,14 @@ class XbmcContext(AbstractContext):
     def get_addon_path(self):
         return self._addon_path
 
-    def get_settings(self):
+    def get_settings(self, flush=False):
+        if flush or not self._settings:
+            if self._plugin_id != ADDON_ID:
+                self._addon = xbmcaddon.Addon(self._plugin_id)
+                self._settings = XbmcPluginSettings(self._addon)
+            else:
+                self.__class__._addon = xbmcaddon.Addon(ADDON_ID)
+                self.__class__._settings = XbmcPluginSettings(self._addon)
         return self._settings
 
     @classmethod
@@ -683,6 +692,14 @@ class XbmcContext(AbstractContext):
         self._settings.flush()
         try:
             del self._addon
+            del self._settings
+        except AttributeError:
+            pass
+        try:
+            del self.__class__._addon
+            self.__class__._addon = None
+            del self.__class__._settings
+            self.__class__._settings = None
         except AttributeError:
             pass
 

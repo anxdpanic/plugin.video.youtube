@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import threading
 
-from ..compatibility import xbmc, xbmcaddon
+from ..compatibility import xbmc, xbmcaddon, xbmcgui
 from ..constants import ADDON_ID, CHECK_SETTINGS, WAKEUP
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
@@ -76,12 +76,16 @@ class ServiceMonitor(xbmc.Monitor):
             self.waitForAbort(1)
             if changes != self._settings_changes:
                 return
-        if changes > 1:
-            log_debug('onSettingsChanged: {0} changes'.format(changes))
+        log_debug('onSettingsChanged: {0} change(s)'.format(changes))
         self._settings_changes = 0
 
         settings = self._settings
         settings.flush(xbmcaddon.Addon(ADDON_ID))
+
+        xbmcgui.Window(10000).setProperty(
+            '-'.join((ADDON_ID, CHECK_SETTINGS)), 'true'
+        )
+
         if (not xbmc.getCondVisibility('Container.IsUpdating')
                 and not xbmc.getCondVisibility('System.HasActiveModalDialog')
                 and xbmc.getInfoLabel('Container.FolderPath').startswith(
