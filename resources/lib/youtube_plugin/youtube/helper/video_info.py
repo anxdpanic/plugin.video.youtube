@@ -955,7 +955,8 @@ class VideoInfo(YouTubeRequestClient):
 
             yt_format = self.FORMAT.get(itag)
             if not yt_format:
-                self._context.log_debug('Unknown itag: {0}'.format(itag))
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'
+                                        .format(itag=itag, stream=match[0]))
                 continue
 
             stream = {'url': playlist_url,
@@ -1005,7 +1006,8 @@ class VideoInfo(YouTubeRequestClient):
             stream_map['itag'] = itag
             yt_format = self.FORMAT.get(itag)
             if not yt_format:
-                self._context.log_debug('Unknown itag: {0}'.format(itag))
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'
+                                        .format(itag=itag, stream=stream_map))
                 continue
             if (yt_format.get('discontinued') or yt_format.get('unsupported')
                     or (yt_format.get('dash/video')
