@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .constants import ADDON_ID, TEMP_PATH
+from .constants import ABORT_FLAG, ADDON_ID, TEMP_PATH
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
 from .utils import rm_dir
@@ -23,7 +23,8 @@ __all__ = ('run',)
 def run():
     context = XbmcContext()
     context.log_debug('YouTube service initialization...')
-    context.get_ui().clear_property('abort_requested')
+    ui = context.get_ui()
+    ui.clear_property(ABORT_FLAG)
 
     monitor = ServiceMonitor()
     player = PlayerMonitor(provider=Provider(),
@@ -64,7 +65,7 @@ def run():
             break
         waited += wait_interval
 
-    context.get_ui().set_property('abort_requested', 'true')
+    ui.set_property(ABORT_FLAG, 'true')
 
     # clean up any/all playback monitoring threads
     player.cleanup_threads(only_ended=False)

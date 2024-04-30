@@ -13,7 +13,7 @@ import json
 import threading
 
 from ..compatibility import xbmc, xbmcaddon
-from ..constants import ADDON_ID
+from ..constants import ADDON_ID, CHECK_SETTINGS
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 from ..settings import XbmcPluginSettings
@@ -45,8 +45,8 @@ class ServiceMonitor(xbmc.Monitor):
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
             return
-
-        if method.endswith('.check_settings'):
+        group, separator, event = method.partition('.')
+        if event == CHECK_SETTINGS:
             if not isinstance(data, dict):
                 data = json.loads(data)
             log_debug('onNotification: |check_settings| -> |{data}|'

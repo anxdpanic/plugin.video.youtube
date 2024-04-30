@@ -14,7 +14,7 @@ from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
 from ...compatibility import xbmcplugin
-from ...constants import BUSY_FLAG, PLAYLIST_POSITION, ROUTE_FLAG
+from ...constants import BUSY_FLAG, PLAYLIST_POSITION, REROUTE
 from ...exceptions import KodionException
 from ...items import (
     DirectoryItem,
@@ -112,7 +112,7 @@ class XbmcPlugin(AbstractPlugin):
             provider.run_wizard(context)
 
         try:
-            route = ui.get_property(ROUTE_FLAG)
+            route = ui.get_property(REROUTE)
             if route:
                 function_cache = context.get_function_cache()
                 result, options = function_cache.run(
@@ -122,7 +122,7 @@ class XbmcPlugin(AbstractPlugin):
                     _oneshot=True,
                     context=context.clone(route),
                 )
-                ui.clear_property(ROUTE_FLAG)
+                ui.clear_property(REROUTE)
             else:
                 result, options = provider.navigate(context)
         except KodionException as exc:

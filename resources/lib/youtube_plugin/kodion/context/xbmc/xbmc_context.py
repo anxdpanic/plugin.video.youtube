@@ -22,7 +22,7 @@ from ...compatibility import (
     xbmcaddon,
     xbmcplugin,
 )
-from ...constants import ADDON_ID, content, sort
+from ...constants import ABORT_FLAG, ADDON_ID, content, sort
 from ...player import XbmcPlayer, XbmcPlaylist
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
@@ -661,7 +661,7 @@ class XbmcContext(AbstractContext):
             return False
 
     def abort_requested(self):
-        return self.get_ui().get_property('abort_requested').lower() == 'true'
+        return self.get_ui().get_property(ABORT_FLAG).lower() == 'true'
 
     @staticmethod
     def get_infobool(name):

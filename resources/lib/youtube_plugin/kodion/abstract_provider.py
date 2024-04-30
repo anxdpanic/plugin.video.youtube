@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import content, paths, ROUTE_FLAG
+from .constants import CHECK_SETTINGS, REROUTE, content, paths
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -106,7 +106,7 @@ class AbstractProvider(object):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        context.send_notification('check_settings', 'defer')
+        context.send_notification(CHECK_SETTINGS, 'defer')
 
         wizard_steps = self.get_wizard_steps(context)
 
@@ -126,7 +126,7 @@ class AbstractProvider(object):
                         step += 1
         finally:
             settings.setup_wizard_enabled(False)
-            context.send_notification('check_settings', 'process')
+            context.send_notification(CHECK_SETTINGS, 'process')
 
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
@@ -226,7 +226,7 @@ class AbstractProvider(object):
             finally:
                 if not result:
                     return False
-                context.get_ui().set_property(ROUTE_FLAG, path)
+                context.get_ui().set_property(REROUTE, path)
                 context.execute('ActivateWindow(Videos, {0}, return)'.format(
                     context.create_uri(path, params)
                 ))

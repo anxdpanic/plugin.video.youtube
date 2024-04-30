@@ -32,21 +32,25 @@ VALUE_FROM_STR = {
     'true': True,
 }
 
+ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
+CHECK_SETTINGS = 'check_settings'
 PLAYLIST_POSITION = 'playlist_position'
-ROUTE_FLAG = 'route'
+REROUTE = 'reroute'
 SWITCH_PLAYER_FLAG = 'switch_player'
 WAIT_FLAG = 'builtin_running'
 
 __all__ = (
+    'ABORT_FLAG',
     'ADDON_ID',
     'ADDON_PATH',
     'BUSY_FLAG',
+    'CHECK_SETTINGS',
     'DATA_PATH',
     'MEDIA_PATH',
     'PLAYLIST_POSITION',
     'RESOURCE_PATH',
-    'ROUTE_FLAG',
+    'REROUTE',
     'SWITCH_PLAYER_FLAG',
     'TEMP_PATH',
     'VALUE_FROM_STR',
