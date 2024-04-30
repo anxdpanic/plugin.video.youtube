@@ -1,4 +1,4 @@
-## v7.0.6.1
+## v7.0.6.2
 ### Fixed
 - Improve updating containers and (re)loading windows #681
 - Fix refreshing video listing also forcing next pages to refresh when loaded
@@ -20,6 +20,7 @@
 - Enable MPEG-DASH for live streams by default #680
 - Setup Wizard will prompt to run when plugin first opens after updating, in order to update default settings
 - http server will shutdown on idle timeout #699
+- Update client details used for player requests
 
 ### New
 - Add recommended settings in Setup Wizard for Raspberry Pi 1/2 class devices #688
