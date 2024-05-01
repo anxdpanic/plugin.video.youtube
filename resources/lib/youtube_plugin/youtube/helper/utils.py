@@ -227,8 +227,8 @@ def update_channel_infos(provider, context, channel_id_dict,
 
         if not in_bookmarks_list:
             context_menu.append(
-                menu_items.bookmarks_add(
-                    context, channel_item
+                menu_items.bookmarks_add_channel(
+                    context, channel_id
                 )
             )
 
