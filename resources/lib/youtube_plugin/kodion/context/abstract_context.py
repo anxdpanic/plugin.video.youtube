@@ -101,13 +101,7 @@ class AbstractContext(object):
         'reload_path',
     }
 
-    def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
-        if not params:
-            params = {}
-
-        self._cache_path = None
-        self._debug_path = None
-
+    def __init__(self, path='/', params=None, plugin_id=''):
         self._function_cache = None
         self._data_cache = None
         self._search_history = None
@@ -116,14 +110,13 @@ class AbstractContext(object):
         self._watch_later_list = None
         self._access_manager = None
 
-        self._plugin_name = plugin_name
-        self._version = 'UNKNOWN'
+        self._plugin_handle = -1
         self._plugin_id = plugin_id
-        self._path = self.create_path(path)
-        self._params = params
-        self._utils = None
+        self._plugin_name = None
+        self._version = 'UNKNOWN'
 
-        # create valid uri
+        self._path = self.create_path(path)
+        self._params = params or {}
         self.parse_params()
         self._uri = self.create_uri(self._path, self._params)
 
@@ -374,7 +367,7 @@ class AbstractContext(object):
         return self._plugin_id
 
     def get_handle(self):
-        raise NotImplementedError()
+        return self._plugin_handle
 
     def get_settings(self, flush=False):
         raise NotImplementedError()

@@ -128,6 +128,7 @@ class XbmcPlugin(AbstractPlugin):
             ui.clear_property(SLEEPING)
 
         if ui.get_property(CHECK_SETTINGS):
+            provider.reset_client()
             settings = context.get_settings(flush=True)
             ui.clear_property(CHECK_SETTINGS)
         else:

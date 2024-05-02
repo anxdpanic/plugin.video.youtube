@@ -1571,5 +1571,5 @@ class Provider(AbstractProvider):
 
         return True
 
-    def tear_down(self, context):
-        context.tear_down()
+    def tear_down(self):
+        pass
