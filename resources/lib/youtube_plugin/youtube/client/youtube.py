@@ -202,37 +202,51 @@ class YouTube(LoginClient):
 
         # update title
         for video_stream in video_streams:
-            title = '%s (%s)' % (context.get_ui().bold(video_stream['title']), video_stream['container'])
+            title = '%s (%s)' % (
+                context.get_ui().bold(video_stream['title']),
+                video_stream['container']
+            )
 
             if 'audio' in video_stream and 'video' in video_stream:
-                if video_stream['audio']['bitrate'] > 0 and video_stream['video']['encoding'] and \
-                        video_stream['audio']['encoding']:
-                    title = '%s (%s; %s / %s@%d)' % (context.get_ui().bold(video_stream['title']),
-                                                     video_stream['container'],
-                                                     video_stream['video']['encoding'],
-                                                     video_stream['audio']['encoding'],
-                                                     video_stream['audio']['bitrate'])
+                if (video_stream['audio']['bitrate'] > 0
+                        and video_stream['video']['encoding']
+                        and video_stream['audio']['encoding']):
+                    title = '%s (%s; %s / %s@%d)' % (
+                        context.get_ui().bold(video_stream['title']),
+                        video_stream['container'],
+                        video_stream['video']['encoding'],
+                        video_stream['audio']['encoding'],
+                        video_stream['audio']['bitrate']
+                    )
 
-                elif video_stream['video']['encoding'] and video_stream['audio']['encoding']:
-                    title = '%s (%s; %s / %s)' % (context.get_ui().bold(video_stream['title']),
-                                                  video_stream['container'],
-                                                  video_stream['video']['encoding'],
-                                                  video_stream['audio']['encoding'])
+                elif (video_stream['video']['encoding']
+                      and video_stream['audio']['encoding']):
+                    title = '%s (%s; %s / %s)' % (
+                        context.get_ui().bold(video_stream['title']),
+                        video_stream['container'],
+                        video_stream['video']['encoding'],
+                        video_stream['audio']['encoding']
+                    )
             elif 'audio' in video_stream and 'video' not in video_stream:
-                if video_stream['audio']['encoding'] and video_stream['audio']['bitrate'] > 0:
-                    title = '%s (%s; %s@%d)' % (context.get_ui().bold(video_stream['title']),
-                                                video_stream['container'],
-                                                video_stream['audio']['encoding'],
-                                                video_stream['audio']['bitrate'])
+                if (video_stream['audio']['encoding']
+                        and video_stream['audio']['bitrate'] > 0):
+                    title = '%s (%s; %s@%d)' % (
+                        context.get_ui().bold(video_stream['title']),
+                        video_stream['container'],
+                        video_stream['audio']['encoding'],
+                        video_stream['audio']['bitrate']
+                    )
 
             elif 'audio' in video_stream or 'video' in video_stream:
                 encoding = video_stream.get('audio', {}).get('encoding')
                 if not encoding:
                     encoding = video_stream.get('video', {}).get('encoding')
                 if encoding:
-                    title = '%s (%s; %s)' % (context.get_ui().bold(video_stream['title']),
-                                             video_stream['container'],
-                                             encoding)
+                    title = '%s (%s; %s)' % (
+                        context.get_ui().bold(video_stream['title']),
+                        video_stream['container'],
+                        encoding
+                    )
 
             video_stream['title'] = title
 
@@ -1607,10 +1621,15 @@ class YouTube(LoginClient):
                                           post_data=_post_data)
             _data = {}
             if 'continuationContents' in _json_data:
-                _data = _json_data.get('continuationContents', {}).get('horizontalListContinuation', {})
+                _data = (_json_data.get('continuationContents', {})
+                         .get('horizontalListContinuation', {}))
             elif 'contents' in _json_data:
-                _data = _json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])[_playlist_idx].get(
-                    'shelfRenderer', {}).get('content', {}).get('horizontalListRenderer', {})
+                _data = (_json_data.get('contents', {})
+                         .get('sectionListRenderer', {})
+                         .get('contents', [{}])[_playlist_idx]
+                         .get('shelfRenderer', {})
+                         .get('content', {})
+                         .get('horizontalListRenderer', {}))
 
             _items = _data.get('items', [])
             if not _result:
@@ -1624,22 +1643,36 @@ class YouTube(LoginClient):
             for _item in _items:
                 _item = _item.get('gridPlaylistRenderer', {})
                 if _item:
-                    _video_item = {'id': _item['playlistId'],
-                                   'title': _item.get('title', {}).get('runs', [{}])[0].get('text', ''),
-                                   'channel': _item.get('shortBylineText', {}).get('runs', [{}])[0].get('text', ''),
-                                   'channel_id': _item.get('shortBylineText', {}).get('runs', [{}])[0]
-                                       .get('navigationEndpoint', {}).get('browseEndpoint', {}).get('browseId', ''),
-                                   'thumbnails': (_item.get('thumbnail', {})
-                                                  .get('thumbnails', [{}]))}
+                    _video_item = {
+                        'id': _item['playlistId'],
+                        'title': (_item.get('title', {})
+                                  .get('runs', [{}])[0]
+                                  .get('text', '')),
+                        'channel': (_item.get('shortBylineText', {})
+                                    .get('runs', [{}])[0]
+                                    .get('text', '')),
+                        'channel_id': (_item.get('shortBylineText', {})
+                                       .get('runs', [{}])[0]
+                                       .get('navigationEndpoint', {})
+                                       .get('browseEndpoint', {})
+                                       .get('browseId', '')),
+                        'thumbnails': (_item.get('thumbnail', {})
+                                       .get('thumbnails', [{}])),
+                    }
 
                     _result['items'].append(_video_item)
 
-            _continuations = _data.get('continuations', [{}])[0].get('nextContinuationData', {}).get('continuation', '')
+            _continuations = (_data.get('continuations', [{}])[0]
+                              .get('nextContinuationData', {})
+                              .get('continuation', ''))
             if _continuations and len(_result['items']) <= self._max_results:
                 _result['next_page_token'] = _continuations
 
                 if len(_result['items']) < self._max_results:
-                    _result = _perform(_playlist_idx=playlist_index, _page_token=_continuations, _offset=0, _result=_result)
+                    _result = _perform(_playlist_idx=playlist_index,
+                                       _page_token=_continuations,
+                                       _offset=0,
+                                       _result=_result)
 
             # trim result
             if len(_result['items']) > self._max_results:
@@ -1681,18 +1714,28 @@ class YouTube(LoginClient):
                                      method='POST',
                                      path='browse',
                                      post_data=_en_post_data)
-        contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+        contents = (json_data.get('contents', {})
+                    .get('sectionListRenderer', {})
+                    .get('contents', [{}]))
 
         for idx, shelf in enumerate(contents):
-            title = shelf.get('shelfRenderer', {}).get('title', {}).get('runs', [{}])[0].get('text', '')
+            title = (shelf.get('shelfRenderer', {})
+                     .get('title', {})
+                     .get('runs', [{}])[0]
+                     .get('text', ''))
             if title.lower() == 'saved playlists':
                 playlist_index = idx
                 break
 
         if playlist_index is not None:
-            contents = json_data.get('contents', {}).get('sectionListRenderer', {}).get('contents', [{}])
+            contents = (json_data.get('contents', {})
+                        .get('sectionListRenderer', {})
+                        .get('contents', [{}]))
             if 0 <= playlist_index < len(contents):
-                result = _perform(_playlist_idx=playlist_index, _page_token=page_token, _offset=offset, _result=result)
+                result = _perform(_playlist_idx=playlist_index,
+                                  _page_token=page_token,
+                                  _offset=offset,
+                                  _result=result)
 
         return result
 
