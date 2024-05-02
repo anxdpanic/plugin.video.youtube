@@ -5,11 +5,14 @@
 - Fixed http server idle shutdown not restarting if plugin is run but GUI is still idle
 - Additional improvements to busy dialog crash workaround
 - Workaround for new settings interface not updated correctly
+- Fix bookmarks icon background colour
+- Fix adding channel items directly to bookmarks
 
 ### Changed
 - Removed Settings > Advanced > Views > Show channel fanart
   - Now included as option in Settings > Advanced > Views > Show fanart
 - MPEG-DASH for live streams only enabled by default in Kodi v21
+- Make better use of reuselanguageinvoker
 
 ### New
 - Improvements to plugin page navigation #715
