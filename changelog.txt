@@ -1,4 +1,4 @@
-## v7.0.6.2
+## v7.0.6.3
 ### Fixed
 - Improve updating containers and (re)loading windows #681
 - Fix refreshing video listing also forcing next pages to refresh when loaded
@@ -9,6 +9,7 @@
 - Update error checks to avoid unnecessary retries of player requests
 - Fix adding and viewing items to internal bookmarks and watchlater list #720
 - Fix error checks to prevent prematurely stopping retries of player requests #730
+- Disable using android client player request by default #737
 
 ### Changed
 - Setup Wizard default settings now disable pre-downloading subtitles if MPEG-DASH is enabled

@@ -60,6 +60,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'android': {
             '_id': 3,
+            '_disabled': True,
             '_query_subtitles': 'optional',
             'json': {
                 'context': {
@@ -343,11 +344,18 @@ class YouTubeRequestClient(BaseRequestsClass):
         return result
 
     @classmethod
-    def build_client(cls, client_name, data=None):
+    def build_client(cls, client_name=None, data=None):
         templates = {}
 
-        client = (cls.CLIENTS.get(client_name)
-                  or YouTubeRequestClient.CLIENTS['web']).copy()
+        client = None
+        if client_name:
+            client = cls.CLIENTS.get(client_name)
+            if client and client.get('_disabled'):
+                return None
+        if not client:
+            client = YouTubeRequestClient.CLIENTS['web']
+        client = client.copy()
+
         if data:
             client = merge_dicts(client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
