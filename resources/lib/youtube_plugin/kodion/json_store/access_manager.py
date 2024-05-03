@@ -378,17 +378,16 @@ class AccessManager(JSONStore):
         Returns the access token for some API
         :return: access_token
         """
-        return self.get_current_user_details().get('access_token', '')
+        token = self.get_current_user_details().get('access_token', '')
+        return token.split('|')
 
     def get_refresh_token(self):
         """
         Returns the refresh token
         :return: refresh token
         """
-        return self.get_current_user_details().get('refresh_token', '')
-
-    def has_refresh_token(self):
-        return self.get_refresh_token() != ''
+        token = self.get_current_user_details().get('refresh_token', '')
+        return token.split('|')
 
     def is_access_token_expired(self):
         """
@@ -401,19 +400,12 @@ class AccessManager(JSONStore):
         access_token = current_user.get('access_token', '')
         expires = int(current_user.get('token_expires', -1))
 
-        # with no access_token it must be expired
-        if not access_token:
+        if access_token and expires <= int(time.time()):
             return True
-
-        # in this case no expiration date was set
-        if expires == -1:
-            return False
-
-        now = int(time.time())
-        return expires <= now
+        return False
 
     def update_access_token(self,
-                            access_token,
+                            access_token=None,
                             unix_timestamp=None,
                             refresh_token=None):
         """
@@ -424,14 +416,24 @@ class AccessManager(JSONStore):
         :return:
         """
         current_user = {
-            'access_token': access_token,
+            'access_token': (
+                '|'.join(access_token)
+                if isinstance(access_token, (list, tuple)) else
+                access_token
+                if access_token else
+                ''
+            )
         }
 
         if unix_timestamp is not None:
             current_user['token_expires'] = int(unix_timestamp)
 
         if refresh_token is not None:
-            current_user['refresh_token'] = refresh_token
+            current_user['refresh_token'] = (
+                '|'.join(refresh_token)
+                if isinstance(refresh_token, (list, tuple)) else
+                refresh_token
+            )
 
         data = {
             'access_manager': {
@@ -492,17 +494,14 @@ class AccessManager(JSONStore):
         :param addon_id: addon id
         :return: access_token
         """
-        return self.get_developer(addon_id).get('access_token', '')
+        return self.get_developer(addon_id).get('access_token', '').split('|')
 
     def get_dev_refresh_token(self, addon_id):
         """
         Returns the refresh token
         :return: refresh token
         """
-        return self.get_developer(addon_id).get('refresh_token', '')
-
-    def developer_has_refresh_token(self, addon_id):
-        return self.get_dev_refresh_token(addon_id) != ''
+        return self.get_developer(addon_id).get('refresh_token', '').split('|')
 
     def is_dev_access_token_expired(self, addon_id):
         """
@@ -515,20 +514,13 @@ class AccessManager(JSONStore):
         access_token = developer.get('access_token', '')
         expires = int(developer.get('token_expires', -1))
 
-        # with no access_token it must be expired
-        if not access_token:
+        if access_token and expires <= int(time.time()):
             return True
-
-        # in this case no expiration date was set
-        if expires == -1:
-            return False
-
-        now = int(time.time())
-        return expires <= now
+        return False
 
     def update_dev_access_token(self,
                                 addon_id,
-                                access_token,
+                                access_token=None,
                                 unix_timestamp=None,
                                 refresh_token=None):
         """
@@ -540,14 +532,24 @@ class AccessManager(JSONStore):
         :return:
         """
         developer = {
-            'access_token': access_token
+            'access_token': (
+                '|'.join(access_token)
+                if isinstance(access_token, (list, tuple)) else
+                access_token
+                if access_token else
+                ''
+            )
         }
 
         if unix_timestamp is not None:
             developer['token_expires'] = int(unix_timestamp)
 
         if refresh_token is not None:
-            developer['refresh_token'] = refresh_token
+            developer['refresh_token'] = (
+                '|'.join(refresh_token)
+                if isinstance(refresh_token, (list, tuple)) else
+                refresh_token
+            )
 
         data = {
             'access_manager': {
@@ -588,7 +590,7 @@ class AccessManager(JSONStore):
         return False
 
     @staticmethod
-    def calc_key_hash(key, id, secret):
+    def calc_key_hash(key, id, secret, **_kwargs):
         md5_hash = md5()
         md5_hash.update(''.join((key, id, secret)).encode('utf-8'))
         return md5_hash.hexdigest()
