@@ -1000,7 +1000,7 @@ class VideoInfo(YouTubeRequestClient):
 
             if not url:
                 continue
-            url = self._process_url_params(url)
+            url, _ = self._process_url_params(url)
 
             itag = str(stream_map['itag'])
             stream_map['itag'] = itag
@@ -1068,12 +1068,12 @@ class VideoInfo(YouTubeRequestClient):
 
     def _process_url_params(self, url):
         if not url:
-            return url
+            return url, None
 
         parts = urlsplit(url)
         query = parse_qs(parts.query)
         new_query = {}
-        update_url = False
+        update_url = {}
 
         if self._calculate_n and 'n' in query:
             self._player_js = self._player_js or self._get_player_js()
@@ -1094,12 +1094,35 @@ class VideoInfo(YouTubeRequestClient):
             content_length = query.get('clen', [''])[0]
             new_query['range'] = '0-{0}'.format(content_length)
 
+        if 'mn' in query and 'fvip' in query:
+            fvip = query['fvip'][0]
+            primary, _, secondary = query['mn'][0].partition(',')
+            prefix, separator, server = parts.netloc.partition('---')
+            if primary and secondary:
+                update_url = {
+                    'netloc': separator.join((
+                        re.sub(r'\d+', fvip, prefix),
+                        server.replace(primary, secondary),
+                    )),
+                }
+
         if new_query:
             query.update(new_query)
-        elif not update_url:
-            return url
+            query = urlencode(query, doseq=True)
+        elif update_url:
+            query = parts.query
+        else:
+            return url, None
 
-        return parts._replace(query=urlencode(query, doseq=True)).geturl()
+        if update_url:
+            return (
+                parts._replace(query=query).geturl(),
+                parts._replace(query=query, **update_url).geturl(),
+            )
+        return (
+            parts._replace(query=query).geturl(),
+            None,
+        )
 
     def _get_error_details(self, playability_status, details=None):
         if not playability_status:
@@ -1714,15 +1737,15 @@ class VideoInfo(YouTubeRequestClient):
                 data[quality_group] = {}
 
             url = unquote(url)
-            url = self._process_url_params(url)
-            url = (url.replace("&", "&amp;")
-                   .replace('"', "&quot;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;"))
+            primary_url, secondary_url = self._process_url_params(url)
+            primary_url = (primary_url.replace("&", "&amp;")
+                           .replace('"', "&quot;")
+                           .replace("<", "&lt;")
+                           .replace(">", "&gt;"))
 
             details = {
                 'mimeType': mime_type,
-                'baseUrl': url,
+                'baseUrl': primary_url,
                 'mediaType': media_type,
                 'container': container,
                 'codecs': codecs,
@@ -1747,6 +1770,12 @@ class VideoInfo(YouTubeRequestClient):
                 'sampleRate': sample_rate,
                 'channels': channels,
             }
+            if secondary_url:
+                secondary_url = (secondary_url.replace("&", "&amp;")
+                                 .replace('"', "&quot;")
+                                 .replace("<", "&lt;")
+                                 .replace(">", "&gt;"))
+                details['baseUrlSecondary'] = secondary_url
             data[mime_group][itag] = data[quality_group][itag] = details
 
         if not video_data:
@@ -1988,7 +2017,9 @@ class VideoInfo(YouTubeRequestClient):
                         '/>\n'
                     # Representation Label element is not used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n' +
+                    ('\t\t\t\t<BaseURL>{baseUrlSecondary}</BaseURL>\n'
+                     if 'baseUrlSecondary' in stream else '') +
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
@@ -2012,7 +2043,9 @@ class VideoInfo(YouTubeRequestClient):
                         '>\n'
                     # Representation Label element is not used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n' +
+                    ('\t\t\t\t<BaseURL>{baseUrlSecondary}</BaseURL>\n'
+                     if 'baseUrlSecondary' in stream else '') +
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
