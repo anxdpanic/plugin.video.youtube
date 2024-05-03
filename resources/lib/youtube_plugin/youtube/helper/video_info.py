@@ -1166,6 +1166,8 @@ class VideoInfo(YouTubeRequestClient):
                         )
                     )
                 client = self.build_client(client_name, client_data)
+                if not client:
+                    continue
 
                 result = self.request(
                     video_info_url,
@@ -1420,6 +1422,8 @@ class VideoInfo(YouTubeRequestClient):
                     and subtitles.sub_selection == subtitles.LANG_ALL)):
             for client_name in ('smarttv_embedded', 'web', 'android'):
                 caption_client = self.build_client(client_name, client_data)
+                if not caption_client:
+                    continue
                 result = self.request(
                     video_info_url,
                     'POST',
