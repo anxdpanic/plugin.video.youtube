@@ -21,21 +21,24 @@ from ..youtube import Provider
 
 __all__ = ('run',)
 
-context = XbmcContext()
-plugin = XbmcPlugin()
-provider = Provider()
+_context = XbmcContext()
+_plugin = XbmcPlugin()
+_provider = Provider()
 
-profiler = context.get_infobool('System.GetBool(debug.showloginfo)')
-if profiler:
+_profiler = _context.get_infobool('System.GetBool(debug.showloginfo)')
+if _profiler:
     from .debug import Profiler
 
-    profiler = Profiler(enabled=False)
+    _profiler = Profiler(enabled=False)
 
-atexit.register(provider.tear_down)
-atexit.register(context.tear_down)
+atexit.register(_provider.tear_down)
+atexit.register(_context.tear_down)
 
 
-def run():
+def run(context=_context,
+        plugin=_plugin,
+        provider=_provider,
+        profiler=_profiler):
     if profiler:
         profiler.enable(flush=True)
 
