@@ -177,3 +177,6 @@ class ServiceMonitor(xbmc.Monitor):
 
     def httpd_required(self):
         return self._use_httpd
+
+    def tear_down(self):
+        self._settings.flush()

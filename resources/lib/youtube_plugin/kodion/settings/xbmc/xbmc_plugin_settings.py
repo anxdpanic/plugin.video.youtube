@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import atexit
+
 from ..abstract_settings import AbstractSettings
 from ...compatibility import xbmcaddon
 from ...constants import VALUE_FROM_STR
@@ -270,3 +272,6 @@ class XbmcPluginSettings(AbstractSettings):
                 status=error if error else 'success'
             ))
         return not error
+
+
+atexit.register(XbmcPluginSettings.flush)

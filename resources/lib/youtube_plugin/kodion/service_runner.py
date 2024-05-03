@@ -77,4 +77,5 @@ def run():
     if monitor.httpd:
         monitor.shutdown_httpd()  # shutdown http server
 
+    monitor.tear_down()
     context.tear_down()
