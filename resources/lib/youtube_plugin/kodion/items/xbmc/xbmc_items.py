@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from json import dumps
+
 from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...compatibility import xbmc, xbmcgui
 from ...constants import SWITCH_PLAYER_FLAG
@@ -381,7 +383,12 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
                                 'inputstreamaddon')
         props[inputstream_property] = 'inputstream.adaptive'
 
-        if not current_system_version.compatible(21, 0):
+        if current_system_version.compatible(21, 0):
+            if video_item.live:
+                props['inputstream.adaptive.manifest_config'] = dumps({
+                    'timeshift_bufferlimit': 4 * 60 * 60,
+                })
+        else:
             props['inputstream.adaptive.manifest_type'] = manifest_type
 
         if headers:
