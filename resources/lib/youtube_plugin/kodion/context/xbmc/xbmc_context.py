@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import sys
-import weakref
+from weakref import proxy
 
 from ..abstract_context import AbstractContext
 from ...compatibility import (
@@ -400,27 +400,27 @@ class XbmcContext(AbstractContext):
 
     def get_video_playlist(self):
         if not self._video_playlist:
-            self._video_playlist = XbmcPlaylist('video', weakref.proxy(self))
+            self._video_playlist = XbmcPlaylist('video', proxy(self))
         return self._video_playlist
 
     def get_audio_playlist(self):
         if not self._audio_playlist:
-            self._audio_playlist = XbmcPlaylist('audio', weakref.proxy(self))
+            self._audio_playlist = XbmcPlaylist('audio', proxy(self))
         return self._audio_playlist
 
     def get_video_player(self):
         if not self._video_player:
-            self._video_player = XbmcPlayer('video', weakref.proxy(self))
+            self._video_player = XbmcPlayer('video', proxy(self))
         return self._video_player
 
     def get_audio_player(self):
         if not self._audio_player:
-            self._audio_player = XbmcPlayer('audio', weakref.proxy(self))
+            self._audio_player = XbmcPlayer('audio', proxy(self))
         return self._audio_player
 
     def get_ui(self):
         if not self._ui:
-            self._ui = XbmcContextUI(self._addon, weakref.proxy(self))
+            self._ui = XbmcContextUI(self._addon, proxy(self))
         return self._ui
 
     def get_data_path(self):
@@ -695,6 +695,16 @@ class XbmcContext(AbstractContext):
             self.__class__._settings = None
         except AttributeError:
             pass
+        del self._ui
+        self._ui = None
+        del self._video_playlist
+        self._video_playlist = None
+        del self._audio_playlist
+        self._audio_playlist = None
+        del self._video_player
+        self._video_player = None
+        del self._audio_player
+        self._audio_player = None
 
     def wakeup(self):
         self.get_ui().set_property(WAKEUP, 'true')

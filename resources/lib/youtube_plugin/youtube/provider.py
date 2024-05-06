@@ -51,11 +51,9 @@ class Provider(AbstractProvider):
     def __init__(self):
         super(Provider, self).__init__()
         self._resource_manager = None
-
         self._client = None
         self._api_check = None
         self._logged_in = False
-
         self.yt_video = yt_video
 
     def get_wizard_steps(self, context):
@@ -1595,4 +1593,11 @@ class Provider(AbstractProvider):
         return True
 
     def tear_down(self):
-        pass
+        del self._resource_manager
+        self._resource_manager = None
+        del self._client
+        self._client = None
+        del self._api_check
+        self._api_check = None
+        del self.yt_video
+        self.yt_video = None
