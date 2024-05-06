@@ -32,7 +32,7 @@ class AccessManager(JSONStore):
 
     def __init__(self, context):
         super(AccessManager, self).__init__('access_manager.json')
-        self._settings = context.get_settings()
+        self._context = context
         access_manager_data = self._data['access_manager']
         self._user = access_manager_data.get('current_user', 0)
         self._last_origin = access_manager_data.get('last_origin', ADDON_ID)
@@ -283,7 +283,7 @@ class AccessManager(JSONStore):
         """
         current_user = self.get_current_user_details()
         current_id = current_user.get('watch_later', 'WL')
-        settings_id = self._settings.get_watch_later_playlist()
+        settings_id = self._context.get_settings().get_watch_later_playlist()
 
         if settings_id and current_id != settings_id:
             current_id = self.set_watch_later_id(settings_id)
@@ -301,7 +301,7 @@ class AccessManager(JSONStore):
         if playlist_id.lower().strip() == 'wl':
             playlist_id = ''
 
-        self._settings.set_watch_later_playlist('')
+        self._context.get_settings().set_watch_later_playlist('')
         data = {
             'access_manager': {
                 'users': {
@@ -321,7 +321,7 @@ class AccessManager(JSONStore):
         """
         current_user = self.get_current_user_details()
         current_id = current_user.get('watch_history', 'HL')
-        settings_id = self._settings.get_history_playlist()
+        settings_id = self._context.get_settings().get_history_playlist()
 
         if settings_id and current_id != settings_id:
             current_id = self.set_watch_history_id(settings_id)
@@ -339,7 +339,7 @@ class AccessManager(JSONStore):
         if playlist_id.lower().strip() == 'hl':
             playlist_id = ''
 
-        self._settings.set_history_playlist('')
+        self._context.get_settings().set_history_playlist('')
         data = {
             'access_manager': {
                 'users': {
