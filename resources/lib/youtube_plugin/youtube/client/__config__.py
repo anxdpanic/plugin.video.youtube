@@ -194,3 +194,10 @@ class APICheck(object):
             return_secret = client_secret
 
         return return_key, return_id, return_secret
+
+    def get_configs(self):
+        return {
+            'youtube-tv': self.get_api_keys('youtube-tv'),
+            'main': self.get_api_keys(self.get_current_switch()),
+            'developer': self.get_api_keys('developer')
+        }

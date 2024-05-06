@@ -52,6 +52,7 @@ class Provider(AbstractProvider):
         self._resource_manager = None
 
         self._client = None
+        self._api_check = None
         self._logged_in = False
 
         self.yt_video = yt_video
@@ -140,16 +141,14 @@ class Provider(AbstractProvider):
 
     def reset_client(self):
         self._client = None
+        self._api_check = None
 
     def get_client(self, context):
         access_manager = context.get_access_manager()
 
-        api_check = APICheck(context)
-        configs = {
-            'youtube-tv': api_check.get_api_keys('youtube-tv'),
-            'main': api_check.get_api_keys(api_check.get_current_switch()),
-            'developer': api_check.get_api_keys('developer')
-        }
+        if not self._api_check:
+            self._api_check = APICheck(context)
+        configs = self._api_check.get_configs()
 
         dev_id = context.get_param('addon_id')
         if not dev_id or dev_id == ADDON_ID:
@@ -221,7 +220,7 @@ class Provider(AbstractProvider):
 
             refresh_tokens = access_manager.get_refresh_token()
             if refresh_tokens:
-                if api_check.changed:
+                if self._api_check.changed:
                     context.log_warning('API key set changed: Resetting client'
                                         ' and updating access token')
                     self.reset_client()
@@ -744,7 +743,7 @@ class Provider(AbstractProvider):
     def _on_sign(self, context, re_match):
         sign_out_confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
-        if (mode == 'in') and context.get_access_manager().has_refresh_token():
+        if (mode == 'in') and context.get_access_manager().get_refresh_token():
             yt_login.process('out', self, context, sign_out_refresh=False)
 
         if (not sign_out_confirmed and mode == 'out'
