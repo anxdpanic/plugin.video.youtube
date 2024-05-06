@@ -165,8 +165,6 @@ class PlayerMonitorThread(threading.Thread):
 
                     # only report state='paused' once
                     if state == 'playing' or last_state == 'playing':
-                        # refresh client, tokens may need refreshing
-                        self._provider.reset_client()
                         client = self._provider.get_client(self._context)
                         logged_in = self._provider.is_logged_in()
 
@@ -200,9 +198,7 @@ class PlayerMonitorThread(threading.Thread):
                                         total=self.total_time,
                                         percent=self.progress))
 
-        # refresh client, tokens may need refreshing
         if logged_in:
-            self._provider.reset_client()
             client = self._provider.get_client(self._context)
             logged_in = self._provider.is_logged_in()
 

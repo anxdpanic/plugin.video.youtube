@@ -284,7 +284,6 @@ def process_language(provider, context, step, steps):
     settings = context.get_settings()
     settings.set_language(language_id)
     settings.set_region(region_id)
-    provider.reset_client()
     return step
 
 
