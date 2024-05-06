@@ -215,6 +215,7 @@ class AbstractProvider(object):
                 or params != current_params):
             result = None
             function_cache = context.get_function_cache()
+            window_return = params.pop('window_return', True)
             try:
                 result, options = function_cache.run(
                     self.navigate,
@@ -227,8 +228,9 @@ class AbstractProvider(object):
                 if not result:
                     return False
                 context.get_ui().set_property(REROUTE, path)
-                context.execute('ActivateWindow(Videos, {0}, return)'.format(
-                    context.create_uri(path, params)
+                context.execute('ActivateWindow(Videos, {0}{1})'.format(
+                    context.create_uri(path, params),
+                    ', return' if window_return else '',
                 ))
         return False
 

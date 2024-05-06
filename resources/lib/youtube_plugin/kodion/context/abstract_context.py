@@ -46,6 +46,7 @@ class AbstractContext(object):
         'resume',
         'screensaver',
         'strm',
+        'window_return',
     }
     _INT_PARAMS = {
         'fanart_type',

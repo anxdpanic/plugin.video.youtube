@@ -548,6 +548,9 @@ def goto_home(context):
         context.localize(10000),
         'RunPlugin({0})'.format(context.create_uri(
             (paths.ROUTE, paths.HOME,),
+            {
+                'window_return': False,
+            },
         ))
     )
 
