@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 from base64 import b64decode
 
 from ... import key_sets
-from ...kodion.json_store import APIKeyStore
+from ...kodion.json_store import APIKeyStore, AccessManager
 
 
 DEFAULT_SWITCH = 1
@@ -22,12 +22,12 @@ class APICheck(object):
     def __init__(self, context):
         self._context = context
         self._api_jstore = APIKeyStore()
-        json_data = self._api_jstore.get_data()
-        access_manager = context.get_access_manager()
+        self._json_api = self._api_jstore.get_data()
+        self._access_manager = AccessManager(context)
 
-        j_key = json_data['keys']['personal'].get('api_key', '')
-        j_id = json_data['keys']['personal'].get('client_id', '')
-        j_secret = json_data['keys']['personal'].get('client_secret', '')
+        j_key = self._json_api['keys']['personal'].get('api_key', '')
+        j_id = self._json_api['keys']['personal'].get('client_id', '')
+        j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
         if j_key and j_id and j_secret:
             # users are now pasting keys into api_keys.json
@@ -35,8 +35,8 @@ class APICheck(object):
             stripped_key, stripped_id, stripped_secret = self._strip_api_keys(j_key, j_id, j_secret)
             if (stripped_key and stripped_id and stripped_secret
                     and (j_key != stripped_key or j_id != stripped_id or j_secret != stripped_secret)):
-                json_data['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
-                self._api_jstore.save(json_data)
+                self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
+                self._api_jstore.save(self._json_api)
 
         settings = self._context.get_settings()
         original_key = settings.api_key()
@@ -51,13 +51,13 @@ class APICheck(object):
                     settings.api_secret(own_secret)
 
                 if (j_key != own_key) or (j_id != own_id) or (j_secret != own_secret):
-                    json_data['keys']['personal'] = {'api_key': own_key, 'client_id': own_id, 'client_secret': own_secret}
-                    self._api_jstore.save(json_data)
+                    self._json_api['keys']['personal'] = {'api_key': own_key, 'client_id': own_id, 'client_secret': own_secret}
+                    self._api_jstore.save(self._json_api)
 
-                json_data = self._api_jstore.get_data()
-                j_key = json_data['keys']['personal'].get('api_key', '')
-                j_id = json_data['keys']['personal'].get('client_id', '')
-                j_secret = json_data['keys']['personal'].get('client_secret', '')
+                self._json_api = self._api_jstore.get_data()
+                j_key = self._json_api['keys']['personal'].get('api_key', '')
+                j_id = self._json_api['keys']['personal'].get('client_id', '')
+                j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
         if (not original_key or not original_id or not original_secret
                 and j_key and j_secret and j_id):
@@ -66,7 +66,7 @@ class APICheck(object):
             settings.api_secret(j_secret)
 
         switch = self.get_current_switch()
-        user_details = access_manager.get_current_user_details()
+        user_details = self._access_manager.get_current_user_details()
         last_hash = user_details.get('last_key_hash', '')
         current_set_hash = self._get_key_set_hash(switch)
 
@@ -74,7 +74,7 @@ class APICheck(object):
         if changed and switch == 'own':
             changed = self._get_key_set_hash('own_old') != last_hash
             if not changed:
-                access_manager.set_last_key_hash(current_set_hash)
+                self._access_manager.set_last_key_hash(current_set_hash)
         self.changed = changed
 
         self._context.log_debug('User: |{user}|, '
@@ -91,14 +91,14 @@ class APICheck(object):
                     }
                 )
             ))
-            access_manager.set_last_key_hash(current_set_hash)
+            self._access_manager.set_last_key_hash(current_set_hash)
 
     @staticmethod
     def get_current_switch():
         return 'own'
 
     def get_current_user(self):
-        return self._context.get_access_manager().get_current_user()
+        return self._access_manager.get_current_user()
 
     def has_own_api_keys(self):
         json_data = self._api_jstore.get_data()
@@ -110,9 +110,9 @@ class APICheck(object):
             return False
 
     def get_api_keys(self, switch):
-        json_data = self._api_jstore.get_data()
+        self._json_api = self._api_jstore.get_data()
         if switch == 'developer':
-            return json_data['keys'][switch]
+            return self._json_api['keys'][switch]
 
         decode = True
         if switch == 'youtube-tv':
@@ -122,7 +122,7 @@ class APICheck(object):
         elif switch.startswith('own'):
             decode = False
             system = 'All'
-            key_set_details = json_data['keys']['personal']
+            key_set_details = self._json_api['keys']['personal']
 
         else:
             system = 'All'
@@ -153,7 +153,7 @@ class APICheck(object):
             if switch == 'own_old':
                 client_id += '.apps.googleusercontent.com'
             key_set['id'] = client_id
-        return self._context.get_access_manager().calc_key_hash(**key_set)
+        return self._access_manager.calc_key_hash(**key_set)
 
     def _strip_api_keys(self, api_key, client_id, client_secret):
         stripped_key = ''.join(api_key.split())
