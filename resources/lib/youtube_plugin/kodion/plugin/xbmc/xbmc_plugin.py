@@ -102,7 +102,11 @@ class XbmcPlugin(AbstractPlugin):
                                         'reloading playlist')
 
                     num_items = playlist.add_items(items)
-                    max_wait_time = min(position, num_items)
+                    if position:
+                        max_wait_time = min(position, num_items)
+                    else:
+                        position = 1
+                        max_wait_time = num_items
                     while ui.busy_dialog_active() or playlist.size() < position:
                         max_wait_time -= 1
                         if max_wait_time < 0:
