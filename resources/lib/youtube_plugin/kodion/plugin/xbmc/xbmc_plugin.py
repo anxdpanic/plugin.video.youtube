@@ -24,7 +24,6 @@ from ...constants import (
 )
 from ...exceptions import KodionException
 from ...items import (
-    DirectoryItem,
     audio_listitem,
     directory_listitem,
     image_listitem,

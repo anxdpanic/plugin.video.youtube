@@ -1855,7 +1855,7 @@ class VideoInfo(YouTubeRequestClient):
 
                 skip_group = (
                     new_stream['height'] <= previous_stream['height']
-                ) if media_type == 'video' else (
+                    if media_type == 'video' else
                     new_stream['channels'] <= previous_stream['channels']
                 )
             else:
@@ -1864,7 +1864,7 @@ class VideoInfo(YouTubeRequestClient):
 
                 skip_group = (
                     new_stream['height'] == previous_stream['height']
-                ) if media_type == 'video' else (
+                    if media_type == 'video' else
                     2 == new_stream['channels'] == previous_stream['channels']
                 )
 
@@ -1872,7 +1872,7 @@ class VideoInfo(YouTubeRequestClient):
                 skip_group
                 and new_stream['fps'] == previous_stream['fps']
                 and new_stream['hdr'] == previous_stream['hdr']
-            ) if media_type == 'video' else (
+                if media_type == 'video' else
                 skip_group
                 and new_stream['langCode'] == previous_stream['langCode']
                 and new_stream['role'] == previous_stream['role']
@@ -1926,7 +1926,7 @@ class VideoInfo(YouTubeRequestClient):
             if group.startswith(mime_type) and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
                     stream['langName']
-                        or self._context.localize('stream.automatic'),
+                    or self._context.localize('stream.automatic'),
                     stream['label']
                 )
                 if stream == main_stream[media_type]:

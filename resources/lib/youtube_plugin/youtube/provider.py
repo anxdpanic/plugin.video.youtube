@@ -79,7 +79,9 @@ class Provider(AbstractProvider):
 
         dev_config = {}
         if _dev_config:
-            context.log_debug('Using window property for developer keys is deprecated, instead use the youtube_registration module.')
+            context.log_warning('Using window property for developer keys is'
+                                ' deprecated. Please use the'
+                                ' youtube_registration module instead')
             try:
                 dev_config = json.loads(_dev_config)
             except ValueError:
@@ -92,17 +94,26 @@ class Provider(AbstractProvider):
             return {}
 
         if dev_config:
-            if (not dev_config.get('main')
-                    or not dev_config['main'].get('key')
-                    or not dev_config['main'].get('system')
-                    or not dev_config.get('origin')
-                    or not dev_config['main'].get('id')
-                    or not dev_config['main'].get('secret')):
-                context.log_error('Error loading developer config: |invalid structure| '
-                                  'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
+            dev_main = dev_origin = None
+            if {'main', 'origin'}.issubset(dev_config):
+                dev_main = dev_config['main']
+                dev_origin = dev_config['origin']
+
+                if not {'system', 'key', 'id', 'secret'}.issubset(dev_main):
+                    dev_main = None
+
+            if not dev_main:
+                context.log_error('Invalid developer config: |{dev_config}|\n'
+                                  'expected: |{{'
+                                  ' "origin": ADDON_ID,'
+                                  ' "main": {{'
+                                  ' "system": SYSTEM_NAME,'
+                                  ' "key": API_KEY,'
+                                  ' "id": CLIENT_ID,'
+                                  ' "secret": CLIENT_SECRET'
+                                  '}}}}|'.format(dev_config=dev_config))
                 return {}
-            dev_origin = dev_config['origin']
-            dev_main = dev_config['main']
+
             dev_system = dev_main['system']
             if dev_system == 'JSONStore':
                 dev_key = b64decode(dev_main['key'])
@@ -112,8 +123,18 @@ class Provider(AbstractProvider):
                 dev_key = dev_main['key']
                 dev_id = dev_main['id']
                 dev_secret = dev_main['secret']
-            context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
-            return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
+            context.log_debug('Using developer config: '
+                              '|origin: {origin}, system: {system}|'
+                              .format(origin=dev_origin, system=dev_system))
+            return {
+                'origin': dev_origin,
+                'main': {
+                    'system': dev_system,
+                    'id': dev_id,
+                    'secret': dev_secret,
+                    'key': dev_key,
+                }
+            }
 
         return {}
 
