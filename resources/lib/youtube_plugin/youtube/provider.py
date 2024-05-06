@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import re
 from base64 import b64decode
+from weakref import proxy
 
 from .client import APICheck, YouTube
 from .helper import (
@@ -294,8 +295,7 @@ class Provider(AbstractProvider):
 
     def get_resource_manager(self, context):
         if not self._resource_manager:
-            # self._resource_manager = ResourceManager(weakref.proxy(context), weakref.proxy(self.get_client(context)))
-            self._resource_manager = ResourceManager(context, self.get_client(context))
+            self._resource_manager = ResourceManager(proxy(self), context)
         return self._resource_manager
 
     # noinspection PyUnusedLocal
