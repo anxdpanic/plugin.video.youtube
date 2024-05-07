@@ -35,6 +35,7 @@ VALUE_FROM_STR = {
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
 CHECK_SETTINGS = 'check_settings'
+PLAYER_DATA = 'player_json'
 PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
 REROUTE = 'reroute'
@@ -51,6 +52,7 @@ __all__ = (
     'CHECK_SETTINGS',
     'DATA_PATH',
     'MEDIA_PATH',
+    'PLAYER_DATA',
     'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
     'RESOURCE_PATH',
