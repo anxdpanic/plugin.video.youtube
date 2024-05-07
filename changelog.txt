@@ -7,12 +7,13 @@
 - Workaround for new settings interface not updated correctly
 - Fix bookmarks icon background colour
 - Fix adding channel items directly to bookmarks
+- Fixes for player monitoring preventing item being marked as watched #746
 
 ### Changed
 - Removed Settings > Advanced > Views > Show channel fanart
   - Now included as option in Settings > Advanced > Views > Show fanart
 - MPEG-DASH for live streams only enabled by default in Kodi v21
-- Make better use of reuselanguageinvoker
+- Make better use of reuselanguageinvoker and various memory usage improvements
 
 ### New
 - Improvements to plugin page navigation #715
