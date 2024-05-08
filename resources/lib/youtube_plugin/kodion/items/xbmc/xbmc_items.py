@@ -18,7 +18,7 @@ from ...constants import SWITCH_PLAYER_FLAG
 from ...utils import current_system_version, datetime_parser
 
 
-def set_info(list_item, item, properties):
+def set_info(list_item, item, properties, resume=True):
     is_video = False
     if not current_system_version.compatible(20, 0):
         if isinstance(item, VideoItem):
@@ -161,7 +161,7 @@ def set_info(list_item, item, properties):
                 list_item.setProperties(properties)
             return
 
-        resume_time = item.get_start_time()
+        resume_time = resume and item.get_start_time()
         if resume_time:
             properties['ResumeTime'] = str(resume_time)
         duration = item.get_duration()
@@ -289,7 +289,7 @@ def set_info(list_item, item, properties):
         if value is not None:
             info_tag.setAlbum(value)
 
-    resume_time = item.get_start_time()
+    resume_time = resume and item.get_start_time()
     duration = item.get_duration()
     if resume_time and duration:
         info_tag.setResumePoint(resume_time, float(duration))
@@ -432,7 +432,8 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
-    set_info(list_item, video_item, props)
+    resume = context.get_param('resume')
+    set_info(list_item, video_item, props, resume=resume)
 
     return list_item
 
@@ -463,7 +464,8 @@ def audio_listitem(context, audio_item, show_fanart=None, for_playback=False):
         'thumb': image,
     })
 
-    set_info(list_item, audio_item, props)
+    resume = context.get_param('resume') or not for_playback
+    set_info(list_item, audio_item, props, resume=resume)
 
     context_menu = audio_item.get_context_menu()
     if context_menu:
