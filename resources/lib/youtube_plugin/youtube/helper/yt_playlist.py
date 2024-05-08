@@ -34,7 +34,7 @@ def _process_add_video(provider, context, keymap_action=False):
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(path, 'play/'):
+        if context.is_plugin_path(path, 'play'):
             video_id = find_video_id(path)
             keymap_action = True
         if not video_id:
@@ -160,7 +160,7 @@ def _process_select_playlist(provider, context):
 
     video_id = params.get('video_id', '')
     if not video_id:
-        if context.is_plugin_path(path, 'play/'):
+        if context.is_plugin_path(path, 'play'):
             video_id = find_video_id(path)
             if video_id:
                 context.set_param('video_id', video_id)

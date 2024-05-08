@@ -114,7 +114,7 @@ class PlayerMonitorThread(threading.Thread):
                 break
 
             if (not current_file.startswith(playing_file) and not (
-                    self._context.is_plugin_path(current_file, 'play/')
+                    self._context.is_plugin_path(current_file, 'play')
                     and video_id_param in current_file
             )) or total_time <= 0:
                 self.stop()

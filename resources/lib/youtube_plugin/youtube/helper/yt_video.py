@@ -28,7 +28,7 @@ def _process_rate_video(provider, context, re_match):
         try:
             video_id = re_match.group('video_id')
         except IndexError:
-            if context.is_plugin_path(listitem_path, 'play/'):
+            if context.is_plugin_path(listitem_path, 'play'):
                 video_id = find_video_id(listitem_path)
 
             if not video_id:

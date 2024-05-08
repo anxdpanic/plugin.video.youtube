@@ -633,7 +633,7 @@ class Provider(AbstractProvider):
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
             path = context.get_listitem_detail('FileNameAndPath', attr=True)
-            if context.is_plugin_path(path, 'play/'):
+            if context.is_plugin_path(path, 'play'):
                 video_id = find_video_id(path)
                 if video_id:
                     context.set_param('video_id', video_id)

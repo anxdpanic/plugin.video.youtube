@@ -351,8 +351,14 @@ class XbmcContext(AbstractContext):
     def addon(self):
         return self._addon
 
-    def is_plugin_path(self, uri, uri_path=''):
-        return uri.startswith('plugin://%s/%s' % (self.get_id(), uri_path))
+    def is_plugin_path(self, uri, uri_path='', partial=False):
+        uri_path = ('plugin://%s/%s' % (self.get_id(), uri_path)).rstrip('/')
+        if not partial:
+            uri_path = (
+                uri_path + '/',
+                uri_path + '?'
+            )
+        return uri.startswith(uri_path)
 
     @staticmethod
     def format_date_short(date_obj, str_format=None):
