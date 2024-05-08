@@ -119,12 +119,10 @@ class BaseItem(object):
     def get_fanart(self):
         return self._fanart
 
-    def set_context_menu(self, context_menu):
-        self._context_menu = context_menu
-
-    def add_context_menu(self, context_menu, position=0):
-        if self._context_menu is None:
-            self._context_menu = context_menu
+    def add_context_menu(self, context_menu, position='end', replace=False):
+        context_menu = (item for item in context_menu if item)
+        if replace or not self._context_menu:
+            self._context_menu = list(context_menu)
         elif position == 'end':
             self._context_menu.extend(context_menu)
         else:

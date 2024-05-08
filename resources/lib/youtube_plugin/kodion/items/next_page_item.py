@@ -44,7 +44,7 @@ class NextPageItem(DirectoryItem):
             menu_items.goto_quick_search(context),
             menu_items.separator(),
         ]
-        self.set_context_menu(context_menu)
+        self.add_context_menu(context_menu)
 
     @classmethod
     def create_page_token(cls, page, items_per_page=50):

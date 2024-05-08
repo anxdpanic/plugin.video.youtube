@@ -39,4 +39,4 @@ class SearchHistoryItem(DirectoryItem):
             menu_items.search_rename(context, query),
             menu_items.search_clear(context),
         ]
-        self.set_context_menu(context_menu)
+        self.add_context_menu(context_menu)

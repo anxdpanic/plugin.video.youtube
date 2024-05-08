@@ -233,7 +233,7 @@ def update_channel_infos(provider, context, channel_id_dict,
             )
 
         if context_menu:
-            channel_item.set_context_menu(context_menu)
+            channel_item.add_context_menu(context_menu, replace=True)
 
         fanart_images = yt_item.get('brandingSettings', {}).get('image', {})
         for banner in banners:
@@ -297,15 +297,11 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         context_menu = [
             menu_items.play_all_from_playlist(
                 context, playlist_id
-            )
+            ),
+            menu_items.bookmarks_add(
+                context, playlist_item
+            ) if not in_bookmarks_list and channel_id != 'mine' else None,
         ]
-
-        if not in_bookmarks_list and channel_id != 'mine':
-            context_menu.append(
-                menu_items.bookmarks_add(
-                    context, playlist_item
-                )
-            )
 
         if logged_in:
             if channel_id != 'mine':
@@ -352,7 +348,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
             )
 
         if context_menu:
-            playlist_item.set_context_menu(context_menu)
+            playlist_item.add_context_menu(context_menu, replace=True)
 
         # update channel mapping
         if channel_items_dict is not None:
@@ -782,7 +778,7 @@ def update_video_infos(provider, context, video_id_dict,
             context_menu.append(
                 menu_items.separator(),
             )
-            video_item.set_context_menu(context_menu)
+            video_item.add_context_menu(context_menu, replace=True)
 
 
 def update_play_info(provider, context, video_id, video_item, video_stream,

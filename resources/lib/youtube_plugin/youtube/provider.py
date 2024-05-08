@@ -1033,7 +1033,7 @@ class Provider(AbstractProvider):
                     ),
                     menu_items.separator(),
                 ]
-                video_item.add_context_menu(context_menu)
+                video_item.add_context_menu(context_menu, position=0)
 
             return video_items
 
@@ -1215,7 +1215,7 @@ class Provider(AbstractProvider):
                         context, watch_later_id
                     )
                 ]
-                watch_later_item.set_context_menu(context_menu)
+                watch_later_item.add_context_menu(context_menu, replace=True)
                 result.append(watch_later_item)
             else:
                 watch_history_item = DirectoryItem(
@@ -1240,7 +1240,7 @@ class Provider(AbstractProvider):
                         context, playlists['likes']
                     )
                 ]
-                liked_videos_item.set_context_menu(context_menu)
+                liked_videos_item.add_context_menu(context_menu, replace=True)
                 result.append(liked_videos_item)
 
         # disliked videos
@@ -1265,7 +1265,7 @@ class Provider(AbstractProvider):
                         context, history_id
                     )
                 ]
-                watch_history_item.set_context_menu(context_menu)
+                watch_history_item.add_context_menu(context_menu, replace=True)
                 result.append(watch_history_item)
             elif local_history:
                 watch_history_item = DirectoryItem(
@@ -1436,7 +1436,7 @@ class Provider(AbstractProvider):
                     ),
                     menu_items.separator(),
                 ]
-                item.add_context_menu(context_menu)
+                item.add_context_menu(context_menu, position=0)
                 bookmarks.append(item)
 
             return bookmarks
@@ -1500,7 +1500,7 @@ class Provider(AbstractProvider):
                     ),
                     menu_items.separator(),
                 ]
-                video_item.add_context_menu(context_menu)
+                video_item.add_context_menu(context_menu, position=0)
 
             return video_items
 
