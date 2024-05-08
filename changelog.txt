@@ -1,3 +1,8 @@
+## v7.0.7+beta.2
+### Fixed
+- Fix invalid pageToken error by removing jump from unsupported listings #715
+
+
 ## v7.0.7+beta.1
 ### Fixed
 - Fixed not being able to re-refresh a directory listing that has already been refreshed
