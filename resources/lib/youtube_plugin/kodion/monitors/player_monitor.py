@@ -23,7 +23,7 @@ from ..constants import (
 
 
 class PlayerMonitorThread(threading.Thread):
-    def __init__(self, player, provider, context, monitor, playback_json):
+    def __init__(self, player, provider, context, monitor, playback_data):
         super(PlayerMonitorThread, self).__init__()
 
         self._stopped = threading.Event()
@@ -34,10 +34,10 @@ class PlayerMonitorThread(threading.Thread):
         self._context = context
         self._monitor = monitor
 
-        self.playback_json = playback_json
-        self.video_id = self.playback_json.get('video_id')
-        self.channel_id = self.playback_json.get('channel_id')
-        self.video_status = self.playback_json.get('video_status')
+        self.playback_data = playback_data
+        self.video_id = playback_data.get('video_id')
+        self.channel_id = playback_data.get('channel_id')
+        self.video_status = playback_data.get('video_status')
 
         self.current_time = 0.0
         self.total_time = 0.0
@@ -52,13 +52,13 @@ class PlayerMonitorThread(threading.Thread):
                 or self.stopped())
 
     def run(self):
-        playing_file = self.playback_json.get('playing_file')
-        play_count = self.playback_json.get('play_count', 0)
-        use_remote_history = self.playback_json.get('use_remote_history', False)
-        use_local_history = self.playback_json.get('use_local_history', False)
-        playback_stats = self.playback_json.get('playback_stats', {})
-        refresh_only = self.playback_json.get('refresh_only', False)
-        clip = self.playback_json.get('clip', False)
+        playing_file = self.playback_data.get('playing_file')
+        play_count = self.playback_data.get('play_count', 0)
+        use_remote_history = self.playback_data.get('use_remote_history', False)
+        use_local_history = self.playback_data.get('use_local_history', False)
+        playback_stats = self.playback_data.get('playback_stats', {})
+        refresh_only = self.playback_data.get('refresh_only', False)
+        clip = self.playback_data.get('clip', False)
 
         self._context.log_debug('PlayerMonitorThread[{0}]: Starting'
                                 .format(self.video_id))
@@ -187,20 +187,6 @@ class PlayerMonitorThread(threading.Thread):
         if self.total_time > 0:
             self.progress = int(100 * self.current_time / self.total_time)
 
-        state = 'stopped'
-        self._context.send_notification('PlaybackStopped', {
-            'video_id': self.video_id,
-            'channel_id': self.channel_id,
-            'status': self.video_status,
-        })
-        self._context.log_debug('Playback stopped [{video_id}]:'
-                                ' {current:.3f} secs of {total:.3f}'
-                                ' @ {percent}%'
-                                .format(video_id=self.video_id,
-                                        current=self.current_time,
-                                        total=self.total_time,
-                                        percent=self.progress))
-
         if logged_in:
             client = self._provider.get_client(self._context)
             logged_in = self._provider.is_logged_in()
@@ -213,25 +199,31 @@ class PlayerMonitorThread(threading.Thread):
             segment_end = self.current_time
             refresh_only = True
 
+        play_data = {
+            'play_count': play_count,
+            'total_time': self.total_time,
+            'played_time': self.current_time,
+            'played_percent': self.progress,
+        }
+        self.playback_data['play_data'] = play_data
+
         if logged_in and report_url:
             client.update_watch_history(
                 self._context,
                 self.video_id,
                 report_url,
-                status=(segment_end,
-                        segment_end,
-                        segment_end,
-                        state),
+                status=(segment_end, segment_end, segment_end, 'stopped'),
             )
         if use_local_history:
-            play_data = {
-                'play_count': play_count,
-                'total_time': self.total_time,
-                'played_time': self.current_time,
-                'played_percent': self.progress,
-            }
             self._context.get_playback_history().update(self.video_id,
                                                         play_data)
+
+        self._context.send_notification('PlaybackStopped', self.playback_data)
+        self._context.log_debug('Playback stopped [{video_id}]:'
+                                ' {played_time:.3f} secs of {total_time:.3f}'
+                                ' @ {played_percent}%,'
+                                ' played {play_count} time(s)'
+                                .format(video_id=self.video_id, **play_data))
 
         if refresh_only:
             pass
@@ -362,17 +354,17 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        playback_json = self._ui.get_property(PLAYER_DATA)
-        if not playback_json:
+        playback_data = self._ui.get_property(PLAYER_DATA)
+        if not playback_data:
             return
         self._ui.clear_property(PLAYER_DATA)
         self.cleanup_threads()
 
-        playback_json = json.loads(playback_json)
+        playback_data = json.loads(playback_data)
         try:
-            self.seek_time = float(playback_json.get('seek_time'))
-            self.start_time = float(playback_json.get('start_time'))
-            self.end_time = float(playback_json.get('end_time'))
+            self.seek_time = float(playback_data.get('seek_time'))
+            self.start_time = float(playback_data.get('start_time'))
+            self.end_time = float(playback_data.get('end_time'))
             self.current_time = max(0.0, self.getTime())
             self.total_time = max(0.0, self.getTotalTime())
         except (ValueError, TypeError, RuntimeError):
@@ -386,7 +378,7 @@ class PlayerMonitor(xbmc.Player):
                                                 self._provider,
                                                 self._context,
                                                 self._monitor,
-                                                playback_json))
+                                                playback_data))
 
     def onPlayBackEnded(self):
         if not self._ui.busy_dialog_active():
