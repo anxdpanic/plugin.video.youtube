@@ -107,8 +107,9 @@ class PlayerMonitorThread(threading.Thread):
                 current_file = player.getPlayingFile()
                 played_time = player.getTime()
                 total_time = player.getTotalTime()
-                player.current_time = played_time
-                player.total_time = total_time
+                if not player.seeking:
+                    player.current_time = played_time
+                    player.total_time = total_time
             except RuntimeError:
                 self.stop()
                 break
@@ -299,6 +300,7 @@ class PlayerMonitor(xbmc.Player):
         self._monitor = monitor
         self._ui = self._context.get_ui()
         self.threads = []
+        self.seeking = False
         self.seek_time = None
         self.start_time = None
         self.end_time = None
@@ -403,9 +405,13 @@ class PlayerMonitor(xbmc.Player):
 
     def onPlayBackSeek(self, time, seekOffset):
         time_s = time / 1000
+        self.seeking = True
         self.current_time = time_s
         self.seek_time = None
         if ((self.end_time and time_s > self.end_time + 1)
                 or (self.start_time and time_s < self.start_time - 1)):
             self.start_time = None
             self.end_time = None
+
+    def onAVChange(self):
+        self.seeking = False
