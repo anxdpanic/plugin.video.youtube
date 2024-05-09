@@ -333,10 +333,6 @@ def run(argv):
             xbmcaddon.Addon().openSettings()
             return
 
-        if action == 'refresh':
-            xbmc.executebuiltin('Container.Refresh')
-            return
-
         if action == 'play_with':
             ui.set_property(SWITCH_PLAYER_FLAG, 'true')
             xbmc.executebuiltin('Action(Play)')

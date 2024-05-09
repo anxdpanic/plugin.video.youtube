@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
-from ...constants import ADDON_ID
+from ...constants import ADDON_ID, REFRESH_CONTAINER
 from ...utils import to_unicode
 
 
@@ -138,13 +138,8 @@ class XbmcContextUI(AbstractContextUI):
     def open_settings(self):
         self._xbmc_addon.openSettings()
 
-    @staticmethod
-    def refresh_container():
-        # TODO: find out why the RunScript call is required
-        # xbmc.executebuiltin("Container.Refresh")
-        xbmc.executebuiltin('RunScript({addon_id},action/refresh)'.format(
-            addon_id=ADDON_ID
-        ))
+    def refresh_container(self):
+        self._context.send_notification(REFRESH_CONTAINER, True)
 
     @staticmethod
     def set_property(property_id, value):
