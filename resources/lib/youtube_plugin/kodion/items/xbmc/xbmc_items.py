@@ -110,9 +110,18 @@ def set_info(list_item, item, properties, resume=True):
                 list_item.setInfo('video', info_labels)
 
         elif isinstance(item, DirectoryItem):
+            info_labels = {}
+
+            value = item.get_name()
+            if value is not None:
+                info_labels['title'] = value
+
             value = item.get_plot()
             if value is not None:
-                list_item.setInfo('picture', {'plot': value})
+                info_labels['plot'] = value
+
+            if info_labels:
+                list_item.setInfo('video', info_labels)
 
             if properties:
                 list_item.setProperties(properties)
@@ -169,6 +178,7 @@ def set_info(list_item, item, properties, resume=True):
             properties['TotalTime'] = str(duration)
             if is_video:
                 list_item.addStreamInfo('video', {'duration': duration})
+
         if properties:
             list_item.setProperties(properties)
         return
@@ -269,15 +279,21 @@ def set_info(list_item, item, properties, resume=True):
     elif isinstance(item, DirectoryItem):
         info_tag = list_item.getVideoInfoTag()
 
+        value = item.get_name()
+        if value is not None:
+            info_tag.setTitle(value)
+
         value = item.get_plot()
         if value is not None:
             info_tag.setPlot(value)
         return
 
     elif isinstance(item, ImageItem):
+        info_tag = list_item.getPictureInfoTag()
+
         value = item.get_title()
         if value is not None:
-            list_item.setInfo('picture', {'title': value})
+            info_tag.setTitle(value)
         return
 
     elif isinstance(item, AudioItem):
