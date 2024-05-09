@@ -713,5 +713,5 @@ class XbmcContext(AbstractContext):
         self._audio_player = None
 
     def wakeup(self):
-        self.get_ui().set_property(WAKEUP, 'true')
+        self.get_ui().set_property(WAKEUP)
         self.send_notification(WAKEUP, True)

@@ -311,7 +311,7 @@ def _user_actions(context, action, params):
 def run(argv):
     context = XbmcContext()
     ui = context.get_ui()
-    ui.set_property(WAIT_FLAG, 'true')
+    ui.set_property(WAIT_FLAG)
     try:
         category = action = params = None
         args = argv[1:]
@@ -334,7 +334,7 @@ def run(argv):
             return
 
         if action == 'play_with':
-            ui.set_property(SWITCH_PLAYER_FLAG, 'true')
+            ui.set_property(SWITCH_PLAYER_FLAG)
             xbmc.executebuiltin('Action(Play)')
             return
 

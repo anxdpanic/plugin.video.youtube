@@ -202,7 +202,7 @@ class XbmcPlugin(AbstractPlugin):
         if base_item.playable:
             ui = context.get_ui()
             if not context.is_plugin_path(uri) and ui.busy_dialog_active():
-                ui.set_property(BUSY_FLAG, 'true')
+                ui.set_property(BUSY_FLAG)
                 playlist = XbmcPlaylist('auto', context)
                 position, _ = playlist.get_position()
                 items = playlist.get_items()

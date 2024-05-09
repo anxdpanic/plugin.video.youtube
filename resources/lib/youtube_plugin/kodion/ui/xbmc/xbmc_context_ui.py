@@ -142,7 +142,7 @@ class XbmcContextUI(AbstractContextUI):
         self._context.send_notification(REFRESH_CONTAINER, True)
 
     @staticmethod
-    def set_property(property_id, value):
+    def set_property(property_id, value='true'):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(property_id, value)
 

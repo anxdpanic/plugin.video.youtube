@@ -49,7 +49,7 @@ def run():
                 waited = 0
             if waited >= 30:
                 monitor.shutdown_httpd()
-                ui.set_property(SLEEPING, 'true')
+                ui.set_property(SLEEPING)
         elif waited >= ping_period:
             waited = 0
             if monitor.ping_httpd():
@@ -69,7 +69,7 @@ def run():
             break
         waited += wait_interval
 
-    ui.set_property(ABORT_FLAG, 'true')
+    ui.set_property(ABORT_FLAG)
 
     # clean up any/all playback monitoring threads
     player.cleanup_threads(only_ended=False)
