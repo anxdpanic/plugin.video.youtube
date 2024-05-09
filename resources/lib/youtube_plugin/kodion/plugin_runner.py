@@ -14,8 +14,8 @@ import atexit
 from copy import deepcopy
 from platform import python_version
 
-from .plugin import XbmcPlugin
 from .context import XbmcContext
+from .plugin import XbmcPlugin
 from ..youtube import Provider
 
 
@@ -50,13 +50,14 @@ def run(context=_context,
         if key in params:
             params[key] = '<redacted>'
 
-    context.log_notice('Running: {plugin} ({version}) on {kodi} with {python}\n'
+    context.log_notice('Running: {plugin} ({version})'
+                       ' on {kodi} with Python {python}\n'
                        'Path: {path}\n'
                        'Params: {params}'
                        .format(plugin=context.get_name(),
                                version=context.get_version(),
                                kodi=context.get_system_version(),
-                               python='Python {0}'.format(python_version()),
+                               python=python_version(),
                                path=context.get_path(),
                                params=params))
 

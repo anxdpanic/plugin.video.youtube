@@ -23,8 +23,17 @@ __all__ = ('run',)
 def run():
     context = XbmcContext()
     context.log_debug('YouTube service initialization...')
+
+    get_infobool = context.get_infobool
+    get_infolabel = context.get_infolabel
+    get_listitem_detail = context.get_listitem_detail
+
     ui = context.get_ui()
-    ui.clear_property(ABORT_FLAG)
+    clear_property = ui.clear_property
+    get_property = ui.get_property
+    set_property = ui.set_property
+
+    clear_property(ABORT_FLAG)
 
     monitor = ServiceMonitor()
     player = PlayerMonitor(provider=Provider(),
@@ -40,16 +49,16 @@ def run():
     while not monitor.abortRequested():
         if not monitor.httpd:
             if (monitor.httpd_required()
-                    and not context.get_infobool('System.IdleTime(10)')):
+                    and not get_infobool('System.IdleTime(10)')):
                 monitor.start_httpd()
                 waited = 0
-        elif context.get_infobool('System.IdleTime(10)'):
-            if ui.get_property(WAKEUP):
-                ui.clear_property(WAKEUP)
+        elif get_infobool('System.IdleTime(10)'):
+            if get_property(WAKEUP):
+                clear_property(WAKEUP)
                 waited = 0
             if waited >= 30:
                 monitor.shutdown_httpd()
-                ui.set_property(SLEEPING)
+                set_property(SLEEPING)
         elif waited >= ping_period:
             waited = 0
             if monitor.ping_httpd():
@@ -60,7 +69,7 @@ def run():
             else:
                 monitor.shutdown_httpd()
 
-        if context.get_infolabel('Container.FolderPath').startswith(plugin_url):
+        if get_infolabel('Container.FolderPath').startswith(plugin_url):
             wait_interval = 1
         else:
             wait_interval = 10
@@ -69,7 +78,7 @@ def run():
             break
         waited += wait_interval
 
-    ui.set_property(ABORT_FLAG)
+    set_property(ABORT_FLAG)
 
     # clean up any/all playback monitoring threads
     player.cleanup_threads(only_ended=False)

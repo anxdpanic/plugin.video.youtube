@@ -31,7 +31,6 @@ class XbmcContextUI(AbstractContextUI):
 
         return XbmcProgressDialog(heading, text)
 
-
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
