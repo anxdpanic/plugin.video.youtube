@@ -43,7 +43,10 @@ def run(context=_context,
         profiler.enable(flush=True)
 
     context.log_debug('Starting Kodion framework by bromix...')
+
+    current_uri = context.get_uri()
     context.init()
+    new_uri = context.get_uri()
 
     params = deepcopy(context.get_params())
     for key in ('api_key', 'client_id', 'client_secret'):
@@ -61,7 +64,7 @@ def run(context=_context,
                                path=context.get_path(),
                                params=params))
 
-    plugin.run(provider, context)
+    plugin.run(provider, context, new_uri == current_uri)
 
     if profiler:
         profiler.print_stats()

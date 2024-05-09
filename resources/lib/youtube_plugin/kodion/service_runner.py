@@ -10,7 +10,15 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .constants import ABORT_FLAG, ADDON_ID, SLEEPING, TEMP_PATH, WAKEUP
+from .constants import (
+    ABORT_FLAG,
+    ADDON_ID,
+    PLAY_COUNT,
+    SLEEPING,
+    TEMP_PATH,
+    VIDEO_ID,
+    WAKEUP,
+)
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
 from .utils import rm_dir
@@ -46,6 +54,7 @@ def run():
     ping_period = waited = 60
     restart_attempts = 0
     plugin_url = 'plugin://{0}/'.format(ADDON_ID)
+    video_id = None
     while not monitor.abortRequested():
         if not monitor.httpd:
             if (monitor.httpd_required()
@@ -70,7 +79,33 @@ def run():
                 monitor.shutdown_httpd()
 
         if get_infolabel('Container.FolderPath').startswith(plugin_url):
-            wait_interval = 1
+            new_video_id = get_listitem_detail('video_id')
+            if not new_video_id:
+                video_id = None
+                if get_listitem_detail('Label', True):
+                    clear_property(VIDEO_ID)
+                    clear_property(PLAY_COUNT)
+            elif video_id != new_video_id:
+                video_id = new_video_id
+                set_property(VIDEO_ID, video_id)
+                plugin_play_count = get_listitem_detail('play_count')
+                set_property(PLAY_COUNT, plugin_play_count)
+            else:
+                kodi_play_count = get_listitem_detail('PlayCount', True)
+                kodi_play_count = int(kodi_play_count or 0)
+                plugin_play_count = get_property(PLAY_COUNT)
+                plugin_play_count = int(plugin_play_count or 0)
+                if kodi_play_count != plugin_play_count:
+                    playback_history = context.get_playback_history()
+                    play_data = playback_history.get_item(video_id)
+                    if not play_data:
+                        play_data = {'play_count': kodi_play_count}
+                        playback_history.update(video_id, play_data)
+                    elif play_data.get('play_count') != kodi_play_count:
+                        play_data['play_count'] = kodi_play_count
+                        playback_history.update(video_id, play_data)
+                    set_property(PLAY_COUNT, str(kodi_play_count))
+            wait_interval = 0.5
         else:
             wait_interval = 10
 
