@@ -13,7 +13,7 @@ import json
 import threading
 
 from ..compatibility import xbmc, xbmcaddon, xbmcgui
-from ..constants import ADDON_ID, CHECK_SETTINGS, WAKEUP
+from ..constants import ADDON_ID, CHECK_SETTINGS, REFRESH_CONTAINER, WAKEUP
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 from ..settings import XbmcPluginSettings
@@ -42,6 +42,14 @@ class ServiceMonitor(xbmc.Monitor):
 
         super(ServiceMonitor, self).__init__()
 
+    @staticmethod
+    def _refresh_allowed():
+        return (not xbmc.getCondVisibility('Container.IsUpdating')
+                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
+                and xbmc.getInfoLabel('Container.FolderPath').startswith(
+                    'plugin://{0}/'.format(ADDON_ID)
+                ))
+
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
             return
@@ -63,6 +71,9 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == WAKEUP:
             if not self.httpd and self.httpd_required():
                 self.start_httpd()
+        elif event == REFRESH_CONTAINER:
+            if self._refresh_allowed():
+                xbmc.executebuiltin('Container.Refresh')
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
@@ -86,10 +97,7 @@ class ServiceMonitor(xbmc.Monitor):
             '-'.join((ADDON_ID, CHECK_SETTINGS)), 'true'
         )
 
-        if (not xbmc.getCondVisibility('Container.IsUpdating')
-                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
-                and xbmc.getInfoLabel('Container.FolderPath').startswith(
-                    'plugin://{0}/'.format(ADDON_ID))):
+        if self._refresh_allowed():
             xbmc.executebuiltin('Container.Refresh')
 
         use_httpd = (settings.use_isa()

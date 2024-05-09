@@ -14,7 +14,12 @@ import re
 import threading
 
 from ..compatibility import xbmc
-from ..constants import BUSY_FLAG, PLAYER_DATA, SWITCH_PLAYER_FLAG
+from ..constants import (
+    BUSY_FLAG,
+    PLAYER_DATA,
+    REFRESH_CONTAINER,
+    SWITCH_PLAYER_FLAG,
+)
 
 
 class PlayerMonitorThread(threading.Thread):
@@ -243,9 +248,6 @@ class PlayerMonitorThread(threading.Thread):
             else:
                 self._context.get_watch_later_list().remove(self.video_id)
 
-        playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
-        in_playlist = playlist.size() >= 2
-
         if logged_in and not refresh_only:
             history_id = access_manager.get_watch_history_id()
             if history_id:
@@ -253,8 +255,8 @@ class PlayerMonitorThread(threading.Thread):
 
             # rate video
             if (settings.get_bool('youtube.post.play.rate') and
-                    (not in_playlist or
-                     settings.get_bool('youtube.post.play.rate.playlists'))):
+                    (settings.get_bool('youtube.post.play.rate.playlists')
+                     or xbmc.PlayList(xbmc.PLAYLIST_VIDEO).size() < 2)):
                 json_data = client.get_video_rating(self.video_id)
                 if json_data:
                     items = json_data.get('items', [{'rating': 'none'}])
@@ -269,9 +271,8 @@ class PlayerMonitorThread(threading.Thread):
                                                         self._context,
                                                         rating_match)
 
-        if ((not in_playlist or playlist.getposition() == -1)
-                and settings.get_bool('youtube.post.play.refresh', False)):
-            self._context.get_ui().refresh_container()
+        if settings.get_bool('youtube.post.play.refresh', False):
+            self._context.send_notification(REFRESH_CONTAINER, True)
 
         self.end()
 

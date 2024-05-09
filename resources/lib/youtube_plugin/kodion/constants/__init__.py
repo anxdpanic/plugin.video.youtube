@@ -38,6 +38,7 @@ CHECK_SETTINGS = 'check_settings'
 PLAYER_DATA = 'player_json'
 PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
+REFRESH_CONTAINER = 'refresh_container'
 REROUTE = 'reroute'
 SLEEPING = 'sleeping'
 SWITCH_PLAYER_FLAG = 'switch_player'
@@ -55,6 +56,7 @@ __all__ = (
     'PLAYER_DATA',
     'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
+    'REFRESH_CONTAINER',
     'RESOURCE_PATH',
     'REROUTE',
     'SLEEPING',
