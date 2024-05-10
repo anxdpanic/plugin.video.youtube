@@ -10,8 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from youtube_plugin import youtube
 from youtube_plugin.kodion import plugin_runner
 
 
-plugin_runner.run(youtube.Provider())
+plugin_runner.run()

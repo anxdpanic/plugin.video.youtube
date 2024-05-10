@@ -163,12 +163,12 @@ class VideoItem(BaseItem):
     def set_directors(self, directors):
         self._directors = list(directors)
 
-    def add_cast(self, member, role=None, order=None, thumbnail=None):
+    def add_cast(self, name, role=None, order=None, thumbnail=None):
         if self._cast is None:
             self._cast = []
-        if member:
+        if name:
             self._cast.append({
-                'member': to_str(member),
+                'name': to_str(name),
                 'role': to_str(role) if role else '',
                 'order': int(order) if order else len(self._cast) + 1,
                 'thumbnail': to_str(thumbnail) if thumbnail else '',

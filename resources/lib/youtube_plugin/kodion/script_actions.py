@@ -29,9 +29,9 @@ def _config_actions(context, action, *_args):
 
     elif action == 'isa':
         if context.use_inputstream_adaptive():
-            xbmcaddon.Addon(id='inputstream.adaptive').openSettings()
+            xbmcaddon.Addon('inputstream.adaptive').openSettings()
         else:
-            settings.set_bool('kodion.video.quality.isa', False)
+            settings.use_isa(False)
 
     elif action == 'inputstreamhelper':
         try:
@@ -239,7 +239,7 @@ def _user_actions(context, action, params):
             localize('user.changed') % access_manager.get_username(user),
             localize('user.switch')
         )
-        if context.get_param('refresh') is not False:
+        if context.get_param('refresh') != 0:
             ui.refresh_container()
 
     if action == 'switch':

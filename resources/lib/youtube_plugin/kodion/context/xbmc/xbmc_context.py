@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import sys
-import weakref
+from weakref import proxy
 
 from ..abstract_context import AbstractContext
 from ...compatibility import (
@@ -22,7 +22,7 @@ from ...compatibility import (
     xbmcaddon,
     xbmcplugin,
 )
-from ...constants import ADDON_ID, content, sort
+from ...constants import ABORT_FLAG, ADDON_ID, WAKEUP, content, sort
 from ...player import XbmcPlayer, XbmcPlaylist
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
@@ -39,6 +39,7 @@ from ...utils import (
 
 class XbmcContext(AbstractContext):
     _addon = None
+    _settings = None
 
     _KODI_UI_SUBTITLE_OPTIONS = None
 
@@ -133,8 +134,9 @@ class XbmcContext(AbstractContext):
         'my_subscriptions.filter.remove': 30588,
         'my_subscriptions.filter.removed': 30590,
         'my_subscriptions.filtered': 30584,
-        'next_page': 30106,
         'none': 30561,
+        'page.next': 30106,
+        'page.choose': 30806,
         'playlist.added_to': 30714,
         'playlist.create': 30522,
         'playlist.play.all': 30531,
@@ -275,7 +277,8 @@ class XbmcContext(AbstractContext):
 
     def __new__(cls, *args, **kwargs):
         if not cls._addon:
-            cls._addon = xbmcaddon.Addon(id=ADDON_ID)
+            cls._addon = xbmcaddon.Addon(ADDON_ID)
+            cls._settings = XbmcPluginSettings(cls._addon)
 
         if not cls._KODI_UI_SUBTITLE_OPTIONS:
             cls._KODI_UI_SUBTITLE_OPTIONS = {
@@ -292,57 +295,55 @@ class XbmcContext(AbstractContext):
     def __init__(self,
                  path='/',
                  params=None,
-                 plugin_name='',
-                 plugin_id='',
-                 override=True):
-        super(XbmcContext, self).__init__(path, params, plugin_name, plugin_id)
+                 plugin_id=''):
+        super(XbmcContext, self).__init__(path, params, plugin_id)
 
-        if plugin_id and plugin_id != ADDON_ID:
-            self._addon = xbmcaddon.Addon(id=plugin_id)
-
-        """
-        I don't know what xbmc/kodi is doing with a simple uri, but we have to extract the information from the
-        sys parameters and re-build our clean uri.
-        Also we extract the path and parameters - man, that would be so simple with the normal url-parsing routines.
-        """
-        num_args = len(sys.argv)
-        if override and num_args:
-            uri = sys.argv[0]
-            is_plugin_invocation = uri.startswith('plugin://')
-            if is_plugin_invocation:
-                # first the path of the uri
-                parsed_url = urlsplit(uri)
-                self._path = unquote(parsed_url.path)
-
-                # after that try to get the params
-                if num_args > 2:
-                    params = sys.argv[2][1:]
-                    if params:
-                        self.parse_params(dict(parse_qsl(params)))
-
-                # then Kodi resume status
-                if num_args > 3 and sys.argv[3].lower() == 'resume:true':
-                    self._params['resume'] = True
-
-                self._uri = self.create_uri(self._path, self._params)
-        elif num_args:
-            uri = sys.argv[0]
-            is_plugin_invocation = uri.startswith('plugin://')
-        else:
-            is_plugin_invocation = False
+        self._plugin_id = plugin_id or ADDON_ID
+        if self._plugin_id != ADDON_ID:
+            self._addon = xbmcaddon.Addon(self._plugin_id)
+            self._settings = XbmcPluginSettings(self._addon)
 
         self._ui = None
         self._video_playlist = None
         self._audio_playlist = None
         self._video_player = None
         self._audio_player = None
-        self._plugin_handle = int(sys.argv[1]) if is_plugin_invocation else -1
-        self._plugin_id = plugin_id or ADDON_ID
-        self._plugin_name = plugin_name or self._addon.getAddonInfo('name')
+
+        self._plugin_name = self._addon.getAddonInfo('name')
         self._version = self._addon.getAddonInfo('version')
+
         self._addon_path = make_dirs(self._addon.getAddonInfo('path'))
         self._data_path = make_dirs(self._addon.getAddonInfo('profile'))
-        self._settings = XbmcPluginSettings(self._addon)
+
+    def init(self):
+        num_args = len(sys.argv)
+        if num_args:
+            uri = sys.argv[0]
+            if uri.startswith('plugin://'):
+                self._plugin_handle = int(sys.argv[1])
+            else:
+                self._plugin_handle = -1
+                return
+        else:
+            self._plugin_handle = -1
+            return
+
+        # first the path of the uri
+        parsed_url = urlsplit(uri)
+        self._path = unquote(parsed_url.path)
+
+        # after that try to get the params
+        self._params = {}
+        if num_args > 2:
+            params = sys.argv[2][1:]
+            if params:
+                self.parse_params(dict(parse_qsl(params)))
+
+        # then Kodi resume status
+        if num_args > 3 and sys.argv[3].lower() == 'resume:true':
+            self._params['resume'] = True
+
+        self._uri = self.create_uri(self._path, self._params)
 
     def get_region(self):
         pass  # implement from abstract
@@ -399,31 +400,28 @@ class XbmcContext(AbstractContext):
 
     def get_video_playlist(self):
         if not self._video_playlist:
-            self._video_playlist = XbmcPlaylist('video', weakref.proxy(self))
+            self._video_playlist = XbmcPlaylist('video', proxy(self))
         return self._video_playlist
 
     def get_audio_playlist(self):
         if not self._audio_playlist:
-            self._audio_playlist = XbmcPlaylist('audio', weakref.proxy(self))
+            self._audio_playlist = XbmcPlaylist('audio', proxy(self))
         return self._audio_playlist
 
     def get_video_player(self):
         if not self._video_player:
-            self._video_player = XbmcPlayer('video', weakref.proxy(self))
+            self._video_player = XbmcPlayer('video', proxy(self))
         return self._video_player
 
     def get_audio_player(self):
         if not self._audio_player:
-            self._audio_player = XbmcPlayer('audio', weakref.proxy(self))
+            self._audio_player = XbmcPlayer('audio', proxy(self))
         return self._audio_player
 
     def get_ui(self):
         if not self._ui:
-            self._ui = XbmcContextUI(self._addon, weakref.proxy(self))
+            self._ui = XbmcContextUI(self._addon, proxy(self))
         return self._ui
-
-    def get_handle(self):
-        return self._plugin_handle
 
     def get_data_path(self):
         return self._data_path
@@ -431,7 +429,14 @@ class XbmcContext(AbstractContext):
     def get_addon_path(self):
         return self._addon_path
 
-    def get_settings(self):
+    def get_settings(self, flush=False):
+        if flush or not self._settings:
+            if self._plugin_id != ADDON_ID:
+                self._addon = xbmcaddon.Addon(self._plugin_id)
+                self._settings = XbmcPluginSettings(self._addon)
+            else:
+                self.__class__._addon = xbmcaddon.Addon(ADDON_ID)
+                self.__class__._settings = XbmcPluginSettings(self._addon)
         return self._settings
 
     @classmethod
@@ -526,9 +531,7 @@ class XbmcContext(AbstractContext):
 
         new_context = XbmcContext(path=new_path,
                                   params=new_params,
-                                  plugin_name=self._plugin_name,
-                                  plugin_id=self._plugin_id,
-                                  override=False)
+                                  plugin_id=self._plugin_id)
         new_context._function_cache = self._function_cache
         new_context._search_history = self._search_history
         new_context._bookmarks_list = self._bookmarks_list
@@ -585,8 +588,7 @@ class XbmcContext(AbstractContext):
         jsonrpc(method='JSONRPC.NotifyAll',
                 params={'sender': ADDON_ID,
                         'message': method,
-                        'data': data},
-                no_response=True)
+                        'data': data})
 
     def use_inputstream_adaptive(self):
         if self._settings.use_isa():
@@ -661,7 +663,7 @@ class XbmcContext(AbstractContext):
             return False
 
     def abort_requested(self):
-        return self.get_ui().get_property('abort_requested').lower() == 'true'
+        return self.get_ui().get_property(ABORT_FLAG).lower() == 'true'
 
     @staticmethod
     def get_infobool(name):
@@ -683,5 +685,27 @@ class XbmcContext(AbstractContext):
         self._settings.flush()
         try:
             del self._addon
+            del self._settings
         except AttributeError:
             pass
+        try:
+            del self.__class__._addon
+            self.__class__._addon = None
+            del self.__class__._settings
+            self.__class__._settings = None
+        except AttributeError:
+            pass
+        del self._ui
+        self._ui = None
+        del self._video_playlist
+        self._video_playlist = None
+        del self._audio_playlist
+        self._audio_playlist = None
+        del self._video_player
+        self._video_player = None
+        del self._audio_player
+        self._audio_player = None
+
+    def wakeup(self):
+        self.get_ui().set_property(WAKEUP, 'true')
+        self.send_notification(WAKEUP, True)

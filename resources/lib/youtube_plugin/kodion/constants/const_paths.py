@@ -13,11 +13,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 BOOKMARKS = '/kodion/bookmarks'
 EXTERNAL_SEARCH = '/search'
+GOTO_PAGE = '/kodion/goto_page'
+ROUTE = '/kodion/route'
 SEARCH = '/kodion/search'
 WATCH_LATER = '/kodion/watch_later'
 HISTORY = '/kodion/playback_history'
 
 DISLIKED_VIDEOS = '/special/disliked_videos'
+HOME = '/home'
 LIKED_VIDEOS = '/channel/mine/playlist/LL'
 MY_PLAYLISTS = '/channel/mine/playlists'
 MY_SUBSCRIPTIONS = '/special/new_uploaded_videos'

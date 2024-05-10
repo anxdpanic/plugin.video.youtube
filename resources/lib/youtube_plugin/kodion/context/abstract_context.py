@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 
 from .. import logger
-from ..compatibility import to_str, urlencode
+from ..compatibility import quote, to_str, urlencode
 from ..constants import VALUE_FROM_STR
 from ..json_store import AccessManager
 from ..sql_store import (
@@ -24,7 +24,7 @@ from ..sql_store import (
     SearchHistory,
     WatchLaterList,
 )
-from ..utils import create_path, current_system_version
+from ..utils import current_system_version
 
 
 class AbstractContext(object):
@@ -43,16 +43,21 @@ class AbstractContext(object):
         'logged_in',
         'play',
         'prompt_for_subtitles',
-        'refresh',
         'resume',
         'screensaver',
         'strm',
+        'window_return',
     }
     _INT_PARAMS = {
+        'fanart_type',
         'live',
         'next_page_token',
         'offset',
         'page',
+        'refresh',
+    }
+    _INT_BOOL_PARAMS = {
+        'refresh',
     }
     _FLOAT_PARAMS = {
         'seek',
@@ -97,13 +102,7 @@ class AbstractContext(object):
         'reload_path',
     }
 
-    def __init__(self, path='/', params=None, plugin_name='', plugin_id=''):
-        if not params:
-            params = {}
-
-        self._cache_path = None
-        self._debug_path = None
-
+    def __init__(self, path='/', params=None, plugin_id=''):
         self._function_cache = None
         self._data_cache = None
         self._search_history = None
@@ -112,14 +111,13 @@ class AbstractContext(object):
         self._watch_later_list = None
         self._access_manager = None
 
-        self._plugin_name = plugin_name
-        self._version = 'UNKNOWN'
+        self._plugin_handle = -1
         self._plugin_id = plugin_id
-        self._path = create_path(path)
-        self._params = params
-        self._utils = None
+        self._plugin_name = None
+        self._version = 'UNKNOWN'
 
-        # create valid uri
+        self._path = self.create_path(path)
+        self._params = params or {}
         self.parse_params()
         self._uri = self.create_uri(self._path, self._params)
 
@@ -176,7 +174,7 @@ class AbstractContext(object):
     def get_search_history(self):
         if not self._search_history:
             settings = self.get_settings()
-            search_size = settings.get_int(settings.SEARCH_SIZE, 50)
+            search_size = settings.get_search_history_size()
             uuid = self.get_access_manager().get_current_user_id()
             filename = 'search.sqlite'
             filepath = os.path.join(self.get_data_path(), uuid, filename)
@@ -226,11 +224,11 @@ class AbstractContext(object):
 
     def create_uri(self, path=None, params=None):
         if isinstance(path, (list, tuple)):
-            uri = create_path(*path, is_uri=True)
+            uri = self.create_path(*path, is_uri=True)
         elif path:
             uri = path
         else:
-            uri = '/'
+            uri = '/' if params else '/?'
 
         uri = self._plugin_id.join(('plugin://', uri))
 
@@ -239,11 +237,32 @@ class AbstractContext(object):
 
         return uri
 
+    @staticmethod
+    def create_path(*args, **kwargs):
+        path = '/'.join([
+            part
+            for part in [
+                str(arg).strip('/').replace('\\', '/').replace('//', '/')
+                for arg in args
+            ] if part
+        ])
+        if path:
+            path = path.join(('/', '/'))
+        else:
+            return '/'
+
+        if kwargs.get('is_uri'):
+            return quote(path)
+        return path
+
     def get_path(self):
         return self._path
 
-    def set_path(self, *path):
-        self._path = create_path(*path)
+    def set_path(self, *path, **kwargs):
+        if kwargs.get('force'):
+            self._path = path[0]
+        else:
+            self._path = self.create_path(*path)
 
     def get_params(self):
         return self._params
@@ -261,7 +280,13 @@ class AbstractContext(object):
                 if param in self._BOOL_PARAMS:
                     parsed_value = VALUE_FROM_STR.get(str(value).lower(), False)
                 elif param in self._INT_PARAMS:
-                    parsed_value = int(value)
+                    parsed_value = None
+                    if param in self._INT_BOOL_PARAMS:
+                        parsed_value = VALUE_FROM_STR.get(str(value).lower())
+                    if parsed_value is None:
+                        parsed_value = int(value)
+                    else:
+                        parsed_value = int(parsed_value)
                 elif param in self._FLOAT_PARAMS:
                     parsed_value = float(value)
                 elif param in self._LIST_PARAMS:
@@ -343,9 +368,9 @@ class AbstractContext(object):
         return self._plugin_id
 
     def get_handle(self):
-        raise NotImplementedError()
+        return self._plugin_handle
 
-    def get_settings(self):
+    def get_settings(self, flush=False):
         raise NotImplementedError()
 
     def localize(self, text_id, default_text=None):
@@ -400,3 +425,6 @@ class AbstractContext(object):
 
     def tear_down(self):
         pass
+
+    def wakeup(self):
+        raise NotImplementedError()

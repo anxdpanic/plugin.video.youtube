@@ -12,8 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import threading
 
-from ..compatibility import xbmc, xbmcaddon
-from ..constants import ADDON_ID
+from ..compatibility import xbmc, xbmcaddon, xbmcgui
+from ..constants import ADDON_ID, CHECK_SETTINGS, WAKEUP
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 from ..settings import XbmcPluginSettings
@@ -45,8 +45,8 @@ class ServiceMonitor(xbmc.Monitor):
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
             return
-
-        if method.endswith('.check_settings'):
+        group, separator, event = method.partition('.')
+        if event == CHECK_SETTINGS:
             if not isinstance(data, dict):
                 data = json.loads(data)
             log_debug('onNotification: |check_settings| -> |{data}|'
@@ -60,6 +60,9 @@ class ServiceMonitor(xbmc.Monitor):
                 self.onSettingsChanged()
                 self._settings_state = None
                 return
+        elif event == WAKEUP:
+            if not self.httpd and self.httpd_required():
+                self.start_httpd()
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
@@ -73,12 +76,16 @@ class ServiceMonitor(xbmc.Monitor):
             self.waitForAbort(1)
             if changes != self._settings_changes:
                 return
-        if changes > 1:
-            log_debug('onSettingsChanged: {0} changes'.format(changes))
+        log_debug('onSettingsChanged: {0} change(s)'.format(changes))
         self._settings_changes = 0
 
         settings = self._settings
         settings.flush(xbmcaddon.Addon(ADDON_ID))
+
+        xbmcgui.Window(10000).setProperty(
+            '-'.join((ADDON_ID, CHECK_SETTINGS)), 'true'
+        )
+
         if (not xbmc.getCondVisibility('Container.IsUpdating')
                 and not xbmc.getCondVisibility('System.HasActiveModalDialog')
                 and xbmc.getInfoLabel('Container.FolderPath').startswith(
@@ -165,9 +172,11 @@ class ServiceMonitor(xbmc.Monitor):
         self.shutdown_httpd()
         self.start_httpd()
 
-    @staticmethod
-    def ping_httpd():
-        return httpd_status()
+    def ping_httpd(self):
+        return self.httpd and httpd_status()
 
     def httpd_required(self):
         return self._use_httpd
+
+    def tear_down(self):
+        self._settings.flush()

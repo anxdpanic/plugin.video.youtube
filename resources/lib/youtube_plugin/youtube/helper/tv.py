@@ -68,14 +68,14 @@ def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', 0)
-    if next_page_token or json_data.get('continue', False):
-        new_params = dict(context.get_params(),
+    next_page_token = json_data.get('next_page_token')
+    if next_page_token or json_data.get('continue'):
+        params = context.get_params()
+        new_params = dict(params,
                           next_page_token=next_page_token,
-                          offset=json_data.get('offset', 0))
-        new_context = context.clone(new_params=new_params)
-        current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page)
+                          offset=json_data.get('offset', 0),
+                          page=params.get('page', 1) + 1)
+        next_page_item = NextPageItem(context, new_params)
         result.append(next_page_item)
 
     return result
@@ -117,14 +117,14 @@ def tv_videos_to_items(provider, context, json_data):
         result = utils.filter_short_videos(result)
 
     # next page
-    next_page_token = json_data.get('next_page_token', 0)
-    if next_page_token or json_data.get('continue', False):
-        new_params = dict(context.get_params(),
+    next_page_token = json_data.get('next_page_token')
+    if next_page_token or json_data.get('continue'):
+        params = context.get_params()
+        new_params = dict(params,
                           next_page_token=next_page_token,
-                          offset=json_data.get('offset', 0))
-        new_context = context.clone(new_params=new_params)
-        current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page)
+                          offset=json_data.get('offset', 0),
+                          page=params.get('page', 1) + 1)
+        next_page_item = NextPageItem(context, new_params)
         result.append(next_page_item)
 
     return result
@@ -134,7 +134,7 @@ def saved_playlists_to_items(provider, context, json_data):
     result = []
     playlist_id_dict = {}
 
-    thumb_size = context.get_settings().use_thumbnail_size()
+    thumb_size = context.get_settings().get_thumbnail_size()
     incognito = context.get_param('incognito', False)
     item_params = {}
     if incognito:
@@ -170,14 +170,14 @@ def saved_playlists_to_items(provider, context, json_data):
     utils.update_fanarts(provider, context, channel_items_dict)
 
     # next page
-    next_page_token = json_data.get('next_page_token', 0)
-    if next_page_token or json_data.get('continue', False):
-        new_params = dict(context.get_params(),
+    next_page_token = json_data.get('next_page_token')
+    if next_page_token or json_data.get('continue'):
+        params = context.get_params()
+        new_params = dict(params,
                           next_page_token=next_page_token,
-                          offset=json_data.get('offset', 0))
-        new_context = context.clone(new_params=new_params)
-        current_page = new_context.get_param('page', 1)
-        next_page_item = NextPageItem(new_context, current_page)
+                          offset=json_data.get('offset', 0),
+                          page=params.get('page', 1) + 1)
+        next_page_item = NextPageItem(context, new_params)
         result.append(next_page_item)
 
     return result

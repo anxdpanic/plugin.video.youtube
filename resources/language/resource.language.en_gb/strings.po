@@ -318,7 +318,7 @@ msgid "Go to %s"
 msgstr ""
 
 msgctxt "#30503"
-msgid "Show channel fanart"
+msgid "Channel fanart"
 msgstr ""
 
 msgctxt "#30504"
@@ -1527,4 +1527,12 @@ msgstr ""
 
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
+msgstr ""
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr ""
+
+msgctxt "#30807"
+msgid "Use channel name as"
 msgstr ""

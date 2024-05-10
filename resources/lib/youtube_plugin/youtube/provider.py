@@ -13,8 +13,9 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import re
 from base64 import b64decode
+from weakref import proxy
 
-from .client import YouTube
+from .client import APICheck, YouTube
 from .helper import (
     ResourceManager,
     UrlResolver,
@@ -50,10 +51,9 @@ class Provider(AbstractProvider):
     def __init__(self):
         super(Provider, self).__init__()
         self._resource_manager = None
-
         self._client = None
+        self._api_check = None
         self._logged_in = False
-
         self.yt_video = yt_video
 
     def get_wizard_steps(self, context):
@@ -79,7 +79,9 @@ class Provider(AbstractProvider):
 
         dev_config = {}
         if _dev_config:
-            context.log_debug('Using window property for developer keys is deprecated, instead use the youtube_registration module.')
+            context.log_warning('Using window property for developer keys is'
+                                ' deprecated. Please use the'
+                                ' youtube_registration module instead')
             try:
                 dev_config = json.loads(_dev_config)
             except ValueError:
@@ -89,20 +91,29 @@ class Provider(AbstractProvider):
 
         if dev_config and not context.get_settings().allow_dev_keys():
             context.log_debug('Developer config ignored')
-            return None
+            return {}
 
         if dev_config:
-            if (not dev_config.get('main')
-                    or not dev_config['main'].get('key')
-                    or not dev_config['main'].get('system')
-                    or not dev_config.get('origin')
-                    or not dev_config['main'].get('id')
-                    or not dev_config['main'].get('secret')):
-                context.log_error('Error loading developer config: |invalid structure| '
-                                  'expected: |{"origin": ADDON_ID, "main": {"system": SYSTEM_NAME, "key": API_KEY, "id": CLIENT_ID, "secret": CLIENT_SECRET}}|')
+            dev_main = dev_origin = None
+            if {'main', 'origin'}.issubset(dev_config):
+                dev_main = dev_config['main']
+                dev_origin = dev_config['origin']
+
+                if not {'system', 'key', 'id', 'secret'}.issubset(dev_main):
+                    dev_main = None
+
+            if not dev_main:
+                context.log_error('Invalid developer config: |{dev_config}|\n'
+                                  'expected: |{{'
+                                  ' "origin": ADDON_ID,'
+                                  ' "main": {{'
+                                  ' "system": SYSTEM_NAME,'
+                                  ' "key": API_KEY,'
+                                  ' "id": CLIENT_ID,'
+                                  ' "secret": CLIENT_SECRET'
+                                  '}}}}|'.format(dev_config=dev_config))
                 return {}
-            dev_origin = dev_config['origin']
-            dev_main = dev_config['main']
+
             dev_system = dev_main['system']
             if dev_system == 'JSONStore':
                 dev_key = b64decode(dev_main['key'])
@@ -112,147 +123,159 @@ class Provider(AbstractProvider):
                 dev_key = dev_main['key']
                 dev_id = dev_main['id']
                 dev_secret = dev_main['secret']
-            context.log_debug('Using developer config: origin: |{0}| system |{1}|'.format(dev_origin, dev_system))
-            return {'origin': dev_origin, 'main': {'id': dev_id, 'secret': dev_secret, 'key': dev_key, 'system': dev_system}}
+            context.log_debug('Using developer config: '
+                              '|origin: {origin}, system: {system}|'
+                              .format(origin=dev_origin, system=dev_system))
+            return {
+                'origin': dev_origin,
+                'main': {
+                    'system': dev_system,
+                    'id': dev_id,
+                    'secret': dev_secret,
+                    'key': dev_key,
+                }
+            }
 
         return {}
 
     def reset_client(self):
         self._client = None
+        self._api_check = None
 
     def get_client(self, context):
-        if self._client is not None:
-            return self._client
-        # set the items per page (later)
-        settings = context.get_settings()
         access_manager = context.get_access_manager()
 
-        items_per_page = settings.items_per_page()
-
-        plugin_lang = settings.get_language()
-        plugin_region = settings.get_region()
-
-        api_last_origin = access_manager.get_last_origin()
-
-        youtube_config = YouTube.CONFIGS.get('main')
+        if not self._api_check:
+            self._api_check = APICheck(context)
+        configs = self._api_check.get_configs()
 
         dev_id = context.get_param('addon_id')
-        dev_configs = YouTube.CONFIGS.get('developer')
-        dev_config = self.get_dev_config(context, dev_id, dev_configs)
-        dev_keys = dev_config.get('main') if dev_config else None
-
-        refresh_tokens = []
-
-        if dev_id:
-            origin = dev_config.get('origin') if dev_config.get('origin') else dev_id
-        else:
+        if not dev_id or dev_id == ADDON_ID:
+            dev_id = dev_keys = None
             origin = ADDON_ID
+        else:
+            dev_config = self.get_dev_config(
+                context, dev_id, configs['developer']
+            )
+            origin = dev_config.get('origin') or dev_id
+            dev_keys = dev_config.get('main')
 
+        api_last_origin = access_manager.get_last_origin()
         if api_last_origin != origin:
             context.log_debug('API key origin changed: |{old}| to |{new}|'
                               .format(old=api_last_origin, new=origin))
             access_manager.set_last_origin(origin)
+            self.reset_client()
 
         if dev_id:
-            access_tokens = access_manager.get_dev_access_token(dev_id).split('|')
-            if len(access_tokens) != 2 or access_manager.is_dev_access_token_expired(dev_id):
+            access_tokens = access_manager.get_dev_access_token(dev_id)
+            if access_manager.is_dev_access_token_expired(dev_id):
                 # reset access_token
-                access_manager.update_dev_access_token(dev_id, '')
                 access_tokens = []
-        else:
-            access_tokens = access_manager.get_access_token().split('|')
-            if len(access_tokens) != 2 or access_manager.is_access_token_expired():
-                # reset access_token
-                access_manager.update_access_token('')
-                access_tokens = []
+                access_manager.update_dev_access_token(dev_id, access_tokens)
+            elif self._client:
+                return self._client
 
-        if dev_id:
             if dev_keys:
-                context.log_debug('Selecting YouTube developer config "%s"' % dev_id)
+                context.log_debug('Selecting YouTube developer config "{0}"'
+                                  .format(dev_id))
+                configs['main'] = dev_keys
             else:
-                context.log_debug('Selecting YouTube config "%s" w/ developer access tokens' % youtube_config['system'])
+                dev_keys = configs['main']
+                context.log_debug('Selecting YouTube config "{0}"'
+                                  ' w/ developer access tokens'
+                                  .format(dev_keys['system']))
 
-            if access_manager.developer_has_refresh_token(dev_id):
-                if dev_keys:
-                    keys_changed = access_manager.dev_keys_changed(dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret'])
-                else:
-                    keys_changed = access_manager.dev_keys_changed(dev_id, youtube_config['key'], youtube_config['id'], youtube_config['secret'])
-
+            refresh_tokens = access_manager.get_dev_refresh_token(dev_id)
+            if refresh_tokens:
+                keys_changed = access_manager.dev_keys_changed(
+                    dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
+                )
                 if keys_changed:
-                    context.log_warning('API key set changed: Resetting client and updating access token')
+                    context.log_warning('API key set changed: Resetting client'
+                                        ' and updating access token')
                     self.reset_client()
-                    access_manager.update_dev_access_token(dev_id, access_token='', refresh_token='')
-
-                access_tokens = access_manager.get_dev_access_token(dev_id)
-                if access_tokens:
-                    access_tokens = access_tokens.split('|')
-                else:
                     access_tokens = []
-
-                refresh_tokens = access_manager.get_dev_refresh_token(dev_id)
-                if refresh_tokens:
-                    refresh_tokens = refresh_tokens.split('|')
-                else:
                     refresh_tokens = []
+                    access_manager.update_dev_access_token(
+                        dev_id, access_tokens, -1, refresh_tokens
+                    )
 
-                context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
+                context.log_debug(
+                    'Access token count: |{0}|, refresh token count: |{1}|'
+                    .format(len(access_tokens), len(refresh_tokens))
+                )
         else:
-            context.log_debug('Selecting YouTube config "%s"' % youtube_config['system'])
+            access_tokens = access_manager.get_access_token()
+            if access_manager.is_access_token_expired():
+                # reset access_token
+                access_tokens = []
+                access_manager.update_access_token(access_tokens)
+            elif self._client:
+                return self._client
 
-            if access_manager.has_refresh_token():
-                if YouTube.api_keys_changed:
-                    context.log_warning('API key set changed: Resetting client and updating access token')
+            context.log_debug('Selecting YouTube config "{0}"'
+                              .format(configs['main']['system']))
+
+            refresh_tokens = access_manager.get_refresh_token()
+            if refresh_tokens:
+                if self._api_check.changed:
+                    context.log_warning('API key set changed: Resetting client'
+                                        ' and updating access token')
                     self.reset_client()
-                    access_manager.update_access_token(access_token='', refresh_token='')
-
-                access_tokens = access_manager.get_access_token()
-                if access_tokens:
-                    access_tokens = access_tokens.split('|')
-                else:
                     access_tokens = []
-
-                refresh_tokens = access_manager.get_refresh_token()
-                if refresh_tokens:
-                    refresh_tokens = refresh_tokens.split('|')
-                else:
                     refresh_tokens = []
+                    access_manager.update_access_token(
+                        access_tokens, -1, refresh_tokens
+                    )
 
-                context.log_debug('Access token count: |%d| Refresh token count: |%d|' % (len(access_tokens), len(refresh_tokens)))
+                context.log_debug(
+                    'Access token count: |{0}|, refresh token count: |{1}|'
+                    .format(len(access_tokens), len(refresh_tokens))
+                )
 
+        settings = context.get_settings()
         client = YouTube(context=context,
-                         language=plugin_lang,
-                         region=plugin_region,
-                         items_per_page=items_per_page,
-                         config=dev_keys if dev_keys else youtube_config)
+                         language=settings.get_language(),
+                         region=settings.get_region(),
+                         items_per_page=settings.items_per_page(),
+                         configs=configs)
 
         with client:
-            if not refresh_tokens or not refresh_tokens[0]:
+            if not refresh_tokens:
                 self._client = client
 
             # create new access tokens
             elif len(access_tokens) != 2 and len(refresh_tokens) == 2:
                 try:
-                    access_token_kodi, expires_in_kodi = client.refresh_token(refresh_tokens[1])
-                    access_token_tv, expires_in_tv = client.refresh_token_tv(refresh_tokens[0])
-                    access_tokens = [access_token_tv, access_token_kodi]
-                    access_token = '%s|%s' % (access_token_tv, access_token_kodi)
-                    expires_in = min(expires_in_tv, expires_in_kodi)
+                    kodi_token = client.refresh_token(refresh_tokens[1])
+                    tv_token = client.refresh_token_tv(refresh_tokens[0])
+                    access_tokens = (tv_token[0], kodi_token[0])
+                    expires_in = min(tv_token[1], kodi_token[1])
                     if dev_id:
-                        access_manager.update_dev_access_token(dev_id, access_token, expires_in)
+                        access_manager.update_dev_access_token(
+                            dev_id, access_tokens, expires_in
+                        )
                     else:
-                        access_manager.update_access_token(access_token, expires_in)
+                        access_manager.update_access_token(
+                            access_tokens, expires_in
+                        )
                 except (InvalidGrant, LoginException) as exc:
                     self.handle_exception(context, exc)
                     # reset access_token
                     if isinstance(exc, InvalidGrant):
                         if dev_id:
-                            access_manager.update_dev_access_token(dev_id, access_token='', refresh_token='')
+                            access_manager.update_dev_access_token(
+                                dev_id, access_token='', refresh_token=''
+                            )
                         else:
-                            access_manager.update_access_token(access_token='', refresh_token='')
+                            access_manager.update_access_token(
+                                access_token='', refresh_token=''
+                            )
                     elif dev_id:
-                        access_manager.update_dev_access_token(dev_id, '')
+                        access_manager.update_dev_access_token(dev_id)
                     else:
-                        access_manager.update_access_token('')
+                        access_manager.update_access_token()
 
             # in debug log the login status
             self._logged_in = len(access_tokens) == 2
@@ -270,8 +293,7 @@ class Provider(AbstractProvider):
 
     def get_resource_manager(self, context):
         if not self._resource_manager:
-            # self._resource_manager = ResourceManager(weakref.proxy(context), weakref.proxy(self.get_client(context)))
-            self._resource_manager = ResourceManager(context, self.get_client(context))
+            self._resource_manager = ResourceManager(proxy(self), context)
         return self._resource_manager
 
     # noinspection PyUnusedLocal
@@ -719,7 +741,7 @@ class Provider(AbstractProvider):
     def _on_sign(self, context, re_match):
         sign_out_confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
-        if (mode == 'in') and context.get_access_manager().has_refresh_token():
+        if (mode == 'in') and context.get_access_manager().get_refresh_token():
             yt_login.process('out', self, context, sign_out_refresh=False)
 
         if (not sign_out_confirmed and mode == 'out'
@@ -902,23 +924,22 @@ class Provider(AbstractProvider):
         if target == 'access_manager' and ui.on_yes_no_input(
                 context.get_name(), localize('reset.access_manager.confirm')
         ):
-            try:
-                access_manager = context.get_access_manager()
-                client = self.get_client(context)
-                if access_manager.has_refresh_token():
-                    refresh_tokens = access_manager.get_refresh_token()
-                    for refresh_token in set(refresh_tokens.split('|')):
-                        try:
-                            client.revoke(refresh_token)
-                        except:
-                            pass
-                self.reset_client()
-                access_manager.update_access_token(access_token='',
-                                                   refresh_token='')
-                ui.refresh_container()
-                ui.show_notification(localize('succeeded'))
-            except:
-                ui.show_notification(localize('failed'))
+            access_manager = context.get_access_manager()
+            client = self.get_client(context)
+            refresh_tokens = access_manager.get_refresh_token()
+            success = True
+            if refresh_tokens:
+                for refresh_token in set(refresh_tokens):
+                    try:
+                        client.revoke(refresh_token)
+                    except LoginException:
+                        success = False
+            self.reset_client()
+            access_manager.update_access_token(
+                access_token='', refresh_token=''
+            )
+            ui.refresh_container()
+            ui.show_notification(localize('succeeded' if success else 'failed'))
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/api/update/?$')
@@ -937,24 +958,24 @@ class Provider(AbstractProvider):
         log_list = []
 
         if api_key:
-            settings.set_string('youtube.api.key', api_key)
+            settings.api_key(api_key)
             updated_list.append(localize('api.key'))
             log_list.append('Key')
         if client_id:
-            settings.set_string('youtube.api.id', client_id)
+            settings.api_id(client_id)
             updated_list.append(localize('api.id'))
             log_list.append('Id')
         if client_secret:
-            settings.set_string('youtube.api.secret', client_secret)
+            settings.api_secret(client_secret)
             updated_list.append(localize('api.secret'))
             log_list.append('Secret')
         if updated_list:
             ui.show_notification(localize('updated_') % ', '.join(updated_list))
         context.log_debug('Updated API keys: %s' % ', '.join(log_list))
 
-        client_id = settings.get_string('youtube.api.id', '')
-        client_secret = settings.get_string('youtube.api.secret', '')
-        api_key = settings.get_string('youtube.api.key', '')
+        client_id = settings.api_id()
+        client_secret = settings.api_secret()
+        api_key = settings.api_key
         missing_list = []
         log_list = []
 
@@ -1010,7 +1031,7 @@ class Provider(AbstractProvider):
                     menu_items.history_clear(
                         context
                     ),
-                    ('--------', 'noop'),
+                    menu_items.separator(),
                 ]
                 video_item.add_context_menu(context_menu)
 
@@ -1413,7 +1434,7 @@ class Provider(AbstractProvider):
                     menu_items.bookmarks_clear(
                         context
                     ),
-                    ('--------', 'noop'),
+                    menu_items.separator(),
                 ]
                 item.add_context_menu(context_menu)
                 bookmarks.append(item)
@@ -1477,7 +1498,7 @@ class Provider(AbstractProvider):
                     menu_items.watch_later_local_clear(
                         context
                     ),
-                    ('--------', 'noop'),
+                    menu_items.separator(),
                 ]
                 video_item.add_context_menu(context_menu)
 
@@ -1571,5 +1592,12 @@ class Provider(AbstractProvider):
 
         return True
 
-    def tear_down(self, context):
-        context.tear_down()
+    def tear_down(self):
+        del self._resource_manager
+        self._resource_manager = None
+        del self._client
+        self._client = None
+        del self._api_check
+        self._api_check = None
+        del self.yt_video
+        self.yt_video = None

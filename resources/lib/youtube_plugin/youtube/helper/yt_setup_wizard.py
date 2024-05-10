@@ -16,8 +16,8 @@ from ...kodion.compatibility import urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_FLAG
 from ...kodion.network import Locator, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
+from ...kodion.utils import current_system_version, to_unicode
 from ...kodion.utils.datetime_parser import strptime
-from ...kodion.utils.methods import to_unicode
 
 
 DEFAULT_LANGUAGES = {'items': [
@@ -282,9 +282,8 @@ def process_language(provider, context, step, steps):
 
     # set new language id and region id
     settings = context.get_settings()
-    settings.set_string(settings.LANGUAGE, language_id)
-    settings.set_string(settings.REGION, region_id)
-    provider.reset_client()
+    settings.set_language(language_id)
+    settings.set_region(region_id)
     return step
 
 
@@ -322,7 +321,10 @@ def process_default_settings(_provider, context, step, steps):
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.set_subtitle_download(False)
-        settings.live_stream_type(3)
+        if current_system_version.compatible(21, 0):
+            settings.live_stream_type(3)
+        else:
+            settings.live_stream_type(2)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
             settings.default_player_web_urls(False)
         if settings.cache_size() < 20:
@@ -444,6 +446,7 @@ def process_subtitles(_provider, context, step, steps):
         context.execute('RunScript({addon_id},config/subtitles)'.format(
             addon_id=ADDON_ID
         ), wait_for=WAIT_FLAG)
+        context.get_settings(flush=True)
     return step
 
 

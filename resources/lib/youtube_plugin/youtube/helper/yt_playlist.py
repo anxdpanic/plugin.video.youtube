@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from .utils import get_thumbnail
 from ...kodion import KodionException
 from ...kodion.utils import find_video_id
 
@@ -110,7 +111,11 @@ def _process_remove_video(provider, context):
             if keymap_action:
                 context.get_ui().set_focus_next_item()
             elif path is not False:
-                context.get_ui().reload_container(path)
+                provider.reroute(
+                    context,
+                    path=path,
+                    params=dict(params, refresh=params.get('refresh', 0) + 1),
+                )
 
             context.get_ui().show_notification(
                 message=context.localize('playlist.removed_from'),
@@ -173,6 +178,7 @@ def _process_select_playlist(provider, context):
     else:
         watch_later_id = None
 
+    thumb_size = context.get_settings().get_thumb_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
     while True:
@@ -207,19 +213,19 @@ def _process_select_playlist(provider, context):
             snippet = playlist.get('snippet', {})
             title = snippet.get('title', '')
             description = snippet.get('description', '')
-            thumbnail = snippet.get('thumbnails', {}).get('default', {})
+            thumbnail = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
             playlist_id = playlist.get('id', '')
             if title and playlist_id:
                 items.append((
                     title, description,
                     playlist_id,
-                    thumbnail.get('url') or default_thumb
+                    thumbnail or default_thumb
                 ))
 
         if page_token:
             next_page = current_page + 1
             items.append((
-                ui.bold(context.localize('next_page') % next_page), '',
+                ui.bold(context.localize('page.next') % next_page), '',
                 'playlist.next',
                 'DefaultFolder.png',
             ))

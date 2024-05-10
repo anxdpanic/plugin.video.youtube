@@ -55,12 +55,16 @@ USE_REMOTE_HISTORY = 'kodion.history.remote'  # (bool)
 SEARCH_SIZE = 'kodion.search.size'  # (int)
 CACHE_SIZE = 'kodion.cache.size'  # (int)
 
+CHANNEL_NAME_ALIASES = 'youtube.view.channel_name.aliases'  # (list[string])
 DETAILED_DESCRIPTION = 'youtube.view.description.details'  # (bool)
 DETAILED_LABELS = 'youtube.view.label.details'  # (bool)
 LABEL_COLOR = 'youtube.view.label.color'  # (string)
 
 THUMB_SIZE = 'kodion.thumbnail.size'  # (int)
-SHOW_FANART = 'kodion.fanart.show'  # (bool)
+THUMB_SIZE_BEST = 2
+FANART_SELECTION = 'kodion.fanart.selection'  # (int)
+FANART_CHANNEL = 2
+FANART_THUMBNAIL = 3
 
 LANGUAGE = 'youtube.language'  # (str)
 REGION = 'youtube.region'  # (str)

@@ -745,6 +745,21 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.view.channel_name.aliases" type="list[string]" label="30807" help="">
+                    <level>0</level>
+                    <default>cast</default>
+                    <constraints>
+                        <options>
+                            <option label="206">cast</option>
+                            <option label="572">studio</option>
+                        </options>
+                        <delimiter>,</delimiter>
+                    </constraints>
+                    <control type="list" format="string">
+                        <multiselect>true</multiselect>
+                        <hidevalue>true</hidevalue>
+                    </control>
+                </setting>
                 <setting id="youtube.view.label.color.viewCount" type="string" parent="youtube.view.label.details" label="30793" help="">
                     <level>0</level>
                     <default>ffadd8e6</default>
@@ -795,29 +810,28 @@
                 </setting>
                 <setting id="kodion.thumbnail.size" type="integer" label="30591" help="">
                     <level>0</level>
-                    <default>1</default>
+                    <default>1</default>  <!-- High (4:3) -->
                     <constraints>
                         <options>
-                            <option label="30592">0</option>
-                            <option label="30593">1</option>
+                            <option label="30592">0</option>  <!-- Medium (16:9) -->
+                            <option label="30593">1</option>  <!-- High (4:3) -->
+                            <option label="20049">2</option>  <!-- Best available -->
                         </options>
                     </constraints>
                     <control format="string" type="spinner"/>
                 </setting>
-                <setting id="kodion.fanart.show" type="boolean" label="30021" help="">
+                <setting id="kodion.fanart.selection" type="integer" label="30021" help="">
                     <level>0</level>
-                    <default>true</default>
-                    <control type="toggle"/>
-                </setting>
-                <setting id="youtube.channel.fanart.show" type="boolean" parent="kodion.fanart.show" label="30503" help="">
-                    <level>0</level>
-                    <default>true</default>
-                    <dependencies>
-                        <dependency type="enable">
-                            <condition setting="kodion.fanart.show" operator="is">true</condition>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
+                    <default>2</default>  <!-- channel fanart -->
+                    <constraints>
+                        <options>
+                            <option label="20439">0</option>  <!-- no fanart -->
+                            <option label="571">1</option>    <!-- default -->
+                            <option label="30503">2</option>  <!-- channel fanart -->
+                            <option label="21371">3</option>  <!-- thumbnail -->
+                        </options>
+                    </constraints>
+                    <control format="string" type="spinner"/>
                 </setting>
             </group>
             <group id="5" label="30527">

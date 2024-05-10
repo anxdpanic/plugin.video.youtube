@@ -10,26 +10,65 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import menu_items
 from .directory_item import DirectoryItem
 
 
 class NextPageItem(DirectoryItem):
-    def __init__(self, context, current_page=1, image=None, fanart=None):
-        next_page = current_page + 1
-        new_params = dict(context.get_params(), page=next_page)
-        if 'refresh' in new_params:
-            del new_params['refresh']
-        name = context.localize('next_page') % next_page
+    def __init__(self, context, params, image=None, fanart=None):
+        if 'refresh' in params:
+            del params['refresh']
 
-        super(NextPageItem, self).__init__(name,
-                                           context.create_uri(
-                                               context.get_path(),
-                                               new_params
-                                           ),
-                                           image=image,
-                                           category_label='__inherit__')
+        page = params.get('page', 2)
+        items_per_page = params.get('items_per_page', 50)
+        if 'page_token' not in params:
+            params['page_token'] = self.create_page_token(page, items_per_page)
+
+        super(NextPageItem, self).__init__(
+            context.localize('page.next') % page,
+            context.create_uri(context.get_path(), params),
+            image=image,
+            category_label='__inherit__',
+        )
+
+        self.next_page = page
+        self.items_per_page = items_per_page
 
         if fanart:
             self.set_fanart(fanart)
 
-        self.next_page = True
+        context_menu = [
+            menu_items.refresh(context),
+            menu_items.goto_page(context),
+            menu_items.goto_home(context),
+            menu_items.goto_quick_search(context),
+            menu_items.separator(),
+        ]
+        self.set_context_menu(context_menu)
+
+    @classmethod
+    def create_page_token(cls, page, items_per_page=50):
+        low = 'AEIMQUYcgkosw048'
+        high = 'ABCDEFGHIJKLMNOP'
+        len_low = len(low)
+        len_high = len(high)
+
+        position = (page - 1) * items_per_page
+
+        overflow_token = 'Q'
+        if position >= 128:
+            overflow_token_iteration = position // 128
+            overflow_token = '%sE' % high[overflow_token_iteration]
+        low_iteration = position % len_low
+
+        # at this position the iteration starts with 'I' again (after 'P')
+        if position >= 256:
+            multiplier = (position // 128) - 1
+            position -= 128 * multiplier
+        high_iteration = (position // len_low) % len_high
+
+        return 'C{high_token}{low_token}{overflow_token}AA'.format(
+            high_token=high[high_iteration],
+            low_token=low[low_iteration],
+            overflow_token=overflow_token
+        )

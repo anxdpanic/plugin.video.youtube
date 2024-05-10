@@ -14,7 +14,7 @@ import re
 import threading
 
 from ..compatibility import xbmc
-from ..constants import BUSY_FLAG, SWITCH_PLAYER_FLAG
+from ..constants import BUSY_FLAG, PLAYER_DATA, SWITCH_PLAYER_FLAG
 
 
 class PlayerMonitorThread(threading.Thread):
@@ -34,8 +34,8 @@ class PlayerMonitorThread(threading.Thread):
         self.channel_id = self.playback_json.get('channel_id')
         self.video_status = self.playback_json.get('video_status')
 
-        self.total_time = 0.0
         self.current_time = 0.0
+        self.total_time = 0.0
         self.progress = 0
 
         self.daemon = True
@@ -62,7 +62,7 @@ class PlayerMonitorThread(threading.Thread):
 
         timeout_period = 5
         waited = 0
-        wait_interval = 0.2
+        wait_interval = 0.5
         while not player.isPlaying():
             if self._context.abort_requested():
                 break
@@ -98,75 +98,65 @@ class PlayerMonitorThread(threading.Thread):
         video_id_param = 'video_id=%s' % self.video_id
         report_url = use_remote_history and playback_stats.get('watchtime_url')
 
-        segment_start = 0
-        played_time = -1.0
-        wait_interval = 0.5
+        segment_start = 0.0
+        report_time = -1.0
+        wait_interval = 1
         report_period = waited = 10
         while not self.abort_now():
             try:
                 current_file = player.getPlayingFile()
-                self.current_time = player.getTime()
-                self.total_time = player.getTotalTime()
+                played_time = player.getTime()
+                total_time = player.getTotalTime()
+                player.current_time = played_time
+                player.total_time = total_time
             except RuntimeError:
                 self.stop()
                 break
 
-            if (current_file != playing_file and not (
+            if (not current_file.startswith(playing_file) and not (
                     self._context.is_plugin_path(current_file, 'play/')
-                    and video_id_param in current_file)):
+                    and video_id_param in current_file
+            )) or total_time <= 0:
                 self.stop()
                 break
 
-            if self.current_time < 0:
-                self.current_time = 0.0
+            _seek_time = player.start_time or player.seek_time
+            if waited and _seek_time and played_time < _seek_time:
+                waited = 0
+                player.seekTime(_seek_time)
+                continue
 
-            if self.total_time <= 0:
-                self.stop()
-                break
-            self.progress = int(100 * self.current_time / self.total_time)
-
-            if player.start_time or player.seek_time:
-                _seek_time = player.start_time or player.seek_time
-                if self.current_time < _seek_time:
-                    player.seekTime(_seek_time)
-                    try:
-                        self.current_time = player.getTime()
-                    except RuntimeError:
-                        self.stop()
-                        break
-
-            if player.end_time and self.current_time >= player.end_time:
-                if clip and player.start_time:
+            if player.end_time and played_time >= player.end_time:
+                if waited and clip and player.start_time:
+                    waited = 0
                     player.seekTime(player.start_time)
-                else:
-                    player.stop()
+                    continue
+                player.stop()
 
             if waited >= report_period:
                 waited = 0
 
                 last_state = state
-                if self.current_time == played_time:
+                if played_time == report_time:
                     state = 'paused'
                 else:
                     state = 'playing'
-                played_time = self.current_time
+                report_time = played_time
 
                 if logged_in and report_url:
                     if state == 'playing':
-                        segment_end = self.current_time
+                        segment_end = played_time
                     else:
                         segment_end = segment_start
 
                     if segment_start > segment_end:
                         segment_end = segment_start + report_period
 
-                    if segment_end > self.total_time:
-                        segment_end = self.total_time
+                    if segment_end > total_time:
+                        segment_end = total_time
 
                     # only report state='paused' once
                     if state == 'playing' or last_state == 'playing':
-                        # refresh client, tokens may need refreshing
-                        self._provider.reset_client()
                         client = self._provider.get_client(self._context)
                         logged_in = self._provider.is_logged_in()
 
@@ -175,7 +165,7 @@ class PlayerMonitorThread(threading.Thread):
                                 self._context,
                                 self.video_id,
                                 report_url,
-                                status=(self.current_time,
+                                status=(played_time,
                                         segment_start,
                                         segment_end,
                                         state),
@@ -185,6 +175,11 @@ class PlayerMonitorThread(threading.Thread):
 
             self._monitor.waitForAbort(wait_interval)
             waited += wait_interval
+
+        self.current_time = player.current_time
+        self.total_time = player.total_time
+        if self.total_time > 0:
+            self.progress = int(100 * self.current_time / self.total_time)
 
         state = 'stopped'
         self._context.send_notification('PlaybackStopped', {
@@ -200,15 +195,13 @@ class PlayerMonitorThread(threading.Thread):
                                         total=self.total_time,
                                         percent=self.progress))
 
-        # refresh client, tokens may need refreshing
         if logged_in:
-            self._provider.reset_client()
             client = self._provider.get_client(self._context)
             logged_in = self._provider.is_logged_in()
 
         if self.progress >= settings.get_play_count_min_percent():
             play_count += 1
-            self.current_time = 0.0
+            self.current_time = 0
             segment_end = self.total_time
         else:
             segment_end = self.current_time
@@ -309,6 +302,8 @@ class PlayerMonitor(xbmc.Player):
         self.seek_time = None
         self.start_time = None
         self.end_time = None
+        self.current_time = None
+        self.total_time = None
 
     def stop_threads(self):
         for thread in self.threads:
@@ -364,10 +359,10 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        playback_json = self._ui.get_property('playback_json')
+        playback_json = self._ui.get_property(PLAYER_DATA)
         if not playback_json:
             return
-        self._ui.clear_property('playback_json')
+        self._ui.clear_property(PLAYER_DATA)
         self.cleanup_threads()
 
         playback_json = json.loads(playback_json)
@@ -375,10 +370,14 @@ class PlayerMonitor(xbmc.Player):
             self.seek_time = float(playback_json.get('seek_time'))
             self.start_time = float(playback_json.get('start_time'))
             self.end_time = float(playback_json.get('end_time'))
-        except (ValueError, TypeError):
+            self.current_time = max(0.0, self.getTime())
+            self.total_time = max(0.0, self.getTotalTime())
+        except (ValueError, TypeError, RuntimeError):
             self.seek_time = None
             self.start_time = None
             self.end_time = None
+            self.current_time = 0.0
+            self.total_time = 0.0
 
         self.threads.append(PlayerMonitorThread(self,
                                                 self._provider,
@@ -404,6 +403,7 @@ class PlayerMonitor(xbmc.Player):
 
     def onPlayBackSeek(self, time, seekOffset):
         time_s = time / 1000
+        self.current_time = time_s
         self.seek_time = None
         if ((self.end_time and time_s > self.end_time + 1)
                 or (self.start_time and time_s < self.start_time - 1)):

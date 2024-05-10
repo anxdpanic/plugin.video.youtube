@@ -83,8 +83,8 @@ class AbstractSettings(object):
         return (self.get_bool(settings.VIDEO_QUALITY_ASK, False)
                 or self.get_int(settings.MPD_STREAM_SELECT) == 4)
 
-    def show_fanart(self):
-        return self.get_bool(settings.SHOW_FANART, True)
+    def fanart_selection(self):
+        return self.get_int(settings.FANART_SELECTION, 2)
 
     def cache_size(self, value=None):
         if value is not None:
@@ -94,10 +94,18 @@ class AbstractSettings(object):
     def get_search_history_size(self):
         return self.get_int(settings.SEARCH_SIZE, 10)
 
-    def is_setup_wizard_enabled(self):
+    def setup_wizard_enabled(self, value=None):
         # Increment min_required on new release to enable oneshot on first run
         min_required = 3
-        forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, min_required - 1)
+
+        if value is False:
+            self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
+            return self.set_bool(settings.SETUP_WIZARD, False)
+        if value is True:
+            self.set_int(settings.SETUP_WIZARD_RUNS, 0)
+            return self.set_bool(settings.SETUP_WIZARD, True)
+
+        forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, 0)
         if forced_runs < min_required:
             self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
             return True
@@ -150,10 +158,28 @@ class AbstractSettings(object):
     def set_subtitle_download(self, value):
         return self.set_bool(settings.SUBTITLE_DOWNLOAD, value)
 
-    def use_thumbnail_size(self):
-        size = self.get_int(settings.THUMB_SIZE, 0)
-        sizes = {0: 'medium', 1: 'high'}
-        return sizes[size]
+    _THUMB_SIZES = {
+        0: {  # Medium (16:9)
+            'size': 320 * 180,
+            'ratio': 320 / 180,
+        },
+        1: {  # High (4:3)
+            'size': 480 * 360,
+            'ratio': 480 / 360,
+        },
+        2: {  # Best available
+            'size': 0,
+            'ratio': 0,
+        },
+    }
+
+    def get_thumbnail_size(self, value=None):
+        default = 1
+        if value is None:
+            value = self.get_int(settings.THUMB_SIZE, default)
+        if value in self._THUMB_SIZES:
+            return self._THUMB_SIZES[value]
+        return self._THUMB_SIZES[default]
 
     def safe_search(self):
         index = self.get_int(settings.SAFE_SEARCH, 0)
@@ -380,8 +406,14 @@ class AbstractSettings(object):
     def get_language(self):
         return self.get_string(settings.LANGUAGE, 'en_US').replace('_', '-')
 
+    def set_language(self, language_id):
+        return self.set_string(settings.LANGUAGE, language_id)
+
     def get_region(self):
         return self.get_string(settings.REGION, 'US')
+
+    def set_region(self, region_id):
+        return self.set_string(settings.REGION, region_id)
 
     def get_watch_later_playlist(self):
         return self.get_string(settings.WATCH_LATER_PLAYLIST, '').strip()
@@ -409,3 +441,6 @@ class AbstractSettings(object):
 
         def get_label_color(self, label_part):
             return self._COLOR_MAP.get(label_part, 'white')
+
+    def get_channel_name_aliases(self):
+        return frozenset(self.get_string_list(settings.CHANNEL_NAME_ALIASES))
