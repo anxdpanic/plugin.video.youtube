@@ -59,7 +59,7 @@ class APICheck(object):
                 j_id = self._json_api['keys']['personal'].get('client_id', '')
                 j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
-        if (not original_key or not original_id or not original_secret
+        if ((not original_key or not original_id or not original_secret)
                 and j_key and j_secret and j_id):
             settings.api_key(j_key)
             settings.api_id(j_id)
