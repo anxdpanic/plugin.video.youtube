@@ -588,6 +588,7 @@ def update_video_infos(provider, context, video_id_dict,
                 (ui.italic(start_at, cr_after=1) if video_item.upcoming
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 description,
+                ui.new_line('https://youtu.be/' + video_id, cr_before=1)
             ))
         video_item.set_plot(description)
 
