@@ -19,6 +19,7 @@ from traceback import format_stack
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
 from .subtitles import Subtitles
+from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import (
@@ -917,7 +918,7 @@ class VideoInfo(YouTubeRequestClient):
         if meta_info is None:
             meta_info = {'video': {},
                          'channel': {},
-                         'images': {},
+                         'thumbnails': {},
                          'subtitles': []}
 
         if playback_stats is None:
@@ -954,7 +955,8 @@ class VideoInfo(YouTubeRequestClient):
 
             yt_format = self.FORMAT.get(itag)
             if not yt_format:
-                self._context.log_debug('Unknown itag: {0}'.format(itag))
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'
+                                        .format(itag=itag, stream=match[0]))
                 continue
 
             stream = {'url': playlist_url,
@@ -981,7 +983,7 @@ class VideoInfo(YouTubeRequestClient):
         if meta_info is None:
             meta_info = {'video': {},
                          'channel': {},
-                         'images': {},
+                         'thumbnails': {},
                          'subtitles': []}
         if playback_stats is None:
             playback_stats = {}
@@ -998,13 +1000,14 @@ class VideoInfo(YouTubeRequestClient):
 
             if not url:
                 continue
-            url = self._process_url_params(url)
+            url, _ = self._process_url_params(url)
 
             itag = str(stream_map['itag'])
             stream_map['itag'] = itag
             yt_format = self.FORMAT.get(itag)
             if not yt_format:
-                self._context.log_debug('Unknown itag: {0}'.format(itag))
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'
+                                        .format(itag=itag, stream=stream_map))
                 continue
             if (yt_format.get('discontinued') or yt_format.get('unsupported')
                     or (yt_format.get('dash/video')
@@ -1065,12 +1068,12 @@ class VideoInfo(YouTubeRequestClient):
 
     def _process_url_params(self, url):
         if not url:
-            return url
+            return url, None
 
         parts = urlsplit(url)
         query = parse_qs(parts.query)
         new_query = {}
-        update_url = False
+        update_url = {}
 
         if self._calculate_n and 'n' in query:
             self._player_js = self._player_js or self._get_player_js()
@@ -1091,12 +1094,35 @@ class VideoInfo(YouTubeRequestClient):
             content_length = query.get('clen', [''])[0]
             new_query['range'] = '0-{0}'.format(content_length)
 
+        if 'mn' in query and 'fvip' in query:
+            fvip = query['fvip'][0]
+            primary, _, secondary = query['mn'][0].partition(',')
+            prefix, separator, server = parts.netloc.partition('---')
+            if primary and secondary:
+                update_url = {
+                    'netloc': separator.join((
+                        re.sub(r'\d+', fvip, prefix),
+                        server.replace(primary, secondary),
+                    )),
+                }
+
         if new_query:
             query.update(new_query)
-        elif not update_url:
-            return url
+            query = urlencode(query, doseq=True)
+        elif update_url:
+            query = parts.query
+        else:
+            return url, None
 
-        return parts._replace(query=urlencode(query, doseq=True)).geturl()
+        if update_url:
+            return (
+                parts._replace(query=query).geturl(),
+                parts._replace(query=query, **update_url).geturl(),
+            )
+        return (
+            parts._replace(query=query).geturl(),
+            None,
+        )
 
     def _get_error_details(self, playability_status, details=None):
         if not playability_status:
@@ -1155,7 +1181,7 @@ class VideoInfo(YouTubeRequestClient):
             for client_name in self._prioritised_clients:
                 if status and status != 'OK':
                     self._context.log_warning(
-                        'Failed to retrieved video info - '
+                        'Failed to retrieve video info - '
                         'video_id: {0}, client: {1}, auth: {2},\n'
                         'status: {3}, reason: {4}'.format(
                             video_id,
@@ -1306,15 +1332,13 @@ class VideoInfo(YouTubeRequestClient):
                                    .encode('raw_unicode_escape')
                                    .decode('raw_unicode_escape')),
             },
-            'images': {
-                'high': ('https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg'
-                         .format(video_id, thumb_suffix)),
-                'medium': ('https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg'
-                           .format(video_id, thumb_suffix)),
-                'standard': ('https://i.ytimg.com/vi/{0}/sddefault{1}.jpg'
-                             .format(video_id, thumb_suffix)),
-                'default': ('https://i.ytimg.com/vi/{0}/default{1}.jpg'
-                            .format(video_id, thumb_suffix)),
+            'thumbnails': {
+                thumb_type: {
+                    'url': thumb['url'].format(video_id, thumb_suffix),
+                    'size': thumb['size'],
+                    'ratio': thumb['ratio'],
+                }
+                for thumb_type, thumb in THUMB_TYPES.items()
             },
             'subtitles': None,
         }
@@ -1713,15 +1737,15 @@ class VideoInfo(YouTubeRequestClient):
                 data[quality_group] = {}
 
             url = unquote(url)
-            url = self._process_url_params(url)
-            url = (url.replace("&", "&amp;")
-                   .replace('"', "&quot;")
-                   .replace("<", "&lt;")
-                   .replace(">", "&gt;"))
+            primary_url, secondary_url = self._process_url_params(url)
+            primary_url = (primary_url.replace("&", "&amp;")
+                           .replace('"', "&quot;")
+                           .replace("<", "&lt;")
+                           .replace(">", "&gt;"))
 
             details = {
                 'mimeType': mime_type,
-                'baseUrl': url,
+                'baseUrl': primary_url,
                 'mediaType': media_type,
                 'container': container,
                 'codecs': codecs,
@@ -1746,6 +1770,12 @@ class VideoInfo(YouTubeRequestClient):
                 'sampleRate': sample_rate,
                 'channels': channels,
             }
+            if secondary_url:
+                secondary_url = (secondary_url.replace("&", "&amp;")
+                                 .replace('"', "&quot;")
+                                 .replace("<", "&lt;")
+                                 .replace(">", "&gt;"))
+                details['baseUrlSecondary'] = secondary_url
             data[mime_group][itag] = data[quality_group][itag] = details
 
         if not video_data:
@@ -1825,7 +1855,7 @@ class VideoInfo(YouTubeRequestClient):
 
                 skip_group = (
                     new_stream['height'] <= previous_stream['height']
-                ) if media_type == 'video' else (
+                    if media_type == 'video' else
                     new_stream['channels'] <= previous_stream['channels']
                 )
             else:
@@ -1834,7 +1864,7 @@ class VideoInfo(YouTubeRequestClient):
 
                 skip_group = (
                     new_stream['height'] == previous_stream['height']
-                ) if media_type == 'video' else (
+                    if media_type == 'video' else
                     2 == new_stream['channels'] == previous_stream['channels']
                 )
 
@@ -1842,7 +1872,7 @@ class VideoInfo(YouTubeRequestClient):
                 skip_group
                 and new_stream['fps'] == previous_stream['fps']
                 and new_stream['hdr'] == previous_stream['hdr']
-            ) if media_type == 'video' else (
+                if media_type == 'video' else
                 skip_group
                 and new_stream['langCode'] == previous_stream['langCode']
                 and new_stream['role'] == previous_stream['role']
@@ -1896,7 +1926,7 @@ class VideoInfo(YouTubeRequestClient):
             if group.startswith(mime_type) and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
                     stream['langName']
-                        or self._context.localize('stream.automatic'),
+                    or self._context.localize('stream.automatic'),
                     stream['label']
                 )
                 if stream == main_stream[media_type]:
@@ -1987,7 +2017,9 @@ class VideoInfo(YouTubeRequestClient):
                         '/>\n'
                     # Representation Label element is not used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n' +
+                    ('\t\t\t\t<BaseURL>{baseUrlSecondary}</BaseURL>\n'
+                     if 'baseUrlSecondary' in stream else '') +
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
@@ -2011,7 +2043,9 @@ class VideoInfo(YouTubeRequestClient):
                         '>\n'
                     # Representation Label element is not used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n' +
+                    ('\t\t\t\t<BaseURL>{baseUrlSecondary}</BaseURL>\n'
+                     if 'baseUrlSecondary' in stream else '') +
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'

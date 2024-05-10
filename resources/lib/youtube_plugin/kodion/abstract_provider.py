@@ -12,13 +12,13 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import content, paths
+from .constants import CHECK_SETTINGS, REROUTE, content, paths
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
     NewSearchItem,
+    NextPageItem,
     SearchHistoryItem,
-    menu_items,
 )
 from .utils import to_unicode
 
@@ -32,61 +32,81 @@ class AbstractProvider(object):
         self._dict_path = {}
 
         # register some default paths
-        self.register_path(r'^/$', '_internal_root')
+        self.register_path(r''.join((
+            '^',
+            '(?:', paths.HOME, ')?/?$'
+        )), self._internal_root)
+
+        self.register_path(r''.join((
+            '^',
+            paths.ROUTE,
+            '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
+        )), self.reroute)
+
+        self.register_path(r''.join((
+            '^',
+            paths.GOTO_PAGE,
+            '(?P<page>/[0-9]+)?'
+            '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
+        )), self._internal_goto_page)
 
         self.register_path(r''.join((
             '^',
             paths.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), 'on_watch_later')
+        )), self.on_watch_later)
 
         self.register_path(r''.join((
             '^',
             paths.BOOKMARKS,
             '/(?P<command>add|clear|list|remove)/?$'
-        )), 'on_bookmarks')
+        )), self.on_bookmarks)
 
         self.register_path(r''.join((
             '^',
             '(', paths.SEARCH, '|', paths.EXTERNAL_SEARCH, ')',
             '/(?P<command>input|query|list|remove|clear|rename)?/?$'
-        )), '_internal_search')
+        )), self._internal_search)
 
         self.register_path(r''.join((
             '^',
             paths.HISTORY,
             '/?$'
-        )), 'on_playback_history')
+        )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
-                           '_internal_on_extra_fanart')
+                           self._internal_on_extra_fanart)
 
         """
-        Test each method of this class for the appended attribute '_re_match' by the
-        decorator (RegisterProviderPath).
-        The '_re_match' attributes describes the path which must match for the decorated method.
+        Test each method of this class for the attribute 'kodion_re_path' added
+        by the decorator @RegisterProviderPath.
+        The 'kodion_re_path' attribute is a regular expression that must match
+        the current path in order for the decorated method to run.
         """
+        for attribute_name in dir(self):
+            if attribute_name.startswith('__'):
+                continue
+            attribute = getattr(self, attribute_name, None)
+            if not attribute or not callable(attribute):
+                continue
+            re_path = getattr(attribute, 'kodion_re_path', None)
+            if re_path:
+                self.register_path(re_path, attribute)
 
-        for method_name in dir(self):
-            method = getattr(self, method_name, None)
-            path = method and getattr(method, 'kodion_re_path', None)
-            if path:
-                self.register_path(path, method_name)
-
-    def register_path(self, re_path, method_name):
+    def register_path(self, re_path, method):
         """
-        Registers a new method by name (string) for the given regular expression
+        Registers a new method for the given regular expression
         :param re_path: regular expression of the path
-        :param method_name: name of the method
+        :param method: method to be registered
         :return:
         """
-        self._dict_path[re_path] = method_name
+        self._dict_path[re.compile(re_path, re.UNICODE)] = method
 
     def run_wizard(self, context):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        context.send_notification('check_settings', 'defer')
+        context.send_notification(CHECK_SETTINGS, 'defer')
 
         wizard_steps = self.get_wizard_steps(context)
         wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
@@ -106,8 +126,8 @@ class AbstractProvider(object):
                     else:
                         step += 1
         finally:
-            settings.set_bool(settings.SETUP_WIZARD, False)
-            context.send_notification('check_settings', 'process')
+            settings.setup_wizard_enabled(False)
+            context.send_notification(CHECK_SETTINGS, 'process')
 
     def get_wizard_steps(self, context):
         # can be overridden by the derived class
@@ -115,25 +135,25 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         path = context.get_path()
+        for re_path, method in self._dict_path.items():
+            re_match = re_path.search(path)
+            if not re_match:
+                continue
 
-        for key in self._dict_path:
-            re_match = re.search(key, path, re.UNICODE)
-            if re_match is not None:
-                method_name = self._dict_path.get(key, '')
-                method = getattr(self, method_name, None)
-                if method is not None:
-                    result = method(context, re_match)
-                    refresh = context.get_param('refresh', False)
-                    if not isinstance(result, tuple):
-                        options = {
-                            self.RESULT_CACHE_TO_DISC: True,
-                            self.RESULT_UPDATE_LISTING: refresh,
-                        }
-                    else:
-                        result, options = result
-                        if refresh:
-                            options[self.RESULT_UPDATE_LISTING] = refresh
-                    return result, options
+            result = method(context, re_match)
+            if isinstance(result, tuple):
+                result, options = result
+            else:
+                options = {
+                    self.RESULT_CACHE_TO_DISC: True,
+                    self.RESULT_UPDATE_LISTING: False,
+                }
+
+            refresh = context.get_param('refresh')
+            if refresh is not None:
+                options[self.RESULT_UPDATE_LISTING] = bool(refresh)
+
+            return result, options
 
         raise KodionException("Mapping for path '%s' not found" % path)
 
@@ -164,6 +184,56 @@ class AbstractProvider(object):
 
     def _internal_root(self, context, re_match):
         return self.on_root(context, re_match)
+
+    def _internal_goto_page(self, context, re_match):
+        page = re_match.group('page')
+        if page:
+            page = int(page.lstrip('/'))
+        else:
+            result, page = context.get_ui().on_numeric_input(
+                context.localize('page.choose'), 1
+            )
+            if not result:
+                return False
+
+        path = re_match.group('path')
+        params = context.get_params()
+        page_token = NextPageItem.create_page_token(
+            page, params.get('items_per_page', 50)
+        )
+        params = dict(params, page=page, page_token=page_token)
+        return self.reroute(context, path=path, params=params)
+
+    def reroute(self, context, re_match=None, path=None, params=None):
+        current_path = context.get_path()
+        current_params = context.get_params()
+        if re_match:
+            path = re_match.group('path')
+        if params is None:
+            params = current_params
+        if (path and path != current_path
+                or 'refresh' in params
+                or params != current_params):
+            result = None
+            function_cache = context.get_function_cache()
+            window_return = params.pop('window_return', True)
+            try:
+                result, options = function_cache.run(
+                    self.navigate,
+                    seconds=None,
+                    _cacheparams=function_cache.PARAMS_NONE,
+                    _refresh=True,
+                    context=context.clone(path, params),
+                )
+            finally:
+                if not result:
+                    return False
+                context.get_ui().set_property(REROUTE, path)
+                context.execute('ActivateWindow(Videos, {0}{1})'.format(
+                    context.create_uri(path, params),
+                    ', return' if window_return else '',
+                ))
+        return False
 
     def on_bookmarks(self, context, re_match):
         raise NotImplementedError()
@@ -212,8 +282,9 @@ class AbstractProvider(object):
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
-            if (folder_path.startswith('plugin://%s' % context.get_id()) and
-                    re.match('.+/(?:query|input)/.*', folder_path)):
+            if (not params.get('refresh')
+                    and folder_path.startswith('plugin://%s' % context.get_id())
+                    and re.match('.+/(?:query|input)/.*', folder_path)):
                 cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
                     query = to_unicode(cached)
@@ -261,7 +332,7 @@ class AbstractProvider(object):
     def handle_exception(self, context, exception_to_handle):
         return True
 
-    def tear_down(self, context):
+    def tear_down(self):
         pass
 
 

@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 from base64 import b64decode
 
 from ... import key_sets
-from ...kodion.context import XbmcContext
 from ...kodion.json_store import APIKeyStore, AccessManager
 
 
@@ -22,17 +21,9 @@ DEFAULT_SWITCH = 1
 class APICheck(object):
     def __init__(self, context):
         self._context = context
-        self._settings = context.get_settings()
-        self._ui = context.get_ui()
         self._api_jstore = APIKeyStore()
         self._json_api = self._api_jstore.get_data()
         self._access_manager = AccessManager(context)
-        self.changed = False
-
-        self._on_init()
-
-    def _on_init(self):
-        self._json_api = self._api_jstore.get_data()
 
         j_key = self._json_api['keys']['personal'].get('api_key', '')
         j_id = self._json_api['keys']['personal'].get('client_id', '')
@@ -47,16 +38,17 @@ class APICheck(object):
                 self._json_api['keys']['personal'] = {'api_key': stripped_key, 'client_id': stripped_id, 'client_secret': stripped_secret}
                 self._api_jstore.save(self._json_api)
 
-        original_key = self._settings.api_key()
-        original_id = self._settings.api_id()
-        original_secret = self._settings.api_secret()
+        settings = self._context.get_settings()
+        original_key = settings.api_key()
+        original_id = settings.api_id()
+        original_secret = settings.api_secret()
         if original_key and original_id and original_secret:
             own_key, own_id, own_secret = self._strip_api_keys(original_key, original_id, original_secret)
             if own_key and own_id and own_secret:
                 if (original_key != own_key) or (original_id != own_id) or (original_secret != own_secret):
-                    self._settings.api_key(own_key)
-                    self._settings.api_id(own_id)
-                    self._settings.api_secret(own_secret)
+                    settings.api_key(own_key)
+                    settings.api_id(own_id)
+                    settings.api_secret(own_secret)
 
                 if (j_key != own_key) or (j_id != own_id) or (j_secret != own_secret):
                     self._json_api['keys']['personal'] = {'api_key': own_key, 'client_id': own_id, 'client_secret': own_secret}
@@ -69,9 +61,9 @@ class APICheck(object):
 
         if (not original_key or not original_id or not original_secret
                 and j_key and j_secret and j_id):
-            self._settings.api_key(j_key)
-            self._settings.api_id(j_id)
-            self._settings.api_secret(j_secret)
+            settings.api_key(j_key)
+            settings.api_id(j_id)
+            settings.api_secret(j_secret)
 
         switch = self.get_current_switch()
         user_details = self._access_manager.get_current_user_details()
@@ -91,8 +83,14 @@ class APICheck(object):
                                         switch=switch))
         if changed:
             self._context.log_debug('API key set changed: Signing out')
-            self._context.execute('RunPlugin(plugin://plugin.video.youtube/'
-                                  'sign/out/?confirmed=true)')
+            self._context.execute('RunPlugin({0})'.format(
+                self._context.create_uri(
+                    ('sign', 'out'),
+                    {
+                        'confirmed': True,
+                    }
+                )
+            ))
             self._access_manager.set_last_key_hash(current_set_hash)
 
     @staticmethod
@@ -103,11 +101,13 @@ class APICheck(object):
         return self._access_manager.get_current_user()
 
     def has_own_api_keys(self):
-        self._json_api = self._api_jstore.get_data()
-        own_key = self._json_api['keys']['personal']['api_key']
-        own_id = self._json_api['keys']['personal']['client_id']
-        own_secret = self._json_api['keys']['personal']['client_secret']
-        return own_key and own_id and own_secret
+        json_data = self._api_jstore.get_data()
+        try:
+            return (json_data['keys']['personal']['api_key']
+                    and json_data['keys']['personal']['client_id']
+                    and json_data['keys']['personal']['client_secret'])
+        except KeyError:
+            return False
 
     def get_api_keys(self, switch):
         self._json_api = self._api_jstore.get_data()
@@ -116,30 +116,35 @@ class APICheck(object):
 
         decode = True
         if switch == 'youtube-tv':
-            api_key = key_sets[switch]['key']
-            client_id = key_sets[switch]['id']
-            client_secret = key_sets[switch]['secret']
+            system = 'YouTube TV'
+            key_set_details = key_sets[switch]
 
         elif switch.startswith('own'):
             decode = False
-            api_key = self._json_api['keys']['personal']['api_key']
-            client_id = self._json_api['keys']['personal']['client_id']
-            client_secret = self._json_api['keys']['personal']['client_secret']
+            system = 'All'
+            key_set_details = self._json_api['keys']['personal']
 
         else:
-            api_key = key_sets['provided'][switch]['key']
-            client_id = key_sets['provided'][switch]['id']
-            client_secret = key_sets['provided'][switch]['secret']
+            system = 'All'
+            if switch not in key_sets['provided']:
+                switch = 0
+            key_set_details = key_sets['provided'][switch]
 
-        if decode:
-            api_key = b64decode(api_key).decode('utf-8')
-            client_id = b64decode(client_id).decode('utf-8')
-            client_secret = b64decode(client_secret).decode('utf-8')
-
-        client_id += '.apps.googleusercontent.com'
-        return {'key': api_key,
-                'id': client_id,
-                'secret': client_secret}
+        key_set = {
+            'system': system,
+            'id': '',
+            'key': '',
+            'secret': ''
+        }
+        for key, value in key_set_details.items():
+            if decode:
+                value = b64decode(value).decode('utf-8')
+            key = key.partition('_')[-1]
+            if key and key in key_set:
+                key_set[key] = value
+        if not key_set['id'].endswith('.apps.googleusercontent.com'):
+            key_set['id'] += '.apps.googleusercontent.com'
+        return key_set
 
     def _get_key_set_hash(self, switch):
         key_set = self.get_api_keys(switch)
@@ -151,7 +156,6 @@ class APICheck(object):
         return self._access_manager.calc_key_hash(**key_set)
 
     def _strip_api_keys(self, api_key, client_id, client_secret):
-
         stripped_key = ''.join(api_key.split())
         stripped_id = ''.join(client_id.replace('.apps.googleusercontent.com', '').split())
         stripped_secret = ''.join(client_secret.split())
@@ -191,12 +195,9 @@ class APICheck(object):
 
         return return_key, return_id, return_secret
 
-
-_api_check = APICheck(XbmcContext())
-
-keys_changed = _api_check.changed
-current_user = _api_check.get_current_user()
-
-api = _api_check.get_api_keys(_api_check.get_current_switch())
-youtube_tv = _api_check.get_api_keys('youtube-tv')
-developer_keys = _api_check.get_api_keys('developer')
+    def get_configs(self):
+        return {
+            'youtube-tv': self.get_api_keys('youtube-tv'),
+            'main': self.get_api_keys(self.get_current_switch()),
+            'developer': self.get_api_keys('developer')
+        }

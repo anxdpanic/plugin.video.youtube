@@ -34,6 +34,7 @@ class DirectoryItem(BaseItem):
         self._channel_id = channel_id
         self._playlist_id = playlist_id
         self._subscription_id = subscription_id
+        self._next_page = False
 
     def set_name(self, name, category_label=None):
         name = super(DirectoryItem, self).set_name(name)
@@ -96,3 +97,11 @@ class DirectoryItem(BaseItem):
 
     def get_playlist_id(self):
         return self._playlist_id
+
+    @property
+    def next_page(self):
+        return self._next_page
+
+    @next_page.setter
+    def next_page(self, value):
+        self._next_page = value

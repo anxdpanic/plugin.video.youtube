@@ -12,14 +12,15 @@ from __future__ import absolute_import, division, unicode_literals
 
 
 class ResourceManager(object):
-    def __init__(self, context, client):
+    def __init__(self, provider, context):
         self._context = context
-        self._client = client
+        self._provider = provider
         self._data_cache = context.get_data_cache()
         self._function_cache = context.get_function_cache()
-        self._show_fanart = context.get_settings().get_bool(
-            'youtube.channel.fanart.show', True
-        )
+        fanart_type = context.get_param('fanart_type')
+        if fanart_type is None:
+            fanart_type = context.get_settings().fanart_selection()
+        self._fanart_type = fanart_type
         self.new_data = {}
 
     @staticmethod
@@ -30,6 +31,7 @@ class ResourceManager(object):
             yield input_list[i:i + n]
 
     def get_channels(self, ids, defer_cache=False):
+        client = self._provider.get_client(self._context)
         refresh = self._context.get_param('refresh')
         updated = []
         for channel_id in ids:
@@ -41,7 +43,7 @@ class ResourceManager(object):
                 continue
 
             data = self._function_cache.run(
-                self._client.get_channel_by_username,
+                client.get_channel_by_username,
                 self._function_cache.ONE_DAY,
                 _refresh=refresh,
                 username=channel_id
@@ -68,7 +70,7 @@ class ResourceManager(object):
                                     .format(ids=list(result)))
 
         if to_update:
-            new_data = [self._client.get_channels(list_of_50)
+            new_data = [client.get_channels(list_of_50)
                         for list_of_50 in self._list_batch(to_update, n=50)]
             if not any(new_data):
                 new_data = None
@@ -99,12 +101,16 @@ class ResourceManager(object):
         return result
 
     def get_fanarts(self, channel_ids, defer_cache=False):
-        if not self._show_fanart:
+        if self._fanart_type != self._context.get_settings().FANART_CHANNEL:
             return {}
 
         result = self.get_channels(channel_ids, defer_cache=defer_cache)
-        banners = ['bannerTvMediumImageUrl', 'bannerTvLowImageUrl',
-                   'bannerTvImageUrl', 'bannerExternalUrl']
+        banners = (
+            'bannerTvMediumImageUrl',
+            'bannerTvLowImageUrl',
+            'bannerTvImageUrl',
+            'bannerExternalUrl',
+        )
         # transform
         for key, item in result.items():
             images = item.get('brandingSettings', {}).get('image', {})
@@ -135,7 +141,8 @@ class ResourceManager(object):
                                     .format(ids=list(result)))
 
         if to_update:
-            new_data = [self._client.get_playlists(list_of_50)
+            client = self._provider.get_client(self._context)
+            new_data = [client.get_playlists(list_of_50)
                         for list_of_50 in self._list_batch(to_update, n=50)]
             if not any(new_data):
                 new_data = None
@@ -207,6 +214,7 @@ class ResourceManager(object):
             self._context.log_debug('Found cached items for playlists:\n|{ids}|'
                                     .format(ids=list(result)))
 
+        client = self._provider.get_client(self._context)
         new_data = {}
         insert_point = 0
         for playlist_id, page_token in to_update:
@@ -216,7 +224,7 @@ class ResourceManager(object):
             while 1:
                 batch_id = (playlist_id, page_token)
                 new_batch_ids.append(batch_id)
-                batch = self._client.get_playlist_items(*batch_id)
+                batch = client.get_playlist_items(*batch_id)
                 new_data[batch_id] = batch
                 page_token = batch.get('nextPageToken') if fetch_next else None
                 if page_token is None:
@@ -279,10 +287,11 @@ class ResourceManager(object):
 
         if to_update:
             notify_and_raise = not suppress_errors
-            new_data = [self._client.get_videos(list_of_50,
-                                                live_details,
-                                                notify=notify_and_raise,
-                                                raise_exc=notify_and_raise)
+            client = self._provider.get_client(self._context)
+            new_data = [client.get_videos(list_of_50,
+                                          live_details,
+                                          notify=notify_and_raise,
+                                          raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
             if not any(new_data):
                 new_data = None

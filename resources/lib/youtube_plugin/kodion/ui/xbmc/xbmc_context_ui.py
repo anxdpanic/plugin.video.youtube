@@ -42,7 +42,9 @@ class XbmcContextUI(AbstractContextUI):
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
         dialog = xbmcgui.Dialog()
-        result = dialog.input(title, to_unicode(default), type=xbmcgui.INPUT_ALPHANUM)
+        result = dialog.input(title,
+                              to_unicode(default),
+                              type=xbmcgui.INPUT_ALPHANUM)
         if result:
             text = to_unicode(result)
             return True, text
@@ -149,15 +151,6 @@ class XbmcContextUI(AbstractContextUI):
         # xbmc.executebuiltin("Container.Refresh")
         xbmc.executebuiltin('RunScript({addon_id},action/refresh)'.format(
             addon_id=ADDON_ID
-        ))
-
-    def reload_container(self, path=None):
-        context = self._context
-        if path in (True, None):
-            path = context.get_path()
-        params = dict(context.get_params(), refresh=True)
-        xbmc.executebuiltin('ActivateWindow(Videos, {0}, return)'.format(
-            context.create_uri(path, params)
         ))
 
     @staticmethod

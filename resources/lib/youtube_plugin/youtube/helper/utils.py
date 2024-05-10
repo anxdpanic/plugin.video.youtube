@@ -17,7 +17,6 @@ from math import log10
 from ...kodion.constants import content, paths
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
-    create_path,
     datetime_parser,
     friendly_number,
     strip_html_from_text,
@@ -173,7 +172,7 @@ def update_channel_infos(provider, context, channel_id_dict,
         in_bookmarks_list = False
         in_subscription_list = False
 
-    thumb_size = settings.use_thumbnail_size
+    thumb_size = settings.get_thumbnail_size()
     banners = [
         'bannerTvMediumImageUrl',
         'bannerTvLowImageUrl',
@@ -228,8 +227,8 @@ def update_channel_infos(provider, context, channel_id_dict,
 
         if not in_bookmarks_list:
             context_menu.append(
-                menu_items.bookmarks_add(
-                    context, channel_item
+                menu_items.bookmarks_add_channel(
+                    context, channel_id
                 )
             )
 
@@ -269,7 +268,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     custom_history_id = access_manager.get_watch_history_id()
     logged_in = provider.is_logged_in()
     path = context.get_path()
-    thumb_size = context.get_settings().use_thumbnail_size()
+    thumb_size = context.get_settings().get_thumbnail_size()
 
     # if the path directs to a playlist of our own, set channel id to 'mine'
     if path.startswith(paths.MY_PLAYLISTS):
@@ -390,18 +389,21 @@ def update_video_infos(provider, context, video_id_dict,
     else:
         watch_later_id = None
 
+    localize = context.localize
     settings = context.get_settings()
     alternate_player = settings.support_alternative_player()
     default_web_urls = settings.default_player_web_urls()
     ask_quality = not default_web_urls and settings.ask_for_video_quality()
     audio_only = settings.audio_only()
+    channel_name_aliases = settings.get_channel_name_aliases()
     hide_shorts = settings.hide_short_videos()
     show_details = settings.show_detailed_description()
     subtitles_prompt = settings.get_subtitle_selection() == 1
-    thumb_size = settings.use_thumbnail_size()
+    thumb_size = settings.get_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
 
-    untitled = context.localize('untitled')
+    channel_role = localize(19029)
+    untitled = localize('untitled')
 
     path = context.get_path()
     ui = context.get_ui()
@@ -485,8 +487,7 @@ def update_video_infos(provider, context, video_id_dict,
             video_item.set_aired_from_datetime(local_datetime)
             video_item.set_premiered_from_datetime(local_datetime)
             video_item.set_date_from_datetime(local_datetime)
-            type_label = context.localize('live' if video_item.live
-                                          else 'upcoming')
+            type_label = localize('live' if video_item.live else 'upcoming')
             start_at = '{type_label} {start_at}'.format(
                 type_label=type_label,
                 start_at=datetime_parser.get_scheduled_start(
@@ -508,7 +509,7 @@ def update_video_infos(provider, context, video_id_dict,
                     continue
 
                 color = settings.get_label_color(stat)
-                label = context.localize(label)
+                label = localize(label)
                 if value == 1:
                     label = label.rstrip('s')
 
@@ -574,8 +575,15 @@ def update_video_infos(provider, context, video_id_dict,
             if season and episode:
                 break
 
-        # plot
+        # channel name
         channel_name = snippet.get('channelTitle', '')
+        video_item.add_artist(channel_name)
+        if 'cast' in channel_name_aliases:
+            video_item.add_cast(channel_name, role=channel_role)
+        if 'studio' in channel_name_aliases:
+            video_item.add_studio(channel_name)
+
+        # plot
         description = strip_html_from_text(snippet['description'])
         if show_details:
             description = ''.join((
@@ -585,9 +593,6 @@ def update_video_infos(provider, context, video_id_dict,
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 description,
             ))
-        # video_item.add_studio(channel_name)
-        # video_item.add_cast(channel_name)
-        video_item.add_artist(channel_name)
         video_item.set_plot(description)
 
         # date time
@@ -646,10 +651,6 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             ))
 
-        # 'play with...' (external player)
-        if alternate_player:
-            context_menu.append(menu_items.play_with(context))
-
         # add 'Watch Later' only if we are not in my 'Watch Later' list
         if watch_later_id:
             if not playlist_id or watch_later_id != playlist_id:
@@ -691,7 +692,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and
-                create_path('channel', channel_id) != path):
+                context.create_path('channel', channel_id) != path):
             video_item.set_channel_id(channel_id)
             context_menu.append(
                 menu_items.go_to_channel(
@@ -752,6 +753,10 @@ def update_video_infos(provider, context, video_id_dict,
             )
         )
 
+        # 'play with...' (external player)
+        if alternate_player:
+            context_menu.append(menu_items.play_with(context))
+
         if not subtitles_prompt:
             context_menu.append(
                 menu_items.play_with_subtitles(
@@ -775,7 +780,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         if context_menu:
             context_menu.append(
-                ('--------', 'noop')
+                menu_items.separator(),
             )
             video_item.set_context_menu(context_menu)
 
@@ -795,8 +800,8 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
     if meta_data:
         video_item.live = meta_data.get('status', {}).get('live', False)
         video_item.set_subtitles(meta_data.get('subtitles', None))
-        image = get_thumbnail(settings.use_thumbnail_size(),
-                              meta_data.get('images', {}))
+        image = get_thumbnail(settings.get_thumbnail_size(),
+                              meta_data.get('thumbnails', {}))
         if image:
             if video_item.live:
                 image = ''.join((image, '?ct=', get_thumb_timestamp()))
@@ -847,21 +852,96 @@ def update_fanarts(provider, context, channel_items_dict, data=None):
                 channel_item.set_fanart(fanart)
 
 
-def get_thumbnail(thumb_size, thumbnails):
-    if thumb_size == 'high':
-        thumbnail_sizes = ['high', 'medium', 'default']
-    else:
-        thumbnail_sizes = ['medium', 'high', 'default']
+THUMB_TYPES = {
+    'default': {
+        'url': 'https://i.ytimg.com/vi/{0}/default{1}.jpg',
+        'width': 120,
+        'height': 90,
+        'size': 120 * 90,
+        'ratio': 120 / 90,  # 4:3
+    },
+    'medium': {
+        'url': 'https://i.ytimg.com/vi/{0}/mqdefault{1}.jpg',
+        'width': 320,
+        'height': 180,
+        'size': 320 * 180,
+        'ratio': 320 / 180,  # 16:9
+    },
+    'high': {
+        'url': 'https://i.ytimg.com/vi/{0}/hqdefault{1}.jpg',
+        'width': 480,
+        'height': 360,
+        'size': 480 * 360,
+        'ratio': 480 / 360,  # 4:3
+    },
+    'standard': {
+        'url': 'https://i.ytimg.com/vi/{0}/sddefault{1}.jpg',
+        'width': 640,
+        'height': 480,
+        'size': 640 * 480,
+        'ratio': 640 / 480,  # 4:3
+    },
+    '720': {
+        'url': 'https://i.ytimg.com/vi/{0}/hq720{1}.jpg',
+        'width': 1280,
+        'height': 720,
+        'size': 1280 * 720,
+        'ratio': 1280 / 720,  # 16:9
+    },
+    'oar': {
+        'url': 'https://i.ytimg.com/vi/{0}/oardefault{1}.jpg',
+        'size': 0,
+        'ratio': 0,
+    },
+    'maxres': {
+        'url': 'https://i.ytimg.com/vi/{0}/maxresdefault{1}.jpg',
+        'width': 1920,
+        'height': 1080,
+        'size': 1920 * 1080,
+        'ratio': 1920 / 1080,  # 16:9
+    },
+}
 
-    image = ''
-    for thumbnail_size in thumbnail_sizes:
-        try:
-            image = thumbnails.get(thumbnail_size, {}).get('url', '')
-        except AttributeError:
-            image = thumbnails.get(thumbnail_size, '')
-        if image:
-            break
-    return image
+
+def get_thumbnail(thumb_size, thumbnails):
+    if not thumbnails:
+        return None
+    is_dict = isinstance(thumbnails, dict)
+    size_limit = thumb_size['size']
+    ratio_limit = thumb_size['ratio']
+
+    def _sort_ratio_size(thumb):
+        if is_dict:
+            thumb_type, thumb = thumb
+        else:
+            thumb_type = None
+
+        if 'size' in thumb:
+            size = thumb['size']
+            ratio = thumb['ratio']
+        elif 'width' in thumb:
+            width = thumb['width']
+            height = thumb['height']
+            size = width * height
+            ratio = width / height
+        elif thumb_type in THUMB_TYPES:
+            thumb = THUMB_TYPES[thumb_type]
+            size = thumb['size']
+            ratio = thumb['ratio']
+        else:
+            return False, False
+        return (
+            ratio_limit and ratio_limit * 0.9 <= ratio <= ratio_limit * 1.1,
+            size <= size_limit and size if size_limit else size
+        )
+
+    thumbnail = sorted(thumbnails.items() if is_dict else thumbnails,
+                       key=_sort_ratio_size,
+                       reverse=True)[0]
+    url = (thumbnail[1] if is_dict else thumbnail).get('url')
+    if url and url.startswith('//'):
+        url = 'https:' + url
+    return url
 
 
 def get_shelf_index_by_title(context, json_data, shelf_title):

@@ -162,9 +162,10 @@ def reset_access_tokens(addon_id):
     """
     if not addon_id or addon_id == ADDON_ID:
         context = XbmcContext()
-        context.log_error('Developer reset access tokens: |%s| Invalid addon_id' % addon_id)
+        context.log_error('Reset addon access tokens - invalid addon_id: |{0}|'
+                          .format(addon_id))
         return
     context = XbmcContext(params={'addon_id': addon_id})
-
-    access_manager = context.get_access_manager()
-    access_manager.update_dev_access_token(addon_id, access_token='', refresh_token='')
+    context.get_access_manager().update_dev_access_token(
+        addon_id, access_token='', refresh_token=''
+    )

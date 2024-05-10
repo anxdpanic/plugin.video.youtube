@@ -75,6 +75,26 @@ class Profiler(object):
                 *args, **kwargs
             )
 
+        def disable(self, *args, **kwargs):
+            return super(Profiler.Proxy, self).__call__().disable(
+                *args, **kwargs
+            )
+
+        def enable(self, *args, **kwargs):
+            return super(Profiler.Proxy, self).__call__().enable(
+                *args, **kwargs
+            )
+
+        def get_stats(self, *args, **kwargs):
+            return super(Profiler.Proxy, self).__call__().get_stats(
+                *args, **kwargs
+            )
+
+        def print_stats(self, *args, **kwargs):
+            return super(Profiler.Proxy, self).__call__().print_stats(
+                *args, **kwargs
+            )
+
     _instances = set()
 
     def __new__(cls, *args, **kwargs):
@@ -205,7 +225,7 @@ class Profiler(object):
             self._Stats(
                 self._profiler,
                 stream=output_stream
-            ).strip_dirs().sort_stats('cumulative', 'time').print_stats(50)
+            ).strip_dirs().sort_stats('cumulative', 'time').print_stats(20)
             output = output_stream.getvalue()
         # Occurs when no stats were able to be generated from profiler
         except TypeError:

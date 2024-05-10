@@ -32,23 +32,37 @@ VALUE_FROM_STR = {
     'true': True,
 }
 
+ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
-SWITCH_PLAYER_FLAG = 'switch_player'
+CHECK_SETTINGS = 'check_settings'
+PLAYER_DATA = 'player_json'
+PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
+REROUTE = 'reroute'
+SLEEPING = 'sleeping'
+SWITCH_PLAYER_FLAG = 'switch_player'
 WAIT_FLAG = 'builtin_running'
+WAKEUP = 'wakeup'
 
 __all__ = (
+    'ABORT_FLAG',
     'ADDON_ID',
     'ADDON_PATH',
     'BUSY_FLAG',
+    'CHECK_SETTINGS',
     'DATA_PATH',
     'MEDIA_PATH',
+    'PLAYER_DATA',
+    'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
     'RESOURCE_PATH',
+    'REROUTE',
+    'SLEEPING',
     'SWITCH_PLAYER_FLAG',
     'TEMP_PATH',
     'VALUE_FROM_STR',
     'WAIT_FLAG',
+    'WAKEUP',
     'content',
     'paths',
     'settings',
