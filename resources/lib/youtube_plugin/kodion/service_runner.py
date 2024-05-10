@@ -103,6 +103,8 @@ def run():
                         playback_history.update(video_id, play_data)
                     elif play_data.get('play_count') != kodi_play_count:
                         play_data['play_count'] = kodi_play_count
+                        play_data['played_time'] = 0.0
+                        play_data['played_percent'] = 0
                         playback_history.update(video_id, play_data)
                     set_property(PLAY_COUNT, str(kodi_play_count))
             wait_interval = 0.5

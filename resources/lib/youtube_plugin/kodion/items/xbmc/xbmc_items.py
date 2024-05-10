@@ -652,10 +652,12 @@ def video_listitem(context,
         ))
 
     set_play_count = True
+    resume = True
     prop_value = video_item.video_id
     if prop_value:
         if focused and focused == prop_value:
             set_play_count = False
+            resume = False
         props['video_id'] = prop_value
 
     # make channel_id property available for keymapping
@@ -690,7 +692,11 @@ def video_listitem(context,
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
-    set_info(list_item, video_item, props, set_play_count=set_play_count)
+    set_info(list_item,
+             video_item,
+             props,
+             set_play_count=set_play_count,
+             resume=resume)
 
     context_menu = video_item.get_context_menu()
     if context_menu:
