@@ -573,7 +573,7 @@ class YouTube(LoginClient):
                 {
                     'kind': 'youtube#video',
                     'id': video['videoId'],
-                    'partial': True,
+                    '_partial': True,
                     'snippet': {
                         'title': self.json_traverse(video, (
                             ('title', 'runs', 0, 'text'),
@@ -652,7 +652,7 @@ class YouTube(LoginClient):
 
         # Fetch existing list of items, if any
         cache = self._context.get_data_cache()
-        cache_items_key = 'get-activities-home-items'
+        cache_items_key = 'get-activities-home-items-v2'
         cached = cache.get_item(cache_items_key, None) or []
 
         # Increase value to recursively retrieve recommendations for the first
@@ -682,13 +682,13 @@ class YouTube(LoginClient):
 
             for idx, item in enumerate(items):
                 if original_related is not None:
-                    related = item['related_video_id'] = original_related
+                    related = item['_related_video_id'] = original_related
                 else:
-                    related = item['related_video_id']
+                    related = item['_related_video_id']
                 if original_channel is not None:
-                    channel = item['related_channel_id'] = original_channel
+                    channel = item['_related_channel_id'] = original_channel
                 else:
-                    channel = item['related_channel_id']
+                    channel = item['_related_channel_id']
                 video_id = item['id']
 
                 index['_related'].setdefault(related, 0)
@@ -696,15 +696,15 @@ class YouTube(LoginClient):
 
                 if video_id in index:
                     item_count = index[video_id]
-                    item_count['related'].setdefault(related, 0)
-                    item_count['related'][related] += 1
-                    item_count['channels'].setdefault(channel, 0)
-                    item_count['channels'][channel] += 1
+                    item_count['_related'].setdefault(related, 0)
+                    item_count['_related'][related] += 1
+                    item_count['_channels'].setdefault(channel, 0)
+                    item_count['_channels'][channel] += 1
                     continue
 
                 index[video_id] = {
-                    'related': {related: 1},
-                    'channels': {channel: 1}
+                    '_related': {related: 1},
+                    '_channels': {channel: 1}
                 }
 
                 if item_store is None:
@@ -720,7 +720,7 @@ class YouTube(LoginClient):
                     group = 0
 
                 num_stored = len(item_store[group])
-                item['order'] = items_per_page * group + num_stored
+                item['_order'] = items_per_page * group + num_stored
                 item_store[group].append(item)
 
                 if num_stored or depth <= 1:
@@ -793,18 +793,18 @@ class YouTube(LoginClient):
 
         # Finally sort items per page by rank and date for a better distribution
         def rank_and_sort(item):
-            if 'order' not in item:
+            if '_order' not in item:
                 counts['_counter'] += 1
-                item['order'] = counts['_counter']
+                item['_order'] = counts['_counter']
 
-            page = 1 + item['order'] // (items_per_page * max_depth)
+            page = 1 + item['_order'] // (items_per_page * max_depth)
             page_count = counts['_pages'].setdefault(page, {'_counter': 0})
             while page_count['_counter'] < items_per_page and page > 1:
                 page -= 1
                 page_count = counts['_pages'].setdefault(page, {'_counter': 0})
 
-            related_video = item['related_video_id']
-            related_channel = item['related_channel_id']
+            related_video = item['_related_video_id']
+            related_channel = item['_related_channel_id']
             channel_id = item.get('snippet', {}).get('channelId')
             """
             # Video channel and related channel can be the same which can double
@@ -833,16 +833,16 @@ class YouTube(LoginClient):
                 page_count.setdefault(channel_id, 0)
                 page_count[channel_id] += 1
             page_count['_counter'] += 1
-            item['page'] = page
+            item['_page'] = page
 
             item_count = counts[item['id']]
-            item['rank'] = (2 * sum(item_count['channels'].values())
-                            + sum(item_count['related'].values()))
+            item['_rank'] = (2 * sum(item_count['_channels'].values())
+                             + sum(item_count['_related'].values()))
 
             return (
-                -item['page'],
-                item['rank'],
-                -randint(0, item['order'])
+                -item['_page'],
+                item['_rank'],
+                -randint(0, item['_order'])
             )
 
         items.sort(key=rank_and_sort, reverse=True)
@@ -1208,7 +1208,7 @@ class YouTube(LoginClient):
             'id': video['videoId'],
             'related_video_id': video_id,
             'related_channel_id': channel_id,
-            'partial': True,
+            '_partial': True,
             'snippet': {
                 'title': self.json_traverse(video, path=(
                     'title',

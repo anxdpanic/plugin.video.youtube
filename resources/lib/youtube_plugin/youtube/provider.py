@@ -1016,7 +1016,7 @@ class Provider(AbstractProvider):
                     {
                         'kind': 'youtube#video',
                         'id': video_id,
-                        'partial': True,
+                        '_partial': True,
                     }
                     for video_id in items.keys()
                 ]
@@ -1407,7 +1407,7 @@ class Provider(AbstractProvider):
                     {
                         'kind': 'youtube#channel',
                         'id': item_id,
-                        'partial': True,
+                        '_partial': True,
                     }
                     for item_id, item in items.items()
                     if isinstance(item, float)
@@ -1483,7 +1483,7 @@ class Provider(AbstractProvider):
                     {
                         'kind': 'youtube#video',
                         'id': video_id,
-                        'partial': True,
+                        '_partial': True,
                     }
                     for video_id in items.keys()
                 ]
