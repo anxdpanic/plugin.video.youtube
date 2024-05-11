@@ -1856,7 +1856,7 @@ class YouTube(LoginClient):
             if key:
                 client['params']['key'] = key
             else:
-                client['params']['key']
+                del client['params']['key']
 
         if method != 'POST' and 'json' in client:
             del client['json']
