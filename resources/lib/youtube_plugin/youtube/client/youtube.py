@@ -1425,167 +1425,185 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def get_my_subscriptions(self,
-                             page_token=None,
-                             offset=0,
+                             page_token=1,
                              logged_in=False,
+                             do_filter=False,
                              **kwargs):
         """
         modified by PureHemp, using YouTube RSS for fetching latest videos
         """
 
-        result = {
+        v3_response = {
+            'kind': 'youtube#videoListResponse',
             'items': [],
         }
 
-        def _perform(_page_token, _offset, _result):
+        cache = self._context.get_data_cache()
+        settings = self._context.get_settings()
 
-            if not _result:
-                _result = {
-                    'items': []
+        filter_list = []
+        black_list = False
+        if do_filter:
+            black_list = settings.get_bool(
+                'youtube.filter.my_subscriptions_filtered.blacklist', False
+            )
+            filter_list = settings.get_string(
+                'youtube.filter.my_subscriptions_filtered.list', ''
+            ).replace(', ', ',').split(',')
+            filter_list = {filter_item.lower() for filter_item in filter_list}
+
+        # if new uploads is cached
+        cache_items_key = 'my-subscriptions-items-v2'
+        cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
+        if cached:
+            items = cached
+        # no cache, get uploads data from web
+        else:
+            sub_channel_ids = []
+
+            if logged_in:
+                params = {
+                    'part': 'snippet',
+                    'maxResults': '50',
+                    'order': 'alphabetical',
+                    'mine': 'true'
                 }
 
-            cache = self._context.get_data_cache()
+                while 1:
+                    json_data = self.api_request(method='GET',
+                                                 path='subscriptions',
+                                                 params=params,
+                                                 **kwargs)
+                    if not json_data:
+                        break
 
-            # if new uploads is cached
-            cache_items_key = 'my-subscriptions-items'
-            cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
-            if cached:
-                _result['items'] = cached
-
-            """ no cache, get uploads data from web """
-            if not _result['items']:
-                sub_channel_ids = []
-
-                if logged_in:
-                    params = {
-                        'part': 'snippet',
-                        'maxResults': '50',
-                        'order': 'alphabetical',
-                        'mine': 'true'
-                    }
-
-                    while 1:
-                        json_data = self.api_request(method='GET',
-                                                     path='subscriptions',
-                                                     params=params,
-                                                     **kwargs)
-                        if not json_data:
-                            break
-
-                        sub_channel_ids.extend([
-                            item['snippet']['resourceId']['channelId']
-                            for item in json_data.get('items', [])
-                        ])
-
-                        # get next token if exists
-                        sub_page_token = json_data.get('nextPageToken')
-                        if sub_page_token:
-                            params['pageToken'] = sub_page_token
-                        # terminate loop when last page
-                        else:
-                            break
-
-                items = self._context.get_bookmarks_list().get_items()
-                if items:
                     sub_channel_ids.extend([
-                        item_id
-                        for item_id, item in items.items()
-                        if (item_id not in sub_channel_ids
-                            and (isinstance(item, float)
-                                 or getattr(item, 'get_channel_id', bool)()))
+                        item['snippet']['resourceId']['channelId']
+                        for item in json_data.get('items', [])
                     ])
 
-                headers = {
-                    'Host': 'www.youtube.com',
-                    'Connection': 'keep-alive',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36',
-                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-                    'DNT': '1',
-                    'Accept-Encoding': 'gzip, deflate',
-                    'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
-                }
+                    # get next token if exists
+                    sub_page_token = json_data.get('nextPageToken')
+                    if sub_page_token:
+                        params['pageToken'] = sub_page_token
+                    # terminate loop when last page
+                    else:
+                        break
 
-                responses = []
+            items = self._context.get_bookmarks_list().get_items()
+            if items:
+                sub_channel_ids.extend([
+                    item_id
+                    for item_id, item in items.items()
+                    if (item_id not in sub_channel_ids
+                        and (isinstance(item, float)
+                             or getattr(item, 'get_channel_id', bool)()))
+                ])
 
-                def fetch_xml(_url, _responses):
-                    _response = self.request(_url, headers=headers)
-                    if _response:
-                        _responses.append(_response)
+            headers = {
+                'Host': 'www.youtube.com',
+                'Connection': 'keep-alive',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'DNT': '1',
+                'Accept-Encoding': 'gzip, deflate',
+                'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
+            }
 
-                threads = []
-                for channel_id in sub_channel_ids:
-                    thread = threading.Thread(
-                        target=fetch_xml,
-                        args=('https://www.youtube.com/feeds/videos.xml?channel_id=' + channel_id,
-                              responses)
-                    )
-                    threads.append(thread)
-                    thread.start()
+            def fetch_xml(_channel_id, _responses):
+                _response = self.request(
+                    'https://www.youtube.com/feeds/videos.xml?channel_id='
+                    + _channel_id,
+                    headers=headers,
+                )
+                if _response:
+                    _responses.append(_response)
 
-                for thread in threads:
-                    thread.join(30)
+            responses = []
+            threads = []
+            for channel_id in sub_channel_ids:
+                thread = threading.Thread(
+                    target=fetch_xml,
+                    args=(channel_id, responses)
+                )
+                threads.append(thread)
+                thread.start()
 
-                do_encode = not current_system_version.compatible(19, 0)
+            for thread in threads:
+                thread.join(30)
 
-                ns = {
-                    'atom': 'http://www.w3.org/2005/Atom',
-                    'yt': 'http://www.youtube.com/xml/schemas/2015',
-                    'media': 'http://search.yahoo.com/mrss/',
-                }
+            do_encode = not current_system_version.compatible(19, 0)
 
-                for response in responses:
-                    if not response:
-                        continue
+            ns = {
+                'atom': 'http://www.w3.org/2005/Atom',
+                'yt': 'http://www.youtube.com/xml/schemas/2015',
+                'media': 'http://search.yahoo.com/mrss/',
+            }
 
-                    response.encoding = 'utf-8'
-                    xml_data = to_unicode(response.content)
-                    xml_data = xml_data.replace('\n', '')
-                    if do_encode:
-                        xml_data = to_str(xml_data)
+            items = []
+            for response in responses:
+                if not response:
+                    continue
 
-                    root = ET.fromstring(xml_data)
-                    _result['items'].extend([{
-                        'id': entry.find('yt:videoId', ns).text,
-                        'title': entry.find('media:group/media:title', ns).text,
-                        'channel': entry.find('atom:author/atom:name', ns).text,
-                        'published': entry.find('atom:published', ns).text,
-                    } for entry in root.findall('atom:entry', ns)])
+                response.encoding = 'utf-8'
+                xml_data = to_unicode(response.content)
+                xml_data = xml_data.replace('\n', '')
+                if do_encode:
+                    xml_data = to_str(xml_data)
 
-                # sorting by publish date
-                def _sort_by_date_time(item):
-                    return datetime_parser.since_epoch(
-                        datetime_parser.strptime(item['published'])
-                    )
+                root = ET.fromstring(xml_data)
+                items.extend([{
+                    'kind': 'youtube#video',
+                    'id': entry.find('yt:videoId', ns).text,
+                    'snippet': {
+                        'title': entry.find('atom:title', ns).text,
+                        'channelId': entry.find('yt:channelId', ns).text,
+                    },
+                    '_channel': (entry.find('atom:author/atom:name', ns).text
+                                 .lower().replace(',', '')),
+                    '_timestamp': datetime_parser.since_epoch(
+                        datetime_parser.strptime(
+                            entry.find('atom:published', ns).text
+                        )
+                    ),
+                    '_partial': True,
+                } for entry in root.findall('atom:entry', ns)])
 
-                _result['items'].sort(reverse=True, key=_sort_by_date_time)
+            # Update cache
+            cache.set_item(cache_items_key, items)
 
-                # Update cache
-                cache.set_item(cache_items_key, _result['items'])
-            """ no cache, get uploads data from web """
+        # filter, sorting by publish date and trim
+        page = page_token or 1
 
-            # trim result
-            if not _page_token:
-                _page_token = 0
+        limits = {
+            'num': 0,
+            'start': -self._max_results,
+            'end': page * self._max_results,
+        }
+        limits['start'] += limits['end']
 
-            if len(_result['items']) > self._max_results:
-                start = _page_token * self._max_results
-                end = start + self._max_results
-                _result['items'] = _result['items'][start:end]
-                _result['next_page_token'] = _page_token + 1
+        def _sort_by_date_time(item, limits=limits):
+            if do_filter:
+                filtered = item['_channel'] in filter_list
+                if black_list:
+                    if filtered:
+                        return -1
+                elif not filtered:
+                    return -1
+            limits['num'] += 1
+            return item['_timestamp']
 
-            if len(_result['items']) < self._max_results:
-                if 'continue' in _result:
-                    del _result['continue']
+        items.sort(reverse=True, key=_sort_by_date_time)
 
-                if 'next_page_token' in _result:
-                    del _result['next_page_token']
+        if limits['num'] > limits['end']:
+            v3_response['nextPageToken'] = page + 1
+        if limits['num'] > limits['start']:
+            items = items[limits['start']:min(limits['num'], limits['end'])]
+        else:
+            items = []
 
-                if 'offset' in _result:
-                    del _result['offset']
-
-            return _result
-
-        return _perform(_page_token=page_token, _offset=offset, _result=result)
+        v3_response['items'] = items
+        return v3_response
 
     def get_saved_playlists(self, page_token, offset):
         if not page_token:
