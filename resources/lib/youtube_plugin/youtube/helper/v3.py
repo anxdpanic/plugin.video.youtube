@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from threading import Thread
 
 from .utils import (
+    THUMB_TYPES,
     filter_short_videos,
     get_thumbnail,
     make_comment_item,
@@ -71,7 +72,16 @@ def _process_list_response(provider, context, json_data):
         snippet = yt_item.get('snippet', {})
         title = snippet.get('title', context.localize('untitled'))
 
-        thumbnails = snippet.get('thumbnails', {})
+        thumbnails = snippet.get('thumbnails')
+        if not thumbnails and yt_item.get('_partial'):
+            thumbnails = {
+                thumb_type: {
+                    'url': thumb['url'].format(item_id, ''),
+                    'size': thumb['size'],
+                    'ratio': thumb['ratio'],
+                }
+                for thumb_type, thumb in THUMB_TYPES.items()
+            }
         image = get_thumbnail(thumb_size, thumbnails)
         fanart = get_thumbnail(fanart_type, thumbnails) if fanart_type else None
 
