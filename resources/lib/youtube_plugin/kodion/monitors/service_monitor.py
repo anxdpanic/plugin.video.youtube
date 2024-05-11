@@ -152,7 +152,6 @@ class ServiceMonitor(xbmc.Monitor):
             return
 
         self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
-        self.httpd_thread.daemon = True
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()

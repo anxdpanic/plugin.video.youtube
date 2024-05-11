@@ -8,7 +8,8 @@
 """
 
 __all__ = (
-    'BaseHTTPServer',
+    'BaseHTTPRequestHandler',
+    'TCPServer',
     'byte_string_type',
     'datetime_infolabel',
     'parse_qs',
@@ -32,7 +33,8 @@ __all__ = (
 # Kodi v19+ and Python v3.x
 try:
     from html import unescape
-    from http import server as BaseHTTPServer
+    from http.server import BaseHTTPRequestHandler
+    from socketserver import TCPServer
     from urllib.parse import (
         parse_qs,
         parse_qsl,
@@ -58,8 +60,9 @@ try:
     to_str = str
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
-    import BaseHTTPServer
+    from BaseHTTPServer import BaseHTTPRequestHandler
     from contextlib import contextmanager as _contextmanager
+    from SocketServer import TCPServer
     from urllib import (
         quote as _quote,
         unquote as _unquote,

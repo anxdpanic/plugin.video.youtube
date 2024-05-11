@@ -18,7 +18,8 @@ from textwrap import dedent
 
 from .requests import BaseRequestsClass
 from ..compatibility import (
-    BaseHTTPServer,
+    BaseHTTPRequestHandler,
+    TCPServer,
     parse_qs,
     urlsplit,
     xbmc,
@@ -42,7 +43,7 @@ del _addon
 _server_requests = BaseRequestsClass()
 
 
-class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler, object):
+class RequestHandler(BaseHTTPRequestHandler, object):
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
     chunk_size = 1024 * 64
     local_ranges = (
@@ -548,7 +549,11 @@ class Pages(object):
 
 def get_http_server(address, port):
     try:
-        server = BaseHTTPServer.HTTPServer((address, port), RequestHandler)
+        server = TCPServer((address, port), RequestHandler, False)
+        server.allow_reuse_address = True
+        server.allow_reuse_port = True
+        server.server_bind()
+        server.server_activate()
         return server
     except socket.error as exc:
         log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'
@@ -601,6 +606,10 @@ def get_connect_address(as_netloc=False):
     sock = None
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        if hasattr(socket, "SO_REUSEADDR"):
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        if hasattr(socket, "SO_REUSEPORT"):
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     except socket.error:
         address = xbmc.getIPAddress()
 
