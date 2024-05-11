@@ -167,7 +167,7 @@ def _process_description_links(provider, context):
         url_resolver = UrlResolver(context)
 
         with context.get_ui().create_progress_dialog(
-            heading=context.localize('please_wait'), background=False
+                heading=context.localize('please_wait'), background=False
         ) as progress_dialog:
             resource_manager = provider.get_resource_manager(context)
 

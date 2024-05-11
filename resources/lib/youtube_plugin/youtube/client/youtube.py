@@ -1204,7 +1204,7 @@ class YouTube(LoginClient):
             related_videos = chain.from_iterable(related_videos)
 
         items = [{
-            'kind': "youtube#video",
+            'kind': 'youtube#video',
             'id': video['videoId'],
             'related_video_id': video_id,
             'related_channel_id': channel_id,

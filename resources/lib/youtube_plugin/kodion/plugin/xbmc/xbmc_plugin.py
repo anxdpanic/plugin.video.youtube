@@ -161,7 +161,7 @@ class XbmcPlugin(AbstractPlugin):
                 context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
                     exc=exc, details=''.join(format_stack())
                 ))
-                ui.on_ok("Error in ContentProvider", exc.__str__())
+                ui.on_ok('Error in ContentProvider', exc.__str__())
 
         focused = ui.get_property(VIDEO_ID) if refresh else None
         item_count = 0
