@@ -8,12 +8,15 @@
     - Start-Process powershell -Verb runAs -ArgumentList "net stop winnat; net start winnat"
     - Start-Process powershell -Verb runAs -ArgumentList "net stop hns; net start hns"
 - Fix changing fanart type on My Subscriptions #751
+- Fix not using thumbnail fanart for channels/subscriptions/playlists when enabled #751
+- Fix My Subscriptions threading issues #529
 
 ### Changed
 - Use internal Kodi resume enable/disable for all playback #693
   - For playback where Kodi does not prompt to resume, the plugin will also no longer resume
   - For playback where Kodi does prompt to resume, the plugin will follow whatever is selected
 - Cached data for My Subscriptions and Related Videos will be replaced due to changes in cached data
+- Use channel fanart as backup to thumbnail fanart for channel items without thumbnails #751
 
 ### New
 - Enable syncing of plugin watched state with Kodi watched state when using Kodi mark as (un)watched #709
