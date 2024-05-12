@@ -824,10 +824,17 @@ def update_fanarts(provider, context, channel_items_dict, data=None):
 
     if not data:
         resource_manager = provider.get_resource_manager(context)
-        data = resource_manager.get_fanarts(channel_ids)
+        data = resource_manager.get_fanarts(channel_ids, force=True)
 
     if not data:
         return
+
+    settings = context.get_settings()
+    fanart_type = context.get_param('fanart_type')
+    if fanart_type is None:
+        fanart_type = settings.fanart_selection()
+    use_channel_fanart = fanart_type == settings.FANART_CHANNEL
+    use_thumb_fanart = fanart_type == settings.FANART_THUMBNAIL
 
     for channel_id, channel_items in channel_items_dict.items():
         # only set not empty fanarts
@@ -835,7 +842,9 @@ def update_fanarts(provider, context, channel_items_dict, data=None):
         if not fanart:
             continue
         for item in channel_items:
-            item.set_fanart(fanart)
+            if (use_channel_fanart
+                    or use_thumb_fanart and not item.get_fanart(default=False)):
+                item.set_fanart(fanart)
 
 
 THUMB_TYPES = {

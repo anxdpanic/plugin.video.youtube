@@ -352,11 +352,8 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/?$')
     def _on_channel_playlists(self, context, re_match):
         context.set_content(content.LIST_CONTENT)
-        result = []
 
         channel_id = re_match.group('channel_id')
-
-        resource_manager = self.get_resource_manager(context)
 
         params = context.get_params()
         page_token = params.get('page_token', '')
@@ -369,27 +366,38 @@ class Provider(AbstractProvider):
         if addon_id:
             new_params['addon_id'] = addon_id
 
+        resource_manager = self.get_resource_manager(context)
+        fanart = resource_manager.get_fanarts(
+            (channel_id,), force=True
+        ).get(channel_id)
         playlists = resource_manager.get_related_playlists(channel_id)
-        uploads_playlist = playlists.get('uploads', '')
-        if uploads_playlist:
+
+        uploads = playlists.get('uploads')
+        if uploads:
             item_label = context.localize('uploads')
-            uploads_item = DirectoryItem(
+            uploads = DirectoryItem(
                 context.get_ui().bold(item_label),
                 context.create_uri(
-                    ('channel', channel_id, 'playlist', uploads_playlist),
+                    ('channel', channel_id, 'playlist', uploads),
                     new_params,
                 ),
                 image='{media}/playlist.png',
+                fanart=fanart,
                 category_label=item_label,
             )
-            result.append(uploads_item)
+            result = [uploads]
+        else:
+            result = False
 
-        # no caching
-        json_data = self.get_client(context).get_playlists_of_channel(channel_id, page_token)
+        json_data = self.get_client(context).get_playlists_of_channel(
+            channel_id, page_token
+        )
         if not json_data:
-            return False
-        result.extend(v3.response_to_items(self, context, json_data))
+            return result
 
+        if not result:
+            result = []
+        result.extend(v3.response_to_items(self, context, json_data))
         return result
 
     """
@@ -484,7 +492,9 @@ class Provider(AbstractProvider):
                 if method == 'user':
                     return False
 
-        channel_fanarts = resource_manager.get_fanarts((channel_id,))
+        fanart = resource_manager.get_fanarts(
+            (channel_id,), force=True
+        ).get(channel_id)
 
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
@@ -513,7 +523,7 @@ class Provider(AbstractProvider):
                         new_params,
                     ),
                     image='{media}/playlist.png',
-                    fanart=channel_fanarts.get(channel_id),
+                    fanart=fanart,
                     category_label=item_label,
                 )
                 result.append(playlists_item)
@@ -523,6 +533,7 @@ class Provider(AbstractProvider):
                 search_item = NewSearchItem(
                     context, name=ui.bold(localize('search')),
                     image='{media}/search.png',
+                    fanart=fanart,
                     channel_id=search_live_id,
                     incognito=incognito,
                     addon_id=addon_id,
@@ -535,6 +546,7 @@ class Provider(AbstractProvider):
                     ui.bold(item_label),
                     create_uri(('channel', search_live_id, 'live'), new_params),
                     image='{media}/live.png',
+                    fanart=fanart,
                     category_label=item_label,
                 )
                 result.append(live_item)

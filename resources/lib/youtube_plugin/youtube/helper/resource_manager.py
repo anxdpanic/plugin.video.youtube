@@ -100,8 +100,10 @@ class ResourceManager(object):
 
         return result
 
-    def get_fanarts(self, channel_ids, defer_cache=False):
-        if self._fanart_type != self._context.get_settings().FANART_CHANNEL:
+    def get_fanarts(self, channel_ids, force=False, defer_cache=False):
+        if force:
+            pass
+        elif self._fanart_type != self._context.get_settings().FANART_CHANNEL:
             return {}
 
         result = self.get_channels(channel_ids, defer_cache=defer_cache)

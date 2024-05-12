@@ -283,7 +283,10 @@ def _process_list_response(provider, context, json_data):
         4: {
             'fetcher': resource_manager.get_fanarts,
             'args': (channel_items_dict,),
-            'kwargs': {'defer_cache': True},
+            'kwargs': {
+                'force': bool(channel_id_dict or playlist_id_dict),
+                'defer_cache': True,
+            },
             'thread': None,
             'updater': update_fanarts,
             'upd_args': (
