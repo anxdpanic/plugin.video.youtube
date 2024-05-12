@@ -110,6 +110,7 @@ def _process_list_response(provider, context, json_data):
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
+                                 fanart=fanart,
                                  channel_id=item_id)
             channel_id_dict[item_id] = item
 
@@ -133,6 +134,7 @@ def _process_list_response(provider, context, json_data):
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
+                                 fanart=fanart,
                                  channel_id=item_id,
                                  subscription_id=subscription_id)
             channel_id_dict[item_id] = item
@@ -150,6 +152,7 @@ def _process_list_response(provider, context, json_data):
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
+                                 fanart=fanart,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
 
