@@ -717,11 +717,6 @@ class Provider(AbstractProvider):
 
         if method == 'list':
             context.set_content(content.LIST_CONTENT)
-            channel_ids = {subscription.get_channel_id(): subscription
-                           for subscription in subscriptions}
-            channel_fanarts = resource_manager.get_fanarts(channel_ids)
-            for channel_id, fanart in channel_fanarts.items():
-                channel_ids[channel_id].set_fanart(fanart)
 
         return subscriptions
 

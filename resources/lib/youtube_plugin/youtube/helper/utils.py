@@ -173,11 +173,6 @@ def update_channel_infos(provider, context, channel_id_dict,
         in_subscription_list = False
 
     thumb_size = settings.get_thumbnail_size()
-    banners = [
-        'bannerTvMediumImageUrl',
-        'bannerTvLowImageUrl',
-        'bannerTvImageUrl'
-    ]
 
     for channel_id, yt_item in data.items():
         channel_item = channel_id_dict[channel_id]
@@ -234,13 +229,6 @@ def update_channel_infos(provider, context, channel_id_dict,
 
         if context_menu:
             channel_item.add_context_menu(context_menu, replace=True)
-
-        fanart_images = yt_item.get('brandingSettings', {}).get('image', {})
-        for banner in banners:
-            fanart = fanart_images.get(banner)
-            if fanart:
-                channel_item.set_fanart(fanart)
-                break
 
         # update channel mapping
         if channel_items_dict is not None:
@@ -842,11 +830,12 @@ def update_fanarts(provider, context, channel_items_dict, data=None):
         return
 
     for channel_id, channel_items in channel_items_dict.items():
-        for channel_item in channel_items:
-            # only set not empty fanarts
-            fanart = data.get(channel_id, '')
-            if fanart:
-                channel_item.set_fanart(fanart)
+        # only set not empty fanarts
+        fanart = data.get(channel_id)
+        if not fanart:
+            continue
+        for item in channel_items:
+            item.set_fanart(fanart)
 
 
 THUMB_TYPES = {

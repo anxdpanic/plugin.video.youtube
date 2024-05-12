@@ -116,10 +116,9 @@ class ResourceManager(object):
             images = item.get('brandingSettings', {}).get('image', {})
             for banner in banners:
                 image = images.get(banner)
-                if not image:
-                    continue
-                result[key] = image
-                break
+                if image:
+                    result[key] = image
+                    break
             else:
                 # set an empty url
                 result[key] = ''
