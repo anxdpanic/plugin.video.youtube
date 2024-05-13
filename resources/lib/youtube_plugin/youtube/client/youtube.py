@@ -14,6 +14,7 @@ import threading
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from itertools import chain, islice
+from os import cpu_count
 from random import randint
 
 from .login_client import LoginClient
@@ -1478,7 +1479,7 @@ class YouTube(LoginClient):
                         break
 
                     sub_channel_ids.extend([
-                        item['snippet']['resourceId']['channelId']
+                        (item['snippet']['resourceId']['channelId'],)
                         for item in json_data.get('items', [])
                     ])
 
@@ -1493,81 +1494,125 @@ class YouTube(LoginClient):
             items = self._context.get_bookmarks_list().get_items()
             if items:
                 sub_channel_ids.extend([
-                    item_id
+                    (item_id,)
                     for item_id, item in items.items()
-                    if (item_id not in sub_channel_ids
-                        and (isinstance(item, float)
-                             or getattr(item, 'get_channel_id', bool)()))
+                    if (isinstance(item, float)
+                        or getattr(item, 'get_channel_id', bool)())
                 ])
 
             headers = {
                 'Host': 'www.youtube.com',
                 'Connection': 'keep-alive',
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.66 Safari/537.36',
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                              ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                              ' Chrome/87.0.4280.66 Safari/537.36',
+                'Accept': 'text/html,'
+                          'application/xhtml+xml,'
+                          'application/xml;q=0.9,'
+                          'image/webp,*/*;q=0.8',
                 'DNT': '1',
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
             }
-
-            def fetch_xml(_channel_id, _responses):
-                _response = self.request(
-                    'https://www.youtube.com/feeds/videos.xml?channel_id='
-                    + _channel_id,
-                    headers=headers,
-                )
-                if _response:
-                    _responses.append(_response)
-
-            responses = []
-            threads = []
-            for channel_id in sub_channel_ids:
-                thread = threading.Thread(
-                    target=fetch_xml,
-                    args=(channel_id, responses)
-                )
-                threads.append(thread)
-                thread.start()
-
-            for thread in threads:
-                thread.join(30)
-
-            do_encode = not current_system_version.compatible(19, 0)
-
-            ns = {
+            namespaces = {
                 'atom': 'http://www.w3.org/2005/Atom',
                 'yt': 'http://www.youtube.com/xml/schemas/2015',
                 'media': 'http://search.yahoo.com/mrss/',
             }
 
-            items = []
-            for response in responses:
+            def _feed_items(channel_id,
+                            encode=not current_system_version.compatible(19, 0),
+                            headers=headers,
+                            ns=namespaces):
+                response = self.request(
+                    'https://www.youtube.com/feeds/videos.xml?channel_id='
+                    + channel_id,
+                    headers=headers,
+                )
                 if not response:
-                    continue
+                    return None
 
                 response.encoding = 'utf-8'
                 xml_data = to_unicode(response.content)
                 xml_data = xml_data.replace('\n', '')
-                if do_encode:
+                if encode:
                     xml_data = to_str(xml_data)
 
                 root = ET.fromstring(xml_data)
-                items.extend([{
+                channel_name = (root.findtext('atom:title', '', ns)
+                                .lower().replace(',', ''))
+                return [{
                     'kind': 'youtube#video',
-                    'id': entry.find('yt:videoId', ns).text,
+                    'id': item.findtext('yt:videoId', '', ns),
                     'snippet': {
-                        'title': entry.find('atom:title', ns).text,
-                        'channelId': entry.find('yt:channelId', ns).text,
+                        'title': item.findtext('atom:title', '', ns),
+                        'channelId': channel_id,
                     },
-                    '_channel': (entry.find('atom:author/atom:name', ns).text
-                                 .lower().replace(',', '')),
+                    '_channel': channel_name,
                     '_timestamp': datetime_parser.since_epoch(
                         datetime_parser.strptime(
-                            entry.find('atom:published', ns).text
+                            item.findtext('atom:published', '', ns)
                         )
                     ),
                     '_partial': True,
-                } for entry in root.findall('atom:entry', ns)])
+                } for item in root.findall('atom:entry', ns)]
+
+            def _threaded_fetch(args,
+                                kwargs,
+                                output,
+                                worker,
+                                input_lock,
+                                output_lock):
+                while 1:
+                    if input_lock.acquire(blocking=False):
+                        _args = args.pop() if args else []
+                        _kwargs = kwargs.pop() if kwargs else {}
+                        if not _args and not _kwargs:
+                            break
+                        input_lock.release()
+                    else:
+                        continue
+
+                    try:
+                        _output = worker(*_args, **_kwargs)
+                    except Exception as exc:
+                        self._context.log_error('threaded_fetch error: |{exc}|'
+                                                .format(exc=exc))
+                        continue
+                    if _output and output_lock.acquire(blocking=True):
+                        output.extend(_output)
+                        output_lock.release()
+                input_lock.release()
+
+            payload = {
+                'args': list(set(sub_channel_ids)),
+                'kwargs': None,
+                'output': [],
+                'worker': _feed_items,
+                'input_lock': threading.Lock(),
+                'output_lock': threading.Lock(),
+            }
+
+            threads = []
+            num_threads = 0
+            max_threads = min(32, (cpu_count() or 1) + 4)
+            while (payload['args']
+                   or payload['kwargs']
+                   or payload['output_lock'].locked()):
+                if num_threads >= max_threads:
+                    continue
+                thread = threading.Thread(
+                    target=_threaded_fetch,
+                    kwargs=payload,
+                )
+                threads.append(thread)
+                num_threads += 1
+                thread.start()
+
+            for thread in threads:
+                thread.join(30)
+
+            items = payload['output']
 
             # Update cache
             cache.set_item(cache_items_key, items)
@@ -1579,10 +1624,11 @@ class YouTube(LoginClient):
             'num': 0,
             'start': -self._max_results,
             'end': page * self._max_results,
+            'video_ids': set(),
         }
         limits['start'] += limits['end']
 
-        def _sort_by_date_time(item, limits=limits):
+        def _sort_by_date_time(item, _limits=limits):
             if do_filter:
                 filtered = item['_channel'] in filter_list
                 if black_list:
@@ -1590,7 +1636,11 @@ class YouTube(LoginClient):
                         return -1
                 elif not filtered:
                     return -1
-            limits['num'] += 1
+            video_id = item['id']
+            if video_id in _limits['video_ids']:
+                return -1
+            _limits['num'] += 1
+            _limits['video_ids'].add(video_id)
             return item['_timestamp']
 
         items.sort(reverse=True, key=_sort_by_date_time)
