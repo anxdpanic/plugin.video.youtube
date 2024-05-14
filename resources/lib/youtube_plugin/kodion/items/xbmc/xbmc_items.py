@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from json import dumps
 
 from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
-from ...compatibility import xbmc, xbmcgui
+from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import PLAY_COUNT, SWITCH_PLAYER_FLAG
 from ...utils import current_system_version, datetime_parser
 
@@ -643,11 +643,11 @@ def video_listitem(context,
     local_datetime = None
     if datetime:
         local_datetime = datetime_parser.utc_to_local(datetime)
-        props['PublishedLocal'] = str(local_datetime)
+        props['PublishedLocal'] = to_str(local_datetime)
     if video_item.live:
         props['PublishedSince'] = context.localize('live')
     elif local_datetime:
-        props['PublishedSince'] = str(datetime_parser.datetime_to_since(
+        props['PublishedSince'] = to_str(datetime_parser.datetime_to_since(
             context, local_datetime
         ))
 
