@@ -420,7 +420,11 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     @staticmethod
-    def get_listitem_detail(detail_name, attr=False):
+    def get_listitem_detail(detail_name):
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_listitem_info(detail_name):
         raise NotImplementedError()
 
     def tear_down(self):

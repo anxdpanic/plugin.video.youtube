@@ -35,6 +35,7 @@ def run():
     get_infobool = context.get_infobool
     get_infolabel = context.get_infolabel
     get_listitem_detail = context.get_listitem_detail
+    get_listitem_info = context.get_listitem_info
 
     ui = context.get_ui()
     clear_property = ui.clear_property
@@ -82,7 +83,7 @@ def run():
             new_video_id = get_listitem_detail('video_id')
             if not new_video_id:
                 video_id = None
-                if get_listitem_detail('Label', True):
+                if get_listitem_info('Label'):
                     clear_property(VIDEO_ID)
                     clear_property(PLAY_COUNT)
             elif video_id != new_video_id:
@@ -91,7 +92,7 @@ def run():
                 plugin_play_count = get_listitem_detail('play_count')
                 set_property(PLAY_COUNT, plugin_play_count)
             else:
-                kodi_play_count = get_listitem_detail('PlayCount', True)
+                kodi_play_count = get_listitem_info('PlayCount')
                 kodi_play_count = int(kodi_play_count or 0)
                 plugin_play_count = get_property(PLAY_COUNT)
                 plugin_play_count = int(plugin_play_count or 0)

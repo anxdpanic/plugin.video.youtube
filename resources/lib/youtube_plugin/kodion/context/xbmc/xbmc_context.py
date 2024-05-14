@@ -680,12 +680,13 @@ class XbmcContext(AbstractContext):
         return xbmc.getInfoLabel(name)
 
     @staticmethod
-    def get_listitem_detail(detail_name, attr=False):
-        return xbmc.getInfoLabel(
-            'Container.ListItem(0).{0}'.format(detail_name)
-            if attr else
-            'Container.ListItem(0).Property({0})'.format(detail_name)
-        )
+    def get_listitem_detail(detail_name):
+        return xbmc.getInfoLabel('Container.ListItem(0).Property({0})'
+                                 .format(detail_name))
+
+    @staticmethod
+    def get_listitem_info(detail_name):
+        return xbmc.getInfoLabel('Container.ListItem(0).' + detail_name)
 
     def tear_down(self):
         self._settings.flush()
