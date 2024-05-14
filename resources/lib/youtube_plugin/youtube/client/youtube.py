@@ -14,19 +14,17 @@ import threading
 import xml.etree.ElementTree as ET
 from copy import deepcopy
 from itertools import chain, islice
-from os import cpu_count
 from random import randint
 
 from .login_client import LoginClient
 from ..helper.video_info import VideoInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
-from ...kodion.compatibility import string_type, to_str
+from ...kodion.compatibility import cpu_count, string_type, to_str
 from ...kodion.utils import (
     current_system_version,
     datetime_parser,
     strip_html_from_text,
     to_unicode,
-    wait,
 )
 
 
@@ -1461,46 +1459,44 @@ class YouTube(LoginClient):
             items = cached
         # no cache, get uploads data from web
         else:
-            sub_channel_ids = []
+            channel_ids = []
+            params = {
+                'part': 'snippet',
+                'maxResults': '50',
+                'order': 'alphabetical',
+                'mine': 'true'
+            }
 
-            if logged_in:
-                params = {
-                    'part': 'snippet',
-                    'maxResults': '50',
-                    'order': 'alphabetical',
-                    'mine': 'true'
-                }
+            def _get_channels(params=params):
+                if not params or 'complete' in params:
+                    return None, None
+                json_data = self.api_request(method='GET',
+                                             path='subscriptions',
+                                             params=params,
+                                             **kwargs)
+                if not json_data:
+                    return None, None
 
-                while 1:
-                    json_data = self.api_request(method='GET',
-                                                 path='subscriptions',
-                                                 params=params,
-                                                 **kwargs)
-                    if not json_data:
-                        break
+                page_token = json_data.get('nextPageToken')
+                if page_token:
+                    params['pageToken'] = page_token
+                else:
+                    params['complete'] = True
 
-                    sub_channel_ids.extend([
-                        (item['snippet']['resourceId']['channelId'],)
-                        for item in json_data.get('items', [])
-                    ])
+                return 'list_list', [{
+                    'channel_id': item['snippet']['resourceId']['channelId']
+                } for item in json_data.get('items', [])]
 
-                    # get next token if exists
-                    sub_page_token = json_data.get('nextPageToken')
-                    if sub_page_token:
-                        params['pageToken'] = sub_page_token
-                    # terminate loop when last page
-                    else:
-                        break
-
-            items = self._context.get_bookmarks_list().get_items()
-            if items:
-                sub_channel_ids.extend([
-                    (item_id,)
-                    for item_id, item in items.items()
+            bookmarks = self._context.get_bookmarks_list().get_items()
+            if bookmarks:
+                channel_ids.extend([
+                    {'channel_id': item_id}
+                    for item_id, item in bookmarks.items()
                     if (isinstance(item, float)
                         or getattr(item, 'get_channel_id', bool)())
                 ])
 
+            feeds = []
             headers = {
                 'Host': 'www.youtube.com',
                 'Connection': 'keep-alive',
@@ -1517,78 +1513,34 @@ class YouTube(LoginClient):
             }
 
             def _get_feed(channel_id, headers=headers):
-                return channel_id, self.request(
-                    'https://www.youtube.com/feeds/videos.xml?channel_id='
-                    + channel_id,
-                    headers=headers,
-                )
+                return 'value_list', {
+                    'channel_id': channel_id,
+                    'feed': self.request(
+                        'https://www.youtube.com/feeds/videos.xml?channel_id='
+                        + channel_id,
+                        headers=headers,
+                    ),
+                }
 
-            def _threaded_fetch(args,
-                                kwargs,
-                                output,
-                                worker,
-                                input_lock):
-                while 1:
-                    if input_lock.acquire(blocking=False):
-                        _args = args.pop() if args else []
-                        _kwargs = kwargs.pop() if kwargs else {}
-                        if not _args and not _kwargs:
-                            break
-                        input_lock.release()
-                    else:
-                        wait(0.1)
-                        continue
-
-                    try:
-                        key, _output = worker(*_args, **_kwargs)
-                    except Exception as exc:
-                        self._context.log_error('threaded_fetch error: |{exc}|'
-                                                .format(exc=exc))
-                        continue
-                    if _output:
-                        output[key] = _output
-                input_lock.release()
-
-            payload = {
-                'args': list(set(sub_channel_ids)),
-                'kwargs': None,
-                'output': {},
-                'worker': _get_feed,
-                'input_lock': threading.Lock(),
-            }
-
-            threads = []
-            num_threads = 0
-            max_threads = min(32, (cpu_count() or 1) + 4)
-            while payload['args'] or payload['kwargs']:
-                if num_threads >= max_threads:
-                    continue
-                thread = threading.Thread(
-                    target=_threaded_fetch,
-                    kwargs=payload,
-                )
-                threads.append(thread)
-                num_threads += 1
-                thread.start()
-
-            for thread in threads:
-                thread.join(30)
-
+            items = []
             namespaces = {
                 'atom': 'http://www.w3.org/2005/Atom',
                 'yt': 'http://www.youtube.com/xml/schemas/2015',
                 'media': 'http://search.yahoo.com/mrss/',
             }
-            encode = not current_system_version.compatible(19, 0)
-            items = []
-            for channel_id, feed in payload['output'].items():
+
+            def _parse_feed(channel_id,
+                            feed,
+                            encode=not current_system_version.compatible(19, 0),
+                            namespaces=namespaces,
+                            as_list=False):
                 feed.encoding = 'utf-8'
                 feed = to_unicode(feed.content).replace('\n', '')
 
                 root = ET.fromstring(to_str(feed) if encode else feed)
                 channel_name = (root.findtext('atom:title', '', namespaces)
                                 .lower().replace(',', ''))
-                items.extend([{
+                feed_items = [{
                     'kind': 'youtube#video',
                     'id': item.findtext('yt:videoId', '', namespaces),
                     'snippet': {
@@ -1602,7 +1554,147 @@ class YouTube(LoginClient):
                         )
                     ),
                     '_partial': True,
-                } for item in root.findall('atom:entry', namespaces)])
+                } for item in root.findall('atom:entry', namespaces)]
+                if as_list:
+                    return feed_items
+                return 'list_list', feed_items
+
+            def _threaded_fetch(kwargs,
+                                output,
+                                worker,
+                                threads,
+                                pool_id,
+                                dynamic,
+                                input_wait,
+                                **_kwargs):
+                while not threads['balance'].is_set():
+                    if kwargs is True:
+                        _kwargs = {}
+                    elif kwargs:
+                        _kwargs = kwargs.pop()
+                    elif input_wait:
+                        input_wait.acquire(blocking=True)
+                        input_wait.release()
+                        if kwargs:
+                            continue
+                        break
+                    else:
+                        break
+
+                    try:
+                        output_type, _output = worker(**_kwargs)
+                    except Exception as exc:
+                        self._context.log_error('threaded_fetch error: |{exc}|'
+                                                .format(exc=exc))
+                        continue
+
+                    if not output_type:
+                        break
+                    if output_type == 'value_dict':
+                        output[_output[0]] = _output[1]
+                    elif output_type == 'dict_dict':
+                        output.update(_output)
+                    elif output_type == 'value_list':
+                        output.append(_output)
+                    elif output_type == 'list_list':
+                        output.extend(_output)
+                else:
+                    threads['balance'].clear()
+
+                thread = threading.current_thread()
+                threads['available'].release()
+                if dynamic:
+                    threads['pool_counts'][pool_id] -= 1
+                threads['current'].discard(thread)
+
+            try:
+                num_cores = cpu_count() or 1
+            except NotImplementedError:
+                num_cores = 1
+            max_threads = min(32, 2 * (num_cores + 4))
+            threads = {
+                'max': max_threads,
+                'available': threading.Semaphore(max_threads),
+                'current': set(),
+                'pool_counts': {},
+                'balance': threading.Event(),
+            }
+            payloads = [
+                {
+                    'pool_id': 1,
+                    'kwargs': True,
+                    'output': channel_ids,
+                    'worker': _get_channels,
+                    'threads': threads,
+                    'limit': 1,
+                    'dynamic': False,
+                    'input_wait': None,
+                },
+            ] if logged_in else []
+            payloads.extend((
+                {
+                    'pool_id': 2,
+                    'kwargs': channel_ids,
+                    'output': feeds,
+                    'worker': _get_feed,
+                    'threads': threads,
+                    'limit': None,
+                    'dynamic': True,
+                    'input_wait': threading.Lock(),
+                },
+                {
+                    'pool_id': 3,
+                    'kwargs': feeds,
+                    'output': items,
+                    'worker': _parse_feed,
+                    'threads': threads,
+                    'limit': 1,
+                    'dynamic': True,
+                    'input_wait': threading.Lock(),
+                },
+            ))
+            while 1:
+                for payload in payloads:
+                    pool_id = payload['pool_id']
+                    if pool_id in threads['pool_counts']:
+                        current_num = threads['pool_counts'][pool_id]
+                    else:
+                        current_num = threads['pool_counts'][pool_id] = 0
+
+                    input_wait = payload['input_wait']
+                    if payload['kwargs']:
+                        if input_wait and input_wait.locked():
+                            input_wait.release()
+                    else:
+                        continue
+
+                    spots_available = threads['available']._value
+                    limit = payload['limit']
+                    if limit:
+                        if current_num >= limit:
+                            continue
+                        if not spots_available:
+                            threads['balance'].set()
+                    elif not spots_available:
+                        continue
+
+                    thread = threading.Thread(
+                        target=_threaded_fetch,
+                        kwargs=payload,
+                    )
+                    thread.daemon = True
+                    threads['current'].add(thread)
+                    threads['pool_counts'][pool_id] += 1
+                    threads['available'].acquire(blocking=True)
+                    thread.start()
+
+                if not threads['current']:
+                    break
+
+            for thread in threads['current']:
+                if thread and thread.is_alive():
+                    thread.join(30)
+
 
             # Update cache
             cache.set_item(cache_items_key, items)
@@ -1618,7 +1710,7 @@ class YouTube(LoginClient):
         }
         limits['start'] += limits['end']
 
-        def _sort_by_date_time(item, _limits=limits):
+        def _sort_by_date_time(item, limits=limits):
             if do_filter:
                 filtered = item['_channel'] in filter_list
                 if black_list:
@@ -1627,10 +1719,10 @@ class YouTube(LoginClient):
                 elif not filtered:
                     return -1
             video_id = item['id']
-            if video_id in _limits['video_ids']:
+            if video_id in limits['video_ids']:
                 return -1
-            _limits['num'] += 1
-            _limits['video_ids'].add(video_id)
+            limits['num'] += 1
+            limits['video_ids'].add(video_id)
             return item['_timestamp']
 
         items.sort(reverse=True, key=_sort_by_date_time)

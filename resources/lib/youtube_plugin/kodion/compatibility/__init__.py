@@ -11,6 +11,7 @@ __all__ = (
     'BaseHTTPRequestHandler',
     'TCPServer',
     'byte_string_type',
+    'cpu_count',
     'datetime_infolabel',
     'parse_qs',
     'parse_qsl',
@@ -35,6 +36,7 @@ try:
     from html import unescape
     from http.server import BaseHTTPRequestHandler
     from socketserver import TCPServer
+    from os import cpu_count
     from urllib.parse import (
         parse_qs,
         parse_qsl,
@@ -62,6 +64,7 @@ try:
 except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from contextlib import contextmanager as _contextmanager
+    from multiprocessing import cpu_count
     from SocketServer import TCPServer
     from urllib import (
         quote as _quote,
