@@ -1207,8 +1207,8 @@ class YouTube(LoginClient):
         items = [{
             'kind': 'youtube#video',
             'id': video['videoId'],
-            'related_video_id': video_id,
-            'related_channel_id': channel_id,
+            '_related_video_id': video_id,
+            '_related_channel_id': channel_id,
             '_partial': True,
             'snippet': {
                 'title': self.json_traverse(video, path=(
