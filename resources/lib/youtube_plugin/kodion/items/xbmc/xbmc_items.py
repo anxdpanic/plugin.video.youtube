@@ -14,7 +14,7 @@ from json import dumps
 
 from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...compatibility import xbmc, xbmcgui
-from ...constants import SWITCH_PLAYER_FLAG
+from ...constants import PLAY_COUNT, SWITCH_PLAYER_FLAG
 from ...utils import current_system_version, datetime_parser
 
 
@@ -74,7 +74,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
             if value is not None:
                 if set_play_count:
                     info_labels['playcount'] = value
-                properties['play_count'] = value
+                properties[PLAY_COUNT] = value
 
             value = item.get_plot()
             if value is not None:
@@ -259,7 +259,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         if value is not None:
             if set_play_count:
                 info_tag.setPlaycount(value)
-            properties['play_count'] = value
+            properties[PLAY_COUNT] = value
 
         # plot: str
         value = item.get_plot()

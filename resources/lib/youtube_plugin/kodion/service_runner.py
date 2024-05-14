@@ -89,7 +89,7 @@ def run():
             elif video_id != new_video_id:
                 video_id = new_video_id
                 set_property(VIDEO_ID, video_id)
-                plugin_play_count = get_listitem_detail('play_count')
+                plugin_play_count = get_listitem_detail(PLAY_COUNT)
                 set_property(PLAY_COUNT, plugin_play_count)
             else:
                 kodi_play_count = get_listitem_info('PlayCount')
@@ -108,7 +108,7 @@ def run():
                         play_data['played_percent'] = 0
                         playback_history.update(video_id, play_data)
                     set_property(PLAY_COUNT, str(kodi_play_count))
-            wait_interval = 0.5
+            wait_interval = 0.1
         else:
             wait_interval = 10
 
