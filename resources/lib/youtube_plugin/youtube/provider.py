@@ -168,11 +168,11 @@ class Provider(AbstractProvider):
             self.reset_client()
 
         if dev_id:
-            access_tokens = access_manager.get_dev_access_token(dev_id)
-            if access_manager.is_dev_access_token_expired(dev_id):
+            access_tokens = access_manager.get_access_token(dev_id)
+            if access_manager.is_access_token_expired(dev_id):
                 # reset access_token
                 access_tokens = []
-                access_manager.update_dev_access_token(dev_id, access_tokens)
+                access_manager.update_access_token(dev_id, access_tokens)
             elif self._client:
                 return self._client
 
@@ -186,7 +186,7 @@ class Provider(AbstractProvider):
                                   ' w/ developer access tokens'
                                   .format(dev_keys['system']))
 
-            refresh_tokens = access_manager.get_dev_refresh_token(dev_id)
+            refresh_tokens = access_manager.get_refresh_token(dev_id)
             if refresh_tokens:
                 keys_changed = access_manager.dev_keys_changed(
                     dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
@@ -197,7 +197,7 @@ class Provider(AbstractProvider):
                     self.reset_client()
                     access_tokens = []
                     refresh_tokens = []
-                    access_manager.update_dev_access_token(
+                    access_manager.update_access_token(
                         dev_id, access_tokens, -1, refresh_tokens
                     )
 
@@ -206,18 +206,18 @@ class Provider(AbstractProvider):
                     .format(len(access_tokens), len(refresh_tokens))
                 )
         else:
-            access_tokens = access_manager.get_access_token()
-            if access_manager.is_access_token_expired():
+            access_tokens = access_manager.get_access_token(dev_id)
+            if access_manager.is_access_token_expired(dev_id):
                 # reset access_token
                 access_tokens = []
-                access_manager.update_access_token(access_tokens)
+                access_manager.update_access_token(dev_id, access_tokens)
             elif self._client:
                 return self._client
 
             context.log_debug('Selecting YouTube config "{0}"'
                               .format(configs['main']['system']))
 
-            refresh_tokens = access_manager.get_refresh_token()
+            refresh_tokens = access_manager.get_refresh_token(dev_id)
             if refresh_tokens:
                 if self._api_check.changed:
                     context.log_warning('API key set changed: Resetting client'
@@ -226,7 +226,7 @@ class Provider(AbstractProvider):
                     access_tokens = []
                     refresh_tokens = []
                     access_manager.update_access_token(
-                        access_tokens, -1, refresh_tokens
+                        dev_id, access_tokens, -1, refresh_tokens,
                     )
 
                 context.log_debug(
@@ -252,30 +252,18 @@ class Provider(AbstractProvider):
                     tv_token = client.refresh_token_tv(refresh_tokens[0])
                     access_tokens = (tv_token[0], kodi_token[0])
                     expires_in = min(tv_token[1], kodi_token[1])
-                    if dev_id:
-                        access_manager.update_dev_access_token(
-                            dev_id, access_tokens, expires_in
-                        )
-                    else:
-                        access_manager.update_access_token(
-                            access_tokens, expires_in
-                        )
+                    access_manager.update_access_token(
+                        dev_id, access_tokens, expires_in,
+                    )
                 except (InvalidGrant, LoginException) as exc:
                     self.handle_exception(context, exc)
                     # reset access_token
                     if isinstance(exc, InvalidGrant):
-                        if dev_id:
-                            access_manager.update_dev_access_token(
-                                dev_id, access_token='', refresh_token=''
-                            )
-                        else:
-                            access_manager.update_access_token(
-                                access_token='', refresh_token=''
-                            )
-                    elif dev_id:
-                        access_manager.update_dev_access_token(dev_id)
+                        access_manager.update_access_token(
+                            dev_id, access_token='', refresh_token='',
+                        )
                     else:
-                        access_manager.update_access_token()
+                        access_manager.update_access_token(dev_id)
 
             # in debug log the login status
             self._logged_in = len(access_tokens) == 2
@@ -931,6 +919,7 @@ class Provider(AbstractProvider):
         if target == 'access_manager' and ui.on_yes_no_input(
                 context.get_name(), localize('reset.access_manager.confirm')
         ):
+            addon_id = context.get_param('addon_id', None)
             access_manager = context.get_access_manager()
             client = self.get_client(context)
             refresh_tokens = access_manager.get_refresh_token()
@@ -943,7 +932,7 @@ class Provider(AbstractProvider):
                         success = False
             self.reset_client()
             access_manager.update_access_token(
-                access_token='', refresh_token=''
+                addon_id, access_token='', refresh_token='',
             )
             ui.refresh_container()
             ui.show_notification(localize('succeeded' if success else 'failed'))
@@ -1576,7 +1565,9 @@ class Provider(AbstractProvider):
             if error == 'deleted_client':
                 message = context.localize('key.requirement')
                 context.get_access_manager().update_access_token(
-                    access_token='', refresh_token=''
+                    context.get_param('addon_id', None),
+                    access_token='',
+                    refresh_token='',
                 )
                 ok_dialog = True
 
