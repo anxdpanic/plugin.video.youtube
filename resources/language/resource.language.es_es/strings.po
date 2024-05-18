@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-27 22:42+0000\n"
+"PO-Revision-Date: 2024-05-13 17:53+0000\n"
 "Last-Translator: José Antonio Alvarado <jalvarado0.eses@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.5.4\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -313,8 +313,8 @@ msgid "Go to %s"
 msgstr "Ir a %s"
 
 msgctxt "#30503"
-msgid "Show channel fanart"
-msgstr "Mostrar fanart del canal"
+msgid "Channel fanart"
+msgstr "Canal fanart"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -1523,6 +1523,18 @@ msgstr "Usar reproductor externo para URLs de YouTube"
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr "Usar reproductor externo para formatos de transmisiones Adaptativas"
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr "Saltar a la página..."
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr "Usar el nombre del canal como"
+
+#~ msgctxt "#30503"
+#~ msgid "Show channel fanart"
+#~ msgstr "Mostrar fanart del canal"
 
 # Kodion Common
 # empty strings from id 30039 to 30099

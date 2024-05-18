@@ -309,8 +309,8 @@ msgid "Go to %s"
 msgstr "Avaa \"%s\""
 
 msgctxt "#30503"
-msgid "Show channel fanart"
-msgstr "Näytä kanavien fanart-kuvat"
+msgid "Channel fanart"
+msgstr ""
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -1519,6 +1519,18 @@ msgstr ""
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr ""
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr ""
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr ""
+
+#~ msgctxt "#30503"
+#~ msgid "Show channel fanart"
+#~ msgstr "Näytä kanavien fanart-kuvat"
 
 # Kodion Common
 # empty strings from id 30039 to 30099
