@@ -1130,5 +1130,14 @@
                 </setting>
             </group>
         </category>
+        <category id="end">
+            <group id="1">
+                <setting id="|end_settings_marker|" type="boolean" help="">
+                    <level>4</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+        </category>
     </section>
 </settings>

@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 SETUP_WIZARD = 'kodion.setup_wizard'  # (bool)
 SETUP_WIZARD_RUNS = 'kodion.setup_wizard.forced_runs'  # (int)
+SETTINGS_END = '|end_settings_marker|'  # (bool)
 
 MPD_VIDEOS = 'kodion.mpd.videos'  # (bool)
 MPD_STREAM_SELECT = 'kodion.mpd.stream.select'  # (int)

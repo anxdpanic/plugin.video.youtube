@@ -95,7 +95,7 @@ class AbstractSettings(object):
 
     def setup_wizard_enabled(self, value=None):
         # Increment min_required on new release to enable oneshot on first run
-        min_required = 3
+        min_required = 4
 
         if value is False:
             self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
@@ -107,6 +107,7 @@ class AbstractSettings(object):
         forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, 0)
         if forced_runs < min_required:
             self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
+            self.set_bool(settings.SETTINGS_END, True)
             return True
         return self.get_bool(settings.SETUP_WIZARD, False)
 
