@@ -426,7 +426,7 @@ class XbmcContext(AbstractContext):
 
     def get_ui(self):
         if not self._ui:
-            self._ui = XbmcContextUI(self._addon, proxy(self))
+            self._ui = XbmcContextUI(proxy(self))
         return self._ui
 
     def get_data_path(self):

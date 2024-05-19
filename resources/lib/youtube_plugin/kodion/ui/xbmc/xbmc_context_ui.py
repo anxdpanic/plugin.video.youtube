@@ -18,11 +18,8 @@ from ...utils import to_unicode
 
 
 class XbmcContextUI(AbstractContextUI):
-    def __init__(self, xbmc_addon, context):
+    def __init__(self, context):
         super(XbmcContextUI, self).__init__()
-
-        self._xbmc_addon = xbmc_addon
-
         self._context = context
 
     def create_progress_dialog(self, heading, text=None, background=False):
@@ -133,9 +130,6 @@ class XbmcContextUI(AbstractContextUI):
                                       _image,
                                       time_ms,
                                       audible)
-
-    def open_settings(self):
-        self._xbmc_addon.openSettings()
 
     def refresh_container(self):
         self._context.send_notification(REFRESH_CONTAINER, True)
