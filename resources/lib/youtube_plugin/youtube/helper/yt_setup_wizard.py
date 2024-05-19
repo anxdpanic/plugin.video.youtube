@@ -446,7 +446,7 @@ def process_subtitles(_provider, context, step, steps):
         context.execute('RunScript({addon_id},config/subtitles)'.format(
             addon_id=ADDON_ID
         ), wait_for=WAIT_FLAG)
-        context.get_settings(flush=True)
+        context.get_settings(refresh=True)
     return step
 
 

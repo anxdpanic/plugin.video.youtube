@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
 from copy import deepcopy
 from platform import python_version
 
@@ -30,8 +29,6 @@ if _profiler:
     from .debug import Profiler
 
     _profiler = Profiler(enabled=False)
-
-atexit.register(_context.tear_down)
 
 
 def run(context=_context,

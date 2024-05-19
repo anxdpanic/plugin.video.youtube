@@ -133,7 +133,7 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.get_property(CHECK_SETTINGS):
             provider.reset_client()
-            settings = context.get_settings(flush=True)
+            settings = context.get_settings(refresh=True)
             ui.clear_property(CHECK_SETTINGS)
         else:
             settings = context.get_settings()
