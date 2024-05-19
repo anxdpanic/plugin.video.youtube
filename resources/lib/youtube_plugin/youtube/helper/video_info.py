@@ -1369,7 +1369,7 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         use_mpd_vod = _settings.use_mpd_videos()
-        httpd_running = _settings.use_isa() and httpd_status()
+        httpd_running = _settings.use_isa() and httpd_status(self._context)
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not httpd_running:
@@ -1382,7 +1382,7 @@ class VideoInfo(YouTubeRequestClient):
                 continue
             self._context.log_debug('Found widevine license url: {0}'
                                     .format(url))
-            address, port = get_connect_address()
+            address, port = get_connect_address(self._context)
             license_info = {
                 'url': url,
                 'proxy': 'http://{address}:{port}{path}||R{{SSM}}|'.format(
@@ -2129,7 +2129,7 @@ class VideoInfo(YouTubeRequestClient):
                                     .format(file=filepath))
             success = False
         if success:
-            address, port = get_connect_address()
+            address, port = get_connect_address(self._context)
             return 'http://{address}:{port}{path}{file}'.format(
                 address=address,
                 port=port,

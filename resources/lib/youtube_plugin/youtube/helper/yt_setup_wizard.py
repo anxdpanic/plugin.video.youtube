@@ -329,7 +329,7 @@ def process_default_settings(_provider, context, step, steps):
             settings.default_player_web_urls(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
-        if settings.use_isa() and not httpd_status():
+        if settings.use_isa() and not httpd_status(context):
             settings.httpd_listen('0.0.0.0')
     return step
 

@@ -32,6 +32,8 @@ def run():
     context = XbmcContext()
     context.log_debug('YouTube service initialization...')
 
+    provider = Provider()
+
     get_infobool = context.get_infobool
     get_infolabel = context.get_infolabel
     get_listitem_detail = context.get_listitem_detail
@@ -44,8 +46,8 @@ def run():
 
     clear_property(ABORT_FLAG)
 
-    monitor = ServiceMonitor()
-    player = PlayerMonitor(provider=Provider(),
+    monitor = ServiceMonitor(context=context)
+    player = PlayerMonitor(provider=provider,
                            context=context,
                            monitor=monitor)
 
@@ -124,5 +126,5 @@ def run():
     if monitor.httpd:
         monitor.shutdown_httpd()  # shutdown http server
 
-    monitor.tear_down()
+    provider.tear_down()
     context.tear_down()

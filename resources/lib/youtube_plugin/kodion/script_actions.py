@@ -111,8 +111,8 @@ def _config_actions(context, action, *_args):
             settings.httpd_listen(addresses[selected_address])
 
     elif action == 'show_client_ip':
-        if httpd_status():
-            client_ip = get_client_ip_address()
+        if httpd_status(context):
+            client_ip = get_client_ip_address(context)
             if client_ip:
                 ui.on_ok(context.get_name(),
                          context.localize('client.ip') % client_ip)

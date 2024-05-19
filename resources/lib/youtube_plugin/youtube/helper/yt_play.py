@@ -102,7 +102,7 @@ def play_video(provider, context):
     if is_external:
         url = urlunsplit((
             'http',
-            get_connect_address(as_netloc=True),
+            get_connect_address(context=context, as_netloc=True),
             paths.REDIRECT,
             urlencode({'url': video_stream['url']}),
             '',
