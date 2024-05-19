@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import atexit
 import json
 import re
 from base64 import b64decode
@@ -55,6 +56,8 @@ class Provider(AbstractProvider):
         self._api_check = None
         self._logged_in = False
         self.yt_video = yt_video
+
+        atexit.register(self.tear_down)
 
     def get_wizard_steps(self, context):
         steps = [
@@ -1591,11 +1594,15 @@ class Provider(AbstractProvider):
         return True
 
     def tear_down(self):
-        del self._resource_manager
-        self._resource_manager = None
-        del self._client
-        self._client = None
-        del self._api_check
-        self._api_check = None
-        del self.yt_video
-        self.yt_video = None
+        attrs = (
+            '_resource_manager',
+            '_client',
+            '_api_check',
+            'yt_video',
+        )
+        for attr in attrs:
+            try:
+                delattr(self, attr)
+                setattr(self, attr, None)
+            except (AttributeError, TypeError):
+                pass

@@ -31,7 +31,6 @@ if _profiler:
 
     _profiler = Profiler(enabled=False)
 
-atexit.register(_provider.tear_down)
 atexit.register(_context.tear_down)
 
 
