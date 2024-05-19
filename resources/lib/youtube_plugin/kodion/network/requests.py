@@ -55,9 +55,6 @@ class BaseRequestsClass(object):
         else:
             self._default_exc = (RequestException,)
 
-    def __del__(self):
-        self._session.close()
-
     def __enter__(self):
         return self
 
