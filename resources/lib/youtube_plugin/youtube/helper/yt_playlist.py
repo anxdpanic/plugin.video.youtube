@@ -178,7 +178,7 @@ def _process_select_playlist(provider, context):
     else:
         watch_later_id = None
 
-    thumb_size = context.get_settings().get_thumb_size()
+    thumb_size = context.get_settings().get_thumbnail_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
     while True:
