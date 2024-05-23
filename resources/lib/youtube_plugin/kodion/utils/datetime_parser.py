@@ -14,6 +14,7 @@ import re
 from datetime import date, datetime, time as dt_time, timedelta
 from importlib import import_module
 from sys import modules
+from threading import Condition, Lock
 
 from ..exceptions import KodionException
 from ..logger import log_error
@@ -278,16 +279,30 @@ def strptime(datetime_str, fmt=None):
     try:
         return datetime.strptime(datetime_str, fmt)
     except TypeError:
-        log_error('Python strptime bug workaround.\n'
-                  'Refer to https://github.com/python/cpython/issues/71587')
-
-        if '_strptime' not in modules:
-            modules['_strptime'] = import_module('_strptime')
-        _strptime = modules['_strptime']
+        if '_strptime' not in modules or strptime.reloading.locked():
+            if strptime.reloaded.acquire(blocking=False):
+                _strptime = import_module('_strptime')
+                modules['_strptime'] = _strptime
+                log_error('Python strptime bug workaround - '
+                          'https://github.com/python/cpython/issues/71587')
+                strptime.reloaded.notify_all()
+                strptime.reloaded.release()
+            else:
+                strptime.reloaded.acquire()
+                while '_strptime' not in modules:
+                    strptime.reloaded.wait()
+                _strptime = modules['_strptime']
+                strptime.reloaded.release()
+        else:
+            _strptime = modules['_strptime']
 
         if timezone:
             return _strptime._strptime_datetime(datetime, datetime_str, fmt)
         return datetime(*(_strptime._strptime(datetime_str, fmt)[0][0:6]))
+
+
+strptime.reloading = Lock()
+strptime.reloaded = Condition(lock=strptime.reloading)
 
 
 def since_epoch(dt_object=None):

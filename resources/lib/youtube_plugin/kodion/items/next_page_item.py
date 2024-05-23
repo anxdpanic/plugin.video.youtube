@@ -19,14 +19,18 @@ class NextPageItem(DirectoryItem):
         if 'refresh' in params:
             del params['refresh']
 
+        path = context.get_path()
         page = params.get('page', 2)
         items_per_page = params.get('items_per_page', 50)
-        if 'page_token' not in params:
+        can_jump = ('next_page_token' not in params
+                    and not path.startswith(('/channel',
+                                             '/special/recommendations')))
+        if 'page_token' not in params and can_jump:
             params['page_token'] = self.create_page_token(page, items_per_page)
 
         super(NextPageItem, self).__init__(
             context.localize('page.next') % page,
-            context.create_uri(context.get_path(), params),
+            context.create_uri(path, params),
             image=image,
             category_label='__inherit__',
         )
@@ -39,12 +43,12 @@ class NextPageItem(DirectoryItem):
 
         context_menu = [
             menu_items.refresh(context),
-            menu_items.goto_page(context),
+            menu_items.goto_page(context) if can_jump else None,
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context),
             menu_items.separator(),
         ]
-        self.set_context_menu(context_menu)
+        self.add_context_menu(context_menu)
 
     @classmethod
     def create_page_token(cls, page, items_per_page=50):

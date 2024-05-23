@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 SETUP_WIZARD = 'kodion.setup_wizard'  # (bool)
 SETUP_WIZARD_RUNS = 'kodion.setup_wizard.forced_runs'  # (int)
+SETTINGS_END = '|end_settings_marker|'  # (bool)
 
 MPD_VIDEOS = 'kodion.mpd.videos'  # (bool)
 MPD_STREAM_SELECT = 'kodion.mpd.stream.select'  # (int)
@@ -26,7 +27,7 @@ SUBTITLE_SELECTION = 'kodion.subtitle.languages.num'  # (int)
 SUBTITLE_DOWNLOAD = 'kodion.subtitle.download'  # (bool)
 
 ITEMS_PER_PAGE = 'kodion.content.max_per_page'  # (int)
-HIDE_SHORT_VIDEOS = 'youtube.hide_shorts'  # (bool)
+HIDE_VIDEOS = 'youtube.view.hide_videos'  # (list[string])
 
 SAFE_SEARCH = 'kodion.safe.search'  # (int)
 AGE_GATE = 'kodion.age.gate'  # (bool)

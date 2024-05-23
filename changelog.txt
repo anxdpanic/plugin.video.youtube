@@ -1,3 +1,31 @@
+## v7.0.7+beta.2
+### Fixed
+- Fix invalid pageToken error by removing jump from unsupported listings #715
+- Fix issues with post play refresh possibly causing loss of window history
+- Fix bug that could lead to plugin continuously reloading #608
+- Attempted fix for socket error 98 on Linux #746
+  - For error 10013 on Windows try either of the following:
+    - Start-Process powershell -Verb runAs -ArgumentList "net stop winnat; net start winnat"
+    - Start-Process powershell -Verb runAs -ArgumentList "net stop hns; net start hns"
+- Fix changing fanart type on My Subscriptions #751
+- Fix not using thumbnail fanart for channels/subscriptions/playlists when enabled #751
+- Fix My Subscriptions threading issues #529
+- Fix failing to login #759
+- Improve resource usage
+- Fix adding video to playlist #764
+- Update video filtering for live streams #755
+
+### Changed
+- Use internal Kodi resume enable/disable for all playback #693
+  - For playback where Kodi does not prompt to resume, the plugin will also no longer resume
+  - For playback where Kodi does prompt to resume, the plugin will follow whatever is selected
+- Cached data for My Subscriptions and Related Videos will be replaced due to changes in cached data
+- Use channel fanart as backup to thumbnail fanart for channel items without thumbnails #751
+
+### New
+- Enable syncing of plugin watched state with Kodi watched state when using Kodi mark as (un)watched #709
+- Add website link to video descriptions #721
+
 ## v7.0.7+beta.1
 ### Fixed
 - Fixed not being able to re-refresh a directory listing that has already been refreshed

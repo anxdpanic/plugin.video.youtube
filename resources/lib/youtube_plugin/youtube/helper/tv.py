@@ -14,107 +14,41 @@ from ..helper import utils
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 
 
-def my_subscriptions_to_items(provider, context, json_data, do_filter=False):
-    settings = context.get_settings()
-    result = []
-    video_id_dict = {}
-
-    filter_list = []
-    black_list = False
-    if do_filter:
-        black_list = settings.get_bool(
-            'youtube.filter.my_subscriptions_filtered.blacklist', False
-        )
-        filter_list = settings.get_string(
-            'youtube.filter.my_subscriptions_filtered.list', ''
-        )
-        filter_list = {
-            filter_item.lower()
-            for filter_item in filter_list.replace(', ', ',').split(',')
-        }
-
-    item_params = {'video_id': None}
-    incognito = context.get_param('incognito', False)
-    if incognito:
-        item_params['incognito'] = incognito
-
-    items = json_data.get('items', [])
-    for item in items:
-        channel = item['channel'].lower().replace(',', '')
-        if (not do_filter
-                or (black_list and channel not in filter_list)
-                or (not black_list and channel in filter_list)):
-            video_id = item['id']
-            item_params['video_id'] = video_id
-            item_uri = context.create_uri(('play',), item_params)
-            video_item = VideoItem(item['title'], uri=item_uri)
-            if incognito:
-                video_item.set_play_count(0)
-            result.append(video_item)
-
-            video_id_dict[video_id] = video_item
-
-    use_play_data = not incognito and settings.use_local_history()
-
-    channel_item_dict = {}
-    utils.update_video_infos(provider,
-                             context,
-                             video_id_dict,
-                             channel_items_dict=channel_item_dict,
-                             use_play_data=use_play_data)
-    utils.update_fanarts(provider, context, channel_item_dict)
-
-    if context.get_settings().hide_short_videos():
-        result = utils.filter_short_videos(result)
-
-    # next page
-    next_page_token = json_data.get('next_page_token')
-    if next_page_token or json_data.get('continue'):
-        params = context.get_params()
-        new_params = dict(params,
-                          next_page_token=next_page_token,
-                          offset=json_data.get('offset', 0),
-                          page=params.get('page', 1) + 1)
-        next_page_item = NextPageItem(context, new_params)
-        result.append(next_page_item)
-
-    return result
-
-
 def tv_videos_to_items(provider, context, json_data):
-    result = []
-    video_id_dict = {}
+    incognito = context.get_param('incognito')
+    settings = context.get_settings()
+    use_play_data = not incognito and settings.use_local_history()
+    item_filter = settings.item_filter()
 
-    item_params = {'video_id': None}
-    incognito = context.get_param('incognito', False)
+    item_params = {
+        'video_id': None,
+    }
     if incognito:
-        item_params['incognito'] = incognito
-
-    items = json_data.get('items', [])
-    for item in items:
+        item_params['incognito'] = True
+    video_id_dict = {}
+    channel_item_dict = {}
+    for item in json_data.get('items', []):
         video_id = item['id']
         item_params['video_id'] = video_id
-        item_uri = context.create_uri(('play',), item_params)
-        video_item = VideoItem(item['title'], uri=item_uri)
+        video_item = VideoItem(
+            item['title'], context.create_uri(('play',), item_params)
+        )
         if incognito:
             video_item.set_play_count(0)
-
-        result.append(video_item)
-
         video_id_dict[video_id] = video_item
 
-    use_play_data = not incognito and context.get_settings().use_local_history()
-
-    channel_item_dict = {}
     utils.update_video_infos(provider,
                              context,
                              video_id_dict,
                              channel_items_dict=channel_item_dict,
-                             use_play_data=use_play_data)
+                             use_play_data=use_play_data,
+                             item_filter=item_filter)
     utils.update_fanarts(provider, context, channel_item_dict)
 
-    if context.get_settings().hide_short_videos():
-        result = utils.filter_short_videos(result)
+    if item_filter:
+        result = utils.filter_videos(video_id_dict.values(), **item_filter)
+    else:
+        result = list(video_id_dict.values())
 
     # next page
     next_page_token = json_data.get('next_page_token')

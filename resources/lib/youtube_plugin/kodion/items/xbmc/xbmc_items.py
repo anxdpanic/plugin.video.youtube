@@ -13,12 +13,12 @@ from __future__ import absolute_import, division, unicode_literals
 from json import dumps
 
 from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
-from ...compatibility import xbmc, xbmcgui
-from ...constants import SWITCH_PLAYER_FLAG
+from ...compatibility import to_str, xbmc, xbmcgui
+from ...constants import PLAY_COUNT, SWITCH_PLAYER_FLAG
 from ...utils import current_system_version, datetime_parser
 
 
-def set_info(list_item, item, properties):
+def set_info(list_item, item, properties, set_play_count=True, resume=True):
     is_video = False
     if not current_system_version.compatible(20, 0):
         if isinstance(item, VideoItem):
@@ -72,7 +72,9 @@ def set_info(list_item, item, properties):
 
             value = item.get_play_count()
             if value is not None:
-                info_labels['playcount'] = value
+                if set_play_count:
+                    info_labels['playcount'] = value
+                properties[PLAY_COUNT] = value
 
             value = item.get_plot()
             if value is not None:
@@ -110,9 +112,18 @@ def set_info(list_item, item, properties):
                 list_item.setInfo('video', info_labels)
 
         elif isinstance(item, DirectoryItem):
+            info_labels = {}
+
+            value = item.get_name()
+            if value is not None:
+                info_labels['title'] = value
+
             value = item.get_plot()
             if value is not None:
-                list_item.setInfo('picture', {'plot': value})
+                info_labels['plot'] = value
+
+            if info_labels:
+                list_item.setInfo('video', info_labels)
 
             if properties:
                 list_item.setProperties(properties)
@@ -161,7 +172,7 @@ def set_info(list_item, item, properties):
                 list_item.setProperties(properties)
             return
 
-        resume_time = item.get_start_time()
+        resume_time = resume and item.get_start_time()
         if resume_time:
             properties['ResumeTime'] = str(resume_time)
         duration = item.get_duration()
@@ -169,12 +180,10 @@ def set_info(list_item, item, properties):
             properties['TotalTime'] = str(duration)
             if is_video:
                 list_item.addStreamInfo('video', {'duration': duration})
+
         if properties:
             list_item.setProperties(properties)
         return
-
-    if properties:
-        list_item.setProperties(properties)
 
     value = item.get_date(as_info_label=True)
     if value is not None:
@@ -248,7 +257,9 @@ def set_info(list_item, item, properties):
         # playcount: int
         value = item.get_play_count()
         if value is not None:
-            info_tag.setPlaycount(value)
+            if set_play_count:
+                info_tag.setPlaycount(value)
+            properties[PLAY_COUNT] = value
 
         # plot: str
         value = item.get_plot()
@@ -269,15 +280,27 @@ def set_info(list_item, item, properties):
     elif isinstance(item, DirectoryItem):
         info_tag = list_item.getVideoInfoTag()
 
+        value = item.get_name()
+        if value is not None:
+            info_tag.setTitle(value)
+
         value = item.get_plot()
         if value is not None:
             info_tag.setPlot(value)
+
+        if properties:
+            list_item.setProperties(properties)
         return
 
     elif isinstance(item, ImageItem):
+        info_tag = list_item.getPictureInfoTag()
+
         value = item.get_title()
         if value is not None:
-            list_item.setInfo('picture', {'title': value})
+            info_tag.setTitle(value)
+
+        if properties:
+            list_item.setProperties(properties)
         return
 
     elif isinstance(item, AudioItem):
@@ -289,7 +312,7 @@ def set_info(list_item, item, properties):
         if value is not None:
             info_tag.setAlbum(value)
 
-    resume_time = item.get_start_time()
+    resume_time = resume and item.get_start_time()
     duration = item.get_duration()
     if resume_time and duration:
         info_tag.setResumePoint(resume_time, float(duration))
@@ -337,6 +360,9 @@ def set_info(list_item, item, properties):
     value = item.get_year()
     if value is not None:
         info_tag.setYear(value)
+
+    if properties:
+        list_item.setProperties(properties)
 
 
 def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
@@ -432,12 +458,17 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
-    set_info(list_item, video_item, props)
+    resume = context.get_param('resume')
+    set_info(list_item, video_item, props, resume=resume)
 
     return list_item
 
 
-def audio_listitem(context, audio_item, show_fanart=None, for_playback=False):
+def audio_listitem(context,
+                   audio_item,
+                   show_fanart=None,
+                   for_playback=False,
+                   **_kwargs):
     uri = audio_item.get_uri()
     context.log_debug('Converting AudioItem |%s|' % uri)
 
@@ -463,7 +494,8 @@ def audio_listitem(context, audio_item, show_fanart=None, for_playback=False):
         'thumb': image,
     })
 
-    set_info(list_item, audio_item, props)
+    resume = context.get_param('resume') or not for_playback
+    set_info(list_item, audio_item, props, resume=resume)
 
     context_menu = audio_item.get_context_menu()
     if context_menu:
@@ -474,7 +506,7 @@ def audio_listitem(context, audio_item, show_fanart=None, for_playback=False):
     return uri, list_item, False
 
 
-def directory_listitem(context, directory_item, show_fanart=None):
+def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     uri = directory_item.get_uri()
     context.log_debug('Converting DirectoryItem |%s|' % uri)
 
@@ -531,7 +563,7 @@ def directory_listitem(context, directory_item, show_fanart=None):
     return uri, list_item, is_folder
 
 
-def image_listitem(context, image_item, show_fanart=None):
+def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     uri = image_item.get_uri()
     context.log_debug('Converting ImageItem |%s|' % uri)
 
@@ -584,7 +616,11 @@ def uri_listitem(context, uri_item, **_kwargs):
     return list_item
 
 
-def video_listitem(context, video_item, show_fanart=None):
+def video_listitem(context,
+                   video_item,
+                   show_fanart=None,
+                   focused=None,
+                   **_kwargs):
     uri = video_item.get_uri()
     context.log_debug('Converting VideoItem |%s|' % uri)
 
@@ -607,13 +643,22 @@ def video_listitem(context, video_item, show_fanart=None):
     local_datetime = None
     if datetime:
         local_datetime = datetime_parser.utc_to_local(datetime)
-        props['PublishedLocal'] = str(local_datetime)
+        props['PublishedLocal'] = to_str(local_datetime)
     if video_item.live:
         props['PublishedSince'] = context.localize('live')
     elif local_datetime:
-        props['PublishedSince'] = str(datetime_parser.datetime_to_since(
+        props['PublishedSince'] = to_str(datetime_parser.datetime_to_since(
             context, local_datetime
         ))
+
+    set_play_count = True
+    resume = True
+    prop_value = video_item.video_id
+    if prop_value:
+        if focused and focused == prop_value:
+            set_play_count = False
+            resume = False
+        props['video_id'] = prop_value
 
     # make channel_id property available for keymapping
     prop_value = video_item.get_channel_id()
@@ -647,7 +692,11 @@ def video_listitem(context, video_item, show_fanart=None):
     if video_item.subtitles:
         list_item.setSubtitles(video_item.subtitles)
 
-    set_info(list_item, video_item, props)
+    set_info(list_item,
+             video_item,
+             props,
+             set_play_count=set_play_count,
+             resume=resume)
 
     context_menu = video_item.get_context_menu()
     if context_menu:

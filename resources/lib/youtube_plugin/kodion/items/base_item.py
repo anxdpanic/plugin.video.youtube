@@ -108,7 +108,6 @@ class BaseItem(object):
 
     def set_fanart(self, fanart):
         if not fanart:
-            self._fanart = '{0}/fanart.jpg'.format(MEDIA_PATH)
             return
 
         if '{media}/' in fanart:
@@ -116,15 +115,15 @@ class BaseItem(object):
         else:
             self._fanart = fanart
 
-    def get_fanart(self):
-        return self._fanart
+    def get_fanart(self, default=True):
+        if self._fanart or not default:
+            return self._fanart
+        return '{0}/fanart.jpg'.format(MEDIA_PATH)
 
-    def set_context_menu(self, context_menu):
-        self._context_menu = context_menu
-
-    def add_context_menu(self, context_menu, position=0):
-        if self._context_menu is None:
-            self._context_menu = context_menu
+    def add_context_menu(self, context_menu, position='end', replace=False):
+        context_menu = (item for item in context_menu if item)
+        if replace or not self._context_menu:
+            self._context_menu = list(context_menu)
         elif position == 'end':
             self._context_menu.extend(context_menu)
         else:

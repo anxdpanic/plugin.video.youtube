@@ -59,22 +59,21 @@ class APICheck(object):
                 j_id = self._json_api['keys']['personal'].get('client_id', '')
                 j_secret = self._json_api['keys']['personal'].get('client_secret', '')
 
-        if (not original_key or not original_id or not original_secret
+        if ((not original_key or not original_id or not original_secret)
                 and j_key and j_secret and j_id):
             settings.api_key(j_key)
             settings.api_id(j_id)
             settings.api_secret(j_secret)
 
         switch = self.get_current_switch()
-        user_details = self._access_manager.get_current_user_details()
-        last_hash = user_details.get('last_key_hash', '')
-        current_set_hash = self._get_key_set_hash(switch)
+        last_hash = self._access_manager.get_last_key_hash()
+        current_hash = self._get_key_set_hash(switch)
 
-        changed = current_set_hash != last_hash
+        changed = current_hash != last_hash
         if changed and switch == 'own':
             changed = self._get_key_set_hash('own_old') != last_hash
             if not changed:
-                self._access_manager.set_last_key_hash(current_set_hash)
+                self._access_manager.set_last_key_hash(current_hash)
         self.changed = changed
 
         self._context.log_debug('User: |{user}|, '
@@ -91,7 +90,7 @@ class APICheck(object):
                     }
                 )
             ))
-            self._access_manager.set_last_key_hash(current_set_hash)
+            self._access_manager.set_last_key_hash(current_hash)
 
     @staticmethod
     def get_current_switch():

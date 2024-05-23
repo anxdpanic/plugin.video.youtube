@@ -14,16 +14,13 @@ from .view_manager import ViewManager
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
-from ...constants import ADDON_ID
+from ...constants import ADDON_ID, REFRESH_CONTAINER
 from ...utils import to_unicode
 
 
 class XbmcContextUI(AbstractContextUI):
-    def __init__(self, xbmc_addon, context):
+    def __init__(self, context):
         super(XbmcContextUI, self).__init__()
-
-        self._xbmc_addon = xbmc_addon
-
         self._context = context
         self._view_manager = None
 
@@ -142,19 +139,11 @@ class XbmcContextUI(AbstractContextUI):
                                       time_ms,
                                       audible)
 
-    def open_settings(self):
-        self._xbmc_addon.openSettings()
+    def refresh_container(self):
+        self._context.send_notification(REFRESH_CONTAINER, True)
 
     @staticmethod
-    def refresh_container():
-        # TODO: find out why the RunScript call is required
-        # xbmc.executebuiltin("Container.Refresh")
-        xbmc.executebuiltin('RunScript({addon_id},action/refresh)'.format(
-            addon_id=ADDON_ID
-        ))
-
-    @staticmethod
-    def set_property(property_id, value):
+    def set_property(property_id, value='true'):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(property_id, value)
 

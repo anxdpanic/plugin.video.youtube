@@ -45,8 +45,6 @@ class AbstractContextUI(object):
     def on_select(self, title, items=None, preselect=-1, use_details=False):
         raise NotImplementedError()
 
-    def open_settings(self):
-        raise NotImplementedError()
 
     def show_notification(self, message, header='', image_uri='',
                           time_ms=5000, audible=True):

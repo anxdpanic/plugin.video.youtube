@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import atexit
 import sys
 from weakref import proxy
 
@@ -38,9 +39,6 @@ from ...utils import (
 
 
 class XbmcContext(AbstractContext):
-    _addon = None
-    _settings = None
-
     _KODI_UI_SUBTITLE_OPTIONS = None
 
     LOCAL_MAP = {
@@ -276,20 +274,23 @@ class XbmcContext(AbstractContext):
     }
 
     def __new__(cls, *args, **kwargs):
-        if not cls._addon:
-            cls._addon = xbmcaddon.Addon(ADDON_ID)
-            cls._settings = XbmcPluginSettings(cls._addon)
+        self = super(XbmcContext, cls).__new__(cls)
 
-        if not cls._KODI_UI_SUBTITLE_OPTIONS:
+        if not cls._initialized:
+            addon = xbmcaddon.Addon(ADDON_ID)
+            cls._addon = addon
+            cls._settings = XbmcPluginSettings(addon)
+
             cls._KODI_UI_SUBTITLE_OPTIONS = {
                 None,                 # No setting value
-                cls.localize(231),    # None
-                cls.localize(13207),  # Forced only
-                cls.localize(308),    # Original language
-                cls.localize(309),    # UI language
+                self.localize(231),    # None
+                self.localize(13207),  # Forced only
+                self.localize(308),    # Original language
+                self.localize(309),    # UI language
             }
 
-        self = super(XbmcContext, cls).__new__(cls)
+            cls._initialized = True
+
         return self
 
     def __init__(self,
@@ -300,8 +301,15 @@ class XbmcContext(AbstractContext):
 
         self._plugin_id = plugin_id or ADDON_ID
         if self._plugin_id != ADDON_ID:
-            self._addon = xbmcaddon.Addon(self._plugin_id)
-            self._settings = XbmcPluginSettings(self._addon)
+            addon = xbmcaddon.Addon(ADDON_ID)
+            self._addon = addon
+            self._settings = XbmcPluginSettings(addon)
+
+        self._addon_path = make_dirs(self._addon.getAddonInfo('path'))
+        self._data_path = make_dirs(self._addon.getAddonInfo('profile'))
+        self._plugin_name = self._addon.getAddonInfo('name')
+        self._plugin_icon = self._addon.getAddonInfo('icon')
+        self._version = self._addon.getAddonInfo('version')
 
         self._ui = None
         self._video_playlist = None
@@ -309,11 +317,7 @@ class XbmcContext(AbstractContext):
         self._video_player = None
         self._audio_player = None
 
-        self._plugin_name = self._addon.getAddonInfo('name')
-        self._version = self._addon.getAddonInfo('version')
-
-        self._addon_path = make_dirs(self._addon.getAddonInfo('path'))
-        self._data_path = make_dirs(self._addon.getAddonInfo('profile'))
+        atexit.register(self.tear_down)
 
     def init(self):
         num_args = len(sys.argv)
@@ -348,11 +352,14 @@ class XbmcContext(AbstractContext):
     def get_region(self):
         pass  # implement from abstract
 
-    def addon(self):
-        return self._addon
-
-    def is_plugin_path(self, uri, uri_path=''):
-        return uri.startswith('plugin://%s/%s' % (self.get_id(), uri_path))
+    def is_plugin_path(self, uri, uri_path='', partial=False):
+        uri_path = ('plugin://%s/%s' % (self.get_id(), uri_path)).rstrip('/')
+        if not partial:
+            uri_path = (
+                uri_path + '/',
+                uri_path + '?'
+            )
+        return uri.startswith(uri_path)
 
     @staticmethod
     def format_date_short(date_obj, str_format=None):
@@ -420,7 +427,7 @@ class XbmcContext(AbstractContext):
 
     def get_ui(self):
         if not self._ui:
-            self._ui = XbmcContextUI(self._addon, proxy(self))
+            self._ui = XbmcContextUI(proxy(self))
         return self._ui
 
     def get_data_path(self):
@@ -429,24 +436,31 @@ class XbmcContext(AbstractContext):
     def get_addon_path(self):
         return self._addon_path
 
-    def get_settings(self, flush=False):
-        if flush or not self._settings:
+    def clear_settings(self):
+        if self._plugin_id != ADDON_ID and self._settings:
+            self._settings.flush()
+        if self.__class__._settings:
+            self.__class__._settings.flush()
+
+    def get_settings(self, refresh=False):
+        if refresh or not self._settings:
             if self._plugin_id != ADDON_ID:
-                self._addon = xbmcaddon.Addon(self._plugin_id)
-                self._settings = XbmcPluginSettings(self._addon)
+                addon = xbmcaddon.Addon(self._plugin_id)
+                self._addon = addon
+                self._settings = XbmcPluginSettings(addon)
             else:
-                self.__class__._addon = xbmcaddon.Addon(ADDON_ID)
-                self.__class__._settings = XbmcPluginSettings(self._addon)
+                addon = xbmcaddon.Addon(ADDON_ID)
+                self.__class__._addon = addon
+                self.__class__._settings = XbmcPluginSettings(addon)
         return self._settings
 
-    @classmethod
-    def localize(cls, text_id, default_text=None):
+    def localize(self, text_id, default_text=None):
         if default_text is None:
             default_text = 'Undefined string ID: |{0}|'.format(text_id)
 
         if not isinstance(text_id, int):
             try:
-                text_id = cls.LOCAL_MAP[text_id]
+                text_id = self.LOCAL_MAP[text_id]
             except KeyError:
                 try:
                     text_id = int(text_id)
@@ -461,7 +475,7 @@ class XbmcContext(AbstractContext):
         (see: http://kodi.wiki/view/Language_support) but we do it anyway.
         I want some of the localized strings for the views of a skin.
         """
-        source = cls._addon if 30000 <= text_id < 31000 else xbmc
+        source = self._addon if 30000 <= text_id < 31000 else xbmc
         result = source.getLocalizedString(text_id)
         result = to_unicode(result) if result else default_text
         return result
@@ -675,38 +689,43 @@ class XbmcContext(AbstractContext):
         return xbmc.getInfoLabel(name)
 
     @staticmethod
-    def get_listitem_detail(detail_name, attr=False):
-        return xbmc.getInfoLabel(
-            'Container.ListItem(0).{0}'.format(detail_name)
-            if attr else
-            'Container.ListItem(0).Property({0})'.format(detail_name)
-        )
+    def get_listitem_detail(detail_name):
+        return xbmc.getInfoLabel('Container.ListItem(0).Property({0})'
+                                 .format(detail_name))
+
+    @staticmethod
+    def get_listitem_info(detail_name):
+        return xbmc.getInfoLabel('Container.ListItem(0).' + detail_name)
 
     def tear_down(self):
-        self._settings.flush()
-        try:
-            del self._addon
-            del self._settings
-        except AttributeError:
-            pass
-        try:
-            del self.__class__._addon
-            self.__class__._addon = None
-            del self.__class__._settings
-            self.__class__._settings = None
-        except AttributeError:
-            pass
-        del self._ui
-        self._ui = None
-        del self._video_playlist
-        self._video_playlist = None
-        del self._audio_playlist
-        self._audio_playlist = None
-        del self._video_player
-        self._video_player = None
-        del self._audio_player
-        self._audio_player = None
+        self.clear_settings()
+        attrs = (
+            '_addon',
+            '_settings',
+        )
+        for attr in attrs:
+            try:
+                if self._plugin_id != ADDON_ID:
+                    delattr(self, attr)
+                delattr(self.__class__, attr)
+                setattr(self.__class__, attr, None)
+            except AttributeError:
+                pass
+
+        attrs = (
+            '_ui',
+            '_video_playlist',
+            '_audio_playlist',
+            '_video_player',
+            '_audio_player',
+        )
+        for attr in attrs:
+            try:
+                delattr(self, attr)
+                setattr(self, attr, None)
+            except AttributeError:
+                pass
 
     def wakeup(self):
-        self.get_ui().set_property(WAKEUP, 'true')
+        self.get_ui().set_property(WAKEUP)
         self.send_notification(WAKEUP, True)

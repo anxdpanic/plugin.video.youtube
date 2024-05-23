@@ -25,7 +25,6 @@ class AbstractSettings(object):
     _echo = False
     _cache = {}
     _check_set = True
-    _instance = None
 
     @classmethod
     def flush(cls, xbmc_addon):
@@ -96,7 +95,7 @@ class AbstractSettings(object):
 
     def setup_wizard_enabled(self, value=None):
         # Increment min_required on new release to enable oneshot on first run
-        min_required = 3
+        min_required = 4
 
         if value is False:
             self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
@@ -108,6 +107,7 @@ class AbstractSettings(object):
         forced_runs = self.get_int(settings.SETUP_WIZARD_RUNS, 0)
         if forced_runs < min_required:
             self.set_int(settings.SETUP_WIZARD_RUNS, min_required)
+            self.set_bool(settings.SETTINGS_END, True)
             return True
         return self.get_bool(settings.SETUP_WIZARD, False)
 
@@ -385,8 +385,35 @@ class AbstractSettings(object):
             return self._STREAM_SELECT[value]
         return self._STREAM_SELECT[default]
 
-    def hide_short_videos(self):
-        return self.get_bool(settings.HIDE_SHORT_VIDEOS, False)
+    _DEFAULT_FILTER = {
+        'shorts': True,
+        'upcoming': True,
+        'upcoming_live': True,
+        'live': True,
+        'premieres': True,
+        'completed': True,
+        'vod': True,
+    }
+
+    def item_filter(self, update=None):
+        types = dict.fromkeys(self.get_string_list(settings.HIDE_VIDEOS), False)
+        types = dict(self._DEFAULT_FILTER, **types)
+        if update:
+            if 'live_folder' in update:
+                if 'live_folder' in types:
+                    types.update(update)
+                else:
+                    types.update({
+                        'upcoming': True,
+                        'upcoming_live': True,
+                        'live': True,
+                        'premieres': True,
+                        'completed': True,
+                    })
+                types['vod'] = False
+            else:
+                types.update(update)
+        return types
 
     def client_selection(self, value=None):
         if value is not None:

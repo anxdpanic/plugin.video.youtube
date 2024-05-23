@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import atexit
 import os
 
 from .logger import log_debug
@@ -95,6 +96,11 @@ class Profiler(object):
                 *args, **kwargs
             )
 
+        def tear_down(self, *args, **kwargs):
+            return super(Profiler.Proxy, self).__call__().tear_down(
+                *args, **kwargs
+            )
+
     _instances = set()
 
     def __new__(cls, *args, **kwargs):
@@ -120,9 +126,7 @@ class Profiler(object):
         if enabled and not lazy:
             self._create_profiler()
 
-    def __del__(self):
-        # pylint: disable=protected-access
-        self.__class__._instances.discard(self)
+        atexit.register(self.tear_down)
 
     def __enter__(self):
         if not self._enabled:
@@ -139,7 +143,7 @@ class Profiler(object):
             reuse=self._reuse
         )))
         if not self._reuse:
-            self.__del__()
+            self.tear_down()
 
     def __call__(self, func=None, name=__name__, reuse=False):
         """Decorator used to profile function calls"""
@@ -187,7 +191,7 @@ class Profiler(object):
             return result
 
         if not self._enabled:
-            self.__del__()
+            self.tear_down()
             return func
         return wrapper
 
@@ -243,3 +247,6 @@ class Profiler(object):
         log_debug('Profiling stats: {0}'.format(self.get_stats(
             reuse=self._reuse
         )))
+
+    def tear_down(self):
+        self.__class__._instances.discard(self)

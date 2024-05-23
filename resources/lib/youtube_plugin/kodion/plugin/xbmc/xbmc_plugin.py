@@ -21,6 +21,7 @@ from ...constants import (
     PLAYLIST_POSITION,
     REROUTE,
     SLEEPING,
+    VIDEO_ID,
 )
 from ...exceptions import KodionException
 from ...items import (
@@ -57,7 +58,7 @@ class XbmcPlugin(AbstractPlugin):
         super(XbmcPlugin, self).__init__()
         self.handle = None
 
-    def run(self, provider, context):
+    def run(self, provider, context, refresh=False):
         self.handle = context.get_handle()
         ui = context.get_ui()
 
@@ -132,7 +133,7 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.get_property(CHECK_SETTINGS):
             provider.reset_client()
-            settings = context.get_settings(flush=True)
+            settings = context.get_settings(refresh=True)
             ui.clear_property(CHECK_SETTINGS)
         else:
             settings = context.get_settings()
@@ -160,14 +161,18 @@ class XbmcPlugin(AbstractPlugin):
                 context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
                     exc=exc, details=''.join(format_stack())
                 ))
-                ui.on_ok("Error in ContentProvider", exc.__str__())
+                ui.on_ok('Error in ContentProvider', exc.__str__())
 
+        focused = ui.get_property(VIDEO_ID) if refresh else None
         item_count = 0
         if isinstance(result, (list, tuple)):
             show_fanart = settings.fanart_selection()
             result = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](
-                    context, item, show_fanart=show_fanart
+                    context,
+                    item,
+                    show_fanart=show_fanart,
+                    focused=focused,
                 )
                 for item in result
                 if item.__class__.__name__ in self._LIST_ITEM_MAP
@@ -201,15 +206,6 @@ class XbmcPlugin(AbstractPlugin):
             updateListing=update_listing,
             cacheToDisc=cache_to_disc,
         )
-
-        # set alternative view mode
-        view_manager = ui.get_view_manager()
-        if view_manager.is_override_view_enabled():
-            view_mode = view_manager.get_view_mode()
-            if view_mode is not None:
-                context.log_debug('Override view mode to "%d"' % view_mode)
-                context.execute('Container.SetViewMode(%d)' % view_mode)
-
         return succeeded
 
     def _set_resolved_url(self, context, base_item):
@@ -219,7 +215,7 @@ class XbmcPlugin(AbstractPlugin):
         if base_item.playable:
             ui = context.get_ui()
             if not context.is_plugin_path(uri) and ui.busy_dialog_active():
-                ui.set_property(BUSY_FLAG, 'true')
+                ui.set_property(BUSY_FLAG)
                 playlist = XbmcPlaylist('auto', context)
                 position, _ = playlist.get_position()
                 items = playlist.get_items()

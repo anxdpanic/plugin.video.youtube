@@ -12,24 +12,23 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 import threading
 
-from ..compatibility import xbmc, xbmcaddon, xbmcgui
-from ..constants import ADDON_ID, CHECK_SETTINGS, WAKEUP
+from ..compatibility import xbmc, xbmcgui
+from ..constants import ADDON_ID, CHECK_SETTINGS, REFRESH_CONTAINER, WAKEUP
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
-from ..settings import XbmcPluginSettings
 
 
 class ServiceMonitor(xbmc.Monitor):
-    _settings = XbmcPluginSettings(xbmcaddon.Addon(ADDON_ID))
     _settings_changes = 0
     _settings_state = None
 
-    def __init__(self):
-        settings = self._settings
+    def __init__(self, context):
+        self._context = context
+        settings = context.get_settings()
         self._use_httpd = (settings.use_isa()
                            or settings.api_config_page()
                            or settings.support_alternative_player())
-        address, port = get_connect_address()
+        address, port = get_connect_address(self._context)
         self._old_httpd_address = self._httpd_address = address
         self._old_httpd_port = self._httpd_port = port
         self._whitelist = settings.httpd_whitelist()
@@ -41,6 +40,14 @@ class ServiceMonitor(xbmc.Monitor):
             self.start_httpd()
 
         super(ServiceMonitor, self).__init__()
+
+    @staticmethod
+    def _refresh_allowed():
+        return (not xbmc.getCondVisibility('Container.IsUpdating')
+                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
+                and xbmc.getInfoLabel('Container.FolderPath').startswith(
+                    'plugin://{0}/'.format(ADDON_ID)
+                ))
 
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
@@ -63,6 +70,9 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == WAKEUP:
             if not self.httpd and self.httpd_required():
                 self.start_httpd()
+        elif event == REFRESH_CONTAINER:
+            if self._refresh_allowed():
+                xbmc.executebuiltin('Container.Refresh')
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
@@ -79,23 +89,19 @@ class ServiceMonitor(xbmc.Monitor):
         log_debug('onSettingsChanged: {0} change(s)'.format(changes))
         self._settings_changes = 0
 
-        settings = self._settings
-        settings.flush(xbmcaddon.Addon(ADDON_ID))
+        settings = self._context.get_settings(refresh=True)
 
         xbmcgui.Window(10000).setProperty(
             '-'.join((ADDON_ID, CHECK_SETTINGS)), 'true'
         )
 
-        if (not xbmc.getCondVisibility('Container.IsUpdating')
-                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
-                and xbmc.getInfoLabel('Container.FolderPath').startswith(
-                    'plugin://{0}/'.format(ADDON_ID))):
+        if self._refresh_allowed():
             xbmc.executebuiltin('Container.Refresh')
 
         use_httpd = (settings.use_isa()
                      or settings.api_config_page()
                      or settings.support_alternative_player())
-        address, port = get_connect_address()
+        address, port = get_connect_address(self._context)
         whitelist = settings.httpd_whitelist()
 
         whitelist_changed = whitelist != self._whitelist
@@ -139,12 +145,12 @@ class ServiceMonitor(xbmc.Monitor):
                   .format(ip=self._httpd_address, port=self._httpd_port))
         self.httpd_address_sync()
         self.httpd = get_http_server(address=self._httpd_address,
-                                     port=self._httpd_port)
+                                     port=self._httpd_port,
+                                     context=self._context)
         if not self.httpd:
             return
 
         self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
-        self.httpd_thread.daemon = True
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
@@ -173,10 +179,7 @@ class ServiceMonitor(xbmc.Monitor):
         self.start_httpd()
 
     def ping_httpd(self):
-        return self.httpd and httpd_status()
+        return self.httpd and httpd_status(self._context)
 
     def httpd_required(self):
         return self._use_httpd
-
-    def tear_down(self):
-        self._settings.flush()

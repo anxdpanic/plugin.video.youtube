@@ -10,12 +10,11 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
 from copy import deepcopy
 from platform import python_version
 
-from .plugin import XbmcPlugin
 from .context import XbmcContext
+from .plugin import XbmcPlugin
 from ..youtube import Provider
 
 
@@ -31,9 +30,6 @@ if _profiler:
 
     _profiler = Profiler(enabled=False)
 
-atexit.register(_provider.tear_down)
-atexit.register(_context.tear_down)
-
 
 def run(context=_context,
         plugin=_plugin,
@@ -43,24 +39,28 @@ def run(context=_context,
         profiler.enable(flush=True)
 
     context.log_debug('Starting Kodion framework by bromix...')
+
+    current_uri = context.get_uri()
     context.init()
+    new_uri = context.get_uri()
 
     params = deepcopy(context.get_params())
     for key in ('api_key', 'client_id', 'client_secret'):
         if key in params:
             params[key] = '<redacted>'
 
-    context.log_notice('Running: {plugin} ({version}) on {kodi} with {python}\n'
+    context.log_notice('Running: {plugin} ({version})'
+                       ' on {kodi} with Python {python}\n'
                        'Path: {path}\n'
                        'Params: {params}'
                        .format(plugin=context.get_name(),
                                version=context.get_version(),
                                kodi=context.get_system_version(),
-                               python='Python {0}'.format(python_version()),
+                               python=python_version(),
                                path=context.get_path(),
                                params=params))
 
-    plugin.run(provider, context)
+    plugin.run(provider, context, new_uri == current_uri)
 
     if profiler:
         profiler.print_stats()

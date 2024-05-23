@@ -16,8 +16,6 @@ from requests import Session
 from requests.adapters import HTTPAdapter, Retry
 from requests.exceptions import InvalidJSONError, RequestException
 
-from ..compatibility import xbmcaddon
-from ..constants import ADDON_ID
 from ..logger import log_error
 from ..settings import XbmcPluginSettings
 
@@ -26,8 +24,6 @@ __all__ = (
     'BaseRequestsClass',
     'InvalidJSONError'
 )
-
-_settings = XbmcPluginSettings(xbmcaddon.Addon(ADDON_ID))
 
 
 class BaseRequestsClass(object):
@@ -47,17 +43,17 @@ class BaseRequestsClass(object):
     atexit.register(_session.close)
 
     def __init__(self, exc_type=None):
-        self._verify = _settings.verify_ssl()
-        self._timeout = _settings.get_timeout()
+        settings = XbmcPluginSettings()
+        self._verify = settings.verify_ssl()
+        self._timeout = settings.get_timeout()
+        settings.flush(flush_all=False)
+
         if isinstance(exc_type, tuple):
             self._default_exc = (RequestException,) + exc_type
         elif exc_type:
             self._default_exc = (RequestException, exc_type)
         else:
             self._default_exc = (RequestException,)
-
-    def __del__(self):
-        self._session.close()
 
     def __enter__(self):
         return self
