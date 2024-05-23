@@ -403,19 +403,32 @@ class Provider(AbstractProvider):
         result = []
 
         channel_id = re_match.group('channel_id')
-        page_token = context.get_param('page_token', '')
-        safe_search = context.get_settings().safe_search()
+        params = context.get_params()
+        page_token = params.get('page_token', '')
 
-        # no caching
-        json_data = self.get_client(context).search(q='',
-                                                    search_type='video',
-                                                    event_type='live',
-                                                    channel_id=channel_id,
-                                                    page_token=page_token,
-                                                    safe_search=safe_search)
-        if not json_data:
-            return False
-        result.extend(v3.response_to_items(self, context, json_data))
+        client = self.get_client(context)
+        function_cache = context.get_function_cache()
+        resource_manager = self.get_resource_manager(context)
+
+        playlists = function_cache.run(resource_manager.get_related_playlists,
+                                       function_cache.ONE_DAY,
+                                       channel_id=channel_id)
+        upload_playlist = playlists.get('uploads', '')
+        if upload_playlist:
+            json_data = function_cache.run(client.get_playlist_items,
+                                           function_cache.ONE_MINUTE * 5,
+                                           _refresh=params.get('refresh'),
+                                           playlist_id=upload_playlist,
+                                           page_token=page_token)
+            if not json_data:
+                return result
+
+            result.extend(v3.response_to_items(
+                self, context, json_data,
+                item_filter={
+                    'live_folder': True,
+                },
+            ))
 
         return result
 
@@ -542,7 +555,9 @@ class Provider(AbstractProvider):
                 )
                 result.append(live_item)
 
-        playlists = resource_manager.get_related_playlists(channel_id)
+        playlists = function_cache.run(resource_manager.get_related_playlists,
+                                       function_cache.ONE_DAY,
+                                       channel_id=channel_id)
         upload_playlist = playlists.get('uploads', '')
         if upload_playlist:
             json_data = function_cache.run(client.get_playlist_items,
@@ -553,7 +568,13 @@ class Provider(AbstractProvider):
             if not json_data:
                 return result
 
-            result.extend(v3.response_to_items(self, context, json_data))
+            result.extend(v3.response_to_items(
+                self, context, json_data,
+                item_filter={
+                    'live': False,
+                    'upcoming_live': False,
+                },
+            ))
 
         return result
 
@@ -788,6 +809,7 @@ class Provider(AbstractProvider):
         location = params.get('location')
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
+        order = params.get('order', 'relevance')
         search_type = params.get('search_type', 'video')
         safe_search = context.get_settings().safe_search()
 
@@ -796,7 +818,10 @@ class Provider(AbstractProvider):
         else:
             context.set_content(content.LIST_CONTENT)
 
-        if page == 1 and search_type == 'video' and not event_type and not hide_folders:
+        if (page == 1
+                and search_type == 'video'
+                and not event_type
+                and not hide_folders):
             if not channel_id and not location:
                 channel_params = dict(params, search_type='channel')
                 item_label = context.localize('channels')
@@ -846,10 +871,18 @@ class Provider(AbstractProvider):
                                        safe_search=safe_search,
                                        page_token=page_token,
                                        channel_id=channel_id,
+                                       order=order,
                                        location=location)
         if not json_data:
             return False
-        result.extend(v3.response_to_items(self, context, json_data))
+        result.extend(v3.response_to_items(
+            self, context, json_data,
+            item_filter={
+                'live_folder': True,
+            } if event_type else {
+                'live': False,
+            },
+        ))
         return result
 
     @RegisterProviderPath('^/config/(?P<action>[^/]+)/?$')

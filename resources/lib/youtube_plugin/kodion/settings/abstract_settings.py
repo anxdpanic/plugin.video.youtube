@@ -385,8 +385,35 @@ class AbstractSettings(object):
             return self._STREAM_SELECT[value]
         return self._STREAM_SELECT[default]
 
-    def hide_short_videos(self):
-        return self.get_bool(settings.HIDE_SHORT_VIDEOS, False)
+    _DEFAULT_FILTER = {
+        'shorts': True,
+        'upcoming': True,
+        'upcoming_live': True,
+        'live': True,
+        'premieres': True,
+        'completed': True,
+        'vod': True,
+    }
+
+    def item_filter(self, update=None):
+        types = dict.fromkeys(self.get_string_list(settings.HIDE_VIDEOS), False)
+        types = dict(self._DEFAULT_FILTER, **types)
+        if update:
+            if 'live_folder' in update:
+                if 'live_folder' in types:
+                    types.update(update)
+                else:
+                    types.update({
+                        'upcoming': True,
+                        'upcoming_live': True,
+                        'live': True,
+                        'premieres': True,
+                        'completed': True,
+                    })
+                types['vod'] = False
+            else:
+                types.update(update)
+        return types
 
     def client_selection(self, value=None):
         if value is not None:

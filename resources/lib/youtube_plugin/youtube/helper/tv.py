@@ -15,39 +15,40 @@ from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 
 
 def tv_videos_to_items(provider, context, json_data):
-    result = []
-    video_id_dict = {}
+    incognito = context.get_param('incognito')
+    settings = context.get_settings()
+    use_play_data = not incognito and settings.use_local_history()
+    item_filter = settings.item_filter()
 
-    item_params = {'video_id': None}
-    incognito = context.get_param('incognito', False)
+    item_params = {
+        'video_id': None,
+    }
     if incognito:
-        item_params['incognito'] = incognito
-
-    items = json_data.get('items', [])
-    for item in items:
+        item_params['incognito'] = True
+    video_id_dict = {}
+    channel_item_dict = {}
+    for item in json_data.get('items', []):
         video_id = item['id']
         item_params['video_id'] = video_id
-        item_uri = context.create_uri(('play',), item_params)
-        video_item = VideoItem(item['title'], uri=item_uri)
+        video_item = VideoItem(
+            item['title'], context.create_uri(('play',), item_params)
+        )
         if incognito:
             video_item.set_play_count(0)
-
-        result.append(video_item)
-
         video_id_dict[video_id] = video_item
 
-    use_play_data = not incognito and context.get_settings().use_local_history()
-
-    channel_item_dict = {}
     utils.update_video_infos(provider,
                              context,
                              video_id_dict,
                              channel_items_dict=channel_item_dict,
-                             use_play_data=use_play_data)
+                             use_play_data=use_play_data,
+                             item_filter=item_filter)
     utils.update_fanarts(provider, context, channel_item_dict)
 
-    if context.get_settings().hide_short_videos():
-        result = utils.filter_short_videos(result)
+    if item_filter:
+        result = utils.filter_videos(video_id_dict.values(), **item_filter)
+    else:
+        result = list(video_id_dict.values())
 
     # next page
     next_page_token = json_data.get('next_page_token')

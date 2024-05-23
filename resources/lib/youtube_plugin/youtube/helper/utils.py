@@ -350,6 +350,7 @@ def update_video_infos(provider, context, video_id_dict,
                        channel_items_dict=None,
                        live_details=True,
                        use_play_data=True,
+                       item_filter=None,
                        data=None):
     video_ids = list(video_id_dict)
     if not video_ids and not data:
@@ -380,7 +381,6 @@ def update_video_infos(provider, context, video_id_dict,
     ask_quality = not default_web_urls and settings.ask_for_video_quality()
     audio_only = settings.audio_only()
     channel_name_aliases = settings.get_channel_name_aliases()
-    hide_shorts = settings.hide_short_videos()
     show_details = settings.show_detailed_description()
     subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.get_thumbnail_size()
@@ -421,26 +421,66 @@ def update_video_infos(provider, context, video_id_dict,
 
         if not yt_item or 'snippet' not in yt_item:
             continue
-
         snippet = yt_item['snippet']
-        play_data = use_play_data and yt_item.get('play_data')
-        broadcast_type = snippet.get('liveBroadcastContent')
-        video_item.live = broadcast_type == 'live'
-        video_item.upcoming = broadcast_type == 'upcoming'
 
-        # duration
-        if (not (video_item.live or video_item.upcoming)
-                and play_data and 'total_time' in play_data):
+        play_data = use_play_data and yt_item.get('play_data')
+        if play_data and 'total_time' in play_data:
             duration = play_data['total_time']
         else:
             duration = yt_item.get('contentDetails', {}).get('duration')
             if duration:
                 duration = datetime_parser.parse(duration)
-                # subtract 1s because YouTube duration is +1s too long
-                duration = (duration.seconds - 1) if duration.seconds else None
+                if duration.seconds:
+                    # subtract 1s because YouTube duration is +1s too long
+                    duration = duration.seconds - 1
         if duration:
             video_item.set_duration_from_seconds(duration)
-            if hide_shorts and duration <= 60:
+            if duration <= 60:
+                video_item.short = True
+
+        broadcast_type = snippet.get('liveBroadcastContent')
+        video_item.live = broadcast_type == 'live'
+        video_item.upcoming = broadcast_type == 'upcoming'
+
+        upload_status = yt_item.get('status', {}).get('uploadStatus')
+        if upload_status == 'processed' and duration:
+            video_item.live = False
+        elif upload_status == 'uploaded' and not duration:
+            video_item.live = True
+
+        if 'liveStreamingDetails' in yt_item:
+            streaming_details = yt_item['liveStreamingDetails']
+            if 'actualStartTime' in streaming_details:
+                start_at = streaming_details['actualStartTime']
+                video_item.upcoming = False
+                if 'actualEndTime' in streaming_details:
+                    video_item.completed = True
+            else:
+                start_at = streaming_details.get('scheduledStartTime')
+                video_item.upcoming = True
+        else:
+            video_item.completed = False
+            video_item.live = False
+            video_item.upcoming = False
+            video_item.vod = True
+            start_at = None
+
+            if item_filter and (
+                    (not item_filter['shorts']
+                     and video_item.short)
+                    or (not item_filter['completed']
+                        and video_item.completed)
+                    or (not item_filter['live']
+                        and video_item.live and not video_item.upcoming)
+                    or (not item_filter['upcoming']
+                        and video_item.upcoming)
+                    or (not item_filter['premieres']
+                        and video_item.upcoming and not video_item.live)
+                    or (not item_filter['upcoming_live']
+                        and video_item.upcoming and video_item.live)
+                    or (not item_filter['vod']
+                        and video_item.vod)
+            ):
                 continue
 
         if not video_item.live and play_data:
@@ -458,11 +498,6 @@ def update_video_infos(provider, context, video_id_dict,
         elif video_item.live:
             video_item.set_play_count(0)
 
-        if ((video_item.live or video_item.upcoming)
-                and 'liveStreamingDetails' in yt_item):
-            start_at = yt_item['liveStreamingDetails'].get('scheduledStartTime')
-        else:
-            start_at = None
         if start_at:
             datetime = datetime_parser.parse(start_at)
             video_item.set_scheduled_start_utc(datetime)
@@ -471,7 +506,15 @@ def update_video_infos(provider, context, video_id_dict,
             video_item.set_aired_from_datetime(local_datetime)
             video_item.set_premiered_from_datetime(local_datetime)
             video_item.set_date_from_datetime(local_datetime)
-            type_label = localize('live' if video_item.live else 'upcoming')
+            if video_item.upcoming:
+                if video_item.live:
+                    type_label = localize('live.upcoming')
+                else:
+                    type_label = localize('upcoming')
+            elif video_item.live:
+                type_label = localize('live')
+            else:
+                type_label = localize(335)  # "Start"
             start_at = '{type_label} {start_at}'.format(
                 type_label=type_label,
                 start_at=datetime_parser.get_scheduled_start(
@@ -1004,9 +1047,24 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                 break
 
 
-def filter_short_videos(items):
+def filter_videos(items,
+                  shorts=True,
+                  live=True,
+                  upcoming_live=True,
+                  premieres=True,
+                  upcoming=True,
+                  completed=True,
+                  vod=True,
+                  **_kwargs):
     return [
         item
         for item in items
-        if not item.playable or not 0 <= item.get_duration() <= 60
+        if (not item.playable or (
+                (completed and item.completed)
+                or (live and item.live and not item.upcoming)
+                or (premieres and upcoming and item.upcoming and not item.live)
+                or (upcoming_live and upcoming and item.upcoming and item.live)
+                or (vod and shorts and item.vod)
+                or (vod and not shorts and item.vod and not item.short)
+        ))
     ]
