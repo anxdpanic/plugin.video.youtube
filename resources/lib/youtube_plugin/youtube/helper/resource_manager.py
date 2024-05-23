@@ -47,7 +47,7 @@ class ResourceManager(object):
                 self._function_cache.ONE_DAY,
                 _refresh=refresh,
                 username=channel_id
-            )
+            ) or {}
             items = data.get('items', [{'id': 'mine'}])
 
             try:
