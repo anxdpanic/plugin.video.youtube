@@ -43,9 +43,10 @@ class VideoItem(BaseItem):
         self._track_number = None
         self._studios = None
         self._artists = None
-        self._play_count = None
-        self._uses_isa = None
+        self._production_code = None
         self._mediatype = None
+
+        self._play_count = None
         self._last_played = None
         self._start_percent = None
         self._start_time = None
@@ -56,15 +57,16 @@ class VideoItem(BaseItem):
         self._upcoming = False
         self._vod = False
 
+        self._uses_isa = None
         self.subtitles = None
         self._headers = None
         self.license_key = None
+
         self._video_id = None
         self._channel_id = None
         self._subscription_id = None
         self._playlist_id = None
         self._playlist_item_id = None
-        self._production_code = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count or 0)
