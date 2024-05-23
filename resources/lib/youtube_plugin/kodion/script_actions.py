@@ -111,8 +111,8 @@ def _config_actions(context, action, *_args):
             settings.httpd_listen(addresses[selected_address])
 
     elif action == 'show_client_ip':
-        if httpd_status():
-            client_ip = get_client_ip_address()
+        if httpd_status(context):
+            client_ip = get_client_ip_address(context)
             if client_ip:
                 ui.on_ok(context.get_name(),
                          context.localize('client.ip') % client_ip)
@@ -311,7 +311,7 @@ def _user_actions(context, action, params):
 def run(argv):
     context = XbmcContext()
     ui = context.get_ui()
-    ui.set_property(WAIT_FLAG, 'true')
+    ui.set_property(WAIT_FLAG)
     try:
         category = action = params = None
         args = argv[1:]
@@ -333,12 +333,8 @@ def run(argv):
             xbmcaddon.Addon().openSettings()
             return
 
-        if action == 'refresh':
-            xbmc.executebuiltin('Container.Refresh')
-            return
-
         if action == 'play_with':
-            ui.set_property(SWITCH_PLAYER_FLAG, 'true')
+            ui.set_property(SWITCH_PLAYER_FLAG)
             xbmc.executebuiltin('Action(Play)')
             return
 
@@ -354,5 +350,4 @@ def run(argv):
             _user_actions(context, action, params)
             return
     finally:
-        context.tear_down()
         ui.clear_property(WAIT_FLAG)

@@ -13,7 +13,8 @@ from __future__ import absolute_import, division, unicode_literals
 from threading import Thread
 
 from .utils import (
-    filter_short_videos,
+    THUMB_TYPES,
+    filter_videos,
     get_thumbnail,
     make_comment_item,
     update_channel_infos,
@@ -26,7 +27,7 @@ from ...kodion.constants import paths
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 
 
-def _process_list_response(provider, context, json_data):
+def _process_list_response(provider, context, json_data, item_filter):
     yt_items = json_data.get('items', [])
     if not yt_items:
         context.log_warning('v3 response: Items list is empty')
@@ -71,7 +72,16 @@ def _process_list_response(provider, context, json_data):
         snippet = yt_item.get('snippet', {})
         title = snippet.get('title', context.localize('untitled'))
 
-        thumbnails = snippet.get('thumbnails', {})
+        thumbnails = snippet.get('thumbnails')
+        if not thumbnails and yt_item.get('_partial'):
+            thumbnails = {
+                thumb_type: {
+                    'url': thumb['url'].format(item_id, ''),
+                    'size': thumb['size'],
+                    'ratio': thumb['ratio'],
+                }
+                for thumb_type, thumb in THUMB_TYPES.items()
+            }
         image = get_thumbnail(thumb_size, thumbnails)
         fanart = get_thumbnail(fanart_type, thumbnails) if fanart_type else None
 
@@ -100,6 +110,7 @@ def _process_list_response(provider, context, json_data):
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
+                                 fanart=fanart,
                                  channel_id=item_id)
             channel_id_dict[item_id] = item
 
@@ -123,6 +134,7 @@ def _process_list_response(provider, context, json_data):
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
+                                 fanart=fanart,
                                  channel_id=item_id,
                                  subscription_id=subscription_id)
             channel_id_dict[item_id] = item
@@ -140,6 +152,7 @@ def _process_list_response(provider, context, json_data):
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
+                                 fanart=fanart,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
 
@@ -229,7 +242,8 @@ def _process_list_response(provider, context, json_data):
             'upd_kwargs': {
                 'data': None,
                 'live_details': True,
-                'use_play_data': use_play_data
+                'use_play_data': use_play_data,
+                'item_filter': item_filter,
             },
             'complete': False,
             'defer': False,
@@ -270,7 +284,10 @@ def _process_list_response(provider, context, json_data):
         4: {
             'fetcher': resource_manager.get_fanarts,
             'args': (channel_items_dict,),
-            'kwargs': {'defer_cache': True},
+            'kwargs': {
+                'force': bool(channel_id_dict or playlist_id_dict),
+                'defer_cache': True,
+            },
             'thread': None,
             'updater': update_fanarts,
             'upd_args': (
@@ -366,22 +383,26 @@ def response_to_items(provider,
                       json_data,
                       sort=None,
                       reverse=False,
-                      process_next_page=True):
+                      process_next_page=True,
+                      item_filter=None):
     is_youtube, kind = _parse_kind(json_data)
     if not is_youtube:
         context.log_debug('v3 response: Response discarded, is_youtube=False')
         return []
 
     if kind in _KNOWN_RESPONSE_KINDS:
-        result = _process_list_response(provider, context, json_data)
+        item_filter = context.get_settings().item_filter(item_filter)
+        result = _process_list_response(
+            provider, context, json_data, item_filter
+        )
     else:
         raise KodionException("Unknown kind '%s'" % kind)
 
+    if item_filter:
+        result = filter_videos(result, **item_filter)
+
     if sort is not None:
         result.sort(key=sort, reverse=reverse)
-
-    if context.get_settings().hide_short_videos():
-        result = filter_short_videos(result)
 
     # no processing of next page item
     if not result or not process_next_page:

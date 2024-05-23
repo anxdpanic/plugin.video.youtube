@@ -35,12 +35,15 @@ VALUE_FROM_STR = {
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
 CHECK_SETTINGS = 'check_settings'
+PLAY_COUNT = 'video_play_count'
 PLAYER_DATA = 'player_json'
 PLAYLIST_PATH = 'playlist_path'
 PLAYLIST_POSITION = 'playlist_position'
+REFRESH_CONTAINER = 'refresh_container'
 REROUTE = 'reroute'
 SLEEPING = 'sleeping'
 SWITCH_PLAYER_FLAG = 'switch_player'
+VIDEO_ID = 'video_id'
 WAIT_FLAG = 'builtin_running'
 WAKEUP = 'wakeup'
 
@@ -52,15 +55,18 @@ __all__ = (
     'CHECK_SETTINGS',
     'DATA_PATH',
     'MEDIA_PATH',
+    'PLAY_COUNT',
     'PLAYER_DATA',
     'PLAYLIST_PATH',
     'PLAYLIST_POSITION',
+    'REFRESH_CONTAINER',
     'RESOURCE_PATH',
     'REROUTE',
     'SLEEPING',
     'SWITCH_PLAYER_FLAG',
     'TEMP_PATH',
     'VALUE_FROM_STR',
+    'VIDEO_ID',
     'WAIT_FLAG',
     'WAKEUP',
     'content',

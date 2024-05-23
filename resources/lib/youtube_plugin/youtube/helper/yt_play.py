@@ -102,7 +102,7 @@ def play_video(provider, context):
     if is_external:
         url = urlunsplit((
             'http',
-            get_connect_address(as_netloc=True),
+            get_connect_address(context=context, as_netloc=True),
             paths.REDIRECT,
             urlencode({'url': video_stream['url']}),
             '',
@@ -131,7 +131,7 @@ def play_video(provider, context):
     play_count = use_play_data and video_item.get_play_count() or 0
     playback_stats = video_stream.get('playback_stats')
 
-    playback_json = {
+    playback_data = {
         'video_id': video_id,
         'channel_id': metadata.get('channel', {}).get('id', ''),
         'video_status': video_details.get('status', {}),
@@ -143,16 +143,12 @@ def play_video(provider, context):
         'seek_time': seek_time,
         'start_time': start_time,
         'end_time': end_time,
-        'clip': params.get('clip'),
+        'clip': params.get('clip', False),
         'refresh_only': screensaver
     }
 
-    ui.set_property(PLAYER_DATA, json.dumps(playback_json, ensure_ascii=False))
-    context.send_notification('PlaybackInit', {
-        'video_id': video_id,
-        'channel_id': playback_json.get('channel_id', ''),
-        'status': playback_json.get('video_status', {})
-    })
+    ui.set_property(PLAYER_DATA, json.dumps(playback_data, ensure_ascii=False))
+    context.send_notification('PlaybackInit', playback_data)
     return video_item
 
 

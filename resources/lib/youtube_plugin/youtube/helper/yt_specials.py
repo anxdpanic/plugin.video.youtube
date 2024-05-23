@@ -167,7 +167,7 @@ def _process_description_links(provider, context):
         url_resolver = UrlResolver(context)
 
         with context.get_ui().create_progress_dialog(
-            heading=context.localize('please_wait'), background=False
+                heading=context.localize('please_wait'), background=False
         ) as progress_dialog:
             resource_manager = provider.get_resource_manager(context)
 
@@ -296,17 +296,14 @@ def _process_new_uploaded_videos_tv(provider, context, filtered=False):
     context.set_content(content.VIDEO_CONTENT)
 
     json_data = provider.get_client(context).get_my_subscriptions(
-        page_token=context.get_param('next_page_token', 0),
-        offset=context.get_param('offset', 0),
+        page_token=context.get_param('page'),
         logged_in=provider.is_logged_in(),
+        do_filter=filtered,
     )
 
     if not json_data:
         return False
-    return tv.my_subscriptions_to_items(provider,
-                                        context,
-                                        json_data,
-                                        do_filter=filtered)
+    return v3.response_to_items(provider, context, json_data)
 
 
 def process(category, provider, context):

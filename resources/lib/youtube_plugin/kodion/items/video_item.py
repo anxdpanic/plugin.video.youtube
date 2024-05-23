@@ -43,23 +43,30 @@ class VideoItem(BaseItem):
         self._track_number = None
         self._studios = None
         self._artists = None
-        self._play_count = None
-        self._uses_isa = None
+        self._production_code = None
         self._mediatype = None
+
+        self._play_count = None
         self._last_played = None
         self._start_percent = None
         self._start_time = None
+
+        self._completed = False
         self._live = False
+        self._short = False
         self._upcoming = False
+        self._vod = False
+
+        self._uses_isa = None
         self.subtitles = None
         self._headers = None
         self.license_key = None
+
         self._video_id = None
         self._channel_id = None
         self._subscription_id = None
         self._playlist_id = None
         self._playlist_item_id = None
-        self._production_code = None
 
     def set_play_count(self, play_count):
         self._play_count = int(play_count or 0)
@@ -241,6 +248,14 @@ class VideoItem(BaseItem):
         return self._scheduled_start_utc
 
     @property
+    def completed(self):
+        return self._completed
+
+    @completed.setter
+    def completed(self, value):
+        self._completed = value
+
+    @property
     def live(self):
         return self._live
 
@@ -249,12 +264,28 @@ class VideoItem(BaseItem):
         self._live = value
 
     @property
+    def short(self):
+        return self._short
+
+    @short.setter
+    def short(self, value):
+        self._short = value
+
+    @property
     def upcoming(self):
         return self._upcoming
 
     @upcoming.setter
     def upcoming(self, value):
         self._upcoming = value
+
+    @property
+    def vod(self):
+        return self._vod
+
+    @vod.setter
+    def vod(self, value):
+        self._vod = value
 
     def add_genre(self, genre):
         if self._genres is None:

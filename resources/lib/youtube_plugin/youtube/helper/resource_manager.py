@@ -47,7 +47,7 @@ class ResourceManager(object):
                 self._function_cache.ONE_DAY,
                 _refresh=refresh,
                 username=channel_id
-            )
+            ) or {}
             items = data.get('items', [{'id': 'mine'}])
 
             try:
@@ -63,7 +63,7 @@ class ResourceManager(object):
         else:
             result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
-                     if id_ not in result or result[id_].get('partial')]
+                     if id_ not in result or result[id_].get('_partial')]
 
         if result:
             self._context.log_debug('Found cached data for channels:\n|{ids}|'
@@ -100,8 +100,10 @@ class ResourceManager(object):
 
         return result
 
-    def get_fanarts(self, channel_ids, defer_cache=False):
-        if self._fanart_type != self._context.get_settings().FANART_CHANNEL:
+    def get_fanarts(self, channel_ids, force=False, defer_cache=False):
+        if force:
+            pass
+        elif self._fanart_type != self._context.get_settings().FANART_CHANNEL:
             return {}
 
         result = self.get_channels(channel_ids, defer_cache=defer_cache)
@@ -116,10 +118,9 @@ class ResourceManager(object):
             images = item.get('brandingSettings', {}).get('image', {})
             for banner in banners:
                 image = images.get(banner)
-                if not image:
-                    continue
-                result[key] = image
-                break
+                if image:
+                    result[key] = image
+                    break
             else:
                 # set an empty url
                 result[key] = ''
@@ -134,7 +135,7 @@ class ResourceManager(object):
         else:
             result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
-                     if id_ not in result or result[id_].get('partial')]
+                     if id_ not in result or result[id_].get('_partial')]
 
         if result:
             self._context.log_debug('Found cached data for playlists:\n|{ids}|'
@@ -279,7 +280,7 @@ class ResourceManager(object):
         else:
             result = self._data_cache.get_items(ids, self._data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
-                     if id_ not in result or result[id_].get('partial')]
+                     if id_ not in result or result[id_].get('_partial')]
 
         if result:
             self._context.log_debug('Found cached data for videos:\n|{ids}|'

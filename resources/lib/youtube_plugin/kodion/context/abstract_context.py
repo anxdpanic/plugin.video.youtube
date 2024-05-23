@@ -28,6 +28,10 @@ from ..utils import current_system_version
 
 
 class AbstractContext(object):
+    _initialized = False
+    _addon = None
+    _settings = None
+
     _BOOL_PARAMS = {
         'ask_for_quality',
         'audio_only',
@@ -114,6 +118,7 @@ class AbstractContext(object):
         self._plugin_handle = -1
         self._plugin_id = plugin_id
         self._plugin_name = None
+        self._plugin_icon = None
         self._version = 'UNKNOWN'
 
         self._path = self.create_path(path)
@@ -343,7 +348,7 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     def get_icon(self):
-        return self.create_resource_path('media/icon.png')
+        return self._plugin_icon
 
     def get_fanart(self):
         return self.create_resource_path('media/fanart.jpg')
@@ -420,7 +425,11 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     @staticmethod
-    def get_listitem_detail(detail_name, attr=False):
+    def get_listitem_detail(detail_name):
+        raise NotImplementedError()
+
+    @staticmethod
+    def get_listitem_info(detail_name):
         raise NotImplementedError()
 
     def tear_down(self):

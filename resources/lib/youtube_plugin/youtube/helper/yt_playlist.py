@@ -16,7 +16,7 @@ from ...kodion.utils import find_video_id
 
 
 def _process_add_video(provider, context, keymap_action=False):
-    path = context.get_listitem_detail('FileNameAndPath', attr=True)
+    path = context.get_listitem_info('FileNameAndPath')
 
     client = provider.get_client(context)
     logged_in = provider.is_logged_in()
@@ -34,7 +34,7 @@ def _process_add_video(provider, context, keymap_action=False):
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(path, 'play/'):
+        if context.is_plugin_path(path, 'play'):
             video_id = find_video_id(path)
             keymap_action = True
         if not video_id:
@@ -67,7 +67,7 @@ def _process_add_video(provider, context, keymap_action=False):
 def _process_remove_video(provider, context):
     listitem_playlist_id = context.get_listitem_detail('playlist_id')
     listitem_playlist_item_id = context.get_listitem_detail('playlist_item_id')
-    listitem_title = context.get_listitem_detail('Title', attr=True)
+    listitem_title = context.get_listitem_info('Title')
     keymap_action = False
 
     params = context.get_params()
@@ -150,7 +150,7 @@ def _process_remove_playlist(provider, context):
 
 def _process_select_playlist(provider, context):
     # Get listitem path asap, relies on listitems focus
-    path = context.get_listitem_detail('FileNameAndPath', attr=True)
+    path = context.get_listitem_info('FileNameAndPath')
 
     params = context.get_params()
     ui = context.get_ui()
@@ -160,7 +160,7 @@ def _process_select_playlist(provider, context):
 
     video_id = params.get('video_id', '')
     if not video_id:
-        if context.is_plugin_path(path, 'play/'):
+        if context.is_plugin_path(path, 'play'):
             video_id = find_video_id(path)
             if video_id:
                 context.set_param('video_id', video_id)
@@ -178,7 +178,7 @@ def _process_select_playlist(provider, context):
     else:
         watch_later_id = None
 
-    thumb_size = context.get_settings().get_thumb_size()
+    thumb_size = context.get_settings().get_thumbnail_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
     while True:

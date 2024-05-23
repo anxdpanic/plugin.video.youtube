@@ -16,16 +16,12 @@ from ...kodion.items import UriItem
 
 
 def _process_list(provider, context):
-    result = []
-
-    page_token = context.get_param('page_token', '')
-    # no caching
-    json_data = provider.get_client(context).get_subscription('mine', page_token=page_token)
+    json_data = provider.get_client(context).get_subscription(
+        'mine', page_token=context.get_param('page_token', '')
+    )
     if not json_data:
         return []
-    result.extend(v3.response_to_items(provider, context, json_data))
-
-    return result
+    return v3.response_to_items(provider, context, json_data)
 
 
 def _process_add(provider, context):
@@ -84,20 +80,15 @@ def _process_remove(provider, context):
 
 
 def process(method, provider, context):
-    result = []
-
     # we need a login
     _ = provider.get_client(context)
     if not provider.is_logged_in():
         return UriItem(context.create_uri(('sign', 'in')))
 
     if method == 'list':
-        result.extend(_process_list(provider, context))
-    elif method == 'add':
+        return _process_list(provider, context)
+    if method == 'add':
         return _process_add(provider, context)
-    elif method == 'remove':
+    if method == 'remove':
         return _process_remove(provider, context)
-    else:
-        raise KodionException("Unknown subscriptions method '%s'" % method)
-
-    return result
+    raise KodionException("Unknown subscriptions method '%s'" % method)
