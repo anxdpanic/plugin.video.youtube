@@ -22,32 +22,35 @@ from ...utils.system_version import current_system_version
 
 class SettingsProxy(object):
     def __init__(self, instance):
-        self.ref = instance
+        self._ref = instance
 
     if current_system_version.compatible(21, 0):
         def get_bool(self, *args, **kwargs):
-            return xbmcaddon.Settings.getBool(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.getBool(self.ref(), *args, **kwargs)
 
         def set_bool(self, *args, **kwargs):
-            return xbmcaddon.Settings.setBool(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.setBool(self.ref(), *args, **kwargs)
 
         def get_int(self, *args, **kwargs):
-            return xbmcaddon.Settings.getInt(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.getInt(self.ref(), *args, **kwargs)
 
         def set_int(self, *args, **kwargs):
-            return xbmcaddon.Settings.setInt(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.setInt(self.ref(), *args, **kwargs)
 
         def get_str(self, *args, **kwargs):
-            return xbmcaddon.Settings.getString(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.getString(self.ref(), *args, **kwargs)
 
         def set_str(self, *args, **kwargs):
-            return xbmcaddon.Settings.setString(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.setString(self.ref(), *args, **kwargs)
 
         def get_str_list(self, *args, **kwargs):
-            return xbmcaddon.Settings.getStringList(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.getStringList(self.ref(), *args, **kwargs)
 
         def set_str_list(self, *args, **kwargs):
-            return xbmcaddon.Settings.setStringList(self.ref, *args, **kwargs)
+            return xbmcaddon.Settings.setStringList(self.ref(), *args, **kwargs)
+
+        def ref(self):
+            return self._ref
     else:
         def get_bool(self, *args, **kwargs):
             return xbmcaddon.Addon.getSettingBool(self.ref(), *args, **kwargs)
@@ -73,6 +76,13 @@ class SettingsProxy(object):
         def set_str_list(self, setting, value):
             value = ','.join(value)
             return xbmcaddon.Addon.setSetting(self.ref(), setting, value)
+
+        if current_system_version.compatible(19, 0):
+            def ref(self):
+                return self._ref
+        else:
+            def ref(self):
+                return self._ref()
 
 
 class XbmcPluginSettings(AbstractSettings):
@@ -108,6 +118,8 @@ class XbmcPluginSettings(AbstractSettings):
             # don't actually return anything...
             # Ignore return value until bug is fixed in Kodi
             self._check_set = False
+        elif current_system_version.compatible(19, 0):
+            self._proxy = SettingsProxy(xbmc_addon)
         else:
             if fill:
                 self.__class__._instances.add(xbmc_addon)
