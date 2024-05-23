@@ -10,6 +10,10 @@
 - Fix changing fanart type on My Subscriptions #751
 - Fix not using thumbnail fanart for channels/subscriptions/playlists when enabled #751
 - Fix My Subscriptions threading issues #529
+- Fix failing to login #759
+- Improve resource usage
+- Fix adding video to playlist #764
+- Update video filtering for live streams #755
 
 ### Changed
 - Use internal Kodi resume enable/disable for all playback #693
