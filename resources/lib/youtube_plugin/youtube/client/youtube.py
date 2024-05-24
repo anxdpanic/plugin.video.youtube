@@ -1580,7 +1580,7 @@ class YouTube(LoginClient):
                     elif kwargs:
                         _kwargs = kwargs.pop()
                     elif input_wait:
-                        input_wait.acquire(blocking=True)
+                        input_wait.acquire(True)
                         input_wait.release()
                         if kwargs:
                             continue
