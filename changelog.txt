@@ -22,6 +22,7 @@
 - Improve resource usage
 - Fix adding video to playlist #764
 - Fix plugin settings raising exception in Kodi 19-20 #769
+- Fix location icon background colour
 
 ### Changed
 - Removed Settings > Advanced > Views > Show channel fanart
