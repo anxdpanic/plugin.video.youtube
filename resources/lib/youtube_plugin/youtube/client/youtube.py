@@ -613,7 +613,7 @@ class YouTube(LoginClient):
 
         return v3_response
 
-    def get_related_for_home(self, page_token=''):
+    def get_related_for_home(self, page_token='', refresh=False):
         """
         YouTube has deprecated this API, so we use history and related items to
         form a recommended set.
@@ -653,7 +653,10 @@ class YouTube(LoginClient):
         # Fetch existing list of items, if any
         cache = self._context.get_data_cache()
         cache_items_key = 'get-activities-home-items-v2'
-        cached = cache.get_item(cache_items_key, None) or []
+        if refresh:
+            cached = []
+        else:
+            cached = cache.get_item(cache_items_key, None) or []
 
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth
@@ -1428,6 +1431,7 @@ class YouTube(LoginClient):
                              page_token=1,
                              logged_in=False,
                              do_filter=False,
+                             refresh=False,
                              **kwargs):
         """
         modified by PureHemp, using YouTube RSS for fetching latest videos
@@ -1454,7 +1458,10 @@ class YouTube(LoginClient):
 
         # if new uploads is cached
         cache_items_key = 'my-subscriptions-items-v2'
-        cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
+        if refresh:
+            cached = None
+        else:
+            cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
         if cached:
             items = cached
         # no cache, get uploads data from web
