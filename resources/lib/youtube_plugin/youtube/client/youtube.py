@@ -1612,6 +1612,7 @@ class YouTube(LoginClient):
                 threads['available'].release()
                 if dynamic:
                     threads['pool_counts'][pool_id] -= 1
+                threads['pool_counts']['all'] -= 1
                 threads['current'].discard(thread)
 
             try:
@@ -1623,7 +1624,9 @@ class YouTube(LoginClient):
                 'max': max_threads,
                 'available': threading.Semaphore(max_threads),
                 'current': set(),
-                'pool_counts': {},
+                'pool_counts': {
+                    'all': 0,
+                },
                 'balance': threading.Event(),
             }
             payloads = [
@@ -1675,14 +1678,14 @@ class YouTube(LoginClient):
                     else:
                         continue
 
-                    spots_available = threads['available']._value
+                    available = threads['max'] - threads['pool_counts']['all']
                     limit = payload['limit']
                     if limit:
                         if current_num >= limit:
                             continue
-                        if not spots_available:
+                        if not available:
                             threads['balance'].set()
-                    elif not spots_available:
+                    elif not available:
                         continue
 
                     thread = threading.Thread(
@@ -1692,6 +1695,7 @@ class YouTube(LoginClient):
                     thread.daemon = True
                     threads['current'].add(thread)
                     threads['pool_counts'][pool_id] += 1
+                    threads['pool_counts']['all'] -= 1
                     threads['available'].acquire(blocking=True)
                     thread.start()
 
