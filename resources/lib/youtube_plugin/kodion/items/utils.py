@@ -54,7 +54,7 @@ def from_json(json_data, *args):
     :return:
     """
     if isinstance(json_data, string_type):
-        if json_data == 'None':
+        if json_data == b'None':
             # Channel bookmark that will be updated. Store timestamp for update
             if args and args[0] and len(args[0]) == 4:
                 return args[0][1]
