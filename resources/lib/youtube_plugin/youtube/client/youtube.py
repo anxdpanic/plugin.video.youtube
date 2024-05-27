@@ -613,7 +613,7 @@ class YouTube(LoginClient):
 
         return v3_response
 
-    def get_related_for_home(self, page_token=''):
+    def get_related_for_home(self, page_token='', refresh=False):
         """
         YouTube has deprecated this API, so we use history and related items to
         form a recommended set.
@@ -653,7 +653,10 @@ class YouTube(LoginClient):
         # Fetch existing list of items, if any
         cache = self._context.get_data_cache()
         cache_items_key = 'get-activities-home-items-v2'
-        cached = cache.get_item(cache_items_key, None) or []
+        if refresh:
+            cached = []
+        else:
+            cached = cache.get_item(cache_items_key, None) or []
 
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth
@@ -1428,6 +1431,7 @@ class YouTube(LoginClient):
                              page_token=1,
                              logged_in=False,
                              do_filter=False,
+                             refresh=False,
                              **kwargs):
         """
         modified by PureHemp, using YouTube RSS for fetching latest videos
@@ -1454,7 +1458,10 @@ class YouTube(LoginClient):
 
         # if new uploads is cached
         cache_items_key = 'my-subscriptions-items-v2'
-        cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
+        if refresh:
+            cached = None
+        else:
+            cached = cache.get_item(cache_items_key, cache.ONE_HOUR) or []
         if cached:
             items = cached
         # no cache, get uploads data from web
@@ -1573,7 +1580,7 @@ class YouTube(LoginClient):
                     elif kwargs:
                         _kwargs = kwargs.pop()
                     elif input_wait:
-                        input_wait.acquire(blocking=True)
+                        input_wait.acquire(True)
                         input_wait.release()
                         if kwargs:
                             continue
@@ -1605,6 +1612,7 @@ class YouTube(LoginClient):
                 threads['available'].release()
                 if dynamic:
                     threads['pool_counts'][pool_id] -= 1
+                threads['pool_counts']['all'] -= 1
                 threads['current'].discard(thread)
 
             try:
@@ -1616,7 +1624,9 @@ class YouTube(LoginClient):
                 'max': max_threads,
                 'available': threading.Semaphore(max_threads),
                 'current': set(),
-                'pool_counts': {},
+                'pool_counts': {
+                    'all': 0,
+                },
                 'balance': threading.Event(),
             }
             payloads = [
@@ -1668,14 +1678,14 @@ class YouTube(LoginClient):
                     else:
                         continue
 
-                    spots_available = threads['available']._value
+                    available = threads['max'] - threads['pool_counts']['all']
                     limit = payload['limit']
                     if limit:
                         if current_num >= limit:
                             continue
-                        if not spots_available:
+                        if not available:
                             threads['balance'].set()
-                    elif not spots_available:
+                    elif not available:
                         continue
 
                     thread = threading.Thread(
@@ -1685,6 +1695,7 @@ class YouTube(LoginClient):
                     thread.daemon = True
                     threads['current'].add(thread)
                     threads['pool_counts'][pool_id] += 1
+                    threads['pool_counts']['all'] -= 1
                     threads['available'].acquire(blocking=True)
                     thread.start()
 
