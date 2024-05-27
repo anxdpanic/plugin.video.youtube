@@ -20,6 +20,11 @@ jobs:
     permissions:
       contents: write
 
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.x' ]
+
     steps:
       - name: Get and set release status
         # workflow_dispatch: use pre-release variable for release status
@@ -38,10 +43,10 @@ jobs:
             echo "pre-release=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Setup Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: '3.x'
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         # install lftp for mirroring repository
