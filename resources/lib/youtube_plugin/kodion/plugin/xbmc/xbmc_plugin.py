@@ -182,6 +182,7 @@ class XbmcPlugin(AbstractPlugin):
             result = self._set_resolved_url(context, result)
 
         if item_count:
+            context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
                 self.handle, result, item_count
             )

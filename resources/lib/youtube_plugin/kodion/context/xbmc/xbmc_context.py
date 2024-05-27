@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import atexit
+import json
 import sys
 from weakref import proxy
 
@@ -23,7 +24,14 @@ from ...compatibility import (
     xbmcaddon,
     xbmcplugin,
 )
-from ...constants import ABORT_FLAG, ADDON_ID, WAKEUP, content, sort
+from ...constants import (
+    ABORT_FLAG,
+    ADDON_ID,
+    CONTENT_TYPE,
+    WAKEUP,
+    content,
+    sort,
+)
 from ...player import XbmcPlayer, XbmcPlaylist
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
@@ -481,7 +489,22 @@ class XbmcContext(AbstractContext):
         return result
 
     def set_content(self, content_type, sub_type=None, category_label=None):
-        self.log_debug('Setting content-type: |{type}| for |{path}|'.format(
+        ui = self.get_ui()
+        ui.set_property(CONTENT_TYPE, json.dumps(
+            (content_type, sub_type, category_label),
+            ensure_ascii=False,
+        ))
+
+    def apply_content(self):
+        ui = self.get_ui()
+        content_type = ui.get_property(CONTENT_TYPE)
+        if content_type:
+            ui.clear_property(CONTENT_TYPE)
+            content_type, sub_type, category_label = json.loads(content_type)
+        else:
+            return
+
+        self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
             type=(sub_type or content_type), path=self.get_path()
         ))
         xbmcplugin.setContent(self._plugin_handle, content_type)

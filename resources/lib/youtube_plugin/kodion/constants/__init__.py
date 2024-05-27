@@ -35,6 +35,7 @@ VALUE_FROM_STR = {
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
 CHECK_SETTINGS = 'check_settings'
+CONTENT_TYPE = 'content_type'
 PLAY_COUNT = 'video_play_count'
 PLAYER_DATA = 'player_json'
 PLAYLIST_PATH = 'playlist_path'
@@ -53,6 +54,7 @@ __all__ = (
     'ADDON_PATH',
     'BUSY_FLAG',
     'CHECK_SETTINGS',
+    'CONTENT_TYPE',
     'DATA_PATH',
     'MEDIA_PATH',
     'PLAY_COUNT',
