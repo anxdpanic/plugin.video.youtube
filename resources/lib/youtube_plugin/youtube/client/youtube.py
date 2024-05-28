@@ -1706,7 +1706,6 @@ class YouTube(LoginClient):
                 if thread and thread.is_alive():
                     thread.join(30)
 
-
             # Update cache
             cache.set_item(cache_items_key, items)
 

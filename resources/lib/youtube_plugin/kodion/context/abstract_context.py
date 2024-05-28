@@ -378,7 +378,7 @@ class AbstractContext(object):
     def get_handle(self):
         return self._plugin_handle
 
-    def get_settings(self, flush=False):
+    def get_settings(self, refresh=False):
         raise NotImplementedError()
 
     def localize(self, text_id, default_text=None):

@@ -146,9 +146,7 @@ def _maintenance_actions(context, action, params):
         if target not in targets:
             return
 
-        if ui.on_clear_content(
-            localize('maintenance.{0}'.format(target))
-        ):
+        if ui.on_clear_content(localize('maintenance.{0}'.format(target))):
             targets[target]().clear()
             ui.show_notification(localize('succeeded'))
 

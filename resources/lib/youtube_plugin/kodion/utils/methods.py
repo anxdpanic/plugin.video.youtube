@@ -328,7 +328,7 @@ def validate_ip_address(ip_address):
         if len(octets) != 4:
             raise ValueError
     except ValueError:
-        return (0, 0, 0, 0)
+        return 0, 0, 0, 0
     return tuple(octets)
 
 

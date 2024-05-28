@@ -216,7 +216,7 @@
                 </setting>
                 <setting id="youtube.view.hide_videos" type="list[string]" label="30808" help="">
                     <level>0</level>
-                    <default></default>
+                    <default/>
                     <constraints>
                         <options>
                             <option label="30736">shorts</option>

@@ -736,7 +736,6 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/?$')
     def _on_subscriptions(self, context, re_match):
         method = re_match.group('method')
-        resource_manager = self.get_resource_manager(context)
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
