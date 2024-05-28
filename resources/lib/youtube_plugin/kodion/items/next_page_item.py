@@ -43,7 +43,7 @@ class NextPageItem(DirectoryItem):
 
         context_menu = [
             menu_items.refresh(context),
-            menu_items.goto_page(context) if can_jump else None,
+            menu_items.goto_page(context, params) if can_jump else None,
             menu_items.goto_home(context),
             menu_items.goto_quick_search(context),
             menu_items.separator(),

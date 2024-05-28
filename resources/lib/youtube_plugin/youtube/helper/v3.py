@@ -422,7 +422,9 @@ def response_to_items(provider,
     new_params = dict(params, page=next_page)
 
     yt_next_page_token = json_data.get('nextPageToken')
-    if yt_next_page_token:
+    if yt_next_page_token == next_page:
+        new_params['page_token'] = ''
+    elif yt_next_page_token:
         new_params['page_token'] = yt_next_page_token
     elif 'page_token' in new_params:
         del new_params['page_token']

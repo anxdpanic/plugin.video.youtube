@@ -197,9 +197,12 @@ class AbstractProvider(object):
 
         path = re_match.group('path')
         params = context.get_params()
-        page_token = NextPageItem.create_page_token(
-            page, params.get('items_per_page', 50)
-        )
+        if 'page_token' in params:
+            page_token = NextPageItem.create_page_token(
+                page, params.get('items_per_page', 50)
+            )
+        else:
+            page_token = ''
         params = dict(params, page=page, page_token=page_token)
         return self.reroute(context, path=path, params=params)
 
