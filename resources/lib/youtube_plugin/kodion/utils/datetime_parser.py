@@ -280,7 +280,7 @@ def strptime(datetime_str, fmt=None):
         return datetime.strptime(datetime_str, fmt)
     except TypeError:
         if '_strptime' not in modules or strptime.reloading.locked():
-            if strptime.reloaded.acquire(blocking=False):
+            if strptime.reloaded.acquire(False):
                 _strptime = import_module('_strptime')
                 modules['_strptime'] = _strptime
                 log_error('Python strptime bug workaround - '

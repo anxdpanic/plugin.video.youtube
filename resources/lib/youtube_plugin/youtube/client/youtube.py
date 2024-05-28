@@ -1696,7 +1696,7 @@ class YouTube(LoginClient):
                     threads['current'].add(thread)
                     threads['pool_counts'][pool_id] += 1
                     threads['pool_counts']['all'] -= 1
-                    threads['available'].acquire(blocking=True)
+                    threads['available'].acquire(True)
                     thread.start()
 
                 if not threads['current']:
