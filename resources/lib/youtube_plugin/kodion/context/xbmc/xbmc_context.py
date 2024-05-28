@@ -620,7 +620,7 @@ class XbmcContext(AbstractContext):
                                    error.get('message', 'unknown')))
             return False
 
-    def send_notification(self, method, data):
+    def send_notification(self, method, data=True):
         self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
         jsonrpc(method='JSONRPC.NotifyAll',
                 params={'sender': ADDON_ID,
@@ -750,4 +750,4 @@ class XbmcContext(AbstractContext):
 
     def wakeup(self):
         self.get_ui().set_property(WAKEUP)
-        self.send_notification(WAKEUP, True)
+        self.send_notification(WAKEUP)

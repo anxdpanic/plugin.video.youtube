@@ -264,7 +264,7 @@ class PlayerMonitorThread(threading.Thread):
                                                         rating_match)
 
         if settings.get_bool('youtube.post.play.refresh', False):
-            self._context.send_notification(REFRESH_CONTAINER, True)
+            self._context.send_notification(REFRESH_CONTAINER)
 
         self.end()
 

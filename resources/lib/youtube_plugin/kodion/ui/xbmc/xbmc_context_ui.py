@@ -132,7 +132,7 @@ class XbmcContextUI(AbstractContextUI):
                                       audible)
 
     def refresh_container(self):
-        self._context.send_notification(REFRESH_CONTAINER, True)
+        self._context.send_notification(REFRESH_CONTAINER)
 
     @staticmethod
     def set_property(property_id, value='true'):
