@@ -17,7 +17,7 @@ from .audio_item import AudioItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
 from .video_item import VideoItem
-from ..compatibility import string_type
+from ..compatibility import string_type, to_str
 from ..utils.datetime_parser import strptime
 
 
@@ -54,7 +54,7 @@ def from_json(json_data, *args):
     :return:
     """
     if isinstance(json_data, string_type):
-        if json_data == b'None':
+        if json_data == to_str(None):
             # Channel bookmark that will be updated. Store timestamp for update
             if args and args[0] and len(args[0]) == 4:
                 return args[0][1]
