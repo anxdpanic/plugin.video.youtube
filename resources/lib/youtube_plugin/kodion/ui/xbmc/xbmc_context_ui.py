@@ -138,6 +138,7 @@ class XbmcContextUI(AbstractContextUI):
     def set_property(property_id, value='true'):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(property_id, value)
+        return value
 
     @staticmethod
     def get_property(property_id):
@@ -148,6 +149,7 @@ class XbmcContextUI(AbstractContextUI):
     def clear_property(property_id):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).clearProperty(property_id)
+        return None
 
     @staticmethod
     def bold(value, cr_before=0, cr_after=0):

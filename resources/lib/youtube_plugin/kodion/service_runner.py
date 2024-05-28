@@ -17,7 +17,6 @@ from .constants import (
     SLEEPING,
     TEMP_PATH,
     VIDEO_ID,
-    WAKEUP,
 )
 from .context import XbmcContext
 from .monitors import PlayerMonitor, ServiceMonitor
@@ -53,6 +52,7 @@ def run():
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
 
+    sleeping = False
     ping_period = waited = 60
     restart_attempts = 0
     video_id = None
@@ -61,64 +61,71 @@ def run():
             if (monitor.httpd_required()
                     and not get_infobool('System.IdleTime(10)')):
                 monitor.start_httpd()
+                if sleeping:
+                    sleeping = clear_property(SLEEPING)
                 waited = 0
         elif get_infobool('System.IdleTime(10)'):
-            if get_property(WAKEUP):
-                clear_property(WAKEUP)
-                waited = 0
             if waited >= 30:
                 monitor.shutdown_httpd()
-                set_property(SLEEPING)
-        elif waited >= ping_period:
-            waited = 0
-            if monitor.ping_httpd():
-                restart_attempts = 0
-            elif restart_attempts < 5:
-                monitor.restart_httpd()
-                restart_attempts += 1
-            else:
-                monitor.shutdown_httpd()
-
-        is_plugin_container = monitor.is_plugin_container()
-        if is_plugin_container and get_property(REFRESH_CONTAINER):
-            monitor.refresh_container(force=True)
-            clear_property(REFRESH_CONTAINER)
-            wait_interval = 0.1
-            num_waits = 1
-        elif is_plugin_container:
-            new_video_id = get_listitem_detail('video_id')
-            if not new_video_id:
-                video_id = None
-                if get_listitem_info('Label'):
-                    clear_property(VIDEO_ID)
-                    clear_property(PLAY_COUNT)
-            elif video_id != new_video_id:
-                video_id = new_video_id
-                set_property(VIDEO_ID, video_id)
-                plugin_play_count = get_listitem_detail(PLAY_COUNT)
-                set_property(PLAY_COUNT, plugin_play_count)
-            else:
-                kodi_play_count = get_listitem_info('PlayCount')
-                kodi_play_count = int(kodi_play_count or 0)
-                plugin_play_count = get_property(PLAY_COUNT)
-                plugin_play_count = int(plugin_play_count or 0)
-                if kodi_play_count != plugin_play_count:
-                    playback_history = context.get_playback_history()
-                    play_data = playback_history.get_item(video_id)
-                    if not play_data:
-                        play_data = {'play_count': kodi_play_count}
-                        playback_history.update(video_id, play_data)
-                    elif play_data.get('play_count') != kodi_play_count:
-                        play_data['play_count'] = kodi_play_count
-                        play_data['played_time'] = 0.0
-                        play_data['played_percent'] = 0
-                        playback_history.update(video_id, play_data)
-                    set_property(PLAY_COUNT, str(kodi_play_count))
-            wait_interval = 0.1
-            num_waits = 1
+                if not sleeping:
+                    sleeping = set_property(SLEEPING)
         else:
-            wait_interval = 2
-            num_waits = 5
+            if sleeping:
+                sleeping = clear_property(SLEEPING)
+            if waited >= ping_period:
+                waited = 0
+                if monitor.ping_httpd():
+                    restart_attempts = 0
+                elif restart_attempts < 5:
+                    monitor.restart_httpd()
+                    restart_attempts += 1
+                else:
+                    monitor.shutdown_httpd()
+
+        if sleeping:
+            wait_interval = 1
+            num_waits = 10
+        else:
+            is_plugin_container = monitor.is_plugin_container()
+            if is_plugin_container and get_property(REFRESH_CONTAINER):
+                monitor.refresh_container(force=True)
+                clear_property(REFRESH_CONTAINER)
+                wait_interval = 0.1
+                num_waits = 1
+            elif is_plugin_container:
+                new_video_id = get_listitem_detail('video_id')
+                if not new_video_id:
+                    video_id = None
+                    if get_listitem_info('Label'):
+                        clear_property(VIDEO_ID)
+                        clear_property(PLAY_COUNT)
+                elif video_id != new_video_id:
+                    video_id = new_video_id
+                    set_property(VIDEO_ID, video_id)
+                    plugin_play_count = get_listitem_detail(PLAY_COUNT)
+                    set_property(PLAY_COUNT, plugin_play_count)
+                else:
+                    kodi_play_count = get_listitem_info('PlayCount')
+                    kodi_play_count = int(kodi_play_count or 0)
+                    plugin_play_count = get_property(PLAY_COUNT)
+                    plugin_play_count = int(plugin_play_count or 0)
+                    if kodi_play_count != plugin_play_count:
+                        playback_history = context.get_playback_history()
+                        play_data = playback_history.get_item(video_id)
+                        if not play_data:
+                            play_data = {'play_count': kodi_play_count}
+                            playback_history.update(video_id, play_data)
+                        elif play_data.get('play_count') != kodi_play_count:
+                            play_data['play_count'] = kodi_play_count
+                            play_data['played_time'] = 0.0
+                            play_data['played_percent'] = 0
+                            playback_history.update(video_id, play_data)
+                        set_property(PLAY_COUNT, str(kodi_play_count))
+                wait_interval = 0.1
+                num_waits = 1
+            else:
+                wait_interval = 1
+                num_waits = 10
 
         while not monitor.waitForAbort(wait_interval):
             waited += wait_interval

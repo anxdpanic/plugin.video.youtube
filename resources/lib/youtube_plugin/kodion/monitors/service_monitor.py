@@ -59,6 +59,7 @@ class ServiceMonitor(xbmc.Monitor):
     def set_property(property_id, value='true'):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).setProperty(property_id, value)
+        return value
 
     def refresh_container(self, force=False):
         if force or self.is_plugin_container():

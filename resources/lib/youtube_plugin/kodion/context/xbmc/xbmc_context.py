@@ -749,5 +749,4 @@ class XbmcContext(AbstractContext):
                 pass
 
     def wakeup(self):
-        self.get_ui().set_property(WAKEUP)
         self.send_notification(WAKEUP)
