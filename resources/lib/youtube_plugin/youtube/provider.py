@@ -1164,7 +1164,7 @@ class Provider(AbstractProvider):
         local_history = settings.use_local_history()
 
         # Home / Recommendations
-        if settings.get_bool('youtube.folder.recommendations.show', True):
+        if logged_in and settings.get_bool('youtube.folder.recommendations.show', True):
             recommendations_item = DirectoryItem(
                 localize('recommendations'),
                 create_uri(('special', 'recommendations')),
