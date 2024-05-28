@@ -48,12 +48,23 @@ class ServiceMonitor(xbmc.Monitor):
         super(ServiceMonitor, self).__init__()
 
     @staticmethod
-    def _refresh_allowed():
-        return (not xbmc.getCondVisibility('Container.IsUpdating')
-                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
-                and xbmc.getInfoLabel('Container.FolderPath').startswith(
-                    'plugin://{0}/'.format(ADDON_ID)
-                ))
+    def is_plugin_container(info_bool=xbmc.getCondVisibility,
+                            info_label=xbmc.getInfoLabel,
+                            url='plugin://{0}/'.format(ADDON_ID)):
+        return (not info_bool('Container.IsUpdating')
+                and not info_bool('System.HasActiveModalDialog')
+                and info_label('Container.FolderPath').startswith(url))
+
+    @staticmethod
+    def set_property(property_id, value='true'):
+        property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).setProperty(property_id, value)
+
+    def refresh_container(self, force=False):
+        if force or self.is_plugin_container():
+            xbmc.executebuiltin('Container.Refresh')
+        else:
+            self.set_property(REFRESH_CONTAINER)
 
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
@@ -77,12 +88,10 @@ class ServiceMonitor(xbmc.Monitor):
             if not self.httpd and self.httpd_required():
                 self.start_httpd()
         elif event == REFRESH_CONTAINER:
-            if self._refresh_allowed():
-                xbmc.executebuiltin('Container.Refresh')
+            self.refresh_container()
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
-            if self._refresh_allowed():
-                xbmc.executebuiltin('Container.Refresh')
+            self.refresh_container()
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
@@ -101,12 +110,8 @@ class ServiceMonitor(xbmc.Monitor):
 
         settings = self._context.get_settings(refresh=True)
 
-        xbmcgui.Window(10000).setProperty(
-            '-'.join((ADDON_ID, CHECK_SETTINGS)), 'true'
-        )
-
-        if self._refresh_allowed():
-            xbmc.executebuiltin('Container.Refresh')
+        self.set_property(CHECK_SETTINGS)
+        self.refresh_container()
 
         use_httpd = (settings.use_isa()
                      or settings.api_config_page()

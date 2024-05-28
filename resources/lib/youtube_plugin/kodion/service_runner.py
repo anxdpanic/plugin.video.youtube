@@ -12,8 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .constants import (
     ABORT_FLAG,
-    ADDON_ID,
     PLAY_COUNT,
+    REFRESH_CONTAINER,
     SLEEPING,
     TEMP_PATH,
     VIDEO_ID,
@@ -35,7 +35,6 @@ def run():
     provider = Provider()
 
     get_infobool = context.get_infobool
-    get_infolabel = context.get_infolabel
     get_listitem_detail = context.get_listitem_detail
     get_listitem_info = context.get_listitem_info
 
@@ -56,7 +55,6 @@ def run():
 
     ping_period = waited = 60
     restart_attempts = 0
-    plugin_url = 'plugin://{0}/'.format(ADDON_ID)
     video_id = None
     while not monitor.abortRequested():
         if not monitor.httpd:
@@ -81,7 +79,13 @@ def run():
             else:
                 monitor.shutdown_httpd()
 
-        if get_infolabel('Container.FolderPath').startswith(plugin_url):
+        is_plugin_container = monitor.is_plugin_container()
+        if is_plugin_container and get_property(REFRESH_CONTAINER):
+            monitor.refresh_container(force=True)
+            clear_property(REFRESH_CONTAINER)
+            wait_interval = 0.1
+            num_waits = 1
+        elif is_plugin_container:
             new_video_id = get_listitem_detail('video_id')
             if not new_video_id:
                 video_id = None
@@ -111,12 +115,18 @@ def run():
                         playback_history.update(video_id, play_data)
                     set_property(PLAY_COUNT, str(kodi_play_count))
             wait_interval = 0.1
+            num_waits = 1
         else:
-            wait_interval = 10
+            wait_interval = 2
+            num_waits = 5
 
-        if monitor.waitForAbort(wait_interval):
+        while not monitor.waitForAbort(wait_interval):
+            waited += wait_interval
+            num_waits -= 1
+            if num_waits <= 0:
+                break
+        else:
             break
-        waited += wait_interval
 
     set_property(ABORT_FLAG)
 
