@@ -1229,7 +1229,7 @@ class Provider(AbstractProvider):
             my_channel_item = DirectoryItem(
                 localize('my_channel'),
                 create_uri(('channel', 'mine')),
-                image='{media}/channel.png',
+                image='{media}/user.png',
             )
             result.append(my_channel_item)
 
@@ -1384,7 +1384,7 @@ class Provider(AbstractProvider):
             switch_user_item = DirectoryItem(
                 localize('user.switch'),
                 create_uri(('users', 'switch')),
-                image='{media}/channel.png',
+                image='{media}/user.png',
                 action=True,
             )
             result.append(switch_user_item)
