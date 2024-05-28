@@ -13,7 +13,13 @@ import json
 import threading
 
 from ..compatibility import xbmc, xbmcgui
-from ..constants import ADDON_ID, CHECK_SETTINGS, REFRESH_CONTAINER, WAKEUP
+from ..constants import (
+    ADDON_ID,
+    CHECK_SETTINGS,
+    REFRESH_CONTAINER,
+    RELOAD_ACCESS_MANAGER,
+    WAKEUP,
+)
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 
@@ -71,6 +77,10 @@ class ServiceMonitor(xbmc.Monitor):
             if not self.httpd and self.httpd_required():
                 self.start_httpd()
         elif event == REFRESH_CONTAINER:
+            if self._refresh_allowed():
+                xbmc.executebuiltin('Container.Refresh')
+        elif event == RELOAD_ACCESS_MANAGER:
+            self._context.reload_access_manager()
             if self._refresh_allowed():
                 xbmc.executebuiltin('Container.Refresh')
         else:

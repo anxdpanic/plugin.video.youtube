@@ -19,6 +19,7 @@ from ...constants import (
     CHECK_SETTINGS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    RELOAD_ACCESS_MANAGER,
     REROUTE,
     SLEEPING,
     VIDEO_ID,
@@ -130,6 +131,10 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(SLEEPING):
             context.wakeup()
             ui.clear_property(SLEEPING)
+
+        if ui.get_property(RELOAD_ACCESS_MANAGER):
+            context.reload_access_manager()
+            ui.clear_property(RELOAD_ACCESS_MANAGER)
 
         if ui.get_property(CHECK_SETTINGS):
             provider.reset_client()

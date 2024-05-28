@@ -208,6 +208,9 @@ class AbstractContext(object):
             self._access_manager = AccessManager(self)
         return self._access_manager
 
+    def reload_access_manager(self):
+        self._access_manager = AccessManager(self)
+
     def get_video_playlist(self):
         raise NotImplementedError()
 
