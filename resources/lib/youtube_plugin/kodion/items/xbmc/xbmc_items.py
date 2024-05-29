@@ -14,7 +14,15 @@ from json import dumps
 
 from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...compatibility import to_str, xbmc, xbmcgui
-from ...constants import PLAY_COUNT, SWITCH_PLAYER_FLAG
+from ...constants import (
+    CHANNEL_ID,
+    PLAY_COUNT,
+    PLAYLIST_ID,
+    PLAYLISTITEM_ID,
+    SUBSCRIPTION_ID,
+    SWITCH_PLAYER_FLAG,
+    VIDEO_ID,
+)
 from ...utils import current_system_version, datetime_parser
 
 
@@ -526,7 +534,7 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     else:
         prop_value = directory_item.get_subscription_id()
         if prop_value:
-            props['channel_subscription_id'] = prop_value
+            props[SUBSCRIPTION_ID] = prop_value
         elif directory_item.get_channel_id():
             pass
         elif directory_item.get_playlist_id():
@@ -658,27 +666,27 @@ def video_listitem(context,
         if focused and focused == prop_value:
             set_play_count = False
             resume = False
-        props['video_id'] = prop_value
+        props[VIDEO_ID] = prop_value
 
     # make channel_id property available for keymapping
     prop_value = video_item.get_channel_id()
     if prop_value:
-        props['channel_id'] = prop_value
+        props[CHANNEL_ID] = prop_value
 
     # make subscription_id property available for keymapping
     prop_value = video_item.get_subscription_id()
     if prop_value:
-        props['subscription_id'] = prop_value
+        props[SUBSCRIPTION_ID] = prop_value
 
     # make playlist_id property available for keymapping
     prop_value = video_item.get_playlist_id()
     if prop_value:
-        props['playlist_id'] = prop_value
+        props[PLAYLIST_ID] = prop_value
 
     # make playlist_item_id property available for keymapping
     prop_value = video_item.get_playlist_item_id()
     if prop_value:
-        props['playlist_item_id'] = prop_value
+        props[PLAYLISTITEM_ID] = prop_value
 
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()

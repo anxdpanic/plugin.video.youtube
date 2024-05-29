@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
+from ...kodion.constants import PLAYLIST_ID, PLAYLISTITEM_ID
 from ...kodion.utils import find_video_id
 
 
@@ -65,8 +66,8 @@ def _process_add_video(provider, context, keymap_action=False):
 
 
 def _process_remove_video(provider, context):
-    listitem_playlist_id = context.get_listitem_detail('playlist_id')
-    listitem_playlist_item_id = context.get_listitem_detail('playlist_item_id')
+    listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
+    listitem_playlist_item_id = context.get_listitem_property(PLAYLISTITEM_ID)
     listitem_title = context.get_listitem_info('Title')
     keymap_action = False
 

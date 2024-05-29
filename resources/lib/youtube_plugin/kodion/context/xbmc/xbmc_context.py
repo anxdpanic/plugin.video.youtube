@@ -711,7 +711,7 @@ class XbmcContext(AbstractContext):
         return xbmc.getInfoLabel(name)
 
     @staticmethod
-    def get_listitem_detail(detail_name):
+    def get_listitem_property(detail_name):
         return xbmc.getInfoLabel('Container.ListItem(0).Property({0})'
                                  .format(detail_name))
 

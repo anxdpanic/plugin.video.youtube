@@ -428,7 +428,7 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     @staticmethod
-    def get_listitem_detail(detail_name):
+    def get_listitem_property(detail_name):
         raise NotImplementedError()
 
     @staticmethod

@@ -34,6 +34,11 @@ from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider, RegisterProviderPath
 from ..kodion.constants import (
     ADDON_ID,
+    CHANNEL_ID,
+    DEVELOPER_CONFIGS,
+    PLAY_FORCE_AUDIO,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
     content,
     paths,
 )
@@ -77,8 +82,8 @@ class Provider(AbstractProvider):
 
     @staticmethod
     def get_dev_config(context, addon_id, dev_configs):
-        _dev_config = context.get_ui().get_property('configs')
-        context.get_ui().clear_property('configs')
+        _dev_config = context.get_ui().get_property(DEVELOPER_CONFIGS)
+        context.get_ui().clear_property(DEVELOPER_CONFIGS)
 
         dev_config = {}
         if _dev_config:
@@ -440,7 +445,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/?$')
     def _on_channel(self, context, re_match):
-        listitem_channel_id = context.get_listitem_detail('channel_id')
+        listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
         client = self.get_client(context)
         localize = context.localize
@@ -670,34 +675,34 @@ class Provider(AbstractProvider):
         video_id = params.get('video_id')
         playlist_id = params.get('playlist_id')
 
-        if ui.get_property('prompt_for_subtitles') != video_id:
-            ui.clear_property('prompt_for_subtitles')
+        if ui.get_property(PLAY_PROMPT_SUBTITLES) != video_id:
+            ui.clear_property(PLAY_PROMPT_SUBTITLES)
 
-        if ui.get_property('audio_only') != video_id:
-            ui.clear_property('audio_only')
+        if ui.get_property(PLAY_FORCE_AUDIO) != video_id:
+            ui.clear_property(PLAY_FORCE_AUDIO)
 
-        if ui.get_property('ask_for_quality') != video_id:
-            ui.clear_property('ask_for_quality')
+        if ui.get_property(PLAY_PROMPT_QUALITY) != video_id:
+            ui.clear_property(PLAY_PROMPT_QUALITY)
 
         if video_id and not playlist_id:
-            if params.pop('prompt_for_subtitles', None):
+            if params.pop(PLAY_PROMPT_SUBTITLES, None):
                 # redirect to builtin after setting home window property,
                 # so playback url matches playable listitems
-                ui.set_property('prompt_for_subtitles', video_id)
+                ui.set_property(PLAY_PROMPT_SUBTITLES, video_id)
                 context.log_debug('Redirecting playback with subtitles')
                 redirect = True
 
             if params.pop('audio_only', None):
                 # redirect to builtin after setting home window property,
                 # so playback url matches playable listitems
-                ui.set_property('audio_only', video_id)
+                ui.set_property(PLAY_FORCE_AUDIO, video_id)
                 context.log_debug('Redirecting audio only playback')
                 redirect = True
 
             if params.pop('ask_for_quality', None):
                 # redirect to builtin after setting home window property,
                 # so playback url matches playable listitems
-                ui.set_property('ask_for_quality', video_id)
+                ui.set_property(PLAY_PROMPT_QUALITY, video_id)
                 context.log_debug('Redirecting ask quality playback')
                 redirect = True
 

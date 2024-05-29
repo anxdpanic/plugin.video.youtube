@@ -14,7 +14,7 @@ import re
 import time
 from math import log10
 
-from ...kodion.constants import content, paths
+from ...kodion.constants import LICENSE_TOKEN, LICENSE_URL, content, paths
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
@@ -855,8 +855,8 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
                      drm='com.widevine.alpha').check_inputstream()
 
         video_item.set_license_key(license_proxy)
-        ui.set_property('license_url', license_url)
-        ui.set_property('license_token', license_token)
+        ui.set_property(LICENSE_URL, license_url)
+        ui.set_property(LICENSE_TOKEN, license_token)
 
 
 def update_fanarts(provider, context, channel_items_dict, data=None):

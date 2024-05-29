@@ -34,7 +34,7 @@ def run():
     provider = Provider()
 
     get_infobool = context.get_infobool
-    get_listitem_detail = context.get_listitem_detail
+    get_listitem_property = context.get_listitem_property
     get_listitem_info = context.get_listitem_info
 
     ui = context.get_ui()
@@ -93,7 +93,7 @@ def run():
                 wait_interval = 0.1
                 num_waits = 1
             elif is_plugin_container:
-                new_video_id = get_listitem_detail('video_id')
+                new_video_id = get_listitem_property('video_id')
                 if not new_video_id:
                     video_id = None
                     if get_listitem_info('Label'):
@@ -102,7 +102,7 @@ def run():
                 elif video_id != new_video_id:
                     video_id = new_video_id
                     set_property(VIDEO_ID, video_id)
-                    plugin_play_count = get_listitem_detail(PLAY_COUNT)
+                    plugin_play_count = get_listitem_property(PLAY_COUNT)
                     set_property(PLAY_COUNT, plugin_play_count)
                 else:
                     kodi_play_count = get_listitem_info('PlayCount')

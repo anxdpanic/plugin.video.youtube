@@ -17,7 +17,13 @@ from traceback import format_stack
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
 from ...kodion.compatibility import urlencode, urlunsplit
-from ...kodion.constants import PLAYER_DATA, SWITCH_PLAYER_FLAG, paths
+from ...kodion.constants import (
+    PLAY_FORCE_AUDIO,
+    PLAY_PROMPT_QUALITY,
+    PLAYER_DATA,
+    SWITCH_PLAYER_FLAG,
+    paths,
+)
 from ...kodion.items import VideoItem
 from ...kodion.network import get_connect_address
 from ...kodion.utils import select_stream
@@ -46,15 +52,15 @@ def play_video(provider, context):
         }
     else:
         ask_for_quality = None
-        if not screensaver and ui.get_property('ask_for_quality') == video_id:
+        if not screensaver and ui.get_property(PLAY_PROMPT_QUALITY) == video_id:
             ask_for_quality = True
-        ui.clear_property('ask_for_quality')
+        ui.clear_property(PLAY_PROMPT_QUALITY)
 
         audio_only = None
-        if ui.get_property('audio_only') == video_id:
+        if ui.get_property(PLAY_FORCE_AUDIO) == video_id:
             ask_for_quality = False
             audio_only = True
-        ui.clear_property('audio_only')
+        ui.clear_property(PLAY_FORCE_AUDIO)
 
         try:
             video_streams = client.get_video_streams(context, video_id)
