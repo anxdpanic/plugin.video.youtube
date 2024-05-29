@@ -1,4 +1,4 @@
-## v7.0.7
+## v7.0.7.1
 ### Fixed
 - Fixed not being able to re-refresh a directory listing that has already been refreshed
 - Fixed various window and history nagivation issues
@@ -22,7 +22,10 @@
 - Improve resource usage
 - Fix adding video to playlist #764
 - Fix plugin settings raising exception in Kodi 19-20 #769
-- Fix location icon background colour
+- Fix My Subscriptions next page error #779
+- Fix page jump when page_token is not used
+- Fix not reloading access manager when performing user actions #780
+- Attempt to fix PlaylistPlayer race condition error #704
 
 ### Changed
 - Removed Settings > Advanced > Views > Show channel fanart
@@ -34,6 +37,8 @@
   - For playback where Kodi does prompt to resume, the plugin will follow whatever is selected
 - Cached data for My Subscriptions and Related Videos will be replaced due to changes in cached data
 - Use channel fanart as backup to thumbnail fanart for channel items without thumbnails #751
+- Home Recommendations only enabled when logged in
+- Update some icons
 
 ### New
 - Improvements to plugin page navigation #715
