@@ -182,14 +182,15 @@ def _process_select_playlist(provider, context):
     thumb_size = context.get_settings().get_thumbnail_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
-    while True:
+    while 1:
         current_page += 1
         json_data = function_cache.run(client.get_playlists_of_channel,
                                        function_cache.ONE_MINUTE // 3,
                                        _refresh=params.get('refresh'),
                                        channel_id='mine',
                                        page_token=page_token)
-
+        if not json_data:
+            break
         playlists = json_data.get('items', [])
         page_token = json_data.get('nextPageToken', '')
 
@@ -253,7 +254,6 @@ def _process_select_playlist(provider, context):
             new_params = dict(context.get_params(), playlist_id=result)
             new_context = context.clone(new_params=new_params)
             _process_add_video(provider, new_context, keymap_action)
-            break
         break
 
 

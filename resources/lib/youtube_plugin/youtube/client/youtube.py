@@ -486,11 +486,6 @@ class YouTube(LoginClient):
                                  visitor='',
                                  page_token='',
                                  click_tracking=''):
-        payload = {
-            'kind': 'youtube#activityListResponse',
-            'items': []
-        }
-
         post_data = {'browseId': 'FEwhat_to_watch'}
         if page_token:
             post_data['continuation'] = page_token
@@ -511,7 +506,7 @@ class YouTube(LoginClient):
                                   path='browse',
                                   post_data=post_data)
         if not result:
-            return payload
+            return None
 
         recommended_videos = self.json_traverse(
             result,
@@ -565,7 +560,7 @@ class YouTube(LoginClient):
                  )
         )
         if not recommended_videos:
-            return payload
+            return None
 
         v3_response = {
             'kind': 'youtube#activityListResponse',
@@ -611,6 +606,8 @@ class YouTube(LoginClient):
             if visitor:
                 v3_response['visitorData'] = visitor
 
+        if not v3_response['items']:
+            v3_response = None
         return v3_response
 
     def get_related_for_home(self, page_token='', refresh=False):
@@ -1104,7 +1101,7 @@ class YouTube(LoginClient):
                                   post_data=post_data,
                                   no_login=True)
         if not result:
-            return {}
+            return None
 
         related_videos = self.json_traverse(result, path=(
             (
@@ -1270,14 +1267,17 @@ class YouTube(LoginClient):
                 max_results=remaining,
                 **kwargs
             )
-            if 'nextPageToken' in continuation:
+            if continuation and 'nextPageToken' in continuation:
                 page_token = continuation['nextPageToken']
             else:
                 page_token = ''
             if 'items' in continuation:
                 items.extend(continuation['items'])
 
-        v3_response['items'] = items
+        if items:
+            v3_response['items'] = items
+        else:
+            v3_response = None
         return v3_response
 
     def get_parent_comments(self,
@@ -1744,7 +1744,10 @@ class YouTube(LoginClient):
         else:
             items = []
 
-        v3_response['items'] = items
+        if items:
+            v3_response['items'] = items
+        else:
+            v3_response = None
         return v3_response
 
     def get_saved_playlists(self, page_token, offset):

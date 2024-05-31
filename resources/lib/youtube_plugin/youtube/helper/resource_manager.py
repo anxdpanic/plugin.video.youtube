@@ -264,9 +264,8 @@ class ResourceManager(object):
                     break
 
         if item is None:
-            return {}
-
-        return item.get('contentDetails', {}).get('relatedPlaylists', {})
+            return None
+        return item.get('contentDetails', {}).get('relatedPlaylists')
 
     def get_videos(self,
                    ids,

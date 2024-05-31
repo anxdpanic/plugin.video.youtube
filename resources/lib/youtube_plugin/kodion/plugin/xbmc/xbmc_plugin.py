@@ -159,8 +159,8 @@ class XbmcPlugin(AbstractPlugin):
                 result, options = function_cache.run(
                     provider.navigate,
                     seconds=None,
-                    _cacheparams=function_cache.PARAMS_NONE,
                     _oneshot=True,
+                    _scope=function_cache.SCOPE_NONE,
                     context=context.clone(route),
                 )
                 ui.clear_property(REROUTE)

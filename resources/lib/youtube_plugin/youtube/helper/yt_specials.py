@@ -120,7 +120,8 @@ def _process_browse_channels(provider, context, client):
     else:
         function_cache = context.get_function_cache()
         json_data = function_cache.run(client.get_guide_categories,
-                                       function_cache.ONE_MONTH)
+                                       function_cache.ONE_MONTH,
+                                       _refresh=context.get_param('refresh'))
 
     if not json_data:
         return False

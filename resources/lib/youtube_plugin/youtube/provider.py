@@ -418,12 +418,11 @@ class Provider(AbstractProvider):
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
                                        channel_id=channel_id)
-        upload_playlist = playlists.get('uploads', '')
-        if upload_playlist:
+        if playlists and 'uploads' in playlists:
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
                                            _refresh=params.get('refresh'),
-                                           playlist_id=upload_playlist,
+                                           playlist_id=playlists['uploads'],
                                            page_token=page_token)
             if not json_data:
                 return result
@@ -563,12 +562,11 @@ class Provider(AbstractProvider):
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
                                        channel_id=channel_id)
-        upload_playlist = playlists.get('uploads', '')
-        if upload_playlist:
+        if playlists and 'uploads' in playlists:
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
                                            _refresh=params.get('refresh'),
-                                           playlist_id=upload_playlist,
+                                           playlist_id=playlists['uploads'],
                                            page_token=page_token)
             if not json_data:
                 return result
