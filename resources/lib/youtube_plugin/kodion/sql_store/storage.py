@@ -396,7 +396,7 @@ class Storage(object):
             size = int(memoryview(blob).itemsize) * len(blob)
         return str(key), timestamp, blob, size
 
-    def _get(self, item_id, process=None, seconds=None):
+    def _get(self, item_id, process=None, seconds=None, as_dict=False):
         with self as (db, cursor), db:
             result = self._execute(cursor, self._sql['get'], [str(item_id)])
             item = result.fetchone() if result else None
@@ -404,12 +404,18 @@ class Storage(object):
                 return None
         cut_off = since_epoch() - seconds if seconds else 0
         if not cut_off or item[1] >= cut_off:
+            if as_dict:
+                return {
+                    'item_id': item_id,
+                    'age': since_epoch() - item[1],
+                    'value': self._decode(item[2], process, item),
+                }
             return self._decode(item[2], process, item)
         return None
 
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
                     seconds=None, process=None,
-                    as_dict=False, values_only=False):
+                    as_dict=False, values_only=True):
         if not item_ids:
             if oldest_first:
                 query = self._sql['get_many']
@@ -421,14 +427,24 @@ class Storage(object):
             query = self._sql['get_by_key'].format('?,' * (num_ids - 1) + '?')
             item_ids = tuple(item_ids)
 
-        cut_off = since_epoch() - seconds if seconds else 0
+        epoch = since_epoch()
+        cut_off = epoch - seconds if seconds else 0
         with self as (db, cursor), db:
             result = self._execute(cursor, query, item_ids)
             if as_dict:
-                result = {
-                    item[0]: self._decode(item[2], process, item)
-                    for item in result if not cut_off or item[1] >= cut_off
-                }
+                if values_only:
+                    result = {
+                        item[0]: self._decode(item[2], process, item)
+                        for item in result if not cut_off or item[1] >= cut_off
+                    }
+                else:
+                    result = {
+                        item[0]: {
+                            'age': epoch - item[1],
+                            'value': self._decode(item[2], process, item),
+                        }
+                        for item in result if not cut_off or item[1] >= cut_off
+                    }
             elif values_only:
                 result = [
                     self._decode(item[2], process, item)
