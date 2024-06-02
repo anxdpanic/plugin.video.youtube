@@ -892,7 +892,7 @@
             <group id="6" label="16103">
                 <setting id="kodion.play_count.percent" type="integer" label="30668" help="">
                     <level>0</level>
-                    <default>85</default>
+                    <default>90</default>
                     <constraints>
                         <minimum>1</minimum>
                         <step>1</step>
