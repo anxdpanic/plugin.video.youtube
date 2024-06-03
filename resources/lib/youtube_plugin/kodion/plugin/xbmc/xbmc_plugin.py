@@ -19,6 +19,7 @@ from ...constants import (
     CHECK_SETTINGS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE,
     SLEEPING,
@@ -59,7 +60,7 @@ class XbmcPlugin(AbstractPlugin):
         super(XbmcPlugin, self).__init__()
         self.handle = None
 
-    def run(self, provider, context, refresh=False):
+    def run(self, provider, context, focused=None):
         self.handle = context.get_handle()
         ui = context.get_ui()
 
@@ -131,6 +132,12 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(SLEEPING):
             context.wakeup()
 
+        if ui.get_property(REFRESH_CONTAINER):
+            focused = False
+            ui.clear_property(REFRESH_CONTAINER)
+        elif focused:
+            focused = ui.get_property(VIDEO_ID)
+
         if ui.get_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
             ui.clear_property(RELOAD_ACCESS_MANAGER)
@@ -167,9 +174,10 @@ class XbmcPlugin(AbstractPlugin):
                 ))
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
-        focused = ui.get_property(VIDEO_ID) if refresh else None
         item_count = 0
-        if isinstance(result, (list, tuple)):
+        if not result:
+            pass
+        elif isinstance(result, (list, tuple)):
             show_fanart = settings.fanart_selection()
             result = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](

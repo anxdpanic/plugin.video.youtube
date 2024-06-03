@@ -42,18 +42,29 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd = None
         self.httpd_thread = None
 
+        self.refresh = False
+        self.interrupt = False
+
         if self._use_httpd:
             self.start_httpd()
 
         super(ServiceMonitor, self).__init__()
 
     @staticmethod
-    def is_plugin_container(info_bool=xbmc.getCondVisibility,
-                            info_label=xbmc.getInfoLabel,
-                            url='plugin://{0}/'.format(ADDON_ID)):
-        return (not info_bool('Container.IsUpdating')
-                and not info_bool('System.HasActiveModalDialog')
-                and info_label('Container.FolderPath').startswith(url))
+    def is_plugin_container(url='plugin://{0}/'.format(ADDON_ID),
+                            check_all=False,
+                            _bool=xbmc.getCondVisibility,
+                            _label=xbmc.getInfoLabel):
+        if check_all:
+            return (not _bool('Container.IsUpdating')
+                    and not _bool('System.HasActiveModalDialog')
+                    and _label('Container.FolderPath').startswith(url))
+        is_plugin = _label('Container.FolderPath').startswith(url)
+        return {
+            'is_plugin': is_plugin,
+            'is_loaded': is_plugin and not _bool('Container.IsUpdating'),
+            'is_active': is_plugin and not _bool('System.HasActiveModalDialog'),
+        }
 
     @staticmethod
     def set_property(property_id, value='true'):
@@ -62,10 +73,11 @@ class ServiceMonitor(xbmc.Monitor):
         return value
 
     def refresh_container(self, force=False):
-        if force or self.is_plugin_container():
+        self.set_property(REFRESH_CONTAINER)
+        if force or self.is_plugin_container(check_all=True):
             xbmc.executebuiltin('Container.Refresh')
         else:
-            self.set_property(REFRESH_CONTAINER)
+            self.refresh = True
 
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
@@ -88,6 +100,7 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == WAKEUP:
             if not self.httpd and self.httpd_required():
                 self.start_httpd()
+            self.interrupt = True
         elif event == REFRESH_CONTAINER:
             self.refresh_container()
         elif event == RELOAD_ACCESS_MANAGER:
