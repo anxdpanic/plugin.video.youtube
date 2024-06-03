@@ -654,7 +654,7 @@ class Provider(AbstractProvider):
     def on_play(self, context, re_match):
         ui = context.get_ui()
 
-        redirect = False
+        force_play = False
         params = context.get_params()
 
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
@@ -684,37 +684,19 @@ class Provider(AbstractProvider):
 
         if video_id and not playlist_id:
             if params.pop(PLAY_PROMPT_SUBTITLES, None):
-                # redirect to builtin after setting home window property,
-                # so playback url matches playable listitems
                 ui.set_property(PLAY_PROMPT_SUBTITLES, video_id)
-                context.log_debug('Redirecting playback with subtitles')
-                redirect = True
+                force_play = True
 
             if params.pop('audio_only', None):
-                # redirect to builtin after setting home window property,
-                # so playback url matches playable listitems
                 ui.set_property(PLAY_FORCE_AUDIO, video_id)
-                context.log_debug('Redirecting audio only playback')
-                redirect = True
+                force_play = True
 
             if params.pop('ask_for_quality', None):
-                # redirect to builtin after setting home window property,
-                # so playback url matches playable listitems
                 ui.set_property(PLAY_PROMPT_QUALITY, video_id)
-                context.log_debug('Redirecting ask quality playback')
-                redirect = True
+                force_play = True
 
-            builtin = None
-            if context.get_handle() == -1:
-                builtin = 'PlayMedia({0})'
-                context.log_debug('Redirecting playback, handle is -1')
-            elif redirect:
-                builtin = 'RunPlugin({0})'
-
-            if builtin:
-                context.execute(builtin.format(
-                    context.create_uri(('play',), params)
-                ))
+            if force_play:
+                context.execute('Action(Play)')
                 return False
             return yt_play.play_video(self, context)
 
