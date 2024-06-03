@@ -318,14 +318,15 @@ class VideoItem(BaseItem):
         return False
 
     def set_mediatype(self, mediatype):
-        self._mediatype = mediatype
+        if (mediatype in {'video',
+                          'movie',
+                          'tvshow', 'season', 'episode',
+                          'musicvideo'}):
+            self._mediatype = mediatype
+        else:
+            self._mediatype = 'video'
 
     def get_mediatype(self):
-        if (self._mediatype not in {'video',
-                                    'movie',
-                                    'tvshow', 'season', 'episode',
-                                    'musicvideo'}):
-            self._mediatype = 'video'
         return self._mediatype
 
     def set_subtitles(self, value):
