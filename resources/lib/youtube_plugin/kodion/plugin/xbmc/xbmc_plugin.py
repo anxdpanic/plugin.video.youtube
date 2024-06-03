@@ -174,15 +174,12 @@ class XbmcPlugin(AbstractPlugin):
                 ))
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
+        items = None
         item_count = 0
-        if not result:
-            pass
-        elif isinstance(result, (list, tuple)):
-            if (context.is_plugin_path(context.get_uri(), 'play')
-                    and result[0].__class__.__name__ in self._PLAY_ITEM_MAP):
-                self._set_resolved_url(context, result[0])
+
+        if result and isinstance(result, (list, tuple)):
             show_fanart = settings.fanart_selection()
-            result = [
+            items = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](
                     context,
                     item,
@@ -192,14 +189,18 @@ class XbmcPlugin(AbstractPlugin):
                 for item in result
                 if item.__class__.__name__ in self._LIST_ITEM_MAP
             ]
-            item_count = len(result)
-        elif result.__class__.__name__ in self._PLAY_ITEM_MAP:
+            item_count = len(items)
+
+            if options.get(provider.RESULT_FORCE_RESOLVE):
+                result = result[0]
+
+        if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             result = self._set_resolved_url(context, result)
 
         if item_count:
             context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
-                self.handle, result, item_count
+                self.handle, items, item_count
             )
             cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
             update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)

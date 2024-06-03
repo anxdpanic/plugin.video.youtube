@@ -25,7 +25,8 @@ from .utils import to_unicode
 
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
-    RESULT_UPDATE_LISTING = 'update_listing'
+    RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
+    RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
 
     def __init__(self):
         # map for regular expression (path) to method (names)

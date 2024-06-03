@@ -253,12 +253,18 @@ def play_playlist(provider, context):
             playlist.shuffle()
         """
 
+    options = {
+        provider.RESULT_CACHE_TO_DISC: False,
+        provider.RESULT_FORCE_RESOLVE: True,
+        provider.RESULT_UPDATE_LISTING: False,
+    }
+
     if not params.get('play'):
-        return videos
+        return videos, options
     if context.get_handle() == -1:
         player.play(playlist_index=playlist_position)
         return False
-    return videos[playlist_position]
+    return videos[playlist_position], options
 
 
 def play_channel_live(provider, context):
