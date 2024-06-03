@@ -139,14 +139,14 @@ class AbstractProvider(object):
             if not re_match:
                 continue
 
+            options = {
+                self.RESULT_CACHE_TO_DISC: True,
+                self.RESULT_UPDATE_LISTING: False,
+            }
             result = method(context, re_match)
             if isinstance(result, tuple):
-                result, options = result
-            else:
-                options = {
-                    self.RESULT_CACHE_TO_DISC: True,
-                    self.RESULT_UPDATE_LISTING: False,
-                }
+                result, new_options = result
+                options.update(new_options)
 
             refresh = context.get_param('refresh')
             if refresh is not None:
