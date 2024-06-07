@@ -434,9 +434,14 @@ def response_to_items(provider,
 
         if current_page * yt_results_per_page < yt_total_results:
             new_params['items_per_page'] = yt_results_per_page
-        else:
+        elif context.is_plugin_path(
+                context.get_infolabel('Container.FolderPath'),
+                partial=True,
+        ):
             next_page = 1
             new_params['page'] = 1
+        else:
+            return result
     else:
         return result
 
