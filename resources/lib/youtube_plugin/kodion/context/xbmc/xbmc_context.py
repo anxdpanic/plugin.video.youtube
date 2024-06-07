@@ -361,7 +361,23 @@ class XbmcContext(AbstractContext):
         pass  # implement from abstract
 
     def is_plugin_path(self, uri, uri_path='', partial=False):
-        uri_path = ('plugin://%s/%s' % (self.get_id(), uri_path)).rstrip('/')
+        plugin = self.get_id()
+
+        if isinstance(uri_path, (list, tuple)):
+            if partial:
+                paths = ['plugin://{0}/{1}'.format(plugin, path).rstrip('/')
+                         for path in uri_path]
+            else:
+                paths = []
+                for path in uri_path:
+                    path = 'plugin://{0}/{1}'.format(plugin, path).rstrip('/')
+                    paths.extend((
+                        path + '/',
+                        path + '?'
+                    ))
+            return uri.startswith(tuple(paths))
+
+        uri_path = 'plugin://{0}/{1}'.format(plugin, uri_path).rstrip('/')
         if not partial:
             uri_path = (
                 uri_path + '/',
