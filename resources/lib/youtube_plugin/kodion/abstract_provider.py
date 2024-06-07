@@ -281,13 +281,14 @@ class AbstractProvider(object):
         if command == 'input':
             data_cache = context.get_data_cache()
 
-            folder_path = context.get_infolabel('Container.FolderPath')
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
             if (not params.get('refresh')
-                    and folder_path.startswith('plugin://%s' % context.get_id())
-                    and re.match('.+/(?:query|input)/.*', folder_path)):
+                    and context.is_plugin_path(
+                        context.get_infolabel('Container.FolderPath'),
+                        ('query', 'input')
+                    )):
                 cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
                     query = to_unicode(cached)
