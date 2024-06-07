@@ -165,6 +165,7 @@ def play_playlist(provider, context):
     player = context.get_video_player()
     player.stop()
 
+    action = params.get('action')
     playlist_ids = params.get('playlist_ids')
     if not playlist_ids:
         playlist_ids = [params.get('playlist_id')]
@@ -229,29 +230,22 @@ def play_playlist(provider, context):
             # The implementation of XBMC/KODI is quite weak :(
             random.shuffle(videos)
 
+        if action == 'list':
+            return videos
+
         # clear the playlist
         playlist = context.get_video_playlist()
         playlist.clear()
-
-        # select unshuffle
-        if order == 'shuffle':
-            playlist.unshuffle()
+        playlist.unshuffle()
 
         # check if we have a video as starting point for the playlist
-        video_id = params.get('video_id', '')
+        video_id = params.get('video_id')
+        playlist_position = None if video_id else 0
         # add videos to playlist
-        playlist_position = 0
         for idx, video in enumerate(videos):
             playlist.add(video)
-            if (video_id and not playlist_position
-                    and video_id in video.get_uri()):
+            if playlist_position is None and video.video_id == video_id:
                 playlist_position = idx
-
-        # we use the shuffle implementation of the playlist
-        """
-        if order == 'shuffle':
-            playlist.shuffle()
-        """
 
     options = {
         provider.RESULT_CACHE_TO_DISC: False,
@@ -259,9 +253,9 @@ def play_playlist(provider, context):
         provider.RESULT_UPDATE_LISTING: False,
     }
 
-    if not params.get('play'):
+    if action == 'queue':
         return videos, options
-    if context.get_handle() == -1:
+    if context.get_handle() == -1 or action == 'play':
         player.play(playlist_index=playlist_position)
         return False
     return videos[playlist_position], options
