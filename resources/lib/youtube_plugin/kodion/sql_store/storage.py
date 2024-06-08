@@ -14,6 +14,7 @@ import os
 import pickle
 import sqlite3
 import time
+from threading import Lock
 from traceback import format_stack
 
 from ..logger import log_error
@@ -145,6 +146,7 @@ class Storage(object):
         self._filepath = filepath
         self._db = None
         self._cursor = None
+        self._lock = Lock()
         self._max_item_count = -1 if migrate else max_item_count
         self._max_file_size_kb = -1 if migrate else max_file_size_kb
 
@@ -171,16 +173,15 @@ class Storage(object):
     def set_max_file_size_kb(self, max_file_size_kb):
         self._max_file_size_kb = max_file_size_kb
 
-    def __del__(self):
-        self._close()
-
     def __enter__(self):
+        self._lock.acquire()
         if not self._db or not self._cursor:
             self._open()
         return self._db, self._cursor
 
     def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
         self._close()
+        self._lock.release()
 
     def _open(self):
         if not os.path.exists(self._filepath):

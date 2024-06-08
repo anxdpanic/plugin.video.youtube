@@ -302,10 +302,7 @@ def _process_new_uploaded_videos_tv(provider, context, client, filtered=False):
     params = context.get_params()
     refresh = params.get('refresh')
 
-    json_data = function_cache.run(
-        client.get_my_subscriptions,
-        function_cache.ONE_MINUTE * 30,
-        _refresh=refresh,
+    json_data = client.get_my_subscriptions(
         page_token=params.get('page', 1),
         logged_in=provider.is_logged_in(),
         do_filter=filtered,
