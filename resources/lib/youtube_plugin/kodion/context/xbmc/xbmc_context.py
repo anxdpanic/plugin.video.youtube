@@ -127,6 +127,7 @@ class XbmcContext(AbstractContext):
         'live.upcoming': 30646,
         'maintenance.bookmarks': 30800,
         'maintenance.data_cache': 30687,
+        'maintenance.feed_history': 30814,
         'maintenance.function_cache': 30557,
         'maintenance.playback_history': 30673,
         'maintenance.search_history': 30558,

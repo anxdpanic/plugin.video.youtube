@@ -19,6 +19,7 @@ from ..json_store import AccessManager
 from ..sql_store import (
     BookmarksList,
     DataCache,
+    FeedHistory,
     FunctionCache,
     PlaybackHistory,
     SearchHistory,
@@ -107,13 +108,15 @@ class AbstractContext(object):
     }
 
     def __init__(self, path='/', params=None, plugin_id=''):
-        self._function_cache = None
-        self._data_cache = None
-        self._search_history = None
-        self._playback_history = None
-        self._bookmarks_list = None
-        self._watch_later_list = None
         self._access_manager = None
+
+        self._bookmarks_list = None
+        self._data_cache = None
+        self._feed_history = None
+        self._function_cache = None
+        self._playback_history = None
+        self._search_history = None
+        self._watch_later_list = None
 
         self._plugin_handle = -1
         self._plugin_id = plugin_id
@@ -154,6 +157,14 @@ class AbstractContext(object):
             filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._playback_history = PlaybackHistory(filepath)
         return self._playback_history
+
+    def get_feed_history(self):
+        if not self._feed_history:
+            uuid = self.get_access_manager().get_current_user_id()
+            filename = 'feeds.sqlite'
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
+            self._feed_history = FeedHistory(filepath)
+        return self._feed_history
 
     def get_data_cache(self):
         if not self._data_cache:

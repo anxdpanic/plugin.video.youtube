@@ -1443,7 +1443,7 @@ class YouTube(LoginClient):
             'items': [],
         }
 
-        cache = self._context.get_data_cache()
+        cache = self._context.get_feed_history()
         settings = self._context.get_settings()
 
         if do_filter:
@@ -1470,14 +1470,7 @@ class YouTube(LoginClient):
         }
         totals['start'] += totals['end']
 
-        def _sort_by_date_time(item, limits, filters=None):
-            if filters:
-                filtered = item['_channel'] in filters['set']
-                if filters['blacklist']:
-                    if filtered:
-                        return -1
-                elif not filtered:
-                    return -1
+        def _sort_by_date_time(item, limits):
             video_id = item['id']
             if video_id in limits['video_ids']:
                 return -1
@@ -1539,19 +1532,17 @@ class YouTube(LoginClient):
         }
 
         def _get_feed_cache(channel_id, _cache=cache, _refresh=refresh):
-            cache_key = channel_id + '_feed'
-            cached = _cache.get_item(cache_key, as_dict=True)
+            cached = _cache.get_item(channel_id)
             if cached:
-                cached_items = cached['value']
+                feed_details = cached['value']
                 _refresh = _refresh or cached['age'] > _cache.ONE_HOUR
             else:
-                cached_items = None
+                feed_details = {
+                    'channel_name': None,
+                    'cached_items': None,
+                }
                 _refresh = True
 
-            feed_details = {
-                'cache_key': cache_key,
-                'cached_items': cached_items,
-            }
             if _refresh:
                 feed_details['refresh'] = True
 
@@ -1564,7 +1555,6 @@ class YouTube(LoginClient):
                     + channel_id,
                     headers=_headers,
                 ),
-                'cache_key': channel_id + '_feed',
                 'refresh': True,
             })
 
@@ -1576,12 +1566,13 @@ class YouTube(LoginClient):
 
         def _parse_feeds(feeds,
                          encode=not current_system_version.compatible(19, 0),
+                         filters=subscription_filters,
                          _ns=namespaces,
                          _cache=cache):
             all_items = {}
             new_cache = {}
             for channel_id, feed in feeds.items():
-                cache_key = feed['cache_key']
+                channel_name = feed.get('channel_name')
                 cached_items = feed.get('cached_items')
                 refresh_feed = feed.get('refresh')
                 content = feed.get('content')
@@ -1597,10 +1588,8 @@ class YouTube(LoginClient):
                         'kind': 'youtube#video',
                         'id': item.findtext('yt:videoId', '', _ns),
                         'snippet': {
-                            'title': item.findtext('atom:title', '', _ns),
                             'channelId': channel_id,
                         },
-                        '_channel': channel_name,
                         '_timestamp': datetime_parser.since_epoch(
                             datetime_parser.strptime(
                                 item.findtext('atom:published', '', _ns)
@@ -1622,12 +1611,23 @@ class YouTube(LoginClient):
                                     key=partial(_sort_by_date_time,
                                                 limits=feed_limits))
                     feed_items = feed_items[:min(1000, feed_limits['num'])]
-                    new_cache[cache_key] = feed_items
+                    new_cache[channel_id] = {
+                        'channel_name': channel_name,
+                        'cached_items': feed_items,
+                    }
                 elif cached_items:
                     feed_items = cached_items
                 else:
                     continue
-                all_items[cache_key] = feed_items
+                if filters:
+                    filtered = channel_name and channel_name in filters['set']
+                    if filters['blacklist']:
+                        if not filtered:
+                            all_items[channel_id] = feed_items
+                    elif filtered:
+                        all_items[channel_id] = feed_items
+                else:
+                    all_items[channel_id] = feed_items
 
             if new_cache:
                 _cache.set_items(new_cache)
@@ -1791,8 +1791,7 @@ class YouTube(LoginClient):
         if items:
             items.sort(reverse=True,
                        key=partial(_sort_by_date_time,
-                                   limits=totals,
-                                   filters=subscription_filters))
+                                   limits=totals))
         else:
             return None
 

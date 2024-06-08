@@ -138,6 +138,7 @@ def _maintenance_actions(context, action, params):
         targets = {
             'bookmarks': context.get_bookmarks_list,
             'data_cache': context.get_data_cache,
+            'feed_history': context.get_feed_history,
             'function_cache': context.get_function_cache,
             'playback_history': context.get_playback_history,
             'search_history': context.get_search_history,
@@ -155,6 +156,7 @@ def _maintenance_actions(context, action, params):
         targets = {
             'bookmarks': 'bookmarks.sqlite',
             'data_cache': 'data_cache.sqlite',
+            'feed_history': 'feeds.sqlite',
             'function_cache': 'cache.sqlite',
             'playback_history': 'history.sqlite',
             'search_history': 'search.sqlite',

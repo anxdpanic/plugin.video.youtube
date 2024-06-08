@@ -1045,6 +1045,14 @@
                     <data>RunScript($ID,maintenance/clear?target=bookmarks)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="kodion.maintain.clear.feed_history" type="action" label="30812" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/clear?target=feed_history)</data>
+                    <control format="action" type="button"/>
+                </setting>
             </group>
             <group id="2">
                 <setting id="kodion.maintain.delete.function_cache" type="action" label="30553" help="">
@@ -1095,7 +1103,16 @@
                     <data>RunScript($ID,maintenance/delete?target=bookmarks)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="kodion.maintain.delete.feed_history" type="action" label="30813" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/delete?target=feed_history)</data>
+                    <control format="action" type="button"/>
+                </setting>
             </group>
+
             <group id="3">
                 <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" help="">
                     <level>0</level>
