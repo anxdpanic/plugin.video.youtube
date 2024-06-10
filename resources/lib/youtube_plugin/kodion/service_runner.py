@@ -61,7 +61,7 @@ def run():
         elif get_infobool('System.IdleTime(10)'):
             if waited >= 30:
                 waited = 0
-                monitor.shutdown_httpd()
+                monitor.shutdown_httpd(sleep=True)
                 if not sleeping:
                     sleeping = set_property(SLEEPING)
         else:

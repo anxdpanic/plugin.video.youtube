@@ -16,6 +16,7 @@ from ..compatibility import xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
     CHECK_SETTINGS,
+    PLAYBACK_INIT,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     WAKEUP,
@@ -106,6 +107,9 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()
+        elif event == PLAYBACK_INIT:
+            if not self.httpd and self.httpd_required():
+                self.start_httpd()
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
@@ -186,8 +190,10 @@ class ServiceMonitor(xbmc.Monitor):
         log_debug('HTTPServer: Serving on |{ip}:{port}|'
                   .format(ip=address[0], port=address[1]))
 
-    def shutdown_httpd(self):
+    def shutdown_httpd(self, sleep=False):
         if self.httpd:
+            if sleep and self._context.get_settings().api_config_page():
+                return
             log_debug('HTTPServer: Shutting down |{ip}:{port}|'
                       .format(ip=self._old_httpd_address,
                               port=self._old_httpd_port))
