@@ -99,7 +99,7 @@ def _process_remove_video(provider, context):
         else:
             raise KodionException('Playlist/Remove: missing video_name')
 
-    if playlist_id.strip().lower() not in ('wl', 'hl'):
+    if playlist_id.strip().lower() not in {'wl', 'hl'}:
         if context.get_ui().on_remove_content(video_name):
             success = provider.get_client(context).remove_video_from_playlist(
                 playlist_id=playlist_id,

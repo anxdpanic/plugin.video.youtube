@@ -320,7 +320,7 @@ class AbstractContext(object):
                         )
                     # process and translate deprecated parameters
                     elif param == 'action':
-                        if parsed_value in ('play_all', 'play_video'):
+                        if parsed_value in {'play_all', 'play_video'}:
                             to_delete.append(param)
                             self.set_path('play')
                             continue

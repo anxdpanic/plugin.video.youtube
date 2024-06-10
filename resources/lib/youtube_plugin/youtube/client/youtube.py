@@ -1395,7 +1395,7 @@ class YouTube(LoginClient):
                   'relevanceLanguage': self._language,
                   'maxResults': str(self._max_results)}
 
-        if event_type and event_type in ['live', 'upcoming', 'completed']:
+        if event_type and event_type in {'live', 'upcoming', 'completed'}:
             params['eventType'] = event_type
         if search_type:
             params['type'] = search_type
@@ -2004,7 +2004,7 @@ class YouTube(LoginClient):
             elif reason == 'keyInvalid' and message == 'Bad Request':
                 notification = self._context.localize('api.key.incorrect')
                 timeout = 7000
-            elif reason in ('quotaExceeded', 'dailyLimitExceeded'):
+            elif reason in {'quotaExceeded', 'dailyLimitExceeded'}:
                 notification = message
                 timeout = 7000
             else:
