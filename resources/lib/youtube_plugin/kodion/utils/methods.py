@@ -239,7 +239,8 @@ def rm_dir(path):
 
 
 def find_video_id(plugin_path):
-    match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*', plugin_path)
+    match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*',
+                      plugin_path)
     if match:
         return match.group('video_id')
     return ''

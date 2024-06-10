@@ -135,8 +135,9 @@ def run():
     # clean up any/all playback monitoring threads
     player.cleanup_threads(only_ended=False)
 
+    # shutdown http server
     if monitor.httpd:
-        monitor.shutdown_httpd()  # shutdown http server
+        monitor.shutdown_httpd()
 
     provider.tear_down()
     context.tear_down()
