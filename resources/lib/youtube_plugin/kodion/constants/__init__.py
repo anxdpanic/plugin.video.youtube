@@ -44,6 +44,9 @@ PLAY_COUNT = 'video_play_count'
 PLAY_FORCE_AUDIO = 'audio_only'
 PLAY_PROMPT_QUALITY = 'ask_for_quality'
 PLAY_PROMPT_SUBTITLES = 'prompt_for_subtitles'
+PLAYBACK_INIT = 'playback_init'
+PLAYBACK_STARTED = 'playback_started'
+PLAYBACK_STOPPED = 'playback_stopped'
 PLAYER_DATA = 'player_json'
 PLAYLIST_ID = 'playlist_id'
 PLAYLISTITEM_ID = 'playlistitem_id'
@@ -76,6 +79,9 @@ __all__ = (
     'PLAY_FORCE_AUDIO',
     'PLAY_PROMPT_QUALITY',
     'PLAY_PROMPT_SUBTITLES',
+    'PLAYBACK_INIT',
+    'PLAYBACK_STARTED',
+    'PLAYBACK_STOPPED',
     'PLAYER_DATA',
     'PLAYLIST_ID',
     'PLAYLISTITEM_ID',

@@ -20,6 +20,7 @@ from ...kodion.compatibility import urlencode, urlunsplit
 from ...kodion.constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
+    PLAYBACK_INIT,
     PLAYER_DATA,
     SWITCH_PLAYER_FLAG,
     paths,
@@ -154,7 +155,7 @@ def play_video(provider, context):
     }
 
     ui.set_property(PLAYER_DATA, json.dumps(playback_data, ensure_ascii=False))
-    context.send_notification('PlaybackInit', playback_data)
+    context.send_notification(PLAYBACK_INIT, playback_data)
     return video_item
 
 
