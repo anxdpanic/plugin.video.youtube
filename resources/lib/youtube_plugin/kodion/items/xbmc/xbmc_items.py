@@ -401,8 +401,7 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
             'isPlayable': str(video_item.playable).lower(),
         }
 
-    if (video_item.use_isa_video()
-            and context.addon_enabled('inputstream.adaptive')):
+    if video_item.use_isa_video() and context.use_inputstream_adaptive():
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'

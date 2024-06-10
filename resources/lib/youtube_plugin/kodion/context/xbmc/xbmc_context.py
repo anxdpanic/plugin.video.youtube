@@ -644,19 +644,24 @@ class XbmcContext(AbstractContext):
                         'message': method,
                         'data': data})
 
-    def use_inputstream_adaptive(self):
-        if self._settings.use_isa():
-            if self.addon_enabled('inputstream.adaptive'):
-                success = True
-            elif self.get_ui().on_yes_no_input(
-                    self.get_name(), self.localize('isa.enable.confirm')
-            ):
-                success = self.set_addon_enabled('inputstream.adaptive')
-            else:
-                success = False
-        else:
-            success = False
-        return success
+    def use_inputstream_adaptive(self, prompt=False):
+        if not self.get_settings().use_isa():
+            return None
+
+        while 1:
+            try:
+                addon = xbmcaddon.Addon('inputstream.adaptive')
+                return addon.getAddonInfo('version')
+            except RuntimeError:
+                if (prompt
+                        and self.get_ui().on_yes_no_input(
+                            self.get_name(),
+                            self.localize('isa.enable.confirm'),
+                        )
+                        and self.set_addon_enabled('inputstream.adaptive')):
+                    prompt = False
+                    continue
+            return None
 
     # Values of capability map can be any of the following:
     # - required version number, as string param to loose_version() to compare
@@ -687,13 +692,8 @@ class XbmcContext(AbstractContext):
         # If capability param is provided, returns True if the installed version
         # of ISA supports the nominated capability, False otherwise
 
-        try:
-            addon = xbmcaddon.Addon('inputstream.adaptive')
-            inputstream_version = addon.getAddonInfo('version')
-        except RuntimeError:
-            inputstream_version = ''
-
-        if not self.use_inputstream_adaptive() or not inputstream_version:
+        inputstream_version = self.use_inputstream_adaptive()
+        if not inputstream_version:
             return frozenset() if capability is None else None
 
         isa_loose_version = loose_version(inputstream_version)

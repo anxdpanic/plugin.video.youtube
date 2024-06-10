@@ -34,7 +34,7 @@ def _config_actions(context, action, *_args):
         xbmcaddon.Addon().openSettings()
 
     elif action == 'isa':
-        if context.use_inputstream_adaptive():
+        if context.use_inputstream_adaptive(prompt=True):
             xbmcaddon.Addon('inputstream.adaptive').openSettings()
         else:
             settings.use_isa(False)
