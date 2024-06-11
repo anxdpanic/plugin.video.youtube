@@ -49,7 +49,7 @@ def play_video(provider, context):
     if ((is_external and settings.alternative_player_web_urls())
             or settings.default_player_web_urls()):
         video_stream = {
-            'url': 'https://www.youtube.com/watch?v={0}'.format(video_id),
+            'url': 'https://youtu.be/{0}'.format(video_id),
         }
     else:
         ask_for_quality = None
