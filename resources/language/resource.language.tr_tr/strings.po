@@ -1548,6 +1548,18 @@ msgctxt "#30811"
 msgid "Filter Live folders"
 msgstr ""
 
+msgctxt "#30812"
+msgid "Clear subscription feed history"
+msgstr ""
+
+msgctxt "#30813"
+msgid "Delete subscription feed history database"
+msgstr ""
+
+msgctxt "#30814"
+msgid "feed history"
+msgstr ""
+
 #~ msgctxt "#30736"
 #~ msgid "Hide short videos (1 minute or less)"
 #~ msgstr "Kısa Videoları Gizle (1 dk ya da daha az)"
