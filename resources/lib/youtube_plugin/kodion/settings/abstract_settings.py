@@ -70,13 +70,9 @@ class AbstractSettings(object):
         4: 1080,
     }
 
-    def get_video_quality(self, quality_map_override=None):
-        if quality_map_override is not None:
-            video_quality_map = quality_map_override
-        else:
-            video_quality_map = self._VIDEO_QUALITY_MAP
+    def get_video_quality(self):
         value = self.get_int(settings.VIDEO_QUALITY, 3)
-        return video_quality_map[value]
+        return self._VIDEO_QUALITY_MAP[value]
 
     def ask_for_video_quality(self):
         return (self.get_bool(settings.VIDEO_QUALITY_ASK, False)
@@ -339,18 +335,18 @@ class AbstractSettings(object):
         return self.get_bool(settings.USE_REMOTE_HISTORY, False)
 
     # Selections based on max width and min height at common (utra-)wide aspect ratios
-    _QUALITY_SELECTIONS = {                                                 # Setting | Resolution
-        7:   {'width': 7680, 'height': 3148, 'label': '4320p{0} (8K){1}'},  #   7     |   4320p 8K
-        6:   {'width': 3840, 'height': 1080, 'label': '2160p{0} (4K){1}'},  #   6     |   2160p 4K
-        5:   {'width': 2560, 'height': 984, 'label': '1440p{0} (QHD){1}'},  #   5     |   1440p 2.5K / QHD
-        4.1: {'width': 2048, 'height': 858, 'label': '1152p{0} (2K){1}'},   #   N/A   |   1152p 2K / QWXGA
-        4:   {'width': 1920, 'height': 787, 'label': '1080p{0} (FHD){1}'},  #   4     |   1080p FHD
-        3:   {'width': 1280, 'height': 525, 'label': '720p{0} (HD){1}'},    #   3     |   720p  HD
-        2:   {'width': 854, 'height': 350, 'label': '480p{0}{1}'},          #   2     |   480p
-        1:   {'width': 640, 'height': 263, 'label': '360p{0}{1}'},          #   1     |   360p
-        0:   {'width': 426, 'height': 175, 'label': '240p{0}{1}'},          #   0     |   240p
-        -1:  {'width': 256, 'height': 105, 'label': '144p{0}{1}'},          #   N/A   |   144p
-        -2:  {'width': 0, 'height': 0, 'label': '{2}p{0}{1}'},              #   N/A   |   Custom
+    _QUALITY_SELECTIONS = {                                                                         # Setting | Resolution
+        7:   {'width': 7680, 'min_height': 3148, 'nom_height': 4320, 'label': '{0}p{1} (8K){2}'},   #   7     |   4320p 8K
+        6:   {'width': 3840, 'min_height': 1080, 'nom_height': 2160, 'label': '{0}p{1} (4K){2}'},   #   6     |   2160p 4K
+        5:   {'width': 2560, 'min_height': 984,  'nom_height': 1440, 'label': '{0}p{1} (QHD){2}'},  #   5     |   1440p 2.5K / QHD
+        4.1: {'width': 2048, 'min_height': 858,  'nom_height': 1152, 'label': '{0}p{1} (2K){2}'},   #   N/A   |   1152p 2K / QWXGA
+        4:   {'width': 1920, 'min_height': 787,  'nom_height': 1080, 'label': '{0}p{1} (FHD){2}'},  #   4     |   1080p FHD
+        3:   {'width': 1280, 'min_height': 525,  'nom_height': 720,  'label': '{0}p{1} (HD){2}'},   #   3     |   720p  HD
+        2:   {'width': 854,  'min_height': 350,  'nom_height': 480,  'label': '{0}p{1}{2}'},        #   2     |   480p
+        1:   {'width': 640,  'min_height': 263,  'nom_height': 360,  'label': '{0}p{1}{2}'},        #   1     |   360p
+        0:   {'width': 426,  'min_height': 175,  'nom_height': 240,  'label': '{0}p{1}{2}'},        #   0     |   240p
+        -1:  {'width': 256,  'min_height': 105,  'nom_height': 144,  'label': '{0}p{1}{2}'},        #   N/A   |   144p
+        -2:  {'width': 0,    'min_height': 0,    'nom_height': 0,    'label': '{0}p{1}{2}'},        #   N/A   |   Custom
     }
 
     def mpd_video_qualities(self, value=None):

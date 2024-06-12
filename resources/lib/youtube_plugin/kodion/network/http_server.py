@@ -26,7 +26,7 @@ from ..compatibility import (
     xbmcgui,
     xbmcvfs,
 )
-from ..constants import ADDON_ID, TEMP_PATH, paths
+from ..constants import ADDON_ID, LICENSE_TOKEN, LICENSE_URL, TEMP_PATH, paths
 from ..logger import log_debug, log_error
 from ..utils import validate_ip_address, wait
 
@@ -237,12 +237,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         elif self.path.startswith(paths.DRM):
             home = xbmcgui.Window(10000)
 
-            lic_url = home.getProperty('-'.join((ADDON_ID, 'license_url')))
+            lic_url = home.getProperty('-'.join((ADDON_ID, LICENSE_URL)))
             if not lic_url:
                 self.send_error(404)
                 return
 
-            lic_token = home.getProperty('-'.join((ADDON_ID, 'license_token')))
+            lic_token = home.getProperty('-'.join((ADDON_ID, LICENSE_TOKEN)))
             if not lic_token:
                 self.send_error(403)
                 return

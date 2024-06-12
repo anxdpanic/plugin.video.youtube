@@ -16,6 +16,8 @@ import threading
 from ..compatibility import xbmc
 from ..constants import (
     BUSY_FLAG,
+    PLAYBACK_STARTED,
+    PLAYBACK_STOPPED,
     PLAYER_DATA,
     REFRESH_CONTAINER,
     SWITCH_PLAYER_FLAG,
@@ -79,7 +81,7 @@ class PlayerMonitorThread(threading.Thread):
             self._monitor.waitForAbort(wait_interval)
             waited += wait_interval
         else:
-            self._context.send_notification('PlaybackStarted', {
+            self._context.send_notification(PLAYBACK_STARTED, {
                 'video_id': self.video_id,
                 'channel_id': self.channel_id,
                 'status': self.video_status,
@@ -218,7 +220,7 @@ class PlayerMonitorThread(threading.Thread):
             self._context.get_playback_history().update(self.video_id,
                                                         play_data)
 
-        self._context.send_notification('PlaybackStopped', self.playback_data)
+        self._context.send_notification(PLAYBACK_STOPPED, self.playback_data)
         self._context.log_debug('Playback stopped [{video_id}]:'
                                 ' {played_time:.3f} secs of {total_time:.3f}'
                                 ' @ {played_percent}%,'
@@ -264,7 +266,7 @@ class PlayerMonitorThread(threading.Thread):
                                                         rating_match)
 
         if settings.get_bool('youtube.post.play.refresh', False):
-            self._context.send_notification(REFRESH_CONTAINER, True)
+            self._context.send_notification(REFRESH_CONTAINER)
 
         self.end()
 

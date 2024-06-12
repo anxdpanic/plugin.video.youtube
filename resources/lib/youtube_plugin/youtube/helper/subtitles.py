@@ -18,7 +18,7 @@ from ...kodion.compatibility import (
     urlsplit,
     xbmcvfs,
 )
-from ...kodion.constants import TEMP_PATH
+from ...kodion.constants import PLAY_PROMPT_SUBTITLES, TEMP_PATH
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import make_dirs
 
@@ -82,9 +82,9 @@ class Subtitles(object):
             self.preferred_lang = ('en',)
 
         ui = context.get_ui()
-        self.prompt_override = (ui.get_property('prompt_for_subtitles')
+        self.prompt_override = (ui.get_property(PLAY_PROMPT_SUBTITLES)
                                 == video_id)
-        ui.clear_property('prompt_for_subtitles')
+        ui.clear_property(PLAY_PROMPT_SUBTITLES)
 
     def load(self, captions, headers=None):
         if headers:

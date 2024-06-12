@@ -13,7 +13,13 @@ import os
 import socket
 
 from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
-from .constants import DATA_PATH, SWITCH_PLAYER_FLAG, TEMP_PATH, WAIT_FLAG
+from .constants import (
+    DATA_PATH,
+    RELOAD_ACCESS_MANAGER,
+    SWITCH_PLAYER_FLAG,
+    TEMP_PATH,
+    WAIT_FLAG,
+)
 from .context import XbmcContext
 from .network import get_client_ip_address, httpd_status
 from .utils import rm_dir, validate_ip_address
@@ -28,7 +34,7 @@ def _config_actions(context, action, *_args):
         xbmcaddon.Addon().openSettings()
 
     elif action == 'isa':
-        if context.use_inputstream_adaptive():
+        if context.use_inputstream_adaptive(prompt=True):
             xbmcaddon.Addon('inputstream.adaptive').openSettings()
         else:
             settings.use_isa(False)
@@ -132,6 +138,7 @@ def _maintenance_actions(context, action, params):
         targets = {
             'bookmarks': context.get_bookmarks_list,
             'data_cache': context.get_data_cache,
+            'feed_history': context.get_feed_history,
             'function_cache': context.get_function_cache,
             'playback_history': context.get_playback_history,
             'search_history': context.get_search_history,
@@ -140,9 +147,7 @@ def _maintenance_actions(context, action, params):
         if target not in targets:
             return
 
-        if ui.on_clear_content(
-            localize('maintenance.{0}'.format(target))
-        ):
+        if ui.on_clear_content(localize('maintenance.{0}'.format(target))):
             targets[target]().clear()
             ui.show_notification(localize('succeeded'))
 
@@ -151,6 +156,7 @@ def _maintenance_actions(context, action, params):
         targets = {
             'bookmarks': 'bookmarks.sqlite',
             'data_cache': 'data_cache.sqlite',
+            'feed_history': 'feeds.sqlite',
             'function_cache': 'cache.sqlite',
             'playback_history': 'history.sqlite',
             'search_history': 'search.sqlite',
@@ -205,6 +211,7 @@ def _user_actions(context, action, params):
     localize = context.localize
     access_manager = context.get_access_manager()
     ui = context.get_ui()
+    reload = False
 
     def select_user(reason, new_user=False):
         current_users = access_manager.get_users()
@@ -239,8 +246,6 @@ def _user_actions(context, action, params):
             localize('user.changed') % access_manager.get_username(user),
             localize('user.switch')
         )
-        if context.get_param('refresh') != 0:
-            ui.refresh_container()
 
     if action == 'switch':
         result, user_index_map = select_user(localize('user.switch'),
@@ -254,6 +259,7 @@ def _user_actions(context, action, params):
 
         if user is not None and user != access_manager.get_current_user():
             switch_to_user(user)
+            reload = True
 
     elif action == 'add':
         user, details = add_user()
@@ -264,6 +270,7 @@ def _user_actions(context, action, params):
             )
             if result:
                 switch_to_user(user)
+                reload = True
 
     elif action == 'remove':
         result, user_index_map = select_user(localize('user.remove'))
@@ -274,13 +281,14 @@ def _user_actions(context, action, params):
         username = access_manager.get_username(user)
         if ui.on_remove_content(username):
             access_manager.remove_user(user)
+            ui.show_notification(localize('removed') % username,
+                                 localize('remove'))
             if user == 0:
                 access_manager.add_user(username=localize('user.default'),
                                         user=0)
             if user == access_manager.get_current_user():
-                access_manager.set_user(0, switch_to=True)
-            ui.show_notification(localize('removed') % username,
-                                 localize('remove'))
+                switch_to_user(0)
+            reload = True
 
     elif action == 'rename':
         result, user_index_map = select_user(localize('user.rename'))
@@ -304,7 +312,11 @@ def _user_actions(context, action, params):
                 localize('renamed') % (old_username, new_username),
                 localize('rename')
             )
+        reload = True
 
+    if reload:
+        ui.set_property(RELOAD_ACCESS_MANAGER)
+        context.send_notification(RELOAD_ACCESS_MANAGER)
     return True
 
 

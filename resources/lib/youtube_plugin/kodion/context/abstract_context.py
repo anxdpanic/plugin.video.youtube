@@ -19,6 +19,7 @@ from ..json_store import AccessManager
 from ..sql_store import (
     BookmarksList,
     DataCache,
+    FeedHistory,
     FunctionCache,
     PlaybackHistory,
     SearchHistory,
@@ -107,13 +108,15 @@ class AbstractContext(object):
     }
 
     def __init__(self, path='/', params=None, plugin_id=''):
-        self._function_cache = None
-        self._data_cache = None
-        self._search_history = None
-        self._playback_history = None
-        self._bookmarks_list = None
-        self._watch_later_list = None
         self._access_manager = None
+
+        self._bookmarks_list = None
+        self._data_cache = None
+        self._feed_history = None
+        self._function_cache = None
+        self._playback_history = None
+        self._search_history = None
+        self._watch_later_list = None
 
         self._plugin_handle = -1
         self._plugin_id = plugin_id
@@ -154,6 +157,14 @@ class AbstractContext(object):
             filepath = os.path.join(self.get_data_path(), uuid, filename)
             self._playback_history = PlaybackHistory(filepath)
         return self._playback_history
+
+    def get_feed_history(self):
+        if not self._feed_history:
+            uuid = self.get_access_manager().get_current_user_id()
+            filename = 'feeds.sqlite'
+            filepath = os.path.join(self.get_data_path(), uuid, filename)
+            self._feed_history = FeedHistory(filepath)
+        return self._feed_history
 
     def get_data_cache(self):
         if not self._data_cache:
@@ -207,6 +218,9 @@ class AbstractContext(object):
         if not self._access_manager:
             self._access_manager = AccessManager(self)
         return self._access_manager
+
+    def reload_access_manager(self):
+        self._access_manager = AccessManager(self)
 
     def get_video_playlist(self):
         raise NotImplementedError()
@@ -306,7 +320,7 @@ class AbstractContext(object):
                         )
                     # process and translate deprecated parameters
                     elif param == 'action':
-                        if parsed_value in ('play_all', 'play_video'):
+                        if parsed_value in {'play_all', 'play_video'}:
                             to_delete.append(param)
                             self.set_path('play')
                             continue
@@ -375,7 +389,7 @@ class AbstractContext(object):
     def get_handle(self):
         return self._plugin_handle
 
-    def get_settings(self, flush=False):
+    def get_settings(self, refresh=False):
         raise NotImplementedError()
 
     def localize(self, text_id, default_text=None):
@@ -425,7 +439,7 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     @staticmethod
-    def get_listitem_detail(detail_name):
+    def get_listitem_property(detail_name):
         raise NotImplementedError()
 
     @staticmethod

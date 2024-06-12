@@ -19,6 +19,8 @@ from ...constants import (
     CHECK_SETTINGS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    REFRESH_CONTAINER,
+    RELOAD_ACCESS_MANAGER,
     REROUTE,
     SLEEPING,
     VIDEO_ID,
@@ -58,7 +60,7 @@ class XbmcPlugin(AbstractPlugin):
         super(XbmcPlugin, self).__init__()
         self.handle = None
 
-    def run(self, provider, context, refresh=False):
+    def run(self, provider, context, focused=None):
         self.handle = context.get_handle()
         ui = context.get_ui()
 
@@ -129,7 +131,16 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.get_property(SLEEPING):
             context.wakeup()
-            ui.clear_property(SLEEPING)
+
+        if ui.get_property(REFRESH_CONTAINER):
+            focused = False
+            ui.clear_property(REFRESH_CONTAINER)
+        elif focused:
+            focused = ui.get_property(VIDEO_ID)
+
+        if ui.get_property(RELOAD_ACCESS_MANAGER):
+            context.reload_access_manager()
+            ui.clear_property(RELOAD_ACCESS_MANAGER)
 
         if ui.get_property(CHECK_SETTINGS):
             provider.reset_client()
@@ -148,8 +159,8 @@ class XbmcPlugin(AbstractPlugin):
                 result, options = function_cache.run(
                     provider.navigate,
                     seconds=None,
-                    _cacheparams=function_cache.PARAMS_NONE,
                     _oneshot=True,
+                    _scope=function_cache.SCOPE_NONE,
                     context=context.clone(route),
                 )
                 ui.clear_property(REROUTE)
@@ -163,11 +174,12 @@ class XbmcPlugin(AbstractPlugin):
                 ))
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
-        focused = ui.get_property(VIDEO_ID) if refresh else None
+        items = None
         item_count = 0
-        if isinstance(result, (list, tuple)):
+
+        if result and isinstance(result, (list, tuple)):
             show_fanart = settings.fanart_selection()
-            result = [
+            items = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](
                     context,
                     item,
@@ -177,13 +189,18 @@ class XbmcPlugin(AbstractPlugin):
                 for item in result
                 if item.__class__.__name__ in self._LIST_ITEM_MAP
             ]
-            item_count = len(result)
-        elif result.__class__.__name__ in self._PLAY_ITEM_MAP:
+            item_count = len(items)
+
+            if options.get(provider.RESULT_FORCE_RESOLVE):
+                result = result[0]
+
+        if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             result = self._set_resolved_url(context, result)
 
         if item_count:
+            context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
-                self.handle, result, item_count
+                self.handle, items, item_count
             )
             cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
             update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)

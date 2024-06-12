@@ -120,7 +120,8 @@ def _process_browse_channels(provider, context, client):
     else:
         function_cache = context.get_function_cache()
         json_data = function_cache.run(client.get_guide_categories,
-                                       function_cache.ONE_MONTH)
+                                       function_cache.ONE_MONTH,
+                                       _refresh=context.get_param('refresh'))
 
     if not json_data:
         return False
@@ -301,11 +302,8 @@ def _process_new_uploaded_videos_tv(provider, context, client, filtered=False):
     params = context.get_params()
     refresh = params.get('refresh')
 
-    json_data = function_cache.run(
-        client.get_my_subscriptions,
-        function_cache.ONE_MINUTE * 30,
-        _refresh=refresh,
-        page_token=params.get('page_token', ''),
+    json_data = client.get_my_subscriptions(
+        page_token=params.get('page', 1),
         logged_in=provider.is_logged_in(),
         do_filter=filtered,
         refresh=refresh,

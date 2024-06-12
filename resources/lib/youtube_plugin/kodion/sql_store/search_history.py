@@ -29,8 +29,7 @@ class SearchHistory(Storage):
     def get_items(self, process=None):
         result = self._get_by_ids(oldest_first=False,
                                   limit=self._max_item_count,
-                                  process=process,
-                                  values_only=True)
+                                  process=process)
         return result
 
     @staticmethod

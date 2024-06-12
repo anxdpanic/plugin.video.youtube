@@ -1,3 +1,30 @@
+## v7.0.8+beta.1
+### Fixed
+- Update selection and sorting of streams to fix missing live streams
+- Fix using cached settings for XbmcContext.use_inputstream_adaptive
+- Wakeup http server on playback start if required #746
+- Improve handling of context menu play items
+- Use consistent return values for function cache to avoid caching errors #782
+- Attempt to fix PlaylistPlayer race condition error #704
+- Fix not reloading access manager when performing user actions #780
+- Fix page jump when page_token is not used
+- Ensure container is always refreshed when required and available
+- Fix incorrect comparison after cd45122
+
+### Changed
+- Update icons
+- Only enable recommendations when logged in
+- Improve sync with internal Kodi watched state #709
+- Align default value for watched percentage with Kodi default #746
+- Limit need to check window property for sleep and wakeup
+- Only show Next Page listitem linking to first page when opening listings from the GUI #787
+- Use shortened YouTube url with external players for better compatibility with different types of videos
+
+### New
+- Cache and update My Subscriptions content per channel feed #785 #786
+- Use separate database for My Subscription feed history #785
+- Enable action parameter in play playlist route
+
 ## v7.0.7
 ### Fixed
 - Fixed not being able to re-refresh a directory listing that has already been refreshed
@@ -22,7 +49,6 @@
 - Improve resource usage
 - Fix adding video to playlist #764
 - Fix plugin settings raising exception in Kodi 19-20 #769
-- Fix location icon background colour
 
 ### Changed
 - Removed Settings > Advanced > Views > Show channel fanart
