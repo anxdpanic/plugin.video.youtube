@@ -60,7 +60,7 @@ def run(context=_context,
                                path=context.get_path(),
                                params=params))
 
-    plugin.run(provider, context, new_uri == current_uri)
+    plugin.run(provider, context, focused=(current_uri == new_uri))
 
     if profiler:
         profiler.print_stats()

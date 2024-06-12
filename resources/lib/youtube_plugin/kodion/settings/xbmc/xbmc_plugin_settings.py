@@ -237,7 +237,7 @@ class XbmcPluginSettings(AbstractSettings):
                 echo = 'xx.xxxx,xx.xxxx'
             elif setting == 'youtube.api.id':
                 echo = '...'.join((value[:3], value[-5:]))
-            elif setting in ('youtube.api.key', 'youtube.api.secret'):
+            elif setting in {'youtube.api.key', 'youtube.api.secret'}:
                 echo = '...'.join((value[:3], value[-3:]))
             else:
                 echo = value
@@ -265,7 +265,7 @@ class XbmcPluginSettings(AbstractSettings):
                 echo = 'xx.xxxx,xx.xxxx'
             elif setting == 'youtube.api.id':
                 echo = '...'.join((value[:3], value[-5:]))
-            elif setting in ('youtube.api.key', 'youtube.api.secret'):
+            elif setting in {'youtube.api.key', 'youtube.api.secret'}:
                 echo = '...'.join((value[:3], value[-3:]))
             else:
                 echo = value

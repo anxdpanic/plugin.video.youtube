@@ -14,7 +14,7 @@ import re
 import time
 from math import log10
 
-from ...kodion.constants import content, paths
+from ...kodion.constants import LICENSE_TOKEN, LICENSE_URL, content, paths
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
@@ -705,7 +705,7 @@ def update_video_infos(provider, context, video_id_dict,
         # we support all playlist except 'Watch History'
         if (logged_in and video_id in playlist_item_id_dict and playlist_id
                 and playlist_channel_id == 'mine'
-                and playlist_id.strip().lower() not in ('hl', 'wl')):
+                and playlist_id.strip().lower() not in {'hl', 'wl'}):
             playlist_item_id = playlist_item_id_dict[video_id]
             video_item.set_playlist_id(playlist_id)
             video_item.set_playlist_item_id(playlist_item_id)
@@ -855,8 +855,8 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
                      drm='com.widevine.alpha').check_inputstream()
 
         video_item.set_license_key(license_proxy)
-        ui.set_property('license_url', license_url)
-        ui.set_property('license_token', license_token)
+        ui.set_property(LICENSE_URL, license_url)
+        ui.set_property(LICENSE_TOKEN, license_token)
 
 
 def update_fanarts(provider, context, channel_items_dict, data=None):

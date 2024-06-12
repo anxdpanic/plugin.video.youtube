@@ -311,8 +311,8 @@ msgid "Go to %s"
 msgstr "Перейти до %s"
 
 msgctxt "#30503"
-msgid "Show channel fanart"
-msgstr "Показувати фанарти каналів"
+msgid "Channel fanart"
+msgstr ""
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -1243,8 +1243,8 @@ msgid "Edited"
 msgstr ""
 
 msgctxt "#30736"
-msgid "Hide short videos (1 minute or less)"
-msgstr "Не показувати короткі відео (менше хвилини)"
+msgid "Shorts (1 minute or less)"
+msgstr ""
 
 msgctxt "#30737"
 msgid "Use alternate client details"
@@ -1521,6 +1521,38 @@ msgstr ""
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr ""
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr ""
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr ""
+
+msgctxt "#30808"
+msgid "Hide videos from listings"
+msgstr ""
+
+msgctxt "#30809"
+msgid "All upcoming videos"
+msgstr ""
+
+msgctxt "#30810"
+msgid "All previously streamed (completed) videos"
+msgstr ""
+
+msgctxt "#30811"
+msgid "Filter Live folders"
+msgstr ""
+
+#~ msgctxt "#30736"
+#~ msgid "Hide short videos (1 minute or less)"
+#~ msgstr "Не показувати короткі відео (менше хвилини)"
+
+#~ msgctxt "#30503"
+#~ msgid "Show channel fanart"
+#~ msgstr "Показувати фанарти каналів"
 
 # Kodion Common
 # empty strings from id 30039 to 30099

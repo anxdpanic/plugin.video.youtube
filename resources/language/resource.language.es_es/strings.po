@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-27 22:42+0000\n"
-"Last-Translator: José Antonio Alvarado <jalvarado0.eses@gmail.com>\n"
+"PO-Revision-Date: 2024-05-23 19:38+0000\n"
+"Last-Translator: roliverosc <roliverosc@hotmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.5.4\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -164,7 +164,7 @@ msgstr "Vista: Canciones"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr "Vista: Intérpretes"
+msgstr "Vista: Artistas"
 
 msgctxt "#30035"
 msgid "View: Albums"
@@ -313,8 +313,8 @@ msgid "Go to %s"
 msgstr "Ir a %s"
 
 msgctxt "#30503"
-msgid "Show channel fanart"
-msgstr "Mostrar fanart del canal"
+msgid "Channel fanart"
+msgstr "Canal fanart"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -374,7 +374,7 @@ msgstr "Suscribirse a %s"
 
 msgctxt "#30518"
 msgid "Go to '%s'"
-msgstr "Por favor, vaya a la URL '%s' desde"
+msgstr "Por favor, vaya a la URL '%s'"
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -406,11 +406,11 @@ msgstr "Seleccionar región"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr "Asistente de Configuración"
+msgstr "Asistente de configuración"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr "Idioma y Región"
+msgstr "Idioma y región"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -466,7 +466,7 @@ msgstr "Abrir con..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr "Mostrar el nombre del canal y los detalles del vídeo en la descripción"
+msgstr "Mostrar nombre del canal y detalles del vídeo en la descripción"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -482,7 +482,7 @@ msgstr "Enlaces en la descripción"
 
 msgctxt "#30545"
 msgid "No further links found."
-msgstr "No se encontraron enlaces."
+msgstr "No se encontraron más enlaces."
 
 msgctxt "#30546"
 msgid "Please log in twice!"
@@ -574,7 +574,7 @@ msgstr "Establecer como 'Ver más tarde'"
 
 msgctxt "#30568"
 msgid "Remove as Watch Later"
-msgstr "Eliminar como 'Ver más tarde'"
+msgstr "Borrar como 'Ver más tarde'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove '%s' as your Watch Later list?"
@@ -666,7 +666,7 @@ msgstr "Borrado filtro de 'Mis Suscripciones'"
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr "Tamaño para miniaturas"
+msgstr "Tamaño de miniaturas"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
@@ -914,7 +914,7 @@ msgstr "Radio de ubicación (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr "Mi ubicación mediante la búsqueda de geolocalización por IP"
+msgstr "Mi Ubicación mediante la búsqueda de geolocalización por IP"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -1098,7 +1098,7 @@ msgstr "Comprobar mi dirección IP"
 
 msgctxt "#30699"
 msgid "HTTP server is not running"
-msgstr "El Servidor HTTP no está arrancado"
+msgstr "El servidor HTTP no está arrancado"
 
 msgctxt "#30700"
 msgid "Client IP is %s"
@@ -1245,8 +1245,8 @@ msgid "Edited"
 msgstr "Editado"
 
 msgctxt "#30736"
-msgid "Hide short videos (1 minute or less)"
-msgstr "Ocultar vídeos cortos (1 minuto o menos)"
+msgid "Shorts (1 minute or less)"
+msgstr "Cortos (1 minuto o menos)"
 
 msgctxt "#30737"
 msgid "Use alternate client details"
@@ -1294,7 +1294,7 @@ msgstr "Alternativo"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr "Funcionalidades de emisión"
+msgstr "Características de emisión"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
@@ -1318,7 +1318,7 @@ msgstr "Activar audio Surround"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr "Habilitar audio AC-3"
+msgstr "Activar audio AC-3"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
@@ -1414,7 +1414,7 @@ msgstr "Vistas para %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr "¿Importar el antiguo historial de reproducción?"
+msgstr "¿Importar antiguo historial de reproducción?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
@@ -1523,6 +1523,38 @@ msgstr "Usar reproductor externo para URLs de YouTube"
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr "Usar reproductor externo para formatos de transmisiones Adaptativas"
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr "Saltar a la página..."
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr "Usar el nombre del canal como"
+
+msgctxt "#30808"
+msgid "Hide videos from listings"
+msgstr "Ocultar vídeos de listados"
+
+msgctxt "#30809"
+msgid "All upcoming videos"
+msgstr "Todos los próximos vídeos"
+
+msgctxt "#30810"
+msgid "All previously streamed (completed) videos"
+msgstr "Todos los vídeos transmitidos (completados) anteriormente"
+
+msgctxt "#30811"
+msgid "Filter Live folders"
+msgstr "Filtrar carpetas en directo"
+
+#~ msgctxt "#30736"
+#~ msgid "Hide short videos (1 minute or less)"
+#~ msgstr "Ocultar vídeos cortos (1 minuto o menos)"
+
+#~ msgctxt "#30503"
+#~ msgid "Show channel fanart"
+#~ msgstr "Mostrar fanart del canal"
 
 # Kodion Common
 # empty strings from id 30039 to 30099

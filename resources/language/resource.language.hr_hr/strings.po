@@ -313,8 +313,8 @@ msgid "Go to %s"
 msgstr "Idi na %s"
 
 msgctxt "#30503"
-msgid "Show channel fanart"
-msgstr "Prikaži poster kanala"
+msgid "Channel fanart"
+msgstr ""
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -1245,8 +1245,8 @@ msgid "Edited"
 msgstr "Uređeno"
 
 msgctxt "#30736"
-msgid "Hide short videos (1 minute or less)"
-msgstr "Sakrij kratke video snimke (1 minuta ii manje)"
+msgid "Shorts (1 minute or less)"
+msgstr ""
 
 msgctxt "#30737"
 msgid "Use alternate client details"
@@ -1523,6 +1523,38 @@ msgstr ""
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr ""
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr ""
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr ""
+
+msgctxt "#30808"
+msgid "Hide videos from listings"
+msgstr ""
+
+msgctxt "#30809"
+msgid "All upcoming videos"
+msgstr ""
+
+msgctxt "#30810"
+msgid "All previously streamed (completed) videos"
+msgstr ""
+
+msgctxt "#30811"
+msgid "Filter Live folders"
+msgstr ""
+
+#~ msgctxt "#30736"
+#~ msgid "Hide short videos (1 minute or less)"
+#~ msgstr "Sakrij kratke video snimke (1 minuta ii manje)"
+
+#~ msgctxt "#30503"
+#~ msgid "Show channel fanart"
+#~ msgstr "Prikaži poster kanala"
 
 # Kodion Common
 # empty strings from id 30039 to 30099

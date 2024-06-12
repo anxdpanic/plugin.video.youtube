@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from ..helper import v3
 from ...kodion import KodionException
+from ...kodion.constants import CHANNEL_ID, SUBSCRIPTION_ID
 from ...kodion.items import UriItem
 
 
@@ -25,7 +26,7 @@ def _process_list(provider, context, client):
 
 
 def _process_add(_provider, context, client):
-    listitem_subscription_id = context.get_listitem_detail('subscription_id')
+    listitem_subscription_id = context.get_listitem_property(SUBSCRIPTION_ID)
 
     subscription_id = context.get_param('subscription_id', '')
     if (not subscription_id and listitem_subscription_id
@@ -48,8 +49,8 @@ def _process_add(_provider, context, client):
 
 
 def _process_remove(_provider, context, client):
-    listitem_subscription_id = context.get_listitem_detail('channel_subscription_id')
-    listitem_channel_id = context.get_listitem_detail('channel_id')
+    listitem_subscription_id = context.get_listitem_property(SUBSCRIPTION_ID)
+    listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
     subscription_id = context.get_param('subscription_id', '')
     if not subscription_id and listitem_subscription_id:

@@ -12,13 +12,23 @@ jobs:
     if: github.repository == 'anxdpanic/plugin.video.youtube'
 
     name: Add-on Validations
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.x' ]
 
     steps:
       - name: Checkout Add-on
         uses: actions/checkout@v4
         with:
           path: ${{ github.event.repository.name }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |

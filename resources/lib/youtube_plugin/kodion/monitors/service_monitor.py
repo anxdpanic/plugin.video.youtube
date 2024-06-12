@@ -13,7 +13,14 @@ import json
 import threading
 
 from ..compatibility import xbmc, xbmcgui
-from ..constants import ADDON_ID, CHECK_SETTINGS, REFRESH_CONTAINER, WAKEUP
+from ..constants import (
+    ADDON_ID,
+    CHECK_SETTINGS,
+    PLAYBACK_INIT,
+    REFRESH_CONTAINER,
+    RELOAD_ACCESS_MANAGER,
+    WAKEUP,
+)
 from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 
@@ -36,18 +43,42 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd = None
         self.httpd_thread = None
 
+        self.refresh = False
+        self.interrupt = False
+
         if self._use_httpd:
             self.start_httpd()
 
         super(ServiceMonitor, self).__init__()
 
     @staticmethod
-    def _refresh_allowed():
-        return (not xbmc.getCondVisibility('Container.IsUpdating')
-                and not xbmc.getCondVisibility('System.HasActiveModalDialog')
-                and xbmc.getInfoLabel('Container.FolderPath').startswith(
-                    'plugin://{0}/'.format(ADDON_ID)
-                ))
+    def is_plugin_container(url='plugin://{0}/'.format(ADDON_ID),
+                            check_all=False,
+                            _bool=xbmc.getCondVisibility,
+                            _label=xbmc.getInfoLabel):
+        if check_all:
+            return (not _bool('Container.IsUpdating')
+                    and not _bool('System.HasActiveModalDialog')
+                    and _label('Container.FolderPath').startswith(url))
+        is_plugin = _label('Container.FolderPath').startswith(url)
+        return {
+            'is_plugin': is_plugin,
+            'is_loaded': is_plugin and not _bool('Container.IsUpdating'),
+            'is_active': is_plugin and not _bool('System.HasActiveModalDialog'),
+        }
+
+    @staticmethod
+    def set_property(property_id, value='true'):
+        property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).setProperty(property_id, value)
+        return value
+
+    def refresh_container(self, force=False):
+        self.set_property(REFRESH_CONTAINER)
+        if force or self.is_plugin_container(check_all=True):
+            xbmc.executebuiltin('Container.Refresh')
+        else:
+            self.refresh = True
 
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
@@ -70,9 +101,15 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == WAKEUP:
             if not self.httpd and self.httpd_required():
                 self.start_httpd()
+            self.interrupt = True
         elif event == REFRESH_CONTAINER:
-            if self._refresh_allowed():
-                xbmc.executebuiltin('Container.Refresh')
+            self.refresh_container()
+        elif event == RELOAD_ACCESS_MANAGER:
+            self._context.reload_access_manager()
+            self.refresh_container()
+        elif event == PLAYBACK_INIT:
+            if not self.httpd and self.httpd_required():
+                self.start_httpd()
         else:
             log_debug('onNotification: |unhandled method| -> |{method}|'
                       .format(method=method))
@@ -91,12 +128,8 @@ class ServiceMonitor(xbmc.Monitor):
 
         settings = self._context.get_settings(refresh=True)
 
-        xbmcgui.Window(10000).setProperty(
-            '-'.join((ADDON_ID, CHECK_SETTINGS)), 'true'
-        )
-
-        if self._refresh_allowed():
-            xbmc.executebuiltin('Container.Refresh')
+        self.set_property(CHECK_SETTINGS)
+        self.refresh_container()
 
         use_httpd = (settings.use_isa()
                      or settings.api_config_page()
@@ -157,8 +190,10 @@ class ServiceMonitor(xbmc.Monitor):
         log_debug('HTTPServer: Serving on |{ip}:{port}|'
                   .format(ip=address[0], port=address[1]))
 
-    def shutdown_httpd(self):
+    def shutdown_httpd(self, sleep=False):
         if self.httpd:
+            if sleep and self._context.get_settings().api_config_page():
+                return
             log_debug('HTTPServer: Shutting down |{ip}:{port}|'
                       .format(ip=self._old_httpd_address,
                               port=self._old_httpd_port))

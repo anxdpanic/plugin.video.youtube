@@ -66,11 +66,11 @@ class YouTubeResolver(AbstractResolver):
         super(YouTubeResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
-        if url_components.hostname not in (
-                'www.youtube.com',
-                'youtube.com',
-                'm.youtube.com',
-        ):
+        if url_components.hostname not in {
+            'www.youtube.com',
+            'youtube.com',
+            'm.youtube.com',
+        }:
             return False
 
         path = url_components.path.lower()
@@ -193,11 +193,11 @@ class CommonResolver(AbstractResolver):
         super(CommonResolver, self).__init__(*args, **kwargs)
 
     def supports_url(self, url, url_components):
-        if url_components.hostname in (
-                'www.youtube.com',
-                'youtube.com',
-                'm.youtube.com',
-        ):
+        if url_components.hostname in {
+            'www.youtube.com',
+            'youtube.com',
+            'm.youtube.com',
+        }:
             return False
         return 'HEAD'
 

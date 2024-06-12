@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
+from ...kodion.constants import PLAYLIST_ID, PLAYLISTITEM_ID
 from ...kodion.utils import find_video_id
 
 
@@ -65,8 +66,8 @@ def _process_add_video(provider, context, keymap_action=False):
 
 
 def _process_remove_video(provider, context):
-    listitem_playlist_id = context.get_listitem_detail('playlist_id')
-    listitem_playlist_item_id = context.get_listitem_detail('playlist_item_id')
+    listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
+    listitem_playlist_item_id = context.get_listitem_property(PLAYLISTITEM_ID)
     listitem_title = context.get_listitem_info('Title')
     keymap_action = False
 
@@ -98,7 +99,7 @@ def _process_remove_video(provider, context):
         else:
             raise KodionException('Playlist/Remove: missing video_name')
 
-    if playlist_id.strip().lower() not in ('wl', 'hl'):
+    if playlist_id.strip().lower() not in {'wl', 'hl'}:
         if context.get_ui().on_remove_content(video_name):
             success = provider.get_client(context).remove_video_from_playlist(
                 playlist_id=playlist_id,
@@ -181,14 +182,15 @@ def _process_select_playlist(provider, context):
     thumb_size = context.get_settings().get_thumbnail_size()
     default_thumb = context.create_resource_path('media', 'playlist.png')
 
-    while True:
+    while 1:
         current_page += 1
         json_data = function_cache.run(client.get_playlists_of_channel,
                                        function_cache.ONE_MINUTE // 3,
                                        _refresh=params.get('refresh'),
                                        channel_id='mine',
                                        page_token=page_token)
-
+        if not json_data:
+            break
         playlists = json_data.get('items', [])
         page_token = json_data.get('nextPageToken', '')
 
@@ -252,7 +254,6 @@ def _process_select_playlist(provider, context):
             new_params = dict(context.get_params(), playlist_id=result)
             new_context = context.clone(new_params=new_params)
             _process_add_video(provider, new_context, keymap_action)
-            break
         break
 
 

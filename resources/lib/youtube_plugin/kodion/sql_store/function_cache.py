@@ -24,9 +24,9 @@ class FunctionCache(Storage):
     _sql = {}
 
     _BUILTIN = str.__module__
-    PARAMS_NONE = 0
-    PARAMS_BUILTINS = 1
-    PARAMS_ALL = 2
+    SCOPE_NONE = 0
+    SCOPE_BUILTINS = 1
+    SCOPE_ALL = 2
 
     def __init__(self, filepath, max_file_size_mb=5):
         max_file_size_kb = max_file_size_mb * 1024
@@ -49,7 +49,7 @@ class FunctionCache(Storage):
         self._enabled = False
 
     @classmethod
-    def _create_id_from_func(cls, partial_func, hash_params=PARAMS_ALL):
+    def _create_id_from_func(cls, partial_func, scope=SCOPE_ALL):
         """
         Creates an id from the given function
         :param partial_func:
@@ -60,7 +60,7 @@ class FunctionCache(Storage):
             partial_func.func.__module__,
             partial_func.func.__name__,
         )
-        if hash_params == cls.PARAMS_BUILTINS:
+        if scope == cls.SCOPE_BUILTINS:
             signature = chain(
                 signature,
                 ((
@@ -74,7 +74,7 @@ class FunctionCache(Storage):
                     (key, type(arg))
                 ) for key, arg in partial_func.keywords.items()),
             )
-        elif hash_params == cls.PARAMS_ALL:
+        elif scope == cls.SCOPE_ALL:
             signature = chain(
                 signature,
                 partial_func.args,
@@ -101,27 +101,34 @@ class FunctionCache(Storage):
         :param int|None seconds: max allowable age of cached result
         :param tuple args: positional arguments passed to the function
         :param dict kwargs: keyword arguments passed to the function
-        :keyword _cacheparams: (int) cache result for function and parameters.
-                               0: function only,
-                               1: include value of builtin type parameters
-                               2: include value of all parameters, default 2
+        :keyword _scope: (int) cache result if matching:
+                         0: function only,
+                         1: function + value of builtin type parameters
+                         2: function + value of all parameters, default 2
+        :keyword _ignore_value: (Any) don't cache func return value if equal to
+                                _ignored_value, default None
         :keyword _oneshot: (bool) remove previously cached result, default False
         :keyword _refresh: (bool) updates cache with new result, default False
+        :keyword _retry_value: (Any) re-evaluate func if cached value is equal
+                               _retry_value, default None
         :return:
         """
-        cache_params = kwargs.pop('_cacheparams', self.PARAMS_ALL)
+        scope = kwargs.pop('_scope', self.SCOPE_ALL)
+        ignore_value = kwargs.pop('_ignore_value', None)
         oneshot = kwargs.pop('_oneshot', False)
         refresh = kwargs.pop('_refresh', False)
+        retry_value = kwargs.pop('_retry_value', None)
         partial_func = partial(func, *args, **kwargs)
 
         # if caching is disabled call the function
         if not self._enabled:
             return partial_func()
 
-        cache_id = self._create_id_from_func(partial_func, cache_params)
-        data = None if refresh else self._get(cache_id, seconds=seconds)
-        if data is None:
+        cache_id = self._create_id_from_func(partial_func, scope)
+        data = retry_value if refresh else self._get(cache_id, seconds=seconds)
+        if data == retry_value:
             data = partial_func()
+        if data != ignore_value:
             self._set(cache_id, data)
         elif oneshot:
             self._remove(cache_id)

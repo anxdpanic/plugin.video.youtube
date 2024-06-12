@@ -564,11 +564,11 @@ def goto_quick_search(context):
     )
 
 
-def goto_page(context):
+def goto_page(context, params=None):
     return (
         context.localize('page.choose'),
         'RunPlugin({0})'.format(context.create_uri(
             (paths.GOTO_PAGE, context.get_path(),),
-            context.get_params(),
+            params or context.get_params(),
         ))
     )

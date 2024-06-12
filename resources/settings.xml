@@ -216,7 +216,7 @@
                 </setting>
                 <setting id="youtube.view.hide_videos" type="list[string]" label="30808" help="">
                     <level>0</level>
-                    <default></default>
+                    <default/>
                     <constraints>
                         <options>
                             <option label="30736">shorts</option>
@@ -921,7 +921,7 @@
             <group id="6" label="16103">
                 <setting id="kodion.play_count.percent" type="integer" label="30668" help="">
                     <level>0</level>
-                    <default>85</default>
+                    <default>90</default>
                     <constraints>
                         <minimum>1</minimum>
                         <step>1</step>
@@ -1074,6 +1074,14 @@
                     <data>RunScript($ID,maintenance/clear?target=bookmarks)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="kodion.maintain.clear.feed_history" type="action" label="30812" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/clear?target=feed_history)</data>
+                    <control format="action" type="button"/>
+                </setting>
             </group>
             <group id="2">
                 <setting id="kodion.maintain.delete.function_cache" type="action" label="30553" help="">
@@ -1124,7 +1132,16 @@
                     <data>RunScript($ID,maintenance/delete?target=bookmarks)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="kodion.maintain.delete.feed_history" type="action" label="30813" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/delete?target=feed_history)</data>
+                    <control format="action" type="button"/>
+                </setting>
             </group>
+
             <group id="3">
                 <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" help="">
                     <level>0</level>

@@ -25,7 +25,8 @@ from .utils import to_unicode
 
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
-    RESULT_UPDATE_LISTING = 'update_listing'
+    RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
+    RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
 
     def __init__(self):
         # map for regular expression (path) to method (names)
@@ -140,14 +141,14 @@ class AbstractProvider(object):
             if not re_match:
                 continue
 
+            options = {
+                self.RESULT_CACHE_TO_DISC: True,
+                self.RESULT_UPDATE_LISTING: False,
+            }
             result = method(context, re_match)
             if isinstance(result, tuple):
-                result, options = result
-            else:
-                options = {
-                    self.RESULT_CACHE_TO_DISC: True,
-                    self.RESULT_UPDATE_LISTING: False,
-                }
+                result, new_options = result
+                options.update(new_options)
 
             refresh = context.get_param('refresh')
             if refresh is not None:
@@ -198,9 +199,12 @@ class AbstractProvider(object):
 
         path = re_match.group('path')
         params = context.get_params()
-        page_token = NextPageItem.create_page_token(
-            page, params.get('items_per_page', 50)
-        )
+        if 'page_token' in params:
+            page_token = NextPageItem.create_page_token(
+                page, params.get('items_per_page', 50)
+            )
+        else:
+            page_token = ''
         params = dict(params, page=page, page_token=page_token)
         return self.reroute(context, path=path, params=params)
 
@@ -221,8 +225,8 @@ class AbstractProvider(object):
                 result, options = function_cache.run(
                     self.navigate,
                     seconds=None,
-                    _cacheparams=function_cache.PARAMS_NONE,
                     _refresh=True,
+                    _scope=function_cache.SCOPE_NONE,
                     context=context.clone(path, params),
                 )
             finally:
@@ -278,13 +282,14 @@ class AbstractProvider(object):
         if command == 'input':
             data_cache = context.get_data_cache()
 
-            folder_path = context.get_infolabel('Container.FolderPath')
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
             if (not params.get('refresh')
-                    and folder_path.startswith('plugin://%s' % context.get_id())
-                    and re.match('.+/(?:query|input)/.*', folder_path)):
+                    and context.is_plugin_path(
+                        context.get_infolabel('Container.FolderPath'),
+                        ('query', 'input')
+                    )):
                 cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
                     query = to_unicode(cached)

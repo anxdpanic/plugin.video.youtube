@@ -7,15 +7,15 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 15:14+0000\n"
-"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"PO-Revision-Date: 2024-05-10 23:53+0000\n"
+"Last-Translator: skypichat <skypichat@hotmail.fr>\n"
 "Language-Team: French (France) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/fr_fr/>\n"
 "Language: fr_fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.5.3\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -126,11 +126,11 @@ msgstr "Taille du cache (Mo)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Activer l'assistant de configuration"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Remplacer les vues"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -146,7 +146,7 @@ msgstr "Affichage par films"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Configurer %s ?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -184,11 +184,11 @@ msgstr "Personnaliser l'ID historique de la liste de lecture"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Signets"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Signet"
 
 msgctxt "#30102"
 msgid "Search"
@@ -248,7 +248,7 @@ msgstr "Confirmer la suppression"
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr "Supprimer \"%s\" ?"
+msgstr "Supprimer \"%s\" ?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
@@ -264,11 +264,11 @@ msgstr "Veuillez patienter…"
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Confirmer effacer"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "Effacer %s ?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -309,8 +309,8 @@ msgid "Go to %s"
 msgstr "Aller à %s"
 
 msgctxt "#30503"
-msgid "Show channel fanart"
-msgstr "Afficher le fanart de la chaîne"
+msgid "Channel fanart"
+msgstr ""
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -350,7 +350,7 @@ msgstr "Parcourir les chaines"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "Tendance"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -402,11 +402,11 @@ msgstr "Sélectionner la région"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Assistant de configuration"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Langue et région"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -462,7 +462,7 @@ msgstr "Lire avec..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Afficher le nom de la chaîne et les détails de la vidéo dans la description"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -614,7 +614,7 @@ msgstr "Forcer la vérification du certificat SSL"
 
 msgctxt "#30579"
 msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "InputStream Adaptive est activé dans les paramètres YouTube, mais le module complémentaire a été désactivé. Souhaitez-vous activer InputStream Adaptive maintenant ?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -622,7 +622,7 @@ msgstr "Réinitialiser le gestionnaire d'accès"
 
 msgctxt "#30581"
 msgid "Are you sure you want to reset access manager?"
-msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès ?"
+msgstr "Êtes-vous sûr de vouloir réinitialiser le gestionnaire d'accès ?"
 
 msgctxt "#30582"
 msgid "Autoplay suggested videos"
@@ -642,7 +642,7 @@ msgstr "Liste des chaînes filtrées (délimitées par des virgules)"
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr "Blackliste"
+msgstr "Liste noire"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
@@ -694,11 +694,11 @@ msgstr "Clés API personnelles activées"
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
-msgstr "Impossible d'activer les clés API personnelles. Disparu : %s"
+msgstr "Impossible d'activer les clés API personnelles. Disparu : %s"
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Sous-titres"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -746,7 +746,7 @@ msgstr "Playlists Sauvegardées"
 
 msgctxt "#30612"
 msgid "Retry"
-msgstr "Recommencez"
+msgstr "Recommencer"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
@@ -766,11 +766,11 @@ msgstr "Doit être enregistré."
 
 msgctxt "#30617"
 msgid "InputStream Adaptive"
-msgstr ""
+msgstr "InputStream Adaptive"
 
 msgctxt "#30618"
 msgid "Enable MPEG-DASH proxy"
-msgstr ""
+msgstr "Activer le proxy MPEG-DASH"
 
 msgctxt "#30619"
 msgid "Port"
@@ -782,7 +782,7 @@ msgstr "Le port %s est déjà en cours d'utilisation. Impossible de démarrer le
 
 msgctxt "#30621"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr ""
+msgstr "Un proxy est requis pour les VOD MPEG-DASH (voir Avancé > Serveur HTTP)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -790,7 +790,7 @@ msgstr "Achats"
 
 msgctxt "#30623"
 msgid "Install InputStream Helper"
-msgstr "Installez l'aide d'InputStream"
+msgstr "Installer l'aide d'InputStream"
 
 msgctxt "#30624"
 msgid "Requires Kodi 17+"
@@ -806,7 +806,7 @@ msgstr "Supprimer les fichiers temporaires"
 
 msgctxt "#30627"
 msgid "Rate video after watching"
-msgstr "Notez la vidéo après l'avoir regardé"
+msgstr "Noter la vidéo après l'avoir regardé"
 
 msgctxt "#30628"
 msgid "HTTP Server"
@@ -822,7 +822,7 @@ msgstr "Sauvegarder"
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
-msgstr "Mise à jour réussie : %s"
+msgstr "Mise à jour réussie : %s"
 
 msgctxt "#30632"
 msgid "Enable API configuration page"
@@ -910,7 +910,7 @@ msgstr "Rayon autour de la position (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "Ma position à l'aide de la recherche de géolocalisation IP"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -986,7 +986,7 @@ msgstr "Effacer l'historique de lecture"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Supprimer la base de données de l'historique de lecture"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1050,7 +1050,7 @@ msgstr "cache de données"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Utiliser MPEG-DASH pour les vidéos"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1114,7 +1114,7 @@ msgstr "Êtes-vous sûr ?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "Utiliser les URL du site Web YouTube avec le lecteur par défaut"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1154,11 +1154,11 @@ msgstr "Ajouté à \"À regarder plus tard\""
 
 msgctxt "#30714"
 msgid "Added to playlist"
-msgstr "Ajouté à la playlist"
+msgstr "Ajouté à la liste de lecture"
 
 msgctxt "#30715"
 msgid "Removed from playlist"
-msgstr "Supprimé de la playlist"
+msgstr "Supprimé de la liste de lecture"
 
 msgctxt "#30716"
 msgid "Liked video"
@@ -1190,7 +1190,7 @@ msgstr "Activer la vidéo HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Un proxy est requis pour les VOD MPEG-DASH (voir Avancé > Serveur HTTP)[CR]La vidéo HDR et > 1080p nécessite InputStream Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1241,8 +1241,8 @@ msgid "Edited"
 msgstr "Édité"
 
 msgctxt "#30736"
-msgid "Hide short videos (1 minute or less)"
-msgstr "Cacher les vidéos courtes (1 minute ou moins)"
+msgid "Shorts (1 minute or less)"
+msgstr ""
 
 msgctxt "#30737"
 msgid "Use alternate client details"
@@ -1519,6 +1519,38 @@ msgstr ""
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
 msgstr ""
+
+msgctxt "#30806"
+msgid "Jump to page..."
+msgstr ""
+
+msgctxt "#30807"
+msgid "Use channel name as"
+msgstr ""
+
+msgctxt "#30808"
+msgid "Hide videos from listings"
+msgstr ""
+
+msgctxt "#30809"
+msgid "All upcoming videos"
+msgstr ""
+
+msgctxt "#30810"
+msgid "All previously streamed (completed) videos"
+msgstr ""
+
+msgctxt "#30811"
+msgid "Filter Live folders"
+msgstr ""
+
+#~ msgctxt "#30736"
+#~ msgid "Hide short videos (1 minute or less)"
+#~ msgstr "Cacher les vidéos courtes (1 minute ou moins)"
+
+#~ msgctxt "#30503"
+#~ msgid "Show channel fanart"
+#~ msgstr "Afficher le fanart de la chaîne"
 
 # Kodion Common
 # empty strings from id 30039 to 30099

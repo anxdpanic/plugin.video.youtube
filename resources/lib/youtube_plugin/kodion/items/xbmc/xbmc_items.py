@@ -14,7 +14,15 @@ from json import dumps
 
 from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...compatibility import to_str, xbmc, xbmcgui
-from ...constants import PLAY_COUNT, SWITCH_PLAYER_FLAG
+from ...constants import (
+    CHANNEL_ID,
+    PLAY_COUNT,
+    PLAYLIST_ID,
+    PLAYLISTITEM_ID,
+    SUBSCRIPTION_ID,
+    SWITCH_PLAYER_FLAG,
+    VIDEO_ID,
+)
 from ...utils import current_system_version, datetime_parser
 
 
@@ -393,8 +401,7 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
             'isPlayable': str(video_item.playable).lower(),
         }
 
-    if (video_item.use_isa_video()
-            and context.addon_enabled('inputstream.adaptive')):
+    if video_item.use_isa_video() and context.use_inputstream_adaptive():
         if video_item.use_mpd_video():
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'
@@ -519,20 +526,20 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
         'ForceResolvePlugin': 'true',
     }
 
-    list_item = xbmcgui.ListItem(**kwargs)
-
     if directory_item.next_page:
         props['specialSort'] = 'bottom'
     else:
         prop_value = directory_item.get_subscription_id()
         if prop_value:
-            props['channel_subscription_id'] = prop_value
+            props[SUBSCRIPTION_ID] = prop_value
         elif directory_item.get_channel_id():
             pass
         elif directory_item.get_playlist_id():
             pass
         else:
             props['specialSort'] = 'top'
+
+    list_item = xbmcgui.ListItem(**kwargs)
 
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()
@@ -635,8 +642,6 @@ def video_listitem(context,
         'ForceResolvePlugin': 'true',
     }
 
-    list_item = xbmcgui.ListItem(**kwargs)
-
     published_at = video_item.get_added_utc()
     scheduled_start = video_item.get_scheduled_start_utc()
     datetime = scheduled_start or published_at
@@ -658,27 +663,29 @@ def video_listitem(context,
         if focused and focused == prop_value:
             set_play_count = False
             resume = False
-        props['video_id'] = prop_value
+        props[VIDEO_ID] = prop_value
 
     # make channel_id property available for keymapping
     prop_value = video_item.get_channel_id()
     if prop_value:
-        props['channel_id'] = prop_value
+        props[CHANNEL_ID] = prop_value
 
     # make subscription_id property available for keymapping
     prop_value = video_item.get_subscription_id()
     if prop_value:
-        props['subscription_id'] = prop_value
+        props[SUBSCRIPTION_ID] = prop_value
 
     # make playlist_id property available for keymapping
     prop_value = video_item.get_playlist_id()
     if prop_value:
-        props['playlist_id'] = prop_value
+        props[PLAYLIST_ID] = prop_value
 
     # make playlist_item_id property available for keymapping
     prop_value = video_item.get_playlist_item_id()
     if prop_value:
-        props['playlist_item_id'] = prop_value
+        props[PLAYLISTITEM_ID] = prop_value
+
+    list_item = xbmcgui.ListItem(**kwargs)
 
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()
@@ -697,6 +704,16 @@ def video_listitem(context,
              props,
              set_play_count=set_play_count,
              resume=resume)
+
+    if not set_play_count:
+        video_id = video_item.video_id
+        playback_history = context.get_playback_history()
+        playback_history.update(video_id, dict(
+            playback_history.get_item(video_id) or {},
+            play_count=int(not video_item.get_play_count()),
+            played_time=0.0,
+            played_percent=0,
+        ))
 
     context_menu = video_item.get_context_menu()
     if context_menu:
