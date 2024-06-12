@@ -114,33 +114,33 @@ class VideoInfo(YouTubeRequestClient):
         # === 3D ===
         '82': {'container': 'mp4',
                '3D': True,
-               'title': '3D@360p',
+               'title': '3D 360p',
                'video': {'height': 360, 'codec': 'h.264'},
                'audio': {'bitrate': 96, 'codec': 'aac'}},
         '83': {'container': 'mp4',
                '3D': True,
-               'title': '3D@240p',
+               'title': '3D 240p',
                'video': {'height': 240, 'codec': 'h.264'},
                'audio': {'bitrate': 96, 'codec': 'aac'}},
         '84': {'container': 'mp4',
                '3D': True,
-               'title': '3D@720p',
+               'title': '3D 720p',
                'video': {'height': 720, 'codec': 'h.264'},
                'audio': {'bitrate': 192, 'codec': 'aac'}},
         '85': {'container': 'mp4',
                '3D': True,
-               'title': '3D@1080p',
+               'title': '3D 1080p',
                'video': {'height': 1080, 'codec': 'h.264'},
                'audio': {'bitrate': 192, 'codec': 'aac'}},
         '100': {'container': 'webm',
                 '3D': True,
-                'title': '3D@360p',
+                'title': '3D 360p',
                 'video': {'height': 360, 'codec': 'vp8'},
                 'audio': {'bitrate': 128, 'codec': 'vorbis'}},
         '101': {'container': 'webm',  # Discontinued
                 'discontinued': True,
                 '3D': True,
-                'title': '3D@360p',
+                'title': '3D 360p',
                 'video': {'height': 360, 'codec': 'vp8'},
                 'audio': {'bitrate': 192, 'codec': 'vorbis'}},
         '102': {'container': 'webm',  # Discontinued
@@ -150,66 +150,57 @@ class VideoInfo(YouTubeRequestClient):
                 'audio': {'bitrate': 192, 'codec': 'vorbis'}},
         # === Live Streams ===
         '91': {'container': 'ts',
-               'Live': True,
-               'title': 'Live@144p',
+               'title': '144p',
                'video': {'height': 144, 'codec': 'h.264'},
                'audio': {'bitrate': 48, 'codec': 'aac'}},
         '92': {'container': 'ts',
-               'Live': True,
-               'title': 'Live@240p',
+               'title': '240p',
                'video': {'height': 240, 'codec': 'h.264'},
                'audio': {'bitrate': 48, 'codec': 'aac'}},
         '93': {'container': 'ts',
-               'Live': True,
-               'title': 'Live@360p',
+               'title': '360p',
                'video': {'height': 360, 'codec': 'h.264'},
                'audio': {'bitrate': 128, 'codec': 'aac'}},
         '94': {'container': 'ts',
-               'Live': True,
-               'title': 'Live@480p',
+               'title': '480p',
                'video': {'height': 480, 'codec': 'h.264'},
                'audio': {'bitrate': 128, 'codec': 'aac'}},
         '95': {'container': 'ts',
-               'Live': True,
-               'title': 'Live@720p',
+               'title': '720p',
                'video': {'height': 720, 'codec': 'h.264'},
                'audio': {'bitrate': 256, 'codec': 'aac'}},
         '96': {'container': 'ts',
-               'Live': True,
-               'title': 'Live@1080p',
+               'title': '1080p',
                'video': {'height': 1080, 'codec': 'h.264'},
                'audio': {'bitrate': 256, 'codec': 'aac'}},
         '120': {'container': 'flv',  # Discontinued
                 'discontinued': True,
-                'Live': True,
-                'title': 'Live@720p',
+                'live': True,
+                'title': 'Live 720p',
                 'video': {'height': 720, 'codec': 'h.264'},
                 'audio': {'bitrate': 128, 'codec': 'aac'}},
         '127': {'container': 'ts',
-                'Live': True,
+                'live': True,
                 'audio': {'bitrate': 96, 'codec': 'aac'}},
         '128': {'container': 'ts',
-                'Live': True,
+                'live': True,
                 'audio': {'bitrate': 96, 'codec': 'aac'}},
         '132': {'container': 'ts',
-                'Live': True,
-                'title': 'Live@240p',
+                'title': '240p',
                 'video': {'height': 240, 'codec': 'h.264'},
                 'audio': {'bitrate': 48, 'codec': 'aac'}},
         '151': {'container': 'ts',
-                'Live': True,
+                'live': True,
                 'unsupported': True,
-                'title': 'Live@72p',
+                'title': 'Live 72p',
                 'video': {'height': 72, 'codec': 'h.264'},
                 'audio': {'bitrate': 24, 'codec': 'aac'}},
         '300': {'container': 'ts',
-                'Live': True,
-                'title': 'Live@720p',
+                'title': '720p',
                 'video': {'height': 720, 'codec': 'h.264'},
                 'audio': {'bitrate': 128, 'codec': 'aac'}},
         '301': {'container': 'ts',
-                'Live': True,
-                'title': 'Live@1080p',
+                'title': '1080p',
                 'video': {'height': 1080, 'codec': 'h.264'},
                 'audio': {'bitrate': 128, 'codec': 'aac'}},
         # === DASH (video only)
@@ -502,35 +493,43 @@ class VideoInfo(YouTubeRequestClient):
                  'title': 'HLS',
                  'hls/audio': True,
                  'hls/video': True,
+                 'sort': 9994,
                  'audio': {'bitrate': 0, 'codec': 'aac'},
                  'video': {'height': 0, 'codec': 'h.264'}},
         # === Live HLS
         '9995': {'container': 'hls',
-                 'Live': True,
+                 'live': True,
                  'title': 'Live HLS',
                  'hls/audio': True,
                  'hls/video': True,
+                 'sort': 9995,
                  'audio': {'bitrate': 0, 'codec': 'aac'},
                  'video': {'height': 0, 'codec': 'h.264'}},
         # === Live HLS adaptive
         '9996': {'container': 'hls',
-                 'Live': True,
+                 'live': True,
                  'title': 'Adaptive Live HLS',
                  'hls/audio': True,
                  'hls/video': True,
+                 'adaptive': True,
+                 'sort': 9996,
                  'audio': {'bitrate': 0, 'codec': 'aac'},
                  'video': {'height': 0, 'codec': 'h.264'}},
         # === DASH adaptive audio only
         '9997': {'container': 'mpd',
                  'title': 'DASH Audio',
                  'dash/audio': True,
+                 'adaptive': True,
+                 'sort': 9997,
                  'audio': {'bitrate': 0, 'codec': ''}},
         # === Live DASH adaptive
         '9998': {'container': 'mpd',
-                 'Live': True,
+                 'live': True,
                  'title': 'Live DASH',
                  'dash/audio': True,
                  'dash/video': True,
+                 'adaptive': True,
+                 'sort': 9998,
                  'audio': {'bitrate': 0, 'codec': ''},
                  'video': {'height': 0, 'codec': ''}},
         # === DASH adaptive
@@ -538,6 +537,8 @@ class VideoInfo(YouTubeRequestClient):
                  'title': 'DASH',
                  'dash/audio': True,
                  'dash/video': True,
+                 'adaptive': True,
+                 'sort': 9999,
                  'audio': {'bitrate': 0, 'codec': ''},
                  'video': {'height': 0, 'codec': ''}}
     }
@@ -702,45 +703,53 @@ class VideoInfo(YouTubeRequestClient):
                         '0123456789-_')
         return ''.join(random.choice(cpn_alphabet) for _ in range(16))
 
-    @classmethod
-    def _get_stream_format(cls, itag, stream=None):
-        yt_format = cls.FORMAT.get(itag)
+    def _get_stream_format(self, itag, info=None, max_height=None, **kwargs):
+        yt_format = self.FORMAT.get(itag)
         if not yt_format:
             return None
 
         yt_format = yt_format.copy()
-        if 'sort' in yt_format:
-            return yt_format
+        manual_sort = yt_format.get('sort', 0)
 
-        if stream:
-            video_info = stream.get('video') or {}
+        if info:
+            video_info = info.get('video') or {}
             yt_format['title'] = video_info.get('label', '')
             yt_format['video']['codec'] = video_info.get('codec', '')
             yt_format['video']['height'] = video_info.get('height', 0)
 
-            audio_info = stream.get('audio') or {}
+            audio_info = info.get('audio') or {}
             yt_format['audio']['codec'] = audio_info.get('codec', '')
             yt_format['audio']['bitrate'] = audio_info.get('bitrate', 0) // 1000
 
         video_info = yt_format.get('video')
         if video_info:
+            video_height = video_info.get('height', 0)
+            if max_height and video_height > max_height:
+                return None
             video_sort = (
-                    video_info.get('height', 0)
-                    * cls.QUALITY_FACTOR.get(video_info.get('codec'), 1)
+                    video_height
+                    * self.QUALITY_FACTOR.get(video_info.get('codec'), 1)
             )
         else:
-            video_sort = 0
+            video_sort = -1
 
         audio_info = yt_format.get('audio')
         if audio_info:
             audio_sort = (
                     audio_info.get('bitrate', 0)
-                    * cls.QUALITY_FACTOR.get(audio_info.get('codec'), 1)
+                    * self.QUALITY_FACTOR.get(audio_info.get('codec'), 1)
             )
         else:
             audio_sort = 0
 
-        yt_format['sort'] = [video_sort, audio_sort]
+        yt_format['sort'] = [
+            manual_sort,
+            video_sort,
+            audio_sort,
+        ]
+        if kwargs:
+            kwargs.update(yt_format)
+            return kwargs
         return yt_format
 
     def load_stream_infos(self, video_id):
@@ -885,7 +894,7 @@ class VideoInfo(YouTubeRequestClient):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _load_hls_manifest(self, url, live_type=None, meta_info=None,
+    def _load_hls_manifest(self, url, is_live=False, meta_info=None,
                            headers=None, playback_stats=None):
         if not url:
             return []
@@ -925,26 +934,35 @@ class VideoInfo(YouTubeRequestClient):
         if playback_stats is None:
             playback_stats = {}
 
-        yt_format = None
-        if not live_type:
-            yt_format = self._get_stream_format('9994')
-        elif live_type == 'hls':
-            yt_format = self._get_stream_format('9995')
-        elif live_type == 'isa_hls':
-            yt_format = self._get_stream_format('9996')
-
-        if yt_format:
-            stream = {
-                'title': '',
-                'url': url,
-                'meta': meta_info,
-                'headers': curl_headers,
-                'playback_stats': playback_stats,
-            }
-            stream.update(yt_format)
-            stream_list = [stream]
+        if is_live:
+            stream_list = [
+                self._get_stream_format(
+                    itag=yt_format,
+                    title='',
+                    url=url,
+                    meta=meta_info,
+                    headers=curl_headers,
+                    playback_stats=playback_stats,
+                ) for yt_format in ('9995', '9996')
+            ]
         else:
-            stream_list = []
+            stream_list = [
+                self._get_stream_format(
+                    itag='9994',
+                    title='',
+                    url=url,
+                    meta=meta_info,
+                    headers=curl_headers,
+                    playback_stats=playback_stats,
+                )
+            ]
+
+        settings = self._context.get_settings()
+        if settings.use_mpd_videos():
+            qualities = settings.mpd_video_qualities()
+            selected_height = qualities[0]['nom_height']
+        else:
+            selected_height = settings.get_video_quality()
 
         # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
         # a small default stream with itag 133 (240p) and can be ignored.
@@ -954,27 +972,31 @@ class VideoInfo(YouTubeRequestClient):
             r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
         )
         for match in re_playlist_data.finditer(result):
-            playlist_url = match.group('url')
             itag = match.group('itag')
-            yt_format = self._get_stream_format(itag)
-            if not yt_format:
-                self._context.log_debug('Unknown itag: {itag}\n{stream}'
-                                        .format(itag=itag, stream=match[0]))
+            yt_format = self._get_stream_format(
+                itag=itag,
+                max_height=selected_height,
+                title='',
+                url=match.group('url'),
+                meta=meta_info,
+                headers=curl_headers,
+                playback_stats=playback_stats,
+            )
+            if yt_format:
+                if is_live:
+                    yt_format['live'] = True
+                    yt_format['title'] = 'Live ' + yt_format['title']
+                stream_list.append(yt_format)
                 continue
+            self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
+                itag=itag, stream=match[0]
+            ))
 
-            stream = {
-                'title': '',
-                'url': playlist_url,
-                'meta': meta_info,
-                'headers': curl_headers,
-                'playback_stats': playback_stats,
-            }
-            stream.update(yt_format)
-            stream_list.append(stream)
         return stream_list
 
     def _create_stream_list(self,
                             streams,
+                            is_live=False,
                             meta_info=None,
                             headers=None,
                             playback_stats=None):
@@ -996,6 +1018,13 @@ class VideoInfo(YouTubeRequestClient):
         if playback_stats is None:
             playback_stats = {}
 
+        settings = self._context.get_settings()
+        if settings.use_mpd_videos():
+            qualities = settings.mpd_video_qualities()
+            selected_height = qualities[0]['nom_height']
+        else:
+            selected_height = settings.get_video_quality()
+
         stream_list = []
         for stream_map in streams:
             url = stream_map.get('url')
@@ -1012,7 +1041,15 @@ class VideoInfo(YouTubeRequestClient):
 
             itag = str(stream_map['itag'])
             stream_map['itag'] = itag
-            yt_format = self._get_stream_format(itag)
+            yt_format = self._get_stream_format(
+                itag=itag,
+                max_height=selected_height,
+                title='',
+                url=url,
+                meta=meta_info,
+                headers=curl_headers,
+                playback_stats=playback_stats,
+            )
             if not yt_format:
                 self._context.log_debug('Unknown itag: {itag}\n{stream}'
                                         .format(itag=itag, stream=stream_map))
@@ -1022,28 +1059,23 @@ class VideoInfo(YouTubeRequestClient):
                         and not yt_format.get('dash/audio'))):
                 continue
 
-            stream = {
-                'title': '',
-                'url': url,
-                'meta': meta_info,
-                'headers': curl_headers,
-                'playback_stats': playback_stats,
-            }
-            stream.update(yt_format)
+            if is_live:
+                yt_format['live'] = True
+                yt_format['title'] = 'Live ' + yt_format['title']
 
             if 'audioTrack' in stream_map:
                 audio_track = stream_map['audioTrack']
                 display_name = audio_track['displayName']
-                stream['title'] = '{0} {1}'.format(
-                    stream['title'], display_name
+                yt_format['title'] = '{0} {1}'.format(
+                    yt_format['title'], display_name
                 ).strip()
-                stream['sort'].extend((
+                yt_format['sort'].extend((
                     audio_track['id'].startswith(self._language_base),
                     'original' in display_name,
                     display_name
                 ))
 
-            stream_list.append(stream)
+            stream_list.append(yt_format)
         return stream_list
 
     def _process_signature_cipher(self, stream_map):
@@ -1315,11 +1347,10 @@ class VideoInfo(YouTubeRequestClient):
         streaming_data = result.get('streamingData', {})
         is_live = video_details.get('isLiveContent', False)
         if is_live:
-            live_type = _settings.live_stream_type()
+            is_live = video_details.get('isLive', False)
             live_dvr = video_details.get('isLiveDvrEnabled', False)
-            thumb_suffix = '_live'
+            thumb_suffix = '_live' if is_live else ''
         else:
-            live_type = None
             live_dvr = False
             thumb_suffix = ''
 
@@ -1420,9 +1451,7 @@ class VideoInfo(YouTubeRequestClient):
             self._player_js = self._get_player_js()
             self._cipher = Cipher(self._context, javascript=self._player_js)
 
-        manifest_url = None
-
-        if live_type == 'isa_mpd' and 'dashManifestUrl' in streaming_data:
+        if 'dashManifestUrl' in streaming_data:
             manifest_url = streaming_data['dashManifestUrl']
             if '?' in manifest_url:
                 manifest_url += '&mpd_version=5'
@@ -1431,28 +1460,24 @@ class VideoInfo(YouTubeRequestClient):
             else:
                 manifest_url += '/mpd_version/5'
 
-            video_stream = {
-                'title': '',
-                'url': manifest_url,
-                'meta': meta_info,
-                'headers': curl_headers,
-                'license_info': license_info,
-                'playback_stats': playback_stats
-            }
-            yt_format = self._get_stream_format('9998')
-            video_stream.update(yt_format)
-            stream_list.append(video_stream)
-        elif 'hlsManifestUrl' in streaming_data:
+            stream_list.append(self._get_stream_format(
+                itag='9998',
+                title='',
+                url=manifest_url,
+                meta=meta_info,
+                headers=curl_headers,
+                license_info=license_info,
+                playback_stats=playback_stats,
+            ))
+        if 'hlsManifestUrl' in streaming_data:
             stream_list.extend(self._load_hls_manifest(
                 streaming_data['hlsManifestUrl'],
-                live_type, meta_info, client['headers'], playback_stats
+                is_live, meta_info, client['headers'], playback_stats
             ))
-        else:
-            live_type = None
 
         subtitles = Subtitles(self._context, video_id)
         query_subtitles = client.get('_query_subtitles')
-        if (not live_type or live_dvr) and (
+        if (not is_live or live_dvr) and (
                 query_subtitles is True
                 or (query_subtitles
                     and subtitles.sub_selection == subtitles.LANG_ALL)):
@@ -1497,7 +1522,7 @@ class VideoInfo(YouTubeRequestClient):
             subs_data = None
 
         # extract adaptive streams and create MPEG-DASH manifest
-        if not live_type and not manifest_url and adaptive_fmts:
+        if adaptive_fmts:
             video_data, audio_data = self._process_stream_data(
                 adaptive_fmts,
                 default_lang['default']
@@ -1508,16 +1533,17 @@ class VideoInfo(YouTubeRequestClient):
                 video_data, audio_data, subs_data, license_info.get('url')
             )
 
-            video_stream = {
-                'title': '',
-                'url': manifest_url,
-                'meta': meta_info,
-                'headers': curl_headers,
-                'license_info': license_info,
-                'playback_stats': playback_stats
-            }
             if main_stream:
-                yt_format = self._get_stream_format('9999', main_stream)
+                yt_format = self._get_stream_format(
+                    itag='9999',
+                    info=main_stream,
+                    title='',
+                    url=manifest_url,
+                    meta=meta_info,
+                    headers=curl_headers,
+                    license_info=license_info,
+                    playback_stats=playback_stats,
+                )
 
                 title = [yt_format['title']]
 
@@ -1539,13 +1565,12 @@ class VideoInfo(YouTubeRequestClient):
                 if len(title) > 1:
                     yt_format['title'] = ''.join(yt_format['title'])
 
-                video_stream.update(yt_format)
-                stream_list.append(video_stream)
+                stream_list.append(yt_format)
 
         # extract non-adaptive streams
         if all_fmts:
             stream_list.extend(self._create_stream_list(
-                all_fmts, meta_info, client['headers'], playback_stats
+                all_fmts, is_live, meta_info, client['headers'], playback_stats
             ))
 
         if not stream_list:
@@ -1700,9 +1725,9 @@ class VideoInfo(YouTubeRequestClient):
                 for quality in qualities:
                     if compare_width > quality['width']:
                         if bounded_quality:
-                            if compare_height >= bounded_quality['height']:
+                            if compare_height >= bounded_quality['min_height']:
                                 quality = bounded_quality
-                            elif compare_height < quality['height']:
+                            elif compare_height < quality['min_height']:
                                 quality = qualities[-1]
                         if fps > 30 and disable_hfr_max:
                             bounded_quality = None
@@ -1725,9 +1750,11 @@ class VideoInfo(YouTubeRequestClient):
                     hdr='_hdr' if hdr else ''
                 )
                 channels = language = role = role_type = sample_rate = None
-                label = quality['label'].format(fps if fps > 30 else '',
-                                                ' HDR' if hdr else '',
-                                                compare_height)
+                label = quality['label'].format(
+                    quality['nom_height'] or compare_height,
+                    fps if fps > 30 else '',
+                    ' HDR' if hdr else '',
+                )
                 quality_group = '{0}_{1}_{2}'.format(container, codec, label)
 
             if mime_group not in data:

@@ -117,7 +117,7 @@ def play_video(provider, context):
         video_stream['url'] = url
     video_item = VideoItem(video_details.get('title', ''), video_stream['url'])
 
-    use_history = not (screensaver or incognito or video_stream.get('Live'))
+    use_history = not (screensaver or incognito or video_stream.get('live'))
     use_remote_history = use_history and settings.use_remote_history()
     use_play_data = use_history and settings.use_local_history()
 
