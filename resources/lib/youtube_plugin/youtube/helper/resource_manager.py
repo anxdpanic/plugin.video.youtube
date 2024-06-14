@@ -204,7 +204,7 @@ class ResourceManager(object):
                     batch = None
                 else:
                     batch = data_cache.get_item(
-                        batch_id,
+                        '{0},{1}'.format(*batch_id),
                         data_cache.ONE_HOUR if page_token
                         else data_cache.ONE_MINUTE * 5
                     )
@@ -243,15 +243,18 @@ class ResourceManager(object):
             self._context.log_debug('Got items for playlists:\n|{ids}|'
                                     .format(ids=to_update))
             result.update(new_data)
-            self.cache_data(new_data, defer=defer_cache)
+            self.cache_data({
+                '{0},{1}'.format(*batch_id): batch
+                for batch_id, batch in new_data.items()
+            }, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
         if list(result) != batch_ids[:len(result)]:
             result = {
-                id_: result[id_]
-                for id_ in batch_ids
-                if id_ in result
+                batch_id: result[batch_id]
+                for batch_id in batch_ids
+                if batch_id in result
             }
 
         return result
