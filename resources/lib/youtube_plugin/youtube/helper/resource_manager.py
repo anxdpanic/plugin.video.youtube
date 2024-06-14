@@ -341,8 +341,13 @@ class ResourceManager(object):
                 self.new_data.update(data)
             return
 
-        data = data or self.new_data
+        flush = False
+        if not data:
+            data = self.new_data
+            flush = True
         if data:
             self._context.get_data_cache().set_items(data)
             self._context.log_debug('Cached data for items:\n|{ids}|'
                                     .format(ids=list(data)))
+        if flush:
+            self.new_data = {}
