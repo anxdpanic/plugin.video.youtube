@@ -157,7 +157,8 @@ class Storage(object):
                  max_item_count=-1,
                  max_file_size_kb=-1,
                  migrate=False):
-        self._filepath = filepath
+        self.uuid = filepath[1]
+        self._filepath = os.path.join(*filepath)
         self._db = None
         self._cursor = None
         self._lock = Lock()
