@@ -288,9 +288,13 @@ class Provider(AbstractProvider):
         return self._client
 
     def get_resource_manager(self, context):
-        if not self._resource_manager:
-            self._resource_manager = ResourceManager(proxy(self), context)
-        return self._resource_manager
+        resource_manager = self._resource_manager
+        if not resource_manager or resource_manager.context_changed(context):
+            new_resource_manager = ResourceManager(proxy(self), context)
+            if not resource_manager:
+                self._resource_manager = new_resource_manager
+            return new_resource_manager
+        return resource_manager
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/uri2addon/?$')

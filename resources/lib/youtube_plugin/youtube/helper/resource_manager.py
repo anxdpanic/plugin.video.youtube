@@ -21,6 +21,9 @@ class ResourceManager(object):
         self._provider = provider
         self.new_data = {}
 
+    def context_changed(self, context):
+        return self._context != context
+
     @staticmethod
     def _list_batch(input_list, n=50):
         if not isinstance(input_list, (list, tuple)):
