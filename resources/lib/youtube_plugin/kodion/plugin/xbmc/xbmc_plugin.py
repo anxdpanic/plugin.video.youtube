@@ -158,7 +158,6 @@ class XbmcPlugin(AbstractPlugin):
                 function_cache = context.get_function_cache()
                 result, options = function_cache.run(
                     provider.navigate,
-                    seconds=None,
                     _oneshot=True,
                     _scope=function_cache.SCOPE_NONE,
                     context=context.clone(route),

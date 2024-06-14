@@ -654,7 +654,7 @@ class YouTube(LoginClient):
         if refresh:
             cached = []
         else:
-            cached = cache.get_item(cache_items_key, None) or []
+            cached = cache.get_item(cache_items_key) or []
 
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth

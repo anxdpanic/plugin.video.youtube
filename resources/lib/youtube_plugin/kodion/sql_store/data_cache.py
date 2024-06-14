@@ -24,7 +24,11 @@ class DataCache(Storage):
         super(DataCache, self).__init__(filepath,
                                         max_file_size_kb=max_file_size_kb)
 
-    def get_items(self, content_ids, seconds, as_dict=True, values_only=True):
+    def get_items(self,
+                  content_ids,
+                  seconds=None,
+                  as_dict=True,
+                  values_only=True):
         result = self._get_by_ids(content_ids,
                                   seconds=seconds,
                                   as_dict=as_dict,

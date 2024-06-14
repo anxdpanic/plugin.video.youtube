@@ -223,7 +223,6 @@ class AbstractProvider(object):
             try:
                 result, options = function_cache.run(
                     self.navigate,
-                    seconds=None,
                     _refresh=True,
                     _scope=function_cache.SCOPE_NONE,
                     context=context.clone(path, params),
