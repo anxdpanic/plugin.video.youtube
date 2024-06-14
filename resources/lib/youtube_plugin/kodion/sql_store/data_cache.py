@@ -35,6 +35,24 @@ class DataCache(Storage):
                                   values_only=values_only)
         return result
 
+    def get_items_like(self, content_id, seconds=None):
+        result = self._get_by_ids((content_id,),
+                                  seconds=seconds,
+                                  wildcard=True,
+                                  as_dict=True,
+                                  values_only=False)
+        return result
+
+    def get_item_like(self, content_id, seconds=None, first=False):
+        result = self._get_by_ids((content_id,),
+                                  seconds=seconds,
+                                  wildcard=True,
+                                  as_dict=False,
+                                  values_only=False,
+                                  oldest_first=first,
+                                  limit=1)
+        return result
+
     def get_item(self, content_id, seconds=None, as_dict=False):
         result = self._get(content_id, seconds=seconds, as_dict=as_dict)
         return result
@@ -48,8 +66,8 @@ class DataCache(Storage):
     def remove(self, content_id):
         self._remove(content_id)
 
-    def update(self, content_id, item):
-        self._set(str(content_id), item)
+    def update(self, content_id, item, timestamp=None):
+        self._set(content_id, item, timestamp)
 
     def _optimize_item_count(self, limit=-1, defer=False):
         return False

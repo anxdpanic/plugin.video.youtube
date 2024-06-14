@@ -64,6 +64,20 @@ class Storage(object):
             ' FROM {table}'
             ' WHERE key in ({{0}});'
         ),
+        'get_by_key_like': (
+            'SELECT *'
+            ' FROM {table}'
+            ' WHERE key like ?'
+            ' ORDER BY {order_col}'
+            ' LIMIT {{0}};'
+        ),
+        'get_by_key_like_desc': (
+            'SELECT *'
+            ' FROM {table}'
+            ' WHERE key like ?'
+            ' ORDER BY {order_col} DESC'
+            ' LIMIT {{0}};'
+        ),
         'get_many': (
             'SELECT *'
             ' FROM {table}'
@@ -415,13 +429,19 @@ class Storage(object):
         return None
 
     def _get_by_ids(self, item_ids=None, oldest_first=True, limit=-1,
-                    seconds=None, process=None,
+                    wildcard=False, seconds=None, process=None,
                     as_dict=False, values_only=True):
         if not item_ids:
             if oldest_first:
                 query = self._sql['get_many']
             else:
                 query = self._sql['get_many_desc']
+            query = query.format(limit)
+        elif wildcard:
+            if oldest_first:
+                query = self._sql['get_by_key_like']
+            else:
+                query = self._sql['get_by_key_like_desc']
             query = query.format(limit)
         else:
             num_ids = len(item_ids)
