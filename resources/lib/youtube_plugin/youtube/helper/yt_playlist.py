@@ -24,14 +24,15 @@ def _process_add_video(provider, context, keymap_action=False):
     if not logged_in:
         raise KodionException('Playlist/Add: not logged in')
 
-    watch_later_id = context.get_access_manager().get_watch_later_id()
-
     playlist_id = context.get_param('playlist_id', '')
-    if playlist_id.lower() == 'watch_later':
-        playlist_id = watch_later_id
-
     if not playlist_id:
         raise KodionException('Playlist/Add: missing playlist_id')
+
+    if playlist_id.lower() == 'watch_later':
+        playlist_id = context.get_access_manager().get_watch_later_id()
+        notify_message = context.localize('watch_later.added_to')
+    else:
+        notify_message = context.localize('playlist.added_to')
 
     video_id = context.get_param('video_id', '')
     if not video_id:
@@ -47,11 +48,6 @@ def _process_add_video(provider, context, keymap_action=False):
         context.log_debug('Playlist/Add: failed for playlist |{playlist_id}|'
                           .format(playlist_id=playlist_id))
         return False
-
-    if playlist_id == watch_later_id:
-        notify_message = context.localize('watch_later.added_to')
-    else:
-        notify_message = context.localize('playlist.added_to')
 
     context.get_ui().show_notification(
         message=notify_message,

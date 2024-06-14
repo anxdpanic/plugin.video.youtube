@@ -649,12 +649,12 @@ class YouTube(LoginClient):
                     continue
 
         # Fetch existing list of items, if any
-        cache = self._context.get_data_cache()
+        data_cache = self._context.get_data_cache()
         cache_items_key = 'get-activities-home-items-v2'
         if refresh:
             cached = []
         else:
-            cached = cache.get_item(cache_items_key) or []
+            cached = data_cache.get_item(cache_items_key) or []
 
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth
@@ -860,7 +860,7 @@ class YouTube(LoginClient):
         """
 
         # Update cache
-        cache.set_item(cache_items_key, items)
+        data_cache.set_item(cache_items_key, items)
 
         return payload
 
