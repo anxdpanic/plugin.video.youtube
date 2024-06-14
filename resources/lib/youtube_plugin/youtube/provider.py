@@ -306,10 +306,10 @@ class Provider(AbstractProvider):
         if not uri:
             return False
 
-        resolver = UrlResolver(context)
-        res_url = resolver.resolve(uri)
+        url_resolver = UrlResolver(context)
+        resolved_url = url_resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
-        url_converter.add_url(res_url, context)
+        url_converter.add_url(resolved_url, context)
         items = url_converter.get_items(self, context, skip_title=skip_title)
         if items:
             return items if listing else items[0]
