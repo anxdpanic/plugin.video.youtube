@@ -33,7 +33,7 @@ from ...kodion.compatibility import (
     xbmcvfs,
 )
 from ...kodion.constants import TEMP_PATH, paths
-from ...kodion.network import get_connect_address, httpd_status
+from ...kodion.network import get_connect_address
 from ...kodion.utils import make_dirs
 
 
@@ -1405,11 +1405,11 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         use_mpd_vod = _settings.use_mpd_videos()
-        httpd_running = _settings.use_isa() and httpd_status(self._context)
+        use_isa = _settings.use_isa()
 
         pa_li_info = streaming_data.get('licenseInfos', [])
-        if any(pa_li_info) and not httpd_running:
-            raise YouTubeException('Proxy is not running')
+        if any(pa_li_info) and not use_isa:
+            raise YouTubeException('InputStream.Adaptive not enabled')
         for li_info in pa_li_info:
             if li_info.get('drmFamily') != 'WIDEVINE':
                 continue
@@ -1437,7 +1437,7 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         stream_list = []
-        if httpd_running and use_mpd_vod:
+        if use_isa and use_mpd_vod:
             adaptive_fmts = streaming_data.get('adaptiveFormats', [])
             all_fmts = streaming_data.get('formats', []) + adaptive_fmts
         else:
