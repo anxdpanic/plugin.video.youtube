@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .base_item import BaseItem
-from ..compatibility import urlencode
+from ..compatibility import unescape, urlencode
 
 
 class DirectoryItem(BaseItem):
@@ -69,6 +69,10 @@ class DirectoryItem(BaseItem):
         return self._category_label
 
     def set_plot(self, plot):
+        try:
+            plot = unescape(plot)
+        except:
+            pass
         self._plot = plot
 
     def get_plot(self):

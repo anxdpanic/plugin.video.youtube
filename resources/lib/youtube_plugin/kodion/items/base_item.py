@@ -71,10 +71,11 @@ class BaseItem(object):
 
     def set_name(self, name):
         try:
-            self._name = unescape(name)
+            name = unescape(name)
         except:
-            self._name = name
-        return self._name
+            pass
+        self._name = name
+        return name
 
     def get_name(self):
         """
