@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 
 BOOKMARKS = '/kodion/bookmarks'
+COMMAND = '/kodion/command'
 EXTERNAL_SEARCH = '/search'
 GOTO_PAGE = '/kodion/goto_page'
 ROUTE = '/kodion/route'

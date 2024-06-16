@@ -19,6 +19,7 @@ from .items import (
     NewSearchItem,
     NextPageItem,
     SearchHistoryItem,
+    UriItem,
 )
 from .utils import to_unicode
 
@@ -50,6 +51,12 @@ class AbstractProvider(object):
             '(?P<page>/[0-9]+)?'
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
         )), self._internal_goto_page)
+
+        self.register_path(r''.join((
+            '^',
+            paths.COMMAND,
+            '/(?P<command>[^?]+?)(?:/*[?].+|/*)$'
+        )), self._on_command)
 
         self.register_path(r''.join((
             '^',
@@ -331,6 +338,10 @@ class AbstractProvider(object):
             result.append(search_history_item)
 
         return result, {self.RESULT_CACHE_TO_DISC: False}
+
+    def _on_command(self, _context, re_match):
+        command = re_match.group('command')
+        return UriItem('command://{0}'.format(command))
 
     def handle_exception(self, context, exception_to_handle):
         return True

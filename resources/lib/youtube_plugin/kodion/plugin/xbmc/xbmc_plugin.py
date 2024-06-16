@@ -40,6 +40,7 @@ from ...player import XbmcPlaylist
 class XbmcPlugin(AbstractPlugin):
     _LIST_ITEM_MAP = {
         'AudioItem': audio_listitem,
+        'CommandItem': directory_listitem,
         'DirectoryItem': directory_listitem,
         'ImageItem': image_listitem,
         'SearchItem': directory_listitem,
@@ -225,6 +226,11 @@ class XbmcPlugin(AbstractPlugin):
                 context.execute('RunScript({0})'.format(uri))
                 result = False
 
+            elif uri.startswith('command://'):
+                uri = uri[len('command://'):]
+                context.log_debug('Running command: |{0}|'.format(uri))
+                context.execute(uri)
+                result = True
 
             elif context.is_plugin_path(uri):
                 context.log_debug('Redirecting to: |{0}|'.format(uri))
