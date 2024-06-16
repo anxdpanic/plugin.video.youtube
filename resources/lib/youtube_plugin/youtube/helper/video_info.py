@@ -34,7 +34,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import TEMP_PATH, paths
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs
+from ...kodion.utils import make_dirs, redact_ip_from_url
 
 
 class VideoInfo(YouTubeRequestClient):
@@ -987,7 +987,7 @@ class VideoInfo(YouTubeRequestClient):
                 stream_list.append(yt_format)
                 continue
             self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
-                itag=itag, stream=match[0]
+                itag=itag, stream=redact_ip_from_url(match[0])
             ))
 
         return stream_list
@@ -1049,8 +1049,9 @@ class VideoInfo(YouTubeRequestClient):
                 playback_stats=playback_stats,
             )
             if not yt_format:
-                self._context.log_debug('Unknown itag: {itag}\n{stream}'
-                                        .format(itag=itag, stream=stream_map))
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
+                    itag=itag, stream=redact_ip_from_url(stream_map)
+                ))
                 continue
             if (yt_format.get('discontinued') or yt_format.get('unsupported')
                     or (yt_format.get('dash/video')
