@@ -58,6 +58,13 @@ def _process_add_video(provider, context, keymap_action=False):
     if keymap_action:
         context.get_ui().set_focus_next_item()
 
+    data_cache = context.get_data_cache()
+    playlist_cache = data_cache.get_item_like(','.join((playlist_id, '%')))
+    if playlist_cache:
+        cache_key, _, cached_last_page = playlist_cache[0]
+        if cached_last_page:
+            data_cache.update(cache_key, None)
+
     return True
 
 
