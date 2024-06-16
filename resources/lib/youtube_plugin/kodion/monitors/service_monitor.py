@@ -197,7 +197,7 @@ class ServiceMonitor(xbmc.Monitor):
                               port=self._old_httpd_port))
             self.httpd_address_sync()
             self.httpd.shutdown()
-            self.httpd.socket.close()
+            self.httpd.server_close()
             self.httpd_thread.join()
             self.httpd_thread = None
             self.httpd = None
