@@ -740,7 +740,7 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
     def _on_users(self, _context, re_match):
         action = re_match.group('action')
-        return UriItem('{addon},users/{action}'.format(
+        return UriItem('script://{addon},users/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
@@ -879,7 +879,7 @@ class Provider(AbstractProvider):
         if action == 'setup_wizard':
             self.run_wizard(context)
             return False
-        return UriItem('{addon},config/{action}'.format(
+        return UriItem('script://{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
@@ -932,7 +932,7 @@ class Provider(AbstractProvider):
 
         if action != 'reset':
             return UriItem(
-                '{addon},maintenance/{action}/?target={target}'.format(
+                'script://{addon},maintenance/{action}/?target={target}'.format(
                     addon=ADDON_ID, action=action, target=target,
                 )
             )

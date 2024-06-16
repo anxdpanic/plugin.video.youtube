@@ -244,7 +244,8 @@ class XbmcPlugin(AbstractPlugin):
         elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
             context.execute('RunPlugin({0})'.format(uri))
-        else:
+        elif uri.startswith('script://'):
+            uri = uri[len('script://'):]
             context.log_debug('Running script: |{0}|'.format(uri))
             context.execute('RunScript({0})'.format(uri))
 
