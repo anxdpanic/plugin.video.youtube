@@ -17,7 +17,7 @@ from ...kodion.utils import find_video_id
 
 
 def _process_add_video(provider, context, keymap_action=False):
-    path = context.get_listitem_info('FileNameAndPath')
+    listitem_path = context.get_listitem_info('FileNameAndPath')
 
     client = provider.get_client(context)
     logged_in = provider.is_logged_in()
@@ -36,8 +36,8 @@ def _process_add_video(provider, context, keymap_action=False):
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(path, 'play'):
-            video_id = find_video_id(path)
+        if context.is_plugin_path(listitem_path, 'play'):
+            video_id = find_video_id(listitem_path)
             keymap_action = True
         if not video_id:
             raise KodionException('Playlist/Add: missing video_id')
@@ -154,7 +154,7 @@ def _process_remove_playlist(provider, context):
 
 def _process_select_playlist(provider, context):
     # Get listitem path asap, relies on listitems focus
-    path = context.get_listitem_info('FileNameAndPath')
+    listitem_path = context.get_listitem_info('FileNameAndPath')
 
     params = context.get_params()
     ui = context.get_ui()
@@ -164,8 +164,8 @@ def _process_select_playlist(provider, context):
 
     video_id = params.get('video_id', '')
     if not video_id:
-        if context.is_plugin_path(path, 'play'):
-            video_id = find_video_id(path)
+        if context.is_plugin_path(listitem_path, 'play'):
+            video_id = find_video_id(listitem_path)
             if video_id:
                 context.set_param('video_id', video_id)
                 keymap_action = True
@@ -290,10 +290,10 @@ def _playlist_id_change(context, playlist, method):
                               .format(type=playlist, method=method))
 
     if context.get_ui().on_yes_no_input(
-        context.get_name(),
-        context.localize('{type}.list.{method}.confirm'.format(
-            type=playlist, method=method
-        )) % playlist_name
+            context.get_name(),
+            context.localize('{type}.list.{method}.confirm'.format(
+                type=playlist, method=method
+            )) % playlist_name
     ):
         if playlist == 'watch_later':
             if method == 'remove':

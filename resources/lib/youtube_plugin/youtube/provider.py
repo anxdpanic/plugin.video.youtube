@@ -459,7 +459,8 @@ class Provider(AbstractProvider):
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
 
-        if (method == 'channel' and channel_id
+        if (method == 'channel'
+                and channel_id
                 and channel_id.lower() == 'property'
                 and listitem_channel_id
                 and listitem_channel_id.lower().startswith(('mine', 'uc'))):
@@ -662,9 +663,9 @@ class Provider(AbstractProvider):
 
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
-            path = context.get_listitem_info('FileNameAndPath')
-            if context.is_plugin_path(path, 'play'):
-                video_id = find_video_id(path)
+            listitem_path = context.get_listitem_info('FileNameAndPath')
+            if context.is_plugin_path(listitem_path, 'play'):
+                video_id = find_video_id(listitem_path)
                 if video_id:
                     context.set_param('video_id', video_id)
                     params['video_id'] = video_id
