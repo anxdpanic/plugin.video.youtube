@@ -194,7 +194,45 @@ class XbmcPlugin(AbstractPlugin):
                 result = result[0]
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
-            result = self._set_resolved_url(context, result)
+            uri = result.get_uri()
+
+            if result.playable:
+                ui = context.get_ui()
+                if not context.is_plugin_path(uri) and ui.busy_dialog_active():
+                    ui.set_property(BUSY_FLAG)
+                    playlist = XbmcPlaylist('auto', context)
+                    position, _ = playlist.get_position()
+                    items = playlist.get_items()
+                    if position and items:
+                        ui.set_property(PLAYLIST_PATH,
+                                        items[position - 1]['file'])
+                        ui.set_property(PLAYLIST_POSITION, str(position))
+
+                item = self._PLAY_ITEM_MAP[result.__class__.__name__](
+                    context,
+                    result,
+                    show_fanart=context.get_settings().fanart_selection(),
+                    for_playback=True,
+                )
+                result = True
+                xbmcplugin.setResolvedUrl(self.handle,
+                                          succeeded=result,
+                                          listitem=item)
+
+            elif uri.startswith('script://'):
+                uri = uri[len('script://'):]
+                context.log_debug('Running script: |{0}|'.format(uri))
+                context.execute('RunScript({0})'.format(uri))
+                result = False
+
+
+            elif context.is_plugin_path(uri):
+                context.log_debug('Redirecting to: |{0}|'.format(uri))
+                context.execute('RunPlugin({0})'.format(uri))
+                result = False
+
+            else:
+                result = False
 
         if item_count:
             context.apply_content()
@@ -215,38 +253,3 @@ class XbmcPlugin(AbstractPlugin):
             cacheToDisc=cache_to_disc,
         )
         return succeeded
-
-    def _set_resolved_url(self, context, base_item):
-        resolved = False
-        uri = base_item.get_uri()
-
-        if base_item.playable:
-            ui = context.get_ui()
-            if not context.is_plugin_path(uri) and ui.busy_dialog_active():
-                ui.set_property(BUSY_FLAG)
-                playlist = XbmcPlaylist('auto', context)
-                position, _ = playlist.get_position()
-                items = playlist.get_items()
-                if position and items:
-                    ui.set_property(PLAYLIST_PATH, items[position - 1]['file'])
-                    ui.set_property(PLAYLIST_POSITION, str(position))
-
-            item = self._PLAY_ITEM_MAP[base_item.__class__.__name__](
-                context,
-                base_item,
-                show_fanart=context.get_settings().fanart_selection(),
-                for_playback=True,
-            )
-            xbmcplugin.setResolvedUrl(self.handle,
-                                      succeeded=True,
-                                      listitem=item)
-            resolved = True
-        elif context.is_plugin_path(uri):
-            context.log_debug('Redirecting to: |{0}|'.format(uri))
-            context.execute('RunPlugin({0})'.format(uri))
-        elif uri.startswith('script://'):
-            uri = uri[len('script://'):]
-            context.log_debug('Running script: |{0}|'.format(uri))
-            context.execute('RunScript({0})'.format(uri))
-
-        return resolved
