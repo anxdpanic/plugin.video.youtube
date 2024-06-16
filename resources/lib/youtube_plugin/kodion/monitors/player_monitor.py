@@ -260,10 +260,11 @@ class PlayerMonitorThread(threading.Thread):
                             r'/(?P<video_id>[^/]+)/(?P<rating>[^/]+)',
                             '/{0}/{1}/'.format(self.video_id, rating)
                         )
-                        self._provider.yt_video.process('rate',
-                                                        self._provider,
-                                                        self._context,
-                                                        rating_match)
+                        self._provider.on_video_x(
+                            self._context,
+                            rating_match,
+                            method='rate',
+                        )
 
         if settings.get_bool('youtube.post.play.refresh', False):
             self._context.send_notification(REFRESH_CONTAINER)

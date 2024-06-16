@@ -60,7 +60,6 @@ class Provider(AbstractProvider):
         self._client = None
         self._api_check = None
         self._logged_in = False
-        self.yt_video = yt_video
 
         atexit.register(self.tear_down)
 
@@ -712,8 +711,9 @@ class Provider(AbstractProvider):
         return False
 
     @RegisterProviderPath('^/video/(?P<method>[^/]+)/?$')
-    def _on_video_x(self, context, re_match):
-        method = re_match.group('method')
+    def on_video_x(self, context, re_match=None, method=None):
+        if method is None:
+            method = re_match.group('method')
         return yt_video.process(method, self, context, re_match)
 
     @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$')
@@ -1619,7 +1619,6 @@ class Provider(AbstractProvider):
             '_resource_manager',
             '_client',
             '_api_check',
-            'yt_video',
         )
         for attr in attrs:
             try:
