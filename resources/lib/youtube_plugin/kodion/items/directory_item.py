@@ -20,6 +20,7 @@ class DirectoryItem(BaseItem):
                  uri,
                  image='',
                  fanart='',
+                 plot=None,
                  action=False,
                  category_label=None,
                  channel_id=None,
@@ -29,7 +30,7 @@ class DirectoryItem(BaseItem):
         name = self.get_name()
         self._category_label = None
         self.set_category_label(category_label or name)
-        self._plot = name
+        self._plot = plot or name
         self._is_action = action
         self._channel_id = channel_id
         self._playlist_id = playlist_id
