@@ -18,7 +18,7 @@ class DirectoryItem(BaseItem):
     def __init__(self,
                  name,
                  uri,
-                 image=None,
+                 image='DefaultFolder.png',
                  fanart=None,
                  plot=None,
                  action=False,

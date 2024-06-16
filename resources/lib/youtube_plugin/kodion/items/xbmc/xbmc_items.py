@@ -456,7 +456,7 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     if show_fanart is None:
         show_fanart = settings.fanart_selection()
     image = video_item.get_image()
-    art = {'icon': image or 'DefaultVideo.png'}
+    art = {'icon': image}
     if image:
         art['thumb'] = image
     if show_fanart:
@@ -496,7 +496,7 @@ def audio_listitem(context,
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()
     image = audio_item.get_image()
-    art = {'icon': image or 'DefaultAudio.png'}
+    art = {'icon': image}
     if image:
         art['thumb'] = image
     if show_fanart:
@@ -546,7 +546,7 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()
     image = directory_item.get_image()
-    art = {'icon': image or 'DefaultFolder.png'}
+    art = {'icon': image}
     if image:
         art['thumb'] = image
     if show_fanart:
@@ -592,7 +592,7 @@ def image_listitem(context, image_item, show_fanart=None, **_kwargs):
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()
     image = image_item.get_image()
-    art = {'icon': image or 'DefaultPicture.png'}
+    art = {'icon': image}
     if image:
         art['thumb'] = image
     if show_fanart:
@@ -694,7 +694,7 @@ def video_listitem(context,
     if show_fanart is None:
         show_fanart = context.get_settings().fanart_selection()
     image = video_item.get_image()
-    art = {'icon': image or 'DefaultVideo.png'}
+    art = {'icon': image}
     if image:
         art['thumb'] = image
     if show_fanart:
