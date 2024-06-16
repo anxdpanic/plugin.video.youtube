@@ -32,14 +32,12 @@ class NextPageItem(DirectoryItem):
             context.localize('page.next') % page,
             context.create_uri(path, params),
             image=image,
+            fanart=fanart,
             category_label='__inherit__',
         )
 
         self.next_page = page
         self.items_per_page = items_per_page
-
-        if fanart:
-            self.set_fanart(fanart)
 
         context_menu = [
             menu_items.refresh(context),

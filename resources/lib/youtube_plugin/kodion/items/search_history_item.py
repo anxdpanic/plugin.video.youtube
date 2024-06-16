@@ -29,10 +29,8 @@ class SearchHistoryItem(DirectoryItem):
                                                     (paths.SEARCH, 'query',),
                                                     params=params,
                                                 ),
-                                                image=image)
-
-        if fanart:
-            self.set_fanart(fanart)
+                                                image=image,
+                                                fanart=fanart)
 
         context_menu = [
             menu_items.search_remove(context, query),

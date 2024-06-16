@@ -26,7 +26,5 @@ class WatchLaterItem(DirectoryItem):
                                              context.create_uri(
                                                  (paths.WATCH_LATER, 'list',),
                                              ),
-                                             image=image)
-
-        if fanart:
-            self.set_fanart(fanart)
+                                             image=image,
+                                             fanart=fanart)
