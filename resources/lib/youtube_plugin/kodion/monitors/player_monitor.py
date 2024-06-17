@@ -236,8 +236,14 @@ class PlayerMonitorThread(threading.Thread):
                     playlist_id=watch_later_id, video_id=self.video_id
                 )
                 if playlist_item_id:
-                    client.remove_video_from_playlist(
-                        watch_later_id, playlist_item_id
+                    self._provider.on_playlist_x(
+                        self._context,
+                        method='remove',
+                        category='video',
+                        playlist_id=watch_later_id,
+                        video_id=playlist_item_id,
+                        video_name='',
+                        confirmed=True,
                     )
             else:
                 self._context.get_watch_later_list().remove(self.video_id)

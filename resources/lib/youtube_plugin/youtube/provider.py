@@ -718,10 +718,17 @@ class Provider(AbstractProvider):
         return yt_video.process(method, self, context, re_match)
 
     @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$')
-    def _on_playlist_x(self, context, re_match):
-        method = re_match.group('method')
-        category = re_match.group('category')
-        return yt_playlist.process(method, category, self, context)
+    def on_playlist_x(self,
+                      context,
+                      re_match=None,
+                      method=None,
+                      category=None,
+                      **kwargs):
+        if method is None:
+            method = re_match.group('method')
+        if category is None:
+            category = re_match.group('category')
+        return yt_playlist.process(method, category, self, context, **kwargs)
 
     @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/?$')
     def _on_subscriptions(self, context, re_match):
