@@ -142,8 +142,10 @@ class XbmcContext(AbstractContext):
         'my_subscriptions.filter.removed': 30590,
         'my_subscriptions.filtered': 30584,
         'none': 30561,
-        'page.next': 30106,
+        'page.back': 30815,
         'page.choose': 30806,
+        'page.empty': 30816,
+        'page.next': 30106,
         'playlist.added_to': 30714,
         'playlist.create': 30522,
         'playlist.play.all': 30531,
@@ -586,14 +588,23 @@ class XbmcContext(AbstractContext):
         new_context = XbmcContext(path=new_path,
                                   params=new_params,
                                   plugin_id=self._plugin_id)
-        new_context._function_cache = self._function_cache
-        new_context._search_history = self._search_history
-        new_context._bookmarks_list = self._bookmarks_list
-        new_context._watch_later_list = self._watch_later_list
+
         new_context._access_manager = self._access_manager
+        new_context._uuid = self._uuid
+
+        new_context._bookmarks_list = self._bookmarks_list
+        new_context._data_cache = self._data_cache
+        new_context._feed_history = self._feed_history
+        new_context._function_cache = self._function_cache
+        new_context._playback_history = self._playback_history
+        new_context._search_history = self._search_history
+        new_context._watch_later_list = self._watch_later_list
+
         new_context._ui = self._ui
         new_context._video_playlist = self._video_playlist
+        new_context._audio_playlist = self._audio_playlist
         new_context._video_player = self._video_player
+        new_context._audio_player = self._audio_player
 
         return new_context
 

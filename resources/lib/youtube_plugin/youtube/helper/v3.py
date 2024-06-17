@@ -24,14 +24,22 @@ from .utils import (
 )
 from ...kodion import KodionException
 from ...kodion.constants import paths
-from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
+from ...kodion.items import CommandItem, DirectoryItem, NextPageItem, VideoItem
 
 
 def _process_list_response(provider, context, json_data, item_filter):
     yt_items = json_data.get('items', [])
     if not yt_items:
         context.log_warning('v3 response: Items list is empty')
-        return []
+        return [
+            CommandItem(
+                context.localize('page.back'),
+                'Action(ParentDir)',
+                context,
+                image='DefaultFolderBack.png',
+                plot=context.localize('page.empty'),
+            )
+        ]
 
     video_id_dict = {}
     channel_id_dict = {}

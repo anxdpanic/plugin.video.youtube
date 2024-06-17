@@ -60,7 +60,6 @@ class Provider(AbstractProvider):
         self._client = None
         self._api_check = None
         self._logged_in = False
-        self.yt_video = yt_video
 
         atexit.register(self.tear_down)
 
@@ -288,9 +287,13 @@ class Provider(AbstractProvider):
         return self._client
 
     def get_resource_manager(self, context):
-        if not self._resource_manager:
-            self._resource_manager = ResourceManager(proxy(self), context)
-        return self._resource_manager
+        resource_manager = self._resource_manager
+        if not resource_manager or resource_manager.context_changed(context):
+            new_resource_manager = ResourceManager(proxy(self), context)
+            if not resource_manager:
+                self._resource_manager = new_resource_manager
+            return new_resource_manager
+        return resource_manager
 
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/uri2addon/?$')
@@ -306,10 +309,10 @@ class Provider(AbstractProvider):
         if not uri:
             return False
 
-        resolver = UrlResolver(context)
-        res_url = resolver.resolve(uri)
+        url_resolver = UrlResolver(context)
+        resolved_url = url_resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
-        url_converter.add_url(res_url, context)
+        url_converter.add_url(resolved_url, context)
         items = url_converter.get_items(self, context, skip_title=skip_title)
         if items:
             return items if listing else items[0]
@@ -456,7 +459,8 @@ class Provider(AbstractProvider):
         method = re_match.group('method')
         channel_id = re_match.group('channel_id')
 
-        if (method == 'channel' and channel_id
+        if (method == 'channel'
+                and channel_id
                 and channel_id.lower() == 'property'
                 and listitem_channel_id
                 and listitem_channel_id.lower().startswith(('mine', 'uc'))):
@@ -659,9 +663,9 @@ class Provider(AbstractProvider):
 
         if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
-            path = context.get_listitem_info('FileNameAndPath')
-            if context.is_plugin_path(path, 'play'):
-                video_id = find_video_id(path)
+            listitem_path = context.get_listitem_info('FileNameAndPath')
+            if context.is_plugin_path(listitem_path, 'play'):
+                video_id = find_video_id(listitem_path)
                 if video_id:
                     context.set_param('video_id', video_id)
                     params['video_id'] = video_id
@@ -708,15 +712,23 @@ class Provider(AbstractProvider):
         return False
 
     @RegisterProviderPath('^/video/(?P<method>[^/]+)/?$')
-    def _on_video_x(self, context, re_match):
-        method = re_match.group('method')
+    def on_video_x(self, context, re_match=None, method=None):
+        if method is None:
+            method = re_match.group('method')
         return yt_video.process(method, self, context, re_match)
 
     @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$')
-    def _on_playlist_x(self, context, re_match):
-        method = re_match.group('method')
-        category = re_match.group('category')
-        return yt_playlist.process(method, category, self, context)
+    def on_playlist_x(self,
+                      context,
+                      re_match=None,
+                      method=None,
+                      category=None,
+                      **kwargs):
+        if method is None:
+            method = re_match.group('method')
+        if category is None:
+            category = re_match.group('category')
+        return yt_playlist.process(method, category, self, context, **kwargs)
 
     @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/?$')
     def _on_subscriptions(self, context, re_match):
@@ -736,7 +748,7 @@ class Provider(AbstractProvider):
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
     def _on_users(self, _context, re_match):
         action = re_match.group('action')
-        return UriItem('{addon},users/{action}'.format(
+        return UriItem('script://{addon},users/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
@@ -875,7 +887,7 @@ class Provider(AbstractProvider):
         if action == 'setup_wizard':
             self.run_wizard(context)
             return False
-        return UriItem('{addon},config/{action}'.format(
+        return UriItem('script://{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
@@ -928,7 +940,7 @@ class Provider(AbstractProvider):
 
         if action != 'reset':
             return UriItem(
-                '{addon},maintenance/{action}/?target={target}'.format(
+                'script://{addon},maintenance/{action}/?target={target}'.format(
                     addon=ADDON_ID, action=action, target=target,
                 )
             )
@@ -1615,7 +1627,6 @@ class Provider(AbstractProvider):
             '_resource_manager',
             '_client',
             '_api_check',
-            'yt_video',
         )
         for attr in attrs:
             try:

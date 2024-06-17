@@ -31,6 +31,18 @@ from ..logger import log_debug, log_error
 from ..utils import validate_ip_address, wait
 
 
+class HTTPServer(TCPServer):
+    allow_reuse_address = True
+    allow_reuse_port = True
+
+    def server_close(self):
+        try:
+            self.socket.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        self.socket.close()
+
+
 class RequestHandler(BaseHTTPRequestHandler, object):
     _context = None
     requests = BaseRequestsClass()
@@ -548,11 +560,7 @@ class Pages(object):
 def get_http_server(address, port, context):
     RequestHandler._context = context
     try:
-        server = TCPServer((address, port), RequestHandler, False)
-        server.allow_reuse_address = True
-        server.allow_reuse_port = True
-        server.server_bind()
-        server.server_activate()
+        server = HTTPServer((address, port), RequestHandler)
         return server
     except socket.error as exc:
         log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'

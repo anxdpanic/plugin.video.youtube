@@ -94,7 +94,7 @@ class FunctionCache(Storage):
         cache_id = self._create_id_from_func(partial_func)
         return self._get(cache_id)
 
-    def run(self, func, seconds, *args, **kwargs):
+    def run(self, func, seconds=None, *args, **kwargs):
         """
         Returns the cached data of the given function.
         :param function func: function to call and cache if not already cached

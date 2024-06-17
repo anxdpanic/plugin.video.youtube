@@ -23,7 +23,7 @@ class BaseItem(object):
 
     _playable = False
 
-    def __init__(self, name, uri, image='', fanart=''):
+    def __init__(self, name, uri, image=None, fanart=None):
         self._version = BaseItem.VERSION
 
         self._name = None
@@ -31,10 +31,12 @@ class BaseItem(object):
 
         self._uri = uri
 
-        self._image = None
-        self.set_image(image)
-        self._fanart = None
-        self.set_fanart(fanart)
+        self._image = ''
+        if image:
+            self.set_image(image)
+        self._fanart = ''
+        if fanart:
+            self.set_fanart(fanart)
 
         self._bookmark_timestamp = None
         self._context_menu = None
@@ -71,10 +73,11 @@ class BaseItem(object):
 
     def set_name(self, name):
         try:
-            self._name = unescape(name)
+            name = unescape(name)
         except:
-            self._name = name
-        return self._name
+            pass
+        self._name = name
+        return name
 
     def get_name(self):
         """
@@ -95,7 +98,6 @@ class BaseItem(object):
 
     def set_image(self, image):
         if not image:
-            self._image = ''
             return
 
         if '{media}/' in image:

@@ -36,7 +36,5 @@ class SearchItem(DirectoryItem):
                                              (paths.SEARCH, 'list',),
                                              params=params,
                                          ),
-                                         image=image)
-
-        if fanart:
-            self.set_fanart(fanart)
+                                         image=image,
+                                         fanart=fanart)

@@ -17,7 +17,7 @@ from ..compatibility import to_str, unescape
 class AudioItem(BaseItem):
     _playable = True
 
-    def __init__(self, name, uri, image='', fanart=''):
+    def __init__(self, name, uri, image='DefaultAudio.png', fanart=None):
         super(AudioItem, self).__init__(name, uri, image, fanart)
         self._start_time = None
         self._duration = -1

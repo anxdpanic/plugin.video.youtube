@@ -29,7 +29,8 @@ def _process_add(_provider, context, client):
     listitem_subscription_id = context.get_listitem_property(SUBSCRIPTION_ID)
 
     subscription_id = context.get_param('subscription_id', '')
-    if (not subscription_id and listitem_subscription_id
+    if (not subscription_id
+            and listitem_subscription_id
             and listitem_subscription_id.lower().startswith('uc')):
         subscription_id = listitem_subscription_id
 

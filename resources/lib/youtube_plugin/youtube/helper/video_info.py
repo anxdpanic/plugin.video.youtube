@@ -33,8 +33,8 @@ from ...kodion.compatibility import (
     xbmcvfs,
 )
 from ...kodion.constants import TEMP_PATH, paths
-from ...kodion.network import get_connect_address, httpd_status
-from ...kodion.utils import make_dirs
+from ...kodion.network import get_connect_address
+from ...kodion.utils import make_dirs, redact_ip_from_url
 
 
 class VideoInfo(YouTubeRequestClient):
@@ -584,7 +584,6 @@ class VideoInfo(YouTubeRequestClient):
     def __init__(self, context, access_token='', **kwargs):
         self.video_id = None
         self._context = context
-        self._data_cache = self._context.get_data_cache()
         self._language_base = kwargs.get('language', 'en_US')[0:2]
         self._access_token = access_token
         self._player_js = None
@@ -815,8 +814,8 @@ class VideoInfo(YouTubeRequestClient):
         return None
 
     def _get_player_js(self):
-        cached = self._data_cache.get_item('player_js_url',
-                                           self._data_cache.ONE_HOUR * 4)
+        data_cache = self._context.get_data_cache()
+        cached = data_cache.get_item('player_js_url', data_cache.ONE_HOUR * 4)
         cached = cached and cached.get('url', '')
         js_url = cached if cached not in {'', 'http://', 'https://'} else None
 
@@ -838,11 +837,10 @@ class VideoInfo(YouTubeRequestClient):
             return ''
 
         js_url = self._normalize_url(js_url)
-        self._data_cache.set_item('player_js_url', {'url': js_url})
+        data_cache.set_item('player_js_url', {'url': js_url})
 
         js_cache_key = quote(js_url)
-        cached = self._data_cache.get_item(js_cache_key,
-                                           self._data_cache.ONE_HOUR * 4)
+        cached = data_cache.get_item(js_cache_key, data_cache.ONE_HOUR * 4)
         cached = cached and cached.get('js')
         if cached:
             return cached
@@ -866,7 +864,7 @@ class VideoInfo(YouTubeRequestClient):
         if not result:
             return ''
 
-        self._data_cache.set_item(js_cache_key, {'js': result})
+        data_cache.set_item(js_cache_key, {'js': result})
         return result
 
     @staticmethod
@@ -989,7 +987,7 @@ class VideoInfo(YouTubeRequestClient):
                 stream_list.append(yt_format)
                 continue
             self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
-                itag=itag, stream=match[0]
+                itag=itag, stream=redact_ip_from_url(match[0])
             ))
 
         return stream_list
@@ -1051,8 +1049,9 @@ class VideoInfo(YouTubeRequestClient):
                 playback_stats=playback_stats,
             )
             if not yt_format:
-                self._context.log_debug('Unknown itag: {itag}\n{stream}'
-                                        .format(itag=itag, stream=stream_map))
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
+                    itag=itag, stream=redact_ip_from_url(stream_map)
+                ))
                 continue
             if (yt_format.get('discontinued') or yt_format.get('unsupported')
                     or (yt_format.get('dash/video')
@@ -1087,8 +1086,9 @@ class VideoInfo(YouTubeRequestClient):
         if not url or not encrypted_signature:
             return None
 
-        signature = self._data_cache.get_item(encrypted_signature,
-                                              self._data_cache.ONE_HOUR * 4)
+        data_cache = self._context.get_data_cache()
+        signature = data_cache.get_item(encrypted_signature,
+                                        data_cache.ONE_HOUR * 4)
         signature = signature and signature.get('sig')
         if not signature:
             try:
@@ -1102,7 +1102,7 @@ class VideoInfo(YouTubeRequestClient):
                     details=''.join(format_stack())
                 ))
                 return None
-            self._data_cache.set_item(encrypted_signature, {'sig': signature})
+            data_cache.set_item(encrypted_signature, {'sig': signature})
 
         if signature:
             url = '{0}&{1}={2}'.format(url, query_var, signature)
@@ -1406,11 +1406,11 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         use_mpd_vod = _settings.use_mpd_videos()
-        httpd_running = _settings.use_isa() and httpd_status(self._context)
+        use_isa = _settings.use_isa()
 
         pa_li_info = streaming_data.get('licenseInfos', [])
-        if any(pa_li_info) and not httpd_running:
-            raise YouTubeException('Proxy is not running')
+        if any(pa_li_info) and not use_isa:
+            raise YouTubeException('InputStream.Adaptive not enabled')
         for li_info in pa_li_info:
             if li_info.get('drmFamily') != 'WIDEVINE':
                 continue
@@ -1438,7 +1438,7 @@ class VideoInfo(YouTubeRequestClient):
             }
 
         stream_list = []
-        if httpd_running and use_mpd_vod:
+        if use_isa and use_mpd_vod:
             adaptive_fmts = streaming_data.get('adaptiveFormats', [])
             all_fmts = streaming_data.get('formats', []) + adaptive_fmts
         else:

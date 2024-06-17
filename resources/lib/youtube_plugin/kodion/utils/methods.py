@@ -110,9 +110,7 @@ def select_stream(context,
 
         original_value = log_data.get('url')
         if original_value:
-            log_data['url'] = re.sub(r'ip=\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}',
-                                     'ip=xxx.xxx.xxx.xxx',
-                                     original_value)
+            log_data['url'] = redact_ip_from_url(original_value)
 
         context.log_debug('Stream {0}:\n{1}'.format(idx, log_data))
 
@@ -315,3 +313,7 @@ def wait(timeout=None):
     elif timeout < 0:
         timeout = 0.1
     return xbmc.Monitor().waitForAbort(timeout)
+
+
+def redact_ip_from_url(url):
+    return re.sub(r'([?&/])ip([=/])[^?&/]+', '\g<1>ip\g<2><redacted>', url)
