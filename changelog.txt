@@ -1,3 +1,15 @@
+## v7.0.8+beta.2
+### Fixed
+- Fix various caching issues #786 #797
+- Fix including un-redacted IP address in debug logs
+
+### Changed
+- Test not starting/checking for http server until required for playback #746
+- Invalidate portion of playlist cache if item added to playlist #797
+
+### New
+- Use placeholder in empty listings to provide info and allow refreshing #797
+
 ## v7.0.8+beta.1
 ### Fixed
 - Update selection and sorting of streams to fix missing live streams
