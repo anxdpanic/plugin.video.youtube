@@ -1561,6 +1561,14 @@ msgctxt "#30814"
 msgid "feed history"
 msgstr ""
 
+msgctxt "#30815"
+msgid "Go back..."
+msgstr ""
+
+msgctxt "#30816"
+msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
+msgstr ""
+
 #~ msgctxt "#30503"
 #~ msgid "Show channel fanart"
 #~ msgstr "Toon kanaal afbeeldingen"
