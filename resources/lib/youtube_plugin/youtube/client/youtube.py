@@ -649,12 +649,12 @@ class YouTube(LoginClient):
                     continue
 
         # Fetch existing list of items, if any
-        cache = self._context.get_data_cache()
+        data_cache = self._context.get_data_cache()
         cache_items_key = 'get-activities-home-items-v2'
         if refresh:
             cached = []
         else:
-            cached = cache.get_item(cache_items_key, None) or []
+            cached = data_cache.get_item(cache_items_key) or []
 
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth
@@ -860,7 +860,7 @@ class YouTube(LoginClient):
         """
 
         # Update cache
-        cache.set_item(cache_items_key, items)
+        data_cache.set_item(cache_items_key, items)
 
         return payload
 
@@ -912,24 +912,30 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def get_playlist_item_id_of_video_id(self, playlist_id, video_id, page_token=''):
-        old_max_results = self._max_results
-        self._max_results = 50
-        json_data = self.get_playlist_items(playlist_id=playlist_id, page_token=page_token)
-        self._max_results = old_max_results
+    def get_playlist_item_id_of_video_id(self,
+                                         playlist_id,
+                                         video_id,
+                                         page_token=''):
+        json_data = self.get_playlist_items(
+            playlist_id=playlist_id,
+            page_token=page_token,
+            max_results=50,
+        )
+        if not json_data:
+            return None
 
-        items = json_data.get('items', [])
-        for item in items:
-            playlist_item_id = item['id']
-            playlist_video_id = item.get('snippet', {}).get('resourceId', {}).get('videoId', '')
-            if playlist_video_id and playlist_video_id == video_id:
-                return playlist_item_id
+        for item in json_data.get('items', []):
+            if (item.get('snippet', {}).get('resourceId', {}).get('videoId')
+                    == video_id):
+                return item['id']
 
-        next_page_token = json_data.get('nextPageToken', '')
+        next_page_token = json_data.get('nextPageToken')
         if next_page_token:
-            return self.get_playlist_item_id_of_video_id(playlist_id=playlist_id, video_id=video_id,
-                                                         page_token=next_page_token)
-
+            return self.get_playlist_item_id_of_video_id(
+                playlist_id=playlist_id,
+                video_id=video_id,
+                page_token=next_page_token,
+            )
         return None
 
     def get_playlist_items(self,
@@ -938,9 +944,10 @@ class YouTube(LoginClient):
                            max_results=None,
                            **kwargs):
         # prepare params
-        max_results = str(self._max_results) if max_results is None else str(max_results)
+        if max_results is None:
+            max_results = self._max_results
         params = {'part': 'snippet',
-                  'maxResults': max_results,
+                  'maxResults': str(max_results),
                   'playlistId': playlist_id}
         if page_token:
             params['pageToken'] = page_token

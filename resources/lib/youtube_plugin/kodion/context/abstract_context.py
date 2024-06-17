@@ -109,6 +109,7 @@ class AbstractContext(object):
 
     def __init__(self, path='/', params=None, plugin_id=''):
         self._access_manager = None
+        self._uuid = None
 
         self._bookmarks_list = None
         self._data_cache = None
@@ -151,76 +152,83 @@ class AbstractContext(object):
         raise NotImplementedError()
 
     def get_playback_history(self):
-        if not self._playback_history:
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'history.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
+        uuid = self.get_uuid()
+        if not self._playback_history or self._playback_history.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'history.sqlite')
             self._playback_history = PlaybackHistory(filepath)
         return self._playback_history
 
     def get_feed_history(self):
-        if not self._feed_history:
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'feeds.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
+        uuid = self.get_uuid()
+        if not self._feed_history or self._feed_history.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'feeds.sqlite')
             self._feed_history = FeedHistory(filepath)
         return self._feed_history
 
     def get_data_cache(self):
-        if not self._data_cache:
-            settings = self.get_settings()
-            cache_size = settings.cache_size() / 2
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'data_cache.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
-            self._data_cache = DataCache(filepath, max_file_size_mb=cache_size)
+        uuid = self.get_uuid()
+        if not self._data_cache or self._data_cache.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'data_cache.sqlite')
+            self._data_cache = DataCache(
+                filepath,
+                max_file_size_mb=self.get_settings().cache_size() / 2,
+            )
         return self._data_cache
 
     def get_function_cache(self):
-        if not self._function_cache:
-            settings = self.get_settings()
-            cache_size = settings.cache_size() / 2
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'cache.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
-            self._function_cache = FunctionCache(filepath,
-                                                 max_file_size_mb=cache_size)
+        uuid = self.get_uuid()
+        if not self._function_cache or self._function_cache.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'cache.sqlite')
+            self._function_cache = FunctionCache(
+                filepath,
+                max_file_size_mb=self.get_settings().cache_size() / 2,
+            )
         return self._function_cache
 
     def get_search_history(self):
-        if not self._search_history:
-            settings = self.get_settings()
-            search_size = settings.get_search_history_size()
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'search.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
-            self._search_history = SearchHistory(filepath,
-                                                 max_item_count=search_size)
+        uuid = self.get_uuid()
+        if not self._search_history or self._search_history.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'search.sqlite')
+            self._search_history = SearchHistory(
+                filepath,
+                max_item_count=self.get_settings().get_search_history_size(),
+            )
         return self._search_history
 
     def get_bookmarks_list(self):
-        if not self._bookmarks_list:
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'bookmarks.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
+        uuid = self.get_uuid()
+        if not self._bookmarks_list or self._bookmarks_list.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'bookmarks.sqlite')
             self._bookmarks_list = BookmarksList(filepath)
         return self._bookmarks_list
 
     def get_watch_later_list(self):
-        if not self._watch_later_list:
-            uuid = self.get_access_manager().get_current_user_id()
-            filename = 'watch_later.sqlite'
-            filepath = os.path.join(self.get_data_path(), uuid, filename)
+        uuid = self.get_uuid()
+        if not self._watch_later_list or self._watch_later_list.uuid != uuid:
+            filepath = (self.get_data_path(), uuid, 'watch_later.sqlite')
             self._watch_later_list = WatchLaterList(filepath)
         return self._watch_later_list
 
-    def get_access_manager(self):
-        if not self._access_manager:
-            self._access_manager = AccessManager(self)
-        return self._access_manager
+    def get_uuid(self):
+        uuid = self._uuid
+        if uuid:
+            return uuid
+        return self.reload_access_manager(get_uuid=True)
 
-    def reload_access_manager(self):
-        self._access_manager = AccessManager(self)
+    def get_access_manager(self):
+        access_manager = self._access_manager
+        if access_manager:
+            return access_manager
+        return self.reload_access_manager()
+
+    def reload_access_manager(self, get_uuid=False):
+        access_manager = AccessManager(self)
+        self._access_manager = access_manager
+        uuid = access_manager.get_current_user_id()
+        self._uuid = uuid
+        if get_uuid:
+            return uuid
+        return access_manager
 
     def get_video_playlist(self):
         raise NotImplementedError()

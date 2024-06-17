@@ -14,7 +14,7 @@ from .base_item import BaseItem
 
 
 class ImageItem(BaseItem):
-    def __init__(self, name, uri, image='', fanart=''):
+    def __init__(self, name, uri, image='DefaultPicture.png', fanart=None):
         super(ImageItem, self).__init__(name, uri, image, fanart)
         self._title = None
 

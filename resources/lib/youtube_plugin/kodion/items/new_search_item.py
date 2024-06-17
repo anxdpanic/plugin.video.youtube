@@ -44,7 +44,6 @@ class NewSearchItem(DirectoryItem):
                                             context.create_uri(
                                                 (paths.SEARCH, 'input',),
                                                 params=params,
-                                            ), image=image)
-
-        if fanart:
-            self.set_fanart(fanart)
+                                            ),
+                                            image=image,
+                                            fanart=fanart)

@@ -11,15 +11,16 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .base_item import BaseItem
-from ..compatibility import urlencode
+from ..compatibility import unescape, urlencode
 
 
 class DirectoryItem(BaseItem):
     def __init__(self,
                  name,
                  uri,
-                 image='',
-                 fanart='',
+                 image='DefaultFolder.png',
+                 fanart=None,
+                 plot=None,
                  action=False,
                  category_label=None,
                  channel_id=None,
@@ -29,7 +30,7 @@ class DirectoryItem(BaseItem):
         name = self.get_name()
         self._category_label = None
         self.set_category_label(category_label or name)
-        self._plot = name
+        self._plot = plot or name
         self._is_action = action
         self._channel_id = channel_id
         self._playlist_id = playlist_id
@@ -68,6 +69,10 @@ class DirectoryItem(BaseItem):
         return self._category_label
 
     def set_plot(self, plot):
+        try:
+            plot = unescape(plot)
+        except:
+            pass
         self._plot = plot
 
     def get_plot(self):

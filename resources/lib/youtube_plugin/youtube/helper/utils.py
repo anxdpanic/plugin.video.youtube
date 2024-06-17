@@ -112,21 +112,18 @@ def make_comment_item(context, snippet, uri, total_replies=0):
             author=author, body=ui.new_line(body, cr_before=2)
         )
 
-    comment_item = DirectoryItem(label, uri)
-    comment_item.set_plot(plot)
+    comment_item = DirectoryItem(label, uri, plot=plot, action=(not uri))
 
     datetime = datetime_parser.parse(published_at)
     comment_item.set_added_utc(datetime)
+
     local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_dateadded_from_datetime(local_datetime)
+
     if edited:
         datetime = datetime_parser.parse(updated_at)
         local_datetime = datetime_parser.utc_to_local(datetime)
     comment_item.set_date_from_datetime(local_datetime)
-
-    if not uri:
-        # Cosmetic, makes the item not a folder.
-        comment_item.set_action(True)
 
     return comment_item
 
