@@ -83,8 +83,10 @@ def select_stream(context,
             item for item in stream_data_list
             if (not item.get('adaptive')
                 or (not item.get('live') and use_adaptive)
-                or (live_type.startswith('isa_') and item.get('hls/video'))
-                or (live_type == 'isa_mpd' and item.get('dash/video')))
+                or (item.get('live')
+                    and live_type.startswith('isa')
+                    and ((live_type == 'isa_mpd' and item.get('dash/video'))
+                         or item.get('hls/video'))))
         ]
 
     if not stream_list:

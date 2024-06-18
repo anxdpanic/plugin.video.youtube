@@ -1,3 +1,9 @@
+## v7.0.8+beta.3
+### Fixed
+- Additional fixes for redacting IP addresses in debug logs #801
+- Various minor fixes for external player use
+- Fix trying to access playlists for account that has no Youtube channel #803
+
 ## v7.0.8+beta.2
 ### Fixed
 - Fix various caching issues #786 #797

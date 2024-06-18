@@ -190,7 +190,7 @@ class ServiceMonitor(xbmc.Monitor):
 
     def shutdown_httpd(self, sleep=False):
         if self.httpd:
-            if sleep and self._context.get_settings().api_config_page():
+            if sleep and self.httpd_required(while_sleeping=True):
                 return
             log_debug('HTTPServer: Shutting down |{ip}:{port}|'
                       .format(ip=self._old_httpd_address,
@@ -214,5 +214,9 @@ class ServiceMonitor(xbmc.Monitor):
     def ping_httpd(self):
         return self.httpd and httpd_status(self._context)
 
-    def httpd_required(self):
+    def httpd_required(self, while_sleeping=False):
+        if while_sleeping:
+            settings = self._context.get_settings()
+            return (settings.api_config_page()
+                    or settings.support_alternative_player())
         return self._use_httpd

@@ -724,7 +724,7 @@ class VideoInfo(YouTubeRequestClient):
         if video_info:
             video_height = video_info.get('height', 0)
             if max_height and video_height > max_height:
-                return None
+                return False
             video_sort = (
                     video_height
                     * self.QUALITY_FACTOR.get(video_info.get('codec'), 1)
@@ -980,15 +980,19 @@ class VideoInfo(YouTubeRequestClient):
                 headers=curl_headers,
                 playback_stats=playback_stats,
             )
-            if yt_format:
-                if is_live:
-                    yt_format['live'] = True
-                    yt_format['title'] = 'Live ' + yt_format['title']
-                stream_list.append(yt_format)
+            if yt_format is None:
+                self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
+                    itag=itag, stream=redact_ip_from_url(match[0]),
+                ))
+            if (not yt_format
+                    or yt_format.get('discontinued')
+                    or yt_format.get('unsupported')):
                 continue
-            self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
-                itag=itag, stream=redact_ip_from_url(match[0])
-            ))
+
+            if is_live:
+                yt_format['live'] = True
+                yt_format['title'] = 'Live ' + yt_format['title']
+            stream_list.append(yt_format)
 
         return stream_list
 
@@ -1027,15 +1031,18 @@ class VideoInfo(YouTubeRequestClient):
         for stream_map in streams:
             url = stream_map.get('url')
             conn = stream_map.get('conn')
+            stream = stream_map.get('stream')
 
-            if not url and conn:
-                url = '%s?%s' % (conn, unquote(stream_map['stream']))
+            if not url and conn and stream:
+                new_url = '%s?%s' % (conn, unquote(stream))
             elif not url and self._cipher and 'signatureCipher' in stream_map:
-                url = self._process_signature_cipher(stream_map)
+                new_url = self._process_signature_cipher(stream_map)
+            else:
+                new_url = url
 
-            if not url:
+            if not new_url:
                 continue
-            url, _ = self._process_url_params(url)
+            new_url, _ = self._process_url_params(new_url)
 
             itag = str(stream_map['itag'])
             stream_map['itag'] = itag
@@ -1043,17 +1050,24 @@ class VideoInfo(YouTubeRequestClient):
                 itag=itag,
                 max_height=selected_height,
                 title='',
-                url=url,
+                url=new_url,
                 meta=meta_info,
                 headers=curl_headers,
                 playback_stats=playback_stats,
             )
-            if not yt_format:
+            if yt_format is None:
+                if url:
+                    stream_map['url'] = redact_ip_from_url(url)
+                if conn:
+                    stream_map['conn'] = redact_ip_from_url(conn)
+                if stream:
+                    stream_map['stream'] = redact_ip_from_url(stream)
                 self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
-                    itag=itag, stream=redact_ip_from_url(stream_map)
+                    itag=itag, stream=stream_map,
                 ))
-                continue
-            if (yt_format.get('discontinued') or yt_format.get('unsupported')
+            if (not yt_format
+                    or yt_format.get('discontinued')
+                    or yt_format.get('unsupported')
                     or (yt_format.get('dash/video')
                         and not yt_format.get('dash/audio'))):
                 continue
