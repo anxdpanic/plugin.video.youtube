@@ -26,7 +26,7 @@ from ..compatibility import (
     xbmcgui,
     xbmcvfs,
 )
-from ..constants import ADDON_ID, LICENSE_TOKEN, LICENSE_URL, TEMP_PATH, paths
+from ..constants import ADDON_ID, LICENSE_TOKEN, LICENSE_URL, PATHS, TEMP_PATH
 from ..logger import log_debug, log_error
 from ..utils import validate_ip_address, redact_ip_from_url, wait
 
@@ -81,7 +81,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         if not conn_allowed:
             log_debug('HTTPServer: Connection from |{client_ip| not allowed'
                       .format(client_ip=client_ip))
-        elif self.path != paths.PING:
+        elif self.path != PATHS.PING:
             log_debug(' '.join(log_lines))
         return conn_allowed
 
@@ -93,7 +93,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
         # Strip trailing slash if present
         stripped_path = self.path.rstrip('/')
-        if stripped_path != paths.PING:
+        if stripped_path != PATHS.PING:
             log_debug('HTTPServer: GET |{path}|'.format(
                 path=redact_ip_from_url(self.path)
             ))
@@ -101,7 +101,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         if not self.connection_allowed():
             self.send_error(403)
 
-        elif stripped_path == paths.IP:
+        elif stripped_path == PATHS.IP:
             client_json = json.dumps({"ip": "{ip}"
                                      .format(ip=self.client_address[0])})
             self.send_response(200)
@@ -110,8 +110,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.end_headers()
             self.wfile.write(client_json.encode('utf-8'))
 
-        elif stripped_path.startswith(paths.MPD):
-            filepath = os.path.join(self.BASE_PATH, self.path[len(paths.MPD):])
+        elif stripped_path.startswith(PATHS.MPD):
+            filepath = os.path.join(self.BASE_PATH, self.path[len(PATHS.MPD):])
             file_chunk = True
             try:
                 with open(filepath, 'rb') as f:
@@ -129,7 +129,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                             .format(path=self.path, filepath=filepath))
                 self.send_error(404, response)
 
-        elif api_config_enabled and stripped_path == paths.API:
+        elif api_config_enabled and stripped_path == PATHS.API:
             html = self.api_config_page()
             html = html.encode('utf-8')
 
@@ -141,7 +141,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif api_config_enabled and stripped_path.startswith(paths.API_SUBMIT):
+        elif api_config_enabled and stripped_path.startswith(PATHS.API_SUBMIT):
             xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
 
             query = urlsplit(self.path).query
@@ -199,10 +199,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif stripped_path == paths.PING:
+        elif stripped_path == PATHS.PING:
             self.send_error(204)
 
-        elif stripped_path.startswith(paths.REDIRECT):
+        elif stripped_path.startswith(PATHS.REDIRECT):
             url = parse_qs(urlsplit(self.path).query).get('url')
             if url:
                 wait(1)
@@ -222,8 +222,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         if not self.connection_allowed():
             self.send_error(403)
 
-        elif self.path.startswith(paths.MPD):
-            filepath = os.path.join(self.BASE_PATH, self.path[len(paths.MPD):])
+        elif self.path.startswith(PATHS.MPD):
+            filepath = os.path.join(self.BASE_PATH, self.path[len(PATHS.MPD):])
             if not os.path.isfile(filepath):
                 response = ('File Not Found: |{path}| -> |{filepath}|'
                             .format(path=self.path, filepath=filepath))
@@ -235,7 +235,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                  str(os.path.getsize(filepath)))
                 self.end_headers()
 
-        elif self.path.startswith(paths.REDIRECT):
+        elif self.path.startswith(PATHS.REDIRECT):
             self.send_error(404)
 
         else:
@@ -248,7 +248,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         if not self.connection_allowed():
             self.send_error(403)
 
-        elif self.path.startswith(paths.DRM):
+        elif self.path.startswith(PATHS.DRM):
             home = xbmcgui.Window(10000)
 
             lic_url = home.getProperty('-'.join((ADDON_ID, LICENSE_URL)))
@@ -408,7 +408,7 @@ class Pages(object):
                 </div>
               </body>
             </html>
-        '''.format(action_url=paths.API_SUBMIT)),
+        '''.format(action_url=PATHS.API_SUBMIT)),
         'css': ''.join('\t\t\t'.expandtabs(2) + line for line in dedent('''
             body {
               background: #141718;
@@ -579,7 +579,7 @@ def httpd_status(context):
     address, port = get_connect_address(context)
     url = 'http://{address}:{port}{path}'.format(address=address,
                                                  port=port,
-                                                 path=paths.PING)
+                                                 path=PATHS.PING)
     response = RequestHandler.requests.request(url)
     result = response and response.status_code
     if result == 204:
@@ -597,7 +597,7 @@ def get_client_ip_address(context):
     address, port = get_connect_address(context)
     url = 'http://{address}:{port}{path}'.format(address=address,
                                                  port=port,
-                                                 path=paths.IP)
+                                                 path=PATHS.IP)
     response = RequestHandler.requests.request(url)
     if response and response.status_code == 200:
         response_json = response.json()

@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import CHECK_SETTINGS, REROUTE, content, paths
+from .constants import CHECK_SETTINGS, CONTENT, PATHS, REROUTE_PATH
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -36,49 +36,49 @@ class AbstractProvider(object):
         # register some default paths
         self.register_path(r''.join((
             '^',
-            '(?:', paths.HOME, ')?/?$'
+            '(?:', PATHS.HOME, ')?/?$'
         )), self._internal_root)
 
         self.register_path(r''.join((
             '^',
-            paths.ROUTE,
+            PATHS.ROUTE,
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
         )), self.reroute)
 
         self.register_path(r''.join((
             '^',
-            paths.GOTO_PAGE,
+            PATHS.GOTO_PAGE,
             '(?P<page>/[0-9]+)?'
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
         )), self._internal_goto_page)
 
         self.register_path(r''.join((
             '^',
-            paths.COMMAND,
+            PATHS.COMMAND,
             '/(?P<command>[^?]+?)(?:/*[?].+|/*)$'
         )), self._on_command)
 
         self.register_path(r''.join((
             '^',
-            paths.WATCH_LATER,
+            PATHS.WATCH_LATER,
             '/(?P<command>add|clear|list|remove)/?$'
         )), self.on_watch_later)
 
         self.register_path(r''.join((
             '^',
-            paths.BOOKMARKS,
+            PATHS.BOOKMARKS,
             '/(?P<command>add|clear|list|remove)/?$'
         )), self.on_bookmarks)
 
         self.register_path(r''.join((
             '^',
-            '(', paths.SEARCH, '|', paths.EXTERNAL_SEARCH, ')',
+            '(', PATHS.SEARCH, '|', PATHS.EXTERNAL_SEARCH, ')',
             '/(?P<command>input|query|list|remove|clear|rename)?/?$'
         )), self._internal_search)
 
         self.register_path(r''.join((
             '^',
-            paths.HISTORY,
+            PATHS.HISTORY,
             '/?$'
         )), self.on_playback_history)
 
@@ -237,7 +237,7 @@ class AbstractProvider(object):
             finally:
                 if not result:
                     return False
-                context.get_ui().set_property(REROUTE, path)
+                context.get_ui().set_property(REROUTE_PATH, path)
                 context.execute('ActivateWindow(Videos, {0}{1})'.format(
                     context.create_uri(path, params),
                     ', return' if window_return else '',
@@ -312,10 +312,10 @@ class AbstractProvider(object):
 
             if not params.get('incognito') and not params.get('channel_id'):
                 search_history.update(query)
-            context.set_path(paths.SEARCH, 'query')
+            context.set_path(PATHS.SEARCH, 'query')
             return self.on_search(query, context, re_match)
 
-        context.set_content(content.LIST_CONTENT)
+        context.set_content(CONTENT.LIST_CONTENT)
         result = []
 
         location = context.get_param('location', False)

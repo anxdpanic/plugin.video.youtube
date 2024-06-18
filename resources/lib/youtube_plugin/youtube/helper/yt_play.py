@@ -18,12 +18,12 @@ from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
 from ...kodion.compatibility import urlencode, urlunsplit
 from ...kodion.constants import (
-    PLAY_FORCE_AUDIO,
-    PLAY_PROMPT_QUALITY,
+    PATHS,
     PLAYBACK_INIT,
     PLAYER_DATA,
-    SWITCH_PLAYER_FLAG,
-    paths,
+    PLAY_FORCE_AUDIO,
+    PLAY_PROMPT_QUALITY,
+    PLAY_WITH,
 )
 from ...kodion.items import VideoItem
 from ...kodion.network import get_connect_address
@@ -45,7 +45,7 @@ def play_video(provider, context):
     incognito = params.get('incognito', False)
     screensaver = params.get('screensaver', False)
 
-    is_external = ui.get_property(SWITCH_PLAYER_FLAG)
+    is_external = ui.get_property(PLAY_WITH)
     if ((is_external and settings.alternative_player_web_urls())
             or settings.default_player_web_urls()):
         video_stream = {
@@ -53,15 +53,15 @@ def play_video(provider, context):
         }
     else:
         ask_for_quality = None
-        if not screensaver and ui.get_property(PLAY_PROMPT_QUALITY) == video_id:
+        if not screensaver and ui.get_property(PLAY_PROMPT_QUALITY):
             ask_for_quality = True
-        ui.clear_property(PLAY_PROMPT_QUALITY)
+            ui.clear_property(PLAY_PROMPT_QUALITY)
 
         audio_only = None
-        if ui.get_property(PLAY_FORCE_AUDIO) == video_id:
+        if ui.get_property(PLAY_FORCE_AUDIO):
             ask_for_quality = False
             audio_only = True
-        ui.clear_property(PLAY_FORCE_AUDIO)
+            ui.clear_property(PLAY_FORCE_AUDIO)
 
         try:
             video_streams = client.get_video_streams(context, video_id)
@@ -110,7 +110,7 @@ def play_video(provider, context):
         url = urlunsplit((
             'http',
             get_connect_address(context=context, as_netloc=True),
-            paths.REDIRECT,
+            PATHS.REDIRECT,
             urlencode({'url': video_stream['url']}),
             '',
         ))

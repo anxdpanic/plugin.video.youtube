@@ -14,7 +14,13 @@ import os
 
 from .. import logger
 from ..compatibility import quote, to_str, urlencode
-from ..constants import VALUE_FROM_STR
+from ..constants import (
+    PLAY_FORCE_AUDIO,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
+    PLAY_WITH,
+    VALUE_FROM_STR,
+)
 from ..json_store import AccessManager
 from ..sql_store import (
     BookmarksList,
@@ -34,8 +40,10 @@ class AbstractContext(object):
     _settings = None
 
     _BOOL_PARAMS = {
-        'ask_for_quality',
-        'audio_only',
+        PLAY_FORCE_AUDIO,
+        PLAY_PROMPT_SUBTITLES,
+        PLAY_PROMPT_QUALITY,
+        PLAY_WITH,
         'confirmed',
         'clip',
         'enable',
@@ -47,7 +55,6 @@ class AbstractContext(object):
         'location',
         'logged_in',
         'play',
-        'prompt_for_subtitles',
         'resume',
         'screensaver',
         'strm',

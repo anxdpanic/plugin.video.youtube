@@ -19,8 +19,8 @@ from ..constants import (
     PLAYBACK_STARTED,
     PLAYBACK_STOPPED,
     PLAYER_DATA,
+    PLAY_WITH,
     REFRESH_CONTAINER,
-    SWITCH_PLAYER_FLAG,
 )
 
 
@@ -352,12 +352,12 @@ class PlayerMonitor(xbmc.Player):
         self.threads = active_threads
 
     def onPlayBackStarted(self):
-        if self._ui.get_property(SWITCH_PLAYER_FLAG):
+        if self._ui.get_property(PLAY_WITH):
             self._context.execute('Action(SwitchPlayer)')
             self._context.execute('Action(Stop)')
 
     def onAVStarted(self):
-        if self._ui.get_property(SWITCH_PLAYER_FLAG):
+        if self._ui.get_property(PLAY_WITH):
             return
 
         if not self._ui.busy_dialog_active():
@@ -393,8 +393,8 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        if self._ui.get_property(SWITCH_PLAYER_FLAG):
-            self._ui.clear_property(SWITCH_PLAYER_FLAG)
+        if self._ui.get_property(PLAY_WITH):
+            self._ui.clear_property(PLAY_WITH)
 
         self.stop_threads()
         self.cleanup_threads()

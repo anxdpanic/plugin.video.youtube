@@ -32,7 +32,7 @@ from ...kodion.compatibility import (
     urlsplit,
     xbmcvfs,
 )
-from ...kodion.constants import TEMP_PATH, paths
+from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
 from ...kodion.utils import make_dirs, redact_ip_from_url
 
@@ -1518,7 +1518,7 @@ class VideoInfo(YouTubeRequestClient):
                 'proxy': 'http://{address}:{port}{path}||R{{SSM}}|'.format(
                     address=address,
                     port=port,
-                    path=paths.DRM,
+                    path=PATHS.DRM,
                 ),
                 'token': self._access_token,
             }
@@ -2247,7 +2247,7 @@ class VideoInfo(YouTubeRequestClient):
             return 'http://{address}:{port}{path}{file}'.format(
                 address=address,
                 port=port,
-                path=paths.MPD,
+                path=PATHS.MPD,
                 file=filename,
             ), main_stream
         return None, None

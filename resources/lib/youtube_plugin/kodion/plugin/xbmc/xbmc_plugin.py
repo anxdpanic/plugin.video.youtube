@@ -21,7 +21,7 @@ from ...constants import (
     PLAYLIST_POSITION,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
-    REROUTE,
+    REROUTE_PATH,
     SLEEPING,
     VIDEO_ID,
 )
@@ -154,7 +154,7 @@ class XbmcPlugin(AbstractPlugin):
             provider.run_wizard(context)
 
         try:
-            route = ui.get_property(REROUTE)
+            route = ui.get_property(REROUTE_PATH)
             if route:
                 function_cache = context.get_function_cache()
                 result, options = function_cache.run(
@@ -163,7 +163,7 @@ class XbmcPlugin(AbstractPlugin):
                     _scope=function_cache.SCOPE_NONE,
                     context=context.clone(route),
                 )
-                ui.clear_property(REROUTE)
+                ui.clear_property(REROUTE_PATH)
             else:
                 result, options = provider.navigate(context)
         except KodionException as exc:

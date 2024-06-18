@@ -16,11 +16,11 @@ from .. import AudioItem, DirectoryItem, ImageItem, VideoItem
 from ...compatibility import to_str, xbmc, xbmcgui
 from ...constants import (
     CHANNEL_ID,
-    PLAY_COUNT,
-    PLAYLIST_ID,
     PLAYLISTITEM_ID,
+    PLAYLIST_ID,
+    PLAY_COUNT,
+    PLAY_WITH,
     SUBSCRIPTION_ID,
-    SWITCH_PLAYER_FLAG,
     VIDEO_ID,
 )
 from ...utils import current_system_version, datetime_parser, redact_ip_from_url
@@ -380,7 +380,7 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
-    is_external = context.get_ui().get_property(SWITCH_PLAYER_FLAG)
+    is_external = context.get_ui().get_property(PLAY_WITH)
     is_strm = context.get_param('strm')
     mime_type = None
 

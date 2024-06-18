@@ -10,7 +10,13 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from ..constants import ADDON_ID, paths
+from ..constants import (
+    PATHS,
+    PLAY_FORCE_AUDIO,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
+    PLAY_WITH,
+)
 
 
 def more_for_video(context, video_id, logged_in=False, refresh=False):
@@ -33,7 +39,7 @@ def related_videos(context, video_id):
     return (
         context.localize('related_videos'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, 'special', 'related_videos',),
+            (PATHS.ROUTE, 'special', 'related_videos',),
             {
                 'video_id': video_id,
             },
@@ -45,7 +51,7 @@ def video_comments(context, video_id):
     return (
         context.localize('video.comments'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, 'special', 'parent_comments',),
+            (PATHS.ROUTE, 'special', 'parent_comments',),
             {
                 'video_id': video_id,
             },
@@ -57,7 +63,7 @@ def content_from_description(context, video_id):
     return (
         context.localize('video.description.links'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, 'special', 'description_links',),
+            (PATHS.ROUTE, 'special', 'description_links',),
             {
                 'video_id': video_id,
             },
@@ -65,10 +71,16 @@ def content_from_description(context, video_id):
     )
 
 
-def play_with(context):
+def play_with(context, video_id):
     return (
         context.localize('video.play.with'),
-        'RunScript({addon_id},action/play_with)'.format(addon_id=ADDON_ID),
+        'RunPlugin({0})'.format(context.create_uri(
+            ('play',),
+            {
+                'video_id': video_id,
+                PLAY_WITH: True,
+            },
+        ))
     )
 
 
@@ -77,7 +89,7 @@ def refresh(context):
     return (
         context.localize('refresh'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, context.get_path(),),
+            (PATHS.ROUTE, context.get_path(),),
             dict(params, refresh=params.get('refresh', 0) + 1),
         ))
     )
@@ -279,7 +291,7 @@ def watch_later_local_add(context, item):
     return (
         context.localize('watch_later.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.WATCH_LATER, 'add',),
+            (PATHS.WATCH_LATER, 'add',),
             {
                 'video_id': item.video_id,
                 'item': repr(item),
@@ -292,7 +304,7 @@ def watch_later_local_remove(context, video_id):
     return (
         context.localize('watch_later.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.WATCH_LATER, 'remove',),
+            (PATHS.WATCH_LATER, 'remove',),
             {
                 'video_id': video_id,
             },
@@ -304,7 +316,7 @@ def watch_later_local_clear(context):
     return (
         context.localize('watch_later.clear'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.WATCH_LATER, 'clear',),
+            (PATHS.WATCH_LATER, 'clear',),
         ))
     )
 
@@ -313,7 +325,7 @@ def go_to_channel(context, channel_id, channel_name):
     return (
         context.localize('go_to_channel') % context.get_ui().bold(channel_name),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, 'channel', channel_id,),
+            (PATHS.ROUTE, 'channel', channel_id,),
         ))
     )
 
@@ -357,7 +369,7 @@ def play_with_subtitles(context, video_id):
             ('play',),
             {
                 'video_id': video_id,
-                'prompt_for_subtitles': True,
+                PLAY_PROMPT_SUBTITLES: True,
             },
         ))
     )
@@ -370,7 +382,7 @@ def play_audio_only(context, video_id):
             ('play',),
             {
                 'video_id': video_id,
-                'audio_only': True,
+                PLAY_FORCE_AUDIO: True,
             },
         ))
     )
@@ -383,7 +395,7 @@ def play_ask_for_quality(context, video_id):
             ('play',),
             {
                 'video_id': video_id,
-                'ask_for_quality': True,
+                PLAY_PROMPT_QUALITY: True,
             },
         ))
     )
@@ -393,7 +405,7 @@ def history_remove(context, video_id):
     return (
         context.localize('history.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.HISTORY,),
+            (PATHS.HISTORY,),
             {
                 'action': 'remove',
                 'video_id': video_id
@@ -406,7 +418,7 @@ def history_clear(context):
     return (
         context.localize('history.clear'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.HISTORY,),
+            (PATHS.HISTORY,),
             {
                 'action': 'clear'
             },
@@ -418,7 +430,7 @@ def history_mark_watched(context, video_id):
     return (
         context.localize('history.mark.watched'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.HISTORY,),
+            (PATHS.HISTORY,),
             {
                 'video_id': video_id,
                 'action': 'mark_watched',
@@ -431,7 +443,7 @@ def history_mark_unwatched(context, video_id):
     return (
         context.localize('history.mark.unwatched'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.HISTORY,),
+            (PATHS.HISTORY,),
             {
                 'video_id': video_id,
                 'action': 'mark_unwatched',
@@ -444,7 +456,7 @@ def history_reset_resume(context, video_id):
     return (
         context.localize('history.reset.resume_point'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.HISTORY,),
+            (PATHS.HISTORY,),
             {
                 'video_id': video_id,
                 'action': 'reset_resume',
@@ -457,7 +469,7 @@ def bookmarks_add(context, item):
     return (
         context.localize('bookmarks.add'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.BOOKMARKS, 'add',),
+            (PATHS.BOOKMARKS, 'add',),
             {
                 'item_id': item.get_id(),
                 'item': repr(item),
@@ -473,7 +485,7 @@ def bookmarks_add_channel(context, channel_id, channel_name=''):
             context.localize(19029)
         )),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.BOOKMARKS, 'add',),
+            (PATHS.BOOKMARKS, 'add',),
             {
                 'item_id': channel_id,
                 'item': None,
@@ -486,7 +498,7 @@ def bookmarks_remove(context, item_id):
     return (
         context.localize('bookmarks.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.BOOKMARKS, 'remove',),
+            (PATHS.BOOKMARKS, 'remove',),
             {
                 'item_id': item_id,
             },
@@ -498,7 +510,7 @@ def bookmarks_clear(context):
     return (
         context.localize('bookmarks.clear'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.BOOKMARKS, 'clear',),
+            (PATHS.BOOKMARKS, 'clear',),
         ))
     )
 
@@ -507,7 +519,7 @@ def search_remove(context, query):
     return (
         context.localize('search.remove'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.SEARCH, 'remove',),
+            (PATHS.SEARCH, 'remove',),
             {
                 'q': query,
             },
@@ -519,7 +531,7 @@ def search_rename(context, query):
     return (
         context.localize('search.rename'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.SEARCH, 'rename',),
+            (PATHS.SEARCH, 'rename',),
             {
                 'q': query,
             },
@@ -531,7 +543,7 @@ def search_clear(context):
     return (
         context.localize('search.clear'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.SEARCH, 'clear',),
+            (PATHS.SEARCH, 'clear',),
         ))
     )
 
@@ -547,7 +559,7 @@ def goto_home(context):
     return (
         context.localize(10000),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, paths.HOME,),
+            (PATHS.ROUTE, PATHS.HOME,),
             {
                 'window_return': False,
             },
@@ -559,7 +571,7 @@ def goto_quick_search(context):
     return (
         context.localize('search.quick'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.ROUTE, paths.SEARCH, 'input',),
+            (PATHS.ROUTE, PATHS.SEARCH, 'input',),
         ))
     )
 
@@ -568,7 +580,7 @@ def goto_page(context, params=None):
     return (
         context.localize('page.choose'),
         'RunPlugin({0})'.format(context.create_uri(
-            (paths.GOTO_PAGE, context.get_path(),),
+            (PATHS.GOTO_PAGE, context.get_path(),),
             params or context.get_params(),
         ))
     )

@@ -82,9 +82,11 @@ class Subtitles(object):
             self.preferred_lang = ('en',)
 
         ui = context.get_ui()
-        self.prompt_override = (ui.get_property(PLAY_PROMPT_SUBTITLES)
-                                == video_id)
-        ui.clear_property(PLAY_PROMPT_SUBTITLES)
+        if ui.get_property(PLAY_PROMPT_SUBTITLES):
+            self.prompt_override = True
+            ui.clear_property(PLAY_PROMPT_SUBTITLES)
+        else:
+            self.prompt_override = False
 
     def load(self, captions, headers=None):
         if headers:
