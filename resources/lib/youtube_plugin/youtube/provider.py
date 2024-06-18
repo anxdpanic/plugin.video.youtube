@@ -1257,7 +1257,7 @@ class Provider(AbstractProvider):
         if logged_in and settings.get_bool('youtube.folder.liked_videos.show', True):
             resource_manager = self.get_resource_manager(context)
             playlists = resource_manager.get_related_playlists(channel_id='mine')
-            if 'likes' in playlists:
+            if playlists and 'likes' in playlists:
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
                     create_uri(('channel', 'mine', 'playlist', playlists['likes'])),
