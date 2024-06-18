@@ -647,10 +647,9 @@ class Provider(AbstractProvider):
     path for playlist: '/play/?playlist_id=XXXXXXX&mode=[OPTION]'
     OPTION: [normal(default)|reverse|shuffle]
 
-    path for channel live streams: '/play/?channel_id=UCXXXXXXX&live=X
-    OPTION:
-        live parameter required, live=1 for first live stream
-        live = index of live stream if channel has multiple live streams
+    Channel live streams: '/play/?channel_id=UCXXXXXX[&live=X]
+        X: optional index of live stream to play if channel has multiple live
+           streams. 1 (default) for first live stream
     """
 
     # noinspection PyUnusedLocal
@@ -661,7 +660,7 @@ class Provider(AbstractProvider):
         force_play = False
         params = context.get_params()
 
-        if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
+        if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(params.keys())):
             listitem_path = context.get_listitem_info('FileNameAndPath')
             if context.is_plugin_path(listitem_path, 'play'):
@@ -707,7 +706,7 @@ class Provider(AbstractProvider):
         if playlist_id or 'playlist_ids' in params:
             return yt_play.play_playlist(self, context)
 
-        if 'channel_id' in params and params.get('live', 0) > 0:
+        if 'channel_id' in params:
             return yt_play.play_channel_live(self, context)
         return False
 

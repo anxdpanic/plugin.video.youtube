@@ -265,7 +265,7 @@ def play_playlist(provider, context):
 
 def play_channel_live(provider, context):
     channel_id = context.get_param('channel_id')
-    index = context.get_param('live') - 1
+    index = context.get_param('live', 1) - 1
     if index < 0:
         index = 0
     json_data = provider.get_client(context).search(q='',
