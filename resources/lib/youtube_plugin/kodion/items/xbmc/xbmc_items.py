@@ -23,7 +23,7 @@ from ...constants import (
     SWITCH_PLAYER_FLAG,
     VIDEO_ID,
 )
-from ...utils import current_system_version, datetime_parser
+from ...utils import current_system_version, datetime_parser, redact_ip_from_url
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
@@ -375,7 +375,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     uri = video_item.get_uri()
-    context.log_debug('Converting VideoItem |%s|' % uri)
+    context.log_debug('Converting VideoItem |%s|' % redact_ip_from_url(uri))
 
     settings = context.get_settings()
     headers = video_item.get_headers()
@@ -437,10 +437,9 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        if (headers and uri.startswith('http') and not (
-                settings.default_player_web_urls()
-                or (is_external and settings.alternative_player_web_urls())
-        )):
+        if (headers and uri.startswith('http')
+                and not (is_external
+                         or settings.default_player_web_urls())):
             kwargs['path'] = '|'.join((uri, headers))
 
     list_item = xbmcgui.ListItem(**kwargs)

@@ -649,7 +649,6 @@ class XbmcContext(AbstractContext):
             return False
 
     def send_notification(self, method, data=True):
-        self.log_debug('send_notification: |%s| -> |%s|' % (method, data))
         jsonrpc(method='JSONRPC.NotifyAll',
                 params={'sender': ADDON_ID,
                         'message': method,
