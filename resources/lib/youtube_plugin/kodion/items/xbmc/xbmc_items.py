@@ -437,10 +437,9 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        if (headers and uri.startswith('http') and not (
-                settings.default_player_web_urls()
-                or (is_external and settings.alternative_player_web_urls())
-        )):
+        if (headers and uri.startswith('http')
+                and not (is_external
+                         or settings.default_player_web_urls())):
             kwargs['path'] = '|'.join((uri, headers))
 
     list_item = xbmcgui.ListItem(**kwargs)
