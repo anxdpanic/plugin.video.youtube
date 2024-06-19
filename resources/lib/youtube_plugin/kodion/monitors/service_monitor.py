@@ -87,17 +87,12 @@ class ServiceMonitor(xbmc.Monitor):
         if event == CHECK_SETTINGS:
             if not isinstance(data, dict):
                 data = json.loads(data)
-            log_debug('onNotification: |check_settings| -> |{data}|'
-                      .format(data=data))
-
             if data == 'defer':
                 self._settings_state = data
-                return
-            if data == 'process':
+            elif data == 'process':
                 self._settings_state = data
                 self.onSettingsChanged()
                 self._settings_state = None
-                return
         elif event == WAKEUP:
             if not isinstance(data, dict):
                 data = json.loads(data)
@@ -113,9 +108,6 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()
-        else:
-            log_debug('onNotification: |unhandled method| -> |{method}|'
-                      .format(method=method))
 
     def onSettingsChanged(self):
         self._settings_changes += 1
