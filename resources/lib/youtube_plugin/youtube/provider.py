@@ -82,8 +82,7 @@ class Provider(AbstractProvider):
 
     @staticmethod
     def get_dev_config(context, addon_id, dev_configs):
-        _dev_config = context.get_ui().get_property(DEVELOPER_CONFIGS)
-        context.get_ui().clear_property(DEVELOPER_CONFIGS)
+        _dev_config = context.get_ui().pop_property(DEVELOPER_CONFIGS)
 
         dev_config = {}
         if _dev_config:

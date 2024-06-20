@@ -516,13 +516,11 @@ class XbmcContext(AbstractContext):
 
     def apply_content(self):
         ui = self.get_ui()
-        content_type = ui.get_property(CONTENT_TYPE)
-        if content_type:
-            ui.clear_property(CONTENT_TYPE)
-            content_type, sub_type, category_label = json.loads(content_type)
-        else:
+        content_type = ui.pop_property(CONTENT_TYPE)
+        if not content_type:
             return
 
+        content_type, sub_type, category_label = json.loads(content_type)
         self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
             type=(sub_type or content_type), path=self.get_path()
         ))

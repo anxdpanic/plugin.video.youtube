@@ -363,10 +363,9 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        playback_data = self._ui.get_property(PLAYER_DATA)
+        playback_data = self._ui.pop_property(PLAYER_DATA)
         if not playback_data:
             return
-        self._ui.clear_property(PLAYER_DATA)
         self.cleanup_threads()
 
         playback_data = json.loads(playback_data)
@@ -393,8 +392,7 @@ class PlayerMonitor(xbmc.Player):
         if not self._ui.busy_dialog_active():
             self._ui.clear_property(BUSY_FLAG)
 
-        if self._ui.get_property(PLAY_WITH):
-            self._ui.clear_property(PLAY_WITH)
+        self._ui.pop_property(PLAY_WITH)
 
         self.stop_threads()
         self.cleanup_threads()
