@@ -489,14 +489,91 @@ class VideoInfo(YouTubeRequestClient):
                 'dash/audio': True,
                 'audio': {'bitrate': 384, 'codec': 'ac-3'}},
         # === HLS
+        '229': {'container': 'hls',
+                'title': '240p',
+                'hls/video': True,
+                'video': {'height': 240, 'codec': 'h.264'}},
+        '230': {'container': 'hls',
+                'title': '360p',
+                'hls/video': True,
+                'video': {'height': 360, 'codec': 'h.264'}},
+        '231': {'container': 'hls',
+                'title': '480p',
+                'hls/video': True,
+                'video': {'height': 480, 'codec': 'h.264'}},
+        '232': {'container': 'hls',
+                'title': '720p',
+                'hls/video': True,
+                'video': {'height': 720, 'codec': 'h.264'}},
+        '269': {'container': 'hls',
+                'title': '144p',
+                'hls/video': True,
+                'video': {'height': 144, 'codec': 'h.264'}},
+        '270': {'container': 'hls',
+                'title': 'Premium 1080p',
+                'hls/video': True,
+                'video': {'height': 1080, 'codec': 'h.264'}},
+        '311': {'container': 'hls',
+                'title': '720p60',
+                'hls/video': True,
+                'fps': 60,
+                'video': {'height': 720, 'codec': 'h.264'}},
+        '312': {'container': 'hls',
+                'title': 'Premium 1080p60',
+                'hls/video': True,
+                'fps': 60,
+                'video': {'height': 1080, 'codec': 'h.264'}},
+        '602': {'container': 'hls',
+                'title': '144p15',
+                'hls/video': True,
+                'fps': 15,
+                'video': {'height': 144, 'codec': 'vp9'}},
+        '603': {'container': 'hls',
+                'title': '144p',
+                'hls/video': True,
+                'video': {'height': 144, 'codec': 'vp9'}},
+        '604': {'container': 'hls',
+                'title': '240p',
+                'hls/video': True,
+                'video': {'height': 240, 'codec': 'vp9'}},
+        '605': {'container': 'hls',
+                'title': '360p',
+                'hls/video': True,
+                'video': {'height': 360, 'codec': 'vp9'}},
+        '606': {'container': 'hls',
+                'title': '480p',
+                'hls/video': True,
+                'video': {'height': 480, 'codec': 'vp9'}},
+        '609': {'container': 'hls',
+                'title': '720p',
+                'hls/video': True,
+                'video': {'height': 720, 'codec': 'vp9'}},
+        '612': {'container': 'hls',
+                'title': '720p60',
+                'hls/video': True,
+                'fps': 60,
+                'video': {'height': 720, 'codec': 'vp9'}},
+        '614': {'container': 'hls',
+                'title': '1080p',
+                'hls/video': True,
+                'video': {'height': 1080, 'codec': 'vp9'}},
+        '616': {'container': 'hls',
+                'title': 'Premium 1080p',
+                'hls/video': True,
+                'video': {'height': 1080, 'codec': 'vp9'}},
+        '617': {'container': 'hls',
+                'title': 'Premium 1080p60',
+                'hls/video': True,
+                'fps': 60,
+                'video': {'height': 1080, 'codec': 'vp9'}},
         '9994': {'container': 'hls',
                  'title': 'Adaptive HLS',
                  'hls/audio': True,
                  'hls/video': True,
                  'adaptive': True,
                  'sort': 9994,
-                 'audio': {'bitrate': 0, 'codec': 'aac'},
-                 'video': {'height': 0, 'codec': 'h.264'}},
+                 'audio': {'bitrate': 0, 'codec': ''},
+                 'video': {'height': 0, 'codec': ''}},
         # === Live HLS
         '9995': {'container': 'hls',
                  'live': True,
@@ -504,8 +581,8 @@ class VideoInfo(YouTubeRequestClient):
                  'hls/audio': True,
                  'hls/video': True,
                  'sort': 9995,
-                 'audio': {'bitrate': 0, 'codec': 'aac'},
-                 'video': {'height': 0, 'codec': 'h.264'}},
+                 'audio': {'bitrate': 0, 'codec': ''},
+                 'video': {'height': 0, 'codec': ''}},
         # === Live HLS adaptive
         '9996': {'container': 'hls',
                  'live': True,
@@ -514,8 +591,8 @@ class VideoInfo(YouTubeRequestClient):
                  'hls/video': True,
                  'adaptive': True,
                  'sort': 9996,
-                 'audio': {'bitrate': 0, 'codec': 'aac'},
-                 'video': {'height': 0, 'codec': 'h.264'}},
+                 'audio': {'bitrate': 0, 'codec': ''},
+                 'video': {'height': 0, 'codec': ''}},
         # === DASH adaptive audio only
         '9997': {'container': 'mpd',
                  'title': 'DASH Audio',
@@ -574,6 +651,7 @@ class VideoInfo(YouTubeRequestClient):
         # audio - order based on preference
         'mp3': 0.5,
         'vorbis': 0.75,
+        'aac': 0.9,
         'mp4a': 0.9,
         'opus': 1,
         'ac-3': 1.1,
@@ -707,6 +785,8 @@ class VideoInfo(YouTubeRequestClient):
         yt_format = self.FORMAT.get(itag)
         if not yt_format:
             return None
+        if yt_format.get('discontinued') or yt_format.get('unsupported'):
+            return False
 
         yt_format = yt_format.copy()
         manual_sort = yt_format.get('sort', 0)
@@ -986,8 +1066,8 @@ class VideoInfo(YouTubeRequestClient):
                     itag=itag, stream=redact_ip_from_url(match[0]),
                 ))
             if (not yt_format
-                    or yt_format.get('discontinued')
-                    or yt_format.get('unsupported')):
+                    or (yt_format.get('hls/video')
+                        and not yt_format.get('hls/audio'))):
                 continue
 
             if is_live:
@@ -1067,8 +1147,6 @@ class VideoInfo(YouTubeRequestClient):
                     itag=itag, stream=stream_map,
                 ))
             if (not yt_format
-                    or yt_format.get('discontinued')
-                    or yt_format.get('unsupported')
                     or (yt_format.get('dash/video')
                         and not yt_format.get('dash/audio'))):
                 continue
