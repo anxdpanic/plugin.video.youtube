@@ -208,6 +208,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         'media_connect_frontend': {
             '_id': 95,
             '_access_token': KeyError,
+            '_query_subtitles': True,
             'json': {
                 'context': {
                     'client': {
