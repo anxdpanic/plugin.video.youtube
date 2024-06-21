@@ -131,7 +131,7 @@ class XbmcPlugin(AbstractPlugin):
             ui.clear_property(PLAYLIST_POSITION)
 
         if ui.get_property(SLEEPING):
-            context.wakeup()
+            context.wakeup('plugin')
 
         if ui.get_property(REFRESH_CONTAINER):
             focused = False

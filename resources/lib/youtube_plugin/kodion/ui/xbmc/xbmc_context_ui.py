@@ -154,6 +154,15 @@ class XbmcContextUI(AbstractContextUI):
         return xbmcgui.Window(10000).getProperty(property_id)
 
     @staticmethod
+    def pop_property(property_id):
+        property_id = '-'.join((ADDON_ID, property_id))
+        window = xbmcgui.Window(10000)
+        value = window.getProperty(property_id)
+        if value:
+            window.clearProperty(property_id)
+        return value
+
+    @staticmethod
     def clear_property(property_id):
         property_id = '-'.join((ADDON_ID, property_id))
         xbmcgui.Window(10000).clearProperty(property_id)
