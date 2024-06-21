@@ -1,3 +1,8 @@
+## v7.0.8+beta.4
+### Fixed
+- Poll for http server restart when required for playback #746 #808
+- Fix unsubscribe from My Subscriptions #809
+
 ## v7.0.8+beta.3
 ### Fixed
 - Additional fixes for redacting IP addresses in debug logs #801

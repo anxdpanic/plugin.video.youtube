@@ -643,7 +643,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # update channel mapping
         channel_id = snippet.get('channelId', '')
-        video_item.set_subscription_id(channel_id)
+        video_item.set_channel_id(channel_id)
         if channel_id and channel_items_dict is not None:
             if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
