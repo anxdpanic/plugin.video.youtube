@@ -775,15 +775,29 @@ class XbmcContext(AbstractContext):
             except AttributeError:
                 pass
 
-    def wakeup(self, target):
-        self.send_notification(WAKEUP, target)
-        if not target:
+    def wakeup(self, target, timeout=None):
+        data = {'target': target, 'response_required': bool(timeout)}
+        self.send_notification(WAKEUP, data)
+        if not timeout:
             return
+
         pop_property = self.get_ui().pop_property
-        while 1:
+        no_timeout = timeout < 0
+        remaining = timeout
+        wait_period = 0.1
+
+        while no_timeout or remaining > 0:
             awake = pop_property(WAKEUP)
             if awake:
-                if awake != target:
-                    self.log_error('Incorrect wakeup target')
+                if awake == target:
+                    self.log_debug('Wakeup |{0}| in {1}s'
+                                   .format(awake, timeout - remaining))
+                else:
+                    self.log_error('Wakeup |{0}| in {1}s - expected |{2}|'
+                                   .format(awake, timeout - remaining, target))
                 break
-            wait(0.5)
+            wait(wait_period)
+            remaining -= wait_period
+        else:
+            self.log_error('Wakeup |{0}| timed out in {1}s'
+                           .format(target, timeout))
