@@ -264,13 +264,13 @@ class AbstractProvider(object):
             return self.on_search(query, context, re_match)
 
         if command == 'remove':
-            query = params.get('q', '')
+            query = to_unicode(params.get('q', ''))
             search_history.remove(query)
             ui.refresh_container()
             return True
 
         if command == 'rename':
-            query = params.get('q', '')
+            query = to_unicode(params.get('q', ''))
             result, new_query = ui.on_keyboard_input(
                 context.localize('search.rename'), query
             )

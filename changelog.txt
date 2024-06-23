@@ -1,3 +1,16 @@
+## v7.0.8+beta.5
+### Fixed
+- Fix Python2 UnicodeDecodeError when removing/renaming searches #815
+- Fix not catching socket.error in Python2 when force shutting down socket
+- Fix deleting window property with multiple threads causing hang on exit #813
+
+### Changed
+- Update 720p preset in Setup Wizard #807
+- Update itags found in HLS playlists and exclude them in quality selection #806
+
+### New
+- Enable subtitles for alternative client 2 #806
+
 ## v7.0.8+beta.4
 ### Fixed
 - Poll for http server restart when required for playback #746 #808

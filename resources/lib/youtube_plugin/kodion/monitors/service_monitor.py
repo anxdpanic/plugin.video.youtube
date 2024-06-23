@@ -96,13 +96,16 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == WAKEUP:
             if not isinstance(data, dict):
                 data = json.loads(data)
-            if data:
-                self.set_property(WAKEUP, data)
-            if data == 'plugin':
+            if not data:
+                return
+            target = data.get('target')
+            if target == 'plugin':
                 self.interrupt = True
-            elif data == 'server':
+            elif target == 'server':
                 if not self.httpd and self.httpd_required():
                     self.start_httpd()
+            if data.get('response_required'):
+                self.set_property(WAKEUP, target)
         elif event == REFRESH_CONTAINER:
             self.refresh_container()
         elif event == RELOAD_ACCESS_MANAGER:
