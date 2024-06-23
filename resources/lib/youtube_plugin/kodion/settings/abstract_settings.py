@@ -70,9 +70,17 @@ class AbstractSettings(object):
         4: 1080,
     }
 
-    def get_video_quality(self):
-        value = self.get_int(settings.VIDEO_QUALITY, 3)
-        return self._VIDEO_QUALITY_MAP[value]
+    def fixed_video_quality(self, value=None):
+        default = 3
+        if value is None:
+            _value = self.get_int(settings.VIDEO_QUALITY, default)
+        else:
+            _value = value
+        if _value not in self._VIDEO_QUALITY_MAP:
+            _value = default
+        if value is not None:
+            self.set_int(settings.VIDEO_QUALITY, _value)
+        return self._VIDEO_QUALITY_MAP[_value]
 
     def ask_for_video_quality(self):
         return (self.get_bool(settings.VIDEO_QUALITY_ASK, False)

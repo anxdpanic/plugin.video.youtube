@@ -490,9 +490,10 @@ class VideoInfo(YouTubeRequestClient):
                 'audio': {'bitrate': 384, 'codec': 'ac-3'}},
         # === HLS
         '9994': {'container': 'hls',
-                 'title': 'HLS',
+                 'title': 'Adaptive HLS',
                  'hls/audio': True,
                  'hls/video': True,
+                 'adaptive': True,
                  'sort': 9994,
                  'audio': {'bitrate': 0, 'codec': 'aac'},
                  'video': {'height': 0, 'codec': 'h.264'}},
@@ -960,7 +961,7 @@ class VideoInfo(YouTubeRequestClient):
             qualities = settings.mpd_video_qualities()
             selected_height = qualities[0]['nom_height']
         else:
-            selected_height = settings.get_video_quality()
+            selected_height = settings.fixed_video_quality()
 
         # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
         # a small default stream with itag 133 (240p) and can be ignored.
@@ -1025,7 +1026,7 @@ class VideoInfo(YouTubeRequestClient):
             qualities = settings.mpd_video_qualities()
             selected_height = qualities[0]['nom_height']
         else:
-            selected_height = settings.get_video_quality()
+            selected_height = settings.fixed_video_quality()
 
         stream_list = []
         for stream_map in streams:
