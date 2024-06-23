@@ -38,7 +38,7 @@ class HTTPServer(TCPServer):
     def server_close(self):
         try:
             self.socket.shutdown(socket.SHUT_RDWR)
-        except OSError:
+        except (OSError, socket.error):
             pass
         self.socket.close()
 

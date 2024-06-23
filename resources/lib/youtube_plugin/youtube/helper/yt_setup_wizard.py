@@ -369,6 +369,8 @@ def process_performance_settings(_provider, context, step, steps):
                 'stream_features': ('avc1', 'mp4a', 'filter'),
                 'num_items': 10,
                 'settings': (
+                    (settings.use_isa, (False,)),
+                    (settings.client_selection, (2,)),
                     (settings.use_mpd_videos, (False,)),
                     (settings.set_subtitle_download, (True,)),
                 ),
@@ -425,12 +427,14 @@ def process_performance_settings(_provider, context, step, steps):
             return step
 
         device_type = device_types[device_type]
-        settings.mpd_video_qualities(device_type['max_resolution'])
-        settings.stream_features(device_type['stream_features'])
-        settings.items_per_page(device_type['num_items'])
         if 'settings' in device_type:
             for setting in device_type['settings']:
                 setting[0](*setting[1])
+        settings.mpd_video_qualities(device_type['max_resolution'])
+        if not settings.use_mpd_videos():
+            settings.fixed_video_quality(device_type['max_resolution'])
+        settings.stream_features(device_type['stream_features'])
+        settings.items_per_page(device_type['num_items'])
     return step
 
 

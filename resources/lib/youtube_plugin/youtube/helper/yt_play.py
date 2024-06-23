@@ -154,7 +154,7 @@ def play_video(provider, context):
         'refresh_only': screensaver
     }
 
-    context.wakeup('server')
+    context.wakeup('server', timeout=30)
     ui.set_property(PLAYER_DATA, json.dumps(playback_data, ensure_ascii=False))
     context.send_notification(PLAYBACK_INIT, playback_data)
     return video_item
