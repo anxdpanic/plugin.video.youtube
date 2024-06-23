@@ -522,6 +522,4 @@ class AccessManager(JSONStore):
 
     @staticmethod
     def calc_key_hash(key, id, secret, **_kwargs):
-        md5_hash = md5()
-        md5_hash.update(''.join((key, id, secret)).encode('utf-8'))
-        return md5_hash.hexdigest()
+        return md5(''.join((key, id, secret)).encode('utf-8')).hexdigest()

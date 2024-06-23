@@ -16,7 +16,6 @@ from ..compatibility import xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
     CHECK_SETTINGS,
-    PLAYBACK_INIT,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     WAKEUP,
