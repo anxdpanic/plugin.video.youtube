@@ -172,9 +172,11 @@ def update_channel_infos(provider, context, channel_id_dict,
     thumb_size = settings.get_thumbnail_size()
 
     for channel_id, yt_item in data.items():
-        channel_item = channel_id_dict[channel_id]
-
+        if not yt_item or 'snippet' not in yt_item:
+            continue
         snippet = yt_item['snippet']
+
+        channel_item = channel_id_dict[channel_id]
 
         # title
         title = snippet['title']
@@ -267,11 +269,15 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         in_my_playlists = False
 
     for playlist_id, yt_item in data.items():
+        if not yt_item or 'snippet' not in yt_item:
+            continue
+        snippet = yt_item['snippet']
+
         playlist_item = playlist_id_dict[playlist_id]
 
-        snippet = yt_item['snippet']
         title = snippet['title']
         playlist_item.set_name(title)
+
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         playlist_item.set_image(image)
 
@@ -411,14 +417,12 @@ def update_video_infos(provider, context, video_id_dict,
         playlist_match = __RE_PLAYLIST.match(path)
 
     for video_id, yt_item in data.items():
-        video_item = video_id_dict[video_id]
-
-        # set mediatype
-        video_item.set_mediatype(CONTENT.VIDEO_TYPE)
-
         if not yt_item or 'snippet' not in yt_item:
             continue
         snippet = yt_item['snippet']
+
+        video_item = video_id_dict[video_id]
+        video_item.set_mediatype(CONTENT.VIDEO_TYPE)
 
         play_data = use_play_data and yt_item.get('play_data')
         if play_data and 'total_time' in play_data:
