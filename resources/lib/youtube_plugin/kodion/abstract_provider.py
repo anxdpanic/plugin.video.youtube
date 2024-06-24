@@ -234,7 +234,13 @@ class AbstractProvider(object):
                     _scope=function_cache.SCOPE_NONE,
                     context=context.clone(path, params),
                 )
+            except Exception as exc:
+                context.log_error('Rerouting error: |{0}|'.format(exc))
             finally:
+                context.log_debug('Rerouting to |{path}| |{params}|{status}'
+                                  .format(path=path,
+                                          params=params,
+                                          status='' if result else ' failed'))
                 if not result:
                     return False
                 context.get_ui().set_property(REROUTE_PATH, path)
