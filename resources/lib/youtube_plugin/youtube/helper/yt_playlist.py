@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
-from ...kodion.constants import PLAYLIST_ID, PLAYLISTITEM_ID
+from ...kodion.constants import CHANNEL_ID, PLAYLISTITEM_ID, PLAYLIST_ID
 from ...kodion.utils import find_video_id
 
 
@@ -145,26 +145,34 @@ def _process_remove_video(provider,
             time_ms=2500,
             audible=False
         )
-
         return True
+    return False
 
 
 def _process_remove_playlist(provider, context):
-    playlist_id = context.get_param('playlist_id', '')
+    channel_id = context.get_listitem_property(CHANNEL_ID)
+
+    params = context.get_params()
+    ui = context.get_ui()
+
+    playlist_id = params.get('playlist_id', '')
     if not playlist_id:
         raise KodionException('Playlist/Remove: missing playlist_id')
 
-    playlist_name = context.get_param('playlist_name', '')
+    playlist_name = params.get('playlist_name', '')
     if not playlist_name:
         raise KodionException('Playlist/Remove: missing playlist_name')
 
-    if context.get_ui().on_delete_content(playlist_name):
+    if ui.on_delete_content(playlist_name):
         json_data = provider.get_client(context).remove_playlist(playlist_id)
         if not json_data:
             return False
 
-        context.get_ui().refresh_container()
-    return True
+        if channel_id:
+            data_cache = context.get_data_cache()
+            data_cache.remove(channel_id)
+            ui.refresh_container()
+    return False
 
 
 def _process_select_playlist(provider, context):
@@ -250,48 +258,52 @@ def _process_select_playlist(provider, context):
                 'DefaultFolder.png',
             ))
 
+        playlist_id = None
         result = ui.on_select(context.localize('playlist.select'), items)
-        if result == 'playlist.create':
+        if result == 'playlist.next':
+            continue
+        elif result == 'playlist.create':
             result, text = ui.on_keyboard_input(
                 context.localize('playlist.create'))
             if result and text:
                 json_data = client.create_playlist(title=text)
                 if not json_data:
                     break
-
                 playlist_id = json_data.get('id', '')
-                if playlist_id:
-                    new_params = dict(context.get_params(),
-                                      playlist_id=playlist_id)
-                    new_context = context.clone(new_params=new_params)
-                    _process_add_video(provider, new_context, keymap_action)
-            break
-        if result == 'playlist.next':
-            continue
-        if result != -1:
-            new_params = dict(context.get_params(), playlist_id=result)
+        elif result != -1:
+            playlist_id = result
+
+        if playlist_id:
+            new_params = dict(context.get_params(), playlist_id=playlist_id)
             new_context = context.clone(new_params=new_params)
             _process_add_video(provider, new_context, keymap_action)
         break
 
 
 def _process_rename_playlist(provider, context):
-    playlist_id = context.get_param('playlist_id', '')
+    params = context.get_params()
+    ui = context.get_ui()
+
+    playlist_id = params.get('playlist_id', '')
     if not playlist_id:
         raise KodionException('playlist/rename: missing playlist_id')
 
-    current_playlist_name = context.get_param('playlist_name', '')
-    result, text = context.get_ui().on_keyboard_input(
-        context.localize('rename'), default=current_playlist_name
+    result, text = ui.on_keyboard_input(
+        context.localize('rename'), default=params.get('playlist_name', ''),
     )
-    if result and text:
-        json_data = provider.get_client(context).rename_playlist(
-            playlist_id=playlist_id, new_title=text
-        )
-        if not json_data:
-            return
+    if not result or not text:
+        return False
 
-        context.get_ui().refresh_container()
+    json_data = provider.get_client(context).rename_playlist(
+        playlist_id=playlist_id, new_title=text,
+    )
+    if not json_data:
+        return False
+
+    data_cache = context.get_data_cache()
+    data_cache.remove(playlist_id)
+    ui.refresh_container()
+    return False
 
 
 def _playlist_id_change(context, playlist, method):
@@ -316,8 +328,8 @@ def _playlist_id_change(context, playlist, method):
             context.get_access_manager().set_watch_later_id(playlist_id)
         else:
             context.get_access_manager().set_watch_history_id(playlist_id)
-
-        context.get_ui().refresh_container()
+        return True
+    return False
 
 
 def process(method, category, provider, context, **kwargs):
