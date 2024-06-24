@@ -16,8 +16,10 @@ from ..compatibility import xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
     CHECK_SETTINGS,
+    PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
+    SERVER_WAKEUP,
     WAKEUP,
 )
 from ..logger import log_debug
@@ -97,9 +99,9 @@ class ServiceMonitor(xbmc.Monitor):
             if not data:
                 return
             target = data.get('target')
-            if target == 'plugin':
+            if target == PLUGIN_WAKEUP:
                 self.interrupt = True
-            elif target == 'server':
+            elif target == SERVER_WAKEUP:
                 if not self.httpd and self.httpd_required():
                     self.start_httpd()
             if data.get('response_required'):

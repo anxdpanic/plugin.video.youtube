@@ -37,7 +37,6 @@ VALUE_FROM_STR = {
 # Flags
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
-SLEEPING = 'sleeping'
 WAIT_FLAG = 'builtin_running'
 
 # ListItem Properties
@@ -55,6 +54,12 @@ PLAYBACK_STARTED = 'playback_started'
 PLAYBACK_STOPPED = 'playback_stopped'
 REFRESH_CONTAINER = 'refresh_container'
 RELOAD_ACCESS_MANAGER = 'reload_access_manager'
+
+# Sleep/wakeup states
+PLUGIN_WAKEUP = 'plugin_wakeup'
+PLUGIN_SLEEPING = 'plugin_sleeping'
+SERVER_WAKEUP = 'server_wakeup'
+SERVER_POST_START = 'server_post_start'
 WAKEUP = 'wakeup'
 
 # Play options
@@ -88,7 +93,6 @@ __all__ = (
     # Flags
     'ABORT_FLAG',
     'BUSY_FLAG',
-    'SLEEPING',
     'WAIT_FLAG',
 
     # ListItem properties
@@ -106,6 +110,12 @@ __all__ = (
     'PLAYBACK_STOPPED',
     'REFRESH_CONTAINER',
     'RELOAD_ACCESS_MANAGER',
+
+    # Sleep/wakeup states
+    'PLUGIN_SLEEPING',
+    'PLUGIN_WAKEUP',
+    'SERVER_POST_START',
+    'SERVER_WAKEUP',
     'WAKEUP',
 
     # Play options

@@ -19,10 +19,11 @@ from ...constants import (
     CHECK_SETTINGS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    PLUGIN_SLEEPING,
+    PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
-    SLEEPING,
     VIDEO_ID,
 )
 from ...exceptions import KodionException
@@ -122,8 +123,8 @@ class XbmcPlugin(AbstractPlugin):
                         playlist.play_playlist_item(position)
                 return False
 
-        if ui.get_property(SLEEPING):
-            context.wakeup('plugin')
+        if ui.get_property(PLUGIN_SLEEPING):
+            context.wakeup(PLUGIN_WAKEUP)
 
         if ui.pop_property(REFRESH_CONTAINER):
             focused = False

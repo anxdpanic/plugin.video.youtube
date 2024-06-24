@@ -42,6 +42,8 @@ from ..kodion.constants import (
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
     PLAY_WITH,
+    SERVER_POST_START,
+    SERVER_WAKEUP,
 )
 from ..kodion.items import (
     BaseItem,
@@ -692,7 +694,10 @@ class Provider(AbstractProvider):
             if force_play:
                 context.execute('Action(Play)')
                 return False
-            return yt_play.play_video(self, context)
+            context.wakeup(SERVER_WAKEUP, timeout=5)
+            video = yt_play.play_video(self, context)
+            ui.set_property(SERVER_POST_START)
+            return video
 
         if playlist_id or 'playlist_ids' in params:
             return yt_play.play_playlist(self, context)
