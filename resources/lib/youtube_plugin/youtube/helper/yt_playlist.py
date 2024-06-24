@@ -310,16 +310,14 @@ def _playlist_id_change(context, playlist, method):
                 type=playlist, method=method
             )) % playlist_name
     ):
+        if method == 'remove':
+            playlist_id = None
         if playlist == 'watch_later':
-            if method == 'remove':
-                playlist_id = 'WL'
             context.get_access_manager().set_watch_later_id(playlist_id)
         else:
-            if method == 'remove':
-                playlist_id = 'HL'
             context.get_access_manager().set_watch_history_id(playlist_id)
 
-    context.get_ui().refresh_container()
+        context.get_ui().refresh_container()
 
 
 def process(method, category, provider, context, **kwargs):
