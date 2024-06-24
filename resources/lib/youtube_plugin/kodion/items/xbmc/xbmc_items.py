@@ -530,15 +530,25 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     if directory_item.next_page:
         props['specialSort'] = 'bottom'
     else:
+        special_sort = 'top'
+
         prop_value = directory_item.get_subscription_id()
         if prop_value:
+            special_sort = None
             props[SUBSCRIPTION_ID] = prop_value
-        elif directory_item.get_channel_id():
-            pass
-        elif directory_item.get_playlist_id():
-            pass
-        else:
-            props['specialSort'] = 'top'
+
+        prop_value = directory_item.get_channel_id()
+        if prop_value:
+            special_sort = None
+            props[CHANNEL_ID] = prop_value
+
+        prop_value = directory_item.get_playlist_id()
+        if prop_value:
+            special_sort = None
+            props[PLAYLIST_ID] = prop_value
+
+        if special_sort:
+            props['specialSort'] = special_sort
 
     list_item = xbmcgui.ListItem(**kwargs)
 

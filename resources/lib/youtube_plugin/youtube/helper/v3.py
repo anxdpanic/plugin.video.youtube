@@ -150,17 +150,19 @@ def _process_list_response(provider, context, json_data, item_filter):
         elif kind == 'playlist':
             # set channel id to 'mine' if the path is for a playlist of our own
             if context.get_path().startswith(PATHS.MY_PLAYLISTS):
-                channel_id = 'mine'
-            else:
+                uri_channel_id = 'mine'
                 channel_id = snippet['channelId']
+            else:
+                uri_channel_id = channel_id = snippet['channelId']
             item_uri = context.create_uri(
-                ('channel', channel_id, 'playlist', item_id),
+                ('channel', uri_channel_id, 'playlist', item_id),
                 item_params,
             )
             item = DirectoryItem(title,
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
+                                 channel_id=channel_id,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
 
