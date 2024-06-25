@@ -14,7 +14,7 @@ import re
 import time
 from math import log10
 
-from ...kodion.constants import LICENSE_TOKEN, LICENSE_URL, content, paths
+from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
 from ...kodion.items import DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
@@ -151,7 +151,7 @@ def update_channel_infos(provider, context, channel_id_dict,
     path = context.get_path()
 
     filter_list = None
-    if path.startswith(paths.SUBSCRIPTIONS):
+    if path.startswith(PATHS.SUBSCRIPTIONS):
         in_bookmarks_list = False
         in_subscription_list = True
         if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
@@ -162,7 +162,7 @@ def update_channel_infos(provider, context, channel_id_dict,
             filter_string = filter_string.replace(', ', ',')
             filter_list = filter_string.split(',')
             filter_list = [x.lower() for x in filter_list]
-    elif path.startswith(paths.BOOKMARKS):
+    elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_subscription_list = False
     else:
@@ -172,9 +172,11 @@ def update_channel_infos(provider, context, channel_id_dict,
     thumb_size = settings.get_thumbnail_size()
 
     for channel_id, yt_item in data.items():
-        channel_item = channel_id_dict[channel_id]
-
+        if not yt_item or 'snippet' not in yt_item:
+            continue
         snippet = yt_item['snippet']
+
+        channel_item = channel_id_dict[channel_id]
 
         # title
         title = snippet['title']
@@ -256,10 +258,10 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     thumb_size = context.get_settings().get_thumbnail_size()
 
     # if the path directs to a playlist of our own, set channel id to 'mine'
-    if path.startswith(paths.MY_PLAYLISTS):
+    if path.startswith(PATHS.MY_PLAYLISTS):
         in_bookmarks_list = False
         in_my_playlists = True
-    elif path.startswith(paths.BOOKMARKS):
+    elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_my_playlists = False
     else:
@@ -267,11 +269,15 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         in_my_playlists = False
 
     for playlist_id, yt_item in data.items():
+        if not yt_item or 'snippet' not in yt_item:
+            continue
+        snippet = yt_item['snippet']
+
         playlist_item = playlist_id_dict[playlist_id]
 
-        snippet = yt_item['snippet']
         title = snippet['title']
         playlist_item.set_name(title)
+
         image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
         playlist_item.set_image(image)
 
@@ -389,17 +395,17 @@ def update_video_infos(provider, context, video_id_dict,
     path = context.get_path()
     ui = context.get_ui()
 
-    if path.startswith(paths.MY_SUBSCRIPTIONS):
+    if path.startswith(PATHS.MY_SUBSCRIPTIONS):
         in_bookmarks_list = False
         in_my_subscriptions_list = True
         in_watched_later_list = False
         playlist_match = False
-    elif path.startswith(paths.WATCH_LATER):
+    elif path.startswith(PATHS.WATCH_LATER):
         in_bookmarks_list = False
         in_my_subscriptions_list = False
         in_watched_later_list = True
         playlist_match = False
-    elif path.startswith(paths.BOOKMARKS):
+    elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_my_subscriptions_list = False
         in_watched_later_list = False
@@ -411,14 +417,12 @@ def update_video_infos(provider, context, video_id_dict,
         playlist_match = __RE_PLAYLIST.match(path)
 
     for video_id, yt_item in data.items():
-        video_item = video_id_dict[video_id]
-
-        # set mediatype
-        video_item.set_mediatype(content.VIDEO_TYPE)
-
         if not yt_item or 'snippet' not in yt_item:
             continue
         snippet = yt_item['snippet']
+
+        video_item = video_id_dict[video_id]
+        video_item.set_mediatype(CONTENT.VIDEO_TYPE)
 
         play_data = use_play_data and yt_item.get('play_data')
         if play_data and 'total_time' in play_data:
@@ -768,7 +772,7 @@ def update_video_infos(provider, context, video_id_dict,
                 )
 
         # more...
-        refresh = path.startswith((paths.LIKED_VIDEOS, paths.DISLIKED_VIDEOS))
+        refresh = path.startswith((PATHS.LIKED_VIDEOS, PATHS.DISLIKED_VIDEOS))
         context_menu.append(
             menu_items.more_for_video(
                 context,
@@ -780,7 +784,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # 'play with...' (external player)
         if alternate_player:
-            context_menu.append(menu_items.play_with(context))
+            context_menu.append(menu_items.play_with(context, video_id))
 
         if not subtitles_prompt:
             context_menu.append(

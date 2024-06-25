@@ -27,10 +27,10 @@ from ...compatibility import (
 from ...constants import (
     ABORT_FLAG,
     ADDON_ID,
+    CONTENT,
     CONTENT_TYPE,
+    SORT,
     WAKEUP,
-    content,
-    sort,
 )
 from ...player import XbmcPlayer, XbmcPlaylist
 from ...settings import XbmcPluginSettings
@@ -516,13 +516,11 @@ class XbmcContext(AbstractContext):
 
     def apply_content(self):
         ui = self.get_ui()
-        content_type = ui.get_property(CONTENT_TYPE)
-        if content_type:
-            ui.clear_property(CONTENT_TYPE)
-            content_type, sub_type, category_label = json.loads(content_type)
-        else:
+        content_type = ui.pop_property(CONTENT_TYPE)
+        if not content_type:
             return
 
+        content_type, sub_type, category_label = json.loads(content_type)
         self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
             type=(sub_type or content_type), path=self.get_path()
         ))
@@ -535,43 +533,43 @@ class XbmcContext(AbstractContext):
         detailed_labels = self.get_settings().show_detailed_labels()
         if sub_type == 'history':
             self.add_sort_method(
-                (sort.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
-                (sort.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
-                (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (sort.LABEL,            '%T \u2022 %P',           '%D | %J'),
+                (SORT.LASTPLAYED,       '%T \u2022 %P',           '%D | %J'),
+                (SORT.PLAYCOUNT,        '%T \u2022 %P',           '%D | %J'),
+                (SORT.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (SORT.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
-                (sort.LASTPLAYED,),
-                (sort.PLAYCOUNT,),
-                (sort.UNSORTED,),
-                (sort.LABEL,),
+                (SORT.LASTPLAYED,),
+                (SORT.PLAYCOUNT,),
+                (SORT.UNSORTED,),
+                (SORT.LABEL,),
             )
         else:
             self.add_sort_method(
-                (sort.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
-                (sort.LABEL,            '%T \u2022 %P',           '%D | %J'),
+                (SORT.UNSORTED,         '%T \u2022 %P',           '%D | %J'),
+                (SORT.LABEL,            '%T \u2022 %P',           '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
-                (sort.UNSORTED,),
-                (sort.LABEL,),
+                (SORT.UNSORTED,),
+                (SORT.LABEL,),
             )
-        if content_type == content.VIDEO_CONTENT:
+        if content_type == CONTENT.VIDEO_CONTENT:
             self.add_sort_method(
-                (sort.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),
-                (sort.ARTIST,           '%T \u2022 %P | %D | %J', '%A'),
-                (sort.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
-                (sort.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
-                (sort.DATE,             '%T \u2022 %P | %D',      '%J'),
-                (sort.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
-                (sort.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
-                (sort.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
+                (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),
+                (SORT.ARTIST,           '%T \u2022 %P | %D | %J', '%A'),
+                (SORT.PROGRAM_COUNT,    '%T \u2022 %P | %D | %J', '%C'),
+                (SORT.VIDEO_RATING,     '%T \u2022 %P | %D | %J', '%R'),
+                (SORT.DATE,             '%T \u2022 %P | %D',      '%J'),
+                (SORT.DATEADDED,        '%T \u2022 %P | %D',      '%a'),
+                (SORT.VIDEO_RUNTIME,    '%T \u2022 %P | %J',      '%D'),
+                (SORT.TRACKNUM,         '[%N. ]%T \u2022 %P',     '%D | %J'),
             ) if detailed_labels else self.add_sort_method(
-                (sort.CHANNEL,          '[%A - ]%T'),
-                (sort.ARTIST,),
-                (sort.PROGRAM_COUNT,),
-                (sort.VIDEO_RATING,),
-                (sort.DATE,),
-                (sort.DATEADDED,),
-                (sort.VIDEO_RUNTIME,),
-                (sort.TRACKNUM,         '[%N. ]%T '),
+                (SORT.CHANNEL,          '[%A - ]%T'),
+                (SORT.ARTIST,),
+                (SORT.PROGRAM_COUNT,),
+                (SORT.VIDEO_RATING,),
+                (SORT.DATE,),
+                (SORT.DATEADDED,),
+                (SORT.VIDEO_RUNTIME,),
+                (SORT.TRACKNUM,         '[%N. ]%T '),
             )
 
     def add_sort_method(self, *sort_methods):

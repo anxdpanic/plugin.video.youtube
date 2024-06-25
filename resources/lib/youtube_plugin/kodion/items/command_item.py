@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .directory_item import DirectoryItem
-from ..constants import paths
+from ..constants import PATHS
 
 
 class CommandItem(DirectoryItem):
@@ -25,7 +25,7 @@ class CommandItem(DirectoryItem):
                  plot=None):
         super(CommandItem, self).__init__(
             name,
-            context.create_uri((paths.COMMAND, command)),
+            context.create_uri((PATHS.COMMAND, command)),
             image=image,
             fanart=fanart,
             plot=plot,

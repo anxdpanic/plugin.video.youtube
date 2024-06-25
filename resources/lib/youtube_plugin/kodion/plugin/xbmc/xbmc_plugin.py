@@ -19,10 +19,11 @@ from ...constants import (
     CHECK_SETTINGS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
+    PLUGIN_SLEEPING,
+    PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
-    REROUTE,
-    SLEEPING,
+    REROUTE_PATH,
     VIDEO_ID,
 )
 from ...exceptions import KodionException
@@ -65,7 +66,7 @@ class XbmcPlugin(AbstractPlugin):
         self.handle = context.get_handle()
         ui = context.get_ui()
 
-        if ui.get_property(BUSY_FLAG).lower() == 'true':
+        if ui.pop_property(BUSY_FLAG).lower() == 'true':
             if ui.busy_dialog_active():
                 xbmcplugin.endOfDirectory(
                     self.handle,
@@ -83,8 +84,8 @@ class XbmcPlugin(AbstractPlugin):
 
                 if position and items:
                     path = items[position - 1]['file']
-                    old_path = ui.get_property(PLAYLIST_PATH)
-                    old_position = ui.get_property(PLAYLIST_POSITION)
+                    old_path = ui.pop_property(PLAYLIST_PATH)
+                    old_position = ui.pop_property(PLAYLIST_POSITION)
                     if (old_position and position == int(old_position)
                             and old_path and path == old_path):
                         if remaining:
@@ -120,33 +121,22 @@ class XbmcPlugin(AbstractPlugin):
                         context.sleep(1)
                     else:
                         playlist.play_playlist_item(position)
-
-                ui.clear_property(BUSY_FLAG)
-                ui.clear_property(PLAYLIST_PATH)
-                ui.clear_property(PLAYLIST_POSITION)
                 return False
 
-            ui.clear_property(BUSY_FLAG)
-            ui.clear_property(PLAYLIST_PATH)
-            ui.clear_property(PLAYLIST_POSITION)
+        if ui.get_property(PLUGIN_SLEEPING):
+            context.wakeup(PLUGIN_WAKEUP)
 
-        if ui.get_property(SLEEPING):
-            context.wakeup('plugin')
-
-        if ui.get_property(REFRESH_CONTAINER):
+        if ui.pop_property(REFRESH_CONTAINER):
             focused = False
-            ui.clear_property(REFRESH_CONTAINER)
         elif focused:
             focused = ui.get_property(VIDEO_ID)
 
-        if ui.get_property(RELOAD_ACCESS_MANAGER):
+        if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
-            ui.clear_property(RELOAD_ACCESS_MANAGER)
 
-        if ui.get_property(CHECK_SETTINGS):
+        if ui.pop_property(CHECK_SETTINGS):
             provider.reset_client()
             settings = context.get_settings(refresh=True)
-            ui.clear_property(CHECK_SETTINGS)
         else:
             settings = context.get_settings()
 
@@ -154,7 +144,7 @@ class XbmcPlugin(AbstractPlugin):
             provider.run_wizard(context)
 
         try:
-            route = ui.get_property(REROUTE)
+            route = ui.pop_property(REROUTE_PATH)
             if route:
                 function_cache = context.get_function_cache()
                 result, options = function_cache.run(
@@ -163,7 +153,6 @@ class XbmcPlugin(AbstractPlugin):
                     _scope=function_cache.SCOPE_NONE,
                     context=context.clone(route),
                 )
-                ui.clear_property(REROUTE)
             else:
                 result, options = provider.navigate(context)
         except KodionException as exc:

@@ -16,7 +16,6 @@ from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .constants import (
     DATA_PATH,
     RELOAD_ACCESS_MANAGER,
-    SWITCH_PLAYER_FLAG,
     TEMP_PATH,
     WAIT_FLAG,
 )
@@ -343,11 +342,6 @@ def run(argv):
 
         if not category:
             xbmcaddon.Addon().openSettings()
-            return
-
-        if action == 'play_with':
-            ui.set_property(SWITCH_PLAYER_FLAG)
-            xbmc.executebuiltin('Action(Play)')
             return
 
         if category == 'config':
