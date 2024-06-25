@@ -2215,7 +2215,7 @@ class VideoInfo(YouTubeRequestClient):
                     '\t\t\t<Representation'
                         ' id="subs_', kind, '"'
                         # unsure about what value to use for bandwidth
-                        ' bandwidth="268"'
+                        ' bandwidth="0"'
                         '>\n'
                     '\t\t\t\t<BaseURL>', url, '</BaseURL>\n'
                     '\t\t\t</Representation>\n'
