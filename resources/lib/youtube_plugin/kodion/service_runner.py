@@ -12,7 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .constants import (
     ABORT_FLAG,
-    SLEEPING,
+    PLUGIN_SLEEPING,
+    SERVER_POST_START,
     TEMP_PATH,
     VIDEO_ID,
 )
@@ -37,6 +38,7 @@ def run():
 
     ui = context.get_ui()
     clear_property = ui.clear_property
+    pop_property = ui.pop_property
     set_property = ui.set_property
 
     clear_property(ABORT_FLAG)
@@ -49,26 +51,39 @@ def run():
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
 
-    sleeping = False
-    ping_period = waited = 60
+    plugin_sleeping = httpd_can_sleep = False
+    plugin_sleep_timeout = httpd_sleep_timeout = 0
+    ping_period = 60
     loop_num = sub_loop_num = 0
     restart_attempts = 0
     video_id = None
     container = monitor.is_plugin_container()
     while not monitor.abortRequested():
-        if not monitor.httpd:
-            waited = 0
-        elif get_infobool('System.IdleTime(10)'):
-            if waited >= 30:
-                waited = 0
-                monitor.shutdown_httpd(sleep=True)
-                if not sleeping:
-                    sleeping = set_property(SLEEPING)
+        idle = get_infobool('System.IdleTime(10)')
+
+        if idle:
+            if plugin_sleep_timeout >= 30:
+                plugin_sleep_timeout = 0
+                if not plugin_sleeping:
+                    plugin_sleeping = set_property(PLUGIN_SLEEPING)
         else:
-            if sleeping:
-                sleeping = clear_property(SLEEPING)
-            if waited >= ping_period:
-                waited = 0
+            plugin_sleep_timeout = 0
+            if plugin_sleeping:
+                plugin_sleeping = clear_property(PLUGIN_SLEEPING)
+
+        if not monitor.httpd:
+            httpd_can_sleep = False
+            httpd_sleep_timeout = 0
+        elif idle:
+            if pop_property(SERVER_POST_START):
+                httpd_can_sleep = True
+                httpd_sleep_timeout = 0
+            if httpd_can_sleep and httpd_sleep_timeout >= 30:
+                httpd_can_sleep = False
+                monitor.shutdown_httpd(sleep=True)
+        else:
+            if httpd_sleep_timeout >= ping_period:
+                httpd_sleep_timeout = 0
                 if monitor.ping_httpd():
                     restart_attempts = 0
                 elif restart_attempts < 5:
@@ -106,8 +121,8 @@ def run():
                 if sub_loop_num < 1:
                     sub_loop_num = 5
 
-                if not sleeping:
-                    sleeping = set_property(SLEEPING)
+                if not plugin_sleeping:
+                    plugin_sleeping = set_property(PLUGIN_SLEEPING)
 
             if sub_loop_num > 1:
                 sub_loop_num -= 1
@@ -123,7 +138,8 @@ def run():
 
             if wait_interval:
                 monitor.waitForAbort(wait_interval)
-                waited += wait_interval
+                httpd_sleep_timeout += wait_interval
+                plugin_sleep_timeout += wait_interval
 
             if loop_num <= 0:
                 break

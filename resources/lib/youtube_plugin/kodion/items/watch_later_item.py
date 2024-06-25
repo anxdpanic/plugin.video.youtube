@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .directory_item import DirectoryItem
-from ..constants import paths
+from ..constants import PATHS
 
 
 class WatchLaterItem(DirectoryItem):
@@ -24,7 +24,7 @@ class WatchLaterItem(DirectoryItem):
 
         super(WatchLaterItem, self).__init__(name,
                                              context.create_uri(
-                                                 (paths.WATCH_LATER, 'list',),
+                                                 (PATHS.WATCH_LATER, 'list',),
                                              ),
                                              image=image,
                                              fanart=fanart)

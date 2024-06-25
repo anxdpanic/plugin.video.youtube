@@ -34,9 +34,7 @@ class SearchHistory(Storage):
 
     @staticmethod
     def _make_id(search_text):
-        md5_hash = md5()
-        md5_hash.update(search_text.encode('utf-8'))
-        return md5_hash.hexdigest()
+        return md5(search_text.encode('utf-8')).hexdigest()
 
     def rename(self, old_search_text, new_search_text):
         self.remove(old_search_text)

@@ -35,12 +35,15 @@ from ..kodion import AbstractProvider, RegisterProviderPath
 from ..kodion.constants import (
     ADDON_ID,
     CHANNEL_ID,
+    CONTENT,
     DEVELOPER_CONFIGS,
+    PATHS,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
-    content,
-    paths,
+    PLAY_WITH,
+    SERVER_POST_START,
+    SERVER_WAKEUP,
 )
 from ..kodion.items import (
     BaseItem,
@@ -81,8 +84,7 @@ class Provider(AbstractProvider):
 
     @staticmethod
     def get_dev_config(context, addon_id, dev_configs):
-        _dev_config = context.get_ui().get_property(DEVELOPER_CONFIGS)
-        context.get_ui().clear_property(DEVELOPER_CONFIGS)
+        _dev_config = context.get_ui().pop_property(DEVELOPER_CONFIGS)
 
         dev_config = {}
         if _dev_config:
@@ -330,7 +332,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/?$')
     def _on_playlist(self, context, re_match):
-        context.set_content(content.VIDEO_CONTENT)
+        context.set_content(CONTENT.VIDEO_CONTENT)
         resource_manager = self.get_resource_manager(context)
 
         batch_id = (re_match.group('playlist_id'),
@@ -350,7 +352,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/?$')
     def _on_channel_playlists(self, context, re_match):
-        context.set_content(content.LIST_CONTENT)
+        context.set_content(CONTENT.LIST_CONTENT)
 
         channel_id = re_match.group('channel_id')
 
@@ -407,7 +409,7 @@ class Provider(AbstractProvider):
 
     @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/?$')
     def _on_channel_live(self, context, re_match):
-        context.set_content(content.VIDEO_CONTENT)
+        context.set_content(CONTENT.VIDEO_CONTENT)
         result = []
 
         channel_id = re_match.group('channel_id')
@@ -471,7 +473,7 @@ class Provider(AbstractProvider):
         if method == 'channel' and not channel_id:
             return False
 
-        context.set_content(content.VIDEO_CONTENT)
+        context.set_content(CONTENT.VIDEO_CONTENT)
 
         resource_manager = self.get_resource_manager(context)
 
@@ -588,7 +590,7 @@ class Provider(AbstractProvider):
     # noinspection PyUnusedLocal
     @RegisterProviderPath('^/location/mine/?$')
     def _on_my_location(self, context, re_match):
-        context.set_content(content.LIST_CONTENT)
+        context.set_content(CONTENT.LIST_CONTENT)
 
         create_uri = context.create_uri
         localize = context.localize
@@ -641,16 +643,16 @@ class Provider(AbstractProvider):
         return result
 
     """
-    Plays a video.
-    path for video: '/play/?video_id=XXXXXXX'
+    Plays a video, playlist, or channel live stream.
+    Video: '/play/?video_id=XXXXXX'
 
-    path for playlist: '/play/?playlist_id=XXXXXXX&mode=[OPTION]'
-    OPTION: [normal(default)|reverse|shuffle]
+    Playlist: '/play/?playlist_id=XXXXXX[&order=ORDER][&action=ACTION]'
+        ORDER: [normal(default)|reverse|shuffle] optional playlist ordering
+        ACTION: [list|play|queue|None(default)] optional action to perform
 
-    path for channel live streams: '/play/?channel_id=UCXXXXXXX&live=X
-    OPTION:
-        live parameter required, live=1 for first live stream
-        live = index of live stream if channel has multiple live streams
+    Channel live streams: '/play/?channel_id=UCXXXXXX[&live=X]
+        X: optional index of live stream to play if channel has multiple live
+           streams. 1 (default) for first live stream
     """
 
     # noinspection PyUnusedLocal
@@ -658,11 +660,11 @@ class Provider(AbstractProvider):
     def on_play(self, context, re_match):
         ui = context.get_ui()
 
-        force_play = False
         params = context.get_params()
+        param_keys = params.keys()
 
-        if ({'channel_id', 'live', 'playlist_id', 'playlist_ids', 'video_id'}
-                .isdisjoint(params.keys())):
+        if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}
+                .isdisjoint(param_keys)):
             listitem_path = context.get_listitem_info('FileNameAndPath')
             if context.is_plugin_path(listitem_path, 'play'):
                 video_id = find_video_id(listitem_path)
@@ -677,37 +679,30 @@ class Provider(AbstractProvider):
         video_id = params.get('video_id')
         playlist_id = params.get('playlist_id')
 
-        if ui.get_property(PLAY_PROMPT_SUBTITLES) != video_id:
-            ui.clear_property(PLAY_PROMPT_SUBTITLES)
-
-        if ui.get_property(PLAY_FORCE_AUDIO) != video_id:
-            ui.clear_property(PLAY_FORCE_AUDIO)
-
-        if ui.get_property(PLAY_PROMPT_QUALITY) != video_id:
-            ui.clear_property(PLAY_PROMPT_QUALITY)
+        force_play = False
+        for param in {PLAY_FORCE_AUDIO,
+                      PLAY_PROMPT_QUALITY,
+                      PLAY_PROMPT_SUBTITLES,
+                      PLAY_WITH}.intersection(param_keys):
+            del params[param]
+            ui.set_property(param)
+            force_play = True
 
         if video_id and not playlist_id:
-            if params.pop(PLAY_PROMPT_SUBTITLES, None):
-                ui.set_property(PLAY_PROMPT_SUBTITLES, video_id)
-                force_play = True
-
-            if params.pop('audio_only', None):
-                ui.set_property(PLAY_FORCE_AUDIO, video_id)
-                force_play = True
-
-            if params.pop('ask_for_quality', None):
-                ui.set_property(PLAY_PROMPT_QUALITY, video_id)
-                force_play = True
-
+            # This is required to trigger Kodi resume prompt, along with using
+            # RunPlugin. Prompt will not be used if using PlayMedia
             if force_play:
                 context.execute('Action(Play)')
                 return False
-            return yt_play.play_video(self, context)
+            context.wakeup(SERVER_WAKEUP, timeout=5)
+            video = yt_play.play_video(self, context)
+            ui.set_property(SERVER_POST_START)
+            return video
 
         if playlist_id or 'playlist_ids' in params:
             return yt_play.play_playlist(self, context)
 
-        if 'channel_id' in params and params.get('live', 0) > 0:
+        if 'channel_id' in params:
             return yt_play.play_channel_live(self, context)
         return False
 
@@ -736,7 +731,7 @@ class Provider(AbstractProvider):
         subscriptions = yt_subscriptions.process(method, self, context)
 
         if method == 'list':
-            context.set_content(content.LIST_CONTENT)
+            context.set_content(CONTENT.LIST_CONTENT)
 
         return subscriptions
 
@@ -810,9 +805,9 @@ class Provider(AbstractProvider):
         safe_search = context.get_settings().safe_search()
 
         if search_type == 'video':
-            context.set_content(content.VIDEO_CONTENT)
+            context.set_content(CONTENT.VIDEO_CONTENT)
         else:
-            context.set_content(content.LIST_CONTENT)
+            context.set_content(CONTENT.LIST_CONTENT)
 
         if (page == 1
                 and search_type == 'video'
@@ -1033,7 +1028,7 @@ class Provider(AbstractProvider):
         playback_history = context.get_playback_history()
 
         if action == 'list':
-            context.set_content(content.VIDEO_CONTENT, sub_type='history')
+            context.set_content(CONTENT.VIDEO_CONTENT, sub_type='history')
             items = playback_history.get_items()
             if not items:
                 return True
@@ -1119,7 +1114,7 @@ class Provider(AbstractProvider):
         logged_in = self.is_logged_in()
         # _.get_my_playlists()
 
-        # context.set_content(content.LIST_CONTENT)
+        # context.set_content(CONTENT.LIST_CONTENT)
 
         result = []
 
@@ -1248,7 +1243,7 @@ class Provider(AbstractProvider):
             else:
                 watch_history_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri((paths.WATCH_LATER, 'list')),
+                    create_uri((PATHS.WATCH_LATER, 'list')),
                     image='{media}/watch_later.png',
                 )
                 result.append(watch_history_item)
@@ -1298,7 +1293,7 @@ class Provider(AbstractProvider):
             elif local_history:
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri((paths.HISTORY,), params={'action': 'list'}),
+                    create_uri((PATHS.HISTORY,), params={'action': 'list'}),
                     image='{media}/history.png',
                 )
                 result.append(watch_history_item)
@@ -1335,7 +1330,7 @@ class Provider(AbstractProvider):
         if settings.get_bool('youtube.folder.bookmarks.show', True):
             bookmarks_item = DirectoryItem(
                 localize('bookmarks'),
-                create_uri((paths.BOOKMARKS, 'list')),
+                create_uri((PATHS.BOOKMARKS, 'list')),
                 image='{media}/bookmarks.png',
             )
             result.append(bookmarks_item)
@@ -1423,7 +1418,7 @@ class Provider(AbstractProvider):
             return False
 
         if command == 'list':
-            context.set_content(content.VIDEO_CONTENT)
+            context.set_content(CONTENT.VIDEO_CONTENT)
             bookmarks_list = context.get_bookmarks_list()
             items = bookmarks_list.get_items()
             if not items:
@@ -1500,7 +1495,7 @@ class Provider(AbstractProvider):
             return False
 
         if command == 'list':
-            context.set_content(content.VIDEO_CONTENT, sub_type='watch_later')
+            context.set_content(CONTENT.VIDEO_CONTENT, sub_type='watch_later')
             items = context.get_watch_later_list().get_items()
             if not items:
                 return True

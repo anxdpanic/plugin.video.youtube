@@ -1,3 +1,17 @@
+## v7.0.9+beta.1
+### Fixed
+- Fix renaming playlists
+- Improve https server wakeup #746 #801
+
+### Changed
+- Make live query parameter optional when playing channel live stream
+- Allow for removal of custom watch later and history playlists from settings #818
+  - Use default value of "HL" for history or "WL" for watch later as reset value
+  - This will then clear the setting and clear value from access_manager.json
+  - Old values will be stored as a backup, just in case
+- Update cached data when playlists are modified (removed/renamed)
+- Changed bandwidth attribute of subtitles in MPEG-DASH manifest to 0
+
 ## v7.0.8
 ### Fixed
 - Update selection and sorting of streams to fix missing live streams

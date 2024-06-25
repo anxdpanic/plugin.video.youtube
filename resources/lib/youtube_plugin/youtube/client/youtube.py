@@ -2046,8 +2046,12 @@ class YouTube(LoginClient):
         }
         if headers:
             client_data['headers'] = headers
-        if post_data and method == 'POST':
-            client_data['json'] = post_data
+        if method in {'POST', 'PUT'}:
+            if post_data:
+                client_data['json'] = post_data
+            clear_data = False
+        else:
+            clear_data = True
         if params:
             client_data['params'] = params
 
@@ -2065,7 +2069,7 @@ class YouTube(LoginClient):
             else:
                 del client['params']['key']
 
-        if method != 'POST' and 'json' in client:
+        if clear_data and 'json' in client:
             del client['json']
 
         params = client.get('params')

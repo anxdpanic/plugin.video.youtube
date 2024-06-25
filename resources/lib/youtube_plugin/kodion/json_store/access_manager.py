@@ -283,33 +283,46 @@ class AccessManager(JSONStore):
         Returns the current users watch later playlist id
         :return: the current users watch later playlist id
         """
-        current_user = self.get_current_user_details()
-        current_id = current_user.get('watch_later', 'WL')
-        settings_id = self._context.get_settings().get_watch_later_playlist()
+        current_id = (self.get_current_user_details().get('watch_later')
+                      or 'WL').strip()
 
-        if settings_id and current_id != settings_id:
+        settings = self._context.get_settings()
+        settings_id = settings.get_watch_later_playlist()
+
+        if settings_id.lower() == 'wl':
+            current_id = self.set_watch_later_id(None)
+        elif settings_id and settings_id != current_id:
             current_id = self.set_watch_later_id(settings_id)
+        elif current_id:
+            if current_id.lower() == 'wl':
+                current_id = ''
+            elif settings_id:
+                settings.set_watch_later_playlist('')
 
-        if current_id and current_id.lower().strip() == 'wl':
-            return ''
         return current_id
 
-    def set_watch_later_id(self, playlist_id):
+    def set_watch_later_id(self, playlist_id=None):
         """
         Sets the current users watch later playlist id
         :param playlist_id: string, watch later playlist id
         :return:
         """
-        if playlist_id.lower().strip() == 'wl':
+        if not playlist_id:
             playlist_id = ''
 
         self._context.get_settings().set_watch_later_playlist('')
+
+        playlists = {
+            'watch_later': playlist_id,
+        }
+        current_id = self.get_current_user_details().get('watch_later')
+        if current_id:
+            playlists['watch_later_old'] = current_id
+
         data = {
             'access_manager': {
                 'users': {
-                    self._user: {
-                        'watch_later': playlist_id,
-                    },
+                    self._user: playlists,
                 },
             },
         }
@@ -321,33 +334,46 @@ class AccessManager(JSONStore):
         Returns the current users watch history playlist id
         :return: the current users watch history playlist id
         """
-        current_user = self.get_current_user_details()
-        current_id = current_user.get('watch_history', 'HL')
-        settings_id = self._context.get_settings().get_history_playlist()
+        current_id = (self.get_current_user_details().get('watch_history')
+                      or 'HL').strip()
 
-        if settings_id and current_id != settings_id:
+        settings = self._context.get_settings()
+        settings_id = settings.get_history_playlist()
+
+        if settings_id.lower() == 'hl':
+            current_id = self.set_watch_history_id(None)
+        elif settings_id and settings_id != current_id:
             current_id = self.set_watch_history_id(settings_id)
+        elif current_id:
+            if current_id.lower() == 'hl':
+                current_id = ''
+            elif settings_id:
+                settings.set_history_playlist('')
 
-        if current_id and current_id.lower().strip() == 'hl':
-            return ''
         return current_id
 
-    def set_watch_history_id(self, playlist_id):
+    def set_watch_history_id(self, playlist_id=None):
         """
         Sets the current users watch history playlist id
         :param playlist_id: string, watch history playlist id
         :return:
         """
-        if playlist_id.lower().strip() == 'hl':
+        if not playlist_id:
             playlist_id = ''
 
         self._context.get_settings().set_history_playlist('')
+
+        playlists = {
+            'watch_history': playlist_id,
+        }
+        current_id = self.get_current_user_details().get('watch_history')
+        if current_id:
+            playlists['watch_history_old'] = current_id
+
         data = {
             'access_manager': {
                 'users': {
-                    self._user: {
-                        'watch_history': playlist_id,
-                    },
+                    self._user: playlists,
                 },
             },
         }
@@ -522,6 +548,4 @@ class AccessManager(JSONStore):
 
     @staticmethod
     def calc_key_hash(key, id, secret, **_kwargs):
-        md5_hash = md5()
-        md5_hash.update(''.join((key, id, secret)).encode('utf-8'))
-        return md5_hash.hexdigest()
+        return md5(''.join((key, id, secret)).encode('utf-8')).hexdigest()

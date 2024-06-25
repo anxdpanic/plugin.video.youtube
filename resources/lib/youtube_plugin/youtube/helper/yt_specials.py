@@ -12,14 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import UrlResolver, UrlToItemConverter, tv, utils, v3
 from ...kodion import KodionException
-from ...kodion.constants import content
+from ...kodion.constants import CONTENT
 from ...kodion.items import DirectoryItem, UriItem
 from ...kodion.utils import strip_html_from_text
 from ...kodion.utils.datetime_parser import yt_datetime_offset
 
 
 def _process_related_videos(provider, context, client):
-    context.set_content(content.VIDEO_CONTENT)
+    context.set_content(CONTENT.VIDEO_CONTENT)
     function_cache = context.get_function_cache()
 
     params = context.get_params()
@@ -49,7 +49,7 @@ def _process_related_videos(provider, context, client):
 
 
 def _process_parent_comments(provider, context, client):
-    context.set_content(content.LIST_CONTENT)
+    context.set_content(CONTENT.LIST_CONTENT)
 
     video_id = context.get_param('video_id', '')
     if not video_id:
@@ -65,7 +65,7 @@ def _process_parent_comments(provider, context, client):
 
 
 def _process_child_comments(provider, context, client):
-    context.set_content(content.LIST_CONTENT)
+    context.set_content(CONTENT.LIST_CONTENT)
 
     parent_id = context.get_param('parent_id', '')
     if not parent_id:
@@ -81,7 +81,7 @@ def _process_child_comments(provider, context, client):
 
 
 def _process_recommendations(provider, context, client):
-    context.set_content(content.VIDEO_CONTENT)
+    context.set_content(CONTENT.VIDEO_CONTENT)
     params = context.get_params()
     function_cache = context.get_function_cache()
 
@@ -100,7 +100,7 @@ def _process_recommendations(provider, context, client):
 
 
 def _process_trending(provider, context, client):
-    context.set_content(content.VIDEO_CONTENT)
+    context.set_content(CONTENT.VIDEO_CONTENT)
 
     json_data = client.get_trending_videos(
         page_token=context.get_param('page_token', '')
@@ -112,7 +112,7 @@ def _process_trending(provider, context, client):
 
 
 def _process_browse_channels(provider, context, client):
-    context.set_content(content.LIST_CONTENT)
+    context.set_content(CONTENT.LIST_CONTENT)
 
     guide_id = context.get_param('guide_id', '')
     if guide_id:
@@ -129,7 +129,7 @@ def _process_browse_channels(provider, context, client):
 
 
 def _process_disliked_videos(provider, context, client):
-    context.set_content(content.VIDEO_CONTENT)
+    context.set_content(CONTENT.VIDEO_CONTENT)
 
     json_data = client.get_disliked_videos(
         page_token=context.get_param('page_token', '')
@@ -141,7 +141,7 @@ def _process_disliked_videos(provider, context, client):
 
 
 def _process_live_events(provider, context, client, event_type='live'):
-    context.set_content(content.VIDEO_CONTENT)
+    context.set_content(CONTENT.VIDEO_CONTENT)
 
     # TODO: cache result
     json_data = client.get_live_events(
@@ -165,7 +165,7 @@ def _process_description_links(provider, context):
     addon_id = params.get('addon_id', '')
 
     def _extract_urls(video_id):
-        context.set_content(content.VIDEO_CONTENT)
+        context.set_content(CONTENT.VIDEO_CONTENT)
         url_resolver = UrlResolver(context)
 
         with context.get_ui().create_progress_dialog(
@@ -282,7 +282,7 @@ def _process_description_links(provider, context):
 
 
 def _process_saved_playlists_tv(provider, context, client):
-    context.set_content(content.LIST_CONTENT)
+    context.set_content(CONTENT.LIST_CONTENT)
 
     json_data = client.get_saved_playlists(
         page_token=context.get_param('next_page_token', 0),
@@ -295,7 +295,7 @@ def _process_saved_playlists_tv(provider, context, client):
 
 
 def _process_new_uploaded_videos_tv(provider, context, client, filtered=False):
-    context.set_content(content.VIDEO_CONTENT)
+    context.set_content(CONTENT.VIDEO_CONTENT)
 
     function_cache = context.get_function_cache()
 

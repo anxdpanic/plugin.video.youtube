@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .directory_item import DirectoryItem
-from ..constants import paths
+from ..constants import PATHS
 
 
 class SearchItem(DirectoryItem):
@@ -33,7 +33,7 @@ class SearchItem(DirectoryItem):
 
         super(SearchItem, self).__init__(name,
                                          context.create_uri(
-                                             (paths.SEARCH, 'list',),
+                                             (PATHS.SEARCH, 'list',),
                                              params=params,
                                          ),
                                          image=image,
