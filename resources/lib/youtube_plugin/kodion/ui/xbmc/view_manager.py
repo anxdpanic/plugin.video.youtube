@@ -11,7 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ...compatibility import xbmc
-from ...constants import content
+from ...constants import CONTENT
 
 
 class ViewManager(object):
@@ -22,8 +22,8 @@ class ViewManager(object):
     }
 
     SUPPORTED_TYPES_MAP = {
-        content.LIST_CONTENT: 'default',
-        content.VIDEO_CONTENT: 'episodes',
+        CONTENT.LIST_CONTENT: 'default',
+        CONTENT.VIDEO_CONTENT: 'episodes',
     }
 
     STRING_MAP = {
