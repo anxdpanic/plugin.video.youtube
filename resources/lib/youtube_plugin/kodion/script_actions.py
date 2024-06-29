@@ -280,7 +280,7 @@ def _user_actions(context, action, params):
         username = access_manager.get_username(user)
         if ui.on_remove_content(username):
             access_manager.remove_user(user)
-            ui.show_notification(localize('removed') % username,
+            ui.show_notification(localize('removed') % '"%s"' % username,
                                  localize('remove'))
             if user == 0:
                 access_manager.add_user(username=localize('user.default'),

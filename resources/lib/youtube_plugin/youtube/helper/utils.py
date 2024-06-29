@@ -221,7 +221,7 @@ def update_channel_infos(provider, context, channel_id_dict,
 
         if not in_bookmarks_list:
             context_menu.append(
-                menu_items.bookmarks_add_channel(
+                menu_items.bookmark_add_channel(
                     context, channel_id
                 )
             )
@@ -289,7 +289,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
             menu_items.play_all_from_playlist(
                 context, playlist_id
             ),
-            menu_items.bookmarks_add(
+            menu_items.bookmark_add(
                 context, playlist_item
             ) if not in_bookmarks_list and channel_id != 'mine' else None,
         ]
@@ -333,7 +333,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         if not in_bookmarks_list and channel_id != 'mine':
             context_menu.append(
                 # bookmark channel of the playlist
-                menu_items.bookmarks_add_channel(
+                menu_items.bookmark_add_channel(
                     context, channel_id, channel_name
                 )
             )
@@ -697,7 +697,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         if not in_bookmarks_list:
             context_menu.append(
-                menu_items.bookmarks_add(
+                menu_items.bookmark_add(
                     context, video_item
                 )
             )
@@ -744,11 +744,11 @@ def update_video_infos(provider, context, video_id_dict,
         if not in_bookmarks_list:
             context_menu.append(
                 # remove bookmarked channel of the video
-                menu_items.bookmarks_remove(
+                menu_items.bookmark_remove(
                     context, item_id=channel_id
                 ) if in_my_subscriptions_list else
                 # bookmark channel of the video
-                menu_items.bookmarks_add_channel(
+                menu_items.bookmark_add_channel(
                     context, channel_id, channel_name
                 )
             )

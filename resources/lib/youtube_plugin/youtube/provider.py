@@ -1451,7 +1451,7 @@ class Provider(AbstractProvider):
                 if not isinstance(item, BaseItem):
                     continue
                 context_menu = [
-                    menu_items.bookmarks_remove(
+                    menu_items.bookmark_remove(
                         context, item_id
                     ),
                     menu_items.bookmarks_clear(
@@ -1464,12 +1464,21 @@ class Provider(AbstractProvider):
 
             return bookmarks
 
-        if command == 'clear' and context.get_ui().on_yes_no_input(
+        ui = context.get_ui()
+        localize = context.localize
+
+        if command == 'clear' and ui.on_yes_no_input(
                 context.get_name(),
-                context.localize('bookmarks.clear.confirm')
+                localize('bookmarks.clear.confirm')
         ):
             context.get_bookmarks_list().clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('succeeded'),
+                time_ms=2500,
+                audible=False
+            )
             return True
 
         item_id = params.get('item_id')
@@ -1479,11 +1488,23 @@ class Provider(AbstractProvider):
         if command == 'add':
             item = params.get('item')
             context.get_bookmarks_list().add(item_id, item)
+
+            ui.show_notification(
+                localize('bookmark.created'),
+                time_ms=2500,
+                audible=False
+            )
             return True
 
         if command == 'remove':
             context.get_bookmarks_list().remove(item_id)
             context.get_ui().refresh_container()
+
+            ui.show_notification(
+                localize('removed') % localize('bookmark'),
+                time_ms=2500,
+                audible=False
+            )
             return True
 
         return False

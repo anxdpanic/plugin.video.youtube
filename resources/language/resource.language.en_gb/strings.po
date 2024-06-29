@@ -970,7 +970,7 @@ msgid "Switch to '%s' now?"
 msgstr ""
 
 msgctxt "#30666"
-msgid "Removed '%s'"
+msgid "%s removed"
 msgstr ""
 
 msgctxt "#30667"
