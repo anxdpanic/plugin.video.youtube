@@ -294,7 +294,7 @@ def _process_saved_playlists_tv(provider, context, client):
     return tv.saved_playlists_to_items(provider, context, json_data)
 
 
-def _process_new_uploaded_videos_tv(provider, context, client, filtered=False):
+def _process_my_subscriptions(provider, context, client, filtered=False):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
     function_cache = context.get_function_cache()
@@ -326,11 +326,9 @@ def process(category, provider, context):
         return _process_recommendations(provider, context, client)
     if category == 'browse_channels':
         return _process_browse_channels(provider, context, client)
-    if category == 'new_uploaded_videos_tv':
-        return _process_new_uploaded_videos_tv(provider, context, client)
-    if category == 'new_uploaded_videos_tv_filtered':
-        return _process_new_uploaded_videos_tv(
-            provider, context, client, filtered=True
+    if category.startswith(('my_subscriptions', 'new_uploaded_videos_tv')):
+        return _process_my_subscriptions(
+            provider, context, client, filtered=category.endswith('_filtered'),
         )
     if category == 'disliked_videos':
         if provider.is_logged_in():

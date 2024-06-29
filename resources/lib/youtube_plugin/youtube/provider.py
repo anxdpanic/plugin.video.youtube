@@ -1135,7 +1135,7 @@ class Provider(AbstractProvider):
             item_label = localize('my_subscriptions')
             my_subscriptions_item = DirectoryItem(
                 ui.bold(item_label),
-                create_uri(('special', 'new_uploaded_videos_tv')),
+                create_uri(('special', 'my_subscriptions')),
                 image='{media}/new_uploads.png',
                 category_label=item_label,
             )
@@ -1145,7 +1145,7 @@ class Provider(AbstractProvider):
             # my subscriptions filtered
             my_subscriptions_filtered_item = DirectoryItem(
                 localize('my_subscriptions.filtered'),
-                create_uri(('special', 'new_uploaded_videos_tv_filtered')),
+                create_uri(('special', 'my_subscriptions_filtered')),
                 image='{media}/new_uploads.png',
             )
             result.append(my_subscriptions_filtered_item)
