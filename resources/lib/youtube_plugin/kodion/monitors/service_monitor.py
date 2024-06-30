@@ -41,6 +41,7 @@ class ServiceMonitor(xbmc.Monitor):
 
         self.httpd = None
         self.httpd_thread = None
+        self.httpd_sleep_allowed = True
 
         self.refresh = False
         self.interrupt = False
@@ -103,6 +104,7 @@ class ServiceMonitor(xbmc.Monitor):
                 self.interrupt = True
             elif target == SERVER_WAKEUP:
                 if not self.httpd and self.httpd_required():
+                    self.httpd_sleep_allowed = False
                     self.start_httpd()
             if data.get('response_required'):
                 self.set_property(WAKEUP, target)
