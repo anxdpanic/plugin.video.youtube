@@ -162,7 +162,7 @@ class AbstractProvider(object):
 
             return result, options
 
-        raise KodionException("Mapping for path '%s' not found" % path)
+        raise KodionException('Mapping for path "%s" not found' % path)
 
     # noinspection PyUnusedLocal
     @staticmethod

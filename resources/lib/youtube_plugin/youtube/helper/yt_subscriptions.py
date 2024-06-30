@@ -92,4 +92,4 @@ def process(method, provider, context):
         return _process_add(provider, context, client)
     if method == 'remove':
         return _process_remove(provider, context, client)
-    raise KodionException("Unknown subscriptions method '%s'" % method)
+    raise KodionException('Unknown subscriptions method: %s' % method)

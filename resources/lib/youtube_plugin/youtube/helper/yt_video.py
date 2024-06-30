@@ -120,4 +120,4 @@ def process(method, provider, context, re_match):
         return _process_rate_video(provider, context, re_match)
     if method == 'more':
         return _process_more_for_video(context)
-    raise KodionException("Unknown method '%s'" % method)
+    raise KodionException('Unknown method: %s' % method)

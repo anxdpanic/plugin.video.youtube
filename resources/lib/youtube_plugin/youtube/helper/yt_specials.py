@@ -354,4 +354,4 @@ def process(category, provider, context):
         return _process_child_comments(provider, context, client)
     if category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context, client)
-    raise KodionException("YouTube special category '%s' not found" % category)
+    raise KodionException('YouTube special category "%s" not found' % category)

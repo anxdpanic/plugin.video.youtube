@@ -406,7 +406,7 @@ def response_to_items(provider,
             provider, context, json_data, item_filter
         )
     else:
-        raise KodionException("Unknown kind '%s'" % kind)
+        raise KodionException('Unknown kind: %s' % kind)
 
     if item_filter:
         result = filter_videos(result, **item_filter)

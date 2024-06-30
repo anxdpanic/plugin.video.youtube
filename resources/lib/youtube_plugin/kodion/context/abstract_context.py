@@ -72,9 +72,9 @@ class AbstractContext(object):
         'refresh',
     }
     _FLOAT_PARAMS = {
+        'end',
         'seek',
         'start',
-        'end'
     }
     _LIST_PARAMS = {
         'channel_ids',
