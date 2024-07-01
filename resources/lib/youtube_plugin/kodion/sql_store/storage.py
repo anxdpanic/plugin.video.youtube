@@ -181,6 +181,20 @@ class Storage(object):
                 for name, sql in Storage._sql.items()
             }
             self._base._sql.update(statements)
+        elif self._sql and '_partial' in self._sql:
+            statements = {
+                name: sql.format(table=self._table_name,
+                                 order_col='timestamp')
+                for name, sql in Storage._sql.items()
+            }
+            partial_statements = {
+                name: sql.format(table=self._table_name,
+                                 order_col='timestamp')
+                for name, sql in self._base._sql.items()
+                if not name.startswith('_')
+            }
+            statements.update(partial_statements)
+            self._base._sql = statements
 
     def set_max_item_count(self, max_item_count):
         self._max_item_count = max_item_count
