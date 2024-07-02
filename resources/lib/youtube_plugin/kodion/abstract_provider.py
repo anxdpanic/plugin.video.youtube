@@ -266,12 +266,12 @@ class AbstractProvider(object):
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
             if not params.get('incognito') and not params.get('channel_id'):
-                search_history.update(query)
+                search_history.add_item(query)
             return self.on_search(query, context, re_match)
 
         if command == 'remove':
             query = to_unicode(params.get('q', ''))
-            search_history.remove(query)
+            search_history.del_item(query)
             ui.refresh_container()
             return True
 
@@ -281,7 +281,8 @@ class AbstractProvider(object):
                 context.localize('search.rename'), query
             )
             if result:
-                search_history.rename(query, new_query)
+                search_history.del_item(query)
+                search_history.add_item(new_query)
                 ui.refresh_container()
             return True
 
@@ -317,7 +318,7 @@ class AbstractProvider(object):
             data_cache.set_item('search_query', query)
 
             if not params.get('incognito') and not params.get('channel_id'):
-                search_history.update(query)
+                search_history.add_item(query)
             context.set_path(PATHS.SEARCH, 'query')
             return self.on_search(query, context, re_match)
 

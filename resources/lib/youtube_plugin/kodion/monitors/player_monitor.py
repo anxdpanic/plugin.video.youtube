@@ -217,8 +217,8 @@ class PlayerMonitorThread(threading.Thread):
                 status=(segment_end, segment_end, segment_end, 'stopped'),
             )
         if use_local_history:
-            self._context.get_playback_history().update(self.video_id,
-                                                        play_data)
+            self._context.get_playback_history().update_item(self.video_id,
+                                                             play_data)
 
         self._context.send_notification(PLAYBACK_STOPPED, self.playback_data)
         self._context.log_debug('Playback stopped [{video_id}]:'
@@ -246,7 +246,7 @@ class PlayerMonitorThread(threading.Thread):
                         confirmed=True,
                     )
             else:
-                self._context.get_watch_later_list().remove(self.video_id)
+                self._context.get_watch_later_list().del_item(self.video_id)
 
         if logged_in and not refresh_only:
             history_id = access_manager.get_watch_history_id()

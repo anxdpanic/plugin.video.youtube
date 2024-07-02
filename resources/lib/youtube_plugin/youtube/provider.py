@@ -1073,12 +1073,15 @@ class Provider(AbstractProvider):
             return False
 
         if action == 'remove':
-            playback_history.remove(video_id)
+            playback_history.del_item(video_id)
             context.get_ui().refresh_container()
             return True
 
         play_data = playback_history.get_item(video_id)
-        if not play_data:
+        if play_data:
+            playback_history_method = playback_history.update_item
+        else:
+            playback_history_method = playback_history.set_item
             play_data = {
                 'play_count': 0,
                 'total_time': 0,
@@ -1100,7 +1103,7 @@ class Provider(AbstractProvider):
             play_data['played_time'] = 0
             play_data['played_percent'] = 0
 
-        playback_history.update(video_id, play_data)
+        playback_history_method(video_id, play_data)
         context.get_ui().refresh_container()
         return True
 
@@ -1445,7 +1448,9 @@ class Provider(AbstractProvider):
                 timestamp = items[channel_id]
                 channel_item.set_bookmark_timestamp(timestamp)
                 items[channel_id] = channel_item
-                bookmarks_list.update(channel_id, repr(channel_item), timestamp)
+                bookmarks_list.update_item(
+                    channel_id, repr(channel_item), timestamp
+                )
 
             bookmarks = []
             for item_id, item in items.items():
@@ -1488,7 +1493,7 @@ class Provider(AbstractProvider):
 
         if command == 'add':
             item = params.get('item')
-            context.get_bookmarks_list().add(item_id, item)
+            context.get_bookmarks_list().add_item(item_id, item)
 
             ui.show_notification(
                 localize('bookmark.created'),
@@ -1498,7 +1503,7 @@ class Provider(AbstractProvider):
             return True
 
         if command == 'remove':
-            context.get_bookmarks_list().remove(item_id)
+            context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
 
             ui.show_notification(
@@ -1564,11 +1569,11 @@ class Provider(AbstractProvider):
         if command == 'add':
             item = params.get('item')
             if item:
-                context.get_watch_later_list().add(video_id, item)
+                context.get_watch_later_list().add_item(video_id, item)
             return True
 
         if command == 'remove':
-            context.get_watch_later_list().remove(video_id)
+            context.get_watch_later_list().del_item(video_id)
             context.get_ui().refresh_container()
             return True
 

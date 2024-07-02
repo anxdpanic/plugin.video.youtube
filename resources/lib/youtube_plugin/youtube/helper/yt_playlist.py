@@ -63,7 +63,7 @@ def _process_add_video(provider, context, keymap_action=False):
     if playlist_cache:
         cache_key, _, cached_last_page = playlist_cache[0]
         if cached_last_page:
-            data_cache.update(cache_key, None)
+            data_cache.update_item(cache_key, None)
 
     return True
 
@@ -170,7 +170,7 @@ def _process_remove_playlist(provider, context):
 
         if channel_id:
             data_cache = context.get_data_cache()
-            data_cache.remove(channel_id)
+            data_cache.del_item(channel_id)
             ui.refresh_container()
     return False
 
@@ -301,7 +301,7 @@ def _process_rename_playlist(provider, context):
         return False
 
     data_cache = context.get_data_cache()
-    data_cache.remove(playlist_id)
+    data_cache.del_item(playlist_id)
     ui.refresh_container()
     return False
 

@@ -150,6 +150,12 @@ class Storage(object):
             ' (key, timestamp, value, size)'
             ' VALUES {{0}};'
         ),
+        'update': (
+            'UPDATE'
+            ' {table}'
+            ' SET timestamp = ?, value = ?, size = ?'
+            ' WHERE key = ?;'
+        ),
     }
 
     def __init__(self,
@@ -389,6 +395,11 @@ class Storage(object):
             self._execute(cursor, query, many=(not flatten), values=values)
         self._optimize_file_size()
 
+    def _update(self, item_id, item, timestamp=None):
+        values = self._encode(item_id, item, timestamp, for_update=True)
+        with self as (db, cursor), db:
+            self._execute(cursor, self._sql['update'], values=values)
+
     def clear(self, defer=False):
         query = self._sql['clear']
         if defer:
@@ -416,7 +427,7 @@ class Storage(object):
         return decoded_obj
 
     @staticmethod
-    def _encode(key, obj, timestamp=None):
+    def _encode(key, obj, timestamp=None, for_update=False):
         timestamp = timestamp or since_epoch()
         blob = sqlite3.Binary(pickle.dumps(
             obj, protocol=pickle.HIGHEST_PROTOCOL
@@ -424,7 +435,11 @@ class Storage(object):
         size = getattr(blob, 'nbytes', None)
         if not size:
             size = int(memoryview(blob).itemsize) * len(blob)
-        return str(key), timestamp, blob, size
+        if key:
+            if for_update:
+                return timestamp, blob, size, str(key)
+            return str(key), timestamp, blob, size
+        return timestamp, blob, size
 
     def _get(self, item_id, process=None, seconds=None, as_dict=False):
         with self as (db, cursor), db:
