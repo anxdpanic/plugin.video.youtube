@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
-from ...kodion.constants import CHANNEL_ID, PLAYLISTITEM_ID, PLAYLIST_ID
+from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
 from ...kodion.utils import find_video_id
 
 
@@ -36,7 +36,7 @@ def _process_add_video(provider, context, keymap_action=False):
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(listitem_path, 'play'):
+        if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
             keymap_action = True
         if not video_id:
@@ -187,7 +187,7 @@ def _process_select_playlist(provider, context):
 
     video_id = params.get('video_id', '')
     if not video_id:
-        if context.is_plugin_path(listitem_path, 'play'):
+        if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
             if video_id:
                 context.set_param('video_id', video_id)

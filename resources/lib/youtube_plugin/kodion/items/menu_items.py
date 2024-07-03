@@ -75,7 +75,7 @@ def play_with(context, video_id):
     return (
         context.localize('video.play.with'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('play',),
+            (PATHS.PLAY,),
             {
                 'video_id': video_id,
                 PLAY_WITH: True,
@@ -107,7 +107,7 @@ def play_all_from_playlist(context, playlist_id, video_id=''):
         return (
             context.localize('playlist.play.from_here'),
             'RunPlugin({0})'.format(context.create_uri(
-                ('play',),
+                (PATHS.PLAY,),
                 {
                     'playlist_id': playlist_id,
                     'video_id': video_id,
@@ -118,7 +118,7 @@ def play_all_from_playlist(context, playlist_id, video_id=''):
     return (
         context.localize('playlist.play.all'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('play',),
+            (PATHS.PLAY,),
             {
                 'playlist_id': playlist_id,
                 'play': True,
@@ -366,7 +366,7 @@ def play_with_subtitles(context, video_id):
     return (
         context.localize('video.play.with_subtitles'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('play',),
+            (PATHS.PLAY,),
             {
                 'video_id': video_id,
                 PLAY_PROMPT_SUBTITLES: True,
@@ -379,7 +379,7 @@ def play_audio_only(context, video_id):
     return (
         context.localize('video.play.audio_only'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('play',),
+            (PATHS.PLAY,),
             {
                 'video_id': video_id,
                 PLAY_FORCE_AUDIO: True,
@@ -392,7 +392,7 @@ def play_ask_for_quality(context, video_id):
     return (
         context.localize('video.play.ask_for_quality'),
         'RunPlugin({0})'.format(context.create_uri(
-            ('play',),
+            (PATHS.PLAY,),
             {
                 'video_id': video_id,
                 PLAY_PROMPT_QUALITY: True,

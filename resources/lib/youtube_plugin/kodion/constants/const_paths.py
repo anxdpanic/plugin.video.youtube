@@ -25,6 +25,7 @@ HOME = '/home'
 LIKED_VIDEOS = '/channel/mine/playlist/LL'
 MY_PLAYLISTS = '/channel/mine/playlists'
 MY_SUBSCRIPTIONS = '/special/my_subscriptions'
+PLAY = '/play'
 SUBSCRIPTIONS = '/subscriptions/list'
 
 API = '/youtube/api'

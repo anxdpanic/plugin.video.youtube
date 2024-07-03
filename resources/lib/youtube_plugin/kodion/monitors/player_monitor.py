@@ -16,6 +16,7 @@ import threading
 from ..compatibility import xbmc
 from ..constants import (
     BUSY_FLAG,
+    PATHS,
     PLAYBACK_STARTED,
     PLAYBACK_STOPPED,
     PLAYER_DATA,
@@ -122,7 +123,7 @@ class PlayerMonitorThread(threading.Thread):
                 break
 
             if (not current_file.startswith(playing_file) and not (
-                    self._context.is_plugin_path(current_file, 'play')
+                    self._context.is_plugin_path(current_file, PATHS.PLAY)
                     and video_id_param in current_file
             )) or total_time <= 0:
                 self.stop()
