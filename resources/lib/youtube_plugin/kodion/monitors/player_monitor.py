@@ -238,6 +238,7 @@ class PlayerMonitorThread(threading.Thread):
                 )
                 if playlist_item_id:
                     self._provider.on_playlist_x(
+                        self._provider,
                         self._context,
                         method='remove',
                         category='video',
@@ -268,6 +269,7 @@ class PlayerMonitorThread(threading.Thread):
                             '/{0}/{1}/'.format(self.video_id, rating)
                         )
                         self._provider.on_video_x(
+                            self._provider,
                             self._context,
                             rating_match,
                             method='rate',

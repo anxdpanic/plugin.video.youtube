@@ -108,7 +108,12 @@ class AbstractProvider(object):
         :param method: method to be registered
         :return:
         """
-        self._dict_path[re.compile(re_path, re.UNICODE)] = method
+        self._dict_path[re.compile(re_path, re.UNICODE)] = {
+            'method': method,
+            'bound': isinstance(getattr(method, '__self__', None),
+                                self.__class__),
+        }
+        return method
 
     def run_wizard(self, context):
         settings = context.get_settings()
@@ -142,7 +147,7 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         path = context.get_path()
-        for re_path, method in self._dict_path.items():
+        for re_path, handler in self._dict_path.items():
             re_match = re_path.search(path)
             if not re_match:
                 continue
@@ -151,7 +156,10 @@ class AbstractProvider(object):
                 self.RESULT_CACHE_TO_DISC: True,
                 self.RESULT_UPDATE_LISTING: False,
             }
-            result = method(context, re_match)
+            if handler['bound']:
+                result = handler['method'](context, re_match)
+            else:
+                result = handler['method'](self, context, re_match)
             if isinstance(result, tuple):
                 result, new_options = result
                 options.update(new_options)

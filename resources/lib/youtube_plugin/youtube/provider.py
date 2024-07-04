@@ -64,6 +64,26 @@ class Provider(AbstractProvider):
         self._api_check = None
         self._logged_in = False
 
+        self.on_video_x = self.register_path(
+            '^/video/(?P<method>[^/]+)/?$',
+            yt_video.process,
+        )
+
+        self.on_playlist_x = self.register_path(
+            '^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$',
+            yt_playlist.process,
+        )
+
+        self.register_path(
+            '^/special/(?P<category>[^/]+)/?$',
+            yt_specials.process,
+        )
+
+        self.register_path(
+            '^/subscriptions/(?P<method>[^/]+)/?$',
+            yt_subscriptions.process,
+        )
+
         atexit.register(self.tear_down)
 
     def get_wizard_steps(self, context):
@@ -705,40 +725,6 @@ class Provider(AbstractProvider):
         if 'channel_id' in params:
             return yt_play.play_channel_live(self, context)
         return False
-
-    @RegisterProviderPath('^/video/(?P<method>[^/]+)/?$')
-    def on_video_x(self, context, re_match=None, method=None):
-        if method is None:
-            method = re_match.group('method')
-        return yt_video.process(method, self, context, re_match)
-
-    @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$')
-    def on_playlist_x(self,
-                      context,
-                      re_match=None,
-                      method=None,
-                      category=None,
-                      **kwargs):
-        if method is None:
-            method = re_match.group('method')
-        if category is None:
-            category = re_match.group('category')
-        return yt_playlist.process(method, category, self, context, **kwargs)
-
-    @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/?$')
-    def _on_subscriptions(self, context, re_match):
-        method = re_match.group('method')
-        subscriptions = yt_subscriptions.process(method, self, context)
-
-        if method == 'list':
-            context.set_content(CONTENT.LIST_CONTENT)
-
-        return subscriptions
-
-    @RegisterProviderPath('^/special/(?P<category>[^/]+)/?$')
-    def _on_yt_specials(self, context, re_match):
-        category = re_match.group('category')
-        return yt_specials.process(category, self, context)
 
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
     def _on_users(self, _context, re_match):

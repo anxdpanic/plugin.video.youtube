@@ -314,44 +314,59 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
     return v3.response_to_items(provider, context, json_data)
 
 
-def process(category, provider, context):
+def process(provider, context, re_match):
+    category = re_match.group('category')
+
     # required for provider.is_logged_in()
     client = provider.get_client(context)
 
     if category == 'related_videos':
         return _process_related_videos(provider, context, client)
+
     if category == 'popular_right_now':
         return _process_trending(provider, context, client)
+
     if category == 'recommendations':
         return _process_recommendations(provider, context, client)
+
     if category == 'browse_channels':
         return _process_browse_channels(provider, context, client)
+
     if category.startswith(('my_subscriptions', 'new_uploaded_videos_tv')):
         return _process_my_subscriptions(
             provider, context, client, filtered=category.endswith('_filtered'),
         )
+
     if category == 'disliked_videos':
         if provider.is_logged_in():
             return _process_disliked_videos(provider, context, client)
         return UriItem(context.create_uri(('sign', 'in')))
+
     if category == 'live':
         return _process_live_events(
             provider, context, client, event_type='live'
         )
+
     if category == 'upcoming_live':
         return _process_live_events(
             provider, context, client, event_type='upcoming'
         )
+
     if category == 'completed_live':
         return _process_live_events(
             provider, context, client, event_type='completed'
         )
+
     if category == 'description_links':
         return _process_description_links(provider, context)
+
     if category == 'parent_comments':
         return _process_parent_comments(provider, context, client)
+
     if category == 'child_comments':
         return _process_child_comments(provider, context, client)
+
     if category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context, client)
+
     raise KodionException('YouTube special category "%s" not found' % category)

@@ -343,20 +343,38 @@ def _playlist_id_change(context, playlist, method):
     return False
 
 
-def process(method, category, provider, context, **kwargs):
+def process(provider,
+            context,
+            re_match=None,
+            method=None,
+            category=None,
+            **kwargs):
+    if re_match:
+        if method is None:
+            method = re_match.group('method')
+        if category is None:
+            category = re_match.group('category')
+
     if method == 'add' and category == 'video':
         return _process_add_video(provider, context)
+
     if method == 'remove' and category == 'video':
         return _process_remove_video(provider, context, **kwargs)
+
     if method == 'remove' and category == 'playlist':
         return _process_remove_playlist(provider, context)
+
     if method == 'select' and category == 'playlist':
         return _process_select_playlist(provider, context)
+
     if method == 'rename' and category == 'playlist':
         return _process_rename_playlist(provider, context)
+
     if method in {'set', 'remove'} and category == 'watch_later':
         return _playlist_id_change(context, category, method)
+
     if method in {'set', 'remove'} and category == 'history':
         return _playlist_id_change(context, category, method)
+
     raise KodionException('Unknown category |{0}| or method |{1}|'
                           .format(category, method))
