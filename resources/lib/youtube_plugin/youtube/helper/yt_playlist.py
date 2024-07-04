@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
+from ...kodion.compatibility import parse_qsl, urlsplit
 from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
 from ...kodion.utils import find_video_id
 
@@ -74,7 +75,7 @@ def _process_remove_video(provider,
                           video_id=None,
                           video_name=None,
                           confirmed=None):
-    listitem_path = context.get_listitem_info('FileNameAndPath')
+    container_uri = context.get_infolabel('Container.FolderPath')
     listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
     listitem_video_id = context.get_listitem_property(PLAYLISTITEM_ID)
     listitem_video_name = context.get_listitem_info('Title')
@@ -130,21 +131,31 @@ def _process_remove_video(provider,
         if not success:
             return False
 
-        path = params.pop('reload_path', False if confirmed else None)
-        if keymap_action and not confirmed:
-            context.get_ui().set_focus_next_item()
-        elif path is not False and context.is_plugin_path(listitem_path):
-            provider.reroute(
-                context,
-                path=path,
-                params=dict(params, refresh=params.get('refresh', 0) + 1),
-            )
-
         context.get_ui().show_notification(
             message=context.localize('playlist.removed_from'),
             time_ms=2500,
             audible=False
         )
+
+        if not context.is_plugin_path(container_uri):
+            return True
+
+        if (keymap_action or video_id == listitem_video_id) and not confirmed:
+            context.get_ui().set_focus_next_item()
+
+        if playlist_id in container_uri:
+            container_uri = urlsplit(container_uri)
+            path = container_uri.path
+            params = dict(parse_qsl(container_uri.query))
+        else:
+            path = params.pop('reload_path', False if confirmed else None)
+
+        if path is not False:
+            provider.reroute(
+                context,
+                path=path,
+                params=dict(params, refresh=int(params.get('refresh', 0)) + 1),
+            )
         return True
     return False
 
