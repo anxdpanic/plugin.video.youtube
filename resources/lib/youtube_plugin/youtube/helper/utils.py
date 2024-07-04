@@ -227,7 +227,8 @@ def update_channel_infos(provider, context, channel_id_dict,
             )
 
         if context_menu:
-            channel_item.add_context_menu(context_menu, replace=True)
+            context_menu.append(menu_items.separator())
+            channel_item.add_context_menu(context_menu)
 
         # update channel mapping
         if channel_items_dict is not None:
@@ -339,7 +340,8 @@ def update_playlist_infos(provider, context, playlist_id_dict,
             )
 
         if context_menu:
-            playlist_item.add_context_menu(context_menu, replace=True)
+            context_menu.append(menu_items.separator())
+            playlist_item.add_context_menu(context_menu)
 
         # update channel mapping
         if channel_items_dict is not None:
@@ -808,10 +810,8 @@ def update_video_infos(provider, context, video_id_dict,
             )
 
         if context_menu:
-            context_menu.append(
-                menu_items.separator(),
-            )
-            video_item.add_context_menu(context_menu, replace=True)
+            context_menu.append(menu_items.separator())
+            video_item.add_context_menu(context_menu)
 
 
 def update_play_info(provider, context, video_id, video_item, video_stream,
