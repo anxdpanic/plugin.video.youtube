@@ -83,8 +83,9 @@ class AbstractSettings(object):
         return self._VIDEO_QUALITY_MAP[_value]
 
     def ask_for_video_quality(self):
-        return (self.get_bool(SETTINGS.VIDEO_QUALITY_ASK, False)
-                or self.get_int(SETTINGS.MPD_STREAM_SELECT) == 4)
+        if self.use_mpd_videos():
+            return self.get_int(SETTINGS.MPD_STREAM_SELECT) == 4
+        return self.get_bool(SETTINGS.VIDEO_QUALITY_ASK, False)
 
     def fanart_selection(self):
         return self.get_int(SETTINGS.FANART_SELECTION, 2)

@@ -15,6 +15,7 @@ import os
 from .. import logger
 from ..compatibility import quote, to_str, urlencode
 from ..constants import (
+    PATHS,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
@@ -72,9 +73,9 @@ class AbstractContext(object):
         'refresh',
     }
     _FLOAT_PARAMS = {
+        'end',
         'seek',
         'start',
-        'end'
     }
     _LIST_PARAMS = {
         'channel_ids',
@@ -262,7 +263,7 @@ class AbstractContext(object):
         elif path:
             uri = path
         else:
-            uri = '/' if params else '/?'
+            uri = '/'
 
         uri = self._plugin_id.join(('plugin://', uri))
 
@@ -337,7 +338,7 @@ class AbstractContext(object):
                     elif param == 'action':
                         if parsed_value in {'play_all', 'play_video'}:
                             to_delete.append(param)
-                            self.set_path('play')
+                            self.set_path(PATHS.PLAY)
                             continue
                     elif param == 'videoid':
                         to_delete.append(param)

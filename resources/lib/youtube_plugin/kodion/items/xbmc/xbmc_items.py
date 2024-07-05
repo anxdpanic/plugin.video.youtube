@@ -722,7 +722,7 @@ def video_listitem(context,
     if not set_play_count:
         video_id = video_item.video_id
         playback_history = context.get_playback_history()
-        playback_history.update(video_id, dict(
+        playback_history.set_item(video_id, dict(
             playback_history.get_item(video_id) or {},
             play_count=int(not video_item.get_play_count()),
             played_time=0.0,

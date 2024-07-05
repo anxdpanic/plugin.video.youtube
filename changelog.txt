@@ -1,7 +1,26 @@
+## v7.0.9+beta.2
+### Fixed
+- Fix ask for video quality setting being inconsistently applied
+- Fix http server not sleeping after initial start of service #746 #801
+- Fix not reloading WL playlist if open after playback of video in WL
+
+### Changed
+- Rename My Subscriptions plugin url
+  - From:
+    - plugin://plugin.video.youtube/special/new_uploaded_videos_tv
+    - plugin://plugin.video.youtube/special/new_uploaded_videos_tv_filtered
+  - To:
+    - plugin://plugin.video.youtube/special/my_subscriptions
+    - plugin://plugin.video.youtube/special/my_subscriptions_filtered
+  - Old url retained for backwards compatibility, to be removed with Kodi v22
+
+### New
+- Add notifications for creating/removing/clearing bookmarks #720
+
 ## v7.0.9+beta.1
 ### Fixed
 - Fix renaming playlists
-- Improve https server wakeup #746 #801
+- Improve http server wakeup #746 #801
 
 ### Changed
 - Make live query parameter optional when playing channel live stream

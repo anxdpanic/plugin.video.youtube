@@ -63,7 +63,7 @@ def select_stream(context,
                   use_adaptive_formats=True):
     settings = context.get_settings()
     if ask_for_quality is None:
-        ask_for_quality = context.get_settings().ask_for_video_quality()
+        ask_for_quality = settings.ask_for_video_quality()
     if audio_only is None:
         audio_only = settings.audio_only()
 
@@ -98,7 +98,7 @@ def select_stream(context,
 
     stream_list.sort(key=_stream_sort, reverse=True)
     num_streams = len(stream_list)
-    ask_for_quality = ask_for_quality and num_streams > 1
+    ask_for_quality = ask_for_quality and num_streams >= 1
     context.log_debug('Available streams: {0}'.format(num_streams))
 
     for idx, stream in enumerate(stream_list):

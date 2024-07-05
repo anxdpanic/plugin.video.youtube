@@ -14,6 +14,7 @@ import re
 
 from . import utils
 from ...kodion.compatibility import parse_qsl, urlsplit
+from ...kodion.constants import PATHS
 from ...kodion.items import DirectoryItem, UriItem, VideoItem
 from ...kodion.utils import duration_to_seconds
 
@@ -85,7 +86,7 @@ class UrlToItemConverter(object):
             video_id = new_params['video_id']
 
             video_item = VideoItem(
-                '', context.create_uri(('play',), new_params)
+                '', context.create_uri((PATHS.PLAY,), new_params)
             )
             self._video_id_dict[video_id] = video_item
 
@@ -110,7 +111,7 @@ class UrlToItemConverter(object):
                 return
 
             channel_item = VideoItem(
-                '', context.create_uri(('play',), new_params)
+                '', context.create_uri((PATHS.PLAY,), new_params)
             ) if live else DirectoryItem(
                 '', context.create_uri(('channel', channel_id,), new_params)
             )
@@ -151,7 +152,7 @@ class UrlToItemConverter(object):
             if context.get_param('uri'):
                 playlists_item = UriItem(
                     context.create_uri(
-                        ('play',),
+                        (PATHS.PLAY,),
                         {
                             'playlist_ids': ','.join(self._playlist_ids),
                             'play': True,

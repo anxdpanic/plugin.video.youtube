@@ -51,7 +51,7 @@ def run():
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
 
-    plugin_sleeping = httpd_can_sleep = False
+    plugin_sleeping = False
     plugin_sleep_timeout = httpd_sleep_timeout = 0
     ping_period = 60
     loop_num = sub_loop_num = 0
@@ -72,15 +72,15 @@ def run():
                 plugin_sleeping = clear_property(PLUGIN_SLEEPING)
 
         if not monitor.httpd:
-            httpd_can_sleep = False
             httpd_sleep_timeout = 0
         elif idle:
-            if pop_property(SERVER_POST_START):
-                httpd_can_sleep = True
+            if monitor.httpd_sleep_allowed:
+                if httpd_sleep_timeout >= 30:
+                    monitor.shutdown_httpd(sleep=True)
+            else:
+                if pop_property(SERVER_POST_START):
+                    monitor.httpd_sleep_allowed = True
                 httpd_sleep_timeout = 0
-            if httpd_can_sleep and httpd_sleep_timeout >= 30:
-                httpd_can_sleep = False
-                monitor.shutdown_httpd(sleep=True)
         else:
             if httpd_sleep_timeout >= ping_period:
                 httpd_sleep_timeout = 0
