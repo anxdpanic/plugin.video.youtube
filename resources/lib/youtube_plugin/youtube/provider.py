@@ -64,6 +64,26 @@ class Provider(AbstractProvider):
         self._api_check = None
         self._logged_in = False
 
+        self.on_video_x = self.register_path(
+            '^/video/(?P<method>[^/]+)/?$',
+            yt_video.process,
+        )
+
+        self.on_playlist_x = self.register_path(
+            '^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$',
+            yt_playlist.process,
+        )
+
+        self.register_path(
+            '^/special/(?P<category>[^/]+)/?$',
+            yt_specials.process,
+        )
+
+        self.register_path(
+            '^/subscriptions/(?P<method>[^/]+)/?$',
+            yt_subscriptions.process,
+        )
+
         atexit.register(self.tear_down)
 
     def get_wizard_steps(self, context):
@@ -666,7 +686,7 @@ class Provider(AbstractProvider):
         if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}
                 .isdisjoint(param_keys)):
             listitem_path = context.get_listitem_info('FileNameAndPath')
-            if context.is_plugin_path(listitem_path, 'play'):
+            if context.is_plugin_path(listitem_path, PATHS.PLAY):
                 video_id = find_video_id(listitem_path)
                 if video_id:
                     context.set_param('video_id', video_id)
@@ -705,40 +725,6 @@ class Provider(AbstractProvider):
         if 'channel_id' in params:
             return yt_play.play_channel_live(self, context)
         return False
-
-    @RegisterProviderPath('^/video/(?P<method>[^/]+)/?$')
-    def on_video_x(self, context, re_match=None, method=None):
-        if method is None:
-            method = re_match.group('method')
-        return yt_video.process(method, self, context, re_match)
-
-    @RegisterProviderPath('^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$')
-    def on_playlist_x(self,
-                      context,
-                      re_match=None,
-                      method=None,
-                      category=None,
-                      **kwargs):
-        if method is None:
-            method = re_match.group('method')
-        if category is None:
-            category = re_match.group('category')
-        return yt_playlist.process(method, category, self, context, **kwargs)
-
-    @RegisterProviderPath('^/subscriptions/(?P<method>[^/]+)/?$')
-    def _on_subscriptions(self, context, re_match):
-        method = re_match.group('method')
-        subscriptions = yt_subscriptions.process(method, self, context)
-
-        if method == 'list':
-            context.set_content(CONTENT.LIST_CONTENT)
-
-        return subscriptions
-
-    @RegisterProviderPath('^/special/(?P<category>[^/]+)/?$')
-    def _on_yt_specials(self, context, re_match):
-        category = re_match.group('category')
-        return yt_specials.process(category, self, context)
 
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
     def _on_users(self, _context, re_match):
@@ -1073,12 +1059,15 @@ class Provider(AbstractProvider):
             return False
 
         if action == 'remove':
-            playback_history.remove(video_id)
+            playback_history.del_item(video_id)
             context.get_ui().refresh_container()
             return True
 
         play_data = playback_history.get_item(video_id)
-        if not play_data:
+        if play_data:
+            playback_history_method = playback_history.update_item
+        else:
+            playback_history_method = playback_history.set_item
             play_data = {
                 'play_count': 0,
                 'total_time': 0,
@@ -1100,7 +1089,7 @@ class Provider(AbstractProvider):
             play_data['played_time'] = 0
             play_data['played_percent'] = 0
 
-        playback_history.update(video_id, play_data)
+        playback_history_method(video_id, play_data)
         context.get_ui().refresh_container()
         return True
 
@@ -1108,7 +1097,8 @@ class Provider(AbstractProvider):
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
-        ui = context.get_ui()
+        settings_bool = settings.get_bool
+        bold = context.get_ui().bold
 
         _ = self.get_client(context)  # required for self.is_logged_in()
         logged_in = self.is_logged_in()
@@ -1119,10 +1109,10 @@ class Provider(AbstractProvider):
         result = []
 
         # sign in
-        if not logged_in and settings.get_bool('youtube.folder.sign.in.show', True):
+        if not logged_in and settings_bool('youtube.folder.sign.in.show', True):
             item_label = localize('sign.in')
             sign_in_item = DirectoryItem(
-                ui.bold(item_label),
+                bold(item_label),
                 create_uri(('sign', 'in')),
                 image='{media}/sign_in.png',
                 action=True,
@@ -1130,22 +1120,22 @@ class Provider(AbstractProvider):
             )
             result.append(sign_in_item)
 
-        if settings.get_bool('youtube.folder.my_subscriptions.show', True):
+        if settings_bool('youtube.folder.my_subscriptions.show', True):
             # my subscription
             item_label = localize('my_subscriptions')
             my_subscriptions_item = DirectoryItem(
-                ui.bold(item_label),
-                create_uri(('special', 'new_uploaded_videos_tv')),
+                bold(item_label),
+                create_uri(('special', 'my_subscriptions')),
                 image='{media}/new_uploads.png',
                 category_label=item_label,
             )
             result.append(my_subscriptions_item)
 
-        if settings.get_bool('youtube.folder.my_subscriptions_filtered.show', True):
+        if settings_bool('youtube.folder.my_subscriptions_filtered.show'):
             # my subscriptions filtered
             my_subscriptions_filtered_item = DirectoryItem(
                 localize('my_subscriptions.filtered'),
-                create_uri(('special', 'new_uploaded_videos_tv_filtered')),
+                create_uri(('special', 'my_subscriptions_filtered')),
                 image='{media}/new_uploads.png',
             )
             result.append(my_subscriptions_filtered_item)
@@ -1156,7 +1146,7 @@ class Provider(AbstractProvider):
         local_history = settings.use_local_history()
 
         # Home / Recommendations
-        if logged_in and settings.get_bool('youtube.folder.recommendations.show', True):
+        if logged_in and settings_bool('youtube.folder.recommendations.show', True):
             recommendations_item = DirectoryItem(
                 localize('recommendations'),
                 create_uri(('special', 'recommendations')),
@@ -1165,7 +1155,7 @@ class Provider(AbstractProvider):
             result.append(recommendations_item)
 
         # Related
-        if settings.get_bool('youtube.folder.related.show', True):
+        if settings_bool('youtube.folder.related.show', True):
             if history_id or local_history:
                 related_item = DirectoryItem(
                     localize('related_videos'),
@@ -1175,7 +1165,7 @@ class Provider(AbstractProvider):
                 result.append(related_item)
 
         # Trending
-        if settings.get_bool('youtube.folder.popular_right_now.show', True):
+        if settings_bool('youtube.folder.popular_right_now.show', True):
             trending_item = DirectoryItem(
                 localize('trending'),
                 create_uri(('special', 'popular_right_now')),
@@ -1184,13 +1174,13 @@ class Provider(AbstractProvider):
             result.append(trending_item)
 
         # search
-        if settings.get_bool('youtube.folder.search.show', True):
+        if settings_bool('youtube.folder.search.show', True):
             search_item = SearchItem(
                 context,
             )
             result.append(search_item)
 
-        if settings.get_bool('youtube.folder.quick_search.show', True):
+        if settings_bool('youtube.folder.quick_search.show'):
             quick_search_item = NewSearchItem(
                 context,
                 name=localize('search.quick'),
@@ -1198,7 +1188,7 @@ class Provider(AbstractProvider):
             )
             result.append(quick_search_item)
 
-        if settings.get_bool('youtube.folder.quick_search_incognito.show', True):
+        if settings_bool('youtube.folder.quick_search_incognito.show'):
             quick_search_incognito_item = NewSearchItem(
                 context,
                 name=localize('search.quick.incognito'),
@@ -1208,7 +1198,7 @@ class Provider(AbstractProvider):
             result.append(quick_search_incognito_item)
 
         # my location
-        if settings.get_bool('youtube.folder.my_location.show', True) and settings.get_location():
+        if settings_bool('youtube.folder.my_location.show', True) and settings.get_location():
             my_location_item = DirectoryItem(
                 localize('my_location'),
                 create_uri(('location', 'mine')),
@@ -1217,7 +1207,7 @@ class Provider(AbstractProvider):
             result.append(my_location_item)
 
         # my channel
-        if logged_in and settings.get_bool('youtube.folder.my_channel.show', True):
+        if logged_in and settings_bool('youtube.folder.my_channel.show', True):
             my_channel_item = DirectoryItem(
                 localize('my_channel'),
                 create_uri(('channel', 'mine')),
@@ -1226,7 +1216,7 @@ class Provider(AbstractProvider):
             result.append(my_channel_item)
 
         # watch later
-        if settings.get_bool('youtube.folder.watch_later.show', True):
+        if settings_bool('youtube.folder.watch_later.show', True):
             if watch_later_id:
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
@@ -1238,7 +1228,7 @@ class Provider(AbstractProvider):
                         context, watch_later_id
                     )
                 ]
-                watch_later_item.add_context_menu(context_menu, replace=True)
+                watch_later_item.add_context_menu(context_menu)
                 result.append(watch_later_item)
             else:
                 watch_history_item = DirectoryItem(
@@ -1249,7 +1239,7 @@ class Provider(AbstractProvider):
                 result.append(watch_history_item)
 
         # liked videos
-        if logged_in and settings.get_bool('youtube.folder.liked_videos.show', True):
+        if logged_in and settings_bool('youtube.folder.liked_videos.show', True):
             resource_manager = self.get_resource_manager(context)
             playlists = resource_manager.get_related_playlists(channel_id='mine')
             if playlists and 'likes' in playlists:
@@ -1263,11 +1253,11 @@ class Provider(AbstractProvider):
                         context, playlists['likes']
                     )
                 ]
-                liked_videos_item.add_context_menu(context_menu, replace=True)
+                liked_videos_item.add_context_menu(context_menu)
                 result.append(liked_videos_item)
 
         # disliked videos
-        if logged_in and settings.get_bool('youtube.folder.disliked_videos.show', True):
+        if logged_in and settings_bool('youtube.folder.disliked_videos.show', True):
             disliked_videos_item = DirectoryItem(
                 localize('video.disliked'),
                 create_uri(('special', 'disliked_videos')),
@@ -1276,7 +1266,7 @@ class Provider(AbstractProvider):
             result.append(disliked_videos_item)
 
         # history
-        if settings.get_bool('youtube.folder.history.show', False):
+        if settings_bool('youtube.folder.history.show', False):
             if history_id:
                 watch_history_item = DirectoryItem(
                     localize('history'),
@@ -1288,7 +1278,7 @@ class Provider(AbstractProvider):
                         context, history_id
                     )
                 ]
-                watch_history_item.add_context_menu(context_menu, replace=True)
+                watch_history_item.add_context_menu(context_menu)
                 result.append(watch_history_item)
             elif local_history:
                 watch_history_item = DirectoryItem(
@@ -1299,7 +1289,7 @@ class Provider(AbstractProvider):
                 result.append(watch_history_item)
 
         # (my) playlists
-        if logged_in and settings.get_bool('youtube.folder.playlists.show', True):
+        if logged_in and settings_bool('youtube.folder.playlists.show', True):
             playlists_item = DirectoryItem(
                 localize('playlists'),
                 create_uri(('channel', 'mine', 'playlists')),
@@ -1309,7 +1299,7 @@ class Provider(AbstractProvider):
 
         # saved playlists
         # TODO: re-enable once functionality is restored
-        # if logged_in and settings.get_bool('youtube.folder.saved.playlists.show', True):
+        # if logged_in and settings_bool('youtube.folder.saved.playlists.show', True):
         #     playlists_item = DirectoryItem(
         #         localize('saved.playlists'),
         #         create_uri(('special', 'saved_playlists')),
@@ -1318,7 +1308,7 @@ class Provider(AbstractProvider):
         #     result.append(playlists_item)
 
         # subscriptions
-        if logged_in and settings.get_bool('youtube.folder.subscriptions.show', True):
+        if logged_in and settings_bool('youtube.folder.subscriptions.show', True):
             subscriptions_item = DirectoryItem(
                 localize('subscriptions'),
                 create_uri(('subscriptions', 'list')),
@@ -1327,7 +1317,7 @@ class Provider(AbstractProvider):
             result.append(subscriptions_item)
 
         # bookmarks
-        if settings.get_bool('youtube.folder.bookmarks.show', True):
+        if settings_bool('youtube.folder.bookmarks.show', True):
             bookmarks_item = DirectoryItem(
                 localize('bookmarks'),
                 create_uri((PATHS.BOOKMARKS, 'list')),
@@ -1336,7 +1326,7 @@ class Provider(AbstractProvider):
             result.append(bookmarks_item)
 
         # browse channels
-        if logged_in and settings.get_bool('youtube.folder.browse_channels.show', True):
+        if logged_in and settings_bool('youtube.folder.browse_channels.show', True):
             browse_channels_item = DirectoryItem(
                 localize('browse_channels'),
                 create_uri(('special', 'browse_channels')),
@@ -1345,7 +1335,7 @@ class Provider(AbstractProvider):
             result.append(browse_channels_item)
 
         # completed live events
-        if settings.get_bool('youtube.folder.completed.live.show', True):
+        if settings_bool('youtube.folder.completed.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
                 create_uri(('special', 'completed_live')),
@@ -1354,7 +1344,7 @@ class Provider(AbstractProvider):
             result.append(live_events_item)
 
         # upcoming live events
-        if settings.get_bool('youtube.folder.upcoming.live.show', True):
+        if settings_bool('youtube.folder.upcoming.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
                 create_uri(('special', 'upcoming_live')),
@@ -1363,7 +1353,7 @@ class Provider(AbstractProvider):
             result.append(live_events_item)
 
         # live events
-        if settings.get_bool('youtube.folder.live.show', True):
+        if settings_bool('youtube.folder.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live'),
                 create_uri(('special', 'live')),
@@ -1372,7 +1362,7 @@ class Provider(AbstractProvider):
             result.append(live_events_item)
 
         # switch user
-        if settings.get_bool('youtube.folder.switch.user.show', True):
+        if settings_bool('youtube.folder.switch.user.show', True):
             switch_user_item = DirectoryItem(
                 localize('user.switch'),
                 create_uri(('users', 'switch')),
@@ -1382,7 +1372,7 @@ class Provider(AbstractProvider):
             result.append(switch_user_item)
 
         # sign out
-        if logged_in and settings.get_bool('youtube.folder.sign.out.show', True):
+        if logged_in and settings_bool('youtube.folder.sign.out.show', True):
             sign_out_item = DirectoryItem(
                 localize('sign.out'),
                 create_uri(('sign', 'out')),
@@ -1391,7 +1381,7 @@ class Provider(AbstractProvider):
             )
             result.append(sign_out_item)
 
-        if settings.get_bool('youtube.folder.settings.show', True):
+        if settings_bool('youtube.folder.settings.show', True):
             settings_menu_item = DirectoryItem(
                 localize('setup_wizard'),
                 create_uri(('config', 'setup_wizard')),
@@ -1400,7 +1390,7 @@ class Provider(AbstractProvider):
             )
             result.append(settings_menu_item)
 
-        if settings.get_bool('youtube.folder.settings.advanced.show', True):
+        if settings_bool('youtube.folder.settings.advanced.show'):
             settings_menu_item = DirectoryItem(
                 localize('settings'),
                 create_uri(('config', 'youtube')),
@@ -1444,14 +1434,16 @@ class Provider(AbstractProvider):
                 timestamp = items[channel_id]
                 channel_item.set_bookmark_timestamp(timestamp)
                 items[channel_id] = channel_item
-                bookmarks_list.update(channel_id, repr(channel_item), timestamp)
+                bookmarks_list.update_item(
+                    channel_id, repr(channel_item), timestamp
+                )
 
             bookmarks = []
             for item_id, item in items.items():
                 if not isinstance(item, BaseItem):
                     continue
                 context_menu = [
-                    menu_items.bookmarks_remove(
+                    menu_items.bookmark_remove(
                         context, item_id
                     ),
                     menu_items.bookmarks_clear(
@@ -1464,12 +1456,21 @@ class Provider(AbstractProvider):
 
             return bookmarks
 
-        if command == 'clear' and context.get_ui().on_yes_no_input(
+        ui = context.get_ui()
+        localize = context.localize
+
+        if command == 'clear' and ui.on_yes_no_input(
                 context.get_name(),
-                context.localize('bookmarks.clear.confirm')
+                localize('bookmarks.clear.confirm')
         ):
             context.get_bookmarks_list().clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('succeeded'),
+                time_ms=2500,
+                audible=False
+            )
             return True
 
         item_id = params.get('item_id')
@@ -1478,12 +1479,24 @@ class Provider(AbstractProvider):
 
         if command == 'add':
             item = params.get('item')
-            context.get_bookmarks_list().add(item_id, item)
+            context.get_bookmarks_list().add_item(item_id, item)
+
+            ui.show_notification(
+                localize('bookmark.created'),
+                time_ms=2500,
+                audible=False
+            )
             return True
 
         if command == 'remove':
-            context.get_bookmarks_list().remove(item_id)
+            context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
+
+            ui.show_notification(
+                localize('removed') % localize('bookmark'),
+                time_ms=2500,
+                audible=False
+            )
             return True
 
         return False
@@ -1542,11 +1555,11 @@ class Provider(AbstractProvider):
         if command == 'add':
             item = params.get('item')
             if item:
-                context.get_watch_later_list().add(video_id, item)
+                context.get_watch_later_list().add_item(video_id, item)
             return True
 
         if command == 'remove':
-            context.get_watch_later_list().remove(video_id)
+            context.get_watch_later_list().del_item(video_id)
             context.get_ui().refresh_container()
             return True
 

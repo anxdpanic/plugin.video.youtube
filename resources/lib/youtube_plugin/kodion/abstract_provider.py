@@ -108,7 +108,12 @@ class AbstractProvider(object):
         :param method: method to be registered
         :return:
         """
-        self._dict_path[re.compile(re_path, re.UNICODE)] = method
+        self._dict_path[re.compile(re_path, re.UNICODE)] = {
+            'method': method,
+            'bound': isinstance(getattr(method, '__self__', None),
+                                self.__class__),
+        }
+        return method
 
     def run_wizard(self, context):
         settings = context.get_settings()
@@ -143,7 +148,7 @@ class AbstractProvider(object):
 
     def navigate(self, context):
         path = context.get_path()
-        for re_path, method in self._dict_path.items():
+        for re_path, handler in self._dict_path.items():
             re_match = re_path.search(path)
             if not re_match:
                 continue
@@ -152,7 +157,10 @@ class AbstractProvider(object):
                 self.RESULT_CACHE_TO_DISC: True,
                 self.RESULT_UPDATE_LISTING: False,
             }
-            result = method(context, re_match)
+            if handler['bound']:
+                result = handler['method'](context, re_match)
+            else:
+                result = handler['method'](self, context, re_match)
             if isinstance(result, tuple):
                 result, new_options = result
                 options.update(new_options)
@@ -163,7 +171,7 @@ class AbstractProvider(object):
 
             return result, options
 
-        raise KodionException("Mapping for path '%s' not found" % path)
+        raise KodionException('Mapping for path "%s" not found' % path)
 
     # noinspection PyUnusedLocal
     @staticmethod
@@ -267,12 +275,12 @@ class AbstractProvider(object):
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
             if not params.get('incognito') and not params.get('channel_id'):
-                search_history.update(query)
+                search_history.add_item(query)
             return self.on_search(query, context, re_match)
 
         if command == 'remove':
             query = to_unicode(params.get('q', ''))
-            search_history.remove(query)
+            search_history.del_item(query)
             ui.refresh_container()
             return True
 
@@ -282,7 +290,8 @@ class AbstractProvider(object):
                 context.localize('search.rename'), query
             )
             if result:
-                search_history.rename(query, new_query)
+                search_history.del_item(query)
+                search_history.add_item(new_query)
                 ui.refresh_container()
             return True
 
@@ -318,7 +327,7 @@ class AbstractProvider(object):
             data_cache.set_item('search_query', query)
 
             if not params.get('incognito') and not params.get('channel_id'):
-                search_history.update(query)
+                search_history.add_item(query)
             context.set_path(PATHS.SEARCH, 'query')
             return self.on_search(query, context, re_match)
 

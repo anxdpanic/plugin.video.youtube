@@ -481,7 +481,7 @@ def process_old_search_db(_provider, context, step, steps):
         )
         items = old_search_db.get_items(process=_convert_old_search_item)
         for search in items:
-            search_history.update(search['text'], search['timestamp'])
+            search_history.update_item(search['text'], search['timestamp'])
 
         ui.show_notification(localize('succeeded'))
         context.execute(
@@ -527,7 +527,7 @@ def process_old_history_db(_provider, context, step, steps):
         items = old_history_db.get_items(process=_convert_old_history_item)
         for video_id, history in items.items():
             timestamp = history.pop('timestamp', None)
-            playback_history.update(video_id, history, timestamp)
+            playback_history.update_item(video_id, history, timestamp)
 
         ui.show_notification(localize('succeeded'))
         context.execute(

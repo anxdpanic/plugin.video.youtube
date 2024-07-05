@@ -1548,6 +1548,26 @@ msgctxt "#30811"
 msgid "Filter Live folders"
 msgstr ""
 
+msgctxt "#30812"
+msgid "Clear subscription feed history"
+msgstr ""
+
+msgctxt "#30813"
+msgid "Delete subscription feed history database"
+msgstr ""
+
+msgctxt "#30814"
+msgid "feed history"
+msgstr ""
+
+msgctxt "#30815"
+msgid "Go back..."
+msgstr ""
+
+msgctxt "#30816"
+msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
+msgstr ""
+
 #~ msgctxt "#30503"
 #~ msgid "Show channel fanart"
 #~ msgstr "顯示頻道的背景圖片"

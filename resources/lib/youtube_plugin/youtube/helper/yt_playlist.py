@@ -12,7 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
-from ...kodion.constants import CHANNEL_ID, PLAYLISTITEM_ID, PLAYLIST_ID
+from ...kodion.compatibility import parse_qsl, urlsplit
+from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
 from ...kodion.utils import find_video_id
 
 
@@ -36,7 +37,7 @@ def _process_add_video(provider, context, keymap_action=False):
 
     video_id = context.get_param('video_id', '')
     if not video_id:
-        if context.is_plugin_path(listitem_path, 'play'):
+        if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
             keymap_action = True
         if not video_id:
@@ -63,7 +64,7 @@ def _process_add_video(provider, context, keymap_action=False):
     if playlist_cache:
         cache_key, _, cached_last_page = playlist_cache[0]
         if cached_last_page:
-            data_cache.update(cache_key, None)
+            data_cache.update_item(cache_key, None)
 
     return True
 
@@ -74,7 +75,7 @@ def _process_remove_video(provider,
                           video_id=None,
                           video_name=None,
                           confirmed=None):
-    listitem_path = context.get_listitem_info('FileNameAndPath')
+    container_uri = context.get_infolabel('Container.FolderPath')
     listitem_playlist_id = context.get_listitem_property(PLAYLIST_ID)
     listitem_video_id = context.get_listitem_property(PLAYLISTITEM_ID)
     listitem_video_name = context.get_listitem_info('Title')
@@ -130,21 +131,31 @@ def _process_remove_video(provider,
         if not success:
             return False
 
-        path = params.pop('reload_path', False if confirmed else None)
-        if keymap_action and not confirmed:
-            context.get_ui().set_focus_next_item()
-        elif path is not False and context.is_plugin_path(listitem_path):
-            provider.reroute(
-                context,
-                path=path,
-                params=dict(params, refresh=params.get('refresh', 0) + 1),
-            )
-
         context.get_ui().show_notification(
             message=context.localize('playlist.removed_from'),
             time_ms=2500,
             audible=False
         )
+
+        if not context.is_plugin_path(container_uri):
+            return True
+
+        if (keymap_action or video_id == listitem_video_id) and not confirmed:
+            context.get_ui().set_focus_next_item()
+
+        if playlist_id in container_uri:
+            container_uri = urlsplit(container_uri)
+            path = container_uri.path
+            params = dict(parse_qsl(container_uri.query))
+        else:
+            path = params.pop('reload_path', False if confirmed else None)
+
+        if path is not False:
+            provider.reroute(
+                context,
+                path=path,
+                params=dict(params, refresh=int(params.get('refresh', 0)) + 1),
+            )
         return True
     return False
 
@@ -170,7 +181,7 @@ def _process_remove_playlist(provider, context):
 
         if channel_id:
             data_cache = context.get_data_cache()
-            data_cache.remove(channel_id)
+            data_cache.del_item(channel_id)
             ui.refresh_container()
     return False
 
@@ -187,7 +198,7 @@ def _process_select_playlist(provider, context):
 
     video_id = params.get('video_id', '')
     if not video_id:
-        if context.is_plugin_path(listitem_path, 'play'):
+        if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
             if video_id:
                 context.set_param('video_id', video_id)
@@ -301,7 +312,7 @@ def _process_rename_playlist(provider, context):
         return False
 
     data_cache = context.get_data_cache()
-    data_cache.remove(playlist_id)
+    data_cache.del_item(playlist_id)
     ui.refresh_container()
     return False
 
@@ -332,20 +343,38 @@ def _playlist_id_change(context, playlist, method):
     return False
 
 
-def process(method, category, provider, context, **kwargs):
+def process(provider,
+            context,
+            re_match=None,
+            method=None,
+            category=None,
+            **kwargs):
+    if re_match:
+        if method is None:
+            method = re_match.group('method')
+        if category is None:
+            category = re_match.group('category')
+
     if method == 'add' and category == 'video':
         return _process_add_video(provider, context)
+
     if method == 'remove' and category == 'video':
         return _process_remove_video(provider, context, **kwargs)
+
     if method == 'remove' and category == 'playlist':
         return _process_remove_playlist(provider, context)
+
     if method == 'select' and category == 'playlist':
         return _process_select_playlist(provider, context)
+
     if method == 'rename' and category == 'playlist':
         return _process_rename_playlist(provider, context)
+
     if method in {'set', 'remove'} and category == 'watch_later':
         return _playlist_id_change(context, category, method)
+
     if method in {'set', 'remove'} and category == 'history':
         return _playlist_id_change(context, category, method)
+
     raise KodionException('Unknown category |{0}| or method |{1}|'
                           .format(category, method))

@@ -353,7 +353,7 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.filter.my_subscriptions_filtered.list" type="string" parent="youtube.filter.my_subscriptions_filtered.blacklist" label="30585" help="">
+                <setting id="youtube.filter.my_subscriptions_filtered.list" type="string" parent="youtube.folder.my_subscriptions_filtered.show" label="30585" help="">
                     <level>0</level>
                     <default/>
                     <constraints>

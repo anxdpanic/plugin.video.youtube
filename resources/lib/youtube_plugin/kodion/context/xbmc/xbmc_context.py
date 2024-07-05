@@ -59,12 +59,13 @@ class XbmcContext(AbstractContext):
         'archive': 30105,
         'are_you_sure': 30703,
         'auto_remove_watch_later': 30515,
+        'bookmark': 30101,
+        'bookmark.channel': 30803,
+        'bookmark.created': 21362,
+        'bookmark.remove': 20404,
         'bookmarks': 30100,
-        'bookmarks.add': 30101,
-        'bookmarks.add.channel': 30803,
         'bookmarks.clear': 30801,
         'bookmarks.clear.confirm': 30802,
-        'bookmarks.remove': 20404,
         'browse_channels': 30512,
         'cancel': 30615,
         'channels': 30500,
@@ -212,7 +213,7 @@ class XbmcContext(AbstractContext):
         'sign.twice.text': 30547,
         'sign.twice.title': 30546,
         'stats.commentCount': 30732,
-        # 'stats.favoriteCount': 30100,
+        # 'stats.favoriteCount': 1036,
         'stats.likeCount': 30733,
         'stats.viewCount': 30767,
         'stream.alternate': 30747,
@@ -364,23 +365,20 @@ class XbmcContext(AbstractContext):
         pass  # implement from abstract
 
     def is_plugin_path(self, uri, uri_path='', partial=False):
-        plugin = self.get_id()
-
         if isinstance(uri_path, (list, tuple)):
             if partial:
-                paths = ['plugin://{0}/{1}'.format(plugin, path).rstrip('/')
-                         for path in uri_path]
+                paths = [self.create_uri(path).rstrip('/') for path in uri_path]
             else:
                 paths = []
                 for path in uri_path:
-                    path = 'plugin://{0}/{1}'.format(plugin, path).rstrip('/')
+                    path = self.create_uri(path).rstrip('/')
                     paths.extend((
                         path + '/',
                         path + '?'
                     ))
             return uri.startswith(tuple(paths))
 
-        uri_path = 'plugin://{0}/{1}'.format(plugin, uri_path).rstrip('/')
+        uri_path = self.create_uri(uri_path).rstrip('/')
         if not partial:
             uri_path = (
                 uri_path + '/',

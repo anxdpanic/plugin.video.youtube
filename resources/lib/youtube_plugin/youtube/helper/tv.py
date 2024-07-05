@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from ..helper import utils
+from ...kodion.constants import PATHS
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
 
 
@@ -31,7 +32,7 @@ def tv_videos_to_items(provider, context, json_data):
         video_id = item['id']
         item_params['video_id'] = video_id
         video_item = VideoItem(
-            item['title'], context.create_uri(('play',), item_params)
+            item['title'], context.create_uri((PATHS.PLAY,), item_params)
         )
         if incognito:
             video_item.set_play_count(0)

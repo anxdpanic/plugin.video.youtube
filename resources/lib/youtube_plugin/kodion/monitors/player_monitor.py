@@ -16,6 +16,7 @@ import threading
 from ..compatibility import xbmc
 from ..constants import (
     BUSY_FLAG,
+    PATHS,
     PLAYBACK_STARTED,
     PLAYBACK_STOPPED,
     PLAYER_DATA,
@@ -122,7 +123,7 @@ class PlayerMonitorThread(threading.Thread):
                 break
 
             if (not current_file.startswith(playing_file) and not (
-                    self._context.is_plugin_path(current_file, 'play')
+                    self._context.is_plugin_path(current_file, PATHS.PLAY)
                     and video_id_param in current_file
             )) or total_time <= 0:
                 self.stop()
@@ -217,8 +218,8 @@ class PlayerMonitorThread(threading.Thread):
                 status=(segment_end, segment_end, segment_end, 'stopped'),
             )
         if use_local_history:
-            self._context.get_playback_history().update(self.video_id,
-                                                        play_data)
+            self._context.get_playback_history().update_item(self.video_id,
+                                                             play_data)
 
         self._context.send_notification(PLAYBACK_STOPPED, self.playback_data)
         self._context.log_debug('Playback stopped [{video_id}]:'
@@ -237,6 +238,7 @@ class PlayerMonitorThread(threading.Thread):
                 )
                 if playlist_item_id:
                     self._provider.on_playlist_x(
+                        self._provider,
                         self._context,
                         method='remove',
                         category='video',
@@ -246,7 +248,7 @@ class PlayerMonitorThread(threading.Thread):
                         confirmed=True,
                     )
             else:
-                self._context.get_watch_later_list().remove(self.video_id)
+                self._context.get_watch_later_list().del_item(self.video_id)
 
         if logged_in and not refresh_only:
             history_id = access_manager.get_watch_history_id()
@@ -267,6 +269,7 @@ class PlayerMonitorThread(threading.Thread):
                             '/{0}/{1}/'.format(self.video_id, rating)
                         )
                         self._provider.on_video_x(
+                            self._provider,
                             self._context,
                             rating_match,
                             method='rate',
