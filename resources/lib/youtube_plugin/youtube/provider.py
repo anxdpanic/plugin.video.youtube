@@ -462,11 +462,11 @@ class Provider(AbstractProvider):
 
     """
     Lists a playlist folder and all uploaded videos of a channel.
-    path      :'/channel|user/(?P<channel_id|username>)[^/]+/'
+    path      :'/channel|handle|user/(?P<channel_id|username>)[^/]+/'
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/(?P<method>(channel|user))/(?P<channel_id>[^/]+)/?$')
+    @RegisterProviderPath('^/(?P<method>(channel|handle|user))/(?P<identifier>[^/]+)/?$')
     def _on_channel(self, context, re_match):
         listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
@@ -478,52 +478,63 @@ class Provider(AbstractProvider):
         ui = context.get_ui()
 
         method = re_match.group('method')
-        channel_id = re_match.group('channel_id')
+        identifier = re_match.group('identifier')
 
         if (method == 'channel'
-                and channel_id
-                and channel_id.lower() == 'property'
+                and identifier
+                and identifier.lower() == 'property'
                 and listitem_channel_id
                 and listitem_channel_id.lower().startswith(('mine', 'uc'))):
             context.execute('ActivateWindow(Videos, {channel}, return)'.format(
                 channel=create_uri(('channel', listitem_channel_id))
             ))
 
-        if method == 'channel' and not channel_id:
+        if method == 'channel' and not identifier:
             return False
 
         context.set_content(CONTENT.VIDEO_CONTENT)
 
         resource_manager = self.get_resource_manager(context)
 
-        mine_id = ''
         result = []
 
         """
-        This is a helper routine if we only have the username of a channel.
-        This will retrieve the correct channel id based on the username.
+        This is a helper routine that will retrieve the correct channel ID if we
+        only have the handle or username of a channel.
         """
-        if method == 'user' or channel_id == 'mine':
-            context.log_debug('Trying to get channel id for user "%s"' % channel_id)
+        if identifier == 'mine':
+            method = 'mine'
+        elif identifier.startswith('@'):
+            method = 'handle'
+        if method == 'channel':
+            channel_id = identifier
+        else:
+            channel_id = None
+            identifier = {method: True, 'identifier': identifier}
 
-            json_data = function_cache.run(client.get_channel_by_username,
+        if not channel_id:
+            context.log_debug('Trying to get channel ID for |{0}|'.format(
+                identifier['identifier']
+            ))
+            json_data = function_cache.run(client.get_channel_by_identifier,
                                            function_cache.ONE_DAY,
                                            _refresh=params.get('refresh'),
-                                           username=channel_id)
+                                           **identifier)
             if not json_data:
                 return False
 
+            identifier = identifier['identifier']
             # we correct the channel id based on the username
             items = json_data.get('items', [])
             if items:
-                if method == 'user':
-                    channel_id = items[0]['id']
-                else:
-                    mine_id = items[0]['id']
+                channel_id = items[0]['id']
             else:
-                context.log_warning('Could not find channel ID for user "%s"' % channel_id)
-                if method == 'user':
-                    return False
+                context.log_debug('Channel ID not found for |{0}|'.format(
+                    identifier
+                ))
+
+        if not channel_id:
+            return False
 
         fanart = resource_manager.get_fanarts(
             (channel_id,), force=True
@@ -561,13 +572,12 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlists_item)
 
-            search_live_id = mine_id if mine_id else channel_id
             if not hide_search:
                 search_item = NewSearchItem(
                     context, name=ui.bold(localize('search')),
                     image='{media}/search.png',
                     fanart=fanart,
-                    channel_id=search_live_id,
+                    channel_id=channel_id,
                     incognito=incognito,
                     addon_id=addon_id,
                 )
@@ -577,7 +587,10 @@ class Provider(AbstractProvider):
                 item_label = localize('live')
                 live_item = DirectoryItem(
                     ui.bold(item_label),
-                    create_uri(('channel', search_live_id, 'live'), new_params),
+                    create_uri(
+                        ('channel', channel_id, 'live'),
+                        new_params,
+                    ),
                     image='{media}/live.png',
                     fanart=fanart,
                     category_label=item_label,
@@ -586,7 +599,7 @@ class Provider(AbstractProvider):
 
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
-                                       channel_id=channel_id)
+                                       channel_id=identifier)
         if playlists and 'uploads' in playlists:
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
