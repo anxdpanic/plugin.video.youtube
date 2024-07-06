@@ -308,7 +308,8 @@ class AbstractProvider(object):
             if (not params.get('refresh')
                     and context.is_plugin_path(
                         context.get_infolabel('Container.FolderPath'),
-                        ('query', 'input')
+                        ((PATHS.SEARCH, 'query',),
+                         (PATHS.SEARCH, 'input',)),
                     )):
                 cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
