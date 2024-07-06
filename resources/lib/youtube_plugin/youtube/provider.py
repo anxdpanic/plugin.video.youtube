@@ -38,12 +38,6 @@ from ..kodion.constants import (
     CONTENT,
     DEVELOPER_CONFIGS,
     PATHS,
-    PLAY_FORCE_AUDIO,
-    PLAY_PROMPT_QUALITY,
-    PLAY_PROMPT_SUBTITLES,
-    PLAY_WITH,
-    SERVER_POST_START,
-    SERVER_WAKEUP,
 )
 from ..kodion.items import (
     BaseItem,
@@ -53,7 +47,7 @@ from ..kodion.items import (
     UriItem,
     menu_items,
 )
-from ..kodion.utils import find_video_id, strip_html_from_text
+from ..kodion.utils import strip_html_from_text
 
 
 class Provider(AbstractProvider):
@@ -72,6 +66,11 @@ class Provider(AbstractProvider):
         self.on_playlist_x = self.register_path(
             '^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$',
             yt_playlist.process,
+        )
+
+        self.register_path(
+            '^/play/?$',
+            yt_play.process,
         )
 
         self.register_path(
@@ -674,57 +673,6 @@ class Provider(AbstractProvider):
         X: optional index of live stream to play if channel has multiple live
            streams. 1 (default) for first live stream
     """
-
-    # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/play/?$')
-    def on_play(self, context, re_match):
-        ui = context.get_ui()
-
-        params = context.get_params()
-        param_keys = params.keys()
-
-        if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}
-                .isdisjoint(param_keys)):
-            listitem_path = context.get_listitem_info('FileNameAndPath')
-            if context.is_plugin_path(listitem_path, PATHS.PLAY):
-                video_id = find_video_id(listitem_path)
-                if video_id:
-                    context.set_param('video_id', video_id)
-                    params['video_id'] = video_id
-                else:
-                    return False
-            else:
-                return False
-
-        video_id = params.get('video_id')
-        playlist_id = params.get('playlist_id')
-
-        force_play = False
-        for param in {PLAY_FORCE_AUDIO,
-                      PLAY_PROMPT_QUALITY,
-                      PLAY_PROMPT_SUBTITLES,
-                      PLAY_WITH}.intersection(param_keys):
-            del params[param]
-            ui.set_property(param)
-            force_play = True
-
-        if video_id and not playlist_id:
-            # This is required to trigger Kodi resume prompt, along with using
-            # RunPlugin. Prompt will not be used if using PlayMedia
-            if force_play:
-                context.execute('Action(Play)')
-                return False
-            context.wakeup(SERVER_WAKEUP, timeout=5)
-            video = yt_play.play_video(self, context)
-            ui.set_property(SERVER_POST_START)
-            return video
-
-        if playlist_id or 'playlist_ids' in params:
-            return yt_play.play_playlist(self, context)
-
-        if 'channel_id' in params:
-            return yt_play.play_channel_live(self, context)
-        return False
 
     @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
     def _on_users(self, _context, re_match):

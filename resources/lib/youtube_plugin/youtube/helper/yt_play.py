@@ -23,14 +23,17 @@ from ...kodion.constants import (
     PLAYER_DATA,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
     PLAY_WITH,
+    SERVER_POST_START,
+    SERVER_WAKEUP,
 )
 from ...kodion.items import VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils import select_stream
+from ...kodion.utils import find_video_id, select_stream
 
 
-def play_video(provider, context):
+def _play_video(provider, context):
     ui = context.get_ui()
     params = context.get_params()
     video_id = params.get('video_id')
@@ -157,7 +160,7 @@ def play_video(provider, context):
     return video_item
 
 
-def play_playlist(provider, context):
+def _play_playlist(provider, context):
     videos = []
     params = context.get_params()
 
@@ -260,7 +263,7 @@ def play_playlist(provider, context):
     return videos[playlist_position], options
 
 
-def play_channel_live(provider, context):
+def _play_channel_live(provider, context):
     channel_id = context.get_param('channel_id')
     index = context.get_param('live', 1) - 1
     if index < 0:
@@ -294,3 +297,53 @@ def play_channel_live(provider, context):
         player.play(playlist_index=0)
         return False
     return video_item
+
+
+def process(provider, context, _re_match):
+    ui = context.get_ui()
+
+    params = context.get_params()
+    param_keys = params.keys()
+
+    if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}
+            .isdisjoint(param_keys)):
+        listitem_path = context.get_listitem_info('FileNameAndPath')
+        if context.is_plugin_path(listitem_path, PATHS.PLAY):
+            video_id = find_video_id(listitem_path)
+            if video_id:
+                context.set_param('video_id', video_id)
+                params['video_id'] = video_id
+            else:
+                return False
+        else:
+            return False
+
+    video_id = params.get('video_id')
+    playlist_id = params.get('playlist_id')
+
+    force_play = False
+    for param in {PLAY_FORCE_AUDIO,
+                  PLAY_PROMPT_QUALITY,
+                  PLAY_PROMPT_SUBTITLES,
+                  PLAY_WITH}.intersection(param_keys):
+        del params[param]
+        ui.set_property(param)
+        force_play = True
+
+    if video_id and not playlist_id:
+        # This is required to trigger Kodi resume prompt, along with using
+        # RunPlugin. Prompt will not be used if using PlayMedia
+        if force_play:
+            context.execute('Action(Play)')
+            return False
+        context.wakeup(SERVER_WAKEUP, timeout=5)
+        video = _play_video(provider, context)
+        ui.set_property(SERVER_POST_START)
+        return video
+
+    if playlist_id or 'playlist_ids' in params:
+        return _play_playlist(provider, context)
+
+    if 'channel_id' in params:
+        return _play_channel_live(provider, context)
+    return False
