@@ -225,41 +225,55 @@ class AbstractProvider(object):
         params = dict(params, page=page, page_token=page_token)
         return self.reroute(context, path=path, params=params)
 
-    def reroute(self, context, re_match=None, path=None, params=None):
+    def reroute(self, context, re_match=None, path=None, params=None, uri=None):
         current_path = context.get_path()
         current_params = context.get_params()
-        if re_match:
-            path = re_match.group('path')
-        if params is None:
-            params = current_params
-        if (path and path != current_path
-                or 'refresh' in params
-                or params != current_params):
-            result = None
-            function_cache = context.get_function_cache()
-            window_return = params.pop('window_return', True)
-            try:
-                result, options = function_cache.run(
-                    self.navigate,
-                    _refresh=True,
-                    _scope=function_cache.SCOPE_NONE,
-                    context=context.clone(path, params),
-                )
-            except Exception as exc:
-                context.log_error('Rerouting error: |{0}|'.format(exc))
-            finally:
-                context.log_debug('Rerouting to |{path}| |{params}|{status}'
-                                  .format(path=path,
-                                          params=params,
-                                          status='' if result else ' failed'))
-                if not result:
-                    return False
-                context.get_ui().set_property(REROUTE_PATH, path)
-                context.execute('ActivateWindow(Videos, {0}{1})'.format(
-                    context.create_uri(path, params),
-                    ', return' if window_return else '',
-                ))
-        return False
+
+        if uri is None:
+            if re_match:
+                path = re_match.group('path')
+            elif path is None:
+                path = current_path
+            if params is None:
+                params = current_params
+        else:
+            uri = context.parse_uri(uri)
+            if params:
+                uri[1].update(params)
+            path, params = uri
+
+        if not path:
+            return False
+        if path == current_path and params == current_params:
+            if 'refresh' not in params:
+                return False
+            params['refresh'] += 1
+
+        result = None
+        function_cache = context.get_function_cache()
+        window_return = params.pop('window_return', True)
+        try:
+            result, options = function_cache.run(
+                self.navigate,
+                _refresh=True,
+                _scope=function_cache.SCOPE_NONE,
+                context=context.clone(path, params),
+            )
+        except Exception as exc:
+            context.log_error('Rerouting error: |{0}|'.format(exc))
+        finally:
+            context.log_debug('Rerouting to |{path}| |{params}|{status}'
+                              .format(path=path,
+                                      params=params,
+                                      status='' if result else ' failed'))
+            if not result:
+                return False
+            context.get_ui().set_property(REROUTE_PATH, path)
+            context.execute('ActivateWindow(Videos, {0}{1})'.format(
+                context.create_uri(path, params),
+                ', return' if window_return else '',
+            ))
+        return True
 
     def on_bookmarks(self, context, re_match):
         raise NotImplementedError()
