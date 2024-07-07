@@ -299,7 +299,7 @@ def _play_channel_live(provider, context):
     return video_item
 
 
-def process(provider, context, _re_match):
+def process(provider, context, **_kwargs):
     ui = context.get_ui()
 
     params = context.get_params()

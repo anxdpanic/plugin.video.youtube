@@ -29,34 +29,34 @@ class AbstractProvider(object):
     RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
     RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
 
-    def __init__(self):
-        # map for regular expression (path) to method (names)
-        self._dict_path = {}
+    # map for regular expression (path) to method (names)
+    _dict_path = {}
 
+    def __init__(self):
         # register some default paths
         self.register_path(r''.join((
             '^',
             '(?:', PATHS.HOME, ')?/?$'
-        )), self._internal_root)
+        )), self.on_root)
 
         self.register_path(r''.join((
             '^',
             PATHS.ROUTE,
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
-        )), self.reroute)
+        )), self.on_reroute)
 
         self.register_path(r''.join((
             '^',
             PATHS.GOTO_PAGE,
             '(?P<page>/[0-9]+)?'
             '(?P<path>/[^?]+?)(?:/*[?].+|/*)$'
-        )), self._internal_goto_page)
+        )), self.on_goto_page)
 
         self.register_path(r''.join((
             '^',
             PATHS.COMMAND,
             '/(?P<command>[^?]+?)(?:/*[?].+|/*)$'
-        )), self._on_command)
+        )), self.on_command)
 
         self.register_path(r''.join((
             '^',
@@ -74,7 +74,7 @@ class AbstractProvider(object):
             '^',
             '(', PATHS.SEARCH, '|', PATHS.EXTERNAL_SEARCH, ')',
             '/(?P<command>input|query|list|remove|clear|rename)?/?$'
-        )), self._internal_search)
+        )), self.on_search)
 
         self.register_path(r''.join((
             '^',
@@ -83,37 +83,31 @@ class AbstractProvider(object):
         )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
-                           self._internal_on_extra_fanart)
+                           self.on_extra_fanart)
 
-        """
-        Test each method of this class for the attribute 'kodion_re_path' added
-        by the decorator @RegisterProviderPath.
-        The 'kodion_re_path' attribute is a regular expression that must match
-        the current path in order for the decorated method to run.
-        """
-        for attribute_name in dir(self):
-            if attribute_name.startswith('__'):
-                continue
-            attribute = getattr(self, attribute_name, None)
-            if not attribute or not callable(attribute):
-                continue
-            re_path = getattr(attribute, 'kodion_re_path', None)
-            if re_path:
-                self.register_path(re_path, attribute)
-
-    def register_path(self, re_path, method):
+    @classmethod
+    def register_path(cls, re_path, method=None):
         """
         Registers a new method for the given regular expression
         :param re_path: regular expression of the path
-        :param method: method to be registered
+        :param method: method or function to be registered
         :return:
         """
-        self._dict_path[re.compile(re_path, re.UNICODE)] = {
-            'method': method,
-            'bound': isinstance(getattr(method, '__self__', None),
-                                self.__class__),
-        }
-        return method
+
+        def wrapper(method):
+            if callable(method):
+                func = method
+            else:
+                func = getattr(method, '__func__', None)
+                if not callable(func):
+                    return None
+
+            cls._dict_path[re.compile(re_path, re.UNICODE)] = func
+            return method
+
+        if method:
+            return wrapper(method)
+        return wrapper
 
     def run_wizard(self, context):
         settings = context.get_settings()
@@ -121,7 +115,7 @@ class AbstractProvider(object):
 
         context.send_notification(CHECK_SETTINGS, 'defer')
 
-        wizard_steps = self.get_wizard_steps(context)
+        wizard_steps = self.get_wizard_steps()
 
         step = 0
         steps = len(wizard_steps)
@@ -144,7 +138,8 @@ class AbstractProvider(object):
             settings.setup_wizard_enabled(False)
             context.send_notification(CHECK_SETTINGS, 'process')
 
-    def get_wizard_steps(self, context):
+    @staticmethod
+    def get_wizard_steps():
         # can be overridden by the derived class
         return []
 
@@ -159,10 +154,7 @@ class AbstractProvider(object):
                 self.RESULT_CACHE_TO_DISC: True,
                 self.RESULT_UPDATE_LISTING: False,
             }
-            if handler['bound']:
-                result = handler['method'](context, re_match)
-            else:
-                result = handler['method'](self, context, re_match)
+            result = handler(provider=self, context=context, re_match=re_match)
             if isinstance(result, tuple):
                 result, new_options = result
                 options.update(new_options)
@@ -175,9 +167,7 @@ class AbstractProvider(object):
 
         raise KodionException('Mapping for path "%s" not found' % path)
 
-    # noinspection PyUnusedLocal
-    @staticmethod
-    def on_extra_fanart(context, re_match):
+    def on_extra_fanart_run(self, context, re_match):
         """
         The implementation of the provider can override this behavior.
         :param context:
@@ -186,24 +176,22 @@ class AbstractProvider(object):
         """
         return
 
-    def _internal_on_extra_fanart(self, context, re_match):
+    @staticmethod
+    def on_extra_fanart(provider, context, re_match):
         path = re_match.group('path')
         new_context = context.clone(new_path=path)
-        return self.on_extra_fanart(new_context, re_match)
+        return provider.on_extra_fanart_run(new_context, re_match)
 
-    def on_playback_history(self, context, re_match):
+    @staticmethod
+    def on_playback_history(provider, context, re_match):
         raise NotImplementedError()
 
-    def on_search(self, search_text, context, re_match):
+    @staticmethod
+    def on_root(provider, context, re_match):
         raise NotImplementedError()
 
-    def on_root(self, context, re_match):
-        raise NotImplementedError()
-
-    def _internal_root(self, context, re_match):
-        return self.on_root(context, re_match)
-
-    def _internal_goto_page(self, context, re_match):
+    @staticmethod
+    def on_goto_page(provider, context, re_match):
         page = re_match.group('page')
         if page:
             page = int(page.lstrip('/'))
@@ -223,16 +211,18 @@ class AbstractProvider(object):
         else:
             page_token = ''
         params = dict(params, page=page, page_token=page_token)
-        return self.reroute(context, path=path, params=params)
+        return provider.reroute(context=context, path=path, params=params)
 
-    def reroute(self, context, re_match=None, path=None, params=None, uri=None):
+    @staticmethod
+    def on_reroute(provider, context, re_match):
+        return provider.reroute(context=context, path=re_match.group('path'))
+
+    def reroute(self, context, path=None, params=None, uri=None):
         current_path = context.get_path()
         current_params = context.get_params()
 
         if uri is None:
-            if re_match:
-                path = re_match.group('path')
-            elif path is None:
+            if path is None:
                 path = current_path
             if params is None:
                 params = current_params
@@ -275,13 +265,19 @@ class AbstractProvider(object):
             ))
         return True
 
-    def on_bookmarks(self, context, re_match):
+    @staticmethod
+    def on_bookmarks(provider, context, re_match):
         raise NotImplementedError()
 
-    def on_watch_later(self, context, re_match):
+    @staticmethod
+    def on_watch_later(provider, context, re_match):
         raise NotImplementedError()
 
-    def _internal_search(self, context, re_match):
+    def on_search_run(self, context, search_text):
+        raise NotImplementedError()
+
+    @staticmethod
+    def on_search(provider, context, re_match):
         params = context.get_params()
         ui = context.get_ui()
 
@@ -290,7 +286,7 @@ class AbstractProvider(object):
 
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
-            return self.on_search(query, context, re_match)
+            return provider.on_search_run(context=context, search_text=query)
 
         if command == 'remove':
             query = to_unicode(params.get('q', ''))
@@ -339,7 +335,7 @@ class AbstractProvider(object):
                 return False
 
             context.set_path(PATHS.SEARCH, 'query')
-            return self.on_search(query, context, re_match)
+            return provider.on_search_run(context=context, search_text=query)
 
         context.set_content(CONTENT.LIST_CONTENT)
         result = []
@@ -363,9 +359,10 @@ class AbstractProvider(object):
             )
             result.append(search_history_item)
 
-        return result, {self.RESULT_CACHE_TO_DISC: False}
+        return result, {provider.RESULT_CACHE_TO_DISC: False}
 
-    def _on_command(self, _context, re_match):
+    @staticmethod
+    def on_command(re_match, **_kwargs):
         command = re_match.group('command')
         return UriItem('command://{0}'.format(command))
 
@@ -374,16 +371,3 @@ class AbstractProvider(object):
 
     def tear_down(self):
         pass
-
-
-class RegisterProviderPath(object):
-    def __init__(self, re_path):
-        self._kodion_re_path = re_path
-
-    def __call__(self, func):
-        def wrapper(*args, **kwargs):
-            # only use a wrapper if you need extra code to be run here
-            return func(*args, **kwargs)
-
-        wrapper.kodion_re_path = self._kodion_re_path
-        return wrapper

@@ -31,7 +31,7 @@ from .helper import (
     yt_video,
 )
 from .youtube_exceptions import InvalidGrant, LoginException
-from ..kodion import AbstractProvider, RegisterProviderPath
+from ..kodion import AbstractProvider
 from ..kodion.constants import (
     ADDON_ID,
     CHANNEL_ID,
@@ -85,7 +85,8 @@ class Provider(AbstractProvider):
 
         atexit.register(self.tear_down)
 
-    def get_wizard_steps(self, context):
+    @staticmethod
+    def get_wizard_steps():
         steps = [
             yt_setup_wizard.process_default_settings,
             yt_setup_wizard.process_performance_settings,
@@ -316,9 +317,9 @@ class Provider(AbstractProvider):
             return new_resource_manager
         return resource_manager
 
-    # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/uri2addon/?$')
-    def on_uri2addon(self, context, re_match, uri=None):
+    @AbstractProvider.register_path('^/uri2addon/?$')
+    @staticmethod
+    def on_uri2addon(provider, context, uri=None, **_kwargs):
         if uri is None:
             uri = context.get_param('uri')
             skip_title = True
@@ -334,7 +335,9 @@ class Provider(AbstractProvider):
         resolved_url = url_resolver.resolve(uri)
         url_converter = UrlToItemConverter(flatten=True)
         url_converter.add_url(resolved_url, context)
-        items = url_converter.get_items(self, context, skip_title=skip_title)
+        items = url_converter.get_items(provider=provider,
+                                        context=context,
+                                        skip_title=skip_title)
         if items:
             return items if listing else items[0]
 
@@ -349,10 +352,14 @@ class Provider(AbstractProvider):
     playlist_id: <PLAYLIST_ID>
     """
 
-    @RegisterProviderPath('^(?:/channel/(?P<channel_id>[^/]+))?/playlist/(?P<playlist_id>[^/]+)/?$')
-    def _on_playlist(self, context, re_match):
+    @AbstractProvider.register_path(
+        r'^(?:/channel/(?P<channel_id>[^/]+))?'
+        r'/playlist/(?P<playlist_id>[^/]+)/?$'
+    )
+    @staticmethod
+    def on_playlist(provider, context, re_match):
         context.set_content(CONTENT.VIDEO_CONTENT)
-        resource_manager = self.get_resource_manager(context)
+        resource_manager = provider.get_resource_manager(context)
 
         batch_id = (re_match.group('playlist_id'),
                     context.get_param('page_token') or 0)
@@ -360,7 +367,7 @@ class Provider(AbstractProvider):
         json_data = resource_manager.get_playlist_items(batch_id=batch_id)
         if not json_data:
             return False
-        result = v3.response_to_items(self, context, json_data[batch_id])
+        result = v3.response_to_items(provider, context, json_data[batch_id])
         return result
 
     """
@@ -369,8 +376,11 @@ class Provider(AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/playlists/?$')
-    def _on_channel_playlists(self, context, re_match):
+    @AbstractProvider.register_path(
+        r'^/channel/(?P<channel_id>[^/]+)'
+        r'/playlists/?$')
+    @staticmethod
+    def on_channel_playlists(provider, context, re_match):
         context.set_content(CONTENT.LIST_CONTENT)
 
         channel_id = re_match.group('channel_id')
@@ -386,7 +396,7 @@ class Provider(AbstractProvider):
         if addon_id:
             new_params['addon_id'] = addon_id
 
-        resource_manager = self.get_resource_manager(context)
+        resource_manager = provider.get_resource_manager(context)
         fanart = resource_manager.get_fanarts(
             (channel_id,), force=True
         ).get(channel_id)
@@ -409,7 +419,7 @@ class Provider(AbstractProvider):
         else:
             result = False
 
-        json_data = self.get_client(context).get_playlists_of_channel(
+        json_data = provider.get_client(context).get_playlists_of_channel(
             channel_id, page_token
         )
         if not json_data:
@@ -417,7 +427,7 @@ class Provider(AbstractProvider):
 
         if not result:
             result = []
-        result.extend(v3.response_to_items(self, context, json_data))
+        result.extend(v3.response_to_items(provider, context, json_data))
         return result
 
     """
@@ -426,8 +436,11 @@ class Provider(AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/channel/(?P<channel_id>[^/]+)/live/?$')
-    def _on_channel_live(self, context, re_match):
+    @AbstractProvider.register_path(
+        r'^/channel/(?P<channel_id>[^/]+)'
+        r'/live/?$')
+    @staticmethod
+    def on_channel_live(provider, context, re_match):
         context.set_content(CONTENT.VIDEO_CONTENT)
         result = []
 
@@ -435,9 +448,9 @@ class Provider(AbstractProvider):
         params = context.get_params()
         page_token = params.get('page_token', '')
 
-        client = self.get_client(context)
+        client = provider.get_client(context)
         function_cache = context.get_function_cache()
-        resource_manager = self.get_resource_manager(context)
+        resource_manager = provider.get_resource_manager(context)
 
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
@@ -452,7 +465,7 @@ class Provider(AbstractProvider):
                 return result
 
             result.extend(v3.response_to_items(
-                self, context, json_data,
+                provider, context, json_data,
                 item_filter={
                     'live_folder': True,
                 },
@@ -466,11 +479,14 @@ class Provider(AbstractProvider):
     channel_id: <CHANNEL_ID>
     """
 
-    @RegisterProviderPath('^/(?P<method>(channel|handle|user))/(?P<identifier>[^/]+)/?$')
-    def _on_channel(self, context, re_match):
+    @AbstractProvider.register_path(
+        r'^/(?P<method>(channel|handle|user))'
+        r'/(?P<identifier>[^/]+)/?$')
+    @staticmethod
+    def on_channel(provider, context, re_match):
         listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
-        client = self.get_client(context)
+        client = provider.get_client(context)
         localize = context.localize
         create_uri = context.create_uri
         function_cache = context.get_function_cache()
@@ -494,7 +510,7 @@ class Provider(AbstractProvider):
 
         context.set_content(CONTENT.VIDEO_CONTENT)
 
-        resource_manager = self.get_resource_manager(context)
+        resource_manager = provider.get_resource_manager(context)
 
         result = []
 
@@ -610,7 +626,7 @@ class Provider(AbstractProvider):
                 return result
 
             result.extend(v3.response_to_items(
-                self, context, json_data,
+                provider, context, json_data,
                 item_filter={
                     'live': False,
                     'upcoming_live': False,
@@ -619,9 +635,9 @@ class Provider(AbstractProvider):
 
         return result
 
-    # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/location/mine/?$')
-    def _on_my_location(self, context, re_match):
+    @AbstractProvider.register_path('^/location/mine/?$')
+    @staticmethod
+    def on_my_location(context, **_kwargs):
         context.set_content(CONTENT.LIST_CONTENT)
 
         create_uri = context.create_uri
@@ -687,19 +703,21 @@ class Provider(AbstractProvider):
            streams. 1 (default) for first live stream
     """
 
-    @RegisterProviderPath('^/users/(?P<action>[^/]+)/?$')
-    def _on_users(self, _context, re_match):
+    @AbstractProvider.register_path('^/users/(?P<action>[^/]+)/?$')
+    @staticmethod
+    def on_users(re_match, **_kwargs):
         action = re_match.group('action')
         return UriItem('script://{addon},users/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
-    @RegisterProviderPath('^/sign/(?P<mode>[^/]+)/?$')
-    def _on_sign(self, context, re_match):
+    @AbstractProvider.register_path('^/sign/(?P<mode>[^/]+)/?$')
+    @staticmethod
+    def on_sign(provider, context, re_match):
         sign_out_confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
         if (mode == 'in') and context.get_access_manager().get_refresh_token():
-            yt_login.process('out', self, context, sign_out_refresh=False)
+            yt_login.process('out', provider, context, sign_out_refresh=False)
 
         if (not sign_out_confirmed and mode == 'out'
                 and context.get_ui().on_yes_no_input(
@@ -709,35 +727,34 @@ class Provider(AbstractProvider):
             sign_out_confirmed = True
 
         if mode == 'in' or (mode == 'out' and sign_out_confirmed):
-            yt_login.process(mode, self, context)
+            yt_login.process(mode, provider, context)
         return False
 
-    def _search_channel_or_playlist(self, context, id_string):
-        json_data = {}
-        result = []
+    def _search_channel_or_playlist(self, context, identifier):
+        if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', identifier):
+            json_data = self.get_client(context).get_channels(identifier)
+        elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', identifier):
+            json_data = self.get_client(context).get_playlists(identifier)
+        else:
+            return False
 
-        if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', id_string):
-            json_data = self.get_client(context).get_channels(id_string)
+        if json_data:
+            return v3.response_to_items(self, context, json_data)
+        return False
 
-        elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', id_string):
-            json_data = self.get_client(context).get_playlists(id_string)
-
-        if not json_data:
-            return []
-
-        result.extend(v3.response_to_items(self, context, json_data))
-        return result
-
-    def on_search(self, search_text, context, re_match):
+    def on_search_run(self, context, search_text):
         # Search by url to access unlisted videos
         if search_text.startswith(('https://', 'http://')):
-            return self.on_uri2addon(context, None, search_text)
+            return self.on_uri2addon(provider=self,
+                                     context=context,
+                                     uri=search_text)
         if context.is_plugin_path(search_text):
             return self.reroute(context=context, uri=search_text)
 
         result = self._search_channel_or_playlist(context, search_text)
         if result:  # found a channel or playlist matching search_text
             return result
+        result = []
 
         context.set_param('q', search_text)
         context.set_param('category_label', search_text)
@@ -829,19 +846,20 @@ class Provider(AbstractProvider):
         ))
         return result
 
-    @RegisterProviderPath('^/config/(?P<action>[^/]+)/?$')
-    def configure_addon(self, context, re_match):
+    @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
+    @staticmethod
+    def on_configure_addon(provider, context, re_match):
         action = re_match.group('action')
         if action == 'setup_wizard':
-            self.run_wizard(context)
+            provider.run_wizard(context)
             return False
         return UriItem('script://{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
 
-    # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/my_subscriptions/filter/?$')
-    def manage_my_subscription_filter(self, context, re_match):
+    @AbstractProvider.register_path('^/my_subscriptions/filter/?$')
+    @staticmethod
+    def on_manage_my_subscription_filter(context, **_kwargs):
         settings = context.get_settings()
         ui = context.get_ui()
 
@@ -881,8 +899,13 @@ class Provider(AbstractProvider):
                 ui.show_notification(message=message)
         ui.refresh_container()
 
-    @RegisterProviderPath('^/maintenance/(?P<action>[^/]+)/(?P<target>[^/]+)/?$')
-    def maintenance_actions(self, context, re_match):
+    @AbstractProvider.register_path(
+        r'^/maintenance'
+        r'/(?P<action>[^/]+)'
+        r'/(?P<target>[^/]+)/?$'
+    )
+    @staticmethod
+    def on_maintenance_actions(provider, context, re_match):
         target = re_match.group('target')
         action = re_match.group('action')
 
@@ -901,7 +924,7 @@ class Provider(AbstractProvider):
         ):
             addon_id = context.get_param('addon_id', None)
             access_manager = context.get_access_manager()
-            client = self.get_client(context)
+            client = provider.get_client(context)
             refresh_tokens = access_manager.get_refresh_token()
             success = True
             if refresh_tokens:
@@ -910,16 +933,16 @@ class Provider(AbstractProvider):
                         client.revoke(refresh_token)
                     except LoginException:
                         success = False
-            self.reset_client()
+            provider.reset_client()
             access_manager.update_access_token(
                 addon_id, access_token='', refresh_token='',
             )
             ui.refresh_container()
             ui.show_notification(localize('succeeded' if success else 'failed'))
 
-    # noinspection PyUnusedLocal
-    @RegisterProviderPath('^/api/update/?$')
-    def api_key_update(self, context, re_match):
+    @AbstractProvider.register_path('^/api/update/?$')
+    @staticmethod
+    def on_api_key_update(context, **_kwargs):
         localize = context.localize
         settings = context.get_settings()
         ui = context.get_ui()
@@ -971,8 +994,8 @@ class Provider(AbstractProvider):
             ui.show_notification(localize('api.personal.failed') % ', '.join(missing_list))
             context.log_debug('Failed to enable personal API keys. Missing: %s' % ', '.join(log_list))
 
-    # noinspection PyUnusedLocal
-    def on_playback_history(self, context, re_match):
+    @staticmethod
+    def on_playback_history(provider, context, re_match):
         params = context.get_params()
         action = params.get('action')
         if not action:
@@ -997,7 +1020,7 @@ class Provider(AbstractProvider):
                     for video_id in items.keys()
                 ]
             }
-            video_items = v3.response_to_items(self, context, v3_response)
+            video_items = v3.response_to_items(provider, context, v3_response)
 
             for video_item in video_items:
                 context_menu = [
@@ -1060,15 +1083,16 @@ class Provider(AbstractProvider):
         context.get_ui().refresh_container()
         return True
 
-    def on_root(self, context, re_match):
+    @staticmethod
+    def on_root(provider, context, re_match):
         create_uri = context.create_uri
         localize = context.localize
         settings = context.get_settings()
         settings_bool = settings.get_bool
         bold = context.get_ui().bold
 
-        _ = self.get_client(context)  # required for self.is_logged_in()
-        logged_in = self.is_logged_in()
+        _ = provider.get_client(context)  # required for self.is_logged_in()
+        logged_in = provider.is_logged_in()
         # _.get_my_playlists()
 
         # context.set_content(CONTENT.LIST_CONTENT)
@@ -1207,8 +1231,8 @@ class Provider(AbstractProvider):
 
         # liked videos
         if logged_in and settings_bool('youtube.folder.liked_videos.show', True):
-            resource_manager = self.get_resource_manager(context)
-            playlists = resource_manager.get_related_playlists(channel_id='mine')
+            resource_manager = provider.get_resource_manager(context)
+            playlists = resource_manager.get_related_playlists('mine')
             if playlists and 'likes' in playlists:
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
@@ -1368,7 +1392,8 @@ class Provider(AbstractProvider):
 
         return result
 
-    def on_bookmarks(self, context, re_match):
+    @staticmethod
+    def on_bookmarks(provider, context, re_match):
         params = context.get_params()
         command = re_match.group('command')
         if not command:
@@ -1393,7 +1418,7 @@ class Provider(AbstractProvider):
                     if isinstance(item, float)
                 ]
             }
-            channel_items = v3.response_to_items(self, context, v3_response)
+            channel_items = v3.response_to_items(provider, context, v3_response)
             for channel_item in channel_items:
                 channel_id = channel_item.get_channel_id()
                 if channel_id not in items:
@@ -1468,7 +1493,8 @@ class Provider(AbstractProvider):
 
         return False
 
-    def on_watch_later(self, context, re_match):
+    @staticmethod
+    def on_watch_later(provider, context, re_match):
         params = context.get_params()
         command = re_match.group('command')
         if not command:
@@ -1491,7 +1517,7 @@ class Provider(AbstractProvider):
                     for video_id in items.keys()
                 ]
             }
-            video_items = v3.response_to_items(self, context, v3_response)
+            video_items = v3.response_to_items(provider, context, v3_response)
 
             for video_item in video_items:
                 context_menu = [
