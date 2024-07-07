@@ -134,7 +134,10 @@ class AbstractProvider(object):
             ):
                 for wizard_step in wizard_steps:
                     if callable(wizard_step):
-                        step = wizard_step(self, context, step, steps)
+                        step = wizard_step(provider=self,
+                                           context=context,
+                                           step=step,
+                                           steps=steps)
                     else:
                         step += 1
         finally:

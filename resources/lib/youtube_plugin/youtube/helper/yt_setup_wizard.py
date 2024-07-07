@@ -287,7 +287,7 @@ def process_language(provider, context, step, steps):
     return step
 
 
-def process_geo_location(_provider, context, step, steps):
+def process_geo_location(context, step, steps, **_kwargs):
     localize = context.localize
 
     step += 1
@@ -306,7 +306,7 @@ def process_geo_location(_provider, context, step, steps):
     return step
 
 
-def process_default_settings(_provider, context, step, steps):
+def process_default_settings(context, step, steps, **_kwargs):
     localize = context.localize
     settings = context.get_settings()
 
@@ -334,7 +334,7 @@ def process_default_settings(_provider, context, step, steps):
     return step
 
 
-def process_list_detail_settings(_provider, context, step, steps):
+def process_list_detail_settings(context, step, steps, **_kwargs):
     localize = context.localize
     settings = context.get_settings()
 
@@ -352,7 +352,7 @@ def process_list_detail_settings(_provider, context, step, steps):
     return step
 
 
-def process_performance_settings(_provider, context, step, steps):
+def process_performance_settings(context, step, steps, **_kwargs):
     localize = context.localize
     settings = context.get_settings()
     ui = context.get_ui()
@@ -438,7 +438,7 @@ def process_performance_settings(_provider, context, step, steps):
     return step
 
 
-def process_subtitles(_provider, context, step, steps):
+def process_subtitles(context, step, steps, **_kwargs):
     localize = context.localize
 
     step += 1
@@ -454,7 +454,7 @@ def process_subtitles(_provider, context, step, steps):
     return step
 
 
-def process_old_search_db(_provider, context, step, steps):
+def process_old_search_db(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 
@@ -495,7 +495,7 @@ def process_old_search_db(_provider, context, step, steps):
     return step
 
 
-def process_old_history_db(_provider, context, step, steps):
+def process_old_history_db(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 
