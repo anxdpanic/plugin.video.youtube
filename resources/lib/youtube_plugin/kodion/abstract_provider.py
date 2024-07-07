@@ -290,8 +290,6 @@ class AbstractProvider(object):
 
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
-            if not params.get('incognito') and not params.get('channel_id'):
-                search_history.add_item(query)
             return self.on_search(query, context, re_match)
 
         if command == 'remove':
@@ -317,8 +315,6 @@ class AbstractProvider(object):
             return True
 
         if command == 'input':
-            data_cache = context.get_data_cache()
-
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
@@ -328,6 +324,7 @@ class AbstractProvider(object):
                         ((PATHS.SEARCH, 'query',),
                          (PATHS.SEARCH, 'input',)),
                     )):
+                data_cache = context.get_data_cache()
                 cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
                 if cached:
                     query = to_unicode(cached)
@@ -341,10 +338,6 @@ class AbstractProvider(object):
             if not query:
                 return False
 
-            data_cache.set_item('search_query', query)
-
-            if not params.get('incognito') and not params.get('channel_id'):
-                search_history.add_item(query)
             context.set_path(PATHS.SEARCH, 'query')
             return self.on_search(query, context, re_match)
 

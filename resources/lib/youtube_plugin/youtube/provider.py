@@ -732,6 +732,8 @@ class Provider(AbstractProvider):
         # Search by url to access unlisted videos
         if search_text.startswith(('https://', 'http://')):
             return self.on_uri2addon(context, None, search_text)
+        if context.is_plugin_path(search_text):
+            return self.reroute(context=context, uri=search_text)
 
         result = self._search_channel_or_playlist(context, search_text)
         if result:  # found a channel or playlist matching search_text
@@ -750,6 +752,10 @@ class Provider(AbstractProvider):
         order = params.get('order', 'relevance')
         search_type = params.get('search_type', 'video')
         safe_search = context.get_settings().safe_search()
+
+        context.get_data_cache().set_item('search_query', search_text)
+        if not params.get('incognito') and not params.get('channel_id'):
+            context.get_search_history().add_item(search_text)
 
         if search_type == 'video':
             context.set_content(CONTENT.VIDEO_CONTENT)
