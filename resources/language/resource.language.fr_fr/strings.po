@@ -961,8 +961,8 @@ msgid "Switch to '%s' now?"
 msgstr "Changer pour '%s' maintenant ?"
 
 msgctxt "#30666"
-msgid "Removed '%s'"
-msgstr "'%s' supprimé"
+msgid "%s removed"
+msgstr ""
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -1563,6 +1563,10 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+#~ msgctxt "#30666"
+#~ msgid "Removed '%s'"
+#~ msgstr "'%s' supprimé"
 
 #~ msgctxt "#30736"
 #~ msgid "Hide short videos (1 minute or less)"
