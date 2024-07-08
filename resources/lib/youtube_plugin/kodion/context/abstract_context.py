@@ -140,6 +140,8 @@ class AbstractContext(object):
         'q',
         'rating',
         'reload_path',
+        'sort_method',
+        'sort_order',
         'search_type',
         SUBSCRIPTION_ID,
         'uri',
@@ -151,6 +153,8 @@ class AbstractContext(object):
         'reload_path',
     ))
     _STRING_INT_PARAMS = frozenset((
+        'sort_method',
+        'sort_order',
     ))
     _NON_EMPTY_STRING_PARAMS = set()
 

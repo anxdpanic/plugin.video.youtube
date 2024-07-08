@@ -387,6 +387,35 @@ class XbmcPlugin(AbstractPlugin):
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
+        # set alternative view mode
+        view_manager = ui.get_view_manager()
+        if view_manager.is_override_view_enabled():
+            post_run_actions.append((
+                view_manager.apply_view_mode,
+                {
+                    'context': context,
+                },
+            ))
+
+        sort_method = context.get_param('sort_method')
+        if sort_method is not None:
+            post_run_actions.append((
+                view_manager.apply_sort_method,
+                {
+                    'context': context,
+                    'sort_method': sort_method,
+                },
+            ))
+
+        sort_order = context.get_param('sort_order')
+        if sort_order is not None:
+            post_run_actions.append((
+                view_manager.apply_sort_order,
+                {
+                    'context': context,
+                    'sort_order': sort_order,
+                },
+            ))
 
         if post_run_actions:
             self.post_run(context, ui, *post_run_actions)
