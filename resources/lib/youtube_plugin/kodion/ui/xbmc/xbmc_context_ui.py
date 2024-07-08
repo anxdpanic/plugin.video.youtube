@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from .view_manager import ViewManager
 from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
@@ -21,6 +22,7 @@ class XbmcContextUI(AbstractContextUI):
     def __init__(self, context):
         super(XbmcContextUI, self).__init__()
         self._context = context
+        self._view_manager = None
 
     def create_progress_dialog(self,
                                heading,
