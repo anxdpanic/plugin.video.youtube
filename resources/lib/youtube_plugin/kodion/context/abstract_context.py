@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 
 from .. import logger
-from ..compatibility import quote, to_str, urlencode
+from ..compatibility import parse_qsl, quote, to_str, urlencode, urlsplit
 from ..constants import (
     PATHS,
     PLAY_FORCE_AUDIO,
@@ -135,7 +135,7 @@ class AbstractContext(object):
 
         self._path = self.create_path(path)
         self._params = params or {}
-        self.parse_params()
+        self.parse_params(self._params)
         self._uri = self.create_uri(self._path, self._params)
 
     @staticmethod
@@ -305,10 +305,15 @@ class AbstractContext(object):
     def get_param(self, name, default=None):
         return self._params.get(name, default)
 
-    def parse_params(self, params=None):
-        if not params:
-            params = self._params
+    def parse_uri(self, uri):
+        uri = urlsplit(uri)
+        path = uri.path
+        params = self.parse_params(dict(parse_qsl(uri.query)), update=False)
+        return path, params
+
+    def parse_params(self, params, update=True):
         to_delete = []
+        output = self._params if update else {}
 
         for param, value in params.items():
             try:
@@ -359,10 +364,12 @@ class AbstractContext(object):
                 to_delete.append(param)
                 continue
 
-            self._params[param] = parsed_value
+            output[param] = parsed_value
 
         for param in to_delete:
             del params[param]
+
+        return output
 
     def set_param(self, name, value):
         self.parse_params({name: value})

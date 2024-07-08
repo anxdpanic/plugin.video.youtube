@@ -681,8 +681,8 @@ class XbmcContext(AbstractContext):
         'ttml': loose_version('20.0.0'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
-        # Opus audio enabled in Kodi v21+ which fixes stalls after seek
-        'opus': loose_version('21.0.0'),
+        # unknown when Opus audio support was implemented
+        'opus': loose_version('19.0.0'),
         'mp4a': True,
         'ac-3': loose_version('2.1.15'),
         'ec-3': loose_version('2.1.15'),

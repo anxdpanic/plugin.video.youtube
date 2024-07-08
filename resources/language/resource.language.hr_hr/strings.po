@@ -965,8 +965,8 @@ msgid "Switch to '%s' now?"
 msgstr "Promijeni na korisnika '%s' odmah?"
 
 msgctxt "#30666"
-msgid "Removed '%s'"
-msgstr "Uklonjen je '%s'"
+msgid "%s removed"
+msgstr ""
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -1567,6 +1567,10 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+#~ msgctxt "#30666"
+#~ msgid "Removed '%s'"
+#~ msgstr "Uklonjen je '%s'"
 
 #~ msgctxt "#30736"
 #~ msgid "Hide short videos (1 minute or less)"

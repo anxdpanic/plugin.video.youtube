@@ -46,10 +46,10 @@ class ResourceManager(object):
                 continue
 
             data = function_cache.run(
-                client.get_channel_by_username,
+                client.get_channel_by_identifier,
                 function_cache.ONE_DAY,
                 _refresh=refresh,
-                username=channel_id
+                identifier=channel_id,
             ) or {}
             items = data.get('items', [{'id': 'mine'}])
 
