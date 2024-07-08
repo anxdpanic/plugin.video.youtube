@@ -256,6 +256,14 @@ class XbmcPlugin(AbstractPlugin):
             )
             cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
             update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
+
+            # set alternative view mode
+            view_manager = ui.get_view_manager()
+            if view_manager.is_override_view_enabled():
+                view_mode = view_manager.get_view_mode()
+                if view_mode is not None:
+                    context.log_debug('Override view mode to "%d"' % view_mode)
+                    context.execute('Container.SetViewMode(%d)' % view_mode)
         else:
             succeeded = bool(result)
             if not succeeded:
