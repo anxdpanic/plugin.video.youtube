@@ -130,6 +130,7 @@ class AbstractProvider(object):
         context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
         wizard_steps = self.get_wizard_steps()
+        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
 
         step = 0
         steps = len(wizard_steps)
