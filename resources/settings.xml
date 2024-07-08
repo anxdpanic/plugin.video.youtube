@@ -837,6 +837,35 @@
                     </constraints>
                     <control format="string" type="spinner"/>
                 </setting>
+                <setting id="kodion.view.override" type="boolean" label="30026" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="kodion.view.default" type="integer" parent="kodion.view.override" label="30027" help="">
+                    <level>0</level>
+                    <default>55</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="kodion.view.override" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control format="integer" type="edit">
+                        <heading>30027</heading>
+                    </control>
+                </setting>
+                <setting id="kodion.view.episodes" type="integer" parent="kodion.view.override" label="30028" help="">
+                    <level>0</level>
+                    <default>55</default>
+                    <dependencies>
+                        <dependency type="enable">
+                            <condition setting="kodion.view.override" operator="is">true</condition>
+                        </dependency>
+                    </dependencies>
+                    <control format="integer" type="edit">
+                        <heading>30028</heading>
+                    </control>
+                </setting>
             </group>
             <group id="5" label="30527">
                 <setting id="youtube.language" type="string" label="30523" help="">
