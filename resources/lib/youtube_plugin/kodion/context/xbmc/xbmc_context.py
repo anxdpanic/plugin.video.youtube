@@ -552,6 +552,7 @@ class XbmcContext(AbstractContext):
                 type=(sub_type or content_type), path=self.get_path()
             ))
             xbmcplugin.setContent(self._plugin_handle, content_type)
+            ui.get_view_manager().set_view_mode(content_type)
         else:
             content_type = None
             sub_type = None
