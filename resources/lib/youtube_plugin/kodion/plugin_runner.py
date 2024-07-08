@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import gc
+
 from . import logging
 from .constants import CHECK_SETTINGS, PATHS
 from .context import XbmcContext
@@ -59,6 +60,8 @@ def run(context=_context,
         log.verbose_logging = False
         profiler.disable()
 
+    sort_method = context.get_infolabel('Container.SortMethod')
+    sort_order = context.get_infolabel('Container.SortOrder')
     current_path = context.get_path().rstrip('/')
     current_params = context.get_original_params()
     current_handle = context.get_handle()
@@ -88,6 +91,10 @@ def run(context=_context,
     if forced:
         refresh = context.refresh_requested(force=True, off=True)
         new_params['refresh'] = refresh if refresh else 0
+    if sort_method:
+        new_params['sort_method'] = sort_method
+    if sort_order:
+        new_params['sort_order'] = sort_order
     if new_params:
         context.set_params(**new_params)
 
