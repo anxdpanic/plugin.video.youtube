@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from weakref import proxy
 
+from .view_manager import ViewManager
 from ..abstract_context_ui import AbstractContextUI, AbstractProgressDialog
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, REFRESH_CONTAINER
@@ -22,6 +23,7 @@ class XbmcContextUI(AbstractContextUI):
     def __init__(self, context):
         super(XbmcContextUI, self).__init__()
         self._context = context
+        self._view_manager = None
 
     def create_progress_dialog(self,
                                heading,
@@ -45,6 +47,12 @@ class XbmcContextUI(AbstractContextUI):
             message_template=message_template,
             template_params=template_params,
         )
+
+    def get_view_manager(self):
+        if self._view_manager is None:
+            self._view_manager = ViewManager(self._context)
+
+        return self._view_manager
 
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)

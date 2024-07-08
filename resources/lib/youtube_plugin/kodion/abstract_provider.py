@@ -136,6 +136,7 @@ class AbstractProvider(object):
         if last_run and last_run > 1:
             self.pre_run_wizard_step(provider=self, context=context)
         wizard_steps = self.get_wizard_steps()
+        wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
 
         step = 0
         steps = len(wizard_steps)
