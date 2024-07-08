@@ -1,3 +1,13 @@
+## v7.0.9+beta.3
+### Fixed
+- Fix navigating to search page after playback and prompt re-opening
+
+### Changed
+- Disable OPUS audio again by default #537
+
+### New
+- Add support for channel handles
+
 ## v7.0.9+beta.2
 ### Fixed
 - Fix ask for video quality setting being inconsistently applied

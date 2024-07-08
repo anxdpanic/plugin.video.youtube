@@ -179,23 +179,27 @@ def get_playlist_items(playlist_id, page_token='', all_pages=False, addon_id=Non
     return items
 
 
-def get_channel_id(channel_name, addon_id=None):
+def get_channel_id(identifier,
+                   mine=False,
+                   handle=False,
+                   addon_id=None):
     """
-
-    :param channel_name: channel name
-    :param addon_id: addon id associated with developer keys to use for requests
-    :type channel_name: str
-    :type addon_id: str
+    :param str identifier: channel username to retrieve channel ID for
+    :param bool mine: treat identifier as request for authenticated user
+    :param bool handle: treat identifier as request for handle
+    :param str addon_id: addon id associated with developer keys to use for requests
     :return: list of <kind: youtube#channel> <parts: ['id']> for the given channel name
                 see also https://developers.google.com/youtube/v3/docs/channels#resource
     :rtype: list of dict
     """
     provider, context, client = __get_core_components(addon_id)
 
-    json_data = client.get_channel_by_username(channel_name,
-                                               notify=False,
-                                               pass_data=True,
-                                               raise_exc=False)
+    json_data = client.get_channel_by_identifier(identifier=identifier,
+                                                 mine=mine,
+                                                 handle=handle,
+                                                 notify=False,
+                                                 pass_data=True,
+                                                 raise_exc=False)
     if not json_data or 'error' in json_data:
         return [json_data]
 

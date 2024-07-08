@@ -957,17 +957,25 @@ class YouTube(LoginClient):
                                 params=params,
                                 **kwargs)
 
-    def get_channel_by_username(self, username, **kwargs):
+    def get_channel_by_identifier(self,
+                                  identifier,
+                                  mine=False,
+                                  handle=False,
+                                  **kwargs):
         """
         Returns a collection of zero or more channel resources that match the request criteria.
-        :param username: retrieve channel_id for username
+        :param str identifier: channel username to retrieve channel ID for
+        :param bool mine: treat identifier as request for authenticated user
+        :param bool handle: treat identifier as request for handle
         :return:
         """
         params = {'part': 'id'}
-        if username == 'mine':
+        if mine or identifier == 'mine':
             params['mine'] = True
+        elif handle or identifier.startswith('@'):
+            params['forHandle'] = identifier
         else:
-            params['forUsername'] = username
+            params['forUsername'] = identifier
 
         return self.api_request(method='GET',
                                 path='channels',
