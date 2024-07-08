@@ -14,6 +14,7 @@ import sys
 
 from . import const_content_types as CONTENT
 from ..compatibility import (
+    xbmc,
     xbmcplugin,
 )
 
@@ -77,12 +78,26 @@ methods = [
     ('VIDEO_ORIGINAL_TITLE',            20376,    57),
     ('VIDEO_ORIGINAL_TITLE_IGNORE_THE', 20376,    None),
 ]
+SORT_ID_MAPPING = {}
 
 SORT = sys.modules[__name__]
 name = label_id = sort_by = sort_method = None
 for name, label_id, sort_by in methods:
     sort_method = getattr(xbmcplugin, 'SORT_METHOD_' + name, 0)
     setattr(SORT, name, sort_method)
+    if sort_by is not None:
+        SORT_ID_MAPPING.update((
+            (name, sort_by),
+            (xbmc.getLocalizedString(label_id).lower(), sort_by),
+            (sort_method, sort_by if sort_method else 0),
+        ))
+
+SORT_ID_MAPPING.update((
+    (CONTENT.VIDEO_CONTENT.join(('__', '__')), SORT.UNSORTED),
+    (CONTENT.LIST_CONTENT.join(('__', '__')), SORT.LABEL),
+    (CONTENT.COMMENTS.join(('__', '__')), SORT.CHANNEL),
+    (CONTENT.HISTORY.join(('__', '__')), SORT.LASTPLAYED),
+))
 
 # Label mask token details:
 # https://github.com/xbmc/xbmc/blob/master/xbmc/utils/LabelFormatter.cpp#L33-L105
@@ -179,6 +194,7 @@ COMMENTS_CONTENT_SIMPLE = (
 del (
     sys,
     CONTENT,
+    xbmc,
     xbmcplugin,
     methods,
     SORT,
