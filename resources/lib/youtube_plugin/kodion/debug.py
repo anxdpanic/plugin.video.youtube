@@ -42,6 +42,8 @@ class Profiler(object):
     __slots__ = (
         '__weakref__',
         '_enabled',
+        '_num_lines',
+        '_print_callees',
         '_profiler',
         '_reuse',
         '_timer',
@@ -115,9 +117,13 @@ class Profiler(object):
                  enabled=True,
                  lazy=True,
                  name=__name__,
+                 num_lines=20,
+                 print_callees=False,
                  reuse=False,
                  timer=None):
         self._enabled = enabled
+        self._num_lines = num_lines
+        self._print_callees = print_callees
         self._profiler = None
         self._reuse = reuse
         self._timer = timer
@@ -140,7 +146,9 @@ class Profiler(object):
             return
 
         log_debug('Profiling stats: {0}'.format(self.get_stats(
-            reuse=self._reuse
+            num_lines=self._num_lines,
+            print_callees=self._print_callees,
+            reuse=self._reuse,
         )))
         if not self._reuse:
             self.tear_down()
@@ -218,7 +226,11 @@ class Profiler(object):
         else:
             self._profiler.enable()
 
-    def get_stats(self, flush=True, reuse=False):
+    def get_stats(self,
+                  flush=True,
+                  num_lines=20,
+                  print_callees=False,
+                  reuse=False):
         if not (self._enabled and self._profiler):
             return None
 
@@ -226,10 +238,15 @@ class Profiler(object):
 
         output_stream = self._StringIO()
         try:
-            self._Stats(
+            stats = self._Stats(
                 self._profiler,
                 stream=output_stream
-            ).strip_dirs().sort_stats('cumulative', 'time').print_stats(20)
+            )
+            stats.strip_dirs().sort_stats('cumulative', 'time')
+            if print_callees:
+                stats.print_callees(num_lines)
+            else:
+                stats.print_stats(num_lines)
             output = output_stream.getvalue()
         # Occurs when no stats were able to be generated from profiler
         except TypeError:
@@ -245,7 +262,9 @@ class Profiler(object):
 
     def print_stats(self):
         log_debug('Profiling stats: {0}'.format(self.get_stats(
-            reuse=self._reuse
+            num_lines=self._num_lines,
+            print_callees=self._print_callees,
+            reuse=self._reuse,
         )))
 
     def tear_down(self):
