@@ -19,7 +19,6 @@ from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
 from ..logger import log_error
-from ..settings import XbmcPluginSettings
 
 
 __all__ = (
@@ -53,11 +52,10 @@ class BaseRequestsClass(object):
     ))
     atexit.register(_session.close)
 
-    def __init__(self, exc_type=None):
-        settings = XbmcPluginSettings()
+    def __init__(self, context, exc_type=None):
+        settings = context.get_settings()
         self._verify = settings.verify_ssl()
         self._timeout = settings.get_timeout()
-        settings.flush(flush_all=False)
 
         if isinstance(exc_type, tuple):
             self._default_exc = (RequestException,) + exc_type

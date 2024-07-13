@@ -288,7 +288,12 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self, language=None, region=None, exc_type=None, **_kwargs):
+    def __init__(self,
+                 context,
+                 language=None,
+                 region=None,
+                 exc_type=None,
+                 **_kwargs):
         common_client = self.CLIENTS['_common']['json']['context']['client']
         # the default language is always en_US (like YouTube on the WEB)
         language = language.replace('-', '_') if language else 'en_US'
@@ -302,7 +307,10 @@ class YouTubeRequestClient(BaseRequestsClass):
         else:
             exc_type = (YouTubeException,)
 
-        super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
+        super(YouTubeRequestClient, self).__init__(
+            context=context,
+            exc_type=exc_type,
+        )
 
     @classmethod
     def json_traverse(cls, json_data, path, default=None):

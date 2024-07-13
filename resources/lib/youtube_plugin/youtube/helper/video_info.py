@@ -713,7 +713,7 @@ class VideoInfo(YouTubeRequestClient):
                 'android_embedded',
             )
 
-        super(VideoInfo, self).__init__(**kwargs)
+        super(VideoInfo, self).__init__(context=context, **kwargs)
 
     @staticmethod
     def _response_hook_json(**kwargs):

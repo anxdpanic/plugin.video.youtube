@@ -133,7 +133,7 @@ class YouTube(LoginClient):
         if 'items_per_page' in kwargs:
             self._max_results = kwargs.pop('items_per_page')
 
-        super(YouTube, self).__init__(**kwargs)
+        super(YouTube, self).__init__(context=context, **kwargs)
 
     def get_max_results(self):
         return self._max_results

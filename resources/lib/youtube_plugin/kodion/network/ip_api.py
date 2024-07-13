@@ -15,11 +15,11 @@ from .. import logger
 
 class Locator(BaseRequestsClass):
 
-    def __init__(self):
+    def __init__(self, context):
         self._base_url = 'http://ip-api.com'
         self._response = {}
 
-        super(Locator, self).__init__()
+        super(Locator, self).__init__(context=context)
 
     def response(self):
         return self._response
