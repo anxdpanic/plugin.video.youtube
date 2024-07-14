@@ -1283,7 +1283,9 @@ class YouTube(LoginClient):
                 max_results=remaining,
                 **kwargs
             )
-            if continuation and 'nextPageToken' in continuation:
+            if not continuation:
+                break
+            if 'nextPageToken' in continuation:
                 page_token = continuation['nextPageToken']
             else:
                 page_token = ''
