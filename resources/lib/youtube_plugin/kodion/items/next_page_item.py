@@ -24,7 +24,8 @@ class NextPageItem(DirectoryItem):
         items_per_page = params.get('items_per_page', 50)
         can_jump = ('next_page_token' not in params
                     and not path.startswith(('/channel',
-                                             '/special/recommendations')))
+                                             '/special/recommendations',
+                                             '/special/related_videos')))
         if 'page_token' not in params and can_jump:
             params['page_token'] = self.create_page_token(page, items_per_page)
 
