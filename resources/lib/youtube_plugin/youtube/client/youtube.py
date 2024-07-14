@@ -1458,6 +1458,10 @@ class YouTube(LoginClient):
         v3_response = {
             'kind': 'youtube#videoListResponse',
             'items': [],
+            'pageInfo': {
+                'totalResults': 0,
+                'resultsPerPage': self._max_results,
+            },
         }
 
         cache = self._context.get_feed_history()
@@ -1819,6 +1823,7 @@ class YouTube(LoginClient):
         else:
             return None
 
+        v3_response['pageInfo']['totalResults'] = totals['num']
         v3_response['items'] = items
         return v3_response
 
