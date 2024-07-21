@@ -42,7 +42,9 @@ class SystemVersion(object):
             self._version = (1, 0)  # Frodo
             self._appname = 'Unknown Application'
 
-        if self._version >= (21, 0):
+        if self._version >= (22, 0):
+            self._releasename = 'Piers'
+        elif self._version >= (21, 0):
             self._releasename = 'Omega'
         elif self._version >= (20, 0):
             self._releasename = 'Nexus'
