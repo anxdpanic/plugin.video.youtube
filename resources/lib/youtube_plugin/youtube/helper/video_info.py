@@ -1350,9 +1350,15 @@ class VideoInfo(YouTubeRequestClient):
                 status = playability_status.get('status', '').upper()
                 reason = playability_status.get('reason', '')
 
-                if status in {'', 'AGE_CHECK_REQUIRED', 'UNPLAYABLE',
-                              'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED',
-                              'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
+                if status in {
+                    '',
+                    'AGE_CHECK_REQUIRED',
+                    'AGE_VERIFICATION_REQUIRED',
+                    'CONTENT_CHECK_REQUIRED',
+                    'ERROR',
+                    'LOGIN_REQUIRED',
+                    'UNPLAYABLE',
+                }:
                     if (playability_status.get('desktopLegacyAgeGateReason')
                             and _settings.age_gate()):
                         break

@@ -411,10 +411,10 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
             manifest_type = 'hls'
             mime_type = 'application/x-mpegURL'
 
-        inputstream_property = ('inputstream'
-                                if current_system_version.compatible(19, 0) else
-                                'inputstreamaddon')
-        props[inputstream_property] = 'inputstream.adaptive'
+        if current_system_version.compatible(19, 0):
+            props['inputstream'] = 'inputstream.adaptive'
+        else:
+            props['inputstreamaddon'] = 'inputstream.adaptive'
 
         if current_system_version.compatible(21, 0):
             isa_capabilities = context.inputstream_adaptive_capabilities()

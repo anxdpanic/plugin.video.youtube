@@ -644,7 +644,8 @@ class XbmcContext(AbstractContext):
                                    error.get('message', 'unknown')))
             return False
 
-    def send_notification(self, method, data=True):
+    @staticmethod
+    def send_notification(method, data=True):
         jsonrpc(method='JSONRPC.NotifyAll',
                 params={'sender': ADDON_ID,
                         'message': method,
@@ -675,8 +676,9 @@ class XbmcContext(AbstractContext):
     # - any Falsy value to exclude capability regardless of version
     # - True to include capability regardless of version
     _ISA_CAPABILITIES = {
-        'live': loose_version('2.0.12'),
+        # functionality
         'drm': loose_version('2.2.12'),
+        'live': loose_version('2.0.12'),
         'ttml': loose_version('20.0.0'),
         # properties
         'config_prop': loose_version('21.4.11'),
