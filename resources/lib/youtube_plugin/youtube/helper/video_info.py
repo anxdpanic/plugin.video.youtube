@@ -1315,7 +1315,7 @@ class VideoInfo(YouTubeRequestClient):
 
         while 1:
             for client_name in self._prioritised_clients:
-                if status and status != 'OK':
+                if status is not None:
                     self._context.log_warning(
                         'Failed to retrieve video info - '
                         'video_id: {0}, client: {1}, auth: {2},\n'
@@ -1350,11 +1350,19 @@ class VideoInfo(YouTubeRequestClient):
                 status = playability_status.get('status', '').upper()
                 reason = playability_status.get('reason', '')
 
-                if status in {
+                if video_details and video_id != video_details.get('videoId'):
+                    status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
+                    reason = 'Watch on the latest version of YouTube'
+                    continue
+
+                if status == 'OK':
+                    break
+                elif status in {
                     '',
                     'AGE_CHECK_REQUIRED',
                     'AGE_VERIFICATION_REQUIRED',
                     'CONTENT_CHECK_REQUIRED',
+                    'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
                     'ERROR',
                     'LOGIN_REQUIRED',
                     'UNPLAYABLE',
@@ -1392,9 +1400,11 @@ class VideoInfo(YouTubeRequestClient):
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
                         continue
-                if video_details and video_id != video_details.get('videoId'):
-                    status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                    reason = 'Watch on the latest version of YouTube'
+                else:
+                    self._context.log_debug(
+                        'Unknown playabilityStatus in player response:\n|{0}|'
+                        .format(playability_status)
+                    )
                     continue
                 break
             # Only attempt to remove Authorization header if clients iterable
