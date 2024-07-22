@@ -784,21 +784,22 @@ class XbmcContext(AbstractContext):
 
         pop_property = self.get_ui().pop_property
         no_timeout = timeout < 0
-        remaining = timeout
-        wait_period = 0.1
+        remaining = timeout = timeout * 1000
+        wait_period_ms = 100
+        wait_period = wait_period_ms / 1000
 
         while no_timeout or remaining > 0:
             awake = pop_property(WAKEUP)
             if awake:
                 if awake == target:
-                    self.log_debug('Wakeup |{0}| in {1}s'
+                    self.log_debug('Wakeup |{0}| in {1}ms'
                                    .format(awake, timeout - remaining))
                 else:
-                    self.log_error('Wakeup |{0}| in {1}s - expected |{2}|'
+                    self.log_error('Wakeup |{0}| in {1}ms - expected |{2}|'
                                    .format(awake, timeout - remaining, target))
                 break
             wait(wait_period)
-            remaining -= wait_period
+            remaining -= wait_period_ms
         else:
-            self.log_error('Wakeup |{0}| timed out in {1}s'
+            self.log_error('Wakeup |{0}| timed out in {1}ms'
                            .format(target, timeout))
