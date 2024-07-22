@@ -678,6 +678,9 @@ class XbmcContext(AbstractContext):
         'live': loose_version('2.0.12'),
         'drm': loose_version('2.2.12'),
         'ttml': loose_version('20.0.0'),
+        # properties
+        'config_prop': loose_version('21.4.11'),
+        'manifest_config_prop': loose_version('21.4.5'),
         # audio codecs
         'vorbis': loose_version('2.3.14'),
         # unknown when Opus audio support was implemented
