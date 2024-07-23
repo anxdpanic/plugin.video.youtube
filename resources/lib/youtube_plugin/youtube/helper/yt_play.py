@@ -33,7 +33,7 @@ from ...kodion.network import get_connect_address
 from ...kodion.utils import find_video_id, select_stream
 
 
-def _play_video(provider, context):
+def _play_stream(provider, context):
     ui = context.get_ui()
     params = context.get_params()
     video_id = params.get('video_id')
@@ -51,7 +51,7 @@ def _play_video(provider, context):
     is_external = ui.get_property(PLAY_WITH)
     if ((is_external and settings.alternative_player_web_urls())
             or settings.default_player_web_urls()):
-        video_stream = {
+        stream = {
             'url': 'https://youtu.be/{0}'.format(video_id),
         }
     else:
@@ -61,11 +61,10 @@ def _play_video(provider, context):
 
         audio_only = None
         if ui.pop_property(PLAY_FORCE_AUDIO):
-            ask_for_quality = False
             audio_only = True
 
         try:
-            video_streams = client.get_video_streams(context, video_id)
+            streams = client.get_streams(context, video_id, audio_only)
         except YouTubeException as exc:
             context.log_error('yt_play.play_video - {exc}:\n{details}'.format(
                 exc=exc, details=''.join(format_stack())
@@ -73,24 +72,24 @@ def _play_video(provider, context):
             ui.show_notification(message=exc.get_message())
             return False
 
-        if not video_streams:
+        if not streams:
             message = context.localize('error.no_video_streams_found')
             ui.show_notification(message, time_ms=5000)
             return False
 
-        video_stream = select_stream(
+        stream = select_stream(
             context,
-            video_streams,
+            streams,
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
             use_adaptive_formats=(not is_external
                                   or settings.alternative_player_adaptive()),
         )
 
-        if video_stream is None:
+        if stream is None:
             return False
 
-    video_type = video_stream.get('video')
+    video_type = stream.get('video')
     if video_type and video_type.get('rtmpe'):
         message = context.localize('error.rtmpe_not_supported')
         ui.show_notification(message, time_ms=5000)
@@ -104,7 +103,7 @@ def _play_video(provider, context):
                                             v3,
                                             video_id)
 
-    metadata = video_stream.get('meta', {})
+    metadata = stream.get('meta', {})
     video_details = metadata.get('video', {})
 
     if is_external:
@@ -112,18 +111,18 @@ def _play_video(provider, context):
             'http',
             get_connect_address(context=context, as_netloc=True),
             PATHS.REDIRECT,
-            urlencode({'url': video_stream['url']}),
+            urlencode({'url': stream['url']}),
             '',
         ))
-        video_stream['url'] = url
-    video_item = VideoItem(video_details.get('title', ''), video_stream['url'])
+        stream['url'] = url
+    video_item = VideoItem(video_details.get('title', ''), stream['url'])
 
-    use_history = not (screensaver or incognito or video_stream.get('live'))
+    use_history = not (screensaver or incognito or stream.get('live'))
     use_remote_history = use_history and settings.use_remote_history()
     use_play_data = use_history and settings.use_local_history()
 
     utils.update_play_info(provider, context, video_id, video_item,
-                           video_stream, use_play_data=use_play_data)
+                           stream, use_play_data=use_play_data)
 
     seek_time = 0.0 if params.get('resume') else params.get('seek', 0.0)
     start_time = params.get('start', 0.0)
@@ -137,7 +136,7 @@ def _play_video(provider, context):
     #     video_item.set_duration_from_seconds(end_time)
 
     play_count = use_play_data and video_item.get_play_count() or 0
-    playback_stats = video_stream.get('playback_stats')
+    playback_stats = stream.get('playback_stats')
 
     playback_data = {
         'video_id': video_id,
@@ -337,9 +336,9 @@ def process(provider, context, **_kwargs):
             context.execute('Action(Play)')
             return False
         context.wakeup(SERVER_WAKEUP, timeout=5)
-        video = _play_video(provider, context)
+        video_item = _play_stream(provider, context)
         ui.set_property(SERVER_POST_START)
-        return video
+        return video_item
 
     if playlist_id or 'playlist_ids' in params:
         return _play_playlist(provider, context)

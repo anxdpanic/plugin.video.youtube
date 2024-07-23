@@ -18,7 +18,7 @@ from itertools import chain, islice
 from random import randint
 
 from .login_client import LoginClient
-from ..helper.video_info import VideoInfo
+from ..helper.stream_info import StreamInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import cpu_count, string_type, to_str
 from ...kodion.utils import (
@@ -195,63 +195,11 @@ class YouTube(LoginClient):
         self.request(url, params=params, headers=headers,
                      error_msg='Failed to update watch history')
 
-    def get_video_streams(self, context, video_id):
-        video_info = VideoInfo(context, access_token=self._access_token_tv,
-                               language=self._language)
-
-        video_streams = video_info.load_stream_infos(video_id)
-
-        # update title
-        for video_stream in video_streams:
-            title = '%s (%s)' % (
-                context.get_ui().bold(video_stream['title']),
-                video_stream['container']
-            )
-
-            if 'audio' in video_stream and 'video' in video_stream:
-                if (video_stream['audio']['bitrate'] > 0
-                        and video_stream['video']['codec']
-                        and video_stream['audio']['codec']):
-                    title = '%s (%s; %s / %s@%d)' % (
-                        context.get_ui().bold(video_stream['title']),
-                        video_stream['container'],
-                        video_stream['video']['codec'],
-                        video_stream['audio']['codec'],
-                        video_stream['audio']['bitrate']
-                    )
-
-                elif (video_stream['video']['codec']
-                      and video_stream['audio']['codec']):
-                    title = '%s (%s; %s / %s)' % (
-                        context.get_ui().bold(video_stream['title']),
-                        video_stream['container'],
-                        video_stream['video']['codec'],
-                        video_stream['audio']['codec']
-                    )
-            elif 'audio' in video_stream and 'video' not in video_stream:
-                if (video_stream['audio']['codec']
-                        and video_stream['audio']['bitrate'] > 0):
-                    title = '%s (%s; %s@%d)' % (
-                        context.get_ui().bold(video_stream['title']),
-                        video_stream['container'],
-                        video_stream['audio']['codec'],
-                        video_stream['audio']['bitrate']
-                    )
-
-            elif 'audio' in video_stream or 'video' in video_stream:
-                codec = video_stream.get('audio', {}).get('codec')
-                if not codec:
-                    codec = video_stream.get('video', {}).get('codec')
-                if codec:
-                    title = '%s (%s; %s)' % (
-                        context.get_ui().bold(video_stream['title']),
-                        video_stream['container'],
-                        codec
-                    )
-
-            video_stream['title'] = title
-
-        return video_streams
+    def get_streams(self, context, video_id, audio_only=False):
+        return StreamInfo(context,
+                          access_token=self._access_token_tv,
+                          audio_only=audio_only,
+                          language=self._language).load_stream_infos(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
