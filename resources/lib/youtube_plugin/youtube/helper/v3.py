@@ -258,6 +258,9 @@ def _process_list_response(provider, context, json_data, item_filter):
             position = snippet.get('position') or len(result)
             item.set_track_number(position + 1)
 
+        if '_callback' in yt_item:
+            yt_item['_callback'](item)
+
         result.append(item)
 
     # this will also update the channel_id_dict with the correct channel_id
