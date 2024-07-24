@@ -1017,24 +1017,23 @@ class Provider(AbstractProvider):
                         'kind': 'youtube#video',
                         'id': video_id,
                         '_partial': True,
+                        '_context_menu': {
+                            'context_menu': (
+                                menu_items.history_remove(
+                                    context, video_id
+                                ),
+                                menu_items.history_clear(
+                                    context
+                                ),
+                                menu_items.separator(),
+                            ),
+                            'position': 0,
+                        }
                     }
                     for video_id in items.keys()
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
-
-            for video_item in video_items:
-                context_menu = [
-                    menu_items.history_remove(
-                        context, video_item.video_id
-                    ),
-                    menu_items.history_clear(
-                        context
-                    ),
-                    menu_items.separator(),
-                ]
-                video_item.add_context_menu(context_menu, position=0)
-
             return video_items
 
         if action == 'clear' and context.get_ui().on_yes_no_input(
@@ -1531,24 +1530,23 @@ class Provider(AbstractProvider):
                         'kind': 'youtube#video',
                         'id': video_id,
                         '_partial': True,
+                        '_context_menu': {
+                            'context_menu': (
+                                menu_items.watch_later_local_remove(
+                                    context, video_id
+                                ),
+                                menu_items.watch_later_local_clear(
+                                    context
+                                ),
+                                menu_items.separator(),
+                            ),
+                            'position': 0,
+                        }
                     }
                     for video_id in items.keys()
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
-
-            for video_item in video_items:
-                context_menu = [
-                    menu_items.watch_later_local_remove(
-                        context, video_item.video_id
-                    ),
-                    menu_items.watch_later_local_clear(
-                        context
-                    ),
-                    menu_items.separator(),
-                ]
-                video_item.add_context_menu(context_menu, position=0)
-
             return video_items
 
         if command == 'clear' and context.get_ui().on_yes_no_input(
