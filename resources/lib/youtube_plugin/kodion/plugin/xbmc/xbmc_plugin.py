@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import xbmcplugin
+from ...compatibility import xbmc, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CHECK_SETTINGS,
@@ -107,6 +107,8 @@ class XbmcPlugin(AbstractPlugin):
                                         'reloading playlist')
 
                     num_items = playlist.add_items(items)
+                    if xbmc.Player().isPlaying():
+                        return False
                     if position:
                         max_wait_time = min(position, num_items)
                     else:
