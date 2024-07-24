@@ -537,17 +537,17 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     else:
         special_sort = 'top'
 
-        prop_value = directory_item.get_subscription_id()
+        prop_value = directory_item.subscription_id
         if prop_value:
             special_sort = None
             props[SUBSCRIPTION_ID] = prop_value
 
-        prop_value = directory_item.get_channel_id()
+        prop_value = directory_item.channel_id
         if prop_value:
             special_sort = None
             props[CHANNEL_ID] = prop_value
 
-        prop_value = directory_item.get_playlist_id()
+        prop_value = directory_item.playlist_id
         if prop_value:
             special_sort = None
             props[PLAYLIST_ID] = prop_value
@@ -684,22 +684,22 @@ def video_listitem(context,
         props[VIDEO_ID] = prop_value
 
     # make channel_id property available for keymapping
-    prop_value = video_item.get_channel_id()
+    prop_value = video_item.channel_id
     if prop_value:
         props[CHANNEL_ID] = prop_value
 
     # make subscription_id property available for keymapping
-    prop_value = video_item.get_subscription_id()
+    prop_value = video_item.subscription_id
     if prop_value:
         props[SUBSCRIPTION_ID] = prop_value
 
     # make playlist_id property available for keymapping
-    prop_value = video_item.get_playlist_id()
+    prop_value = video_item.playlist_id
     if prop_value:
         props[PLAYLIST_ID] = prop_value
 
     # make playlist_item_id property available for keymapping
-    prop_value = video_item.get_playlist_item_id()
+    prop_value = video_item.playlist_item_id
     if prop_value:
         props[PLAYLISTITEM_ID] = prop_value
 

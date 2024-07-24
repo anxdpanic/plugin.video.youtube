@@ -19,13 +19,10 @@ from ..constants import MEDIA_PATH
 
 
 class BaseItem(object):
-    VERSION = 3
-
+    _version = 3
     _playable = False
 
     def __init__(self, name, uri, image=None, fanart=None):
-        self._version = BaseItem.VERSION
-
         self._name = None
         self.set_name(name)
 

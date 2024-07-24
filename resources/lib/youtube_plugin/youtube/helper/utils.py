@@ -192,7 +192,7 @@ def update_channel_infos(provider, context, channel_id_dict,
         # -- unsubscribe from channel
         subscription_id = subscription_id_dict.get(channel_id, '')
         if subscription_id:
-            channel_item.set_subscription_id(subscription_id)
+            channel_item.subscription_id = subscription_id
             context_menu.append(
                 menu_items.unsubscribe_from_channel(
                     context, subscription_id=subscription_id
@@ -649,7 +649,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # update channel mapping
         channel_id = snippet.get('channelId', '')
-        video_item.set_channel_id(channel_id)
+        video_item.channel_id = channel_id
         if channel_id and channel_items_dict is not None:
             if channel_id not in channel_items_dict:
                 channel_items_dict[channel_id] = []
@@ -710,8 +710,8 @@ def update_video_infos(provider, context, video_id_dict,
                 and playlist_channel_id == 'mine'
                 and playlist_id.strip().lower() not in {'hl', 'wl'}):
             playlist_item_id = playlist_item_id_dict[video_id]
-            video_item.set_playlist_id(playlist_id)
-            video_item.set_playlist_item_id(playlist_item_id)
+            video_item.playlist_id = playlist_id
+            video_item.playlist_item_id = playlist_item_id
             context_menu.append(
                 menu_items.remove_video_from_playlist(
                     context,
@@ -724,7 +724,7 @@ def update_video_infos(provider, context, video_id_dict,
         # got to [CHANNEL] only if we are not directly in the channel
         if (channel_id and channel_name and
                 context.create_path('channel', channel_id) != path):
-            video_item.set_channel_id(channel_id)
+            video_item.channel_id = channel_id
             context_menu.append(
                 menu_items.go_to_channel(
                     context, channel_id, channel_name
