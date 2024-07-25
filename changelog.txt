@@ -1,3 +1,17 @@
+## v7.0.9+beta.4
+### Fixed
+- Fix issues with next page and jump to page in related video listings
+- Attempt to workaround issue with getting system idle time on Xbox #839
+- Better handle unknown errors in player request responses #845
+- Fix double playback due to busy dialog crash workaround
+
+### Changed
+- Respect disable certificate verification setting with cURL in ISA #841
+- Update bookmarks when listing rather than only using item snapshot
+
+### New
+- Enable loop to first page on last page of manually paginated listings (My Subscriptions)
+
 ## v7.0.9+beta.3
 ### Fixed
 - Fix navigating to search page after playback and prompt re-opening
