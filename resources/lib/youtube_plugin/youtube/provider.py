@@ -45,6 +45,7 @@ from ..kodion.items import (
     NewSearchItem,
     SearchItem,
     UriItem,
+    VideoItem,
     menu_items,
 )
 from ..kodion.utils import strip_html_from_text
@@ -1016,24 +1017,23 @@ class Provider(AbstractProvider):
                         'kind': 'youtube#video',
                         'id': video_id,
                         '_partial': True,
+                        '_context_menu': {
+                            'context_menu': (
+                                menu_items.history_remove(
+                                    context, video_id
+                                ),
+                                menu_items.history_clear(
+                                    context
+                                ),
+                                menu_items.separator(),
+                            ),
+                            'position': 0,
+                        }
                     }
                     for video_id in items.keys()
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
-
-            for video_item in video_items:
-                context_menu = [
-                    menu_items.history_remove(
-                        context, video_item.video_id
-                    ),
-                    menu_items.history_clear(
-                        context
-                    ),
-                    menu_items.separator(),
-                ]
-                video_item.add_context_menu(context_menu, position=0)
-
             return video_items
 
         if action == 'clear' and context.get_ui().on_yes_no_input(
@@ -1407,45 +1407,62 @@ class Provider(AbstractProvider):
                 return True
 
             v3_response = {
-                'kind': 'youtube#channelListResponse',
-                'items': [
-                    {
-                        'kind': 'youtube#channel',
-                        'id': item_id,
-                        '_partial': True,
-                    }
-                    for item_id, item in items.items()
-                    if isinstance(item, float)
-                ]
+                'kind': 'youtube#pluginListResponse',
+                'items': []
             }
-            channel_items = v3.response_to_items(provider, context, v3_response)
-            for channel_item in channel_items:
-                channel_id = channel_item.get_channel_id()
-                if channel_id not in items:
-                    continue
-                timestamp = items[channel_id]
-                channel_item.set_bookmark_timestamp(timestamp)
-                items[channel_id] = channel_item
-                bookmarks_list.update_item(
-                    channel_id, repr(channel_item), timestamp
-                )
 
-            bookmarks = []
+            def _update_bookmark(_id, timestamp):
+                def _update(new_item):
+                    new_item.set_bookmark_timestamp(timestamp)
+                    bookmarks_list.update_item(_id, repr(new_item), timestamp)
+
+                return _update
+
             for item_id, item in items.items():
-                if not isinstance(item, BaseItem):
-                    continue
-                context_menu = [
-                    menu_items.bookmark_remove(
-                        context, item_id
-                    ),
-                    menu_items.bookmarks_clear(
-                        context
-                    ),
-                    menu_items.separator(),
-                ]
-                item.add_context_menu(context_menu, position=0)
-                bookmarks.append(item)
+                if isinstance(item, float):
+                    kind = 'youtube#channel'
+                    yt_id = item_id
+                    callback = _update_bookmark(item_id, item)
+                    partial = True
+                else:
+                    callback = None
+                    partial = False
+                    if isinstance(item, VideoItem):
+                        kind = 'youtube#video'
+                        yt_id = item.video_id
+                    else:
+                        yt_id = item.playlist_id
+                        if yt_id:
+                            kind = 'youtube#playlist'
+                        else:
+                            kind = 'youtube#channel'
+                            yt_id = item.channel_id
 
+                if not yt_id:
+                    continue
+
+                item = {
+                    'kind': kind,
+                    'id': yt_id,
+                    '_partial': partial,
+                    '_context_menu': {
+                        'context_menu': (
+                            menu_items.bookmark_remove(
+                                context, item_id
+                            ),
+                            menu_items.bookmarks_clear(
+                                context
+                            ),
+                            menu_items.separator(),
+                        ),
+                        'position': 0,
+                    },
+                }
+                if callback:
+                    item['_callback'] = callback
+                v3_response['items'].append(item)
+
+            bookmarks = v3.response_to_items(provider, context, v3_response)
             return bookmarks
 
         ui = context.get_ui()
@@ -1513,24 +1530,23 @@ class Provider(AbstractProvider):
                         'kind': 'youtube#video',
                         'id': video_id,
                         '_partial': True,
+                        '_context_menu': {
+                            'context_menu': (
+                                menu_items.watch_later_local_remove(
+                                    context, video_id
+                                ),
+                                menu_items.watch_later_local_clear(
+                                    context
+                                ),
+                                menu_items.separator(),
+                            ),
+                            'position': 0,
+                        }
                     }
                     for video_id in items.keys()
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
-
-            for video_item in video_items:
-                context_menu = [
-                    menu_items.watch_later_local_remove(
-                        context, video_item.video_id
-                    ),
-                    menu_items.watch_later_local_clear(
-                        context
-                    ),
-                    menu_items.separator(),
-                ]
-                video_item.add_context_menu(context_menu, position=0)
-
             return video_items
 
         if command == 'clear' and context.get_ui().on_yes_no_input(

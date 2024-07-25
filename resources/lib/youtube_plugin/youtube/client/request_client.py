@@ -88,14 +88,15 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited to 720p on some videos
         'android_embedded': {
             '_id': 55,
+            '_disabled': True,
             '_query_subtitles': 'optional',
             'json': {
                 'params': _ANDROID_PARAMS,
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientVersion': '19.17.34',
                         'clientScreen': 'EMBED',
+                        'clientVersion': '19.17.34',
                         'androidSdkVersion': '34',
                         'osName': 'Android',
                         'osVersion': '14',
@@ -114,6 +115,9 @@ class YouTubeRequestClient(BaseRequestsClass):
                                ' {json[context][client][gl]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+            },
+            'params': {
+                'key': _API_KEYS['android_embedded'],
             },
         },
         # 4k with HDR
@@ -207,7 +211,6 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'media_connect_frontend': {
             '_id': 95,
-            '_access_token': KeyError,
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -288,7 +291,12 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
     }
 
-    def __init__(self, language=None, region=None, exc_type=None, **_kwargs):
+    def __init__(self,
+                 context,
+                 language=None,
+                 region=None,
+                 exc_type=None,
+                 **_kwargs):
         common_client = self.CLIENTS['_common']['json']['context']['client']
         # the default language is always en_US (like YouTube on the WEB)
         language = language.replace('-', '_') if language else 'en_US'
@@ -302,7 +310,10 @@ class YouTubeRequestClient(BaseRequestsClass):
         else:
             exc_type = (YouTubeException,)
 
-        super(YouTubeRequestClient, self).__init__(exc_type=exc_type)
+        super(YouTubeRequestClient, self).__init__(
+            context=context,
+            exc_type=exc_type,
+        )
 
     @classmethod
     def json_traverse(cls, json_data, path, default=None):

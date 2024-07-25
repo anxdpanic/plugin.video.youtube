@@ -258,6 +258,9 @@ def _process_list_response(provider, context, json_data, item_filter):
             position = snippet.get('position') or len(result)
             item.set_track_number(position + 1)
 
+        if '_callback' in yt_item:
+            yt_item['_callback'](item)
+
         result.append(item)
 
     # this will also update the channel_id_dict with the correct channel_id
@@ -463,8 +466,8 @@ def response_to_items(provider,
     This should work for up to ~2000 entries.
     """
     params = context.get_params()
-    current_page = params.get('page', 1)
-    next_page = current_page + 1
+    current_page = params.get('page')
+    next_page = current_page + 1 if current_page else 2
     new_params = dict(params, page=next_page)
 
     yt_next_page_token = json_data.get('nextPageToken')
@@ -472,8 +475,14 @@ def response_to_items(provider,
         new_params['page_token'] = ''
     elif yt_next_page_token:
         new_params['page_token'] = yt_next_page_token
-    elif 'page_token' in new_params:
-        del new_params['page_token']
+    else:
+        if 'page_token' in new_params:
+            del new_params['page_token']
+        elif current_page:
+            new_params['page_token'] = ''
+        else:
+            return result
+
         page_info = json_data.get('pageInfo', {})
         yt_total_results = int(page_info.get('totalResults', 0))
         yt_results_per_page = int(page_info.get('resultsPerPage', 50))
@@ -488,8 +497,6 @@ def response_to_items(provider,
             new_params['page'] = 1
         else:
             return result
-    else:
-        return result
 
     yt_visitor_data = json_data.get('visitorData')
     if yt_visitor_data:

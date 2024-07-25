@@ -29,6 +29,7 @@ from ..network import get_connect_address, get_http_server, httpd_status
 class ServiceMonitor(xbmc.Monitor):
     _settings_changes = 0
     _settings_state = None
+    get_idle_time = xbmc.getGlobalIdleTime
 
     def __init__(self, context):
         self._context = context
@@ -43,6 +44,7 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd_thread = None
         self.httpd_sleep_allowed = True
 
+        self.system_idle = False
         self.refresh = False
         self.interrupt = False
 
@@ -113,6 +115,20 @@ class ServiceMonitor(xbmc.Monitor):
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()
+
+    def onScreensaverActivated(self):
+        self.system_idle = True
+
+    def onScreensaverDeactivated(self):
+        self.system_idle = False
+        self.interrupt = True
+
+    def onDPMSActivated(self):
+        self.system_idle = True
+
+    def onDPMSDeactivated(self):
+        self.system_idle = False
+        self.interrupt = True
 
     def onSettingsChanged(self):
         self._settings_changes += 1

@@ -37,7 +37,7 @@ from ...kodion.network import get_connect_address
 from ...kodion.utils import make_dirs, redact_ip_from_url
 
 
-class VideoInfo(YouTubeRequestClient):
+class StreamInfo(YouTubeRequestClient):
     BASE_PATH = make_dirs(TEMP_PATH)
 
     FORMAT = {
@@ -566,6 +566,24 @@ class VideoInfo(YouTubeRequestClient):
                 'hls/video': True,
                 'fps': 60,
                 'video': {'height': 1080, 'codec': 'vp9'}},
+        '620': {'container': 'hls',
+                'title': '1440p',
+                'hls/video': True,
+                'video': {'height': 1440, 'codec': 'vp9'}},
+        '623': {'container': 'hls',
+                'title': '1440p@60',
+                'hls/video': True,
+                'fps': 60,
+                'video': {'height': 1440, 'codec': 'vp9'}},
+        '625': {'container': 'hls',
+                'title': '4k',
+                'hls/video': True,
+                'video': {'height': 2160, 'codec': 'vp9'}},
+        '628': {'container': 'hls',
+                'title': '4k@60',
+                'hls/video': True,
+                'fps': 60,
+                'video': {'height': 2160, 'codec': 'vp9'}},
         '9994': {'container': 'hls',
                  'title': 'Adaptive HLS',
                  'hls/audio': True,
@@ -660,17 +678,24 @@ class VideoInfo(YouTubeRequestClient):
         'dtse': 1.3,
     }
 
-    def __init__(self, context, access_token='', **kwargs):
+    def __init__(self,
+                 context,
+                 access_token='',
+                 clients=None,
+                 audio_only=False,
+                 **kwargs):
         self.video_id = None
         self._context = context
         self._language_base = kwargs.get('language', 'en_US')[0:2]
         self._access_token = access_token
+        self._audio_only = audio_only
         self._player_js = None
         self._calculate_n = True
         self._cipher = None
 
         self._selected_client = None
         client_selection = context.get_settings().client_selection()
+        self._prioritised_clients = clients if clients else ()
 
         # Default client selection uses the Android or iOS client as the first
         # option to ensure that the age gate setting is enforced, regardless of
@@ -680,7 +705,7 @@ class VideoInfo(YouTubeRequestClient):
         # Prefer iOS client to access premium streams, however other stream
         # types are limited
         if client_selection == 1:
-            self._prioritised_clients = (
+            self._prioritised_clients += (
                 'ios',
                 'android',
                 'android_youtube_tv',
@@ -691,7 +716,7 @@ class VideoInfo(YouTubeRequestClient):
         # Alternate #2
         # Prefer use of non-adaptive formats.
         elif client_selection == 2:
-            self._prioritised_clients = (
+            self._prioritised_clients += (
                 'media_connect_frontend',
                 'android',
                 'android_youtube_tv',
@@ -704,7 +729,7 @@ class VideoInfo(YouTubeRequestClient):
         # Some restricted videos require additional requests for subtitles
         # Fallback to iOS, media connect, and embedded clients
         else:
-            self._prioritised_clients = (
+            self._prioritised_clients += (
                 'android',
                 'android_youtube_tv',
                 'android_testsuite',
@@ -713,7 +738,7 @@ class VideoInfo(YouTubeRequestClient):
                 'android_embedded',
             )
 
-        super(VideoInfo, self).__init__(**kwargs)
+        super(StreamInfo, self).__init__(context=context, **kwargs)
 
     @staticmethod
     def _response_hook_json(**kwargs):
@@ -790,12 +815,17 @@ class VideoInfo(YouTubeRequestClient):
 
         yt_format = yt_format.copy()
         manual_sort = yt_format.get('sort', 0)
+        av_label = [yt_format['container']]
 
         if info:
-            video_info = info.get('video') or {}
-            yt_format['title'] = video_info.get('label', '')
-            yt_format['video']['codec'] = video_info.get('codec', '')
-            yt_format['video']['height'] = video_info.get('height', 0)
+            if 'video' in yt_format:
+                if self._audio_only:
+                    del yt_format['video']
+                else:
+                    video_info = info['video'] or {}
+                    yt_format['title'] = video_info.get('label', '')
+                    yt_format['video']['codec'] = video_info.get('codec', '')
+                    yt_format['video']['height'] = video_info.get('height', 0)
 
             audio_info = info.get('audio') or {}
             yt_format['audio']['codec'] = audio_info.get('codec', '')
@@ -806,19 +836,24 @@ class VideoInfo(YouTubeRequestClient):
             video_height = video_info.get('height', 0)
             if max_height and video_height > max_height:
                 return False
-            video_sort = (
-                    video_height
-                    * self.QUALITY_FACTOR.get(video_info.get('codec'), 1)
-            )
+            codec = video_info.get('codec')
+            if codec:
+                video_sort = video_height * self.QUALITY_FACTOR.get(codec, 1)
+                av_label.append(codec)
+            else:
+                video_sort = video_height
         else:
             video_sort = -1
 
         audio_info = yt_format.get('audio')
         if audio_info:
-            audio_sort = (
-                    audio_info.get('bitrate', 0)
-                    * self.QUALITY_FACTOR.get(audio_info.get('codec'), 1)
-            )
+            codec = audio_info.get('codec')
+            bitrate = audio_info.get('bitrate', 0)
+            audio_sort = bitrate * self.QUALITY_FACTOR.get(codec, 1)
+            if bitrate:
+                av_label.append('@'.join((codec, str(bitrate))))
+            elif codec:
+                av_label.append(codec)
         else:
             audio_sort = 0
 
@@ -827,14 +862,22 @@ class VideoInfo(YouTubeRequestClient):
             video_sort,
             audio_sort,
         ]
+
         if kwargs:
             kwargs.update(yt_format)
-            return kwargs
+            yt_format = kwargs
+
+        yt_format['title'] = ''.join((
+            self._context.get_ui().bold(yt_format['title']),
+            ' (',
+            ' / '.join(av_label),
+            ')'
+        ))
         return yt_format
 
     def load_stream_infos(self, video_id):
         self.video_id = video_id
-        return self._get_video_info()
+        return self._get_stream_info()
 
     def _get_player_page(self, client_name='web', embed=False):
         if embed:
@@ -973,8 +1016,12 @@ class VideoInfo(YouTubeRequestClient):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _load_hls_manifest(self, url, is_live=False, meta_info=None,
-                           headers=None, playback_stats=None):
+    def _load_hls_manifest(self,
+                           url,
+                           is_live=False,
+                           meta_info=None,
+                           headers=None,
+                           playback_stats=None):
         if not url:
             return []
 
@@ -1294,7 +1341,7 @@ class VideoInfo(YouTubeRequestClient):
             return result['simpleText']
         return None
 
-    def _get_video_info(self):
+    def _get_stream_info(self):
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         _settings = self._context.get_settings()
@@ -1315,7 +1362,7 @@ class VideoInfo(YouTubeRequestClient):
 
         while 1:
             for client_name in self._prioritised_clients:
-                if status and status != 'OK':
+                if status is not None:
                     self._context.log_warning(
                         'Failed to retrieve video info - '
                         'video_id: {0}, client: {1}, auth: {2},\n'
@@ -1329,6 +1376,7 @@ class VideoInfo(YouTubeRequestClient):
                     )
                 client = self.build_client(client_name, client_data)
                 if not client:
+                    status = None
                     continue
 
                 result = self.request(
@@ -1350,9 +1398,23 @@ class VideoInfo(YouTubeRequestClient):
                 status = playability_status.get('status', '').upper()
                 reason = playability_status.get('reason', '')
 
-                if status in {'', 'AGE_CHECK_REQUIRED', 'UNPLAYABLE',
-                              'CONTENT_CHECK_REQUIRED', 'LOGIN_REQUIRED',
-                              'AGE_VERIFICATION_REQUIRED', 'ERROR'}:
+                if video_details and video_id != video_details.get('videoId'):
+                    status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
+                    reason = 'Watch on the latest version of YouTube'
+                    continue
+
+                if status == 'OK':
+                    break
+                elif status in {
+                    '',
+                    'AGE_CHECK_REQUIRED',
+                    'AGE_VERIFICATION_REQUIRED',
+                    'CONTENT_CHECK_REQUIRED',
+                    'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
+                    'ERROR',
+                    'LOGIN_REQUIRED',
+                    'UNPLAYABLE',
+                }:
                     if (playability_status.get('desktopLegacyAgeGateReason')
                             and _settings.age_gate()):
                         break
@@ -1386,9 +1448,11 @@ class VideoInfo(YouTubeRequestClient):
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
                         continue
-                if video_details and video_id != video_details.get('videoId'):
-                    status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                    reason = 'Watch on the latest version of YouTube'
+                else:
+                    self._context.log_debug(
+                        'Unknown playabilityStatus in player response:\n|{0}|'
+                        .format(playability_status)
+                    )
                     continue
                 break
             # Only attempt to remove Authorization header if clients iterable
@@ -1565,7 +1629,10 @@ class VideoInfo(YouTubeRequestClient):
         if 'hlsManifestUrl' in streaming_data:
             stream_list.extend(self._load_hls_manifest(
                 streaming_data['hlsManifestUrl'],
-                is_live, meta_info, client['headers'], playback_stats
+                is_live,
+                meta_info,
+                client['headers'],
+                playback_stats,
             ))
 
         subtitles = Subtitles(self._context, video_id)
@@ -1615,7 +1682,7 @@ class VideoInfo(YouTubeRequestClient):
             subs_data = None
 
         # extract adaptive streams and create MPEG-DASH manifest
-        if adaptive_fmts:
+        if adaptive_fmts and not self._audio_only:
             video_data, audio_data = self._process_stream_data(
                 adaptive_fmts,
                 default_lang['default']
@@ -1673,6 +1740,7 @@ class VideoInfo(YouTubeRequestClient):
 
     def _process_stream_data(self, stream_data, default_lang_code='und'):
         _settings = self._context.get_settings()
+        audio_only = self._audio_only
         qualities = _settings.mpd_video_qualities()
         isa_capabilities = self._context.inputstream_adaptive_capabilities()
         stream_features = _settings.stream_features()
@@ -1790,7 +1858,8 @@ class VideoInfo(YouTubeRequestClient):
                     )
                 else:
                     quality_group = mime_group
-
+            elif audio_only:
+                continue
             else:
                 data = video_data
                 # Could use "zxx" language code for
@@ -1897,7 +1966,7 @@ class VideoInfo(YouTubeRequestClient):
                 details['baseUrlSecondary'] = secondary_url
             data[mime_group][itag] = data[quality_group][itag] = details
 
-        if not video_data:
+        if not video_data and not audio_only:
             self._context.log_debug('Generate MPD: No video mime-types found')
             return None, None
 
@@ -1946,6 +2015,7 @@ class VideoInfo(YouTubeRequestClient):
                                audio_data,
                                subs_data,
                                license_url):
+        # if (not video_data and not self._audio_only) or not audio_data:
         if not video_data or not audio_data:
             return None, None
 
@@ -2005,11 +2075,15 @@ class VideoInfo(YouTubeRequestClient):
         stream_select = _settings.stream_select()
 
         main_stream = {
-            'video': video_data[0][1][0],
             'audio': audio_data[0][1][0],
             'multi_audio': False,
             'multi_lang': False,
         }
+        if video_data:
+            main_stream['video'] = video_data[0][1][0]
+            duration = main_stream['video']['duration']
+        else:
+            duration = main_stream['audio']['duration']
 
         output = [
             '<?xml version="1.0" encoding="UTF-8"?>\n'
@@ -2018,7 +2092,7 @@ class VideoInfo(YouTubeRequestClient):
                 ' xmlns:xlink="http://www.w3.org/1999/xlink"'
                 ' xsi:schemaLocation="urn:mpeg:dash:schema:mpd:2011 http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-DASH_schema_files/DASH-MPD.xsd"'
                 ' minBufferTime="PT1.5S"'
-                ' mediaPresentationDuration="PT', str(main_stream['video']['duration']), 'S"'
+                ' mediaPresentationDuration="PT', str(duration), 'S"'
                 ' type="static"'
                 ' profiles="urn:mpeg:dash:profile:isoff-main:2011"'
                 '>\n'

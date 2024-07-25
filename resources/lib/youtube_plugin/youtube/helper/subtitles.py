@@ -391,7 +391,7 @@ class Subtitles(object):
         if not download:
             return subtitle_url, self.FORMATS[sub_format]['mime_type']
 
-        response = BaseRequestsClass().request(
+        response = BaseRequestsClass(context=self._context).request(
             subtitle_url,
             headers=self.headers,
             error_info=('Subtitles._get_url - GET failed for: {lang}: {{exc}}'

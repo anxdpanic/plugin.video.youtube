@@ -80,9 +80,6 @@ class LoginClient(YouTubeRequestClient):
             return None, None, None, json_data, False, InvalidGrant(json_data)
         return None, None, None, json_data, False, LoginException(json_data)
 
-    def verify(self):
-        return self._verify
-
     def set_access_token(self, access_token=''):
         self._access_token = access_token
 
