@@ -418,11 +418,11 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
 
         if current_system_version.compatible(21, 0):
             isa_capabilities = context.inputstream_adaptive_capabilities()
-            if video_item.live and isa_capabilities['manifest_config_prop']:
+            if video_item.live and 'manifest_config_prop' in isa_capabilities:
                 props['inputstream.adaptive.manifest_config'] = dumps({
                     'timeshift_bufferlimit': 4 * 60 * 60,
                 })
-            if not settings.verify_ssl() and isa_capabilities['config_prop']:
+            if not settings.verify_ssl() and 'config_prop' in isa_capabilities:
                 props['inputstream.adaptive.config'] = dumps({
                     'ssl_verify_peer': False,
                 })
