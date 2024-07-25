@@ -22,67 +22,76 @@ from ...utils.system_version import current_system_version
 
 class SettingsProxy(object):
     def __init__(self, instance):
-        self._ref = instance
+        self.ref = instance
 
     if current_system_version.compatible(21, 0):
         def get_bool(self, *args, **kwargs):
-            return xbmcaddon.Settings.getBool(self.ref(), *args, **kwargs)
+            return self.ref.getBool(*args, **kwargs)
 
         def set_bool(self, *args, **kwargs):
-            return xbmcaddon.Settings.setBool(self.ref(), *args, **kwargs)
+            return self.ref.setBool(*args, **kwargs)
 
         def get_int(self, *args, **kwargs):
-            return xbmcaddon.Settings.getInt(self.ref(), *args, **kwargs)
+            return self.ref.getInt(*args, **kwargs)
 
         def set_int(self, *args, **kwargs):
-            return xbmcaddon.Settings.setInt(self.ref(), *args, **kwargs)
+            return self.ref.setInt(*args, **kwargs)
 
         def get_str(self, *args, **kwargs):
-            return xbmcaddon.Settings.getString(self.ref(), *args, **kwargs)
+            return self.ref.getString(*args, **kwargs)
 
         def set_str(self, *args, **kwargs):
-            return xbmcaddon.Settings.setString(self.ref(), *args, **kwargs)
+            return self.ref.setString(*args, **kwargs)
 
         def get_str_list(self, *args, **kwargs):
-            return xbmcaddon.Settings.getStringList(self.ref(), *args, **kwargs)
+            return self.ref.getStringList(*args, **kwargs)
 
         def set_str_list(self, *args, **kwargs):
-            return xbmcaddon.Settings.setStringList(self.ref(), *args, **kwargs)
+            return self.ref.setStringList(*args, **kwargs)
 
-        def ref(self):
-            return self._ref
     else:
         def get_bool(self, *args, **kwargs):
-            return xbmcaddon.Addon.getSettingBool(self.ref(), *args, **kwargs)
+            return self.ref.getSettingBool(*args, **kwargs)
 
         def set_bool(self, *args, **kwargs):
-            return xbmcaddon.Addon.setSettingBool(self.ref(), *args, **kwargs)
+            return self.ref.setSettingBool(*args, **kwargs)
 
         def get_int(self, *args, **kwargs):
-            return xbmcaddon.Addon.getSettingInt(self.ref(), *args, **kwargs)
+            return self.ref.getSettingInt(*args, **kwargs)
 
         def set_int(self, *args, **kwargs):
-            return xbmcaddon.Addon.setSettingInt(self.ref(), *args, **kwargs)
+            return self.ref.setSettingInt(*args, **kwargs)
 
         def get_str(self, *args, **kwargs):
-            return xbmcaddon.Addon.getSettingString(self.ref(), *args, **kwargs)
+            return self.ref.getSettingString(*args, **kwargs)
 
         def set_str(self, *args, **kwargs):
-            return xbmcaddon.Addon.setSettingString(self.ref(), *args, **kwargs)
+            return self.ref.setSettingString(*args, **kwargs)
 
         def get_str_list(self, setting):
-            return xbmcaddon.Addon.getSetting(self.ref(), setting).split(',')
+            return self.ref.getSetting(setting).split(',')
 
         def set_str_list(self, setting, value):
             value = ','.join(value)
-            return xbmcaddon.Addon.setSetting(self.ref(), setting, value)
+            return self.ref.setSetting(setting, value)
 
-        if current_system_version.compatible(19, 0):
+        if not current_system_version.compatible(19, 0):
+            @property
             def ref(self):
-                return self._ref
-        else:
+                if self._ref:
+                    return self._ref()
+                return None
+
+            @ref.setter
+            def ref(self, value):
+                if value:
+                    self._ref = ref(value)
+                else:
+                    self._ref = None
+
+            @ref.deleter
             def ref(self):
-                return self._ref()
+                del self._ref
 
 
 class XbmcPluginSettings(AbstractSettings):
@@ -98,10 +107,12 @@ class XbmcPluginSettings(AbstractSettings):
                 xbmc_addon = xbmcaddon.Addon(ADDON_ID)
             else:
                 if self.__class__._instances:
-                    if not flush_all:
-                        self.__class__._instances.discard(self._proxy.ref())
-                    else:
+                    if flush_all:
                         self.__class__._instances.clear()
+                    else:
+                        self.__class__._instances.discard(self._proxy.ref)
+                del self._proxy.ref
+                self._proxy.ref = None
                 del self._proxy
                 self._proxy = None
                 return
@@ -118,12 +129,10 @@ class XbmcPluginSettings(AbstractSettings):
             # don't actually return anything...
             # Ignore return value until bug is fixed in Kodi
             self._check_set = False
-        elif current_system_version.compatible(19, 0):
-            self._proxy = SettingsProxy(xbmc_addon)
         else:
-            if fill:
+            if fill and not current_system_version.compatible(19, 0):
                 self.__class__._instances.add(xbmc_addon)
-            self._proxy = SettingsProxy(ref(xbmc_addon))
+            self._proxy = SettingsProxy(xbmc_addon)
 
     def get_bool(self, setting, default=None, echo=None):
         if setting in self._cache:

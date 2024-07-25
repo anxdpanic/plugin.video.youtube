@@ -195,9 +195,10 @@ class AbstractSettings(object):
         return self.get_bool(SETTINGS.AGE_GATE, True)
 
     def verify_ssl(self):
-        verify = self.get_bool(SETTINGS.VERIFY_SSL, False)
         if sys.version_info <= (2, 7, 9):
             verify = False
+        else:
+            verify = self.get_bool(SETTINGS.VERIFY_SSL, True)
         return verify
 
     def get_timeout(self):

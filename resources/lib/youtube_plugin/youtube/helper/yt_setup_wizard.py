@@ -296,7 +296,7 @@ def process_geo_location(context, step, steps, **_kwargs):
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.my_location'))
     ):
-        locator = Locator()
+        locator = Locator(context)
         locator.locate_requester()
         coords = locator.coordinates()
         if coords:

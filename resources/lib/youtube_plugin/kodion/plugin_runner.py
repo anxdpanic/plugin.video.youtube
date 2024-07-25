@@ -28,7 +28,7 @@ _profiler = _context.get_infobool('System.GetBool(debug.showloginfo)')
 if _profiler:
     from .debug import Profiler
 
-    _profiler = Profiler(enabled=False)
+    _profiler = Profiler(enabled=False, print_callees=False, num_lines=20)
 
 
 def run(context=_context,

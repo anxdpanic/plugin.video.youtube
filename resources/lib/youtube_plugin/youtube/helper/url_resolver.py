@@ -43,7 +43,7 @@ class AbstractResolver(BaseRequestsClass):
 
     def __init__(self, context):
         self._context = context
-        super(AbstractResolver, self).__init__()
+        super(AbstractResolver, self).__init__(context=context)
 
     def supports_url(self, url, url_components):
         raise NotImplementedError()

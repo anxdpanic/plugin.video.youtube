@@ -374,28 +374,36 @@ class VideoItem(BaseItem):
     def video_id(self, value):
         self._video_id = value
 
-    def get_channel_id(self):
+    @property
+    def channel_id(self):
         return self._channel_id
 
-    def set_channel_id(self, value):
+    @channel_id.setter
+    def channel_id(self, value):
         self._channel_id = value
 
-    def get_subscription_id(self):
+    @property
+    def subscription_id(self):
         return self._subscription_id
 
-    def set_subscription_id(self, value):
+    @subscription_id.setter
+    def subscription_id(self, value):
         self._subscription_id = value
 
-    def get_playlist_id(self):
+    @property
+    def playlist_id(self):
         return self._playlist_id
 
-    def set_playlist_id(self, value):
+    @playlist_id.setter
+    def playlist_id(self, value):
         self._playlist_id = value
 
-    def get_playlist_item_id(self):
+    @property
+    def playlist_item_id(self):
         return self._playlist_item_id
 
-    def set_playlist_item_id(self, value):
+    @playlist_item_id.setter
+    def playlist_item_id(self, value):
         self._playlist_item_id = value
 
     def get_code(self):

@@ -43,9 +43,9 @@ class HTTPServer(TCPServer):
         self.socket.close()
 
 
-class RequestHandler(BaseHTTPRequestHandler, object):
+class RequestHandler(BaseHTTPRequestHandler):
     _context = None
-    requests = BaseRequestsClass()
+    requests = None
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
     chunk_size = 1024 * 64
     local_ranges = (
@@ -58,6 +58,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     )
 
     def __init__(self, *args, **kwargs):
+        if not RequestHandler.requests:
+            RequestHandler.requests = BaseRequestsClass(context=self._context)
         self.whitelist_ips = self._context.get_settings().httpd_whitelist()
         super(RequestHandler, self).__init__(*args, **kwargs)
 
@@ -580,6 +582,8 @@ def httpd_status(context):
     url = 'http://{address}:{port}{path}'.format(address=address,
                                                  port=port,
                                                  path=PATHS.PING)
+    if not RequestHandler.requests:
+        RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url)
     result = response and response.status_code
     if result == 204:
@@ -598,6 +602,8 @@ def get_client_ip_address(context):
     url = 'http://{address}:{port}{path}'.format(address=address,
                                                  port=port,
                                                  path=PATHS.IP)
+    if not RequestHandler.requests:
+        RequestHandler.requests = BaseRequestsClass(context=context)
     response = RequestHandler.requests.request(url)
     if response and response.status_code == 200:
         response_json = response.json()

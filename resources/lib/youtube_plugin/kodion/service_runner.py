@@ -32,7 +32,6 @@ def run():
 
     provider = Provider()
 
-    get_infobool = context.get_infobool
     get_listitem_info = context.get_listitem_info
     get_listitem_property = context.get_listitem_property
 
@@ -51,61 +50,86 @@ def run():
     # wipe add-on temp folder on updates/restarts (subtitles, and mpd files)
     rm_dir(TEMP_PATH)
 
-    plugin_sleeping = False
-    plugin_sleep_timeout = httpd_sleep_timeout = 0
-    ping_period = 60
-    loop_num = sub_loop_num = 0
-    restart_attempts = 0
+    loop_period = 10
+    loop_period_ms = loop_period * 1000
+
+    httpd_idle_time_ms = 0
+    httpd_idle_timeout_ms = 30000
+    httpd_ping_period_ms = 60000
+    httpd_restart_attempts = 0
+    httpd_max_restarts = 5
+
+    plugin_is_idle = False
+    plugin_idle_time_ms = 0
+    plugin_idle_timeout_ms = 30000
+
+    active_interval_ms = 100
+    idle_interval_ms = 1000
+
     video_id = None
     container = monitor.is_plugin_container()
-    while not monitor.abortRequested():
-        idle = get_infobool('System.IdleTime(10)')
 
-        if idle:
-            if plugin_sleep_timeout >= 30:
-                plugin_sleep_timeout = 0
-                if not plugin_sleeping:
-                    plugin_sleeping = set_property(PLUGIN_SLEEPING)
+    while not monitor.abortRequested():
+        is_idle = monitor.system_idle or monitor.get_idle_time() >= loop_period
+
+        if is_idle:
+            if plugin_idle_time_ms >= plugin_idle_timeout_ms:
+                plugin_idle_time_ms = 0
+                if not plugin_is_idle:
+                    plugin_is_idle = set_property(PLUGIN_SLEEPING)
         else:
-            plugin_sleep_timeout = 0
-            if plugin_sleeping:
-                plugin_sleeping = clear_property(PLUGIN_SLEEPING)
+            plugin_idle_time_ms = 0
+            if plugin_is_idle:
+                plugin_is_idle = clear_property(PLUGIN_SLEEPING)
 
         if not monitor.httpd:
-            httpd_sleep_timeout = 0
-        elif idle:
+            httpd_idle_time_ms = 0
+        elif is_idle:
             if monitor.httpd_sleep_allowed:
-                if httpd_sleep_timeout >= 30:
+                if httpd_idle_time_ms >= httpd_idle_timeout_ms:
+                    httpd_idle_time_ms = 0
                     monitor.shutdown_httpd(sleep=True)
             else:
                 if pop_property(SERVER_POST_START):
                     monitor.httpd_sleep_allowed = True
-                httpd_sleep_timeout = 0
+                httpd_idle_time_ms = 0
         else:
-            if httpd_sleep_timeout >= ping_period:
-                httpd_sleep_timeout = 0
+            if httpd_idle_time_ms >= httpd_ping_period_ms:
+                httpd_idle_time_ms = 0
                 if monitor.ping_httpd():
-                    restart_attempts = 0
-                elif restart_attempts < 5:
+                    httpd_restart_attempts = 0
+                elif httpd_restart_attempts < httpd_max_restarts:
                     monitor.restart_httpd()
-                    restart_attempts += 1
+                    httpd_restart_attempts += 1
                 else:
                     monitor.shutdown_httpd()
 
+        check_item = not plugin_is_idle and container['is_plugin']
+        if check_item:
+            wait_interval_ms = active_interval_ms
+        else:
+            wait_interval_ms = idle_interval_ms
+        wait_interval = wait_interval_ms / 1000
+        wait_time_ms = 0
+
         while not monitor.abortRequested():
-            if container['is_plugin']:
-                wait_interval = 0.1
-                if loop_num < 1:
-                    loop_num = 1
-                if sub_loop_num < 1:
-                    sub_loop_num = 10
+            if monitor.refresh and all(container.values()):
+                monitor.refresh_container(force=True)
+                monitor.refresh = False
+                break
 
-                if monitor.refresh and all(container.values()):
-                    monitor.refresh_container(force=True)
-                    monitor.refresh = False
-                    break
+            if monitor.interrupt:
                 monitor.interrupt = False
+                container = monitor.is_plugin_container()
+                if check_item != container['is_plugin']:
+                    check_item = not check_item
+                    if check_item:
+                        wait_interval_ms = active_interval_ms
+                    else:
+                        wait_interval_ms = idle_interval_ms
+                    wait_interval = wait_interval_ms / 1000
 
+            if check_item:
                 new_video_id = get_listitem_property(VIDEO_ID)
                 if new_video_id:
                     if video_id != new_video_id:
@@ -114,34 +138,15 @@ def run():
                 elif video_id and get_listitem_info('Label'):
                     video_id = None
                     clear_property(VIDEO_ID)
-            else:
-                wait_interval = 1
-                if loop_num < 1:
-                    loop_num = 2
-                if sub_loop_num < 1:
-                    sub_loop_num = 5
+            elif not plugin_is_idle and not container['is_plugin']:
+                plugin_is_idle = set_property(PLUGIN_SLEEPING)
 
-                if not plugin_sleeping:
-                    plugin_sleeping = set_property(PLUGIN_SLEEPING)
+            monitor.waitForAbort(wait_interval)
+            wait_time_ms += wait_interval_ms
+            httpd_idle_time_ms += wait_interval_ms
+            plugin_idle_time_ms += wait_interval_ms
 
-            if sub_loop_num > 1:
-                sub_loop_num -= 1
-                if monitor.interrupt:
-                    container = monitor.is_plugin_container()
-                    monitor.interrupt = False
-            else:
-                container = monitor.is_plugin_container()
-                sub_loop_num = 0
-                loop_num -= 1
-                if not wait_interval or container['is_plugin']:
-                    wait_interval = 0.1
-
-            if wait_interval:
-                monitor.waitForAbort(wait_interval)
-                httpd_sleep_timeout += wait_interval
-                plugin_sleep_timeout += wait_interval
-
-            if loop_num <= 0:
+            if wait_time_ms >= loop_period_ms:
                 break
         else:
             break
