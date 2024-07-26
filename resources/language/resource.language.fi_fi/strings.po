@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2024-07-26 06:25+0000\n"
+"Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
 "Language-Team: Finnish <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/fi_fi/>\n"
 "Language: fi_fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.6.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -49,12 +49,12 @@ msgstr "Salasana"
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream Adaptive"
-msgstr ""
+msgstr "Käytä InputStream Adaptivea"
 
 msgctxt "#30008"
 msgid "Configure InputStream Adaptive"
@@ -126,11 +126,11 @@ msgstr "Välimuistin koko (Mt)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Aktivoi opastettu määritys"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Korvaa näkymiä"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -146,7 +146,7 @@ msgstr "Näkymä: Elokuvat"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Määritetäänkö %s?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -184,11 +184,11 @@ msgstr "Oman \"Historia\" -soittolistan tunniste"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Kirjanmerkit"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Kirjanmerkki"
 
 msgctxt "#30102"
 msgid "Search"
@@ -264,11 +264,11 @@ msgstr "Odota..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Vahvista tyhjennys"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "Tyhjennetäänkö %s?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -310,7 +310,7 @@ msgstr "Avaa \"%s\""
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "Kanavan fanart-kuvat"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -350,7 +350,7 @@ msgstr "Selaa kanavia"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "Nousussa"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -402,11 +402,11 @@ msgstr "Valitse alue"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Opastettu määritys"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Kieli ja alue"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -462,7 +462,7 @@ msgstr "Toista soittimella..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Näytä kuvauksessa kanavan nimi ja tietoja videosta"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -614,7 +614,7 @@ msgstr "Pakota SSL-varmenteen vahvistus"
 
 msgctxt "#30579"
 msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr ""
+msgstr "YouTube on määritetty käyttämään InputStream Adaptive -lisäosaa, mutta se on poistettu käytöstä. Haluatko ottaa sen käyttöön?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -698,11 +698,11 @@ msgstr "Henkilökohtaisten API-avainten käyttöönotto epäonnistui. Puuttuu: %
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Tekstitykset"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s alkuperäisellä/%s varmistuksella"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -750,11 +750,11 @@ msgstr "Yritä uudelleen"
 
 msgctxt "#30613"
 msgid "Retrieve Watch Later playlist id"
-msgstr "Nouda \"Katso myöhemmin\" -soittolistan tunniste"
+msgstr "Nouda \"Katso myöhemmin\" -listan tunniste"
 
 msgctxt "#30614"
 msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "\"Katso myöhemmin\" -soittolistan tunnisteen nouto epäonnistui. Lisää muutama \"Katso myöhemmin\" -listalle muutama video sivuston/sovelluksen kautta ja yritä uudelleen."
+msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Lisää \"Katso myöhemmin\" -listalle muutama video sivuston/sovelluksen kautta ja yritä uudelleen."
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -766,11 +766,11 @@ msgstr "On oltava sisäänkirjautuneena."
 
 msgctxt "#30617"
 msgid "InputStream Adaptive"
-msgstr ""
+msgstr "InputStream Adaptive"
 
 msgctxt "#30618"
 msgid "Enable MPEG-DASH proxy"
-msgstr ""
+msgstr "Käytä MPEG-DASH-välityspalvelinta"
 
 msgctxt "#30619"
 msgid "Port"
@@ -782,7 +782,7 @@ msgstr "Portti %s on jo käytössä. HTTP-palvelimen käynnistys ei onnistu."
 
 msgctxt "#30621"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr ""
+msgstr "Välityspalvelin tarvitaan MPEG-DASH VOD -toistoon (näytä Lisäasetukset > HTTP-palvelin)"
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -830,7 +830,7 @@ msgstr "Käytä API:n määrityssivua"
 
 msgctxt "#30633"
 msgid "http://<ipaddress>:<port>/youtube/api (see Advanced > HTTP Server)"
-msgstr "http://<ip-osoite>:<portti>/youtube/api (katso HTTP-palvelin)"
+msgstr "http://<ip-osoite>:<portti>/youtube/api (katso Lisäasetukset > HTTP-palvelin)"
 
 msgctxt "#30634"
 msgid "YouTube Add-on API Configuration"
@@ -850,7 +850,7 @@ msgstr "Henkilökohtaiset API-avaimet on poistettu käytöstä."
 
 msgctxt "#30638"
 msgid "Bookmark this page to quickly add your keys in the future."
-msgstr "Lisää sivu selaimesi kirjanmerkkeihin avainten lisäyksen nopeuttamiseksi tulevaisuudessa."
+msgstr "Lisää sivu kirjanmerkkeihin nopeuttaaksesi avainten lisäystä jatkossa."
 
 msgctxt "#30639"
 msgid "Found personal API keys in api_keys.json, would you like to restore them? Choosing no will overwrite them."
@@ -910,7 +910,7 @@ msgstr "Sijainnin säde (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "\"Oma sijainti\" käyttää IP-geopaikannusta"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -962,7 +962,7 @@ msgstr "Vaihdetaanko käyttäjään \"%s\" nyt?"
 
 msgctxt "#30666"
 msgid "%s removed"
-msgstr ""
+msgstr "%s poistettiin"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -986,7 +986,7 @@ msgstr "Tyhjennä toistohistoria"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Poista toistohiostorian tietokanta"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1050,7 +1050,7 @@ msgstr "tietovälimuisti"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Käytä videoille MPEG-DASH-lisäosaa"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1114,7 +1114,7 @@ msgstr "Oletko varma?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "Käytä YouTube-sivuston URL-osoitteita oletussoittimessa"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1134,11 +1134,11 @@ msgstr "Toista vain ääni"
 
 msgctxt "#30709"
 msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "\"Katso myöhemmin\" -soittolistan tunnisteen nouto epäonnistui. Parantaaksesi noudon onnistumisen todennäköisyyttä, lisää \"Katso myöhemmin\" -listalle 8–10 videota sivuston/sovelluksen kautta ja yritä uudelleen."
+msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Parantaaksesi noudon onnistumisen todennäköisyyttä, lisää listalle 8–10 videota sivuston/sovelluksen kautta ja yritä uudelleen."
 
 msgctxt "#30710"
 msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "\"Katso myöhemmin\" -soittolistan tunnisteen nouto epäonnistui. Kokeile huomenna uudelleen poistamatta videoita."
+msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Kokeile huomenna uudelleen poistamatta videoita."
 
 msgctxt "#30711"
 msgid "Searching for Watch Later... Page %s"
@@ -1150,7 +1150,7 @@ msgstr "Arvioi videot toistettaessa soittolistoja"
 
 msgctxt "#30713"
 msgid "Added to Watch Later"
-msgstr "Lisättiin \"Katso myöhemmin\" listalle"
+msgstr "Lisättiin \"Katso myöhemmin\" -listalle"
 
 msgctxt "#30714"
 msgid "Added to playlist"
@@ -1190,7 +1190,7 @@ msgstr "Tue HDR-videota"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Välityspalvelin tarvitaan MPEG-DASH VOD -toistoon (näytä Lisäasetukset > HTTP-palvelin).[CR]HDR ja >1080p video vaatii vähitään InputStream Adaptive -version 2.3.14."
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1242,7 +1242,7 @@ msgstr "Muokattu"
 
 msgctxt "#30736"
 msgid "Shorts (1 minute or less)"
-msgstr ""
+msgstr "Shorts (enintään minuutin pituiset)"
 
 msgctxt "#30737"
 msgid "Use alternate client details"
@@ -1354,215 +1354,215 @@ msgstr "Moniääninen"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Pyynnön yhteys aikakatkaistiin"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Pyynnön luku aikakatkaistiin"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Ensiesitykset"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Katselumäärä"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Älä käytä korkean kuvanopeuden videota korkeimmalla videolaadulla"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Tyhjennä \"Katso myöhemmin\" -lista"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "Haluatko varmasti tyhjentää \"Katso myöhemmin\" -listan?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Älä käytä osittaista kuvanopeusvihjausta"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Älä käytä mitään kuvanopeusvihjausta"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Näytä videolistassa tietoja videoista"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Kaikki käytettävissä"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (käännös)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Kysy + Automaattinen + Laadunvalinta"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Katslumäärä kohteelle %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "Tuodaanko vanha toistohistoria?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "Tuodaanko vanha hakuhistoria?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Tyhjennä paikallinen \"Katso myöhemmin\" -lista"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Poista paikallinen \"Katso myöhemmin\" -tietokanta"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "paikallinen katso myöhemmin -lista"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "asetukset suositusarvoihin"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "listauksissa näytetään minimaaliset tiedot"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "suorituskykyasetukset"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Näytä laitteen ominaisuudet"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, vain H.264 | Rajoitettu vanhemmilla laitteilla"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 fps | Raspberry Pi 3 tai vastaava"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 fps tai 1080p/60 fps, HDR jos tuettu | Raspberry Pi 5 tai vastaava"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR jos tuettu | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 tai vastaava"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 fps, HDR, AV1-muoto | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V tai vastaava"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 fps, HDR, AV1-muoto | Moderni laite tai kyvykäs tietokone"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Katselumäärän väri"
 
 msgctxt "#30794"
 msgid "Likes count display colour"
-msgstr ""
+msgstr "Tykkäysmäärän väri"
 
 msgctxt "#30795"
 msgid "Comments count display colour"
-msgstr ""
+msgstr "Kommenttimäärän väri"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 fps | Raspberry Pi 4 tai vastaava"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 fps tai 720p/30 fps, vain H.264 | Raspberry Pi 1/2 tai vastaava"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Tyhjennä \"Kirjamerkit\" -lista"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Poista \"Kirjanmerkit\" -tietokanta"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "kirjanmerkit-lista"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Tyhjennä \"Kirjanmerkit\" -lista"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "Haluatko varmasti tyhjentää \"Kirjanmerkit\" -listan?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Lisää %s kirjanmerkkeihin"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "Käytä YouTube-sivuston URL-osoitteita ulkoisessa soittimessa"
 
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
-msgstr ""
+msgstr "Käytä mukautuvie suoratoistomuotoja ulkoisessa soittimessa"
 
 msgctxt "#30806"
 msgid "Jump to page..."
-msgstr ""
+msgstr "Siirry sivulle..."
 
 msgctxt "#30807"
 msgid "Use channel name as"
-msgstr ""
+msgstr "Käytä kanvan nimeä"
 
 msgctxt "#30808"
 msgid "Hide videos from listings"
-msgstr ""
+msgstr "Piilota videot listauksista"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
-msgstr ""
+msgstr "Kaikki tulevat videot"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr ""
+msgstr "Kaikki aiemmin suoratoistetut (katsotut) videot"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "Suodata Live-kansioita"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "Tyhjennä \"Tilaukset\"-syötteen historia"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "Poista \"Tilaukset\"-syötteen historiatietokanta"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr ""
+msgstr "tilaukset-syöte"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "Palaa takaisin..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "Lista on tyhjä.[CR][CR]Päivitä sisältövalikosta tai yritä uudelleen."
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"
