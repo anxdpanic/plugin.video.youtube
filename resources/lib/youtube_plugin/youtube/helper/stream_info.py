@@ -1360,9 +1360,11 @@ class StreamInfo(YouTubeRequestClient):
         if self._access_token:
             client_data['_access_token'] = self._access_token
 
+        last_status = None
+        num_errors = num_requests = 0
         while 1:
             for client_name in self._prioritised_clients:
-                if status is not None:
+                if last_status:
                     self._context.log_warning(
                         'Failed to retrieve video info - '
                         'video_id: {0}, client: {1}, auth: {2},\n'
@@ -1370,7 +1372,7 @@ class StreamInfo(YouTubeRequestClient):
                             video_id,
                             client['_name'],
                             bool(client.get('_access_token')),
-                            status,
+                            last_status,
                             reason or 'UNKNOWN',
                         )
                     )
@@ -1393,9 +1395,10 @@ class StreamInfo(YouTubeRequestClient):
                     **client
                 )
 
+                num_requests += 1
                 video_details = result.get('videoDetails', {})
                 playability_status = result.get('playabilityStatus', {})
-                status = playability_status.get('status', '').upper()
+                status = playability_status.get('status', 'ERROR').upper()
                 reason = playability_status.get('reason', '')
 
                 if video_details and video_id != video_details.get('videoId'):
@@ -1406,7 +1409,6 @@ class StreamInfo(YouTubeRequestClient):
                 if status == 'OK':
                     break
                 elif status in {
-                    '',
                     'AGE_CHECK_REQUIRED',
                     'AGE_VERIFICATION_REQUIRED',
                     'CONTENT_CHECK_REQUIRED',
@@ -1415,6 +1417,9 @@ class StreamInfo(YouTubeRequestClient):
                     'LOGIN_REQUIRED',
                     'UNPLAYABLE',
                 }:
+                    if not last_status or status == last_status:
+                        num_errors += 1
+                    last_status = status
                     if (playability_status.get('desktopLegacyAgeGateReason')
                             and _settings.age_gate()):
                         break
@@ -1447,17 +1452,16 @@ class StreamInfo(YouTubeRequestClient):
                     )
                     if url and url.startswith('//support.google.com/youtube/answer/12318250'):
                         status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                        continue
                 else:
                     self._context.log_debug(
                         'Unknown playabilityStatus in player response:\n|{0}|'
                         .format(playability_status)
                     )
-                    continue
-                break
             # Only attempt to remove Authorization header if clients iterable
             # was exhausted i.e. request attempted using all clients
             else:
+                if num_errors == num_requests:
+                    break
                 if '_access_token' in client_data:
                     del client_data['_access_token']
                     continue
