@@ -1,3 +1,10 @@
+## v7.0.9+beta.5
+### Fixed
+- Fix disabling certification verification #841
+- Fix not using player request fallbacks #845
+- Fix incorrectly identifying VP9 streams #833
+- Fix videos not able to be re-opened from Kodi playlist #810
+
 ## v7.0.9+beta.4
 ### Fixed
 - Fix issues with next page and jump to page in related video listings
