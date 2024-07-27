@@ -290,6 +290,11 @@ class AbstractSettings(object):
             allow_list.append('.'.join(map(str, octets)))
         return allow_list
 
+    def httpd_sleep_allowed(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.HTTPD_IDLE_SLEEP, value)
+        return self.get_bool(SETTINGS.HTTPD_IDLE_SLEEP, True)
+
     def api_config_page(self):
         return self.get_bool(SETTINGS.API_CONFIG_PAGE, False)
 
