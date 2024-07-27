@@ -662,7 +662,9 @@ class StreamInfo(YouTubeRequestClient):
         # video - order based on comparative compression ratio
         'av01': 1,
         'vp9': 0.75,
+        'vp09': 0.75,
         'vp8': 0.55,
+        'vp08': 0.55,
         'avc1': 0.5,
         'h.264': 0.5,
         'h.263': 0.4,
@@ -1791,7 +1793,7 @@ class StreamInfo(YouTubeRequestClient):
             codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
             if codec:
                 codec = codec.group(1)
-                if codec.startswith('vp9'):
+                if codec.startswith(('vp9', 'vp09')):
                     codec = 'vp9'
                 elif codec.startswith('dts'):
                     codec = 'dts'
