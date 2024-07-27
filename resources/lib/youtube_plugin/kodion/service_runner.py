@@ -90,9 +90,12 @@ def run():
                     httpd_idle_time_ms = 0
                     monitor.shutdown_httpd(sleep=True)
             else:
-                if pop_property(SERVER_POST_START):
-                    monitor.httpd_sleep_allowed = True
-                httpd_idle_time_ms = 0
+                if monitor.httpd_sleep_allowed is None:
+                    if pop_property(SERVER_POST_START):
+                        monitor.httpd_sleep_allowed = True
+                    httpd_idle_time_ms = 0
+                else:
+                    pop_property(SERVER_POST_START)
         else:
             if httpd_idle_time_ms >= httpd_ping_period_ms:
                 httpd_idle_time_ms = 0
