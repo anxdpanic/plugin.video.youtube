@@ -1023,6 +1023,11 @@
                     <data>RunScript($ID,config/show_client_ip)</data>
                     <control format="action" type="button"/>
                 </setting>
+                <setting id="youtube.http.idle_sleep" type="boolean" label="13018" help="">
+                    <level>0</level>
+                    <default>true</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
         </category>
         <category id="maintenance" label="30552" help="">

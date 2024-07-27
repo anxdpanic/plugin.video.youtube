@@ -35,8 +35,11 @@ class SSLHTTPAdapter(HTTPAdapter):
 
     def init_poolmanager(self, *args, **kwargs):
         kwargs['ssl_context'] = self._ssl_context
-        super(SSLHTTPAdapter, self).init_poolmanager(*args, **kwargs)
+        return super(SSLHTTPAdapter, self).init_poolmanager(*args, **kwargs)
 
+    def cert_verify(self, conn, url, verify, cert):
+        self._ssl_context.check_hostname = bool(verify)
+        return super(SSLHTTPAdapter, self).cert_verify(conn, url, verify, cert)
 
 class BaseRequestsClass(object):
     _session = Session()
