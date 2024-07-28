@@ -43,7 +43,7 @@ class HTTPServer(TCPServer):
         self.socket.close()
 
 
-class RequestHandler(BaseHTTPRequestHandler):
+class RequestHandler(BaseHTTPRequestHandler, object):
     _context = None
     requests = None
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
