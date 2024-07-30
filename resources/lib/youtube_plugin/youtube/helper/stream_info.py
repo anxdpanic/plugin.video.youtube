@@ -877,10 +877,6 @@ class StreamInfo(YouTubeRequestClient):
         ))
         return yt_format
 
-    def load_stream_infos(self, video_id):
-        self.video_id = video_id
-        return self._get_stream_info()
-
     def _get_player_page(self, client_name='web', embed=False):
         if embed:
             url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
@@ -1343,11 +1339,11 @@ class StreamInfo(YouTubeRequestClient):
             return result['simpleText']
         return None
 
-    def _get_stream_info(self):
+    def load_stream_infos(self, video_id):
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
         _settings = self._context.get_settings()
-        video_id = self.video_id
+        self.video_id = video_id
         client_name = reason = status = None
         client = playability_status = result = None
 
