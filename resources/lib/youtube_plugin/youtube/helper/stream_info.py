@@ -1340,137 +1340,95 @@ class StreamInfo(YouTubeRequestClient):
         return None
 
     def load_stream_infos(self, video_id):
+        self.video_id = video_id
+
+        settings = self._context.get_settings()
+        age_gate_enabled = settings.age_gate()
+
+        client_name = reason = status = None
+        client = playability = result = None
+
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
-        _settings = self._context.get_settings()
-        self.video_id = video_id
-        client_name = reason = status = None
-        client = playability_status = result = None
-
-        reasons = (
-            self._context.localize(574, 'country').lower(),
-            # not available error appears to vary by language/region/video type
-            # disable this check for now
-            # self._context.localize(10005, 'not available').lower(),
-        )
+        reasons = {
+            'country',
+            'available',
+            'latest version',
+        }
 
         client_data = {'json': {'videoId': video_id}}
         if self._access_token:
+            auth = True
             client_data['_access_token'] = self._access_token
+        else:
+            auth = False
 
-        last_status = None
-        num_errors = num_requests = 0
-        while 1:
-            for client_name in self._prioritised_clients:
-                if last_status:
-                    self._context.log_warning(
-                        'Failed to retrieve video info - '
-                        'video_id: {0}, client: {1}, auth: {2},\n'
-                        'status: {3}, reason: {4}'.format(
-                            video_id,
-                            client['_name'],
-                            bool(client.get('_access_token')),
-                            last_status,
-                            reason or 'UNKNOWN',
-                        )
+        for client_name in self._prioritised_clients:
+            client = self.build_client(client_name, client_data)
+            if not client:
+                continue
+
+            result = self.request(
+                video_info_url,
+                'POST',
+                response_hook=self._response_hook_json,
+                error_title='Player request failed',
+                error_hook=self._error_hook,
+                error_hook_kwargs={
+                    'video_id': video_id,
+                    'client': client_name,
+                    'auth': bool(client.get('_access_token')),
+                },
+                **client
+            )
+
+            video_details = result.get('videoDetails', {})
+            playability = result.get('playabilityStatus', {})
+            status = playability.get('status', 'ERROR').upper()
+            reason = playability.get('reason', '')
+
+            if video_details and video_id != video_details.get('videoId'):
+                status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
+                reason = 'Watch on the latest version of YouTube'
+
+            if (age_gate_enabled
+                    and playability.get('desktopLegacyAgeGateReason')):
+                break
+            elif status == 'OK':
+                break
+            elif status in {
+                'AGE_CHECK_REQUIRED',
+                'AGE_VERIFICATION_REQUIRED',
+                'CONTENT_CHECK_REQUIRED',
+                'LOGIN_REQUIRED',
+                'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
+                'ERROR',
+                'UNPLAYABLE',
+            }:
+                self._context.log_warning(
+                    'Failed to retrieve video info - '
+                    'video_id: {0}, client: {1}, auth: {2},\n'
+                    'status: {3}, reason: {4}'.format(
+                        video_id,
+                        client['_name'],
+                        auth,
+                        status,
+                        reason or 'UNKNOWN',
                     )
-                client = self.build_client(client_name, client_data)
-                if not client:
-                    status = None
-                    continue
-
-                result = self.request(
-                    video_info_url,
-                    'POST',
-                    response_hook=self._response_hook_json,
-                    error_title='Player request failed',
-                    error_hook=self._error_hook,
-                    error_hook_kwargs={
-                        'video_id': video_id,
-                        'client': client_name,
-                        'auth': bool(client.get('_access_token')),
-                    },
-                    **client
                 )
-
-                num_requests += 1
-                video_details = result.get('videoDetails', {})
-                playability_status = result.get('playabilityStatus', {})
-                status = playability_status.get('status', 'ERROR').upper()
-                reason = playability_status.get('reason', '')
-
-                if video_details and video_id != video_details.get('videoId'):
-                    status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                    reason = 'Watch on the latest version of YouTube'
-                    continue
-
-                if status == 'OK':
+                if any(why in reason for why in reasons):
                     break
-                elif status in {
-                    'AGE_CHECK_REQUIRED',
-                    'AGE_VERIFICATION_REQUIRED',
-                    'CONTENT_CHECK_REQUIRED',
-                    'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
-                    'ERROR',
-                    'LOGIN_REQUIRED',
-                    'UNPLAYABLE',
-                }:
-                    if not last_status or status == last_status:
-                        num_errors += 1
-                    last_status = status
-                    if (playability_status.get('desktopLegacyAgeGateReason')
-                            and _settings.age_gate()):
-                        break
-                    # Geo-blocked video with error reasons like:
-                    # "This video contains content from XXX, who has blocked it in your country on copyright grounds"
-                    # "The uploader has not made this video available in your country"
-                    # Reason language will vary based on Accept-Language and
-                    # client hl, Kodi localised language is used for comparison
-                    # but may not match reason language
-                    if (status == 'UNPLAYABLE'
-                            and any(why in reason for why in reasons)):
-                        break
-                    if status != 'ERROR':
-                        continue
-                    # This is used to check for error like:
-                    # "The following content is not available on this app."
-                    # Reason language will vary based on Accept-Language and
-                    # client hl, so YouTube support url is checked instead
-                    url = self._get_error_details(
-                        playability_status,
-                        details=(
-                            'errorScreen',
-                            'playerErrorMessageRenderer',
-                            'learnMore',
-                            'runs', 0,
-                            'navigationEndpoint',
-                            'urlEndpoint',
-                            'url'
-                        )
-                    )
-                    if url and url.startswith('//support.google.com/youtube/answer/12318250'):
-                        status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                else:
-                    self._context.log_debug(
-                        'Unknown playabilityStatus in player response:\n|{0}|'
-                        .format(playability_status)
-                    )
-            # Only attempt to remove Authorization header if clients iterable
-            # was exhausted i.e. request attempted using all clients
             else:
-                if num_errors == num_requests:
-                    break
-                if '_access_token' in client_data:
-                    del client_data['_access_token']
-                    continue
-            # Otherwise skip retrying clients without Authorization header
-            break
+                self._context.log_debug(
+                    'Unknown playabilityStatus in player response:\n|{0}|'
+                    .format(playability)
+                )
 
         if status != 'OK':
             if status == 'LIVE_STREAM_OFFLINE':
                 if not reason:
                     reason = self._get_error_details(
-                        playability_status,
+                        playability,
                         details=(
                             'liveStreamability',
                             'liveStreamabilityRenderer',
@@ -1480,7 +1438,7 @@ class StreamInfo(YouTubeRequestClient):
                         )
                     )
             elif not reason:
-                reason = self._get_error_details(playability_status)
+                reason = self._get_error_details(playability)
             raise YouTubeException(reason or 'UNKNOWN')
 
         self._context.log_debug(
@@ -1544,7 +1502,7 @@ class StreamInfo(YouTubeRequestClient):
             'subtitles': None,
         }
 
-        if _settings.use_remote_history():
+        if settings.use_remote_history():
             playback_stats = {
                 'playback_url': 'videostatsPlaybackUrl',
                 'watchtime_url': 'videostatsWatchtimeUrl',
@@ -1564,8 +1522,8 @@ class StreamInfo(YouTubeRequestClient):
                 'watchtime_url': '',
             }
 
-        use_mpd_vod = _settings.use_mpd_videos()
-        use_isa = _settings.use_isa()
+        use_mpd_vod = settings.use_mpd_videos()
+        use_isa = settings.use_isa()
 
         pa_li_info = streaming_data.get('licenseInfos', [])
         if any(pa_li_info) and not use_isa:

@@ -198,8 +198,7 @@ class YouTube(LoginClient):
     def get_streams(self, context, video_id, audio_only=False):
         return StreamInfo(context,
                           access_token=self._access_token_tv,
-                          audio_only=audio_only,
-                          language=self._language).load_stream_infos(video_id)
+                          audio_only=audio_only).load_stream_infos(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
