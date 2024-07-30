@@ -335,6 +335,7 @@ def process(provider, context, **_kwargs):
         if force_play:
             context.execute('Action(Play)')
             return False
+        ui.clear_property(SERVER_POST_START)
         context.wakeup(SERVER_WAKEUP, timeout=5)
         video_item = _play_stream(provider, context)
         ui.set_property(SERVER_POST_START)
