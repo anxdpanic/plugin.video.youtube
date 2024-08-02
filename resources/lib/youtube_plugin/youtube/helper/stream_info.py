@@ -1539,11 +1539,14 @@ class StreamInfo(YouTubeRequestClient):
             address, port = get_connect_address(self._context)
             license_info = {
                 'url': url,
-                'proxy': 'http://{address}:{port}{path}||R{{SSM}}|'.format(
-                    address=address,
-                    port=port,
-                    path=PATHS.DRM,
-                ),
+                'proxy': ''.join((
+                    'http://',
+                    address,
+                    ':',
+                    str(port),
+                    PATHS.DRM,
+                    '||R{{SSM}}|',
+                )),
                 'token': self._access_token,
             }
             break
@@ -1866,11 +1869,14 @@ class StreamInfo(YouTubeRequestClient):
                 else:
                     frame_rate = None
 
-                mime_group = '{mime_type}_{codec}{hdr}'.format(
-                    mime_type=mime_type,
-                    codec=codec,
-                    hdr='_hdr' if hdr else ''
-                )
+                mime_group = '_'.join((
+                    mime_type,
+                    codec,
+                    'hdr',
+                ) if hdr else (
+                    mime_type,
+                    codec,
+                ))
                 channels = language = role = role_type = sample_rate = None
                 label = quality['label'].format(
                     quality['nom_height'] or compare_height,
@@ -2089,10 +2095,10 @@ class StreamInfo(YouTubeRequestClient):
                 if 'auto' in stream_select or media_type == 'video':
                     label = stream['label']
                 else:
-                    label = '{0} {1}'.format(
+                    label = ' '.join((
                         stream['langName'],
-                        stream['label']
-                    ).strip()
+                        stream['label'],
+                    )).strip()
                     if stream == main_stream[media_type]:
                         default = True
                         role = 'main'
@@ -2278,10 +2284,12 @@ class StreamInfo(YouTubeRequestClient):
             success = False
         if success:
             address, port = get_connect_address(self._context)
-            return 'http://{address}:{port}{path}{file}'.format(
-                address=address,
-                port=port,
-                path=PATHS.MPD,
-                file=filename,
-            ), main_stream
+            return ''.join((
+                'http://',
+                address,
+                ':',
+                str(port),
+                PATHS.MPD,
+                filename,
+            )), main_stream
         return None, None

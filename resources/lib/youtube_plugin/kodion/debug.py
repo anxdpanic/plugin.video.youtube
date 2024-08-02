@@ -179,15 +179,24 @@ class Profiler(object):
                     class_name = args[0].__name__
                 else:
                     class_name = args[0].__class__.__name__
-                name = '{0}.{1}'.format(class_name, func.__name__)
+                name = '.'.join((
+                    class_name,
+                    func.__name__,
+                ))
 
             elif (func.__class__
                   and not isinstance(func.__class__, type)
                   and func.__class__.__name__ != 'function'):
-                name = '{0}.{1}'.format(func.__class__.__name__, func.__name__)
+                name = '.'.join((
+                    func.__class__.__name__,
+                    func.__name__,
+                ))
 
             elif func.__module__:
-                name = '{0}.{1}'.format(func.__module__, func.__name__)
+                name = '.'.join((
+                    func.__module__,
+                    func.__name__,
+                ))
 
             else:
                 name = func.__name__

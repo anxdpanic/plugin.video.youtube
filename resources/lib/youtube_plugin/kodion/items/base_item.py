@@ -115,7 +115,10 @@ class BaseItem(object):
     def get_fanart(self, default=True):
         if self._fanart or not default:
             return self._fanart
-        return '{0}/fanart.jpg'.format(MEDIA_PATH)
+        return '/'.join((
+            MEDIA_PATH,
+            'fanart.jpg',
+        ))
 
     def add_context_menu(self, context_menu, position='end', replace=False):
         context_menu = (item for item in context_menu if item)
