@@ -1,3 +1,12 @@
+## v7.0.9+beta.6
+### Fixed
+- Fix http server not working in Kodi 18
+- Fix issues with http server wakeup and sleep on initial start/restart
+
+### Changed
+- Player requests no longer use configured plugin language
+- Alternate client selections removed
+
 ## v7.0.9+beta.5
 ### Fixed
 - Fix disabling certification verification #841

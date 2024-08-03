@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 from .utils import get_thumbnail
 from ...kodion import KodionException
-from ...kodion.compatibility import parse_qsl, urlsplit
 from ...kodion.constants import CHANNEL_ID, PATHS, PLAYLISTITEM_ID, PLAYLIST_ID
 from ...kodion.utils import find_video_id
 

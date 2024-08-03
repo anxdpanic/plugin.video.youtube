@@ -426,11 +426,6 @@ class AbstractSettings(object):
                 types.update(update)
         return types
 
-    def client_selection(self, value=None):
-        if value is not None:
-            return self.set_int(SETTINGS.CLIENT_SELECTION, value)
-        return self.get_int(SETTINGS.CLIENT_SELECTION, 0)
-
     def show_detailed_description(self, value=None):
         if value is not None:
             return self.set_bool(SETTINGS.DETAILED_DESCRIPTION, value)

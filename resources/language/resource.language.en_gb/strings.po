@@ -1254,15 +1254,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
+msgid ""
 msgstr ""
 
 msgctxt "#30740"

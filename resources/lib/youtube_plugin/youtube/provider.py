@@ -40,7 +40,6 @@ from ..kodion.constants import (
     PATHS,
 )
 from ..kodion.items import (
-    BaseItem,
     DirectoryItem,
     NewSearchItem,
     SearchItem,
