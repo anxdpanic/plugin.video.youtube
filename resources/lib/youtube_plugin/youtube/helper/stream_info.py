@@ -34,7 +34,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, redact_ip_from_url
+from ...kodion.utils import make_dirs, redact_ip
 
 
 class StreamInfo(YouTubeRequestClient):
@@ -862,9 +862,9 @@ class StreamInfo(YouTubeRequestClient):
 
     def _get_player_page(self, client_name='web', embed=False):
         if embed:
-            url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
+            url = ''.join(('https://www.youtube.com/embed/', self.video_id))
         else:
-            url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
+            url = ''.join(('https://www.youtube.com/watch?v=', self.video_id))
         # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
@@ -974,16 +974,14 @@ class StreamInfo(YouTubeRequestClient):
 
     @staticmethod
     def _make_curl_headers(headers, cookies=None):
-        output = []
         if cookies:
-            output.append('Cookie={0}'.format(quote('; '.join(
-                '{0.name}={0.value}'.format(cookie)
-                for cookie in cookies
-            ))))
+            headers['Cookie'] = '; '.join([
+                '='.join((cookie.name, cookie.value)) for cookie in cookies
+            ])
         # Headers used in xbmc_items.video_playback_item'
-        output.extend('{0}={1}'.format(key, quote(value))
-                      for key, value in headers.items())
-        return '&'.join(output)
+        return '&'.join([
+            '='.join((key, quote(value))) for key, value in headers.items()
+        ])
 
     @staticmethod
     def _normalize_url(url):
@@ -999,13 +997,13 @@ class StreamInfo(YouTubeRequestClient):
 
     def _update_from_hls(self,
                          stream_list,
-                         url,
+                         urls,
                          is_live=False,
-                         meta_info=None,
                          headers=None,
+                         meta_info=None,
                          playback_stats=None):
-        if not url:
-            return []
+        if not urls:
+            return
 
         if not headers and self._selected_client:
             client_name = self._selected_client['_name']
@@ -1018,21 +1016,6 @@ class StreamInfo(YouTubeRequestClient):
             headers = self.build_client(client_name, client_data)['headers']
         curl_headers = self._make_curl_headers(headers, cookies=None)
 
-        result = self.request(
-            url,
-            headers=headers,
-            response_hook=self._response_hook_text,
-            error_title='Failed to get HLS manifest',
-            error_hook=self._error_hook,
-            error_hook_kwargs={
-                'video_id': self.video_id,
-                'client': client_name,
-                'auth': False,
-            },
-        )
-        if not result:
-            return ()
-
         if meta_info is None:
             meta_info = {'video': {},
                          'channel': {},
@@ -1042,26 +1025,6 @@ class StreamInfo(YouTubeRequestClient):
         if playback_stats is None:
             playback_stats = {}
 
-        if is_live:
-            for yt_format in ('9995', '9996'):
-                stream_list[yt_format] = self._get_stream_format(
-                    itag=yt_format,
-                    title='',
-                    url=url,
-                    meta=meta_info,
-                    headers=curl_headers,
-                    playback_stats=playback_stats,
-                )
-        else:
-            stream_list['9994'] = self._get_stream_format(
-                itag='9994',
-                title='',
-                url=url,
-                meta=meta_info,
-                headers=curl_headers,
-                playback_stats=playback_stats,
-            )
-
         settings = self._context.get_settings()
         if self._use_mpd:
             qualities = settings.mpd_video_qualities()
@@ -1069,48 +1032,77 @@ class StreamInfo(YouTubeRequestClient):
         else:
             selected_height = settings.fixed_video_quality()
 
-        # The playlist might include a #EXT-X-MEDIA entry, but it's usually for
-        # a small default stream with itag 133 (240p) and can be ignored.
-        # Capture the URL of a .m3u8 playlist and the itag value from that URL.
-        re_playlist_data = re.compile(
-            r'#EXT-X-STREAM-INF[^#]+'
-            r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
-        )
-        for match in re_playlist_data.finditer(result):
-            itag = match.group('itag')
-            if itag in stream_list:
-                continue
-
-            yt_format = self._get_stream_format(
-                itag=itag,
-                max_height=selected_height,
-                title='',
-                url=match.group('url'),
-                meta=meta_info,
-                headers=curl_headers,
-                playback_stats=playback_stats,
+        for url in urls:
+            result = self.request(
+                url,
+                headers=headers,
+                response_hook=self._response_hook_text,
+                error_title='Failed to get HLS manifest',
+                error_hook=self._error_hook,
+                error_hook_kwargs={
+                    'video_id': self.video_id,
+                    'client': client_name,
+                    'auth': False,
+                },
             )
-            if yt_format is None:
-                self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
-                    itag=itag, stream=redact_ip_from_url(match[0]),
-                ))
-            if (not yt_format
-                    or (yt_format.get('hls/video')
-                        and not yt_format.get('hls/audio'))):
+            if not result:
                 continue
 
-            if is_live:
-                yt_format['live'] = True
-                yt_format['title'] = 'Live ' + yt_format['title']
+            for itag in ('9995', '9996') if is_live else ('9994', ):
+                if itag in stream_list:
+                    continue
 
-            stream_list[itag] = yt_format
+                stream_list[itag] = self._get_stream_format(
+                    itag=itag,
+                    title='',
+                    url=url,
+                    headers=curl_headers,
+                    meta=meta_info,
+                    playback_stats=playback_stats,
+                )
+
+            # The playlist might include a #EXT-X-MEDIA entry, but it's usually
+            # for a default stream with itag 133 (240p) and can be ignored.
+            # Capture the URL of a .m3u8 playlist and the itag from that URL.
+            re_playlist_data = re.compile(
+                r'#EXT-X-STREAM-INF[^#]+'
+                r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
+            )
+            for match in re_playlist_data.finditer(result):
+                itag = match.group('itag')
+                if itag in stream_list:
+                    continue
+
+                yt_format = self._get_stream_format(
+                    itag=itag,
+                    max_height=selected_height,
+                    title='',
+                    url=match.group('url'),
+                    meta=meta_info,
+                    headers=curl_headers,
+                    playback_stats=playback_stats,
+                )
+                if yt_format is None:
+                    self._context.log_debug('Unknown itag: {itag}\n{stream}'
+                                            .format(itag=itag,
+                                                    stream=redact_ip(match[0])))
+                if (not yt_format
+                        or (yt_format.get('hls/video')
+                            and not yt_format.get('hls/audio'))):
+                    continue
+
+                if is_live:
+                    yt_format['live'] = True
+                    yt_format['title'] = 'Live ' + yt_format['title']
+
+                stream_list[itag] = yt_format
 
     def _update_from_streams(self,
                              stream_list,
                              streams,
                              is_live=False,
-                             meta_info=None,
                              headers=None,
+                             meta_info=None,
                              playback_stats=None):
         if not headers and self._selected_client:
             headers = self._selected_client['headers'].copy()
@@ -1127,6 +1119,7 @@ class StreamInfo(YouTubeRequestClient):
                          'channel': {},
                          'thumbnails': {},
                          'subtitles': []}
+
         if playback_stats is None:
             playback_stats = {}
 
@@ -1169,11 +1162,11 @@ class StreamInfo(YouTubeRequestClient):
             )
             if yt_format is None:
                 if url:
-                    stream_map['url'] = redact_ip_from_url(url)
+                    stream_map['url'] = redact_ip(url)
                 if conn:
-                    stream_map['conn'] = redact_ip_from_url(conn)
+                    stream_map['conn'] = redact_ip(conn)
                 if stream:
-                    stream_map['stream'] = redact_ip_from_url(stream)
+                    stream_map['stream'] = redact_ip(stream)
                 self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
                     itag=itag, stream=stream_map,
                 ))
@@ -1243,7 +1236,7 @@ class StreamInfo(YouTubeRequestClient):
             data_cache.set_item(encrypted_signature, {'sig': signature})
 
         if signature:
-            url = '{0}&{1}={2}'.format(url, query_var, signature)
+            url = ''.join((url, '&', query_var, '=', signature))
             return url
         return None
 
@@ -1360,6 +1353,7 @@ class StreamInfo(YouTubeRequestClient):
         streaming_data = {}
         adaptive_fmts = []
         progressive_fmts = []
+        hls_playlists = []
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
@@ -1391,7 +1385,7 @@ class StreamInfo(YouTubeRequestClient):
                 continue
             if name == 'mpd' and not use_mpd:
                 continue
-            if name == 'ask' and not ask_for_quality and self._selected_client:
+            if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
 
             status = None
@@ -1491,6 +1485,8 @@ class StreamInfo(YouTubeRequestClient):
                     adaptive_fmts.extend(
                         _streaming_data.get('adaptiveFormats', [])
                     )
+                if 'hlsManifestUrl' in _streaming_data:
+                    hls_playlists.append(_streaming_data['hlsManifestUrl'])
                 streaming_data.update(_streaming_data)
 
         if not self._selected_client:
@@ -1630,7 +1626,7 @@ class StreamInfo(YouTubeRequestClient):
                 license_info=license_info,
                 playback_stats=playback_stats,
             )
-        if 'hlsManifestUrl' in streaming_data and (
+        if hls_playlists and (
                 is_live
                 or live_dvr
                 or ask_for_quality
@@ -1638,10 +1634,10 @@ class StreamInfo(YouTubeRequestClient):
         ):
             self._update_from_hls(
                 stream_list,
-                streaming_data['hlsManifestUrl'],
+                hls_playlists,
                 is_live,
-                meta_info,
                 client['headers'],
+                meta_info,
                 playback_stats,
             )
 
@@ -1745,8 +1741,8 @@ class StreamInfo(YouTubeRequestClient):
                 stream_list,
                 progressive_fmts,
                 is_live,
-                meta_info,
                 client['headers'],
+                meta_info,
                 playback_stats,
             )
 
@@ -1845,16 +1841,16 @@ class StreamInfo(YouTubeRequestClient):
                         role = 'alternate'
                         label = self._context.localize('stream.alternate')
 
-                    mime_group = '{0}_{1}.{2}'.format(
-                        mime_type, language_code, role_type
-                    )
+                    mime_group = ''.join((
+                        mime_type, '_', language_code, '.', role_type,
+                    ))
                     if language_code == self._language_base and (
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
                     ):
                         preferred_audio = {
-                            'id': '_{0}.{1}'.format(language_code, role_type),
+                            'id': ''.join(('_', language_code, '.', role_type)),
                             'language_code': language_code,
                             'role_type': role_type,
                         }
@@ -1870,9 +1866,10 @@ class StreamInfo(YouTubeRequestClient):
                 language = self._context.get_language_name(language_code)
                 label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
                 if channels > 2 or 'auto' not in stream_select:
-                    quality_group = '{0}_{1}_{2}.{3}'.format(
-                        container, codec, language_code, role_type
-                    )
+                    quality_group = ''.join((
+                        container, '_', codec, '_', language_code,
+                        '.', role_type,
+                    ))
                 else:
                     quality_group = mime_group
             elif audio_only:
@@ -1937,7 +1934,7 @@ class StreamInfo(YouTubeRequestClient):
                     fps if fps > 30 else '',
                     ' HDR' if hdr else '',
                 )
-                quality_group = '{0}_{1}_{2}'.format(container, codec, label)
+                quality_group = '_'.join((container, codec, label))
 
             if mime_group not in data:
                 data[mime_group] = {}
