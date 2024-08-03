@@ -1,3 +1,8 @@
+## v7.0.9+beta.7
+### New
+- Improve use of progressive streams
+- Improve stream selection for HLS stream in InputStream.Adaptive
+
 ## v7.0.9+beta.6
 ### Fixed
 - Fix http server not working in Kodi 18

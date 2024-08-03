@@ -48,19 +48,6 @@
                     </dependencies>
                     <control format="string" type="spinner"/>
                 </setting>
-                <setting id="kodion.video.quality.ask" type="boolean" label="30009" help="">
-                    <level>0</level>
-                    <default>false</default>
-                    <dependencies>
-                        <dependency type="visible">
-                            <or>
-                                <condition setting="kodion.video.quality.isa" operator="is">false</condition>
-                                <condition setting="kodion.mpd.videos" operator="is">false</condition>
-                            </or>
-                        </dependency>
-                    </dependencies>
-                    <control type="toggle"/>
-                </setting>
                 <setting id="kodion.mpd.quality.selection" type="integer" label="30010" help="">
                     <level>0</level>
                     <default>4</default>  <!-- 1080p (FHD) -->
@@ -85,6 +72,38 @@
                         </dependency>
                     </dependencies>
                     <control format="string" type="spinner"/>
+                </setting>
+                <setting id="kodion.video.stream.select" type="integer" label="30758" help="">
+                    <level>0</level>
+                    <default>2</default>  <!-- auto+list -->
+                    <constraints>
+                        <options>
+                            <option label="30583">1</option>  <!-- auto -->
+                            <option label="30759">2</option>  <!-- list -->
+                        </options>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible">
+                            <and>
+                                <condition setting="kodion.video.quality.isa" operator="is">true</condition>
+                                <condition setting="kodion.mpd.videos" operator="is">false</condition>
+                            </and>
+                        </dependency>
+                    </dependencies>
+                    <control format="string" type="spinner"/>
+                </setting>
+                <setting id="kodion.video.quality.ask" type="boolean" label="30009" help="">
+                    <level>0</level>
+                    <default>false</default>
+                    <dependencies>
+                        <dependency type="visible">
+                            <or>
+                                <condition setting="kodion.video.quality.isa" operator="is">false</condition>
+                                <condition setting="kodion.mpd.videos" operator="is">false</condition>
+                            </or>
+                        </dependency>
+                    </dependencies>
+                    <control type="toggle"/>
                 </setting>
                 <setting id="kodion.video.quality" type="integer" label="30010" help="">
                     <level>0</level>

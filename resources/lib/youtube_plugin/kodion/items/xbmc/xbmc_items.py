@@ -23,7 +23,7 @@ from ...constants import (
     SUBSCRIPTION_ID,
     VIDEO_ID,
 )
-from ...utils import current_system_version, datetime_parser, redact_ip_from_url
+from ...utils import current_system_version, datetime_parser, redact_ip
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
@@ -375,7 +375,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     uri = video_item.get_uri()
-    context.log_debug('Converting VideoItem |%s|' % redact_ip_from_url(uri))
+    context.log_debug('Converting VideoItem |%s|' % redact_ip(uri))
 
     settings = context.get_settings()
     headers = video_item.get_headers()
@@ -402,14 +402,20 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
         }
 
     if video_item.use_isa_video() and context.use_inputstream_adaptive():
-        if video_item.use_mpd_video():
+        use_mpd = video_item.use_mpd_video()
+        if use_mpd:
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'
-            if 'auto' in settings.stream_select():
-                props['inputstream.adaptive.stream_selection_type'] = 'adaptive'
         else:
             manifest_type = 'hls'
             mime_type = 'application/x-mpegURL'
+
+        stream_select = settings.stream_select()
+        if not use_mpd and 'list' in stream_select:
+            props['inputstream.adaptive.stream_selection_type'] = 'manual-osd'
+        elif 'auto' in stream_select:
+            props['inputstream.adaptive.stream_selection_type'] = 'adaptive'
+            props['inputstream.adaptive.chooser_resolution_max'] = 'auto'
 
         if current_system_version.compatible(19, 0):
             props['inputstream'] = 'inputstream.adaptive'

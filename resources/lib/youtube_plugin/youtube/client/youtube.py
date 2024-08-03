@@ -156,7 +156,7 @@ class YouTube(LoginClient):
             'Accept': '*/*',
             'Accept-Language': 'en-US,en;q=0.5',
             'DNT': '1',
-            'Referer': 'https://www.youtube.com/watch?v={0}'.format(video_id),
+            'Referer': 'https://www.youtube.com/watch?v=' + video_id,
             'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
                            ' AppleWebKit/537.36 (KHTML, like Gecko)'
                            ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
@@ -1976,7 +1976,7 @@ class YouTube(LoginClient):
             else:
                 notification = message
 
-            title = '{0}: {1}'.format(self._context.get_name(), reason)
+            title = ': '.join((self._context.get_name(), reason))
             if ok_dialog:
                 self._context.get_ui().on_ok(title, notification)
             else:
