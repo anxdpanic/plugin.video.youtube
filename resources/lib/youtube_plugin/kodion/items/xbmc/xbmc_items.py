@@ -402,14 +402,20 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
         }
 
     if video_item.use_isa_video() and context.use_inputstream_adaptive():
-        if video_item.use_mpd_video():
+        use_mpd = video_item.use_mpd_video()
+        if use_mpd:
             manifest_type = 'mpd'
             mime_type = 'application/dash+xml'
-            if 'auto' in settings.stream_select():
-                props['inputstream.adaptive.stream_selection_type'] = 'adaptive'
         else:
             manifest_type = 'hls'
             mime_type = 'application/x-mpegURL'
+
+        stream_select = settings.stream_select()
+        if not use_mpd and 'list' in stream_select:
+            props['inputstream.adaptive.stream_selection_type'] = 'manual-osd'
+        elif 'auto' in stream_select:
+            props['inputstream.adaptive.stream_selection_type'] = 'adaptive'
+            props['inputstream.adaptive.chooser_resolution_max'] = 'auto'
 
         if current_system_version.compatible(19, 0):
             props['inputstream'] = 'inputstream.adaptive'

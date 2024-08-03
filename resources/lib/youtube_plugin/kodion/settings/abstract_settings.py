@@ -388,10 +388,16 @@ class AbstractSettings(object):
     }
 
     def stream_select(self, value=None):
+        if self.use_mpd_videos():
+            setting = SETTINGS.MPD_STREAM_SELECT
+            default = 3
+        else:
+            setting = SETTINGS.VIDEO_STREAM_SELECT
+            default = 2
+
         if value is not None:
-            return self.set_int(SETTINGS.MPD_STREAM_SELECT, value)
-        default = 3
-        value = self.get_int(SETTINGS.MPD_STREAM_SELECT, default)
+            return self.set_int(setting, value)
+        value = self.get_int(setting, default)
         if value in self._STREAM_SELECT:
             return self._STREAM_SELECT[value]
         return self._STREAM_SELECT[default]
