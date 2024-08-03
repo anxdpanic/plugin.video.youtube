@@ -23,7 +23,7 @@ from ...constants import (
     SUBSCRIPTION_ID,
     VIDEO_ID,
 )
-from ...utils import current_system_version, datetime_parser, redact_ip_from_url
+from ...utils import current_system_version, datetime_parser, redact_ip
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
@@ -375,7 +375,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
 def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     uri = video_item.get_uri()
-    context.log_debug('Converting VideoItem |%s|' % redact_ip_from_url(uri))
+    context.log_debug('Converting VideoItem |%s|' % redact_ip(uri))
 
     settings = context.get_settings()
     headers = video_item.get_headers()

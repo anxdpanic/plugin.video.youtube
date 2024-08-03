@@ -107,7 +107,7 @@ def select_stream(context,
 
         original_value = log_data.get('url')
         if original_value:
-            log_data['url'] = redact_ip_from_url(original_value)
+            log_data['url'] = redact_ip(original_value)
 
         context.log_debug('Stream {0}:\n{1}'.format(idx, log_data))
 
@@ -312,5 +312,5 @@ def wait(timeout=None):
     return xbmc.Monitor().waitForAbort(timeout)
 
 
-def redact_ip_from_url(url):
+def redact_ip(url):
     return re.sub(r'([?&/])ip([=/])[^?&/]+', '\g<1>ip\g<2><redacted>', url)

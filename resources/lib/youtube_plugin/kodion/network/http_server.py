@@ -28,7 +28,7 @@ from ..compatibility import (
 )
 from ..constants import ADDON_ID, LICENSE_TOKEN, LICENSE_URL, PATHS, TEMP_PATH
 from ..logger import log_debug, log_error
-from ..utils import validate_ip_address, redact_ip_from_url, wait
+from ..utils import validate_ip_address, redact_ip, wait
 
 
 class HTTPServer(TCPServer):
@@ -97,7 +97,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         stripped_path = self.path.rstrip('/')
         if stripped_path != PATHS.PING:
             log_debug('HTTPServer: GET |{path}|'.format(
-                path=redact_ip_from_url(self.path)
+                path=redact_ip(self.path)
             ))
 
         if not self.connection_allowed():
