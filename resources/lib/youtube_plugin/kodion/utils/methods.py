@@ -58,15 +58,10 @@ def to_unicode(text):
 
 def select_stream(context,
                   stream_data_list,
-                  ask_for_quality=None,
-                  audio_only=None,
+                  ask_for_quality,
+                  audio_only,
                   use_adaptive_formats=True):
     settings = context.get_settings()
-    if ask_for_quality is None:
-        ask_for_quality = settings.ask_for_video_quality()
-    if audio_only is None:
-        audio_only = settings.audio_only()
-
     isa_capabilities = context.inputstream_adaptive_capabilities()
     use_adaptive = (use_adaptive_formats
                     and settings.use_isa()

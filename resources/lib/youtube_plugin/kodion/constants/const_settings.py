@@ -41,7 +41,6 @@ ALLOW_DEV_KEYS = 'youtube.allow.dev.keys'  # (bool)
 WATCH_LATER_PLAYLIST = 'youtube.folder.watch_later.playlist'  # (str)
 HISTORY_PLAYLIST = 'youtube.folder.history.playlist'  # (str)
 
-CLIENT_SELECTION = 'youtube.client.selection'  # (int)
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 DEFAULT_PLAYER_WEB_URLS = 'kodion.default_player.web_urls'  # (bool)
 ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web_urls'  # (bool)

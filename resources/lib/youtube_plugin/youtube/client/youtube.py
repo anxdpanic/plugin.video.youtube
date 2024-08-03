@@ -195,10 +195,17 @@ class YouTube(LoginClient):
         self.request(url, params=params, headers=headers,
                      error_msg='Failed to update watch history')
 
-    def get_streams(self, context, video_id, audio_only=False):
+    def get_streams(self,
+                    context,
+                    video_id,
+                    ask_for_quality=False,
+                    audio_only=False,
+                    use_mpd=True):
         return StreamInfo(context,
                           access_token=self._access_token_tv,
-                          audio_only=audio_only).load_stream_infos(video_id)
+                          ask_for_quality=ask_for_quality,
+                          audio_only=audio_only,
+                          use_mpd=use_mpd).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
