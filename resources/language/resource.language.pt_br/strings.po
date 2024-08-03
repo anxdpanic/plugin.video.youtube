@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2024-07-16 10:25+0000\n"
 "Last-Translator: Havok Dan <havokdan@yahoo.com.br>\n"
@@ -1249,16 +1249,16 @@ msgid "Shorts (1 minute or less)"
 msgstr "Curtas (1 minuto ou menos)"
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Use detalhes alternativos do cliente"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Alternativa #1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Alternativa #2"
+msgid ""
+msgstr ""
 
 #, fuzzy
 msgctxt "#30740"
@@ -1572,6 +1572,18 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Use detalhes alternativos do cliente"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Alternativa #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Alternativa #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

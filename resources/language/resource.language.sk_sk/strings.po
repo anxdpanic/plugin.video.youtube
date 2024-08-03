@@ -1247,16 +1247,16 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Použitie alternatívnych údajov o klientovi"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Alternatíva č. 1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Alternatíva č. 2"
+msgid ""
+msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1565,6 +1565,18 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Použitie alternatívnych údajov o klientovi"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Alternatíva č. 1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Alternatíva č. 2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"
