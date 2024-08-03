@@ -1245,16 +1245,16 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Utiliser les détails du client alternatif"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Alternative #1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Alternative #2"
+msgid ""
+msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1563,6 +1563,18 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Utiliser les détails du client alternatif"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Alternative #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Alternative #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"
