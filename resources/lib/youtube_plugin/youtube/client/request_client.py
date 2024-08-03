@@ -15,49 +15,19 @@ from ...kodion.utils import merge_dicts
 
 
 class YouTubeRequestClient(BaseRequestsClass):
-    _ANDROID_PARAMS = 'CgIIAdgDAQ=='
-    # yt-dlp has chosen the following value, but this results in the android
-    # player response returning unexpected details sometimes. To be investigated
-    # _ANDROID_PARAMS = 'CgIIAQ=='
     _API_KEYS = {
         'android': 'AIzaSyA8eiZmM1FaDVjRy-df2KTyQ_vz_yYM39w',
         'android_embedded': 'AIzaSyCjc_pVEDi4qsv5MtC2dMXzpIaDoRFLsxw',
         'ios': 'AIzaSyB-63vPrdThhKuerbB2N_l7Kwwcxj6yUAc',
+        'smart_tv': 'AIzaSyDCU8hByM-4DrUqRUYnGn-3llEO78bcxq8',
         'web': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+    }
+    _PLAYER_PARAMS = {
+        'android': 'CgIIAdgDAQ==',
+        'android_testsuite': '2AMB',
     }
 
     CLIENTS = {
-        # 4k no VP9 HDR
-        # Limited subtitle availability
-        'android_testsuite': {
-            '_id': 30,
-            '_query_subtitles': True,
-            'json': {
-                'params': _ANDROID_PARAMS,
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_TESTSUITE',
-                        'clientVersion': '1.9',
-                        'androidSdkVersion': '34',
-                        'osName': 'Android',
-                        'osVersion': '14',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': _API_KEYS['android'],
-            },
-        },
         'android': {
             '_id': 3,
             '_disabled': True,
@@ -66,10 +36,10 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '19.17.34',
-                        'androidSdkVersion': '34',
+                        'clientVersion': '19.29.37',
+                        'androidSdkVersion': '30',
                         'osName': 'Android',
-                        'osVersion': '14',
+                        'osVersion': '11',
                         'platform': 'MOBILE',
                     },
                 },
@@ -78,8 +48,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'User-Agent': ('com.google.android.youtube/'
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
+                               ' {json[context][client][osVersion]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -91,15 +60,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_disabled': True,
             '_query_subtitles': 'optional',
             'json': {
-                'params': _ANDROID_PARAMS,
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_EMBEDDED_PLAYER',
                         'clientScreen': 'EMBED',
-                        'clientVersion': '19.17.34',
-                        'androidSdkVersion': '34',
+                        'clientVersion': '19.29.37',
+                        'androidSdkVersion': '30',
                         'osName': 'Android',
-                        'osVersion': '14',
+                        'osVersion': '11',
                         'platform': 'MOBILE',
                     },
                 },
@@ -111,13 +79,36 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'User-Agent': ('com.google.android.youtube/'
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
+                               ' {json[context][client][osVersion]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
-            'params': {
-                'key': _API_KEYS['android_embedded'],
+        },
+        # 4k no VP9 HDR
+        # Limited subtitle availability
+        'android_testsuite': {
+            '_id': 30,
+            '_query_subtitles': True,
+            'json': {
+                'params': _PLAYER_PARAMS['android_testsuite'],
+                'context': {
+                    'client': {
+                        'clientName': 'ANDROID_TESTSUITE',
+                        'clientVersion': '1.9',
+                        'androidSdkVersion': '30',
+                        'osName': 'Android',
+                        'osVersion': '11',
+                        'platform': 'MOBILE',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': ('com.google.android.youtube/'
+                               '{json[context][client][clientVersion]}'
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]}) gzip'),
+                'X-YouTube-Client-Name': '{_id}',
+                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
         },
         # 4k with HDR
@@ -127,14 +118,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': 29,
             '_query_subtitles': True,
             'json': {
-                'params': _ANDROID_PARAMS,
+                'params': _PLAYER_PARAMS['android'],
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
                         'clientVersion': '8.12.0',
-                        'androidSdkVersion': '34',
+                        'androidSdkVersion': '30',
                         'osName': 'Android',
-                        'osVersion': '14',
+                        'osVersion': '11',
                         'platform': 'MOBILE',
                     },
                 },
@@ -143,28 +134,25 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'User-Agent': ('com.google.android.apps.youtube.unplugged/'
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]};'
-                               ' {json[context][client][gl]}) gzip'),
+                               ' {json[context][client][osVersion]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-            'params': {
-                'key': _API_KEYS['android'],
             },
         },
         'ios': {
             '_id': 5,
             '_os': {
                 'major': '17',
-                'minor': '4',
+                'minor': '5',
                 'patch': '1',
-                'build': '21E236',
+                'build': '21F90',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.16.3',
+                        'clientVersion': '19.29.1',
+                        'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
                         'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
@@ -183,9 +171,22 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
         },
+        'media_connect_frontend': {
+            '_id': 95,
+            '_query_subtitles': True,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'MEDIA_CONNECT_FRONTEND',
+                        'clientVersion': '0.1',
+                    },
+                },
+            },
+            'headers': {},
+        },
         # Used to requests captions for clients that don't provide them
         # Requires handling of nsig to overcome throttling (TODO)
-        'smarttv_embedded': {
+        'smart_tv_embedded': {
             '_id': 85,
             'json': {
                 'context': {
@@ -205,25 +206,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                                ' AppleWebKit/537.36 (KHTML, like Gecko)'
                                ' 85.0.4183.93/6.5 TV Safari/537.36'),
             },
-            'params': {
-                'key': _API_KEYS['web'],
-            },
-        },
-        'media_connect_frontend': {
-            '_id': 95,
-            '_query_subtitles': True,
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'MEDIA_CONNECT_FRONTEND',
-                        'clientVersion': '0.1',
-                    },
-                },
-            },
-            'headers': {},
-            'params': {
-                'key': _API_KEYS['web'],
-            },
         },
         # Used for misc api requests by default
         # Requires handling of nsig to overcome throttling (TODO)
@@ -233,7 +215,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'WEB',
-                        'clientVersion': '2.20240304.00.00',
+                        'clientVersion': '2.20240726.00.00',
                     },
                 },
             },
@@ -244,9 +226,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                                ' AppleWebKit/537.36 (KHTML, like Gecko)'
                                ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
                 'Referer': 'https://www.youtube.com/watch?v={json[videoId]}'
-            },
-            'params': {
-                'key': _API_KEYS['web'],
             },
         },
         '_common': {
@@ -374,10 +353,15 @@ class YouTubeRequestClient(BaseRequestsClass):
         client['_name'] = client_name
 
         try:
+            params = client['params']
             if client.get('_access_token'):
-                del client['params']['key']
-            elif 'Authorization' in client['headers']:
-                del client['headers']['Authorization']
+                if 'key' in params:
+                    del params['key']
+            else:
+                if 'Authorization' in client['headers']:
+                    del client['headers']['Authorization']
+                if 'key' in params and not params['key']:
+                    del params['key']
         except KeyError:
             pass
 

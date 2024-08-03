@@ -1651,7 +1651,7 @@ class StreamInfo(YouTubeRequestClient):
                 query_subtitles is True
                 or (query_subtitles
                     and subtitles.sub_selection == subtitles.LANG_ALL)):
-            for client_name in ('smarttv_embedded', 'web', 'android'):
+            for client_name in ('smart_tv_embedded', 'web', 'android'):
                 caption_client = self.build_client(client_name, client_data)
                 if not caption_client:
                     continue

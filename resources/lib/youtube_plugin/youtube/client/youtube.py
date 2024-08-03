@@ -45,9 +45,6 @@ class YouTube(LoginClient):
             'headers': {
                 'Host': 'www.youtube.com',
             },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
         },
         3: {
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
@@ -70,9 +67,6 @@ class YouTube(LoginClient):
             'headers': {
                 'Host': 'www.youtube.com',
             },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
         },
         'tv_embed': {
             'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
@@ -87,9 +81,6 @@ class YouTube(LoginClient):
             },
             'headers': {
                 'Host': 'www.youtube.com',
-            },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
             },
         },
         '_common': {
@@ -122,7 +113,6 @@ class YouTube(LoginClient):
                                ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
             },
             'params': {
-                'key': None,
                 'prettyPrint': 'false'
             },
         },
