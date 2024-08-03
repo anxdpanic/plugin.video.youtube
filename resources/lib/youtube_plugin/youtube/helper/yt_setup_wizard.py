@@ -316,7 +316,6 @@ def process_default_settings(context, step, steps, **_kwargs):
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.defaults'))
     ):
-        settings.client_selection(0)
         settings.use_isa(True)
         settings.use_mpd_videos(True)
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
@@ -370,7 +369,6 @@ def process_performance_settings(context, step, steps, **_kwargs):
                 'num_items': 10,
                 'settings': (
                     (settings.use_isa, (False,)),
-                    (settings.client_selection, (2,)),
                     (settings.use_mpd_videos, (False,)),
                     (settings.set_subtitle_download, (True,)),
                 ),
@@ -379,9 +377,6 @@ def process_performance_settings(context, step, steps, **_kwargs):
                 'max_resolution': 4,  # 1080p
                 'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter'),
                 'num_items': 10,
-                'settings': (
-                    (settings.client_selection, (2,)),
-                ),
             },
             '1080p30': {
                 'max_resolution': 4,  # 1080p

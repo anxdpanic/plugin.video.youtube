@@ -106,8 +106,9 @@ class ServiceMonitor(xbmc.Monitor):
                 self.interrupt = True
             elif target == SERVER_WAKEUP:
                 if not self.httpd and self.httpd_required():
-                    self.httpd_sleep_allowed = None
                     self.start_httpd()
+                if self.httpd_sleep_allowed:
+                    self.httpd_sleep_allowed = None
             if data.get('response_required'):
                 self.set_property(WAKEUP, target)
         elif event == REFRESH_CONTAINER:

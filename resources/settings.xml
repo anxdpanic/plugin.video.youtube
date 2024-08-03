@@ -575,18 +575,6 @@
         </category>
         <category id="advanced" label="30031" help="">
             <group id="1">
-                <setting id="youtube.client.selection" type="integer" label="30737" help="">
-                    <level>0</level>
-                    <default>0</default>
-                    <constraints>
-                        <options>
-                            <option label="30532">0</option>
-                            <option label="30738">1</option>
-                            <option label="30739">2</option>
-                        </options>
-                    </constraints>
-                    <control format="string" type="spinner"/>
-                </setting>
                 <setting id="kodion.support.alternative_player" type="boolean" label="30036" help="">
                     <level>0</level>
                     <default>false</default>

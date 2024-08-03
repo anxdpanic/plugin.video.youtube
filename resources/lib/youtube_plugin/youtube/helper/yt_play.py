@@ -55,16 +55,20 @@ def _play_stream(provider, context):
             'url': 'https://youtu.be/{0}'.format(video_id),
         }
     else:
-        ask_for_quality = None
+        ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
             ask_for_quality = True
 
-        audio_only = None
+        audio_only = settings.audio_only()
         if ui.pop_property(PLAY_FORCE_AUDIO):
             audio_only = True
 
         try:
-            streams = client.get_streams(context, video_id, audio_only)
+            streams = client.get_streams(context,
+                                         video_id,
+                                         ask_for_quality,
+                                         audio_only,
+                                         settings.use_mpd_videos())
         except YouTubeException as exc:
             context.log_error('yt_play.play_video - {exc}:\n{details}'.format(
                 exc=exc, details=''.join(format_stack())
@@ -335,6 +339,7 @@ def process(provider, context, **_kwargs):
         if force_play:
             context.execute('Action(Play)')
             return False
+        ui.clear_property(SERVER_POST_START)
         context.wakeup(SERVER_WAKEUP, timeout=5)
         video_item = _play_stream(provider, context)
         ui.set_property(SERVER_POST_START)

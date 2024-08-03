@@ -260,10 +260,11 @@ class AbstractProvider(object):
             if not result:
                 return False
             context.get_ui().set_property(REROUTE_PATH, path)
-            context.execute('ActivateWindow(Videos, {0}{1})'.format(
+            context.execute(''.join((
+                'ActivateWindow(Videos, ',
                 context.create_uri(path, params),
-                ', return' if window_return else '',
-            ))
+                ', return)' if window_return else ')',
+            )))
         return True
 
     @staticmethod
@@ -365,7 +366,7 @@ class AbstractProvider(object):
     @staticmethod
     def on_command(re_match, **_kwargs):
         command = re_match.group('command')
-        return UriItem('command://{0}'.format(command))
+        return UriItem(''.join(('command://', command)))
 
     def handle_exception(self, context, exception_to_handle):
         return True

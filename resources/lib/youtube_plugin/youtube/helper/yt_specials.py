@@ -297,8 +297,6 @@ def _process_saved_playlists_tv(provider, context, client):
 def _process_my_subscriptions(provider, context, client, filtered=False):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
-    function_cache = context.get_function_cache()
-
     params = context.get_params()
     refresh = params.get('refresh')
 

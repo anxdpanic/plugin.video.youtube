@@ -18,7 +18,6 @@ from .json_script_engine import JsonScriptEngine
 class Cipher(object):
     def __init__(self, context, javascript):
         self._context = context
-        self._verify = context.get_settings().verify_ssl()
         self._javascript = javascript
 
         self._object_cache = {}

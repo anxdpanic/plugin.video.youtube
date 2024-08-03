@@ -257,7 +257,7 @@ class AbstractContext(object):
     def get_system_version():
         return current_system_version
 
-    def create_uri(self, path=None, params=None):
+    def create_uri(self, path=None, params=None, run=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
         elif path:
@@ -270,7 +270,11 @@ class AbstractContext(object):
         if params:
             uri = '?'.join((uri, urlencode(params)))
 
-        return uri
+        return ''.join((
+            'RunPlugin(',
+            uri,
+            ')'
+        )) if run else uri
 
     @staticmethod
     def create_path(*args, **kwargs):

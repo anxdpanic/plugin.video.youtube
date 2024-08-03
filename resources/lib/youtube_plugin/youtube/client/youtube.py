@@ -45,9 +45,6 @@ class YouTube(LoginClient):
             'headers': {
                 'Host': 'www.youtube.com',
             },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
         },
         3: {
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
@@ -70,9 +67,6 @@ class YouTube(LoginClient):
             'headers': {
                 'Host': 'www.youtube.com',
             },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-            },
         },
         'tv_embed': {
             'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
@@ -87,9 +81,6 @@ class YouTube(LoginClient):
             },
             'headers': {
                 'Host': 'www.youtube.com',
-            },
-            'params': {
-                'key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
             },
         },
         '_common': {
@@ -122,7 +113,6 @@ class YouTube(LoginClient):
                                ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
             },
             'params': {
-                'key': None,
                 'prettyPrint': 'false'
             },
         },
@@ -195,11 +185,17 @@ class YouTube(LoginClient):
         self.request(url, params=params, headers=headers,
                      error_msg='Failed to update watch history')
 
-    def get_streams(self, context, video_id, audio_only=False):
+    def get_streams(self,
+                    context,
+                    video_id,
+                    ask_for_quality=False,
+                    audio_only=False,
+                    use_mpd=True):
         return StreamInfo(context,
                           access_token=self._access_token_tv,
+                          ask_for_quality=ask_for_quality,
                           audio_only=audio_only,
-                          language=self._language).load_stream_infos(video_id)
+                          use_mpd=use_mpd).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,

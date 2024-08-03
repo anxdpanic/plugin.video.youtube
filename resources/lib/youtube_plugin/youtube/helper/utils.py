@@ -90,27 +90,33 @@ def make_comment_item(context, snippet, uri, total_replies=0):
 
     # Format the label of the comment item.
     if label_props:
-        label = '{author} ({props}) {body}'.format(
-            author=author,
-            props='|'.join(label_props),
-            body=body.replace('\n', ' ')
-        )
+        label = ''.join((
+            author,
+            ' (',
+            '|'.join(label_props),
+            ') ',
+            body.replace('\n', ' '),
+        ))
     else:
-        label = '{author} {body}'.format(
-            author=author, body=body.replace('\n', ' ')
-        )
+        label = ' '.join((
+            author,
+            body.replace('\n', ' '),
+        ))
 
     # Format the plot of the comment item.
     if plot_props:
-        plot = '{author} ({props}){body}'.format(
-            author=author,
-            props='|'.join(plot_props),
-            body=ui.new_line(body, cr_before=2)
-        )
+        plot = ''.join((
+            author,
+            ' (',
+            '|'.join(plot_props),
+            ')',
+            ui.new_line(body, cr_before=2),
+        ))
     else:
-        plot = '{author}{body}'.format(
-            author=author, body=ui.new_line(body, cr_before=2)
-        )
+        plot = ''.join((
+            author,
+            ui.new_line(body, cr_before=2),
+        ))
 
     comment_item = DirectoryItem(label, uri, plot=plot, action=(not uri))
 
@@ -518,12 +524,10 @@ def update_video_infos(provider, context, video_id_dict,
                 type_label = localize('live')
             else:
                 type_label = localize(335)  # "Start"
-            start_at = '{type_label} {start_at}'.format(
-                type_label=type_label,
-                start_at=datetime_parser.get_scheduled_start(
-                    context, local_datetime
-                )
-            )
+            start_at = ' '.join((
+                type_label,
+                datetime_parser.get_scheduled_start(context, local_datetime),
+            ))
 
         label_stats = []
         stats = []
