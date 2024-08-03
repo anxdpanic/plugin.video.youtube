@@ -862,9 +862,9 @@ class StreamInfo(YouTubeRequestClient):
 
     def _get_player_page(self, client_name='web', embed=False):
         if embed:
-            url = 'https://www.youtube.com/embed/{0}'.format(self.video_id)
+            url = ''.join(('https://www.youtube.com/embed/', self.video_id))
         else:
-            url = 'https://www.youtube.com/watch?v={0}'.format(self.video_id)
+            url = ''.join(('https://www.youtube.com/watch?v=', self.video_id))
         # Manually configured cookies to avoid cookie consent redirect
         cookies = {'SOCS': 'CAISAiAD'}
 
@@ -974,16 +974,14 @@ class StreamInfo(YouTubeRequestClient):
 
     @staticmethod
     def _make_curl_headers(headers, cookies=None):
-        output = []
         if cookies:
-            output.append('Cookie={0}'.format(quote('; '.join(
-                '{0.name}={0.value}'.format(cookie)
-                for cookie in cookies
-            ))))
+            headers['Cookie'] = '; '.join([
+                '='.join((cookie.name, cookie.value)) for cookie in cookies
+            ])
         # Headers used in xbmc_items.video_playback_item'
-        output.extend('{0}={1}'.format(key, quote(value))
-                      for key, value in headers.items())
-        return '&'.join(output)
+        return '&'.join([
+            '='.join((key, quote(value))) for key, value in headers.items()
+        ])
 
     @staticmethod
     def _normalize_url(url):
@@ -1243,7 +1241,7 @@ class StreamInfo(YouTubeRequestClient):
             data_cache.set_item(encrypted_signature, {'sig': signature})
 
         if signature:
-            url = '{0}&{1}={2}'.format(url, query_var, signature)
+            url = ''.join((url, '&', query_var, '=', signature))
             return url
         return None
 
@@ -1845,16 +1843,16 @@ class StreamInfo(YouTubeRequestClient):
                         role = 'alternate'
                         label = self._context.localize('stream.alternate')
 
-                    mime_group = '{0}_{1}.{2}'.format(
-                        mime_type, language_code, role_type
-                    )
+                    mime_group = ''.join((
+                        mime_type, '_', language_code, '.', role_type,
+                    ))
                     if language_code == self._language_base and (
                             not preferred_audio['id']
                             or role == 'main'
                             or role_type > preferred_audio['role_type']
                     ):
                         preferred_audio = {
-                            'id': '_{0}.{1}'.format(language_code, role_type),
+                            'id': ''.join(('_', language_code, '.', role_type)),
                             'language_code': language_code,
                             'role_type': role_type,
                         }
@@ -1870,9 +1868,10 @@ class StreamInfo(YouTubeRequestClient):
                 language = self._context.get_language_name(language_code)
                 label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
                 if channels > 2 or 'auto' not in stream_select:
-                    quality_group = '{0}_{1}_{2}.{3}'.format(
-                        container, codec, language_code, role_type
-                    )
+                    quality_group = ''.join((
+                        container, '_', codec, '_', language_code,
+                        '.', role_type,
+                    ))
                 else:
                     quality_group = mime_group
             elif audio_only:
@@ -1937,7 +1936,7 @@ class StreamInfo(YouTubeRequestClient):
                     fps if fps > 30 else '',
                     ' HDR' if hdr else '',
                 )
-                quality_group = '{0}_{1}_{2}'.format(container, codec, label)
+                quality_group = '_'.join((container, codec, label))
 
             if mime_group not in data:
                 data[mime_group] = {}

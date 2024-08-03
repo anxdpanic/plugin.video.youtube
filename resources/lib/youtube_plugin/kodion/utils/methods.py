@@ -270,7 +270,7 @@ def get_kodi_setting_value(setting, process=None):
 
 
 def get_kodi_setting_bool(setting):
-    return xbmc.getCondVisibility('System.GetBool({0})'.format(setting))
+    return xbmc.getCondVisibility(setting.join(('System.GetBool(', ')')))
 
 
 def validate_ip_address(ip_address):

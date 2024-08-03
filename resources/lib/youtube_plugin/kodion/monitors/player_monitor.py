@@ -266,7 +266,7 @@ class PlayerMonitorThread(threading.Thread):
                     if rating == 'none':
                         rating_match = re.search(
                             r'/(?P<video_id>[^/]+)/(?P<rating>[^/]+)',
-                            '/{0}/{1}/'.format(self.video_id, rating)
+                            '/'.join(('', self.video_id, rating, ''))
                         )
                         self._provider.on_video_x(
                             self._provider,
