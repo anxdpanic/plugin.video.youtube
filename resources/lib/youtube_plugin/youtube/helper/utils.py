@@ -813,6 +813,13 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
+        if video_item.live:
+            context_menu.append(
+                menu_items.play_timeshift(
+                    context, video_id
+                )
+            )
+
         if context_menu:
             context_menu.append(menu_items.separator())
             video_item.add_context_menu(context_menu)
@@ -829,7 +836,7 @@ def update_play_info(provider, context, video_id, video_item, video_stream,
     settings = context.get_settings()
     ui = context.get_ui()
 
-    meta_data = video_stream.get('meta', None)
+    meta_data = video_stream.get('meta')
     if meta_data:
         video_item.live = meta_data.get('status', {}).get('live', False)
         video_item.set_subtitles(meta_data.get('subtitles', None))

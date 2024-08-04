@@ -1422,6 +1422,9 @@ class StreamInfo(YouTubeRequestClient):
                         and playability.get('desktopLegacyAgeGateReason')):
                     abort = True
                     break
+                elif status == 'LIVE_STREAM_OFFLINE':
+                    abort = True
+                    break
                 elif status == 'OK':
                     break
                 elif status in {
@@ -1526,18 +1529,16 @@ class StreamInfo(YouTubeRequestClient):
             thumb_suffix = ''
 
         meta_info = {
-            'video': {
-                'id': video_id,
-                'title': unescape(video_details.get('title', '')
-                                  .encode('raw_unicode_escape')
-                                  .decode('raw_unicode_escape')),
-                'status': {
-                    'unlisted': microformat.get('isUnlisted', False),
-                    'private': video_details.get('isPrivate', False),
-                    'crawlable': video_details.get('isCrawlable', False),
-                    'family_safe': microformat.get('isFamilySafe', False),
-                    'live': is_live,
-                },
+            'id': video_id,
+            'title': unescape(video_details.get('title', '')
+                              .encode('raw_unicode_escape')
+                              .decode('raw_unicode_escape')),
+            'status': {
+                'unlisted': microformat.get('isUnlisted', False),
+                'private': video_details.get('isPrivate', False),
+                'crawlable': video_details.get('isCrawlable', False),
+                'family_safe': microformat.get('isFamilySafe', False),
+                'live': is_live,
             },
             'channel': {
                 'id': video_details.get('channelId', ''),

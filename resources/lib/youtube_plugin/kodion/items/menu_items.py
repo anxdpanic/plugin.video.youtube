@@ -15,6 +15,7 @@ from ..constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_TIMESHIFT,
     PLAY_WITH,
 )
 
@@ -425,6 +426,20 @@ def play_ask_for_quality(context, video_id):
             {
                 'video_id': video_id,
                 PLAY_PROMPT_QUALITY: True,
+            },
+            run=True,
+        ),
+    )
+
+
+def play_timeshift(context, video_id):
+    return (
+        context.localize('video.play.timeshift'),
+        context.create_uri(
+            (PATHS.PLAY,),
+            {
+                'video_id': video_id,
+                PLAY_TIMESHIFT: True,
             },
             run=True,
         ),
