@@ -1820,8 +1820,8 @@ class StreamInfo(YouTubeRequestClient):
 
                     language = audio_track.get('id', default_lang_code)
                     if '.' in language:
-                        language_code, role_type = language.split('.')
-                        role_type = int(role_type)
+                        language_code, role_str = language.split('.')
+                        role_type = int(role_str)
                     else:
                         language_code = language
                         role_type = 4
@@ -1842,7 +1842,7 @@ class StreamInfo(YouTubeRequestClient):
                         label = self._context.localize('stream.alternate')
 
                     mime_group = ''.join((
-                        mime_type, '_', language_code, '.', role_type,
+                        mime_type, '_', language_code, '.', role_str,
                     ))
                     if language_code == self._language_base and (
                             not preferred_audio['id']
@@ -1850,7 +1850,7 @@ class StreamInfo(YouTubeRequestClient):
                             or role_type > preferred_audio['role_type']
                     ):
                         preferred_audio = {
-                            'id': ''.join(('_', language_code, '.', role_type)),
+                            'id': ''.join(('_', language_code, '.', role_str)),
                             'language_code': language_code,
                             'role_type': role_type,
                         }
@@ -1868,7 +1868,7 @@ class StreamInfo(YouTubeRequestClient):
                 if channels > 2 or 'auto' not in stream_select:
                     quality_group = ''.join((
                         container, '_', codec, '_', language_code,
-                        '.', role_type,
+                        '.', role_str,
                     ))
                 else:
                     quality_group = mime_group
