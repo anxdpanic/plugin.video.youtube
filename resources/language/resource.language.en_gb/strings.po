@@ -1580,3 +1580,7 @@ msgstr ""
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
 msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""

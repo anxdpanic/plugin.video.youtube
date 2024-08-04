@@ -24,6 +24,7 @@ from ...kodion.constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_TIMESHIFT,
     PLAY_WITH,
     SERVER_POST_START,
     SERVER_WAKEUP,
@@ -108,8 +109,6 @@ def _play_stream(provider, context):
                                             video_id)
 
     metadata = stream.get('meta', {})
-    video_details = metadata.get('video', {})
-
     if is_external:
         url = urlunsplit((
             'http',
@@ -119,7 +118,8 @@ def _play_stream(provider, context):
             '',
         ))
         stream['url'] = url
-    video_item = VideoItem(video_details.get('title', ''), stream['url'])
+
+    video_item = VideoItem(metadata.get('title', ''), stream['url'])
 
     use_history = not (screensaver or incognito or stream.get('live'))
     use_remote_history = use_history and settings.use_remote_history()
@@ -145,7 +145,7 @@ def _play_stream(provider, context):
     playback_data = {
         'video_id': video_id,
         'channel_id': metadata.get('channel', {}).get('id', ''),
-        'video_status': video_details.get('status', {}),
+        'video_status': metadata.get('status', {}),
         'playing_file': video_item.get_uri(),
         'play_count': play_count,
         'use_remote_history': use_remote_history,
@@ -326,6 +326,7 @@ def process(provider, context, **_kwargs):
 
     force_play = False
     for param in {PLAY_FORCE_AUDIO,
+                  PLAY_TIMESHIFT,
                   PLAY_PROMPT_QUALITY,
                   PLAY_PROMPT_SUBTITLES,
                   PLAY_WITH}.intersection(param_keys):

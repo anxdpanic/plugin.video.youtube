@@ -259,6 +259,7 @@ class XbmcContext(AbstractContext):
         'video.more': 30548,
         'video.play.ask_for_quality': 30730,
         'video.play.audio_only': 30708,
+        'video.play.timeshift': 30819,
         'video.play.with': 30540,
         'video.play.with_subtitles': 30702,
         'video.queue': 30511,
@@ -674,6 +675,7 @@ class XbmcContext(AbstractContext):
         # functionality
         'drm': loose_version('2.2.12'),
         'live': loose_version('2.0.12'),
+        'timeshift': loose_version('2.5.2'),
         'ttml': loose_version('20.0.0'),
         # properties
         'config_prop': loose_version('21.4.11'),

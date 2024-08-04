@@ -19,6 +19,7 @@ from ...constants import (
     PLAYLISTITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
+    PLAY_TIMESHIFT,
     PLAY_WITH,
     SUBSCRIPTION_ID,
     VIDEO_ID,
@@ -380,7 +381,9 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
     settings = context.get_settings()
     headers = video_item.get_headers()
     license_key = video_item.get_license_key()
-    is_external = context.get_ui().get_property(PLAY_WITH)
+
+    ui = context.get_ui()
+    is_external = ui.get_property(PLAY_WITH)
     is_strm = context.get_param('strm')
     mime_type = None
 
@@ -402,6 +405,8 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
         }
 
     if video_item.use_isa_video() and context.use_inputstream_adaptive():
+        capabilities = context.inputstream_adaptive_capabilities()
+
         use_mpd = video_item.use_mpd_video()
         if use_mpd:
             manifest_type = 'mpd'
@@ -422,18 +427,21 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
         else:
             props['inputstreamaddon'] = 'inputstream.adaptive'
 
-        if current_system_version.compatible(21, 0):
-            isa_capabilities = context.inputstream_adaptive_capabilities()
-            if video_item.live and 'manifest_config_prop' in isa_capabilities:
+        if not current_system_version.compatible(21, 0):
+            props['inputstream.adaptive.manifest_type'] = manifest_type
+
+        if video_item.live:
+            if 'manifest_config_prop' in capabilities:
                 props['inputstream.adaptive.manifest_config'] = dumps({
                     'timeshift_bufferlimit': 4 * 60 * 60,
                 })
-            if not settings.verify_ssl() and 'config_prop' in isa_capabilities:
-                props['inputstream.adaptive.config'] = dumps({
-                    'ssl_verify_peer': False,
-                })
-        else:
-            props['inputstream.adaptive.manifest_type'] = manifest_type
+            if ui.pop_property(PLAY_TIMESHIFT) and 'timeshift' in capabilities:
+                props['inputstream.adaptive.play_timeshift_buffer'] = True
+
+        if not settings.verify_ssl() and 'config_prop' in capabilities:
+            props['inputstream.adaptive.config'] = dumps({
+                'ssl_verify_peer': False,
+            })
 
         if headers:
             props['inputstream.adaptive.manifest_headers'] = headers

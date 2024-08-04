@@ -1,3 +1,11 @@
+## v7.0.9+beta.10
+### Fixed
+- Don't retry player requests for offline live streams
+- Fix incorrectly updating playing live stream details
+
+### New
+- Add context menu item to play live stream from start #320
+
 ## v7.0.9+beta.9
 ### Fixed
 - Fix not properly defining default audio role #861
