@@ -813,6 +813,13 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
+        if video_item.live:
+            context_menu.append(
+                menu_items.play_timeshift(
+                    context, video_id
+                )
+            )
+
         if context_menu:
             context_menu.append(menu_items.separator())
             video_item.add_context_menu(context_menu)

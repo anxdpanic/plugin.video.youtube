@@ -19,6 +19,7 @@ from ...constants import (
     PLAYLISTITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
+    PLAY_TIMESHIFT,
     PLAY_WITH,
     SUBSCRIPTION_ID,
     VIDEO_ID,
@@ -434,6 +435,8 @@ def video_playback_item(context, video_item, show_fanart=None, **_kwargs):
                 props['inputstream.adaptive.manifest_config'] = dumps({
                     'timeshift_bufferlimit': 4 * 60 * 60,
                 })
+            if ui.pop_property(PLAY_TIMESHIFT) and 'timeshift' in capabilities:
+                props['inputstream.adaptive.play_timeshift_buffer'] = True
 
         if not settings.verify_ssl() and 'config_prop' in capabilities:
             props['inputstream.adaptive.config'] = dumps({

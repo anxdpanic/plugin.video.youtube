@@ -24,6 +24,7 @@ from ...kodion.constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_TIMESHIFT,
     PLAY_WITH,
     SERVER_POST_START,
     SERVER_WAKEUP,
@@ -325,6 +326,7 @@ def process(provider, context, **_kwargs):
 
     force_play = False
     for param in {PLAY_FORCE_AUDIO,
+                  PLAY_TIMESHIFT,
                   PLAY_PROMPT_QUALITY,
                   PLAY_PROMPT_SUBTITLES,
                   PLAY_WITH}.intersection(param_keys):
