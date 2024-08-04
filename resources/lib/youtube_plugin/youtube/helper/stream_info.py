@@ -1825,6 +1825,7 @@ class StreamInfo(YouTubeRequestClient):
                     else:
                         language_code = language
                         role_type = 4
+                        role_str = '4'
 
                     if role_type == 4 or audio_track.get('audioIsDefault'):
                         role = 'main'
@@ -1858,6 +1859,7 @@ class StreamInfo(YouTubeRequestClient):
                     language_code = default_lang_code
                     role = 'main'
                     role_type = 4
+                    role_str = '4'
                     label = self._context.localize('stream.original')
                     mime_group = mime_type
 
