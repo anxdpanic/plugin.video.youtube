@@ -1,3 +1,13 @@
+## v7.0.9+beta.8
+### Fixed
+- Fix API requests failing if not logged in
+- Fix multi-audio streams failing to play
+
+### New
+- Add script action to refresh settings
+  - Settings > Maintenance > Refresh settings.xml
+  - Will remove unused settings from settings.xml to stop log spam
+
 ## v7.0.9+beta.7
 ### New
 - Improve use of progressive streams

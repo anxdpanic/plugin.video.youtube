@@ -1154,7 +1154,6 @@
                     <control format="action" type="button"/>
                 </setting>
             </group>
-
             <group id="3">
                 <setting id="kodion.maintain.reset.accessmanager" type="action" label="30580" help="">
                     <level>0</level>
@@ -1162,6 +1161,16 @@
                         <allowempty>true</allowempty>
                     </constraints>
                     <data>RunPlugin(plugin://$ID/maintenance/reset/access_manager/)</data>
+                    <control format="action" type="button">
+                        <close>true</close>
+                    </control>
+                </setting>
+                <setting id="kodion.maintain.refresh.settings" type="action" label="30817" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,maintenance/refresh?target=settings_xml)</data>
                     <control format="action" type="button">
                         <close>true</close>
                     </control>

@@ -21,7 +21,7 @@ from .constants import (
 )
 from .context import XbmcContext
 from .network import get_client_ip_address, httpd_status
-from .utils import rm_dir, validate_ip_address
+from .utils import current_system_version, rm_dir, validate_ip_address
 
 
 def _config_actions(context, action, *_args):
@@ -149,6 +149,48 @@ def _maintenance_actions(context, action, params):
         if ui.on_clear_content(localize('maintenance.{0}'.format(target))):
             targets[target]().clear()
             ui.show_notification(localize('succeeded'))
+
+    elif action == 'refresh':
+        targets = {
+            'settings_xml': 'settings.xml',
+        }
+        path = targets.get(target)
+        if not path:
+            return
+
+        if target == 'settings_xml' and ui.on_yes_no_input(
+                context.get_name(), localize('refresh.settings.confirm')
+        ):
+            if not current_system_version.compatible(20, 0):
+                ui.show_notification(localize('failed'))
+                return
+
+            import xml.etree.ElementTree as ET
+
+            path = xbmcvfs.translatePath(os.path.join(DATA_PATH, path))
+            xml = ET.parse(path)
+            settings = xml.getroot()
+
+            marker = settings.find('setting[@id="|end_settings_marker|"]')
+            if marker is None:
+                ui.show_notification(localize('failed'))
+                return
+
+            removed = 0
+            for setting in reversed(settings.findall('setting')):
+                if setting == marker:
+                    break
+                settings.remove(setting)
+                removed += 1
+            else:
+                ui.show_notification(localize('failed'))
+                return
+
+            if removed:
+                xml.write(path)
+            ui.show_notification(localize('succeeded'))
+        else:
+            return
 
     elif action == 'delete':
         path = params.get('path')
