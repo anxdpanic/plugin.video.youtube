@@ -113,6 +113,7 @@ class YouTube(LoginClient):
                                ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
             },
             'params': {
+                'key': None,
                 'prettyPrint': 'false'
             },
         },
