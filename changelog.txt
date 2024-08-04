@@ -1,3 +1,7 @@
+## v7.0.9+beta.9
+### Fixed
+- Fix not properly defining default audio role #861
+
 ## v7.0.9+beta.8
 ### Fixed
 - Fix API requests failing if not logged in
