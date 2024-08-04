@@ -264,7 +264,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Authorization': 'Bearer {_access_token}',
             },
             'params': {
-                'key': None,
+                'key': ValueError,
                 'prettyPrint': 'false'
             },
         },
@@ -360,7 +360,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             else:
                 if 'Authorization' in client['headers']:
                     del client['headers']['Authorization']
-                if 'key' in params and not params['key']:
+                if 'key' in params and params['key'] is ValueError:
                     del params['key']
         except KeyError:
             pass
