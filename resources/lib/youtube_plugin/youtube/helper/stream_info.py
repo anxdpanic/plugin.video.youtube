@@ -1422,6 +1422,9 @@ class StreamInfo(YouTubeRequestClient):
                         and playability.get('desktopLegacyAgeGateReason')):
                     abort = True
                     break
+                elif status == 'LIVE_STREAM_OFFLINE':
+                    abort = True
+                    break
                 elif status == 'OK':
                     break
                 elif status in {
