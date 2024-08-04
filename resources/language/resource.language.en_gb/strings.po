@@ -1572,3 +1572,11 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""

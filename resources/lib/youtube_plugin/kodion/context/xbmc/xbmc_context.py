@@ -159,6 +159,7 @@ class XbmcContext(AbstractContext):
         'purchases': 30622,
         'recommendations': 30551,
         'refresh': 30543,
+        'refresh.settings.confirm': 30818,
         'related_videos': 30514,
         'remove': 30108,
         'removed': 30666,
