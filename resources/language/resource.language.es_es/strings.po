@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-07-11 02:21+0000\n"
+"PO-Revision-Date: 2024-08-06 06:27+0000\n"
 "Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
@@ -42,11 +42,11 @@ msgstr "General"
 
 msgctxt "#30001"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30002"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -55,11 +55,11 @@ msgstr "YouTube"
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "Usar InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "Configurar InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -198,15 +198,15 @@ msgstr "Buscar"
 
 msgctxt "#30103"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30104"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30105"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -222,7 +222,7 @@ msgstr "Borrar"
 
 msgctxt "#30109"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30110"
 msgid "New Search"
@@ -292,11 +292,11 @@ msgstr "API Secret"
 
 msgctxt "#30204"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30205"
 msgid ""
-msgstr ""
+msgstr " "
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -374,7 +374,7 @@ msgstr "Suscribirse a %s"
 
 msgctxt "#30518"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -550,19 +550,19 @@ msgstr "Ninguno"
 
 msgctxt "#30562"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30563"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30564"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30565"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -618,7 +618,7 @@ msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr ""
+msgstr "InputStream.Adaptive está activado en los ajustes de YouTube. Sin embargo, el add-on está desactivado. ¿Quieres activar InputStreeam.Adaptive ahora?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -754,11 +754,11 @@ msgstr "Volver a intentarlo"
 
 msgctxt "#30613"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30614"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30615"
 msgid "Cancel"
@@ -766,15 +766,15 @@ msgstr "Cancelar"
 
 msgctxt "#30616"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30619"
 msgid "Port"
@@ -786,7 +786,7 @@ msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -798,7 +798,7 @@ msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -894,15 +894,15 @@ msgstr "Emisiones en directo recientes"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings > API > API Key"
-msgstr ""
+msgstr "La clave API es incorrecta. Ajustes > API > Clave API"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings > API > API Id"
-msgstr ""
+msgstr "El Id de Cliente es incorrecto. Ajustes > API > Id API"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings > API > API Secret"
-msgstr ""
+msgstr "El Secreto de Cliente es incorrecto. Ajustes > API > Secreto API"
 
 msgctxt "#30651"
 msgid "Location"
@@ -1062,7 +1062,7 @@ msgstr "Usar para trasmisiones en directo"
 
 msgctxt "#30690"
 msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "Se requiere InputStream.Adaptive >= 2.0.12 para los flujos adaptativos en directo"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1138,15 +1138,15 @@ msgstr "Reproducir sólo audio"
 
 msgctxt "#30709"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30710"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30711"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1186,7 +1186,7 @@ msgstr "Desuscrito del canal"
 
 msgctxt "#30721"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30722"
 msgid "Enable HDR video"
@@ -1194,7 +1194,7 @@ msgstr "Activar vídeo HDR"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
-msgstr ""
+msgstr "Se requiere Proxy para MPEG-DASH VOD (Ver Avanzado > Servidor HTTP)[CR]Los vídeos HDR y >1080p requieren InputStream.Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1250,15 +1250,15 @@ msgstr "Cortos (1 minuto o menos)"
 
 msgctxt "#30737"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30738"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30739"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1570,15 +1570,15 @@ msgstr "La lista está vacía[CR][CR]Actualiza desde el menú contextual o inté
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "Refrescar settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "¿Seguro que quieres refrescar settings.xml?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "Reproducir desde el inicio"
 
 #~ msgctxt "#30001"
 #~ msgid "Username"
