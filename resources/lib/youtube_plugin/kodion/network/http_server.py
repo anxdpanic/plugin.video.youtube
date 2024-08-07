@@ -583,7 +583,7 @@ def httpd_status(context):
         address,
         ':',
         str(port),
-        PATHS.IP,
+        PATHS.PING,
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
