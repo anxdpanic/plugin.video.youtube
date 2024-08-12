@@ -411,6 +411,10 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
         }
         props = {
             'isPlayable': str(media_item.playable).lower(),
+            'playlist_type_hint': (
+                xbmc.PLAYLIST_MUSIC if isinstance(media_item, AudioItem) else
+                xbmc.PLAYLIST_VIDEO
+            ),
         }
 
     if media_item.use_isa() and context.use_inputstream_adaptive():
@@ -642,6 +646,10 @@ def media_listitem(context,
     props = {
         'isPlayable': str(media_item.playable).lower(),
         'ForceResolvePlugin': 'true',
+        'playlist_type_hint': (
+            xbmc.PLAYLIST_MUSIC if isinstance(media_item, AudioItem) else
+            xbmc.PLAYLIST_VIDEO
+        ),
     }
 
     published_at = media_item.get_added_utc()
