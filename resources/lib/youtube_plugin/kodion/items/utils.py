@@ -13,10 +13,9 @@ from __future__ import absolute_import, division, unicode_literals
 import json
 from datetime import date, datetime
 
-from .audio_item import AudioItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
-from .video_item import VideoItem
+from .media_item import AudioItem, VideoItem
 from ..compatibility import string_type, to_str
 from ..utils.datetime_parser import strptime
 
