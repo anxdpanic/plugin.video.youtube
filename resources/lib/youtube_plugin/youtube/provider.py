@@ -96,6 +96,7 @@ class Provider(AbstractProvider):
             yt_setup_wizard.process_old_search_db,
             yt_setup_wizard.process_old_history_db,
             yt_setup_wizard.process_list_detail_settings,
+            yt_setup_wizard.process_refresh_settings,
         ]
         return steps
 
