@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2024-07-26 06:25+0000\n"
 "Last-Translator: Oskari Lavinto <olavinto@protonmail.com>\n"
@@ -40,12 +40,12 @@ msgid "General"
 msgstr "Yleistä"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Käyttäjänimi"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Salasana"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -53,12 +53,12 @@ msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
-msgstr "Käytä InputStream Adaptivea"
+msgid "Use InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Määritä InputStream Adaptive -lisäosan asetukset"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -195,16 +195,16 @@ msgid "Search"
 msgstr "Haku"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Kirjasto"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Esittelyssä"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Arkisto"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -219,8 +219,8 @@ msgid "Remove"
 msgstr "Poista"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Uusimmat videot"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -289,12 +289,12 @@ msgid "API Secret"
 msgstr "API Secret -arvo"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Käytä henkilökohtaisia API-avaimia"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Käytä esiasetettua API-avainyhdistelmää"
+msgid ""
+msgstr ""
 
 msgctxt "#30500"
 msgid "Channels"
@@ -369,8 +369,8 @@ msgid "Subscribe to %s"
 msgstr "Tilaa \"%s\""
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Avaa \"%s\""
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -545,20 +545,20 @@ msgid "None"
 msgstr "Ei mitään"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Kaikki"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Asetus"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Asetus, englanti"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "Englanti"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -613,8 +613,8 @@ msgid "Force SSL certificate verification"
 msgstr "Pakota SSL-varmenteen vahvistus"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "YouTube on määritetty käyttämään InputStream Adaptive -lisäosaa, mutta se on poistettu käytöstä. Haluatko ottaa sen käyttöön?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
+msgstr ""
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -749,28 +749,28 @@ msgid "Retry"
 msgstr "Yritä uudelleen"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Nouda \"Katso myöhemmin\" -listan tunniste"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Lisää \"Katso myöhemmin\" -listalle muutama video sivuston/sovelluksen kautta ja yritä uudelleen."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Peruuta"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "On oltava sisäänkirjautuneena."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
-msgstr "InputStream Adaptive"
+msgid "InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
-msgstr "Käytä MPEG-DASH-välityspalvelinta"
+msgid ""
+msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
@@ -781,8 +781,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Portti %s on jo käytössä. HTTP-palvelimen käynnistys ei onnistu."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr "Välityspalvelin tarvitaan MPEG-DASH VOD -toistoon (näytä Lisäasetukset > HTTP-palvelin)"
+msgid ""
+msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -793,8 +793,8 @@ msgid "Install InputStream Helper"
 msgstr "Asenna InputStream Helper -lisäosa"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Edellyttää vähintään Kodi-versiota 17"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -889,16 +889,16 @@ msgid "Completed Live"
 msgstr "Päättyneet livelähetykset"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "API-avain on virheellinen. Asetukset - API - API-avain"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "\"Client ID\" -arvo on virheellinen. Asetukset - API - API ID"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "\"Client Secret\" on virheellinen. Asetukset - API - API Secret"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1057,8 +1057,8 @@ msgid "Use for live streams"
 msgstr "Käytä livelähetyksille"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr "Adaptiivinen live-toisto vaatii InputStream Adaptive -lisäosan >= 2.0.12"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr ""
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1133,16 +1133,16 @@ msgid "Play audio only"
 msgstr "Toista vain ääni"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Parantaaksesi noudon onnistumisen todennäköisyyttä, lisää listalle 8–10 videota sivuston/sovelluksen kautta ja yritä uudelleen."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Kokeile huomenna uudelleen poistamatta videoita."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "Etsitään \"Katso myöhemmin\" -listaa... Sivu %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1181,16 +1181,16 @@ msgid "Unsubscribed from channel"
 msgstr "Kanavan tilaus lopetettiin"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Käytä oletusarvoisesti WEBM-mukautuvuussarjaa (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr "Tue HDR-videota"
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr "Välityspalvelin tarvitaan MPEG-DASH VOD -toistoon (näytä Lisäasetukset > HTTP-palvelin).[CR]HDR ja >1080p video vaatii vähitään InputStream Adaptive -version 2.3.14."
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
+msgstr ""
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1245,16 +1245,16 @@ msgid "Shorts (1 minute or less)"
 msgstr "Shorts (enintään minuutin pituiset)"
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Käytä vaihtoehtoisia päätetietoja"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Vaihtoehto #1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Vaihtoehto #2"
+msgid ""
+msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1563,6 +1563,159 @@ msgstr "Palaa takaisin..."
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr "Lista on tyhjä.[CR][CR]Päivitä sisältövalikosta tai yritä uudelleen."
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Käyttäjänimi"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Salasana"
+
+# empty strings from id 30004 to 30006
+#~ msgctxt "#30007"
+#~ msgid "Use InputStream Adaptive"
+#~ msgstr "Käytä InputStream Adaptivea"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Määritä InputStream Adaptive -lisäosan asetukset"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Kirjasto"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Esittelyssä"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Arkisto"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Uusimmat videot"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Käytä henkilökohtaisia API-avaimia"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Käytä esiasetettua API-avainyhdistelmää"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Avaa \"%s\""
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Kaikki"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Asetus"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Asetus, englanti"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "Englanti"
+
+#~ msgctxt "#30579"
+#~ msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+#~ msgstr "YouTube on määritetty käyttämään InputStream Adaptive -lisäosaa, mutta se on poistettu käytöstä. Haluatko ottaa sen käyttöön?"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Nouda \"Katso myöhemmin\" -listan tunniste"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Lisää \"Katso myöhemmin\" -listalle muutama video sivuston/sovelluksen kautta ja yritä uudelleen."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "On oltava sisäänkirjautuneena."
+
+#~ msgctxt "#30617"
+#~ msgid "InputStream Adaptive"
+#~ msgstr "InputStream Adaptive"
+
+#~ msgctxt "#30618"
+#~ msgid "Enable MPEG-DASH proxy"
+#~ msgstr "Käytä MPEG-DASH-välityspalvelinta"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+#~ msgstr "Välityspalvelin tarvitaan MPEG-DASH VOD -toistoon (näytä Lisäasetukset > HTTP-palvelin)"
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Edellyttää vähintään Kodi-versiota 17"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "API-avain on virheellinen. Asetukset - API - API-avain"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "\"Client ID\" -arvo on virheellinen. Asetukset - API - API ID"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "\"Client Secret\" on virheellinen. Asetukset - API - API Secret"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+#~ msgstr "Adaptiivinen live-toisto vaatii InputStream Adaptive -lisäosan >= 2.0.12"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Parantaaksesi noudon onnistumisen todennäköisyyttä, lisää listalle 8–10 videota sivuston/sovelluksen kautta ja yritä uudelleen."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "\"Katso myöhemmin\" -listan tunnisteen nouto epäonnistui. Kokeile huomenna uudelleen poistamatta videoita."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "Etsitään \"Katso myöhemmin\" -listaa... Sivu %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Käytä oletusarvoisesti WEBM-mukautuvuussarjaa (4K)"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "Välityspalvelin tarvitaan MPEG-DASH VOD -toistoon (näytä Lisäasetukset > HTTP-palvelin).[CR]HDR ja >1080p video vaatii vähitään InputStream Adaptive -version 2.3.14."
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Käytä vaihtoehtoisia päätetietoja"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Vaihtoehto #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Vaihtoehto #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

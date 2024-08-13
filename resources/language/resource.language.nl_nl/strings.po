@@ -41,12 +41,12 @@ msgid "General"
 msgstr "Algemeen"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Gebruikersnaam"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Wachtwoord"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr ""
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Configureer adaptieve inputstream"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 # empty strings from id 30003 to 30008
 msgctxt "#30009"
@@ -198,16 +198,16 @@ msgid "Search"
 msgstr "Zoeken"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Bibliotheek"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Hoogtepunten"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Archief"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -222,8 +222,8 @@ msgid "Remove"
 msgstr "Verwijder"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Nieuwste Video's"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -292,12 +292,12 @@ msgid "API Secret"
 msgstr "API Geheim"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Peroonlijke API sleutels inschakelen"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Gebruik vooraf ingestelde API sleutel set"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -374,8 +374,8 @@ msgid "Subscribe to %s"
 msgstr "Abonneer op %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Ga naar '%s'"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -550,20 +550,20 @@ msgid "None"
 msgstr "Geen"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Alles"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Instelling"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Instelling, Engels"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "Engels"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -618,7 +618,7 @@ msgid "Force SSL certificate verification"
 msgstr "Forceer SSL certificaat verificatie"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -754,27 +754,27 @@ msgid "Retry"
 msgstr "Probeer nogmaals"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Bekijk Later afspeellijst-id ophalen"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Ophalen afspeellijst-id mislukt. Voeg een aantal video's toe aan Bekijk Later via internet/app en probeer nogmaals."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Annuleren"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Je moet ingelogd zijn."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -786,7 +786,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Poort %s al in gebruik. Kan de http server niet starten."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -798,8 +798,8 @@ msgid "Install InputStream Helper"
 msgstr "Installeer InputStream Helper"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Kodi 17+ vereist"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -894,16 +894,16 @@ msgid "Completed Live"
 msgstr "Live Afgerond"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "API Sleutel is onjuist. Instellingen - API - API Sleutel"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "Client ID is onjuist. Instellingen - API - API ID"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "Client Geheim is onjuist. Instellingen - API - Geheim"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1062,7 +1062,7 @@ msgid "Use for live streams"
 msgstr "Gebruik voor livestreams"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1138,16 +1138,16 @@ msgid "Play audio only"
 msgstr "Alleen geluid afspelen"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "Ophalen ID van Bekijk Later afspeellijst mislukt. Voeg minimaal 8 video's toe aan de de afspeellijst en probeer het opnieuw"
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "Ophalen ID van Bekijk Later afspeellijst mislukt. Probeer het morgen opnieuw zonder een video van de afspeellijst te verwijderen"
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "Zoeken naar Bekijk Later...pagina %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1186,15 +1186,15 @@ msgid "Unsubscribed from channel"
 msgstr "Niet meer geabonneerd"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Standaard naar WEBM (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1250,15 +1250,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
+msgid ""
 msgstr ""
 
 msgctxt "#30740"
@@ -1568,6 +1568,118 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Gebruikersnaam"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Wachtwoord"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Configureer adaptieve inputstream"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Bibliotheek"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Hoogtepunten"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Archief"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Nieuwste Video's"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Peroonlijke API sleutels inschakelen"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Gebruik vooraf ingestelde API sleutel set"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Ga naar '%s'"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Alles"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Instelling"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Instelling, Engels"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "Engels"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Bekijk Later afspeellijst-id ophalen"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "Ophalen afspeellijst-id mislukt. Voeg een aantal video's toe aan Bekijk Later via internet/app en probeer nogmaals."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Je moet ingelogd zijn."
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Kodi 17+ vereist"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "API Sleutel is onjuist. Instellingen - API - API Sleutel"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "Client ID is onjuist. Instellingen - API - API ID"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "Client Geheim is onjuist. Instellingen - API - Geheim"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "Ophalen ID van Bekijk Later afspeellijst mislukt. Voeg minimaal 8 video's toe aan de de afspeellijst en probeer het opnieuw"
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "Ophalen ID van Bekijk Later afspeellijst mislukt. Probeer het morgen opnieuw zonder een video van de afspeellijst te verwijderen"
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "Zoeken naar Bekijk Later...pagina %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Standaard naar WEBM (4K)"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

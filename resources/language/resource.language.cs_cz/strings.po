@@ -41,12 +41,12 @@ msgid "General"
 msgstr "Obecné"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Jméno"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Heslo"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr ""
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Konfigurovat InputStream Adaptive"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -197,16 +197,16 @@ msgid "Search"
 msgstr "Hledat"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Knihovna"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Zvýraznění"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Archiv"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -221,8 +221,8 @@ msgid "Remove"
 msgstr "Odstranit"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Poslední videa"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -291,12 +291,12 @@ msgid "API Secret"
 msgstr "API SECRET"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Povolit osobní API KEY"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Použít předvolbu nastavení API KEY"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -373,8 +373,8 @@ msgid "Subscribe to %s"
 msgstr "Odebírat od %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Přejděte na '%s'"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -549,20 +549,20 @@ msgid "None"
 msgstr "Žádné"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Vše"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Nastavení"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Nastavení, Angličtina"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "Angličtina"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -617,7 +617,7 @@ msgid "Force SSL certificate verification"
 msgstr "Certifikát ověření Force SSL"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -753,27 +753,27 @@ msgid "Retry"
 msgstr "Opakovat"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Obnovit ID seznamu 'Shlédnout později'"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Chyba obnovení ID seznamu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Zrušit"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Musíte být přihlášen."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -785,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Port %s je již použiván. Nelze spustit HTTP Server."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "Instalovat InputStream Helper"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Vyžadován Kodi 17 a novější"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -893,16 +893,16 @@ msgid "Completed Live"
 msgstr "Kompletní Živě"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "Chyba API KEY. Nastavení - API - API Key"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "Chyba ID klienta. Nastavení - API - API ID"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "Chyba klienta SECRET. Nastavení - API - API SECRET"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1061,7 +1061,7 @@ msgid "Use for live streams"
 msgstr "Použít pro stream Živě"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1137,16 +1137,16 @@ msgid "Play audio only"
 msgstr "Přehrát pouze zvuk"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "Chyba získání ID seznamu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "Chyba získání ID seznamu 'Shlédnout později'. Zkuste to zítra bez odstranění videa."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "Vyhledávání pro 'Shlédnout později'... Strana %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1185,15 +1185,15 @@ msgid "Unsubscribed from channel"
 msgstr "Nepředplacené z kanálu"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Výchozí nastavení přizpůsobení WEBM (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1249,15 +1249,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
+msgid ""
 msgstr ""
 
 msgctxt "#30740"
@@ -1567,6 +1567,118 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Jméno"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Heslo"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Konfigurovat InputStream Adaptive"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Knihovna"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Zvýraznění"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Archiv"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Poslední videa"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Povolit osobní API KEY"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Použít předvolbu nastavení API KEY"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Přejděte na '%s'"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Vše"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Nastavení"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Nastavení, Angličtina"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "Angličtina"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Obnovit ID seznamu 'Shlédnout později'"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "Chyba obnovení ID seznamu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Musíte být přihlášen."
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Vyžadován Kodi 17 a novější"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "Chyba API KEY. Nastavení - API - API Key"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "Chyba ID klienta. Nastavení - API - API ID"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "Chyba klienta SECRET. Nastavení - API - API SECRET"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "Chyba získání ID seznamu 'Shlédnout později'. Přidejte sledovaná videa přes webovou aplikaci a zkuste to znovu."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "Chyba získání ID seznamu 'Shlédnout později'. Zkuste to zítra bez odstranění videa."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "Vyhledávání pro 'Shlédnout později'... Strana %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Výchozí nastavení přizpůsobení WEBM (4K)"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

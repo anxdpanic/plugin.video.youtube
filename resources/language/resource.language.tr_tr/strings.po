@@ -41,12 +41,12 @@ msgid "General"
 msgstr "Genel"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Kullanıcı Adı"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Parola"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr ""
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "InputStream Adaptive Ayarla"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -197,16 +197,16 @@ msgid "Search"
 msgstr "Arama"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Kütüphaneler"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Öne Çıkanlar"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Arşiv"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -221,8 +221,8 @@ msgid "Remove"
 msgstr "Kaldır"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "En Yeni Videolar"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -291,12 +291,12 @@ msgid "API Secret"
 msgstr "API Gizli Anahtarı"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Kişisel API anahtarlarını etkinleştir"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Önceden ayarlanmış API anahtar setini kullan"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -373,8 +373,8 @@ msgid "Subscribe to %s"
 msgstr "%s kanalına abone ol"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Git: '%s'"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -549,20 +549,20 @@ msgid "None"
 msgstr "Hiçbiri"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Hepsi"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Ayarlar"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Ayarlar, İngilizce"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "İngilizce"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -617,7 +617,7 @@ msgid "Force SSL certificate verification"
 msgstr "SSL sertifikası doğrulamasını zorla"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -753,27 +753,27 @@ msgid "Retry"
 msgstr "Yeniden Dene"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Daha Sonra İzle oynatma listesi kodunu al"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Web veya uygulama aracılığıyla Daha Sonra İzle'ye birkaç video ekleyin ve yeniden deneyin."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "İptal Et"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Giriş yapmış olmanız gerekiyor."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -785,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "%s bağlantı noktası zaten kullanılıyor.Http sunucusu başlatılamıyor."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "InputStream Helper kur"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Kodi 17+ gerektirir"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -893,16 +893,16 @@ msgid "Completed Live"
 msgstr "Bitmiş canlı yayınlar"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "API Anahtarı yanlış. Ayarlar - API - API Anahtarı"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "İstemci Kodu yanlış. Ayarlar - API - API Kodu"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "İstemci Gizli Anahtarı yanlış. Ayarlar - API - API Gizli Anahtarı"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1061,8 +1061,8 @@ msgid "Use for live streams"
 msgstr "Canlı yayınlar için kullan"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr "Uyarlanabilir canlı yayınlar için Uyarlanabilir InputStream >= 2.0.12 gereklidir"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr ""
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1137,16 +1137,16 @@ msgid "Play audio only"
 msgstr "Yalnızca ses olarak oynat"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Geri alma şansını artırmak için web veya uygulama aracılığıyla 8-10 videoyu Daha Sonra İzle'ye ekleyin ve yeniden deneyin."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Videoların hiçbirini kaldırmadan yarın tekrar deneyin."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "DAha Sonra İzle için aranama yapılıyor... Sayfa %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1185,15 +1185,15 @@ msgid "Unsubscribed from channel"
 msgstr "Kanalın aboneliğinden ayrılıldı"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Varsayılan olarak WEBM uyarlama seti (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr "HDR videoyu Etkinleştir"
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1249,16 +1249,16 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Farklı istemci ayrıntıları kullan"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Farklı #1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Farklı #2"
+msgid ""
+msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1567,6 +1567,134 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Kullanıcı Adı"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Parola"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "InputStream Adaptive Ayarla"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Kütüphaneler"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Öne Çıkanlar"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Arşiv"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "En Yeni Videolar"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Kişisel API anahtarlarını etkinleştir"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Önceden ayarlanmış API anahtar setini kullan"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Git: '%s'"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Hepsi"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Ayarlar"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Ayarlar, İngilizce"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "İngilizce"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Daha Sonra İzle oynatma listesi kodunu al"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Web veya uygulama aracılığıyla Daha Sonra İzle'ye birkaç video ekleyin ve yeniden deneyin."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Giriş yapmış olmanız gerekiyor."
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Kodi 17+ gerektirir"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "API Anahtarı yanlış. Ayarlar - API - API Anahtarı"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "İstemci Kodu yanlış. Ayarlar - API - API Kodu"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "İstemci Gizli Anahtarı yanlış. Ayarlar - API - API Gizli Anahtarı"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+#~ msgstr "Uyarlanabilir canlı yayınlar için Uyarlanabilir InputStream >= 2.0.12 gereklidir"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Geri alma şansını artırmak için web veya uygulama aracılığıyla 8-10 videoyu Daha Sonra İzle'ye ekleyin ve yeniden deneyin."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "Daha Sonra İzle oynatma listesi kodu alınamadı. Videoların hiçbirini kaldırmadan yarın tekrar deneyin."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "DAha Sonra İzle için aranama yapılıyor... Sayfa %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Varsayılan olarak WEBM uyarlama seti (4K)"
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Farklı istemci ayrıntıları kullan"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Farklı #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Farklı #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

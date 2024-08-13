@@ -41,12 +41,12 @@ msgid "General"
 msgstr "Generel"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Brugernavn"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Adgangskode"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Konfigurer InputStream Adaptive"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -197,16 +197,16 @@ msgid "Search"
 msgstr "Søg"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Bibliotek"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Højdepunkter"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Arkiv"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -221,8 +221,8 @@ msgid "Remove"
 msgstr "Fjern"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Seneste videoer"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -291,12 +291,12 @@ msgid "API Secret"
 msgstr "API-hemmelighed"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Aktiver personlige API-nøgler"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Brug forudindstillet API-nøglesæt"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -373,8 +373,8 @@ msgid "Subscribe to %s"
 msgstr "Abonner på %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Gå til %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -549,20 +549,20 @@ msgid "None"
 msgstr "Ingen"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Alle"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Indstilling"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Indstilling, engelsk"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "Engelsk"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -617,7 +617,7 @@ msgid "Force SSL certificate verification"
 msgstr "Gennemtving bekræftelse af SSL-certifikat"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -753,27 +753,27 @@ msgid "Retry"
 msgstr "Forsøg igen"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Hent playliste-id for 'Se senere'"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Kunne ikke hente playliste-id for 'Se senere'. Tilføj et par videoer til 'Se senere' via nettet/appen, og prøv igen."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Annuller"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Skal være logget ind."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -785,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Port %s er allerede i brug. Kan ikke starte http-serveren."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "Installer InputStream Helper"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Kræver Kodi 17+"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -893,16 +893,16 @@ msgid "Completed Live"
 msgstr "Afsluttet live"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "API-nøgle er forkert. Indstillinger - API - API-nøgle"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "Klient-id er forkert. Indstillinger - API - API-id"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "Klienthemmelighed er forkert. Indstillinger - API - API-hemmelighed"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1061,7 +1061,7 @@ msgid "Use for live streams"
 msgstr "Anvendes til livestreams"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1137,16 +1137,16 @@ msgid "Play audio only"
 msgstr "Afspil kun lyd"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "Kunne ikke hente ID på 'Se senere'-playliste. For at øge chancerne for hentning, tilføj 8-10 videoer til Se senere via nettet/appen og prøv igen."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "Kunne ikke hente ID på 'Se senere'-playliste. Prøv igen i morgen uden at fjerne nogen af videoerne."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "Søger efter 'Se senere'... Side %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1185,15 +1185,15 @@ msgid "Unsubscribed from channel"
 msgstr "Afmeldte abonnement på kanalen"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Sæt standard til WEBM-tilpasningssæt (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1249,16 +1249,16 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Brug alternative klientoplysninger"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Alternativ #1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Alternativ #2"
+msgid ""
+msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1567,6 +1567,130 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Brugernavn"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Adgangskode"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Konfigurer InputStream Adaptive"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Bibliotek"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Højdepunkter"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Arkiv"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Seneste videoer"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Aktiver personlige API-nøgler"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Brug forudindstillet API-nøglesæt"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Gå til %s"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Alle"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Indstilling"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Indstilling, engelsk"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "Engelsk"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Hent playliste-id for 'Se senere'"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "Kunne ikke hente playliste-id for 'Se senere'. Tilføj et par videoer til 'Se senere' via nettet/appen, og prøv igen."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Skal være logget ind."
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Kræver Kodi 17+"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "API-nøgle er forkert. Indstillinger - API - API-nøgle"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "Klient-id er forkert. Indstillinger - API - API-id"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "Klienthemmelighed er forkert. Indstillinger - API - API-hemmelighed"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "Kunne ikke hente ID på 'Se senere'-playliste. For at øge chancerne for hentning, tilføj 8-10 videoer til Se senere via nettet/appen og prøv igen."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "Kunne ikke hente ID på 'Se senere'-playliste. Prøv igen i morgen uden at fjerne nogen af videoerne."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "Søger efter 'Se senere'... Side %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Sæt standard til WEBM-tilpasningssæt (4K)"
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Brug alternative klientoplysninger"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Alternativ #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Alternativ #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

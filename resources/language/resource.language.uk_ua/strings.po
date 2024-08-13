@@ -40,12 +40,12 @@ msgid "General"
 msgstr "Загальні"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Ім'я користувача"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Пароль"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -53,12 +53,12 @@ msgstr ""
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Налаштувати InputStream Adaptive"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -195,16 +195,16 @@ msgid "Search"
 msgstr "Пошук"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Бібліотека"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Рекомендоване"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Архів"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -219,8 +219,8 @@ msgid "Remove"
 msgstr "Видалити"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Новітнє відео"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -289,12 +289,12 @@ msgid "API Secret"
 msgstr ""
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Використовувати персональний API ключ"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Використовувати стандартний API ключ"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -371,8 +371,8 @@ msgid "Subscribe to %s"
 msgstr "Підписатися на %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Перейдіть по '%s'"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -547,19 +547,19 @@ msgid "None"
 msgstr "Жоден"
 
 msgctxt "#30562"
-msgid "All"
+msgid ""
 msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Налаштування"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
+msgid ""
 msgstr ""
 
 msgctxt "#30565"
-msgid "English"
+msgid ""
 msgstr ""
 
 msgctxt "#30566"
@@ -615,7 +615,7 @@ msgid "Force SSL certificate verification"
 msgstr ""
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -751,27 +751,27 @@ msgid "Retry"
 msgstr "Повторити"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Отримати id плейлиста \\\"Переглянути пізніше\\\""
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Не вдалося отримати id плейлиста \\\"Переглянути пізніше\\\". Додайте кілька відео до плейлиста та спробуйте ще раз."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Відмінити"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Потрібна авторизація."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -783,7 +783,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Порт %s зайнято. Не вдалося запустити HTTP сервер."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -795,7 +795,7 @@ msgid "Install InputStream Helper"
 msgstr "Встановити InputStream Helper"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
+msgid ""
 msgstr ""
 
 msgctxt "#30625"
@@ -891,15 +891,15 @@ msgid "Completed Live"
 msgstr "Завершені прямі ефіри"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
+msgid "API Key is incorrect. Settings > API > API Key"
 msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
+msgid "Client Id is incorrect. Settings > API > API Id"
 msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
 msgstr ""
 
 msgctxt "#30651"
@@ -1059,7 +1059,7 @@ msgid "Use for live streams"
 msgstr "Використовувати для прямих ефірів"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1135,15 +1135,15 @@ msgid "Play audio only"
 msgstr "Відтворювати тільки аудіо"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+msgid ""
 msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+msgid ""
 msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
+msgid ""
 msgstr ""
 
 msgctxt "#30712"
@@ -1183,7 +1183,7 @@ msgid "Unsubscribed from channel"
 msgstr "Відписано від каналу"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
+msgid ""
 msgstr ""
 
 msgctxt "#30722"
@@ -1191,7 +1191,7 @@ msgid "Enable HDR video"
 msgstr "Ввімкнути HDR"
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1247,15 +1247,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
+msgid ""
 msgstr ""
 
 msgctxt "#30740"
@@ -1565,6 +1565,74 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Ім'я користувача"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Пароль"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Налаштувати InputStream Adaptive"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Бібліотека"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Рекомендоване"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Архів"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Новітнє відео"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Використовувати персональний API ключ"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Використовувати стандартний API ключ"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Перейдіть по '%s'"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Налаштування"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Отримати id плейлиста \\\"Переглянути пізніше\\\""
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "Не вдалося отримати id плейлиста \\\"Переглянути пізніше\\\". Додайте кілька відео до плейлиста та спробуйте ще раз."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Потрібна авторизація."
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"
