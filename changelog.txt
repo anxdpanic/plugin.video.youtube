@@ -1,3 +1,61 @@
+## v7.0.9
+### Fixed
+- Fix renaming playlists
+- Improve http server wakeup #746 #801
+- Fix ask for video quality setting being inconsistently applied
+- Fix http server not sleeping after initial start of service #746 #801
+- Fix not reloading WL playlist if open after playback of video in WL
+- Fix navigating to search page after playback and prompt re-opening
+- Fix issues with next page and jump to page in related video listings
+- Attempt to workaround issue with getting system idle time on Xbox #839
+- Better handle unknown errors in player request responses #845
+- Fix double playback due to busy dialog crash workaround
+- Fix disabling certification verification #841
+- Fix not using player request fallbacks #845
+- Fix incorrectly identifying VP9 streams #833
+- Fix videos not able to be re-opened from Kodi playlist #810
+- Fix http server not working in Kodi 18
+- Fix issues with http server wakeup and sleep on initial start/restart
+- Fix API requests failing if not logged in
+- Fix multi-audio streams failing to play
+- Fix not properly defining default audio role #861
+- Don't retry player requests for offline live streams
+- Fix incorrectly updating playing live stream details
+- Fix typo causing http server to restart when checking status
+
+### Changed
+- Make live query parameter optional when playing channel live stream
+- Allow for removal of custom watch later and history playlists from settings #818
+  - Use default value of "HL" for history or "WL" for watch later as reset value
+  - This will then clear the setting and clear value from access_manager.json
+  - Old values will be stored as a backup, just in case
+- Update cached data when playlists are modified (removed/renamed)
+- Changed bandwidth attribute of subtitles in MPEG-DASH manifest to 0
+- Rename My Subscriptions plugin url
+  - From:
+    - plugin://plugin.video.youtube/special/new_uploaded_videos_tv
+    - plugin://plugin.video.youtube/special/new_uploaded_videos_tv_filtered
+  - To:
+    - plugin://plugin.video.youtube/special/my_subscriptions
+    - plugin://plugin.video.youtube/special/my_subscriptions_filtered
+  - Old url retained for backwards compatibility, to be removed with Kodi v22
+- Disable OPUS audio again by default #537
+- Respect disable certificate verification setting with cURL in ISA #841
+- Update bookmarks when listing rather than only using item snapshot
+- Player requests no longer use configured plugin language
+- Alternate client selections removed
+
+### New
+- Add notifications for creating/removing/clearing bookmarks #720
+- Add support for channel handles
+- Enable loop to first page on last page of manually paginated listings (My Subscriptions)
+- Improve use of progressive streams
+- Improve stream selection for HLS stream in InputStream.Adaptive
+- Add script action to refresh settings
+  - Settings > Maintenance > Refresh settings.xml
+  - Will remove unused settings from settings.xml to stop log spam
+- Add context menu item to play live stream from start #320
+
 ## v7.0.9+beta.10
 ### Fixed
 - Don't retry player requests for offline live streams
