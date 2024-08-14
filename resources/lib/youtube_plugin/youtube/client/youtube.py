@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import threading
 import xml.etree.ElementTree as ET
-from copy import deepcopy
 from functools import partial
 from itertools import chain, islice
 from random import randint
@@ -2022,19 +2021,21 @@ class YouTube(LoginClient):
 
         client = self.build_client(version, client_data)
 
-        if 'key' in client['params'] and not client['params']['key']:
+        params = client.get('params')
+        if 'key' in params and not params['key']:
+            params = params.copy()
             key = self._config.get('key') or self._config_tv.get('key')
             if key:
-                client['params']['key'] = key
+                params['key'] = key
             else:
-                del client['params']['key']
+                del params['key']
+            client['params'] = params
 
         if clear_data and 'json' in client:
             del client['json']
 
-        params = client.get('params')
         if params:
-            log_params = deepcopy(params)
+            log_params = params.copy()
             if 'location' in log_params:
                 log_params['location'] = '|xx.xxxx,xx.xxxx|'
             if 'key' in log_params:
@@ -2045,7 +2046,7 @@ class YouTube(LoginClient):
 
         headers = client.get('headers')
         if headers:
-            log_headers = deepcopy(headers)
+            log_headers = headers.copy()
             if 'Authorization' in log_headers:
                 log_headers['Authorization'] = '|logged in|'
         else:

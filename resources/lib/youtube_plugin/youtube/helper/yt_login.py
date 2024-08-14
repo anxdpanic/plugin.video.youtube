@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import copy
 import time
 
 from ..youtube_exceptions import LoginException
@@ -81,7 +80,7 @@ def process(mode, provider, context, sign_out_refresh=True):
                     _do_logout()
                     raise
 
-                log_data = copy.deepcopy(json_data)
+                log_data = json_data.copy()
                 if 'access_token' in log_data:
                     log_data['access_token'] = '<redacted>'
                 if 'refresh_token' in log_data:

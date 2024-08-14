@@ -356,12 +356,20 @@ class YouTubeRequestClient(BaseRequestsClass):
             params = client['params']
             if client.get('_access_token'):
                 if 'key' in params:
+                    params = params.copy()
                     del params['key']
+                    client['params'] = params
             else:
-                if 'Authorization' in client['headers']:
-                    del client['headers']['Authorization']
+                headers = client['headers']
+                if 'Authorization' in headers:
+                    headers = headers.copy()
+                    del headers['Authorization']
+                    client['headers'] = headers
+
                 if 'key' in params and params['key'] is ValueError:
+                    params = params.copy()
                     del params['key']
+                    client['params'] = params
         except KeyError:
             pass
 
