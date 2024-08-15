@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-07-11 02:22+0000\n"
+"PO-Revision-Date: 2024-08-15 18:26+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
 "Language: ko_kr\n"
@@ -54,11 +54,11 @@ msgstr "유튜브"
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive 사용"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive 구성"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -616,7 +616,7 @@ msgstr "SSL 보안 검증 강제함"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr ""
+msgstr "InputStream.Adaptive는 YouTube 설정에서 사용되지만, 애드온을 사용하지 않습니다. InputStream.Adaptive를 사용할까요?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -768,7 +768,7 @@ msgstr ""
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
 msgid ""
@@ -892,15 +892,15 @@ msgstr "지나간 실시간"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings > API > API Key"
-msgstr ""
+msgstr "API 키가 올바르지 않습니다. 설정 > API > API 키"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings > API > API Id"
-msgstr ""
+msgstr "클라이언트 ID가 올바르지 않습니다. 설정 > API > API ID"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings > API > API Secret"
-msgstr ""
+msgstr "클라이언트 Secret이 올바르지 않습니다. 설정 > API > API Secret"
 
 msgctxt "#30651"
 msgid "Location"
@@ -1060,7 +1060,7 @@ msgstr "실시간에 사용"
 
 msgctxt "#30690"
 msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "적응형 라이브 스트림에는 InputStream.Adaptive >= 2.0.12가 필요합니다"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1192,7 +1192,7 @@ msgstr "HDR 비디오 사용"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
-msgstr ""
+msgstr "MPEG-DASH VOD에는 프록시가 필요합니다(고급 > HTTP 서버 참조)[CR]HDR 및 >1080p 비디오에는 InputStream.Adaptive >= 2.3.14가 필요합니다"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1568,15 +1568,15 @@ msgstr "목록이 비어 있습니다.[CR][CR]컨텍스트 메뉴에서 새로 �
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "settings.xml 새로 고침"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "settings.xml을 새로 고칠까요?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "처음부터 재생"
 
 #~ msgctxt "#30001"
 #~ msgid "Username"
