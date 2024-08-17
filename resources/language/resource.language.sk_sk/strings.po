@@ -5,17 +5,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
-"Last-Translator: Christian Gade <gade@kodi.tv>\n"
+"PO-Revision-Date: 2024-08-17 20:46+0000\n"
+"Last-Translator: Jose Riha <jose1711@gmail.com>\n"
 "Language-Team: Slovak <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/sk_sk/>\n"
 "Language: sk_sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.6.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -49,16 +49,16 @@ msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "Použiť InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "Konfigurovať InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -66,7 +66,7 @@ msgstr "Vždy sa spýtať na kvalitu videa"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "Najlepšia kvalita videa"
 
 msgctxt "#30011"
 msgid "480p"
@@ -78,15 +78,15 @@ msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
@@ -102,7 +102,7 @@ msgstr "1080p Živé / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 msgctxt "#30020"
 msgid "Allow 3D"
@@ -126,11 +126,11 @@ msgstr "Veľkosť cache (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
-msgstr ""
+msgstr "Povoliť Sprievodcu nastavením"
 
 msgctxt "#30026"
 msgid "Override views"
-msgstr ""
+msgstr "Vymeniť pohľady"
 
 msgctxt "#30027"
 msgid "View: Default"
@@ -146,7 +146,7 @@ msgstr "Zobraziť: Filmy"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Konfigurovať %s?"
 
 msgctxt "#30031"
 msgid "Advanced"
@@ -184,11 +184,11 @@ msgstr "Vlastné ID zoznamu 'História'"
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Záložky"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Záložka"
 
 msgctxt "#30102"
 msgid "Search"
@@ -264,11 +264,11 @@ msgstr "Prosím čakajte..."
 
 msgctxt "#30120"
 msgid "Confirm clear"
-msgstr ""
+msgstr "Potvrdiť vyčistenie"
 
 msgctxt "#30121"
 msgid "Clear %s?"
-msgstr ""
+msgstr "Vyčistiť %s?"
 
 # YouTube
 # empty strings from id 30121 to 30199
@@ -312,7 +312,7 @@ msgstr "Prejsť na %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
-msgstr ""
+msgstr "Fanart kanála"
 
 msgctxt "#30504"
 msgid "Subscriptions"
@@ -352,7 +352,7 @@ msgstr "Prehliadať kanály"
 
 msgctxt "#30513"
 msgid "Trending"
-msgstr ""
+msgstr "V kurze"
 
 msgctxt "#30514"
 msgid "Related Videos"
@@ -404,11 +404,11 @@ msgstr "Vyberte región"
 
 msgctxt "#30526"
 msgid "Setup Wizard"
-msgstr ""
+msgstr "Sprievodca nastavením"
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Jazyk a región"
 
 msgctxt "#30528"
 msgid "Rate..."
@@ -464,7 +464,7 @@ msgstr "Prehrať pomocou..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
-msgstr ""
+msgstr "Zobraziť názov kanála a detaily videa v popise"
 
 msgctxt "#30542"
 msgid "rtmpe streams are not supported"
@@ -616,7 +616,7 @@ msgstr "Vynútiť overenie SSL certifikátu"
 
 msgctxt "#30579"
 msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
-msgstr ""
+msgstr "InputStream.Adaptive je povolený v nastaveniach YouTube, no doplnok bol vypnutý. Chcete zapnúť InputStream.Adaptive teraz?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -700,11 +700,11 @@ msgstr "Nepodarilo sa zapnúť osobné kľúče API. Chýba: %s"
 
 msgctxt "#30600"
 msgid "Subtitles"
-msgstr ""
+msgstr "Titulky"
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
-msgstr ""
+msgstr "%s s originálom/%s záložný"
 
 msgctxt "#30602"
 msgid "No auto-generated"
@@ -768,7 +768,7 @@ msgstr ""
 
 msgctxt "#30617"
 msgid "InputStream.Adaptive"
-msgstr ""
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
 msgid ""
@@ -892,15 +892,15 @@ msgstr "Dokončené živé prenosy"
 
 msgctxt "#30648"
 msgid "API Key is incorrect. Settings > API > API Key"
-msgstr ""
+msgstr "API kľúč je nesprávny. Nastavenia > API > API kľúč"
 
 msgctxt "#30649"
 msgid "Client Id is incorrect. Settings > API > API Id"
-msgstr ""
+msgstr "Identifikátor klienta nie je platný. Nastavenia > API > Identifikátor API"
 
 msgctxt "#30650"
 msgid "Client Secret is incorrect. Settings > API > API Secret"
-msgstr ""
+msgstr "Tajomstvo klienta je neplatné. Nastavenia > API > Tajomstvo API"
 
 msgctxt "#30651"
 msgid "Location"
@@ -912,7 +912,7 @@ msgstr "Polomer polohy (km)"
 
 msgctxt "#30653"
 msgid "My Location using IP geolocation lookup"
-msgstr ""
+msgstr "Moja lokalizácia, ktorá využíva geolokáciu IP adresy"
 
 msgctxt "#30654"
 msgid "My Location"
@@ -964,7 +964,7 @@ msgstr "Prepnúť na '%s' teraz?"
 
 msgctxt "#30666"
 msgid "%s removed"
-msgstr ""
+msgstr "%s bolo odstránené"
 
 msgctxt "#30667"
 msgid "Renamed '%s' to '%s'"
@@ -988,7 +988,7 @@ msgstr "Vyčistiť históriu prehrávania"
 
 msgctxt "#30672"
 msgid "Delete playback history database"
-msgstr ""
+msgstr "Odstrániť databázu histórie prehrávania"
 
 msgctxt "#30673"
 msgid "playback history"
@@ -1000,7 +1000,7 @@ msgstr "Resetovať pozíciu pokračovania"
 
 msgctxt "#30675"
 msgid "Use local playback history (watched, resume tracking)"
-msgstr ""
+msgstr "Použiť lokálnu históriu prehrávania (videné, obnoviť sledovanie)"
 
 msgctxt "#30676"
 msgid "Just now"
@@ -1052,7 +1052,7 @@ msgstr "dátová keš"
 
 msgctxt "#30688"
 msgid "Use MPEG-DASH for videos"
-msgstr ""
+msgstr "Používať formát MPEG-DASH pre videá"
 
 msgctxt "#30689"
 msgid "Use for live streams"
@@ -1060,7 +1060,7 @@ msgstr "Použiť pre živé prenosy"
 
 msgctxt "#30690"
 msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr ""
+msgstr "Pre adaptívne živé vysielanie je vyžadovaný InputStream.Adaptive aspoň vo verzii 2.0.12"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1116,7 +1116,7 @@ msgstr "Naozaj to chcete?"
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
-msgstr ""
+msgstr "Používať URL adresy YouTube s predvoleným prehrávačom"
 
 msgctxt "#30705"
 msgid "Download subtitles"
@@ -1188,19 +1188,19 @@ msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
-msgstr ""
+msgstr "Povoliť HDR video"
 
 msgctxt "#30723"
 msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
-msgstr ""
+msgstr "MPEG-DASH VOD vyžaduje proxy (pozrite Pokročilé > HTTP server)[CR]HDR a video s rozlíšením vyšším ako 1080p vyžaduje InputStream.Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
-msgstr ""
+msgstr "Povoliť video s vysokou frekvenciou snímok"
 
 msgctxt "#30725"
 msgid "1440p (QHD)"
-msgstr ""
+msgstr "1440p (QHD)"
 
 msgctxt "#30726"
 msgid "Uploads"
@@ -1208,11 +1208,11 @@ msgstr "Nahraté"
 
 msgctxt "#30727"
 msgid "Enable H.264 video"
-msgstr ""
+msgstr "Povoliť H.264 video"
 
 msgctxt "#30728"
 msgid "Enable VP9 video"
-msgstr ""
+msgstr "Povoliť VP9 video"
 
 msgctxt "#30729"
 msgid ""
@@ -1244,7 +1244,7 @@ msgstr "Upravené"
 
 msgctxt "#30736"
 msgid "Shorts (1 minute or less)"
-msgstr ""
+msgstr "Shorts (jedna minúta alebo menej)"
 
 msgctxt "#30737"
 msgid ""
@@ -1260,323 +1260,323 @@ msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
-msgstr ""
+msgstr "HLS"
 
 msgctxt "#30741"
 msgid "Multi-stream HLS"
-msgstr ""
+msgstr "Multi-streamové HLS"
 
 msgctxt "#30742"
 msgid "Adaptive HLS"
-msgstr ""
+msgstr "Adaptívne HLS"
 
 msgctxt "#30743"
 msgid "MPEG-DASH"
-msgstr ""
+msgstr "MPEG-DASH"
 
 msgctxt "#30744"
 msgid "Original"
-msgstr ""
+msgstr "Pôvodný"
 
 msgctxt "#30745"
 msgid "Dubbed"
-msgstr ""
+msgstr "Dabovaný"
 
 msgctxt "#30746"
 msgid "Descriptive"
-msgstr ""
+msgstr "Popisný"
 
 msgctxt "#30747"
 msgid "Alternate"
-msgstr ""
+msgstr "Alternatívny"
 
 msgctxt "#30748"
 msgid "Stream features"
-msgstr ""
+msgstr "Funkcie streamu"
 
 msgctxt "#30749"
 msgid "Enable AV1 video"
-msgstr ""
+msgstr "Povoliť AV1 video"
 
 msgctxt "#30750"
 msgid "Enable Vorbis audio"
-msgstr ""
+msgstr "Povoliť zvuk Vorbis"
 
 msgctxt "#30751"
 msgid "Enable Opus audio"
-msgstr ""
+msgstr "Povoliť zvuk Opus"
 
 msgctxt "#30752"
 msgid "Enable AAC audio"
-msgstr ""
+msgstr "Povoliť zvuk AAC"
 
 msgctxt "#30753"
 msgid "Enable surround sound audio"
-msgstr ""
+msgstr "Povoliť priestorový zvuk"
 
 msgctxt "#30754"
 msgid "Enable AC-3 audio"
-msgstr ""
+msgstr "Povoliť zvuk AC-3"
 
 msgctxt "#30755"
 msgid "Enable EAC-3 audio"
-msgstr ""
+msgstr "Povoliť zvuk EAC-3"
 
 msgctxt "#30756"
 msgid "Enable DTS audio"
-msgstr ""
+msgstr "Povoliť zvuk DTS"
 
 msgctxt "#30757"
 msgid "Remove similar/duplicate streams"
-msgstr ""
+msgstr "Odstrániť podobné/zdvojené streamy"
 
 msgctxt "#30758"
 msgid "Stream selection"
-msgstr ""
+msgstr "Výber streamu"
 
 msgctxt "#30759"
 msgid "Quality selection"
-msgstr ""
+msgstr "Výber kvality"
 
 msgctxt "#30760"
 msgid "Automatic + Quality selection"
-msgstr ""
+msgstr "Automatický + výber kvality"
 
 msgctxt "#30761"
 msgid "Update playback history on Youtube"
-msgstr ""
+msgstr "Aktualizovať históriu prehrávania na YouTube"
 
 msgctxt "#30762"
 msgid "Multi-language"
-msgstr ""
+msgstr "Viacjazyčný"
 
 msgctxt "#30763"
 msgid "Multi-audio"
-msgstr ""
+msgstr "Viaczvukový"
 
 msgctxt "#30764"
 msgid "Requests connect timeout"
-msgstr ""
+msgstr "Bol prekročený limit času pripojenia"
 
 msgctxt "#30765"
 msgid "Requests read timeout"
-msgstr ""
+msgstr "Limit času odpovede"
 
 msgctxt "#30766"
 msgid "Premieres"
-msgstr ""
+msgstr "Premiéry"
 
 msgctxt "#30767"
 msgid "Views"
-msgstr ""
+msgstr "Zobrazenia"
 
 msgctxt "#30768"
 msgid "Disable high framerate video at maximum video quality"
-msgstr ""
+msgstr "Vypnúť video s vysokou frekvenciou snímok pri maximálnej kvalite"
 
 msgctxt "#30769"
 msgid "Clear Watch Later list"
-msgstr ""
+msgstr "Vyčistiť zoznam Pozrieť neskôr"
 
 msgctxt "#30770"
 msgid "Are you sure you want to clear your Watch Later list?"
-msgstr ""
+msgstr "Naozaj chcete vyčistiť zoznam Pozrieť neskôr?"
 
 msgctxt "#30771"
 msgid "Disable fractional framerate hinting"
-msgstr ""
+msgstr "Vypnúť rady týkajúce sa neceločíselnej snímkovej frekvencie"
 
 msgctxt "#30772"
 msgid "Disable all framerate hinting"
-msgstr ""
+msgstr "Vypnúť všetky rady týkajúce sa snímkovej frekvencie"
 
 msgctxt "#30773"
 msgid "Show video details in video lists"
-msgstr ""
+msgstr "Zobrazovať podrobnosti o videu v zoznamoch videí"
 
 msgctxt "#30774"
 msgid "All available"
-msgstr ""
+msgstr "Všetky dostupné"
 
 msgctxt "#30775"
 msgid "%s (translation)"
-msgstr ""
+msgstr "%s (preklad)"
 
 msgctxt "#30776"
 msgid "Ask + Automatic + Quality selection"
-msgstr ""
+msgstr "Spýtať sa + Automatické + Výber kvality"
 
 msgctxt "#30777"
 msgid "Views for %s (%s)"
-msgstr ""
+msgstr "Zobrazenia %s (%s)"
 
 msgctxt "#30778"
 msgid "Import old playback history?"
-msgstr ""
+msgstr "Importovať starú históriu prehrávania?"
 
 msgctxt "#30779"
 msgid "Import old search history?"
-msgstr ""
+msgstr "Importovať starú históriu vyhľadávania?"
 
 msgctxt "#30780"
 msgid "Clear local watch later list"
-msgstr ""
+msgstr "Vyčistiť lokálny zoznam Pozrieť neskôr"
 
 msgctxt "#30781"
 msgid "Delete watch later database"
-msgstr ""
+msgstr "Vymazať databázu Pozrieť neskôr"
 
 msgctxt "#30782"
 msgid "local watch later list"
-msgstr ""
+msgstr "Lokálny zoznam Pozrieť neskôr"
 
 msgctxt "#30783"
 msgid "settings to recommended values"
-msgstr ""
+msgstr "Nastavenia na odporúčané hodnoty"
 
 msgctxt "#30784"
 msgid "listings to show minimal details"
-msgstr ""
+msgstr "Výpisy budú zobrazovať minimum údajov"
 
 msgctxt "#30785"
 msgid "performance settings"
-msgstr ""
+msgstr "Nastavenia pre výkon"
 
 msgctxt "#30786"
 msgid "Choose device capabilities"
-msgstr ""
+msgstr "Vyberte možnosti zariadenia"
 
 msgctxt "#30787"
 msgid "720p, H.264 only | Limited or older devices"
-msgstr ""
+msgstr "720p, iba H.264 | Obmedzené alebo staršie zariadenia"
 
 msgctxt "#30788"
 msgid "1080p/30 fps | Raspberry Pi 3, or similar"
-msgstr ""
+msgstr "1080p/30 sním./s | Raspberry Pi 3 alebo podobné"
 
 msgctxt "#30789"
 msgid "4K/30 fps or 1080p/60 fps, HDR if compatible | Raspberry Pi 5, or similar"
-msgstr ""
+msgstr "4K/30 sním./s alebo 1080p/60 sním./s, HDR ak je kompatibilné | Raspberry Pi 5 alebo podobné"
 
 msgctxt "#30790"
 msgid "4K/60 fps, HDR if compatible | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1, or similar"
-msgstr ""
+msgstr "4K/60 sním./s, HDR ak je kompatibilné | Fire TV Cube Gen 2, Shield TV, Fire TV Stick 4K Gen 1 alebo podobné"
 
 msgctxt "#30791"
 msgid "4K/60 fps, HDR, using AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V, or similar"
-msgstr ""
+msgstr "4K/60 sním./s, HDR, s použitím AV1 | Fire TV Cube Gen 3, Fire TV Stick 4K Max, Vero V alebo podobné"
 
 msgctxt "#30792"
 msgid "8K/60 fps, HDR, using AV1 | Modern device or PC with full capabilities"
-msgstr ""
+msgstr "8K/60 sním./s, HDR, s použitím AV1 | Moderné zariadenie alebo PC s plnými možnosťami"
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr ""
+msgstr "Farba zobrazenia počtu videní"
 
 msgctxt "#30794"
 msgid "Likes count display colour"
-msgstr ""
+msgstr "Farba zobrazenia počtu Lajkov"
 
 msgctxt "#30795"
 msgid "Comments count display colour"
-msgstr ""
+msgstr "Farba zobrazenia počtu komentárov"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
-msgstr ""
+msgstr "1080p/60 sním./s | Raspberry Pi 4 alebo podobné"
 
 msgctxt "#30797"
 msgid "1080p/30 fps or 720p/30 fps, H.264 only | Raspberry Pi 1/2, or similar"
-msgstr ""
+msgstr "1080p/30 sním./s alebo 720p/30 sním./s, iba H.264 | Raspberry Pi 1/2 alebo podobné"
 
 msgctxt "#30798"
 msgid "Clear bookmarks list"
-msgstr ""
+msgstr "Vyčistiť zoznam záložiek"
 
 msgctxt "#30799"
 msgid "Delete bookmarks database"
-msgstr ""
+msgstr "Vymazať databázu záložiek"
 
 msgctxt "#30800"
 msgid "bookmarks list"
-msgstr ""
+msgstr "Zoznam záložiek"
 
 msgctxt "#30801"
 msgid "Clear Bookmarks list"
-msgstr ""
+msgstr "Vyčistiť zoznam záložiek"
 
 msgctxt "#30802"
 msgid "Are you sure you want to clear your Bookmarks list?"
-msgstr ""
+msgstr "Naozaj chcete vyčistiť zoznam záložiek?"
 
 msgctxt "#30803"
 msgid "Bookmark %s"
-msgstr ""
+msgstr "Záložka %s"
 
 msgctxt "#30804"
 msgid "Use YouTube website urls with external player"
-msgstr ""
+msgstr "Používať URL adresy YouTube s externým prehrávačom"
 
 msgctxt "#30805"
 msgid "Use adaptive streaming formats with external player"
-msgstr ""
+msgstr "Použiť formáty adaptívneho streamovania s externým prehrávačom"
 
 msgctxt "#30806"
 msgid "Jump to page..."
-msgstr ""
+msgstr "Prejsť na stranu..."
 
 msgctxt "#30807"
 msgid "Use channel name as"
-msgstr ""
+msgstr "Použiť názov kanála ako"
 
 msgctxt "#30808"
 msgid "Hide videos from listings"
-msgstr ""
+msgstr "Skrývať filmy v zoznamoch"
 
 msgctxt "#30809"
 msgid "All upcoming videos"
-msgstr ""
+msgstr "Všetky nadchádzajúce filmy"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr ""
+msgstr "Všetky skôr streamované (ukončené) videá"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr ""
+msgstr "Filtrovať priečinky s filmami naživo"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr ""
+msgstr "Vyčistiť históriu kanálov odberov"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr ""
+msgstr "Vymazať databázu históriu kanálov odberov"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr ""
+msgstr "história kanálov"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr ""
+msgstr "Návrat..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
-msgstr ""
+msgstr "Zoznam je prázdny.[CR][CR]Obnovte z kontextovej ponuky alebo to skúste neskôr."
 
 msgctxt "#30817"
 msgid "Refresh settings.xml"
-msgstr ""
+msgstr "Aktualizovať settings.xml"
 
 msgctxt "#30818"
 msgid "Are you sure you want to refresh settings.xml?"
-msgstr ""
+msgstr "Naozaj chcete aktualizovať settings.xml?"
 
 msgctxt "#30819"
 msgid "Play from start"
-msgstr ""
+msgstr "Prehrať od začiatku"
 
 #~ msgctxt "#30001"
 #~ msgid "Username"
