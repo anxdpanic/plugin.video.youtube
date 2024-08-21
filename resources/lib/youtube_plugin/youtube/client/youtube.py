@@ -1726,9 +1726,9 @@ class YouTube(LoginClient):
                 if limit:
                     if current_num >= limit:
                         continue
-                    if not available:
+                    if available <= 0:
                         threads['balance'].set()
-                elif not available:
+                elif available <= 0:
                     continue
 
                 thread = threading.Thread(
