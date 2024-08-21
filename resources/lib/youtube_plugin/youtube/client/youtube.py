@@ -1473,12 +1473,11 @@ class YouTube(LoginClient):
 
         bookmarks = self._context.get_bookmarks_list().get_items()
         if bookmarks:
-            channel_ids.extend([
-                {'channel_id': item_id}
-                for item_id, item in bookmarks.items()
-                if (isinstance(item, float)
-                    or getattr(item, 'get_channel_id', bool)())
-            ])
+            for item_id, item in bookmarks.items():
+                if not isinstance(item, float):
+                    item_id = getattr(item, 'channel_id', None)
+                if item_id:
+                    channel_ids.append({'channel_id': item_id})
 
         feeds = {}
         headers = {
