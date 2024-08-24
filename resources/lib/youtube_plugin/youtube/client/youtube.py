@@ -21,6 +21,7 @@ from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import cpu_count, string_type, to_str
+from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     current_system_version,
     datetime_parser,
@@ -1478,10 +1479,12 @@ class YouTube(LoginClient):
         if bookmarks:
             channel_ids = threaded_output['channel_ids']
             for item_id, item in bookmarks.items():
-                if not isinstance(item, float):
-                    item_id = getattr(item, 'channel_id', None)
-                if item_id:
+                if isinstance(item, float):
                     channel_ids.append({'channel_id': item_id})
+                elif isinstance(item, DirectoryItem):
+                    channel_ids.append({
+                        'channel_id': getattr(item, 'channel_id', None)
+                    })
 
         headers = {
             'Host': 'www.youtube.com',
