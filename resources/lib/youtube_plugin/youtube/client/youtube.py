@@ -1662,6 +1662,7 @@ class YouTube(LoginClient):
                 threads['pool_counts'][pool_id] -= 1
             threads['pool_counts']['all'] -= 1
             threads['current'].discard(current_thread)
+            threads['loop'].set()
 
         try:
             num_cores = cpu_count() or 1
@@ -1710,7 +1711,7 @@ class YouTube(LoginClient):
         completed = []
         iterator = iter(payloads)
         threads['loop'].set()
-        while threads['loop'].wait(1):
+        while threads['loop'].wait():
             try:
                 pool_id = next(iterator)
             except StopIteration:
