@@ -16,7 +16,6 @@ from ..items import from_json
 
 class BookmarksList(Storage):
     _table_name = 'storage_v2'
-    _table_created = False
     _table_updated = False
     _sql = {}
 

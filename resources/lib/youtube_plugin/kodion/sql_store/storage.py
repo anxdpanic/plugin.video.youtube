@@ -31,7 +31,6 @@ class Storage(object):
 
     _base = None
     _table_name = 'storage_v2'
-    _table_created = False
     _table_updated = False
 
     _sql = {
@@ -175,7 +174,6 @@ class Storage(object):
             self._base = self
             self._sql = {}
             self._table_name = migrate
-            self._table_created = True
             self._table_updated = True
         else:
             self._base = self.__class__
@@ -219,9 +217,12 @@ class Storage(object):
         self._lock.release()
 
     def _open(self):
+        statements = []
         if not os.path.exists(self._filepath):
             make_dirs(os.path.dirname(self._filepath))
-            self._base._table_created = False
+            statements.append(
+                self._sql['create_table']
+            )
             self._base._table_updated = True
 
         for _ in range(3):
@@ -256,12 +257,6 @@ class Storage(object):
             'PRAGMA cache_size = 1000;',
             'PRAGMA journal_mode = WAL;',
         ]
-        statements = []
-
-        if not self._table_created:
-            statements.append(
-                self._sql['create_table']
-            )
 
         if not self._table_updated:
             for result in self._execute(cursor, self._sql['has_old_table']):
@@ -279,7 +274,6 @@ class Storage(object):
             sql_script[transaction_begin:transaction_begin] = statements
         self._execute(cursor, '\n'.join(sql_script), script=True)
 
-        self._base._table_created = True
         self._base._table_updated = True
         self._db = db
         self._cursor = cursor
