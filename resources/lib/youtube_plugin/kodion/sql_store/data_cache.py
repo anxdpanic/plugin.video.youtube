@@ -15,7 +15,6 @@ from .storage import Storage
 
 class DataCache(Storage):
     _table_name = 'storage_v2'
-    _table_created = False
     _table_updated = False
     _sql = {}
 

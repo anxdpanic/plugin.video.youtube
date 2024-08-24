@@ -534,3 +534,23 @@ def process_old_history_db(context, step, steps, **_kwargs):
             wait_for=WAIT_FLAG,
         )
     return step
+
+
+def process_refresh_settings(context, step, steps, **_kwargs):
+    localize = context.localize
+
+    step += 1
+    if context.get_ui().on_yes_no_input(
+            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            (localize('setup_wizard.prompt')
+             % localize('setup_wizard.prompt.settings.refresh'))
+    ):
+        context.execute(
+            'RunScript({addon},maintenance/{action}?{query})'
+            .format(addon=ADDON_ID,
+                    action='refresh',
+                    query='target=settings_xml'),
+            wait_for=WAIT_FLAG,
+        )
+        context.get_settings(refresh=True)
+    return step

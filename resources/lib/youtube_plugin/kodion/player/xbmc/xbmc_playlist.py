@@ -14,7 +14,7 @@ import json
 
 from ..abstract_playlist import AbstractPlaylist
 from ...compatibility import xbmc
-from ...items import VideoItem, video_listitem
+from ...items import VideoItem, media_listitem
 from ...utils.methods import jsonrpc, wait
 
 
@@ -44,7 +44,7 @@ class XbmcPlaylist(AbstractPlaylist):
         self._playlist.clear()
 
     def add(self, base_item):
-        uri, item, _ = video_listitem(self._context, base_item)
+        uri, item, _ = media_listitem(self._context, base_item)
         if item:
             self._playlist.add(uri, listitem=item)
 
