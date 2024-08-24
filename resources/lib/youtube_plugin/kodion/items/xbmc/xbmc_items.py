@@ -113,7 +113,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         else:
             return
 
-        value = item.get_artists_string()
+        value = item.get_artists()
         if value is not None:
             info_labels['artist'] = value
 
