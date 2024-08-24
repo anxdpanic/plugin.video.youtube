@@ -1479,12 +1479,12 @@ class YouTube(LoginClient):
         if bookmarks:
             channel_ids = threaded_output['channel_ids']
             for item_id, item in bookmarks.items():
-                if isinstance(item, float):
+                if isinstance(item, DirectoryItem):
+                    item_id = getattr(item, 'channel_id', None)
+                elif not isinstance(item, float):
+                    continue
+                if item_id:
                     channel_ids.append({'channel_id': item_id})
-                elif isinstance(item, DirectoryItem):
-                    channel_ids.append({
-                        'channel_id': getattr(item, 'channel_id', None)
-                    })
 
         headers = {
             'Host': 'www.youtube.com',
