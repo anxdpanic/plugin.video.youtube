@@ -28,19 +28,18 @@ from ...constants import (
 )
 from ...exceptions import KodionException
 from ...items import (
-    audio_listitem,
     directory_listitem,
     image_listitem,
+    media_listitem,
+    playback_item,
     uri_listitem,
-    video_listitem,
-    video_playback_item,
 )
 from ...player import XbmcPlaylist
 
 
 class XbmcPlugin(AbstractPlugin):
     _LIST_ITEM_MAP = {
-        'AudioItem': audio_listitem,
+        'AudioItem': media_listitem,
         'CommandItem': directory_listitem,
         'DirectoryItem': directory_listitem,
         'ImageItem': image_listitem,
@@ -48,14 +47,14 @@ class XbmcPlugin(AbstractPlugin):
         'SearchHistoryItem': directory_listitem,
         'NewSearchItem': directory_listitem,
         'NextPageItem': directory_listitem,
-        'VideoItem': video_listitem,
+        'VideoItem': media_listitem,
         'WatchLaterItem': directory_listitem,
     }
 
     _PLAY_ITEM_MAP = {
-        'AudioItem': audio_listitem,
+        'AudioItem': playback_item,
         'UriItem': uri_listitem,
-        'VideoItem': video_playback_item,
+        'VideoItem': playback_item,
     }
 
     def __init__(self):
@@ -204,7 +203,6 @@ class XbmcPlugin(AbstractPlugin):
                     context,
                     result,
                     show_fanart=context.get_settings().fanart_selection(),
-                    for_playback=True,
                 )
                 result = True
                 xbmcplugin.setResolvedUrl(self.handle,

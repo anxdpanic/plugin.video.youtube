@@ -41,12 +41,12 @@ msgid "General"
 msgstr "Umum"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Nama pengguna"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Katasandi"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr ""
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Konfigurasikan InputStream Adaptive"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -197,16 +197,16 @@ msgid "Search"
 msgstr "Cari"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Pustaka"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Sorotan"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Arsip"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -221,8 +221,8 @@ msgid "Remove"
 msgstr "Hapus"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Video Terakhir"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -291,12 +291,12 @@ msgid "API Secret"
 msgstr "Secret API"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Aktifkan kunci API pribadi"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Gunakan kumpulan kunci API prasetel"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -373,8 +373,8 @@ msgid "Subscribe to %s"
 msgstr "Berlangganan ke %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Ke '%s'"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -549,20 +549,20 @@ msgid "None"
 msgstr "Nihil"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Semua"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Pengaturan"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Pengaturan, Inggris"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "Inggris"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -617,7 +617,7 @@ msgid "Force SSL certificate verification"
 msgstr "Paksa verifikasi sertifikat SSL"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -753,27 +753,27 @@ msgid "Retry"
 msgstr "Coba lagi"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Ambil id daftar putar Tonton Nanti"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "Gagal mengambil id daftar putar Tonton Nanti. Tambahkan beberapa video ke Tonton Nanti melalui web/aplikasi dan coba lagi."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Batal"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Harus masuk."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -785,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Port %s sudah digunakan. Tidak dapat memulai server http."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "Instal Pembantu InputStream"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Membutuhkan Kodi 17 keatas"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -893,16 +893,16 @@ msgid "Completed Live"
 msgstr "Live Selesai"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "Kunci API salah. Pengaturan - API - Kunci API"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "Id klien salah. Pengaturan - API - Id API"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "Secret Klien salah. Pengaturan - API - Secret API"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1061,7 +1061,7 @@ msgid "Use for live streams"
 msgstr "Gunakan untuk streaming langsung"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1137,16 +1137,16 @@ msgid "Play audio only"
 msgstr "Putar hanya audio"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "Gagal mengambil id daftar putar Tonton Nanti. Untuk meningkatkan peluang pengambilan, tambahkan 8-10 video ke Tonton Nanti melalui web/aplikasi dan coba lagi."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "Gagal mengambil id daftar putar Tonton Nanti. Coba lagi besok tanpa menghapus video apa pun."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "Mencari Tonton Nanti... Halaman %s"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1185,15 +1185,15 @@ msgid "Unsubscribed from channel"
 msgstr "Berhenti berlangganan dari saluran"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Default ke set adaptasi WEBM (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1249,15 +1249,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
+msgid ""
 msgstr ""
 
 msgctxt "#30740"
@@ -1567,6 +1567,118 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Nama pengguna"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Katasandi"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Konfigurasikan InputStream Adaptive"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Pustaka"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Sorotan"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Arsip"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Video Terakhir"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Aktifkan kunci API pribadi"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Gunakan kumpulan kunci API prasetel"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Ke '%s'"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Semua"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Pengaturan"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Pengaturan, Inggris"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "Inggris"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Ambil id daftar putar Tonton Nanti"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "Gagal mengambil id daftar putar Tonton Nanti. Tambahkan beberapa video ke Tonton Nanti melalui web/aplikasi dan coba lagi."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Harus masuk."
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Membutuhkan Kodi 17 keatas"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "Kunci API salah. Pengaturan - API - Kunci API"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "Id klien salah. Pengaturan - API - Id API"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "Secret Klien salah. Pengaturan - API - Secret API"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "Gagal mengambil id daftar putar Tonton Nanti. Untuk meningkatkan peluang pengambilan, tambahkan 8-10 video ke Tonton Nanti melalui web/aplikasi dan coba lagi."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "Gagal mengambil id daftar putar Tonton Nanti. Coba lagi besok tanpa menghapus video apa pun."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "Mencari Tonton Nanti... Halaman %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Default ke set adaptasi WEBM (4K)"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

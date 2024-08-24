@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import copy
 import json
 import os
 import re
@@ -97,13 +96,15 @@ def select_stream(context,
     context.log_debug('Available streams: {0}'.format(num_streams))
 
     for idx, stream in enumerate(stream_list):
-        log_data = copy.deepcopy(stream)
+        log_data = stream.copy()
 
         if 'license_info' in log_data:
+            license_info = log_data['license_info'].copy()
             for detail in ('url', 'token'):
-                original_value = log_data['license_info'].get(detail)
+                original_value = license_info.get(detail)
                 if original_value:
-                    log_data['license_info'][detail] = '<redacted>'
+                    license_info[detail] = '<redacted>'
+            log_data['license_info'] = license_info
 
         original_value = log_data.get('url')
         if original_value:
@@ -313,4 +314,4 @@ def wait(timeout=None):
 
 
 def redact_ip(url):
-    return re.sub(r'([?&/])ip([=/])[^?&/]+', '\g<1>ip\g<2><redacted>', url)
+    return re.sub(r'([?&/])ip([=/])[^?&/]+', r'\g<1>ip\g<2><redacted>', url)

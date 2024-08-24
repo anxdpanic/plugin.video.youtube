@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from copy import deepcopy
 from platform import python_version
 
 from .context import XbmcContext
@@ -44,7 +43,7 @@ def run(context=_context,
     context.init()
     new_uri = context.get_uri()
 
-    params = deepcopy(context.get_params())
+    params = context.get_params().copy()
     for key in ('api_key', 'client_id', 'client_secret'):
         if key in params:
             params[key] = '<redacted>'

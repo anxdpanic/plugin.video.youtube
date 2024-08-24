@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from threading import Thread
+import threading
 
 from .utils import (
     THUMB_TYPES,
@@ -363,22 +363,41 @@ def _process_list_response(provider, context, json_data, item_filter):
         data = resource['fetcher'](
             *resource['args'], **resource['kwargs']
         )
-        if not data or not resource['updater']:
-            return
-        resource['upd_kwargs']['data'] = data
-        resource['updater'](*resource['upd_args'], **resource['upd_kwargs'])
+        if data and resource['updater']:
+            resource['upd_kwargs']['data'] = data
+            resource['updater'](*resource['upd_args'], **resource['upd_kwargs'])
+        resource['complete'] = True
+        threads['current'].discard(resource['thread'])
+        threads['loop'].set()
+
+    threads = {
+        'current': set(),
+        'loop': threading.Event(),
+    }
 
     remaining = len(resources)
     deferred = sum(1 for resource in resources.values() if resource['defer'])
-    iterator = iter(resources.values())
-    while remaining:
+    completed = []
+    iterator = iter(resources)
+    threads['loop'].set()
+    while threads['loop'].wait():
         try:
-            resource = next(iterator)
+            resource_id = next(iterator)
         except StopIteration:
-            iterator = iter(resources.values())
-            resource = next(iterator)
+            if not remaining and not threads['current']:
+                break
+            if threads['current']:
+                threads['loop'].clear()
+            for resource_id in completed:
+                del resources[resource_id]
+            completed = []
+            iterator = iter(resources)
+            continue
 
+        resource = resources[resource_id]
         if resource['complete']:
+            remaining -= 1
+            completed.append(resource_id)
             continue
 
         defer = resource['defer']
@@ -392,21 +411,14 @@ def _process_list_response(provider, context, json_data, item_filter):
         args = resource['args']
         if args and not args[0]:
             resource['complete'] = True
-            remaining -= 1
             continue
 
-        thread = resource['thread']
-        if thread:
-            thread.join(5)
-            if not thread.is_alive():
-                resource['thread'] = None
-                resource['complete'] = True
-                remaining -= 1
-        else:
-            thread = Thread(target=_fetch, args=(resource,))
-            thread.daemon = True
-            thread.start()
-            resource['thread'] = thread
+        if not resource['thread']:
+            new_thread = threading.Thread(target=_fetch, args=(resource,))
+            new_thread.daemon = True
+            threads['current'].add(new_thread)
+            resource['thread'] = new_thread
+            new_thread.start()
 
     return result
 

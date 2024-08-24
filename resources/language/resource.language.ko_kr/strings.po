@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-07-11 02:22+0000\n"
+"PO-Revision-Date: 2024-08-15 18:26+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
 "Language-Team: Korean <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/ko_kr/>\n"
 "Language: ko_kr\n"
@@ -40,12 +40,12 @@ msgid "General"
 msgstr "일반"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "사용자명"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "비밀번호"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -53,12 +53,12 @@ msgstr "유튜브"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
-msgstr "InputStream 적응형 사용"
+msgid "Use InputStream.Adaptive"
+msgstr "InputStream.Adaptive 사용"
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "InputStream Adaptive 설정"
+msgid "Configure InputStream.Adaptive"
+msgstr "InputStream.Adaptive 구성"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -195,16 +195,16 @@ msgid "Search"
 msgstr "검색"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "라이브러리"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "하이라이트"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "보관"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -219,8 +219,8 @@ msgid "Remove"
 msgstr "제거"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "최근 동영상"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -289,12 +289,12 @@ msgid "API Secret"
 msgstr "API 비밀"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "개인 API 키 사용함"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "현재 API 키 세트 사용"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -371,8 +371,8 @@ msgid "Subscribe to %s"
 msgstr "%s에 구독"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "'%s'로 가기"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -547,20 +547,20 @@ msgid "None"
 msgstr "안 함"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "전부"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "설정"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "설정, 영어"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "영어"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -615,8 +615,8 @@ msgid "Force SSL certificate verification"
 msgstr "SSL 보안 검증 강제함"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "InputStream 적응형은 유튜브 설정에서 사용하지만, 추가 기능은 사용하지 않습니다. 지금 InputStream 적응형을 사용할까요?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
+msgstr "InputStream.Adaptive는 YouTube 설정에서 사용되지만, 애드온을 사용하지 않습니다. InputStream.Adaptive를 사용할까요?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -751,28 +751,28 @@ msgid "Retry"
 msgstr "다시 시도"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "나중에 볼 재생목록 id 가져오기"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "나중에 볼 재생목록을 가져 올 수 없습니다. 웹/앱에서 나중에 볼 동영상을 추가하고 다시 시도해야 합니다."
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "취소"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "기록해야 합니다."
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
-msgstr "InputStream 적응형"
+msgid "InputStream.Adaptive"
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
-msgstr "MPEG-DASH 프록시 사용"
+msgid ""
+msgstr ""
 
 msgctxt "#30619"
 msgid "Port"
@@ -783,8 +783,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "$s 포트는 이미 사용 중입니다. http 서버를 시작할 수 없습니다."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr "MPEG-DASH VOD에는 프록시가 필요합니다 (고급 > HTTP 서버 참조)"
+msgid ""
+msgstr ""
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -795,8 +795,8 @@ msgid "Install InputStream Helper"
 msgstr "InputStream Helper 설치"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Kodi 17이상 필요"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -891,16 +891,16 @@ msgid "Completed Live"
 msgstr "지나간 실시간"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "API 키가 부정확합니다. 설정 - API - API 키"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr "API 키가 올바르지 않습니다. 설정 > API > API 키"
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "클라이언트 Id가 부정확합니다. 설정 - API - API Id"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr "클라이언트 ID가 올바르지 않습니다. 설정 > API > API ID"
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "클라이언트 Secret가 부정확합니다. 설정 - API - API Secret"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr "클라이언트 Secret이 올바르지 않습니다. 설정 > API > API Secret"
 
 msgctxt "#30651"
 msgid "Location"
@@ -1059,8 +1059,8 @@ msgid "Use for live streams"
 msgstr "실시간에 사용"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr "적응형 라이브 스트림에는 InputStream Adaptive >= 2.0.12가 필요함"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr "적응형 라이브 스트림에는 InputStream.Adaptive >= 2.0.12가 필요합니다"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1135,16 +1135,16 @@ msgid "Play audio only"
 msgstr "소리만 재생"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "나중에 볼 재생목록 id를 가져올 수 없습니다. 기회를 높이려면 웹/앱으로 나중에 볼 영상 8-10개를 추가하고 다시 시도합니다."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "나중에 볼 재생목록 id를 가져올 수 없습니다. 동영상을 삭제하지 말고 내일 다시 시도해 보시기 바랍니다."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "나중에 볼 동영상 찾기... $s 페이지"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1183,16 +1183,16 @@ msgid "Unsubscribed from channel"
 msgstr "채널 구독 취소"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "기본으로 WEBM 적응 설정 (4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr "HDR 비디오 사용"
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr "MPEG-DASH VOD에는 프록시가 필요합니다(고급 > HTTP 서버 참조)[CR]HDR 및 >1080p 비디오에는 InputStream 적응형 >= 2.3.14가 필요합니다"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
+msgstr "MPEG-DASH VOD에는 프록시가 필요합니다(고급 > HTTP 서버 참조)[CR]HDR 및 >1080p 비디오에는 InputStream.Adaptive >= 2.3.14가 필요합니다"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1247,16 +1247,16 @@ msgid "Shorts (1 minute or less)"
 msgstr "Shorts (1분 이내)"
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "대체 클라이언트 세부 정보 사용"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "대체 #1"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "대체 #2"
+msgid ""
+msgstr ""
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1565,6 +1565,159 @@ msgstr "뒤로 돌아가기..."
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr "목록이 비어 있습니다.[CR][CR]컨텍스트 메뉴에서 새로 고치거나 나중에 다시 시도하세요."
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr "settings.xml 새로 고침"
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr "settings.xml을 새로 고칠까요?"
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr "처음부터 재생"
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "사용자명"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "비밀번호"
+
+# empty strings from id 30004 to 30006
+#~ msgctxt "#30007"
+#~ msgid "Use InputStream Adaptive"
+#~ msgstr "InputStream 적응형 사용"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "InputStream Adaptive 설정"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "라이브러리"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "하이라이트"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "보관"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "최근 동영상"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "개인 API 키 사용함"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "현재 API 키 세트 사용"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "'%s'로 가기"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "전부"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "설정"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "설정, 영어"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "영어"
+
+#~ msgctxt "#30579"
+#~ msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+#~ msgstr "InputStream 적응형은 유튜브 설정에서 사용하지만, 추가 기능은 사용하지 않습니다. 지금 InputStream 적응형을 사용할까요?"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "나중에 볼 재생목록 id 가져오기"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "나중에 볼 재생목록을 가져 올 수 없습니다. 웹/앱에서 나중에 볼 동영상을 추가하고 다시 시도해야 합니다."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "기록해야 합니다."
+
+#~ msgctxt "#30617"
+#~ msgid "InputStream Adaptive"
+#~ msgstr "InputStream 적응형"
+
+#~ msgctxt "#30618"
+#~ msgid "Enable MPEG-DASH proxy"
+#~ msgstr "MPEG-DASH 프록시 사용"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+#~ msgstr "MPEG-DASH VOD에는 프록시가 필요합니다 (고급 > HTTP 서버 참조)"
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Kodi 17이상 필요"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "API 키가 부정확합니다. 설정 - API - API 키"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "클라이언트 Id가 부정확합니다. 설정 - API - API Id"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "클라이언트 Secret가 부정확합니다. 설정 - API - API Secret"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+#~ msgstr "적응형 라이브 스트림에는 InputStream Adaptive >= 2.0.12가 필요함"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "나중에 볼 재생목록 id를 가져올 수 없습니다. 기회를 높이려면 웹/앱으로 나중에 볼 영상 8-10개를 추가하고 다시 시도합니다."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "나중에 볼 재생목록 id를 가져올 수 없습니다. 동영상을 삭제하지 말고 내일 다시 시도해 보시기 바랍니다."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "나중에 볼 동영상 찾기... $s 페이지"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "기본으로 WEBM 적응 설정 (4K)"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "MPEG-DASH VOD에는 프록시가 필요합니다(고급 > HTTP 서버 참조)[CR]HDR 및 >1080p 비디오에는 InputStream 적응형 >= 2.3.14가 필요합니다"
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "대체 클라이언트 세부 정보 사용"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "대체 #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "대체 #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

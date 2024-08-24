@@ -41,12 +41,12 @@ msgid "General"
 msgstr "一般設定"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "帳戶"
+msgid ""
+msgstr ""
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "密碼"
+msgid ""
+msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr ""
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "設定 InputStream Adaptive"
+msgid "Configure InputStream.Adaptive"
+msgstr ""
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -197,16 +197,16 @@ msgid "Search"
 msgstr "搜尋"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "資料庫"
+msgid ""
+msgstr ""
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "標記"
+msgid ""
+msgstr ""
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "封存"
+msgid ""
+msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -221,8 +221,8 @@ msgid "Remove"
 msgstr "移除"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "最新的影片"
+msgid ""
+msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
@@ -291,12 +291,12 @@ msgid "API Secret"
 msgstr "API Secret"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "啟用個人 API 金鑰"
+msgid ""
+msgstr ""
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "使用預設的 API 金鑰"
+msgid ""
+msgstr ""
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -373,8 +373,8 @@ msgid "Subscribe to %s"
 msgstr "訂閱 %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "請使用瀏覽器開啟下列連結： '%s'"
+msgid ""
+msgstr ""
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -549,20 +549,20 @@ msgid "None"
 msgstr "無"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "全部"
+msgid ""
+msgstr ""
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "設定"
+msgid ""
+msgstr ""
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "設定, 英文"
+msgid ""
+msgstr ""
 
 msgctxt "#30565"
-msgid "English"
-msgstr "英文"
+msgid ""
+msgstr ""
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -617,7 +617,7 @@ msgid "Force SSL certificate verification"
 msgstr "強制驗證 SSL 憑證"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
 msgstr ""
 
 msgctxt "#30580"
@@ -753,27 +753,27 @@ msgid "Retry"
 msgstr "重試"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "取得稍後播放列表 ID"
+msgid ""
+msgstr ""
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "無法取得稍後播放列表ID，請從網頁或APP加入一些影片至稍後播放後重試。"
+msgid ""
+msgstr ""
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "取消"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "你必須登入。"
+msgid ""
+msgstr ""
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
+msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
+msgid ""
 msgstr ""
 
 msgctxt "#30619"
@@ -785,7 +785,7 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "Port %s 已經被使用. 無法啟動 HTTP 伺服器."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+msgid ""
 msgstr ""
 
 msgctxt "#30622"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "安裝 InputStream Helper"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "需要 Kodi 17 以上版本"
+msgid ""
+msgstr ""
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -893,16 +893,16 @@ msgid "Completed Live"
 msgstr "已結束直播"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "API 金鑰錯誤。 設定 - API - API 金鑰"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr ""
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "客戶端 ID 錯誤。 設定 - API - API ID"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr ""
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "客戶端 Secret 錯誤。 設定 - API - API Secret"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr ""
 
 msgctxt "#30651"
 msgid "Location"
@@ -1061,7 +1061,7 @@ msgid "Use for live streams"
 msgstr "使用在直播串流"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
 msgstr ""
 
 msgctxt "#30691"
@@ -1137,16 +1137,16 @@ msgid "Play audio only"
 msgstr "只播放音源"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "獲取稍後觀看撥放清單ID失敗.利用網頁/APP在稍後觀看撥放清單中加入8-10部影片以增加獲取機會並重試."
+msgid ""
+msgstr ""
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "獲取稍後觀看撥放清單ID失敗.請在無移除影片的情況下明天再重試."
+msgid ""
+msgstr ""
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "搜尋稍後觀看... %s頁"
+msgid ""
+msgstr ""
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1185,15 +1185,15 @@ msgid "Unsubscribed from channel"
 msgstr "取消訂閱頻道"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "初始為WEBM adaptation(4K)"
+msgid ""
+msgstr ""
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr ""
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
 msgstr ""
 
 msgctxt "#30724"
@@ -1249,15 +1249,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Use alternate client details"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Alternate #1"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid "Alternate #2"
+msgid ""
 msgstr ""
 
 msgctxt "#30740"
@@ -1567,6 +1567,118 @@ msgstr ""
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr ""
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr ""
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr ""
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr ""
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "帳戶"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "密碼"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "設定 InputStream Adaptive"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "資料庫"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "標記"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "封存"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "最新的影片"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "啟用個人 API 金鑰"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "使用預設的 API 金鑰"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "請使用瀏覽器開啟下列連結： '%s'"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "全部"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "設定"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "設定, 英文"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "英文"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "取得稍後播放列表 ID"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "無法取得稍後播放列表ID，請從網頁或APP加入一些影片至稍後播放後重試。"
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "你必須登入。"
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "需要 Kodi 17 以上版本"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "API 金鑰錯誤。 設定 - API - API 金鑰"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "客戶端 ID 錯誤。 設定 - API - API ID"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "客戶端 Secret 錯誤。 設定 - API - API Secret"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "獲取稍後觀看撥放清單ID失敗.利用網頁/APP在稍後觀看撥放清單中加入8-10部影片以增加獲取機會並重試."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "獲取稍後觀看撥放清單ID失敗.請在無移除影片的情況下明天再重試."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "搜尋稍後觀看... %s頁"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "初始為WEBM adaptation(4K)"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

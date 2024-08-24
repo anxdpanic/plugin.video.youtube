@@ -12,6 +12,8 @@ from __future__ import absolute_import, division, unicode_literals
 
 VIDEO_CONTENT = 'episodes'
 LIST_CONTENT = ''
+
+AUDIO_TYPE = 'music'
 VIDEO_TYPE = 'video'
 
 FILES = 'files'

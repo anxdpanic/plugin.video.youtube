@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-07-11 02:21+0000\n"
-"Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
+"PO-Revision-Date: 2024-08-15 18:26+0000\n"
+"Last-Translator: José Antonio Alvarado <jalvarado0.eses@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
 "MIME-Version: 1.0\n"
@@ -41,12 +41,12 @@ msgid "General"
 msgstr "General"
 
 msgctxt "#30001"
-msgid "Username"
-msgstr "Nombre de usuario"
+msgid ""
+msgstr " "
 
 msgctxt "#30002"
-msgid "Password"
-msgstr "Contraseña"
+msgid ""
+msgstr " "
 
 msgctxt "#30003"
 msgid "YouTube"
@@ -54,12 +54,12 @@ msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
-msgid "Use InputStream Adaptive"
-msgstr "Usar InputStream Adaptive"
+msgid "Use InputStream.Adaptive"
+msgstr "Usar InputStream.Adaptive"
 
 msgctxt "#30008"
-msgid "Configure InputStream Adaptive"
-msgstr "Configurar InputStream Adaptive"
+msgid "Configure InputStream.Adaptive"
+msgstr "Configurar InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
@@ -194,19 +194,19 @@ msgstr "Marcador"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr "Buscar"
+msgstr "Búsqueda"
 
 msgctxt "#30103"
-msgid "Library"
-msgstr "Biblioteca"
+msgid ""
+msgstr " "
 
 msgctxt "#30104"
-msgid "Highlights"
-msgstr "Destacados"
+msgid ""
+msgstr " "
 
 msgctxt "#30105"
-msgid "Archive"
-msgstr "Archivos"
+msgid ""
+msgstr " "
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
@@ -221,8 +221,8 @@ msgid "Remove"
 msgstr "Borrar"
 
 msgctxt "#30109"
-msgid "Latest Videos"
-msgstr "Últimos vídeos"
+msgid ""
+msgstr " "
 
 msgctxt "#30110"
 msgid "New Search"
@@ -291,12 +291,12 @@ msgid "API Secret"
 msgstr "API Secret"
 
 msgctxt "#30204"
-msgid "Enable personal API keys"
-msgstr "Activar claves API personales"
+msgid ""
+msgstr " "
 
 msgctxt "#30205"
-msgid "Use preset API key set"
-msgstr "Usar conjunto de claves API preestablecido"
+msgid ""
+msgstr " "
 
 # YouTube
 # empty strings from id 30206 to 30499
@@ -373,8 +373,8 @@ msgid "Subscribe to %s"
 msgstr "Suscribirse a %s"
 
 msgctxt "#30518"
-msgid "Go to '%s'"
-msgstr "Por favor, vaya a la URL '%s'"
+msgid ""
+msgstr " "
 
 msgctxt "#30519"
 msgid "and enter the following code:"
@@ -549,20 +549,20 @@ msgid "None"
 msgstr "Ninguno"
 
 msgctxt "#30562"
-msgid "All"
-msgstr "Todos"
+msgid ""
+msgstr " "
 
 msgctxt "#30563"
-msgid "Setting"
-msgstr "Configuración"
+msgid ""
+msgstr " "
 
 msgctxt "#30564"
-msgid "Setting, English"
-msgstr "Configuración, Inglés"
+msgid ""
+msgstr " "
 
 msgctxt "#30565"
-msgid "English"
-msgstr "Inglés"
+msgid ""
+msgstr " "
 
 msgctxt "#30566"
 msgid "Prompt"
@@ -617,8 +617,8 @@ msgid "Force SSL certificate verification"
 msgstr "Forzar verificación de certificado SSL"
 
 msgctxt "#30579"
-msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
-msgstr "InputStream Adaptive está activado en los ajustes de YouTube, sin embargo, el complemento ha sido deshabilitado. ¿Quieres activar InputStream Adaptive ahora?"
+msgid "InputStream.Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream.Adaptive now?"
+msgstr "InputStream.Adaptive está activado en los ajustes de YouTube. Sin embargo, el add-on está desactivado. ¿Quieres activar InputStreeam.Adaptive ahora?"
 
 msgctxt "#30580"
 msgid "Reset access manager"
@@ -753,28 +753,28 @@ msgid "Retry"
 msgstr "Volver a intentarlo"
 
 msgctxt "#30613"
-msgid "Retrieve Watch Later playlist id"
-msgstr "Recuperar ID para lista de reproducción 'Ver más tarde'"
+msgid ""
+msgstr " "
 
 msgctxt "#30614"
-msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
-msgstr "¡Vaya! Algo ha fallado al recuperar la ID para la lista de reproducción 'Ver más tarde'. Agregue algunos vídeos a 'Ver más tarde' a través de la aplicación web / Android y vuelva a intentarlo."
+msgid ""
+msgstr " "
 
 msgctxt "#30615"
 msgid "Cancel"
 msgstr "Cancelar"
 
 msgctxt "#30616"
-msgid "Must be signed in."
-msgstr "Debe estar registrado."
+msgid ""
+msgstr " "
 
 msgctxt "#30617"
-msgid "InputStream Adaptive"
-msgstr "InputStream Adaptive"
+msgid "InputStream.Adaptive"
+msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
-msgid "Enable MPEG-DASH proxy"
-msgstr "Activar proxy MPEG-DASH"
+msgid ""
+msgstr " "
 
 msgctxt "#30619"
 msgid "Port"
@@ -785,8 +785,8 @@ msgid "Port %s already in use. Cannot start http server."
 msgstr "El puerto %s ya esta en uso. No se ha podido iniciar el servidor HTTP."
 
 msgctxt "#30621"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
-msgstr "El proxy es necesario para VODs MPEG-DASH (ver Avanzado > Servidor HTTP)"
+msgid ""
+msgstr " "
 
 msgctxt "#30622"
 msgid "Purchases"
@@ -797,8 +797,8 @@ msgid "Install InputStream Helper"
 msgstr "Instalar InputStream Helper"
 
 msgctxt "#30624"
-msgid "Requires Kodi 17+"
-msgstr "Es necesario Kodi 17 o superior"
+msgid ""
+msgstr " "
 
 msgctxt "#30625"
 msgid "InputStream Helper is already installed."
@@ -893,16 +893,16 @@ msgid "Completed Live"
 msgstr "Emisiones en directo recientes"
 
 msgctxt "#30648"
-msgid "API Key is incorrect. Settings - API - API Key"
-msgstr "La clave API es incorrecta. Ajustes > API > API Key"
+msgid "API Key is incorrect. Settings > API > API Key"
+msgstr "La clave API es incorrecta. Ajustes > API > Clave API"
 
 msgctxt "#30649"
-msgid "Client Id is incorrect. Settings - API - API Id"
-msgstr "La ID de cliente es incorrecta. Ajustes > API > API ID"
+msgid "Client Id is incorrect. Settings > API > API Id"
+msgstr "El Id de Cliente es incorrecto. Ajustes > API > Id API"
 
 msgctxt "#30650"
-msgid "Client Secret is incorrect. Settings - API - API Secret"
-msgstr "La API Secreta es incorrecta. Ajustes > API > API Secret"
+msgid "Client Secret is incorrect. Settings > API > API Secret"
+msgstr "El Secreto de Cliente es incorrecto. Ajustes > API > Secreto API"
 
 msgctxt "#30651"
 msgid "Location"
@@ -1061,8 +1061,8 @@ msgid "Use for live streams"
 msgstr "Usar para trasmisiones en directo"
 
 msgctxt "#30690"
-msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
-msgstr "Se requiere InputStream Adaptive >= 2.0.12 para retransmisiones en directo"
+msgid "InputStream.Adaptive >= 2.0.12 is required for adaptive live streams"
+msgstr "Se requiere InputStream.Adaptive >= 2.0.12 para los flujos adaptativos en directo"
 
 msgctxt "#30691"
 msgid "Airing now"
@@ -1137,16 +1137,16 @@ msgid "Play audio only"
 msgstr "Reproducir sólo audio"
 
 msgctxt "#30709"
-msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
-msgstr "No se ha podido recuperar la ID de la lista de reproducción Ver más tarde. Para aumentar las posibilidades de recuperación, agregue 8-10 vídeos a Ver más tarde a través de la web/aplicación y vuelva a intentarlo."
+msgid ""
+msgstr " "
 
 msgctxt "#30710"
-msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
-msgstr "No se ha podido recuperar la ID de la lista de reproducción Ver más tarde. Inténtalo de nuevo mañana sin quitar ninguno de los vídeos."
+msgid ""
+msgstr " "
 
 msgctxt "#30711"
-msgid "Searching for Watch Later... Page %s"
-msgstr "Buscando para Ver más tarde... Página %s"
+msgid ""
+msgstr " "
 
 msgctxt "#30712"
 msgid "Rate videos in playlists"
@@ -1185,16 +1185,16 @@ msgid "Unsubscribed from channel"
 msgstr "Desuscrito del canal"
 
 msgctxt "#30721"
-msgid "Default to WEBM adaptation set (4K)"
-msgstr "Establecer por defecto WEBM adaptativo (4K)"
+msgid ""
+msgstr " "
 
 msgctxt "#30722"
 msgid "Enable HDR video"
 msgstr "Activar vídeo HDR"
 
 msgctxt "#30723"
-msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
-msgstr "Se necesita proxy para los VODs MPEG-DASH (ver Avanzado > Servidor HTTP)[CR]Los vídeos HDR y >1080p requieren InputStream Adaptive >= 2.3.14"
+msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream.Adaptive >= 2.3.14"
+msgstr "Se requiere Proxy para MPEG-DASH VOD (Ver Avanzado > Servidor HTTP)[CR]Los vídeos HDR y >1080p requieren InputStream.Adaptive >= 2.3.14"
 
 msgctxt "#30724"
 msgid "Enable high framerate video"
@@ -1249,16 +1249,16 @@ msgid "Shorts (1 minute or less)"
 msgstr "Cortos (1 minuto o menos)"
 
 msgctxt "#30737"
-msgid "Use alternate client details"
-msgstr "Usar detalles de cliente alternativo"
+msgid ""
+msgstr " "
 
 msgctxt "#30738"
-msgid "Alternate #1"
-msgstr "Alternativa #1"
+msgid ""
+msgstr " "
 
 msgctxt "#30739"
-msgid "Alternate #2"
-msgstr "Alternativa #2"
+msgid ""
+msgstr " "
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1567,6 +1567,159 @@ msgstr "Retrocede..."
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
 msgstr "La lista está vacía[CR][CR]Actualiza desde el menú contextual o inténtalo más tarde."
+
+msgctxt "#30817"
+msgid "Refresh settings.xml"
+msgstr "Refrescar settings.xml"
+
+msgctxt "#30818"
+msgid "Are you sure you want to refresh settings.xml?"
+msgstr "¿Seguro que quieres refrescar settings.xml?"
+
+msgctxt "#30819"
+msgid "Play from start"
+msgstr "Reproducir desde el inicio"
+
+#~ msgctxt "#30001"
+#~ msgid "Username"
+#~ msgstr "Nombre de usuario"
+
+#~ msgctxt "#30002"
+#~ msgid "Password"
+#~ msgstr "Contraseña"
+
+# empty strings from id 30004 to 30006
+#~ msgctxt "#30007"
+#~ msgid "Use InputStream Adaptive"
+#~ msgstr "Usar InputStream Adaptive"
+
+#~ msgctxt "#30008"
+#~ msgid "Configure InputStream Adaptive"
+#~ msgstr "Configurar InputStream Adaptive"
+
+#~ msgctxt "#30103"
+#~ msgid "Library"
+#~ msgstr "Biblioteca"
+
+#~ msgctxt "#30104"
+#~ msgid "Highlights"
+#~ msgstr "Destacados"
+
+#~ msgctxt "#30105"
+#~ msgid "Archive"
+#~ msgstr "Archivos"
+
+#~ msgctxt "#30109"
+#~ msgid "Latest Videos"
+#~ msgstr "Últimos vídeos"
+
+#~ msgctxt "#30204"
+#~ msgid "Enable personal API keys"
+#~ msgstr "Activar claves API personales"
+
+#~ msgctxt "#30205"
+#~ msgid "Use preset API key set"
+#~ msgstr "Usar conjunto de claves API preestablecido"
+
+#~ msgctxt "#30518"
+#~ msgid "Go to '%s'"
+#~ msgstr "Por favor, vaya a la URL '%s'"
+
+#~ msgctxt "#30562"
+#~ msgid "All"
+#~ msgstr "Todos"
+
+#~ msgctxt "#30563"
+#~ msgid "Setting"
+#~ msgstr "Configuración"
+
+#~ msgctxt "#30564"
+#~ msgid "Setting, English"
+#~ msgstr "Configuración, Inglés"
+
+#~ msgctxt "#30565"
+#~ msgid "English"
+#~ msgstr "Inglés"
+
+#~ msgctxt "#30579"
+#~ msgid "InputStream Adaptive is activated in the YouTube settings, however the add-on has been disabled. Would you like to enable InputStream Adaptive now?"
+#~ msgstr "InputStream Adaptive está activado en los ajustes de YouTube, sin embargo, el complemento ha sido deshabilitado. ¿Quieres activar InputStream Adaptive ahora?"
+
+#~ msgctxt "#30613"
+#~ msgid "Retrieve Watch Later playlist id"
+#~ msgstr "Recuperar ID para lista de reproducción 'Ver más tarde'"
+
+#~ msgctxt "#30614"
+#~ msgid "Failed to retrieve Watch Later playlist id. Add a few videos to Watch Later via the web/app and retry."
+#~ msgstr "¡Vaya! Algo ha fallado al recuperar la ID para la lista de reproducción 'Ver más tarde'. Agregue algunos vídeos a 'Ver más tarde' a través de la aplicación web / Android y vuelva a intentarlo."
+
+#~ msgctxt "#30616"
+#~ msgid "Must be signed in."
+#~ msgstr "Debe estar registrado."
+
+#~ msgctxt "#30617"
+#~ msgid "InputStream Adaptive"
+#~ msgstr "InputStream Adaptive"
+
+#~ msgctxt "#30618"
+#~ msgid "Enable MPEG-DASH proxy"
+#~ msgstr "Activar proxy MPEG-DASH"
+
+#~ msgctxt "#30621"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)"
+#~ msgstr "El proxy es necesario para VODs MPEG-DASH (ver Avanzado > Servidor HTTP)"
+
+#~ msgctxt "#30624"
+#~ msgid "Requires Kodi 17+"
+#~ msgstr "Es necesario Kodi 17 o superior"
+
+#~ msgctxt "#30648"
+#~ msgid "API Key is incorrect. Settings - API - API Key"
+#~ msgstr "La clave API es incorrecta. Ajustes > API > API Key"
+
+#~ msgctxt "#30649"
+#~ msgid "Client Id is incorrect. Settings - API - API Id"
+#~ msgstr "La ID de cliente es incorrecta. Ajustes > API > API ID"
+
+#~ msgctxt "#30650"
+#~ msgid "Client Secret is incorrect. Settings - API - API Secret"
+#~ msgstr "La API Secreta es incorrecta. Ajustes > API > API Secret"
+
+#~ msgctxt "#30690"
+#~ msgid "InputStream Adaptive >= 2.0.12 is required for adaptive live streams"
+#~ msgstr "Se requiere InputStream Adaptive >= 2.0.12 para retransmisiones en directo"
+
+#~ msgctxt "#30709"
+#~ msgid "Failed to retrieve Watch Later playlist id. To increase the chances of retrieval add 8-10 videos to Watch Later via the web/app and retry."
+#~ msgstr "No se ha podido recuperar la ID de la lista de reproducción Ver más tarde. Para aumentar las posibilidades de recuperación, agregue 8-10 vídeos a Ver más tarde a través de la web/aplicación y vuelva a intentarlo."
+
+#~ msgctxt "#30710"
+#~ msgid "Failed to retrieve Watch Later playlist id. Try again tomorrow without removing any of the videos."
+#~ msgstr "No se ha podido recuperar la ID de la lista de reproducción Ver más tarde. Inténtalo de nuevo mañana sin quitar ninguno de los vídeos."
+
+#~ msgctxt "#30711"
+#~ msgid "Searching for Watch Later... Page %s"
+#~ msgstr "Buscando para Ver más tarde... Página %s"
+
+#~ msgctxt "#30721"
+#~ msgid "Default to WEBM adaptation set (4K)"
+#~ msgstr "Establecer por defecto WEBM adaptativo (4K)"
+
+#~ msgctxt "#30723"
+#~ msgid "Proxy is required for MPEG-DASH VODs (see Advanced > HTTP Server)[CR]HDR and >1080p video requires InputStream Adaptive >= 2.3.14"
+#~ msgstr "Se necesita proxy para los VODs MPEG-DASH (ver Avanzado > Servidor HTTP)[CR]Los vídeos HDR y >1080p requieren InputStream Adaptive >= 2.3.14"
+
+#~ msgctxt "#30737"
+#~ msgid "Use alternate client details"
+#~ msgstr "Usar detalles de cliente alternativo"
+
+#~ msgctxt "#30738"
+#~ msgid "Alternate #1"
+#~ msgstr "Alternativa #1"
+
+#~ msgctxt "#30739"
+#~ msgid "Alternate #2"
+#~ msgstr "Alternativa #2"
 
 #~ msgctxt "#30666"
 #~ msgid "Removed '%s'"

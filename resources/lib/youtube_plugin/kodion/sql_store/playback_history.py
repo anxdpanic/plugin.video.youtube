@@ -14,7 +14,6 @@ from .storage import Storage, fromtimestamp
 
 class PlaybackHistory(Storage):
     _table_name = 'storage_v2'
-    _table_created = False
     _table_updated = False
     _sql = {}
 

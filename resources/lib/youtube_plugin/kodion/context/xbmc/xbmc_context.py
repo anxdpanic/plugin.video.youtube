@@ -200,6 +200,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard.prompt.settings.defaults': 30783,
         'setup_wizard.prompt.settings.list_details': 30784,
         'setup_wizard.prompt.settings.performance': 30785,
+        'setup_wizard.prompt.settings.refresh': 30817,
         'setup_wizard.prompt.subtitles': 30600,
         'sign.enter_code': 30519,
         'sign.go_to': 30502,
