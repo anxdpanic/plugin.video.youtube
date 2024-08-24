@@ -314,4 +314,4 @@ def wait(timeout=None):
 
 
 def redact_ip(url):
-    return re.sub(r'([?&/])ip([=/])[^?&/]+', '\g<1>ip\g<2><redacted>', url)
+    return re.sub(r'([?&/])ip([=/])[^?&/]+', r'\g<1>ip\g<2><redacted>', url)
