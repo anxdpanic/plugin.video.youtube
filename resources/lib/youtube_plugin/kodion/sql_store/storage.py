@@ -229,7 +229,6 @@ class Storage(object):
             try:
                 db = sqlite3.connect(self._filepath,
                                      check_same_thread=False,
-                                     timeout=1,
                                      isolation_level=None)
                 break
             except (sqlite3.Error, sqlite3.OperationalError) as exc:
@@ -249,8 +248,8 @@ class Storage(object):
             'PRAGMA busy_timeout = 1000;',
             'PRAGMA read_uncommitted = TRUE;',
             'PRAGMA secure_delete = FALSE;',
-            'PRAGMA synchronous = NORMAL;',
-            'PRAGMA locking_mode = NORMAL;'
+            'PRAGMA synchronous = OFF;',
+            'PRAGMA locking_mode = EXCLUSIVE;'
             'PRAGMA temp_store = MEMORY;',
             'PRAGMA mmap_size = 4096000;',
             'PRAGMA page_size = 4096;',
