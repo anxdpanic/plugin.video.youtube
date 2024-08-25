@@ -1636,7 +1636,6 @@ class YouTube(LoginClient):
                     input_wait.release()
                     if kwargs:
                         continue
-                    complete = True
                     break
                 else:
                     complete = True
@@ -1688,6 +1687,7 @@ class YouTube(LoginClient):
                 'threads': threads,
                 'limit': 1,
                 'input_wait': None,
+                'input_wait_for': None,
             }
         payloads.update({
             2: {
@@ -1697,6 +1697,7 @@ class YouTube(LoginClient):
                 'threads': threads,
                 'limit': 1,
                 'input_wait': threading.Lock(),
+                'input_wait_for': 1,
             },
             3: {
                 'worker': _get_feed,
@@ -1705,6 +1706,7 @@ class YouTube(LoginClient):
                 'threads': threads,
                 'limit': None,
                 'input_wait': threading.Lock(),
+                'input_wait_for': 2,
             },
         })
 
@@ -1736,6 +1738,9 @@ class YouTube(LoginClient):
                 if input_wait and input_wait.locked():
                     input_wait.release()
             else:
+                input_wait_for = payload['input_wait_for']
+                if not input_wait_for or input_wait_for not in payloads:
+                    completed.append(pool_id)
                 continue
 
             available = threads['max'] - threads['pool_counts']['all']
