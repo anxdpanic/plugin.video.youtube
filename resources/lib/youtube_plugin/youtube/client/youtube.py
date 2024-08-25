@@ -1644,7 +1644,7 @@ class YouTube(LoginClient):
 
                 try:
                     success, complete = worker(output, **_kwargs)
-                except Exception as exc:
+                except Exception:
                     msg = 'get_my_subscriptions._threaded_fetch - {exc}'
                     self._context.log_error(msg.format(exc=format_exc()))
                     continue
