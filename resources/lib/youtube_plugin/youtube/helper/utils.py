@@ -15,7 +15,7 @@ import time
 from math import log10
 
 from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
-from ...kodion.items import DirectoryItem, menu_items
+from ...kodion.items import AudioItem, DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
     friendly_number,
@@ -431,7 +431,9 @@ def update_video_infos(provider, context, video_id_dict,
 
         media_item = video_id_dict[video_id]
         media_item.set_mediatype(
-            CONTENT.AUDIO_TYPE if audio_only else CONTENT.VIDEO_TYPE
+            CONTENT.AUDIO_TYPE
+            if audio_only or isinstance(media_item, AudioItem) else
+            CONTENT.VIDEO_TYPE
         )
 
         play_data = use_play_data and yt_item.get('play_data')
