@@ -141,7 +141,7 @@ class BaseItem(object):
     def get_date(self, as_text=False, short=False, as_info_label=False):
         if self._date:
             if as_info_label:
-                return datetime_infolabel(self._date)
+                return datetime_infolabel(self._date, '%d.%m.%Y')
             if short:
                 return self._date.date().strftime('%x')
             if as_text:

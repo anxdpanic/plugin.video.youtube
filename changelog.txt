@@ -1,3 +1,9 @@
+## v7.0.9.2
+### Fixed
+- Fix various Kodi 18 listitem setInfo compatibility issues
+- Additional fixes and compatibility shims for playing AudioItems #873
+- Fix early thread loop termination in My Subscriptions #888
+
 ## v7.0.9.1
 ### Fixed
 - Add playlist_type_hint property to workaround issues with CPlayListPlayer::Play #873

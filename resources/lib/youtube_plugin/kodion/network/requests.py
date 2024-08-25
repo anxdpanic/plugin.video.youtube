@@ -41,6 +41,7 @@ class SSLHTTPAdapter(HTTPAdapter):
         self._ssl_context.check_hostname = bool(verify)
         return super(SSLHTTPAdapter, self).cert_verify(conn, url, verify, cert)
 
+
 class BaseRequestsClass(object):
     _session = Session()
     _session.mount('https://', SSLHTTPAdapter(
@@ -50,7 +51,6 @@ class BaseRequestsClass(object):
             total=3,
             backoff_factor=0.1,
             status_forcelist={500, 502, 503, 504},
-            allowed_methods=None,
         )
     ))
     atexit.register(_session.close)
