@@ -113,7 +113,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         else:
             return
 
-        value = item.get_artists_string()
+        value = item.get_artists()
         if value is not None:
             info_labels['artist'] = value
 
@@ -321,12 +321,20 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
 
     resume_time = resume and item.get_start_time()
     duration = item.get_duration()
-    if resume_time and duration:
-        info_tag.setResumePoint(resume_time, float(duration))
-    elif resume_time:
-        info_tag.setResumePoint(resume_time)
-    if info_type == 'video' and duration:
-        info_tag.addVideoStream(xbmc.VideoStreamDetail(duration=duration))
+    if info_type == 'video':
+        if resume_time and duration:
+            info_tag.setResumePoint(resume_time, float(duration))
+        elif resume_time:
+            info_tag.setResumePoint(resume_time)
+        if duration:
+            info_tag.addVideoStream(xbmc.VideoStreamDetail(duration=duration))
+    elif info_type == 'music':
+        # These properties are deprecated but there is no other way to set these
+        # details for a ListItem with a MusicInfoTag
+        if resume_time:
+            properties['ResumeTime'] = str(resume_time)
+        if duration:
+            properties['TotalTime'] = str(duration)
 
     # duration: int
     # As seconds
@@ -346,7 +354,10 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
     value = item.get_play_count()
     if value is not None:
         if set_play_count:
-            info_tag.setPlaycount(value)
+            if info_type == 'video':
+                info_tag.setPlaycount(value)
+            elif info_type == 'music':
+                info_tag.setPlayCount(value)
         properties[PLAY_COUNT] = value
 
     # count: int

@@ -137,9 +137,9 @@ except ImportError:
 
 # Kodi v20+
 if hasattr(xbmcgui.ListItem, 'setDateTime'):
-    def datetime_infolabel(datetime_obj):
+    def datetime_infolabel(datetime_obj, *_args, **_kwargs):
         return datetime_obj.replace(microsecond=0, tzinfo=None).isoformat()
 # Compatibility shims for Kodi v18 and v19
 else:
-    def datetime_infolabel(datetime_obj):
-        return datetime_obj.strftime('%d.%m.%Y')
+    def datetime_infolabel(datetime_obj, str_format='%Y-%m-%d %H:%M:%S'):
+        return datetime_obj.strftime(str_format)

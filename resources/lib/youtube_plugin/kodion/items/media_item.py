@@ -220,7 +220,7 @@ class MediaItem(BaseItem):
             self._mediatype = self._DEFAULT_MEDIATYPE
 
     def get_mediatype(self):
-        return self._mediatype
+        return self._mediatype or self._DEFAULT_MEDIATYPE
 
     def set_plot(self, plot):
         try:
@@ -381,7 +381,7 @@ class MediaItem(BaseItem):
 
 
 class AudioItem(MediaItem):
-    _ALLOWABLE_MEDIATYPES = {'song', 'album', 'artist'}
+    _ALLOWABLE_MEDIATYPES = {CONTENT.AUDIO_TYPE, 'song', 'album', 'artist'}
     _DEFAULT_MEDIATYPE = CONTENT.AUDIO_TYPE
 
     def __init__(self, name, uri, image='DefaultAudio.png', fanart=None):
@@ -396,7 +396,7 @@ class AudioItem(MediaItem):
 
 
 class VideoItem(MediaItem):
-    _ALLOWABLE_MEDIATYPES = {'video',
+    _ALLOWABLE_MEDIATYPES = {CONTENT.VIDEO_TYPE,
                              'movie',
                              'tvshow', 'season', 'episode',
                              'musicvideo'}
