@@ -170,8 +170,8 @@ def _play_playlist(provider, context):
     videos = []
     params = context.get_params()
 
-    player = context.get_video_player()
-    player.stop()
+    playlist_player = context.get_playlist_player()
+    playlist_player.stop()
 
     action = params.get('action')
     playlist_ids = params.get('playlist_ids')
@@ -242,16 +242,15 @@ def _play_playlist(provider, context):
             return videos
 
         # clear the playlist
-        playlist = context.get_video_playlist()
-        playlist.clear()
-        playlist.unshuffle()
+        playlist_player.clear()
+        playlist_player.unshuffle()
 
         # check if we have a video as starting point for the playlist
         video_id = params.get('video_id')
         playlist_position = None if video_id else 0
         # add videos to playlist
         for idx, video in enumerate(videos):
-            playlist.add(video)
+            playlist_player.add(video)
             if playlist_position is None and video.video_id == video_id:
                 playlist_position = idx
 
@@ -264,7 +263,7 @@ def _play_playlist(provider, context):
     if action == 'queue':
         return videos, options
     if context.get_handle() == -1 or action == 'play':
-        player.play(playlist_index=playlist_position)
+        playlist_player.play(playlist_index=playlist_position)
         return False
     return videos[playlist_position], options
 
@@ -292,15 +291,13 @@ def _play_channel_live(provider, context):
     except IndexError:
         return False
 
-    player = context.get_video_player()
-    player.stop()
-
-    playlist = context.get_video_playlist()
-    playlist.clear()
-    playlist.add(video_item)
+    playlist_player = context.get_playlist_player()
+    playlist_player.stop()
+    playlist_player.clear()
+    playlist_player.add(video_item)
 
     if context.get_handle() == -1:
-        player.play(playlist_index=0)
+        playlist_player.play(playlist_index=0)
         return False
     return video_item
 

@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import xbmc, xbmcplugin
+from ...compatibility import xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CHECK_SETTINGS,
@@ -34,7 +34,6 @@ from ...items import (
     playback_item,
     uri_listitem,
 )
-from ...player import XbmcPlaylist
 
 
 class XbmcPlugin(AbstractPlugin):
@@ -73,7 +72,7 @@ class XbmcPlugin(AbstractPlugin):
                     updateListing=True,
                 )
 
-                playlist = XbmcPlaylist('auto', context, retry=3)
+                playlist = context.get_playlist_player()
                 position, remaining = playlist.get_position()
                 items = playlist.get_items()
                 playlist.clear()
@@ -106,7 +105,7 @@ class XbmcPlugin(AbstractPlugin):
                                         'reloading playlist')
 
                     num_items = playlist.add_items(items)
-                    if xbmc.Player().isPlaying():
+                    if playlist.is_playing():
                         return False
                     if position:
                         max_wait_time = min(position, num_items)
@@ -191,7 +190,7 @@ class XbmcPlugin(AbstractPlugin):
                 ui = context.get_ui()
                 if not context.is_plugin_path(uri) and ui.busy_dialog_active():
                     ui.set_property(BUSY_FLAG)
-                    playlist = XbmcPlaylist('auto', context)
+                    playlist = context.get_playlist_player()
                     position, _ = playlist.get_position()
                     items = playlist.get_items()
                     if position and items:

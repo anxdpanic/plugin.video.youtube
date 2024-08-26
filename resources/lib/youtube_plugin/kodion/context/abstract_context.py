@@ -240,16 +240,7 @@ class AbstractContext(object):
             return uuid
         return access_manager
 
-    def get_video_playlist(self):
-        raise NotImplementedError()
-
-    def get_audio_playlist(self):
-        raise NotImplementedError()
-
-    def get_video_player(self):
-        raise NotImplementedError()
-
-    def get_audio_player(self):
+    def get_playlist_player(self):
         raise NotImplementedError()
 
     def get_ui(self):

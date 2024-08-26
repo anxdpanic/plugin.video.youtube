@@ -12,33 +12,37 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 
-from ..abstract_playlist import AbstractPlaylist
+from ..abstract_playlist_player import AbstractPlaylistPlayer
 from ...compatibility import xbmc
 from ...items import VideoItem, media_listitem
 from ...utils.methods import jsonrpc, wait
 
 
-class XbmcPlaylist(AbstractPlaylist):
+class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
     _CACHE = {
-        'playerid': None,
-        'playlistid': None
+        'player_id': None,
+        'playlist_id': None
     }
 
     _PLAYER_PLAYLIST = {
+        0: 'music',
+        1: 'video',
         'video': xbmc.PLAYLIST_VIDEO,  # 1
         'audio': xbmc.PLAYLIST_MUSIC,  # 0
     }
 
     def __init__(self, playlist_type, context, retry=0):
-        super(XbmcPlaylist, self).__init__()
+        super(XbmcPlaylistPlayer, self).__init__()
 
         self._context = context
-        self._playlist = None
-        playlist_type = self._PLAYER_PLAYLIST.get(playlist_type)
-        if playlist_type:
-            self._playlist = xbmc.PlayList(playlist_type)
-        else:
-            self._playlist = xbmc.PlayList(self.get_playlistid(retry=retry))
+
+        playlist_id = self._PLAYER_PLAYLIST.get(playlist_type)
+        if not playlist_type:
+            playlist_id = self.get_playlist_id(retry=retry)
+        self.set_playlist_id(playlist_id)
+
+        self._playlist = xbmc.PlayList(playlist_id)
+        self._player = xbmc.Player()
 
     def clear(self):
         self._playlist.clear()
@@ -57,13 +61,23 @@ class XbmcPlaylist(AbstractPlaylist):
     def size(self):
         return self._playlist.size()
 
-    @classmethod
-    def get_playerid(cls, retry=0):
-        """Function to get active player playerid"""
+    def stop(self):
+        return self._player.stop()
 
-        # We don't need to get playerid every time, cache and reuse instead
-        if cls._CACHE['playerid'] is not None:
-            return cls._CACHE['playerid']
+    def pause(self):
+        return self._player.pause()
+
+    def is_playing(self):
+        return self._player.isPlaying()
+
+    @classmethod
+    def get_player_id(cls, retry=0):
+        """Function to get active player player_id"""
+
+        # We don't need to get player_id every time, cache and reuse instead
+        player_id = cls._CACHE['player_id']
+        if player_id is not None:
+            return player_id
 
         # Sometimes Kodi gets confused and uses a music playlist for video
         # content, so get the first active player instead, default to video
@@ -79,42 +93,55 @@ class XbmcPlaylist(AbstractPlaylist):
                 wait(2)
         else:
             # No active player
-            cls._CACHE['playerid'] = None
+            cls.set_player_id(None)
             return None
 
         for player in result:
             if player.get('type', 'video') in cls._PLAYER_PLAYLIST:
-                playerid = player.get('playerid')
-                if playerid is not None:
-                    playerid = int(playerid)
+                try:
+                    player_id = int(player['playerid'])
+                except (KeyError, TypeError, ValueError):
+                    continue
                 break
         else:
             # No active player
-            cls._CACHE['playerid'] = None
-            return None
+            player_id = None
 
-        cls._CACHE['playerid'] = playerid
-        return playerid
+        cls.set_player_id(player_id)
+        return player_id
 
     @classmethod
-    def get_playlistid(cls, retry=0):
-        """Function to get playlistid of active player"""
+    def set_player_id(cls, player_id):
+        """Function to set player_id for requested player type"""
 
-        # We don't need to get playlistid every time, cache and reuse instead
-        if cls._CACHE['playlistid'] is not None:
-            return cls._CACHE['playlistid']
+        cls._CACHE['player_id'] = player_id
+
+    @classmethod
+    def set_playlist_id(cls, playlist_id):
+        """Function to set playlist_id for requested playlist type"""
+
+        cls._CACHE['playlist_id'] = playlist_id
+
+    @classmethod
+    def get_playlist_id(cls, retry=0):
+        """Function to get playlist_id of active player"""
+
+        # We don't need to get playlist_id every time, cache and reuse instead
+        playlist_id = cls._CACHE['playlist_id']
+        if playlist_id is not None:
+            return playlist_id
 
         result = jsonrpc(method='Player.GetProperties',
-                         params={'playerid': cls.get_playerid(retry=retry),
+                         params={'playerid': cls.get_player_id(retry=retry),
                                  'properties': ['playlistid']})
 
         try:
-            playlistid = int(result['result']['playlistid'])
+            playlist_id = int(result['result']['playlistid'])
         except (KeyError, TypeError, ValueError):
-            playlistid = cls._PLAYER_PLAYLIST['video']
+            playlist_id = cls._PLAYER_PLAYLIST['video']
 
-        cls._CACHE['playlistid'] = playlistid
-        return playlistid
+        cls.set_playlist_id(playlist_id)
+        return playlist_id
 
     def get_items(self, properties=None, dumps=False):
         if properties is None:
@@ -148,7 +175,7 @@ class XbmcPlaylist(AbstractPlaylist):
 
         # jsonrpc(method='Playlist.Add',
         #         params={
-        #             'playlistid': self._playlist.getPlayListId(),
+        #             'playlistid': self._playlist.getPlaylistId(),
         #             'item': items,
         #         },
         #         no_response=True)
@@ -172,7 +199,7 @@ class XbmcPlaylist(AbstractPlaylist):
                           .format(position))
 
         if not resume:
-            xbmc.Player().play(self._playlist, startpos=position - 1)
+            self._player.play(self._playlist, startpos=position - 1)
             return
         # JSON Player.Open can be too slow but is needed if resuming is enabled
         jsonrpc(method='Player.Open',
@@ -182,34 +209,49 @@ class XbmcPlaylist(AbstractPlaylist):
                 options={'resume': True},
                 no_response=True)
 
+    def play(self, playlist_index=-1):
+        """
+        We call the player in this way, because 'Player.play(...)' will call the addon again while the instance is
+        running.  This is somehow shitty, because we couldn't release any resources and in our case we couldn't release
+        the cache. So this is the solution to prevent a locked database (sqlite).
+        """
+        self._context.execute('Playlist.PlayOffset(%s,%d)' % (
+            self._PLAYER_PLAYLIST[self._playlist.getPlayListId()],
+            playlist_index,
+        ))
+
+        """
+        playlist = None
+        if self._player_type == 'video':
+            playlist = xbmc.PlayList(xbmc.PLAYLIST_VIDEO)
+        elif self._player_type == 'music':
+            playlist = xbmc.PlayList(xbmc.PLAYLIST_MUSIC)
+
+        if playlist_index >= 0:
+            xbmc.Player().play(item=playlist, startpos=playlist_index)
+        else:
+            xbmc.Player().play(item=playlist)
+        """
+
     def get_position(self, offset=0):
         """
         Function to get current playlist position and number of remaining
         playlist items, where the first item in the playlist is position 1
         """
 
-        result = (None, None)
-
-        # Use actual playlistid rather than xbmc.PLAYLIST_VIDEO as Kodi
-        # sometimes plays video content in a music playlist
-        playlistid = self._playlist.getPlayListId()
-        if playlistid is None:
-            return result
-
-        playlist = xbmc.PlayList(playlistid)
-        position = playlist.getposition()
+        position = self._playlist.getposition()
         # PlayList().getposition() starts from zero unless playlist not active
         if position < 0:
-            return result
-        playlist_size = playlist.size()
+            return None, None
+        playlist_size = self._playlist.size()
         # Use 1 based index value for playlist position
         position += (offset + 1)
 
         # A playlist with only one element has no next item
         if playlist_size >= 1 and position <= playlist_size:
-            self._context.log_debug('playlistid: {0}, position - {1}/{2}'
-                                    .format(playlistid,
+            self._context.log_debug('playlist_id: {0}, position - {1}/{2}'
+                                    .format(self.get_playlist_id(),
                                             position,
                                             playlist_size))
-            result = (position, (playlist_size - position))
-        return result
+            return position, (playlist_size - position)
+        return None, None

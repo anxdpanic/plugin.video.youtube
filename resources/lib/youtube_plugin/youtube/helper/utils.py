@@ -1020,13 +1020,13 @@ def get_shelf_index_by_title(context, json_data, shelf_title):
 
 
 def add_related_video_to_playlist(provider, context, client, v3, video_id):
-    playlist = context.get_video_playlist()
+    playlist_player = context.get_playlist_player()
 
-    if playlist.size() <= 999:
+    if playlist_player.size() <= 999:
         a = 0
         add_item = None
         page_token = ''
-        playlist_items = playlist.get_items()
+        playlist_items = playlist_player.get_items()
 
         while not add_item and a <= 2:
             a += 1
@@ -1056,7 +1056,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                 continue
 
             if add_item:
-                playlist.add(add_item)
+                playlist_player.add(add_item)
                 break
 
             if not page_token:
