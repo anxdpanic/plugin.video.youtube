@@ -18,9 +18,12 @@ from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
 from ...kodion.compatibility import urlencode, urlunsplit
 from ...kodion.constants import (
+    BUSY_FLAG,
     PATHS,
     PLAYBACK_INIT,
     PLAYER_DATA,
+    PLAYLIST_PATH,
+    PLAYLIST_POSITION,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
@@ -340,10 +343,25 @@ def process(provider, context, **_kwargs):
         if force_play:
             context.execute('Action(Play)')
             return False
+
+        ui.set_property(BUSY_FLAG)
+        playlist_player = context.get_playlist_player()
+        position, _ = playlist_player.get_position()
+        items = playlist_player.get_items()
+
         ui.clear_property(SERVER_POST_START)
         context.wakeup(SERVER_WAKEUP, timeout=5)
         media_item = _play_stream(provider, context)
         ui.set_property(SERVER_POST_START)
+
+        if media_item:
+            if position and items:
+                ui.set_property(PLAYLIST_PATH,
+                                items[position - 1]['file'])
+                ui.set_property(PLAYLIST_POSITION, str(position))
+        else:
+            ui.clear_property(BUSY_FLAG)
+
         return media_item
 
     if playlist_id or 'playlist_ids' in params:

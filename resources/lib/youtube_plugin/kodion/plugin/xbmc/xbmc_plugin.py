@@ -64,64 +64,75 @@ class XbmcPlugin(AbstractPlugin):
         self.handle = context.get_handle()
         ui = context.get_ui()
 
-        if ui.pop_property(BUSY_FLAG).lower() == 'true':
-            if ui.busy_dialog_active():
-                xbmcplugin.endOfDirectory(
-                    self.handle,
-                    succeeded=False,
-                    updateListing=True,
-                )
+        for was_busy in (ui.pop_property(BUSY_FLAG),):
+            if was_busy:
+                if ui.busy_dialog_active():
+                    ui.set_property(BUSY_FLAG)
+            else:
+                break
 
-                playlist = context.get_playlist_player()
-                position, remaining = playlist.get_position()
-                items = playlist.get_items()
-                playlist.clear()
+            xbmcplugin.endOfDirectory(
+                self.handle,
+                succeeded=False,
+            )
 
+            playlist_player = context.get_playlist_player()
+
+            items = playlist_player.get_items()
+            if not items and not playlist_player.is_playing():
                 context.log_warning('Multiple busy dialogs active - '
-                                    'playlist cleared to avoid Kodi crash')
+                                    'plugin call stopped to avoid Kodi crash')
+                break
 
-                if position and items:
-                    path = items[position - 1]['file']
-                    old_path = ui.pop_property(PLAYLIST_PATH)
-                    old_position = ui.pop_property(PLAYLIST_POSITION)
-                    if (old_position and position == int(old_position)
-                            and old_path and path == old_path):
-                        if remaining:
-                            position += 1
-                        else:
-                            items = None
+            playlist_player.clear()
+            context.log_warning('Multiple busy dialogs active - '
+                                'playlist cleared to avoid Kodi crash')
 
-                if items:
-                    max_wait_time = 30
-                    while ui.busy_dialog_active():
-                        max_wait_time -= 1
-                        if max_wait_time < 0:
-                            context.log_error('Multiple busy dialogs active - '
-                                              'extended busy period')
-                            break
-                        context.sleep(1)
-
-                    context.log_warning('Multiple busy dialogs active - '
-                                        'reloading playlist')
-
-                    num_items = playlist.add_items(items)
-                    if playlist.is_playing():
+            position, remaining = playlist_player.get_position()
+            if position:
+                path = items[position - 1]['file']
+                old_path = ui.pop_property(PLAYLIST_PATH)
+                old_position = ui.pop_property(PLAYLIST_POSITION)
+                if (old_position and position == int(old_position)
+                        and old_path and path == old_path):
+                    if remaining:
+                        position += 1
+                    else:
                         return False
-                    if position:
-                        max_wait_time = min(position, num_items)
-                    else:
-                        position = 1
-                        max_wait_time = num_items
-                    while ui.busy_dialog_active() or playlist.size() < position:
-                        max_wait_time -= 1
-                        if max_wait_time < 0:
-                            context.log_error('Multiple busy dialogs active - '
-                                              'unable to restart playback')
-                            break
-                        context.sleep(1)
-                    else:
-                        playlist.play_playlist_item(position)
+
+            max_wait_time = 30
+            while ui.busy_dialog_active():
+                max_wait_time -= 1
+                if max_wait_time < 0:
+                    context.log_error('Multiple busy dialogs active - '
+                                      'extended busy period')
+                    break
+                context.sleep(1)
+
+            context.log_warning('Multiple busy dialogs active - '
+                                'reloading playlist')
+
+            num_items = playlist_player.add_items(items)
+            if playlist_player.is_playing():
                 return False
+
+            if position:
+                max_wait_time = min(position, num_items)
+            else:
+                position = 1
+                max_wait_time = num_items
+
+            while ui.busy_dialog_active() or playlist_player.size() < position:
+                max_wait_time -= 1
+                if max_wait_time < 0:
+                    context.log_error('Multiple busy dialogs active - '
+                                      'unable to restart playback')
+                    break
+                context.sleep(1)
+            else:
+                playlist_player.play_playlist_item(position)
+        else:
+            return False
 
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
@@ -187,17 +198,6 @@ class XbmcPlugin(AbstractPlugin):
             uri = result.get_uri()
 
             if result.playable:
-                ui = context.get_ui()
-                if not context.is_plugin_path(uri) and ui.busy_dialog_active():
-                    ui.set_property(BUSY_FLAG)
-                    playlist = context.get_playlist_player()
-                    position, _ = playlist.get_position()
-                    items = playlist.get_items()
-                    if position and items:
-                        ui.set_property(PLAYLIST_PATH,
-                                        items[position - 1]['file'])
-                        ui.set_property(PLAYLIST_POSITION, str(position))
-
                 item = self._PLAY_ITEM_MAP[result.__class__.__name__](
                     context,
                     result,
