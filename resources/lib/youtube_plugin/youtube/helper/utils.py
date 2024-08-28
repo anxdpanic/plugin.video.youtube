@@ -432,7 +432,7 @@ def update_video_infos(provider, context, video_id_dict,
         media_item = video_id_dict[video_id]
         media_item.set_mediatype(
             CONTENT.AUDIO_TYPE
-            if audio_only or isinstance(media_item, AudioItem) else
+            if isinstance(media_item, AudioItem) else
             CONTENT.VIDEO_TYPE
         )
 

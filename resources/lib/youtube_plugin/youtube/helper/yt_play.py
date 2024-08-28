@@ -62,10 +62,11 @@ def _play_stream(provider, context):
         ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
             ask_for_quality = True
-
-        audio_only = settings.audio_only()
-        if ui.pop_property(PLAY_FORCE_AUDIO):
-            audio_only = True
+            audio_only = False
+        else:
+            audio_only = settings.audio_only()
+            if ui.pop_property(PLAY_FORCE_AUDIO):
+                audio_only = True
 
         try:
             streams = client.get_streams(context,
