@@ -855,12 +855,16 @@ def update_play_info(provider, context, video_id, media_item, video_stream,
         media_item.set_headers(video_stream['headers'])
 
     # set _uses_isa
-    if media_item.live:
-        media_item.set_isa(settings.use_isa_live_streams())
-    elif media_item.use_hls() or media_item.use_mpd():
-        media_item.set_isa(settings.use_isa())
+    if media_item.use_hls() or media_item.use_mpd():
+        if media_item.live:
+            use_isa = settings.use_isa_live_streams()
+        else:
+            use_isa = settings.use_isa()
+    else:
+        use_isa = False
+    media_item.set_isa(use_isa)
 
-    if media_item.use_isa():
+    if use_isa:
         license_info = video_stream.get('license_info', {})
         license_proxy = license_info.get('proxy', '')
         license_url = license_info.get('url', '')
