@@ -17,6 +17,9 @@ from ...compatibility import xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CHECK_SETTINGS,
+    CONTAINER_FOCUS,
+    CONTAINER_ID,
+    CONTAINER_POSITION,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -246,4 +249,8 @@ class XbmcPlugin(AbstractPlugin):
             updateListing=update_listing,
             cacheToDisc=cache_to_disc,
         )
+        container = ui.pop_property(CONTAINER_ID)
+        position = ui.pop_property(CONTAINER_POSITION)
+        if container and position:
+            context.send_notification(CONTAINER_FOCUS, [container, position])
         return succeeded

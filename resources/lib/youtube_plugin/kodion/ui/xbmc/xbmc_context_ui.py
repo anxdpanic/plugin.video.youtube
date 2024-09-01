@@ -218,16 +218,20 @@ class XbmcContextUI(AbstractContextUI):
             '[CR]' * cr_after,
         ))
 
-    def set_focus_next_item(self):
-        list_id = xbmcgui.Window(xbmcgui.getCurrentWindowId()).getFocusId()
+    @staticmethod
+    def set_focus_next_item():
+        container = xbmc.getInfoLabel('System.CurrentControlId')
+        position = xbmc.getInfoLabel('Container.CurrentItem')
         try:
-            position = xbmc.getInfoLabel('Container.Position')
-            next_position = int(position) + 1
-            self._context.execute('SetFocus({list_id},{position})'.format(
-                list_id=list_id, position=next_position
-            ))
+            position = int(position) + 1
         except ValueError:
-            pass
+            return
+        xbmc.executebuiltin(
+            'SetFocus({container},{position},absolute)'.format(
+                container=container,
+                position=position
+            )
+        )
 
     @staticmethod
     def busy_dialog_active():
