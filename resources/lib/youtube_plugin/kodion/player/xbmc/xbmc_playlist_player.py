@@ -67,6 +67,9 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
     def pause(self):
         return self._player.pause()
 
+    def play_item(self, *args, **kwargs):
+        return self._player.play(*args, **kwargs)
+
     def is_playing(self):
         return self._player.isPlaying()
 

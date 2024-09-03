@@ -67,10 +67,13 @@ class XbmcPlugin(AbstractPlugin):
         self.handle = context.get_handle()
         ui = context.get_ui()
 
+        route = ui.pop_property(REROUTE_PATH)
         for was_busy in (ui.pop_property(BUSY_FLAG),):
             if was_busy:
                 if ui.busy_dialog_active():
                     ui.set_property(BUSY_FLAG)
+                if route:
+                    break
             else:
                 break
 
@@ -158,7 +161,6 @@ class XbmcPlugin(AbstractPlugin):
             provider.run_wizard(context)
 
         try:
-            route = ui.pop_property(REROUTE_PATH)
             if route:
                 function_cache = context.get_function_cache()
                 result, options = function_cache.run(
@@ -206,10 +208,16 @@ class XbmcPlugin(AbstractPlugin):
                     result,
                     show_fanart=context.get_settings().fanart_selection(),
                 )
-                result = True
-                xbmcplugin.setResolvedUrl(self.handle,
-                                          succeeded=result,
-                                          listitem=item)
+                result = xbmcplugin.addDirectoryItem(self.handle,
+                                                     url=uri,
+                                                     listitem=item)
+                if route:
+                    playlist_player = context.get_playlist_player()
+                    playlist_player.play_item(item=uri, listitem=item)
+                else:
+                    xbmcplugin.setResolvedUrl(self.handle,
+                                              succeeded=result,
+                                              listitem=item)
 
             elif uri.startswith('script://'):
                 uri = uri[len('script://'):]
