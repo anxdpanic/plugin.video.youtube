@@ -269,9 +269,9 @@ class AbstractProvider(object):
         except Exception as exc:
             context.log_error('Rerouting error: |{0}|'.format(exc))
         finally:
-            context.log_debug('Rerouting to |{path}| |{params}|{status}'
-                              .format(path=path,
-                                      params=params,
+            uri = context.create_uri(path, params)
+            context.log_debug('Rerouting to |{uri}|{status}'
+                              .format(uri=uri,
                                       status='' if result else ' failed'))
             if not result:
                 return False
@@ -284,7 +284,7 @@ class AbstractProvider(object):
 
             context.execute(''.join((
                 'ActivateWindow(Videos, ',
-                context.create_uri(path, params),
+                uri,
                 ', return)' if window_return else ')',
             )))
         return True

@@ -52,6 +52,7 @@ def _play_stream(provider, context):
     incognito = params.get('incognito', False)
     screensaver = params.get('screensaver', False)
 
+    audio_only = False
     is_external = ui.get_property(PLAY_WITH)
     if ((is_external and settings.alternative_player_web_urls())
             or settings.default_player_web_urls()):
@@ -62,11 +63,10 @@ def _play_stream(provider, context):
         ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
             ask_for_quality = True
-            audio_only = False
+        elif ui.pop_property(PLAY_FORCE_AUDIO):
+            audio_only = True
         else:
             audio_only = settings.audio_only()
-            if ui.pop_property(PLAY_FORCE_AUDIO):
-                audio_only = True
 
         try:
             streams = client.get_streams(context,
@@ -312,8 +312,9 @@ def process(provider, context, **_kwargs):
     params = context.get_params()
     param_keys = params.keys()
 
-    if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}
-            .isdisjoint(param_keys)):
+    if {'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}.isdisjoint(
+            param_keys
+    ):
         listitem_path = context.get_listitem_info('FileNameAndPath')
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
