@@ -1,3 +1,18 @@
+## v7.1.0+beta.1
+###
+- Fix logging/retry of sqlite3.OperationalError
+- Fix trying to use ISA for progressive live streams
+- Retain list position when refreshing listings
+- Add workarounds for trying to play videos using RunPlugin rather PlayMedia
+
+### Changed
+- Update multiple busy dialog crash workaround #891
+- Use all playable codecs but deprioritise if not selected in stream features
+- Change default live stream type to suit ISA and Youtube stream availability
+
+### New
+- Allow ask for quality from context menu to override audio only setting
+
 ## v7.0.9.2
 ### Fixed
 - Fix various Kodi 18 listitem setInfo compatibility issues
