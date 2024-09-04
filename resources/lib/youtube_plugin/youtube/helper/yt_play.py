@@ -346,6 +346,12 @@ def process(provider, context, **_kwargs):
             context.execute('Action(Play)')
             return False
 
+        if context.get_handle() == -1:
+            context.execute('PlayMedia({0})'.format(
+                context.create_uri(('play',), params)
+            ))
+            return False
+
         ui.set_property(BUSY_FLAG)
         playlist_player = context.get_playlist_player()
         position, _ = playlist_player.get_position()
