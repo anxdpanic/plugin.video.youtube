@@ -9,8 +9,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc.xbmc_player import XbmcPlayer
-from .xbmc.xbmc_playlist import XbmcPlaylist
+from .xbmc.xbmc_playlist_player import XbmcPlaylistPlayer
 
 
-__all__ = ('XbmcPlayer', 'XbmcPlaylist',)
+__all__ = ('XbmcPlaylistPlayer',)

@@ -16,6 +16,7 @@ from ..compatibility import xbmc, xbmcgui
 from ..constants import (
     ADDON_ID,
     CHECK_SETTINGS,
+    CONTAINER_FOCUS,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
@@ -88,7 +89,7 @@ class ServiceMonitor(xbmc.Monitor):
             return
         group, separator, event = method.partition('.')
         if event == CHECK_SETTINGS:
-            if not isinstance(data, dict):
+            if data:
                 data = json.loads(data)
             if data == 'defer':
                 self._settings_state = data
@@ -113,6 +114,12 @@ class ServiceMonitor(xbmc.Monitor):
                 self.set_property(WAKEUP, target)
         elif event == REFRESH_CONTAINER:
             self.refresh_container()
+        elif event == CONTAINER_FOCUS:
+            if data:
+                data = json.loads(data)
+            if not data or not self.is_plugin_container(check_all=True):
+                return
+            xbmc.executebuiltin('SetFocus({0},{1},absolute)'.format(*data))
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()
