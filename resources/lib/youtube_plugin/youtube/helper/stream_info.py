@@ -1805,8 +1805,9 @@ class StreamInfo(YouTubeRequestClient):
                     codec = 'vp9'
                 elif codec.startswith('dts'):
                     codec = 'dts'
-            if codec not in stream_features or codec not in isa_capabilities:
+            if codec not in isa_capabilities:
                 continue
+            preferred_codec = codec in stream_features
             media_type, container = mime_type.split('/')
             bitrate = stream.get('bitrate', 0)
 
@@ -1958,6 +1959,7 @@ class StreamInfo(YouTubeRequestClient):
                 'container': container,
                 'codecs': codecs,
                 'codec': codec,
+                'preferred_codec': preferred_codec,
                 'id': itag,
                 'width': width,
                 'height': height,
@@ -1995,11 +1997,13 @@ class StreamInfo(YouTubeRequestClient):
                 return (1,)
 
             return (
+                - stream['preferred_codec'],
                 - stream['height'],
                 - stream['fps'],
                 - stream['hdr'],
                 - stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
+                - stream['preferred_codec'],
                 - stream['channels'],
                 - stream['biasedBitrate'],
             )

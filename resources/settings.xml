@@ -688,7 +688,7 @@
                 </setting>
                 <setting id="kodion.live_stream.selection.1" type="integer" label="30689" help="30690">
                     <level>0</level>
-                    <default>3</default>  <!-- isa_mpd -->
+                    <default>2</default>  <!-- isa_hls -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts -->
@@ -706,7 +706,7 @@
                 </setting>
                 <setting id="kodion.live_stream.selection.2" type="integer" label="30689" help="">
                     <level>0</level>
-                    <default>0</default>  <!-- mpegts -->
+                    <default>1</default>  <!-- hls -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts -->

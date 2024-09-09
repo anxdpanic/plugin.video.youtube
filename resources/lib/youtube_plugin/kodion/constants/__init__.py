@@ -70,6 +70,9 @@ PLAY_TIMESHIFT = 'timeshift'
 PLAY_WITH = 'play_with'
 
 # Stored data
+CONTAINER_ID = 'container_id'
+CONTAINER_FOCUS = 'container_focus'
+CONTAINER_POSITION = 'container_position'
 CONTENT_TYPE = 'content_type'
 DEVELOPER_CONFIGS = 'configs'
 LICENSE_TOKEN = 'license_token'
@@ -127,6 +130,9 @@ __all__ = (
     'PLAY_WITH',
 
     # Stored data
+    'CONTAINER_ID',
+    'CONTAINER_FOCUS',
+    'CONTAINER_POSITION',
     'CONTENT_TYPE',
     'DEVELOPER_CONFIGS',
     'LICENSE_TOKEN',

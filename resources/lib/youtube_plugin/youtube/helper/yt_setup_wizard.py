@@ -321,9 +321,9 @@ def process_default_settings(context, step, steps, **_kwargs):
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.set_subtitle_download(False)
         if current_system_version.compatible(21, 0):
-            settings.live_stream_type(3)
-        else:
             settings.live_stream_type(2)
+        else:
+            settings.live_stream_type(1)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
             settings.default_player_web_urls(False)
         if settings.cache_size() < 20:

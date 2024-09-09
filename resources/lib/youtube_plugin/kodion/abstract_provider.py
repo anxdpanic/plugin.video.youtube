@@ -12,7 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 import re
 
-from .constants import CHECK_SETTINGS, CONTENT, PATHS, REROUTE_PATH
+from .constants import (
+    CHECK_SETTINGS,
+    CONTAINER_ID,
+    CONTAINER_POSITION,
+    CONTENT,
+    PATHS,
+    REROUTE_PATH,
+)
 from .exceptions import KodionException
 from .items import (
     DirectoryItem,
@@ -235,10 +242,20 @@ class AbstractProvider(object):
 
         if not path:
             return False
+
+        do_refresh = 'refresh' in params
+
         if path == current_path and params == current_params:
-            if 'refresh' not in params:
+            if not do_refresh:
                 return False
             params['refresh'] += 1
+
+        if do_refresh:
+            container = context.get_infolabel('System.CurrentControlId')
+            position = context.get_infolabel('Container.CurrentItem')
+        else:
+            container = None
+            position = None
 
         result = None
         function_cache = context.get_function_cache()
@@ -253,16 +270,22 @@ class AbstractProvider(object):
         except Exception as exc:
             context.log_error('Rerouting error: |{0}|'.format(exc))
         finally:
-            context.log_debug('Rerouting to |{path}| |{params}|{status}'
-                              .format(path=path,
-                                      params=params,
+            uri = context.create_uri(path, params)
+            context.log_debug('Rerouting to |{uri}|{status}'
+                              .format(uri=uri,
                                       status='' if result else ' failed'))
             if not result:
                 return False
-            context.get_ui().set_property(REROUTE_PATH, path)
+
+            ui = context.get_ui()
+            ui.set_property(REROUTE_PATH, path)
+            if container and position:
+                ui.set_property(CONTAINER_ID, container)
+                ui.set_property(CONTAINER_POSITION, position)
+
             context.execute(''.join((
                 'ActivateWindow(Videos, ',
-                context.create_uri(path, params),
+                uri,
                 ', return)' if window_return else ')',
             )))
         return True

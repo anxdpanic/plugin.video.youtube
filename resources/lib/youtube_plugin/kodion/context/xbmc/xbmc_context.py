@@ -32,7 +32,7 @@ from ...constants import (
     SORT,
     WAKEUP,
 )
-from ...player import XbmcPlayer, XbmcPlaylist
+from ...player import XbmcPlaylistPlayer
 from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
 from ...utils import (
@@ -320,10 +320,7 @@ class XbmcContext(AbstractContext):
         self._version = self._addon.getAddonInfo('version')
 
         self._ui = None
-        self._video_playlist = None
-        self._audio_playlist = None
-        self._video_player = None
-        self._audio_player = None
+        self._playlist = None
 
         atexit.register(self.tear_down)
 
@@ -426,25 +423,12 @@ class XbmcContext(AbstractContext):
             sub_language = None
         return sub_language
 
-    def get_video_playlist(self):
-        if not self._video_playlist:
-            self._video_playlist = XbmcPlaylist('video', proxy(self))
-        return self._video_playlist
-
-    def get_audio_playlist(self):
-        if not self._audio_playlist:
-            self._audio_playlist = XbmcPlaylist('audio', proxy(self))
-        return self._audio_playlist
-
-    def get_video_player(self):
-        if not self._video_player:
-            self._video_player = XbmcPlayer('video', proxy(self))
-        return self._video_player
-
-    def get_audio_player(self):
-        if not self._audio_player:
-            self._audio_player = XbmcPlayer('audio', proxy(self))
-        return self._audio_player
+    def get_playlist_player(self, playlist_type=None):
+        if not self._playlist or playlist_type:
+            self._playlist = XbmcPlaylistPlayer(playlist_type,
+                                                proxy(self),
+                                                retry=3)
+        return self._playlist
 
     def get_ui(self):
         if not self._ui:
@@ -594,10 +578,7 @@ class XbmcContext(AbstractContext):
         new_context._watch_later_list = self._watch_later_list
 
         new_context._ui = self._ui
-        new_context._video_playlist = self._video_playlist
-        new_context._audio_playlist = self._audio_playlist
-        new_context._video_player = self._video_player
-        new_context._audio_player = self._audio_player
+        new_context._playlist = self._playlist
 
         return new_context
 
@@ -762,10 +743,7 @@ class XbmcContext(AbstractContext):
 
         attrs = (
             '_ui',
-            '_video_playlist',
-            '_audio_playlist',
-            '_video_player',
-            '_audio_player',
+            '_playlist',
         )
         for attr in attrs:
             try:

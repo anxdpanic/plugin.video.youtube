@@ -9,7 +9,7 @@
 """
 
 
-class AbstractPlaylist(object):
+class AbstractPlaylistPlayer(object):
     def __init__(self):
         pass
 
