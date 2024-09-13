@@ -425,9 +425,7 @@ class XbmcContext(AbstractContext):
 
     def get_playlist_player(self, playlist_type=None):
         if not self._playlist or playlist_type:
-            self._playlist = XbmcPlaylistPlayer(playlist_type,
-                                                proxy(self),
-                                                retry=3)
+            self._playlist = XbmcPlaylistPlayer(proxy(self), playlist_type)
         return self._playlist
 
     def get_ui(self):

@@ -31,18 +31,26 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         'audio': xbmc.PLAYLIST_MUSIC,  # 0
     }
 
-    def __init__(self, playlist_type, context, retry=0):
+    def __init__(self, context, playlist_type=None, retry=None):
         super(XbmcPlaylistPlayer, self).__init__()
 
         self._context = context
 
-        playlist_id = self._PLAYER_PLAYLIST.get(playlist_type)
-        if not playlist_type:
+        player = xbmc.Player()
+        if retry is None:
+            retry = 3 if player.isPlaying() else 0
+
+        if playlist_type is None:
             playlist_id = self.get_playlist_id(retry=retry)
+        else:
+            playlist_id = (
+                    self._PLAYER_PLAYLIST.get(playlist_type)
+                    or self._PLAYER_PLAYLIST['video']
+            )
         self.set_playlist_id(playlist_id)
 
         self._playlist = xbmc.PlayList(playlist_id)
-        self._player = xbmc.Player()
+        self._player = player
 
     def clear(self):
         self._playlist.clear()
