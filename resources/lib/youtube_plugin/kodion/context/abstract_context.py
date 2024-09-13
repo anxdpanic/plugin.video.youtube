@@ -65,6 +65,7 @@ class AbstractContext(object):
     }
     _INT_PARAMS = {
         'fanart_type',
+        'items_per_page',
         'live',
         'next_page_token',
         'offset',

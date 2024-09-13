@@ -127,8 +127,8 @@ class YouTube(LoginClient):
 
         super(YouTube, self).__init__(context=context, **kwargs)
 
-    def get_max_results(self):
-        return self._max_results
+    def max_results(self):
+        return self._context.get_param('items_per_page') or self._max_results
 
     def get_language(self):
         return self._language
@@ -348,7 +348,7 @@ class YouTube(LoginClient):
         :return:
         """
         params = {'part': 'snippet',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'order': order}
         if channel_id == 'mine':
             params['mine'] = 'true'
@@ -364,7 +364,7 @@ class YouTube(LoginClient):
 
     def get_guide_category(self, guide_category_id, page_token='', **kwargs):
         params = {'part': 'snippet,contentDetails,brandingSettings',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'categoryId': guide_category_id,
                   'regionCode': self._region,
                   'hl': self._language}
@@ -377,7 +377,7 @@ class YouTube(LoginClient):
 
     def get_guide_categories(self, page_token='', **kwargs):
         params = {'part': 'snippet',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'regionCode': self._region,
                   'hl': self._language}
         if page_token:
@@ -390,7 +390,7 @@ class YouTube(LoginClient):
 
     def get_trending_videos(self, page_token='', **kwargs):
         params = {'part': 'snippet,status',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'regionCode': self._region,
                   'hl': self._language,
                   'chart': 'mostPopular'}
@@ -403,7 +403,7 @@ class YouTube(LoginClient):
 
     def get_video_category(self, video_category_id, page_token='', **kwargs):
         params = {'part': 'snippet,contentDetails,status',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'videoCategoryId': video_category_id,
                   'chart': 'mostPopular',
                   'regionCode': self._region,
@@ -417,7 +417,7 @@ class YouTube(LoginClient):
 
     def get_video_categories(self, page_token='', **kwargs):
         params = {'part': 'snippet',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'regionCode': self._region,
                   'hl': self._language}
         if page_token:
@@ -604,7 +604,7 @@ class YouTube(LoginClient):
         # Increase value to recursively retrieve recommendations for the first
         # recommended video, up to the set maximum recursion depth
         max_depth = 2
-        items_per_page = self._max_results
+        items_per_page = self.max_results()
         diversity_limits = items_per_page // (num_items * max_depth)
         items = [[] for _ in range(max_depth * len(video_ids))]
         counts = {
@@ -811,7 +811,7 @@ class YouTube(LoginClient):
 
     def get_activities(self, channel_id, page_token='', **kwargs):
         params = {'part': 'snippet,contentDetails',
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'regionCode': self._region,
                   'hl': self._language}
 
@@ -844,7 +844,7 @@ class YouTube(LoginClient):
 
     def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
         params = {'part': 'snippet',
-                  'maxResults': str(self._max_results)}
+                  'maxResults': str(self.max_results())}
         if channel_id != 'mine':
             params['channelId'] = channel_id
         else:
@@ -864,7 +864,7 @@ class YouTube(LoginClient):
         json_data = self.get_playlist_items(
             playlist_id=playlist_id,
             page_token=page_token,
-            max_results=50,
+            max_results=self.max_results(),
         )
         if not json_data:
             return None
@@ -890,7 +890,7 @@ class YouTube(LoginClient):
                            **kwargs):
         # prepare params
         if max_results is None:
-            max_results = self._max_results
+            max_results = self.max_results()
         params = {'part': 'snippet',
                   'maxResults': str(max_results),
                   'playlistId': playlist_id}
@@ -954,7 +954,7 @@ class YouTube(LoginClient):
         # prepare params
         params = {'part': 'snippet,status',
                   'myRating': 'dislike',
-                  'maxResults': str(self._max_results)}
+                  'maxResults': str(self.max_results())}
         if page_token:
             params['pageToken'] = page_token
 
@@ -1022,7 +1022,7 @@ class YouTube(LoginClient):
                   'regionCode': self._region,
                   'hl': self._language,
                   'relevanceLanguage': self._language,
-                  'maxResults': str(self._max_results)}
+                  'maxResults': str(self.max_results())}
 
         if location:
             settings = self._context.get_settings()
@@ -1049,7 +1049,7 @@ class YouTube(LoginClient):
                            offset=0,
                            retry=0,
                            **kwargs):
-        max_results = self._max_results if max_results <= 0 else max_results
+        max_results = self.max_results() if max_results <= 0 else max_results
 
         post_data = {'videoId': video_id}
         if page_token:
@@ -1248,7 +1248,7 @@ class YouTube(LoginClient):
                             page_token='',
                             max_results=0,
                             **kwargs):
-        max_results = self._max_results if max_results <= 0 else max_results
+        max_results = self.max_results() if max_results <= 0 else max_results
 
         # prepare params
         params = {'part': 'snippet',
@@ -1270,7 +1270,7 @@ class YouTube(LoginClient):
                            page_token='',
                            max_results=0,
                            **kwargs):
-        max_results = self._max_results if max_results <= 0 else max_results
+        max_results = self.max_results() if max_results <= 0 else max_results
 
         # prepare params
         params = {'part': 'snippet',
@@ -1293,7 +1293,7 @@ class YouTube(LoginClient):
 
         params = {'part': 'snippet',
                   'hl': self._language,
-                  'maxResults': str(self._max_results),
+                  'maxResults': str(self.max_results()),
                   'type': 'video',
                   'safeSearch': 'none',
                   'order': 'date'}
@@ -1355,7 +1355,7 @@ class YouTube(LoginClient):
                   'regionCode': self._region,
                   'hl': self._language,
                   'relevanceLanguage': self._language,
-                  'maxResults': str(self._max_results)}
+                  'maxResults': str(self.max_results())}
 
         if event_type and event_type in {'live', 'upcoming', 'completed'}:
             params['eventType'] = event_type
@@ -1405,7 +1405,7 @@ class YouTube(LoginClient):
             'items': [],
             'pageInfo': {
                 'totalResults': 0,
-                'resultsPerPage': self._max_results,
+                'resultsPerPage': self.max_results(),
             },
         }
 
@@ -1430,8 +1430,8 @@ class YouTube(LoginClient):
         page = page_token or 1
         totals = {
             'num': 0,
-            'start': -self._max_results,
-            'end': page * self._max_results,
+            'start': -self.max_results(),
+            'end': page * self.max_results(),
             'video_ids': set(),
         }
         totals['start'] += totals['end']
@@ -1837,7 +1837,7 @@ class YouTube(LoginClient):
             if not _result:
                 _result = {'items': []}
 
-            _new_offset = self._max_results - len(_result['items']) + _offset
+            _new_offset = self.max_results() - len(_result['items']) + _offset
             if _offset > 0:
                 _items = _items[_offset:]
             _result['offset'] = _new_offset
@@ -1867,23 +1867,23 @@ class YouTube(LoginClient):
             _continuations = (_data.get('continuations', [{}])[0]
                               .get('nextContinuationData', {})
                               .get('continuation', ''))
-            if _continuations and len(_result['items']) <= self._max_results:
+            if _continuations and len(_result['items']) <= self.max_results():
                 _result['next_page_token'] = _continuations
 
-                if len(_result['items']) < self._max_results:
+                if len(_result['items']) < self.max_results():
                     _result = _perform(_playlist_idx=playlist_index,
                                        _page_token=_continuations,
                                        _offset=0,
                                        _result=_result)
 
             # trim result
-            if len(_result['items']) > self._max_results:
+            if len(_result['items']) > self.max_results():
                 _items = _result['items']
-                _items = _items[:self._max_results]
+                _items = _items[:self.max_results()]
                 _result['items'] = _items
                 _result['continue'] = True
 
-            if len(_result['items']) < self._max_results:
+            if len(_result['items']) < self.max_results():
                 if 'continue' in _result:
                     del _result['continue']
 
