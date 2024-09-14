@@ -352,6 +352,10 @@ class YouTubeRequestClient(BaseRequestsClass):
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
         client['_name'] = client_name
 
+        for values, template_id, template in templates.values():
+            if template_id in values:
+                values[template_id] = template.format(**client)
+
         try:
             params = client['params']
             if client.get('_access_token'):
@@ -372,9 +376,5 @@ class YouTubeRequestClient(BaseRequestsClass):
                     client['params'] = params
         except KeyError:
             pass
-
-        for values, template_id, template in templates.values():
-            if template_id in values:
-                values[template_id] = template.format(**client)
 
         return client

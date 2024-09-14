@@ -412,8 +412,13 @@ class AbstractSettings(object):
         'vod': True,
     }
 
-    def item_filter(self, update=None):
-        types = dict.fromkeys(self.get_string_list(SETTINGS.HIDE_VIDEOS), False)
+    def item_filter(self, update=None, override=None):
+        types = dict.fromkeys(
+            self.get_string_list(SETTINGS.HIDE_VIDEOS)
+            if override is None else
+            override,
+            False
+        )
         types = dict(self._DEFAULT_FILTER, **types)
         if update:
             if 'live_folder' in update:

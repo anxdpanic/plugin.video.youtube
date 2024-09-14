@@ -219,7 +219,14 @@ class AbstractProvider(object):
         else:
             page_token = ''
         params = dict(params, page=page, page_token=page_token)
-        return provider.reroute(context=context, path=path, params=params)
+
+        if (not context.get_infobool('System.HasActiveModalDialog')
+                and context.is_plugin_path(
+                    context.get_infolabel('Container.FolderPath'),
+                    partial=True,
+                )):
+            return provider.reroute(context=context, path=path, params=params)
+        return provider.navigate(context.clone(path, params))
 
     @staticmethod
     def on_reroute(provider, context, re_match):
