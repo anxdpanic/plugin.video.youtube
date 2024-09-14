@@ -451,8 +451,13 @@ def response_to_items(provider,
         context.log_debug('v3 response discarded: |%s|' % kind)
         return []
 
+    params = context.get_params()
+
     if kind_type in _KNOWN_RESPONSE_KINDS:
-        item_filter = context.get_settings().item_filter(item_filter)
+        item_filter = context.get_settings().item_filter(
+            update=item_filter,
+            override=params.get('item_filter'),
+        )
         result = _process_list_response(
             provider, context, json_data, item_filter
         )
@@ -477,7 +482,6 @@ def response_to_items(provider,
     We implemented our own calculation for the token into the YouTube client
     This should work for up to ~2000 entries.
     """
-    params = context.get_params()
     current_page = params.get('page')
     next_page = current_page + 1 if current_page else 2
     new_params = dict(params, page=next_page)

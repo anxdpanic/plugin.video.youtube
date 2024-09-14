@@ -82,6 +82,7 @@ class AbstractContext(object):
     }
     _LIST_PARAMS = {
         'channel_ids',
+        'item_filter',
         'playlist_ids',
     }
     _STRING_PARAMS = {
