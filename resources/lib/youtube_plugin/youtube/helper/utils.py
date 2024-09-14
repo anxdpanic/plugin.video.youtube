@@ -15,7 +15,7 @@ import time
 from math import log10
 
 from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
-from ...kodion.items import AudioItem, DirectoryItem, menu_items
+from ...kodion.items import AudioItem, DirectoryItem, CommandItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
     friendly_number,
@@ -118,7 +118,10 @@ def make_comment_item(context, snippet, uri, total_replies=0):
             ui.new_line(body, cr_before=2),
         ))
 
-    comment_item = DirectoryItem(label, uri, plot=plot, action=(not uri))
+    if uri:
+        comment_item = DirectoryItem(label, uri, plot=plot)
+    else:
+        comment_item = CommandItem(label, 'Action(Info)', context, plot=plot)
 
     datetime = datetime_parser.parse(published_at)
     comment_item.set_added_utc(datetime)
