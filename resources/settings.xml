@@ -874,6 +874,16 @@
                         <heading>30550</heading>
                     </control>
                 </setting>
+                <setting id="youtube.location.configure" type="action" label="30653" help="">
+                    <level>0</level>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <data>RunScript($ID,config/geo_location)</data>
+                    <control format="action" type="button">
+                        <close>true</close>
+                    </control>
+                </setting>
                 <setting id="youtube.location" type="string" label="30651" help="">
                     <level>0</level>
                     <default/>

@@ -14,7 +14,7 @@ import os
 
 from ...kodion.compatibility import urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
-from ...kodion.network import Locator, httpd_status
+from ...kodion.network import httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils import current_system_version, to_unicode
 from ...kodion.utils.datetime_parser import strptime
@@ -296,13 +296,13 @@ def process_geo_location(context, step, steps, **_kwargs):
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.my_location'))
     ):
-        locator = Locator(context)
-        locator.locate_requester()
-        coords = locator.coordinates()
-        if coords:
-            context.get_settings().set_location(
-                '{0[lat]},{0[lon]}'.format(coords)
-            )
+        context.execute(
+            'RunScript({addon_id},config/geo_location)'.format(
+                addon_id=ADDON_ID,
+            ),
+            wait_for=WAIT_END_FLAG,
+        )
+        context.get_settings(refresh=True)
     return step
 
 

@@ -20,7 +20,7 @@ from .constants import (
     WAIT_END_FLAG,
 )
 from .context import XbmcContext
-from .network import get_client_ip_address, httpd_status
+from .network import Locator, get_client_ip_address, httpd_status
 from .utils import current_system_version, rm_dir, validate_ip_address
 
 
@@ -125,6 +125,15 @@ def _config_actions(context, action, *_args):
                 ui.show_notification(context.localize('client.ip.failed'))
         else:
             ui.show_notification(context.localize('httpd.not.running'))
+
+    elif action == 'geo_location':
+        locator = Locator(context)
+        locator.locate_requester()
+        coords = locator.coordinates()
+        if coords:
+            context.get_settings().set_location(
+                '{0[lat]},{0[lon]}'.format(coords)
+            )
 
 
 def _maintenance_actions(context, action, params):
