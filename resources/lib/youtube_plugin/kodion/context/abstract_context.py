@@ -52,6 +52,7 @@ class AbstractContext(object):
         'enable',
         'hide_folders',
         'hide_live',
+        'hide_next_page',
         'hide_playlists',
         'hide_search',
         'incognito',
