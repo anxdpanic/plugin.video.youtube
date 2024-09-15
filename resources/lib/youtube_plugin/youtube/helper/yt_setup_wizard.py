@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 
 from ...kodion.compatibility import urlencode, xbmcvfs
-from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_FLAG
+from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
 from ...kodion.network import Locator, httpd_status
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils import current_system_version, to_unicode
@@ -444,7 +444,7 @@ def process_subtitles(context, step, steps, **_kwargs):
     ):
         context.execute('RunScript({addon_id},config/subtitles)'.format(
             addon_id=ADDON_ID
-        ), wait_for=WAIT_FLAG)
+        ), wait_for=WAIT_END_FLAG)
         context.get_settings(refresh=True)
     return step
 
@@ -485,7 +485,7 @@ def process_old_search_db(context, step, steps, **_kwargs):
                     action='delete',
                     query=urlencode({'target': 'other_file',
                                      'path': search_db_path})),
-            wait_for=WAIT_FLAG,
+            wait_for=WAIT_END_FLAG,
         )
     return step
 
@@ -531,7 +531,7 @@ def process_old_history_db(context, step, steps, **_kwargs):
                     action='delete',
                     query=urlencode({'target': 'other_file',
                                      'path': history_db_path})),
-            wait_for=WAIT_FLAG,
+            wait_for=WAIT_END_FLAG,
         )
     return step
 
@@ -550,7 +550,7 @@ def process_refresh_settings(context, step, steps, **_kwargs):
             .format(addon=ADDON_ID,
                     action='refresh',
                     query='target=settings_xml'),
-            wait_for=WAIT_FLAG,
+            wait_for=WAIT_END_FLAG,
         )
         context.get_settings(refresh=True)
     return step

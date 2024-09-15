@@ -17,7 +17,7 @@ from .constants import (
     DATA_PATH,
     RELOAD_ACCESS_MANAGER,
     TEMP_PATH,
-    WAIT_FLAG,
+    WAIT_END_FLAG,
 )
 from .context import XbmcContext
 from .network import get_client_ip_address, httpd_status
@@ -364,7 +364,6 @@ def _user_actions(context, action, params):
 def run(argv):
     context = XbmcContext()
     ui = context.get_ui()
-    ui.set_property(WAIT_FLAG)
     try:
         category = action = params = None
         args = argv[1:]
@@ -398,4 +397,4 @@ def run(argv):
             _user_actions(context, action, params)
             return
     finally:
-        ui.clear_property(WAIT_FLAG)
+        ui.set_property(WAIT_END_FLAG)
