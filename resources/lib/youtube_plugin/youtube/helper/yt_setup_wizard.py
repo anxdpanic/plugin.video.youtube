@@ -442,9 +442,12 @@ def process_subtitles(context, step, steps, **_kwargs):
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.subtitles'))
     ):
-        context.execute('RunScript({addon_id},config/subtitles)'.format(
-            addon_id=ADDON_ID
-        ), wait_for=WAIT_END_FLAG)
+        context.execute(
+            'RunScript({addon_id},config/subtitles)'.format(
+                addon_id=ADDON_ID,
+            ),
+            wait_for=WAIT_END_FLAG,
+        )
         context.get_settings(refresh=True)
     return step
 
@@ -480,11 +483,14 @@ def process_old_search_db(context, step, steps, **_kwargs):
 
         ui.show_notification(localize('succeeded'))
         context.execute(
-            'RunScript({addon},maintenance/{action}?{query})'
-            .format(addon=ADDON_ID,
-                    action='delete',
-                    query=urlencode({'target': 'other_file',
-                                     'path': search_db_path})),
+            'RunScript({addon},maintenance/{action}?{query})'.format(
+                addon=ADDON_ID,
+                action='delete',
+                query=urlencode({
+                    'target': 'other_file',
+                    'path': search_db_path,
+                }),
+            ),
             wait_for=WAIT_END_FLAG,
         )
     return step
@@ -526,11 +532,14 @@ def process_old_history_db(context, step, steps, **_kwargs):
 
         ui.show_notification(localize('succeeded'))
         context.execute(
-            'RunScript({addon},maintenance/{action}?{query})'
-            .format(addon=ADDON_ID,
-                    action='delete',
-                    query=urlencode({'target': 'other_file',
-                                     'path': history_db_path})),
+            'RunScript({addon},maintenance/{action}?{query})'.format(
+                addon=ADDON_ID,
+                action='delete',
+                query=urlencode({
+                    'target': 'other_file',
+                    'path': history_db_path,
+                }),
+            ),
             wait_for=WAIT_END_FLAG,
         )
     return step
@@ -542,14 +551,14 @@ def process_refresh_settings(context, step, steps, **_kwargs):
     step += 1
     if context.get_ui().on_yes_no_input(
             localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
-            (localize('setup_wizard.prompt')
-             % localize('setup_wizard.prompt.settings.refresh'))
+            localize('setup_wizard.prompt.settings.refresh'),
     ):
         context.execute(
-            'RunScript({addon},maintenance/{action}?{query})'
-            .format(addon=ADDON_ID,
-                    action='refresh',
-                    query='target=settings_xml'),
+            'RunScript({addon},maintenance/{action}?{query})'.format(
+                addon=ADDON_ID,
+                action='refresh',
+                query='target=settings_xml',
+            ),
             wait_for=WAIT_END_FLAG,
         )
     return step
