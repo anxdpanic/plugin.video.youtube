@@ -80,7 +80,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             '(', PATHS.SEARCH, '|', PATHS.EXTERNAL_SEARCH, ')',
-            '/(?P<command>input|query|list|remove|clear|rename)?/?$'
+            '/(?P<command>input|input_prompt|query|list|remove|clear|rename)?/?$'
         )), self.on_search)
 
         self.register_path(r''.join((
@@ -341,7 +341,7 @@ class AbstractProvider(object):
             ui.refresh_container()
             return True
 
-        if command == 'input':
+        if command.startswith('input'):
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
@@ -366,7 +366,10 @@ class AbstractProvider(object):
                 return False
 
             context.set_path(PATHS.SEARCH, 'query')
-            return provider.on_search_run(context=context, search_text=query)
+            return (
+                provider.on_search_run(context=context, search_text=query),
+                {provider.RESULT_CACHE_TO_DISC: command != 'input_prompt'},
+            )
 
         context.set_content(CONTENT.LIST_CONTENT)
         result = []
