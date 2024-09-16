@@ -166,9 +166,9 @@ class AbstractProvider(object):
                 result, new_options = result
                 options.update(new_options)
 
-            refresh = context.get_param('refresh')
-            if refresh is not None:
-                options[self.RESULT_UPDATE_LISTING] = bool(refresh)
+            if context.get_param('refresh'):
+                options[self.RESULT_CACHE_TO_DISC] = False
+                options[self.RESULT_UPDATE_LISTING] = True
 
             return result, options
 
