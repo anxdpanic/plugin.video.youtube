@@ -80,7 +80,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             '(', PATHS.SEARCH, '|', PATHS.EXTERNAL_SEARCH, ')',
-            '/(?P<command>input|query|list|remove|clear|rename)?/?$'
+            '/(?P<command>input|input_prompt|query|list|remove|clear|rename)?/?$'
         )), self.on_search)
 
         self.register_path(r''.join((
@@ -117,10 +117,11 @@ class AbstractProvider(object):
         return wrapper
 
     def run_wizard(self, context):
-        settings = context.get_settings()
-        ui = context.get_ui()
-
-        context.send_notification(CHECK_SETTINGS, 'defer')
+        context.wakeup(
+            CHECK_SETTINGS,
+            timeout=5,
+            payload={'state': 'defer'},
+        )
 
         wizard_steps = self.get_wizard_steps()
 
@@ -128,7 +129,7 @@ class AbstractProvider(object):
         steps = len(wizard_steps)
 
         try:
-            if wizard_steps and ui.on_yes_no_input(
+            if wizard_steps and context.get_ui().on_yes_no_input(
                     context.localize('setup_wizard'),
                     (context.localize('setup_wizard.prompt')
                      % context.localize('setup_wizard.prompt.settings'))
@@ -142,8 +143,13 @@ class AbstractProvider(object):
                     else:
                         step += 1
         finally:
+            settings = context.get_settings(refresh=True)
             settings.setup_wizard_enabled(False)
-            context.send_notification(CHECK_SETTINGS, 'process')
+            context.wakeup(
+                CHECK_SETTINGS,
+                timeout=5,
+                payload={'state': 'process'},
+            )
 
     @staticmethod
     def get_wizard_steps():
@@ -166,9 +172,9 @@ class AbstractProvider(object):
                 result, new_options = result
                 options.update(new_options)
 
-            refresh = context.get_param('refresh')
-            if refresh is not None:
-                options[self.RESULT_UPDATE_LISTING] = bool(refresh)
+            if context.get_param('refresh'):
+                options[self.RESULT_CACHE_TO_DISC] = False
+                options[self.RESULT_UPDATE_LISTING] = True
 
             return result, options
 
@@ -249,16 +255,12 @@ class AbstractProvider(object):
         if not path:
             return False
 
-        do_refresh = 'refresh' in params
-
-        if path == current_path and params == current_params:
-            if not do_refresh:
-                return False
-            params['refresh'] += 1
-
-        if do_refresh:
+        if 'refresh' in params:
             container = context.get_infolabel('System.CurrentControlId')
             position = context.get_infolabel('Container.CurrentItem')
+            params['refresh'] += 1
+        elif path == current_path and params == current_params:
+            return False
         else:
             container = None
             position = None
@@ -341,7 +343,7 @@ class AbstractProvider(object):
             ui.refresh_container()
             return True
 
-        if command == 'input':
+        if command.startswith('input'):
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
@@ -366,7 +368,10 @@ class AbstractProvider(object):
                 return False
 
             context.set_path(PATHS.SEARCH, 'query')
-            return provider.on_search_run(context=context, search_text=query)
+            return (
+                provider.on_search_run(context=context, search_text=query),
+                {provider.RESULT_CACHE_TO_DISC: command != 'input_prompt'},
+            )
 
         context.set_content(CONTENT.LIST_CONTENT)
         result = []

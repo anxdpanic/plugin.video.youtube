@@ -37,7 +37,7 @@ VALUE_FROM_STR = {
 # Flags
 ABORT_FLAG = 'abort_requested'
 BUSY_FLAG = 'busy'
-WAIT_FLAG = 'builtin_running'
+WAIT_END_FLAG = 'builtin_completed'
 
 # ListItem Properties
 CHANNEL_ID = 'channel_id'
@@ -97,7 +97,7 @@ __all__ = (
     # Flags
     'ABORT_FLAG',
     'BUSY_FLAG',
-    'WAIT_FLAG',
+    'WAIT_END_FLAG',
 
     # ListItem properties
     'CHANNEL_ID',

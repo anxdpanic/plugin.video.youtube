@@ -23,7 +23,7 @@ def _process_related_videos(provider, context, client):
     function_cache = context.get_function_cache()
 
     params = context.get_params()
-    video_id = params.get('video_id', '')
+    video_id = params.get('video_id')
     refresh = params.get('refresh')
     if video_id:
         json_data = function_cache.run(
@@ -298,13 +298,11 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
     params = context.get_params()
-    refresh = params.get('refresh')
-
     json_data = client.get_my_subscriptions(
         page_token=params.get('page', 1),
         logged_in=provider.is_logged_in(),
         do_filter=filtered,
-        refresh=refresh,
+        refresh=params.get('refresh'),
     )
 
     if not json_data:
