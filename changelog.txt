@@ -1,3 +1,16 @@
+## v7.1.0+beta.3
+### Fixed
+- Fix various timing and sync issues with script, service, plugin and Kodi settings
+
+### Changed
+- Move IP location lookup to script and add to settings dialog
+- Move language and region selection to script and add to settings dialog
+
+### New
+- Add hide_next_page query parameter to hide plugin Next page item #896
+- Add new input_prompt command for search endpoint to bypass Kodi window caching
+  - plugin://plugin.video.youtube/kodion/search/input_prompt
+
 ## v7.1.0+beta.2
 ### Fixed
 - Fix possible regression causing 6s delay on first play
