@@ -552,5 +552,4 @@ def process_refresh_settings(context, step, steps, **_kwargs):
                     query='target=settings_xml'),
             wait_for=WAIT_END_FLAG,
         )
-        context.get_settings(refresh=True)
     return step

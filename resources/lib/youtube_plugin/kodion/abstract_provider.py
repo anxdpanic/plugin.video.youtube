@@ -146,6 +146,7 @@ class AbstractProvider(object):
                     else:
                         step += 1
         finally:
+            settings = context.get_settings(refresh=True)
             settings.setup_wizard_enabled(False)
             context.wakeup(
                 CHECK_SETTINGS,
