@@ -88,16 +88,7 @@ class ServiceMonitor(xbmc.Monitor):
         if sender != ADDON_ID:
             return
         group, separator, event = method.partition('.')
-        if event == CHECK_SETTINGS:
-            if data:
-                data = json.loads(data)
-            if data == 'defer':
-                self._settings_state = data
-            elif data == 'process':
-                self._settings_state = data
-                self.onSettingsChanged()
-                self._settings_state = None
-        elif event == WAKEUP:
+        if event == WAKEUP:
             if not isinstance(data, dict):
                 data = json.loads(data)
             if not data:
@@ -110,6 +101,14 @@ class ServiceMonitor(xbmc.Monitor):
                     self.start_httpd()
                 if self.httpd_sleep_allowed:
                     self.httpd_sleep_allowed = None
+            elif target == CHECK_SETTINGS:
+                state = data.get('state')
+                if state == 'defer':
+                    self._settings_state = state
+                elif state == 'process':
+                    self._settings_state = state
+                    self.onSettingsChanged()
+                    self._settings_state = None
             if data.get('response_required'):
                 self.set_property(WAKEUP, target)
         elif event == REFRESH_CONTAINER:

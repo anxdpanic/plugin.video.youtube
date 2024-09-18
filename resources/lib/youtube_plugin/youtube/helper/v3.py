@@ -471,7 +471,7 @@ def response_to_items(provider,
         result.sort(key=sort, reverse=reverse)
 
     # no processing of next page item
-    if not result or not process_next_page:
+    if not result or not process_next_page or params.get('hide_next_page'):
         return result
 
     # next page

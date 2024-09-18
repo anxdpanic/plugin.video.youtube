@@ -52,6 +52,7 @@ class AbstractContext(object):
         'enable',
         'hide_folders',
         'hide_live',
+        'hide_next_page',
         'hide_playlists',
         'hide_search',
         'incognito',
@@ -449,8 +450,7 @@ class AbstractContext(object):
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()
 
-    @staticmethod
-    def execute(command):
+    def execute(self, command, wait=False, wait_for=None):
         raise NotImplementedError()
 
     @staticmethod
