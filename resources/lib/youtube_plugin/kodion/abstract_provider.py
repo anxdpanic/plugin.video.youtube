@@ -120,7 +120,11 @@ class AbstractProvider(object):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        context.send_notification(CHECK_SETTINGS, 'defer')
+        context.wakeup(
+            CHECK_SETTINGS,
+            timeout=5,
+            payload={'state': 'defer'},
+        )
 
         wizard_steps = self.get_wizard_steps()
 
@@ -143,7 +147,11 @@ class AbstractProvider(object):
                         step += 1
         finally:
             settings.setup_wizard_enabled(False)
-            context.send_notification(CHECK_SETTINGS, 'process')
+            context.wakeup(
+                CHECK_SETTINGS,
+                timeout=5,
+                payload={'state': 'process'},
+            )
 
     @staticmethod
     def get_wizard_steps():

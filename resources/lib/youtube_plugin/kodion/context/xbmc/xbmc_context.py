@@ -756,8 +756,10 @@ class XbmcContext(AbstractContext):
             except AttributeError:
                 pass
 
-    def wakeup(self, target, timeout=None):
+    def wakeup(self, target, timeout=None, payload=None):
         data = {'target': target, 'response_required': bool(timeout)}
+        if payload:
+            data.update(payload)
         self.send_notification(WAKEUP, data)
         if not timeout:
             return
