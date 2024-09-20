@@ -499,7 +499,11 @@ def update_video_infos(provider, context, video_id_dict,
             ):
                 continue
 
-        if not media_item.live and play_data:
+        if media_item.live:
+            media_item.set_play_count(0)
+            use_play_data = False
+            play_data = None
+        elif play_data:
             if 'play_count' in play_data:
                 media_item.set_play_count(play_data['play_count'])
 
@@ -511,8 +515,6 @@ def update_video_infos(provider, context, video_id_dict,
 
             if 'last_played' in play_data:
                 media_item.set_last_played(play_data['last_played'])
-        elif media_item.live:
-            media_item.set_play_count(0)
 
         if start_at:
             datetime = datetime_parser.parse(start_at)
@@ -766,18 +768,17 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-        if not media_item.live and play_data:
+        if use_play_data:
             context_menu.append(
                 menu_items.history_mark_unwatched(
                     context, video_id
-                ) if play_data.get('play_count') else
+                ) if play_data and play_data.get('play_count') else
                 menu_items.history_mark_watched(
                     context, video_id
                 )
             )
-
-            if (play_data.get('played_percent', 0) > 0
-                    or play_data.get('played_time', 0) > 0):
+            if play_data and (play_data.get('played_percent', 0) > 0
+                              or play_data.get('played_time', 0) > 0):
                 context_menu.append(
                     menu_items.history_reset_resume(
                         context, video_id
