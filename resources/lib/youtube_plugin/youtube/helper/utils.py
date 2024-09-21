@@ -15,7 +15,7 @@ import time
 from math import log10
 
 from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
-from ...kodion.items import AudioItem, DirectoryItem, CommandItem, menu_items
+from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
     friendly_number,
@@ -363,7 +363,6 @@ def update_video_infos(provider, context, video_id_dict,
                        playlist_item_id_dict=None,
                        channel_items_dict=None,
                        live_details=True,
-                       use_play_data=True,
                        item_filter=None,
                        data=None):
     video_ids = list(video_id_dict)
@@ -399,6 +398,7 @@ def update_video_infos(provider, context, video_id_dict,
     subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.get_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+    use_play_data = settings.use_local_history()
 
     channel_role = localize(19029)
     untitled = localize('untitled')
@@ -833,13 +833,9 @@ def update_video_infos(provider, context, video_id_dict,
             media_item.add_context_menu(context_menu)
 
 
-def update_play_info(provider, context, video_id, media_item, video_stream,
-                     use_play_data=True):
+def update_play_info(provider, context, video_id, media_item, video_stream):
     media_item.video_id = video_id
-    update_video_infos(provider,
-                       context,
-                       {video_id: media_item},
-                       use_play_data=use_play_data)
+    update_video_infos(provider, context, {video_id: media_item})
 
     settings = context.get_settings()
     ui = context.get_ui()
