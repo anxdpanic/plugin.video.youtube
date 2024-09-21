@@ -80,7 +80,7 @@ def saved_playlists_to_items(provider, context, json_data):
         title = item['title']
         channel_id = item['channel_id']
         playlist_id = item['id']
-        image = utils.get_thumbnail(thumb_size, item.get('thumbnails', {}))
+        image = utils.get_thumbnail(thumb_size, item.get('thumbnails'))
 
         if channel_id:
             item_uri = context.create_uri(

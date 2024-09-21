@@ -192,7 +192,7 @@ def update_channel_infos(provider, context, channel_id_dict,
         channel_item.set_name(title)
 
         # image
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         channel_item.set_image(image)
 
         # - update context menu
@@ -288,7 +288,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         title = snippet['title']
         playlist_item.set_name(title)
 
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         playlist_item.set_image(image)
 
         channel_id = 'mine' if in_my_playlists else snippet['channelId']
@@ -655,7 +655,7 @@ def update_video_infos(provider, context, video_id_dict,
         # try to find a better resolution for the image
         image = media_item.get_image()
         if not image:
-            image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+            image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         if image.endswith('_live.jpg'):
             image = ''.join((image, '?ct=', thumb_stamp))
         media_item.set_image(image)
@@ -849,7 +849,7 @@ def update_play_info(provider, context, video_id, media_item, video_stream,
         media_item.live = meta_data.get('status', {}).get('live', False)
         media_item.set_subtitles(meta_data.get('subtitles', None))
         image = get_thumbnail(settings.get_thumbnail_size(),
-                              meta_data.get('thumbnails', {}))
+                              meta_data.get('thumbnails'))
         if image:
             if media_item.live:
                 image = ''.join((image, '?ct=', get_thumb_timestamp()))

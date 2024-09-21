@@ -85,7 +85,7 @@ def _process_list_response(provider, context, json_data, item_filter):
             title = snippet.get('title', context.localize('untitled'))
 
             thumbnails = snippet.get('thumbnails')
-            if not thumbnails and yt_item.get('_partial'):
+            if not thumbnails:
                 thumbnails = {
                     thumb_type: {
                         'url': thumb['url'].format(item_id, ''),
