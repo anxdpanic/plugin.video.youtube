@@ -5,6 +5,7 @@
         <import addon="script.module.requests" version="2.27.1"/>
         <import addon="inputstream.adaptive" version="19.0.0"/>
         <import addon="script.module.inputstreamhelper" version="0.2.2" optional="true"/>
+        <import addon="script.module.pysocks" optional="true"/>
     </requires>
     <extension point="xbmc.python.pluginsource" library="resources/lib/plugin.py">
         <provides>video</provides>
