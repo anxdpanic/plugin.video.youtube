@@ -58,7 +58,7 @@ class BaseRequestsClass(object):
     def __init__(self, context, exc_type=None):
         settings = context.get_settings()
         self._verify = settings.verify_ssl()
-        self._timeout = settings.get_timeout()
+        self._timeout = settings.requests_timeout()
         self._proxy = settings.proxy_settings()
 
         if isinstance(exc_type, tuple):

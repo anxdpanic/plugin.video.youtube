@@ -198,14 +198,22 @@ class AbstractSettings(object):
     def age_gate(self):
         return self.get_bool(SETTINGS.AGE_GATE, True)
 
-    def verify_ssl(self):
+    def verify_ssl(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.VERIFY_SSL, value)
+
         if sys.version_info <= (2, 7, 9):
             verify = False
         else:
             verify = self.get_bool(SETTINGS.VERIFY_SSL, True)
         return verify
 
-    def get_timeout(self):
+    def requests_timeout(self, value=None):
+        if value is not None:
+            self.set_int(SETTINGS.CONNECT_TIMEOUT, value[0])
+            self.set_int(SETTINGS.READ_TIMEOUT, value[1])
+            return value
+
         connect_timeout = self.get_int(SETTINGS.CONNECT_TIMEOUT, 9) + 0.5
         read_timout = self.get_int(SETTINGS.READ_TIMEOUT, 27)
         return connect_timeout, read_timout
