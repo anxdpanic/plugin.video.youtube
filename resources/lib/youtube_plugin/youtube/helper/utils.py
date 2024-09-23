@@ -15,7 +15,7 @@ import time
 from math import log10
 
 from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
-from ...kodion.items import AudioItem, DirectoryItem, CommandItem, menu_items
+from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
     friendly_number,
@@ -192,7 +192,7 @@ def update_channel_infos(provider, context, channel_id_dict,
         channel_item.set_name(title)
 
         # image
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         channel_item.set_image(image)
 
         # - update context menu
@@ -288,7 +288,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         title = snippet['title']
         playlist_item.set_name(title)
 
-        image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+        image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         playlist_item.set_image(image)
 
         channel_id = 'mine' if in_my_playlists else snippet['channelId']
@@ -363,7 +363,6 @@ def update_video_infos(provider, context, video_id_dict,
                        playlist_item_id_dict=None,
                        channel_items_dict=None,
                        live_details=True,
-                       use_play_data=True,
                        item_filter=None,
                        data=None):
     video_ids = list(video_id_dict)
@@ -399,6 +398,7 @@ def update_video_infos(provider, context, video_id_dict,
     subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.get_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
+    use_play_data = settings.use_local_history()
 
     channel_role = localize(19029)
     untitled = localize('untitled')
@@ -499,7 +499,11 @@ def update_video_infos(provider, context, video_id_dict,
             ):
                 continue
 
-        if not media_item.live and play_data:
+        if media_item.live:
+            media_item.set_play_count(0)
+            use_play_data = False
+            play_data = None
+        elif play_data:
             if 'play_count' in play_data:
                 media_item.set_play_count(play_data['play_count'])
 
@@ -511,8 +515,6 @@ def update_video_infos(provider, context, video_id_dict,
 
             if 'last_played' in play_data:
                 media_item.set_last_played(play_data['last_played'])
-        elif media_item.live:
-            media_item.set_play_count(0)
 
         if start_at:
             datetime = datetime_parser.parse(start_at)
@@ -653,7 +655,7 @@ def update_video_infos(provider, context, video_id_dict,
         # try to find a better resolution for the image
         image = media_item.get_image()
         if not image:
-            image = get_thumbnail(thumb_size, snippet.get('thumbnails', {}))
+            image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         if image.endswith('_live.jpg'):
             image = ''.join((image, '?ct=', thumb_stamp))
         media_item.set_image(image)
@@ -766,18 +768,17 @@ def update_video_infos(provider, context, video_id_dict,
                 )
             )
 
-        if not media_item.live and play_data:
+        if use_play_data:
             context_menu.append(
                 menu_items.history_mark_unwatched(
                     context, video_id
-                ) if play_data.get('play_count') else
+                ) if play_data and play_data.get('play_count') else
                 menu_items.history_mark_watched(
                     context, video_id
                 )
             )
-
-            if (play_data.get('played_percent', 0) > 0
-                    or play_data.get('played_time', 0) > 0):
+            if play_data and (play_data.get('played_percent', 0) > 0
+                              or play_data.get('played_time', 0) > 0):
                 context_menu.append(
                     menu_items.history_reset_resume(
                         context, video_id
@@ -832,13 +833,9 @@ def update_video_infos(provider, context, video_id_dict,
             media_item.add_context_menu(context_menu)
 
 
-def update_play_info(provider, context, video_id, media_item, video_stream,
-                     use_play_data=True):
+def update_play_info(provider, context, video_id, media_item, video_stream):
     media_item.video_id = video_id
-    update_video_infos(provider,
-                       context,
-                       {video_id: media_item},
-                       use_play_data=use_play_data)
+    update_video_infos(provider, context, {video_id: media_item})
 
     settings = context.get_settings()
     ui = context.get_ui()
@@ -848,7 +845,7 @@ def update_play_info(provider, context, video_id, media_item, video_stream,
         media_item.live = meta_data.get('status', {}).get('live', False)
         media_item.set_subtitles(meta_data.get('subtitles', None))
         image = get_thumbnail(settings.get_thumbnail_size(),
-                              meta_data.get('thumbnails', {}))
+                              meta_data.get('thumbnails'))
         if image:
             if media_item.live:
                 image = ''.join((image, '?ct=', get_thumb_timestamp()))

@@ -51,16 +51,13 @@ def _process_list_response(provider, context, json_data, item_filter):
 
     new_params = {}
     params = context.get_params()
-    incognito = params.get('incognito', False)
-    if incognito:
-        new_params['incognito'] = incognito
+    if params.get('incognito'):
+        new_params['incognito'] = True
     addon_id = params.get('addon_id', '')
     if addon_id:
         new_params['addon_id'] = addon_id
 
     settings = context.get_settings()
-    use_play_data = not incognito and settings.use_local_history()
-
     thumb_size = settings.get_thumbnail_size()
     fanart_type = params.get('fanart_type')
     if fanart_type is None:
@@ -85,7 +82,7 @@ def _process_list_response(provider, context, json_data, item_filter):
             title = snippet.get('title', context.localize('untitled'))
 
             thumbnails = snippet.get('thumbnails')
-            if not thumbnails and yt_item.get('_partial'):
+            if not thumbnails:
                 thumbnails = {
                     thumb_type: {
                         'url': thumb['url'].format(item_id, ''),
@@ -251,8 +248,6 @@ def _process_list_response(provider, context, json_data, item_filter):
 
         if isinstance(item, VideoItem):
             item.video_id = item_id
-            if incognito:
-                item.set_play_count(0)
             # Set track number from playlist, or set to current list length to
             # match "Default" (unsorted) sort order
             position = snippet.get('position') or len(result)
@@ -289,7 +284,6 @@ def _process_list_response(provider, context, json_data, item_filter):
             'upd_kwargs': {
                 'data': None,
                 'live_details': True,
-                'use_play_data': use_play_data,
                 'item_filter': item_filter,
             },
             'complete': False,

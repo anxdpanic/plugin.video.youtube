@@ -218,8 +218,8 @@ class PlayerMonitorThread(threading.Thread):
                 status=(segment_end, segment_end, segment_end, 'stopped'),
             )
         if use_local_history:
-            self._context.get_playback_history().update_item(self.video_id,
-                                                             play_data)
+            self._context.get_playback_history().set_item(self.video_id,
+                                                          play_data)
 
         self._context.send_notification(PLAYBACK_STOPPED, self.playback_data)
         self._context.log_debug('Playback stopped [{video_id}]:'
