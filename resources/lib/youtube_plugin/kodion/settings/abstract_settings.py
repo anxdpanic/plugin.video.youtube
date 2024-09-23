@@ -282,7 +282,7 @@ class AbstractSettings(object):
                     self.set_bool(setting_name, setting_value)
             return value
 
-        proxy_source = self.get_int(SETTINGS.PROXY_SOURCE, 0)
+        proxy_source = self.get_int(SETTINGS.PROXY_SOURCE, 1)
         if not proxy_source:
             return None
 
@@ -314,6 +314,28 @@ class AbstractSettings(object):
         if proxy_source == 1 and not settings[SETTINGS.PROXY_ENABLED]['value']:
             return None
 
+        scheme = self._PROXY_TYPE_SCHEME[settings[SETTINGS.PROXY_TYPE]['value']]
+        if scheme.startswith('socks'):
+            from ..compatibility import xbmc, xbmcaddon
+
+            pysocks = None
+            install_attempted = False
+            while not pysocks:
+                try:
+                    pysocks = xbmcaddon.Addon('script.module.pysocks')
+                except RuntimeError:
+                    if install_attempted:
+                        break
+                    xbmc.executebuiltin(
+                        'InstallAddon(script.module.pysocks)',
+                        wait=True,
+                    )
+                    install_attempted = True
+            if pysocks:
+                del pysocks
+            else:
+                return None
+
         host = settings[SETTINGS.PROXY_SERVER]['value']
         if not host:
             return None
@@ -335,12 +357,7 @@ class AbstractSettings(object):
         else:
             auth_string = ''
 
-        proxy_string = ''.join((
-            self._PROXY_TYPE_SCHEME[settings[SETTINGS.PROXY_TYPE]['value']],
-            '://',
-            auth_string,
-            host_port_string,
-        ))
+        proxy_string = ''.join((scheme, '://', auth_string, host_port_string))
         return {
             'http': proxy_string,
             'https': proxy_string,
