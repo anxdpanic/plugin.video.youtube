@@ -1,3 +1,17 @@
+## v7.1.0+beta.4
+### Fixed
+- Fix playback history related context menu items not being shown #904
+- Fix new resume details not being saved in plugin local playback history #904
+
+### Changed
+- Allow default thumbnail selection fallbacks for all results
+- Simplify handling of local history
+  - Incognito will no longer prevent existing local history from being shown
+  - Incognito will continue to prevent any update to local history
+
+### New
+- Add support for proxy settings #884
+
 ## v7.1.0+beta.3
 ### Fixed
 - Fix various timing and sync issues with script, service, plugin and Kodi settings

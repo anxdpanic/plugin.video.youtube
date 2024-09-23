@@ -1002,6 +1002,89 @@
                         <formatlabel>14045</formatlabel>
                     </control>
                 </setting>
+                <setting id="requests.proxy.source" type="integer" label="713" help="36380">
+                    <level>0</level>
+                    <default>1</default>  <!-- Kodi proxy -->
+                    <constraints>
+                        <options>
+                            <option label="20009">1</option>  <!-- Kodi proxy -->
+                            <option label="20190">2</option>  <!-- Custom proxy -->
+                            <option label="13106">0</option>  <!-- Disabled -->
+                        </options>
+                    </constraints>
+                    <control format="string" type="spinner"/>
+                </setting>
+                <setting id="requests.proxy.enabled" type="boolean" parent="requests.proxy.source" label="708">
+                    <level>4</level>
+                    <default>false</default>
+                    <control type="toggle"/>
+                </setting>
+                <setting id="requests.proxy.type" type="integer" parent="requests.proxy.source" label="1180" help="36381">
+                    <level>0</level>
+                    <default>0</default>
+                    <constraints>
+                        <options>
+                            <option label="1181">0</option> <!-- PROXY_HTTP -->
+                            <option label="1186">5</option> <!-- PROXY_HTTPS -->
+                            <option label="1182">1</option> <!-- PROXY_SOCKS4 -->
+                            <option label="1183">2</option> <!-- PROXY_SOCKS4A -->
+                            <option label="1184">3</option> <!-- PROXY_SOCKS5 -->
+                            <option label="1185">4</option> <!-- PROXY_SOCKS5_REMOTE -->
+                        </options>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible" setting="requests.proxy.source">2</dependency>
+                    </dependencies>
+                    <control type="list" format="string"/>
+                </setting>
+                <setting id="requests.proxy.server" type="string" parent="requests.proxy.source" label="706" help="36382">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible" setting="requests.proxy.source">2</dependency>
+                    </dependencies>
+                    <control type="edit" format="string"/>
+                </setting>
+                <setting id="requests.proxy.port" type="integer" parent="requests.proxy.source" label="730" help="36383">
+                    <level>0</level>
+                    <default>8080</default>
+                    <constraints>
+                        <minimum>1</minimum>
+                        <step>1</step>
+                        <maximum>65535</maximum>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible" setting="requests.proxy.source">2</dependency>
+                    </dependencies>
+                    <control type="edit" format="integer"/>
+                </setting>
+                <setting id="requests.proxy.username" type="string" parent="requests.proxy.source" label="1048" help="36384">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible" setting="requests.proxy.source">2</dependency>
+                    </dependencies>
+                    <control type="edit" format="string"/>
+                </setting>
+                <setting id="requests.proxy.password" type="string" parent="requests.proxy.source" label="733" help="36385">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <dependencies>
+                        <dependency type="visible" setting="requests.proxy.source">2</dependency>
+                    </dependencies>
+                    <control type="edit" format="string">
+                        <hidden>true</hidden>
+                    </control>
+                </setting>
             </group>
             <group id="9" label="30628">
                 <setting id="kodion.http.listen" type="string" label="30643" help="">

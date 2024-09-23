@@ -130,10 +130,9 @@ def _play_stream(provider, context):
 
     use_history = not (screensaver or incognito or stream.get('live'))
     use_remote_history = use_history and settings.use_remote_history()
-    use_play_data = use_history and settings.use_local_history()
+    use_local_history = use_history and settings.use_local_history()
 
-    utils.update_play_info(provider, context, video_id, media_item,
-                           stream, use_play_data=use_play_data)
+    utils.update_play_info(provider, context, video_id, media_item, stream)
 
     seek_time = 0.0 if params.get('resume') else params.get('seek', 0.0)
     start_time = params.get('start', 0.0)
@@ -146,7 +145,7 @@ def _play_stream(provider, context):
     # if end_time:
     #     video_item.set_duration_from_seconds(end_time)
 
-    play_count = use_play_data and media_item.get_play_count() or 0
+    play_count = use_local_history and media_item.get_play_count() or 0
     playback_stats = stream.get('playback_stats')
 
     playback_data = {
@@ -156,7 +155,7 @@ def _play_stream(provider, context):
         'playing_file': media_item.get_uri(),
         'play_count': play_count,
         'use_remote_history': use_remote_history,
-        'use_local_history': use_play_data,
+        'use_local_history': use_local_history,
         'playback_stats': playback_stats,
         'seek_time': seek_time,
         'start_time': start_time,
