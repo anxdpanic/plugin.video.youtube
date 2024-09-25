@@ -31,15 +31,7 @@ def _process_list_response(provider, context, json_data, item_filter):
     yt_items = json_data.get('items', [])
     if not yt_items:
         context.log_warning('v3 response: Items list is empty')
-        return [
-            CommandItem(
-                context.localize('page.back'),
-                'Action(ParentDir)',
-                context,
-                image='DefaultFolderBack.png',
-                plot=context.localize('page.empty'),
-            )
-        ]
+        return []
 
     video_id_dict = {}
     channel_id_dict = {}
@@ -455,6 +447,8 @@ def response_to_items(provider,
         result = _process_list_response(
             provider, context, json_data, item_filter
         )
+        if not result:
+            return result
     else:
         raise KodionException('Unknown kind: %s' % kind)
 
@@ -465,7 +459,7 @@ def response_to_items(provider,
         result.sort(key=sort, reverse=reverse)
 
     # no processing of next page item
-    if not result or not process_next_page or params.get('hide_next_page'):
+    if not process_next_page or params.get('hide_next_page'):
         return result
 
     # next page
