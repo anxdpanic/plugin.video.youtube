@@ -60,6 +60,7 @@ class UrlToItemConverter(object):
                 ('v', 'video_id', False),
                 ('live', 'live', False),
                 ('clip', 'clip', False),
+                ('video_ids', 'video_ids', False),
             )
             if old in url_params
         }
@@ -82,7 +83,18 @@ class UrlToItemConverter(object):
             ))
             return
 
-        if 'video_id' in new_params:
+        if 'video_ids' in new_params:
+            for video_id in new_params['video_ids'].split(','):
+                video_item = VideoItem(
+                    name='',
+                    uri=context.create_uri(
+                        (PATHS.PLAY,),
+                        dict(new_params, video_id=video_id),
+                    )
+                )
+                self._video_id_dict[video_id] = video_item
+
+        elif 'video_id' in new_params:
             video_id = new_params['video_id']
 
             video_item = VideoItem(
@@ -90,7 +102,7 @@ class UrlToItemConverter(object):
             )
             self._video_id_dict[video_id] = video_item
 
-        elif 'playlist_id' in new_params:
+        if 'playlist_id' in new_params:
             playlist_id = new_params['playlist_id']
 
             if self._flatten:
@@ -102,7 +114,7 @@ class UrlToItemConverter(object):
             )
             self._playlist_id_dict[playlist_id] = playlist_item
 
-        elif 'channel_id' in new_params:
+        if 'channel_id' in new_params:
             channel_id = new_params['channel_id']
             live = new_params.get('live')
 
