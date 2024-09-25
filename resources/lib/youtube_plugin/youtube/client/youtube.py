@@ -1982,7 +1982,7 @@ class YouTube(LoginClient):
         if getattr(exc, 'notify', True):
             ok_dialog = False
             timeout = 5000
-            if reason == 'accessNotConfigured':
+            if reason in {'accessNotConfigured', 'forbidden'}:
                 notification = self._context.localize('key.requirement')
                 ok_dialog = True
             elif reason == 'keyInvalid' and message == 'Bad Request':
