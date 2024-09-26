@@ -654,7 +654,7 @@ def update_video_infos(provider, context, video_id_dict,
 
         # try to find a better resolution for the image
         image = media_item.get_image()
-        if not image:
+        if not image or image.startswith('Default'):
             image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         if image.endswith('_live.jpg'):
             image = ''.join((image, '?ct=', thumb_stamp))

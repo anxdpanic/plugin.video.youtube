@@ -31,6 +31,7 @@ from ...constants import (
 )
 from ...exceptions import KodionException
 from ...items import (
+    CommandItem,
     directory_listitem,
     image_listitem,
     media_listitem,
@@ -179,10 +180,20 @@ class XbmcPlugin(AbstractPlugin):
                 ))
                 ui.on_ok('Error in ContentProvider', exc.__str__())
 
-        items = None
+        items = isinstance(result, (list, tuple))
         item_count = 0
+        if items:
+            if not result:
+                result = [
+                    CommandItem(
+                        context.localize('page.back'),
+                        'Action(ParentDir)',
+                        context,
+                        image='DefaultFolderBack.png',
+                        plot=context.localize('page.empty'),
+                    )
+                ]
 
-        if result and isinstance(result, (list, tuple)):
             show_fanart = settings.fanart_selection()
             items = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](

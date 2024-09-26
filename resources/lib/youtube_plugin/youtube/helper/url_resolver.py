@@ -169,6 +169,17 @@ class YouTubeResolver(AbstractResolver):
                 })
                 return url_components._replace(query=urlencode(params)).geturl()
 
+        elif path == '/watch_videos':
+            params = dict(parse_qsl(url_components.query))
+            new_components = urlsplit(response.url)
+            new_params = dict(parse_qsl(new_components.query))
+            # add/overwrite all other params from original query string
+            new_params.update(params)
+            # build new URL from these components
+            return new_components._replace(
+                query=urlencode(new_params)
+            ).geturl()
+
         # we try to extract the channel id from the html content
         # With the channel id we can construct a URL we already work with
         # https://www.youtube.com/channel/<CHANNEL_ID>
