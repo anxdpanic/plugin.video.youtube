@@ -1,3 +1,15 @@
+## v7.1.0+beta.5
+### Fixed
+- Fix default thumbnails not being updated if available
+
+### Changed
+- Remove revoked API credentials
+- Improve handling of "forbidden - The caller does not have permission" errors
+
+### New
+- Preliminary support for /watch_videos YouTube urls
+- Player client updates
+
 ## v7.1.0+beta.4
 ### Fixed
 - Fix playback history related context menu items not being shown #904
