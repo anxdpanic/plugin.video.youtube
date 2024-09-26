@@ -85,6 +85,7 @@ class AbstractContext(object):
         'channel_ids',
         'item_filter',
         'playlist_ids',
+        'video_ids',
     }
     _STRING_PARAMS = {
         'api_key',

@@ -711,8 +711,9 @@ class StreamInfo(YouTubeRequestClient):
             ),
             # Will play most videos with subtitles at full resolution with HDR
             # Some restricted videos require additional requests for subtitles
-            # Limited audio stream availability
+            # Limited audio stream availability with some clients
             'mpd': (
+                'android_vr',
                 'android_youtube_tv',
                 'android_testsuite',
             ),
