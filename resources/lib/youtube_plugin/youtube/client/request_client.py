@@ -154,11 +154,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'deviceModel': 'Quest 3',
                         'osName': 'Android',
                         'osVersion': '12L',
-                        'androidSdkVersion': '32'
+                        'androidSdkVersion': '32',
                     }
                 }
             },
-            'header': {
+            'headers': {
                 'User-Agent': ('com.google.android.apps.youtube.vr.oculus/'
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
