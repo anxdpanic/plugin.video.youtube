@@ -80,11 +80,11 @@ class LoginClient(YouTubeRequestClient):
             return None, None, None, json_data, False, InvalidGrant(json_data)
         return None, None, None, json_data, False, LoginException(json_data)
 
-    def set_access_token(self, access_token=''):
-        self._access_token = access_token
-
-    def set_access_token_tv(self, access_token_tv=''):
-        self._access_token_tv = access_token_tv
+    def set_access_token(self, personal=None, tv=None):
+        if personal is not None:
+            self._access_token = personal
+        if tv is not None:
+            self._access_token_tv = tv
 
     def revoke(self, refresh_token):
         # https://developers.google.com/youtube/v3/guides/auth/devices
@@ -107,8 +107,10 @@ class LoginClient(YouTubeRequestClient):
                      raise_exc=True)
 
     def refresh_token_tv(self, refresh_token):
-        client_id = self._config_tv.get('id', '')
-        client_secret = self._config_tv.get('secret', '')
+        client_id = self._config_tv.get('id')
+        client_secret = self._config_tv.get('secret')
+        if not client_id or not client_secret:
+            return '', 0
         return self.refresh_token(refresh_token,
                                   client_id=client_id,
                                   client_secret=client_secret)
@@ -151,13 +153,15 @@ class LoginClient(YouTubeRequestClient):
 
         if json_data:
             access_token = json_data['access_token']
-            expires_in = time.time() + int(json_data.get('expires_in', 3600))
-            return access_token, expires_in
-        return '', ''
+            expiry = time.time() + int(json_data.get('expires_in', 3600))
+            return access_token, expiry
+        return '', 0
 
     def request_access_token_tv(self, code, client_id='', client_secret=''):
-        client_id = client_id or self._config_tv.get('id', '')
-        client_secret = client_secret or self._config_tv.get('secret', '')
+        client_id = client_id or self._config_tv.get('id')
+        client_secret = client_secret or self._config_tv.get('secret')
+        if not client_id or not client_secret:
+            return '', ''
         return self.request_access_token(code,
                                          client_id=client_id,
                                          client_secret=client_secret)
@@ -200,7 +204,9 @@ class LoginClient(YouTubeRequestClient):
         return json_data
 
     def request_device_and_user_code_tv(self):
-        client_id = self._config_tv.get('id', '')
+        client_id = self._config_tv.get('id')
+        if not client_id:
+            return None
         return self.request_device_and_user_code(client_id=client_id)
 
     def request_device_and_user_code(self, client_id=''):
@@ -282,17 +288,24 @@ class LoginClient(YouTubeRequestClient):
     def _get_config_type(self, client_id, client_secret=None):
         """used for logging"""
         if client_secret is None:
-            using_conf_tv = client_id == self._config_tv.get('id', '')
-            using_conf_main = client_id == self._config.get('id', '')
+            config_id = self._config_tv.get('id')
+            using_conf_tv = config_id and client_id == config_id
+            config_id = self._config.get('id')
+            using_conf_main = config_id and client_id == config_id
         else:
+            config_secret = self._config_tv.get('secret')
+            config_id = self._config_tv.get('id')
             using_conf_tv = (
-                    client_secret == self._config_tv.get('secret', '')
-                    and client_id == self._config_tv.get('id', '')
+                    config_secret and client_secret == config_secret
+                    and config_id and client_id == config_id
             )
+            config_secret = self._config.get('secret')
+            config_id = self._config.get('id')
             using_conf_main = (
-                    client_secret == self._config.get('secret', '')
-                    and client_id == self._config.get('id', '')
+                    config_secret and client_secret == config_secret
+                    and config_id and client_id == config_id
             )
+
         if not using_conf_main and not using_conf_tv:
             return 'None'
         if using_conf_tv:

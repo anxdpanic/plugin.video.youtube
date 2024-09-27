@@ -27,7 +27,8 @@ def process(mode, provider, context, sign_out_refresh=True):
         if refresh_tokens:
             for _refresh_token in set(refresh_tokens):
                 try:
-                    client.revoke(_refresh_token)
+                    if _refresh_token:
+                        client.revoke(_refresh_token)
                 except LoginException:
                     pass
         access_manager.update_access_token(
@@ -44,6 +45,8 @@ def process(mode, provider, context, sign_out_refresh=True):
                 json_data = _client.request_device_and_user_code_tv()
             else:
                 json_data = _client.request_device_and_user_code()
+            if not json_data:
+                return '', 0, ''
         except LoginException:
             _do_logout()
             raise
@@ -76,6 +79,8 @@ def process(mode, provider, context, sign_out_refresh=True):
                         json_data = _client.request_access_token_tv(device_code)
                     else:
                         json_data = _client.request_access_token(device_code)
+                    if not json_data:
+                        break
                 except LoginException:
                     _do_logout()
                     raise
@@ -93,11 +98,11 @@ def process(mode, provider, context, sign_out_refresh=True):
                     _access_token = json_data.get('access_token', '')
                     _refresh_token = json_data.get('refresh_token', '')
                     if not _access_token and not _refresh_token:
-                        _expires_in = 0
+                        _expiry = 0
                     else:
-                        _expires_in = (int(json_data.get('expires_in', 3600))
-                                       + time.time())
-                    return _access_token, _expires_in, _refresh_token
+                        _expiry = (int(json_data.get('expires_in', 3600))
+                                   + time.time())
+                    return _access_token, _expiry, _refresh_token
 
                 if json_data['error'] != 'authorization_pending':
                     message = json_data['error']
@@ -118,15 +123,15 @@ def process(mode, provider, context, sign_out_refresh=True):
             ui.refresh_container()
 
     elif mode == 'in':
-        ui.on_ok(localize('sign.twice.title'), localize('sign.twice.text'))
+        ui.on_ok(localize('sign.multi.title'), localize('sign.multi.text'))
 
-        tokens = {
-            'tv': None,
-            'kodi': None,
-        }
-        for token in tokens:
+        token_types = ('tv', 'personal')
+        tokens = [None, None]
+        for idx, token in enumerate(token_types):
             new_token = _do_login(login_type=token)
-            access_token, expires_in, refresh_token = new_token
+            tokens[idx] = new_token
+            access_token, expiry, refresh_token = new_token
+
             context.log_debug('YouTube Login:'
                               ' Type |{0}|,'
                               ' Access Token |{1}|,'
@@ -135,15 +140,8 @@ def process(mode, provider, context, sign_out_refresh=True):
                               .format(token,
                                       access_token != '',
                                       refresh_token != '',
-                                      expires_in))
-            # abort login
-            if not access_token and not refresh_token:
-                provider.reset_client()
-                access_manager.update_access_token(addon_id, '')
-                ui.refresh_container()
-                return
-            tokens[token] = new_token
+                                      expiry))
 
         provider.reset_client()
-        access_manager.update_access_token(addon_id, *zip(*tokens.values()))
+        access_manager.update_access_token(addon_id, *zip(*tokens))
         ui.refresh_container()
