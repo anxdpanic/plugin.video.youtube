@@ -1408,7 +1408,7 @@ class StreamInfo(YouTubeRequestClient):
                         'auth': bool(_client.get('_access_token')),
                     },
                     **_client
-                )
+                ) or {}
 
                 video_details = _result.get('videoDetails', {})
                 playability = _result.get('playabilityStatus', {})
