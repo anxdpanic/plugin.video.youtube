@@ -194,7 +194,8 @@ class YouTube(LoginClient):
                     audio_only=False,
                     use_mpd=True):
         return StreamInfo(context,
-                          access_token=self._access_token_tv,
+                          access_token=(self._access_token
+                                        or self._access_token_tv),
                           ask_for_quality=ask_for_quality,
                           audio_only=audio_only,
                           use_mpd=use_mpd).load_stream_info(video_id)
