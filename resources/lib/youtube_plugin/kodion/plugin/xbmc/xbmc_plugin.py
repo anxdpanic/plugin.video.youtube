@@ -20,6 +20,7 @@ from ...constants import (
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
+    CONTENT_TYPE,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -258,6 +259,7 @@ class XbmcPlugin(AbstractPlugin):
             cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
             update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
         else:
+            ui.clear_property(CONTENT_TYPE)
             succeeded = bool(result)
             cache_to_disc = False
             update_listing = True
