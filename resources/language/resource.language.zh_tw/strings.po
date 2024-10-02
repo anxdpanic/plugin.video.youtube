@@ -485,12 +485,12 @@ msgid "No further links found."
 msgstr "沒有此範圍的其他連結。"
 
 msgctxt "#30546"
-msgid "Please log in twice!"
-msgstr "請登入兩次！"
+msgid "Please complete all login prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "您要啟用兩個應用，Youtube 才能發揮完整的功能。"
+msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid "More..."
@@ -1579,6 +1579,14 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+#~ msgctxt "#30546"
+#~ msgid "Please log in twice!"
+#~ msgstr "請登入兩次！"
+
+#~ msgctxt "#30547"
+#~ msgid "You must enable two applications so that YouTube is functioning properly."
+#~ msgstr "您要啟用兩個應用，Youtube 才能發揮完整的功能。"
 
 #~ msgctxt "#30001"
 #~ msgid "Username"

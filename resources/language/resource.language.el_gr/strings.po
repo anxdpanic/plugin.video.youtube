@@ -485,12 +485,12 @@ msgid "No further links found."
 msgstr "Δεν βρέθηκαν άλλοι σύνδεσμοι."
 
 msgctxt "#30546"
-msgid "Please log in twice!"
-msgstr "Παρακαλώ πραγματοποιήστε είσοδο δύο φορές!"
+msgid "Please complete all login prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Πρέπει να επιτρέψετε δύο εφαρμογές του πρόσθετου Youtube ώστε να λειτουργεί σωστά"
+msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid "More..."
@@ -1579,6 +1579,14 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+#~ msgctxt "#30546"
+#~ msgid "Please log in twice!"
+#~ msgstr "Παρακαλώ πραγματοποιήστε είσοδο δύο φορές!"
+
+#~ msgctxt "#30547"
+#~ msgid "You must enable two applications so that YouTube is functioning properly."
+#~ msgstr "Πρέπει να επιτρέψετε δύο εφαρμογές του πρόσθετου Youtube ώστε να λειτουργεί σωστά"
 
 #~ msgctxt "#30001"
 #~ msgid "Username"

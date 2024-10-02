@@ -483,12 +483,12 @@ msgid "No further links found."
 msgstr "Подальших посилань не знайдено."
 
 msgctxt "#30546"
-msgid "Please log in twice!"
-msgstr "Будь-ласка, увійдіть двічі!"
+msgid "Please complete all login prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Ви повинні підключити дві копії програми щоб YouTube працював правильно."
+msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid "More..."
@@ -1577,6 +1577,14 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+#~ msgctxt "#30546"
+#~ msgid "Please log in twice!"
+#~ msgstr "Будь-ласка, увійдіть двічі!"
+
+#~ msgctxt "#30547"
+#~ msgid "You must enable two applications so that YouTube is functioning properly."
+#~ msgstr "Ви повинні підключити дві копії програми щоб YouTube працював правильно."
 
 #~ msgctxt "#30001"
 #~ msgid "Username"
