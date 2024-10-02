@@ -5,21 +5,21 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-04-12 14:59+0000\n"
-"Last-Translator: Anonymous <noreply@weblate.org>\n"
+"PO-Revision-Date: 2024-09-26 19:52+0000\n"
+"Last-Translator: Jakub Fabijan <animatorzpolski@gmail.com>\n"
 "Language-Team: Esperanto <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/eo/>\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.4.3\n"
+"X-Generator: Weblate 5.7.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
-msgstr ""
+msgstr "Aldonaĵo por YouTube"
 
 msgctxt "Addon Description"
 msgid "YouTube is one of the biggest video-sharing websites of the world."
@@ -38,7 +38,7 @@ msgstr ""
 # Kodion Settings
 msgctxt "#30000"
 msgid "General"
-msgstr ""
+msgstr "Ĝeneralaj"
 
 msgctxt "#30001"
 msgid ""
@@ -50,65 +50,65 @@ msgstr ""
 
 msgctxt "#30003"
 msgid "YouTube"
-msgstr ""
+msgstr "YouTube"
 
 # empty strings from id 30004 to 30006
 msgctxt "#30007"
 msgid "Use InputStream.Adaptive"
-msgstr ""
+msgstr "Uzi InputStream.Adaptive"
 
 msgctxt "#30008"
 msgid "Configure InputStream.Adaptive"
-msgstr ""
+msgstr "Konfiguri InputStream.Adaptive"
 
 msgctxt "#30009"
 msgid "Always ask for the video quality"
-msgstr ""
+msgstr "Ĉiam demandi la kvaliton de video"
 
 msgctxt "#30010"
 msgid "Maximum video quality"
-msgstr ""
+msgstr "Maksimuma videa kvalito"
 
 msgctxt "#30011"
 msgid "480p"
-msgstr ""
+msgstr "480p"
 
 msgctxt "#30012"
 msgid "720p (HD)"
-msgstr ""
+msgstr "720p (HD)"
 
 msgctxt "#30013"
 msgid "1080p (FHD)"
-msgstr ""
+msgstr "1080p (FHD)"
 
 msgctxt "#30014"
 msgid "2160p (4K)"
-msgstr ""
+msgstr "2160p (4K)"
 
 msgctxt "#30015"
 msgid "4320p (8K)"
-msgstr ""
+msgstr "4320p (8K)"
 
 msgctxt "#30016"
 msgid "240p"
-msgstr ""
+msgstr "240p"
 
 msgctxt "#30017"
 msgid "360p"
-msgstr ""
+msgstr "360p"
 
 msgctxt "#30018"
 msgid "1080p Live / 720p (HD)"
-msgstr ""
+msgstr "1080p Realtempe / 720p (HD)"
 
 msgctxt "#30019"
 msgid "144p"
-msgstr ""
+msgstr "144p"
 
 # empty strings 30019
 msgctxt "#30020"
 msgid "Allow 3D"
-msgstr ""
+msgstr "Permesi 3D"
 
 msgctxt "#30021"
 msgid "Show fanart"
@@ -116,7 +116,7 @@ msgstr ""
 
 msgctxt "#30022"
 msgid "Items per page"
-msgstr ""
+msgstr "Eroj paĝe"
 
 msgctxt "#30023"
 msgid "Search history size"
@@ -136,39 +136,39 @@ msgstr ""
 
 msgctxt "#30027"
 msgid "View: Default"
-msgstr ""
+msgstr "Vido: Apriora"
 
 msgctxt "#30028"
 msgid "View: Episodes"
-msgstr ""
+msgstr "Vido: Epizodoj"
 
 msgctxt "#30029"
 msgid "View: Movies"
-msgstr ""
+msgstr "Vido: Filmoj"
 
 msgctxt "#30030"
 msgid "Configure %s?"
-msgstr ""
+msgstr "Ĉu konfiguri %s?"
 
 msgctxt "#30031"
 msgid "Advanced"
-msgstr ""
+msgstr "Altnivelaj"
 
 msgctxt "#30032"
 msgid "View: TV Shows"
-msgstr ""
+msgstr "Vido: Televidserioj"
 
 msgctxt "#30033"
 msgid "View: Songs"
-msgstr ""
+msgstr "Vido: Kantoj"
 
 msgctxt "#30034"
 msgid "View: Artists"
-msgstr ""
+msgstr "Vido: Artistoj"
 
 msgctxt "#30035"
 msgid "View: Albums"
-msgstr ""
+msgstr "Vido: Albumoj"
 
 msgctxt "#30036"
 msgid "Support alternative player"
@@ -186,15 +186,15 @@ msgstr ""
 # empty strings from id 30039 to 30099
 msgctxt "#30100"
 msgid "Bookmarks"
-msgstr ""
+msgstr "Legosignoj"
 
 msgctxt "#30101"
 msgid "Bookmark"
-msgstr ""
+msgstr "Legosigno"
 
 msgctxt "#30102"
 msgid "Search"
-msgstr ""
+msgstr "Serĉi"
 
 msgctxt "#30103"
 msgid ""
@@ -210,15 +210,15 @@ msgstr ""
 
 msgctxt "#30106"
 msgid "Next Page (%d)"
-msgstr ""
+msgstr "Sekva paĝo (%d)"
 
 msgctxt "#30107"
 msgid "Watch Later"
-msgstr ""
+msgstr "Spekti poste"
 
 msgctxt "#30108"
 msgid "Remove"
-msgstr ""
+msgstr "Forigi"
 
 msgctxt "#30109"
 msgid ""
@@ -226,23 +226,23 @@ msgstr ""
 
 msgctxt "#30110"
 msgid "New Search"
-msgstr ""
+msgstr "Nova serĉo"
 
 msgctxt "#30111"
 msgid "Sign In"
-msgstr ""
+msgstr "Ensaluti"
 
 msgctxt "#30112"
 msgid "Sign Out"
-msgstr ""
+msgstr "Elsaluti"
 
 msgctxt "#30113"
 msgid "Rename"
-msgstr ""
+msgstr "Alinomi"
 
 msgctxt "#30114"
 msgid "Confirm delete"
-msgstr ""
+msgstr "Konfirmi forigon"
 
 msgctxt "#30115"
 msgid "Confirm remove"
@@ -250,7 +250,7 @@ msgstr ""
 
 msgctxt "#30116"
 msgid "Delete \"%s\"?"
-msgstr ""
+msgstr "Ĉu forigi \"%s\"?"
 
 msgctxt "#30117"
 msgid "Remove \"%s\"?"
@@ -258,11 +258,11 @@ msgstr ""
 
 msgctxt "#30118"
 msgid "Delete"
-msgstr ""
+msgstr "Forigi"
 
 msgctxt "#30119"
 msgid "Please wait..."
-msgstr ""
+msgstr "Bonvolu atendi…"
 
 msgctxt "#30120"
 msgid "Confirm clear"
@@ -276,11 +276,11 @@ msgstr ""
 # empty strings from id 30121 to 30199
 msgctxt "#30200"
 msgid "API"
-msgstr ""
+msgstr "API"
 
 msgctxt "#30201"
 msgid "API Key"
-msgstr ""
+msgstr "API-ŝlosilo"
 
 msgctxt "#30202"
 msgid "API Id"
@@ -288,7 +288,7 @@ msgstr ""
 
 msgctxt "#30203"
 msgid "API Secret"
-msgstr ""
+msgstr "API-sekreto"
 
 msgctxt "#30204"
 msgid ""
@@ -302,15 +302,15 @@ msgstr ""
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid "Channels"
-msgstr ""
+msgstr "Kanaloj"
 
 msgctxt "#30501"
 msgid "Playlists"
-msgstr ""
+msgstr "Ludlistoj"
 
 msgctxt "#30502"
 msgid "Go to %s"
-msgstr ""
+msgstr "Iri al %s"
 
 msgctxt "#30503"
 msgid "Channel fanart"
@@ -318,31 +318,31 @@ msgstr ""
 
 msgctxt "#30504"
 msgid "Subscriptions"
-msgstr ""
+msgstr "Abonoj"
 
 msgctxt "#30505"
 msgid "Unsubscribe"
-msgstr ""
+msgstr "Malaboni"
 
 msgctxt "#30506"
 msgid "Subscribe"
-msgstr ""
+msgstr "Aboni"
 
 msgctxt "#30507"
 msgid "My Channel"
-msgstr ""
+msgstr "Mia kanalo"
 
 msgctxt "#30508"
 msgid "Liked Videos"
-msgstr ""
+msgstr "Ŝatitaj videaĵoj"
 
 msgctxt "#30509"
 msgid "History"
-msgstr ""
+msgstr "Historio"
 
 msgctxt "#30510"
 msgid "My Subscriptions"
-msgstr ""
+msgstr "Miaj abonoj"
 
 msgctxt "#30511"
 msgid "Queue video"

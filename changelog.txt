@@ -1,10 +1,66 @@
+## v7.1.0
+### Fixed
+- Fix logging/retry of sqlite3.OperationalError
+- Fix trying to use ISA for progressive live streams
+- Retain list position when refreshing listings
+- Add workarounds for trying to play videos using RunPlugin rather PlayMedia
+- Fix possible regression causing 6s delay on first play
+- Fix regression in building client details causing wrong referer to be used
+- Only reroute to new window if container was not filled by the plugin #896
+- Only reroute to new window if modal dialog is not open #896
+- Fix various timing and sync issues with script, service, plugin and Kodi settings
+- Fix playback history related context menu items not being shown #904
+- Fix new resume details not being saved in plugin local playback history #904
+- Fix default thumbnails not being updated if available
+- Fix login to personal project only #910
+
+### Changed
+- Update multiple busy dialog crash workaround #891
+- Use all playable codecs but deprioritise if not selected in stream features
+- Change default live stream type to suit ISA and Youtube stream availability
+- Use a CommandItem that opens the Info dialog for comments to avoid log spam
+- Revert old workaround for Kodi treating a non-folder listitem as playable
+- Improve parsing of plugin url query parameters to allow empty values
+- Move IP location lookup to script and add to settings dialog
+- Move language and region selection to script and add to settings dialog
+- Allow default thumbnail selection fallbacks for all results
+- Simplify handling of local history
+  - Incognito will no longer prevent existing local history from being shown
+  - Incognito will continue to prevent any update to local history
+- Remove revoked API credentials #905
+- Improve handling of "forbidden - The caller does not have permission" errors #905
+- Allow retries on POST requests #913
+
+### New
+- Allow ask for quality from context menu to override audio only setting
+- Add items_per_page query parameter to allow number of items in widgets to be customised #896
+- Add item_filter query parameter to override "Hide videos from listings" setting #896
+  - Comma seperated string of item types to be filtered out of listing
+  - "?item_filter=shorts" will remove shorts from listing
+  - "?item_filter=shorts,live" will remove shorts and live streams from listing
+  - "?item_filter" will show all item types
+  - Allowable item types:
+    - shorts
+    - upcoming
+    - upcoming_live
+    - live
+    - premieres
+    - completed
+    - vod
+- Add hide_next_page query parameter to hide plugin Next page item #896
+- Add new input_prompt command for search endpoint to bypass Kodi window caching
+  - plugin://plugin.video.youtube/kodion/search/input_prompt
+- Add support for proxy settings #884
+- Preliminary support for /watch_videos YouTube urls
+- Player client updates
+
 ## v7.1.0+beta.5
 ### Fixed
 - Fix default thumbnails not being updated if available
 
 ### Changed
-- Remove revoked API credentials
-- Improve handling of "forbidden - The caller does not have permission" errors
+- Remove revoked API credentials #905
+- Improve handling of "forbidden - The caller does not have permission" errors #905
 
 ### New
 - Preliminary support for /watch_videos YouTube urls

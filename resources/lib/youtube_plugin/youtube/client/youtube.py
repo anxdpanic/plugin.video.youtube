@@ -53,6 +53,7 @@ class YouTube(LoginClient):
             'headers': {
                 'Host': 'www.googleapis.com',
             },
+            'auth_required': True,
         },
         'tv': {
             'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
@@ -194,7 +195,8 @@ class YouTube(LoginClient):
                     audio_only=False,
                     use_mpd=True):
         return StreamInfo(context,
-                          access_token=self._access_token_tv,
+                          access_token=(self._access_token
+                                        or self._access_token_tv),
                           ask_for_quality=ask_for_quality,
                           audio_only=audio_only,
                           use_mpd=use_mpd).load_stream_info(video_id)
@@ -2032,22 +2034,31 @@ class YouTube(LoginClient):
         if params:
             client_data['params'] = params
 
+        abort = False
+        if no_login:
+            pass
         # a config can decide if a token is allowed
-        if (not no_login and self._access_token
-                and self._config.get('token-allowed', True)):
+        elif self._access_token and self._config.get('token-allowed', True):
             client_data['_access_token'] = self._access_token
+        # abort if authentication is required but not available for request
+        elif self.CLIENTS.get(version, {}).get('auth_required'):
+            abort = True
 
         client = self.build_client(version, client_data)
 
         params = client.get('params')
-        if 'key' in params and not params['key']:
-            params = params.copy()
-            key = self._config.get('key') or self._config_tv.get('key')
-            if key:
-                params['key'] = key
+        if 'key' in params:
+            if params['key']:
+                abort = False
             else:
-                del params['key']
-            client['params'] = params
+                params = params.copy()
+                key = self._config.get('key') or self._config_tv.get('key')
+                if key:
+                    abort = False
+                    params['key'] = key
+                else:
+                    del params['key']
+                client['params'] = params
 
         if clear_data and 'json' in client:
             del client['json']
@@ -2070,21 +2081,26 @@ class YouTube(LoginClient):
         else:
             log_headers = None
 
-        self._context.log_debug('API request:\n'
-                                'version: |{version}|\n'
-                                'method: |{method}|\n'
-                                'path: |{path}|\n'
-                                'params: |{params}|\n'
-                                'post_data: |{data}|\n'
-                                'headers: |{headers}|'
-                                .format(version=version,
-                                        method=method,
-                                        path=path,
-                                        params=log_params,
-                                        data=client.get('json'),
-                                        headers=log_headers))
-        response = self.request(response_hook=self._response_hook,
-                                response_hook_kwargs=kwargs,
-                                error_hook=self._error_hook,
-                                **client)
-        return response
+        context = self._context
+        context.log_debug('API request:\n'
+                          'version: |{version}|\n'
+                          'method: |{method}|\n'
+                          'path: |{path}|\n'
+                          'params: |{params}|\n'
+                          'post_data: |{data}|\n'
+                          'headers: |{headers}|'
+                          .format(version=version,
+                                  method=method,
+                                  path=path,
+                                  params=log_params,
+                                  data=client.get('json'),
+                                  headers=log_headers))
+        if abort:
+            if kwargs.get('notify', True):
+                context.get_ui().on_ok(context.get_name(), context.localize('key.requirement'))
+            context.log_warning('API request: aborted')
+            return {}
+        return self.request(response_hook=self._response_hook,
+                            response_hook_kwargs=kwargs,
+                            error_hook=self._error_hook,
+                            **client)

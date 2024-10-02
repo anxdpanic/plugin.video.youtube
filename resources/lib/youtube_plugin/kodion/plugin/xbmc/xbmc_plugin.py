@@ -20,6 +20,7 @@ from ...constants import (
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
+    CONTENT_TYPE,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -266,6 +267,7 @@ class XbmcPlugin(AbstractPlugin):
                     context.log_debug('Override view mode to "%d"' % view_mode)
                     context.execute('Container.SetViewMode(%d)' % view_mode)
         else:
+            ui.clear_property(CONTENT_TYPE)
             succeeded = bool(result)
             cache_to_disc = False
             update_listing = True

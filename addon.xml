@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.youtube" name="YouTube" version="7.1.0+beta.5" provider-name="anxdpanic, bromix, MoojMidge">
+<addon id="plugin.video.youtube" name="YouTube" version="7.1.0" provider-name="anxdpanic, bromix, MoojMidge">
     <requires>
         <import addon="xbmc.python" version="3.0.0"/>
         <import addon="script.module.requests" version="2.27.1"/>
@@ -32,6 +32,7 @@
         <summary lang="de_DE">Plugin für YouTube</summary>
         <summary lang="el_GR">Πρόσθετο YouTube</summary>
         <summary lang="en_GB">Plugin for YouTube</summary>
+        <summary lang="eo">Aldonaĵo por YouTube</summary>
         <summary lang="es_ES">Complemento para YouTube</summary>
         <summary lang="es_MX">Complemento para YouTube</summary>
         <summary lang="fi_FI">YouTube-lisäosa</summary>
