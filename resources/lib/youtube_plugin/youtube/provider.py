@@ -277,34 +277,58 @@ class Provider(AbstractProvider):
 
             # create new access tokens
             elif len(access_tokens) != 2 and len(refresh_tokens) == 2:
+                access_tokens = ['', '']
+                token_expiry = 0
+                token_index = {
+                    0: {
+                        'type': 'tv',
+                        'refresh': client.refresh_token_tv,
+                    },
+                    1: {
+                        'type': 'personal',
+                        'refresh': client.refresh_token,
+                    },
+                }
                 try:
-                    kodi_token = client.refresh_token(refresh_tokens[1])
-                    tv_token = client.refresh_token_tv(refresh_tokens[0])
-                    access_tokens = (tv_token[0], kodi_token[0])
-                    expires_in = min(tv_token[1], kodi_token[1])
-                    access_manager.update_access_token(
-                        dev_id, access_tokens, expires_in,
-                    )
-                except (InvalidGrant, LoginException) as exc:
-                    self.handle_exception(context, exc)
-                    # reset access_token
-                    if isinstance(exc, InvalidGrant):
+                    for idx, value in enumerate(refresh_tokens):
+                        if not value:
+                            continue
+
+                        token, expiry = token_index[idx]['refresh'](value)
+                        if token and expiry > 0:
+                            access_tokens[idx] = token
+                            if not token_expiry or expiry < token_expiry:
+                                token_expiry = expiry
+
+                    if any(access_tokens) and expiry:
                         access_manager.update_access_token(
-                            dev_id, access_token='', refresh_token='',
+                            dev_id, access_tokens, token_expiry,
                         )
                     else:
-                        access_manager.update_access_token(dev_id)
+                        raise InvalidGrant
+
+                except (InvalidGrant, LoginException) as exc:
+                    self.handle_exception(context, exc)
+                    # reset access token
+                    # reset refresh token if InvalidGrant otherwise leave as-is
+                    # to retry later
+                    access_manager.update_access_token(
+                        dev_id,
+                        refresh_token=('' if isinstance(exc, InvalidGrant)
+                                       else None),
+                    )
 
             # in debug log the login status
-            self._logged_in = len(access_tokens) == 2
+            self._logged_in = any(access_tokens)
             if self._logged_in:
                 context.log_debug('User is logged in')
-                client.set_access_token_tv(access_token_tv=access_tokens[0])
-                client.set_access_token(access_token=access_tokens[1])
+                client.set_access_token(
+                    personal=access_tokens[1],
+                    tv=access_tokens[0],
+                )
             else:
                 context.log_debug('User is not logged in')
-                client.set_access_token_tv(access_token_tv='')
-                client.set_access_token(access_token='')
+                client.set_access_token(personal='', tv='')
 
         self._client = client
         return self._client
@@ -717,8 +741,13 @@ class Provider(AbstractProvider):
     def on_sign(provider, context, re_match):
         sign_out_confirmed = context.get_param('confirmed')
         mode = re_match.group('mode')
-        if (mode == 'in') and context.get_access_manager().get_refresh_token():
-            yt_login.process('out', provider, context, sign_out_refresh=False)
+        if mode == 'in':
+            refresh_tokens = context.get_access_manager().get_refresh_token()
+            if any(refresh_tokens):
+                yt_login.process('out',
+                                 provider,
+                                 context,
+                                 sign_out_refresh=False)
 
         if (not sign_out_confirmed and mode == 'out'
                 and context.get_ui().on_yes_no_input(
@@ -931,7 +960,8 @@ class Provider(AbstractProvider):
             if refresh_tokens:
                 for refresh_token in set(refresh_tokens):
                     try:
-                        client.revoke(refresh_token)
+                        if refresh_token:
+                            client.revoke(refresh_token)
                     except LoginException:
                         success = False
             provider.reset_client()

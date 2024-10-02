@@ -456,7 +456,7 @@ class AccessManager(JSONStore):
 
         if unix_timestamp is not None:
             details['token_expires'] = (
-                min(map(int, unix_timestamp))
+                min(map(int, [val for val in unix_timestamp if val]))
                 if isinstance(unix_timestamp, (list, tuple)) else
                 int(unix_timestamp)
             )
