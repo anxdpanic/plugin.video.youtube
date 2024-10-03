@@ -13,7 +13,6 @@ from __future__ import absolute_import, division, unicode_literals
 from .constants import (
     ABORT_FLAG,
     PLUGIN_SLEEPING,
-    SERVER_POST_START,
     TEMP_PATH,
     VIDEO_ID,
 )
@@ -43,7 +42,6 @@ def run():
 
     ui = context.get_ui()
     clear_property = ui.clear_property
-    pop_property = ui.pop_property
     set_property = ui.set_property
 
     clear_property(ABORT_FLAG)
@@ -95,13 +93,9 @@ def run():
                 if httpd_idle_time_ms >= httpd_idle_timeout_ms:
                     httpd_idle_time_ms = 0
                     monitor.shutdown_httpd(sleep=True)
-            else:
-                if monitor.httpd_sleep_allowed is None:
-                    if pop_property(SERVER_POST_START):
-                        monitor.httpd_sleep_allowed = True
-                    httpd_idle_time_ms = 0
-                else:
-                    pop_property(SERVER_POST_START)
+            elif monitor.httpd_sleep_allowed is None:
+                monitor.httpd_sleep_allowed = True
+                httpd_idle_time_ms = 0
         else:
             if httpd_idle_time_ms >= httpd_ping_period_ms:
                 httpd_idle_time_ms = 0
