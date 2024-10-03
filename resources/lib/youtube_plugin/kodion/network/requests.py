@@ -145,7 +145,7 @@ class BaseRequestsClass(object):
                     error_details.update(_detail)
                 if _response is not None:
                     response = _response
-                    response_text = str(_response)
+                    response_text = repr(_response)
                 if _trace is not None:
                     stack_trace = _trace
                 if _exc is not None:
@@ -168,7 +168,7 @@ class BaseRequestsClass(object):
                     error_info = str(exc)
 
             if response_text:
-                response_text = 'Request response:\n{0}'.format(response_text)
+                response_text = 'Response:\n\t|{0}|'.format(response_text)
 
             if stack_trace:
                 stack_trace = (

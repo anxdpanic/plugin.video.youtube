@@ -1968,14 +1968,16 @@ class YouTube(LoginClient):
         if getattr(exc, 'pass_data', False):
             data = json_data
         else:
-            data = None
+            data = kwargs['response']
         if getattr(exc, 'raise_exc', False):
             exception = YouTubeException
         else:
             exception = None
 
         if not json_data or 'error' not in json_data:
-            return None, None, None, data, None, exception
+            info = 'Exception:\n\t|{exc!r}|'
+            details = kwargs
+            return None, info, details, data, None, exception
 
         details = json_data['error']
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
@@ -2005,7 +2007,7 @@ class YouTube(LoginClient):
                                                          time_ms=timeout)
 
         info = ('API error: {reason}\n'
-                'exc: |{exc}|\n'
+                'exc: |{exc!r}|\n'
                 'message: |{message}|')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
