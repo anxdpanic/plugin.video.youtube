@@ -28,9 +28,15 @@ __all__ = ('run',)
 
 def run():
     context = XbmcContext()
-    context.log_debug('YouTube service initialization...')
-
     provider = Provider()
+
+    system_version = context.get_system_version()
+    context.log_notice('Service: Starting |v{version}|\n'
+                       'Kodi: |v{kodi}|\n'
+                       'Python: |v{python}|'
+                       .format(version=context.get_version(),
+                               kodi=str(system_version),
+                               python=system_version.get_python_version()))
 
     get_listitem_info = context.get_listitem_info
     get_listitem_property = context.get_listitem_property

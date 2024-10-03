@@ -646,6 +646,20 @@ def run(argv):
             if params:
                 params = dict(parse_qsl(args.query))
 
+        system_version = context.get_system_version()
+        context.log_notice('Script: Running |v{version}|\n'
+                           'Kodi: |v{kodi}|\n'
+                           'Python: |v{python}|\n'
+                           'Category: |{category}|\n'
+                           'Action: |{action}|\n'
+                           'Params: |{params}|'
+                           .format(version=context.get_version(),
+                                   kodi=str(system_version),
+                                   python=system_version.get_python_version(),
+                                   category=category,
+                                   action=action,
+                                   params=params))
+
         if not category:
             xbmcaddon.Addon().openSettings()
             return
