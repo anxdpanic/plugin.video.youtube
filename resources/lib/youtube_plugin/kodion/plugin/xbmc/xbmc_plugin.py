@@ -259,8 +259,9 @@ class XbmcPlugin(AbstractPlugin):
             cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
             update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
         else:
-            ui.clear_property(CONTENT_TYPE)
             succeeded = bool(result)
+            if not succeeded:
+                ui.clear_property(CONTENT_TYPE)
             cache_to_disc = False
             update_listing = True
 
