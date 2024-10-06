@@ -485,12 +485,12 @@ msgid "No further links found."
 msgstr "Tidak ada tautan lebih lanjut yang ditemukan."
 
 msgctxt "#30546"
-msgid "Please log in twice!"
-msgstr "Silakan masuk dua kali!"
+msgid "Please complete all login prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "Anda harus mengaktifkan dua aplikasi agar YouTube berfungsi dengan baik."
+msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid "More..."
@@ -1579,6 +1579,14 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+#~ msgctxt "#30546"
+#~ msgid "Please log in twice!"
+#~ msgstr "Silakan masuk dua kali!"
+
+#~ msgctxt "#30547"
+#~ msgid "You must enable two applications so that YouTube is functioning properly."
+#~ msgstr "Anda harus mengaktifkan dua aplikasi agar YouTube berfungsi dengan baik."
 
 #~ msgctxt "#30001"
 #~ msgid "Username"

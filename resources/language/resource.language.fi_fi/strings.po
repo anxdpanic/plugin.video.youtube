@@ -481,12 +481,12 @@ msgid "No further links found."
 msgstr "Enempää linkkejä ei löytynyt."
 
 msgctxt "#30546"
-msgid "Please log in twice!"
-msgstr "Kirjaudu sisään kahdesti!"
+msgid "Please complete all login prompts"
+msgstr ""
 
 msgctxt "#30547"
-msgid "You must enable two applications so that YouTube is functioning properly."
-msgstr "YouTube-lisäosan oikea toiminta edellyttää kahden sovelluksen käyttöönoton."
+msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
+msgstr ""
 
 msgctxt "#30548"
 msgid "More..."
@@ -1575,6 +1575,14 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+#~ msgctxt "#30546"
+#~ msgid "Please log in twice!"
+#~ msgstr "Kirjaudu sisään kahdesti!"
+
+#~ msgctxt "#30547"
+#~ msgid "You must enable two applications so that YouTube is functioning properly."
+#~ msgstr "YouTube-lisäosan oikea toiminta edellyttää kahden sovelluksen käyttöönoton."
 
 #~ msgctxt "#30001"
 #~ msgid "Username"
