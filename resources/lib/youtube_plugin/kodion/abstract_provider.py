@@ -117,6 +117,9 @@ class AbstractProvider(object):
         return wrapper
 
     def run_wizard(self, context):
+        # ui local variable used for ui.get_view_manager() in unofficial version
+        ui = context.get_ui()
+
         context.wakeup(
             CHECK_SETTINGS,
             timeout=5,
@@ -130,7 +133,7 @@ class AbstractProvider(object):
         steps = len(wizard_steps)
 
         try:
-            if wizard_steps and context.get_ui().on_yes_no_input(
+            if wizard_steps and ui.on_yes_no_input(
                     context.localize('setup_wizard'),
                     (context.localize('setup_wizard.prompt')
                      % context.localize('setup_wizard.prompt.settings'))

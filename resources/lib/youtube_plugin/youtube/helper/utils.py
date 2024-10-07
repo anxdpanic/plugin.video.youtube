@@ -23,11 +23,6 @@ from ...kodion.utils import (
 )
 
 
-try:
-    from inputstreamhelper import Helper as ISHelper
-except ImportError:
-    ISHelper = None
-
 __RE_PLAYLIST = re.compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
@@ -866,17 +861,23 @@ def update_play_info(provider, context, video_id, media_item, video_stream):
 
     if use_isa:
         license_info = video_stream.get('license_info', {})
-        license_proxy = license_info.get('proxy', '')
-        license_url = license_info.get('url', '')
-        license_token = license_info.get('token', '')
+        license_proxy = license_info.get('proxy')
+        license_url = license_info.get('url')
+        license_token = license_info.get('token')
 
-        if ISHelper and license_proxy and license_url and license_token:
-            ISHelper('mpd' if media_item.use_mpd() else 'hls',
-                     drm='com.widevine.alpha').check_inputstream()
+        if license_proxy and license_url and license_token:
+            try:
+                from inputstreamhelper import Helper
 
-        media_item.set_license_key(license_proxy)
-        ui.set_property(LICENSE_URL, license_url)
-        ui.set_property(LICENSE_TOKEN, license_token)
+                is_helper = Helper('mpd' if media_item.use_mpd() else 'hls',
+                                   drm='com.widevine.alpha')
+            except ImportError:
+                is_helper = None
+
+            if is_helper and is_helper.check_inputstream():
+                media_item.set_license_key(license_proxy)
+                ui.set_property(LICENSE_URL, license_url)
+                ui.set_property(LICENSE_TOKEN, license_token)
 
 
 def update_fanarts(provider, context, channel_items_dict, data=None):

@@ -484,11 +484,11 @@ msgid "No further links found."
 msgstr ""
 
 msgctxt "#30546"
-msgid "Please log in twice!"
+msgid "Please complete all login prompts"
 msgstr ""
 
 msgctxt "#30547"
-msgid "You must enable two applications so that YouTube is functioning properly."
+msgid "You may be prompted to enable two applications so that YouTube is functioning properly."
 msgstr ""
 
 msgctxt "#30548"
