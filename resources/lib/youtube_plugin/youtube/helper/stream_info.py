@@ -980,9 +980,7 @@ class StreamInfo(YouTubeRequestClient):
                 '='.join((cookie.name, cookie.value)) for cookie in cookies
             ])
         # Headers used in xbmc_items.video_playback_item'
-        return '&'.join([
-            '='.join((key, quote(value))) for key, value in headers.items()
-        ])
+        return urlencode(headers, safe='/', quote_via=quote)
 
     @staticmethod
     def _normalize_url(url):
@@ -2201,8 +2199,10 @@ class StreamInfo(YouTubeRequestClient):
             ))
 
             if license_url:
-                license_url = (license_url.replace("&", "&amp;")
-                               .replace('"', "&quot;").replace("<", "&lt;")
+                license_url = (license_url
+                               .replace("&", "&amp;")
+                               .replace('"', "&quot;")
+                               .replace("<", "&lt;")
                                .replace(">", "&gt;"))
                 output.extend((
                     '\t\t\t<ContentProtection'

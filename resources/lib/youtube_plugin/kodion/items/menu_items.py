@@ -533,7 +533,7 @@ def bookmark_add_channel(context, channel_id, channel_name=''):
     return (
         (context.localize('bookmark.channel') % (
             context.get_ui().bold(channel_name) if channel_name else
-            context.localize(19029)
+            context.localize(19029)  # "Channel"
         )),
         context.create_uri(
             (PATHS.BOOKMARKS, 'add',),
@@ -614,7 +614,7 @@ def separator():
 
 def goto_home(context):
     return (
-        context.localize(10000),
+        context.localize(10000),  # "Home"
         context.create_uri(
             (PATHS.ROUTE, PATHS.HOME,),
             {

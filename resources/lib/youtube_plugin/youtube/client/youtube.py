@@ -23,7 +23,6 @@ from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
-    current_system_version,
     datetime_parser,
     strip_html_from_text,
     to_unicode,
@@ -1551,7 +1550,7 @@ class YouTube(LoginClient):
         }
 
         def _parse_feeds(feeds,
-                         encode=not current_system_version.compatible(19, 0),
+                         utf8=self._context.get_system_version().compatible(19),
                          filters=subscription_filters,
                          _ns=namespaces,
                          _cache=cache):
@@ -1567,7 +1566,7 @@ class YouTube(LoginClient):
                     content.encoding = 'utf-8'
                     content = to_unicode(content.content).replace('\n', '')
 
-                    root = ET.fromstring(to_str(content) if encode else content)
+                    root = ET.fromstring(content if utf8 else to_str(content))
                     channel_name = (root.findtext('atom:title', '', _ns)
                                     .lower().replace(',', ''))
                     feed_items = [{

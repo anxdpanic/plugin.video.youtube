@@ -248,7 +248,7 @@ class LoginClient(YouTubeRequestClient):
                    'User-Agent': 'GoogleAuth/1.4 (GT-I9100 KTU84Q)',
                    'content-type': 'application/x-www-form-urlencoded',
                    'Host': 'android.clients.google.com',
-                   'Connection': 'Keep-Alive',
+                   'Connection': 'keep-alive',
                    'Accept-Encoding': 'gzip'}
 
         post_data = {

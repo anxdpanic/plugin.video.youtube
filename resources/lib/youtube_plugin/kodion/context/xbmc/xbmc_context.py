@@ -550,7 +550,7 @@ class XbmcContext(AbstractContext):
             )
 
     def add_sort_method(self, *sort_methods):
-        args = slice(None if current_system_version.compatible(19, 0) else 2)
+        args = slice(None if current_system_version.compatible(19) else 2)
         for sort_method in sort_methods:
             xbmcplugin.addSortMethod(self._plugin_handle, *sort_method[args])
 

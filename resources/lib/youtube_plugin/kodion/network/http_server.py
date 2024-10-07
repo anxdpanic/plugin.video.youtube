@@ -26,9 +26,15 @@ from ..compatibility import (
     xbmcgui,
     xbmcvfs,
 )
-from ..constants import ADDON_ID, LICENSE_TOKEN, LICENSE_URL, PATHS, TEMP_PATH
+from ..constants import (
+    ADDON_ID,
+    LICENSE_TOKEN,
+    LICENSE_URL,
+    PATHS,
+    TEMP_PATH,
+)
 from ..logger import log_debug, log_error
-from ..utils import validate_ip_address, redact_ip, wait
+from ..utils import redact_ip, validate_ip_address, wait
 
 
 class HTTPServer(TCPServer):
@@ -629,9 +635,9 @@ def get_connect_address(context, as_netloc=False):
     sock = None
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        if hasattr(socket, "SO_REUSEADDR"):
+        if hasattr(socket, 'SO_REUSEADDR'):
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        if hasattr(socket, "SO_REUSEPORT"):
+        if hasattr(socket, 'SO_REUSEPORT'):
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     except socket.error:
         address = xbmc.getIPAddress()

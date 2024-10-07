@@ -28,7 +28,7 @@ from ...utils import current_system_version, datetime_parser, redact_ip
 
 
 def set_info(list_item, item, properties, set_play_count=True, resume=True):
-    if not current_system_version.compatible(20, 0):
+    if not current_system_version.compatible(20):
         if isinstance(item, VideoItem):
             info_labels = {}
             info_type = 'video'
@@ -446,12 +446,12 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
             props['inputstream.adaptive.stream_selection_type'] = 'adaptive'
             props['inputstream.adaptive.chooser_resolution_max'] = 'auto'
 
-        if current_system_version.compatible(19, 0):
+        if current_system_version.compatible(19):
             props['inputstream'] = 'inputstream.adaptive'
         else:
             props['inputstreamaddon'] = 'inputstream.adaptive'
 
-        if not current_system_version.compatible(21, 0):
+        if not current_system_version.compatible(21):
             props['inputstream.adaptive.manifest_type'] = manifest_type
 
         if media_item.live:

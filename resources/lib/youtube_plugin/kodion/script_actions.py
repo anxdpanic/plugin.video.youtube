@@ -21,7 +21,7 @@ from .constants import (
 )
 from .context import XbmcContext
 from .network import Locator, get_client_ip_address, httpd_status
-from .utils import current_system_version, rm_dir, validate_ip_address
+from .utils import rm_dir, validate_ip_address
 from ..youtube import Provider
 
 
@@ -426,7 +426,7 @@ def _maintenance_actions(context, action, params):
         if target == 'settings_xml' and ui.on_yes_no_input(
                 context.get_name(), localize('refresh.settings.confirm')
         ):
-            if not current_system_version.compatible(20, 0):
+            if not context.get_system_version().compatible(20):
                 ui.show_notification(localize('failed'))
                 return
 

@@ -628,7 +628,7 @@ class AbstractSettings(object):
     def set_history_playlist(self, value):
         return self.set_string(SETTINGS.HISTORY_PLAYLIST, value)
 
-    if current_system_version.compatible(20, 0):
+    if current_system_version.compatible(20):
         def get_label_color(self, label_part):
             setting_name = '.'.join((SETTINGS.LABEL_COLOR, label_part))
             return self.get_string(setting_name, 'white')
