@@ -1,4 +1,4 @@
-## v7.1.0
+## v7.1.0.1
 ### Fixed
 - Fix logging/retry of sqlite3.OperationalError
 - Fix trying to use ISA for progressive live streams
@@ -13,6 +13,9 @@
 - Fix new resume details not being saved in plugin local playback history #904
 - Fix default thumbnails not being updated if available
 - Fix login to personal project only #910
+- Fix regression with not using content type when routing after f239764 #922
+- Partially revert eb0f81c to avoid merge error in unofficial version #924
+- Only attempt to import InputStream Helper if necessary #923
 
 ### Changed
 - Update multiple busy dialog crash workaround #891
