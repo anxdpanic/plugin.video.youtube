@@ -21,7 +21,9 @@ from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
     parse_qs,
+    parse_qsl,
     urlsplit,
+    urlunsplit,
     xbmc,
     xbmcgui,
     xbmcvfs,
@@ -118,15 +120,22 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.wfile.write(client_json.encode('utf-8'))
 
         elif stripped_path.startswith(PATHS.MPD):
-            filepath = os.path.join(self.BASE_PATH, self.path[len(PATHS.MPD):])
-            file_chunk = True
             try:
+                file = dict(parse_qsl(urlsplit(self.path).query)).get('file')
+                if file:
+                    filepath = os.path.join(self.BASE_PATH, file)
+                else:
+                    filepath = None
+                    raise IOError
+
                 with open(filepath, 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/dash+xml')
                     self.send_header('Content-Length',
                                      str(os.path.getsize(filepath)))
                     self.end_headers()
+
+                    file_chunk = True
                     while file_chunk:
                         file_chunk = f.read(self.chunk_size)
                         if file_chunk:
@@ -583,13 +592,13 @@ def get_http_server(address, port, context):
 
 
 def httpd_status(context):
-    address, port = get_connect_address(context)
-    url = ''.join((
-        'http://',
-        address,
-        ':',
-        str(port),
+    netloc = get_connect_address(context, as_netloc=True)
+    url = urlunsplit((
+        'http',
+        netloc,
         PATHS.PING,
+        '',
+        '',
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
@@ -598,22 +607,20 @@ def httpd_status(context):
     if result == 204:
         return True
 
-    log_debug('HTTPServer: Ping |{address}:{port}| - |{response}|'
-              .format(address=address,
-                      port=port,
+    log_debug('HTTPServer: Ping |{netloc}| - |{response}|'
+              .format(netloc=netloc,
                       response=result or 'failed'))
     return False
 
 
 def get_client_ip_address(context):
     ip_address = None
-    address, port = get_connect_address(context)
-    url = ''.join((
-        'http://',
-        address,
-        ':',
-        str(port),
+    url = urlunsplit((
+        'http',
+        get_connect_address(context, as_netloc=True),
         PATHS.IP,
+        '',
+        '',
     ))
     if not RequestHandler.requests:
         RequestHandler.requests = BaseRequestsClass(context=context)
@@ -627,10 +634,8 @@ def get_client_ip_address(context):
 
 def get_connect_address(context, as_netloc=False):
     settings = context.get_settings()
-    address = settings.httpd_listen()
-    port = settings.httpd_port()
-    if address == '0.0.0.0':
-        address = '127.0.0.1'
+    listen_address = settings.httpd_listen()
+    listen_port = settings.httpd_port()
 
     sock = None
     try:
@@ -640,18 +645,18 @@ def get_connect_address(context, as_netloc=False):
         if hasattr(socket, 'SO_REUSEPORT'):
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
     except socket.error:
-        address = xbmc.getIPAddress()
+        listen_address = xbmc.getIPAddress()
 
     if sock:
         sock.settimeout(0)
         try:
-            sock.connect((address, 0))
-            address = sock.getsockname()[0]
+            sock.connect((listen_address, 0))
+            connect_address = sock.getsockname()[0]
         except socket.error:
-            address = xbmc.getIPAddress()
+            connect_address = xbmc.getIPAddress()
         finally:
             sock.close()
 
     if as_netloc:
-        return ':'.join((address, str(port)))
-    return address, port
+        return ':'.join((connect_address, str(listen_port)))
+    return listen_address, listen_port

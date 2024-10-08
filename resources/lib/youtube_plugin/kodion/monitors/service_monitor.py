@@ -204,7 +204,7 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
-        log_debug('HTTPServer: Serving on |{ip}:{port}|'
+        log_debug('HTTPServer: Listening on |{ip}:{port}|'
                   .format(ip=address[0], port=address[1]))
 
     def shutdown_httpd(self, sleep=False):

@@ -30,6 +30,7 @@ from ...kodion.compatibility import (
     urlencode,
     urljoin,
     urlsplit,
+    urlunsplit,
     xbmcvfs,
 )
 from ...kodion.constants import PATHS, TEMP_PATH
@@ -1587,17 +1588,15 @@ class StreamInfo(YouTubeRequestClient):
                 continue
             self._context.log_debug('Found widevine license url: {0}'
                                     .format(url))
-            address, port = get_connect_address(self._context)
             license_info = {
                 'url': url,
-                'proxy': ''.join((
-                    'http://',
-                    address,
-                    ':',
-                    str(port),
+                'proxy': urlunsplit((
+                    'http',
+                    get_connect_address(self._context, as_netloc=True),
                     PATHS.DRM,
-                    '||R{{SSM}}|',
-                )),
+                    '',
+                    '',
+                )) + '||R{{SSM}}|R',
                 'token': self._access_token,
             }
             break
@@ -2343,13 +2342,11 @@ class StreamInfo(YouTubeRequestClient):
                                     .format(file=filepath))
             success = False
         if success:
-            address, port = get_connect_address(self._context)
-            return ''.join((
-                'http://',
-                address,
-                ':',
-                str(port),
+            return urlunsplit((
+                'http',
+                get_connect_address(self._context, as_netloc=True),
                 PATHS.MPD,
-                filename,
+                urlencode({'file': filename}),
+                '',
             )), main_stream
         return None, None
