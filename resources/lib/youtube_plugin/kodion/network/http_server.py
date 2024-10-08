@@ -20,7 +20,6 @@ from .requests import BaseRequestsClass
 from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
-    parse_qs,
     parse_qsl,
     urlsplit,
     urlunsplit,
@@ -161,12 +160,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
 
             query = urlsplit(self.path).query
-            params = parse_qs(query)
+            params = dict(parse_qsl(query))
             updated = []
 
-            api_key = params.get('api_key', [None])[0]
-            api_id = params.get('api_id', [None])[0]
-            api_secret = params.get('api_secret', [None])[0]
+            api_key = params.get('api_key')
+            api_id = params.get('api_id')
+            api_secret = params.get('api_secret')
             # Bookmark this page
             if api_key and api_id and api_secret:
                 footer = localize(30638)
@@ -219,11 +218,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_error(204)
 
         elif stripped_path.startswith(PATHS.REDIRECT):
-            url = parse_qs(urlsplit(self.path).query).get('url')
+            url = dict(parse_qsl(urlsplit(self.path).query)).get('url')
             if url:
                 wait(1)
                 self.send_response(301)
-                self.send_header('Location', url[0])
+                self.send_header('Location', url)
                 self.end_headers()
             else:
                 self.send_error(501)
