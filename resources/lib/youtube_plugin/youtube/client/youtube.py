@@ -2041,6 +2041,8 @@ class YouTube(LoginClient):
         # a config can decide if a token is allowed
         elif self._access_token and self._config.get('token-allowed', True):
             client_data['_access_token'] = self._access_token
+        elif self._access_token_tv:
+            client_data['_access_token'] = self._access_token_tv
         # abort if authentication is required but not available for request
         elif self.CLIENTS.get(version, {}).get('auth_required'):
             abort = True
