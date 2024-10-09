@@ -25,7 +25,12 @@ class MediaItem(BaseItem):
 
     _playable = True
 
-    def __init__(self, name, uri, image='DefaultFile.png', fanart=None):
+    def __init__(self,
+                 name,
+                 uri,
+                 image='DefaultFile.png',
+                 fanart=None,
+                 plot=None):
         super(MediaItem, self).__init__(name, uri, image, fanart)
         self._aired = None
         self._premiered = None
@@ -44,7 +49,7 @@ class MediaItem(BaseItem):
         self._start_time = None
 
         self._mediatype = None
-        self._plot = None
+        self._plot = plot
         self._production_code = None
         self._rating = None
         self._title = self.get_name()
@@ -384,8 +389,13 @@ class AudioItem(MediaItem):
     _ALLOWABLE_MEDIATYPES = {CONTENT.AUDIO_TYPE, 'song', 'album', 'artist'}
     _DEFAULT_MEDIATYPE = CONTENT.AUDIO_TYPE
 
-    def __init__(self, name, uri, image='DefaultAudio.png', fanart=None):
-        super(AudioItem, self).__init__(name, uri, image, fanart)
+    def __init__(self,
+                 name,
+                 uri,
+                 image='DefaultAudio.png',
+                 fanart=None,
+                 plot=None):
+        super(AudioItem, self).__init__(name, uri, image, fanart, plot)
         self._album = None
 
     def set_album_name(self, album_name):
@@ -405,8 +415,13 @@ class VideoItem(MediaItem):
         r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?'
     )
 
-    def __init__(self, name, uri, image='DefaultVideo.png', fanart=None):
-        super(VideoItem, self).__init__(name, uri, image, fanart)
+    def __init__(self,
+                 name,
+                 uri,
+                 image='DefaultVideo.png',
+                 fanart=None,
+                 plot=None):
+        super(VideoItem, self).__init__(name, uri, image, fanart, plot)
         self._directors = None
         self._episode = None
         self._imdb_id = None

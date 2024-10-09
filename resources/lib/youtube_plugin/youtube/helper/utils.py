@@ -153,6 +153,7 @@ def update_channel_infos(provider, context, channel_id_dict,
     settings = context.get_settings()
     logged_in = provider.is_logged_in()
     path = context.get_path()
+    untitled = context.localize('untitled')
 
     filter_list = None
     if path.startswith(PATHS.SUBSCRIPTIONS):
@@ -183,8 +184,15 @@ def update_channel_infos(provider, context, channel_id_dict,
         channel_item = channel_id_dict[channel_id]
 
         # title
-        title = snippet['title']
+        localised_info = snippet.get('localized') or {}
+        title = localised_info.get('title') or snippet.get('title') or untitled
         channel_item.set_name(title)
+
+        # plot
+        description = strip_html_from_text(localised_info.get('description')
+                                           or snippet.get('description')
+                                           or '')
+        channel_item.set_plot(description)
 
         # image
         image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
@@ -261,6 +269,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     logged_in = provider.is_logged_in()
     path = context.get_path()
     thumb_size = context.get_settings().get_thumbnail_size()
+    untitled = context.localize('untitled')
 
     # if the path directs to a playlist of our own, set channel id to 'mine'
     if path.startswith(PATHS.MY_PLAYLISTS):
@@ -280,8 +289,16 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
         playlist_item = playlist_id_dict[playlist_id]
 
-        title = snippet['title']
+        # title
+        localised_info = snippet.get('localized') or {}
+        title = localised_info.get('title') or snippet.get('title') or untitled
         playlist_item.set_name(title)
+
+        # plot
+        description = strip_html_from_text(localised_info.get('description')
+                                           or snippet.get('description')
+                                           or '')
+        playlist_item.set_plot(description)
 
         image = get_thumbnail(thumb_size, snippet.get('thumbnails'))
         playlist_item.set_image(image)
@@ -582,9 +599,12 @@ def update_video_infos(provider, context, video_id_dict,
         media_item.set_production_code(label_stats)
 
         # update and set the title
+        localised_info = snippet.get('localized') or {}
         title = media_item.get_title()
         if not title or title == untitled:
-            title = snippet.get('title') or untitled
+            title = (localised_info.get('title')
+                     or snippet.get('title')
+                     or untitled)
         media_item.set_title(ui.italic(title) if media_item.upcoming else title)
 
         """
@@ -614,7 +634,7 @@ def update_video_infos(provider, context, video_id_dict,
                 break
 
         # channel name
-        channel_name = snippet.get('channelTitle', '')
+        channel_name = snippet.get('channelTitle', '') or untitled
         media_item.add_artist(channel_name)
         if 'cast' in channel_name_aliases:
             media_item.add_cast(channel_name, role=channel_role)
@@ -622,15 +642,17 @@ def update_video_infos(provider, context, video_id_dict,
             media_item.add_studio(channel_name)
 
         # plot
-        description = strip_html_from_text(snippet['description'])
+        description = strip_html_from_text(localised_info.get('description')
+                                           or snippet.get('description')
+                                           or '')
         if show_details:
             description = ''.join((
-                ui.bold(channel_name, cr_after=1) if channel_name else '',
+                ui.bold(channel_name, cr_after=1),
                 ui.new_line(stats, cr_after=1) if stats else '',
                 (ui.italic(start_at, cr_after=1) if media_item.upcoming
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
-                description,
-                ui.new_line('https://youtu.be/' + video_id, cr_before=1)
+                ui.new_line(description, cr_after=1) if description else '',
+                'https://youtu.be/' + video_id,
             ))
         media_item.set_plot(description)
 

@@ -25,6 +25,7 @@ from .utils import (
 from ...kodion import KodionException
 from ...kodion.constants import PATHS
 from ...kodion.items import CommandItem, DirectoryItem, NextPageItem, VideoItem
+from ...kodion.utils import strip_html_from_text
 
 
 def _process_list_response(provider, context, json_data, item_filter):
@@ -58,6 +59,7 @@ def _process_list_response(provider, context, json_data, item_filter):
         fanart_type = settings.get_thumbnail_size(settings.THUMB_SIZE_BEST)
     else:
         fanart_type = False
+    untitled = context.localize('untitled')
 
     for yt_item in yt_items:
         kind, is_youtube, is_plugin, kind_type = _parse_kind(yt_item)
@@ -71,7 +73,15 @@ def _process_list_response(provider, context, json_data, item_filter):
         if is_youtube:
             item_id = yt_item.get('id')
             snippet = yt_item.get('snippet', {})
-            title = snippet.get('title', context.localize('untitled'))
+
+            localised_info = snippet.get('localized') or {}
+            title = (localised_info.get('title')
+                     or snippet.get('title')
+                     or untitled)
+            description = strip_html_from_text(localised_info.get('description')
+                                               or snippet.get('description')
+                                               or '')
+            # context.log_debug(f'***********\n{item_id = }, {title = }\n{yt_item = }\n***************')
 
             thumbnails = snippet.get('thumbnails')
             if not thumbnails:
@@ -109,7 +119,11 @@ def _process_list_response(provider, context, json_data, item_filter):
                 (PATHS.PLAY,),
                 item_params,
             )
-            item = VideoItem(title, item_uri, image=image, fanart=fanart)
+            item = VideoItem(title,
+                             item_uri,
+                             image=image,
+                             fanart=fanart,
+                             plot=description)
             video_id_dict[item_id] = item
 
         elif kind_type == 'channel':
@@ -121,6 +135,7 @@ def _process_list_response(provider, context, json_data, item_filter):
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
+                                 plot=description,
                                  channel_id=item_id)
             channel_id_dict[item_id] = item
 
@@ -130,7 +145,11 @@ def _process_list_response(provider, context, json_data, item_filter):
                 ('special', 'browse_channels'),
                 item_params,
             )
-            item = DirectoryItem(title, item_uri)
+            item = DirectoryItem(title,
+                                 item_uri,
+                                 image=image,
+                                 fanart=fanart,
+                                 plot=description)
 
         elif kind_type == 'subscription':
             subscription_id = item_id
@@ -146,6 +165,7 @@ def _process_list_response(provider, context, json_data, item_filter):
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
+                                 plot=description,
                                  channel_id=item_id,
                                  subscription_id=subscription_id)
             channel_id_dict[item_id] = item
@@ -171,6 +191,7 @@ def _process_list_response(provider, context, json_data, item_filter):
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
+                                 plot=description,
                                  channel_id=channel_id,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
@@ -186,7 +207,11 @@ def _process_list_response(provider, context, json_data, item_filter):
                 (PATHS.PLAY,),
                 item_params,
             )
-            item = VideoItem(title, item_uri, image=image, fanart=fanart)
+            item = VideoItem(title,
+                             item_uri,
+                             image=image,
+                             fanart=fanart,
+                             plot=description)
             video_id_dict[item_id] = item
 
         elif kind_type == 'activity':
@@ -204,7 +229,11 @@ def _process_list_response(provider, context, json_data, item_filter):
                 (PATHS.PLAY,),
                 item_params,
             )
-            item = VideoItem(title, item_uri, image=image, fanart=fanart)
+            item = VideoItem(title,
+                             item_uri,
+                             image=image,
+                             fanart=fanart,
+                             plot=description)
             video_id_dict[item_id] = item
 
         elif kind_type == 'commentthread':
