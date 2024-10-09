@@ -629,13 +629,19 @@ class AbstractSettings(object):
         return self.set_string(SETTINGS.HISTORY_PLAYLIST, value)
 
     if current_system_version.compatible(20):
+        _COLOR_SETTING_MAP = {
+            'itemCount': 'commentCount',
+        }
+
         def get_label_color(self, label_part):
+            label_part = self._COLOR_SETTING_MAP.get(label_part) or label_part
             setting_name = '.'.join((SETTINGS.LABEL_COLOR, label_part))
             return self.get_string(setting_name, 'white')
     else:
         _COLOR_MAP = {
             'commentCount': 'cyan',
             'favoriteCount': 'gold',
+            'itemCount': 'cyan',
             'likeCount': 'lime',
             'viewCount': 'lightblue',
         }

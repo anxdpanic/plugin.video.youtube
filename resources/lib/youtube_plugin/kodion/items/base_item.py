@@ -42,6 +42,11 @@ class BaseItem(object):
         self._date = None
         self._dateadded = None
         self._short_details = None
+        self._production_code = None
+
+        self._cast = None
+        self._artists = None
+        self._studios = None
 
     def __str__(self):
         return ('------------------------------\n'
@@ -194,6 +199,58 @@ class BaseItem(object):
     @property
     def playable(self):
         return self._playable
+
+    def add_artist(self, artist):
+        if artist:
+            if self._artists is None:
+                self._artists = []
+            self._artists.append(to_str(artist))
+
+    def get_artists(self):
+        return self._artists
+
+    def get_artists_string(self):
+        if self._artists:
+            return ', '.join(self._artists)
+        return None
+
+    def set_artists(self, artists):
+        self._artists = list(artists)
+
+    def set_cast(self, members):
+        self._cast = list(members)
+
+    def add_cast(self, name, role=None, order=None, thumbnail=None):
+        if name:
+            if self._cast is None:
+                self._cast = []
+            self._cast.append({
+                'name': to_str(name),
+                'role': to_str(role) if role else '',
+                'order': int(order) if order else len(self._cast) + 1,
+                'thumbnail': to_str(thumbnail) if thumbnail else '',
+            })
+
+    def get_cast(self):
+        return self._cast
+
+    def add_studio(self, studio):
+        if studio:
+            if self._studios is None:
+                self._studios = []
+            self._studios.append(to_str(studio))
+
+    def get_studios(self):
+        return self._studios
+
+    def set_studios(self, studios):
+        self._studios = list(studios)
+
+    def set_production_code(self, value):
+        self._production_code = value or ''
+
+    def get_production_code(self):
+        return self._production_code
 
 
 class _Encoder(json.JSONEncoder):

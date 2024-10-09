@@ -15,7 +15,7 @@ from .base_item import BaseItem
 from .command_item import CommandItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
-from .media_item import AudioItem, VideoItem
+from .media_item import AudioItem, MediaItem, VideoItem
 from .new_search_item import NewSearchItem
 from .next_page_item import NextPageItem
 from .search_history_item import SearchHistoryItem
@@ -38,6 +38,7 @@ __all__ = (
     'CommandItem',
     'DirectoryItem',
     'ImageItem',
+    'MediaItem',
     'NewSearchItem',
     'NextPageItem',
     'SearchHistoryItem',

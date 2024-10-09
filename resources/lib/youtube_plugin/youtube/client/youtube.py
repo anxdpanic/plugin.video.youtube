@@ -989,7 +989,7 @@ class YouTube(LoginClient):
         if not isinstance(playlist_id, string_type):
             playlist_id = ','.join(playlist_id)
 
-        params = {'part': 'snippet,contentDetails',
+        params = {'part': 'snippet,status,contentDetails',
                   'id': playlist_id}
         return self.api_request(method='GET',
                                 path='playlists',
