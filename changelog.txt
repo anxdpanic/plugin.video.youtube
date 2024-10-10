@@ -1,3 +1,26 @@
+## v7.1.1+beta.1
+### Fixed
+- Fix http server not listening on any interface if listen IP is 0.0.0.0 #927
+
+### New
+- Explicitly enable TCP keep alive #913
+- Add localised title and description for videos, channels and playlists
+- Update display of playlists to show the following details:
+  - item count
+  - date
+  - channel name
+  - description
+  - web url
+  - podcast status
+- Update display of channels to show the following details:
+  - view count
+  - subscriber count
+  - video count
+  - date
+  - description
+  - channel name in description
+  - web url
+
 ## v7.1.0.1
 ### Fixed
 - Fix logging/retry of sqlite3.OperationalError
