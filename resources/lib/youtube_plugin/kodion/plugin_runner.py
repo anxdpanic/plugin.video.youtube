@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from platform import python_version
-
 from .context import XbmcContext
 from .plugin import XbmcPlugin
 from ..youtube import Provider
@@ -24,6 +22,7 @@ _plugin = XbmcPlugin()
 _provider = Provider()
 
 _profiler = _context.get_infobool('System.GetBool(debug.showloginfo)')
+_profiler = True
 if _profiler:
     from .debug import Profiler
 
@@ -37,8 +36,6 @@ def run(context=_context,
     if profiler:
         profiler.enable(flush=True)
 
-    context.log_debug('Starting Kodion framework by bromix...')
-
     current_uri = context.get_uri()
     context.init()
     new_uri = context.get_uri()
@@ -48,14 +45,15 @@ def run(context=_context,
         if key in params:
             params[key] = '<redacted>'
 
-    context.log_notice('Running: {plugin} ({version})'
-                       ' on {kodi} with Python {python}\n'
-                       'Path: {path}\n'
-                       'Params: {params}'
-                       .format(plugin=context.get_name(),
-                               version=context.get_version(),
-                               kodi=context.get_system_version(),
-                               python=python_version(),
+    system_version = context.get_system_version()
+    context.log_notice('Plugin: Running |v{version}|\n'
+                       'Kodi: |v{kodi}|\n'
+                       'Python: |v{python}|\n'
+                       'Path: |{path}|\n'
+                       'Params: |{params}|'
+                       .format(version=context.get_version(),
+                               kodi=str(system_version),
+                               python=system_version.get_python_version(),
                                path=context.get_path(),
                                params=params))
 

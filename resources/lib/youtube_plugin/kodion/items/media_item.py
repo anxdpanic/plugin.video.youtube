@@ -25,17 +25,19 @@ class MediaItem(BaseItem):
 
     _playable = True
 
-    def __init__(self, name, uri, image='DefaultFile.png', fanart=None):
+    def __init__(self,
+                 name,
+                 uri,
+                 image='DefaultFile.png',
+                 fanart=None,
+                 plot=None):
         super(MediaItem, self).__init__(name, uri, image, fanart)
         self._aired = None
         self._premiered = None
         self._scheduled_start_utc = None
         self._year = None
 
-        self._artists = None
-        self._cast = None
         self._genres = None
-        self._studios = None
 
         self._duration = -1
         self._play_count = None
@@ -44,8 +46,7 @@ class MediaItem(BaseItem):
         self._start_time = None
 
         self._mediatype = None
-        self._plot = None
-        self._production_code = None
+        self._plot = plot
         self._rating = None
         self._title = self.get_name()
         self._track_number = None
@@ -110,40 +111,6 @@ class MediaItem(BaseItem):
     def get_year(self):
         return self._year
 
-    def add_artist(self, artist):
-        if artist:
-            if self._artists is None:
-                self._artists = []
-            self._artists.append(to_str(artist))
-
-    def get_artists(self):
-        return self._artists
-
-    def get_artists_string(self):
-        if self._artists:
-            return ', '.join(self._artists)
-        return None
-
-    def set_artists(self, artists):
-        self._artists = list(artists)
-
-    def set_cast(self, members):
-        self._cast = list(members)
-
-    def add_cast(self, name, role=None, order=None, thumbnail=None):
-        if name:
-            if self._cast is None:
-                self._cast = []
-            self._cast.append({
-                'name': to_str(name),
-                'role': to_str(role) if role else '',
-                'order': int(order) if order else len(self._cast) + 1,
-                'thumbnail': to_str(thumbnail) if thumbnail else '',
-            })
-
-    def get_cast(self):
-        return self._cast
-
     def add_genre(self, genre):
         if genre:
             if self._genres is None:
@@ -155,18 +122,6 @@ class MediaItem(BaseItem):
 
     def set_genres(self, genres):
         self._genres = list(genres)
-
-    def add_studio(self, studio):
-        if studio:
-            if self._studios is None:
-                self._studios = []
-            self._studios.append(to_str(studio))
-
-    def get_studios(self):
-        return self._studios
-
-    def set_studios(self, studios):
-        self._studios = list(studios)
 
     def set_duration(self, hours=0, minutes=0, seconds=0, duration=''):
         if duration:
@@ -231,12 +186,6 @@ class MediaItem(BaseItem):
 
     def get_plot(self):
         return self._plot
-
-    def set_production_code(self, value):
-        self._production_code = value or ''
-
-    def get_production_code(self):
-        return self._production_code
 
     def set_rating(self, rating):
         rating = float(rating)
@@ -384,8 +333,13 @@ class AudioItem(MediaItem):
     _ALLOWABLE_MEDIATYPES = {CONTENT.AUDIO_TYPE, 'song', 'album', 'artist'}
     _DEFAULT_MEDIATYPE = CONTENT.AUDIO_TYPE
 
-    def __init__(self, name, uri, image='DefaultAudio.png', fanart=None):
-        super(AudioItem, self).__init__(name, uri, image, fanart)
+    def __init__(self,
+                 name,
+                 uri,
+                 image='DefaultAudio.png',
+                 fanart=None,
+                 plot=None):
+        super(AudioItem, self).__init__(name, uri, image, fanart, plot)
         self._album = None
 
     def set_album_name(self, album_name):
@@ -405,8 +359,13 @@ class VideoItem(MediaItem):
         r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?'
     )
 
-    def __init__(self, name, uri, image='DefaultVideo.png', fanart=None):
-        super(VideoItem, self).__init__(name, uri, image, fanart)
+    def __init__(self,
+                 name,
+                 uri,
+                 image='DefaultVideo.png',
+                 fanart=None,
+                 plot=None):
+        super(VideoItem, self).__init__(name, uri, image, fanart, plot)
         self._directors = None
         self._episode = None
         self._imdb_id = None

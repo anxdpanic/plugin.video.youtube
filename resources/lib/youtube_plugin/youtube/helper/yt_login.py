@@ -32,21 +32,17 @@ def process(mode, provider, context, sign_out_refresh=True):
                 except LoginException:
                     pass
         access_manager.update_access_token(
-            addon_id, access_token='', refresh_token='',
+            addon_id, access_token='', expiry=-1, refresh_token='',
         )
         provider.reset_client()
 
-    def _do_login(login_type):
-        for_tv = login_type == 'tv'
+    def _do_login(token_type):
         _client = provider.get_client(context)
 
         try:
-            if for_tv:
-                json_data = _client.request_device_and_user_code_tv()
-            else:
-                json_data = _client.request_device_and_user_code()
+            json_data = _client.request_device_and_user_code(token_type)
             if not json_data:
-                return '', 0, ''
+                return None
         except LoginException:
             _do_logout()
             raise
@@ -75,10 +71,8 @@ def process(mode, provider, context, sign_out_refresh=True):
             for _ in range(steps):
                 dialog.update()
                 try:
-                    if for_tv:
-                        json_data = _client.request_access_token_tv(device_code)
-                    else:
-                        json_data = _client.request_access_token(device_code)
+                    json_data = _client.request_access_token(token_type,
+                                                             device_code)
                     if not json_data:
                         break
                 except LoginException:
@@ -115,7 +109,7 @@ def process(mode, provider, context, sign_out_refresh=True):
                     break
 
                 context.sleep(interval)
-        return '', 0, ''
+        return None
 
     if mode == 'out':
         _do_logout()
@@ -125,21 +119,25 @@ def process(mode, provider, context, sign_out_refresh=True):
     elif mode == 'in':
         ui.on_ok(localize('sign.multi.title'), localize('sign.multi.text'))
 
-        token_types = ('tv', 'personal')
-        tokens = [None, None]
-        for idx, token in enumerate(token_types):
-            new_token = _do_login(login_type=token)
-            tokens[idx] = new_token
-            access_token, expiry, refresh_token = new_token
+        tokens = ['tv', 'personal']
+        for token_type, token in enumerate(tokens):
+            new_token = _do_login(token_type)
+            tokens[token_type] = new_token
+            if new_token:
+                access_token, expiry, refresh_token = new_token
+            else:
+                access_token = None
+                expiry = 0
+                refresh_token = None
 
             context.log_debug('YouTube Login:'
-                              ' Type |{0}|,'
-                              ' Access Token |{1}|,'
-                              ' Refresh Token |{2}|,'
-                              ' Expires |{3}|'
+                              'Type: |{0}|\n'
+                              'Access token: |{1}|\n'
+                              'Refresh token: |{2}|\n'
+                              'Expires: |{3}|'
                               .format(token,
-                                      access_token != '',
-                                      refresh_token != '',
+                                      bool(access_token),
+                                      bool(refresh_token),
                                       expiry))
 
         provider.reset_client()

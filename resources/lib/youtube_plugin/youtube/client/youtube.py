@@ -23,7 +23,6 @@ from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
-    current_system_version,
     datetime_parser,
     strip_html_from_text,
     to_unicode,
@@ -938,7 +937,7 @@ class YouTube(LoginClient):
         if not isinstance(channel_id, string_type):
             channel_id = ','.join(channel_id)
 
-        params = {'part': 'snippet,contentDetails,brandingSettings'}
+        params = {'part': 'snippet,contentDetails,brandingSettings,statistics'}
         if channel_id != 'mine':
             params['id'] = channel_id
         else:
@@ -990,7 +989,7 @@ class YouTube(LoginClient):
         if not isinstance(playlist_id, string_type):
             playlist_id = ','.join(playlist_id)
 
-        params = {'part': 'snippet,contentDetails',
+        params = {'part': 'snippet,status,contentDetails',
                   'id': playlist_id}
         return self.api_request(method='GET',
                                 path='playlists',
@@ -1551,7 +1550,7 @@ class YouTube(LoginClient):
         }
 
         def _parse_feeds(feeds,
-                         encode=not current_system_version.compatible(19, 0),
+                         utf8=self._context.get_system_version().compatible(19),
                          filters=subscription_filters,
                          _ns=namespaces,
                          _cache=cache):
@@ -1567,7 +1566,7 @@ class YouTube(LoginClient):
                     content.encoding = 'utf-8'
                     content = to_unicode(content.content).replace('\n', '')
 
-                    root = ET.fromstring(to_str(content) if encode else content)
+                    root = ET.fromstring(content if utf8 else to_str(content))
                     channel_name = (root.findtext('atom:title', '', _ns)
                                     .lower().replace(',', ''))
                     feed_items = [{
@@ -1968,14 +1967,16 @@ class YouTube(LoginClient):
         if getattr(exc, 'pass_data', False):
             data = json_data
         else:
-            data = None
+            data = kwargs['response']
         if getattr(exc, 'raise_exc', False):
             exception = YouTubeException
         else:
             exception = None
 
         if not json_data or 'error' not in json_data:
-            return None, None, None, data, None, exception
+            info = 'Exception:\n\t|{exc!r}|'
+            details = kwargs
+            return None, info, details, data, None, exception
 
         details = json_data['error']
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
@@ -2005,7 +2006,7 @@ class YouTube(LoginClient):
                                                          time_ms=timeout)
 
         info = ('API error: {reason}\n'
-                'exc: |{exc}|\n'
+                'exc: |{exc!r}|\n'
                 'message: |{message}|')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
@@ -2040,6 +2041,8 @@ class YouTube(LoginClient):
         # a config can decide if a token is allowed
         elif self._access_token and self._config.get('token-allowed', True):
             client_data['_access_token'] = self._access_token
+        elif self._access_token_tv:
+            client_data['_access_token'] = self._access_token_tv
         # abort if authentication is required but not available for request
         elif self.CLIENTS.get(version, {}).get('auth_required'):
             abort = True

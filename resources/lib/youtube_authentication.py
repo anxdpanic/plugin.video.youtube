@@ -167,5 +167,5 @@ def reset_access_tokens(addon_id):
         return
     context = XbmcContext(params={'addon_id': addon_id})
     context.get_access_manager().update_access_token(
-        addon_id, access_token='', refresh_token=''
+        addon_id, access_token='', expiry=-1, refresh_token=''
     )

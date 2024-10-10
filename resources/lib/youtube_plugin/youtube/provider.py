@@ -197,72 +197,48 @@ class Provider(AbstractProvider):
             access_manager.set_last_origin(origin)
             self.reset_client()
 
-        if dev_id:
-            access_tokens = access_manager.get_access_token(dev_id)
-            if access_manager.is_access_token_expired(dev_id):
-                # reset access_token
-                access_tokens = []
-                access_manager.update_access_token(dev_id, access_tokens)
-            elif self._client:
-                return self._client
+        access_tokens = access_manager.get_access_token(dev_id)
+        if access_manager.is_access_token_expired(dev_id):
+            # reset access_token
+            access_tokens = [None, None]
+            access_manager.update_access_token(dev_id, access_token='')
+        elif self._client:
+            return self._client
 
-            if dev_keys:
-                context.log_debug('Selecting YouTube developer config "{0}"'
-                                  .format(dev_id))
-                configs['main'] = dev_keys
-            else:
-                dev_keys = configs['main']
-                context.log_debug('Selecting YouTube config "{0}"'
-                                  ' w/ developer access tokens'
-                                  .format(dev_keys['system']))
-
-            refresh_tokens = access_manager.get_refresh_token(dev_id)
-            if refresh_tokens:
-                keys_changed = access_manager.dev_keys_changed(
-                    dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
-                )
-                if keys_changed:
-                    context.log_warning('API key set changed: Resetting client'
-                                        ' and updating access token')
-                    self.reset_client()
-                    access_tokens = []
-                    refresh_tokens = []
-                    access_manager.update_access_token(
-                        dev_id, access_tokens, -1, refresh_tokens
-                    )
-
-                context.log_debug(
-                    'Access token count: |{0}|, refresh token count: |{1}|'
-                    .format(len(access_tokens), len(refresh_tokens))
-                )
-        else:
-            access_tokens = access_manager.get_access_token(dev_id)
-            if access_manager.is_access_token_expired(dev_id):
-                # reset access_token
-                access_tokens = []
-                access_manager.update_access_token(dev_id, access_tokens)
-            elif self._client:
-                return self._client
-
+        if not dev_id:
             context.log_debug('Selecting YouTube config "{0}"'
                               .format(configs['main']['system']))
+        elif dev_keys:
+            context.log_debug('Selecting YouTube developer config "{0}"'
+                              .format(dev_id))
+            configs['main'] = dev_keys
+        else:
+            dev_keys = configs['main']
+            context.log_debug('Selecting YouTube config "{0}"'
+                              ' w/ developer access tokens'
+                              .format(dev_keys['system']))
 
-            refresh_tokens = access_manager.get_refresh_token(dev_id)
-            if refresh_tokens:
-                if self._api_check.changed:
-                    context.log_warning('API key set changed: Resetting client'
-                                        ' and updating access token')
-                    self.reset_client()
-                    access_tokens = []
-                    refresh_tokens = []
-                    access_manager.update_access_token(
-                        dev_id, access_tokens, -1, refresh_tokens,
-                    )
-
-                context.log_debug(
-                    'Access token count: |{0}|, refresh token count: |{1}|'
-                    .format(len(access_tokens), len(refresh_tokens))
+        refresh_tokens = access_manager.get_refresh_token(dev_id)
+        if refresh_tokens:
+            keys_changed = access_manager.dev_keys_changed(
+                dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
+            ) if dev_id else self._api_check.changed
+            if keys_changed:
+                context.log_warning('API key set changed: Resetting client'
+                                    ' and updating access token')
+                self.reset_client()
+                access_tokens = [None, None]
+                refresh_tokens = [None, None]
+                access_manager.update_access_token(
+                    dev_id, access_token='', expiry=-1, refresh_token=''
                 )
+
+        num_access_tokens = sum(1 for token in access_tokens if token)
+        num_refresh_tokens = sum(1 for token in refresh_tokens if token)
+        context.log_debug(
+            'Access token count: |{0}|, refresh token count: |{1}|'
+            .format(num_access_tokens, num_refresh_tokens)
+        )
 
         settings = context.get_settings()
         client = YouTube(context=context,
@@ -276,33 +252,25 @@ class Provider(AbstractProvider):
                 self._client = client
 
             # create new access tokens
-            elif len(access_tokens) != 2 and len(refresh_tokens) == 2:
-                access_tokens = ['', '']
+            elif num_access_tokens != num_refresh_tokens:
+                access_tokens = [None, None]
                 token_expiry = 0
-                token_index = {
-                    0: {
-                        'type': 'tv',
-                        'refresh': client.refresh_token_tv,
-                    },
-                    1: {
-                        'type': 'personal',
-                        'refresh': client.refresh_token,
-                    },
-                }
                 try:
-                    for idx, value in enumerate(refresh_tokens):
+                    for token_type, value in enumerate(refresh_tokens):
                         if not value:
                             continue
 
-                        token, expiry = token_index[idx]['refresh'](value)
+                        token, expiry = client.refresh_token(token_type, value)
                         if token and expiry > 0:
-                            access_tokens[idx] = token
+                            access_tokens[token_type] = token
                             if not token_expiry or expiry < token_expiry:
                                 token_expiry = expiry
 
-                    if any(access_tokens) and expiry:
+                    if any(access_tokens) and token_expiry:
                         access_manager.update_access_token(
-                            dev_id, access_tokens, token_expiry,
+                            dev_id,
+                            access_token=access_tokens,
+                            expiry=token_expiry,
                         )
                     else:
                         raise InvalidGrant
@@ -312,21 +280,26 @@ class Provider(AbstractProvider):
                     # reset access token
                     # reset refresh token if InvalidGrant otherwise leave as-is
                     # to retry later
+                    if isinstance(exc, InvalidGrant):
+                        refresh_token = ''
+                    else:
+                        refresh_token = None
                     access_manager.update_access_token(
                         dev_id,
-                        refresh_token=('' if isinstance(exc, InvalidGrant)
-                                       else None),
+                        refresh_token=refresh_token,
                     )
 
-            # in debug log the login status
-            self._logged_in = any(access_tokens)
-            if self._logged_in:
+                num_access_tokens = sum(1 for token in access_tokens if token)
+
+            if num_access_tokens and access_tokens[1]:
+                self._logged_in = True
                 context.log_debug('User is logged in')
                 client.set_access_token(
                     personal=access_tokens[1],
                     tv=access_tokens[0],
                 )
             else:
+                self._logged_in = False
                 context.log_debug('User is not logged in')
                 client.set_access_token(personal='', tv='')
 
@@ -966,7 +939,7 @@ class Provider(AbstractProvider):
                         success = False
             provider.reset_client()
             access_manager.update_access_token(
-                addon_id, access_token='', refresh_token='',
+                addon_id, access_token='', expiry=-1, refresh_token='',
             )
             ui.refresh_container()
             ui.show_notification(localize('succeeded' if success else 'failed'))
@@ -1646,6 +1619,7 @@ class Provider(AbstractProvider):
                 context.get_access_manager().update_access_token(
                     context.get_param('addon_id', None),
                     access_token='',
+                    expiry=-1,
                     refresh_token='',
                 )
                 ok_dialog = True

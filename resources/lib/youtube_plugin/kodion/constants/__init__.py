@@ -59,7 +59,6 @@ RELOAD_ACCESS_MANAGER = 'reload_access_manager'
 PLUGIN_WAKEUP = 'plugin_wakeup'
 PLUGIN_SLEEPING = 'plugin_sleeping'
 SERVER_WAKEUP = 'server_wakeup'
-SERVER_POST_START = 'server_post_start'
 WAKEUP = 'wakeup'
 
 # Play options
@@ -118,7 +117,6 @@ __all__ = (
     # Sleep/wakeup states
     'PLUGIN_SLEEPING',
     'PLUGIN_WAKEUP',
-    'SERVER_POST_START',
     'SERVER_WAKEUP',
     'WAKEUP',
 

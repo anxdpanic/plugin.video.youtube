@@ -10,70 +10,69 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from platform import python_version
+
 from .methods import jsonrpc
 from ..compatibility import string_type
 
 
 class SystemVersion(object):
+    RELEASE_MAP = {
+        (22, 0): 'Piers',
+        (21, 0): 'Omega',
+        (20, 0): 'Nexus',
+        (19, 0): 'Matrix',
+        (18, 0): 'Leia',
+        (17, 0): 'Krypton',
+        (16, 0): 'Jarvis',
+        (15, 0): 'Isengard',
+        (14, 0): 'Helix',
+        (13, 0): 'Gotham',
+        (12, 0): 'Frodo',
+    }
+
     def __init__(self, version=None, releasename=None, appname=None):
-        self._version = (
-            version if version and isinstance(version, tuple)
-            else (0, 0, 0, 0)
-        )
-
-        self._releasename = (
-            releasename if releasename and isinstance(releasename, string_type)
-            else 'UNKNOWN'
-        )
-
-        self._appname = (
-            appname if appname and isinstance(appname, string_type)
-            else 'UNKNOWN'
-        )
-
-        try:
-            response = jsonrpc(method='Application.GetProperties',
-                               params={'properties': ['version', 'name']})
-            version_installed = response['result']['version']
-            self._version = (version_installed.get('major', 1),
-                             version_installed.get('minor', 0))
-            self._appname = response['result']['name']
-        except (KeyError, TypeError):
-            self._version = (1, 0)  # Frodo
-            self._appname = 'Unknown Application'
-
-        if self._version >= (22, 0):
-            self._releasename = 'Piers'
-        elif self._version >= (21, 0):
-            self._releasename = 'Omega'
-        elif self._version >= (20, 0):
-            self._releasename = 'Nexus'
-        elif self._version >= (19, 0):
-            self._releasename = 'Matrix'
-        elif self._version >= (18, 0):
-            self._releasename = 'Leia'
-        elif self._version >= (17, 0):
-            self._releasename = 'Krypton'
-        elif self._version >= (16, 0):
-            self._releasename = 'Jarvis'
-        elif self._version >= (15, 0):
-            self._releasename = 'Isengard'
-        elif self._version >= (14, 0):
-            self._releasename = 'Helix'
-        elif self._version >= (13, 0):
-            self._releasename = 'Gotham'
-        elif self._version >= (12, 0):
-            self._releasename = 'Frodo'
+        if isinstance(version, tuple):
+            self._version = version
         else:
-            self._releasename = 'Unknown Release'
+            version = None
+
+        if appname and isinstance(appname, string_type):
+            self._appname = appname
+        else:
+            appname = None
+
+        if version is None or appname is None:
+            try:
+                result = jsonrpc(
+                    method='Application.GetProperties',
+                    params={'properties': ['version', 'name']},
+                )['result'] or {}
+            except (KeyError, TypeError):
+                result = {}
+
+            if version is None:
+                version = result.get('version') or {}
+                self._version = (version.get('major', 1),
+                                 version.get('minor', 0))
+
+            if appname is None:
+                self._appname = result.get('name', 'Unknown application')
+
+        if releasename and isinstance(releasename, string_type):
+            self._releasename = releasename
+        else:
+            version = (self._version[0], self._version[1])
+            self._releasename = self.RELEASE_MAP.get(version, 'Unknown release')
+
+        self._python_version = python_version()
 
     def __str__(self):
-        obj_str = '{releasename} ({appname}-{version[0]}.{version[1]})'.format(
+        return '{version[0]}.{version[1]} ({appname} {releasename})'.format(
             releasename=self._releasename,
             appname=self._appname,
             version=self._version
         )
-        return obj_str
 
     def get_release_name(self):
         return self._releasename
@@ -83,6 +82,9 @@ class SystemVersion(object):
 
     def get_app_name(self):
         return self._appname
+
+    def get_python_version(self):
+        return self._python_version
 
     def compatible(self, *version):
         return self._version >= version

@@ -29,8 +29,6 @@ from ...kodion.constants import (
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
     PLAY_WITH,
-    SERVER_POST_START,
-    SERVER_WAKEUP,
 )
 from ...kodion.items import AudioItem, VideoItem
 from ...kodion.network import get_connect_address
@@ -356,11 +354,7 @@ def process(provider, context, **_kwargs):
         position, _ = playlist_player.get_position()
         items = playlist_player.get_items()
 
-        ui.clear_property(SERVER_POST_START)
-        context.wakeup(SERVER_WAKEUP, timeout=5)
         media_item = _play_stream(provider, context)
-        ui.set_property(SERVER_POST_START)
-
         if media_item:
             if position and items:
                 ui.set_property(PLAYLIST_PATH,

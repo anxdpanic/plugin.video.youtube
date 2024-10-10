@@ -24,7 +24,7 @@ class SettingsProxy(object):
     def __init__(self, instance):
         self.ref = instance
 
-    if current_system_version.compatible(21, 0):
+    if current_system_version.compatible(21):
         def get_bool(self, *args, **kwargs):
             return self.ref.getBool(*args, **kwargs)
 
@@ -75,7 +75,7 @@ class SettingsProxy(object):
             value = ','.join(value)
             return self.ref.setSetting(setting, value)
 
-        if not current_system_version.compatible(19, 0):
+        if not current_system_version.compatible(19):
             @property
             def ref(self):
                 if self._ref:
@@ -121,7 +121,7 @@ class XbmcPluginSettings(AbstractSettings):
 
         self._echo = get_kodi_setting_bool('debug.showloginfo')
         self._cache = {}
-        if current_system_version.compatible(21, 0):
+        if current_system_version.compatible(21):
             self._proxy = SettingsProxy(xbmc_addon.getSettings())
             # set methods in new Settings class are documented as returning a
             # bool, True if value was set, False otherwise, similar to how the
@@ -130,7 +130,7 @@ class XbmcPluginSettings(AbstractSettings):
             # Ignore return value until bug is fixed in Kodi
             self._check_set = False
         else:
-            if fill and not current_system_version.compatible(19, 0):
+            if fill and not current_system_version.compatible(19):
                 self.__class__._instances.add(xbmc_addon)
             self._proxy = SettingsProxy(xbmc_addon)
 
