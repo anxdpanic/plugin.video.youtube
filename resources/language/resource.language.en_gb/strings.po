@@ -1254,15 +1254,15 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid ""
+msgid "Episodes"
 msgstr ""
 
 msgctxt "#30738"
-msgid ""
+msgid "Videos"
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1482,11 +1482,11 @@ msgid "Views count display colour"
 msgstr ""
 
 msgctxt "#30794"
-msgid "Likes count display colour"
+msgid "Subscriber/Likes count display colour"
 msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
+msgid "Videos/Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
@@ -1583,4 +1583,8 @@ msgstr ""
 
 msgctxt "#30819"
 msgid "Play from start"
+msgstr ""
+
+msgctxt "#30820"
+msgid "Podcast"
 msgstr ""

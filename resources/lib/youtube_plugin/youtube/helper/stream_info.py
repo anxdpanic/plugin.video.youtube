@@ -30,6 +30,7 @@ from ...kodion.compatibility import (
     urlencode,
     urljoin,
     urlsplit,
+    urlunsplit,
     xbmcvfs,
 )
 from ...kodion.constants import PATHS, TEMP_PATH
@@ -980,9 +981,7 @@ class StreamInfo(YouTubeRequestClient):
                 '='.join((cookie.name, cookie.value)) for cookie in cookies
             ])
         # Headers used in xbmc_items.video_playback_item'
-        return '&'.join([
-            '='.join((key, quote(value))) for key, value in headers.items()
-        ])
+        return urlencode(headers, safe='/', quote_via=quote)
 
     @staticmethod
     def _normalize_url(url):
@@ -1589,17 +1588,15 @@ class StreamInfo(YouTubeRequestClient):
                 continue
             self._context.log_debug('Found widevine license url: {0}'
                                     .format(url))
-            address, port = get_connect_address(self._context)
             license_info = {
                 'url': url,
-                'proxy': ''.join((
-                    'http://',
-                    address,
-                    ':',
-                    str(port),
+                'proxy': urlunsplit((
+                    'http',
+                    get_connect_address(self._context, as_netloc=True),
                     PATHS.DRM,
-                    '||R{{SSM}}|',
-                )),
+                    '',
+                    '',
+                )) + '||R{{SSM}}|R',
                 'token': self._access_token,
             }
             break
@@ -2201,8 +2198,10 @@ class StreamInfo(YouTubeRequestClient):
             ))
 
             if license_url:
-                license_url = (license_url.replace("&", "&amp;")
-                               .replace('"', "&quot;").replace("<", "&lt;")
+                license_url = (license_url
+                               .replace("&", "&amp;")
+                               .replace('"', "&quot;")
+                               .replace("<", "&lt;")
                                .replace(">", "&gt;"))
                 output.extend((
                     '\t\t\t<ContentProtection'
@@ -2343,13 +2342,11 @@ class StreamInfo(YouTubeRequestClient):
                                     .format(file=filepath))
             success = False
         if success:
-            address, port = get_connect_address(self._context)
-            return ''.join((
-                'http://',
-                address,
-                ':',
-                str(port),
+            return urlunsplit((
+                'http',
+                get_connect_address(self._context, as_netloc=True),
                 PATHS.MPD,
-                filename,
+                urlencode({'file': filename}),
+                '',
             )), main_stream
         return None, None

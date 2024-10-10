@@ -37,6 +37,12 @@ class LoginClient(YouTubeRequestClient):
         'identity.plus.page.impersonation',
     ))
     TOKEN_URL = 'https://www.googleapis.com/oauth2/v4/token'
+    TOKEN_TYPES = {
+        0: 'tv',
+        'tv': 'tv',
+        1: 'personal',
+        'personal': 'personal',
+    }
 
     def __init__(self,
                  configs=None,
@@ -106,16 +112,19 @@ class LoginClient(YouTubeRequestClient):
                      error_info='Revoke failed: {exc}',
                      raise_exc=True)
 
-    def refresh_token_tv(self, refresh_token):
-        client_id = self._config_tv.get('id')
-        client_secret = self._config_tv.get('secret')
-        if not client_id or not client_secret:
-            return '', 0
-        return self.refresh_token(refresh_token,
-                                  client_id=client_id,
-                                  client_secret=client_secret)
+    def refresh_token(self, token_type, refresh_token=None):
+        login_type = self.TOKEN_TYPES.get(token_type)
+        if login_type == 'tv':
+            client_id = self._config_tv.get('id')
+            client_secret = self._config_tv.get('secret')
+        elif login_type == 'personal':
+            client_id = self._config.get('id')
+            client_secret = self._config.get('secret')
+        else:
+            return None
+        if not client_id or not client_secret or not refresh_token:
+            return None
 
-    def refresh_token(self, refresh_token, client_id='', client_secret=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
         headers = {'Host': 'www.googleapis.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -123,21 +132,21 @@ class LoginClient(YouTubeRequestClient):
                                  ' Chrome/61.0.3163.100 Safari/537.36',
                    'Content-Type': 'application/x-www-form-urlencoded'}
 
-        client_id = client_id or self._config.get('id', '')
-        client_secret = client_secret or self._config.get('secret', '')
         post_data = {'client_id': client_id,
                      'client_secret': client_secret,
                      'refresh_token': refresh_token,
                      'grant_type': 'refresh_token'}
 
         config_type = self._get_config_type(client_id, client_secret)
-        client = ''.join((
-            '(config_type: |', config_type,
-            '| client_id: |', client_id[:3], '...', client_id[-5:],
-            '| client_secret: |', client_secret[:3], '...', client_secret[-3:],
-            '|)'
-        ))
-        log_debug('Refresh token for {0}'.format(client))
+        client = (('config_type: |{config_type}|\n'
+                   'client_id: |{id_start}...{id_end}|\n'
+                   'client_secret: |{secret_start}...{secret_end}|')
+                  .format(config_type=config_type,
+                          id_start=client_id[:3],
+                          id_end=client_id[-5:],
+                          secret_start=client_secret[:3],
+                          secret_end=client_secret[-3:]))
+        log_debug('Refresh token\n{0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
                                  method='POST',
@@ -146,8 +155,9 @@ class LoginClient(YouTubeRequestClient):
                                  response_hook=LoginClient._response_hook,
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed',
-                                 error_info=('Refresh token failed'
-                                             ' {client}:\n{{exc}}'
+                                 error_info=('Refresh token failed\n'
+                                             '{client}:\n'
+                                             '{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
 
@@ -157,16 +167,19 @@ class LoginClient(YouTubeRequestClient):
             return access_token, expiry
         return '', 0
 
-    def request_access_token_tv(self, code, client_id='', client_secret=''):
-        client_id = client_id or self._config_tv.get('id')
-        client_secret = client_secret or self._config_tv.get('secret')
-        if not client_id or not client_secret:
-            return '', ''
-        return self.request_access_token(code,
-                                         client_id=client_id,
-                                         client_secret=client_secret)
+    def request_access_token(self, token_type, code=None):
+        login_type = self.TOKEN_TYPES.get(token_type)
+        if login_type == 'tv':
+            client_id = self._config_tv.get('id')
+            client_secret = self._config_tv.get('secret')
+        elif login_type == 'personal':
+            client_id = self._config.get('id')
+            client_secret = self._config.get('secret')
+        else:
+            return None
+        if not client_id or not client_secret or not code:
+            return None
 
-    def request_access_token(self, code, client_id='', client_secret=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
         headers = {'Host': 'www.googleapis.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -174,21 +187,21 @@ class LoginClient(YouTubeRequestClient):
                                  ' Chrome/61.0.3163.100 Safari/537.36',
                    'Content-Type': 'application/x-www-form-urlencoded'}
 
-        client_id = client_id or self._config.get('id', '')
-        client_secret = client_secret or self._config.get('secret', '')
         post_data = {'client_id': client_id,
                      'client_secret': client_secret,
                      'code': code,
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
         config_type = self._get_config_type(client_id, client_secret)
-        client = ''.join((
-            '(config_type: |', config_type,
-            '| client_id: |', client_id[:3], '...', client_id[-5:],
-            '| client_secret: |', client_secret[:3], '...', client_secret[-3:],
-            '|)'
-        ))
-        log_debug('Requesting access token for {0}'.format(client))
+        client = (('config_type: |{config_type}|\n'
+                   'client_id: |{id_start}...{id_end}|\n'
+                   'client_secret: |{secret_start}...{secret_end}|')
+                  .format(config_type=config_type,
+                          id_start=client_id[:3],
+                          id_end=client_id[-5:],
+                          secret_start=client_secret[:3],
+                          secret_end=client_secret[-3:]))
+        log_debug('Requesting access token\n{0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
                                  method='POST',
@@ -197,19 +210,24 @@ class LoginClient(YouTubeRequestClient):
                                  response_hook=LoginClient._response_hook,
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed: Unknown response',
-                                 error_info=('Access token request failed'
-                                             ' {client}:\n{{exc}}'
+                                 error_info=('Access token request failed\n'
+                                             '{client}:\n'
+                                             '{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
 
-    def request_device_and_user_code_tv(self):
-        client_id = self._config_tv.get('id')
+    def request_device_and_user_code(self, token_type):
+        login_type = self.TOKEN_TYPES.get(token_type)
+        if login_type == 'tv':
+            client_id = self._config_tv.get('id')
+        elif login_type == 'personal':
+            client_id = self._config.get('id')
+        else:
+            return None
         if not client_id:
             return None
-        return self.request_device_and_user_code(client_id=client_id)
 
-    def request_device_and_user_code(self, client_id=''):
         # https://developers.google.com/youtube/v3/guides/auth/devices
         headers = {'Host': 'accounts.google.com',
                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
@@ -217,17 +235,16 @@ class LoginClient(YouTubeRequestClient):
                                  ' Chrome/61.0.3163.100 Safari/537.36',
                    'Content-Type': 'application/x-www-form-urlencoded'}
 
-        client_id = client_id or self._config.get('id', '')
         post_data = {'client_id': client_id,
                      'scope': 'https://www.googleapis.com/auth/youtube'}
 
         config_type = self._get_config_type(client_id)
-        client = ''.join((
-            '(config_type: |', config_type,
-            '| client_id: |', client_id[:3], '...', client_id[-5:],
-            '|)'
-        ))
-        log_debug('Requesting device and user code for {0}'.format(client))
+        client = (('config_type: |{config_type}|\n'
+                   'client_id: |{id_start}...{id_end}|')
+                  .format(config_type=config_type,
+                          id_start=client_id[:3],
+                          id_end=client_id[-5:]))
+        log_debug('Requesting device and user code\n{0}'.format(client))
 
         json_data = self.request(self.DEVICE_CODE_URL,
                                  method='POST',
@@ -236,8 +253,9 @@ class LoginClient(YouTubeRequestClient):
                                  response_hook=LoginClient._response_hook,
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed: Unknown response',
-                                 error_info=('Device/user code request failed'
-                                             ' {client}:\n{{exc}}'
+                                 error_info=('Device/user code request failed\n'
+                                             '{client}\n'
+                                             '{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
@@ -248,7 +266,7 @@ class LoginClient(YouTubeRequestClient):
                    'User-Agent': 'GoogleAuth/1.4 (GT-I9100 KTU84Q)',
                    'content-type': 'application/x-www-form-urlencoded',
                    'Host': 'android.clients.google.com',
-                   'Connection': 'Keep-Alive',
+                   'Connection': 'keep-alive',
                    'Accept-Encoding': 'gzip'}
 
         post_data = {

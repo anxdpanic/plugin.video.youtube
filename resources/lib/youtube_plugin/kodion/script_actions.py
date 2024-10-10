@@ -21,7 +21,7 @@ from .constants import (
 )
 from .context import XbmcContext
 from .network import Locator, get_client_ip_address, httpd_status
-from .utils import current_system_version, rm_dir, validate_ip_address
+from .utils import rm_dir, validate_ip_address
 from ..youtube import Provider
 
 
@@ -426,7 +426,7 @@ def _maintenance_actions(context, action, params):
         if target == 'settings_xml' and ui.on_yes_no_input(
                 context.get_name(), localize('refresh.settings.confirm')
         ):
-            if not current_system_version.compatible(20, 0):
+            if not context.get_system_version().compatible(20):
                 ui.show_notification(localize('failed'))
                 return
 
@@ -645,6 +645,20 @@ def run(argv):
             params = args.query
             if params:
                 params = dict(parse_qsl(args.query))
+
+        system_version = context.get_system_version()
+        context.log_notice('Script: Running |v{version}|\n'
+                           'Kodi: |v{kodi}|\n'
+                           'Python: |v{python}|\n'
+                           'Category: |{category}|\n'
+                           'Action: |{action}|\n'
+                           'Params: |{params}|'
+                           .format(version=context.get_version(),
+                                   kodi=str(system_version),
+                                   python=system_version.get_python_version(),
+                                   category=category,
+                                   action=action,
+                                   params=params))
 
         if not category:
             xbmcaddon.Addon().openSettings()
