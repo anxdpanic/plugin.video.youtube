@@ -631,6 +631,8 @@ class AbstractSettings(object):
     if current_system_version.compatible(20):
         _COLOR_SETTING_MAP = {
             'itemCount': 'commentCount',
+            'subscriberCount': 'likeCount',
+            'videoCount': 'commentCount',
         }
 
         def get_label_color(self, label_part):

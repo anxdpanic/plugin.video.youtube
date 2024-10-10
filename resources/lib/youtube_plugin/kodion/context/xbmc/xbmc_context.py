@@ -213,6 +213,7 @@ class XbmcContext(AbstractContext):
         # 'stats.favoriteCount': 1036,
         'stats.itemCount': 30737,
         'stats.likeCount': 30733,
+        'stats.subscriberCount': 30739,
         'stats.videoCount': 30738,
         'stats.viewCount': 30767,
         'stream.alternate': 30747,
