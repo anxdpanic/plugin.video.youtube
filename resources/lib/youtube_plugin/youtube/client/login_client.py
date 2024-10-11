@@ -16,7 +16,6 @@ from ..youtube_exceptions import (
     InvalidJSON,
     LoginException,
 )
-from ...kodion.compatibility import parse_qsl
 from ...kodion.logger import log_debug
 
 
@@ -252,49 +251,6 @@ class LoginClient(YouTubeRequestClient):
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
-
-    def authenticate(self, username, password):
-        headers = {'device': '38c6ee9a82b8b10a',
-                   'app': 'com.google.android.youtube',
-                   'User-Agent': 'GoogleAuth/1.4 (GT-I9100 KTU84Q)',
-                   'content-type': 'application/x-www-form-urlencoded',
-                   'Host': 'android.clients.google.com',
-                   'Connection': 'keep-alive',
-                   'Accept-Encoding': 'gzip'}
-
-        post_data = {
-            'device_country': self._region.lower(),
-            'operatorCountry': self._region.lower(),
-            'lang': self._language,
-            'sdk_version': '19',
-            # 'google_play_services_version': '6188034',
-            'accountType': 'HOSTED_OR_GOOGLE',
-            'Email': username.encode('utf-8'),
-            'service': self.SERVICE_URLS,
-            'source': 'android',
-            'androidId': '38c6ee9a82b8b10a',
-            'app': 'com.google.android.youtube',
-            # 'client_sig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
-            'callerPkg': 'com.google.android.youtube',
-            # 'callerSig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
-            'Passwd': password.encode('utf-8')
-        }
-
-        result = self.request(self.ANDROID_CLIENT_AUTH_URL,
-                              method='POST',
-                              data=post_data,
-                              headers=headers,
-                              error_title='Login Failed',
-                              raise_exc=True)
-
-        lines = result.text.replace('\n', '&')
-        params = dict(parse_qsl(lines))
-        token = params.get('Auth', '')
-        expires = int(params.get('Expiry', -1))
-        if not token or expires == -1:
-            raise LoginException('Failed to get token')
-
-        return token, expires
 
     def _get_config_type(self, client_id, client_secret=None):
         """used for logging"""
