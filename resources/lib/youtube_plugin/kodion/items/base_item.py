@@ -34,6 +34,8 @@ class BaseItem(object):
         self.set_name(name)
 
         self._uri = uri
+        self._available = True
+        self._callback = None
 
         self._image = ''
         if image:
@@ -42,6 +44,7 @@ class BaseItem(object):
         if fanart:
             self.set_fanart(fanart)
 
+        self._bookmark_id = None
         self._bookmark_timestamp = None
         self._context_menu = None
         self._added_utc = None
@@ -144,6 +147,22 @@ class BaseItem(object):
         """
         return self._uri
 
+    @property
+    def available(self):
+        return self._available
+
+    @available.setter
+    def available(self, value):
+        self._available = value
+
+    @property
+    def callback(self):
+        return self._callback
+
+    @callback.setter
+    def callback(self, value):
+        self._callback = value
+
     def set_image(self, image):
         if not image:
             return
@@ -238,6 +257,14 @@ class BaseItem(object):
     def set_count(self, count):
         self._count = int(count or 0)
 
+    @property
+    def bookmark_id(self):
+        return self._bookmark_id
+
+    @bookmark_id.setter
+    def bookmark_id(self, value):
+        self._bookmark_id = value
+
     def set_bookmark_timestamp(self, timestamp):
         self._bookmark_timestamp = timestamp
 
@@ -247,6 +274,10 @@ class BaseItem(object):
     @property
     def playable(self):
         return self._playable
+
+    @playable.setter
+    def playable(self, value):
+        self._playable = value
 
     def add_artist(self, artist):
         if artist:
@@ -337,3 +368,6 @@ class _Encoder(json.JSONEncoder):
         if nested:
             return output
         return super(_Encoder, self).encode(output)
+
+    def default(self, obj):
+        pass

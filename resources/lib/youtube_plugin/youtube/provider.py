@@ -1424,21 +1424,43 @@ class Provider(AbstractProvider):
                 'items': []
             }
 
-            def _update_bookmark(_id, timestamp):
+            def _update_bookmark(context, _id, old_item):
                 def _update(new_item):
-                    new_item.set_bookmark_timestamp(timestamp)
-                    bookmarks_list.update_item(_id, repr(new_item), timestamp)
+                    if isinstance(old_item, float):
+                        bookmark_timestamp = old_item
+                    elif isinstance(old_item, BaseItem):
+                        bookmark_timestamp = old_item.get_bookmark_timestamp()
+                    else:
+                        return
+
+                    if new_item.available:
+                        new_item.bookmark_id = _id
+                        new_item.set_bookmark_timestamp(bookmark_timestamp)
+                        new_item.callback = None
+                        bookmarks_list.update_item(
+                            _id,
+                            repr(new_item),
+                            bookmark_timestamp,
+                        )
+                    else:
+                        new_item.__dict__.update(old_item.__dict__)
+                        new_item.bookmark_id = _id
+                        new_item.set_bookmark_timestamp(bookmark_timestamp)
+                        new_item.available = False
+                        new_item.playable = False
+                        new_item.set_title(context.get_ui().color(
+                            'AA808080', new_item.get_title()
+                        ))
 
                 return _update
 
             for item_id, item in items.items():
+                callback = _update_bookmark(context, item_id, item)
                 if isinstance(item, float):
                     kind = 'youtube#channel'
                     yt_id = item_id
-                    callback = _update_bookmark(item_id, item)
                     partial = True
                 elif isinstance(item, BaseItem):
-                    callback = None
                     partial = False
 
                     if isinstance(item, VideoItem):
@@ -1452,7 +1474,9 @@ class Provider(AbstractProvider):
                             kind = 'youtube#channel'
                             yt_id = getattr(item, 'channel_id', None)
                 else:
+                    kind = None
                     yt_id = None
+                    partial = False
 
                 if not yt_id:
                     if isinstance(item, BaseItem):
@@ -1467,10 +1491,6 @@ class Provider(AbstractProvider):
                                 continue
                             kind = 'youtube#' + kind
                             partial = True
-                            callback = _update_bookmark(
-                                item_id,
-                                item.get_bookmark_timestamp(),
-                            )
                             break
                         else:
                             if to_delete:
