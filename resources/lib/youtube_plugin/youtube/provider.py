@@ -261,7 +261,12 @@ class Provider(AbstractProvider):
                         if not value:
                             continue
 
-                        token, expiry = client.refresh_token(token_type, value)
+                        json_data = client.refresh_token(token_type, value)
+                        if not json_data:
+                            continue
+
+                        token = json_data.get('access_token')
+                        expiry = int(json_data.get('expires_in', 3600))
                         if token and expiry > 0:
                             access_tokens[token_type] = token
                             if not token_expiry or expiry < token_expiry:

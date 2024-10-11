@@ -455,7 +455,7 @@ class AccessManager(JSONStore):
         }
 
         if expiry is not None:
-            details['token_expires'] = (
+            details['token_expires'] = time.time() + (
                 min(map(int, [val for val in expiry if val]))
                 if isinstance(expiry, (list, tuple)) else
                 int(expiry)

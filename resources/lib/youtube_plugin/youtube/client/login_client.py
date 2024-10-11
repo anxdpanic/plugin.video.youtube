@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import time
-
 from .request_client import YouTubeRequestClient
 from ..youtube_exceptions import (
     InvalidGrant,
@@ -160,12 +158,7 @@ class LoginClient(YouTubeRequestClient):
                                              '{{exc}}'
                                              .format(client=client)),
                                  raise_exc=True)
-
-        if json_data:
-            access_token = json_data['access_token']
-            expiry = time.time() + int(json_data.get('expires_in', 3600))
-            return access_token, expiry
-        return '', 0
+        return json_data
 
     def request_access_token(self, token_type, code=None):
         login_type = self.TOKEN_TYPES.get(token_type)
