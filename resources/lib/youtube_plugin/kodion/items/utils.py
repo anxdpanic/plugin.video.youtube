@@ -52,12 +52,12 @@ def from_json(json_data, *args):
     :param json_data:
     :return:
     """
+    timestamp = args[0][1] if args and args[0] and len(args[0]) == 4 else None
+
     if isinstance(json_data, string_type):
         if json_data == to_str(None):
             # Channel bookmark that will be updated. Store timestamp for update
-            if args and args[0] and len(args[0]) == 4:
-                return args[0][1]
-            return None
+            return timestamp
         json_data = json.loads(json_data, object_hook=_decoder)
 
     item_type = json_data.get('type')
@@ -69,5 +69,6 @@ def from_json(json_data, *args):
     for key, value in json_data.get('data', {}).items():
         if hasattr(item, key):
             setattr(item, key, value)
+    item.set_bookmark_timestamp(timestamp)
 
     return item

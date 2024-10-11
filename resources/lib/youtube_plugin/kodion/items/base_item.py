@@ -14,7 +14,14 @@ import json
 from datetime import date, datetime
 from hashlib import md5
 
-from ..compatibility import datetime_infolabel, string_type, to_str, unescape
+from ..compatibility import (
+    datetime_infolabel,
+    parse_qsl,
+    string_type,
+    to_str,
+    unescape,
+    urlsplit,
+)
 from ..constants import MEDIA_PATH
 
 
@@ -70,6 +77,47 @@ class BaseItem(object):
         :return: unique id of the item.
         """
         return md5(''.join((self._name, self._uri)).encode('utf-8')).hexdigest()
+
+    def parse_item_ids_from_uri(self):
+        if not self._uri:
+            return None
+
+        item_ids = {}
+
+        uri = urlsplit(self._uri)
+        path = uri.path
+        params = dict(parse_qsl(uri.query))
+
+        video_id = params.get('video_id')
+        if video_id:
+            item_ids['video_id'] = video_id
+
+        channel_id = None
+        playlist_id = None
+
+        while path:
+            part, _, next_part = path.partition('/')
+            if not next_part:
+                break
+
+            if part == 'channel':
+                channel_id = next_part.partition('/')[0]
+            elif part == 'playlist':
+                playlist_id = next_part.partition('/')[0]
+            path = next_part
+
+        if channel_id:
+            item_ids['channel_id'] = channel_id
+        if playlist_id:
+            item_ids['playlist_id'] = playlist_id
+
+        for item_id, value in item_ids.items():
+            try:
+                setattr(self, item_id, value)
+            except AttributeError:
+                pass
+
+        return item_ids
 
     def set_name(self, name):
         try:

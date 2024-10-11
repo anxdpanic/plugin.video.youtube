@@ -40,6 +40,7 @@ from ..kodion.constants import (
     PATHS,
 )
 from ..kodion.items import (
+    BaseItem,
     DirectoryItem,
     NewSearchItem,
     SearchItem,
@@ -1427,22 +1428,47 @@ class Provider(AbstractProvider):
                     yt_id = item_id
                     callback = _update_bookmark(item_id, item)
                     partial = True
-                else:
+                elif isinstance(item, BaseItem):
                     callback = None
                     partial = False
+
                     if isinstance(item, VideoItem):
                         kind = 'youtube#video'
                         yt_id = item.video_id
                     else:
-                        yt_id = item.playlist_id
+                        yt_id = getattr(item, 'playlist_id', None)
                         if yt_id:
                             kind = 'youtube#playlist'
                         else:
                             kind = 'youtube#channel'
-                            yt_id = item.channel_id
+                            yt_id = getattr(item, 'channel_id', None)
+                else:
+                    yt_id = None
 
                 if not yt_id:
-                    continue
+                    if isinstance(item, BaseItem):
+                        item_ids = item.parse_item_ids_from_uri()
+                        to_delete = False
+                        for kind in ('video', 'playlist', 'channel'):
+                            yt_id = item_ids.get(kind + '_id')
+                            if not yt_id:
+                                continue
+                            if yt_id == 'None':
+                                to_delete = True
+                                continue
+                            kind = 'youtube#' + kind
+                            partial = True
+                            callback = _update_bookmark(
+                                item_id,
+                                item.get_bookmark_timestamp(),
+                            )
+                            break
+                        else:
+                            if to_delete:
+                                bookmarks_list.del_item(item_id)
+                            continue
+                    else:
+                        continue
 
                 item = {
                     'kind': kind,
