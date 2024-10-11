@@ -982,7 +982,6 @@ def update_video_infos(provider, context, video_id_dict,
 
 
 def update_play_info(provider, context, video_id, media_item, video_stream):
-    media_item.video_id = video_id
     update_video_infos(provider, context, {video_id: media_item})
 
     settings = context.get_settings()

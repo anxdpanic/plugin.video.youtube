@@ -123,7 +123,8 @@ def _process_list_response(provider, context, json_data, item_filter):
                              item_uri,
                              image=image,
                              fanart=fanart,
-                             plot=description)
+                             plot=description,
+                             video_id=item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'channel':
@@ -211,7 +212,8 @@ def _process_list_response(provider, context, json_data, item_filter):
                              item_uri,
                              image=image,
                              fanart=fanart,
-                             plot=description)
+                             plot=description,
+                             video_id=item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'activity':
@@ -233,7 +235,8 @@ def _process_list_response(provider, context, json_data, item_filter):
                              item_uri,
                              image=image,
                              fanart=fanart,
-                             plot=description)
+                             plot=description,
+                             video_id=item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'commentthread':
@@ -268,7 +271,6 @@ def _process_list_response(provider, context, json_data, item_filter):
             item.add_context_menu(**yt_item['_context_menu'])
 
         if isinstance(item, VideoItem):
-            item.video_id = item_id
             # Set track number from playlist, or set to current list length to
             # match "Default" (unsorted) sort order
             position = snippet.get('position') or len(result)

@@ -188,9 +188,9 @@ class XbmcPlugin(AbstractPlugin):
             if not result:
                 result = [
                     CommandItem(
-                        context.localize('page.back'),
-                        'Action(ParentDir)',
-                        context,
+                        name=context.localize('page.back'),
+                        command='Action(ParentDir)',
+                        context=context,
                         image='DefaultFolderBack.png',
                         plot=context.localize('page.empty'),
                     )

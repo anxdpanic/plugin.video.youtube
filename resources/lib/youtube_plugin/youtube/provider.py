@@ -413,6 +413,8 @@ class Provider(AbstractProvider):
                 image='{media}/playlist.png',
                 fanart=fanart,
                 category_label=item_label,
+                channel_id=channel_id,
+                playlist_id=uploads,
             )
             result = [uploads]
         else:
@@ -584,6 +586,7 @@ class Provider(AbstractProvider):
                     image='{media}/playlist.png',
                     fanart=fanart,
                     category_label=item_label,
+                    channel_id=channel_id,
                 )
                 result.append(playlists_item)
 
@@ -609,6 +612,7 @@ class Provider(AbstractProvider):
                     image='{media}/live.png',
                     fanart=fanart,
                     category_label=item_label,
+                    channel_id=channel_id,
                 )
                 result.append(live_item)
 

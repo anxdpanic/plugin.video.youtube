@@ -121,10 +121,11 @@ def _play_stream(provider, context):
         ))
         stream['url'] = url
 
-    if audio_only or not video_type:
-        media_item = AudioItem(metadata.get('title', ''), stream['url'])
-    else:
-        media_item = VideoItem(metadata.get('title', ''), stream['url'])
+    media_item = (AudioItem if audio_only or not video_type else VideoItem)(
+        name=metadata.get('title', ''),
+        uri=stream['url'],
+        video_id=video_id,
+    )
 
     use_history = not (screensaver or incognito or stream.get('live'))
     use_remote_history = use_history and settings.use_remote_history()
