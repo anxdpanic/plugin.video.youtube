@@ -221,6 +221,7 @@ class XbmcPlugin(AbstractPlugin):
                     result,
                     show_fanart=context.get_settings().fanart_selection(),
                 )
+                uri = result.get_uri()
                 result = xbmcplugin.addDirectoryItem(self.handle,
                                                      url=uri,
                                                      listitem=item)

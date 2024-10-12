@@ -483,7 +483,9 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
         if (headers and uri.startswith('http')
                 and not (is_external
                          or settings.default_player_web_urls())):
-            kwargs['path'] = '|'.join((uri, headers))
+            uri = '|'.join((uri, headers))
+            kwargs['path'] = uri
+            media_item.set_uri(uri)
 
     list_item = xbmcgui.ListItem(**kwargs)
 
