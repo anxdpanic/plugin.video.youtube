@@ -241,17 +241,23 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_error(403)
 
         elif self.path.startswith(PATHS.MPD):
-            filepath = os.path.join(self.BASE_PATH, self.path[len(PATHS.MPD):])
-            if not os.path.isfile(filepath):
-                response = ('File Not Found: |{path}| -> |{filepath}|'
-                            .format(path=self.path, filepath=filepath))
-                self.send_error(404, response)
-            else:
+            try:
+                file = dict(parse_qsl(urlsplit(self.path).query)).get('file')
+                if file:
+                    file_path = os.path.join(self.BASE_PATH, file)
+                else:
+                    file_path = None
+                    raise IOError
+
+                file_size = os.path.getsize(file_path)
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/dash+xml')
-                self.send_header('Content-Length',
-                                 str(os.path.getsize(filepath)))
+                self.send_header('Content-Length', str(file_size))
                 self.end_headers()
+            except IOError:
+                response = ('File Not Found: |{path}| -> |{file_path}|'
+                            .format(path=self.path, file_path=file_path))
+                self.send_error(404, response)
 
         elif self.path.startswith(PATHS.REDIRECT):
             self.send_error(404)
