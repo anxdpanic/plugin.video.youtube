@@ -51,6 +51,9 @@ class HTTPServer(TCPServer):
 
 
 class RequestHandler(BaseHTTPRequestHandler, object):
+    protocol_version = 'HTTP/1.1'
+    server_version = 'plugin.video.youtube/1.0'
+
     _context = None
     requests = None
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
