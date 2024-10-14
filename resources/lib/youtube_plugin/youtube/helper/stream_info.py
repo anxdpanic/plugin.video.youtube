@@ -975,13 +975,17 @@ class StreamInfo(YouTubeRequestClient):
         return result
 
     @staticmethod
-    def _make_curl_headers(headers, cookies=None):
+    def _make_header_string(headers, cookies=None, new_headers=None):
+        if cookies or new_headers:
+            headers = headers.copy()
         if cookies:
             headers['Cookie'] = '; '.join([
                 '='.join((cookie.name, cookie.value)) for cookie in cookies
             ])
+        if new_headers:
+            headers.update(new_headers)
         # Headers used in xbmc_items.video_playback_item'
-        return urlencode(headers, safe='/', quote_via=quote)
+        return urlencode(headers)
 
     @staticmethod
     def _normalize_url(url):
@@ -1014,7 +1018,7 @@ class StreamInfo(YouTubeRequestClient):
             client_name = 'web'
             client_data = {'json': {'videoId': self.video_id}}
             headers = self.build_client(client_name, client_data)['headers']
-        curl_headers = self._make_curl_headers(headers, cookies=None)
+        curl_headers = self._make_header_string(headers)
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1112,7 +1116,7 @@ class StreamInfo(YouTubeRequestClient):
             client_name = 'web'
             client_data = {'json': {'videoId': self.video_id}}
             headers = self.build_client(client_name, client_data)['headers']
-        curl_headers = self._make_curl_headers(headers, cookies=None)
+        curl_headers = self._make_header_string(headers)
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1515,7 +1519,7 @@ class StreamInfo(YouTubeRequestClient):
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self._make_curl_headers(headers, cookies)
-        curl_headers = self._make_curl_headers(client['headers'], cookies=None)
+        curl_headers = self._make_header_string(client['headers'])
 
         microformat = (result.get('microformat', {})
                        .get('playerMicroformatRenderer', {}))
