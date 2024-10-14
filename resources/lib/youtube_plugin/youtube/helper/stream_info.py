@@ -1087,9 +1087,10 @@ class StreamInfo(YouTubeRequestClient):
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
+                    stream_info = redact_ip(match.group(1))
                     self._context.log_debug('Unknown itag: {itag}\n{stream}'
                                             .format(itag=itag,
-                                                    stream=redact_ip(match[0])))
+                                                    stream=stream_info))
                 if (not yt_format
                         or (yt_format.get('hls/video')
                             and not yt_format.get('hls/audio'))):
