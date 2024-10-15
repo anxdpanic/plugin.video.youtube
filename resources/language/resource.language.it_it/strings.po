@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-10-03 15:46+0000\n"
+"PO-Revision-Date: 2024-10-15 21:27+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/it_it/>\n"
 "Language: it_it\n"
@@ -1251,16 +1251,16 @@ msgid "Shorts (1 minute or less)"
 msgstr "Video brevi (1 minuto o meno)"
 
 msgctxt "#30737"
-msgid ""
-msgstr " "
+msgid "Episodes"
+msgstr "Episodi"
 
 msgctxt "#30738"
-msgid ""
-msgstr " "
+msgid "Videos"
+msgstr "Video"
 
 msgctxt "#30739"
-msgid ""
-msgstr " "
+msgid "Subscribers"
+msgstr "Iscritti"
 
 msgctxt "#30740"
 msgid "HLS"
@@ -1476,15 +1476,15 @@ msgstr "8K/60 fps, HDR, usando AV1 | Dispositivo o PC moderno con funzionalità 
 
 msgctxt "#30793"
 msgid "Views count display colour"
-msgstr "Colore di visualizzazione del conteggio visualizzazioni"
+msgstr "Colore di visualizzazione conteggio Visualizzazioni"
 
 msgctxt "#30794"
-msgid "Likes count display colour"
-msgstr "Colore di visualizzazione del conteggio Mi piace"
+msgid "Subscriber/Likes count display colour"
+msgstr "Colore di visualizzazione conteggio Iscritti/Mi piace"
 
 msgctxt "#30795"
-msgid "Comments count display colour"
-msgstr "Colore di visualizzazione del conteggio commenti"
+msgid "Videos/Comments count display colour"
+msgstr "Colore di visualizzazione conteggio Video/Commenti"
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
@@ -1581,6 +1581,30 @@ msgstr "Sei sicuro di voler ricaricare settings.xml?"
 msgctxt "#30819"
 msgid "Play from start"
 msgstr "Riproduci dall'inizio"
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr "Podcast"
+
+#~ msgctxt "#30737"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30738"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30739"
+#~ msgid ""
+#~ msgstr " "
+
+#~ msgctxt "#30794"
+#~ msgid "Likes count display colour"
+#~ msgstr "Colore di visualizzazione del conteggio Mi piace"
+
+#~ msgctxt "#30795"
+#~ msgid "Comments count display colour"
+#~ msgstr "Colore di visualizzazione del conteggio commenti"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"

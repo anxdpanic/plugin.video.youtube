@@ -1247,15 +1247,15 @@ msgid "Shorts (1 minute or less)"
 msgstr "Shorts (jedna minúta alebo menej)"
 
 msgctxt "#30737"
-msgid ""
+msgid "Episodes"
 msgstr ""
 
 msgctxt "#30738"
-msgid ""
+msgid "Videos"
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1475,12 +1475,12 @@ msgid "Views count display colour"
 msgstr "Farba zobrazenia počtu videní"
 
 msgctxt "#30794"
-msgid "Likes count display colour"
-msgstr "Farba zobrazenia počtu Lajkov"
+msgid "Subscriber/Likes count display colour"
+msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
-msgstr "Farba zobrazenia počtu komentárov"
+msgid "Videos/Comments count display colour"
+msgstr ""
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
@@ -1577,6 +1577,18 @@ msgstr "Naozaj chcete aktualizovať settings.xml?"
 msgctxt "#30819"
 msgid "Play from start"
 msgstr "Prehrať od začiatku"
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr ""
+
+#~ msgctxt "#30794"
+#~ msgid "Likes count display colour"
+#~ msgstr "Farba zobrazenia počtu Lajkov"
+
+#~ msgctxt "#30795"
+#~ msgid "Comments count display colour"
+#~ msgstr "Farba zobrazenia počtu komentárov"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"
