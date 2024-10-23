@@ -73,7 +73,7 @@ def _play_stream(provider, context):
                                          audio_only,
                                          settings.use_mpd_videos())
         except YouTubeException as exc:
-            context.log_error('yt_play.play_video - {exc}:\n{details}'.format(
+            context.log_error('yt_play.play_video - {exc!r}:\n{details}'.format(
                 exc=exc, details=''.join(format_stack())
             ))
             ui.show_notification(message=exc.get_message())

@@ -134,8 +134,8 @@ class Provider(AbstractProvider):
                     dev_main = None
 
             if not dev_main:
-                context.log_error('Invalid developer config: |{dev_config}|\n'
-                                  'expected: |{{'
+                context.log_error('Invalid developer config: |{dev_config}|'
+                                  '\n\texpected: |{{'
                                   ' "origin": ADDON_ID,'
                                   ' "main": {{'
                                   ' "system": SYSTEM_NAME,'

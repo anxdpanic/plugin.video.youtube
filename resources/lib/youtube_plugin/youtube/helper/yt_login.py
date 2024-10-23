@@ -128,10 +128,10 @@ def process(mode, provider, context, sign_out_refresh=True):
                 refresh_token = None
 
             context.log_debug('YouTube Login:'
-                              'Type: |{0}|\n'
-                              'Access token: |{1}|\n'
-                              'Refresh token: |{2}|\n'
-                              'Expires: |{3}|'
+                              '\n\tType: |{0}|'
+                              '\n\tAccess token: |{1}|'
+                              '\n\tRefresh token: |{2}|'
+                              '\n\tExpires: |{3}|'
                               .format(token,
                                       bool(access_token),
                                       bool(refresh_token),

@@ -177,7 +177,7 @@ class XbmcPlugin(AbstractPlugin):
         except KodionException as exc:
             result = options = None
             if provider.handle_exception(context, exc):
-                context.log_error('XbmcRunner.run - {exc}:\n{details}'.format(
+                context.log_error('XbmcRunner.run - {exc!r}:\n{details}'.format(
                     exc=exc, details=''.join(format_stack())
                 ))
                 ui.on_ok('Error in ContentProvider', exc.__str__())
