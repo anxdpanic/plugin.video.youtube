@@ -87,20 +87,26 @@ class ServiceMonitor(xbmc.Monitor):
     def onNotification(self, sender, method, data):
         if sender != ADDON_ID:
             return
+
         group, separator, event = method.partition('.')
+
         if event == WAKEUP:
             if not isinstance(data, dict):
                 data = json.loads(data)
             if not data:
                 return
+
             target = data.get('target')
+
             if target == PLUGIN_WAKEUP:
                 self.interrupt = True
+
             elif target == SERVER_WAKEUP:
                 if not self.httpd and self.httpd_required():
                     self.start_httpd()
                 if self.httpd_sleep_allowed:
                     self.httpd_sleep_allowed = None
+
             elif target == CHECK_SETTINGS:
                 state = data.get('state')
                 if state == 'defer':
@@ -109,16 +115,20 @@ class ServiceMonitor(xbmc.Monitor):
                     self._settings_state = state
                     self.onSettingsChanged()
                     self._settings_state = None
+
             if data.get('response_required'):
                 self.set_property(WAKEUP, target)
+
         elif event == REFRESH_CONTAINER:
             self.refresh_container()
+
         elif event == CONTAINER_FOCUS:
             if data:
                 data = json.loads(data)
             if not data or not self.is_plugin_container(check_all=True):
                 return
             xbmc.executebuiltin('SetFocus({0},{1},absolute)'.format(*data))
+
         elif event == RELOAD_ACCESS_MANAGER:
             self._context.reload_access_manager()
             self.refresh_container()

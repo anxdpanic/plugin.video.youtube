@@ -65,6 +65,7 @@ WAKEUP = 'wakeup'
 PLAY_FORCE_AUDIO = 'audio_only'
 PLAY_PROMPT_QUALITY = 'ask_for_quality'
 PLAY_PROMPT_SUBTITLES = 'prompt_for_subtitles'
+PLAY_STRM = 'strm'
 PLAY_TIMESHIFT = 'timeshift'
 PLAY_WITH = 'play_with'
 
@@ -124,6 +125,7 @@ __all__ = (
     'PLAY_FORCE_AUDIO',
     'PLAY_PROMPT_QUALITY',
     'PLAY_PROMPT_SUBTITLES',
+    'PLAY_STRM',
     'PLAY_TIMESHIFT',
     'PLAY_WITH',
 

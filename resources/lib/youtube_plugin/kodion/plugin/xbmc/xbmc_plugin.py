@@ -64,10 +64,9 @@ class XbmcPlugin(AbstractPlugin):
 
     def __init__(self):
         super(XbmcPlugin, self).__init__()
-        self.handle = None
 
     def run(self, provider, context, focused=None):
-        self.handle = context.get_handle()
+        handle = context.get_handle()
         ui = context.get_ui()
 
         route = ui.pop_property(REROUTE_PATH)
@@ -81,7 +80,7 @@ class XbmcPlugin(AbstractPlugin):
                 break
 
             xbmcplugin.endOfDirectory(
-                self.handle,
+                handle,
                 succeeded=False,
             )
 
@@ -211,6 +210,8 @@ class XbmcPlugin(AbstractPlugin):
 
             if options.get(provider.RESULT_FORCE_RESOLVE):
                 result = result[0]
+            else:
+                result = None
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             uri = result.get_uri()
@@ -222,7 +223,7 @@ class XbmcPlugin(AbstractPlugin):
                     show_fanart=context.get_settings().fanart_selection(),
                 )
                 uri = result.get_uri()
-                result = xbmcplugin.addDirectoryItem(self.handle,
+                result = xbmcplugin.addDirectoryItem(handle,
                                                      url=uri,
                                                      listitem=item)
                 if route:
@@ -230,7 +231,7 @@ class XbmcPlugin(AbstractPlugin):
                     playlist_player.play_item(item=uri, listitem=item)
                 else:
                     context.wakeup(SERVER_WAKEUP, timeout=5)
-                    xbmcplugin.setResolvedUrl(self.handle,
+                    xbmcplugin.setResolvedUrl(handle,
                                               succeeded=result,
                                               listitem=item)
 
@@ -257,7 +258,7 @@ class XbmcPlugin(AbstractPlugin):
         if item_count:
             context.apply_content()
             succeeded = xbmcplugin.addDirectoryItems(
-                self.handle, items, item_count
+                handle, items, item_count
             )
             cache_to_disc = options.get(provider.RESULT_CACHE_TO_DISC, True)
             update_listing = options.get(provider.RESULT_UPDATE_LISTING, False)
@@ -269,7 +270,7 @@ class XbmcPlugin(AbstractPlugin):
             update_listing = True
 
         xbmcplugin.endOfDirectory(
-            self.handle,
+            handle,
             succeeded=succeeded,
             updateListing=update_listing,
             cacheToDisc=cache_to_disc,

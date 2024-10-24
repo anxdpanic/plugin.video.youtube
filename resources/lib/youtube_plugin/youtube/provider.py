@@ -347,21 +347,24 @@ class Provider(AbstractProvider):
 
         return False
 
-    """
-    Lists the videos of a playlist.
-    path       : '/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/'
-        or
-    path       : '/playlist/(?P<playlist_id>[^/]+)/'
-    channel_id : ['mine'|<CHANNEL_ID>]
-    playlist_id: <PLAYLIST_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^(?:/channel/(?P<channel_id>[^/]+))?'
         r'/playlist/(?P<playlist_id>[^/]+)/?$'
     )
     @staticmethod
     def on_playlist(provider, context, re_match):
+        """
+        Lists the videos of a playlist.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        or
+
+        plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: ['mine'|YouTube Channel ID]
+        * PLAYLIST_ID: YouTube Playlist ID
+        """
         context.set_content(CONTENT.VIDEO_CONTENT)
         resource_manager = provider.get_resource_manager(context)
 
@@ -374,17 +377,18 @@ class Provider(AbstractProvider):
         result = v3.response_to_items(provider, context, json_data[batch_id])
         return result
 
-    """
-    Lists all playlists of a channel.
-    path      : '/channel/(?P<channel_id>[^/]+)/playlists/'
-    channel_id: <CHANNEL_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
         r'/playlists/?$')
     @staticmethod
     def on_channel_playlists(provider, context, re_match):
+        """
+        Lists all playlists of a channel.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlists/
+
+        * CHANNEL_ID: YouTube Channel ID
+        """
         context.set_content(CONTENT.LIST_CONTENT)
 
         channel_id = re_match.group('channel_id')
@@ -436,17 +440,18 @@ class Provider(AbstractProvider):
         result.extend(v3.response_to_items(provider, context, json_data))
         return result
 
-    """
-    List live streams for channel.
-    path      : '/channel/(?P<channel_id>[^/]+)/live/'
-    channel_id: <CHANNEL_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
         r'/live/?$')
     @staticmethod
     def on_channel_live(provider, context, re_match):
+        """
+        List live streams for channel.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/live
+
+        * CHANNEL_ID: YouTube Channel ID
+        """
         context.set_content(CONTENT.VIDEO_CONTENT)
         result = []
 
@@ -479,17 +484,19 @@ class Provider(AbstractProvider):
 
         return result
 
-    """
-    Lists a playlist folder and all uploaded videos of a channel.
-    path      :'/channel|handle|user/(?P<channel_id|username>)[^/]+/'
-    channel_id: <CHANNEL_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^/(?P<method>(channel|handle|user))'
         r'/(?P<identifier>[^/]+)/?$')
     @staticmethod
     def on_channel(provider, context, re_match):
+        """
+        Lists a playlist folder and all uploaded videos of a channel.
+
+        plugin://plugin.video.youtube/<ID_TYPE>/<ID>
+
+        * ID_TYPE: channel|handle|user
+        * ID: YouTube ID
+        """
         listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
         client = provider.get_client(context)
@@ -697,19 +704,6 @@ class Provider(AbstractProvider):
         result.append(live_events_item)
 
         return result
-
-    """
-    Plays a video, playlist, or channel live stream.
-    Video: '/play/?video_id=XXXXXX'
-
-    Playlist: '/play/?playlist_id=XXXXXX[&order=ORDER][&action=ACTION]'
-        ORDER: [normal(default)|reverse|shuffle] optional playlist ordering
-        ACTION: [list|play|queue|None(default)] optional action to perform
-
-    Channel live streams: '/play/?channel_id=UCXXXXXX[&live=X]
-        X: optional index of live stream to play if channel has multiple live
-           streams. 1 (default) for first live stream
-    """
 
     @AbstractProvider.register_path('^/users/(?P<action>[^/]+)/?$')
     @staticmethod

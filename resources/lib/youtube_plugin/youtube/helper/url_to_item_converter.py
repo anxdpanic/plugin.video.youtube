@@ -178,8 +178,7 @@ class UrlToItemConverter(object):
                         (PATHS.PLAY,),
                         {
                             'playlist_ids': ','.join(self._playlist_ids),
-                            'play': True,
-                            'order': 'default',
+                            'order': 'normal',
                         },
                     ),
                     playable=True,

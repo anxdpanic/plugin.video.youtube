@@ -197,7 +197,7 @@ def _play_playlist(provider, context):
             text='{wait} {current}/{total}'.format(
                 wait=context.localize('please_wait'),
                 current=0,
-                total=total
+                total=total,
             )
         )
 
@@ -214,7 +214,7 @@ def _play_playlist(provider, context):
                 text='{wait} {current}/{total}'.format(
                     wait=context.localize('please_wait'),
                     current=len(videos),
-                    total=total
+                    total=total,
                 )
             )
 
@@ -305,6 +305,27 @@ def _play_channel_live(provider, context):
 
 
 def process(provider, context, **_kwargs):
+    """
+    Plays a video, playlist, or channel live stream.
+
+    Video:
+    plugin://plugin.video.youtube/play/?video_id=<VIDEO_ID>
+
+    * VIDEO_ID: YouTube Video ID
+
+    Playlist:
+    plugin://plugin.video.youtube/play/?playlist_id=<PLAYLIST_ID>[&order=<ORDER>][&action=<ACTION>]
+
+    * PLAYLIST_ID: YouTube Playlist ID
+    * ORDER: [ask(default)|normal|reverse|shuffle] optional playlist order
+    * ACTION: [list|play|queue|None(default)] optional action to perform
+
+    Channel live streams:
+    plugin://plugin.video.youtube/play/?channel_id=<CHANNEL_ID>[&live=X]
+
+    * CHANNEL_ID: YouTube Channel ID
+    * X: optional index of live stream to play if channel has multiple live streams. 1 (default) for first live stream
+    """
     ui = context.get_ui()
 
     params = context.get_params()
@@ -346,7 +367,7 @@ def process(provider, context, **_kwargs):
 
         if context.get_handle() == -1:
             context.execute('PlayMedia({0})'.format(
-                context.create_uri(('play',), params)
+                context.create_uri((PATHS.PLAY,), params)
             ))
             return False
 

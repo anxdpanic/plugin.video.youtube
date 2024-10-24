@@ -2229,7 +2229,7 @@ class StreamInfo(YouTubeRequestClient):
 
             num_streams = len(streams)
             if media_type == 'audio':
-                output.extend(((
+                output.extend([(
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -2255,10 +2255,12 @@ class StreamInfo(YouTubeRequestClient):
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
                 ).format(
-                    quality=(idx + 1), priority=(num_streams - idx), **stream
-                ) for idx, stream in enumerate(streams)))
+                    quality=(idx + 1),
+                    priority=(num_streams - idx),
+                    **stream
+                ) for idx, stream in enumerate(streams)])
             elif media_type == 'video':
-                output.extend(((
+                output.extend([(
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -2281,8 +2283,10 @@ class StreamInfo(YouTubeRequestClient):
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
                 ).format(
-                    quality=(idx + 1), priority=(num_streams - idx), **stream
-                ) for idx, stream in enumerate(streams)))
+                    quality=(idx + 1),
+                    priority=(num_streams - idx),
+                    **stream
+                ) for idx, stream in enumerate(streams)])
 
             output.append('\t\t</AdaptationSet>\n')
             set_id += 1

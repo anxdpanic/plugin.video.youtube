@@ -19,6 +19,7 @@ from ..constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_WITH,
     VALUE_FROM_STR,
@@ -45,6 +46,7 @@ class AbstractContext(object):
         PLAY_FORCE_AUDIO,
         PLAY_PROMPT_SUBTITLES,
         PLAY_PROMPT_QUALITY,
+        PLAY_STRM,
         PLAY_TIMESHIFT,
         PLAY_WITH,
         'confirmed',
@@ -58,10 +60,8 @@ class AbstractContext(object):
         'incognito',
         'location',
         'logged_in',
-        'play',
         'resume',
         'screensaver',
-        'strm',
         'window_return',
     }
     _INT_PARAMS = {

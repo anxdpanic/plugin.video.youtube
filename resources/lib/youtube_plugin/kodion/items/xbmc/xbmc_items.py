@@ -25,6 +25,7 @@ from ...constants import (
     PLAYLISTITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
+    PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_WITH,
     SUBSCRIPTION_ID,
@@ -398,10 +399,12 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
                                               redact_ip(uri)))
 
+    params = context.get_params()
     settings = context.get_settings()
     ui = context.get_ui()
+
     is_external = ui.get_property(PLAY_WITH)
-    is_strm = context.get_param('strm')
+    is_strm = params.get(PLAY_STRM)
     mime_type = None
 
     if is_strm:
@@ -510,7 +513,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     if media_item.subtitles:
         list_item.setSubtitles(media_item.subtitles)
 
-    resume = context.get_param('resume')
+    resume = params.get('resume')
     set_info(list_item, media_item, props, resume=resume)
 
     return list_item
