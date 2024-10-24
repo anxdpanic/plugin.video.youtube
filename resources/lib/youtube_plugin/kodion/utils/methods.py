@@ -32,6 +32,7 @@ __all__ = (
     'make_dirs',
     'merge_dicts',
     'print_items',
+    'redact_ip',
     'rm_dir',
     'seconds_to_duration',
     'select_stream',
