@@ -662,8 +662,8 @@ class StreamInfo(YouTubeRequestClient):
     QUALITY_FACTOR = {
         # video - order based on comparative compression ratio
         'av01': 1,
+        'vp9.2': 0.75,
         'vp9': 0.75,
-        'vp09': 0.75,
         'vp8': 0.55,
         'vp08': 0.55,
         'avc1': 0.5,
@@ -1816,8 +1816,10 @@ class StreamInfo(YouTubeRequestClient):
             codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
             if codec:
                 codec = codec.group(1)
-                if codec.startswith(('vp9', 'vp09')):
+                if codec.startswith('vp9'):
                     codec = 'vp9'
+                elif codec.startswith('vp09'):
+                    codec = 'vp9.2'
                 elif codec.startswith('dts'):
                     codec = 'dts'
             if codec not in isa_capabilities:
@@ -1903,7 +1905,8 @@ class StreamInfo(YouTubeRequestClient):
                 if fps > 30 and not allow_hfr:
                     continue
 
-                hdr = 'HDR' in stream.get('qualityLabel', '')
+                hdr = ('colorInfo' in stream
+                       or 'HDR' in stream.get('qualityLabel', ''))
                 if hdr and not allow_hdr:
                     continue
 

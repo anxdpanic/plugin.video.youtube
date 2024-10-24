@@ -683,6 +683,7 @@ class XbmcContext(AbstractContext):
         'av01': loose_version('20.3.0'),
         'vp8': False,
         'vp9': loose_version('2.3.14'),
+        'vp9.2': loose_version('2.4.0'),
     }
 
     def inputstream_adaptive_capabilities(self, capability=None):
