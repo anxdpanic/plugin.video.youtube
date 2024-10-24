@@ -35,7 +35,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, redact_ip
+from ...kodion.utils import entity_escape, make_dirs, redact_ip
 
 
 class StreamInfo(YouTubeRequestClient):
@@ -1965,14 +1965,10 @@ class StreamInfo(YouTubeRequestClient):
 
             url = unquote(url)
             primary_url, secondary_url = self._process_url_params(url)
-            primary_url = (primary_url.replace("&", "&amp;")
-                           .replace('"', "&quot;")
-                           .replace("<", "&lt;")
-                           .replace(">", "&gt;"))
 
             details = {
                 'mimeType': mime_type,
-                'baseUrl': primary_url,
+                'baseUrl': entity_escape(primary_url),
                 'mediaType': media_type,
                 'container': container,
                 'codecs': codecs,
@@ -1999,11 +1995,7 @@ class StreamInfo(YouTubeRequestClient):
                 'channels': channels,
             }
             if secondary_url:
-                secondary_url = (secondary_url.replace("&", "&amp;")
-                                 .replace('"', "&quot;")
-                                 .replace("<", "&lt;")
-                                 .replace(">", "&gt;"))
-                details['baseUrlSecondary'] = secondary_url
+                details['baseUrlSecondary'] = entity_escape(secondary_url)
             data[mime_group][itag] = data[quality_group][itag] = details
 
         if not video_data and not audio_only:
@@ -2222,11 +2214,7 @@ class StreamInfo(YouTubeRequestClient):
             ))
 
             if license_url:
-                license_url = (license_url
-                               .replace("&", "&amp;")
-                               .replace('"', "&quot;")
-                               .replace("<", "&lt;")
-                               .replace(">", "&gt;"))
+                license_url = entity_escape(license_url)
                 output.extend((
                     '\t\t\t<ContentProtection'
                         ' schemeIdUri="http://youtube.com/drm/2012/10/10"'
@@ -2311,11 +2299,7 @@ class StreamInfo(YouTubeRequestClient):
                 else:
                     kind = lang_id
 
-                url = (unquote(subtitle['url'])
-                       .replace("&", "&amp;")
-                       .replace('"', "&quot;")
-                       .replace("<", "&lt;")
-                       .replace(">", "&gt;"))
+                url = entity_escape(unquote(subtitle['url']))
 
                 output.extend((
                     '\t\t<AdaptationSet'

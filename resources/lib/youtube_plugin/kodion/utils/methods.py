@@ -23,6 +23,7 @@ from ..logger import log_error
 
 __all__ = (
     'duration_to_seconds',
+    'entity_escape',
     'find_video_id',
     'friendly_number',
     'get_kodi_setting_bool',
@@ -316,3 +317,14 @@ def wait(timeout=None):
 
 def redact_ip(url):
     return re.sub(r'([?&/])ip([=/])[^?&/]+', r'\g<1>ip\g<2><redacted>', url)
+
+
+def entity_escape(input,
+                  entities=str.maketrans({
+                      '&': '&amp;',
+                      '"': '&quot;',
+                      '<': '&lt;',
+                      '>': '&gt;',
+                      '\'': '&apos;',
+                  })):
+    return input.translate(entities)
