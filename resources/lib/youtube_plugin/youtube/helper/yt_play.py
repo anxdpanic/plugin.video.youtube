@@ -180,6 +180,7 @@ def _play_playlist(provider, context):
     playlist_ids = params.get('playlist_ids')
     if not playlist_ids:
         playlist_ids = [params.get('playlist_id')]
+    video_id = params.get('video_id')
 
     resource_manager = provider.get_resource_manager(context)
     ui = context.get_ui()
@@ -223,8 +224,10 @@ def _play_playlist(provider, context):
             return False
 
         # select order
-        order = params.get('order', '')
-        if not order:
+        order = params.get('order')
+        if not order and not video_id:
+            order = 'ask'
+        if order == 'ask':
             order_list = ('default', 'reverse', 'shuffle')
             items = [(context.localize('playlist.play.%s' % order), order)
                      for order in order_list]
@@ -250,7 +253,6 @@ def _play_playlist(provider, context):
         playlist_player.unshuffle()
 
         # check if we have a video as starting point for the playlist
-        video_id = params.get('video_id')
         playlist_position = None if video_id else 0
         # add videos to playlist
         for idx, video in enumerate(videos):
