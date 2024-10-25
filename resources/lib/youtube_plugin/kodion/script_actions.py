@@ -16,6 +16,7 @@ from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .constants import (
     DATA_PATH,
     RELOAD_ACCESS_MANAGER,
+    SERVER_WAKEUP,
     TEMP_PATH,
     WAIT_END_FLAG,
 )
@@ -289,6 +290,7 @@ def _config_actions(context, action, *_args):
             settings.httpd_listen(addresses[selected_address])
 
     elif action == 'show_client_ip':
+        context.wakeup(SERVER_WAKEUP, timeout=5)
         if httpd_status(context):
             client_ip = get_client_ip_address(context)
             if client_ip:
