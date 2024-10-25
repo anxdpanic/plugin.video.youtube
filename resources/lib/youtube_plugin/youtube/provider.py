@@ -1222,9 +1222,15 @@ class Provider(AbstractProvider):
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
-                    menu_items.play_all_from_playlist(
+                    menu_items.play_playlist(
                         context, watch_later_id
-                    )
+                    ),
+                    menu_items.view_playlist(
+                        context, watch_later_id
+                    ),
+                    menu_items.shuffle_playlist(
+                        context, watch_later_id
+                    ),
                 ]
                 watch_later_item.add_context_menu(context_menu)
                 result.append(watch_later_item)
@@ -1241,15 +1247,22 @@ class Provider(AbstractProvider):
             resource_manager = provider.get_resource_manager(context)
             playlists = resource_manager.get_related_playlists('mine')
             if playlists and 'likes' in playlists:
+                liked_list_id = playlists['likes']
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
-                    create_uri(('channel', 'mine', 'playlist', playlists['likes'])),
+                    create_uri(('channel', 'mine', 'playlist', liked_list_id)),
                     image='{media}/likes.png',
                 )
                 context_menu = [
-                    menu_items.play_all_from_playlist(
-                        context, playlists['likes']
-                    )
+                    menu_items.play_playlist(
+                        context, liked_list_id
+                    ),
+                    menu_items.view_playlist(
+                        context, liked_list_id
+                    ),
+                    menu_items.shuffle_playlist(
+                        context, liked_list_id
+                    ),
                 ]
                 liked_videos_item.add_context_menu(context_menu)
                 result.append(liked_videos_item)
@@ -1272,9 +1285,15 @@ class Provider(AbstractProvider):
                     image='{media}/history.png',
                 )
                 context_menu = [
-                    menu_items.play_all_from_playlist(
+                    menu_items.play_playlist(
                         context, history_id
-                    )
+                    ),
+                    menu_items.view_playlist(
+                        context, history_id
+                    ),
+                    menu_items.shuffle_playlist(
+                        context, history_id
+                    ),
                 ]
                 watch_history_item.add_context_menu(context_menu)
                 result.append(watch_history_item)

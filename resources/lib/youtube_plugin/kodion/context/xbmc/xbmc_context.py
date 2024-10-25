@@ -154,6 +154,7 @@ class XbmcContext(AbstractContext):
         'playlist.progress.updating': 30536,
         'playlist.removed_from': 30715,
         'playlist.select': 30521,
+        'playlist.view.all': 30562,
         'playlists': 30501,
         'please_wait': 30119,
         'prompt': 30566,

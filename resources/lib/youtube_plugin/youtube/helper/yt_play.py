@@ -19,6 +19,7 @@ from ..youtube_exceptions import YouTubeException
 from ...kodion.compatibility import urlencode, urlunsplit
 from ...kodion.constants import (
     BUSY_FLAG,
+    CONTENT,
     PATHS,
     PLAYBACK_INIT,
     PLAYER_DATA,
@@ -241,6 +242,7 @@ def _play_playlist(provider, context):
             random.shuffle(videos)
 
         if action == 'list':
+            context.set_content(CONTENT.VIDEO_CONTENT)
             return videos
 
         # clear the playlist

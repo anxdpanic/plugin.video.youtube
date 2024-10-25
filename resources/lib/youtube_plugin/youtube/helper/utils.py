@@ -439,9 +439,16 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
         # play all videos of the playlist
         context_menu = [
-            menu_items.play_all_from_playlist(
+            menu_items.play_playlist(
                 context, playlist_id
             ),
+            menu_items.view_playlist(
+                context, playlist_id
+            ),
+            menu_items.shuffle_playlist(
+                context, playlist_id
+            ),
+            menu_items.separator(),
             menu_items.bookmark_add(
                 context, playlist_item
             ) if not in_bookmarks_list and channel_id != 'mine' else None,
@@ -844,12 +851,12 @@ def update_video_infos(provider, context, video_id_dict,
             playlist_channel_id = playlist_match.group('channel_id')
 
             context_menu.extend((
-                menu_items.play_all_from_playlist(
+                menu_items.play_playlist_from(
                     context, playlist_id, video_id
                 ),
-                menu_items.play_all_from_playlist(
+                menu_items.play_playlist(
                     context, playlist_id
-                )
+                ),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
