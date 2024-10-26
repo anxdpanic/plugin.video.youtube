@@ -10,7 +10,9 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from .constants import CHECK_SETTINGS
 from .context import XbmcContext
+from .debug import Profiler
 from .plugin import XbmcPlugin
 from ..youtube import Provider
 
@@ -20,21 +22,26 @@ __all__ = ('run',)
 _context = XbmcContext()
 _plugin = XbmcPlugin()
 _provider = Provider()
-
-_profiler = _context.get_infobool('System.GetBool(debug.showloginfo)')
-_profiler = True
-if _profiler:
-    from .debug import Profiler
-
-    _profiler = Profiler(enabled=False, print_callees=False, num_lines=20)
+_profiler = Profiler(enabled=False, print_callees=False, num_lines=20)
 
 
 def run(context=_context,
         plugin=_plugin,
         provider=_provider,
         profiler=_profiler):
-    if profiler:
+
+    if context.get_ui().pop_property(CHECK_SETTINGS):
+        provider.reset_client()
+        settings = context.get_settings(refresh=True)
+    else:
+        settings = context.get_settings()
+
+    debug = settings.logging_enabled()
+    if debug:
+        context.debug_log(on=True)
         profiler.enable(flush=True)
+    else:
+        context.debug_log(off=True)
 
     current_uri = context.get_uri()
     context.init()
@@ -59,5 +66,5 @@ def run(context=_context,
 
     plugin.run(provider, context, focused=(current_uri == new_uri))
 
-    if profiler:
+    if debug:
         profiler.print_stats()

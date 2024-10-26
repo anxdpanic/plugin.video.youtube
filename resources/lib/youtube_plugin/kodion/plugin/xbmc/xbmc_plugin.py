@@ -16,7 +16,6 @@ from ..abstract_plugin import AbstractPlugin
 from ...compatibility import xbmcplugin
 from ...constants import (
     BUSY_FLAG,
-    CHECK_SETTINGS,
     CONTAINER_FOCUS,
     CONTAINER_ID,
     CONTAINER_POSITION,
@@ -153,12 +152,7 @@ class XbmcPlugin(AbstractPlugin):
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
             context.reload_access_manager()
 
-        if ui.pop_property(CHECK_SETTINGS):
-            provider.reset_client()
-            settings = context.get_settings(refresh=True)
-        else:
-            settings = context.get_settings()
-
+        settings = context.get_settings()
         if settings.setup_wizard_enabled():
             provider.run_wizard(context)
 

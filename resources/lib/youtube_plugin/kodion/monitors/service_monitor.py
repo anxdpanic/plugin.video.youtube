@@ -23,35 +23,33 @@ from ..constants import (
     SERVER_WAKEUP,
     WAKEUP,
 )
-from ..logger import log_debug
 from ..network import get_connect_address, get_http_server, httpd_status
 
 
 class ServiceMonitor(xbmc.Monitor):
     _settings_changes = 0
-    _settings_state = None
+    _settings_collect = False
     get_idle_time = xbmc.getGlobalIdleTime
 
     def __init__(self, context):
         self._context = context
-        settings = context.get_settings()
 
-        self._httpd_address, self._httpd_port = get_connect_address(context)
-        self._old_httpd_address = self._httpd_address
-        self._old_httpd_port = self._httpd_port
-        self._whitelist = settings.httpd_whitelist()
+        self._httpd_address = None
+        self._httpd_port = None
+        self._whitelist = None
+        self._old_httpd_address = None
+        self._old_httpd_port = None
+        self._use_httpd = None
 
         self.httpd = None
         self.httpd_thread = None
-        self.httpd_sleep_allowed = settings.httpd_sleep_allowed()
+        self.httpd_sleep_allowed = True
 
         self.system_idle = False
         self.refresh = False
         self.interrupt = False
 
-        self._use_httpd = None
-        if self.httpd_required(settings):
-            self.start_httpd()
+        self.onSettingsChanged(force=True)
 
         super(ServiceMonitor, self).__init__()
 
@@ -110,11 +108,9 @@ class ServiceMonitor(xbmc.Monitor):
             elif target == CHECK_SETTINGS:
                 state = data.get('state')
                 if state == 'defer':
-                    self._settings_state = state
+                    self._settings_collect = True
                 elif state == 'process':
-                    self._settings_state = state
-                    self.onSettingsChanged()
-                    self._settings_state = None
+                    self.onSettingsChanged(force=True)
 
             if data.get('response_required'):
                 self.set_property(WAKEUP, target)
@@ -147,26 +143,38 @@ class ServiceMonitor(xbmc.Monitor):
         self.system_idle = False
         self.interrupt = True
 
-    def onSettingsChanged(self):
-        self._settings_changes += 1
-        if self._settings_state == 'defer':
-            return
-        changes = self._settings_changes
-        if self._settings_state != 'process':
-            self.waitForAbort(1)
-            if changes != self._settings_changes:
-                return
-        log_debug('onSettingsChanged: {0} change(s)'.format(changes))
-        self._settings_changes = 0
+    def onSettingsChanged(self, force=False):
+        context = self._context
 
-        settings = self._context.get_settings(refresh=True)
+        if force:
+            self._settings_collect = False
+            self._settings_changes = 0
+        else:
+            self._settings_changes += 1
+            if self._settings_collect:
+                return
+
+            total = self._settings_changes
+            self.waitForAbort(1)
+            if total != self._settings_changes:
+                return
+
+            context.log_debug('onSettingsChanged: {0} change(s)'.format(total))
+            self._settings_changes = 0
+
+        settings = context.get_settings(refresh=True)
+        if settings.logging_enabled():
+            context.debug_log(on=True)
+        else:
+            context.debug_log(off=True)
+
         self.set_property(CHECK_SETTINGS)
         self.refresh_container()
 
         httpd_started = bool(self.httpd)
         httpd_restart = False
 
-        address, port = get_connect_address(self._context)
+        address, port = get_connect_address(context)
         if port != self._httpd_port:
             self._old_httpd_port = self._httpd_port
             self._httpd_port = port
@@ -201,12 +209,14 @@ class ServiceMonitor(xbmc.Monitor):
         if self.httpd:
             return
 
-        log_debug('HTTPServer: Starting |{ip}:{port}|'
-                  .format(ip=self._httpd_address, port=self._httpd_port))
+        context = self._context
+        context.log_debug('HTTPServer: Starting |{ip}:{port}|'
+                          .format(ip=self._httpd_address,
+                                  port=self._httpd_port))
         self.httpd_address_sync()
         self.httpd = get_http_server(address=self._httpd_address,
                                      port=self._httpd_port,
-                                     context=self._context)
+                                     context=context)
         if not self.httpd:
             return
 
@@ -214,16 +224,17 @@ class ServiceMonitor(xbmc.Monitor):
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
-        log_debug('HTTPServer: Listening on |{ip}:{port}|'
-                  .format(ip=address[0], port=address[1]))
+        context.log_debug('HTTPServer: Listening on |{ip}:{port}|'
+                          .format(ip=address[0],
+                                  port=address[1]))
 
     def shutdown_httpd(self, sleep=False):
         if self.httpd:
             if sleep and self.httpd_required(while_sleeping=True):
                 return
-            log_debug('HTTPServer: Shutting down |{ip}:{port}|'
-                      .format(ip=self._old_httpd_address,
-                              port=self._old_httpd_port))
+            self._context.log_debug('HTTPServer: Shutting down |{ip}:{port}|'
+                                    .format(ip=self._old_httpd_address,
+                                            port=self._old_httpd_port))
             self.httpd_address_sync()
             self.httpd.shutdown()
             self.httpd.server_close()
@@ -232,11 +243,12 @@ class ServiceMonitor(xbmc.Monitor):
             self.httpd = None
 
     def restart_httpd(self):
-        log_debug('HTTPServer: Restarting |{old_ip}:{old_port}| > |{ip}:{port}|'
-                  .format(old_ip=self._old_httpd_address,
-                          old_port=self._old_httpd_port,
-                          ip=self._httpd_address,
-                          port=self._httpd_port))
+        self._context.log_debug('HTTPServer: Restarting'
+                                ' |{old_ip}:{old_port}| > |{ip}:{port}|'
+                                .format(old_ip=self._old_httpd_address,
+                                        old_port=self._old_httpd_port,
+                                        ip=self._httpd_address,
+                                        port=self._httpd_port))
         self.shutdown_httpd()
         self.start_httpd()
 

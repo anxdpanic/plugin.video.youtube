@@ -17,7 +17,7 @@ import time
 from threading import Lock
 from traceback import format_stack
 
-from ..logger import log_warning, log_error
+from ..logger import Logger
 from ..utils.datetime_parser import fromtimestamp, since_epoch
 from ..utils.methods import make_dirs
 
@@ -236,10 +236,10 @@ class Storage(object):
                     exc=exc, details=''.join(format_stack())
                 )
                 if isinstance(exc, sqlite3.OperationalError):
-                    log_warning(msg)
+                    Logger.log_warning(msg)
                     time.sleep(0.1)
                 else:
-                    log_error(msg)
+                    Logger.log_error(msg)
                     return False
 
         else:
@@ -313,10 +313,10 @@ class Storage(object):
                     exc=exc, details=''.join(format_stack())
                 )
                 if isinstance(exc, sqlite3.OperationalError):
-                    log_warning(msg)
+                    Logger.log_warning(msg)
                     time.sleep(0.1)
                 else:
-                    log_error(msg)
+                    Logger.log_error(msg)
                     return []
         return []
 

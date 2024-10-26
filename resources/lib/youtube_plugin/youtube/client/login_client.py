@@ -16,7 +16,6 @@ from ..youtube_exceptions import (
     InvalidJSON,
     LoginException,
 )
-from ...kodion.logger import log_debug
 
 
 class LoginClient(YouTubeRequestClient):
@@ -143,7 +142,7 @@ class LoginClient(YouTubeRequestClient):
                           id_end=client_id[-5:],
                           secret_start=client_secret[:3],
                           secret_end=client_secret[-3:]))
-        log_debug('Refresh token:{0}'.format(client))
+        self.log_debug('Refresh token:{0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
                                  method='POST',
@@ -193,7 +192,7 @@ class LoginClient(YouTubeRequestClient):
                           id_end=client_id[-5:],
                           secret_start=client_secret[:3],
                           secret_end=client_secret[-3:]))
-        log_debug('Requesting access token:{0}'.format(client))
+        self.log_debug('Requesting access token:{0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
                                  method='POST',
@@ -236,7 +235,7 @@ class LoginClient(YouTubeRequestClient):
                   .format(config_type=config_type,
                           id_start=client_id[:3],
                           id_end=client_id[-5:]))
-        log_debug('Requesting device and user code:{0}'.format(client))
+        self.log_debug('Requesting device and user code:{0}'.format(client))
 
         json_data = self.request(self.DEVICE_CODE_URL,
                                  method='POST',

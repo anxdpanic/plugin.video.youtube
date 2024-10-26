@@ -34,7 +34,6 @@ from ..constants import (
     PATHS,
     TEMP_PATH,
 )
-from ..logger import log_debug, log_error
 from ..utils import redact_ip, validate_ip_address, wait
 
 
@@ -91,24 +90,25 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             log_lines.append('Whitelisted: |%s|' % str(conn_allowed))
 
         if not conn_allowed:
-            log_debug('HTTPServer: Connection from |{client_ip| not allowed'
-                      .format(client_ip=client_ip))
+            self._context.log_debug('HTTPServer: Connection blocked from'
+                                    ' |{client_ip|'
+                                    .format(client_ip=client_ip))
         elif self.path != PATHS.PING:
-            log_debug(' '.join(log_lines))
+            self._context.log_debug(' '.join(log_lines))
         return conn_allowed
 
     # noinspection PyPep8Naming
     def do_GET(self):
-        settings = self._context.get_settings()
-        localize = self._context.localize
+        context = self._context
+        settings = context.get_settings()
+        localize = context.localize
         api_config_enabled = settings.api_config_page()
 
         # Strip trailing slash if present
         stripped_path = self.path.rstrip('/')
         if stripped_path != PATHS.PING:
-            log_debug('HTTPServer: GET |{path}|'.format(
-                path=redact_ip(self.path)
-            ))
+            context.log_debug('HTTPServer: GET |{path}|'
+                              .format(path=redact_ip(self.path)))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -235,7 +235,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        log_debug('HTTPServer: HEAD |{path}|'.format(path=self.path))
+        self._context.log_debug('HTTPServer: HEAD |{path}|'
+                                .format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -267,7 +268,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_POST(self):
-        log_debug('HTTPServer: POST |{path}|'.format(path=self.path))
+        self._context.log_debug('HTTPServer: POST |{path}|'
+                                .format(path=self.path))
 
         if not self.connection_allowed():
             self.send_error(403)
@@ -317,8 +319,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                               re.MULTILINE)
             if match:
                 authorized_types = match.group('authorized_types').split(',')
-                log_debug('HTTPServer: Found authorized formats |{auth_fmts}|'
-                          .format(auth_fmts=authorized_types))
+                self._context.log_debug('HTTPServer: Found authorized formats'
+                                        ' |{auth_fmts}|'
+                                        .format(auth_fmts=authorized_types))
 
                 fmt_to_px = {
                     'SD': (1280 * 528) - 1,
@@ -589,8 +592,10 @@ def get_http_server(address, port, context):
         server = HTTPServer((address, port), RequestHandler)
         return server
     except socket.error as exc:
-        log_error('HTTPServer: Failed to start |{address}:{port}| |{response}|'
-                  .format(address=address, port=port, response=exc))
+        context.log_error('HTTPServer: Failed to start\n'
+                          'Address: |{address}:{port}|\n'
+                          'Response: |{response}|'
+                          .format(address=address, port=port, response=exc))
         xbmcgui.Dialog().notification(context.get_name(),
                                       str(exc),
                                       context.get_icon(),
@@ -615,9 +620,9 @@ def httpd_status(context):
     if result == 204:
         return True
 
-    log_debug('HTTPServer: Ping |{netloc}| - |{response}|'
-              .format(netloc=netloc,
-                      response=result or 'failed'))
+    context.log_debug('HTTPServer: Ping |{netloc}| - |{response}|'
+                      .format(netloc=netloc,
+                              response=result or 'failed'))
     return False
 
 
