@@ -394,7 +394,7 @@ class Subtitles(object):
         response = BaseRequestsClass(context=self._context).request(
             subtitle_url,
             headers=self.headers,
-            error_info=('Subtitles._get_url - GET failed for: {lang}: {{exc}}'
+            error_info=('Subtitles._get_url - GET failed for: {lang}: {{exc!r}}'
                         .format(lang=lang))
         )
         response = response and response.text

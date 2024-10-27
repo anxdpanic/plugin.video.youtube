@@ -32,7 +32,7 @@ def _process_list_response(provider, context, json_data, item_filter):
     yt_items = json_data.get('items', [])
     if not yt_items:
         context.log_warning('v3 response: Items list is empty')
-        return []
+        return None
 
     video_id_dict = {}
     channel_id_dict = {}
@@ -40,7 +40,8 @@ def _process_list_response(provider, context, json_data, item_filter):
     playlist_item_id_dict = {}
     subscription_id_dict = {}
 
-    result = []
+    items = []
+    do_callbacks = False
 
     new_params = {}
     params = context.get_params()
@@ -81,7 +82,6 @@ def _process_list_response(provider, context, json_data, item_filter):
             description = strip_html_from_text(localised_info.get('description')
                                                or snippet.get('description')
                                                or '')
-            # context.log_debug(f'***********\n{item_id = }, {title = }\n{yt_item = }\n***************')
 
             thumbnails = snippet.get('thumbnails')
             if not thumbnails:
@@ -123,7 +123,8 @@ def _process_list_response(provider, context, json_data, item_filter):
                              item_uri,
                              image=image,
                              fanart=fanart,
-                             plot=description)
+                             plot=description,
+                             video_id=item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'channel':
@@ -211,7 +212,8 @@ def _process_list_response(provider, context, json_data, item_filter):
                              item_uri,
                              image=image,
                              fanart=fanart,
-                             plot=description)
+                             plot=description,
+                             video_id=item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'activity':
@@ -233,7 +235,8 @@ def _process_list_response(provider, context, json_data, item_filter):
                              item_uri,
                              image=image,
                              fanart=fanart,
-                             plot=description)
+                             plot=description,
+                             video_id=item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'commentthread':
@@ -268,16 +271,16 @@ def _process_list_response(provider, context, json_data, item_filter):
             item.add_context_menu(**yt_item['_context_menu'])
 
         if isinstance(item, VideoItem):
-            item.video_id = item_id
             # Set track number from playlist, or set to current list length to
             # match "Default" (unsorted) sort order
-            position = snippet.get('position') or len(result)
+            position = snippet.get('position') or len(items)
             item.set_track_number(position + 1)
 
         if '_callback' in yt_item:
-            yt_item['_callback'](item)
+            item.callback = yt_item['_callback']
+            do_callbacks = True
 
-        result.append(item)
+        items.append(item)
 
     # this will also update the channel_id_dict with the correct channel_id
     # for each video.
@@ -435,7 +438,7 @@ def _process_list_response(provider, context, json_data, item_filter):
             resource['thread'] = new_thread
             new_thread.start()
 
-    return result
+    return items, do_callbacks
 
 
 _KNOWN_RESPONSE_KINDS = {
@@ -477,19 +480,23 @@ def response_to_items(provider,
             provider, context, json_data, item_filter
         )
         if not result:
-            return result
+            return []
+
+        items, do_callbacks = result
+        if not items:
+            return items
     else:
         raise KodionException('Unknown kind: %s' % kind)
 
-    if item_filter:
-        result = filter_videos(result, **item_filter)
+    if item_filter or do_callbacks:
+        items = filter_videos(items, **item_filter)
 
     if sort is not None:
-        result.sort(key=sort, reverse=reverse)
+        items.sort(key=sort, reverse=reverse)
 
     # no processing of next page item
     if not process_next_page or params.get('hide_next_page'):
-        return result
+        return items
 
     # next page
     """
@@ -514,7 +521,7 @@ def response_to_items(provider,
         elif current_page:
             new_params['page_token'] = ''
         else:
-            return result
+            return items
 
         page_info = json_data.get('pageInfo', {})
         yt_total_results = int(page_info.get('totalResults', 0))
@@ -529,7 +536,7 @@ def response_to_items(provider,
             next_page = 1
             new_params['page'] = 1
         else:
-            return result
+            return items
 
     yt_visitor_data = json_data.get('visitorData')
     if yt_visitor_data:
@@ -545,9 +552,9 @@ def response_to_items(provider,
             new_params['offset'] = offset
 
     next_page_item = NextPageItem(context, new_params)
-    result.append(next_page_item)
+    items.append(next_page_item)
 
-    return result
+    return items
 
 
 def _parse_kind(item):

@@ -92,7 +92,8 @@ class UrlToItemConverter(object):
                     uri=context.create_uri(
                         (PATHS.PLAY,),
                         dict(new_params, video_id=video_id),
-                    )
+                    ),
+                    video_id=video_id,
                 )
                 self._video_id_dict[video_id] = item
 
@@ -100,7 +101,9 @@ class UrlToItemConverter(object):
             video_id = new_params['video_id']
 
             item = VideoItem(
-                '', context.create_uri((PATHS.PLAY,), new_params)
+                name='',
+                uri=context.create_uri((PATHS.PLAY,), new_params),
+                video_id=video_id,
             )
             self._video_id_dict[video_id] = item
 
@@ -112,7 +115,9 @@ class UrlToItemConverter(object):
                 return
 
             item = DirectoryItem(
-                '', context.create_uri(('playlist', playlist_id,), new_params),
+                name='',
+                uri=context.create_uri(('playlist', playlist_id,), new_params),
+                playlist_id=playlist_id,
             )
             self._playlist_id_dict[playlist_id] = item
 
@@ -125,9 +130,13 @@ class UrlToItemConverter(object):
                 return
 
             item = VideoItem(
-                '', context.create_uri((PATHS.PLAY,), new_params)
+                name='',
+                uri=context.create_uri((PATHS.PLAY,), new_params),
+                channel_id=channel_id,
             ) if live else DirectoryItem(
-                '', context.create_uri(('channel', channel_id,), new_params)
+                name='',
+                uri=context.create_uri(('channel', channel_id,), new_params),
+                channel_id=channel_id,
             )
             self._channel_id_dict[channel_id] = item
 
@@ -154,7 +163,7 @@ class UrlToItemConverter(object):
                         'channel_ids': ','.join(self._channel_ids),
                     },
                 ),
-                image='{media}/playlist.png',
+                image='{media}/channels.png',
                 category_label=item_label,
             )
             result.append(channels_item)
@@ -169,8 +178,7 @@ class UrlToItemConverter(object):
                         (PATHS.PLAY,),
                         {
                             'playlist_ids': ','.join(self._playlist_ids),
-                            'play': True,
-                            'order': 'default',
+                            'order': 'normal',
                         },
                     ),
                     playable=True,

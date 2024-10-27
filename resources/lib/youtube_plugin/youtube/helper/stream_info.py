@@ -23,6 +23,7 @@ from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import (
+    entity_escape,
     parse_qs,
     quote,
     unescape,
@@ -662,8 +663,8 @@ class StreamInfo(YouTubeRequestClient):
     QUALITY_FACTOR = {
         # video - order based on comparative compression ratio
         'av01': 1,
+        'vp9.2': 0.75,
         'vp9': 0.75,
-        'vp09': 0.75,
         'vp8': 0.55,
         'vp08': 0.55,
         'avc1': 0.5,
@@ -766,18 +767,18 @@ class StreamInfo(YouTubeRequestClient):
             exception = None
 
         if not json_data or 'error' not in json_data:
-            info = ('exc: |{exc}|\n'
-                    'video_id: {video_id}, client: {client}, auth: {auth}')
+            info = ('exc: |{exc!r}|'
+                    '\n\tvideo_id: {video_id}, client: {client}, auth: {auth}')
             return None, info, kwargs, data, None, exception
 
         details = json_data['error']
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
         message = details.get('message', 'Unknown error')
 
-        info = ('exc: |{exc}|\n'
-                'reason: {reason}\n'
-                'message: |{message}|\n'
-                'video_id: {video_id}, client: {client}, auth: {auth}')
+        info = ('exc: |{exc!r}|'
+                '\n\treason: |{reason}|'
+                '\n\tmessage: |{message}|'
+                '\n\tvideo_id: {video_id}, client: {client}, auth: {auth}')
         kwargs['message'] = message
         kwargs['reason'] = reason
         return None, info, kwargs, data, None, exception
@@ -975,13 +976,16 @@ class StreamInfo(YouTubeRequestClient):
         return result
 
     @staticmethod
-    def _make_curl_headers(headers, cookies=None):
+    def _prepare_headers(headers, cookies=None, new_headers=None):
+        if cookies or new_headers:
+            headers = headers.copy()
         if cookies:
             headers['Cookie'] = '; '.join([
                 '='.join((cookie.name, cookie.value)) for cookie in cookies
             ])
-        # Headers used in xbmc_items.video_playback_item'
-        return urlencode(headers, safe='/', quote_via=quote)
+        if new_headers:
+            headers.update(new_headers)
+        return headers
 
     @staticmethod
     def _normalize_url(url):
@@ -1014,7 +1018,7 @@ class StreamInfo(YouTubeRequestClient):
             client_name = 'web'
             client_data = {'json': {'videoId': self.video_id}}
             headers = self.build_client(client_name, client_data)['headers']
-        curl_headers = self._make_curl_headers(headers, cookies=None)
+        curl_headers = self._prepare_headers(headers)
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1025,12 +1029,14 @@ class StreamInfo(YouTubeRequestClient):
         if playback_stats is None:
             playback_stats = {}
 
-        settings = self._context.get_settings()
+        context = self._context
+        settings = context.get_settings()
         if self._use_mpd:
             qualities = settings.mpd_video_qualities()
             selected_height = qualities[0]['nom_height']
         else:
             selected_height = settings.fixed_video_quality()
+        log_debug = context.log_debug
 
         for url in urls:
             result = self.request(
@@ -1083,9 +1089,9 @@ class StreamInfo(YouTubeRequestClient):
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
-                    self._context.log_debug('Unknown itag: {itag}\n{stream}'
-                                            .format(itag=itag,
-                                                    stream=redact_ip(match[0])))
+                    stream_info = redact_ip(match.group(1))
+                    log_debug('Unknown itag: {itag}\n{stream}'
+                              .format(itag=itag, stream=stream_info))
                 if (not yt_format
                         or (yt_format.get('hls/video')
                             and not yt_format.get('hls/audio'))):
@@ -1112,7 +1118,7 @@ class StreamInfo(YouTubeRequestClient):
             client_name = 'web'
             client_data = {'json': {'videoId': self.video_id}}
             headers = self.build_client(client_name, client_data)['headers']
-        curl_headers = self._make_curl_headers(headers, cookies=None)
+        curl_headers = self._prepare_headers(headers)
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1123,12 +1129,14 @@ class StreamInfo(YouTubeRequestClient):
         if playback_stats is None:
             playback_stats = {}
 
-        settings = self._context.get_settings()
+        context = self._context
+        settings = context.get_settings()
         if self._use_mpd:
             qualities = settings.mpd_video_qualities()
             selected_height = qualities[0]['nom_height']
         else:
             selected_height = settings.fixed_video_quality()
+        log_debug = context.log_debug
 
         for stream_map in streams:
             itag = str(stream_map['itag'])
@@ -1167,9 +1175,8 @@ class StreamInfo(YouTubeRequestClient):
                     stream_map['conn'] = redact_ip(conn)
                 if stream:
                     stream_map['stream'] = redact_ip(stream)
-                self._context.log_debug('Unknown itag: {itag}\n{stream}'.format(
-                    itag=itag, stream=stream_map,
-                ))
+                log_debug('Unknown itag: {itag}\n{stream}'
+                          .format(itag=itag, stream=stream_map))
             if (not yt_format
                     or (yt_format.get('dash/video')
                         and not yt_format.get('dash/audio'))):
@@ -1225,8 +1232,9 @@ class StreamInfo(YouTubeRequestClient):
                 signature = self._cipher.get_signature(encrypted_signature)
             except Exception as exc:
                 self._context.log_error('VideoInfo._process_signature_cipher - '
-                                        'failed to extract URL from |{sig}|\n'
-                                        '{exc}:\n{details}'.format(
+                                        'failed to extract URL from |{sig}|'
+                                        '\n\texc: |{exc!r}|'
+                                        '\n\tdetails: |{details}|'.format(
                     sig=encrypted_signature,
                     exc=exc,
                     details=''.join(format_stack())
@@ -1336,7 +1344,8 @@ class StreamInfo(YouTubeRequestClient):
     def load_stream_info(self, video_id):
         self.video_id = video_id
 
-        settings = self._context.get_settings()
+        context = self._context
+        settings = context.get_settings()
         age_gate_enabled = settings.age_gate()
         audio_only = self._audio_only
         ask_for_quality = self._ask_for_quality
@@ -1356,6 +1365,9 @@ class StreamInfo(YouTubeRequestClient):
         hls_playlists = []
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
+
+        log_debug = context.log_debug
+        log_warning = context.log_warning
 
         abort_reasons = {
             'country',
@@ -1436,7 +1448,7 @@ class StreamInfo(YouTubeRequestClient):
                     'ERROR',
                     'UNPLAYABLE',
                 }:
-                    self._context.log_warning(
+                    log_warning(
                         'Failed to retrieve video info - '
                         'video_id: {0}, client: {1}, auth: {2},\n'
                         'status: {3}, reason: {4}'.format(
@@ -1456,7 +1468,7 @@ class StreamInfo(YouTubeRequestClient):
                         abort = True
                         break
                 else:
-                    self._context.log_debug(
+                    log_debug(
                         'Unknown playabilityStatus in player response:\n|{0}|'
                         .format(playability)
                     )
@@ -1465,7 +1477,7 @@ class StreamInfo(YouTubeRequestClient):
                 break
 
             if status == 'OK':
-                self._context.log_debug(
+                log_debug(
                     'Retrieved video info - '
                     'video_id: {0}, client: {1}, auth: {2}'.format(
                         video_id,
@@ -1515,7 +1527,7 @@ class StreamInfo(YouTubeRequestClient):
         # the stream during playback. The YT player doesn't seem to use any
         # cookies when doing that, so for now cookies are ignored.
         # curl_headers = self._make_curl_headers(headers, cookies)
-        curl_headers = self._make_curl_headers(client['headers'], cookies=None)
+        curl_headers = self._prepare_headers(client['headers'])
 
         microformat = (result.get('microformat', {})
                        .get('playerMicroformatRenderer', {}))
@@ -1640,7 +1652,7 @@ class StreamInfo(YouTubeRequestClient):
                 playback_stats,
             )
 
-        subtitles = Subtitles(self._context, video_id)
+        subtitles = Subtitles(context, video_id)
         query_subtitles = client.get('_query_subtitles')
         if (not is_live or live_dvr) and (
                 query_subtitles is True
@@ -1721,11 +1733,12 @@ class StreamInfo(YouTubeRequestClient):
                 elif default_lang['is_asr']:
                     title.append(' [ASR]')
 
+                localize = context.localize
                 for _prop in ('multi_lang', 'multi_audio'):
                     if not main_stream.get(_prop):
                         continue
                     _prop = 'stream.' + _prop
-                    title.extend((' [', self._context.localize(_prop), ']'))
+                    title.extend((' [', localize(_prop), ']'))
 
                 if len(title) > 1:
                     yt_format['title'] = ''.join(yt_format['title'])
@@ -1751,11 +1764,12 @@ class StreamInfo(YouTubeRequestClient):
         return stream_list.values()
 
     def _process_stream_data(self, stream_data, default_lang_code='und'):
-        _settings = self._context.get_settings()
+        context = self._context
+        settings = context.get_settings()
         audio_only = self._audio_only
-        qualities = _settings.mpd_video_qualities()
-        isa_capabilities = self._context.inputstream_adaptive_capabilities()
-        stream_features = _settings.stream_features()
+        qualities = settings.mpd_video_qualities()
+        isa_capabilities = context.inputstream_adaptive_capabilities()
+        stream_features = settings.stream_features()
         allow_hdr = 'hdr' in stream_features
         allow_hfr = 'hfr' in stream_features
         disable_hfr_max = 'no_hfr_max' in stream_features
@@ -1763,7 +1777,8 @@ class StreamInfo(YouTubeRequestClient):
         fps_map = (self.INTEGER_FPS_SCALE
                    if 'no_frac_fr_hint' in stream_features else
                    self.FRACTIONAL_FPS_SCALE)
-        stream_select = _settings.stream_select()
+        stream_select = settings.stream_select()
+        localize = context.localize
 
         audio_data = {}
         video_data = {}
@@ -1799,8 +1814,10 @@ class StreamInfo(YouTubeRequestClient):
             codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
             if codec:
                 codec = codec.group(1)
-                if codec.startswith(('vp9', 'vp09')):
+                if codec.startswith('vp9'):
                     codec = 'vp9'
+                elif codec.startswith('vp09'):
+                    codec = 'vp9.2'
                 elif codec.startswith('dts'):
                     codec = 'dts'
             if codec not in isa_capabilities:
@@ -1829,18 +1846,18 @@ class StreamInfo(YouTubeRequestClient):
 
                     if role_type == 4 or audio_track.get('audioIsDefault'):
                         role = 'main'
-                        label = self._context.localize('stream.original')
+                        label = localize('stream.original')
                     elif role_type == 3:
                         role = 'dub'
-                        label = self._context.localize('stream.dubbed')
+                        label = localize('stream.dubbed')
                     elif role_type == 2:
                         role = 'description'
-                        label = self._context.localize('stream.descriptive')
+                        label = localize('stream.descriptive')
                     # Unsure of what other audio types are actually available
                     # Role set to "alternate" as default fallback
                     else:
                         role = 'alternate'
-                        label = self._context.localize('stream.alternate')
+                        label = localize('stream.alternate')
 
                     mime_group = ''.join((
                         mime_type, '_', language_code, '.', role_str,
@@ -1860,12 +1877,12 @@ class StreamInfo(YouTubeRequestClient):
                     role = 'main'
                     role_type = 4
                     role_str = '4'
-                    label = self._context.localize('stream.original')
+                    label = localize('stream.original')
                     mime_group = mime_type
 
                 sample_rate = int(stream.get('audioSampleRate', '0'), 10)
                 height = width = fps = frame_rate = hdr = None
-                language = self._context.get_language_name(language_code)
+                language = context.get_language_name(language_code)
                 label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
                 if channels > 2 or 'auto' not in stream_select:
                     quality_group = ''.join((
@@ -1886,7 +1903,8 @@ class StreamInfo(YouTubeRequestClient):
                 if fps > 30 and not allow_hfr:
                     continue
 
-                hdr = 'HDR' in stream.get('qualityLabel', '')
+                hdr = ('colorInfo' in stream
+                       or 'HDR' in stream.get('qualityLabel', ''))
                 if hdr and not allow_hdr:
                     continue
 
@@ -1945,14 +1963,10 @@ class StreamInfo(YouTubeRequestClient):
 
             url = unquote(url)
             primary_url, secondary_url = self._process_url_params(url)
-            primary_url = (primary_url.replace("&", "&amp;")
-                           .replace('"', "&quot;")
-                           .replace("<", "&lt;")
-                           .replace(">", "&gt;"))
 
             details = {
                 'mimeType': mime_type,
-                'baseUrl': primary_url,
+                'baseUrl': entity_escape(primary_url),
                 'mediaType': media_type,
                 'container': container,
                 'codecs': codecs,
@@ -1979,15 +1993,11 @@ class StreamInfo(YouTubeRequestClient):
                 'channels': channels,
             }
             if secondary_url:
-                secondary_url = (secondary_url.replace("&", "&amp;")
-                                 .replace('"', "&quot;")
-                                 .replace("<", "&lt;")
-                                 .replace(">", "&gt;"))
-                details['baseUrlSecondary'] = secondary_url
+                details['baseUrlSecondary'] = entity_escape(secondary_url)
             data[mime_group][itag] = data[quality_group][itag] = details
 
         if not video_data and not audio_only:
-            self._context.log_debug('Generate MPD: No video mime-types found')
+            context.log_debug('Generate MPD: No video mime-types found')
             return None, None
 
         def _stream_sort(stream):
@@ -2042,9 +2052,12 @@ class StreamInfo(YouTubeRequestClient):
         if not video_data or not audio_data:
             return None, None
 
+        context = self._context
+        log_error = context.log_error
+
         if not self.BASE_PATH:
-            self._context.log_error('VideoInfo._generate_mpd_manifest - '
-                                    'unable to access temp directory')
+            log_error('VideoInfo._generate_mpd_manifest - '
+                      'unable to access temp directory')
             return None, None
 
         def _filter_group(previous_group, previous_stream, item):
@@ -2091,11 +2104,12 @@ class StreamInfo(YouTubeRequestClient):
             )
             return skip_group
 
-        _settings = self._context.get_settings()
-        stream_features = _settings.stream_features()
+        settings = context.get_settings()
+        stream_features = settings.stream_features()
         do_filter = 'filter' in stream_features
         frame_rate_hint = 'no_fr_hint' not in stream_features
-        stream_select = _settings.stream_select()
+        stream_select = settings.stream_select()
+        localize = context.localize
 
         main_stream = {
             'audio': audio_data[0][1][0],
@@ -2142,7 +2156,7 @@ class StreamInfo(YouTubeRequestClient):
             if group.startswith(mime_type) and 'auto' in stream_select:
                 label = '{0} [{1}]'.format(
                     stream['langName']
-                    or self._context.localize('stream.automatic'),
+                    or localize('stream.automatic'),
                     stream['label']
                 )
                 if stream == main_stream[media_type]:
@@ -2198,11 +2212,7 @@ class StreamInfo(YouTubeRequestClient):
             ))
 
             if license_url:
-                license_url = (license_url
-                               .replace("&", "&amp;")
-                               .replace('"', "&quot;")
-                               .replace("<", "&lt;")
-                               .replace(">", "&gt;"))
+                license_url = entity_escape(license_url)
                 output.extend((
                     '\t\t\t<ContentProtection'
                         ' schemeIdUri="http://youtube.com/drm/2012/10/10"'
@@ -2217,7 +2227,7 @@ class StreamInfo(YouTubeRequestClient):
 
             num_streams = len(streams)
             if media_type == 'audio':
-                output.extend(((
+                output.extend([(
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -2243,10 +2253,12 @@ class StreamInfo(YouTubeRequestClient):
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
                 ).format(
-                    quality=(idx + 1), priority=(num_streams - idx), **stream
-                ) for idx, stream in enumerate(streams)))
+                    quality=(idx + 1),
+                    priority=(num_streams - idx),
+                    **stream
+                ) for idx, stream in enumerate(streams)])
             elif media_type == 'video':
-                output.extend(((
+                output.extend([(
                     '\t\t\t<Representation'
                         ' id="{id}"'
                         ' {codecs}'
@@ -2269,14 +2281,16 @@ class StreamInfo(YouTubeRequestClient):
                     '\t\t\t\t</SegmentBase>\n'
                     '\t\t\t</Representation>\n'
                 ).format(
-                    quality=(idx + 1), priority=(num_streams - idx), **stream
-                ) for idx, stream in enumerate(streams)))
+                    quality=(idx + 1),
+                    priority=(num_streams - idx),
+                    **stream
+                ) for idx, stream in enumerate(streams)])
 
             output.append('\t\t</AdaptationSet>\n')
             set_id += 1
 
         if subs_data:
-            translation_lang = self._context.localize('subtitles.translation')
+            translation_lang = localize('subtitles.translation')
             for lang_id, subtitle in subs_data.items():
                 lang_code = subtitle['lang']
                 label = language = subtitle['language']
@@ -2287,11 +2301,7 @@ class StreamInfo(YouTubeRequestClient):
                 else:
                     kind = lang_id
 
-                url = (unquote(subtitle['url'])
-                       .replace("&", "&amp;")
-                       .replace('"', "&quot;")
-                       .replace("<", "&lt;")
-                       .replace(">", "&gt;"))
+                url = entity_escape(unquote(subtitle['url']))
 
                 output.extend((
                     '\t\t<AdaptationSet'
@@ -2337,14 +2347,14 @@ class StreamInfo(YouTubeRequestClient):
             with xbmcvfs.File(filepath, 'w') as mpd_file:
                 success = mpd_file.write(output)
         except (IOError, OSError):
-            self._context.log_error('VideoInfo._generate_mpd_manifest - '
-                                    'file write failed for: {file}'
-                                    .format(file=filepath))
+            log_error('VideoInfo._generate_mpd_manifest - '
+                      'file write failed for: {file}'
+                      .format(file=filepath))
             success = False
         if success:
             return urlunsplit((
                 'http',
-                get_connect_address(self._context, as_netloc=True),
+                get_connect_address(context, as_netloc=True),
                 PATHS.MPD,
                 urlencode({'file': filename}),
                 '',

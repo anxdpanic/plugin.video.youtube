@@ -29,7 +29,9 @@ def tv_videos_to_items(provider, context, json_data):
         video_id = item['id']
         item_params['video_id'] = video_id
         video_id_dict[video_id] = VideoItem(
-            item['title'], context.create_uri((PATHS.PLAY,), item_params)
+            name=item['title'],
+            uri=context.create_uri((PATHS.PLAY,), item_params),
+            video_id=video_id,
         )
 
     item_filter = context.get_settings().item_filter()
@@ -90,7 +92,12 @@ def saved_playlists_to_items(provider, context, json_data):
                 item_params,
             )
 
-        playlist_item = DirectoryItem(title, item_uri, image=image)
+        playlist_item = DirectoryItem(
+            name=title,
+            uri=item_uri,
+            image=image,
+            playlist_id=playlist_id,
+        )
         result.append(playlist_item)
         playlist_id_dict[playlist_id] = playlist_item
 

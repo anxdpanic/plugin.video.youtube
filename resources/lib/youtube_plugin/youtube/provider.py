@@ -40,6 +40,7 @@ from ..kodion.constants import (
     PATHS,
 )
 from ..kodion.items import (
+    BaseItem,
     DirectoryItem,
     NewSearchItem,
     SearchItem,
@@ -133,8 +134,8 @@ class Provider(AbstractProvider):
                     dev_main = None
 
             if not dev_main:
-                context.log_error('Invalid developer config: |{dev_config}|\n'
-                                  'expected: |{{'
+                context.log_error('Invalid developer config: |{dev_config}|'
+                                  '\n\texpected: |{{'
                                   ' "origin": ADDON_ID,'
                                   ' "main": {{'
                                   ' "system": SYSTEM_NAME,'
@@ -260,7 +261,12 @@ class Provider(AbstractProvider):
                         if not value:
                             continue
 
-                        token, expiry = client.refresh_token(token_type, value)
+                        json_data = client.refresh_token(token_type, value)
+                        if not json_data:
+                            continue
+
+                        token = json_data.get('access_token')
+                        expiry = int(json_data.get('expires_in', 3600))
                         if token and expiry > 0:
                             access_tokens[token_type] = token
                             if not token_expiry or expiry < token_expiry:
@@ -341,21 +347,24 @@ class Provider(AbstractProvider):
 
         return False
 
-    """
-    Lists the videos of a playlist.
-    path       : '/channel/(?P<channel_id>[^/]+)/playlist/(?P<playlist_id>[^/]+)/'
-        or
-    path       : '/playlist/(?P<playlist_id>[^/]+)/'
-    channel_id : ['mine'|<CHANNEL_ID>]
-    playlist_id: <PLAYLIST_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^(?:/channel/(?P<channel_id>[^/]+))?'
         r'/playlist/(?P<playlist_id>[^/]+)/?$'
     )
     @staticmethod
     def on_playlist(provider, context, re_match):
+        """
+        Lists the videos of a playlist.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlist/<PLAYLIST_ID>
+
+        or
+
+        plugin://plugin.video.youtube/playlist/<PLAYLIST_ID>
+
+        * CHANNEL_ID: ['mine'|YouTube Channel ID]
+        * PLAYLIST_ID: YouTube Playlist ID
+        """
         context.set_content(CONTENT.VIDEO_CONTENT)
         resource_manager = provider.get_resource_manager(context)
 
@@ -368,17 +377,18 @@ class Provider(AbstractProvider):
         result = v3.response_to_items(provider, context, json_data[batch_id])
         return result
 
-    """
-    Lists all playlists of a channel.
-    path      : '/channel/(?P<channel_id>[^/]+)/playlists/'
-    channel_id: <CHANNEL_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
         r'/playlists/?$')
     @staticmethod
     def on_channel_playlists(provider, context, re_match):
+        """
+        Lists all playlists of a channel.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/playlists/
+
+        * CHANNEL_ID: YouTube Channel ID
+        """
         context.set_content(CONTENT.LIST_CONTENT)
 
         channel_id = re_match.group('channel_id')
@@ -400,19 +410,57 @@ class Provider(AbstractProvider):
         ).get(channel_id)
         playlists = resource_manager.get_related_playlists(channel_id)
 
-        uploads = playlists.get('uploads')
-        if uploads:
+        playlist_id = playlists.get('uploads')
+        if playlist_id:
             item_label = context.localize('uploads')
             uploads = DirectoryItem(
                 context.get_ui().bold(item_label),
                 context.create_uri(
-                    ('channel', channel_id, 'playlist', uploads),
+                    ('channel', channel_id, 'playlist', playlist_id),
                     new_params,
                 ),
                 image='{media}/playlist.png',
                 fanart=fanart,
                 category_label=item_label,
+                channel_id=channel_id,
+                playlist_id=playlist_id,
             )
+
+            context_menu = [
+                menu_items.play_playlist(
+                    context, playlist_id
+                ),
+                menu_items.view_playlist(
+                    context, playlist_id
+                ),
+                menu_items.shuffle_playlist(
+                    context, playlist_id
+                ),
+                menu_items.separator(),
+                menu_items.bookmark_add(
+                    context, uploads
+                ) if channel_id != 'mine' else None,
+            ]
+
+            if channel_id != 'mine':
+                if provider.is_logged_in:
+                    # subscribe to the channel via the playlist item
+                    context_menu.append(
+                        menu_items.subscribe_to_channel(
+                            context, channel_id,
+                        )
+                    )
+                context_menu.append(
+                    # bookmark channel of the playlist
+                    menu_items.bookmark_add_channel(
+                        context, channel_id,
+                    )
+                )
+
+            if context_menu:
+                context_menu.append(menu_items.separator())
+                uploads.add_context_menu(context_menu)
+
             result = [uploads]
         else:
             result = False
@@ -428,17 +476,18 @@ class Provider(AbstractProvider):
         result.extend(v3.response_to_items(provider, context, json_data))
         return result
 
-    """
-    List live streams for channel.
-    path      : '/channel/(?P<channel_id>[^/]+)/live/'
-    channel_id: <CHANNEL_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^/channel/(?P<channel_id>[^/]+)'
         r'/live/?$')
     @staticmethod
     def on_channel_live(provider, context, re_match):
+        """
+        List live streams for channel.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/live
+
+        * CHANNEL_ID: YouTube Channel ID
+        """
         context.set_content(CONTENT.VIDEO_CONTENT)
         result = []
 
@@ -471,17 +520,19 @@ class Provider(AbstractProvider):
 
         return result
 
-    """
-    Lists a playlist folder and all uploaded videos of a channel.
-    path      :'/channel|handle|user/(?P<channel_id|username>)[^/]+/'
-    channel_id: <CHANNEL_ID>
-    """
-
     @AbstractProvider.register_path(
         r'^/(?P<method>(channel|handle|user))'
         r'/(?P<identifier>[^/]+)/?$')
     @staticmethod
     def on_channel(provider, context, re_match):
+        """
+        Lists a playlist folder and all uploaded videos of a channel.
+
+        plugin://plugin.video.youtube/<ID_TYPE>/<ID>
+
+        * ID_TYPE: channel|handle|user
+        * ID: YouTube ID
+        """
         listitem_channel_id = context.get_listitem_property(CHANNEL_ID)
 
         client = provider.get_client(context)
@@ -583,6 +634,7 @@ class Provider(AbstractProvider):
                     image='{media}/playlist.png',
                     fanart=fanart,
                     category_label=item_label,
+                    channel_id=channel_id,
                 )
                 result.append(playlists_item)
 
@@ -608,6 +660,7 @@ class Provider(AbstractProvider):
                     image='{media}/live.png',
                     fanart=fanart,
                     category_label=item_label,
+                    channel_id=channel_id,
                 )
                 result.append(live_item)
 
@@ -687,19 +740,6 @@ class Provider(AbstractProvider):
         result.append(live_events_item)
 
         return result
-
-    """
-    Plays a video, playlist, or channel live stream.
-    Video: '/play/?video_id=XXXXXX'
-
-    Playlist: '/play/?playlist_id=XXXXXX[&order=ORDER][&action=ACTION]'
-        ORDER: [normal(default)|reverse|shuffle] optional playlist ordering
-        ACTION: [list|play|queue|None(default)] optional action to perform
-
-    Channel live streams: '/play/?channel_id=UCXXXXXX[&live=X]
-        X: optional index of live stream to play if channel has multiple live
-           streams. 1 (default) for first live stream
-    """
 
     @AbstractProvider.register_path('^/users/(?P<action>[^/]+)/?$')
     @staticmethod
@@ -1218,9 +1258,15 @@ class Provider(AbstractProvider):
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
-                    menu_items.play_all_from_playlist(
+                    menu_items.play_playlist(
                         context, watch_later_id
-                    )
+                    ),
+                    menu_items.view_playlist(
+                        context, watch_later_id
+                    ),
+                    menu_items.shuffle_playlist(
+                        context, watch_later_id
+                    ),
                 ]
                 watch_later_item.add_context_menu(context_menu)
                 result.append(watch_later_item)
@@ -1237,15 +1283,22 @@ class Provider(AbstractProvider):
             resource_manager = provider.get_resource_manager(context)
             playlists = resource_manager.get_related_playlists('mine')
             if playlists and 'likes' in playlists:
+                liked_list_id = playlists['likes']
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
-                    create_uri(('channel', 'mine', 'playlist', playlists['likes'])),
+                    create_uri(('channel', 'mine', 'playlist', liked_list_id)),
                     image='{media}/likes.png',
                 )
                 context_menu = [
-                    menu_items.play_all_from_playlist(
-                        context, playlists['likes']
-                    )
+                    menu_items.play_playlist(
+                        context, liked_list_id
+                    ),
+                    menu_items.view_playlist(
+                        context, liked_list_id
+                    ),
+                    menu_items.shuffle_playlist(
+                        context, liked_list_id
+                    ),
                 ]
                 liked_videos_item.add_context_menu(context_menu)
                 result.append(liked_videos_item)
@@ -1268,9 +1321,15 @@ class Provider(AbstractProvider):
                     image='{media}/history.png',
                 )
                 context_menu = [
-                    menu_items.play_all_from_playlist(
+                    menu_items.play_playlist(
                         context, history_id
-                    )
+                    ),
+                    menu_items.view_playlist(
+                        context, history_id
+                    ),
+                    menu_items.shuffle_playlist(
+                        context, history_id
+                    ),
                 ]
                 watch_history_item.add_context_menu(context_menu)
                 result.append(watch_history_item)
@@ -1414,35 +1473,80 @@ class Provider(AbstractProvider):
                 'items': []
             }
 
-            def _update_bookmark(_id, timestamp):
+            def _update_bookmark(context, _id, old_item):
                 def _update(new_item):
-                    new_item.set_bookmark_timestamp(timestamp)
-                    bookmarks_list.update_item(_id, repr(new_item), timestamp)
+                    if isinstance(old_item, float):
+                        bookmark_timestamp = old_item
+                    elif isinstance(old_item, BaseItem):
+                        bookmark_timestamp = old_item.get_bookmark_timestamp()
+                    else:
+                        return
+
+                    if new_item.available:
+                        new_item.bookmark_id = _id
+                        new_item.set_bookmark_timestamp(bookmark_timestamp)
+                        new_item.callback = None
+                        bookmarks_list.update_item(
+                            _id,
+                            repr(new_item),
+                            bookmark_timestamp,
+                        )
+                    else:
+                        new_item.__dict__.update(old_item.__dict__)
+                        new_item.bookmark_id = _id
+                        new_item.set_bookmark_timestamp(bookmark_timestamp)
+                        new_item.available = False
+                        new_item.playable = False
+                        new_item.set_title(context.get_ui().color(
+                            'AA808080', new_item.get_title()
+                        ))
 
                 return _update
 
             for item_id, item in items.items():
+                callback = _update_bookmark(context, item_id, item)
                 if isinstance(item, float):
                     kind = 'youtube#channel'
                     yt_id = item_id
-                    callback = _update_bookmark(item_id, item)
                     partial = True
-                else:
-                    callback = None
+                elif isinstance(item, BaseItem):
                     partial = False
+
                     if isinstance(item, VideoItem):
                         kind = 'youtube#video'
                         yt_id = item.video_id
                     else:
-                        yt_id = item.playlist_id
+                        yt_id = getattr(item, 'playlist_id', None)
                         if yt_id:
                             kind = 'youtube#playlist'
                         else:
                             kind = 'youtube#channel'
-                            yt_id = item.channel_id
+                            yt_id = getattr(item, 'channel_id', None)
+                else:
+                    kind = None
+                    yt_id = None
+                    partial = False
 
                 if not yt_id:
-                    continue
+                    if isinstance(item, BaseItem):
+                        item_ids = item.parse_item_ids_from_uri()
+                        to_delete = False
+                        for kind in ('video', 'playlist', 'channel'):
+                            yt_id = item_ids.get(kind + '_id')
+                            if not yt_id:
+                                continue
+                            if yt_id == 'None':
+                                to_delete = True
+                                continue
+                            kind = 'youtube#' + kind
+                            partial = True
+                            break
+                        else:
+                            if to_delete:
+                                bookmarks_list.del_item(item_id)
+                            continue
+                    else:
+                        continue
 
                 item = {
                     'kind': kind,

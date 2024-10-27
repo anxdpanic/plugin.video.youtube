@@ -154,6 +154,7 @@ class XbmcContext(AbstractContext):
         'playlist.progress.updating': 30536,
         'playlist.removed_from': 30715,
         'playlist.select': 30521,
+        'playlist.view.all': 30562,
         'playlists': 30501,
         'please_wait': 30119,
         'prompt': 30566,
@@ -683,6 +684,7 @@ class XbmcContext(AbstractContext):
         'av01': loose_version('20.3.0'),
         'vp8': False,
         'vp9': loose_version('2.3.14'),
+        'vp9.2': loose_version('2.4.0'),
     }
 
     def inputstream_adaptive_capabilities(self, capability=None):

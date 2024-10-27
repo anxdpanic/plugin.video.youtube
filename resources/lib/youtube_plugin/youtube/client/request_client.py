@@ -294,7 +294,7 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             'params': {
                 'key': ValueError,
-                'prettyPrint': 'false'
+                'prettyPrint': False,
             },
         },
     }

@@ -14,9 +14,9 @@ from __future__ import absolute_import, division, unicode_literals
 import re
 
 try:
-    from ....kodion import logger
+    from ....kodion.logger import Logger
 except:
-    class logger(object):
+    class Logger(object):
         @staticmethod
         def log_debug(txt):
             print(txt)
@@ -259,17 +259,17 @@ class CalculateN(object):
         # This pattern is only present in the throttling function code.
         fiduciary_index = js.find('enhanced_except_')
         if fiduciary_index == -1:
-            logger.log_debug('ratebypass: fiduciary_index not found')
+            Logger.log_debug('ratebypass: fiduciary_index not found')
             return None
 
         start_index = js.rfind('=function(', 0, fiduciary_index)
         if start_index == -1:
-            logger.log_debug('ratebypass: function code start not found')
+            Logger.log_debug('ratebypass: function code start not found')
             return None
 
         end_index = js.find('};', fiduciary_index)
         if end_index == -1:
-            logger.log_debug('ratebypass: function code end not found')
+            Logger.log_debug('ratebypass: function code end not found')
             return None
 
         return js[start_index:end_index].replace('\n', '')
@@ -294,7 +294,7 @@ class CalculateN(object):
         plan_start_pattern = 'try{'
         plan_start_index = raw_code.find(plan_start_pattern)
         if plan_start_index == -1:
-            logger.log_debug('ratebypass: command block start not found')
+            Logger.log_debug('ratebypass: command block start not found')
             raise Exception()
         else:
             # Skip the whole start pattern, it's not needed.
@@ -302,7 +302,7 @@ class CalculateN(object):
 
         plan_end_index = raw_code.find('}', plan_start_index)
         if plan_end_index == -1:
-            logger.log_debug('ratebypass: command block end not found')
+            Logger.log_debug('ratebypass: command block end not found')
             raise Exception()
 
         plan_code = raw_code[plan_start_index:plan_end_index]
@@ -365,14 +365,14 @@ class CalculateN(object):
         array_start_pattern = ",c=["
         array_start_index = raw_code.find(array_start_pattern)
         if array_start_index == -1:
-            logger.log_debug('ratebypass: "c" array pattern not found')
+            Logger.log_debug('ratebypass: "c" array pattern not found')
             raise Exception()
         else:
             array_start_index += len(array_start_pattern)
 
         array_end_index = raw_code.rfind('];')
         if array_end_index == -1:
-            logger.log_debug('ratebypass: "c" array end not found')
+            Logger.log_debug('ratebypass: "c" array end not found')
             raise Exception()
 
         array_code = raw_code[array_start_index:array_end_index]
@@ -404,7 +404,7 @@ class CalculateN(object):
                         found = True
                         break
                 else:
-                    logger.log_debug('ratebypass: mapping function not yet '
+                    Logger.log_debug('ratebypass: mapping function not yet '
                                      'listed: {unknown}'.format(unknown=el))
                 if found:
                     continue
@@ -428,7 +428,7 @@ class CalculateN(object):
             video stream URL.
         """
         if self.calculated_n:
-            logger.log_debug('`n` already calculated: {calculated_n}. returning early...'
+            Logger.log_debug('`n` already calculated: {calculated_n}. returning early...'
                              .format(calculated_n=self.calculated_n))
             return self.calculated_n
 
@@ -436,7 +436,7 @@ class CalculateN(object):
             return None
 
         initial_n_string = ''.join(mutable_n_list)
-        logger.log_debug('Attempting to calculate `n` from initial: {initial_n}'
+        Logger.log_debug('Attempting to calculate `n` from initial: {initial_n}'
                          .format(initial_n=initial_n_string))
 
         # For each step in the plan, get the first item of the step as the
@@ -449,8 +449,8 @@ class CalculateN(object):
             for step in self.get_throttling_plan_gen(self.throttling_function_code):
                 curr_func = throttling_array[int(step[0])]
                 if not callable(curr_func):
-                    logger.log_debug('{curr_func} is not callable.'.format(curr_func=curr_func))
-                    logger.log_debug('Throttling array:\n{throttling_array}\n'
+                    Logger.log_debug('{curr_func} is not callable.'.format(curr_func=curr_func))
+                    Logger.log_debug('Throttling array:\n{throttling_array}\n'
                                      .format(throttling_array=throttling_array))
                     return None
 
@@ -462,10 +462,10 @@ class CalculateN(object):
                     second_arg = throttling_array[int(step[2])]
                     curr_func(first_arg, second_arg)
         except:
-            logger.log_debug('Error calculating new `n`')
+            Logger.log_debug('Error calculating new `n`')
             return None
 
         self.calculated_n = ''.join(mutable_n_list)
-        logger.log_debug('Calculated `n`: {calculated_n}'
+        Logger.log_debug('Calculated `n`: {calculated_n}'
                          .format(calculated_n=self.calculated_n))
         return self.calculated_n

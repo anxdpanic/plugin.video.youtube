@@ -13,6 +13,7 @@ __all__ = (
     'byte_string_type',
     'cpu_count',
     'datetime_infolabel',
+    'entity_escape',
     'parse_qs',
     'parse_qsl',
     'quote',
@@ -54,12 +55,25 @@ try:
     import xbmcplugin
     import xbmcvfs
 
+
     xbmc.LOGNOTICE = xbmc.LOGINFO
     xbmc.LOGSEVERE = xbmc.LOGFATAL
 
     string_type = str
     byte_string_type = bytes
     to_str = str
+
+
+    def entity_escape(text,
+                      entities=str.maketrans({
+                          '&': '&amp;',
+                          '"': '&quot;',
+                          '<': '&lt;',
+                          '>': '&gt;',
+                          '\'': '&#x27;',
+                      })):
+        return text.translate(entities)
+
 # Compatibility shims for Kodi v18 and Python v2.7
 except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler
@@ -130,10 +144,24 @@ except ImportError:
     string_type = basestring
     byte_string_type = (bytes, str)
 
+
     def to_str(value):
         if isinstance(value, unicode):
             return value.encode('utf-8')
         return str(value)
+
+
+    def entity_escape(text,
+                      entities={
+                          '&': '&amp;',
+                          '"': '&quot;',
+                          '<': '&lt;',
+                          '>': '&gt;',
+                          '\'': '&#x27;',
+                      }):
+        for key, value in entities.viewitems():
+            text = text.replace(key, value)
+        return text
 
 # Kodi v20+
 if hasattr(xbmcgui.ListItem, 'setDateTime'):

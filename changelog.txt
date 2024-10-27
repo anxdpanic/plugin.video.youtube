@@ -1,3 +1,22 @@
+## v7.1.1+beta.2
+### Fixed
+- Standardise return type of LoginClient.refresh_token #932
+- Fix curl headers not being used when set on path of setResolvedUrl listitem
+- Fix HEAD requests to MPD manifests
+- Fix various Python2 incompatible changes
+- Properly distinguish between VP9 and VP9.2 with HDR info
+- Fix http server not running when script shows client IP
+
+### Changed
+- Improve display and update of bookmarks
+- Explicitly set http server protocol version to HTTP/1.1
+- Improve logging
+
+### New
+- Add View all and Shuffle context menu items for playlists
+- New setting to enable debug logging for addon
+  - Setting > Advanced > Logging > Enable debug logging
+
 ## v7.1.1+beta.1
 ### Fixed
 - Fix http server not listening on any interface if listen IP is 0.0.0.0 #927

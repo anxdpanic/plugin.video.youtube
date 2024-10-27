@@ -14,7 +14,7 @@ import re
 from datetime import date
 
 from . import BaseItem
-from ..compatibility import datetime_infolabel, to_str, unescape
+from ..compatibility import datetime_infolabel, to_str, unescape, urlencode
 from ..constants import CONTENT
 from ..utils import duration_to_seconds, seconds_to_duration
 
@@ -30,7 +30,8 @@ class MediaItem(BaseItem):
                  uri,
                  image='DefaultFile.png',
                  fanart=None,
-                 plot=None):
+                 plot=None,
+                 video_id=None,):
         super(MediaItem, self).__init__(name, uri, image, fanart)
         self._aired = None
         self._premiered = None
@@ -62,7 +63,7 @@ class MediaItem(BaseItem):
         self._upcoming = False
         self._vod = False
 
-        self._video_id = None
+        self._video_id = video_id
         self._channel_id = None
         self._subscription_id = None
         self._playlist_id = None
@@ -217,7 +218,9 @@ class MediaItem(BaseItem):
     def set_headers(self, value):
         self._headers = value
 
-    def get_headers(self):
+    def get_headers(self, as_string=False):
+        if as_string:
+            return urlencode(self._headers)
         return self._headers
 
     def set_license_key(self, url):
@@ -338,8 +341,14 @@ class AudioItem(MediaItem):
                  uri,
                  image='DefaultAudio.png',
                  fanart=None,
-                 plot=None):
-        super(AudioItem, self).__init__(name, uri, image, fanart, plot)
+                 plot=None,
+                 video_id=None):
+        super(AudioItem, self).__init__(name,
+                                        uri,
+                                        image,
+                                        fanart,
+                                        plot,
+                                        video_id)
         self._album = None
 
     def set_album_name(self, album_name):
@@ -364,8 +373,14 @@ class VideoItem(MediaItem):
                  uri,
                  image='DefaultVideo.png',
                  fanart=None,
-                 plot=None):
-        super(VideoItem, self).__init__(name, uri, image, fanart, plot)
+                 plot=None,
+                 video_id=None):
+        super(VideoItem, self).__init__(name,
+                                        uri,
+                                        image,
+                                        fanart,
+                                        plot,
+                                        video_id)
         self._directors = None
         self._episode = None
         self._imdb_id = None

@@ -19,7 +19,7 @@ from requests.exceptions import InvalidJSONError, RequestException
 from requests.utils import DEFAULT_CA_BUNDLE_PATH, extract_zipped_paths
 from urllib3.util.ssl_ import create_urllib3_context
 
-from ..logger import log_error
+from ..logger import Logger
 
 
 __all__ = (
@@ -63,7 +63,7 @@ class SSLHTTPAdapter(HTTPAdapter):
         return super(SSLHTTPAdapter, self).cert_verify(conn, url, verify, cert)
 
 
-class BaseRequestsClass(object):
+class BaseRequestsClass(Logger):
     _session = Session()
     _session.mount('https://', SSLHTTPAdapter(
         pool_maxsize=10,
@@ -198,7 +198,7 @@ class BaseRequestsClass(object):
                     )
                 )
 
-            log_error('\n'.join([part for part in [
+            self.log_error('\n'.join([part for part in [
                 error_title, error_info, response_text, stack_trace
             ] if part]))
 

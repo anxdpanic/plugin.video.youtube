@@ -10,8 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import time
-
 from ..youtube_exceptions import LoginException
 
 
@@ -94,8 +92,7 @@ def process(mode, provider, context, sign_out_refresh=True):
                     if not _access_token and not _refresh_token:
                         _expiry = 0
                     else:
-                        _expiry = (int(json_data.get('expires_in', 3600))
-                                   + time.time())
+                        _expiry = int(json_data.get('expires_in', 3600))
                     return _access_token, _expiry, _refresh_token
 
                 if json_data['error'] != 'authorization_pending':
@@ -131,10 +128,10 @@ def process(mode, provider, context, sign_out_refresh=True):
                 refresh_token = None
 
             context.log_debug('YouTube Login:'
-                              'Type: |{0}|\n'
-                              'Access token: |{1}|\n'
-                              'Refresh token: |{2}|\n'
-                              'Expires: |{3}|'
+                              '\n\tType: |{0}|'
+                              '\n\tAccess token: |{1}|'
+                              '\n\tRefresh token: |{2}|'
+                              '\n\tExpires: |{3}|'
                               .format(token,
                                       bool(access_token),
                                       bool(refresh_token),
