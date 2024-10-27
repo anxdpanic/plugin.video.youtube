@@ -547,7 +547,7 @@ msgid "None"
 msgstr "Nincs"
 
 msgctxt "#30562"
-msgid ""
+msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
