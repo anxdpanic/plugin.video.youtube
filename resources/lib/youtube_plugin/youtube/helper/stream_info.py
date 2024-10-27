@@ -23,6 +23,7 @@ from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import (
+    entity_escape,
     parse_qs,
     quote,
     unescape,
@@ -35,7 +36,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import entity_escape, make_dirs, redact_ip
+from ...kodion.utils import make_dirs, redact_ip
 
 
 class StreamInfo(YouTubeRequestClient):
