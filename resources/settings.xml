@@ -593,7 +593,7 @@
             </group>
         </category>
         <category id="advanced" label="30031" help="">
-            <group id="1">
+            <group id="player_settings" label="14201">
                 <setting id="kodion.support.alternative_player" type="boolean" label="30036" help="">
                     <level>0</level>
                     <default>false</default>
@@ -647,7 +647,7 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="2" label="30617">
+            <group id="inputstream_adaptive" label="30617">
                 <setting id="kodion.video.quality.isa" type="boolean" label="30007" help="">
                     <level>0</level>
                     <default>true</default>
@@ -721,7 +721,7 @@
                     <control format="string" type="spinner"/>
                 </setting>
             </group>
-            <group id="3" label="30509">
+            <group id="history" label="30509">
                 <setting id="kodion.history.local" type="boolean" label="30675" help="">
                     <level>0</level>
                     <default>true</default>
@@ -757,7 +757,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="4" label="30767">
+            <group id="lists_views" label="14240">
                 <setting id="youtube.view.description.details" type="boolean" label="30541" help="">
                     <level>0</level>
                     <default>true</default>
@@ -886,7 +886,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="5" label="14222">
+            <group id="regional" label="14222">
                 <setting id="youtube.language_region.configure" type="action" label="30527" help="">
                     <level>0</level>
                     <constraints>
@@ -946,7 +946,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="6" label="16103">
+            <group id="mark_as_watched" label="16103">
                 <setting id="kodion.play_count.percent" type="integer" label="30668" help="">
                     <level>0</level>
                     <default>90</default>
@@ -970,7 +970,7 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="8" label="443">
+            <group id="internet" label="443">
                 <setting id="requests.ssl.verify" type="boolean" label="30578" help="">
                     <level>0</level>
                     <default>true</default>
@@ -1086,7 +1086,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="9" label="30628">
+            <group id="http_server" label="30628">
                 <setting id="kodion.http.listen" type="string" label="30643" help="">
                     <level>0</level>
                     <default>0.0.0.0</default>
@@ -1136,6 +1136,13 @@
                 <setting id="youtube.http.idle_sleep" type="boolean" label="13018" help="">
                     <level>0</level>
                     <default>true</default>
+                    <control type="toggle"/>
+                </setting>
+            </group>
+            <group id="logging" label="14092">
+                <setting id="kodion.logging.enabled" type="boolean" label="20191" help="36392">
+                    <level>0</level>
+                    <default>false</default>
                     <control type="toggle"/>
                 </setting>
             </group>

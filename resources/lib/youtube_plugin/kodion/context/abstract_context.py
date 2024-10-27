@@ -12,13 +12,14 @@ from __future__ import absolute_import, division, unicode_literals
 
 import os
 
-from .. import logger
+from ..logger import Logger
 from ..compatibility import parse_qsl, quote, to_str, urlencode, urlsplit
 from ..constants import (
     PATHS,
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_WITH,
     VALUE_FROM_STR,
@@ -36,7 +37,7 @@ from ..sql_store import (
 from ..utils import current_system_version
 
 
-class AbstractContext(object):
+class AbstractContext(Logger):
     _initialized = False
     _addon = None
     _settings = None
@@ -45,6 +46,7 @@ class AbstractContext(object):
         PLAY_FORCE_AUDIO,
         PLAY_PROMPT_SUBTITLES,
         PLAY_PROMPT_QUALITY,
+        PLAY_STRM,
         PLAY_TIMESHIFT,
         PLAY_WITH,
         'confirmed',
@@ -58,10 +60,8 @@ class AbstractContext(object):
         'incognito',
         'location',
         'logged_in',
-        'play',
         'resume',
         'screensaver',
-        'strm',
         'window_return',
     }
     _INT_PARAMS = {
@@ -429,24 +429,6 @@ class AbstractContext(object):
 
     def add_sort_method(self, *sort_methods):
         raise NotImplementedError()
-
-    def log(self, text, log_level=logger.NOTICE):
-        logger.log(text, log_level, self.get_id())
-
-    def log_warning(self, text):
-        self.log(text, logger.WARNING)
-
-    def log_error(self, text):
-        self.log(text, logger.ERROR)
-
-    def log_notice(self, text):
-        self.log(text, logger.NOTICE)
-
-    def log_debug(self, text):
-        self.log(text, logger.DEBUG)
-
-    def log_info(self, text):
-        self.log(text, logger.INFO)
 
     def clone(self, new_path=None, new_params=None):
         raise NotImplementedError()

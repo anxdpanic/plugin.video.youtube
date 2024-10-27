@@ -10,7 +10,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from . import logger
 from .abstract_provider import (
     # Abstract provider for implementation by the user
     AbstractProvider,

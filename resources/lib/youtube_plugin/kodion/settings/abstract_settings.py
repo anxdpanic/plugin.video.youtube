@@ -15,6 +15,7 @@ import sys
 from ..constants import SETTINGS
 from ..utils import (
     current_system_version,
+    get_kodi_setting_bool,
     get_kodi_setting_value,
     validate_ip_address,
 )
@@ -653,3 +654,7 @@ class AbstractSettings(object):
 
     def get_channel_name_aliases(self):
         return frozenset(self.get_string_list(SETTINGS.CHANNEL_NAME_ALIASES))
+
+    def logging_enabled(self):
+        return (self.get_bool(SETTINGS.LOGGING_ENABLED, False)
+                or get_kodi_setting_bool('debug.showloginfo'))

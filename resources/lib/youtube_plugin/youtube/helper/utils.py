@@ -439,9 +439,16 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
         # play all videos of the playlist
         context_menu = [
-            menu_items.play_all_from_playlist(
+            menu_items.play_playlist(
                 context, playlist_id
             ),
+            menu_items.view_playlist(
+                context, playlist_id
+            ),
+            menu_items.shuffle_playlist(
+                context, playlist_id
+            ),
+            menu_items.separator(),
             menu_items.bookmark_add(
                 context, playlist_item
             ) if not in_bookmarks_list and channel_id != 'mine' else None,
@@ -571,11 +578,20 @@ def update_video_infos(provider, context, video_id_dict,
         playlist_match = __RE_PLAYLIST.match(path)
 
     for video_id, yt_item in data.items():
-        if not yt_item or 'snippet' not in yt_item:
+        if not yt_item:
+            continue
+
+        media_item = video_id_dict.get(video_id)
+        if not media_item:
+            continue
+
+        if 'snippet' not in yt_item:
+            if yt_item.get('_unavailable'):
+                media_item.playable = False
+                media_item.available = False
             continue
         snippet = yt_item['snippet']
 
-        media_item = video_id_dict[video_id]
         media_item.set_mediatype(
             CONTENT.AUDIO_TYPE
             if isinstance(media_item, AudioItem) else
@@ -835,12 +851,12 @@ def update_video_infos(provider, context, video_id_dict,
             playlist_channel_id = playlist_match.group('channel_id')
 
             context_menu.extend((
-                menu_items.play_all_from_playlist(
+                menu_items.play_playlist_from(
                     context, playlist_id, video_id
                 ),
-                menu_items.play_all_from_playlist(
+                menu_items.play_playlist(
                     context, playlist_id
-                )
+                ),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
@@ -982,7 +998,6 @@ def update_video_infos(provider, context, video_id_dict,
 
 
 def update_play_info(provider, context, video_id, media_item, video_stream):
-    media_item.video_id = video_id
     update_video_infos(provider, context, {video_id: media_item})
 
     settings = context.get_settings()
@@ -1233,7 +1248,7 @@ def filter_videos(items,
     return [
         item
         for item in items
-        if (not item.playable or (
+        if ((item.callback and item.callback(item)) or not item.playable or (
                 (completed and item.completed)
                 or (live and item.live and not item.upcoming)
                 or (premieres and upcoming and item.upcoming and not item.live)

@@ -322,7 +322,8 @@ class ResourceManager(object):
                 for yt_item in batch.get('items', [])
                 if yt_item
             }
-            new_data = dict(dict.fromkeys(to_update, {}), **new_data)
+            new_data = dict(dict.fromkeys(to_update, {'_unavailable': True}),
+                            **new_data)
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 

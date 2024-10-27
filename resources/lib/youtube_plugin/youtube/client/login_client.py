@@ -10,16 +10,12 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import time
-
 from .request_client import YouTubeRequestClient
 from ..youtube_exceptions import (
     InvalidGrant,
     InvalidJSON,
     LoginException,
 )
-from ...kodion.compatibility import parse_qsl
-from ...kodion.logger import log_debug
 
 
 class LoginClient(YouTubeRequestClient):
@@ -109,7 +105,7 @@ class LoginClient(YouTubeRequestClient):
                      response_hook=LoginClient._response_hook,
                      error_hook=LoginClient._error_hook,
                      error_title='Logout Failed',
-                     error_info='Revoke failed: {exc}',
+                     error_info='Revoke failed: {exc!r}',
                      raise_exc=True)
 
     def refresh_token(self, token_type, refresh_token=None):
@@ -138,15 +134,15 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'refresh_token'}
 
         config_type = self._get_config_type(client_id, client_secret)
-        client = (('config_type: |{config_type}|\n'
-                   'client_id: |{id_start}...{id_end}|\n'
-                   'client_secret: |{secret_start}...{secret_end}|')
+        client = (('\n\tconfig_type: |{config_type}|'
+                   '\n\tclient_id: |{id_start}...{id_end}|'
+                   '\n\tclient_secret: |{secret_start}...{secret_end}|')
                   .format(config_type=config_type,
                           id_start=client_id[:3],
                           id_end=client_id[-5:],
                           secret_start=client_secret[:3],
                           secret_end=client_secret[-3:]))
-        log_debug('Refresh token\n{0}'.format(client))
+        self.log_debug('Refresh token:{0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
                                  method='POST',
@@ -157,15 +153,10 @@ class LoginClient(YouTubeRequestClient):
                                  error_title='Login Failed',
                                  error_info=('Refresh token failed\n'
                                              '{client}:\n'
-                                             '{{exc}}'
+                                             '{{exc!r}}'
                                              .format(client=client)),
                                  raise_exc=True)
-
-        if json_data:
-            access_token = json_data['access_token']
-            expiry = time.time() + int(json_data.get('expires_in', 3600))
-            return access_token, expiry
-        return '', 0
+        return json_data
 
     def request_access_token(self, token_type, code=None):
         login_type = self.TOKEN_TYPES.get(token_type)
@@ -193,15 +184,15 @@ class LoginClient(YouTubeRequestClient):
                      'grant_type': 'http://oauth.net/grant_type/device/1.0'}
 
         config_type = self._get_config_type(client_id, client_secret)
-        client = (('config_type: |{config_type}|\n'
-                   'client_id: |{id_start}...{id_end}|\n'
-                   'client_secret: |{secret_start}...{secret_end}|')
+        client = (('\n\tconfig_type: |{config_type}|'
+                   '\n\tclient_id: |{id_start}...{id_end}|'
+                   '\n\tclient_secret: |{secret_start}...{secret_end}|')
                   .format(config_type=config_type,
                           id_start=client_id[:3],
                           id_end=client_id[-5:],
                           secret_start=client_secret[:3],
                           secret_end=client_secret[-3:]))
-        log_debug('Requesting access token\n{0}'.format(client))
+        self.log_debug('Requesting access token:{0}'.format(client))
 
         json_data = self.request(self.TOKEN_URL,
                                  method='POST',
@@ -239,12 +230,12 @@ class LoginClient(YouTubeRequestClient):
                      'scope': 'https://www.googleapis.com/auth/youtube'}
 
         config_type = self._get_config_type(client_id)
-        client = (('config_type: |{config_type}|\n'
-                   'client_id: |{id_start}...{id_end}|')
+        client = (('\n\tconfig_type: |{config_type}|'
+                   '\n\tclient_id: |{id_start}...{id_end}|')
                   .format(config_type=config_type,
                           id_start=client_id[:3],
                           id_end=client_id[-5:]))
-        log_debug('Requesting device and user code\n{0}'.format(client))
+        self.log_debug('Requesting device and user code:{0}'.format(client))
 
         json_data = self.request(self.DEVICE_CODE_URL,
                                  method='POST',
@@ -259,49 +250,6 @@ class LoginClient(YouTubeRequestClient):
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
-
-    def authenticate(self, username, password):
-        headers = {'device': '38c6ee9a82b8b10a',
-                   'app': 'com.google.android.youtube',
-                   'User-Agent': 'GoogleAuth/1.4 (GT-I9100 KTU84Q)',
-                   'content-type': 'application/x-www-form-urlencoded',
-                   'Host': 'android.clients.google.com',
-                   'Connection': 'keep-alive',
-                   'Accept-Encoding': 'gzip'}
-
-        post_data = {
-            'device_country': self._region.lower(),
-            'operatorCountry': self._region.lower(),
-            'lang': self._language,
-            'sdk_version': '19',
-            # 'google_play_services_version': '6188034',
-            'accountType': 'HOSTED_OR_GOOGLE',
-            'Email': username.encode('utf-8'),
-            'service': self.SERVICE_URLS,
-            'source': 'android',
-            'androidId': '38c6ee9a82b8b10a',
-            'app': 'com.google.android.youtube',
-            # 'client_sig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
-            'callerPkg': 'com.google.android.youtube',
-            # 'callerSig': '24bb24c05e47e0aefa68a58a766179d9b613a600',
-            'Passwd': password.encode('utf-8')
-        }
-
-        result = self.request(self.ANDROID_CLIENT_AUTH_URL,
-                              method='POST',
-                              data=post_data,
-                              headers=headers,
-                              error_title='Login Failed',
-                              raise_exc=True)
-
-        lines = result.text.replace('\n', '&')
-        params = dict(parse_qsl(lines))
-        token = params.get('Auth', '')
-        expires = int(params.get('Expiry', -1))
-        if not token or expires == -1:
-            raise LoginException('Failed to get token')
-
-        return token, expires
 
     def _get_config_type(self, client_id, client_secret=None):
         """used for logging"""

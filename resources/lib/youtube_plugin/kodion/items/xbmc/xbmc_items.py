@@ -25,6 +25,7 @@ from ...constants import (
     PLAYLISTITEM_ID,
     PLAYLIST_ID,
     PLAY_COUNT,
+    PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_WITH,
     SUBSCRIPTION_ID,
@@ -398,10 +399,12 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     context.log_debug('Converting %s |%s|' % (media_item.__class__.__name__,
                                               redact_ip(uri)))
 
+    params = context.get_params()
     settings = context.get_settings()
     ui = context.get_ui()
+
     is_external = ui.get_property(PLAY_WITH)
-    is_strm = context.get_param('strm')
+    is_strm = params.get(PLAY_STRM)
     mime_type = None
 
     if is_strm:
@@ -464,7 +467,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
                 'ssl_verify_peer': False,
             })
 
-        headers = media_item.get_headers()
+        headers = media_item.get_headers(as_string=True)
         if headers:
             props['inputstream.adaptive.manifest_headers'] = headers
             props['inputstream.adaptive.stream_headers'] = headers
@@ -479,11 +482,13 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        headers = media_item.get_headers()
+        headers = media_item.get_headers(as_string=True)
         if (headers and uri.startswith('http')
                 and not (is_external
                          or settings.default_player_web_urls())):
-            kwargs['path'] = '|'.join((uri, headers))
+            uri = '|'.join((uri, headers))
+            kwargs['path'] = uri
+            media_item.set_uri(uri)
 
     list_item = xbmcgui.ListItem(**kwargs)
 
@@ -508,7 +513,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
     if media_item.subtitles:
         list_item.setSubtitles(media_item.subtitles)
 
-    resume = context.get_param('resume')
+    resume = params.get('resume')
     set_info(list_item, media_item, props, resume=resume)
 
     return list_item

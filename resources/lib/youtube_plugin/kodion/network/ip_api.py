@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .requests import BaseRequestsClass
-from .. import logger
 
 
 class Locator(BaseRequestsClass):
@@ -32,9 +31,10 @@ class Locator(BaseRequestsClass):
     def success(self):
         successful = self.response().get('status', 'fail') == 'success'
         if successful:
-            logger.log_debug('Location request was successful')
+            self.log_debug('Location request was successful')
         else:
-            logger.log_error(self.response().get('message', 'Location request failed with no error message'))
+            msg = 'Location request failed with no error message'
+            self.log_error(self.response().get('message') or msg)
         return successful
 
     def coordinates(self):
@@ -44,7 +44,7 @@ class Locator(BaseRequestsClass):
             lat = self._response.get('lat')
             lon = self._response.get('lon')
         if lat is None or lon is None:
-            logger.log_error('No coordinates returned')
+            self.log_error('No coordinates returned')
             return None
-        logger.log_debug('Coordinates found')
+        self.log_debug('Coordinates found')
         return {'lat': lat, 'lon': lon}

@@ -115,7 +115,7 @@ class YouTube(LoginClient):
             },
             'params': {
                 'key': None,
-                'prettyPrint': 'false'
+                'prettyPrint': False,
             },
         },
     }
@@ -1944,8 +1944,8 @@ class YouTube(LoginClient):
 
     def _response_hook(self, **kwargs):
         response = kwargs['response']
-        self._context.log_debug('API response: |{0.status_code}|\n'
-                                'headers: |{0.headers}|'.format(response))
+        self._context.log_debug('API response: |{0.status_code}|'
+                                '\n\theaders: |{0.headers}|'.format(response))
         if response.status_code == 204 and 'no_content' in kwargs:
             return True
         try:
@@ -2005,9 +2005,9 @@ class YouTube(LoginClient):
                                                          title,
                                                          time_ms=timeout)
 
-        info = ('API error: {reason}\n'
-                'exc: |{exc!r}|\n'
-                'message: |{message}|')
+        info = ('API error: {reason}'
+                '\n\texc: |{exc!r}|'
+                '\n\tmessage: |{message}|')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
 
@@ -2085,13 +2085,13 @@ class YouTube(LoginClient):
             log_headers = None
 
         context = self._context
-        context.log_debug('API request:\n'
-                          'version: |{version}|\n'
-                          'method: |{method}|\n'
-                          'path: |{path}|\n'
-                          'params: |{params}|\n'
-                          'post_data: |{data}|\n'
-                          'headers: |{headers}|'
+        context.log_debug('API request:'
+                          '\n\tversion: |{version}|'
+                          '\n\tmethod: |{method}|'
+                          '\n\tpath: |{path}|'
+                          '\n\tparams: |{params}|'
+                          '\n\tpost_data: |{data}|'
+                          '\n\theaders: |{headers}|'
                           .format(version=version,
                                   method=method,
                                   path=path,

@@ -224,7 +224,9 @@ def _process_description_links(provider, context):
         channel_id_dict = {}
         for channel_id in channel_ids:
             channel_item = DirectoryItem(
-                '', context.create_uri(('channel', channel_id,), item_params)
+                name='',
+                uri=context.create_uri(('channel', channel_id,), item_params),
+                channel_id=channel_id,
             )
             channel_id_dict[channel_id] = channel_item
 
@@ -249,7 +251,9 @@ def _process_description_links(provider, context):
         playlist_id_dict = {}
         for playlist_id in playlist_ids:
             playlist_item = DirectoryItem(
-                '', context.create_uri(('playlist', playlist_id,), item_params)
+                name='',
+                uri=context.create_uri(('playlist', playlist_id,), item_params),
+                playlist_id=playlist_id,
             )
             playlist_id_dict[playlist_id] = playlist_item
 

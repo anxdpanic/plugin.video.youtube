@@ -18,7 +18,7 @@ from datetime import timedelta
 from math import floor, log
 
 from ..compatibility import byte_string_type, string_type, xbmc, xbmcvfs
-from ..logger import log_error
+from ..logger import Logger
 
 
 __all__ = (
@@ -32,6 +32,7 @@ __all__ = (
     'make_dirs',
     'merge_dicts',
     'print_items',
+    'redact_ip',
     'rm_dir',
     'seconds_to_duration',
     'select_stream',
@@ -166,7 +167,7 @@ def make_dirs(path):
 
     if succeeded:
         return path
-    log_error('Failed to create directory: |{0}|'.format(path))
+    Logger.log_error('Failed to create directory: |{0}|'.format(path))
     return False
 
 
@@ -186,7 +187,7 @@ def rm_dir(path):
 
     if succeeded:
         return True
-    log_error('Failed to remove directory: {0}'.format(path))
+    Logger.log_error('Failed to remove directory: {0}'.format(path))
     return False
 
 

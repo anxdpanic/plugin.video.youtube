@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 import atexit
 import os
 
-from .logger import log_debug
+from .logger import Logger
 
 
 def debug_here(host='localhost'):
@@ -145,7 +145,7 @@ class Profiler(object):
         if not self._enabled:
             return
 
-        log_debug('Profiling stats: {0}'.format(self.get_stats(
+        Logger.log_debug('Profiling stats: {0}'.format(self.get_stats(
             num_lines=self._num_lines,
             print_callees=self._print_callees,
             reuse=self._reuse,
@@ -270,7 +270,7 @@ class Profiler(object):
         return output
 
     def print_stats(self):
-        log_debug('Profiling stats: {0}'.format(self.get_stats(
+        Logger.log_debug('Profiling stats: {0}'.format(self.get_stats(
             num_lines=self._num_lines,
             print_callees=self._print_callees,
             reuse=self._reuse,
