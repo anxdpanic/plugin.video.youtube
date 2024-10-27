@@ -410,21 +410,57 @@ class Provider(AbstractProvider):
         ).get(channel_id)
         playlists = resource_manager.get_related_playlists(channel_id)
 
-        uploads = playlists.get('uploads')
-        if uploads:
+        playlist_id = playlists.get('uploads')
+        if playlist_id:
             item_label = context.localize('uploads')
             uploads = DirectoryItem(
                 context.get_ui().bold(item_label),
                 context.create_uri(
-                    ('channel', channel_id, 'playlist', uploads),
+                    ('channel', channel_id, 'playlist', playlist_id),
                     new_params,
                 ),
                 image='{media}/playlist.png',
                 fanart=fanart,
                 category_label=item_label,
                 channel_id=channel_id,
-                playlist_id=uploads,
+                playlist_id=playlist_id,
             )
+
+            context_menu = [
+                menu_items.play_playlist(
+                    context, playlist_id
+                ),
+                menu_items.view_playlist(
+                    context, playlist_id
+                ),
+                menu_items.shuffle_playlist(
+                    context, playlist_id
+                ),
+                menu_items.separator(),
+                menu_items.bookmark_add(
+                    context, uploads
+                ) if channel_id != 'mine' else None,
+            ]
+
+            if channel_id != 'mine':
+                if provider.is_logged_in:
+                    # subscribe to the channel via the playlist item
+                    context_menu.append(
+                        menu_items.subscribe_to_channel(
+                            context, channel_id,
+                        )
+                    )
+                context_menu.append(
+                    # bookmark channel of the playlist
+                    menu_items.bookmark_add_channel(
+                        context, channel_id,
+                    )
+                )
+
+            if context_menu:
+                context_menu.append(menu_items.separator())
+                uploads.add_context_menu(context_menu)
+
             result = [uploads]
         else:
             result = False
