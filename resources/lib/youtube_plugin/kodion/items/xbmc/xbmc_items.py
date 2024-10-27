@@ -467,7 +467,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
                 'ssl_verify_peer': False,
             })
 
-        headers = media_item.get_headers()
+        headers = media_item.get_headers(as_string=True)
         if headers:
             props['inputstream.adaptive.manifest_headers'] = headers
             props['inputstream.adaptive.stream_headers'] = headers
@@ -482,7 +482,7 @@ def playback_item(context, media_item, show_fanart=None, **_kwargs):
             mime_type = uri.split('mime=', 1)[1].split('&', 1)[0]
             mime_type = mime_type.replace('%2F', '/')
 
-        headers = media_item.get_headers()
+        headers = media_item.get_headers(as_string=True)
         if (headers and uri.startswith('http')
                 and not (is_external
                          or settings.default_player_web_urls())):

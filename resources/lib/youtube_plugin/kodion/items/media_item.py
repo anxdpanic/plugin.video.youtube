@@ -14,7 +14,7 @@ import re
 from datetime import date
 
 from . import BaseItem
-from ..compatibility import datetime_infolabel, to_str, unescape
+from ..compatibility import datetime_infolabel, to_str, unescape, urlencode
 from ..constants import CONTENT
 from ..utils import duration_to_seconds, seconds_to_duration
 
@@ -218,7 +218,9 @@ class MediaItem(BaseItem):
     def set_headers(self, value):
         self._headers = value
 
-    def get_headers(self):
+    def get_headers(self, as_string=False):
+        if as_string:
+            return urlencode(self._headers)
         return self._headers
 
     def set_license_key(self, url):

@@ -975,7 +975,7 @@ class StreamInfo(YouTubeRequestClient):
         return result
 
     @staticmethod
-    def _prepare_headers(headers, to_string=True, cookies=None, new_headers=None):
+    def _prepare_headers(headers, cookies=None, new_headers=None):
         if cookies or new_headers:
             headers = headers.copy()
         if cookies:
@@ -984,9 +984,6 @@ class StreamInfo(YouTubeRequestClient):
             ])
         if new_headers:
             headers.update(new_headers)
-        if to_string:
-            # Headers used in xbmc_items.video_playback_item
-            return urlencode(headers)
         return headers
 
     @staticmethod
