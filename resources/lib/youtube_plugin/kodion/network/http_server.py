@@ -226,6 +226,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 wait(1)
                 self.send_response(301)
                 self.send_header('Location', url)
+                self.send_header('Connection', 'close')
                 self.end_headers()
             else:
                 self.send_error(501)
