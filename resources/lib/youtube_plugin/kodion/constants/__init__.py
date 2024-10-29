@@ -16,6 +16,9 @@ from . import (
     const_settings as SETTINGS,
     const_sort_methods as SORT,
 )
+from .const_lang_region import (
+    TRANSLATION_LANGUAGES,
+)
 
 
 # Addon paths
@@ -147,4 +150,7 @@ __all__ = (
     'PATHS',
     'SETTINGS',
     'SORT',
+
+    # Languages and Regions
+    'TRANSLATION_LANGUAGES',
 )
