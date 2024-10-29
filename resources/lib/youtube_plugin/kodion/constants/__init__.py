@@ -17,6 +17,8 @@ from . import (
     const_sort_methods as SORT,
 )
 from .const_lang_region import (
+    DEFAULT_LANGUAGES,
+    DEFAULT_REGIONS,
     TRANSLATION_LANGUAGES,
 )
 
@@ -152,5 +154,7 @@ __all__ = (
     'SORT',
 
     # Languages and Regions
+    'DEFAULT_LANGUAGES',
+    'DEFAULT_REGIONS',
     'TRANSLATION_LANGUAGES',
 )
