@@ -1734,14 +1734,14 @@ class StreamInfo(YouTubeRequestClient):
                     title.append(' [ASR]')
 
                 localize = context.localize
-                for _prop in ('multi_lang', 'multi_audio'):
+                for _prop in ('multi_language', 'multi_audio'):
                     if not main_stream.get(_prop):
                         continue
                     _prop = 'stream.' + _prop
                     title.extend((' [', localize(_prop), ']'))
 
                 if len(title) > 1:
-                    yt_format['title'] = ''.join(yt_format['title'])
+                    yt_format['title'] = ''.join(title)
 
                 stream_list['9999'] = yt_format
 
@@ -2114,7 +2114,7 @@ class StreamInfo(YouTubeRequestClient):
         main_stream = {
             'audio': audio_data[0][1][0],
             'multi_audio': False,
-            'multi_lang': False,
+            'multi_language': False,
         }
         if video_data:
             main_stream['video'] = video_data[0][1][0]
@@ -2337,7 +2337,7 @@ class StreamInfo(YouTubeRequestClient):
         output = ''.join(output)
 
         if len(languages.difference({'', 'und'})) > 1:
-            main_stream['multi_lang'] = True
+            main_stream['multi_language'] = True
         if roles.difference({'', 'main', 'dub'}):
             main_stream['multi_audio'] = True
 
