@@ -66,13 +66,17 @@ def _play_stream(provider, context):
             audio_only = True
         else:
             audio_only = settings.audio_only()
+        use_adaptive_formats = (not is_external
+                                or settings.alternative_player_adaptive())
 
         try:
-            streams = client.get_streams(context,
-                                         video_id,
-                                         ask_for_quality,
-                                         audio_only,
-                                         settings.use_mpd_videos())
+            streams = client.get_streams(
+                context,
+                video_id=video_id,
+                ask_for_quality=ask_for_quality,
+                audio_only=audio_only,
+                use_mpd=use_adaptive_formats and settings.use_mpd_videos(),
+            )
         except YouTubeException as exc:
             context.log_error('yt_play.play_video - {exc!r}:\n{details}'.format(
                 exc=exc, details=''.join(format_stack())
@@ -90,8 +94,7 @@ def _play_stream(provider, context):
             streams,
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
-            use_adaptive_formats=(not is_external
-                                  or settings.alternative_player_adaptive()),
+            use_adaptive_formats=use_adaptive_formats,
         )
 
         if stream is None:
