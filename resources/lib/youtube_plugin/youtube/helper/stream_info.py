@@ -1853,6 +1853,14 @@ class StreamInfo(YouTubeRequestClient):
                     elif role_type == 2:
                         role = 'description'
                         label = localize('stream.descriptive')
+                    # Secondary language track
+                    elif role_type == 6:
+                        role = 'alternate'
+                        label = localize('stream.alternate')
+                    # Auto-dubbed language track
+                    elif role_type == 10:
+                        role = 'dub'
+                        label = localize('stream.dubbed')
                     # Unsure of what other audio types are actually available
                     # Role set to "alternate" as default fallback
                     else:
