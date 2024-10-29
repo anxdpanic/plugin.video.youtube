@@ -1,3 +1,14 @@
+## v7.1.1+beta.3
+### Fixed
+- Fix not listing full stream details in selection dialog
+- Fix translated subtitles not being available for some videos #945
+- Fix labelling for auto dubbed audio tracks
+- Fix regressions in handling VP9.2 video streams
+- Fix error handling items without headers #946
+
+### Changed
+- Use alternative streams to improve compatibility with external players
+
 ## v7.1.1+beta.2
 ### Fixed
 - Standardise return type of LoginClient.refresh_token #932
