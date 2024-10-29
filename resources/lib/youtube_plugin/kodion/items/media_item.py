@@ -220,7 +220,7 @@ class MediaItem(BaseItem):
 
     def get_headers(self, as_string=False):
         if as_string:
-            return urlencode(self._headers)
+            return urlencode(self._headers) if self._headers else ''
         return self._headers
 
     def set_license_key(self, url):
