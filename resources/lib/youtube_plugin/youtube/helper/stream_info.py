@@ -1822,7 +1822,7 @@ class StreamInfo(YouTubeRequestClient):
                     codec = 'dts'
             if codec not in isa_capabilities:
                 continue
-            preferred_codec = codec in stream_features
+            preferred_codec = codec.split('.')[0] in stream_features
             media_type, container = mime_type.split('/')
             bitrate = stream.get('bitrate', 0)
 
@@ -1911,8 +1911,11 @@ class StreamInfo(YouTubeRequestClient):
                 if fps > 30 and not allow_hfr:
                     continue
 
-                hdr = ('colorInfo' in stream
-                       or 'HDR' in stream.get('qualityLabel', ''))
+                if 'colorInfo' in stream:
+                    hdr = not any(value.endswith('BT709')
+                                  for value in stream['colorInfo'].values())
+                else:
+                    hdr = 'HDR' in stream.get('qualityLabel', '')
                 if hdr and not allow_hdr:
                     continue
 
