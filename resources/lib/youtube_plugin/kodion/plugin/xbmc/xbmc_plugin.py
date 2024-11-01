@@ -27,7 +27,6 @@ from ...constants import (
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
-    SERVER_WAKEUP,
     VIDEO_ID,
 )
 from ...exceptions import KodionException
@@ -224,7 +223,6 @@ class XbmcPlugin(AbstractPlugin):
                     playlist_player = context.get_playlist_player()
                     playlist_player.play_item(item=uri, listitem=item)
                 else:
-                    context.wakeup(SERVER_WAKEUP, timeout=5)
                     xbmcplugin.setResolvedUrl(handle,
                                               succeeded=result,
                                               listitem=item)
