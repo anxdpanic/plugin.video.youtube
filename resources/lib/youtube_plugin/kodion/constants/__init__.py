@@ -36,7 +36,11 @@ VALUE_FROM_STR = {
     '0': False,
     '1': True,
     'false': False,
+    'False': False,
     'true': True,
+    'True': True,
+    'None': None,
+    'null': None,
 }
 
 # Flags

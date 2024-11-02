@@ -15,7 +15,6 @@ from ...kodion import KodionException
 from ...kodion.constants import CONTENT
 from ...kodion.items import DirectoryItem, UriItem
 from ...kodion.utils import strip_html_from_text
-from ...kodion.utils.datetime_parser import yt_datetime_offset
 
 
 def _process_related_videos(provider, context, client):
@@ -149,9 +148,7 @@ def _process_live_events(provider, context, client, event_type='live'):
         order='date' if event_type == 'upcoming' else 'viewCount',
         page_token=context.get_param('page_token', ''),
         location=context.get_param('location', False),
-        after=(yt_datetime_offset(days=3)
-               if event_type == 'completed' else
-               None),
+        after={'days': 3} if event_type == 'completed' else None,
     )
 
     if not json_data:

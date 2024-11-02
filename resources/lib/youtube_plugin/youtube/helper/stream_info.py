@@ -776,8 +776,8 @@ class StreamInfo(YouTubeRequestClient):
         message = details.get('message', 'Unknown error')
 
         info = ('exc: |{exc!r}|'
-                '\n\treason: |{reason}|'
-                '\n\tmessage: |{message}|'
+                '\n\treason:   |{reason}|'
+                '\n\tmessage:  |{message}|'
                 '\n\tvideo_id: {video_id}, client: {client}, auth: {auth}')
         kwargs['message'] = message
         kwargs['reason'] = reason
@@ -1233,7 +1233,7 @@ class StreamInfo(YouTubeRequestClient):
             except Exception as exc:
                 self._context.log_error('VideoInfo._process_signature_cipher - '
                                         'failed to extract URL from |{sig}|'
-                                        '\n\texc: |{exc!r}|'
+                                        '\n\texc:     |{exc!r}|'
                                         '\n\tdetails: |{details}|'.format(
                     sig=encrypted_signature,
                     exc=exc,

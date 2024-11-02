@@ -54,9 +54,9 @@ def run(context=_context,
 
     system_version = context.get_system_version()
     context.log_notice('Plugin: Running |v{version}|'
-                       '\n\tKodi: |v{kodi}|'
+                       '\n\tKodi:   |v{kodi}|'
                        '\n\tPython: |v{python}|'
-                       '\n\tPath: |{path}|'
+                       '\n\tPath:   |{path}|'
                        '\n\tParams: |{params}|'
                        .format(version=context.get_version(),
                                kodi=str(system_version),

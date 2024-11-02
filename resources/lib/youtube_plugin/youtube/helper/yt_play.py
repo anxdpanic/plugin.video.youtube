@@ -282,11 +282,12 @@ def _play_channel_live(provider, context):
     index = context.get_param('live', 1) - 1
     if index < 0:
         index = 0
-    json_data = provider.get_client(context).search(q='',
-                                                    search_type='video',
-                                                    event_type='live',
-                                                    channel_id=channel_id,
-                                                    safe_search=False)
+    _, json_data = provider.get_client(context).search_with_params(params={
+        'type': 'video',
+        'eventType': 'live',
+        'channelId': channel_id,
+        'safeSearch': 'none',
+    })
     if not json_data:
         return False
 

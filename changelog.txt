@@ -1,3 +1,19 @@
+## v7.1.1+beta.4
+### Fixed
+- Fix incorrectly determining Kodi release name
+- Fix search window history navigation when using direct links
+
+### Changed
+- Improve https server sleep and wakeup #810 #951
+- Update Setup Wizard to disable all alternative player settings if not required #938
+
+### New
+- Improvements to searching
+  - Add context menu items for changing sort order of saved searches #172
+  - Allow search parameters to be stored per search #172 #689
+  - Allow additional optional search parameters to be used #689
+  - Improve parsing of date offset when searching  for completed live events
+
 ## v7.1.1+beta.3
 ### Fixed
 - Fix not listing full stream details in selection dialog

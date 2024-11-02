@@ -120,6 +120,33 @@ class AbstractContext(Logger):
     _STRING_BOOL_PARAMS = {
         'reload_path',
     }
+    _SEARCH_PARAMS = {
+        'forMine',
+        'channelId',
+        'channelType',
+        'eventType',
+        'location',
+        'locationRadius',
+        'maxResults',
+        'order',
+        'pageToken'
+        'publishedAfter',
+        'publishedBefore',
+        'q',
+        'safeSearch',
+        'topicId',
+        'type',
+        'videoCaption',
+        'videoCategoryId',
+        'videoDefinition',
+        'videoDimension',
+        'videoDuration',
+        'videoEmbeddable',
+        'videoLicense',
+        'videoPaidProductPlacement',
+        'videoSyndicated',
+        'videoType',
+    }
 
     def __init__(self, path='/', params=None, plugin_id=''):
         self._access_manager = None
@@ -322,15 +349,13 @@ class AbstractContext(Logger):
         for param, value in params.items():
             try:
                 if param in self._BOOL_PARAMS:
-                    parsed_value = VALUE_FROM_STR.get(str(value).lower(), False)
+                    parsed_value = VALUE_FROM_STR.get(str(value), False)
                 elif param in self._INT_PARAMS:
-                    parsed_value = None
-                    if param in self._INT_BOOL_PARAMS:
-                        parsed_value = VALUE_FROM_STR.get(str(value).lower())
-                    if parsed_value is None:
-                        parsed_value = int(value)
-                    else:
-                        parsed_value = int(parsed_value)
+                    parsed_value = int(
+                        (VALUE_FROM_STR.get(str(value), value) or 0)
+                        if param in self._INT_BOOL_PARAMS else
+                        value
+                    )
                 elif param in self._FLOAT_PARAMS:
                     parsed_value = float(value)
                 elif param in self._LIST_PARAMS:
@@ -343,7 +368,7 @@ class AbstractContext(Logger):
                     parsed_value = to_str(value)
                     if param in self._STRING_BOOL_PARAMS:
                         parsed_value = VALUE_FROM_STR.get(
-                            parsed_value.lower(), parsed_value
+                            parsed_value, parsed_value
                         )
                     # process and translate deprecated parameters
                     elif param == 'action':
@@ -357,8 +382,15 @@ class AbstractContext(Logger):
                     elif params == 'playlist':
                         to_delete.append(param)
                         param = 'playlist_id'
+                elif param in self._SEARCH_PARAMS:
+                    parsed_value = to_str(value)
+                    parsed_value = VALUE_FROM_STR.get(
+                        parsed_value, parsed_value
+                    )
+                    if not parsed_value:
+                        raise ValueError
                 else:
-                    self.log_debug('Unknown parameter - |{0}: {1}|'.format(
+                    self.log_debug('Unknown parameter - |{0}: {1!r}|'.format(
                         param, value
                     ))
                     to_delete.append(param)

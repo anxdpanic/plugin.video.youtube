@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import json
 import threading
 import xml.etree.ElementTree as ET
 from functools import partial
@@ -193,12 +194,13 @@ class YouTube(LoginClient):
                     ask_for_quality=False,
                     audio_only=False,
                     use_mpd=True):
-        return StreamInfo(context,
-                          access_token=(self._access_token
-                                        or self._access_token_tv),
-                          ask_for_quality=ask_for_quality,
-                          audio_only=audio_only,
-                          use_mpd=use_mpd).load_stream_info(video_id)
+        return StreamInfo(
+            context,
+            access_token=(self._access_token or self._access_token_tv),
+            ask_for_quality=ask_for_quality,
+            audio_only=audio_only,
+            use_mpd=use_mpd,
+        ).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
@@ -1036,7 +1038,13 @@ class YouTube(LoginClient):
             params['pageToken'] = page_token
 
         if after:
-            params['publishedAfter'] = after
+            if isinstance(after, string_type) and after.startswith('{'):
+                after = json.loads(after)
+            params['publishedAfter'] = (
+                datetime_parser.yt_datetime_offset(**after)
+                if isinstance(after, dict) else
+                after
+            )
 
         return self.api_request(method='GET',
                                 path='search',
@@ -1315,81 +1323,183 @@ class YouTube(LoginClient):
     def search(self,
                q,
                search_type=None,
-               event_type='',
-               channel_id='',
+               event_type=None,
+               channel_id=None,
                order='relevance',
                safe_search='moderate',
                page_token='',
                location=False,
                **kwargs):
         """
+
         Returns a collection of search results that match the query parameters specified in the API request. By default,
         a search result set identifies matching video, channel, and playlist resources, but you can also configure
         queries to only retrieve a specific type of resource.
-        :param q:
-        :param search_type: acceptable values are: 'video' | 'channel' | 'playlist'
-        :param event_type: 'live', 'completed', 'upcoming'
-        :param channel_id: limit search to channel id
-        :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
-        :param safe_search: one of: 'moderate', 'none', 'strict'
-        :param page_token: can be ''
-        :param location: bool, use geolocation
+
+        :param str  q: The q parameter specifies the query term to search for. Query can also use the Boolean NOT (-)
+            and OR (|) operators to exclude videos or to find videos that are associated with one of several search
+            terms.
+        :param str  search_type: Acceptable values are: 'video', 'channel' or 'playlist'
+        :param str  event_type: Restricts a search to broadcast events. If you specify a value for this parameter, you
+            must also set the type parameter's value to video.
+            Acceptable values are:
+                - `live`
+                - `completed`
+                - `upcoming`
+        :param str  channel_id: limit search to channel id
+        :param str  channel_type: Restrict a search to a particular type of channel.
+            Acceptable values are:
+                - `any`         : return all channels.
+                - `show`        : only retrieve shows.
+        :param str  order: Specifies the method that will be used to order resources in the API response. The default
+            value is relevance.
+            Acceptable values are:
+                - `date`        : reverse chronological order based on the date created.
+                - `rating`      : highest to lowest rating.
+                - `relevance`   : sorted based on their relevance to the search query.
+                - `title`       : alphabetically by title.
+                - `videoCount`  : channels are sorted in descending order of their number of uploaded videos.
+                - `viewCount`   : highest to lowest number of views or concurrent viewers for live broadcasts.
+        :param str  safe_search: one of: 'moderate', 'none', 'strict'
+        :param str  page_token: can be ''
+        :param bool location: use geolocation
+        :param str  video_type: Restrict a search to a particular type of videos. If you specify a value for this
+            parameter, you must also set the type parameter's value to video.
+            Acceptable values are:
+                - `any`     : return all videos.
+                - `episode` : only retrieve episodes of shows.
+                - `movie`   : only retrieve movies.
         :return:
         """
 
-        if search_type is None:
-            search_type = ['video', 'channel', 'playlist']
-
-        # prepare search type
-        if not search_type:
-            search_type = ''
-        if not isinstance(search_type, string_type):
-            search_type = ','.join(search_type)
-
-        # prepare page token
-        if not page_token:
-            page_token = ''
-
         # prepare params
-        params = {'q': q,
+        params = {'q': q.replace('|', '%7C') if '|' in q else q,
                   'part': 'snippet',
                   'regionCode': self._region,
                   'hl': self._language,
                   'relevanceLanguage': self._language,
                   'maxResults': str(self.max_results())}
 
-        if event_type and event_type in {'live', 'upcoming', 'completed'}:
-            params['eventType'] = event_type
+        if search_type is None:
+            search_type = ('video', 'channel', 'playlist')
+        if isinstance(search_type, (list, tuple)):
+            search_type = ','.join(search_type)
         if search_type:
             params['type'] = search_type
+
+        if event_type and event_type in {'live', 'upcoming', 'completed'}:
+            params['eventType'] = event_type
+            params['type'] = 'video'
+
         if channel_id:
             params['channelId'] = channel_id
+
         if order:
             params['order'] = order
+
         if safe_search:
             params['safeSearch'] = safe_search
+
         if page_token:
             params['pageToken'] = page_token
 
-        video_only_params = ['eventType', 'videoCaption', 'videoCategoryId', 'videoDefinition',
-                             'videoDimension', 'videoDuration', 'videoEmbeddable', 'videoLicense',
-                             'videoSyndicated', 'videoType', 'relatedToVideoId', 'forMine']
-        for key in video_only_params:
-            if params.get(key) is not None:
-                params['type'] = 'video'
-                break
-
-        if params['type'] == 'video' and location:
+        if location:
             settings = self._context.get_settings()
             location = settings.get_location()
             if location:
                 params['location'] = location
                 params['locationRadius'] = settings.get_location_radius()
+                params['type'] = 'video'
 
         return self.api_request(method='GET',
                                 path='search',
                                 params=params,
                                 **kwargs)
+
+    def search_with_params(self, params, **kwargs):
+        settings = self._context.get_settings()
+
+        # prepare default params
+        search_params = {
+            'part': 'snippet',
+            'regionCode': self._region,
+            'hl': self._language,
+            'relevanceLanguage': self._language,
+            'maxResults': str(self.max_results()),
+        }
+
+        search_query = params.get('q')
+        if '|' in search_query:
+            search_params['q'] = search_query.replace('|', '%7C')
+
+        search_type = params.get('type')
+        if isinstance(search_type, (list, tuple)):
+            search_params['type'] = ','.join(search_type)
+
+        location = params.get('location')
+        if location is True:
+            location = settings.get_location()
+            if location:
+                search_params['location'] = location
+                search_params['locationRadius'] = settings.get_location_radius()
+
+        if 'safeSearch' not in params:
+            search_params['safeSearch'] = settings.safe_search()
+
+        published = params.get('publishedBefore')
+        if published:
+            if isinstance(published, string_type) and published.startswith('{'):
+                published = json.loads(published)
+            search_params['publishedBefore'] = (
+                datetime_parser.yt_datetime_offset(**published)
+                if isinstance(published, dict) else
+                published
+            )
+
+        published = params.get('publishedAfter')
+        if published:
+            if isinstance(published, string_type) and published.startswith('{'):
+                published = json.loads(published)
+            search_params['publishedAfter'] = (
+                datetime_parser.yt_datetime_offset(**published)
+                if isinstance(published, dict) else
+                published
+            )
+
+        params_to_delete = []
+        for param, value in params.items():
+            if value:
+                if param not in search_params:
+                    search_params[param] = value
+            else:
+                params_to_delete.append(param)
+
+        for param in params_to_delete:
+            del params[param]
+
+        video_only_params = {
+            'eventType',
+            'forMine'
+            'location',
+            'relatedToVideoId',
+            'videoCaption',
+            'videoCategoryId',
+            'videoDefinition',
+            'videoDimension',
+            'videoDuration',
+            'videoEmbeddable',
+            'videoLicense',
+            'videoSyndicated',
+            'videoType',
+        }
+        if not video_only_params.isdisjoint(search_params.keys()):
+            search_params['type'] = 'video'
+
+        return (params,
+                self.api_request(method='GET',
+                                 path='search',
+                                 params=search_params,
+                                 **kwargs))
 
     def get_my_subscriptions(self,
                              page_token=1,
@@ -2006,7 +2116,7 @@ class YouTube(LoginClient):
                                                          time_ms=timeout)
 
         info = ('API error: {reason}'
-                '\n\texc: |{exc!r}|'
+                '\n\texc:     |{exc!r}|'
                 '\n\tmessage: |{message}|')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
@@ -2086,12 +2196,12 @@ class YouTube(LoginClient):
 
         context = self._context
         context.log_debug('API request:'
-                          '\n\tversion: |{version}|'
-                          '\n\tmethod: |{method}|'
-                          '\n\tpath: |{path}|'
-                          '\n\tparams: |{params}|'
+                          '\n\tversion:   |{version}|'
+                          '\n\tmethod:    |{method}|'
+                          '\n\tpath:      |{path}|'
+                          '\n\tparams:    |{params}|'
                           '\n\tpost_data: |{data}|'
-                          '\n\theaders: |{headers}|'
+                          '\n\theaders:   |{headers}|'
                           .format(version=version,
                                   method=method,
                                   path=path,

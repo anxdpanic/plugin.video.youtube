@@ -171,7 +171,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             api_secret = params.get('api_secret')
             # Bookmark this page
             if api_key and api_id and api_secret:
-                footer = localize(30638)
+                footer = localize('api.config.bookmark')
             else:
                 footer = ''
 
@@ -184,27 +184,27 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
             if api_key is not None and api_key != settings.api_key():
                 settings.api_key(new_key=api_key)
-                updated.append(localize(30201))  # API Key
+                updated.append(localize('api.key'))
 
             if api_id is not None and api_id != settings.api_id():
                 settings.api_id(new_id=api_id)
-                updated.append(localize(30202))  # API ID
+                updated.append(localize('api.id'))
 
             if api_secret is not None and api_secret != settings.api_secret():
                 settings.api_secret(new_secret=api_secret)
-                updated.append(localize(30203))  # API Secret
+                updated.append(localize('api.secret'))
 
             if api_key and api_id and api_secret:
-                enabled = localize(30636)  # Personal keys enabled
+                enabled = localize('api.personal.enabled')
             else:
-                enabled = localize(30637)  # Personal keys disabled
+                enabled = localize('api.personal.disabled')
 
             if updated:
                 # Successfully updated
-                updated = localize(30631) % ', '.join(updated)
+                updated = localize('api.config.updated') % ', '.join(updated)
             else:
                 # No changes, not updated
-                updated = localize(30635)
+                updated = localize('api.config.not_updated')
 
             html = self.api_submit_page(updated, enabled, footer)
             html = html.encode('utf-8')
@@ -376,15 +376,15 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         css = Pages.api_configuration.get('css')
         html = html.format(
             css=css,
-            title=localize(30634),  # YouTube Add-on API Configuration
-            api_key_head=localize(30201),  # API Key
-            api_id_head=localize(30202),  # API ID
-            api_secret_head=localize(30203),  # API Secret
+            title=localize('api.config'),
+            api_key_head=localize('api.key'),
+            api_id_head=localize('api.id'),
+            api_secret_head=localize('api.secret'),
             api_id_value=api_id,
             api_key_value=api_key,
             api_secret_value=api_secret,
-            submit=localize(30630),  # Save
-            header=localize(30634),  # YouTube Add-on API Configuration
+            submit=localize('api.config.save'),
+            header=localize('api.config'),
         )
         return html
 
@@ -395,11 +395,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         css = Pages.api_submit.get('css')
         html = html.format(
             css=css,
-            title=localize(30634),  # YouTube Add-on API Configuration
+            title=localize('api.config'),
             updated=updated_keys,
             enabled=enabled,
             footer=footer,
-            header=localize(30634),  # YouTube Add-on API Configuration
+            header=localize('api.config'),
         )
         return html
 
