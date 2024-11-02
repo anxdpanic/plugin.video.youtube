@@ -1038,7 +1038,13 @@ class YouTube(LoginClient):
             params['pageToken'] = page_token
 
         if after:
-            params['publishedAfter'] = after
+            if isinstance(after, string_type) and after.startswith('{'):
+                after = json.loads(after)
+            params['publishedAfter'] = (
+                datetime_parser.yt_datetime_offset(**after)
+                if isinstance(after, dict) else
+                after
+            )
 
         return self.api_request(method='GET',
                                 path='search',
