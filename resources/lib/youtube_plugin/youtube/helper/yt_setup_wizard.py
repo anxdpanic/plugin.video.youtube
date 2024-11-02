@@ -78,7 +78,10 @@ def process_default_settings(context, step, steps, **_kwargs):
         else:
             settings.live_stream_type(1)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
+            settings.support_alternative_player(False)
             settings.default_player_web_urls(False)
+            settings.alternative_player_web_urls(False)
+            settings.alternative_player_adaptive(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
         if settings.use_isa() and not httpd_status(context):
