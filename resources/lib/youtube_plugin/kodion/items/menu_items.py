@@ -636,6 +636,21 @@ def search_clear(context):
     )
 
 
+def search_sort_by(context, params, order):
+    selected = params.get('order', 'relevance') == order
+    order_label = context.localize('search.sort.' + order)
+    return (
+        context.localize('search.sort').format(
+            context.get_ui().bold(order_label) if selected else order_label
+        ),
+        context.create_uri(
+            (PATHS.ROUTE, PATHS.SEARCH, 'query',),
+            params=dict(params, order=order),
+            run=True,
+        ),
+    )
+
+
 def separator():
     return (
         '--------',
