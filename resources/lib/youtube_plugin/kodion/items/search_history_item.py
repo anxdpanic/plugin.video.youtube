@@ -20,7 +20,11 @@ class SearchHistoryItem(DirectoryItem):
         if image is None:
             image = '{media}/search.png'
 
-        params = {'q': query}
+        if isinstance(query, dict):
+            params = query
+            query = params['q']
+        else:
+            params = {'q': query}
         if location:
             params['location'] = location
 
@@ -36,5 +40,12 @@ class SearchHistoryItem(DirectoryItem):
             menu_items.search_remove(context, query),
             menu_items.search_rename(context, query),
             menu_items.search_clear(context),
+            menu_items.separator(),
+            menu_items.search_sort_by(context, params, 'relevance'),
+            menu_items.search_sort_by(context, params, 'rating'),
+            menu_items.search_sort_by(context, params, 'viewCount'),
+            menu_items.search_sort_by(context, params, 'date'),
+            menu_items.search_sort_by(context, params, 'title'),
+            menu_items.separator(),
         ]
         self.add_context_menu(context_menu)

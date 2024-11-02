@@ -17,32 +17,32 @@ from ..compatibility import string_type
 
 
 class SystemVersion(object):
-    RELEASE_MAP = {
-        (22, 0): 'Piers',
-        (21, 0): 'Omega',
-        (20, 0): 'Nexus',
-        (19, 0): 'Matrix',
-        (18, 0): 'Leia',
-        (17, 0): 'Krypton',
-        (16, 0): 'Jarvis',
-        (15, 0): 'Isengard',
-        (14, 0): 'Helix',
-        (13, 0): 'Gotham',
-        (12, 0): 'Frodo',
+    RELEASE_NAME_MAP = {
+        22: 'Piers',
+        21: 'Omega',
+        20: 'Nexus',
+        19: 'Matrix',
+        18: 'Leia',
+        17: 'Krypton',
+        16: 'Jarvis',
+        15: 'Isengard',
+        14: 'Helix',
+        13: 'Gotham',
+        12: 'Frodo',
     }
 
-    def __init__(self, version=None, releasename=None, appname=None):
+    def __init__(self, version=None, release_name=None, app_name=None):
         if isinstance(version, tuple):
             self._version = version
         else:
             version = None
 
-        if appname and isinstance(appname, string_type):
-            self._appname = appname
+        if app_name and isinstance(app_name, string_type):
+            self._app_name = app_name
         else:
-            appname = None
+            app_name = None
 
-        if version is None or appname is None:
+        if version is None or app_name is None:
             try:
                 result = jsonrpc(
                     method='Application.GetProperties',
@@ -56,32 +56,32 @@ class SystemVersion(object):
                 self._version = (version.get('major', 1),
                                  version.get('minor', 0))
 
-            if appname is None:
-                self._appname = result.get('name', 'Unknown application')
+            if app_name is None:
+                self._app_name = result.get('name', 'Unknown application')
 
-        if releasename and isinstance(releasename, string_type):
-            self._releasename = releasename
+        if release_name and isinstance(release_name, string_type):
+            self._release_name = release_name
         else:
-            version = (self._version[0], self._version[1])
-            self._releasename = self.RELEASE_MAP.get(version, 'Unknown release')
+            self._release_name = self.RELEASE_NAME_MAP.get(self._version[0],
+                                                           'Unknown release')
 
         self._python_version = python_version()
 
     def __str__(self):
-        return '{version[0]}.{version[1]} ({appname} {releasename})'.format(
-            releasename=self._releasename,
-            appname=self._appname,
+        return '{version[0]}.{version[1]} ({app_name} {release_name})'.format(
+            release_name=self._release_name,
+            app_name=self._app_name,
             version=self._version
         )
 
     def get_release_name(self):
-        return self._releasename
+        return self._release_name
 
     def get_version(self):
         return self._version
 
     def get_app_name(self):
-        return self._appname
+        return self._app_name
 
     def get_python_version(self):
         return self._python_version

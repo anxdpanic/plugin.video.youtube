@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <settings version="1">
     <section id="plugin.video.youtube">
-        <category id="general" label="30000" help="">
+        <category id="general" label="128" help="">
             <group id="1">
                 <setting id="kodion.setup_wizard" type="boolean" label="30025" help="">
                     <level>0</level>
@@ -32,7 +32,7 @@
                     <default>3</default>  <!-- auto+list -->
                     <constraints>
                         <options>
-                            <option label="30583">1</option>  <!-- auto -->
+                            <option label="36588">1</option>  <!-- auto -->
                             <option label="30759">2</option>  <!-- list -->
                             <option label="30760">3</option>  <!-- auto+list -->
                             <option label="30776">4</option>  <!-- ask+auto+list -->
@@ -78,7 +78,7 @@
                     <default>2</default>  <!-- auto+list -->
                     <constraints>
                         <options>
-                            <option label="30583">1</option>  <!-- auto -->
+                            <option label="36588">1</option>  <!-- auto -->
                             <option label="30759">2</option>  <!-- list -->
                         </options>
                     </constraints>
@@ -198,7 +198,7 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="kodion.subtitle.configure" type="action" label="30600" help="">
+                <setting id="kodion.subtitle.configure" type="action" label="287" help="">
                     <level>0</level>
                     <constraints>
                         <allowempty>true</allowempty>
@@ -242,7 +242,7 @@
                             <option label="30736">shorts</option>
                             <option label="30809">upcoming</option>
                             <option label="30646">upcoming_live</option>
-                            <option label="30539">live</option>
+                            <option label="839">live</option>
                             <option label="30766">premieres</option>
                             <option label="30810">completed</option>
                             <option label="30811">live_folder</option>
@@ -284,7 +284,7 @@
                     <constraints>
                         <options>
                             <option label="30595">0</option>
-                            <option label="30561">1</option>
+                            <option label="231">1</option>
                             <option label="30596">2</option>
                         </options>
                     </constraints>
@@ -406,7 +406,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.folder.search.show" type="boolean" label="30102" help="">
+                <setting id="youtube.folder.search.show" type="boolean" label="137" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -493,7 +493,7 @@
                         <heading>30038</heading>
                     </control>
                 </setting>
-                <setting id="youtube.folder.playlists.show" type="boolean" label="30501" help="">
+                <setting id="youtube.folder.playlists.show" type="boolean" label="136" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -529,7 +529,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.folder.live.show" type="boolean" label="30539" help="">
+                <setting id="youtube.folder.live.show" type="boolean" label="839" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
@@ -549,7 +549,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.folder.settings.advanced.show" type="boolean" label="30577" help="">
+                <setting id="youtube.folder.settings.advanced.show" type="boolean" label="10004" help="">
                     <level>0</level>
                     <default>false</default>
                     <control type="toggle"/>
@@ -592,7 +592,7 @@
                 </setting>
             </group>
         </category>
-        <category id="advanced" label="30031" help="">
+        <category id="advanced" label="10038" help="">
             <group id="player_settings" label="14201">
                 <setting id="kodion.support.alternative_player" type="boolean" label="30036" help="">
                     <level>0</level>
@@ -868,20 +868,20 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="youtube.language" type="string" label="30523" help="">
+                <setting id="youtube.language" type="string" label="248" help="">
                     <level>0</level>
                     <default>en-US</default>
                     <enable>false</enable>
                     <control format="string" type="edit">
-                        <heading>30523</heading>
+                        <heading>248</heading>
                     </control>
                 </setting>
-                <setting id="youtube.region" type="string" label="30550" help="">
+                <setting id="youtube.region" type="string" label="20026" help="">
                     <level>0</level>
                     <default>US</default>
                     <enable>false</enable>
                     <control format="string" type="edit">
-                        <heading>30550</heading>
+                        <heading>20026</heading>
                     </control>
                 </setting>
                 <setting id="youtube.location.configure" type="action" label="30653" help="">
@@ -1075,7 +1075,7 @@
                         <close>true</close>
                     </control>
                 </setting>
-                <setting id="kodion.http.port" type="integer" label="30619" help="">
+                <setting id="kodion.http.port" type="integer" label="730" help="">
                     <level>0</level>
                     <default>50152</default>
                     <constraints>
@@ -1083,7 +1083,7 @@
                         <maximum>65535</maximum>
                     </constraints>
                     <control format="integer" type="edit">
-                        <heading>30619</heading>
+                        <heading>730</heading>
                     </control>
                 </setting>
                 <setting id="kodion.http.ip.whitelist" type="string" label="30629" help="">

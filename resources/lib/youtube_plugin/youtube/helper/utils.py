@@ -157,7 +157,7 @@ def update_channel_infos(provider, context, channel_id_dict,
     show_details = settings.show_detailed_description()
 
     localize = context.localize
-    channel_role = localize(19029)  # "Channel"
+    channel_role = localize('channel')
     untitled = localize('untitled')
 
     path = context.get_path()
@@ -337,7 +337,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     item_count_color = settings.get_label_color('itemCount')
 
     localize = context.localize
-    channel_role = localize(19029)  # "Channel"
+    channel_role = localize('channel')
     episode_count_label = localize('stats.itemCount')
     video_count_label = localize('stats.videoCount')
     podcast_label = context.localize('playlist.podcast')
@@ -550,7 +550,7 @@ def update_video_infos(provider, context, video_id_dict,
     use_play_data = settings.use_local_history()
 
     localize = context.localize
-    channel_role = localize(19029)  # "Channel"
+    channel_role = localize('channel')
     untitled = localize('untitled')
 
     path = context.get_path()
@@ -691,7 +691,7 @@ def update_video_infos(provider, context, video_id_dict,
             elif media_item.live:
                 type_label = localize('live')
             else:
-                type_label = localize(335)  # "Start"
+                type_label = localize('start')
             start_at = ' '.join((
                 type_label,
                 datetime_parser.get_scheduled_start(context, local_datetime),
