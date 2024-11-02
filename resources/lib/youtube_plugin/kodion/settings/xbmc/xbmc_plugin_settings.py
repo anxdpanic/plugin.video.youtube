@@ -144,7 +144,7 @@ class XbmcPluginSettings(AbstractSettings, Logger):
         except (TypeError, ValueError) as exc:
             error = exc
             try:
-                value = self.get_string(setting, echo=False).lower()
+                value = self.get_string(setting, echo=False)
                 value = VALUE_FROM_STR.get(value, default)
             except TypeError as exc:
                 error = exc

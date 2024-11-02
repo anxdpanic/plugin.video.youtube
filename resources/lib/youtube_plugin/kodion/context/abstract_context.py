@@ -322,15 +322,13 @@ class AbstractContext(Logger):
         for param, value in params.items():
             try:
                 if param in self._BOOL_PARAMS:
-                    parsed_value = VALUE_FROM_STR.get(str(value).lower(), False)
+                    parsed_value = VALUE_FROM_STR.get(str(value), False)
                 elif param in self._INT_PARAMS:
-                    parsed_value = None
-                    if param in self._INT_BOOL_PARAMS:
-                        parsed_value = VALUE_FROM_STR.get(str(value).lower())
-                    if parsed_value is None:
-                        parsed_value = int(value)
-                    else:
-                        parsed_value = int(parsed_value)
+                    parsed_value = int(
+                        (VALUE_FROM_STR.get(str(value), value) or 0)
+                        if param in self._INT_BOOL_PARAMS else
+                        value
+                    )
                 elif param in self._FLOAT_PARAMS:
                     parsed_value = float(value)
                 elif param in self._LIST_PARAMS:
@@ -343,7 +341,7 @@ class AbstractContext(Logger):
                     parsed_value = to_str(value)
                     if param in self._STRING_BOOL_PARAMS:
                         parsed_value = VALUE_FROM_STR.get(
-                            parsed_value.lower(), parsed_value
+                            parsed_value, parsed_value
                         )
                     # process and translate deprecated parameters
                     elif param == 'action':
