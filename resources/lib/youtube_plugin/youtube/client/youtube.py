@@ -1317,76 +1317,93 @@ class YouTube(LoginClient):
     def search(self,
                q,
                search_type=None,
-               event_type='',
-               channel_id='',
+               event_type=None,
+               channel_id=None,
                order='relevance',
                safe_search='moderate',
                page_token='',
                location=False,
                **kwargs):
         """
+
         Returns a collection of search results that match the query parameters specified in the API request. By default,
         a search result set identifies matching video, channel, and playlist resources, but you can also configure
         queries to only retrieve a specific type of resource.
-        :param q:
-        :param search_type: acceptable values are: 'video' | 'channel' | 'playlist'
-        :param event_type: 'live', 'completed', 'upcoming'
-        :param channel_id: limit search to channel id
-        :param order: one of: 'date', 'rating', 'relevance', 'title', 'videoCount', 'viewCount'
-        :param safe_search: one of: 'moderate', 'none', 'strict'
-        :param page_token: can be ''
-        :param location: bool, use geolocation
+
+        :param str  q: The q parameter specifies the query term to search for. Query can also use the Boolean NOT (-)
+            and OR (|) operators to exclude videos or to find videos that are associated with one of several search
+            terms.
+        :param str  search_type: Acceptable values are: 'video', 'channel' or 'playlist'
+        :param str  event_type: Restricts a search to broadcast events. If you specify a value for this parameter, you
+            must also set the type parameter's value to video.
+            Acceptable values are:
+                - `live`
+                - `completed`
+                - `upcoming`
+        :param str  channel_id: limit search to channel id
+        :param str  channel_type: Restrict a search to a particular type of channel.
+            Acceptable values are:
+                - `any`         : return all channels.
+                - `show`        : only retrieve shows.
+        :param str  order: Specifies the method that will be used to order resources in the API response. The default
+            value is relevance.
+            Acceptable values are:
+                - `date`        : reverse chronological order based on the date created.
+                - `rating`      : highest to lowest rating.
+                - `relevance`   : sorted based on their relevance to the search query.
+                - `title`       : alphabetically by title.
+                - `videoCount`  : channels are sorted in descending order of their number of uploaded videos.
+                - `viewCount`   : highest to lowest number of views or concurrent viewers for live broadcasts.
+        :param str  safe_search: one of: 'moderate', 'none', 'strict'
+        :param str  page_token: can be ''
+        :param bool location: use geolocation
+        :param str  video_type: Restrict a search to a particular type of videos. If you specify a value for this
+            parameter, you must also set the type parameter's value to video.
+            Acceptable values are:
+                - `any`     : return all videos.
+                - `episode` : only retrieve episodes of shows.
+                - `movie`   : only retrieve movies.
         :return:
         """
 
-        if search_type is None:
-            search_type = ['video', 'channel', 'playlist']
-
-        # prepare search type
-        if not search_type:
-            search_type = ''
-        if not isinstance(search_type, string_type):
-            search_type = ','.join(search_type)
-
-        # prepare page token
-        if not page_token:
-            page_token = ''
-
         # prepare params
-        params = {'q': q,
+        params = {'q': q.replace('|', '%7C') if '|' in q else q,
                   'part': 'snippet',
                   'regionCode': self._region,
                   'hl': self._language,
                   'relevanceLanguage': self._language,
                   'maxResults': str(self.max_results())}
 
-        if event_type and event_type in {'live', 'upcoming', 'completed'}:
-            params['eventType'] = event_type
+        if search_type is None:
+            search_type = ('video', 'channel', 'playlist')
+        if isinstance(search_type, (list, tuple)):
+            search_type = ','.join(search_type)
         if search_type:
             params['type'] = search_type
+
+        if event_type and event_type in {'live', 'upcoming', 'completed'}:
+            params['eventType'] = event_type
+            params['type'] = 'video'
+
         if channel_id:
             params['channelId'] = channel_id
+
         if order:
             params['order'] = order
+
         if safe_search:
             params['safeSearch'] = safe_search
+
         if page_token:
             params['pageToken'] = page_token
 
-        video_only_params = ['eventType', 'videoCaption', 'videoCategoryId', 'videoDefinition',
-                             'videoDimension', 'videoDuration', 'videoEmbeddable', 'videoLicense',
-                             'videoSyndicated', 'videoType', 'relatedToVideoId', 'forMine']
-        for key in video_only_params:
-            if params.get(key) is not None:
-                params['type'] = 'video'
-                break
-
-        if params['type'] == 'video' and location:
+        if location:
             settings = self._context.get_settings()
             location = settings.get_location()
             if location:
                 params['location'] = location
                 params['locationRadius'] = settings.get_location_radius()
+                params['type'] = 'video'
 
         return self.api_request(method='GET',
                                 path='search',
