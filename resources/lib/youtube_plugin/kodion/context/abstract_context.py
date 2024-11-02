@@ -120,6 +120,33 @@ class AbstractContext(Logger):
     _STRING_BOOL_PARAMS = {
         'reload_path',
     }
+    _SEARCH_PARAMS = {
+        'forMine',
+        'channelId',
+        'channelType',
+        'eventType',
+        'location',
+        'locationRadius',
+        'maxResults',
+        'order',
+        'pageToken'
+        'publishedAfter',
+        'publishedBefore',
+        'q',
+        'safeSearch',
+        'topicId',
+        'type',
+        'videoCaption',
+        'videoCategoryId',
+        'videoDefinition',
+        'videoDimension',
+        'videoDuration',
+        'videoEmbeddable',
+        'videoLicense',
+        'videoPaidProductPlacement',
+        'videoSyndicated',
+        'videoType',
+    }
 
     def __init__(self, path='/', params=None, plugin_id=''):
         self._access_manager = None
@@ -355,6 +382,13 @@ class AbstractContext(Logger):
                     elif params == 'playlist':
                         to_delete.append(param)
                         param = 'playlist_id'
+                elif param in self._SEARCH_PARAMS:
+                    parsed_value = to_str(value)
+                    parsed_value = VALUE_FROM_STR.get(
+                        parsed_value, parsed_value
+                    )
+                    if not parsed_value:
+                        raise ValueError
                 else:
                     self.log_debug('Unknown parameter - |{0}: {1!r}|'.format(
                         param, value

@@ -35,11 +35,23 @@ class SearchHistory(Storage):
     def _make_id(search_text):
         return md5(search_text.encode('utf-8')).hexdigest()
 
-    def add_item(self, search_text):
-        self._set(self._make_id(search_text), search_text)
+    def add_item(self, query):
+        if isinstance(query, dict):
+            params = query
+            query = params['q']
+        else:
+            params = {'q': query}
+        self._set(self._make_id(query), params)
 
-    def del_item(self, search_text):
-        self._remove(self._make_id(search_text))
+    def del_item(self, query):
+        if isinstance(query, dict):
+            query = query['q']
+        self._remove(self._make_id(query))
 
-    def update_item(self, search_text, timestamp=None):
-        self._update(self._make_id(search_text), search_text, timestamp)
+    def update_item(self, query, timestamp=None):
+        if isinstance(query, dict):
+            params = query
+            query = params['q']
+        else:
+            params = {'q': query}
+        self._update(self._make_id(query), params, timestamp)

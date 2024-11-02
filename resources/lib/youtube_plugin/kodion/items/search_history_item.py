@@ -20,7 +20,11 @@ class SearchHistoryItem(DirectoryItem):
         if image is None:
             image = '{media}/search.png'
 
-        params = {'q': query}
+        if isinstance(query, dict):
+            params = query
+            query = params['q']
+        else:
+            params = {'q': query}
         if location:
             params['location'] = location
 

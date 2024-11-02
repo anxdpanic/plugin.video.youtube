@@ -864,25 +864,31 @@ class Provider(AbstractProvider):
                 )
                 result.append(live_item)
 
+        search_params = {
+            'q': search_text,
+            'order': order,
+            'channelId': channel_id,
+            'type': search_type,
+            'eventType': event_type,
+            'safeSearch': safe_search,
+            'pageToken': page_token,
+            'location': location,
+        }
+
         function_cache = context.get_function_cache()
-        json_data = function_cache.run(self.get_client(context).search,
-                                       function_cache.ONE_MINUTE * 10,
-                                       _refresh=params.get('refresh'),
-                                       q=search_text,
-                                       search_type=search_type,
-                                       event_type=event_type,
-                                       safe_search=safe_search,
-                                       page_token=page_token,
-                                       channel_id=channel_id,
-                                       order=order,
-                                       location=location)
+        search_params, json_data = function_cache.run(
+            self.get_client(context).search_with_params,
+            function_cache.ONE_MINUTE * 10,
+            _refresh=params.get('refresh'),
+            params=search_params,
+        )
         if not json_data:
             return False
 
         # Store current search query for Kodi window history navigation
         if not params.get('incognito'):
             if not params.get('channel_id'):
-                context.get_search_history().add_item(search_text)
+                context.get_search_history().add_item(search_params)
             data_cache.set_item('search_query', search_text)
 
         result.extend(v3.response_to_items(

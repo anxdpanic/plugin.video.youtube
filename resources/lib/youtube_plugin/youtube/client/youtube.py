@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import json
 import threading
 import xml.etree.ElementTree as ET
 from functools import partial
@@ -1391,6 +1392,91 @@ class YouTube(LoginClient):
                                 path='search',
                                 params=params,
                                 **kwargs)
+
+    def search_with_params(self, params, **kwargs):
+        settings = self._context.get_settings()
+
+        # prepare default params
+        search_params = {
+            'part': 'snippet',
+            'regionCode': self._region,
+            'hl': self._language,
+            'relevanceLanguage': self._language,
+            'maxResults': str(self.max_results()),
+        }
+
+        search_query = params.get('q')
+        if '|' in search_query:
+            search_params['q'] = search_query.replace('|', '%7C')
+
+        search_type = params.get('type')
+        if isinstance(search_type, (list, tuple)):
+            search_params['type'] = ','.join(search_type)
+
+        location = params.get('location')
+        if location is True:
+            location = settings.get_location()
+            if location:
+                search_params['location'] = location
+                search_params['locationRadius'] = settings.get_location_radius()
+
+        if 'safeSearch' not in params:
+            search_params['safeSearch'] = settings.safe_search()
+
+        published = params.get('publishedBefore')
+        if published:
+            if isinstance(published, string_type) and published.startswith('{'):
+                published = json.loads(published)
+            search_params['publishedBefore'] = (
+                datetime_parser.yt_datetime_offset(**published)
+                if isinstance(published, dict) else
+                published
+            )
+
+        published = params.get('publishedAfter')
+        if published:
+            if isinstance(published, string_type) and published.startswith('{'):
+                published = json.loads(published)
+            search_params['publishedAfter'] = (
+                datetime_parser.yt_datetime_offset(**published)
+                if isinstance(published, dict) else
+                published
+            )
+
+        params_to_delete = []
+        for param, value in params.items():
+            if value:
+                if param not in search_params:
+                    search_params[param] = value
+            else:
+                params_to_delete.append(param)
+
+        for param in params_to_delete:
+            del params[param]
+
+        video_only_params = {
+            'eventType',
+            'forMine'
+            'location',
+            'relatedToVideoId',
+            'videoCaption',
+            'videoCategoryId',
+            'videoDefinition',
+            'videoDimension',
+            'videoDuration',
+            'videoEmbeddable',
+            'videoLicense',
+            'videoSyndicated',
+            'videoType',
+        }
+        if not video_only_params.isdisjoint(search_params.keys()):
+            search_params['type'] = 'video'
+
+        return (params,
+                self.api_request(method='GET',
+                                 path='search',
+                                 params=search_params,
+                                 **kwargs))
 
     def get_my_subscriptions(self,
                              page_token=1,
