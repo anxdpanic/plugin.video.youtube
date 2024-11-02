@@ -786,6 +786,9 @@ class Provider(AbstractProvider):
         return False
 
     def on_search_run(self, context, search_text):
+        data_cache = context.get_data_cache()
+        data_cache.del_item('search_query')
+
         # Search by url to access unlisted videos
         if search_text.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self,
@@ -812,10 +815,6 @@ class Provider(AbstractProvider):
         order = params.get('order', 'relevance')
         search_type = params.get('search_type', 'video')
         safe_search = context.get_settings().safe_search()
-
-        context.get_data_cache().set_item('search_query', search_text)
-        if not params.get('incognito') and not params.get('channel_id'):
-            context.get_search_history().add_item(search_text)
 
         if search_type == 'video':
             context.set_content(CONTENT.VIDEO_CONTENT)
@@ -879,6 +878,13 @@ class Provider(AbstractProvider):
                                        location=location)
         if not json_data:
             return False
+
+        # Store current search query for Kodi window history navigation
+        if not params.get('incognito'):
+            if not params.get('channel_id'):
+                context.get_search_history().add_item(search_text)
+            data_cache.set_item('search_query', search_text)
+
         result.extend(v3.response_to_items(
             self, context, json_data,
             item_filter={
