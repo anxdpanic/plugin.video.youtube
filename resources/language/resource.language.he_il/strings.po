@@ -31,14 +31,14 @@ msgstr ""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "תוסף עבור-YouTube"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם."
+# msgstr ""
 # Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "כללי"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -151,8 +151,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "מתקדם"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -217,8 +217,8 @@ msgid "Watch Later"
 msgstr "צפה בהמשך"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "הסר"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -237,8 +237,8 @@ msgid "Sign Out"
 msgstr "התנתק"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "שינוי שם"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,8 +257,8 @@ msgid "Remove \"%s\"?"
 msgstr "הסר \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "מחק"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -301,12 +301,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "ערוצים"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "רשימות השמעה"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -385,16 +385,16 @@ msgid "Add to..."
 msgstr "הוסף אל..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "בחר רשימת השמעה"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "רשימת השמעה חדשה..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "שפה"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -425,20 +425,20 @@ msgid "I dislike this"
 msgstr "לא אהבתי את זה"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "נגן הכל"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "ברירת מחדל"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "הפוך"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "אקראי"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -457,8 +457,8 @@ msgid "Disliked Videos"
 msgstr "בטל סימון אהבתי לוידיאו"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "שידור חי"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -473,8 +473,8 @@ msgid "rtmpe streams are not supported"
 msgstr "הזרמה של rtmpe לא נתמכת"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "רענן"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -493,16 +493,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "עוד..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "לא נמצאה הזרמה של וידיאו"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "אזור"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -541,12 +541,12 @@ msgid "Delete settings.xml"
 msgstr "מחיקת settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "שפת כתוביות"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "ללא"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
@@ -565,8 +565,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "התראה"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -609,8 +609,8 @@ msgid "Failed"
 msgstr "נכשל"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "הגדרות"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -633,8 +633,8 @@ msgid "Autoplay suggested videos"
 msgstr "הפעלה אוטומטית של סרטונים מוצעים"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "אוטומטי"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -693,15 +693,15 @@ msgid "Updated: %s"
 msgstr "עודכן: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "אפשר מפתח API אישי"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "נכשל בהפעלת מפתח ה-API האישי. חסר: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -761,7 +761,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
+msgid ""
 msgstr ""
 
 msgctxt "#30616"
@@ -777,7 +777,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
+msgid ""
 msgstr ""
 
 msgctxt "#30620"
@@ -821,7 +821,7 @@ msgid "IP whitelist (comma delimited)"
 msgstr ""
 
 msgctxt "#30630"
-msgid "Save"
+msgid ""
 msgstr ""
 
 msgctxt "#30631"
@@ -1113,7 +1113,7 @@ msgid "Play with subtitles"
 msgstr ""
 
 msgctxt "#30703"
-msgid "Are you sure?"
+msgid ""
 msgstr ""
 
 msgctxt "#30704"
@@ -1249,11 +1249,11 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Episodes"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Videos"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
@@ -1583,6 +1583,107 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "תוסף עבור-YouTube"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube הוא אחד מאתרי שיתוף הווידאו הגדולים בעולם."
+# Kodion Settings
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "כללי"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "מתקדם"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "הסר"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "שינוי שם"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "מחק"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "ערוצים"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "רשימות השמעה"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "בחר רשימת השמעה"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "רשימת השמעה חדשה..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "שפה"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "נגן הכל"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "ברירת מחדל"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "אקראי"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "שידור חי"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "רענן"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "עוד..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "אזור"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "שפת כתוביות"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "ללא"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "התראה"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "הגדרות"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "אוטומטי"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "אפשר מפתח API אישי"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"

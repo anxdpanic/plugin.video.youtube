@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2024-11-02 10:04+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
@@ -35,9 +35,10 @@ msgstr "이 플러그인은 Google의 허가를 받지 않았습니다"
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
 # msgstr ""
+# Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "일반"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -149,8 +150,8 @@ msgid "Configure %s?"
 msgstr "%s을(를) 설정할까요?"
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "고급"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -215,8 +216,8 @@ msgid "Watch Later"
 msgstr "나중에 보기"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "제거"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -235,8 +236,8 @@ msgid "Sign Out"
 msgstr "로그아웃"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "이름 바꾸기"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -255,8 +256,8 @@ msgid "Remove \"%s\"?"
 msgstr "\"%s\" 제거할까요?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "삭제"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -299,12 +300,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "채널"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "재생목록"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -383,16 +384,16 @@ msgid "Add to..."
 msgstr "추가..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "재생목록 선택"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "새 재생목록..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "언어"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -423,20 +424,20 @@ msgid "I dislike this"
 msgstr "싫어함"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "모두 재생"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "기본"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "반대로"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "섞기"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -455,8 +456,8 @@ msgid "Disliked Videos"
 msgstr "싫어하는 동영상"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "실시간"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,8 +472,8 @@ msgid "rtmpe streams are not supported"
 msgstr "rtmpe 스트림 지원 안 함"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "새로 고침"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -491,16 +492,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr "유튜브가 제대로 동작하려면 두 개 애플리케이션을 사용하라는 메시지가 표시될 수 있습니다."
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "더 보기..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "동영상 스트림이 없음"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "지역"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -539,12 +540,12 @@ msgid "Delete settings.xml"
 msgstr "settings.xml 삭제"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "자막 언어"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "안 함"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
@@ -563,8 +564,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "프롬프트"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -607,8 +608,8 @@ msgid "Failed"
 msgstr "실패"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "설정"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -631,8 +632,8 @@ msgid "Autoplay suggested videos"
 msgstr "추천 동영상 자동 재생"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "자동"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -691,16 +692,16 @@ msgid "Updated: %s"
 msgstr "업데이트됨: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "개인 API 키 사용함"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "개인 API 키 사용 실패함. 없음: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
-msgstr "자막"
+msgid ""
+msgstr ""
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -759,8 +760,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "취소"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -775,8 +776,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "포트"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -819,8 +820,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "IP 화이트리스트 (쉼표로 나눔)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "저장"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -1111,8 +1112,8 @@ msgid "Play with subtitles"
 msgstr "자막 재생"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "확실합니까?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1247,12 +1248,12 @@ msgid "Shorts (1 minute or less)"
 msgstr "Shorts (1분 이내)"
 
 msgctxt "#30737"
-msgid "Episodes"
-msgstr "에피소드"
+msgid ""
+msgstr ""
 
 msgctxt "#30738"
-msgid "Videos"
-msgstr "비디오"
+msgid ""
+msgstr ""
 
 msgctxt "#30739"
 msgid "Subscribers"
@@ -1581,6 +1582,134 @@ msgstr "처음부터 재생"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "팟캐스트"
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr ""
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr ""
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "일반"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "고급"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "제거"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "이름 바꾸기"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "삭제"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "채널"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "재생목록"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "재생목록 선택"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "새 재생목록..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "언어"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "모두 재생"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "기본"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "섞기"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "실시간"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "새로 고침"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "더 보기..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "지역"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "자막 언어"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "안 함"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "프롬프트"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "설정"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "자동"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "개인 API 키 사용함"
+
+#~ msgctxt "#30600"
+#~ msgid "Subtitles"
+#~ msgstr "자막"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "취소"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "포트"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "저장"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "확실합니까?"
+
+#~ msgctxt "#30737"
+#~ msgid "Episodes"
+#~ msgstr "에피소드"
+
+#~ msgctxt "#30738"
+#~ msgid "Videos"
+#~ msgstr "비디오"
 
 #~ msgctxt "#30794"
 #~ msgid "Likes count display colour"

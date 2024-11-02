@@ -31,14 +31,14 @@ msgstr "Η παρούσα μικροεφαρμογή δεν έχει υϊοθε�
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "Πρόσθετο Youtube"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "Το Youtube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο"
+# msgstr ""
 # Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Γενικά"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -151,8 +151,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Για προχωρημένους"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -217,8 +217,8 @@ msgid "Watch Later"
 msgstr "Δείτε αργότερα"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Αφαίρεση"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -237,8 +237,8 @@ msgid "Sign Out"
 msgstr "Έξοδος"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Μετονομασία"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,8 +257,8 @@ msgid "Remove \"%s\"?"
 msgstr "Αφαίρεση \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Διαγραφή"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -301,12 +301,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Κανάλια"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Λίστες αναπαραγωγής"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -385,16 +385,16 @@ msgid "Add to..."
 msgstr "Προσθέστε στο..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Επιλογή λίστας αναπαραγωγής"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Νέα λίστα αναπαραγωγής..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Γλώσσα"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -425,20 +425,20 @@ msgid "I dislike this"
 msgstr "Δεν μου αρέσει αυτό"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Αναπαραγωγή όλων"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Προεπιλογή"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Προς τα πίσω"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Τυχαία σειρά"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -457,8 +457,8 @@ msgid "Disliked Videos"
 msgstr "Βίντεο που δεν σας αρέσουν"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Ζωντανά"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -473,8 +473,8 @@ msgid "rtmpe streams are not supported"
 msgstr "Οι ροές rtmpe δεν υποστηρίζονται"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Ανανέωση"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -493,16 +493,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Περισσότερα..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Δεν βρέθηκαν άλλες ροές"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Περιοχή"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -541,12 +541,12 @@ msgid "Delete settings.xml"
 msgstr "Διαγραφή του settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Γλώσσα υποτίτλων"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Καμία"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
@@ -565,8 +565,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "Ερώτηση"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -609,8 +609,8 @@ msgid "Failed"
 msgstr "Αποτυχία"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Ρυθμίσεις"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -633,8 +633,8 @@ msgid "Autoplay suggested videos"
 msgstr "Αυτόματη αναπαραγωγή προτεινόμενων βίντεο"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Αυτόματο"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -693,15 +693,15 @@ msgid "Updated: %s"
 msgstr "Ενημερωθηκε: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Προσωπικά κλειδιά API ενεργοποιήθηκαν"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Αποτυχία ενεργοποίησης προσωπικών κλειδιών API. Λείπει: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -761,8 +761,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "Ακύρωση"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -777,8 +777,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Θύρα"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -821,8 +821,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "Λίστα επιτρεπομένων IP (διαχωρισμένες με κόμμα)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Αποθήκευση"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -1113,8 +1113,8 @@ msgid "Play with subtitles"
 msgstr "Αναπαραγωγή με υπότιτλους"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Είστε σίγουροι;"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1249,11 +1249,11 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Episodes"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Videos"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
@@ -1583,6 +1583,123 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Πρόσθετο Youtube"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "Το Youtube είναι μία από τις μεγαλύτερες ιστοσελίδες διαμοιρασμού βίντεο στον κόσμο"
+# Kodion Settings
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Γενικά"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Για προχωρημένους"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Αφαίρεση"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Μετονομασία"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Διαγραφή"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Κανάλια"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Λίστες αναπαραγωγής"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Επιλογή λίστας αναπαραγωγής"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Νέα λίστα αναπαραγωγής..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Γλώσσα"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Αναπαραγωγή όλων"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Προεπιλογή"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Τυχαία σειρά"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Ζωντανά"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Ανανέωση"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Περισσότερα..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Περιοχή"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Γλώσσα υποτίτλων"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Καμία"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "Ερώτηση"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Ρυθμίσεις"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Αυτόματο"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Προσωπικά κλειδιά API ενεργοποιήθηκαν"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "Ακύρωση"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Θύρα"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Αποθήκευση"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Είστε σίγουροι;"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"
