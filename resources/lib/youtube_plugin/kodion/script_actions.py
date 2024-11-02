@@ -480,11 +480,11 @@ def run(argv):
 
         system_version = context.get_system_version()
         context.log_notice('Script: Running |v{version}|'
-                           '\n\tKodi: |v{kodi}|'
-                           '\n\tPython: |v{python}|'
+                           '\n\tKodi:     |v{kodi}|'
+                           '\n\tPython:   |v{python}|'
                            '\n\tCategory: |{category}|'
-                           '\n\tAction: |{action}|'
-                           '\n\tParams: |{params}|'
+                           '\n\tAction:   |{action}|'
+                           '\n\tParams:   |{params}|'
                            .format(version=context.get_version(),
                                    kodi=str(system_version),
                                    python=system_version.get_python_version(),

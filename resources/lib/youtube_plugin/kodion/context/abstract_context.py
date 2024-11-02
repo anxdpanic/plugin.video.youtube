@@ -358,7 +358,7 @@ class AbstractContext(Logger):
                         to_delete.append(param)
                         param = 'playlist_id'
                 else:
-                    self.log_debug('Unknown parameter - |{0}: {1}|'.format(
+                    self.log_debug('Unknown parameter - |{0}: {1!r}|'.format(
                         param, value
                     ))
                     to_delete.append(param)

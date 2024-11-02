@@ -193,12 +193,13 @@ class YouTube(LoginClient):
                     ask_for_quality=False,
                     audio_only=False,
                     use_mpd=True):
-        return StreamInfo(context,
-                          access_token=(self._access_token
-                                        or self._access_token_tv),
-                          ask_for_quality=ask_for_quality,
-                          audio_only=audio_only,
-                          use_mpd=use_mpd).load_stream_info(video_id)
+        return StreamInfo(
+            context,
+            access_token=(self._access_token or self._access_token_tv),
+            ask_for_quality=ask_for_quality,
+            audio_only=audio_only,
+            use_mpd=use_mpd,
+        ).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
@@ -2006,7 +2007,7 @@ class YouTube(LoginClient):
                                                          time_ms=timeout)
 
         info = ('API error: {reason}'
-                '\n\texc: |{exc!r}|'
+                '\n\texc:     |{exc!r}|'
                 '\n\tmessage: |{message}|')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
@@ -2086,12 +2087,12 @@ class YouTube(LoginClient):
 
         context = self._context
         context.log_debug('API request:'
-                          '\n\tversion: |{version}|'
-                          '\n\tmethod: |{method}|'
-                          '\n\tpath: |{path}|'
-                          '\n\tparams: |{params}|'
+                          '\n\tversion:   |{version}|'
+                          '\n\tmethod:    |{method}|'
+                          '\n\tpath:      |{path}|'
+                          '\n\tparams:    |{params}|'
                           '\n\tpost_data: |{data}|'
-                          '\n\theaders: |{headers}|'
+                          '\n\theaders:   |{headers}|'
                           .format(version=version,
                                   method=method,
                                   path=path,

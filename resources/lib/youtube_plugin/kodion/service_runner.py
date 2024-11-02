@@ -31,7 +31,7 @@ def run():
 
     system_version = context.get_system_version()
     context.log_notice('Service: Starting |v{version}|'
-                       '\n\tKodi: |v{kodi}|'
+                       '\n\tKodi:   |v{kodi}|'
                        '\n\tPython: |v{python}|'
                        .format(version=context.get_version(),
                                kodi=str(system_version),
