@@ -31,13 +31,14 @@ msgstr ""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "YouTube kiegészítő"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "A YouTube a világ egyik legnagyobb videómegosztó weboldala."
+# msgstr ""
+# Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Általános"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -149,8 +150,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Részletes"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -215,8 +216,8 @@ msgid "Watch Later"
 msgstr "Megnézendő videók"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Eltávolítás"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -235,8 +236,8 @@ msgid "Sign Out"
 msgstr "Kijelentkezés"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Átnevezés"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -255,8 +256,8 @@ msgid "Remove \"%s\"?"
 msgstr "Eltávolítja ezt: \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Törlés"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -299,12 +300,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Csatornák"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Lejátszási listák"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -383,16 +384,16 @@ msgid "Add to..."
 msgstr "Hozzáadás..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Lejátszási lista kiválasztása"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Új lejátszási lista..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Nyelv"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -423,20 +424,20 @@ msgid "I dislike this"
 msgstr "Ez nem tetszik nekem"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Összes lejátszása"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Alapértelmezett"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Ellentétes"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Keverés"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -455,8 +456,8 @@ msgid "Disliked Videos"
 msgstr "Nem kedvelt videók"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Élő"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,8 +472,8 @@ msgid "rtmpe streams are not supported"
 msgstr "az rtmpe streamek nem támogatottak"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Frissítés"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -491,16 +492,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Részletek..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Videó streamek nem találhatók"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Ország"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -539,12 +540,12 @@ msgid "Delete settings.xml"
 msgstr "Az settings.xml törlése"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Felirat nyelve"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Nincs"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
@@ -563,8 +564,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "Súgás"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -607,8 +608,8 @@ msgid "Failed"
 msgstr "Nem sikerült"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Beállítások"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -631,8 +632,8 @@ msgid "Autoplay suggested videos"
 msgstr "Javasolt videók automatikus lejátszása"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Automatikus"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -691,15 +692,15 @@ msgid "Updated: %s"
 msgstr "Frissítve: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Személyes API Kulcsok engedélyezve"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Nem sikerült engedélyezni a személyes API-kulcsokat. Hiányzik: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -759,8 +760,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "Mégse"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -775,8 +776,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Port"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -819,8 +820,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "IP fehérlista (vesszővel elválasztva)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Mentés"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -1111,8 +1112,8 @@ msgid "Play with subtitles"
 msgstr "Lejátszás felirattal"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Biztos benne?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1247,11 +1248,11 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Episodes"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Videos"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
@@ -1581,6 +1582,122 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "YouTube kiegészítő"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "A YouTube a világ egyik legnagyobb videómegosztó weboldala."
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Általános"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Részletes"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Eltávolítás"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Átnevezés"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Törlés"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Csatornák"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Lejátszási listák"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Lejátszási lista kiválasztása"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Új lejátszási lista..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Nyelv"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Összes lejátszása"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Alapértelmezett"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Keverés"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Élő"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Frissítés"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Részletek..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Ország"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Felirat nyelve"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Nincs"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "Súgás"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Beállítások"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Automatikus"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Személyes API Kulcsok engedélyezve"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "Mégse"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Port"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Mentés"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Biztos benne?"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"

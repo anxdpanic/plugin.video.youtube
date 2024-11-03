@@ -31,13 +31,14 @@ msgstr ""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "Plugin para o Youtube"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "Youtube é um dos maiores sites do mundo de partilha de vídeos."
+# msgstr ""
+# Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Geral"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -149,8 +150,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Avançado"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -215,8 +216,8 @@ msgid "Watch Later"
 msgstr "Ver mais tarde"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Remover"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -235,8 +236,8 @@ msgid "Sign Out"
 msgstr "Terminar Sessão"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Renomear"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -255,8 +256,8 @@ msgid "Remove \"%s\"?"
 msgstr "Remover \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Apagar"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -299,12 +300,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Canais"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Listas de Reproduções"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -383,16 +384,16 @@ msgid "Add to..."
 msgstr "Adicionar a..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Selecionar Lista de Reprodução"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Nova Lista de Reprodução..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Língua"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -423,20 +424,20 @@ msgid "I dislike this"
 msgstr "Não gosto"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Reproduzir todos"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Padrão"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Anular"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Aleatório"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -455,8 +456,8 @@ msgid "Disliked Videos"
 msgstr "Vídeos que Não Gostei"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Em Directo"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,8 +472,8 @@ msgid "rtmpe streams are not supported"
 msgstr "rtmpe streams não são suportados"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Actualizar"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -491,16 +492,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Mais..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Nenhuma stream de vídeo encontrada"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Região"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -539,12 +540,12 @@ msgid "Delete settings.xml"
 msgstr "apagar settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Linguagem das legendas"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Nenhuma"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
 msgid "View all"
@@ -563,8 +564,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "Perguntar"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -607,8 +608,8 @@ msgid "Failed"
 msgstr "Falhou"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Definições"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -631,8 +632,8 @@ msgid "Autoplay suggested videos"
 msgstr "Reprodução automática de vídeos sugeridos"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Automático"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -691,15 +692,15 @@ msgid "Updated: %s"
 msgstr "Actualizado: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Chaves API pessoais activadas"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Falha ao activar chaves API pessoais. Em falta: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -759,8 +760,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "Cancelar"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -775,8 +776,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Porta"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -819,8 +820,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "Lista de permissões de IP (delimitada por vírgulas)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Guardar"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -1111,8 +1112,8 @@ msgid "Play with subtitles"
 msgstr "Reproduzir com legendas"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Tem a certeza?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1247,11 +1248,11 @@ msgid "Shorts (1 minute or less)"
 msgstr ""
 
 msgctxt "#30737"
-msgid "Episodes"
+msgid ""
 msgstr ""
 
 msgctxt "#30738"
-msgid "Videos"
+msgid ""
 msgstr ""
 
 msgctxt "#30739"
@@ -1581,6 +1582,122 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Plugin para o Youtube"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "Youtube é um dos maiores sites do mundo de partilha de vídeos."
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Geral"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Avançado"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Remover"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Renomear"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Apagar"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Canais"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Listas de Reproduções"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Selecionar Lista de Reprodução"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Nova Lista de Reprodução..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Língua"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Reproduzir todos"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Padrão"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Aleatório"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Em Directo"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Actualizar"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Mais..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Região"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Linguagem das legendas"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Nenhuma"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "Perguntar"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Definições"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Automático"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Chaves API pessoais activadas"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "Cancelar"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Porta"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Guardar"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Tem a certeza?"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"
