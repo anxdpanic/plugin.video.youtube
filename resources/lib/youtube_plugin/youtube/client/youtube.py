@@ -21,7 +21,7 @@ from traceback import format_exc
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
-from ...kodion.compatibility import cpu_count, string_type, to_str
+from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser,
@@ -1773,11 +1773,7 @@ class YouTube(LoginClient):
             threads['current'].discard(threading.current_thread())
             threads['loop'].set()
 
-        try:
-            num_cores = cpu_count() or 1
-        except NotImplementedError:
-            num_cores = 1
-        max_threads = min(32, 2 * (num_cores + 4))
+        max_threads = min(32, 2 * (available_cpu_count() + 4))
         counts = {
             'all': 0,
         }
