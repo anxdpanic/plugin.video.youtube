@@ -204,7 +204,7 @@ class YouTube(LoginClient):
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
-                  'mine': 'true'}
+                  'mine': True}
         return self.api_request(method='DELETE',
                                 path='playlists',
                                 params=params,
@@ -289,7 +289,7 @@ class YouTube(LoginClient):
 
     def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
         params = {'part': 'snippet',
-                  'mine': 'true'}
+                  'mine': True}
         post_data = {'kind': 'youtube#playlistItem',
                      'snippet': {'playlistId': playlist_id,
                                  'resourceId': {'kind': 'youtube#video',
@@ -354,7 +354,7 @@ class YouTube(LoginClient):
                   'maxResults': str(self.max_results()),
                   'order': order}
         if channel_id == 'mine':
-            params['mine'] = 'true'
+            params['mine'] = True
         else:
             params['channelId'] = channel_id
         if page_token:
@@ -819,9 +819,9 @@ class YouTube(LoginClient):
                   'hl': self._language}
 
         if channel_id == 'home':
-            params['home'] = 'true'
+            params['home'] = True
         elif channel_id == 'mine':
-            params['mine'] = 'true'
+            params['mine'] = True
         else:
             params['channelId'] = channel_id
         if page_token:
@@ -837,7 +837,7 @@ class YouTube(LoginClient):
                   'regionCode': self._region,
                   'hl': self._language}
         if channel_id == 'mine':
-            params['mine'] = 'true'
+            params['mine'] = True
         else:
             params['channelId'] = channel_id
         return self.api_request(method='GET',
@@ -848,10 +848,10 @@ class YouTube(LoginClient):
     def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
         params = {'part': 'snippet',
                   'maxResults': str(self.max_results())}
-        if channel_id != 'mine':
-            params['channelId'] = channel_id
+        if channel_id == 'mine':
+            params['mine'] = True
         else:
-            params['mine'] = 'true'
+            params['channelId'] = channel_id
         if page_token:
             params['pageToken'] = page_token
 
@@ -940,10 +940,10 @@ class YouTube(LoginClient):
             channel_id = ','.join(channel_id)
 
         params = {'part': 'snippet,contentDetails,brandingSettings,statistics'}
-        if channel_id != 'mine':
-            params['id'] = channel_id
+        if channel_id == 'mine':
+            params['mine'] = True
         else:
-            params['mine'] = 'true'
+            params['id'] = channel_id
         return self.api_request(method='GET',
                                 path='channels',
                                 params=params,
@@ -1308,7 +1308,7 @@ class YouTube(LoginClient):
                   'order': 'date'}
 
         if channel_id == 'mine':
-            params['forMine'] = 'true'
+            params['forMine'] = True
         else:
             params['channelId'] = channel_id
 
@@ -1573,9 +1573,9 @@ class YouTube(LoginClient):
 
         params = {
             'part': 'snippet',
-            'maxResults': '50',
+            'maxResults': str(self.max_results()),
             'order': 'alphabetical',
-            'mine': 'true'
+            'mine': True,
         }
 
         def _get_channels(output, _params=params):
