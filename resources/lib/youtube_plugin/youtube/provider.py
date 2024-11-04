@@ -806,15 +806,13 @@ class Provider(AbstractProvider):
         context.set_param('category_label', search_text)
 
         params = context.get_params()
-        channel_id = params.get('channel_id')
-        event_type = params.get('event_type')
+        channel_id = params.get('channel_id') or params.get('channelId')
+        event_type = params.get('event_type') or params.get('eventType')
         hide_folders = params.get('hide_folders')
         location = params.get('location')
         page = params.get('page', 1)
-        page_token = params.get('page_token', '')
-        order = params.get('order', 'relevance')
-        search_type = params.get('search_type', 'video')
-        safe_search = context.get_settings().safe_search()
+        page_token = params.get('page_token') or params.get('pageToken') or ''
+        search_type = params.get('search_type', 'video') or params.get('type')
 
         if search_type == 'video':
             context.set_content(CONTENT.VIDEO_CONTENT)
@@ -866,14 +864,16 @@ class Provider(AbstractProvider):
 
         search_params = {
             'q': search_text,
-            'order': order,
             'channelId': channel_id,
             'type': search_type,
             'eventType': event_type,
-            'safeSearch': safe_search,
             'pageToken': page_token,
             'location': location,
         }
+        for param in (context.SEARCH_PARAMS
+                .intersection(params.keys())
+                .difference(search_params.keys())):
+            search_params[param] = params[param]
 
         function_cache = context.get_function_cache()
         search_params, json_data = function_cache.run(

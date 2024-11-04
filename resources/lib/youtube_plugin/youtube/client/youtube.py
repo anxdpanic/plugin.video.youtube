@@ -1425,16 +1425,25 @@ class YouTube(LoginClient):
             'regionCode': self._region,
             'hl': self._language,
             'relevanceLanguage': self._language,
-            'maxResults': str(self.max_results()),
         }
 
         search_query = params.get('q')
         if '|' in search_query:
             search_params['q'] = search_query.replace('|', '%7C')
 
+        max_results = params.get('maxResults')
+        if max_results is None:
+            search_params['maxResults'] = str(self.max_results())
+
         search_type = params.get('type')
         if isinstance(search_type, (list, tuple)):
             search_params['type'] = ','.join(search_type)
+
+        channel_id = params.get('channelId')
+        if channel_id == 'mine':
+            params['forMine'] = True
+        else:
+            params['channelId'] = channel_id
 
         location = params.get('location')
         if location is True:
@@ -1443,7 +1452,8 @@ class YouTube(LoginClient):
                 search_params['location'] = location
                 search_params['locationRadius'] = settings.get_location_radius()
 
-        if 'safeSearch' not in params:
+        safe_search = params.get('safeSearch')
+        if safe_search is None:
             search_params['safeSearch'] = settings.safe_search()
 
         published = params.get('publishedBefore')

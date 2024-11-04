@@ -301,6 +301,34 @@ class XbmcContext(AbstractContext):
         'youtube': 30003,
     }
 
+    SEARCH_PARAMS = {
+        'forMine',
+        'channelId',
+        'channelType',
+        'eventType',
+        'location',
+        'locationRadius',
+        'maxResults',
+        'order',
+        'pageToken'
+        'publishedAfter',
+        'publishedBefore',
+        'q',
+        'safeSearch',
+        'topicId',
+        'type',
+        'videoCaption',
+        'videoCategoryId',
+        'videoDefinition',
+        'videoDimension',
+        'videoDuration',
+        'videoEmbeddable',
+        'videoLicense',
+        'videoPaidProductPlacement',
+        'videoSyndicated',
+        'videoType',
+    }
+
     def __new__(cls, *args, **kwargs):
         self = super(XbmcContext, cls).__new__(cls)
 
@@ -316,6 +344,9 @@ class XbmcContext(AbstractContext):
                 self.localize(308),    # Original language
                 self.localize(309),    # UI language
             }
+
+            # Update default allowable params
+            cls._NON_EMPTY_STRING_PARAMS.update(self.SEARCH_PARAMS)
 
             cls._initialized = True
 
