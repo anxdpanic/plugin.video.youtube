@@ -86,13 +86,13 @@ class XbmcPlugin(AbstractPlugin):
 
             items = playlist_player.get_items()
             if not items and not playlist_player.is_playing():
-                context.log_warning('Multiple busy dialogs active - '
-                                    'plugin call stopped to avoid Kodi crash')
+                context.log_warning('Multiple busy dialogs active'
+                                    ' - Plugin call ended to avoid Kodi crash')
                 break
 
             playlist_player.clear()
-            context.log_warning('Multiple busy dialogs active - '
-                                'playlist cleared to avoid Kodi crash')
+            context.log_warning('Multiple busy dialogs active'
+                                ' - Playlist cleared to avoid Kodi crash')
 
             position, remaining = playlist_player.get_position()
             if position:
@@ -110,13 +110,13 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active():
                 max_wait_time -= 1
                 if max_wait_time < 0:
-                    context.log_error('Multiple busy dialogs active - '
-                                      'extended busy period')
+                    context.log_error('Multiple busy dialogs active'
+                                      ' - Extended busy period')
                     break
                 context.sleep(1)
 
-            context.log_warning('Multiple busy dialogs active - '
-                                'reloading playlist')
+            context.log_warning('Multiple busy dialogs active'
+                                ' - Reloading playlist')
 
             num_items = playlist_player.add_items(items)
             if playlist_player.is_playing():
@@ -131,8 +131,8 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active() or playlist_player.size() < position:
                 max_wait_time -= 1
                 if max_wait_time < 0:
-                    context.log_error('Multiple busy dialogs active - '
-                                      'unable to restart playback')
+                    context.log_error('Multiple busy dialogs active'
+                                      ' - Unable to restart playback')
                     break
                 context.sleep(1)
             else:

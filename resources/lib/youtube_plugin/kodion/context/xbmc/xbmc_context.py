@@ -657,11 +657,15 @@ class XbmcContext(AbstractContext):
                                    'properties': ['enabled']})
         try:
             return response['result']['addon']['enabled'] is True
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as exc:
             error = response.get('error', {})
-            self.log_error('XbmcContext.addon_enabled error - |{0}: {1}|'
-                           .format(error.get('code', 'unknown'),
-                                   error.get('message', 'unknown')))
+            self.log_error('XbmcContext.addon_enabled - Error'
+                           '\n\tException: {exc!r}'
+                           '\n\tCode:      {code}'
+                           '\n\tMessage:   {msg}'
+                           .format(exc=exc,
+                                   code=error.get('code', 'Unknown'),
+                                   msg=error.get('message', 'Unknown')))
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
@@ -670,11 +674,15 @@ class XbmcContext(AbstractContext):
                                    'enabled': enabled})
         try:
             return response['result'] == 'OK'
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as exc:
             error = response.get('error', {})
-            self.log_error('XbmcContext.set_addon_enabled error - |{0}: {1}|'
-                           .format(error.get('code', 'unknown'),
-                                   error.get('message', 'unknown')))
+            self.log_error('XbmcContext.set_addon_enabled - Error'
+                           '\n\tException: {exc!r}'
+                           '\n\tCode:      {code}'
+                           '\n\tMessage:   {msg}'
+                           .format(exc=exc,
+                                   code=error.get('code', 'Unknown'),
+                                   msg=error.get('message', 'Unknown')))
             return False
 
     @staticmethod

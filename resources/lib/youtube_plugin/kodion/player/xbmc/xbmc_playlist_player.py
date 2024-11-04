@@ -166,11 +166,15 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         try:
             result = response['result']['items']
             return json.dumps(result, ensure_ascii=False) if dumps else result
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError) as exc:
             error = response.get('error', {})
-            self._context.log_error('XbmcPlaylist.get_items error - |{0}: {1}|'
-                                    .format(error.get('code', 'unknown'),
-                                            error.get('message', 'unknown')))
+            self._context.log_error('XbmcPlaylist.get_items - Error'
+                                    '\n\tException: {exc!r}'
+                                    '\n\tCode:      {code}'
+                                    '\n\tMessage:   {msg}'
+                                    .format(exc=exc,
+                                            code=error.get('code', 'Unknown'),
+                                            msg=error.get('message', 'Unknown')))
         return '' if dumps else []
 
     def add_items(self, items, loads=False):

@@ -55,10 +55,12 @@ class ResourceManager(object):
 
             try:
                 updated.append(items[0]['id'])
-            except (IndexError, KeyError, TypeError):
-                self._context.log_error('Own channel_id not found'
-                                        '\n\tChannels: {data}'
-                                        .format(data=data))
+            except (IndexError, KeyError, TypeError) as exc:
+                self._context.log_error('ResourceManager.get_channels'
+                                        ' - Own channel_id not found'
+                                        '\n\tException: {exc!r}'
+                                        '\n\tChannels:  {data}'
+                                        .format(exc=exc, data=data))
 
         ids = updated
         if refresh:

@@ -279,13 +279,20 @@ class AbstractProvider(object):
                 context=context.clone(path, params),
             )
         except Exception as exc:
-            context.log_error('Rerouting error: |{0}|'.format(exc))
+            context.log_error('Rerouting - Error'
+                              '\n\tException: {exc!r}'.format(exc=exc))
         finally:
             uri = context.create_uri(path, params)
-            context.log_debug('Rerouting to |{uri}|{status}'
-                              .format(uri=uri,
-                                      status='' if result else ' failed'))
-            if not result:
+            if result:
+                context.log_debug('Rerouting - Success'
+                                  '\n\tURI:     {uri}'
+                                  '\n\tReturn:  |{window_return}|'
+                                  .format(uri=uri,
+                                          window_return=window_return))
+            else:
+                context.log_debug('Rerouting - No results'
+                                  '\n\tURI: {uri}'
+                                  .format(uri=uri))
                 return False
 
             ui = context.get_ui()

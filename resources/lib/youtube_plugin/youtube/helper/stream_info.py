@@ -1239,12 +1239,13 @@ class StreamInfo(YouTubeRequestClient):
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
             except Exception as exc:
-                msg = ('VideoInfo._process_signature_cipher - '
-                       'Failed to extract URL from |{sig}|'
+                msg = ('StreamInfo._process_signature_cipher'
+                       ' - Failed to extract URL'
                        '\n\tException: {exc!r}'
+                       '\n\tSignature: |{sig}|'
                        '\n\tStack trace (most recent call last):\n{stack}'
-                       .format(sig=encrypted_signature,
-                               exc=exc,
+                       .format(exc=exc,
+                               sig=encrypted_signature,
                                stack=''.join(format_stack())))
                 self._context.log_error(msg)
                 self._cipher = False
@@ -2083,8 +2084,8 @@ class StreamInfo(YouTubeRequestClient):
         log_error = context.log_error
 
         if not self.BASE_PATH:
-            log_error('VideoInfo._generate_mpd_manifest - '
-                      'unable to access temp directory')
+            log_error('StreamInfo._generate_mpd_manifest'
+                      ' - Unable to access temp directory')
             return None, None
 
         def _filter_group(previous_group, previous_stream, item):
@@ -2373,10 +2374,12 @@ class StreamInfo(YouTubeRequestClient):
         try:
             with xbmcvfs.File(filepath, 'w') as mpd_file:
                 success = mpd_file.write(output)
-        except (IOError, OSError):
-            log_error('VideoInfo._generate_mpd_manifest - '
-                      'file write failed for: {file}'
-                      .format(file=filepath))
+        except (IOError, OSError) as exc:
+            log_error('StreamInfo._generate_mpd_manifest'
+                      ' - File write failed'
+                      '\n\tException: {exc!r}'
+                      '\n\tFile:      {filepath}'
+                      .format(exc=exc, filepath=filepath))
             success = False
         if success:
             return urlunsplit((

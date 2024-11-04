@@ -283,8 +283,8 @@ def strptime(datetime_str, fmt=None):
             if strptime.reloaded.acquire(False):
                 _strptime = import_module('_strptime')
                 modules['_strptime'] = _strptime
-                Logger.log_error('Python strptime bug workaround - '
-                                 'https://github.com/python/cpython/issues/71587')
+                Logger.log_error('Python strptime bug workaround'
+                                 ' - https://github.com/python/cpython/issues/71587')
                 strptime.reloaded.notify_all()
                 strptime.reloaded.release()
             else:
