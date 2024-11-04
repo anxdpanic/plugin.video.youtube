@@ -659,23 +659,42 @@ def get_connect_address(context, as_netloc=False):
     listen_address = settings.httpd_listen()
     listen_port = settings.httpd_port()
 
-    sock = None
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        if hasattr(socket, 'SO_REUSEADDR'):
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        if hasattr(socket, 'SO_REUSEPORT'):
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-    except socket.error:
-        listen_address = xbmc.getIPAddress()
-
-    if sock:
+        if listen_address == '0.0.0.0':
+            broadcast_address = '<broadcast>'
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        else:
+            broadcast_address = listen_address
+            if hasattr(socket, 'SO_REUSEADDR'):
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if hasattr(socket, 'SO_REUSEPORT'):
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+    except socket.error as exc:
+        context.log_error('HTTPServer'
+                          ' - get_connect_address failed to create socket'
+                          '\n\tException: {exc!r}'
+                          .format(exc=exc))
+        connect_address = xbmc.getIPAddress()
+    else:
         sock.settimeout(0)
         try:
-            sock.connect((listen_address, 0))
-            connect_address = sock.getsockname()[0]
-        except socket.error:
+            sock.connect((broadcast_address, 0))
+        except socket.error as exc:
+            context.log_error('HTTPServer'
+                              ' - get_connect_address failed connect'
+                              '\n\tException: {exc!r}'
+                              .format(exc=exc))
             connect_address = xbmc.getIPAddress()
+        else:
+            try:
+                connect_address = sock.getsockname()[0]
+            except socket.error as exc:
+                context.log_error('HTTPServer'
+                                  ' - get_connect_address failed to get address'
+                                  '\n\tException: {exc!r}'
+                                  .format(exc=exc))
+                connect_address = xbmc.getIPAddress()
         finally:
             sock.close()
 
