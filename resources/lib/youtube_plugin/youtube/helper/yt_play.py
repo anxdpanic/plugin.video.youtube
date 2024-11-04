@@ -78,9 +78,12 @@ def _play_stream(provider, context):
                 use_mpd=use_adaptive_formats and settings.use_mpd_videos(),
             )
         except YouTubeException as exc:
-            context.log_error('yt_play.play_video - {exc!r}:\n{details}'.format(
-                exc=exc, details=''.join(format_stack())
-            ))
+            msg = ('yt_play.play_video - Error'
+                   '\n\tException: {exc!r}'
+                   '\n\tStack trace (most recent call last):\n{stack}'
+                   .format(exc=exc,
+                           stack=''.join(format_stack())))
+            context.log_error(msg)
             ui.show_notification(message=exc.get_message())
             return False
 

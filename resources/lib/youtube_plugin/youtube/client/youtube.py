@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
-from traceback import format_exc
+from traceback import format_stack
 
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
@@ -1764,9 +1764,13 @@ class YouTube(LoginClient):
 
                 try:
                     success, complete = worker(output, **_kwargs)
-                except Exception:
-                    msg = 'get_my_subscriptions._threaded_fetch - {exc}'
-                    self._context.log_error(msg.format(exc=format_exc()))
+                except Exception as exc:
+                    msg = ('get_my_subscriptions._threaded_fetch - Error'
+                           '\n\tException: {exc!r}'
+                           '\n\tStack trace (most recent call last):\n{stack}'
+                           .format(exc=exc,
+                                   stack=''.join(format_stack())))
+                    self._context.log_error(msg)
                     continue
 
                 if complete or not success:
@@ -2090,7 +2094,8 @@ class YouTube(LoginClient):
             exception = None
 
         if not json_data or 'error' not in json_data:
-            info = 'Exception:\n\t|{exc!r}|'
+            info = ('Request - Failed'
+                    '\n\tException: {exc!r}')
             details = kwargs
             return None, info, details, data, None, exception
 
@@ -2121,9 +2126,9 @@ class YouTube(LoginClient):
                                                          title,
                                                          time_ms=timeout)
 
-        info = ('API error: {reason}'
-                '\n\texc:     |{exc!r}|'
-                '\n\tmessage: |{message}|')
+        info = ('API error - {reason}'
+                '\n\tException: {exc!r}'
+                '\n\tMessage:   {message}')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
 

@@ -59,13 +59,14 @@ class BaseItem(object):
         self._studios = None
 
     def __str__(self):
-        return ('------------------------------\n'
-                'Name: |{0}|\n'
-                'URI: |{1}|\n'
-                'Image: |{2}|\n'
-                '------------------------------'.format(self._name,
-                                                        self._uri,
-                                                        self._image))
+        return ('{type}'
+                '\n\tName:  |{name}|'
+                '\n\tURI:   |{uri}|'
+                '\n\tImage: |image}|'
+                .format(type=self.__class__.__name__,
+                        name=self._name,
+                        uri=self._uri,
+                        image=self._image))
 
     def __repr__(self):
         return json.dumps(

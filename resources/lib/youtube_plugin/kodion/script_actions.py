@@ -479,9 +479,9 @@ def run(argv):
                 params = dict(parse_qsl(args.query))
 
         system_version = context.get_system_version()
-        context.log_notice('Script: Running |v{version}|'
-                           '\n\tKodi:     |v{kodi}|'
-                           '\n\tPython:   |v{python}|'
+        context.log_notice('Script: Running v{version}'
+                           '\n\tKodi:     v{kodi}'
+                           '\n\tPython:   v{python}'
                            '\n\tCategory: |{category}|'
                            '\n\tAction:   |{action}|'
                            '\n\tParams:   |{params}|'

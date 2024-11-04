@@ -111,7 +111,9 @@ def select_stream(context,
         if original_value:
             log_data['url'] = redact_ip(original_value)
 
-        context.log_debug('Stream {0}:\n{1}'.format(idx, log_data))
+        context.log_debug('Stream {idx}:'
+                          '\n\t{stream_details}'
+                          .format(idx=idx, stream_details=log_data))
 
     if ask_for_quality:
         selected_stream = context.get_ui().on_select(
