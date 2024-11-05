@@ -819,12 +819,24 @@ class Provider(AbstractProvider):
         else:
             context.set_content(CONTENT.LIST_CONTENT)
 
-        if (page == 1
-                and search_type == 'video'
-                and not event_type
-                and not hide_folders):
-            if not channel_id and not location:
-                channel_params = dict(params, search_type='channel')
+        if not hide_folders and page == 1:
+            if event_type or search_type != 'video':
+                video_params = dict(params,
+                                    search_type='video',
+                                    event_type='')
+                item_label = context.localize('videos')
+                video_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), video_params),
+                    image='DefaultVideo.png',
+                    category_label=item_label,
+                )
+                result.append(video_item)
+
+            if not channel_id and not location and search_type != 'channel':
+                channel_params = dict(params,
+                                      search_type='channel',
+                                      event_type='')
                 item_label = context.localize('channels')
                 channel_item = DirectoryItem(
                     context.get_ui().bold(item_label),
@@ -834,8 +846,10 @@ class Provider(AbstractProvider):
                 )
                 result.append(channel_item)
 
-            if not location:
-                playlist_params = dict(params, search_type='playlist')
+            if not location and search_type != 'playlist':
+                playlist_params = dict(params,
+                                       search_type='playlist',
+                                       event_type='')
                 item_label = context.localize('playlists')
                 playlist_item = DirectoryItem(
                     context.get_ui().bold(item_label),
@@ -845,22 +859,44 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlist_item)
 
-            if not channel_id:
-                # live
+            if not channel_id and event_type != 'live':
                 live_params = dict(params,
                                    search_type='video',
                                    event_type='live')
                 item_label = context.localize('live')
                 live_item = DirectoryItem(
                     context.get_ui().bold(item_label),
-                    context.create_uri(
-                        (context.get_path().replace('input', 'query'),),
-                        live_params,
-                    ),
+                    context.create_uri((context.get_path(),), live_params),
                     image='{media}/live.png',
                     category_label=item_label,
                 )
                 result.append(live_item)
+
+            if event_type and event_type != 'upcoming':
+                upcoming_params = dict(params,
+                                       search_type='video',
+                                       event_type='upcoming')
+                item_label = context.localize('live.upcoming')
+                upcoming_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), upcoming_params),
+                    image='{media}/live.png',
+                    category_label=item_label,
+                )
+                result.append(upcoming_item)
+
+            if event_type and event_type != 'completed':
+                completed_params = dict(params,
+                                        search_type='video',
+                                        event_type='completed')
+                item_label = context.localize('live.completed')
+                completed_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), completed_params),
+                    image='{media}/live.png',
+                    category_label=item_label,
+                )
+                result.append(completed_item)
 
         search_params = {
             'q': search_text,

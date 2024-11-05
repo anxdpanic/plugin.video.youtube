@@ -288,6 +288,7 @@ class XbmcContext(AbstractContext):
         'video.rate.dislike': 30530,
         'video.rate.like': 30529,
         'video.rate.none': 15015,
+        'videos': 3,
         'watch_later': 30107,
         'watch_later.add': 30107,
         'watch_later.added_to': 30713,
