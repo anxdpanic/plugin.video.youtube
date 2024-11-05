@@ -795,7 +795,7 @@ class Provider(AbstractProvider):
                                      context=context,
                                      uri=search_text)
         if context.is_plugin_path(search_text):
-            return self.reroute(context=context, uri=search_text)
+            return UriItem(search_text)
 
         result = self._search_channel_or_playlist(context, search_text)
         if result:  # found a channel or playlist matching search_text

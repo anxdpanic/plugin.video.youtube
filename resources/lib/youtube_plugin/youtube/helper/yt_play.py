@@ -269,7 +269,7 @@ def _play_playlist(provider, context):
     options = {
         provider.RESULT_CACHE_TO_DISC: False,
         provider.RESULT_FORCE_RESOLVE: True,
-        provider.RESULT_UPDATE_LISTING: False,
+        provider.RESULT_UPDATE_LISTING: True,
     }
 
     if action == 'queue':

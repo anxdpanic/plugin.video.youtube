@@ -176,7 +176,7 @@ class AbstractProvider(object):
                 options.update(new_options)
 
             if context.get_param('refresh'):
-                options[self.RESULT_CACHE_TO_DISC] = False
+                options[self.RESULT_CACHE_TO_DISC] = True
                 options[self.RESULT_UPDATE_LISTING] = True
 
             return result, options

@@ -209,6 +209,7 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 result = None
 
+        post_run_action = None
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             uri = result.get_uri()
 
@@ -233,18 +234,18 @@ class XbmcPlugin(AbstractPlugin):
             elif uri.startswith('script://'):
                 uri = uri[len('script://'):]
                 context.log_debug('Running script: |{0}|'.format(uri))
-                context.execute('RunScript({0})'.format(uri))
+                post_run_action = 'RunScript({0})'.format(uri)
                 result = False
 
             elif uri.startswith('command://'):
                 uri = uri[len('command://'):]
                 context.log_debug('Running command: |{0}|'.format(uri))
-                context.execute(uri)
+                post_run_action = uri
                 result = True
 
             elif context.is_plugin_path(uri):
                 context.log_debug('Redirecting to: |{0}|'.format(uri))
-                context.execute('RunPlugin({0})'.format(uri))
+                post_run_action = 'RunPlugin({0})'.format(uri)
                 result = False
 
             else:
@@ -274,4 +275,8 @@ class XbmcPlugin(AbstractPlugin):
         position = ui.pop_property(CONTAINER_POSITION)
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
+
+        if post_run_action:
+            context.execute(post_run_action)
+
         return succeeded
