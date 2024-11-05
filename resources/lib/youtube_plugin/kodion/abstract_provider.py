@@ -320,7 +320,7 @@ class AbstractProvider(object):
     def on_watch_later(provider, context, re_match):
         raise NotImplementedError()
 
-    def on_search_run(self, context, search_text):
+    def on_search_run(self, context, query):
         raise NotImplementedError()
 
     @staticmethod
@@ -333,7 +333,10 @@ class AbstractProvider(object):
 
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
-            return provider.on_search_run(context=context, search_text=query)
+            if query:
+                return provider.on_search_run(context=context, query=query)
+            command = 'list'
+            context.set_path(PATHS.SEARCH, command)
 
         if command == 'remove':
             query = to_unicode(params.get('q', ''))
@@ -383,11 +386,12 @@ class AbstractProvider(object):
 
             context.set_path(PATHS.SEARCH, 'query')
             return (
-                provider.on_search_run(context=context, search_text=query),
+                provider.on_search_run(context=context, query=query),
                 {provider.RESULT_CACHE_TO_DISC: command != 'input_prompt'},
             )
 
-        context.set_content(CONTENT.LIST_CONTENT)
+        context.set_content(CONTENT.LIST_CONTENT,
+                            category_label=context.localize('search'))
         result = []
 
         location = context.get_param('location', False)

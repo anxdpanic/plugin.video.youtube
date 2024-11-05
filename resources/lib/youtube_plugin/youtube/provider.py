@@ -785,25 +785,23 @@ class Provider(AbstractProvider):
             return v3.response_to_items(self, context, json_data)
         return False
 
-    def on_search_run(self, context, search_text):
+    def on_search_run(self, context, query):
         data_cache = context.get_data_cache()
         data_cache.del_item('search_query')
 
         # Search by url to access unlisted videos
-        if search_text.startswith(('https://', 'http://')):
-            return self.on_uri2addon(provider=self,
-                                     context=context,
-                                     uri=search_text)
-        if context.is_plugin_path(search_text):
-            return UriItem(search_text)
+        if query.startswith(('https://', 'http://')):
+            return self.on_uri2addon(provider=self, context=context, uri=query)
+        if context.is_plugin_path(query):
+            return UriItem(query)
 
-        result = self._search_channel_or_playlist(context, search_text)
-        if result:  # found a channel or playlist matching search_text
+        result = self._search_channel_or_playlist(context, query)
+        if result:  # found a channel or playlist matching search query
             return result
         result = []
 
-        context.set_param('q', search_text)
-        context.set_param('category_label', search_text)
+        context.set_param('q', query)
+        context.set_param('category_label', query)
 
         params = context.get_params()
         channel_id = params.get('channel_id') or params.get('channelId')
@@ -899,7 +897,7 @@ class Provider(AbstractProvider):
                 result.append(completed_item)
 
         search_params = {
-            'q': search_text,
+            'q': query,
             'channelId': channel_id,
             'type': search_type,
             'eventType': event_type,
@@ -925,7 +923,7 @@ class Provider(AbstractProvider):
         if not params.get('incognito'):
             if not params.get('channel_id'):
                 context.get_search_history().add_item(search_params)
-            data_cache.set_item('search_query', search_text)
+            data_cache.set_item('search_query', query)
 
         result.extend(v3.response_to_items(
             self, context, json_data,
