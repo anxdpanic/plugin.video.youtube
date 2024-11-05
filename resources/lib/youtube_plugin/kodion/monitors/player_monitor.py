@@ -367,6 +367,9 @@ class PlayerMonitor(xbmc.Player):
         if self._ui.get_property(PLAY_WITH):
             return
 
+        if not self._ui.busy_dialog_active():
+            self._ui.clear_property(BUSY_FLAG)
+
         player_data = self._ui.pop_property(PLAYER_DATA)
         if not player_data:
             return
