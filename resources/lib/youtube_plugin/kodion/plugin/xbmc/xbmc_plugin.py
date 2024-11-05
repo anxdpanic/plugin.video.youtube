@@ -110,8 +110,8 @@ class XbmcPlugin(AbstractPlugin):
             while ui.busy_dialog_active():
                 max_wait_time -= 1
                 if max_wait_time < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Extended busy period')
+                    context.log_warning('Multiple busy dialogs active'
+                                        ' - Extended busy period')
                     break
                 context.sleep(1)
 
@@ -277,6 +277,15 @@ class XbmcPlugin(AbstractPlugin):
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
         if post_run_action:
-            context.execute(post_run_action)
+            max_wait_time = 30
+            while ui.busy_dialog_active():
+                max_wait_time -= 1
+                if max_wait_time < 0:
+                    context.log_error('Multiple busy dialogs active'
+                                      ' - Post run action unable to execute')
+                    break
+                context.sleep(1)
+            else:
+                context.execute(post_run_action)
 
         return succeeded

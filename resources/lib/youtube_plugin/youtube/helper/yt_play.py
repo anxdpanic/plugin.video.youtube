@@ -31,7 +31,7 @@ from ...kodion.constants import (
     PLAY_TIMESHIFT,
     PLAY_WITH,
 )
-from ...kodion.items import AudioItem, VideoItem
+from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
 from ...kodion.utils import find_video_id, select_stream
 
@@ -373,14 +373,12 @@ def process(provider, context, **_kwargs):
         # This is required to trigger Kodi resume prompt, along with using
         # RunPlugin. Prompt will not be used if using PlayMedia
         if force_play:
-            context.execute('Action(Play)')
-            return False
+            return UriItem('command://Action(Play)')
 
         if context.get_handle() == -1:
-            context.execute('PlayMedia({0})'.format(
+            return UriItem('command://PlayMedia({0})'.format(
                 context.create_uri((PATHS.PLAY,), params)
             ))
-            return False
 
         ui.set_property(BUSY_FLAG)
         playlist_player = context.get_playlist_player()
