@@ -645,7 +645,13 @@ def search_sort_by(context, params, order):
         ),
         context.create_uri(
             (PATHS.ROUTE, PATHS.SEARCH, 'query',),
-            params=dict(params, order=order),
+            params=dict(params,
+                        order=order,
+                        page=1,
+                        page_token='',
+                        pageToken='',
+                        window_replace=True,
+                        window_return=False),
             run=True,
         ),
     )
