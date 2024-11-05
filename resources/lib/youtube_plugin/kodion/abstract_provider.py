@@ -270,6 +270,7 @@ class AbstractProvider(object):
 
         result = None
         function_cache = context.get_function_cache()
+        window_replace = params.pop('window_replace', False)
         window_return = params.pop('window_return', True)
         try:
             result, options = function_cache.run(
@@ -286,8 +287,10 @@ class AbstractProvider(object):
             if result:
                 context.log_debug('Rerouting - Success'
                                   '\n\tURI:     {uri}'
+                                  '\n\tReplace: |{window_replace}|'
                                   '\n\tReturn:  |{window_return}|'
                                   .format(uri=uri,
+                                          window_replace=window_replace,
                                           window_return=window_return))
             else:
                 context.log_debug('Rerouting - No results'
@@ -302,9 +305,10 @@ class AbstractProvider(object):
                 ui.set_property(CONTAINER_POSITION, position)
 
             context.execute(''.join((
-                'ActivateWindow(Videos, ',
+                'ReplaceWindow' if window_replace else 'ActivateWindow',
+                '(Videos,',
                 uri,
-                ', return)' if window_return else ')',
+                ',return)' if window_return else ')',
             )))
         return True
 

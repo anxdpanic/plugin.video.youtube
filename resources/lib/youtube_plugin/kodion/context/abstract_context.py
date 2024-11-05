@@ -62,6 +62,7 @@ class AbstractContext(Logger):
         'logged_in',
         'resume',
         'screensaver',
+        'window_replace',
         'window_return',
     }
     _INT_PARAMS = {
