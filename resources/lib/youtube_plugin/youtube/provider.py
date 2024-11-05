@@ -227,12 +227,12 @@ class Provider(AbstractProvider):
             if keys_changed:
                 context.log_warning('API key set changed: Resetting client'
                                     ' and updating access token')
-                self.reset_client()
                 access_tokens = [None, None]
                 refresh_tokens = [None, None]
                 access_manager.update_access_token(
                     dev_id, access_token='', expiry=-1, refresh_token=''
                 )
+                self.reset_client()
 
         num_access_tokens = sum(1 for token in access_tokens if token)
         num_refresh_tokens = sum(1 for token in refresh_tokens if token)

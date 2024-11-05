@@ -82,6 +82,7 @@ class APICheck(object):
                                         switch=switch))
         if changed:
             self._context.log_debug('API key set changed: Signing out')
+            self._access_manager.set_last_key_hash(current_hash)
             self._context.execute(self._context.create_uri(
                 ('sign', 'out'),
                 {
@@ -89,7 +90,6 @@ class APICheck(object):
                 },
                 run=True,
             ))
-            self._access_manager.set_last_key_hash(current_hash)
 
     @staticmethod
     def get_current_switch():
