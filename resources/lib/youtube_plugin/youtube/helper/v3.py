@@ -123,7 +123,6 @@ def _process_list_response(provider, context, json_data, item_filter):
                         menu_items.search_sort_by(context, params, 'viewCount'),
                         menu_items.search_sort_by(context, params, 'rating'),
                         menu_items.search_sort_by(context, params, 'title'),
-                        menu_items.separator()
                     ),
                     'position': 0,
                 }

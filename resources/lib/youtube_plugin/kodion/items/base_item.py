@@ -14,6 +14,7 @@ import json
 from datetime import date, datetime
 from hashlib import md5
 
+from .menu_items import separator
 from ..compatibility import (
     datetime_infolabel,
     parse_qsl,
@@ -193,10 +194,16 @@ class BaseItem(object):
             'fanart.jpg',
         ))
 
-    def add_context_menu(self, context_menu, position='end', replace=False):
-        context_menu = (item for item in context_menu if item)
+    def add_context_menu(self,
+                         context_menu,
+                         position='end',
+                         replace=False,
+                         end_separator=separator()):
+        context_menu = [item for item in context_menu if item]
+        if context_menu and end_separator and context_menu[-1] != end_separator:
+            context_menu.append(end_separator)
         if replace or not self._context_menu:
-            self._context_menu = list(context_menu)
+            self._context_menu = context_menu
         elif position == 'end':
             self._context_menu.extend(context_menu)
         else:

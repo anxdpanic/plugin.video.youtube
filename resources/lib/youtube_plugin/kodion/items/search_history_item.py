@@ -46,6 +46,5 @@ class SearchHistoryItem(DirectoryItem):
             menu_items.search_sort_by(context, params, 'viewCount'),
             menu_items.search_sort_by(context, params, 'rating'),
             menu_items.search_sort_by(context, params, 'title'),
-            menu_items.separator(),
         ]
         self.add_context_menu(context_menu)

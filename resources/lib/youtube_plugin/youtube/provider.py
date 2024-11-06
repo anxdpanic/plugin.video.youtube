@@ -436,29 +436,25 @@ class Provider(AbstractProvider):
                 menu_items.shuffle_playlist(
                     context, playlist_id
                 ),
-                menu_items.separator(),
-                menu_items.bookmark_add(
-                    context, uploads
-                ) if channel_id != 'mine' else None,
             ]
 
             if channel_id != 'mine':
-                if provider.is_logged_in:
+                context_menu.extend((
+                    menu_items.separator(),
+                    menu_items.bookmark_add(
+                        context, uploads
+                    ),
                     # subscribe to the channel via the playlist item
-                    context_menu.append(
-                        menu_items.subscribe_to_channel(
-                            context, channel_id,
-                        )
-                    )
-                context_menu.append(
+                    menu_items.subscribe_to_channel(
+                        context, channel_id,
+                    ) if provider.is_logged_in else None,
                     # bookmark channel of the playlist
                     menu_items.bookmark_add_channel(
                         context, channel_id,
                     )
-                )
+                ))
 
             if context_menu:
-                context_menu.append(menu_items.separator())
                 uploads.add_context_menu(context_menu)
 
             result = [uploads]
@@ -1114,7 +1110,6 @@ class Provider(AbstractProvider):
                                 menu_items.history_clear(
                                     context
                                 ),
-                                menu_items.separator(),
                             ),
                             'position': 0,
                         }
@@ -1606,7 +1601,6 @@ class Provider(AbstractProvider):
                             menu_items.bookmarks_clear(
                                 context
                             ),
-                            menu_items.separator(),
                         ),
                         'position': 0,
                     },
@@ -1691,7 +1685,6 @@ class Provider(AbstractProvider):
                                 menu_items.watch_later_local_clear(
                                     context
                                 ),
-                                menu_items.separator(),
                             ),
                             'position': 0,
                         }
