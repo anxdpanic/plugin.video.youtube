@@ -362,8 +362,8 @@ msgid "Related Videos"
 msgstr "Gerelateerde Video's"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Verwijder automatisch van 'Later Bekijken'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -578,12 +578,12 @@ msgid "Remove as Watch Later"
 msgstr "Verwijder van Bekijk Later"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Weet je zeker dat je '%s' wilt verwijderen van je Bekijk Later lijst?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Weet je zeker dat je je huidige Bekijk Later lijst wilt vervangen met '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -594,12 +594,12 @@ msgid "Remove as History"
 msgstr "Verwijder van geschiedenis"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Weet je zeker dat je '%s' wilt verwijderen van je Geschiedenis lijst?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Weet je zeker dat je je huidige Geschiedenis lijst wilt vervangen met '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -938,8 +938,8 @@ msgid "Enter a name for this user"
 msgstr "Voer een naam in voor deze gebruiker"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Gebruiker is nu '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -962,16 +962,16 @@ msgid "Switch user"
 msgstr "Wissel van Gebruiker"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Schakel nu om naar '%s'?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "'%s' hernoemd naar '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1584,6 +1584,38 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Verwijder automatisch van 'Later Bekijken'"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Weet je zeker dat je '%s' wilt verwijderen van je Bekijk Later lijst?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Weet je zeker dat je je huidige Bekijk Later lijst wilt vervangen met '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Weet je zeker dat je '%s' wilt verwijderen van je Geschiedenis lijst?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Weet je zeker dat je je huidige Geschiedenis lijst wilt vervangen met '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Gebruiker is nu '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Schakel nu om naar '%s'?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "'%s' hernoemd naar '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "Kapcsolódó videók"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Automatikus eltávolítás a megnézendő videók közül"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -576,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Eltávolítás a megtekintendő videók közül"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Biztos benne, hogy eltávolítja a megtekintendő videók közül: \"%s\"?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Biztos benne, hogy az aktuális megtekintési listát a(z) '%s' helyettesíti?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -592,12 +592,12 @@ msgid "Remove as History"
 msgstr "Eltávolítás az előzményekből"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Biztos benne, hogy eltávolítja az előzményekből \"%s\" videót?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Biztos benne, hogy lecseréli az aktuális előzmények listát erre a kifelyezésre: '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -936,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Adja meg a felhasználónevét"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Jelenlegi felhasználó '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -960,16 +960,16 @@ msgid "Switch user"
 msgstr "Felhasználó váltás"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Felhasználóváltás '%s' most?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Átnevezve '%s' - '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1582,6 +1582,38 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Automatikus eltávolítás a megnézendő videók közül"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Biztos benne, hogy eltávolítja a megtekintendő videók közül: \"%s\"?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Biztos benne, hogy az aktuális megtekintési listát a(z) '%s' helyettesíti?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Biztos benne, hogy eltávolítja az előzményekből \"%s\" videót?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Biztos benne, hogy lecseréli az aktuális előzmények listát erre a kifelyezésre: '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Jelenlegi felhasználó '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Felhasználóváltás '%s' most?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Átnevezve '%s' - '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "Aiheeseen liittyvät videot"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Poista \"Katso myöhemmin\" -listalta automaattisesti"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -576,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Poista \"Katso myöhemmin\" -määritys"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Katso myöhemmin\" -määrityksen?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Haluatko varmasti korvata nykyisen \"Katso myöhemmin\" -listan listalla \"%s\"?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -592,12 +592,12 @@ msgid "Remove as History"
 msgstr "Poista \"Historia\" -määritys"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Historia\" -määrityksen?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Haluatko varmasti korvata nykyisen \"Historia\" -listan listalla \"%s\"?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -936,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Syötä käyttäjän nimi"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Käyttäjä on nyt \"%s\""
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -960,16 +960,16 @@ msgid "Switch user"
 msgstr "Vaihda käyttäjä"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Vaihdetaanko käyttäjään \"%s\" nyt?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
-msgstr "%s poistettiin"
+msgid "\"%s\" removed"
+msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Käyttäjän \"%s\" uusi nimi on \"%s\""
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1582,6 +1582,42 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Poista \"Katso myöhemmin\" -listalta automaattisesti"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Katso myöhemmin\" -määrityksen?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Haluatko varmasti korvata nykyisen \"Katso myöhemmin\" -listan listalla \"%s\"?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Historia\" -määrityksen?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Haluatko varmasti korvata nykyisen \"Historia\" -listan listalla \"%s\"?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Käyttäjä on nyt \"%s\""
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Vaihdetaanko käyttäjään \"%s\" nyt?"
+
+#~ msgctxt "#30666"
+#~ msgid "%s removed"
+#~ msgstr "%s poistettiin"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Käyttäjän \"%s\" uusi nimi on \"%s\""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

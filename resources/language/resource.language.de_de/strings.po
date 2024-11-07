@@ -361,8 +361,8 @@ msgid "Related Videos"
 msgstr "Ähnliche Videos"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto-Entfernen für „Später ansehen“"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -577,12 +577,12 @@ msgid "Remove as Watch Later"
 msgstr "Aus „Später ansehen“ entfernen"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "‚%s‘ wirklich aus Später-Ansehen-Liste entfernen?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Die aktuelle Später-Ansehen-Liste wirklich durch ‚%s‘ ersetzen?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,12 +593,12 @@ msgid "Remove as History"
 msgstr "Aus Verlauf entfernen"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "‚%s‘ wirklich aus dem Verlauf entfernen?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Den aktuellen Verlauf wirklich durch ‚%s‘ ersetzen?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -937,8 +937,8 @@ msgid "Enter a name for this user"
 msgstr "Einen Namen für diesen Benutzer eingeben"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Der aktuelle Benutzer ist nun ‚%s‘"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,16 +961,16 @@ msgid "Switch user"
 msgstr "Benutzer wechseln"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Zu ‚%s‘ wechseln?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
-msgstr "%s entfernt"
+msgid "\"%s\" removed"
+msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "‚%s‘ zu ‚%s‘ umbenannt"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1583,6 +1583,42 @@ msgstr "Wiedergabe vom Anfang"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Auto-Entfernen für „Später ansehen“"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "‚%s‘ wirklich aus Später-Ansehen-Liste entfernen?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Die aktuelle Später-Ansehen-Liste wirklich durch ‚%s‘ ersetzen?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "‚%s‘ wirklich aus dem Verlauf entfernen?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Den aktuellen Verlauf wirklich durch ‚%s‘ ersetzen?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Der aktuelle Benutzer ist nun ‚%s‘"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Zu ‚%s‘ wechseln?"
+
+#~ msgctxt "#30666"
+#~ msgid "%s removed"
+#~ msgstr "%s entfernt"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "‚%s‘ zu ‚%s‘ umbenannt"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
