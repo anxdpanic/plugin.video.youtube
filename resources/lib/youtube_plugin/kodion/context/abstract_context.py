@@ -62,6 +62,7 @@ class AbstractContext(Logger):
         'logged_in',
         'resume',
         'screensaver',
+        'window_replace',
         'window_return',
     }
     _INT_PARAMS = {
@@ -93,19 +94,18 @@ class AbstractContext(Logger):
         'addon_id',
         'category_label',
         'channel_id',
-        'channel_name',
         'client_id',
         'client_secret',
         'click_tracking',
         'event_type',
         'item',
         'item_id',
+        'item_name',
         'order',
         'page_token',
         'parent_id',
         'playlist',  # deprecated
         'playlist_id',
-        'playlist_name',
         'q',
         'rating',
         'reload_path',
@@ -114,39 +114,12 @@ class AbstractContext(Logger):
         'uri',
         'videoid',  # deprecated
         'video_id',
-        'video_name',
         'visitor',
     }
     _STRING_BOOL_PARAMS = {
         'reload_path',
     }
-    _SEARCH_PARAMS = {
-        'forMine',
-        'channelId',
-        'channelType',
-        'eventType',
-        'location',
-        'locationRadius',
-        'maxResults',
-        'order',
-        'pageToken'
-        'publishedAfter',
-        'publishedBefore',
-        'q',
-        'safeSearch',
-        'topicId',
-        'type',
-        'videoCaption',
-        'videoCategoryId',
-        'videoDefinition',
-        'videoDimension',
-        'videoDuration',
-        'videoEmbeddable',
-        'videoLicense',
-        'videoPaidProductPlacement',
-        'videoSyndicated',
-        'videoType',
-    }
+    _NON_EMPTY_STRING_PARAMS = set()
 
     def __init__(self, path='/', params=None, plugin_id=''):
         self._access_manager = None
@@ -382,7 +355,7 @@ class AbstractContext(Logger):
                     elif params == 'playlist':
                         to_delete.append(param)
                         param = 'playlist_id'
-                elif param in self._SEARCH_PARAMS:
+                elif param in self._NON_EMPTY_STRING_PARAMS:
                     parsed_value = to_str(value)
                     parsed_value = VALUE_FROM_STR.get(
                         parsed_value, parsed_value

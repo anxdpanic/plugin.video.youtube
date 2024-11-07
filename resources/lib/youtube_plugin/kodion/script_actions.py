@@ -245,7 +245,7 @@ def _maintenance_actions(context, action, params):
 
         if ui.on_clear_content(localize('maintenance.{0}'.format(target))):
             targets[target]().clear()
-            ui.show_notification(localize('succeeded'))
+            ui.show_notification(localize('completed'))
 
     elif action == 'refresh':
         targets = {
@@ -256,7 +256,7 @@ def _maintenance_actions(context, action, params):
             return
 
         if target == 'settings_xml' and ui.on_yes_no_input(
-                context.get_name(), localize('refresh.settings.confirm')
+                context.get_name(), localize('refresh.settings.check')
         ):
             if not context.get_system_version().compatible(20):
                 ui.show_notification(localize('failed'))
@@ -419,7 +419,7 @@ def _user_actions(context, action, params):
         username = access_manager.get_username(user)
         if ui.on_remove_content(username):
             access_manager.remove_user(user)
-            ui.show_notification(localize('removed') % '"%s"' % username,
+            ui.show_notification(localize('removed') % username,
                                  localize('remove'))
             if user == 0:
                 access_manager.add_user(username=localize('user.default'),
@@ -479,9 +479,9 @@ def run(argv):
                 params = dict(parse_qsl(args.query))
 
         system_version = context.get_system_version()
-        context.log_notice('Script: Running |v{version}|'
-                           '\n\tKodi:     |v{kodi}|'
-                           '\n\tPython:   |v{python}|'
+        context.log_notice('Script: Running v{version}'
+                           '\n\tKodi:     v{kodi}'
+                           '\n\tPython:   v{python}'
                            '\n\tCategory: |{category}|'
                            '\n\tAction:   |{action}|'
                            '\n\tParams:   |{params}|'

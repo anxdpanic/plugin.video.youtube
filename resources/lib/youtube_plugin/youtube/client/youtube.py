@@ -16,12 +16,12 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
-from traceback import format_exc
+from traceback import format_stack
 
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
 from ..youtube_exceptions import InvalidJSON, YouTubeException
-from ...kodion.compatibility import cpu_count, string_type, to_str
+from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser,
@@ -204,7 +204,7 @@ class YouTube(LoginClient):
 
     def remove_playlist(self, playlist_id, **kwargs):
         params = {'id': playlist_id,
-                  'mine': 'true'}
+                  'mine': True}
         return self.api_request(method='DELETE',
                                 path='playlists',
                                 params=params,
@@ -289,7 +289,7 @@ class YouTube(LoginClient):
 
     def add_video_to_playlist(self, playlist_id, video_id, **kwargs):
         params = {'part': 'snippet',
-                  'mine': 'true'}
+                  'mine': True}
         post_data = {'kind': 'youtube#playlistItem',
                      'snippet': {'playlistId': playlist_id,
                                  'resourceId': {'kind': 'youtube#video',
@@ -354,7 +354,7 @@ class YouTube(LoginClient):
                   'maxResults': str(self.max_results()),
                   'order': order}
         if channel_id == 'mine':
-            params['mine'] = 'true'
+            params['mine'] = True
         else:
             params['channelId'] = channel_id
         if page_token:
@@ -819,9 +819,9 @@ class YouTube(LoginClient):
                   'hl': self._language}
 
         if channel_id == 'home':
-            params['home'] = 'true'
+            params['home'] = True
         elif channel_id == 'mine':
-            params['mine'] = 'true'
+            params['mine'] = True
         else:
             params['channelId'] = channel_id
         if page_token:
@@ -837,7 +837,7 @@ class YouTube(LoginClient):
                   'regionCode': self._region,
                   'hl': self._language}
         if channel_id == 'mine':
-            params['mine'] = 'true'
+            params['mine'] = True
         else:
             params['channelId'] = channel_id
         return self.api_request(method='GET',
@@ -848,10 +848,10 @@ class YouTube(LoginClient):
     def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
         params = {'part': 'snippet',
                   'maxResults': str(self.max_results())}
-        if channel_id != 'mine':
-            params['channelId'] = channel_id
+        if channel_id == 'mine':
+            params['mine'] = True
         else:
-            params['mine'] = 'true'
+            params['channelId'] = channel_id
         if page_token:
             params['pageToken'] = page_token
 
@@ -940,10 +940,10 @@ class YouTube(LoginClient):
             channel_id = ','.join(channel_id)
 
         params = {'part': 'snippet,contentDetails,brandingSettings,statistics'}
-        if channel_id != 'mine':
-            params['id'] = channel_id
+        if channel_id == 'mine':
+            params['mine'] = True
         else:
-            params['mine'] = 'true'
+            params['id'] = channel_id
         return self.api_request(method='GET',
                                 path='channels',
                                 params=params,
@@ -1308,7 +1308,7 @@ class YouTube(LoginClient):
                   'order': 'date'}
 
         if channel_id == 'mine':
-            params['forMine'] = 'true'
+            params['forMine'] = True
         else:
             params['channelId'] = channel_id
 
@@ -1425,16 +1425,25 @@ class YouTube(LoginClient):
             'regionCode': self._region,
             'hl': self._language,
             'relevanceLanguage': self._language,
-            'maxResults': str(self.max_results()),
         }
 
         search_query = params.get('q')
         if '|' in search_query:
             search_params['q'] = search_query.replace('|', '%7C')
 
+        max_results = params.get('maxResults')
+        if max_results is None:
+            search_params['maxResults'] = str(self.max_results())
+
         search_type = params.get('type')
         if isinstance(search_type, (list, tuple)):
             search_params['type'] = ','.join(search_type)
+
+        channel_id = params.get('channelId')
+        if channel_id == 'mine':
+            params['forMine'] = True
+        else:
+            params['channelId'] = channel_id
 
         location = params.get('location')
         if location is True:
@@ -1443,7 +1452,8 @@ class YouTube(LoginClient):
                 search_params['location'] = location
                 search_params['locationRadius'] = settings.get_location_radius()
 
-        if 'safeSearch' not in params:
+        safe_search = params.get('safeSearch')
+        if safe_search is None:
             search_params['safeSearch'] = settings.safe_search()
 
         published = params.get('publishedBefore')
@@ -1563,9 +1573,9 @@ class YouTube(LoginClient):
 
         params = {
             'part': 'snippet',
-            'maxResults': '50',
+            'maxResults': str(self.max_results()),
             'order': 'alphabetical',
-            'mine': 'true'
+            'mine': True,
         }
 
         def _get_channels(output, _params=params):
@@ -1754,9 +1764,13 @@ class YouTube(LoginClient):
 
                 try:
                     success, complete = worker(output, **_kwargs)
-                except Exception:
-                    msg = 'get_my_subscriptions._threaded_fetch - {exc}'
-                    self._context.log_error(msg.format(exc=format_exc()))
+                except Exception as exc:
+                    msg = ('get_my_subscriptions._threaded_fetch - Error'
+                           '\n\tException: {exc!r}'
+                           '\n\tStack trace (most recent call last):\n{stack}'
+                           .format(exc=exc,
+                                   stack=''.join(format_stack())))
+                    self._context.log_error(msg)
                     continue
 
                 if complete or not success:
@@ -1773,11 +1787,7 @@ class YouTube(LoginClient):
             threads['current'].discard(threading.current_thread())
             threads['loop'].set()
 
-        try:
-            num_cores = cpu_count() or 1
-        except NotImplementedError:
-            num_cores = 1
-        max_threads = min(32, 2 * (num_cores + 4))
+        max_threads = min(32, 2 * (available_cpu_count() + 4))
         counts = {
             'all': 0,
         }
@@ -2084,7 +2094,8 @@ class YouTube(LoginClient):
             exception = None
 
         if not json_data or 'error' not in json_data:
-            info = 'Exception:\n\t|{exc!r}|'
+            info = ('Request - Failed'
+                    '\n\tException: {exc!r}')
             details = kwargs
             return None, info, details, data, None, exception
 
@@ -2115,9 +2126,9 @@ class YouTube(LoginClient):
                                                          title,
                                                          time_ms=timeout)
 
-        info = ('API error: {reason}'
-                '\n\texc:     |{exc!r}|'
-                '\n\tmessage: |{message}|')
+        info = ('API error - {reason}'
+                '\n\tException: {exc!r}'
+                '\n\tMessage:   {message}')
         details = {'reason': reason, 'message': message}
         return '', info, details, data, False, exception
 

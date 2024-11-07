@@ -301,7 +301,6 @@ def update_channel_infos(provider, context, channel_id_dict,
             )
 
         if context_menu:
-            context_menu.append(menu_items.separator())
             channel_item.add_context_menu(context_menu)
 
         # update channel mapping
@@ -342,6 +341,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
     video_count_label = localize('stats.videoCount')
     podcast_label = context.localize('playlist.podcast')
     untitled = localize('untitled')
+    separator = menu_items.separator()
 
     path = context.get_path()
     ui = context.get_ui()
@@ -448,7 +448,7 @@ def update_playlist_infos(provider, context, playlist_id_dict,
             menu_items.shuffle_playlist(
                 context, playlist_id
             ),
-            menu_items.separator(),
+            separator,
             menu_items.bookmark_add(
                 context, playlist_item
             ) if not in_bookmarks_list and channel_id != 'mine' else None,
@@ -499,7 +499,6 @@ def update_playlist_infos(provider, context, playlist_id_dict,
             )
 
         if context_menu:
-            context_menu.append(menu_items.separator())
             playlist_item.add_context_menu(context_menu)
 
         # update channel mapping
@@ -894,7 +893,7 @@ def update_video_infos(provider, context, video_id_dict,
                     context,
                     playlist_id=playlist_id,
                     video_id=playlist_item_id,
-                    video_name=media_item.get_name(),
+                    item_name=media_item.get_name(),
                 )
             )
 
@@ -924,7 +923,7 @@ def update_video_infos(provider, context, video_id_dict,
             context_menu.append(
                 # remove bookmarked channel of the video
                 menu_items.bookmark_remove(
-                    context, item_id=channel_id
+                    context, channel_id, channel_name
                 ) if in_my_subscriptions_list else
                 # bookmark channel of the video
                 menu_items.bookmark_add_channel(
@@ -993,7 +992,6 @@ def update_video_infos(provider, context, video_id_dict,
             )
 
         if context_menu:
-            context_menu.append(menu_items.separator())
             media_item.add_context_menu(context_menu)
 
 

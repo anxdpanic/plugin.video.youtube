@@ -1,3 +1,24 @@
+## v7.1.1+beta.5
+### Fixed
+- Fix Python2/Android incompatibilty when checking CPU count #958
+- Fix method used to determine address of local network interface #938
+- Fix potential infinite loop with corrupted access_manager.json
+- Various improvements to multiple busy dialog crash workarounds #938
+- Fallback to search listing when search query is empty
+- Fix debug log string formatting error #938
+- Fix duplicated separators in context menu
+- Fix Kodi builtin using wrong playlist type #938
+
+### Changed
+- Improve support for optional search API parameters #689
+- Ensure changing sort order of search replaces existing search
+
+### New
+- Add additional search type links to search results #689
+- Add ability to replace window when rerouting using window_replace query parameter
+- Add search sort context menu items to search results #172
+- Add prompts and notifications for deleting items and clearing lists
+
 ## v7.1.1+beta.4
 ### Fixed
 - Fix incorrectly determining Kodi release name

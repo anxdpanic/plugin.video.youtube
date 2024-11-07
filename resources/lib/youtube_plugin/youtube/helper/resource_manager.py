@@ -32,33 +32,36 @@ class ResourceManager(object):
             yield input_list[i:i + n]
 
     def get_channels(self, ids, defer_cache=False):
-        client = self._provider.get_client(self._context)
-        data_cache = self._context.get_data_cache()
-        function_cache = self._context.get_function_cache()
-        refresh = self._context.get_param('refresh')
+        context = self._context
+        client = self._provider.get_client(context)
+        data_cache = context.get_data_cache()
+        function_cache = context.get_function_cache()
+        refresh = context.get_param('refresh')
         updated = []
-        for channel_id in ids:
-            if not channel_id:
+        for identifier in ids:
+            if not identifier:
                 continue
 
-            if channel_id != 'mine':
-                updated.append(channel_id)
+            if identifier != 'mine':
+                updated.append(identifier)
                 continue
 
             data = function_cache.run(
                 client.get_channel_by_identifier,
                 function_cache.ONE_DAY,
                 _refresh=refresh,
-                identifier=channel_id,
+                identifier=identifier,
             ) or {}
-            items = data.get('items', [{'id': 'mine'}])
+            items = data.get('items')
 
             try:
-                channel_id = items[0]['id']
-                updated.append(channel_id)
-            except IndexError:
-                self._context.log_error('Channel not found:\n{data}'
-                                        .format(data=data))
+                updated.append(items[0]['id'])
+            except (IndexError, KeyError, TypeError) as exc:
+                context.log_error('ResourceManager.get_channels'
+                                  ' - Own channel_id not found'
+                                  '\n\tException: {exc!r}'
+                                  '\n\tChannels:  {data}'
+                                  .format(exc=exc, data=data))
 
         ids = updated
         if refresh:
@@ -71,8 +74,12 @@ class ResourceManager(object):
                      or result[id_].get('_partial')]
 
         if result:
-            self._context.log_debug('Found cached data for channels:\n|{ids}|'
-                                    .format(ids=list(result)))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_channels'
+                ' - Using cached data for channels'
+                '\n\tChannel IDs: {ids}'
+                .format(ids=list(result))
+            )
 
         if to_update:
             new_data = [client.get_channels(list_of_50)
@@ -83,8 +90,12 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            self._context.log_debug('Got data for channels:\n|{ids}|'
-                                    .format(ids=to_update))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_channels'
+                ' - Retrieved new data for channels'
+                '\n\tVideo IDs: {ids}'
+                .format(ids=to_update)
+            )
             new_data = {
                 yt_item['id']: yt_item
                 for batch in new_data
@@ -133,12 +144,13 @@ class ResourceManager(object):
         return result
 
     def get_playlists(self, ids, defer_cache=False):
+        context = self._context
         ids = tuple(ids)
-        refresh = self._context.get_param('refresh')
+        refresh = context.get_param('refresh')
         if refresh:
             result = {}
         else:
-            data_cache = self._context.get_data_cache()
+            data_cache = context.get_data_cache()
             result = data_cache.get_items(ids, data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
                      if id_ not in result
@@ -146,11 +158,15 @@ class ResourceManager(object):
                      or result[id_].get('_partial')]
 
         if result:
-            self._context.log_debug('Found cached data for playlists:\n|{ids}|'
-                                    .format(ids=list(result)))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_playlists'
+                ' - Using cached data for playlists'
+                '\n\tVideo IDs: {ids}'
+                .format(ids=list(result))
+            )
 
         if to_update:
-            client = self._provider.get_client(self._context)
+            client = self._provider.get_client(context)
             new_data = [client.get_playlists(list_of_50)
                         for list_of_50 in self._list_batch(to_update, n=50)]
             if not any(new_data):
@@ -159,8 +175,12 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            self._context.log_debug('Got data for playlists:\n|{ids}|'
-                                    .format(ids=to_update))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_playlists'
+                ' - Retrieved new data for playlists'
+                '\n\tVideo IDs: {ids}'
+                .format(ids=to_update)
+            )
             new_data = {
                 yt_item['id']: yt_item
                 for batch in new_data
@@ -185,7 +205,8 @@ class ResourceManager(object):
         if not ids and not batch_id:
             return None
 
-        refresh = self._context.get_param('refresh')
+        context = self._context
+        refresh = context.get_param('refresh')
 
         if batch_id:
             ids = [batch_id[0]]
@@ -195,7 +216,7 @@ class ResourceManager(object):
             page_token = None
             fetch_next = True
 
-        data_cache = self._context.get_data_cache()
+        data_cache = context.get_data_cache()
         batch_ids = []
         to_update = []
         result = {}
@@ -221,10 +242,14 @@ class ResourceManager(object):
                     break
 
         if result:
-            self._context.log_debug('Found cached items for playlists:\n|{ids}|'
-                                    .format(ids=list(result)))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_playlist_items'
+                ' - Using cached data for playlist parts'
+                '\n\tBatch IDs: {ids}'
+                .format(ids=list(result))
+            )
 
-        client = self._provider.get_client(self._context)
+        client = self._provider.get_client(context)
         new_data = {}
         insert_point = 0
         for playlist_id, page_token in to_update:
@@ -243,9 +268,12 @@ class ResourceManager(object):
                     break
 
         if new_data:
-            to_update = list(new_data)
-            self._context.log_debug('Got items for playlists:\n|{ids}|'
-                                    .format(ids=to_update))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_playlist_items'
+                ' - Retrieved new data for playlist parts'
+                '\n\tBatch IDs: {ids}'
+                .format(ids=list(new_data))
+            )
             result.update(new_data)
             self.cache_data({
                 '{0},{1}'.format(*batch_id): batch
@@ -284,12 +312,13 @@ class ResourceManager(object):
                    live_details=False,
                    suppress_errors=False,
                    defer_cache=False):
+        context = self._context
         ids = tuple(ids)
-        refresh = self._context.get_param('refresh')
+        refresh = context.get_param('refresh')
         if refresh:
             result = {}
         else:
-            data_cache = self._context.get_data_cache()
+            data_cache = context.get_data_cache()
             result = data_cache.get_items(ids, data_cache.ONE_MONTH)
         to_update = [id_ for id_ in ids
                      if id_ not in result
@@ -297,12 +326,16 @@ class ResourceManager(object):
                      or result[id_].get('_partial')]
 
         if result:
-            self._context.log_debug('Found cached data for videos:\n|{ids}|'
-                                    .format(ids=list(result)))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_videos'
+                ' - Using cached data for videos'
+                '\n\tVideo IDs: {ids}'
+                .format(ids=list(result))
+            )
 
         if to_update:
             notify_and_raise = not suppress_errors
-            client = self._provider.get_client(self._context)
+            client = self._provider.get_client(context)
             new_data = [client.get_videos(list_of_50,
                                           live_details,
                                           notify=notify_and_raise,
@@ -314,8 +347,12 @@ class ResourceManager(object):
             new_data = None
 
         if new_data:
-            self._context.log_debug('Got data for videos:\n|{ids}|'
-                                    .format(ids=to_update))
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_videos'
+                ' - Retrieved new data for videos'
+                '\n\tVideo IDs: {ids}'
+                .format(ids=to_update)
+            )
             new_data = {
                 yt_item['id']: yt_item
                 for batch in new_data
@@ -336,8 +373,8 @@ class ResourceManager(object):
                 if id_ in result
             }
 
-        if self._context.get_settings().use_local_history():
-            playback_history = self._context.get_playback_history()
+        if context.get_settings().use_local_history():
+            playback_history = context.get_playback_history()
             played_items = playback_history.get_items(ids)
             for video_id, play_data in played_items.items():
                 if video_id in result:
@@ -356,8 +393,13 @@ class ResourceManager(object):
             data = self.new_data
             flush = True
         if data:
-            self._context.get_data_cache().set_items(data)
-            self._context.log_debug('Cached data for items:\n|{ids}|'
-                                    .format(ids=list(data)))
+            context = self._context
+            context.get_data_cache().set_items(data)
+            context.debug_log and context.log_debug(
+                'ResourceManager.cache_data'
+                ' - Storing new data to cache'
+                '\n\tIDs: {ids}'
+                .format(ids=list(data))
+            )
         if flush:
             self.new_data = {}

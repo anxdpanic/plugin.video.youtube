@@ -31,7 +31,7 @@ from ...kodion.constants import (
     PLAY_TIMESHIFT,
     PLAY_WITH,
 )
-from ...kodion.items import AudioItem, VideoItem
+from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
 from ...kodion.utils import find_video_id, select_stream
 
@@ -78,9 +78,12 @@ def _play_stream(provider, context):
                 use_mpd=use_adaptive_formats and settings.use_mpd_videos(),
             )
         except YouTubeException as exc:
-            context.log_error('yt_play.play_video - {exc!r}:\n{details}'.format(
-                exc=exc, details=''.join(format_stack())
-            ))
+            msg = ('yt_play.play_video - Error'
+                   '\n\tException: {exc!r}'
+                   '\n\tStack trace (most recent call last):\n{stack}'
+                   .format(exc=exc,
+                           stack=''.join(format_stack())))
+            context.log_error(msg)
             ui.show_notification(message=exc.get_message())
             return False
 
@@ -266,13 +269,13 @@ def _play_playlist(provider, context):
     options = {
         provider.RESULT_CACHE_TO_DISC: False,
         provider.RESULT_FORCE_RESOLVE: True,
-        provider.RESULT_UPDATE_LISTING: False,
+        provider.RESULT_UPDATE_LISTING: True,
     }
 
     if action == 'queue':
         return videos, options
     if context.get_handle() == -1 or action == 'play':
-        playlist_player.play(playlist_index=playlist_position)
+        playlist_player.play_playlist_item(playlist_position + 1)
         return False
     return videos[playlist_position], options
 
@@ -307,7 +310,7 @@ def _play_channel_live(provider, context):
     playlist_player.add(video_item)
 
     if context.get_handle() == -1:
-        playlist_player.play(playlist_index=0)
+        playlist_player.play_playlist_item(1)
         return False
     return video_item
 
@@ -370,14 +373,11 @@ def process(provider, context, **_kwargs):
         # This is required to trigger Kodi resume prompt, along with using
         # RunPlugin. Prompt will not be used if using PlayMedia
         if force_play:
-            context.execute('Action(Play)')
-            return False
+            return UriItem('command://Action(Play)')
 
         if context.get_handle() == -1:
-            context.execute('PlayMedia({0})'.format(
-                context.create_uri((PATHS.PLAY,), params)
-            ))
-            return False
+            return UriItem('command://PlayMedia({0}, playlist_type_hint=1)'
+                           .format(context.create_uri((PATHS.PLAY,), params)))
 
         ui.set_property(BUSY_FLAG)
         playlist_player = context.get_playlist_player()

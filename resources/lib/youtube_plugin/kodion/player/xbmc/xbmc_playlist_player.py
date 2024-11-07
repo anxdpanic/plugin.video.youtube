@@ -24,7 +24,7 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         'playlist_id': None
     }
 
-    _PLAYER_PLAYLIST = {
+    PLAYLIST_MAP = {
         0: 'music',
         1: 'video',
         'video': xbmc.PLAYLIST_VIDEO,  # 1
@@ -44,8 +44,8 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
             playlist_id = self.get_playlist_id(retry=retry)
         else:
             playlist_id = (
-                    self._PLAYER_PLAYLIST.get(playlist_type)
-                    or self._PLAYER_PLAYLIST['video']
+                    self.PLAYLIST_MAP.get(playlist_type)
+                    or self.PLAYLIST_MAP['video']
             )
         self.set_playlist_id(playlist_id)
 
@@ -108,7 +108,7 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
             return None
 
         for player in result:
-            if player.get('type', 'video') in cls._PLAYER_PLAYLIST:
+            if player.get('type', 'video') in cls.PLAYLIST_MAP:
                 try:
                     player_id = int(player['playerid'])
                 except (KeyError, TypeError, ValueError):
@@ -149,7 +149,7 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         try:
             playlist_id = int(result['result']['playlistid'])
         except (KeyError, TypeError, ValueError):
-            playlist_id = cls._PLAYER_PLAYLIST['video']
+            playlist_id = cls.PLAYLIST_MAP['video']
 
         cls.set_playlist_id(playlist_id)
         return playlist_id
@@ -166,11 +166,15 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         try:
             result = response['result']['items']
             return json.dumps(result, ensure_ascii=False) if dumps else result
-        except (KeyError, TypeError, ValueError):
+        except (KeyError, TypeError, ValueError) as exc:
             error = response.get('error', {})
-            self._context.log_error('XbmcPlaylist.get_items error - |{0}: {1}|'
-                                    .format(error.get('code', 'unknown'),
-                                            error.get('message', 'unknown')))
+            self._context.log_error('XbmcPlaylist.get_items - Error'
+                                    '\n\tException: {exc!r}'
+                                    '\n\tCode:      {code}'
+                                    '\n\tMessage:   {msg}'
+                                    .format(exc=exc,
+                                            code=error.get('code', 'Unknown'),
+                                            msg=error.get('message', 'Unknown')))
         return '' if dumps else []
 
     def add_items(self, items, loads=False):
@@ -226,10 +230,11 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         running.  This is somehow shitty, because we couldn't release any resources and in our case we couldn't release
         the cache. So this is the solution to prevent a locked database (sqlite).
         """
-        self._context.execute('Playlist.PlayOffset(%s,%d)' % (
-            self._PLAYER_PLAYLIST[self._playlist.getPlayListId()],
-            playlist_index,
-        ))
+        playlist_type = self.PLAYLIST_MAP.get(self._playlist.getPlayListId())
+        self._context.execute(
+            'Playlist.PlayOffset({type},{position})'
+            .format(type=playlist_type or 'video', position=playlist_index)
+        )
 
         """
         playlist = None

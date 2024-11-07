@@ -62,3 +62,4 @@ class Logger(object):
             Logger.LOGDEBUG = Logger.LOGNOTICE
         elif off:
             Logger.LOGDEBUG = xbmc.LOGDEBUG
+        return Logger.LOGDEBUG

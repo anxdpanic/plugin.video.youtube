@@ -366,7 +366,7 @@ msgid "Related Videos"
 msgstr ""
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
+msgid "Auto-Remove from Watch Later"
 msgstr ""
 
 msgctxt "#30516"
@@ -582,11 +582,11 @@ msgid "Remove as Watch Later"
 msgstr ""
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
 msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
 msgstr ""
 
 msgctxt "#30571"
@@ -598,11 +598,11 @@ msgid "Remove as History"
 msgstr ""
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
 msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
 msgstr ""
 
 msgctxt "#30575"
@@ -942,7 +942,7 @@ msgid "Enter a name for this user"
 msgstr ""
 
 msgctxt "#30659"
-msgid "User is now '%s'"
+msgid "User is now \"%s\""
 msgstr ""
 
 msgctxt "#30660"
@@ -966,15 +966,15 @@ msgid "Switch user"
 msgstr ""
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
+msgid "Switch to \"%s\" now?"
 msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
+msgid "Renamed \"%s\" to \"%s\""
 msgstr ""
 
 msgctxt "#30668"

@@ -70,7 +70,7 @@ def select_stream(context,
                  and settings.live_stream_type()) or 'hls'
 
     if audio_only:
-        context.log_debug('Select stream: Audio only')
+        context.log_debug('Select stream - Audio only')
         stream_list = [item for item in stream_data_list
                        if 'video' not in item]
     else:
@@ -85,7 +85,7 @@ def select_stream(context,
         ]
 
     if not stream_list:
-        context.log_debug('Select stream: no streams found')
+        context.log_debug('Select stream - No streams found')
         return None
 
     def _stream_sort(_stream):
@@ -111,7 +111,9 @@ def select_stream(context,
         if original_value:
             log_data['url'] = redact_ip(original_value)
 
-        context.log_debug('Stream {0}:\n{1}'.format(idx, log_data))
+        context.log_debug('Stream {idx}:'
+                          '\n\t{stream_details}'
+                          .format(idx=idx, stream_details=log_data))
 
     if ask_for_quality:
         selected_stream = context.get_ui().on_select(
@@ -119,7 +121,7 @@ def select_stream(context,
             [stream['title'] for stream in stream_list],
         )
         if selected_stream == -1:
-            context.log_debug('Select stream: no stream selected')
+            context.log_debug('Select stream - No stream selected')
             return None
     else:
         selected_stream = 0
@@ -167,7 +169,8 @@ def make_dirs(path):
 
     if succeeded:
         return path
-    Logger.log_error('Failed to create directory: |{0}|'.format(path))
+    Logger.log_error('utils.make_dirs - Failed to create directory'
+                     '\n\tPath: {path}'.format(path=path))
     return False
 
 
@@ -187,7 +190,8 @@ def rm_dir(path):
 
     if succeeded:
         return True
-    Logger.log_error('Failed to remove directory: {0}'.format(path))
+    Logger.log_error('utils.rm_dir - Failed to remove directory'
+                     '\n\tPath: {path}'.format(path=path))
     return False
 
 

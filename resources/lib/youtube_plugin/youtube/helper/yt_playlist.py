@@ -52,7 +52,7 @@ def _process_add_video(provider, context, keymap_action=False):
     context.get_ui().show_notification(
         message=notify_message,
         time_ms=2500,
-        audible=False
+        audible=False,
     )
 
     if keymap_action:
@@ -86,7 +86,7 @@ def _process_remove_video(provider,
     if video_id is None:
         video_id = params.pop('video_id', None)
     if video_name is None:
-        video_name = params.pop('video_name', None)
+        video_name = params.pop('item_name', None)
     if confirmed is None:
         confirmed = params.pop('confirmed', False)
 
@@ -133,7 +133,7 @@ def _process_remove_video(provider,
         context.get_ui().show_notification(
             message=context.localize('playlist.removed_from'),
             time_ms=2500,
-            audible=False
+            audible=False,
         )
 
         if not context.is_plugin_path(container_uri):
@@ -171,7 +171,7 @@ def _process_remove_playlist(provider, context):
     if not playlist_id:
         raise KodionException('Playlist/Remove: missing playlist_id')
 
-    playlist_name = params.get('playlist_name', '')
+    playlist_name = params.get('item_name', '')
     if not playlist_name:
         raise KodionException('Playlist/Remove: missing playlist_name')
 
@@ -301,7 +301,7 @@ def _process_rename_playlist(provider, context):
         raise KodionException('playlist/rename: missing playlist_id')
 
     result, text = ui.on_keyboard_input(
-        context.localize('rename'), default=params.get('playlist_name', ''),
+        context.localize('rename'), default=params.get('item_name', ''),
     )
     if not result or not text:
         return False
@@ -323,14 +323,14 @@ def _playlist_id_change(context, playlist, method):
     if not playlist_id:
         raise KodionException('{type}/{method}: missing playlist_id'
                               .format(type=playlist, method=method))
-    playlist_name = context.get_param('playlist_name', '')
+    playlist_name = context.get_param('item_name', '')
     if not playlist_name:
         raise KodionException('{type}/{method}: missing playlist_name'
                               .format(type=playlist, method=method))
 
     if context.get_ui().on_yes_no_input(
             context.get_name(),
-            context.localize('{type}.list.{method}.confirm'.format(
+            context.localize('{type}.list.{method}.check'.format(
                 type=playlist, method=method
             )) % playlist_name
     ):
