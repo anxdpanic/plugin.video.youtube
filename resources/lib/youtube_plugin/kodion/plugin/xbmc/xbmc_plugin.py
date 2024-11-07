@@ -20,6 +20,7 @@ from ...constants import (
     CONTAINER_ID,
     CONTAINER_POSITION,
     CONTENT_TYPE,
+    PATHS,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -68,6 +69,8 @@ class XbmcPlugin(AbstractPlugin):
         ui = context.get_ui()
 
         route = ui.pop_property(REROUTE_PATH)
+        post_run_action = None
+        succeeded = False
         for was_busy in (ui.pop_property(BUSY_FLAG),):
             if was_busy:
                 if ui.busy_dialog_active():
@@ -77,24 +80,32 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 break
 
+            uri = context.get_uri()
+            playlist_player = context.get_playlist_player()
+            position, remaining = playlist_player.get_position()
+            playing = (playlist_player.is_playing()
+                       and context.is_plugin_path(uri, PATHS.PLAY))
+
+            if playing:
+                items = playlist_player.get_items()
+                playlist_player.clear()
+                context.log_warning('Multiple busy dialogs active'
+                                    ' - Playlist cleared to avoid Kodi crash')
+
             xbmcplugin.endOfDirectory(
                 handle,
                 succeeded=False,
+                updateListing=True,
+                cacheToDisc=False,
             )
 
-            playlist_player = context.get_playlist_player()
-
-            items = playlist_player.get_items()
-            if not items and not playlist_player.is_playing():
+            if not playing:
                 context.log_warning('Multiple busy dialogs active'
                                     ' - Plugin call ended to avoid Kodi crash')
-                break
+                result, post_run_action = self.uri_action(context, uri)
+                succeeded = result
+                continue
 
-            playlist_player.clear()
-            context.log_warning('Multiple busy dialogs active'
-                                ' - Playlist cleared to avoid Kodi crash')
-
-            position, remaining = playlist_player.get_position()
             if position:
                 path = items[position - 1]['file']
                 old_path = ui.pop_property(PLAYLIST_PATH)
@@ -104,24 +115,21 @@ class XbmcPlugin(AbstractPlugin):
                     if remaining:
                         position += 1
                     else:
-                        return False
+                        continue
 
             max_wait_time = 30
             while ui.busy_dialog_active():
                 max_wait_time -= 1
                 if max_wait_time < 0:
-                    context.log_warning('Multiple busy dialogs active'
-                                        ' - Extended busy period')
-                    break
+                    context.log_error('Multiple busy dialogs active'
+                                      ' - Extended busy period')
+                    continue
                 context.sleep(1)
 
             context.log_warning('Multiple busy dialogs active'
                                 ' - Reloading playlist')
 
             num_items = playlist_player.add_items(items)
-            if playlist_player.is_playing():
-                return False
-
             if position:
                 max_wait_time = min(position, num_items)
             else:
@@ -133,12 +141,21 @@ class XbmcPlugin(AbstractPlugin):
                 if max_wait_time < 0:
                     context.log_error('Multiple busy dialogs active'
                                       ' - Unable to restart playback')
-                    break
+                    result, post_run_action = self.uri_action(
+                        context,
+                        'command://Playlist.PlayOffset({type},{position})'
+                        .format(type='video',
+                                position=(position - 1)),
+                    )
+                    succeeded = False
+                    continue
                 context.sleep(1)
             else:
                 playlist_player.play_playlist_item(position)
         else:
-            return False
+            if post_run_action:
+                self.post_run(context, ui, post_run_action)
+            return succeeded
 
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
@@ -209,7 +226,6 @@ class XbmcPlugin(AbstractPlugin):
             else:
                 result = None
 
-        post_run_action = None
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             uri = result.get_uri()
 
@@ -231,25 +247,8 @@ class XbmcPlugin(AbstractPlugin):
                                               succeeded=result,
                                               listitem=item)
 
-            elif uri.startswith('script://'):
-                uri = uri[len('script://'):]
-                context.log_debug('Running script: |{0}|'.format(uri))
-                post_run_action = 'RunScript({0})'.format(uri)
-                result = False
-
-            elif uri.startswith('command://'):
-                uri = uri[len('command://'):]
-                context.log_debug('Running command: |{0}|'.format(uri))
-                post_run_action = uri
-                result = True
-
-            elif context.is_plugin_path(uri):
-                context.log_debug('Redirecting to: |{0}|'.format(uri))
-                post_run_action = 'RunPlugin({0})'.format(uri)
-                result = False
-
             else:
-                result = False
+                result, post_run_action = self.uri_action(context, uri)
 
         if item_count:
             context.apply_content()
@@ -277,15 +276,47 @@ class XbmcPlugin(AbstractPlugin):
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
         if post_run_action:
-            max_wait_time = 30
-            while ui.busy_dialog_active():
-                max_wait_time -= 1
-                if max_wait_time < 0:
-                    context.log_error('Multiple busy dialogs active'
-                                      ' - Post run action unable to execute')
-                    break
-                context.sleep(1)
-            else:
-                context.execute(post_run_action)
-
+            self.post_run(context, ui, post_run_action)
         return succeeded
+
+    @staticmethod
+    def post_run(context, ui, action, timeout=30):
+        while ui.busy_dialog_active():
+            timeout -= 1
+            if timeout < 0:
+                context.log_error('Multiple busy dialogs active'
+                                  ' - Post run action unable to execute')
+                break
+            context.sleep(1)
+        else:
+            context.execute(action)
+
+    @staticmethod
+    def uri_action(context, uri):
+        if uri.startswith('script://'):
+            uri = uri[len('script://'):]
+            context.log_debug('Running script: |{0}|'.format(uri))
+            action = 'RunScript({0})'.format(uri)
+            result = True
+
+        elif uri.startswith('command://'):
+            uri = uri[len('command://'):]
+            context.log_debug('Running command: |{0}|'.format(uri))
+            action = uri
+            result = True
+
+        elif context.is_plugin_path(uri, PATHS.PLAY):
+            context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+            action = 'PlayMedia({0}, playlist_time_hint=1)'.format(uri)
+            result = False
+
+        elif context.is_plugin_path(uri):
+            context.log_debug('Redirecting to: |{0}|'.format(uri))
+            action = 'RunPlugin({0})'.format(uri)
+            result = False
+
+        else:
+            action = None
+            result = False
+
+        return result, action
