@@ -244,7 +244,7 @@ class PlayerMonitorThread(threading.Thread):
                         category='video',
                         playlist_id=watch_later_id,
                         video_id=playlist_item_id,
-                        video_name='',
+                        item_name='',
                         confirmed=True,
                     )
             else:

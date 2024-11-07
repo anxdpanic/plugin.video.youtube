@@ -117,6 +117,7 @@ class AbstractProvider(object):
         return wrapper
 
     def run_wizard(self, context):
+        localize = context.localize
         # ui local variable used for ui.get_view_manager() in unofficial version
         ui = context.get_ui()
 
@@ -133,9 +134,9 @@ class AbstractProvider(object):
 
         try:
             if wizard_steps and ui.on_yes_no_input(
-                    context.localize('setup_wizard'),
-                    (context.localize('setup_wizard.prompt')
-                     % context.localize('setup_wizard.prompt.settings'))
+                    localize('setup_wizard'),
+                    (localize('setup_wizard.prompt')
+                     % localize('setup_wizard.prompt.settings'))
             ):
                 for wizard_step in wizard_steps:
                     if callable(wizard_step):
@@ -326,6 +327,7 @@ class AbstractProvider(object):
     @staticmethod
     def on_search(provider, context, re_match):
         params = context.get_params()
+        localize = context.localize
         ui = context.get_ui()
 
         command = re_match.group('command')
@@ -340,14 +342,26 @@ class AbstractProvider(object):
 
         if command == 'remove':
             query = to_unicode(params.get('q', ''))
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % query,
+            ):
+                return False
+
             search_history.del_item(query)
             ui.refresh_container()
+
+            ui.show_notification(
+                localize('removed') % query,
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         if command == 'rename':
             query = to_unicode(params.get('q', ''))
             result, new_query = ui.on_keyboard_input(
-                context.localize('search.rename'), query
+                localize('search.rename'), query
             )
             if result:
                 search_history.del_item(query)
@@ -356,8 +370,20 @@ class AbstractProvider(object):
             return True
 
         if command == 'clear':
+            if not ui.on_yes_no_input(
+                    localize('search.clear'),
+                    localize('content.clear.check') % localize('search.history')
+            ):
+                return False
+
             search_history.clear()
             ui.refresh_container()
+
+            ui.show_notification(
+                localize('completed'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         if command.startswith('input'):
@@ -376,7 +402,7 @@ class AbstractProvider(object):
                     query = to_unicode(cached)
             else:
                 result, input_query = ui.on_keyboard_input(
-                    context.localize('search.title')
+                    localize('search.title')
                 )
                 if result:
                     query = input_query
@@ -391,7 +417,7 @@ class AbstractProvider(object):
             )
 
         context.set_content(CONTENT.LIST_CONTENT,
-                            category_label=context.localize('search'))
+                            category_label=localize('search'))
         result = []
 
         location = context.get_param('location', False)

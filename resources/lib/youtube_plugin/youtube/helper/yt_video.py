@@ -84,7 +84,7 @@ def _process_rate_video(provider, context, re_match):
             context.get_ui().show_notification(
                 message=notify_message,
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
 
     return True

@@ -893,7 +893,7 @@ def update_video_infos(provider, context, video_id_dict,
                     context,
                     playlist_id=playlist_id,
                     video_id=playlist_item_id,
-                    video_name=media_item.get_name(),
+                    item_name=media_item.get_name(),
                 )
             )
 
@@ -923,7 +923,7 @@ def update_video_infos(provider, context, video_id_dict,
             context_menu.append(
                 # remove bookmarked channel of the video
                 menu_items.bookmark_remove(
-                    context, item_id=channel_id
+                    context, channel_id, channel_name
                 ) if in_my_subscriptions_list else
                 # bookmark channel of the video
                 menu_items.bookmark_add_channel(

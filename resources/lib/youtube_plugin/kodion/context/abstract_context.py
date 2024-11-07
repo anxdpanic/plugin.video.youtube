@@ -94,19 +94,18 @@ class AbstractContext(Logger):
         'addon_id',
         'category_label',
         'channel_id',
-        'channel_name',
         'client_id',
         'client_secret',
         'click_tracking',
         'event_type',
         'item',
         'item_id',
+        'item_name',
         'order',
         'page_token',
         'parent_id',
         'playlist',  # deprecated
         'playlist_id',
-        'playlist_name',
         'q',
         'rating',
         'reload_path',
@@ -115,7 +114,6 @@ class AbstractContext(Logger):
         'uri',
         'videoid',  # deprecated
         'video_id',
-        'video_name',
         'visitor',
     }
     _STRING_BOOL_PARAMS = {

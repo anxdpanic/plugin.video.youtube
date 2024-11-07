@@ -48,7 +48,7 @@ from ..kodion.items import (
     VideoItem,
     menu_items,
 )
-from ..kodion.utils import strip_html_from_text
+from ..kodion.utils import strip_html_from_text, to_unicode
 
 
 class Provider(AbstractProvider):
@@ -950,7 +950,7 @@ class Provider(AbstractProvider):
 
         params = context.get_params()
         action = params.get('action')
-        channel = params.get('channel_name')
+        channel = params.get('item_name')
         if not channel or not action:
             return
 
@@ -1005,7 +1005,7 @@ class Provider(AbstractProvider):
         localize = context.localize
 
         if target == 'access_manager' and ui.on_yes_no_input(
-                context.get_name(), localize('reset.access_manager.confirm')
+                context.get_name(), localize('reset.access_manager.check')
         ):
             addon_id = context.get_param('addon_id', None)
             access_manager = context.get_access_manager()
@@ -1087,7 +1087,9 @@ class Provider(AbstractProvider):
         if not action:
             return False
 
+        localize = context.localize
         playback_history = context.get_playback_history()
+        ui = context.get_ui()
 
         if action == 'list':
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='history')
@@ -1120,12 +1122,21 @@ class Provider(AbstractProvider):
             video_items = v3.response_to_items(provider, context, v3_response)
             return video_items
 
-        if action == 'clear' and context.get_ui().on_yes_no_input(
-                context.get_name(),
-                context.localize('history.clear.confirm')
-        ):
+        if action == 'clear':
+            if not ui.on_yes_no_input(
+                    localize('history.clear'),
+                    localize('history.clear.check')
+            ):
+                return False
+
             playback_history.clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('completed'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         video_id = params.get('video_id')
@@ -1133,8 +1144,22 @@ class Provider(AbstractProvider):
             return False
 
         if action == 'remove':
+            video_name = params.get('item_name') or video_id
+            video_name = to_unicode(video_name)
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % video_name,
+            ):
+                return False
+
             playback_history.del_item(video_id)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('removed') % video_name,
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         play_data = playback_history.get_item(video_id)
@@ -1164,7 +1189,7 @@ class Provider(AbstractProvider):
             play_data['played_percent'] = 0
 
         playback_history_method(video_id, play_data)
-        context.get_ui().refresh_container()
+        ui.refresh_container()
         return True
 
     @staticmethod
@@ -1596,7 +1621,7 @@ class Provider(AbstractProvider):
                     '_context_menu': {
                         'context_menu': (
                             menu_items.bookmark_remove(
-                                context, item_id
+                                context, item_id, item.get_name()
                             ),
                             menu_items.bookmarks_clear(
                                 context
@@ -1615,17 +1640,20 @@ class Provider(AbstractProvider):
         ui = context.get_ui()
         localize = context.localize
 
-        if command == 'clear' and ui.on_yes_no_input(
-                context.get_name(),
-                localize('bookmarks.clear.confirm')
-        ):
+        if command == 'clear':
+            if not ui.on_yes_no_input(
+                    context.localize('bookmarks.clear'),
+                    localize('bookmarks.clear.check')
+            ):
+                return False
+
             context.get_bookmarks_list().clear()
             ui.refresh_container()
 
             ui.show_notification(
-                localize('succeeded'),
+                localize('completed'),
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
             return True
 
@@ -1640,18 +1668,26 @@ class Provider(AbstractProvider):
             ui.show_notification(
                 localize('bookmark.created'),
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
             return True
 
         if command == 'remove':
+            bookmark_name = params.get('item_name') or localize('bookmark')
+            bookmark_name = to_unicode(bookmark_name)
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % bookmark_name,
+            ):
+                return False
+
             context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
 
             ui.show_notification(
-                localize('removed') % localize('bookmark'),
+                localize('removed') % bookmark_name,
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
             return True
 
@@ -1663,6 +1699,9 @@ class Provider(AbstractProvider):
         command = re_match.group('command')
         if not command:
             return False
+
+        localize = context.localize
+        ui = context.get_ui()
 
         if command == 'list':
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='watch_later')
@@ -1680,7 +1719,7 @@ class Provider(AbstractProvider):
                         '_context_menu': {
                             'context_menu': (
                                 menu_items.watch_later_local_remove(
-                                    context, video_id
+                                    context, video_id, item.get_name()
                                 ),
                                 menu_items.watch_later_local_clear(
                                     context
@@ -1689,18 +1728,27 @@ class Provider(AbstractProvider):
                             'position': 0,
                         }
                     }
-                    for video_id in items.keys()
+                    for video_id, item in items.items()
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
             return video_items
 
-        if command == 'clear' and context.get_ui().on_yes_no_input(
-                context.get_name(),
-                context.localize('watch_later.clear.confirm')
-        ):
+        if command == 'clear':
+            if not ui.on_yes_no_input(
+                    localize('watch_later.clear'),
+                    localize('watch_later.clear.check')
+            ):
+                return False
+
             context.get_watch_later_list().clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('completed'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         video_id = params.get('video_id')
@@ -1714,8 +1762,22 @@ class Provider(AbstractProvider):
             return True
 
         if command == 'remove':
+            video_name = params.get('item_name') or localize('untitled')
+            video_name = to_unicode(video_name)
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % video_name,
+            ):
+                return False
+
             context.get_watch_later_list().del_item(video_id)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('removed') % video_name,
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         return False
