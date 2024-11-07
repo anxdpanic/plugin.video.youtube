@@ -275,7 +275,7 @@ def _play_playlist(provider, context):
     if action == 'queue':
         return videos, options
     if context.get_handle() == -1 or action == 'play':
-        playlist_player.play(playlist_index=playlist_position)
+        playlist_player.play_playlist_item(playlist_position + 1)
         return False
     return videos[playlist_position], options
 
@@ -310,7 +310,7 @@ def _play_channel_live(provider, context):
     playlist_player.add(video_item)
 
     if context.get_handle() == -1:
-        playlist_player.play(playlist_index=0)
+        playlist_player.play_playlist_item(1)
         return False
     return video_item
 
@@ -376,9 +376,8 @@ def process(provider, context, **_kwargs):
             return UriItem('command://Action(Play)')
 
         if context.get_handle() == -1:
-            return UriItem('command://PlayMedia({0})'.format(
-                context.create_uri((PATHS.PLAY,), params)
-            ))
+            return UriItem('command://PlayMedia({0}, playlist_type_hint=1)'
+                           .format(context.create_uri((PATHS.PLAY,), params)))
 
         ui.set_property(BUSY_FLAG)
         playlist_player = context.get_playlist_player()
