@@ -72,7 +72,7 @@ class XbmcContext(AbstractContext):
         'bookmark.remove': 20404,
         'bookmarks': 30100,
         'bookmarks.clear': 30801,
-        'bookmarks.clear.confirm': 30802,
+        'bookmarks.clear.check': 30802,
         'browse_channels': 30512,
         'cancel': 222,
         'channel': 19029,
@@ -81,12 +81,13 @@ class XbmcContext(AbstractContext):
         'client.ip': 30700,
         'client.ip.failed': 30701,
         'client.secret.incorrect': 30650,
-        'content.clear': 30121,
-        'content.clear.confirm': 30120,
-        'content.delete': 30116,
-        'content.delete.confirm': 30114,
-        'content.remove': 30117,
-        'content.remove.confirm': 30115,
+        'completed': 19256,
+        'content.clear': 30120,
+        'content.clear.check': 30121,
+        'content.delete': 30114,
+        'content.delete.check': 30116,
+        'content.remove': 30115,
+        'content.remove.check': 30117,
         'datetime.a_minute_ago': 30677,
         'datetime.airing_now': 30691,
         'datetime.airing_soon': 30693,
@@ -111,11 +112,11 @@ class XbmcContext(AbstractContext):
         'go_to_channel': 30502,
         'history': 30509,
         'history.clear': 30609,
-        'history.clear.confirm': 30610,
+        'history.clear.check': 30610,
         'history.list.remove': 30572,
-        'history.list.remove.confirm': 30573,
+        'history.list.remove.check': 30573,
         'history.list.set': 30571,
-        'history.list.set.confirm': 30574,
+        'history.list.set.check': 30574,
         'history.mark.unwatched': 30669,
         'history.mark.watched': 30670,
         'history.remove': 15015,
@@ -123,7 +124,7 @@ class XbmcContext(AbstractContext):
         'home': 10000,
         'httpd.not.running': 30699,
         'inputstreamhelper.is_installed': 30625,
-        'isa.enable.confirm': 30579,
+        'isa.enable.check': 30579,
         'key.requirement': 30731,
         'latest_videos': 30109,
         'library': 30103,
@@ -169,17 +170,18 @@ class XbmcContext(AbstractContext):
         'purchases': 30622,
         'recommendations': 30551,
         'refresh': 184,
-        'refresh.settings.confirm': 30818,
+        'refresh.settings.check': 30818,
         'related_videos': 30514,
         'remove': 15015,
         'removed': 30666,
         'rename': 118,
         'renamed': 30667,
-        'reset.access_manager.confirm': 30581,
+        'reset.access_manager.check': 30581,
         'retry': 30612,
         'saved.playlists': 30611,
         'search': 137,
         'search.clear': 30556,
+        'search.history': 30558,
         'search.new': 30110,
         'search.quick': 30605,
         'search.quick.incognito': 30606,
@@ -288,17 +290,46 @@ class XbmcContext(AbstractContext):
         'video.rate.dislike': 30530,
         'video.rate.like': 30529,
         'video.rate.none': 15015,
+        'videos': 3,
         'watch_later': 30107,
         'watch_later.add': 30107,
         'watch_later.added_to': 30713,
         'watch_later.clear': 30769,
-        'watch_later.clear.confirm': 30770,
+        'watch_later.clear.check': 30770,
         'watch_later.list.remove': 30568,
-        'watch_later.list.remove.confirm': 30569,
+        'watch_later.list.remove.check': 30569,
         'watch_later.list.set': 30567,
-        'watch_later.list.set.confirm': 30570,
+        'watch_later.list.set.check': 30570,
         'watch_later.remove': 15015,
         'youtube': 30003,
+    }
+
+    SEARCH_PARAMS = {
+        'forMine',
+        'channelId',
+        'channelType',
+        'eventType',
+        'location',
+        'locationRadius',
+        'maxResults',
+        'order',
+        'pageToken'
+        'publishedAfter',
+        'publishedBefore',
+        'q',
+        'safeSearch',
+        'topicId',
+        'type',
+        'videoCaption',
+        'videoCategoryId',
+        'videoDefinition',
+        'videoDimension',
+        'videoDuration',
+        'videoEmbeddable',
+        'videoLicense',
+        'videoPaidProductPlacement',
+        'videoSyndicated',
+        'videoType',
     }
 
     def __new__(cls, *args, **kwargs):
@@ -316,6 +347,9 @@ class XbmcContext(AbstractContext):
                 self.localize(308),    # Original language
                 self.localize(309),    # UI language
             }
+
+            # Update default allowable params
+            cls._NON_EMPTY_STRING_PARAMS.update(self.SEARCH_PARAMS)
 
             cls._initialized = True
 
@@ -627,11 +661,15 @@ class XbmcContext(AbstractContext):
                                    'properties': ['enabled']})
         try:
             return response['result']['addon']['enabled'] is True
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as exc:
             error = response.get('error', {})
-            self.log_error('XbmcContext.addon_enabled error - |{0}: {1}|'
-                           .format(error.get('code', 'unknown'),
-                                   error.get('message', 'unknown')))
+            self.log_error('XbmcContext.addon_enabled - Error'
+                           '\n\tException: {exc!r}'
+                           '\n\tCode:      {code}'
+                           '\n\tMessage:   {msg}'
+                           .format(exc=exc,
+                                   code=error.get('code', 'Unknown'),
+                                   msg=error.get('message', 'Unknown')))
             return False
 
     def set_addon_enabled(self, addon_id, enabled=True):
@@ -640,11 +678,15 @@ class XbmcContext(AbstractContext):
                                    'enabled': enabled})
         try:
             return response['result'] == 'OK'
-        except (KeyError, TypeError):
+        except (KeyError, TypeError) as exc:
             error = response.get('error', {})
-            self.log_error('XbmcContext.set_addon_enabled error - |{0}: {1}|'
-                           .format(error.get('code', 'unknown'),
-                                   error.get('message', 'unknown')))
+            self.log_error('XbmcContext.set_addon_enabled - Error'
+                           '\n\tException: {exc!r}'
+                           '\n\tCode:      {code}'
+                           '\n\tMessage:   {msg}'
+                           .format(exc=exc,
+                                   code=error.get('code', 'Unknown'),
+                                   msg=error.get('message', 'Unknown')))
             return False
 
     @staticmethod
@@ -666,7 +708,7 @@ class XbmcContext(AbstractContext):
                 if (prompt
                         and self.get_ui().on_yes_no_input(
                             self.get_name(),
-                            self.localize('isa.enable.confirm'),
+                            self.localize('isa.enable.check'),
                         )
                         and self.set_addon_enabled('inputstream.adaptive')):
                     prompt = False

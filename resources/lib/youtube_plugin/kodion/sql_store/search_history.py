@@ -32,8 +32,8 @@ class SearchHistory(Storage):
         return result
 
     @staticmethod
-    def _make_id(search_text):
-        return md5(search_text.encode('utf-8')).hexdigest()
+    def _make_id(query):
+        return md5(query.encode('utf-8')).hexdigest()
 
     def add_item(self, query):
         if isinstance(query, dict):

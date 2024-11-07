@@ -117,6 +117,7 @@ class AbstractProvider(object):
         return wrapper
 
     def run_wizard(self, context):
+        localize = context.localize
         # ui local variable used for ui.get_view_manager() in unofficial version
         ui = context.get_ui()
 
@@ -134,9 +135,9 @@ class AbstractProvider(object):
 
         try:
             if wizard_steps and ui.on_yes_no_input(
-                    context.localize('setup_wizard'),
-                    (context.localize('setup_wizard.prompt')
-                     % context.localize('setup_wizard.prompt.settings'))
+                    localize('setup_wizard'),
+                    (localize('setup_wizard.prompt')
+                     % localize('setup_wizard.prompt.settings'))
             ):
                 for wizard_step in wizard_steps:
                     if callable(wizard_step):
@@ -177,7 +178,7 @@ class AbstractProvider(object):
                 options.update(new_options)
 
             if context.get_param('refresh'):
-                options[self.RESULT_CACHE_TO_DISC] = False
+                options[self.RESULT_CACHE_TO_DISC] = True
                 options[self.RESULT_UPDATE_LISTING] = True
 
             return result, options
@@ -271,6 +272,7 @@ class AbstractProvider(object):
 
         result = None
         function_cache = context.get_function_cache()
+        window_replace = params.pop('window_replace', False)
         window_return = params.pop('window_return', True)
         try:
             result, options = function_cache.run(
@@ -280,13 +282,22 @@ class AbstractProvider(object):
                 context=context.clone(path, params),
             )
         except Exception as exc:
-            context.log_error('Rerouting error: |{0}|'.format(exc))
+            context.log_error('Rerouting - Error'
+                              '\n\tException: {exc!r}'.format(exc=exc))
         finally:
             uri = context.create_uri(path, params)
-            context.log_debug('Rerouting to |{uri}|{status}'
-                              .format(uri=uri,
-                                      status='' if result else ' failed'))
-            if not result:
+            if result:
+                context.log_debug('Rerouting - Success'
+                                  '\n\tURI:     {uri}'
+                                  '\n\tReplace: |{window_replace}|'
+                                  '\n\tReturn:  |{window_return}|'
+                                  .format(uri=uri,
+                                          window_replace=window_replace,
+                                          window_return=window_return))
+            else:
+                context.log_debug('Rerouting - No results'
+                                  '\n\tURI: {uri}'
+                                  .format(uri=uri))
                 return False
 
             ui = context.get_ui()
@@ -296,9 +307,10 @@ class AbstractProvider(object):
                 ui.set_property(CONTAINER_POSITION, position)
 
             context.execute(''.join((
-                'ActivateWindow(Videos, ',
+                'ReplaceWindow' if window_replace else 'ActivateWindow',
+                '(Videos,',
                 uri,
-                ', return)' if window_return else ')',
+                ',return)' if window_return else ')',
             )))
         return True
 
@@ -310,12 +322,13 @@ class AbstractProvider(object):
     def on_watch_later(provider, context, re_match):
         raise NotImplementedError()
 
-    def on_search_run(self, context, search_text):
+    def on_search_run(self, context, query):
         raise NotImplementedError()
 
     @staticmethod
     def on_search(provider, context, re_match):
         params = context.get_params()
+        localize = context.localize
         ui = context.get_ui()
 
         command = re_match.group('command')
@@ -323,18 +336,33 @@ class AbstractProvider(object):
 
         if not command or command == 'query':
             query = to_unicode(params.get('q', ''))
-            return provider.on_search_run(context=context, search_text=query)
+            if query:
+                return provider.on_search_run(context=context, query=query)
+            command = 'list'
+            context.set_path(PATHS.SEARCH, command)
 
         if command == 'remove':
             query = to_unicode(params.get('q', ''))
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % query,
+            ):
+                return False
+
             search_history.del_item(query)
             ui.refresh_container()
+
+            ui.show_notification(
+                localize('removed') % query,
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         if command == 'rename':
             query = to_unicode(params.get('q', ''))
             result, new_query = ui.on_keyboard_input(
-                context.localize('search.rename'), query
+                localize('search.rename'), query
             )
             if result:
                 search_history.del_item(query)
@@ -343,8 +371,20 @@ class AbstractProvider(object):
             return True
 
         if command == 'clear':
+            if not ui.on_yes_no_input(
+                    localize('search.clear'),
+                    localize('content.clear.check') % localize('search.history')
+            ):
+                return False
+
             search_history.clear()
             ui.refresh_container()
+
+            ui.show_notification(
+                localize('completed'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         if command.startswith('input'):
@@ -363,7 +403,7 @@ class AbstractProvider(object):
                     query = to_unicode(cached)
             else:
                 result, input_query = ui.on_keyboard_input(
-                    context.localize('search.title')
+                    localize('search.title')
                 )
                 if result:
                     query = input_query
@@ -373,11 +413,12 @@ class AbstractProvider(object):
 
             context.set_path(PATHS.SEARCH, 'query')
             return (
-                provider.on_search_run(context=context, search_text=query),
+                provider.on_search_run(context=context, query=query),
                 {provider.RESULT_CACHE_TO_DISC: command != 'input_prompt'},
             )
 
-        context.set_content(CONTENT.LIST_CONTENT)
+        context.set_content(CONTENT.LIST_CONTENT,
+                            category_label=localize('search'))
         result = []
 
         location = context.get_param('location', False)

@@ -105,7 +105,8 @@ class LoginClient(YouTubeRequestClient):
                      response_hook=LoginClient._response_hook,
                      error_hook=LoginClient._error_hook,
                      error_title='Logout Failed',
-                     error_info='Revoke failed: {exc!r}',
+                     error_info=('Revoke - Failed'
+                                 '\n\tException: {exc!r}'),
                      raise_exc=True)
 
     def refresh_token(self, token_type, refresh_token=None):
@@ -151,9 +152,9 @@ class LoginClient(YouTubeRequestClient):
                                  response_hook=LoginClient._response_hook,
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed',
-                                 error_info=('Refresh token failed\n'
-                                             '{client}:\n'
-                                             '{{exc!r}}'
+                                 error_info=('Refresh token - Failed'
+                                             '\n\tException: {{exc!r}}'
+                                             '\n\tClient:    |{client}|'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
@@ -201,9 +202,9 @@ class LoginClient(YouTubeRequestClient):
                                  response_hook=LoginClient._response_hook,
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed: Unknown response',
-                                 error_info=('Access token request failed\n'
-                                             '{client}:\n'
-                                             '{{exc}}'
+                                 error_info=('Access token request - Failed'
+                                             '\n\tException: {{exc!r}}'
+                                             '\n\tClient:    |{client}|'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
@@ -244,9 +245,9 @@ class LoginClient(YouTubeRequestClient):
                                  response_hook=LoginClient._response_hook,
                                  error_hook=LoginClient._error_hook,
                                  error_title='Login Failed: Unknown response',
-                                 error_info=('Device/user code request failed\n'
-                                             '{client}\n'
-                                             '{{exc}}'
+                                 error_info=('Device/user code request - Failed'
+                                             '\n\tException: {{exc!r}}'
+                                             '\n\tClient:    |{client}|'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data

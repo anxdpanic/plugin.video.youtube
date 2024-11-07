@@ -189,7 +189,7 @@ def remove_video_from_playlist(context, playlist_id, video_id, video_name):
                 context.get_params(),
                 playlist_id=playlist_id,
                 video_id=video_id,
-                video_name=video_name,
+                item_name=video_name,
                 reload_path=context.get_path(),
             ),
             run=True,
@@ -204,7 +204,7 @@ def rename_playlist(context, playlist_id, playlist_name):
             ('playlist', 'rename', 'playlist',),
             {
                 'playlist_id': playlist_id,
-                'playlist_name': playlist_name
+                'item_name': playlist_name
             },
             run=True,
         ),
@@ -218,7 +218,7 @@ def delete_playlist(context, playlist_id, playlist_name):
             ('playlist', 'remove', 'playlist',),
             {
                 'playlist_id': playlist_id,
-                'playlist_name': playlist_name
+                'item_name': playlist_name
             },
             run=True,
         ),
@@ -232,7 +232,7 @@ def remove_as_watch_later(context, playlist_id, playlist_name):
             ('playlist', 'remove', 'watch_later',),
             {
                 'playlist_id': playlist_id,
-                'playlist_name': playlist_name
+                'item_name': playlist_name
             },
             run=True,
         ),
@@ -246,7 +246,7 @@ def set_as_watch_later(context, playlist_id, playlist_name):
             ('playlist', 'set', 'watch_later',),
             {
                 'playlist_id': playlist_id,
-                'playlist_name': playlist_name
+                'item_name': playlist_name
             },
             run=True,
         ),
@@ -260,7 +260,7 @@ def remove_as_history(context, playlist_id, playlist_name):
             ('playlist', 'remove', 'history',),
             {
                 'playlist_id': playlist_id,
-                'playlist_name': playlist_name
+                'item_name': playlist_name
             },
             run=True,
         ),
@@ -274,7 +274,7 @@ def set_as_history(context, playlist_id, playlist_name):
             ('playlist', 'set', 'history',),
             {
                 'playlist_id': playlist_id,
-                'playlist_name': playlist_name
+                'item_name': playlist_name
             },
             run=True,
         ),
@@ -287,7 +287,7 @@ def remove_my_subscriptions_filter(context, channel_name):
         context.create_uri(
             ('my_subscriptions', 'filter',),
             {
-                'channel_name': channel_name,
+                'item_name': channel_name,
                 'action': 'remove'
             },
             run=True,
@@ -301,7 +301,7 @@ def add_my_subscriptions_filter(context, channel_name):
         context.create_uri(
             ('my_subscriptions', 'filter',),
             {
-                'channel_name': channel_name,
+                'item_name': channel_name,
                 'action': 'add',
             },
             run=True,
@@ -353,13 +353,14 @@ def watch_later_local_add(context, item):
     )
 
 
-def watch_later_local_remove(context, video_id):
+def watch_later_local_remove(context, video_id, video_name=''):
     return (
         context.localize('watch_later.remove'),
         context.create_uri(
             (PATHS.WATCH_LATER, 'remove',),
             {
                 'video_id': video_id,
+                'item_name': video_name,
             },
             run=True,
         ),
@@ -477,14 +478,15 @@ def play_timeshift(context, video_id):
     )
 
 
-def history_remove(context, video_id):
+def history_remove(context, video_id, video_name=''):
     return (
         context.localize('history.remove'),
         context.create_uri(
             (PATHS.HISTORY,),
             {
                 'action': 'remove',
-                'video_id': video_id
+                'video_id': video_id,
+                'item_name': video_name,
             },
             run=True,
         ),
@@ -577,13 +579,14 @@ def bookmark_add_channel(context, channel_id, channel_name=''):
     )
 
 
-def bookmark_remove(context, item_id):
+def bookmark_remove(context, item_id, item_name=''):
     return (
         context.localize('bookmark.remove'),
         context.create_uri(
             (PATHS.BOOKMARKS, 'remove',),
             {
                 'item_id': item_id,
+                'item_name': item_name,
             },
             run=True,
         ),
@@ -645,7 +648,13 @@ def search_sort_by(context, params, order):
         ),
         context.create_uri(
             (PATHS.ROUTE, PATHS.SEARCH, 'query',),
-            params=dict(params, order=order),
+            params=dict(params,
+                        order=order,
+                        page=1,
+                        page_token='',
+                        pageToken='',
+                        window_replace=True,
+                        window_return=False),
             run=True,
         ),
     )

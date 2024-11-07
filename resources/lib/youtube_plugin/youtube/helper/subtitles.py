@@ -304,7 +304,8 @@ class Subtitles(object):
         num_total = num_captions + num_translations
 
         if not num_total:
-            self._context.log_debug('No subtitles found for prompt')
+            self._context.log_debug('Subtitles._prompt'
+                                    ' - No subtitles found for prompt')
         else:
             translation_lang = self._context.localize('subtitles.translation')
             choice = self._context.get_ui().on_select(
@@ -322,11 +323,13 @@ class Subtitles(object):
                 track_kind = 'translation'
                 choice = translations[choice - num_captions]
             else:
-                self._context.log_debug('Subtitle selection cancelled')
+                self._context.log_debug('Subtitles._prompt'
+                                        ' - Subtitle selection cancelled')
                 return None
 
             lang, language = choice
-
+            self._context.log_debug('Subtitles._prompt - selected: |{lang}|'
+                                    .format(lang=lang))
             url, mime_type = self._get_url(track=track, lang=lang)
             if url:
                 return {
@@ -340,8 +343,6 @@ class Subtitles(object):
                         'url': url,
                     },
                 }
-            self._context.log_debug('No subtitle found for selection: |{lang}|'
-                                    .format(lang=lang))
         return None
 
     def _get_url(self, track, lang=None):
@@ -367,19 +368,20 @@ class Subtitles(object):
             ))
             if not self.BASE_PATH:
                 self._context.log_error('Subtitles._get_url'
-                                        ' - unable to access temp directory')
+                                        ' - Unable to access temp directory')
                 return None, None
 
             filepath = os.path.join(self.BASE_PATH, filename)
             if xbmcvfs.exists(filepath):
                 self._context.log_debug('Subtitles._get_url'
-                                        ' - use existing: |{lang}: {file}|'
+                                        ' - Use existing subtitle for: |{lang}|'
+                                        '\n\tFile: {file}'
                                         .format(lang=lang, file=filepath))
                 return filepath, self.FORMATS[sub_format]['mime_type']
 
         base_url = self._normalize_url(track.get('baseUrl'))
         if not base_url:
-            self._context.log_error('Subtitles._get_url - no url for: |{lang}|'
+            self._context.log_error('Subtitles._get_url - no URL for: |{lang}|'
                                     .format(lang=lang))
             return None, None
 
@@ -390,7 +392,9 @@ class Subtitles(object):
             ('tlang', tlang) if tlang else (None, None),
         )
         if not tlang:
-            self._context.log_debug('Subtitles._get_url: |{lang}: {url}|'
+            self._context.log_debug('Subtitles._get_url'
+                                    ' - found new subtitle for: |{lang}|'
+                                    '\n\tURL: {url}'
                                     .format(lang=lang, url=subtitle_url))
 
         if not download:
@@ -399,7 +403,8 @@ class Subtitles(object):
         response = BaseRequestsClass(context=self._context).request(
             subtitle_url,
             headers=self.headers,
-            error_info=('Subtitles._get_url - GET failed for: {lang}: {{exc!r}}'
+            error_info=('Subtitles._get_url - GET failed for: |{lang}|'
+                        '\n\tException: {{exc!r}}'
                         .format(lang=lang))
         )
         response = response and response.text
@@ -414,8 +419,9 @@ class Subtitles(object):
                 success = sub_file.write(output)
         except (IOError, OSError):
             self._context.log_error('Subtitles._get_url'
-                                    ' - write failed for: {file}'
-                                    .format(file=filepath))
+                                    ' - write failed for: |{lang}|'
+                                    '\n\tFile: {file}'
+                                    .format(lang=lang, file=filepath))
         if success:
             return filepath, self.FORMATS[sub_format]['mime_type']
         return None, None

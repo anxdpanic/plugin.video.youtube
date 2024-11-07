@@ -29,12 +29,14 @@ class Locator(BaseRequestsClass):
         self._response = response and response.json() or {}
 
     def success(self):
-        successful = self.response().get('status', 'fail') == 'success'
+        response = self.response()
+        successful = response.get('status', 'fail') == 'success'
         if successful:
-            self.log_debug('Location request was successful')
+            self.log_debug('Locator - Request successful')
         else:
-            msg = 'Location request failed with no error message'
-            self.log_error(self.response().get('message') or msg)
+            self.log_error('Locator - Request failed'
+                           '\n\tMessage: {msg}'
+                           .format(msg=response.get('message', 'Unknown')))
         return successful
 
     def coordinates(self):
@@ -44,7 +46,7 @@ class Locator(BaseRequestsClass):
             lat = self._response.get('lat')
             lon = self._response.get('lon')
         if lat is None or lon is None:
-            self.log_error('No coordinates returned')
+            self.log_error('Locator - No coordinates returned')
             return None
-        self.log_debug('Coordinates found')
+        self.log_debug('Locator - Coordinates found')
         return {'lat': lat, 'lon': lon}

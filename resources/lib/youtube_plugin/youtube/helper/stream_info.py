@@ -767,18 +767,24 @@ class StreamInfo(YouTubeRequestClient):
             exception = None
 
         if not json_data or 'error' not in json_data:
-            info = ('exc: |{exc!r}|'
-                    '\n\tvideo_id: {video_id}, client: {client}, auth: {auth}')
+            info = ('Request - Failed'
+                    '\n\tException: {exc!r}'
+                    '\n\tvideo_id:  |{video_id}|'
+                    '\n\tClient:    |{client}|'
+                    '\n\tAuth:      |{auth}|')
             return None, info, kwargs, data, None, exception
 
         details = json_data['error']
         reason = details.get('errors', [{}])[0].get('reason', 'Unknown')
         message = details.get('message', 'Unknown error')
 
-        info = ('exc: |{exc!r}|'
-                '\n\treason:   |{reason}|'
-                '\n\tmessage:  |{message}|'
-                '\n\tvideo_id: {video_id}, client: {client}, auth: {auth}')
+        info = ('Request - Failed'
+                '\n\tException: {exc!r}'
+                '\n\tReason:    {reason}'
+                '\n\tMessage:   {message}'
+                '\n\tvideo_id:  |{video_id}|'
+                '\n\tClient:    |{client}|'
+                '\n\tAuth:      |{auth}|')
         kwargs['message'] = message
         kwargs['reason'] = reason
         return None, info, kwargs, data, None, exception
@@ -1090,7 +1096,8 @@ class StreamInfo(YouTubeRequestClient):
                 )
                 if yt_format is None:
                     stream_info = redact_ip(match.group(1))
-                    log_debug('Unknown itag: {itag}\n{stream}'
+                    log_debug('Unknown itag - {itag}'
+                              '\n\t{stream}'
                               .format(itag=itag, stream=stream_info))
                 if (not yt_format
                         or (yt_format.get('hls/video')
@@ -1175,7 +1182,8 @@ class StreamInfo(YouTubeRequestClient):
                     stream_map['conn'] = redact_ip(conn)
                 if stream:
                     stream_map['stream'] = redact_ip(stream)
-                log_debug('Unknown itag: {itag}\n{stream}'
+                log_debug('Unknown itag - {itag}'
+                          '\n\t{stream}'
                           .format(itag=itag, stream=stream_map))
             if (not yt_format
                     or (yt_format.get('dash/video')
@@ -1231,14 +1239,15 @@ class StreamInfo(YouTubeRequestClient):
             try:
                 signature = self._cipher.get_signature(encrypted_signature)
             except Exception as exc:
-                self._context.log_error('VideoInfo._process_signature_cipher - '
-                                        'failed to extract URL from |{sig}|'
-                                        '\n\texc:     |{exc!r}|'
-                                        '\n\tdetails: |{details}|'.format(
-                    sig=encrypted_signature,
-                    exc=exc,
-                    details=''.join(format_stack())
-                ))
+                msg = ('StreamInfo._process_signature_cipher'
+                       ' - Failed to extract URL'
+                       '\n\tException: {exc!r}'
+                       '\n\tSignature: |{sig}|'
+                       '\n\tStack trace (most recent call last):\n{stack}'
+                       .format(exc=exc,
+                               sig=encrypted_signature,
+                               stack=''.join(format_stack())))
+                self._context.log_error(msg)
                 self._cipher = False
                 return None
             data_cache.set_item(encrypted_signature, {'sig': signature})
@@ -1449,14 +1458,18 @@ class StreamInfo(YouTubeRequestClient):
                     'UNPLAYABLE',
                 }:
                     log_warning(
-                        'Failed to retrieve video info - '
-                        'video_id: {0}, client: {1}, auth: {2},\n'
-                        'status: {3}, reason: {4}'.format(
-                            video_id,
-                            _client['_name'],
-                            auth,
-                            status,
-                            reason or 'UNKNOWN',
+                        'Failed to retrieve video info'
+                        '\n\tStatus:   {status}'
+                        '\n\tReason:   {reason}'
+                        '\n\tvideo_id: |{video_id}|'
+                        '\n\tClient:   |{client}|'
+                        '\n\tAuth:     |{auth}|'
+                        .format(
+                            status=status,
+                            reason=reason or 'UNKNOWN',
+                            video_id=video_id,
+                            client=_client['_name'],
+                            auth=auth,
                         )
                     )
                     compare_reason = reason.lower()
@@ -1469,7 +1482,8 @@ class StreamInfo(YouTubeRequestClient):
                         break
                 else:
                     log_debug(
-                        'Unknown playabilityStatus in player response:\n|{0}|'
+                        'Unknown playabilityStatus in player response'
+                        '\n\tplayabilityStatus: {0}'
                         .format(playability)
                     )
 
@@ -1478,11 +1492,14 @@ class StreamInfo(YouTubeRequestClient):
 
             if status == 'OK':
                 log_debug(
-                    'Retrieved video info - '
-                    'video_id: {0}, client: {1}, auth: {2}'.format(
-                        video_id,
-                        client_name,
-                        bool(_client.get('_access_token')),
+                    'Retrieved video info:'
+                    '\n\tvideo_id: |{video_id}|'
+                    '\n\tClient:   |{client}|'
+                    '\n\tAuth:     |{auth}|'
+                    .format(
+                        video_id=video_id,
+                        client=client_name,
+                        auth=bool(_client.get('_access_token')),
                     )
                 )
                 if not self._selected_client:
@@ -2067,8 +2084,8 @@ class StreamInfo(YouTubeRequestClient):
         log_error = context.log_error
 
         if not self.BASE_PATH:
-            log_error('VideoInfo._generate_mpd_manifest - '
-                      'unable to access temp directory')
+            log_error('StreamInfo._generate_mpd_manifest'
+                      ' - Unable to access temp directory')
             return None, None
 
         def _filter_group(previous_group, previous_stream, item):
@@ -2357,10 +2374,12 @@ class StreamInfo(YouTubeRequestClient):
         try:
             with xbmcvfs.File(filepath, 'w') as mpd_file:
                 success = mpd_file.write(output)
-        except (IOError, OSError):
-            log_error('VideoInfo._generate_mpd_manifest - '
-                      'file write failed for: {file}'
-                      .format(file=filepath))
+        except (IOError, OSError) as exc:
+            log_error('StreamInfo._generate_mpd_manifest'
+                      ' - File write failed'
+                      '\n\tException: {exc!r}'
+                      '\n\tFile:      {filepath}'
+                      .format(exc=exc, filepath=filepath))
             success = False
         if success:
             return urlunsplit((

@@ -48,7 +48,7 @@ from ..kodion.items import (
     VideoItem,
     menu_items,
 )
-from ..kodion.utils import strip_html_from_text
+from ..kodion.utils import strip_html_from_text, to_unicode
 
 
 class Provider(AbstractProvider):
@@ -227,12 +227,12 @@ class Provider(AbstractProvider):
             if keys_changed:
                 context.log_warning('API key set changed: Resetting client'
                                     ' and updating access token')
-                self.reset_client()
                 access_tokens = [None, None]
                 refresh_tokens = [None, None]
                 access_manager.update_access_token(
                     dev_id, access_token='', expiry=-1, refresh_token=''
                 )
+                self.reset_client()
 
         num_access_tokens = sum(1 for token in access_tokens if token)
         num_refresh_tokens = sum(1 for token in refresh_tokens if token)
@@ -436,29 +436,25 @@ class Provider(AbstractProvider):
                 menu_items.shuffle_playlist(
                     context, playlist_id
                 ),
-                menu_items.separator(),
-                menu_items.bookmark_add(
-                    context, uploads
-                ) if channel_id != 'mine' else None,
             ]
 
             if channel_id != 'mine':
-                if provider.is_logged_in:
+                context_menu.extend((
+                    menu_items.separator(),
+                    menu_items.bookmark_add(
+                        context, uploads
+                    ),
                     # subscribe to the channel via the playlist item
-                    context_menu.append(
-                        menu_items.subscribe_to_channel(
-                            context, channel_id,
-                        )
-                    )
-                context_menu.append(
+                    menu_items.subscribe_to_channel(
+                        context, channel_id,
+                    ) if provider.is_logged_in else None,
                     # bookmark channel of the playlist
                     menu_items.bookmark_add_channel(
                         context, channel_id,
                     )
-                )
+                ))
 
             if context_menu:
-                context_menu.append(menu_items.separator())
                 uploads.add_context_menu(context_menu)
 
             result = [uploads]
@@ -785,48 +781,56 @@ class Provider(AbstractProvider):
             return v3.response_to_items(self, context, json_data)
         return False
 
-    def on_search_run(self, context, search_text):
+    def on_search_run(self, context, query):
         data_cache = context.get_data_cache()
         data_cache.del_item('search_query')
 
         # Search by url to access unlisted videos
-        if search_text.startswith(('https://', 'http://')):
-            return self.on_uri2addon(provider=self,
-                                     context=context,
-                                     uri=search_text)
-        if context.is_plugin_path(search_text):
-            return self.reroute(context=context, uri=search_text)
+        if query.startswith(('https://', 'http://')):
+            return self.on_uri2addon(provider=self, context=context, uri=query)
+        if context.is_plugin_path(query):
+            return UriItem(query)
 
-        result = self._search_channel_or_playlist(context, search_text)
-        if result:  # found a channel or playlist matching search_text
+        result = self._search_channel_or_playlist(context, query)
+        if result:  # found a channel or playlist matching search query
             return result
         result = []
 
-        context.set_param('q', search_text)
-        context.set_param('category_label', search_text)
+        context.set_param('q', query)
+        context.set_param('category_label', query)
 
         params = context.get_params()
-        channel_id = params.get('channel_id')
-        event_type = params.get('event_type')
+        channel_id = params.get('channel_id') or params.get('channelId')
+        event_type = params.get('event_type') or params.get('eventType')
         hide_folders = params.get('hide_folders')
         location = params.get('location')
         page = params.get('page', 1)
-        page_token = params.get('page_token', '')
-        order = params.get('order', 'relevance')
-        search_type = params.get('search_type', 'video')
-        safe_search = context.get_settings().safe_search()
+        page_token = params.get('page_token') or params.get('pageToken') or ''
+        search_type = params.get('search_type', 'video') or params.get('type')
 
         if search_type == 'video':
             context.set_content(CONTENT.VIDEO_CONTENT)
         else:
             context.set_content(CONTENT.LIST_CONTENT)
 
-        if (page == 1
-                and search_type == 'video'
-                and not event_type
-                and not hide_folders):
-            if not channel_id and not location:
-                channel_params = dict(params, search_type='channel')
+        if not hide_folders and page == 1:
+            if event_type or search_type != 'video':
+                video_params = dict(params,
+                                    search_type='video',
+                                    event_type='')
+                item_label = context.localize('videos')
+                video_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), video_params),
+                    image='DefaultVideo.png',
+                    category_label=item_label,
+                )
+                result.append(video_item)
+
+            if not channel_id and not location and search_type != 'channel':
+                channel_params = dict(params,
+                                      search_type='channel',
+                                      event_type='')
                 item_label = context.localize('channels')
                 channel_item = DirectoryItem(
                     context.get_ui().bold(item_label),
@@ -836,8 +840,10 @@ class Provider(AbstractProvider):
                 )
                 result.append(channel_item)
 
-            if not location:
-                playlist_params = dict(params, search_type='playlist')
+            if not location and search_type != 'playlist':
+                playlist_params = dict(params,
+                                       search_type='playlist',
+                                       event_type='')
                 item_label = context.localize('playlists')
                 playlist_item = DirectoryItem(
                     context.get_ui().bold(item_label),
@@ -847,33 +853,57 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlist_item)
 
-            if not channel_id:
-                # live
+            if not channel_id and event_type != 'live':
                 live_params = dict(params,
                                    search_type='video',
                                    event_type='live')
                 item_label = context.localize('live')
                 live_item = DirectoryItem(
                     context.get_ui().bold(item_label),
-                    context.create_uri(
-                        (context.get_path().replace('input', 'query'),),
-                        live_params,
-                    ),
+                    context.create_uri((context.get_path(),), live_params),
                     image='{media}/live.png',
                     category_label=item_label,
                 )
                 result.append(live_item)
 
+            if event_type and event_type != 'upcoming':
+                upcoming_params = dict(params,
+                                       search_type='video',
+                                       event_type='upcoming')
+                item_label = context.localize('live.upcoming')
+                upcoming_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), upcoming_params),
+                    image='{media}/live.png',
+                    category_label=item_label,
+                )
+                result.append(upcoming_item)
+
+            if event_type and event_type != 'completed':
+                completed_params = dict(params,
+                                        search_type='video',
+                                        event_type='completed')
+                item_label = context.localize('live.completed')
+                completed_item = DirectoryItem(
+                    context.get_ui().bold(item_label),
+                    context.create_uri((context.get_path(),), completed_params),
+                    image='{media}/live.png',
+                    category_label=item_label,
+                )
+                result.append(completed_item)
+
         search_params = {
-            'q': search_text,
-            'order': order,
+            'q': query,
             'channelId': channel_id,
             'type': search_type,
             'eventType': event_type,
-            'safeSearch': safe_search,
             'pageToken': page_token,
             'location': location,
         }
+        for param in (context.SEARCH_PARAMS
+                .intersection(params.keys())
+                .difference(search_params.keys())):
+            search_params[param] = params[param]
 
         function_cache = context.get_function_cache()
         search_params, json_data = function_cache.run(
@@ -889,7 +919,7 @@ class Provider(AbstractProvider):
         if not params.get('incognito'):
             if not params.get('channel_id'):
                 context.get_search_history().add_item(search_params)
-            data_cache.set_item('search_query', search_text)
+            data_cache.set_item('search_query', query)
 
         result.extend(v3.response_to_items(
             self, context, json_data,
@@ -920,7 +950,7 @@ class Provider(AbstractProvider):
 
         params = context.get_params()
         action = params.get('action')
-        channel = params.get('channel_name')
+        channel = params.get('item_name')
         if not channel or not action:
             return
 
@@ -975,7 +1005,7 @@ class Provider(AbstractProvider):
         localize = context.localize
 
         if target == 'access_manager' and ui.on_yes_no_input(
-                context.get_name(), localize('reset.access_manager.confirm')
+                context.get_name(), localize('reset.access_manager.check')
         ):
             addon_id = context.get_param('addon_id', None)
             access_manager = context.get_access_manager()
@@ -1057,7 +1087,9 @@ class Provider(AbstractProvider):
         if not action:
             return False
 
+        localize = context.localize
         playback_history = context.get_playback_history()
+        ui = context.get_ui()
 
         if action == 'list':
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='history')
@@ -1080,7 +1112,6 @@ class Provider(AbstractProvider):
                                 menu_items.history_clear(
                                     context
                                 ),
-                                menu_items.separator(),
                             ),
                             'position': 0,
                         }
@@ -1091,12 +1122,21 @@ class Provider(AbstractProvider):
             video_items = v3.response_to_items(provider, context, v3_response)
             return video_items
 
-        if action == 'clear' and context.get_ui().on_yes_no_input(
-                context.get_name(),
-                context.localize('history.clear.confirm')
-        ):
+        if action == 'clear':
+            if not ui.on_yes_no_input(
+                    localize('history.clear'),
+                    localize('history.clear.check')
+            ):
+                return False
+
             playback_history.clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('completed'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         video_id = params.get('video_id')
@@ -1104,8 +1144,22 @@ class Provider(AbstractProvider):
             return False
 
         if action == 'remove':
+            video_name = params.get('item_name') or video_id
+            video_name = to_unicode(video_name)
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % video_name,
+            ):
+                return False
+
             playback_history.del_item(video_id)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('removed') % video_name,
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         play_data = playback_history.get_item(video_id)
@@ -1135,7 +1189,7 @@ class Provider(AbstractProvider):
             play_data['played_percent'] = 0
 
         playback_history_method(video_id, play_data)
-        context.get_ui().refresh_container()
+        ui.refresh_container()
         return True
 
     @staticmethod
@@ -1567,12 +1621,11 @@ class Provider(AbstractProvider):
                     '_context_menu': {
                         'context_menu': (
                             menu_items.bookmark_remove(
-                                context, item_id
+                                context, item_id, item.get_name()
                             ),
                             menu_items.bookmarks_clear(
                                 context
                             ),
-                            menu_items.separator(),
                         ),
                         'position': 0,
                     },
@@ -1587,17 +1640,20 @@ class Provider(AbstractProvider):
         ui = context.get_ui()
         localize = context.localize
 
-        if command == 'clear' and ui.on_yes_no_input(
-                context.get_name(),
-                localize('bookmarks.clear.confirm')
-        ):
+        if command == 'clear':
+            if not ui.on_yes_no_input(
+                    context.localize('bookmarks.clear'),
+                    localize('bookmarks.clear.check')
+            ):
+                return False
+
             context.get_bookmarks_list().clear()
             ui.refresh_container()
 
             ui.show_notification(
-                localize('succeeded'),
+                localize('completed'),
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
             return True
 
@@ -1612,18 +1668,26 @@ class Provider(AbstractProvider):
             ui.show_notification(
                 localize('bookmark.created'),
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
             return True
 
         if command == 'remove':
+            bookmark_name = params.get('item_name') or localize('bookmark')
+            bookmark_name = to_unicode(bookmark_name)
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % bookmark_name,
+            ):
+                return False
+
             context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
 
             ui.show_notification(
-                localize('removed') % localize('bookmark'),
+                localize('removed') % bookmark_name,
                 time_ms=2500,
-                audible=False
+                audible=False,
             )
             return True
 
@@ -1635,6 +1699,9 @@ class Provider(AbstractProvider):
         command = re_match.group('command')
         if not command:
             return False
+
+        localize = context.localize
+        ui = context.get_ui()
 
         if command == 'list':
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='watch_later')
@@ -1652,28 +1719,36 @@ class Provider(AbstractProvider):
                         '_context_menu': {
                             'context_menu': (
                                 menu_items.watch_later_local_remove(
-                                    context, video_id
+                                    context, video_id, item.get_name()
                                 ),
                                 menu_items.watch_later_local_clear(
                                     context
                                 ),
-                                menu_items.separator(),
                             ),
                             'position': 0,
                         }
                     }
-                    for video_id in items.keys()
+                    for video_id, item in items.items()
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
             return video_items
 
-        if command == 'clear' and context.get_ui().on_yes_no_input(
-                context.get_name(),
-                context.localize('watch_later.clear.confirm')
-        ):
+        if command == 'clear':
+            if not ui.on_yes_no_input(
+                    localize('watch_later.clear'),
+                    localize('watch_later.clear.check')
+            ):
+                return False
+
             context.get_watch_later_list().clear()
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('completed'),
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         video_id = params.get('video_id')
@@ -1687,8 +1762,22 @@ class Provider(AbstractProvider):
             return True
 
         if command == 'remove':
+            video_name = params.get('item_name') or localize('untitled')
+            video_name = to_unicode(video_name)
+            if not ui.on_yes_no_input(
+                    localize('content.remove'),
+                    localize('content.remove.check') % video_name,
+            ):
+                return False
+
             context.get_watch_later_list().del_item(video_id)
-            context.get_ui().refresh_container()
+            ui.refresh_container()
+
+            ui.show_notification(
+                localize('removed') % video_name,
+                time_ms=2500,
+                audible=False,
+            )
             return True
 
         return False

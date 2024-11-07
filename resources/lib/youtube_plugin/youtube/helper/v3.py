@@ -24,7 +24,13 @@ from .utils import (
 )
 from ...kodion import KodionException
 from ...kodion.constants import PATHS
-from ...kodion.items import CommandItem, DirectoryItem, NextPageItem, VideoItem
+from ...kodion.items import (
+    CommandItem,
+    DirectoryItem,
+    NextPageItem,
+    VideoItem,
+    menu_items,
+)
 from ...kodion.utils import strip_html_from_text
 
 
@@ -109,7 +115,18 @@ def _process_list_response(provider, context, json_data, item_filter):
                 item_id = item_id['channelId']
             else:
                 item_id = None
-            if not item_id:
+            if item_id:
+                yt_item['_context_menu'] = {
+                    'context_menu': (
+                        menu_items.search_sort_by(context, params, 'relevance'),
+                        menu_items.search_sort_by(context, params, 'date'),
+                        menu_items.search_sort_by(context, params, 'viewCount'),
+                        menu_items.search_sort_by(context, params, 'rating'),
+                        menu_items.search_sort_by(context, params, 'title'),
+                    ),
+                    'position': 0,
+                }
+            else:
                 context.log_debug('v3 searchResult discarded: |%s|' % kind)
                 continue
 

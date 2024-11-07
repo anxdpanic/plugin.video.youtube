@@ -45,7 +45,7 @@ def _process_add(_provider, context, client):
     context.get_ui().show_notification(
         context.localize('subscribed.to.channel'),
         time_ms=2500,
-        audible=False
+        audible=False,
     )
     return True
 
@@ -76,7 +76,7 @@ def _process_remove(_provider, context, client):
     context.get_ui().show_notification(
         context.localize('unsubscribed.from.channel'),
         time_ms=2500,
-        audible=False
+        audible=False,
     )
     return True
 
