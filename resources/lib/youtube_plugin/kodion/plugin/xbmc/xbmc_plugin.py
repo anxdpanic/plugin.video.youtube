@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import xbmcplugin
+from ...compatibility import urlsplit, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -312,7 +312,12 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
-            action = 'RunPlugin({0})'.format(uri)
+            uri = urlsplit(uri)
+            action = context.create_uri(
+                (PATHS.ROUTE, uri.path),
+                uri.query,
+                run=True,
+            )
             result = False
 
         else:

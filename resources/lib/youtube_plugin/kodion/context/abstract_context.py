@@ -265,7 +265,9 @@ class AbstractContext(Logger):
         uri = self._plugin_id.join(('plugin://', uri))
 
         if params:
-            uri = '?'.join((uri, urlencode(params)))
+            if isinstance(params, (dict, list, tuple)):
+                params = urlencode(params)
+            uri = '?'.join((uri, params))
 
         return ''.join((
             'RunPlugin(',
