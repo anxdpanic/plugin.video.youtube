@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
 "Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-10-29 21:02+0000\n"
+"PO-Revision-Date: 2024-11-04 05:43+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/it_it/>\n"
 "Language: it_it\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7.2\n"
+"X-Generator: Weblate 5.8.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -39,7 +39,7 @@ msgstr "Questo plugin non è approvato da Google"
 # Kodion Settings
 msgctxt "#30000"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30001"
 msgid ""
@@ -153,7 +153,7 @@ msgstr "Configurare %s?"
 
 msgctxt "#30031"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -219,7 +219,7 @@ msgstr "Guarda più tardi"
 
 msgctxt "#30108"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30109"
 msgid ""
@@ -239,7 +239,7 @@ msgstr "Disconnessione"
 
 msgctxt "#30113"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -259,7 +259,7 @@ msgstr "Rimuovere \"%s\"?"
 
 msgctxt "#30118"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -303,11 +303,11 @@ msgstr " "
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30501"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -362,8 +362,8 @@ msgid "Related Videos"
 msgstr "Video correlati"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Rimozione automatica da Guarda più tardi"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -387,15 +387,15 @@ msgstr "Aggiungi a..."
 
 msgctxt "#30521"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30522"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30523"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30524"
 msgid "Select language"
@@ -427,11 +427,11 @@ msgstr "Non mi piace"
 
 msgctxt "#30531"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30532"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30533"
 msgid "Reverse"
@@ -439,7 +439,7 @@ msgstr "Inversione"
 
 msgctxt "#30534"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -459,7 +459,7 @@ msgstr "Video non piaciuti"
 
 msgctxt "#30539"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -475,7 +475,7 @@ msgstr "i flussi RTMPE non sono supportati"
 
 msgctxt "#30543"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -495,7 +495,7 @@ msgstr "Potrebbe esserti richiesto di abilitare due applicazioni affinché YouTu
 
 msgctxt "#30548"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30549"
 msgid "No videos streams found"
@@ -503,7 +503,7 @@ msgstr "Nessun flusso video trovato"
 
 msgctxt "#30550"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -543,11 +543,11 @@ msgstr "Elimina settings.xml"
 
 msgctxt "#30560"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30561"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30562"
 msgid "View all"
@@ -567,7 +567,7 @@ msgstr " "
 
 msgctxt "#30566"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -578,12 +578,12 @@ msgid "Remove as Watch Later"
 msgstr "Rimuovi da Guarda più tardi"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Sei sicuro di voler rimuovere '%s' dall'elenco Guarda più tardi?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Sei sicuro di voler sostituire l'attuale elenco Guarda più tardi con l'elenco '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -594,12 +594,12 @@ msgid "Remove as History"
 msgstr "Rimuovi come cronologia"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Sei sicuro di voler rimuovere '%s' dal tuo elenco cronologia?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Sei sicuro di voler sostituire l'attuale elenco cronologia con l'elenco '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -611,7 +611,7 @@ msgstr "Operazione fallita"
 
 msgctxt "#30577"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -635,7 +635,7 @@ msgstr "Riproduci automaticamente i video suggeriti"
 
 msgctxt "#30583"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -695,7 +695,7 @@ msgstr "Aggiornato: %s"
 
 msgctxt "#30598"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
@@ -703,7 +703,7 @@ msgstr "Impossibile abilitare chiavi API personali. Manca: %s"
 
 msgctxt "#30600"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -763,7 +763,7 @@ msgstr " "
 
 msgctxt "#30615"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30616"
 msgid ""
@@ -779,7 +779,7 @@ msgstr " "
 
 msgctxt "#30619"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -823,7 +823,7 @@ msgstr "Whitelist IP (delimitati da virgole)"
 
 msgctxt "#30630"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -938,8 +938,8 @@ msgid "Enter a name for this user"
 msgstr "Inserisci nome utente"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "L'utente ora è '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -962,16 +962,16 @@ msgid "Switch user"
 msgstr "Cambia utente"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Cambiare subito a '%s'?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
-msgstr "%s rimosso"
+msgid "\"%s\" removed"
+msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Rinominato '%s' in '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1115,7 +1115,7 @@ msgstr "Riproduci con sottotitoli"
 
 msgctxt "#30703"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1584,6 +1584,42 @@ msgstr "Riproduci dall'inizio"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "Podcast"
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Rimozione automatica da Guarda più tardi"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Sei sicuro di voler rimuovere '%s' dall'elenco Guarda più tardi?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Sei sicuro di voler sostituire l'attuale elenco Guarda più tardi con l'elenco '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Sei sicuro di voler rimuovere '%s' dal tuo elenco cronologia?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Sei sicuro di voler sostituire l'attuale elenco cronologia con l'elenco '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "L'utente ora è '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Cambiare subito a '%s'?"
+
+#~ msgctxt "#30666"
+#~ msgid "%s removed"
+#~ msgstr "%s rimosso"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Rinominato '%s' in '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

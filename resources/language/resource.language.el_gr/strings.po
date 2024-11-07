@@ -361,8 +361,8 @@ msgid "Related Videos"
 msgstr "Σχετικά βίντεο"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Αυτόματη αφαίρεση από την λίστα 'Δείτε αργότερα'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -577,12 +577,12 @@ msgid "Remove as Watch Later"
 msgstr "Αφαίρεση από το Δείτε Αργότερα"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' από το 'Δείτε Αργότερα'?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα 'Δείτε Αργότερα' με το '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,12 +593,12 @@ msgid "Remove as History"
 msgstr "Αφαίρεση από ιστορικό"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' ως την λίστα ιστορικού σας?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα ιστορικού με το '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -937,8 +937,8 @@ msgid "Enter a name for this user"
 msgstr "Εισαγωγή ονόματος για αυτόν τον χρήστη"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Τωρινός χρήστης '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,16 +961,16 @@ msgid "Switch user"
 msgstr "Αλλαγή χρήστη"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Αλλαγή στον/στην '%s' τώρα;"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Αλλαγή '%s' σε '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1583,6 +1583,38 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Αυτόματη αφαίρεση από την λίστα 'Δείτε αργότερα'"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' από το 'Δείτε Αργότερα'?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα 'Δείτε Αργότερα' με το '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Είστε βέβαιοι ότι θέλετε να αφαιρέσετε το '%s' ως την λίστα ιστορικού σας?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Είστε βέβαιοι ότι θέλετε να αντικαταστήσετε την τρέχουσα λίστα ιστορικού με το '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Τωρινός χρήστης '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Αλλαγή στον/στην '%s' τώρα;"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Αλλαγή '%s' σε '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

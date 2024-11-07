@@ -361,8 +361,8 @@ msgid "Related Videos"
 msgstr "İlgili Videolar"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Daha Sonra İzle'den izlenen videoları sonrasında kaldır"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -577,12 +577,12 @@ msgid "Remove as Watch Later"
 msgstr "Daha Sonra İzle'den kaldır"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "'%s' ögesi Daha Sonra İzle listesinden kaldırılacak, emin misiniz?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Şimdiki Daha Sonra İzle listeniz '%s' ile değiştirilecek, emin misiniz?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,12 +593,12 @@ msgid "Remove as History"
 msgstr "Geçmişten kaldır"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "'%s' ögesi Geçmiş listesinizden kaldırılacak, emin misiniz?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Şimdiki Geçmiş listeniz, '%s' ile değiştirilecek, emin misiniz?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -937,8 +937,8 @@ msgid "Enter a name for this user"
 msgstr "Bu kullanıcı için bir ad gir"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Kullanıcı şu anda '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,16 +961,16 @@ msgid "Switch user"
 msgstr "Kullanıcı değiştir"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "'%s' kullanıcısına geçilsin mi?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Kullanıcının adı, '%s' adından '%s' adına değiştirildi"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1583,6 +1583,38 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Daha Sonra İzle'den izlenen videoları sonrasında kaldır"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "'%s' ögesi Daha Sonra İzle listesinden kaldırılacak, emin misiniz?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Şimdiki Daha Sonra İzle listeniz '%s' ile değiştirilecek, emin misiniz?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "'%s' ögesi Geçmiş listesinizden kaldırılacak, emin misiniz?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Şimdiki Geçmiş listeniz, '%s' ile değiştirilecek, emin misiniz?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Kullanıcı şu anda '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "'%s' kullanıcısına geçilsin mi?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Kullanıcının adı, '%s' adından '%s' adına değiştirildi"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

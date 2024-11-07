@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "Схоже відео"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Авто-видалення з \"Відкладеного перегляду\""
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -576,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Видалити з \\\"Переглянути пізніше\\\""
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Бажаєте видалити '%s' зі списку \\\"Переглянути пізніше\\\"?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Бажаєте замініти поточний список \\\"Переглянути пізніше\\\" на '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -592,11 +592,11 @@ msgid "Remove as History"
 msgstr "Видалити з історії переглянутих"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Бажаєте видалити '%s' з списку переглянутого?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
 msgstr ""
 
 msgctxt "#30575"
@@ -936,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Введіть ім'я користувача"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Поточний користувач: '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -960,16 +960,16 @@ msgid "Switch user"
 msgstr "Змінити користувача"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Змінити на '%s'?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "'%s' перейменовано на '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1582,6 +1582,34 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Авто-видалення з \"Відкладеного перегляду\""
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Бажаєте видалити '%s' зі списку \\\"Переглянути пізніше\\\"?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Бажаєте замініти поточний список \\\"Переглянути пізніше\\\" на '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Бажаєте видалити '%s' з списку переглянутого?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Поточний користувач: '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Змінити на '%s'?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "'%s' перейменовано на '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

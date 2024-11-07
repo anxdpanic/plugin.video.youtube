@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "Súvisiace videá"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Automaticky odstrániť z 'Pozrieť neskôr'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -576,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Odstrániť z 'Pozrieť neskôr'"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Naozaj chcete odstrániť '%s' zo zoznamu 'Pozrieť neskôr'?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Naozaj chcete nahradiť aktuálny zoznam 'Pozrieť neskôr' zoznamom '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -592,12 +592,12 @@ msgid "Remove as History"
 msgstr "Odstrániť z histórie"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Naozaj chcete odstrániť '%s' zo zoznamu histórie?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Naozaj chcete nahradiť aktuálny zoznam histórie zoznamom '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -936,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Zadajte meno používateľa"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Používateľ je teraz '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -960,16 +960,16 @@ msgid "Switch user"
 msgstr "Prepnúť používateľa"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Prepnúť na '%s' teraz?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
-msgstr "%s bolo odstránené"
+msgid "\"%s\" removed"
+msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "'%s' premenované na '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1582,6 +1582,42 @@ msgstr "Prehrať od začiatku"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Automaticky odstrániť z 'Pozrieť neskôr'"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Naozaj chcete odstrániť '%s' zo zoznamu 'Pozrieť neskôr'?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Naozaj chcete nahradiť aktuálny zoznam 'Pozrieť neskôr' zoznamom '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Naozaj chcete odstrániť '%s' zo zoznamu histórie?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Naozaj chcete nahradiť aktuálny zoznam histórie zoznamom '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Používateľ je teraz '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Prepnúť na '%s' teraz?"
+
+#~ msgctxt "#30666"
+#~ msgid "%s removed"
+#~ msgstr "%s bolo odstránené"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "'%s' premenované na '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"

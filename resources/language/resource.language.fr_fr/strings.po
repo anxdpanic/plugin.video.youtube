@@ -360,8 +360,8 @@ msgid "Related Videos"
 msgstr "Vidéos similaires"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Auto suppression de 'Regarder plus tard'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -576,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Supprimer 'Regarder plus tard'"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Êtes-vous sûr de vouloir supprimer '%s' comme liste 'Regarder plus tard' ?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Êtes-vous sûr de vouloir remplacer votre liste 'Regarder plus tard' avec \"%s\" ?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -592,12 +592,12 @@ msgid "Remove as History"
 msgstr "Supprimer l'historique"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Êtes-vous sûr de vouloir supprimer l'historique '%s' de votre liste ?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Êtes-vous sûr que vous voulez remplacer votre liste historique avec '%s' ?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -936,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Entrer un nom pour cet utilisateur"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "L'Utilisateur courant est maintenant '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -960,16 +960,16 @@ msgid "Switch user"
 msgstr "Changer d'utilisateur"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Changer pour '%s' maintenant ?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "'%s' renommer en '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1582,6 +1582,38 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Auto suppression de 'Regarder plus tard'"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Êtes-vous sûr de vouloir supprimer '%s' comme liste 'Regarder plus tard' ?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Êtes-vous sûr de vouloir remplacer votre liste 'Regarder plus tard' avec \"%s\" ?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Êtes-vous sûr de vouloir supprimer l'historique '%s' de votre liste ?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Êtes-vous sûr que vous voulez remplacer votre liste historique avec '%s' ?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "L'Utilisateur courant est maintenant '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Changer pour '%s' maintenant ?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "'%s' renommer en '%s'"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
