@@ -30,6 +30,7 @@ from ...kodion.constants import (
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
     PLAY_WITH,
+    SERVER_WAKEUP,
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
@@ -68,6 +69,9 @@ def _play_stream(provider, context):
             audio_only = settings.audio_only()
         use_adaptive_formats = (not is_external
                                 or settings.alternative_player_adaptive())
+        use_mpd = (use_adaptive_formats
+                   and settings.use_mpd_videos()
+                   and context.wakeup(SERVER_WAKEUP, timeout=5))
 
         try:
             streams = client.get_streams(
@@ -75,7 +79,7 @@ def _play_stream(provider, context):
                 video_id=video_id,
                 ask_for_quality=ask_for_quality,
                 audio_only=audio_only,
-                use_mpd=use_adaptive_formats and settings.use_mpd_videos(),
+                use_mpd=use_mpd,
             )
         except YouTubeException as exc:
             msg = ('yt_play.play_video - Error'

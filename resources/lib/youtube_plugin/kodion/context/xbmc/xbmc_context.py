@@ -825,7 +825,7 @@ class XbmcContext(AbstractContext):
             data.update(payload)
         self.send_notification(WAKEUP, data)
         if not timeout:
-            return
+            return None
 
         pop_property = self.get_ui().pop_property
         no_timeout = timeout < 0
@@ -834,17 +834,34 @@ class XbmcContext(AbstractContext):
         wait_period = wait_period_ms / 1000
 
         while no_timeout or remaining > 0:
-            awake = pop_property(WAKEUP)
-            if awake:
-                if awake == target:
-                    self.log_debug('Wakeup |{0}| in {1}ms'
-                                   .format(awake, timeout - remaining))
-                else:
-                    self.log_error('Wakeup |{0}| in {1}ms - expected |{2}|'
-                                   .format(awake, timeout - remaining, target))
+            data = pop_property(WAKEUP)
+            if data:
+                data = json.loads(data)
+
+            if data:
+                response = data.get('response')
+                response_target = data.get('target') or 'Unknown'
+
+                if target == response_target:
+                    if response:
+                        self.log_debug('Wakeup |{0}| in {1}ms'
+                                       .format(response_target,
+                                               timeout - remaining))
+                    else:
+                        self.log_error('Wakeup |{0}| in {1}ms - failed'
+                                       .format(response_target,
+                                               timeout - remaining))
+                    return response
+
+                self.log_error('Wakeup |{0}| in {1}ms - expected |{2}|'
+                               .format(response_target,
+                                       timeout - remaining,
+                                       target))
                 break
+
             wait(wait_period)
             remaining -= wait_period_ms
         else:
             self.log_error('Wakeup |{0}| timed out in {1}ms'
                            .format(target, timeout))
+        return False
