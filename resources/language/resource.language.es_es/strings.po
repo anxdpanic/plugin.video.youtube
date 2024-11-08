@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-10-29 21:02+0000\n"
+"PO-Revision-Date: 2024-11-08 16:39+0000\n"
 "Last-Translator: Alfonso Cachero <alfonso.cachero@gmail.com>\n"
 "Language-Team: Spanish (Spain) <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/es_es/>\n"
 "Language: es_es\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7.2\n"
+"X-Generator: Weblate 5.8.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -38,7 +38,7 @@ msgstr "Este add-on no está respaldado por Google"
 # Kodion Settings
 msgctxt "#30000"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30001"
 msgid ""
@@ -152,7 +152,7 @@ msgstr "¿Configurar %s?"
 
 msgctxt "#30031"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -218,7 +218,7 @@ msgstr "Ver más tarde"
 
 msgctxt "#30108"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30109"
 msgid ""
@@ -238,7 +238,7 @@ msgstr "Cerrar sesión"
 
 msgctxt "#30113"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -258,7 +258,7 @@ msgstr "¿Está seguro de que desea borrar \"%s\"?"
 
 msgctxt "#30118"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -302,11 +302,11 @@ msgstr " "
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30501"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -362,7 +362,7 @@ msgstr "Vídeos relacionados"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
-msgstr ""
+msgstr "Quitar automáticamente de Ver Mas Tarde"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -386,15 +386,15 @@ msgstr "Añadir a..."
 
 msgctxt "#30521"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30522"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30523"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30524"
 msgid "Select language"
@@ -426,11 +426,11 @@ msgstr "No me gusta"
 
 msgctxt "#30531"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30532"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30533"
 msgid "Reverse"
@@ -438,7 +438,7 @@ msgstr "Inverso"
 
 msgctxt "#30534"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -458,7 +458,7 @@ msgstr "No me gustó el vídeo"
 
 msgctxt "#30539"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -474,7 +474,7 @@ msgstr "Las transmisiones rtmpe no están soportadas"
 
 msgctxt "#30543"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -494,7 +494,7 @@ msgstr "Puede que se pidan activar dos aplicaciones para que YouTube funcione co
 
 msgctxt "#30548"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30549"
 msgid "No videos streams found"
@@ -502,7 +502,7 @@ msgstr "No se han encontrados vídeos"
 
 msgctxt "#30550"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -542,11 +542,11 @@ msgstr "Eliminar settings.xml"
 
 msgctxt "#30560"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30561"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30562"
 msgid "View all"
@@ -566,7 +566,7 @@ msgstr " "
 
 msgctxt "#30566"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -578,11 +578,11 @@ msgstr "Borrar como 'Ver más tarde'"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr ""
+msgstr "¿Seguro de que quieres quitar \"%s\" de la lista Ver Mas Tarde?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
-msgstr ""
+msgstr "¿Seguro de que quieres reemplazar la lista Ver Mas Tarde con \"%s\"?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -594,11 +594,11 @@ msgstr "Borrar como 'Historial'"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "¿Seguro de que quieres quitar \"%s\" como lista Historial?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "¿Seguro de que quieres reemplazar la lista Historial con \"%s\"?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -610,7 +610,7 @@ msgstr "¡Vaya! Algo ha fallado"
 
 msgctxt "#30577"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -634,7 +634,7 @@ msgstr "Reproducir vídeos sugeridos automáticamente"
 
 msgctxt "#30583"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -694,7 +694,7 @@ msgstr "Actualizado: %s"
 
 msgctxt "#30598"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
@@ -702,7 +702,7 @@ msgstr "Error al habilitar claves API personales. No encontrado: %s"
 
 msgctxt "#30600"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -762,7 +762,7 @@ msgstr " "
 
 msgctxt "#30615"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30616"
 msgid ""
@@ -778,7 +778,7 @@ msgstr " "
 
 msgctxt "#30619"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -822,7 +822,7 @@ msgstr "Lista blanca IP (utilice comas como separador)"
 
 msgctxt "#30630"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -938,7 +938,7 @@ msgstr "Introduzca un nombre para este usuario"
 
 msgctxt "#30659"
 msgid "User is now \"%s\""
-msgstr ""
+msgstr "El usuario ahora es \"%s\""
 
 msgctxt "#30660"
 msgid "Users"
@@ -962,15 +962,15 @@ msgstr "Cambiar de usuario"
 
 msgctxt "#30665"
 msgid "Switch to \"%s\" now?"
-msgstr ""
+msgstr "¿Cambiar a \"%s\" ahora?"
 
 msgctxt "#30666"
 msgid "\"%s\" removed"
-msgstr ""
+msgstr "\"%s\" quitado"
 
 msgctxt "#30667"
 msgid "Renamed \"%s\" to \"%s\""
-msgstr ""
+msgstr "\"%s\" renombrado como \"%s\""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1114,7 +1114,7 @@ msgstr "Reproducir con subtítulos"
 
 msgctxt "#30703"
 msgid ""
-msgstr ""
+msgstr " "
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1542,27 +1542,27 @@ msgstr "Todos los próximos vídeos"
 
 msgctxt "#30810"
 msgid "All previously streamed (completed) videos"
-msgstr "Todos los vídeos transmitidos (completados) anteriormente"
+msgstr "Todos los vídeos transmitidos previamente (completados)"
 
 msgctxt "#30811"
 msgid "Filter Live folders"
-msgstr "Filtrar carpetas en directo"
+msgstr "Filtrar carpetas activas"
 
 msgctxt "#30812"
 msgid "Clear subscription feed history"
-msgstr "Limpiar historial del hilo de suscripciones"
+msgstr "Limpiar historial de suscripciones"
 
 msgctxt "#30813"
 msgid "Delete subscription feed history database"
-msgstr "Borrar base de datos del hilo de subscripciones"
+msgstr "Eliminar base de datos del historial de suscripciones"
 
 msgctxt "#30814"
 msgid "feed history"
-msgstr "Historial del hilo"
+msgstr "Historial"
 
 msgctxt "#30815"
 msgid "Go back..."
-msgstr "Retrocede..."
+msgstr "Volver..."
 
 msgctxt "#30816"
 msgid "List is empty.[CR][CR]Refresh from context menu or try again later."
