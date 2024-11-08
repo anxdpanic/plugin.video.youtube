@@ -6,9 +6,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-11-04 05:43+0000\n"
+"PO-Revision-Date: 2024-11-08 16:39+0000\n"
 "Last-Translator: Massimo Pissarello <mapi68@gmail.com>\n"
 "Language-Team: Italian <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/it_it/>\n"
 "Language: it_it\n"
@@ -363,7 +363,7 @@ msgstr "Video correlati"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
-msgstr ""
+msgstr "Rimuovi automaticamente da Guarda più tardi"
 
 msgctxt "#30516"
 msgid "Folders"
@@ -579,11 +579,11 @@ msgstr "Rimuovi da Guarda più tardi"
 
 msgctxt "#30569"
 msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
-msgstr ""
+msgstr "Vuoi davvero rimuovere \"%s\" dall'elenco Guarda più tardi?"
 
 msgctxt "#30570"
 msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
-msgstr ""
+msgstr "Vuoi davvero sostituire l'elenco Guarda più tardi con \"%s\"?"
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -595,11 +595,11 @@ msgstr "Rimuovi come cronologia"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
-msgstr ""
+msgstr "Vuoi davvero rimuovere \"%s\" dall'elenco Cronologia?"
 
 msgctxt "#30574"
 msgid "Are you sure you want to replace your current History list with \"%s\"?"
-msgstr ""
+msgstr "Vuoi davvero sostituire l'elenco Cronologia corrente con \"%s\"?"
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -939,7 +939,7 @@ msgstr "Inserisci nome utente"
 
 msgctxt "#30659"
 msgid "User is now \"%s\""
-msgstr ""
+msgstr "L'utente adesso è \"%s\""
 
 msgctxt "#30660"
 msgid "Users"
@@ -963,15 +963,15 @@ msgstr "Cambia utente"
 
 msgctxt "#30665"
 msgid "Switch to \"%s\" now?"
-msgstr ""
+msgstr "Vuoi passare a \"%s\" adesso?"
 
 msgctxt "#30666"
 msgid "\"%s\" removed"
-msgstr ""
+msgstr "\"%s\" rimosso"
 
 msgctxt "#30667"
 msgid "Renamed \"%s\" to \"%s\""
-msgstr ""
+msgstr "Rinominato \"%s\" in \"%s\""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
