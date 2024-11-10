@@ -16,10 +16,8 @@ from .command_item import CommandItem
 from .directory_item import DirectoryItem
 from .image_item import ImageItem
 from .media_item import AudioItem, MediaItem, VideoItem
-from .new_search_item import NewSearchItem
 from .next_page_item import NextPageItem
-from .search_history_item import SearchHistoryItem
-from .search_item import SearchItem
+from .search_items import NewSearchItem, SearchHistoryItem, SearchItem
 from .uri_item import UriItem
 from .utils import from_json
 from .watch_later_item import WatchLaterItem
