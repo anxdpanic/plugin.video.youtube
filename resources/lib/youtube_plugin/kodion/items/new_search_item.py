@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import menu_items
 from .directory_item import DirectoryItem
 from ..constants import PATHS
 
@@ -47,3 +48,15 @@ class NewSearchItem(DirectoryItem):
                                             ),
                                             image=image,
                                             fanart=fanart)
+
+        if context.is_plugin_path(context.get_uri(), (PATHS.SEARCH, 'list',)):
+            context_menu = [
+                menu_items.search_clear(context),
+                menu_items.separator(),
+                menu_items.goto_quick_search(context, params, not incognito)
+            ]
+        else:
+            context_menu = [
+                menu_items.goto_quick_search(context, params, not incognito)
+            ]
+        self.add_context_menu(context_menu)

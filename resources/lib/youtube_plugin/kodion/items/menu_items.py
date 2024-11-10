@@ -680,11 +680,20 @@ def goto_home(context):
     )
 
 
-def goto_quick_search(context):
+def goto_quick_search(context, params=None, incognito=None):
+    if params is None:
+        params = {}
+    if incognito is None:
+        incognito = params.get('incognito')
+    else:
+        params['incognito'] = incognito
     return (
-        context.localize('search.quick'),
+        context.localize('search.quick.incognito'
+                         if incognito else
+                         'search.quick'),
         context.create_uri(
             (PATHS.ROUTE, PATHS.SEARCH, 'input',),
+            params,
             run=True,
         ),
     )

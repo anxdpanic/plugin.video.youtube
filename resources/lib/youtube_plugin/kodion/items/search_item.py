@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from . import menu_items
 from .directory_item import DirectoryItem
 from ..constants import PATHS
 
@@ -38,3 +39,11 @@ class SearchItem(DirectoryItem):
                                          ),
                                          image=image,
                                          fanart=fanart)
+
+        context_menu = [
+            menu_items.search_clear(context),
+            menu_items.separator(),
+            menu_items.goto_quick_search(context, params),
+            menu_items.goto_quick_search(context, params, incognito=True)
+        ]
+        self.add_context_menu(context_menu)
