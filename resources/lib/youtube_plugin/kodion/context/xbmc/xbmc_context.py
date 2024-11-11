@@ -142,6 +142,7 @@ class XbmcContext(AbstractContext):
         'my_channel': 30507,
         'my_location': 30654,
         'my_subscriptions': 30510,
+        'my_subscriptions.loading': 575,
         'my_subscriptions.filter.add': 30587,
         'my_subscriptions.filter.added': 30589,
         'my_subscriptions.filter.remove': 30588,
