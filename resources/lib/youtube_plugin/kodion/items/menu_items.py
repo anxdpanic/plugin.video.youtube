@@ -174,7 +174,7 @@ def shuffle_playlist(context, playlist_id):
             (PATHS.ROUTE, PATHS.PLAY,),
             {
                 'playlist_id': playlist_id,
-                'order': 'random',
+                'order': 'shuffle',
                 'action': 'list',
             },
             run=True,
