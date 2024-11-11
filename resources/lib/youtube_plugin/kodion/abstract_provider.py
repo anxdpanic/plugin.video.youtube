@@ -68,13 +68,13 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.WATCH_LATER,
-            '/(?P<command>add|clear|list|remove)/?$'
+            '/(?P<command>add|clear|list|play|remove)/?$'
         )), self.on_watch_later)
 
         self.register_path(r''.join((
             '^',
             PATHS.BOOKMARKS,
-            '/(?P<command>add|clear|list|remove)/?$'
+            '/(?P<command>add|clear|list|play|remove)/?$'
         )), self.on_bookmarks)
 
         self.register_path(r''.join((
@@ -86,7 +86,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.HISTORY,
-            '/(?P<command>clear|list|mark_unwatched|mark_watched|remove|reset_resume)/?$'
+            '/(?P<command>clear|list|mark_unwatched|mark_watched|play|remove|reset_resume)/?$'
         )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',

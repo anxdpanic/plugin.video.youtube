@@ -1093,7 +1093,7 @@ class Provider(AbstractProvider):
         playback_history = context.get_playback_history()
         ui = context.get_ui()
 
-        if command == 'list':
+        if command in {'list', 'play'}:
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='history')
             items = playback_history.get_items()
             if not items:
@@ -1122,6 +1122,13 @@ class Provider(AbstractProvider):
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
+            if command == 'play':
+                return yt_play.process_items_for_playlist(
+                    context,
+                    video_items,
+                    action='play',
+                    play_from='start',
+                )
             return video_items
 
         if command == 'clear':
@@ -1339,12 +1346,26 @@ class Provider(AbstractProvider):
                 watch_later_item.add_context_menu(context_menu)
                 result.append(watch_later_item)
             else:
-                watch_history_item = DirectoryItem(
+                watch_later_item = DirectoryItem(
                     localize('watch_later'),
                     create_uri((PATHS.WATCH_LATER, 'list')),
                     image='{media}/watch_later.png',
                 )
-                result.append(watch_history_item)
+                context_menu = [
+                    menu_items.watch_later_local_clear(context),
+                    menu_items.separator(),
+                    menu_items.play_all_from(
+                        context,
+                        route=PATHS.WATCH_LATER,
+                    ),
+                    menu_items.play_all_from(
+                        context,
+                        route=PATHS.WATCH_LATER,
+                        order='shuffle',
+                    ),
+                ]
+                watch_later_item.add_context_menu(context_menu)
+                result.append(watch_later_item)
 
         # liked videos
         if logged_in and settings_bool('youtube.folder.liked_videos.show', True):
@@ -1407,6 +1428,22 @@ class Provider(AbstractProvider):
                     create_uri((PATHS.HISTORY, 'list')),
                     image='{media}/history.png',
                 )
+                context_menu = [
+                    menu_items.history_clear(
+                        context
+                    ),
+                    menu_items.separator(),
+                    menu_items.play_all_from(
+                        context,
+                        route=PATHS.HISTORY,
+                    ),
+                    menu_items.play_all_from(
+                        context,
+                        route=PATHS.HISTORY,
+                        order='shuffle',
+                    ),
+                ]
+                watch_history_item.add_context_menu(context_menu)
                 result.append(watch_history_item)
 
         # (my) playlists
@@ -1444,6 +1481,22 @@ class Provider(AbstractProvider):
                 create_uri((PATHS.BOOKMARKS, 'list')),
                 image='{media}/bookmarks.png',
             )
+            context_menu = [
+                menu_items.bookmarks_clear(
+                    context
+                ),
+                menu_items.separator(),
+                menu_items.play_all_from(
+                    context,
+                    route=PATHS.BOOKMARKS,
+                ),
+                menu_items.play_all_from(
+                    context,
+                    route=PATHS.BOOKMARKS,
+                    order='shuffle',
+                ),
+            ]
+            bookmarks_item.add_context_menu(context_menu)
             result.append(bookmarks_item)
 
         # browse channels
@@ -1529,7 +1582,7 @@ class Provider(AbstractProvider):
         if not command:
             return False
 
-        if command == 'list':
+        if command in {'list', 'play'}:
             context.set_content(CONTENT.VIDEO_CONTENT)
             bookmarks_list = context.get_bookmarks_list()
             items = bookmarks_list.get_items()
@@ -1637,6 +1690,13 @@ class Provider(AbstractProvider):
                 v3_response['items'].append(item)
 
             bookmarks = v3.response_to_items(provider, context, v3_response)
+            if command == 'play':
+                return yt_play.process_items_for_playlist(
+                    context,
+                    bookmarks,
+                    action='play',
+                    play_from='start',
+                )
             return bookmarks
 
         ui = context.get_ui()
@@ -1705,7 +1765,7 @@ class Provider(AbstractProvider):
         localize = context.localize
         ui = context.get_ui()
 
-        if command == 'list':
+        if command in {'list', 'play'}:
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='watch_later')
             items = context.get_watch_later_list().get_items()
             if not items:
@@ -1734,6 +1794,13 @@ class Provider(AbstractProvider):
                 ]
             }
             video_items = v3.response_to_items(provider, context, v3_response)
+            if command == 'play':
+                return yt_play.process_items_for_playlist(
+                    context,
+                    video_items,
+                    action='play',
+                    play_from='start',
+                )
             return video_items
 
         if command == 'clear':

@@ -102,6 +102,21 @@ def refresh(context):
     )
 
 
+def play_all_from(context, route, order='normal'):
+    return (
+        context.localize('playlist.play.shuffle')
+        if order == 'shuffle' else
+        context.localize('playlist.play.all'),
+        context.create_uri(
+            (route, 'play',),
+            {
+                'order': order,
+            },
+            run=True,
+        ),
+    )
+
+
 def queue_video(context):
     return (
         context.localize('video.queue'),
