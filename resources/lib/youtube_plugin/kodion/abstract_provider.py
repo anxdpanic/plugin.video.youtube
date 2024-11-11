@@ -86,34 +86,34 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             PATHS.HISTORY,
-            '/?$'
+            '/(?P<command>clear|list|mark_unwatched|mark_watched|remove|reset_resume)/?$'
         )), self.on_playback_history)
 
         self.register_path(r'(?P<path>.*\/)extrafanart\/([\?#].+)?$',
                            self.on_extra_fanart)
 
     @classmethod
-    def register_path(cls, re_path, method=None):
+    def register_path(cls, re_path, command=None):
         """
         Registers a new method for the given regular expression
         :param re_path: regular expression of the path
-        :param method: method or function to be registered
+        :param command: command or function to be registered
         :return:
         """
 
-        def wrapper(method):
-            if callable(method):
-                func = method
+        def wrapper(command):
+            if callable(command):
+                func = command
             else:
-                func = getattr(method, '__func__', None)
+                func = getattr(command, '__func__', None)
                 if not callable(func):
                     return None
 
             cls._dict_path[re.compile(re_path, re.UNICODE)] = func
-            return method
+            return command
 
-        if method:
-            return wrapper(method)
+        if command:
+            return wrapper(command)
         return wrapper
 
     def run_wizard(self, context):

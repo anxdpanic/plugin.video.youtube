@@ -318,23 +318,23 @@ def _process_rename_playlist(provider, context):
     return False
 
 
-def _playlist_id_change(context, playlist, method):
+def _playlist_id_change(context, playlist, command):
     playlist_id = context.get_param('playlist_id', '')
     if not playlist_id:
-        raise KodionException('{type}/{method}: missing playlist_id'
-                              .format(type=playlist, method=method))
+        raise KodionException('{type}/{command}: missing playlist_id'
+                              .format(type=playlist, command=command))
     playlist_name = context.get_param('item_name', '')
     if not playlist_name:
-        raise KodionException('{type}/{method}: missing playlist_name'
-                              .format(type=playlist, method=method))
+        raise KodionException('{type}/{command}: missing playlist_name'
+                              .format(type=playlist, command=command))
 
     if context.get_ui().on_yes_no_input(
             context.get_name(),
-            context.localize('{type}.list.{method}.check'.format(
-                type=playlist, method=method
+            context.localize('{type}.list.{command}.check'.format(
+                type=playlist, command=command
             )) % playlist_name
     ):
-        if method == 'remove':
+        if command == 'remove':
             playlist_id = None
         if playlist == 'watch_later':
             context.get_access_manager().set_watch_later_id(playlist_id)
@@ -347,35 +347,35 @@ def _playlist_id_change(context, playlist, method):
 def process(provider,
             context,
             re_match=None,
-            method=None,
+            command=None,
             category=None,
             **kwargs):
     if re_match:
-        if method is None:
-            method = re_match.group('method')
+        if command is None:
+            command = re_match.group('command')
         if category is None:
             category = re_match.group('category')
 
-    if method == 'add' and category == 'video':
+    if command == 'add' and category == 'video':
         return _process_add_video(provider, context)
 
-    if method == 'remove' and category == 'video':
+    if command == 'remove' and category == 'video':
         return _process_remove_video(provider, context, **kwargs)
 
-    if method == 'remove' and category == 'playlist':
+    if command == 'remove' and category == 'playlist':
         return _process_remove_playlist(provider, context)
 
-    if method == 'select' and category == 'playlist':
+    if command == 'select' and category == 'playlist':
         return _process_select_playlist(provider, context)
 
-    if method == 'rename' and category == 'playlist':
+    if command == 'rename' and category == 'playlist':
         return _process_rename_playlist(provider, context)
 
-    if method in {'set', 'remove'} and category == 'watch_later':
-        return _playlist_id_change(context, category, method)
+    if command in {'set', 'remove'} and category == 'watch_later':
+        return _playlist_id_change(context, category, command)
 
-    if method in {'set', 'remove'} and category == 'history':
-        return _playlist_id_change(context, category, method)
+    if command in {'set', 'remove'} and category == 'history':
+        return _playlist_id_change(context, category, command)
 
-    raise KodionException('Unknown category |{0}| or method |{1}|'
-                          .format(category, method))
+    raise KodionException('Unknown playlist category |{0}| or command |{1}|'
+                          .format(category, command))

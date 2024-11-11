@@ -60,12 +60,12 @@ class Provider(AbstractProvider):
         self._logged_in = False
 
         self.on_video_x = self.register_path(
-            '^/video/(?P<method>[^/]+)/?$',
+            '^/video/(?P<command>[^/]+)/?$',
             yt_video.process,
         )
 
         self.on_playlist_x = self.register_path(
-            '^/playlist/(?P<method>[^/]+)/(?P<category>[^/]+)/?$',
+            '^/playlist/(?P<command>[^/]+)/(?P<category>[^/]+)/?$',
             yt_playlist.process,
         )
 
@@ -80,7 +80,7 @@ class Provider(AbstractProvider):
         )
 
         self.register_path(
-            '^/subscriptions/(?P<method>[^/]+)/?$',
+            '^/subscriptions/(?P<command>[^/]+)/?$',
             yt_subscriptions.process,
         )
 
@@ -517,7 +517,7 @@ class Provider(AbstractProvider):
         return result
 
     @AbstractProvider.register_path(
-        r'^/(?P<method>(channel|handle|user))'
+        r'^/(?P<command>(channel|handle|user))'
         r'/(?P<identifier>[^/]+)/?$')
     @staticmethod
     def on_channel(provider, context, re_match):
@@ -538,10 +538,10 @@ class Provider(AbstractProvider):
         params = context.get_params()
         ui = context.get_ui()
 
-        method = re_match.group('method')
+        command = re_match.group('command')
         identifier = re_match.group('identifier')
 
-        if (method == 'channel'
+        if (command == 'channel'
                 and identifier
                 and identifier.lower() == 'property'
                 and listitem_channel_id
@@ -550,7 +550,7 @@ class Provider(AbstractProvider):
                 channel=create_uri(('channel', listitem_channel_id))
             ))
 
-        if method == 'channel' and not identifier:
+        if command == 'channel' and not identifier:
             return False
 
         context.set_content(CONTENT.VIDEO_CONTENT)
@@ -564,14 +564,14 @@ class Provider(AbstractProvider):
         only have the handle or username of a channel.
         """
         if identifier == 'mine':
-            method = 'mine'
+            command = 'mine'
         elif identifier.startswith('@'):
-            method = 'handle'
-        if method == 'channel':
+            command = 'handle'
+        if command == 'channel':
             channel_id = identifier
         else:
             channel_id = None
-            identifier = {method: True, 'identifier': identifier}
+            identifier = {command: True, 'identifier': identifier}
 
         if not channel_id:
             context.log_debug('Trying to get channel ID for |{0}|'.format(
@@ -942,16 +942,18 @@ class Provider(AbstractProvider):
             addon=ADDON_ID, action=action
         ))
 
-    @AbstractProvider.register_path('^/my_subscriptions/filter/?$')
+    @AbstractProvider.register_path(
+        '^/my_subscriptions/filter'
+        '/(?P<command>add|remove)/?$'
+    )
     @staticmethod
-    def on_manage_my_subscription_filter(context, **_kwargs):
+    def on_manage_my_subscription_filter(context, re_match):
         settings = context.get_settings()
         ui = context.get_ui()
 
-        params = context.get_params()
-        action = params.get('action')
-        channel = params.get('item_name')
-        if not channel or not action:
+        channel = context.get_param('item_name')
+        command = re_match.group('command')
+        if not channel or not command:
             return
 
         filter_enabled = settings.get_bool('youtube.folder.my_subscriptions_filtered.show', False)
@@ -966,19 +968,19 @@ class Provider(AbstractProvider):
         filter_list = filter_string.split(',')
         filter_list = [x.lower() for x in filter_list]
 
-        if action == 'add':
+        if command == 'add':
             if channel_name not in filter_list:
                 filter_list.append(channel_name)
-        elif action == 'remove' and channel_name in filter_list:
+        elif command == 'remove' and channel_name in filter_list:
             filter_list = [chan_name for chan_name in filter_list if chan_name != channel_name]
 
         modified_string = ','.join(filter_list).lstrip(',')
         if filter_string != modified_string:
             settings.set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
             message = ''
-            if action == 'add':
+            if command == 'add':
                 message = context.localize('my_subscriptions.filter.added')
-            elif action == 'remove':
+            elif command == 'remove':
                 message = context.localize('my_subscriptions.filter.removed')
             if message:
                 ui.show_notification(message=message)
@@ -1083,15 +1085,15 @@ class Provider(AbstractProvider):
     @staticmethod
     def on_playback_history(provider, context, re_match):
         params = context.get_params()
-        action = params.get('action')
-        if not action:
+        command = re_match.group('command')
+        if not command:
             return False
 
         localize = context.localize
         playback_history = context.get_playback_history()
         ui = context.get_ui()
 
-        if action == 'list':
+        if command == 'list':
             context.set_content(CONTENT.VIDEO_CONTENT, sub_type='history')
             items = playback_history.get_items()
             if not items:
@@ -1122,7 +1124,7 @@ class Provider(AbstractProvider):
             video_items = v3.response_to_items(provider, context, v3_response)
             return video_items
 
-        if action == 'clear':
+        if command == 'clear':
             if not ui.on_yes_no_input(
                     localize('history.clear'),
                     localize('history.clear.check')
@@ -1143,7 +1145,7 @@ class Provider(AbstractProvider):
         if not video_id:
             return False
 
-        if action == 'remove':
+        if command == 'remove':
             video_name = params.get('item_name') or video_id
             video_name = to_unicode(video_name)
             if not ui.on_yes_no_input(
@@ -1174,17 +1176,17 @@ class Provider(AbstractProvider):
                 'played_percent': 0
             }
 
-        if action == 'mark_unwatched':
+        if command == 'mark_unwatched':
             if play_data.get('play_count', 0) > 0:
                 play_data['play_count'] = 0
                 play_data['played_time'] = 0
                 play_data['played_percent'] = 0
 
-        elif action == 'mark_watched':
+        elif command == 'mark_watched':
             if not play_data.get('play_count', 0):
                 play_data['play_count'] = 1
 
-        elif action == 'reset_resume':
+        elif command == 'reset_resume':
             play_data['played_time'] = 0
             play_data['played_percent'] = 0
 
@@ -1402,7 +1404,7 @@ class Provider(AbstractProvider):
             elif local_history:
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri((PATHS.HISTORY,), params={'action': 'list'}),
+                    create_uri((PATHS.HISTORY, 'list')),
                     image='{media}/history.png',
                 )
                 result.append(watch_history_item)

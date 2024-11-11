@@ -285,10 +285,9 @@ def remove_my_subscriptions_filter(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.remove'),
         context.create_uri(
-            ('my_subscriptions', 'filter',),
+            ('my_subscriptions', 'filter', 'remove'),
             {
                 'item_name': channel_name,
-                'action': 'remove'
             },
             run=True,
         ),
@@ -299,10 +298,9 @@ def add_my_subscriptions_filter(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.add'),
         context.create_uri(
-            ('my_subscriptions', 'filter',),
+            ('my_subscriptions', 'filter', 'add',),
             {
                 'item_name': channel_name,
-                'action': 'add',
             },
             run=True,
         ),
@@ -482,9 +480,8 @@ def history_remove(context, video_id, video_name=''):
     return (
         context.localize('history.remove'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'remove',),
             {
-                'action': 'remove',
                 'video_id': video_id,
                 'item_name': video_name,
             },
@@ -497,10 +494,7 @@ def history_clear(context):
     return (
         context.localize('history.clear'),
         context.create_uri(
-            (PATHS.HISTORY,),
-            {
-                'action': 'clear'
-            },
+            (PATHS.HISTORY, 'clear',),
             run=True,
         ),
     )
@@ -510,10 +504,9 @@ def history_mark_watched(context, video_id):
     return (
         context.localize('history.mark.watched'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'mark_watched',),
             {
                 'video_id': video_id,
-                'action': 'mark_watched',
             },
             run=True,
         ),
@@ -524,10 +517,9 @@ def history_mark_unwatched(context, video_id):
     return (
         context.localize('history.mark.unwatched'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'mark_unwatched',),
             {
                 'video_id': video_id,
-                'action': 'mark_unwatched',
             },
             run=True,
         ),
@@ -538,10 +530,9 @@ def history_reset_resume(context, video_id):
     return (
         context.localize('history.reset.resume_point'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'reset_resume',),
             {
                 'video_id': video_id,
-                'action': 'reset_resume',
             },
             run=True,
         ),
