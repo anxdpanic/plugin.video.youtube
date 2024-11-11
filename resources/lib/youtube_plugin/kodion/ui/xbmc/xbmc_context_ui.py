@@ -22,11 +22,15 @@ class XbmcContextUI(AbstractContextUI):
         super(XbmcContextUI, self).__init__()
         self._context = context
 
-    def create_progress_dialog(self, heading, text=None, background=False):
+    def create_progress_dialog(self,
+                               heading,
+                               message='',
+                               background=False,
+                               message_template=None):
         if background:
-            return XbmcProgressDialogBG(heading, text)
+            return XbmcProgressDialogBG(heading, message, message_template)
 
-        return XbmcProgressDialog(heading, text)
+        return XbmcProgressDialog(heading, message, message_template)
 
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)

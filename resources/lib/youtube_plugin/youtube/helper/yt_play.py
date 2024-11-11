@@ -196,9 +196,14 @@ def _play_playlist(provider, context):
     ui = context.get_ui()
 
     with ui.create_progress_dialog(
-            context.localize('playlist.progress.updating'),
-            context.localize('please_wait'),
-            background=True
+            heading=context.localize('playlist.progress.updating'),
+            message=context.localize('please_wait'),
+            background=True,
+            message_template=(
+                    '{wait} {{current}}/{{total}}'.format(
+                        wait=context.localize('please_wait'),
+                    )
+            ),
     ) as progress_dialog:
         json_data = resource_manager.get_playlist_items(playlist_ids)
 
@@ -206,11 +211,8 @@ def _play_playlist(provider, context):
         progress_dialog.set_total(total)
         progress_dialog.update(
             steps=0,
-            text='{wait} {current}/{total}'.format(
-                wait=context.localize('please_wait'),
-                current=0,
-                total=total,
-            )
+            current=0,
+            total=total,
         )
 
         # start the loop and fill the list with video items
@@ -223,11 +225,8 @@ def _play_playlist(provider, context):
 
             progress_dialog.update(
                 steps=len(result),
-                text='{wait} {current}/{total}'.format(
-                    wait=context.localize('please_wait'),
-                    current=len(video_items),
-                    total=total,
-                )
+                current=len(video_items),
+                total=total,
             )
 
         if not video_items:
