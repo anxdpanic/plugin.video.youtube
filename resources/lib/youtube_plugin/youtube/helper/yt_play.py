@@ -180,13 +180,13 @@ def _play_stream(provider, context):
 
 
 def _play_playlist(provider, context):
-    videos = []
+    video_items = []
     params = context.get_params()
 
-    playlist_player = context.get_playlist_player()
-    playlist_player.stop()
-
     action = params.get('action')
+    if not action and context.get_handle() == -1:
+        action = 'play'
+
     playlist_ids = params.get('playlist_ids')
     if not playlist_ids:
         playlist_ids = [params.get('playlist_id')]
@@ -219,76 +219,32 @@ def _play_playlist(provider, context):
                                           context,
                                           chunk,
                                           process_next_page=False)
-            videos.extend(result)
+            video_items.extend(result)
 
             progress_dialog.update(
                 steps=len(result),
                 text='{wait} {current}/{total}'.format(
                     wait=context.localize('please_wait'),
-                    current=len(videos),
+                    current=len(video_items),
                     total=total,
                 )
             )
 
-        if not videos:
+        if not video_items:
             return False
 
-        # select order
-        order = params.get('order')
-        if not order and not video_id:
-            order = 'ask'
-        if order == 'ask':
-            order_list = ('default', 'reverse', 'shuffle')
-            items = [(context.localize('playlist.play.%s' % order), order)
-                     for order in order_list]
-            order = ui.on_select(context.localize('playlist.play.select'),
-                                 items)
-            if order not in order_list:
-                order = 'default'
-
-        # reverse the list
-        if order == 'reverse':
-            videos = videos[::-1]
-        elif order == 'shuffle':
-            # we have to shuffle the playlist by our self.
-            # The implementation of XBMC/KODI is quite weak :(
-            random.shuffle(videos)
-
-        if action == 'list':
-            context.set_content(CONTENT.VIDEO_CONTENT)
-            return videos
-
-        # clear the playlist
-        playlist_player.clear()
-        playlist_player.unshuffle()
-
-        # check if we have a video as starting point for the playlist
-        playlist_position = None if video_id else 0
-        # add videos to playlist
-        for idx, video in enumerate(videos):
-            playlist_player.add(video)
-            if playlist_position is None and video.video_id == video_id:
-                playlist_position = idx
-
-    options = {
-        provider.RESULT_CACHE_TO_DISC: False,
-        provider.RESULT_FORCE_RESOLVE: True,
-        provider.RESULT_UPDATE_LISTING: True,
-    }
-
-    if action == 'queue':
-        return videos, options
-    if context.get_handle() == -1 or action == 'play':
-        playlist_player.play_playlist_item(playlist_position + 1)
-        return False
-    return videos[playlist_position], options
+        return (
+            process_items_for_playlist(context, video_items, action, video_id),
+            {
+                provider.RESULT_CACHE_TO_DISC: False,
+                provider.RESULT_FORCE_RESOLVE: True,
+                provider.RESULT_UPDATE_LISTING: True,
+            },
+        )
 
 
 def _play_channel_live(provider, context):
     channel_id = context.get_param('channel_id')
-    index = context.get_param('live', 1) - 1
-    if index < 0:
-        index = 0
     _, json_data = provider.get_client(context).search_with_params(params={
         'type': 'video',
         'eventType': 'live',
@@ -298,25 +254,26 @@ def _play_channel_live(provider, context):
     if not json_data:
         return False
 
-    video_items = v3.response_to_items(provider,
-                                       context,
-                                       json_data,
-                                       process_next_page=False)
-
-    try:
-        video_item = video_items[index]
-    except IndexError:
+    channel_streams = v3.response_to_items(provider,
+                                           context,
+                                           json_data,
+                                           process_next_page=False)
+    if not channel_streams:
         return False
 
-    playlist_player = context.get_playlist_player()
-    playlist_player.stop()
-    playlist_player.clear()
-    playlist_player.add(video_item)
-
-    if context.get_handle() == -1:
-        playlist_player.play_playlist_item(1)
-        return False
-    return video_item
+    return (
+        process_items_for_playlist(
+            context,
+            channel_streams,
+            action='play' if context.get_handle() == -1 else None,
+            play_from=context.get_param('live', 1),
+        ),
+        {
+            provider.RESULT_CACHE_TO_DISC: False,
+            provider.RESULT_FORCE_RESOLVE: True,
+            provider.RESULT_UPDATE_LISTING: True,
+        },
+    )
 
 
 def process(provider, context, **_kwargs):
@@ -405,3 +362,78 @@ def process(provider, context, **_kwargs):
     if 'channel_id' in params:
         return _play_channel_live(provider, context)
     return False
+
+
+def process_items_for_playlist(context, items, action=None, play_from=None):
+    # select order
+    order = context.get_param('order')
+    if not order and play_from is None:
+        order = 'ask'
+    if order == 'ask':
+        order_list = ('default', 'reverse', 'shuffle')
+        selection_list = [
+            (context.localize('playlist.play.%s' % order), order)
+            for order in order_list
+        ]
+        order = context.get_ui().on_select(
+            context.localize('playlist.play.select'),
+            selection_list,
+        )
+        if order not in order_list:
+            order = 'default'
+
+    # reverse the list
+    if order == 'reverse':
+        items = items[::-1]
+    elif order == 'shuffle':
+        # we have to shuffle the playlist by our self.
+        # The implementation of XBMC/KODI is quite weak :(
+        random.shuffle(items)
+
+    if action == 'list':
+        context.set_content(CONTENT.VIDEO_CONTENT)
+        return items
+
+    # stop and clear the playlist
+    playlist_player = context.get_playlist_player()
+    playlist_player.clear()
+    playlist_player.unshuffle()
+
+    # check if we have a video as starting point for the playlist
+    if play_from == 'start':
+        play_from = 0
+    elif play_from == 'end':
+        play_from = -1
+    if isinstance(play_from, int):
+        playlist_position = play_from
+    else:
+        playlist_position = None
+
+    # add videos to playlist
+    for idx, item in enumerate(items):
+        if not item.playable:
+            continue
+        playlist_player.add(item)
+        if playlist_position is None and item.video_id == play_from:
+            playlist_position = idx
+
+    num_items = playlist_player.size()
+    if not num_items:
+        return False
+
+    if isinstance(play_from, int):
+        if num_items >= play_from > 0:
+            playlist_position = play_from - 1
+        elif play_from < 0:
+            playlist_position = num_items + play_from
+        else:
+            playlist_position = 0
+    elif playlist_position is None:
+        playlist_position = 0
+
+    if action == 'queue':
+        return items
+    if action == 'play':
+        playlist_player.play_playlist_item(playlist_position + 1)
+        return False
+    return items[playlist_position]
