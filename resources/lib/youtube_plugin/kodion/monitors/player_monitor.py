@@ -240,7 +240,7 @@ class PlayerMonitorThread(threading.Thread):
                     self._provider.on_playlist_x(
                         self._provider,
                         self._context,
-                        method='remove',
+                        command='remove',
                         category='video',
                         playlist_id=watch_later_id,
                         video_id=playlist_item_id,
@@ -272,7 +272,7 @@ class PlayerMonitorThread(threading.Thread):
                             self._provider,
                             self._context,
                             rating_match,
-                            method='rate',
+                            command='rate',
                         )
 
         if settings.get_bool('youtube.post.play.refresh', False):

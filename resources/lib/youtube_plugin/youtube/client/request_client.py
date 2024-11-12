@@ -88,6 +88,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         'android_testsuite': {
             '_id': 30,
+            '_disabled': True,
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android_testsuite'],
@@ -116,6 +117,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         'android_youtube_tv': {
             '_id': 29,
+            '_disabled': True,
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android'],

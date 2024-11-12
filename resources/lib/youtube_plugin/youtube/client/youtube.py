@@ -1516,6 +1516,7 @@ class YouTube(LoginClient):
                              logged_in=False,
                              do_filter=False,
                              refresh=False,
+                             progress_dialog=None,
                              **kwargs):
         """
         modified by PureHemp, using YouTube RSS for fetching latest videos
@@ -1622,7 +1623,10 @@ class YouTube(LoginClient):
             'Accept-Language': 'en-US,en;q=0.7,de;q=0.3'
         }
 
-        def _get_feed_cache(output, channel_id, _cache=cache, _refresh=refresh):
+        def _get_feed_cache(output,
+                            channel_id,
+                            _cache=cache,
+                            _refresh=refresh):
             cached = _cache.get_item(channel_id)
             if cached:
                 feed_details = cached['value']
@@ -1643,6 +1647,7 @@ class YouTube(LoginClient):
                 feeds[channel_id].update(feed_details)
             else:
                 feeds[channel_id] = feed_details
+
             return True, False
 
         def _get_feed(output, channel_id, _headers=headers):
@@ -1670,10 +1675,19 @@ class YouTube(LoginClient):
         }
 
         def _parse_feeds(feeds,
+                         sort_method,
+                         sort_limits,
+                         progress_dialog=None,
                          utf8=self._context.get_system_version().compatible(19),
                          filters=subscription_filters,
                          _ns=namespaces,
                          _cache=cache):
+            if progress_dialog:
+                total = len(feeds)
+                progress_dialog.reset_total(new_total=total,
+                                            current=0,
+                                            total=total)
+
             all_items = {}
             new_cache = {}
             for channel_id, feed in feeds.items():
@@ -1713,7 +1727,7 @@ class YouTube(LoginClient):
                         'video_ids': set(),
                     }
                     feed_items.sort(reverse=True,
-                                    key=partial(_sort_by_date_time,
+                                    key=partial(sort_method,
                                                 limits=feed_limits))
                     feed_items = feed_items[:min(1000, feed_limits['num'])]
                     new_cache[channel_id] = {
@@ -1734,9 +1748,19 @@ class YouTube(LoginClient):
                 else:
                     all_items[channel_id] = feed_items
 
+                if progress_dialog:
+                    progress_dialog.update(current=len(all_items))
+
             if new_cache:
                 _cache.set_items(new_cache)
-            return list(chain.from_iterable(all_items.values()))
+            # filter, sorting by publish date and trim
+            if all_items:
+                return sorted(
+                    chain.from_iterable(all_items.values()),
+                    reverse=True,
+                    key=partial(sort_method, limits=sort_limits),
+                )
+            return None
 
         def _threaded_fetch(kwargs,
                             output,
@@ -1849,6 +1873,15 @@ class YouTube(LoginClient):
                     del payloads[pool_id]
                 completed = []
                 iterator = iter(payloads)
+                if progress_dialog:
+                    total = progress_dialog.grow_total(
+                        new_total=len(threaded_output['channel_ids']),
+                    )
+                    progress_dialog.update(
+                        steps=0,
+                        current=len(threaded_output['feeds']),
+                        total=total,
+                    )
                 continue
 
             payload = payloads[pool_id]
@@ -1889,14 +1922,13 @@ class YouTube(LoginClient):
             counter.acquire(True)
             new_thread.start()
 
-        items = _parse_feeds(threaded_output['feeds'])
-
-        # filter, sorting by publish date and trim
-        if items:
-            items.sort(reverse=True,
-                       key=partial(_sort_by_date_time,
-                                   limits=totals))
-        else:
+        items = _parse_feeds(
+            threaded_output['feeds'],
+            sort_method=_sort_by_date_time,
+            sort_limits=totals,
+            progress_dialog=progress_dialog,
+        )
+        if not items:
             return None
 
         if totals['num'] > totals['end']:

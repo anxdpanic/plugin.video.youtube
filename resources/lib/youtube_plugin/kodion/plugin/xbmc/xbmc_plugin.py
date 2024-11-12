@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import xbmcplugin
+from ...compatibility import urlsplit, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -261,6 +261,17 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = bool(result)
             if not succeeded:
                 ui.clear_property(CONTENT_TYPE)
+
+                try_fallback = options.get(provider.RESULT_TRY_FALLBACK, True)
+                if try_fallback:
+                    result, post_run_action = self.uri_action(
+                        context,
+                        context.get_parent_uri(params={
+                            'window_fallback': True,
+                            'window_replace': True,
+                            'window_return': False,
+                        }),
+                    )
             cache_to_disc = False
             update_listing = True
 
@@ -312,7 +323,12 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
-            action = 'RunPlugin({0})'.format(uri)
+            uri = urlsplit(uri)
+            action = context.create_uri(
+                (PATHS.ROUTE, uri.path.rstrip('/') or PATHS.HOME),
+                uri.query,
+                run=True,
+            )
             result = False
 
         else:

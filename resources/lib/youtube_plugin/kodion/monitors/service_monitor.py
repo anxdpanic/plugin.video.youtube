@@ -107,7 +107,9 @@ class ServiceMonitor(xbmc.Monitor):
                 player = xbmc.Player()
                 try:
                     playing_file = urlsplit(player.getPlayingFile())
-                    if playing_file.path in {PATHS.MPD, PATHS.REDIRECT}:
+                    if playing_file.path in {PATHS.MPD,
+                                             PATHS.PLAY,
+                                             PATHS.REDIRECT}:
                         self.onWake()
                 except RuntimeError:
                     pass
@@ -129,10 +131,13 @@ class ServiceMonitor(xbmc.Monitor):
 
             if target == PLUGIN_WAKEUP:
                 self.interrupt = True
+                response = True
 
             elif target == SERVER_WAKEUP:
                 if not self.httpd and self.httpd_required():
-                    self.start_httpd()
+                    response = self.start_httpd()
+                else:
+                    response = True
                 if self.httpd_sleep_allowed:
                     self.httpd_sleep_allowed = None
 
@@ -142,9 +147,14 @@ class ServiceMonitor(xbmc.Monitor):
                     self._settings_collect = True
                 elif state == 'process':
                     self.onSettingsChanged(force=True)
+                response = True
+
+            else:
+                return
 
             if data.get('response_required'):
-                self.set_property(WAKEUP, target)
+                data['response'] = response
+                self.set_property(WAKEUP, json.dumps(data, ensure_ascii=False))
 
         elif event == REFRESH_CONTAINER:
             self.refresh_container()
@@ -245,7 +255,7 @@ class ServiceMonitor(xbmc.Monitor):
                                      port=self._httpd_port,
                                      context=context)
         if not self.httpd:
-            return
+            return False
 
         self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
         self.httpd_thread.start()
@@ -254,6 +264,7 @@ class ServiceMonitor(xbmc.Monitor):
         context.log_debug('HTTPServer: Listening on |{ip}:{port}|'
                           .format(ip=address[0],
                                   port=address[1]))
+        return True
 
     def shutdown_httpd(self):
         if self.httpd:

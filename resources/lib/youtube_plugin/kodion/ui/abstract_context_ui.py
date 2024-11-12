@@ -15,7 +15,11 @@ class AbstractContextUI(object):
     def __init__(self):
         pass
 
-    def create_progress_dialog(self, heading, text=None, background=False):
+    def create_progress_dialog(self,
+                               heading,
+                               message='',
+                               background=False,
+                               message_template=None):
         raise NotImplementedError()
 
     def on_keyboard_input(self, title, default='', hidden=False):

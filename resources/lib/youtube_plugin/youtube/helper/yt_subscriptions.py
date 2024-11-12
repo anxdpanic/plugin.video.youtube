@@ -82,20 +82,20 @@ def _process_remove(_provider, context, client):
 
 
 def process(provider, context, re_match):
-    method = re_match.group('method')
+    command = re_match.group('command')
 
     # we need a login
     client = provider.get_client(context)
     if not provider.is_logged_in():
         return UriItem(context.create_uri(('sign', 'in')))
 
-    if method == 'list':
+    if command == 'list':
         return _process_list(provider, context, client)
 
-    if method == 'add':
+    if command == 'add':
         return _process_add(provider, context, client)
 
-    if method == 'remove':
+    if command == 'remove':
         return _process_remove(provider, context, client)
 
-    raise KodionException('Unknown subscriptions method: %s' % method)
+    raise KodionException('Unknown subscriptions command: %s' % command)

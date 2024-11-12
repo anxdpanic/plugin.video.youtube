@@ -1,3 +1,22 @@
+## v7.1.1+beta.6
+### Fixed
+- Ensure http server is started prior to creating MPD for playback #961
+- Fix shuffle play of playlists not working
+- Fix plugin category label not being applied if content type not set
+- Fix Kodi navigating to root path of Video window if plugin listing fails
+
+### Changed
+- Use redirect in multiple busy dialog crash workaround #938
+- Disable unusable alternate players #966
+- Standardise plugin URIs for routing
+  - path parameters used for folders and sub-folders
+  - query parameters used for changing display modes, filtering, sorting and inputs
+
+### New
+- Add Quick Search and search management context menu items to Search folders
+- Add context menu items to Clear and Play All/Shuffle in Bookmarks/Watch Later/Watch History folders
+- Add progress dialog to My Subscription loading
+
 ## v7.1.1+beta.5
 ### Fixed
 - Fix Python2/Android incompatibilty when checking CPU count #958
