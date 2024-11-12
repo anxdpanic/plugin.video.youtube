@@ -467,7 +467,7 @@ def run(argv):
         if args:
             args = urlsplit(args[0])
 
-            path = args.path
+            path = args.path.rstrip('/')
             if path:
                 path = path.split('/')
                 category = path[0]

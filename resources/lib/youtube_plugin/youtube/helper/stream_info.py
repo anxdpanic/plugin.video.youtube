@@ -716,8 +716,6 @@ class StreamInfo(YouTubeRequestClient):
             # Limited audio stream availability with some clients
             'mpd': (
                 'android_vr',
-                'android_youtube_tv',
-                'android_testsuite',
             ),
             # Progressive streams
             # Limited video and audio stream availability

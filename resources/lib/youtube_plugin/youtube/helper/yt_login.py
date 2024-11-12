@@ -56,18 +56,21 @@ def process(mode, provider, context, sign_out_refresh=True):
         else:
             verification_url = 'youtube.com/activate'
 
-        text = [localize('sign.go_to') % ui.bold(verification_url),
-                '[CR]%s %s' % (localize('sign.enter_code'),
-                               ui.bold(user_code))]
-        text = ''.join(text)
+        message = ''.join((
+            localize('sign.go_to') % ui.bold(verification_url),
+            '[CR]',
+            localize('sign.enter_code'),
+            ' ',
+            ui.bold(user_code),
+        ))
 
         with ui.create_progress_dialog(
-                heading=localize('sign.in'), text=text, background=False
-        ) as dialog:
+                heading=localize('sign.in'), message=message, background=False
+        ) as progress_dialog:
             steps = ((10 * 60) // interval)  # 10 Minutes
-            dialog.set_total(steps)
+            progress_dialog.set_total(steps)
             for _ in range(steps):
-                dialog.update()
+                progress_dialog.update()
                 try:
                     json_data = _client.request_access_token(token_type,
                                                              device_code)
@@ -102,7 +105,7 @@ def process(mode, provider, context, sign_out_refresh=True):
                     context.log_error('Error requesting access token: |error|'
                                       .format(error=message))
 
-                if dialog.is_aborted():
+                if progress_dialog.is_aborted():
                     break
 
                 context.sleep(interval)

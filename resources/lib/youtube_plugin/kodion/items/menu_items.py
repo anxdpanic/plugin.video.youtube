@@ -102,6 +102,21 @@ def refresh(context):
     )
 
 
+def play_all_from(context, route, order='normal'):
+    return (
+        context.localize('playlist.play.shuffle')
+        if order == 'shuffle' else
+        context.localize('playlist.play.all'),
+        context.create_uri(
+            (route, 'play',),
+            {
+                'order': order,
+            },
+            run=True,
+        ),
+    )
+
+
 def queue_video(context):
     return (
         context.localize('video.queue'),
@@ -159,7 +174,7 @@ def shuffle_playlist(context, playlist_id):
             (PATHS.ROUTE, PATHS.PLAY,),
             {
                 'playlist_id': playlist_id,
-                'order': 'random',
+                'order': 'shuffle',
                 'action': 'list',
             },
             run=True,
@@ -285,10 +300,9 @@ def remove_my_subscriptions_filter(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.remove'),
         context.create_uri(
-            ('my_subscriptions', 'filter',),
+            ('my_subscriptions', 'filter', 'remove'),
             {
                 'item_name': channel_name,
-                'action': 'remove'
             },
             run=True,
         ),
@@ -299,10 +313,9 @@ def add_my_subscriptions_filter(context, channel_name):
     return (
         context.localize('my_subscriptions.filter.add'),
         context.create_uri(
-            ('my_subscriptions', 'filter',),
+            ('my_subscriptions', 'filter', 'add',),
             {
                 'item_name': channel_name,
-                'action': 'add',
             },
             run=True,
         ),
@@ -482,9 +495,8 @@ def history_remove(context, video_id, video_name=''):
     return (
         context.localize('history.remove'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'remove',),
             {
-                'action': 'remove',
                 'video_id': video_id,
                 'item_name': video_name,
             },
@@ -497,10 +509,7 @@ def history_clear(context):
     return (
         context.localize('history.clear'),
         context.create_uri(
-            (PATHS.HISTORY,),
-            {
-                'action': 'clear'
-            },
+            (PATHS.HISTORY, 'clear',),
             run=True,
         ),
     )
@@ -510,10 +519,9 @@ def history_mark_watched(context, video_id):
     return (
         context.localize('history.mark.watched'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'mark_watched',),
             {
                 'video_id': video_id,
-                'action': 'mark_watched',
             },
             run=True,
         ),
@@ -524,10 +532,9 @@ def history_mark_unwatched(context, video_id):
     return (
         context.localize('history.mark.unwatched'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'mark_unwatched',),
             {
                 'video_id': video_id,
-                'action': 'mark_unwatched',
             },
             run=True,
         ),
@@ -538,10 +545,9 @@ def history_reset_resume(context, video_id):
     return (
         context.localize('history.reset.resume_point'),
         context.create_uri(
-            (PATHS.HISTORY,),
+            (PATHS.HISTORY, 'reset_resume',),
             {
                 'video_id': video_id,
-                'action': 'reset_resume',
             },
             run=True,
         ),
@@ -680,11 +686,20 @@ def goto_home(context):
     )
 
 
-def goto_quick_search(context):
+def goto_quick_search(context, params=None, incognito=None):
+    if params is None:
+        params = {}
+    if incognito is None:
+        incognito = params.get('incognito')
+    else:
+        params['incognito'] = incognito
     return (
-        context.localize('search.quick'),
+        context.localize('search.quick.incognito'
+                         if incognito else
+                         'search.quick'),
         context.create_uri(
             (PATHS.ROUTE, PATHS.SEARCH, 'input',),
+            params,
             run=True,
         ),
     )

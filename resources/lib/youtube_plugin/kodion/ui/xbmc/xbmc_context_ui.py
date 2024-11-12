@@ -24,11 +24,15 @@ class XbmcContextUI(AbstractContextUI):
         self._context = context
         self._view_manager = None
 
-    def create_progress_dialog(self, heading, text=None, background=False):
+    def create_progress_dialog(self,
+                               heading,
+                               message='',
+                               background=False,
+                               message_template=None):
         if background:
-            return XbmcProgressDialogBG(heading, text)
+            return XbmcProgressDialogBG(heading, message, message_template)
 
-        return XbmcProgressDialog(heading, text)
+        return XbmcProgressDialog(heading, message, message_template)
 
     def get_view_manager(self):
         if self._view_manager is None:

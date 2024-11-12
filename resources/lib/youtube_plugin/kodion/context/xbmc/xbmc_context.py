@@ -18,7 +18,6 @@ from weakref import proxy
 from ..abstract_context import AbstractContext
 from ...compatibility import (
     parse_qsl,
-    unquote,
     urlsplit,
     xbmc,
     xbmcaddon,
@@ -142,6 +141,7 @@ class XbmcContext(AbstractContext):
         'my_channel': 30507,
         'my_location': 30654,
         'my_subscriptions': 30510,
+        'my_subscriptions.loading': 575,
         'my_subscriptions.filter.add': 30587,
         'my_subscriptions.filter.added': 30589,
         'my_subscriptions.filter.remove': 30588,
@@ -392,8 +392,7 @@ class XbmcContext(AbstractContext):
             return
 
         # first the path of the uri
-        parsed_url = urlsplit(uri)
-        self._path = unquote(parsed_url.path)
+        self.set_path(urlsplit(uri).path, force=True)
 
         # after that try to get the params
         self._params = {}
@@ -547,21 +546,27 @@ class XbmcContext(AbstractContext):
         ))
 
     def apply_content(self):
+        # ui local variable used for ui.get_view_manager() in unofficial version
         ui = self.get_ui()
-        content_type = ui.pop_property(CONTENT_TYPE)
-        if not content_type:
-            return
 
-        content_type, sub_type, category_label = json.loads(content_type)
-        self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
-            type=(sub_type or content_type), path=self.get_path()
-        ))
-        xbmcplugin.setContent(self._plugin_handle, content_type)
-        ui.get_view_manager().set_view_mode(content_type)
+        content_type = ui.pop_property(CONTENT_TYPE)
+        if content_type:
+            content_type, sub_type, category_label = json.loads(content_type)
+            self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
+                type=(sub_type or content_type), path=self.get_path()
+            ))
+            xbmcplugin.setContent(self._plugin_handle, content_type)
+            ui.get_view_manager().set_view_mode(content_type)
+        else:
+            content_type = None
+            sub_type = None
+            category_label = None
+
         if category_label is None:
             category_label = self.get_param('category_label')
         if category_label:
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
+
         detailed_labels = self.get_settings().show_detailed_labels()
         if sub_type == 'history':
             self.add_sort_method(
@@ -583,6 +588,7 @@ class XbmcContext(AbstractContext):
                 (SORT.UNSORTED,),
                 (SORT.LABEL,),
             )
+
         if content_type == CONTENT.VIDEO_CONTENT:
             self.add_sort_method(
                 (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),
@@ -826,7 +832,7 @@ class XbmcContext(AbstractContext):
             data.update(payload)
         self.send_notification(WAKEUP, data)
         if not timeout:
-            return
+            return None
 
         pop_property = self.get_ui().pop_property
         no_timeout = timeout < 0
@@ -835,17 +841,34 @@ class XbmcContext(AbstractContext):
         wait_period = wait_period_ms / 1000
 
         while no_timeout or remaining > 0:
-            awake = pop_property(WAKEUP)
-            if awake:
-                if awake == target:
-                    self.log_debug('Wakeup |{0}| in {1}ms'
-                                   .format(awake, timeout - remaining))
-                else:
-                    self.log_error('Wakeup |{0}| in {1}ms - expected |{2}|'
-                                   .format(awake, timeout - remaining, target))
+            data = pop_property(WAKEUP)
+            if data:
+                data = json.loads(data)
+
+            if data:
+                response = data.get('response')
+                response_target = data.get('target') or 'Unknown'
+
+                if target == response_target:
+                    if response:
+                        self.log_debug('Wakeup |{0}| in {1}ms'
+                                       .format(response_target,
+                                               timeout - remaining))
+                    else:
+                        self.log_error('Wakeup |{0}| in {1}ms - failed'
+                                       .format(response_target,
+                                               timeout - remaining))
+                    return response
+
+                self.log_error('Wakeup |{0}| in {1}ms - expected |{2}|'
+                               .format(response_target,
+                                       timeout - remaining,
+                                       target))
                 break
+
             wait(wait_period)
             remaining -= wait_period_ms
         else:
             self.log_error('Wakeup |{0}| timed out in {1}ms'
                            .format(target, timeout))
+        return False

@@ -116,14 +116,14 @@ def _process_more_for_video(context):
         context.execute(result)
 
 
-def process(provider, context, re_match=None, method=None):
-    if re_match and method is None:
-        method = re_match.group('method')
+def process(provider, context, re_match=None, command=None):
+    if re_match and command is None:
+        command = re_match.group('command')
 
-    if method == 'rate':
+    if command == 'rate':
         return _process_rate_video(provider, context, re_match)
 
-    if method == 'more':
+    if command == 'more':
         return _process_more_for_video(context)
 
-    raise KodionException('Unknown method: %s' % method)
+    raise KodionException('Unknown video command: %s' % command)
