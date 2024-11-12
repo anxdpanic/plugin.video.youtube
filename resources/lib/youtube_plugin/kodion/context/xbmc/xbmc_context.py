@@ -548,20 +548,26 @@ class XbmcContext(AbstractContext):
         ))
 
     def apply_content(self):
+        # ui local variable used for ui.get_view_manager() in unofficial version
         ui = self.get_ui()
-        content_type = ui.pop_property(CONTENT_TYPE)
-        if not content_type:
-            return
 
-        content_type, sub_type, category_label = json.loads(content_type)
-        self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
-            type=(sub_type or content_type), path=self.get_path()
-        ))
-        xbmcplugin.setContent(self._plugin_handle, content_type)
+        content_type = ui.pop_property(CONTENT_TYPE)
+        if content_type:
+            content_type, sub_type, category_label = json.loads(content_type)
+            self.log_debug('Applying content-type: |{type}| for |{path}|'.format(
+                type=(sub_type or content_type), path=self.get_path()
+            ))
+            xbmcplugin.setContent(self._plugin_handle, content_type)
+        else:
+            content_type = None
+            sub_type = None
+            category_label = None
+
         if category_label is None:
             category_label = self.get_param('category_label')
         if category_label:
             xbmcplugin.setPluginCategory(self._plugin_handle, category_label)
+
         detailed_labels = self.get_settings().show_detailed_labels()
         if sub_type == 'history':
             self.add_sort_method(
@@ -583,6 +589,7 @@ class XbmcContext(AbstractContext):
                 (SORT.UNSORTED,),
                 (SORT.LABEL,),
             )
+
         if content_type == CONTENT.VIDEO_CONTENT:
             self.add_sort_method(
                 (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',    '%D | %J'),

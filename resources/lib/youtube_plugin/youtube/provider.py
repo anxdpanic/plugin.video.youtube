@@ -1214,6 +1214,7 @@ class Provider(AbstractProvider):
         # _.get_my_playlists()
 
         # context.set_content(CONTENT.LIST_CONTENT)
+        context.set_param('category_label', localize('youtube'))
 
         result = []
 
