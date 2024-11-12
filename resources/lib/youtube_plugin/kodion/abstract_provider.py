@@ -34,6 +34,7 @@ from .utils import to_unicode
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
     RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
+    RESULT_TRY_FALLBACK = 'try_fallback'  # (bool)
     RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
 
     # map for regular expression (path) to method (names)
@@ -257,13 +258,30 @@ class AbstractProvider(object):
             path, params = uri
 
         if not path:
+            context.log_error('Rerouting - No route path')
             return False
+
+        window_fallback = params.pop('window_fallback', False)
+        window_replace = params.pop('window_replace', False)
+        window_return = params.pop('window_return', True)
+
+        if window_fallback:
+            container_uri = context.get_infolabel('Container.FolderPath')
+            if context.is_plugin_path(container_uri):
+                context.log_debug('Rerouting - Fallback route not required')
+                return (
+                    False,
+                    {
+                        self.RESULT_TRY_FALLBACK: False,
+                    },
+                )
 
         if 'refresh' in params:
             container = context.get_infolabel('System.CurrentControlId')
             position = context.get_infolabel('Container.CurrentItem')
             params['refresh'] += 1
         elif path == current_path and params == current_params:
+            context.log_error('Rerouting - Unable to reroute to current path')
             return False
         else:
             container = None
@@ -271,8 +289,6 @@ class AbstractProvider(object):
 
         result = None
         function_cache = context.get_function_cache()
-        window_replace = params.pop('window_replace', False)
-        window_return = params.pop('window_return', True)
         try:
             result, options = function_cache.run(
                 self.navigate,
@@ -287,10 +303,12 @@ class AbstractProvider(object):
             uri = context.create_uri(path, params)
             if result:
                 context.log_debug('Rerouting - Success'
-                                  '\n\tURI:     {uri}'
-                                  '\n\tReplace: |{window_replace}|'
-                                  '\n\tReturn:  |{window_return}|'
+                                  '\n\tURI:      {uri}'
+                                  '\n\tFallback: |{window_fallback}|'
+                                  '\n\tReplace:  |{window_replace}|'
+                                  '\n\tReturn:   |{window_return}|'
                                   .format(uri=uri,
+                                          window_fallback=window_fallback,
                                           window_replace=window_replace,
                                           window_return=window_return))
             else:

@@ -18,7 +18,6 @@ from weakref import proxy
 from ..abstract_context import AbstractContext
 from ...compatibility import (
     parse_qsl,
-    unquote,
     urlsplit,
     xbmc,
     xbmcaddon,
@@ -393,8 +392,7 @@ class XbmcContext(AbstractContext):
             return
 
         # first the path of the uri
-        parsed_url = urlsplit(uri)
-        self._path = unquote(parsed_url.path)
+        self.set_path(urlsplit(uri).path, force=True)
 
         # after that try to get the params
         self._params = {}

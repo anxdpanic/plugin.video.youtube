@@ -261,6 +261,17 @@ class XbmcPlugin(AbstractPlugin):
             succeeded = bool(result)
             if not succeeded:
                 ui.clear_property(CONTENT_TYPE)
+
+                try_fallback = options.get(provider.RESULT_TRY_FALLBACK, True)
+                if try_fallback:
+                    result, post_run_action = self.uri_action(
+                        context,
+                        context.get_parent_uri(params={
+                            'window_fallback': True,
+                            'window_replace': True,
+                            'window_return': False,
+                        }),
+                    )
             cache_to_disc = False
             update_listing = True
 
@@ -314,7 +325,7 @@ class XbmcPlugin(AbstractPlugin):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
             uri = urlsplit(uri)
             action = context.create_uri(
-                (PATHS.ROUTE, uri.path),
+                (PATHS.ROUTE, uri.path.rstrip('/') or PATHS.HOME),
                 uri.query,
                 run=True,
             )
