@@ -166,7 +166,7 @@ class Subtitles(object):
     def _unescape(self, text):
         try:
             text = unescape(text)
-        except:
+        except Exception:
             self._context.log_error('Subtitles._unescape - failed: |{text}|'
                                     .format(text=text))
         return text

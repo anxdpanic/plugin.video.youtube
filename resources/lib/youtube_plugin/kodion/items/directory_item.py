@@ -71,7 +71,7 @@ class DirectoryItem(BaseItem):
     def set_plot(self, plot):
         try:
             plot = unescape(plot)
-        except:
+        except Exception:
             pass
         self._plot = plot
 

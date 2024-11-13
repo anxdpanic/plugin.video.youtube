@@ -185,7 +185,7 @@ class MediaItem(BaseItem):
     def set_plot(self, plot):
         try:
             plot = unescape(plot)
-        except:
+        except Exception:
             pass
         self._plot = plot
 
@@ -206,7 +206,7 @@ class MediaItem(BaseItem):
     def set_title(self, title):
         try:
             title = unescape(title)
-        except:
+        except Exception:
             pass
         self._name = self._title = title
 

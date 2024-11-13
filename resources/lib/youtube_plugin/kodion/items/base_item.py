@@ -127,7 +127,7 @@ class BaseItem(object):
     def set_name(self, name):
         try:
             name = unescape(name)
-        except:
+        except Exception:
             pass
         self._name = name
         return name

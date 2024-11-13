@@ -61,7 +61,7 @@ class AbstractProgressDialog(object):
         self._total = int(new_total)
         self.update(steps=0, **kwargs)
 
-    def grow_total(self, new_total, **kwargs):
+    def grow_total(self, new_total):
         total = int(new_total)
         if total > self._total:
             self._total = total
