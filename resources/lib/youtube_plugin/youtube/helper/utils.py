@@ -893,7 +893,7 @@ def update_video_infos(provider, context, video_id_dict,
                     context,
                     playlist_id=playlist_id,
                     video_id=playlist_item_id,
-                    item_name=media_item.get_name(),
+                    video_name=media_item.get_name(),
                 )
             )
 
