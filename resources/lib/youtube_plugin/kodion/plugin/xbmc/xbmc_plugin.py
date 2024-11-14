@@ -262,8 +262,7 @@ class XbmcPlugin(AbstractPlugin):
             if not succeeded:
                 ui.clear_property(CONTENT_TYPE)
 
-                try_fallback = options.get(provider.RESULT_TRY_FALLBACK, True)
-                if try_fallback:
+                if not options or options.get(provider.RESULT_FALLBACK, True):
                     result, post_run_action = self.uri_action(
                         context,
                         context.get_parent_uri(params={
