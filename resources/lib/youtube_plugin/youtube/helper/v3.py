@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from sys import exc_info
+from traceback import format_stack
 import threading
 
 from .utils import (
@@ -408,12 +410,31 @@ def _process_list_response(provider,
     }
 
     def _fetch(resource):
-        data = resource['fetcher'](
-            *resource['args'], **resource['kwargs']
-        )
-        if data and resource['updater']:
-            resource['upd_kwargs']['data'] = data
-            resource['updater'](*resource['upd_args'], **resource['upd_kwargs'])
+        try:
+            data = resource['fetcher'](
+                *resource['args'], **resource['kwargs']
+            )
+            if data and resource['updater']:
+                resource['upd_kwargs']['data'] = data
+                resource['updater'](*resource['upd_args'],
+                                    **resource['upd_kwargs'])
+        except Exception as exc:
+            tb_obj = exc_info()[2]
+            while tb_obj:
+                next_tb_obj = tb_obj.tb_next
+                if next_tb_obj:
+                    tb_obj = next_tb_obj
+                else:
+                    stack = ''.join(format_stack(f=tb_obj.tb_frame))
+                    break
+            else:
+                stack = None
+
+            msg = ('v3._process_list_response._fetch - Error'
+                   '\n\tException: {exc!r}'
+                   '\n\tStack trace (most recent call last):\n{stack}'
+                   .format(exc=exc, stack=stack))
+            context.log_error(msg)
         resource['complete'] = True
         threads['current'].discard(resource['thread'])
         threads['loop'].set()
