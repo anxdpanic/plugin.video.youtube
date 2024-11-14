@@ -439,6 +439,7 @@ class AccessManager(JSONStore):
                             refresh_token=None):
         """
         Updates the old access token with the new one.
+        :param addon_id:
         :param access_token:
         :param expiry:
         :param refresh_token:
