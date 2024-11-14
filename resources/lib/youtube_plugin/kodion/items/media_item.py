@@ -31,7 +31,11 @@ class MediaItem(BaseItem):
                  image='DefaultFile.png',
                  fanart=None,
                  plot=None,
-                 video_id=None,):
+                 video_id=None,
+                 channel_id=None,
+                 playlist_id=None,
+                 playlist_item_id=None,
+                 subscription_id=None):
         super(MediaItem, self).__init__(name, uri, image, fanart)
         self._aired = None
         self._premiered = None
@@ -64,10 +68,10 @@ class MediaItem(BaseItem):
         self._vod = False
 
         self._video_id = video_id
-        self._channel_id = None
-        self._subscription_id = None
-        self._playlist_id = None
-        self._playlist_item_id = None
+        self._channel_id = channel_id
+        self._subscription_id = subscription_id
+        self._playlist_id = playlist_id
+        self._playlist_item_id = playlist_item_id
 
     def set_aired(self, year, month, day):
         self._aired = date(year, month, day)
@@ -181,7 +185,7 @@ class MediaItem(BaseItem):
     def set_plot(self, plot):
         try:
             plot = unescape(plot)
-        except:
+        except Exception:
             pass
         self._plot = plot
 
@@ -202,7 +206,7 @@ class MediaItem(BaseItem):
     def set_title(self, title):
         try:
             title = unescape(title)
-        except:
+        except Exception:
             pass
         self._name = self._title = title
 
@@ -342,13 +346,21 @@ class AudioItem(MediaItem):
                  image='DefaultAudio.png',
                  fanart=None,
                  plot=None,
-                 video_id=None):
+                 video_id=None,
+                 channel_id=None,
+                 playlist_id=None,
+                 playlist_item_id=None,
+                 subscription_id=None):
         super(AudioItem, self).__init__(name,
                                         uri,
                                         image,
                                         fanart,
                                         plot,
-                                        video_id)
+                                        video_id,
+                                        channel_id,
+                                        playlist_id,
+                                        playlist_item_id,
+                                        subscription_id)
         self._album = None
 
     def set_album_name(self, album_name):
@@ -374,13 +386,21 @@ class VideoItem(MediaItem):
                  image='DefaultVideo.png',
                  fanart=None,
                  plot=None,
-                 video_id=None):
+                 video_id=None,
+                 channel_id=None,
+                 playlist_id=None,
+                 playlist_item_id=None,
+                 subscription_id=None):
         super(VideoItem, self).__init__(name,
                                         uri,
                                         image,
                                         fanart,
                                         plot,
-                                        video_id)
+                                        video_id,
+                                        channel_id,
+                                        playlist_id,
+                                        playlist_item_id,
+                                        subscription_id)
         self._directors = None
         self._episode = None
         self._imdb_id = None

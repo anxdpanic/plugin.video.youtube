@@ -225,10 +225,10 @@ def _process_list_response(provider,
             playlist_id_dict[item_id] = item
 
         elif kind_type == 'playlistitem':
-            playlistitem_id = item_id
+            playlist_item_id = item_id
             item_id = snippet['resourceId']['videoId']
             # store the id of the playlistItem - needed for deleting item
-            playlist_item_id_dict[item_id] = playlistitem_id
+            playlist_item_id_dict[item_id] = playlist_item_id
 
             item_params['video_id'] = item_id
             item_uri = context.create_uri(
@@ -240,7 +240,8 @@ def _process_list_response(provider,
                              image=image,
                              fanart=fanart,
                              plot=description,
-                             video_id=item_id)
+                             video_id=item_id,
+                             playlist_item_id=playlist_item_id)
             video_id_dict[item_id] = item
 
         elif kind_type == 'activity':

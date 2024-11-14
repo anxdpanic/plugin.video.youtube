@@ -893,7 +893,7 @@ def update_video_infos(provider, context, video_id_dict,
                     context,
                     playlist_id=playlist_id,
                     video_id=playlist_item_id,
-                    item_name=media_item.get_name(),
+                    video_name=media_item.get_name(),
                 )
             )
 
@@ -1212,7 +1212,7 @@ def add_related_video_to_playlist(provider, context, client, v3, video_id):
                                                     json_data,
                                                     process_next_page=False)
                 page_token = json_data.get('nextPageToken', '')
-            except:
+            except Exception:
                 context.get_ui().show_notification('Failed to add a suggested video.', time_ms=5000)
 
             if result_items:

@@ -147,9 +147,12 @@ class YouTube(LoginClient):
                           ' current time={cmt},'
                           ' segment start={st},'
                           ' segment end={et},'
-                          ' state={state}'.format(
-            video_id=video_id, cmt=cmt, st=st, et=et, state=state
-        ))
+                          ' state={state}'
+                          .format(video_id=video_id,
+                                  cmt=cmt,
+                                  st=st,
+                                  et=et,
+                                  state=state))
 
         headers = {
             'Host': 's.youtube.com',

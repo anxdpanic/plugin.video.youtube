@@ -203,16 +203,17 @@ def find_video_id(plugin_path):
     return ''
 
 
-def friendly_number(input, precision=3, scale=('', 'K', 'M', 'B'), as_str=True):
-    _input = float('{input:.{precision}g}'.format(
-        input=float(input), precision=precision
+def friendly_number(value, precision=3, scale=('', 'K', 'M', 'B'), as_str=True):
+    value = float('{value:.{precision}g}'.format(
+        value=float(value),
+        precision=precision,
     ))
-    _abs_input = abs(_input)
-    magnitude = 0 if _abs_input < 1000 else int(log(floor(_abs_input), 1000))
+    abs_value = abs(value)
+    magnitude = 0 if abs_value < 1000 else int(log(floor(abs_value), 1000))
     output = '{output:f}'.format(
-        output=_input / 1000 ** magnitude
+        output=value / 1000 ** magnitude
     ).rstrip('0').rstrip('.') + scale[magnitude]
-    return output if as_str else (output, _input)
+    return output if as_str else (output, value)
 
 
 _RE_PERIODS = re.compile(r'([\d.]+)(d|h|m|s|$)')

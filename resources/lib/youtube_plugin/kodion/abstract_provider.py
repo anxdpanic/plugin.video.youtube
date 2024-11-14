@@ -122,11 +122,8 @@ class AbstractProvider(object):
         # ui local variable used for ui.get_view_manager() in unofficial version
         ui = context.get_ui()
 
-        context.wakeup(
-            CHECK_SETTINGS,
-            timeout=5,
-            payload={'state': 'defer'},
-        )
+        settings_state = {'state': 'defer'}
+        context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
         wizard_steps = self.get_wizard_steps()
         wizard_steps.extend(ui.get_view_manager().get_wizard_steps())
@@ -151,11 +148,8 @@ class AbstractProvider(object):
         finally:
             settings = context.get_settings(refresh=True)
             settings.setup_wizard_enabled(False)
-            context.wakeup(
-                CHECK_SETTINGS,
-                timeout=5,
-                payload={'state': 'process'},
-            )
+            settings_state['state'] = 'process'
+            context.wakeup(CHECK_SETTINGS, timeout=5, payload=settings_state)
 
     @staticmethod
     def get_wizard_steps():
