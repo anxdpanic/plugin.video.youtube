@@ -33,8 +33,8 @@ from .utils import to_unicode
 
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
+    RESULT_FALLBACK = 'fallback'  # (bool)
     RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
-    RESULT_TRY_FALLBACK = 'try_fallback'  # (bool)
     RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
 
     # map for regular expression (path) to method (names)
@@ -266,7 +266,7 @@ class AbstractProvider(object):
                 return (
                     False,
                     {
-                        self.RESULT_TRY_FALLBACK: False,
+                        self.RESULT_FALLBACK: False,
                     },
                 )
 
