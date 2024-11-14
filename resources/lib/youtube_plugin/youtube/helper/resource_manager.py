@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from .utils import get_thumbnail
+
 
 class ResourceManager(object):
     def __init__(self, provider, context):
@@ -64,7 +66,7 @@ class ResourceManager(object):
                                   .format(exc=exc, data=data))
 
         ids = updated
-        if refresh:
+        if refresh or not ids:
             result = {}
         else:
             result = data_cache.get_items(ids, data_cache.ONE_MONTH)
@@ -116,30 +118,99 @@ class ResourceManager(object):
 
         return result
 
-    def get_fanarts(self, channel_ids, force=False, defer_cache=False):
+    def get_channel_info(self,
+                         ids,
+                         force=False,
+                         channel_data=None,
+                         defer_cache=False):
         if force:
             pass
         elif self._fanart_type != self._context.get_settings().FANART_CHANNEL:
             return {}
 
-        result = self.get_channels(channel_ids, defer_cache=defer_cache)
+        context = self._context
+        refresh = context.get_param('refresh')
+        if not refresh and channel_data:
+            result = channel_data
+        else:
+            result = {}
+
+        to_check = [id_ for id_ in ids
+                    if id_ not in result
+                    or not result[id_]
+                    or result[id_].get('_partial')]
+        if to_check:
+            data_cache = context.get_data_cache()
+            result.update(data_cache.get_items(to_check, data_cache.ONE_MONTH))
+        to_update = [id_ for id_ in ids
+                     if id_ not in result
+                     or not result[id_]
+                     or result[id_].get('_partial')]
+
+        if result:
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_fanarts'
+                ' - Using cached data for channels'
+                '\n\tChannel IDs: {ids}'
+                .format(ids=list(result))
+            )
+
+        if to_update:
+            client = self._provider.get_client(context)
+            new_data = [client.get_channels(list_of_50)
+                        for list_of_50 in self._list_batch(to_update, n=50)]
+            if not any(new_data):
+                new_data = None
+        else:
+            new_data = None
+
+        if new_data:
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_fanarts'
+                ' - Retrieved new data for channels'
+                '\n\tChannel IDs: {ids}'
+                .format(ids=to_update)
+            )
+            new_data = {
+                yt_item['id']: yt_item
+                for batch in new_data
+                for yt_item in batch.get('items', [])
+                if yt_item
+            }
+            result.update(new_data)
+            self.cache_data(new_data, defer=defer_cache)
+
         banners = (
             'bannerTvMediumImageUrl',
             'bannerTvLowImageUrl',
             'bannerTvImageUrl',
             'bannerExternalUrl',
         )
+        untitled = context.localize('untitled')
+        thumb_size = context.get_settings().get_thumbnail_size()
+
         # transform
         for key, item in result.items():
+            channel_info = {
+                'name': None,
+                'image': None,
+                'fanart': None,
+            }
             images = item.get('brandingSettings', {}).get('image', {})
             for banner in banners:
                 image = images.get(banner)
                 if image:
-                    result[key] = image
+                    channel_info['fanart'] = image
                     break
-            else:
-                # set an empty url
-                result[key] = ''
+            snippet = item.get('snippet')
+            if snippet:
+                localised_info = snippet.get('localized') or {}
+                channel_info['name'] = (localised_info.get('title')
+                                        or snippet.get('title')
+                                        or untitled)
+                channel_info['image'] = get_thumbnail(thumb_size,
+                                                      snippet.get('thumbnails'))
+            result[key] = channel_info
 
         return result
 
@@ -147,7 +218,7 @@ class ResourceManager(object):
         context = self._context
         ids = tuple(ids)
         refresh = context.get_param('refresh')
-        if refresh:
+        if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
@@ -315,7 +386,7 @@ class ResourceManager(object):
         context = self._context
         ids = tuple(ids)
         refresh = context.get_param('refresh')
-        if refresh:
+        if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()

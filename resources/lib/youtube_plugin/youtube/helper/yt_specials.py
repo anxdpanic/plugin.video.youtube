@@ -224,11 +224,7 @@ def _process_description_links(provider, context):
             )
             channel_id_dict[channel_id] = channel_item
 
-        channel_item_dict = {}
-        utils.update_channel_infos(provider,
-                                   context,
-                                   channel_id_dict,
-                                   channel_items_dict=channel_item_dict)
+        utils.update_channel_items(provider, context, channel_id_dict)
 
         # clean up - remove empty entries
         return [channel_item
@@ -251,12 +247,12 @@ def _process_description_links(provider, context):
             )
             playlist_id_dict[playlist_id] = playlist_item
 
-        channel_item_dict = {}
-        utils.update_playlist_infos(provider,
+        channel_items_dict = {}
+        utils.update_playlist_items(provider,
                                     context,
                                     playlist_id_dict,
-                                    channel_items_dict=channel_item_dict)
-        utils.update_fanarts(provider, context, channel_item_dict)
+                                    channel_items_dict=channel_items_dict)
+        utils.update_channel_info(provider, context, channel_items_dict)
 
         # clean up - remove empty entries
         return [playlist_item

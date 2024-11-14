@@ -149,19 +149,23 @@ def make_comment_item(context, snippet, uri, reply_count=0):
     return comment_item
 
 
-def update_channel_infos(provider, context, channel_id_dict,
+def update_channel_items(provider, context, channel_id_dict,
                          subscription_id_dict=None,
                          channel_items_dict=None,
                          data=None):
-    channel_ids = list(channel_id_dict)
-    if not channel_ids and not data:
+    if not channel_id_dict and not data and not channel_items_dict:
         return
 
-    if not data:
+    channel_ids = list(channel_id_dict)
+    if channel_ids and not data:
         resource_manager = provider.get_resource_manager(context)
         data = resource_manager.get_channels(channel_ids)
 
     if not data:
+        if channel_items_dict:
+            update_channel_info(provider,
+                                context,
+                                channel_items_dict=channel_items_dict)
         return
 
     if subscription_id_dict is None:
@@ -170,11 +174,9 @@ def update_channel_infos(provider, context, channel_id_dict,
     logged_in = provider.is_logged_in()
 
     settings = context.get_settings()
-    channel_name_aliases = settings.get_channel_name_aliases()
     show_details = settings.show_detailed_description()
 
     localize = context.localize
-    channel_role = localize('channel')
     untitled = localize('untitled')
 
     path = context.get_path()
@@ -206,7 +208,9 @@ def update_channel_infos(provider, context, channel_id_dict,
             continue
         snippet = yt_item['snippet']
 
-        channel_item = channel_id_dict[channel_id]
+        channel_item = channel_id_dict.get(channel_id)
+        if not channel_item:
+            continue
 
         label_stats = []
         stats = []
@@ -247,10 +251,6 @@ def update_channel_infos(provider, context, channel_id_dict,
                         or untitled)
         channel_item.set_name(channel_name)
         channel_item.add_artist(channel_name)
-        if 'cast' in channel_name_aliases:
-            channel_item.add_cast(channel_name, role=channel_role)
-        if 'studio' in channel_name_aliases:
-            channel_item.add_studio(channel_name)
 
         # plot
         description = strip_html_from_text(localised_info.get('description')
@@ -326,15 +326,21 @@ def update_channel_infos(provider, context, channel_id_dict,
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(channel_item)
 
+    if channel_items_dict:
+        update_channel_info(provider,
+                            context,
+                            channel_items_dict=channel_items_dict,
+                            channel_data=data)
 
-def update_playlist_infos(provider, context, playlist_id_dict,
+
+def update_playlist_items(provider, context, playlist_id_dict,
                           channel_items_dict=None,
                           data=None):
-    playlist_ids = list(playlist_id_dict)
-    if not playlist_ids and not data:
+    if not playlist_id_dict and not data:
         return
 
-    if not data:
+    playlist_ids = list(playlist_id_dict)
+    if playlist_ids and not data:
         resource_manager = provider.get_resource_manager(context)
         data = resource_manager.get_playlists(playlist_ids)
 
@@ -348,12 +354,10 @@ def update_playlist_infos(provider, context, playlist_id_dict,
 
     settings = context.get_settings()
     thumb_size = settings.get_thumbnail_size()
-    channel_name_aliases = settings.get_channel_name_aliases()
     show_details = settings.show_detailed_description()
     item_count_color = settings.get_label_color('itemCount')
 
     localize = context.localize
-    channel_role = localize('channel')
     episode_count_label = localize('stats.itemCount')
     video_count_label = localize('stats.videoCount')
     podcast_label = context.localize('playlist.podcast')
@@ -379,7 +383,9 @@ def update_playlist_infos(provider, context, playlist_id_dict,
             continue
         snippet = yt_item['snippet']
 
-        playlist_item = playlist_id_dict[playlist_id]
+        playlist_item = playlist_id_dict.get(playlist_id)
+        if not playlist_item:
+            continue
 
         is_podcast = yt_item.get('status', {}).get('podcastStatus') == 'enabled'
         item_count_str, item_count = friendly_number(
@@ -408,10 +414,6 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         # channel name
         channel_name = snippet.get('channelTitle') or untitled
         playlist_item.add_artist(channel_name)
-        if 'cast' in channel_name_aliases:
-            playlist_item.add_cast(channel_name, role=channel_role)
-        if 'studio' in channel_name_aliases:
-            playlist_item.add_studio(channel_name)
 
         # plot with channel name, podcast status and item count
         description = strip_html_from_text(localised_info.get('description')
@@ -518,24 +520,18 @@ def update_playlist_infos(provider, context, playlist_id_dict,
         if context_menu:
             playlist_item.add_context_menu(context_menu)
 
-        # update channel mapping
-        if channel_items_dict is not None:
-            if channel_id not in channel_items_dict:
-                channel_items_dict[channel_id] = []
-            channel_items_dict[channel_id].append(playlist_item)
 
-
-def update_video_infos(provider, context, video_id_dict,
+def update_video_items(provider, context, video_id_dict,
                        playlist_item_id_dict=None,
                        channel_items_dict=None,
                        live_details=True,
                        item_filter=None,
                        data=None):
-    video_ids = list(video_id_dict)
-    if not video_ids and not data:
+    if not video_id_dict and not data:
         return
 
-    if not data:
+    video_ids = list(video_id_dict)
+    if video_ids and not data:
         resource_manager = provider.get_resource_manager(context)
         data = resource_manager.get_videos(video_ids,
                                            live_details=live_details,
@@ -558,7 +554,6 @@ def update_video_infos(provider, context, video_id_dict,
     default_web_urls = settings.default_player_web_urls()
     ask_quality = not default_web_urls and settings.ask_for_video_quality()
     audio_only = settings.audio_only()
-    channel_name_aliases = settings.get_channel_name_aliases()
     show_details = settings.show_detailed_description()
     subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.get_thumbnail_size()
@@ -566,7 +561,6 @@ def update_video_infos(provider, context, video_id_dict,
     use_play_data = settings.use_local_history()
 
     localize = context.localize
-    channel_role = localize('channel')
     untitled = localize('untitled')
 
     path = context.get_path()
@@ -799,10 +793,6 @@ def update_video_infos(provider, context, video_id_dict,
         # channel name
         channel_name = snippet.get('channelTitle', '') or untitled
         media_item.add_artist(channel_name)
-        if 'cast' in channel_name_aliases:
-            media_item.add_cast(channel_name, role=channel_role)
-        if 'studio' in channel_name_aliases:
-            media_item.add_studio(channel_name)
 
         # plot
         description = strip_html_from_text(localised_info.get('description')
@@ -1014,7 +1004,7 @@ def update_video_infos(provider, context, video_id_dict,
 
 
 def update_play_info(provider, context, video_id, media_item, video_stream):
-    update_video_infos(provider, context, {video_id: media_item})
+    update_video_items(provider, context, {video_id: media_item})
 
     settings = context.get_settings()
     ui = context.get_ui()
@@ -1064,35 +1054,53 @@ def update_play_info(provider, context, video_id, media_item, video_stream):
                 ui.set_property(LICENSE_TOKEN, license_token)
 
 
-def update_fanarts(provider, context, channel_items_dict, data=None):
+def update_channel_info(provider,
+                        context,
+                        channel_items_dict,
+                        data=None,
+                        channel_data=None):
     # at least we need one channel id
-    channel_ids = list(channel_items_dict)
-    if not channel_ids and not data:
+    if not channel_items_dict and not (data or channel_data):
         return
 
-    if not data:
+    channel_ids = list(channel_items_dict)
+    if channel_ids and not data:
         resource_manager = provider.get_resource_manager(context)
-        data = resource_manager.get_fanarts(channel_ids, force=True)
+        data = resource_manager.get_channel_info(channel_ids,
+                                                 force=True,
+                                                 channel_data=channel_data)
 
     if not data:
         return
 
     settings = context.get_settings()
+    channel_name_aliases = settings.get_channel_name_aliases()
     fanart_type = context.get_param('fanart_type')
     if fanart_type is None:
         fanart_type = settings.fanart_selection()
     use_channel_fanart = fanart_type == settings.FANART_CHANNEL
     use_thumb_fanart = fanart_type == settings.FANART_THUMBNAIL
 
+    channel_role = context.localize('channel')
+
     for channel_id, channel_items in channel_items_dict.items():
-        # only set not empty fanarts
-        fanart = data.get(channel_id)
-        if not fanart:
+        channel_info = data.get(channel_id)
+        if not channel_info:
             continue
+
         for item in channel_items:
             if (use_channel_fanart
                     or use_thumb_fanart and not item.get_fanart(default=False)):
-                item.set_fanart(fanart)
+                item.set_fanart(channel_info.get('fanart'))
+
+            channel_name = channel_info.get('name')
+            if channel_name:
+                if 'cast' in channel_name_aliases:
+                    item.add_cast(channel_name,
+                                  role=channel_role,
+                                  thumbnail=channel_info.get('image'))
+                if 'studio' in channel_name_aliases:
+                    item.add_studio(channel_name)
 
 
 THUMB_TYPES = {

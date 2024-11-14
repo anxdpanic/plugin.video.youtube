@@ -405,9 +405,9 @@ class Provider(AbstractProvider):
             new_params['addon_id'] = addon_id
 
         resource_manager = provider.get_resource_manager(context)
-        fanart = resource_manager.get_fanarts(
+        channel_info = resource_manager.get_channel_info(
             (channel_id,), force=True
-        ).get(channel_id)
+        ).get(channel_id) or {}
         playlists = resource_manager.get_related_playlists(channel_id)
 
         playlist_id = playlists.get('uploads')
@@ -420,7 +420,7 @@ class Provider(AbstractProvider):
                     new_params,
                 ),
                 image='{media}/playlist.png',
-                fanart=fanart,
+                fanart=channel_info.get('fanart') or '',
                 category_label=item_label,
                 channel_id=channel_id,
                 playlist_id=playlist_id,
@@ -446,11 +446,15 @@ class Provider(AbstractProvider):
                     ),
                     # subscribe to the channel via the playlist item
                     menu_items.subscribe_to_channel(
-                        context, channel_id,
+                        context,
+                        channel_id,
+                        channel_name=channel_info.get('name') or '',
                     ) if provider.is_logged_in else None,
                     # bookmark channel of the playlist
                     menu_items.bookmark_add_channel(
-                        context, channel_id,
+                        context,
+                        channel_id,
+                        channel_name=channel_info.get('name') or '',
                     )
                 ))
 
@@ -597,9 +601,10 @@ class Provider(AbstractProvider):
         if not channel_id:
             return False
 
-        fanart = resource_manager.get_fanarts(
+        channel_info = resource_manager.get_channel_info(
             (channel_id,), force=True
-        ).get(channel_id)
+        ).get(channel_id) or {}
+        fanart = channel_info.get('fanart') or ''
 
         page = params.get('page', 1)
         page_token = params.get('page_token', '')

@@ -19,10 +19,9 @@ from .utils import (
     filter_videos,
     get_thumbnail,
     make_comment_item,
-    update_channel_infos,
-    update_fanarts,
-    update_playlist_infos,
-    update_video_infos,
+    update_channel_items,
+    update_playlist_items,
+    update_video_items,
 )
 from ...kodion import KodionException
 from ...kodion.constants import PATHS
@@ -330,14 +329,16 @@ def _process_list_response(provider,
     resources = {
         1: {
             'fetcher': resource_manager.get_videos,
-            'args': (video_id_dict,),
+            'args': (
+                video_id_dict,
+            ),
             'kwargs': {
                 'live_details': True,
                 'suppress_errors': True,
                 'defer_cache': True,
             },
             'thread': None,
-            'updater': update_video_infos,
+            'updater': update_video_items,
             'upd_args': (
                 provider,
                 context,
@@ -355,26 +356,37 @@ def _process_list_response(provider,
         },
         2: {
             'fetcher': resource_manager.get_playlists,
-            'args': (playlist_id_dict,),
-            'kwargs': {'defer_cache': True},
+            'args': (
+                playlist_id_dict,
+            ),
+            'kwargs': {
+                'defer_cache': True,
+            },
             'thread': None,
-            'updater': update_playlist_infos,
+            'updater': update_playlist_items,
             'upd_args': (
                 provider,
                 context,
                 playlist_id_dict,
                 channel_items_dict,
             ),
-            'upd_kwargs': {'data': None},
+            'upd_kwargs': {
+                'data': None,
+            },
             'complete': False,
             'defer': False,
         },
         3: {
             'fetcher': resource_manager.get_channels,
-            'args': (channel_id_dict,),
-            'kwargs': {'defer_cache': True},
+            'args': (
+                channel_id_dict,
+            ),
+            'kwargs': {
+                '_force_run': True,
+                'defer_cache': True,
+            },
             'thread': None,
-            'updater': update_channel_infos,
+            'updater': update_channel_items,
             'upd_args': (
                 provider,
                 context,
@@ -382,50 +394,42 @@ def _process_list_response(provider,
                 subscription_id_dict,
                 channel_items_dict,
             ),
-            'upd_kwargs': {'data': None},
-            'complete': False,
-            'defer': False,
-        },
-        4: {
-            'fetcher': resource_manager.get_fanarts,
-            'args': (channel_items_dict,),
-            'kwargs': {
-                'force': bool(channel_id_dict or playlist_id_dict),
-                'defer_cache': True,
+            'upd_kwargs': {
+                '_force_run': True,
+                'data': None,
             },
-            'thread': None,
-            'updater': update_fanarts,
-            'upd_args': (
-                provider,
-                context,
-                channel_items_dict,
-            ),
-            'upd_kwargs': {'data': None},
             'complete': False,
             'defer': True,
         },
-        5: {
+        4: {
             'fetcher': resource_manager.cache_data,
             'args': (),
-            'kwargs': {},
+            'kwargs': {
+                '_force_run': True,
+            },
             'thread': None,
             'updater': None,
             'upd_args': (),
             'upd_kwargs': {},
             'complete': False,
-            'defer': 4,
+            'defer': 3,
         },
     }
 
     def _fetch(resource):
         try:
-            data = resource['fetcher'](
-                *resource['args'], **resource['kwargs']
-            )
-            if data and resource['updater']:
-                resource['upd_kwargs']['data'] = data
-                resource['updater'](*resource['upd_args'],
-                                    **resource['upd_kwargs'])
+            data = resource['fetcher'](*resource['args'], **resource['kwargs'])
+
+            updater = resource['updater']
+            if not updater:
+                return
+
+            kwargs = resource['upd_kwargs']
+            if not kwargs.pop('_force_run', False) and not data:
+                return
+            kwargs['data'] = data
+
+            updater(*resource['upd_args'], **kwargs)
         except Exception as exc:
             tb_obj = exc_info()[2]
             while tb_obj:
@@ -443,9 +447,10 @@ def _process_list_response(provider,
                    '\n\tStack trace (most recent call last):\n{stack}'
                    .format(exc=exc, stack=stack))
             context.log_error(msg)
-        resource['complete'] = True
-        threads['current'].discard(resource['thread'])
-        threads['loop'].set()
+        finally:
+            resource['complete'] = True
+            threads['current'].discard(resource['thread'])
+            threads['loop'].set()
 
     threads = {
         'current': set(),
@@ -493,12 +498,12 @@ def _process_list_response(provider,
                 continue
             resource['defer'] = False
 
-        args = resource['args']
-        if args and not args[0]:
-            resource['complete'] = True
-            continue
-
         if not resource['thread']:
+            if (not resource['kwargs'].pop('_force_run', False)
+                    and not any(resource['args'])):
+                resource['complete'] = True
+                continue
+
             new_thread = threading.Thread(target=_fetch, args=(resource,))
             new_thread.daemon = True
             threads['current'].add(new_thread)
