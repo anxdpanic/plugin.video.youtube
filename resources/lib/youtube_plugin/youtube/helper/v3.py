@@ -270,20 +270,27 @@ def _process_list_response(provider,
                              video_id=item_id)
             video_id_dict[item_id] = item
 
-        elif kind_type == 'commentthread':
-            total_replies = snippet['totalReplyCount']
-            snippet = snippet['topLevelComment']['snippet']
-            if total_replies:
-                item_uri = context.create_uri(
-                    ('special', 'child_comments'),
-                    {'parent_id': item_id}
-                )
+        elif kind_type.startswith('comment'):
+            if kind_type == 'commentthread':
+                reply_count = snippet['totalReplyCount']
+                snippet = snippet['topLevelComment']['snippet']
+                if reply_count:
+                    item_uri = context.create_uri(
+                        ('special', 'child_comments'),
+                        {'parent_id': item_id}
+                    )
+                else:
+                    item_uri = ''
             else:
                 item_uri = ''
-            item = make_comment_item(context, snippet, item_uri, total_replies)
+                reply_count = 0
 
-        elif kind_type == 'comment':
-            item = make_comment_item(context, snippet, uri='')
+            item = make_comment_item(context,
+                                     snippet,
+                                     uri=item_uri,
+                                     reply_count=reply_count)
+            position = snippet.get('position') or len(items)
+            item.set_track_number(position + 1)
 
         elif kind_type == 'pluginitem':
             item = DirectoryItem(**item_params)

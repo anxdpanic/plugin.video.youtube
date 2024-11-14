@@ -15,6 +15,7 @@ import time
 from math import log10
 
 from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
+from ...kodion.compatibility import unquote, urlsplit
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
@@ -45,33 +46,43 @@ def get_thumb_timestamp(minutes=15):
     )))
 
 
-def make_comment_item(context, snippet, uri, total_replies=0):
+def make_comment_item(context, snippet, uri, reply_count=0):
+    localize = context.localize
     settings = context.get_settings()
     ui = context.get_ui()
 
-    author = ui.bold(snippet['authorDisplayName'])
-    body = snippet['textOriginal']
+    author = snippet.get('authorDisplayName')
+    if not author:
+        author = urlsplit(snippet.get('authorChannelUrl', ''))
+        author = unquote(author.path.rstrip('/').split('/')[-1])
+    author_id = snippet.get('authorChannelId', {}).get('value', '')
+    author_image = snippet.get('authorProfileImageUrl')
+    if author_image:
+        author_image = author_image.replace('=s48', '=s160')
+    else:
+        author_image = None
+    body = strip_html_from_text(snippet['textOriginal'])
 
     label_props = []
     plot_props = []
 
     like_count = snippet['likeCount']
     if like_count:
-        like_count = friendly_number(like_count)
+        like_count, likes_value = friendly_number(like_count, as_str=False)
         color = settings.get_label_color('likeCount')
         label_likes = ui.color(color, ui.bold(like_count))
         plot_likes = ui.color(color, ui.bold(' '.join((
-            like_count, context.localize('video.comments.likes')
+            like_count, localize('video.comments.likes')
         ))))
         label_props.append(label_likes)
         plot_props.append(plot_likes)
 
-    if total_replies:
-        total_replies = friendly_number(total_replies)
+    if reply_count:
+        reply_count, replies_value = friendly_number(reply_count, as_str=False)
         color = settings.get_label_color('commentCount')
-        label_replies = ui.color(color, ui.bold(total_replies))
+        label_replies = ui.color(color, ui.bold(reply_count))
         plot_replies = ui.color(color, ui.bold(' '.join((
-            total_replies, context.localize('video.comments.replies')
+            reply_count, localize('video.comments.replies')
         ))))
         label_props.append(label_replies)
         plot_props.append(plot_replies)
@@ -81,47 +92,53 @@ def make_comment_item(context, snippet, uri, total_replies=0):
     edited = published_at != updated_at
     if edited:
         label_props.append('*')
-        plot_props.append(context.localize('video.comments.edited'))
+        plot_props.append(localize('video.comments.edited'))
 
-    # Format the label of the comment item.
-    if label_props:
-        label = ''.join((
-            author,
-            ' (',
-            '|'.join(label_props),
-            ') ',
-            body.replace('\n', ' '),
-        ))
-    else:
-        label = ' '.join((
-            author,
-            body.replace('\n', ' '),
-        ))
+    label = body.replace('\n', ' ')[:140]
+    label_stats = ' | '.join(label_props)
+    plot_stats = ' | '.join(plot_props)
 
     # Format the plot of the comment item.
-    if plot_props:
-        plot = ''.join((
-            author,
-            ' (',
-            '|'.join(plot_props),
-            ')',
-            ui.new_line(body, cr_before=2),
-        ))
-    else:
-        plot = ''.join((
-            author,
-            ui.new_line(body, cr_before=2),
-        ))
-
-    if uri:
-        comment_item = DirectoryItem(label, uri, plot=plot)
-    else:
-        comment_item = CommandItem(label, 'Action(Info)', context, plot=plot)
+    plot = ''.join((
+        ui.bold(author, cr_after=1),
+        ui.new_line(plot_stats, cr_after=1) if plot_stats else '',
+        ui.new_line(body, cr_after=1) if body else ''
+    ))
 
     datetime = datetime_parser.parse(published_at)
-    comment_item.set_added_utc(datetime)
-
     local_datetime = datetime_parser.utc_to_local(datetime)
+
+    if uri:
+        comment_item = DirectoryItem(
+            label,
+            uri,
+            image=author_image,
+            plot=plot,
+            category_label=' - '.join(
+                (author, context.format_date_short(local_datetime))
+            ),
+        )
+    else:
+        comment_item = CommandItem(
+            label,
+            'Action(Info)',
+            context,
+            image=author_image,
+            plot=plot,
+        )
+
+    comment_item.set_count(reply_count)
+
+    comment_item.set_short_details(label_stats)
+    comment_item.set_production_code(label_stats)
+
+    comment_item.channel_id = author_id
+    comment_item.add_artist(ui.bold(author))
+    comment_item.add_cast(author,
+                          role=localize('author'),
+                          thumbnail=author_image)
+
+    comment_item.set_added_utc(datetime)
     comment_item.set_dateadded_from_datetime(local_datetime)
 
     if edited:
@@ -893,7 +910,7 @@ def update_video_infos(provider, context, video_id_dict,
                     context,
                     playlist_id=playlist_id,
                     video_id=playlist_item_id,
-                    video_name=media_item.get_name(),
+                    video_name=title,
                 )
             )
 
@@ -954,6 +971,7 @@ def update_video_infos(provider, context, video_id_dict,
             menu_items.more_for_video(
                 context,
                 video_id,
+                video_name=title,
                 logged_in=logged_in,
                 refresh=refresh,
             )

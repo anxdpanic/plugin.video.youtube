@@ -47,32 +47,29 @@ def _process_related_videos(provider, context, client):
     return v3.response_to_items(provider, context, json_data)
 
 
-def _process_parent_comments(provider, context, client):
-    context.set_content(CONTENT.LIST_CONTENT)
-
-    video_id = context.get_param('video_id', '')
-    if not video_id:
-        return []
-
-    json_data = client.get_parent_comments(
-        video_id=video_id, page_token=context.get_param('page_token', '')
-    )
-
-    if not json_data:
+def _process_comments(provider, context, client):
+    params = context.get_params()
+    video_id = params.get('video_id')
+    parent_id = params.get('parent_id')
+    if not video_id and not parent_id:
         return False
-    return v3.response_to_items(provider, context, json_data)
 
+    context.set_content(CONTENT.LIST_CONTENT,
+                        sub_type='comments',
+                        category_label=params.get('item_name', video_id))
 
-def _process_child_comments(provider, context, client):
-    context.set_content(CONTENT.LIST_CONTENT)
-
-    parent_id = context.get_param('parent_id', '')
-    if not parent_id:
-        return []
-
-    json_data = client.get_child_comments(
-        parent_id=parent_id, page_token=context.get_param('page_token', '')
-    )
+    if video_id:
+        json_data = client.get_parent_comments(
+            video_id=video_id,
+            page_token=params.get('page_token', ''),
+        )
+    elif parent_id:
+        json_data = client.get_child_comments(
+            parent_id=parent_id,
+            page_token=context.get_param('page_token', ''),
+        )
+    else:
+        json_data = None
 
     if not json_data:
         return False
@@ -373,11 +370,8 @@ def process(provider, context, re_match):
     if category == 'description_links':
         return _process_description_links(provider, context)
 
-    if category == 'parent_comments':
-        return _process_parent_comments(provider, context, client)
-
-    if category == 'child_comments':
-        return _process_child_comments(provider, context, client)
+    if category.endswith('_comments'):
+        return _process_comments(provider, context, client)
 
     if category == 'saved_playlists':
         return _process_saved_playlists_tv(provider, context, client)

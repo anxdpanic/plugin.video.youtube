@@ -62,6 +62,7 @@ class XbmcContext(AbstractContext):
         'api.personal.failed': 30599,
         'api.secret': 30203,
         'are_you_sure': 750,
+        'author': 21863,
         'bookmark': 30101,
         'bookmark.channel': 30803,
         'bookmark.created': 21362,
@@ -574,6 +575,20 @@ class XbmcContext(AbstractContext):
                 (SORT.PLAYCOUNT,),
                 (SORT.UNSORTED,),
                 (SORT.LABEL,),
+            )
+        elif sub_type == 'comments':
+            self.add_sort_method(
+                (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',       '%J'),
+                (SORT.ARTIST,           '[%J - ]%T \u2022 %P',       '%A'),
+                (SORT.PROGRAM_COUNT,    '[%A - ]%T \u2022 %P | %J',  '%C'),
+                (SORT.DATE,             '[%A - ]%T \u2022 %P',       '%J'),
+                (SORT.TRACKNUM,         '[%N. ][%A - ]%T \u2022 %P', '%J'),
+            ) if detailed_labels else self.add_sort_method(
+                (SORT.CHANNEL,          '[%A - ]%T'),
+                (SORT.ARTIST,           '[%A - ]%T'),
+                (SORT.PROGRAM_COUNT,    '[%A - ]%T'),
+                (SORT.DATE,             '[%A - ]%T'),
+                (SORT.TRACKNUM,         '[%N. ][%A - ]%T '),
             )
         else:
             self.add_sort_method(

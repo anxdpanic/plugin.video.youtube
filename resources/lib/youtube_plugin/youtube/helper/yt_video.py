@@ -100,14 +100,12 @@ def _process_more_for_video(context):
     items = [
         menu_items.add_video_to_playlist(context, video_id),
         menu_items.related_videos(context, video_id),
-        menu_items.video_comments(context, video_id),
+        menu_items.video_comments(context, video_id, params.get('item_name')),
         menu_items.content_from_description(context, video_id),
-        menu_items.rate_video(context,
-                              video_id,
-                              params.get('refresh')),
+        menu_items.rate_video(context, video_id, params.get('refresh')),
     ] if params.get('logged_in') else [
         menu_items.related_videos(context, video_id),
-        menu_items.video_comments(context, video_id),
+        menu_items.video_comments(context, video_id, params.get('item_name')),
         menu_items.content_from_description(context, video_id),
     ]
 
