@@ -29,6 +29,7 @@ from ...kodion.constants import PATHS
 from ...kodion.items import (
     CommandItem,
     DirectoryItem,
+    MediaItem,
     NextPageItem,
     VideoItem,
     menu_items,
@@ -300,7 +301,7 @@ def _process_list_response(provider,
         if '_context_menu' in yt_item:
             item.add_context_menu(**yt_item['_context_menu'])
 
-        if isinstance(item, VideoItem):
+        if isinstance(item, MediaItem):
             # Set track number from playlist, or set to current list length to
             # match "Default" (unsorted) sort order
             position = snippet.get('position') or len(items)

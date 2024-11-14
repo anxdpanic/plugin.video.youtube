@@ -54,7 +54,6 @@ class MediaItem(BaseItem):
         self._plot = plot
         self._rating = None
         self._title = self.get_name()
-        self._track_number = None
 
         self._headers = None
         self._license_key = None
@@ -212,12 +211,6 @@ class MediaItem(BaseItem):
 
     def get_title(self):
         return self._title
-
-    def set_track_number(self, track_number):
-        self._track_number = int(track_number)
-
-    def get_track_number(self):
-        return self._track_number
 
     def set_headers(self, value):
         self._headers = value

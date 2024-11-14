@@ -126,6 +126,10 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
             if value is not None:
                 info_labels['plot'] = value
 
+            value = item.get_track_number()
+            if value is not None:
+                info_labels['tracknumber'] = value
+
         elif isinstance(item, ImageItem):
             info_type = 'picture'
 
@@ -333,6 +337,12 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
         value = item.get_plot()
         if value is not None:
             info_tag.setPlot(value)
+
+        # tracknumber: int
+        # eg. 12
+        value = item.get_track_number()
+        if value is not None:
+            info_tag.setTrackNumber(value)
 
     elif isinstance(item, ImageItem):
         info_tag = list_item.getPictureInfoTag()
