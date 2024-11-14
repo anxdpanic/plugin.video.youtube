@@ -1,3 +1,85 @@
+## v7.1.1
+### Fixed
+- Fix http server not listening on any interface if listen IP is 0.0.0.0 #927
+- Standardise return type of LoginClient.refresh_token #932
+- Fix curl headers not being used when set on path of setResolvedUrl listitem
+- Fix HEAD requests to MPD manifests
+- Fix various Python2 incompatible changes
+- Properly distinguish between VP9 and VP9.2 with HDR info
+- Fix http server not running when script shows client IP
+- Fix not listing full stream details in selection dialog
+- Fix translated subtitles not being available for some videos #945
+- Fix labelling for auto dubbed audio tracks
+- Fix regressions in handling VP9.2 video streams
+- Fix error handling items without headers #946
+- Fix incorrectly determining Kodi release name
+- Fix search window history navigation when using direct links
+- Fix Python2/Android incompatibilty when checking CPU count #958
+- Fix method used to determine address of local network interface #938
+- Fix potential infinite loop with corrupted access_manager.json
+- Various improvements to multiple busy dialog crash workarounds #938
+- Fallback to search listing when search query is empty
+- Fix debug log string formatting error #938
+- Fix duplicated separators in context menu
+- Fix Kodi builtin using wrong playlist type #938
+- Ensure http server is started prior to creating MPD for playback #961
+- Fix shuffle play of playlists not working
+- Fix plugin category label not being applied if content type not set
+- Fix Kodi navigating to root path of Video window if plugin listing fails
+- Fix loading of Watch Later playlist #971
+ - Also fix other incorrect/missing parameter names
+- Fix possible exception if plugin navigation fails #976
+
+### Changed
+- Improve display and update of bookmarks
+- Explicitly set http server protocol version to HTTP/1.1
+- Improve logging
+- Use alternative streams to improve compatibility with external players
+- Improve https server sleep and wakeup #810 #951
+- Update Setup Wizard to disable all alternative player settings if not required #938
+- Improve support for optional search API parameters #689
+- Ensure changing sort order of search replaces existing search
+- Use redirect in multiple busy dialog crash workaround #938
+- Disable unusable alternate players #966
+- Standardise plugin URIs for routing
+  - path parameters used for folders and sub-folders
+  - query parameters used for changing display modes, filtering, sorting and inputs
+- Don't retry server wakeup on error unless settings change
+
+### New
+- Explicitly enable TCP keep alive #913
+- Add localised title and description for videos, channels and playlists
+- Update display of playlists to show the following details:
+  - item count
+  - date
+  - channel name
+  - description
+  - web url
+  - podcast status
+- Update display of channels to show the following details:
+  - view count
+  - subscriber count
+  - video count
+  - date
+  - description
+  - channel name in description
+  - web url
+- Add View all and Shuffle context menu items for playlists
+- New setting to enable debug logging for addon
+  - Setting > Advanced > Logging > Enable debug logging
+- Improvements to searching
+  - Add context menu items for changing sort order of saved searches #172
+  - Allow search parameters to be stored per search #172 #689
+  - Allow additional optional search parameters to be used #689
+  - Improve parsing of date offset when searching  for completed live events
+- Add additional search type links to search results #689
+- Add ability to replace window when rerouting using window_replace query parameter
+- Add search sort context menu items to search results #172
+- Add prompts and notifications for deleting items and clearing lists
+- Add Quick Search and search management context menu items to Search folders
+- Add context menu items to Clear and Play All/Shuffle in Bookmarks/Watch Later/Watch History folders
+- Add progress dialog to My Subscription loading
+
 ## v7.1.1+beta.7
 ### Fixed
 - Fix loading of Watch Later playlist #971
