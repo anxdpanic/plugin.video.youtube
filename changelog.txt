@@ -1,3 +1,11 @@
+## v7.1.1+beta.7
+### Fixed
+- Fix loading of Watch Later playlist #971
+ - Also fix other incorrect/missing parameter names
+
+### Changed
+- Don't retry server wakeup on error unless settings change
+
 ## v7.1.1+beta.6
 ### Fixed
 - Ensure http server is started prior to creating MPD for playback #961
