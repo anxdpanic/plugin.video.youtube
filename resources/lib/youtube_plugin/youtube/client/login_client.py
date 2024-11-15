@@ -154,7 +154,7 @@ class LoginClient(YouTubeRequestClient):
                                  error_title='Login Failed',
                                  error_info=('Refresh token - Failed'
                                              '\n\tException: {{exc!r}}'
-                                             '\n\tClient:    |{client}|'
+                                             '{client}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
@@ -204,7 +204,7 @@ class LoginClient(YouTubeRequestClient):
                                  error_title='Login Failed: Unknown response',
                                  error_info=('Access token request - Failed'
                                              '\n\tException: {{exc!r}}'
-                                             '\n\tClient:    |{client}|'
+                                             '{client}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data
@@ -247,7 +247,7 @@ class LoginClient(YouTubeRequestClient):
                                  error_title='Login Failed: Unknown response',
                                  error_info=('Device/user code request - Failed'
                                              '\n\tException: {{exc!r}}'
-                                             '\n\tClient:    |{client}|'
+                                             '{client}'
                                              .format(client=client)),
                                  raise_exc=True)
         return json_data

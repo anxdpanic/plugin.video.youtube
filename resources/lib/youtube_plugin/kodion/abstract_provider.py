@@ -263,12 +263,7 @@ class AbstractProvider(object):
             container_uri = context.get_infolabel('Container.FolderPath')
             if context.is_plugin_path(container_uri):
                 context.log_debug('Rerouting - Fallback route not required')
-                return (
-                    False,
-                    {
-                        self.RESULT_FALLBACK: False,
-                    },
-                )
+                return False, {self.RESULT_FALLBACK: False}
 
         if 'refresh' in params:
             container = context.get_infolabel('System.CurrentControlId')

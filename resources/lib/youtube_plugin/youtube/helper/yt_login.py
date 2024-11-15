@@ -22,7 +22,7 @@ def process(mode, provider, context, sign_out_refresh=True):
     def _do_logout():
         refresh_tokens = access_manager.get_refresh_token()
         client = provider.get_client(context)
-        if refresh_tokens:
+        if any(refresh_tokens):
             for _refresh_token in set(refresh_tokens):
                 try:
                     if _refresh_token:
@@ -121,14 +121,8 @@ def process(mode, provider, context, sign_out_refresh=True):
 
         tokens = ['tv', 'personal']
         for token_type, token in enumerate(tokens):
-            new_token = _do_login(token_type)
+            new_token = _do_login(token_type) or (None, 0, None)
             tokens[token_type] = new_token
-            if new_token:
-                access_token, expiry, refresh_token = new_token
-            else:
-                access_token = None
-                expiry = 0
-                refresh_token = None
 
             context.log_debug('YouTube Login:'
                               '\n\tType:          |{0}|'
@@ -136,9 +130,9 @@ def process(mode, provider, context, sign_out_refresh=True):
                               '\n\tRefresh token: |{2}|'
                               '\n\tExpires:       |{3}|'
                               .format(token,
-                                      bool(access_token),
-                                      bool(refresh_token),
-                                      expiry))
+                                      bool(new_token[0]),
+                                      bool(new_token[2]),
+                                      new_token[1]))
 
         provider.reset_client()
         access_manager.update_access_token(addon_id, *zip(*tokens))

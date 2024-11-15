@@ -220,7 +220,7 @@ class Provider(AbstractProvider):
                               .format(dev_keys['system']))
 
         refresh_tokens = access_manager.get_refresh_token(dev_id)
-        if refresh_tokens:
+        if any(refresh_tokens):
             keys_changed = access_manager.dev_keys_changed(
                 dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
             ) if dev_id else self._api_check.changed
@@ -767,7 +767,7 @@ class Provider(AbstractProvider):
 
         if mode == 'in' or (mode == 'out' and sign_out_confirmed):
             yt_login.process(mode, provider, context)
-        return False
+        return True
 
     def _search_channel_or_playlist(self, context, identifier):
         if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', identifier):
@@ -775,11 +775,11 @@ class Provider(AbstractProvider):
         elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', identifier):
             json_data = self.get_client(context).get_playlists(identifier)
         else:
-            return False
+            return None
 
         if json_data:
             return v3.response_to_items(self, context, json_data)
-        return False
+        return None
 
     def on_search_run(self, context, query):
         data_cache = context.get_data_cache()
@@ -937,7 +937,7 @@ class Provider(AbstractProvider):
         action = re_match.group('action')
         if action == 'setup_wizard':
             provider.run_wizard(context)
-            return False
+            return False, {provider.RESULT_FALLBACK: False}
         return UriItem('script://{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
@@ -1014,7 +1014,7 @@ class Provider(AbstractProvider):
             client = provider.get_client(context)
             refresh_tokens = access_manager.get_refresh_token()
             success = True
-            if refresh_tokens:
+            if any(refresh_tokens):
                 for refresh_token in set(refresh_tokens):
                     try:
                         if refresh_token:
@@ -1136,7 +1136,7 @@ class Provider(AbstractProvider):
                     localize('history.clear'),
                     localize('history.clear.check')
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             playback_history.clear()
             ui.refresh_container()
@@ -1159,7 +1159,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % video_name,
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             playback_history.del_item(video_id)
             ui.refresh_container()
@@ -1708,7 +1708,7 @@ class Provider(AbstractProvider):
                     context.localize('bookmarks.clear'),
                     localize('bookmarks.clear.check')
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_bookmarks_list().clear()
             ui.refresh_container()
@@ -1742,7 +1742,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % bookmark_name,
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
@@ -1809,7 +1809,7 @@ class Provider(AbstractProvider):
                     localize('watch_later.clear'),
                     localize('watch_later.clear.check')
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_watch_later_list().clear()
             ui.refresh_container()
@@ -1838,7 +1838,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % video_name,
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_watch_later_list().del_item(video_id)
             ui.refresh_container()
@@ -1853,69 +1853,68 @@ class Provider(AbstractProvider):
         return False
 
     def handle_exception(self, context, exception_to_handle):
-        if isinstance(exception_to_handle, (InvalidGrant, LoginException)):
-            ok_dialog = False
-            message_timeout = 5000
-
-            message = exception_to_handle.get_message()
-            msg = exception_to_handle.get_message()
-            log_message = exception_to_handle.get_message()
-
-            error = ''
-            code = ''
-            if isinstance(msg, dict):
-                if 'error_description' in msg:
-                    message = strip_html_from_text(msg['error_description'])
-                    log_message = strip_html_from_text(msg['error_description'])
-                elif 'message' in msg:
-                    message = strip_html_from_text(msg['message'])
-                    log_message = strip_html_from_text(msg['message'])
-                else:
-                    message = 'No error message'
-                    log_message = 'No error message'
-
-                if 'error' in msg:
-                    error = msg['error']
-
-                if 'code' in msg:
-                    code = msg['code']
-
-            if error and code:
-                title = '%s: [%s] %s' % ('LoginException', code, error)
-            elif error:
-                title = '%s: %s' % ('LoginException', error)
-            else:
-                title = 'LoginException'
-
-            context.log_error('%s: %s' % (title, log_message))
-
-            if error == 'deleted_client':
-                message = context.localize('key.requirement')
-                context.get_access_manager().update_access_token(
-                    context.get_param('addon_id', None),
-                    access_token='',
-                    expiry=-1,
-                    refresh_token='',
-                )
-                ok_dialog = True
-
-            if error == 'invalid_client':
-                if message == 'The OAuth client was not found.':
-                    message = context.localize('client.id.incorrect')
-                    message_timeout = 7000
-                elif message == 'Unauthorized':
-                    message = context.localize('client.secret.incorrect')
-                    message_timeout = 7000
-
-            if ok_dialog:
-                context.get_ui().on_ok(title, message)
-            else:
-                context.get_ui().show_notification(message,
-                                                   title,
-                                                   time_ms=message_timeout)
-
+        if not isinstance(exception_to_handle, (InvalidGrant, LoginException)):
             return False
 
+        ok_dialog = False
+        message_timeout = 5000
+
+        message = exception_to_handle.get_message()
+        msg = exception_to_handle.get_message()
+        log_message = exception_to_handle.get_message()
+
+        error = ''
+        code = ''
+        if isinstance(msg, dict):
+            if 'error_description' in msg:
+                message = strip_html_from_text(msg['error_description'])
+                log_message = strip_html_from_text(msg['error_description'])
+            elif 'message' in msg:
+                message = strip_html_from_text(msg['message'])
+                log_message = strip_html_from_text(msg['message'])
+            else:
+                message = 'No error message'
+                log_message = 'No error message'
+
+            if 'error' in msg:
+                error = msg['error']
+
+            if 'code' in msg:
+                code = msg['code']
+
+        if error and code:
+            title = '%s: [%s] %s' % ('LoginException', code, error)
+        elif error:
+            title = '%s: %s' % ('LoginException', error)
+        else:
+            title = 'LoginException'
+
+        context.log_error('%s: %s' % (title, log_message))
+
+        if error == 'deleted_client':
+            message = context.localize('key.requirement')
+            context.get_access_manager().update_access_token(
+                context.get_param('addon_id', None),
+                access_token='',
+                expiry=-1,
+                refresh_token='',
+            )
+            ok_dialog = True
+
+        if error == 'invalid_client':
+            if message == 'The OAuth client was not found.':
+                message = context.localize('client.id.incorrect')
+                message_timeout = 7000
+            elif message == 'Unauthorized':
+                message = context.localize('client.secret.incorrect')
+                message_timeout = 7000
+
+        if ok_dialog:
+            context.get_ui().on_ok(title, message)
+        else:
+            context.get_ui().show_notification(message,
+                                               title,
+                                               time_ms=message_timeout)
         return True
 
     def tear_down(self):
