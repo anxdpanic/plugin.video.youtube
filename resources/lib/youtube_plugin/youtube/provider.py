@@ -767,7 +767,7 @@ class Provider(AbstractProvider):
 
         if mode == 'in' or (mode == 'out' and sign_out_confirmed):
             yt_login.process(mode, provider, context)
-        return False
+        return True
 
     def _search_channel_or_playlist(self, context, identifier):
         if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', identifier):
@@ -775,11 +775,11 @@ class Provider(AbstractProvider):
         elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', identifier):
             json_data = self.get_client(context).get_playlists(identifier)
         else:
-            return False
+            return None
 
         if json_data:
             return v3.response_to_items(self, context, json_data)
-        return False
+        return None
 
     def on_search_run(self, context, query):
         data_cache = context.get_data_cache()
@@ -937,7 +937,7 @@ class Provider(AbstractProvider):
         action = re_match.group('action')
         if action == 'setup_wizard':
             provider.run_wizard(context)
-            return False
+            return False, {provider.RESULT_FALLBACK: False}
         return UriItem('script://{addon},config/{action}'.format(
             addon=ADDON_ID, action=action
         ))
@@ -1136,7 +1136,7 @@ class Provider(AbstractProvider):
                     localize('history.clear'),
                     localize('history.clear.check')
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             playback_history.clear()
             ui.refresh_container()
@@ -1159,7 +1159,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % video_name,
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             playback_history.del_item(video_id)
             ui.refresh_container()
@@ -1708,7 +1708,7 @@ class Provider(AbstractProvider):
                     context.localize('bookmarks.clear'),
                     localize('bookmarks.clear.check')
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_bookmarks_list().clear()
             ui.refresh_container()
@@ -1742,7 +1742,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % bookmark_name,
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_bookmarks_list().del_item(item_id)
             context.get_ui().refresh_container()
@@ -1809,7 +1809,7 @@ class Provider(AbstractProvider):
                     localize('watch_later.clear'),
                     localize('watch_later.clear.check')
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_watch_later_list().clear()
             ui.refresh_container()
@@ -1838,7 +1838,7 @@ class Provider(AbstractProvider):
                     localize('content.remove'),
                     localize('content.remove.check') % video_name,
             ):
-                return False
+                return False, {provider.RESULT_FALLBACK: False}
 
             context.get_watch_later_list().del_item(video_id)
             ui.refresh_container()
