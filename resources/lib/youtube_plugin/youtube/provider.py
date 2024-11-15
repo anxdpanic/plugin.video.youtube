@@ -220,7 +220,7 @@ class Provider(AbstractProvider):
                               .format(dev_keys['system']))
 
         refresh_tokens = access_manager.get_refresh_token(dev_id)
-        if refresh_tokens:
+        if any(refresh_tokens):
             keys_changed = access_manager.dev_keys_changed(
                 dev_id, dev_keys['key'], dev_keys['id'], dev_keys['secret']
             ) if dev_id else self._api_check.changed
@@ -1014,7 +1014,7 @@ class Provider(AbstractProvider):
             client = provider.get_client(context)
             refresh_tokens = access_manager.get_refresh_token()
             success = True
-            if refresh_tokens:
+            if any(refresh_tokens):
                 for refresh_token in set(refresh_tokens):
                     try:
                         if refresh_token:
