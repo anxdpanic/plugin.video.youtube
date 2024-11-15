@@ -32,7 +32,7 @@ from ...kodion.utils import (
 
 class YouTube(LoginClient):
     CLIENTS = {
-        'v1': {
+        1: {
             'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
             'method': None,
             'json': {
@@ -47,8 +47,8 @@ class YouTube(LoginClient):
                 'Host': 'www.youtube.com',
             },
         },
-        'v3': {
-            '_auth_requested': True,
+        3: {
+            '_auth_required': True,
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
             'method': None,
             'headers': {
@@ -83,24 +83,6 @@ class YouTube(LoginClient):
             },
             'headers': {
                 'Host': 'www.youtube.com',
-            },
-        },
-        'watch_history': {
-            '_auth_required': True,
-            '_auth_type': 'personal',
-            '_video_id': None,
-            'headers': {
-                'Host': 's.youtube.com',
-                'Referer': 'https://www.youtube.com/watch?v={_video_id}',
-            },
-            'params': {
-                'referrer': 'https://accounts.google.com/',
-                'ns': 'yt',
-                'el': 'detailpage',
-                'ver': '2',
-                'fs': '0',
-                'volume': '100',
-                'muted': '0',
             },
         },
         '_common': {
@@ -173,13 +155,29 @@ class YouTube(LoginClient):
                                   et=et,
                                   state=state))
 
-        client_data = {
-            '_video_id': video_id,
-            'url': url,
-            'error_title': 'Failed to update watch history',
+        headers = {
+            'Host': 's.youtube.com',
+            'Connection': 'keep-alive',
+            'Accept-Encoding': 'gzip, deflate',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
+            'Accept': '*/*',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'DNT': '1',
+            'Referer': 'https://www.youtube.com/watch?v=' + video_id,
+            'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
+                           ' AppleWebKit/537.36 (KHTML, like Gecko)'
+                           ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
         }
-
-        params = {}
+        params = {
+            'docid': video_id,
+            'referrer': 'https://accounts.google.com/',
+            'ns': 'yt',
+            'el': 'detailpage',
+            'ver': '2',
+            'fs': '0',
+            'volume': '100',
+            'muted': '0',
+        }
         if cmt is not None:
             params['cmt'] = format(cmt, '.3f')
         if st is not None:
@@ -188,11 +186,11 @@ class YouTube(LoginClient):
             params['et'] = format(et, '.3f')
         if state is not None:
             params['state'] = state
+        if self._access_token:
+            params['access_token'] = self._access_token
 
-        self.api_request(client='watch_history',
-                         client_data=client_data,
-                         params=params,
-                         no_content=True)
+        self.request(url, params=params, headers=headers,
+                     error_msg='Failed to update watch history')
 
     def get_streams(self,
                     context,
@@ -202,7 +200,8 @@ class YouTube(LoginClient):
                     use_mpd=True):
         return StreamInfo(
             context,
-            access_token=(self._access_token or self._access_token_tv),
+            access_token=self._access_token,
+            access_token_tv=self._access_token_tv,
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
             use_mpd=use_mpd,
@@ -328,7 +327,7 @@ class YouTube(LoginClient):
 
     def unsubscribe_channel(self, channel_id, **kwargs):
         post_data = {'channelIds': [channel_id]}
-        return self.api_request(client='v1',
+        return self.api_request(version=1,
                                 method='POST',
                                 path='subscription/unsubscribe',
                                 post_data=post_data,
@@ -456,7 +455,7 @@ class YouTube(LoginClient):
                 }
             post_data['context'] = context
 
-        result = self.api_request(client='v1',
+        result = self.api_request(version=1,
                                   method='POST',
                                   path='browse',
                                   post_data=post_data)
@@ -1070,9 +1069,8 @@ class YouTube(LoginClient):
         if page_token:
             post_data['continuation'] = page_token
 
-        result = self.api_request(client=('tv' if retry == 1 else
-                                          'tv_embed' if retry == 2 else
-                                          'v1'),
+        result = self.api_request(version=('tv' if retry == 1 else
+                                           'tv_embed' if retry == 2 else 1),
                                   method='POST',
                                   path='next',
                                   post_data=post_data,
@@ -1976,7 +1974,7 @@ class YouTube(LoginClient):
             else:
                 _post_data['browseId'] = 'FEmy_youtube'
 
-            _json_data = self.api_request(client='v1',
+            _json_data = self.api_request(version=1,
                                           method='POST',
                                           path='browse',
                                           post_data=_post_data)
@@ -2071,7 +2069,7 @@ class YouTube(LoginClient):
         }
 
         playlist_index = None
-        json_data = self.api_request(client='v1',
+        json_data = self.api_request(version=1,
                                      method='POST',
                                      path='browse',
                                      post_data=_en_post_data)
@@ -2171,20 +2169,18 @@ class YouTube(LoginClient):
         return '', info, details, data, False, exception
 
     def api_request(self,
-                    client='v3',
+                    version=3,
                     method='GET',
-                    client_data=None,
                     path=None,
                     params=None,
                     post_data=None,
                     headers=None,
                     no_login=False,
                     **kwargs):
-        if not client_data:
-            client_data = {}
-        client_data.setdefault('method', method)
-        if path:
-            client_data['_endpoint'] = path.strip('/')
+        client_data = {
+            '_endpoint': path.strip('/'),
+            'method': method,
+        }
         if headers:
             client_data['headers'] = headers
         if method in {'POST', 'PUT'}:
@@ -2198,14 +2194,13 @@ class YouTube(LoginClient):
 
         abort = False
         if not no_login:
-            client_data.setdefault('_auth_requested', True)
             # a config can decide if a token is allowed
             if self._access_token and self._config.get('token-allowed', True):
                 client_data['_access_token'] = self._access_token
             if self._access_token_tv:
                 client_data['_access_token_tv'] = self._access_token_tv
 
-        client = self.build_client(client, client_data)
+        client = self.build_client(version, client_data)
         if not client:
             client = {}
             abort = True
@@ -2249,13 +2244,13 @@ class YouTube(LoginClient):
 
         context = self._context
         context.log_debug('API request:'
-                          '\n\ttype:      |{type}|'
+                          '\n\tversion:   |{version}|'
                           '\n\tmethod:    |{method}|'
                           '\n\tpath:      |{path}|'
                           '\n\tparams:    |{params}|'
                           '\n\tpost_data: |{data}|'
                           '\n\theaders:   |{headers}|'
-                          .format(type=client.get('_name'),
+                          .format(version=version,
                                   method=method,
                                   path=path,
                                   params=log_params,

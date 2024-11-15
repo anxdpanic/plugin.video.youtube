@@ -88,7 +88,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         'android_testsuite': {
             '_id': 30,
-            '_disabled': True,
+            '_auth_required': 'tv',
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android_testsuite'],
@@ -117,7 +117,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         'android_youtube_tv': {
             '_id': 29,
-            '_disabled': True,
+            '_auth_required': 'tv',
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android'],
@@ -172,7 +172,6 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'ios': {
             '_id': 5,
-            '_auth_type': False,
             '_os': {
                 'major': '17',
                 'minor': '5',
@@ -205,6 +204,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'media_connect_frontend': {
             '_id': 95,
+            '_auth_required': 'tv',
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -288,6 +288,8 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'videoId': None,
             },
             'headers': {
+                'Origin': 'https://www.youtube.com',
+                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}',
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
@@ -369,21 +371,19 @@ class YouTubeRequestClient(BaseRequestsClass):
     def build_client(cls, client_name=None, data=None):
         templates = {}
 
-        base_client = None
+        client = None
         if client_name:
-            base_client = cls.CLIENTS.get(client_name)
-            if base_client and base_client.get('_disabled'):
+            client = cls.CLIENTS.get(client_name)
+            if client and client.get('_disabled'):
                 return None
-        if not base_client:
-            base_client = YouTubeRequestClient.CLIENTS['web']
-        base_client = base_client.copy()
+        if not client:
+            client = YouTubeRequestClient.CLIENTS['web']
+        client = client.copy()
 
         if data:
-            client = merge_dicts(base_client, data)
+            client = merge_dicts(client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
         client['_name'] = client_name
-        if base_client.get('_auth_required'):
-            client['_auth_required'] = True
 
         for values, template_id, template in templates.values():
             if template_id in values:
@@ -393,16 +393,12 @@ class YouTubeRequestClient(BaseRequestsClass):
         try:
             params = client['params']
             auth_required = client.get('_auth_required')
-            auth_requested = client.get('_auth_requested')
-            auth_type = client.get('_auth_type')
-            if auth_type == 'tv' and auth_requested != 'personal':
+            if auth_required == 'tv':
                 auth_token = client.get('_access_token_tv')
-            elif auth_type is not False:
-                auth_token = client.get('_access_token')
             else:
-                auth_token = None
+                auth_token = client.get('_access_token')
 
-            if auth_token and (auth_required or auth_requested):
+            if auth_token:
                 headers = client['headers']
                 if 'Authorization' in headers:
                     headers = headers.copy()
