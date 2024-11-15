@@ -261,6 +261,7 @@ class ServiceMonitor(xbmc.Monitor):
             return False
 
         self.httpd_thread = threading.Thread(target=self.httpd.serve_forever)
+        self.httpd_thread.daemon = True
         self.httpd_thread.start()
 
         address = self.httpd.socket.getsockname()
@@ -280,9 +281,21 @@ class ServiceMonitor(xbmc.Monitor):
                                     .format(ip=self._old_httpd_address,
                                             port=self._old_httpd_port))
             self.httpd_address_sync()
-            self.httpd.shutdown()
+
+            shutdown_thread = threading.Thread(target=self.httpd.shutdown)
+            shutdown_thread.daemon = True
+            shutdown_thread.start()
+
+            for thread in (self.httpd_thread, shutdown_thread):
+                if not thread.is_alive():
+                    continue
+                try:
+                    thread.join(5)
+                except RuntimeError:
+                    pass
+
             self.httpd.server_close()
-            self.httpd_thread.join()
+
             self.httpd_thread = None
             self.httpd = None
 
