@@ -1853,69 +1853,68 @@ class Provider(AbstractProvider):
         return False
 
     def handle_exception(self, context, exception_to_handle):
-        if isinstance(exception_to_handle, (InvalidGrant, LoginException)):
-            ok_dialog = False
-            message_timeout = 5000
-
-            message = exception_to_handle.get_message()
-            msg = exception_to_handle.get_message()
-            log_message = exception_to_handle.get_message()
-
-            error = ''
-            code = ''
-            if isinstance(msg, dict):
-                if 'error_description' in msg:
-                    message = strip_html_from_text(msg['error_description'])
-                    log_message = strip_html_from_text(msg['error_description'])
-                elif 'message' in msg:
-                    message = strip_html_from_text(msg['message'])
-                    log_message = strip_html_from_text(msg['message'])
-                else:
-                    message = 'No error message'
-                    log_message = 'No error message'
-
-                if 'error' in msg:
-                    error = msg['error']
-
-                if 'code' in msg:
-                    code = msg['code']
-
-            if error and code:
-                title = '%s: [%s] %s' % ('LoginException', code, error)
-            elif error:
-                title = '%s: %s' % ('LoginException', error)
-            else:
-                title = 'LoginException'
-
-            context.log_error('%s: %s' % (title, log_message))
-
-            if error == 'deleted_client':
-                message = context.localize('key.requirement')
-                context.get_access_manager().update_access_token(
-                    context.get_param('addon_id', None),
-                    access_token='',
-                    expiry=-1,
-                    refresh_token='',
-                )
-                ok_dialog = True
-
-            if error == 'invalid_client':
-                if message == 'The OAuth client was not found.':
-                    message = context.localize('client.id.incorrect')
-                    message_timeout = 7000
-                elif message == 'Unauthorized':
-                    message = context.localize('client.secret.incorrect')
-                    message_timeout = 7000
-
-            if ok_dialog:
-                context.get_ui().on_ok(title, message)
-            else:
-                context.get_ui().show_notification(message,
-                                                   title,
-                                                   time_ms=message_timeout)
-
+        if not isinstance(exception_to_handle, (InvalidGrant, LoginException)):
             return False
 
+        ok_dialog = False
+        message_timeout = 5000
+
+        message = exception_to_handle.get_message()
+        msg = exception_to_handle.get_message()
+        log_message = exception_to_handle.get_message()
+
+        error = ''
+        code = ''
+        if isinstance(msg, dict):
+            if 'error_description' in msg:
+                message = strip_html_from_text(msg['error_description'])
+                log_message = strip_html_from_text(msg['error_description'])
+            elif 'message' in msg:
+                message = strip_html_from_text(msg['message'])
+                log_message = strip_html_from_text(msg['message'])
+            else:
+                message = 'No error message'
+                log_message = 'No error message'
+
+            if 'error' in msg:
+                error = msg['error']
+
+            if 'code' in msg:
+                code = msg['code']
+
+        if error and code:
+            title = '%s: [%s] %s' % ('LoginException', code, error)
+        elif error:
+            title = '%s: %s' % ('LoginException', error)
+        else:
+            title = 'LoginException'
+
+        context.log_error('%s: %s' % (title, log_message))
+
+        if error == 'deleted_client':
+            message = context.localize('key.requirement')
+            context.get_access_manager().update_access_token(
+                context.get_param('addon_id', None),
+                access_token='',
+                expiry=-1,
+                refresh_token='',
+            )
+            ok_dialog = True
+
+        if error == 'invalid_client':
+            if message == 'The OAuth client was not found.':
+                message = context.localize('client.id.incorrect')
+                message_timeout = 7000
+            elif message == 'Unauthorized':
+                message = context.localize('client.secret.incorrect')
+                message_timeout = 7000
+
+        if ok_dialog:
+            context.get_ui().on_ok(title, message)
+        else:
+            context.get_ui().show_notification(message,
+                                               title,
+                                               time_ms=message_timeout)
         return True
 
     def tear_down(self):
