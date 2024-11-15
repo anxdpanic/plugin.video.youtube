@@ -185,7 +185,7 @@ class XbmcPlugin(AbstractPlugin):
                 result, options = provider.navigate(context)
         except KodionException as exc:
             result = options = None
-            if provider.handle_exception(context, exc):
+            if not provider.handle_exception(context, exc):
                 msg = ('XbmcRunner.run - Error'
                        '\n\tException: {exc!r}'
                        '\n\tStack trace (most recent call last):\n{stack}'
