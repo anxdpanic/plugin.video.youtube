@@ -14,8 +14,8 @@ import re
 import time
 from math import log10
 
-from ...kodion.constants import CONTENT, LICENSE_TOKEN, LICENSE_URL, PATHS
 from ...kodion.compatibility import unquote, urlsplit
+from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
@@ -261,6 +261,7 @@ def update_channel_items(provider, context, channel_id_dict,
                 ui.bold(channel_name, cr_after=1),
                 ui.new_line(stats, cr_after=1) if stats else '',
                 ui.new_line(description, cr_after=1) if description else '',
+                ui.new_line('--------', cr_before=1, cr_after=1),
                 'https://youtu.be/channel' + channel_id,
             ))
         channel_item.set_plot(description)
@@ -433,6 +434,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
                     cr_after=1,
                 ),
                 ui.new_line(description, cr_after=1) if description else '',
+                ui.new_line('--------', cr_before=1, cr_after=1),
                 'https://youtu.be/playlist?list=' + playlist_id,
             ))
         playlist_item.set_plot(description)
@@ -805,6 +807,7 @@ def update_video_items(provider, context, video_id_dict,
                 (ui.italic(start_at, cr_after=1) if media_item.upcoming
                  else ui.new_line(start_at, cr_after=1)) if start_at else '',
                 ui.new_line(description, cr_after=1) if description else '',
+                ui.new_line('--------', cr_before=1, cr_after=1),
                 'https://youtu.be/' + video_id,
             ))
         media_item.set_plot(description)
@@ -1007,7 +1010,6 @@ def update_play_info(provider, context, video_id, media_item, video_stream):
     update_video_items(provider, context, {video_id: media_item})
 
     settings = context.get_settings()
-    ui = context.get_ui()
 
     meta_data = video_stream.get('meta')
     if meta_data:
@@ -1034,24 +1036,27 @@ def update_play_info(provider, context, video_id, media_item, video_stream):
     media_item.set_isa(use_isa)
 
     if use_isa:
-        license_info = video_stream.get('license_info', {})
-        license_proxy = license_info.get('proxy')
-        license_url = license_info.get('url')
-        license_token = license_info.get('token')
+        drm_details = video_stream.get('drm_details')
+        if drm_details:
+            drm_type = drm_details.get('widevine')
+            if drm_type:
+                try:
+                    from inputstreamhelper import Helper
+                except ImportError:
+                    Helper = None
 
-        if license_proxy and license_url and license_token:
-            try:
-                from inputstreamhelper import Helper
-
-                is_helper = Helper('mpd' if media_item.use_mpd() else 'hls',
-                                   drm='com.widevine.alpha')
-            except ImportError:
-                is_helper = None
-
-            if is_helper and is_helper.check_inputstream():
-                media_item.set_license_key(license_proxy)
-                ui.set_property(LICENSE_URL, license_url)
-                ui.set_property(LICENSE_TOKEN, license_token)
+                if Helper:
+                    is_helper = Helper(
+                        'mpd' if media_item.use_mpd() else 'hls',
+                        drm=drm_type['license_type'],
+                    )
+                    if is_helper and is_helper.check_inputstream():
+                        media_item.set_license_key('|'.join((
+                            drm_type['proxy_url'],
+                            drm_type['headers'],
+                            drm_type['post_format'],
+                            drm_type['response_format'],
+                        )))
 
 
 def update_channel_info(provider,
