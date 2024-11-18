@@ -1250,11 +1250,11 @@ msgid "Edited"
 msgstr ""
 
 msgctxt "#30736"
-msgid "Shorts (1 minute or less)"
+msgid "Shorts"
 msgstr ""
 
 msgctxt "#30737"
-msgid ""
+msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"

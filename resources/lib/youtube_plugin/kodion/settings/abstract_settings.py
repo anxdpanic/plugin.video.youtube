@@ -600,6 +600,11 @@ class AbstractSettings(object):
                 types.update(update)
         return types
 
+    def shorts_duration(self, value=None):
+        if value is not None:
+            return self.set_int(SETTINGS.SHORTS_DURATION, value)
+        return self.get_int(SETTINGS.SHORTS_DURATION, 60)
+
     def show_detailed_description(self, value=None):
         if value is not None:
             return self.set_bool(SETTINGS.DETAILED_DESCRIPTION, value)

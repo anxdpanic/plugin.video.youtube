@@ -557,6 +557,7 @@ def update_video_items(provider, context, video_id_dict,
     ask_quality = not default_web_urls and settings.ask_for_video_quality()
     audio_only = settings.audio_only()
     show_details = settings.show_detailed_description()
+    shorts_duration = settings.shorts_duration()
     subtitles_prompt = settings.get_subtitle_selection() == 1
     thumb_size = settings.get_thumbnail_size()
     thumb_stamp = get_thumb_timestamp()
@@ -622,7 +623,7 @@ def update_video_items(provider, context, video_id_dict,
                     duration = duration.seconds - 1
         if duration:
             media_item.set_duration_from_seconds(duration)
-            if duration <= 60:
+            if duration <= shorts_duration:
                 media_item.short = True
 
         broadcast_type = snippet.get('liveBroadcastContent')

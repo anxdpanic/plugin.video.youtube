@@ -768,6 +768,18 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.view.shorts.duration" type="integer" label="30737" help="">
+                    <level>0</level>
+                    <default>60</default>
+                    <constraints>
+                        <minimum>30</minimum>
+                        <step>30</step>
+                        <maximum>180</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>false</popup>
+                    </control>
+                </setting>
                 <setting id="youtube.view.channel_name.aliases" type="list[string]" label="30807" help="">
                     <level>0</level>
                     <default>cast</default>
