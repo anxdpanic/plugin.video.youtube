@@ -760,7 +760,7 @@ class StreamInfo(YouTubeRequestClient):
             # Progressive streams
             # Limited video and audio stream availability
             'ask': (
-                'media_connect_frontend',
+                # 'media_connect_frontend',
             ),
         }
 
@@ -1713,7 +1713,7 @@ class StreamInfo(YouTubeRequestClient):
                 and (query_subtitles is True
                      or (query_subtitles
                          and subtitles.sub_selection == subtitles.LANG_ALL))):
-            for client_name in ('smart_tv_embedded', 'web', 'android'):
+            for client_name in ('smart_tv_embedded', 'web'):
                 caption_client = self.build_client(client_name, client_data)
                 if not caption_client:
                     continue

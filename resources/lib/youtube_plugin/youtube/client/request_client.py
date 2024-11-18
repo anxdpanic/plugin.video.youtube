@@ -36,7 +36,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '19.29.37',
+                        'clientVersion': '19.44.38',
                         'androidSdkVersion': '30',
                         'osName': 'Android',
                         'osVersion': '11',
@@ -88,7 +88,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         'android_testsuite': {
             '_id': 30,
-            '_auth_required': 'tv',
+            '_disabled': True,
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android_testsuite'],
@@ -117,6 +117,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         # Limited subtitle availability
         'android_youtube_tv': {
             '_id': 29,
+            '_disabled': True,
             '_auth_required': 'tv',
             '_query_subtitles': True,
             'json': {
@@ -128,7 +129,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'androidSdkVersion': '30',
                         'osName': 'Android',
                         'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'platform': 'TV',
                     },
                 },
                 'thirdParty': {
@@ -151,7 +152,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_VR',
-                        'clientVersion': '1.57.29',
+                        'clientVersion': '1.60.19',
                         'deviceMake': 'Oculus',
                         'deviceModel': 'Quest 3',
                         'osName': 'Android',
@@ -173,16 +174,16 @@ class YouTubeRequestClient(BaseRequestsClass):
         'ios': {
             '_id': 5,
             '_os': {
-                'major': '17',
-                'minor': '5',
-                'patch': '1',
-                'build': '21F90',
+                'major': '18',
+                'minor': '1',
+                'patch': '0',
+                'build': '22B83',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.29.1',
+                        'clientVersion': '19.45.4',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
@@ -204,7 +205,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'media_connect_frontend': {
             '_id': 95,
-            '_auth_required': 'tv',
+            '_disabled': True,
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -288,8 +289,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'videoId': None,
             },
             'headers': {
-                'Origin': 'https://www.youtube.com',
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}',
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
@@ -395,8 +394,10 @@ class YouTubeRequestClient(BaseRequestsClass):
             auth_required = client.get('_auth_required')
             if auth_required == 'tv':
                 auth_token = client.get('_access_token_tv')
-            else:
+            elif auth_required is not False:
                 auth_token = client.get('_access_token')
+            else:
+                auth_token = None
 
             if auth_token:
                 headers = client['headers']
