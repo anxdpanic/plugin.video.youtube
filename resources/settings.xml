@@ -242,7 +242,7 @@
                             <option label="30736">shorts</option>
                             <option label="30809">upcoming</option>
                             <option label="30646">upcoming_live</option>
-                            <option label="839">live</option>
+                            <option label="19664">live</option>
                             <option label="30766">premieres</option>
                             <option label="30810">completed</option>
                             <option label="30811">live_folder</option>
@@ -529,7 +529,7 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.folder.live.show" type="boolean" label="839" help="">
+                <setting id="youtube.folder.live.show" type="boolean" label="19664" help="">
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>

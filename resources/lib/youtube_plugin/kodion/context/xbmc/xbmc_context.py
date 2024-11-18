@@ -124,7 +124,7 @@ class XbmcContext(AbstractContext):
         'isa.enable.check': 30579,
         'key.requirement': 30731,
         'liked.video': 30716,
-        'live': 839,
+        'live': 19664,
         'live.completed': 30647,
         'live.upcoming': 30646,
         'maintenance.bookmarks': 30800,
