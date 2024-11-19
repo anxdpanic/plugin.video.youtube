@@ -84,7 +84,7 @@ def process_default_settings(context, step, steps, **_kwargs):
             settings.alternative_player_adaptive(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
-        if settings.use_isa() and not httpd_status(context):
+        if not httpd_status(context):
             settings.httpd_listen('0.0.0.0')
     return step
 
