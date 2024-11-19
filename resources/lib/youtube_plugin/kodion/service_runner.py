@@ -128,7 +128,9 @@ def run():
                     and not monitor.system_sleep
                     and not (monitor.system_idle
                              or monitor.get_idle_time() >= loop_period)):
-                monitor.onWake()
+                monitor.system_idle = False
+                monitor.system_sleep = False
+                monitor.interrupt = True
 
             if monitor.refresh and all(container.values()):
                 monitor.refresh_container(force=True)

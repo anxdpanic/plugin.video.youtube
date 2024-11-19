@@ -102,7 +102,9 @@ class ServiceMonitor(xbmc.Monitor):
                 'GUI.OnDPMSDeactivated',
                 'System.OnWake',
             }:
-                self.onWake()
+                self.system_idle = False
+                self.system_sleep = False
+                self.interrupt = True
 
             elif method == 'Player.OnPlay':
                 player = xbmc.Player()
@@ -111,7 +113,10 @@ class ServiceMonitor(xbmc.Monitor):
                     if playing_file.path in {PATHS.MPD,
                                              PATHS.PLAY,
                                              PATHS.REDIRECT}:
-                        self.onWake()
+                        if not self.httpd:
+                            self.start_httpd()
+                        if self.httpd_sleep_allowed:
+                            self.httpd_sleep_allowed = None
                 except RuntimeError:
                     pass
 
@@ -131,6 +136,8 @@ class ServiceMonitor(xbmc.Monitor):
             target = data.get('target')
 
             if target == PLUGIN_WAKEUP:
+                self.system_idle = False
+                self.system_sleep = False
                 self.interrupt = True
                 response = True
 
@@ -228,16 +235,6 @@ class ServiceMonitor(xbmc.Monitor):
                 self.start_httpd()
         elif httpd_started:
             self.shutdown_httpd(terminate=True)
-
-    def onWake(self):
-        self.system_idle = False
-        self.system_sleep = False
-        self.interrupt = True
-
-        if not self.httpd and self.httpd_required():
-            self.start_httpd()
-        if self.httpd_sleep_allowed:
-            self.httpd_sleep_allowed = None
 
     def httpd_address_sync(self):
         self._old_httpd_address = self._httpd_address
