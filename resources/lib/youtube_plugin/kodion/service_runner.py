@@ -95,12 +95,12 @@ def run():
             httpd_idle_time_ms = 0
         elif is_asleep:
             httpd_idle_time_ms = 0
-            monitor.shutdown_httpd()
+            monitor.shutdown_httpd(on_idle=True, player=player)
         elif is_idle:
             if monitor.httpd_sleep_allowed:
                 if httpd_idle_time_ms >= httpd_idle_timeout_ms:
                     httpd_idle_time_ms = 0
-                    monitor.shutdown_httpd()
+                    monitor.shutdown_httpd(on_idle=True, player=player)
             elif monitor.httpd_sleep_allowed is None:
                 monitor.httpd_sleep_allowed = True
                 httpd_idle_time_ms = 0
@@ -113,7 +113,7 @@ def run():
                     monitor.restart_httpd()
                     httpd_restart_attempts += 1
                 else:
-                    monitor.shutdown_httpd()
+                    monitor.shutdown_httpd(terminate=True)
 
         check_item = not plugin_is_idle and container['is_plugin']
         if check_item:
@@ -175,7 +175,7 @@ def run():
 
     # shutdown http server
     if monitor.httpd:
-        monitor.shutdown_httpd()
+        monitor.shutdown_httpd(terminate=True)
 
     provider.tear_down()
     context.tear_down()

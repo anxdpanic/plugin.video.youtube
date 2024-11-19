@@ -227,7 +227,7 @@ class ServiceMonitor(xbmc.Monitor):
             else:
                 self.start_httpd()
         elif httpd_started:
-            self.shutdown_httpd()
+            self.shutdown_httpd(terminate=True)
 
     def onWake(self):
         self.system_idle = False
@@ -271,33 +271,33 @@ class ServiceMonitor(xbmc.Monitor):
         self._httpd_error = False
         return True
 
-    def shutdown_httpd(self):
-        if self.httpd:
-            if (not self.system_sleep
-                    and self.system_idle
-                    and self.httpd_required(while_idle=True)):
-                return
-            self._context.log_debug('HTTPServer: Shutting down |{ip}:{port}|'
-                                    .format(ip=self._old_httpd_address,
-                                            port=self._old_httpd_port))
-            self.httpd_address_sync()
+    def shutdown_httpd(self, on_idle=False, terminate=False, player=None):
+        if (not self.httpd
+                or (not (terminate or self.system_sleep)
+                    and (on_idle or self.system_idle)
+                    and self.httpd_required(on_idle=True, player=player))):
+            return
+        self._context.log_debug('HTTPServer: Shutting down |{ip}:{port}|'
+                                .format(ip=self._old_httpd_address,
+                                        port=self._old_httpd_port))
+        self.httpd_address_sync()
 
-            shutdown_thread = threading.Thread(target=self.httpd.shutdown)
-            shutdown_thread.daemon = True
-            shutdown_thread.start()
+        shutdown_thread = threading.Thread(target=self.httpd.shutdown)
+        shutdown_thread.daemon = True
+        shutdown_thread.start()
 
-            for thread in (self.httpd_thread, shutdown_thread):
-                if not thread.is_alive():
-                    continue
-                try:
-                    thread.join(5)
-                except RuntimeError:
-                    pass
+        for thread in (self.httpd_thread, shutdown_thread):
+            if not thread.is_alive():
+                continue
+            try:
+                thread.join(5)
+            except RuntimeError:
+                pass
 
-            self.httpd.server_close()
+        self.httpd.server_close()
 
-            self.httpd_thread = None
-            self.httpd = None
+        self.httpd_thread = None
+        self.httpd = None
 
     def restart_httpd(self):
         self._context.log_debug('HTTPServer: Restarting'
@@ -306,15 +306,15 @@ class ServiceMonitor(xbmc.Monitor):
                                         old_port=self._old_httpd_port,
                                         ip=self._httpd_address,
                                         port=self._httpd_port))
-        self.shutdown_httpd()
+        self.shutdown_httpd(terminate=True)
         self.start_httpd()
 
     def ping_httpd(self):
         return self.httpd and httpd_status(self._context)
 
-    def httpd_required(self, settings=None, while_idle=False):
+    def httpd_required(self, settings=None, on_idle=False, player=None):
         if settings:
-            required = (settings.use_isa()
+            required = (settings.use_mpd_videos()
                         or settings.api_config_page()
                         or settings.support_alternative_player())
             self._use_httpd = required
@@ -322,10 +322,15 @@ class ServiceMonitor(xbmc.Monitor):
         elif self._httpd_error:
             required = False
 
-        elif while_idle:
+        elif on_idle:
             settings = self._context.get_settings()
-            required = (settings.api_config_page()
-                        or settings.support_alternative_player())
+
+            playing = player.isPlaying() if player else False
+            external = player.isExternalPlayer() if playing else False
+
+            required = ((playing and settings.use_mpd_videos())
+                        or settings.api_config_page()
+                        or (external and settings.support_alternative_player()))
 
         else:
             required = self._use_httpd
