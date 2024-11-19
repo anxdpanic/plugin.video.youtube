@@ -171,6 +171,9 @@ class AbstractContext(Logger):
     def get_language_name(self, lang_id=None):
         raise NotImplementedError()
 
+    def get_player_language(self):
+        raise NotImplementedError()
+
     def get_subtitle_language(self):
         raise NotImplementedError()
 

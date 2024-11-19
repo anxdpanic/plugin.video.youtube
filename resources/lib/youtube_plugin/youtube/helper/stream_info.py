@@ -745,6 +745,15 @@ class StreamInfo(YouTubeRequestClient):
         'dtse': 1.3,
     }
 
+    LANG_ROLE_ORDER = {
+        4:  -1,  # Default
+        3:  -2,  # Dubbed
+        6:  -3,  # Secondary
+        10: -4,  # Auto-dubbed
+        2:  -5,  # Descriptive
+        0:  -6,  # Alternate
+    }
+
     def __init__(self,
                  context,
                  access_token='',
@@ -759,8 +768,15 @@ class StreamInfo(YouTubeRequestClient):
         self._access_token = access_token
         self._ask_for_quality = ask_for_quality
         self._audio_only = audio_only
-        self._language_base = kwargs.get('language', 'en_US')[0:2]
         self._use_mpd = use_mpd
+
+        audio_language = context.get_player_language()
+        if audio_language == 'mediadefault':
+            self._language_base = kwargs.get('language', 'en_US')[0:2]
+        elif audio_language == 'original':
+            self._language_base = ''
+        else:
+            self._language_base = audio_language
 
         self._player_js = None
         self._calculate_n = True
@@ -1854,7 +1870,7 @@ class StreamInfo(YouTubeRequestClient):
         preferred_audio = {
             'id': '',
             'language_code': None,
-            'role_type': 0,
+            'role_order': self.LANG_ROLE_ORDER[0],
         }
         for stream in stream_data:
             mime_type = stream.get('mimeType')
@@ -1936,24 +1952,28 @@ class StreamInfo(YouTubeRequestClient):
                         role = 'alternate'
                         label = localize('stream.alternate')
 
-                    mime_group = ''.join((
-                        mime_type, '_', language_code, '.', role_str,
-                    ))
-                    if language_code == self._language_base and (
-                            not preferred_audio['id']
-                            or role == 'main'
-                            or role_type > preferred_audio['role_type']
-                    ):
+                    role_order = self.LANG_ROLE_ORDER.get(role_type, -6)
+                    is_preferred = role_order > preferred_audio['role_order']
+                    preferred_id = preferred_audio['id']
+                    if self._language_base:
+                        lang_match = language_code == self._language_base
+                    else:
+                        lang_match = True
+                    if lang_match and (not preferred_id or is_preferred):
                         preferred_audio = {
                             'id': ''.join(('_', language_code, '.', role_str)),
                             'language_code': language_code,
-                            'role_type': role_type,
+                            'role_order': role_order,
                         }
+
+                    mime_group = ''.join((
+                        mime_type, '_', language_code, '.', role_str,
+                    ))
                 else:
                     language_code = default_lang_code
                     role = 'main'
-                    role_type = 4
                     role_str = '4'
+                    role_order = self.LANG_ROLE_ORDER[0]
                     label = localize('stream.original')
                     mime_group = mime_type
 
@@ -2028,7 +2048,8 @@ class StreamInfo(YouTubeRequestClient):
                     mime_type,
                     codec,
                 ))
-                channels = language = role = role_type = sample_rate = None
+                channels = sample_rate = None
+                language = role = role_order = None
                 label = quality['label'].format(
                     quality['nom_height'] or compare_height,
                     fps if fps > 30 else '',
@@ -2068,7 +2089,7 @@ class StreamInfo(YouTubeRequestClient):
                 'langCode': language_code,
                 'langName': language,
                 'role': role,
-                'roleType': role_type,
+                'roleOrder': role_order,
                 'sampleRate': sample_rate,
                 'channels': channels,
             }
@@ -2106,7 +2127,7 @@ class StreamInfo(YouTubeRequestClient):
                 not group.startswith(main_stream['mimeType']),
                 preferred_audio['id'] not in group,
                 main_stream['langName'],
-                - main_stream['roleType'],
+                - main_stream['roleOrder'],
             )
             return key + _stream_sort(main_stream)
 

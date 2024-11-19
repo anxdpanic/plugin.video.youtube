@@ -46,6 +46,14 @@ from ...utils import (
 
 
 class XbmcContext(AbstractContext):
+    # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1230
+    _KODI_UI_PLAYER_LANGUAGE_OPTIONS = {
+        None,  # No setting value
+        'mediadefault',
+        'original',
+        'default',  # UI language
+    }
+
     # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
     _KODI_UI_SUBTITLE_LANGUAGE_OPTIONS = {
         None,  # No setting value
@@ -464,6 +472,15 @@ class XbmcContext(AbstractContext):
         if lang_id is None:
             lang_id = self.get_language()
         return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
+
+    def get_player_language(self):
+        language = get_kodi_setting_value('locale.audiolanguage')
+        if language == 'default':
+            language = get_kodi_setting_value('locale.language')
+            language = language.replace('resource.language.', '').split('_')[0]
+        elif language not in self._KODI_UI_PLAYER_LANGUAGE_OPTIONS:
+            language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+        return language
 
     def get_subtitle_language(self):
         language = get_kodi_setting_value('locale.subtitlelanguage')
