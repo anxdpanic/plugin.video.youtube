@@ -46,7 +46,14 @@ from ...utils import (
 
 
 class XbmcContext(AbstractContext):
-    _KODI_UI_SUBTITLE_OPTIONS = None
+    # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
+    _KODI_UI_SUBTITLE_LANGUAGE_OPTIONS = {
+        None,  # No setting value
+        'none',
+        'forced_only',
+        'original',
+        'default',  # UI language
+    }
 
     LOCAL_MAP = {
         'api.config': 30634,
@@ -337,14 +344,6 @@ class XbmcContext(AbstractContext):
             cls._addon = addon
             cls._settings = XbmcPluginSettings(addon)
 
-            cls._KODI_UI_SUBTITLE_OPTIONS = {
-                None,                 # No setting value
-                self.localize(231),    # None
-                self.localize(13207),  # Forced only
-                self.localize(308),    # Original language
-                self.localize(309),    # UI language
-            }
-
             # Update default allowable params
             cls._NON_EMPTY_STRING_PARAMS.update(self.SEARCH_PARAMS)
 
@@ -467,13 +466,15 @@ class XbmcContext(AbstractContext):
         return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
 
     def get_subtitle_language(self):
-        sub_language = get_kodi_setting_value('locale.subtitlelanguage')
-        # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
-        if sub_language not in self._KODI_UI_SUBTITLE_OPTIONS:
-            sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
+        language = get_kodi_setting_value('locale.subtitlelanguage')
+        if language == 'default':
+            language = get_kodi_setting_value('locale.language')
+            language = language.replace('resource.language.', '').split('_')[0]
+        elif language in self._KODI_UI_SUBTITLE_LANGUAGE_OPTIONS:
+            language = None
         else:
-            sub_language = None
-        return sub_language
+            language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+        return language
 
     def get_playlist_player(self, playlist_type=None):
         if not self._playlist or playlist_type:
