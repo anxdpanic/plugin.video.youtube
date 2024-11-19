@@ -81,7 +81,7 @@ def process_default_settings(context, step, steps, **_kwargs):
             settings.support_alternative_player(False)
             settings.default_player_web_urls(False)
             settings.alternative_player_web_urls(False)
-            settings.alternative_player_adaptive(False)
+            settings.alternative_player_mpd(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
         if not httpd_status(context):

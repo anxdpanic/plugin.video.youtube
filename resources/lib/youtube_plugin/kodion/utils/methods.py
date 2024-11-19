@@ -60,14 +60,17 @@ def select_stream(context,
                   stream_data_list,
                   ask_for_quality,
                   audio_only,
-                  use_adaptive_formats=True):
+                  use_mpd=True):
     settings = context.get_settings()
-    isa_capabilities = context.inputstream_adaptive_capabilities()
-    use_adaptive = (use_adaptive_formats
-                    and settings.use_isa()
-                    and bool(isa_capabilities))
-    live_type = ('live' in isa_capabilities
-                 and settings.live_stream_type()) or 'hls'
+    if settings.use_isa():
+        isa_capabilities = context.inputstream_adaptive_capabilities()
+        use_adaptive = bool(isa_capabilities)
+        use_live_adaptive = use_adaptive and 'live' in isa_capabilities
+        use_live_mpd = use_live_adaptive and settings.use_mpd_live_streams()
+    else:
+        use_adaptive = False
+        use_live_adaptive = False
+        use_live_mpd = False
 
     if audio_only:
         context.log_debug('Select stream - Audio only')
@@ -77,11 +80,12 @@ def select_stream(context,
         stream_list = [
             item for item in stream_data_list
             if (not item.get('adaptive')
-                or (not item.get('live') and use_adaptive)
+                or (not item.get('live')
+                    and ((use_mpd and item.get('dash/video'))
+                         or (use_adaptive and item.get('hls/video'))))
                 or (item.get('live')
-                    and live_type.startswith('isa')
-                    and ((live_type == 'isa_mpd' and item.get('dash/video'))
-                         or item.get('hls/video'))))
+                    and ((use_live_mpd and item.get('dash/video'))
+                         or (use_live_adaptive and item.get('hls/video')))))
         ]
 
     if not stream_list:

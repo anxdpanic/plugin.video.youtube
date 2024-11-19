@@ -46,7 +46,7 @@ HISTORY_PLAYLIST = 'youtube.folder.history.playlist'  # (str)
 SUPPORT_ALTERNATIVE_PLAYER = 'kodion.support.alternative_player'  # (bool)
 DEFAULT_PLAYER_WEB_URLS = 'kodion.default_player.web_urls'  # (bool)
 ALTERNATIVE_PLAYER_WEB_URLS = 'kodion.alternative_player.web_urls'  # (bool)
-ALTERNATIVE_PLAYER_ADAPTIVE = 'kodion.alternative_player.adaptive'  # (bool)
+ALTERNATIVE_PLAYER_MPD = 'kodion.alternative_player.mpd'  # (bool)
 
 USE_ISA = 'kodion.video.quality.isa'  # (bool)
 LIVE_STREAMS = 'kodion.live_stream.selection'  # (int)

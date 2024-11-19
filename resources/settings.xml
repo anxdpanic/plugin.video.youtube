@@ -614,13 +614,13 @@
                         <dependency type="enable">
                             <and>
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
-                                <condition setting="kodion.alternative_player.adaptive" operator="is">false</condition>
+                                <condition setting="kodion.alternative_player.mpd" operator="is">false</condition>
                             </and>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="kodion.alternative_player.adaptive" type="boolean" parent="kodion.support.alternative_player" label="30805" help="">
+                <setting id="kodion.alternative_player.mpd" type="boolean" parent="kodion.support.alternative_player" label="30805" help="">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
@@ -628,7 +628,7 @@
                             <and>
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
                                 <or>
-                                    <condition setting="kodion.alternative_player.adaptive" operator="is">true</condition>
+                                    <condition setting="kodion.alternative_player.mpd" operator="is">true</condition>
                                     <condition setting="kodion.alternative_player.web_urls" operator="is">false</condition>
                                 </or>
                             </and>

@@ -137,15 +137,15 @@ class AbstractSettings(object):
         if value is not None:
             return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS, value)
         if (self.support_alternative_player()
-                and not self.alternative_player_adaptive()):
+                and not self.alternative_player_mpd()):
             return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_WEB_URLS, False)
         return False
 
-    def alternative_player_adaptive(self, value=None):
+    def alternative_player_mpd(self, value=None):
         if value is not None:
-            return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_ADAPTIVE, value)
+            return self.set_bool(SETTINGS.ALTERNATIVE_PLAYER_MPD, value)
         if self.support_alternative_player():
-            return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_ADAPTIVE, False)
+            return self.get_bool(SETTINGS.ALTERNATIVE_PLAYER_MPD, False)
         return False
 
     def use_isa(self, value=None):

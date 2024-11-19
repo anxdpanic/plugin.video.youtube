@@ -642,6 +642,13 @@ class StreamInfo(YouTubeRequestClient):
                 'hls/video': True,
                 'hdr': True,
                 'video': {'height': 2160, 'codec': 'vp9.2'}},
+        '9993': {'container': 'hls',
+                 'title': 'HLS',
+                 'hls/audio': True,
+                 'hls/video': True,
+                 'sort': 9993,
+                 'audio': {'bitrate': 0, 'codec': ''},
+                 'video': {'height': 0, 'codec': ''}},
         '9994': {'container': 'hls',
                  'title': 'Adaptive HLS',
                  'hls/audio': True,
@@ -1114,7 +1121,7 @@ class StreamInfo(YouTubeRequestClient):
             if not result:
                 continue
 
-            for itag in ('9995', '9996') if is_live else ('9994', ):
+            for itag in ('9995', '9996') if is_live else ('9993', '9994'):
                 if itag in stream_list:
                     continue
 

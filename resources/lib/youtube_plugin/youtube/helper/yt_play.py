@@ -67,9 +67,7 @@ def _play_stream(provider, context):
             audio_only = True
         else:
             audio_only = settings.audio_only()
-        use_adaptive_formats = (not is_external
-                                or settings.alternative_player_adaptive())
-        use_mpd = (use_adaptive_formats
+        use_mpd = ((not is_external or settings.alternative_player_mpd())
                    and settings.use_mpd_videos()
                    and context.wakeup(SERVER_WAKEUP, timeout=5))
 
@@ -101,7 +99,7 @@ def _play_stream(provider, context):
             streams,
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
-            use_adaptive_formats=use_adaptive_formats,
+            use_mpd=use_mpd,
         )
 
         if stream is None:

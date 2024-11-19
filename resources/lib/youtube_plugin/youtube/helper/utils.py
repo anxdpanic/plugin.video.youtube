@@ -1027,7 +1027,7 @@ def update_play_info(provider, context, video_id, media_item, video_stream):
         media_item.set_headers(video_stream['headers'])
 
     # set _uses_isa
-    if media_item.use_hls() or media_item.use_mpd():
+    if video_stream.get('adaptive'):
         if media_item.live:
             use_isa = settings.use_isa_live_streams()
         else:
