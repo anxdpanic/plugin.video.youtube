@@ -64,13 +64,14 @@ def _config_actions(context, action, *_args):
         fallback = ('ASR' if preferred[0].startswith('en') else
                     context.get_language_name('en'))
         preferred = '/'.join(map(context.get_language_name, preferred))
+        preferred_no_asr = '%s (%s)' % (preferred, localize('subtitles.no_asr'))
 
         sub_opts = [
             localize('none'),
             localize('select'),
             localize('subtitles.with_fallback') % (preferred, fallback),
-            preferred,
-            '%s (%s)' % (preferred, localize('subtitles.no_asr')),
+            localize('subtitles.with_fallback') % (preferred_no_asr, fallback),
+            preferred_no_asr,
         ]
 
         if settings.use_mpd_videos():
