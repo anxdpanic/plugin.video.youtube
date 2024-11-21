@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
+from re import split as re_split
 from traceback import format_stack
 
 from .login_client import LoginClient
@@ -25,6 +26,7 @@ from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser,
+    str_to_operator,
     strip_html_from_text,
     to_unicode,
 )
@@ -1545,15 +1547,33 @@ class YouTube(LoginClient):
                 'blacklist': settings.get_bool(
                     'youtube.filter.my_subscriptions_filtered.blacklist', False
                 ),
-                'set': {
-                    item.lower()
-                    for item in settings.get_string(
-                        'youtube.filter.my_subscriptions_filtered.list', ''
-                    ).replace(', ', ',').split(',')
-                },
+                'names': None,
+                'durations': None,
             }
+            durations = []
+            subscription_filters['names'] = {
+                item.lower()
+                for item in settings.get_string(
+                    'youtube.filter.my_subscriptions_filtered.list', ''
+                ).replace(', ', ',').split(',')
+                if (not item.startswith(('{duration}', '{DURATION}'))
+                    or durations.append(re_split(r'^(\D*)(\d*)$', item[10:])))
+            }
+            durations = {
+                op: int(duration)
+                for _, op, duration, _ in durations
+                if op and duration
+            }
+
+            def callback(item, criteria=durations):
+                duration = item.get_duration()
+                for op, value in criteria.items():
+                    if not str_to_operator(op)(duration, value):
+                        return False
+                return True
         else:
             subscription_filters = None
+            callback = None
 
         page = page_token or 1
         totals = {
@@ -1745,7 +1765,7 @@ class YouTube(LoginClient):
                 else:
                     continue
                 if filters:
-                    filtered = channel_name and channel_name in filters['set']
+                    filtered = channel_name and channel_name in filters['names']
                     if filters['blacklist']:
                         if not filtered:
                             all_items[channel_id] = feed_items
@@ -1935,18 +1955,18 @@ class YouTube(LoginClient):
             progress_dialog=progress_dialog,
         )
         if not items:
-            return None
+            return None, None
 
         if totals['num'] > totals['end']:
             v3_response['nextPageToken'] = page + 1
         if totals['num'] > totals['start']:
             items = items[totals['start']:min(totals['num'], totals['end'])]
         else:
-            return None
+            return None, None
 
         v3_response['pageInfo']['totalResults'] = totals['num']
         v3_response['items'] = items
-        return v3_response
+        return v3_response, callback
 
     def get_saved_playlists(self, page_token, offset):
         if not page_token:

@@ -16,6 +16,14 @@ import re
 import shutil
 from datetime import timedelta
 from math import floor, log
+from operator import (
+    eq as op_eq,
+    ne as op_ne,
+    gt as op_gt,
+    ge as op_ge,
+    lt as op_lt,
+    le as op_le,
+)
 
 from ..compatibility import byte_string_type, string_type, xbmc, xbmcvfs
 from ..logger import Logger
@@ -36,6 +44,7 @@ __all__ = (
     'rm_dir',
     'seconds_to_duration',
     'select_stream',
+    'str_to_operator',
     'strip_html_from_text',
     'to_unicode',
     'validate_ip_address',
@@ -325,3 +334,18 @@ def wait(timeout=None):
 
 def redact_ip(url):
     return re.sub(r'([?&/])ip([=/])[^?&/]+', r'\g<1>ip\g<2><redacted>', url)
+
+
+_STR_OP_MAP = {
+    '=': op_eq,
+    '==': op_eq,
+    '!=': op_ne,
+    '>': op_gt,
+    '>=': op_ge,
+    '<': op_lt,
+    '<=': op_le,
+}
+
+
+def str_to_operator(op_str):
+    return _STR_OP_MAP.get(op_str, op_ge)

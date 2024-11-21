@@ -536,6 +536,7 @@ def response_to_items(provider,
                       reverse=False,
                       process_next_page=True,
                       item_filter=None,
+                      callback=None,
                       progress_dialog=None):
     kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
     if not is_youtube and not is_plugin:
@@ -565,8 +566,8 @@ def response_to_items(provider,
     else:
         raise KodionException('Unknown kind: %s' % kind)
 
-    if item_filter or do_callbacks:
-        items = filter_videos(items, **item_filter)
+    if item_filter or do_callbacks or callback:
+        items = filter_videos(items, callback=callback, **item_filter)
 
     if sort is not None:
         items.sort(key=sort, reverse=reverse)

@@ -1607,7 +1607,7 @@ class Provider(AbstractProvider):
                     elif isinstance(old_item, BaseItem):
                         bookmark_timestamp = old_item.get_bookmark_timestamp()
                     else:
-                        return
+                        return True
 
                     if new_item.available:
                         new_item.bookmark_id = _id
@@ -1627,6 +1627,7 @@ class Provider(AbstractProvider):
                         new_item.set_title(context.get_ui().color(
                             'AA808080', new_item.get_title()
                         ))
+                    return True
 
                 return _update
 

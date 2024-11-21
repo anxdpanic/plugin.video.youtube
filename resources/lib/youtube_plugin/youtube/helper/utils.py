@@ -1274,16 +1274,18 @@ def filter_videos(items,
                   upcoming=True,
                   completed=True,
                   vod=True,
+                  callback=None,
                   **_kwargs):
     return [
         item
         for item in items
-        if ((item.callback and item.callback(item)) or not item.playable or (
-                (completed and item.completed)
-                or (live and item.live and not item.upcoming)
-                or (premieres and upcoming and item.upcoming and not item.live)
-                or (upcoming_live and upcoming and item.upcoming and item.live)
-                or (vod and shorts and item.vod)
-                or (vod and not shorts and item.vod and not item.short)
-        ))
+        if ((not item.callback or item.callback(item))
+            and (not callback or callback(item))
+            and (not item.playable
+                 or ((completed and item.completed)
+                     or (live and item.live and not item.upcoming)
+                     or (premieres and upcoming and item.upcoming and not item.live)
+                     or (upcoming_live and upcoming and item.upcoming and item.live)
+                     or (vod and shorts and item.vod)
+                     or (vod and not shorts and item.vod and not item.short))))
     ]
