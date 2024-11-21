@@ -79,12 +79,17 @@ class XbmcContextUI(AbstractContextUI):
         )
 
     def on_select(self, title, items=None, preselect=-1, use_details=False):
-        if items is None:
-            items = []
+        if isinstance(items, (list, tuple)):
+            items = enumerate(items)
+        elif isinstance(items, dict):
+            items = items.items()
+        else:
+            return -1
 
         result_map = {}
         dialog_items = []
-        for idx, item in enumerate(items):
+
+        for idx, item in items:
             if isinstance(item, (list, tuple)):
                 num_details = len(item)
                 if num_details > 2:
