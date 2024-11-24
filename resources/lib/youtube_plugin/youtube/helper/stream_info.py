@@ -10,10 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
-import os
-import random
-import re
+from json import loads as json_loads
+from os import path as os_path
+from random import choice as random_choice
+from re import compile as re_compile
 from traceback import format_stack
 
 from .ratebypass import ratebypass
@@ -875,7 +875,7 @@ class StreamInfo(YouTubeRequestClient):
         cpn_alphabet = ('abcdefghijklmnopqrstuvwxyz'
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                         '0123456789-_')
-        return ''.join(random.choice(cpn_alphabet) for _ in range(16))
+        return ''.join(random_choice(cpn_alphabet) for _ in range(16))
 
     def _get_stream_format(self, itag, info=None, max_height=None, **kwargs):
         yt_format = self.FORMAT.get(itag)
@@ -998,10 +998,9 @@ class StreamInfo(YouTubeRequestClient):
         # pattern source is from youtube-dl
         # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
         # LICENSE: The Unlicense
-        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page_text)
-
-        if found:
-            return json.loads(found.group(1))
+        match = re_compile(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;').search(page_text)
+        if match:
+            return json_loads(match.group(1))
         return None
 
     def _get_player_js(self):
@@ -1149,7 +1148,7 @@ class StreamInfo(YouTubeRequestClient):
             # The playlist might include a #EXT-X-MEDIA entry, but it's usually
             # for a default stream with itag 133 (240p) and can be ignored.
             # Capture the URL of a .m3u8 playlist and the itag from that URL.
-            re_playlist_data = re.compile(
+            re_playlist_data = re_compile(
                 r'#EXT-X-STREAM-INF[^#]+'
                 r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
             )
@@ -1326,7 +1325,7 @@ class StreamInfo(YouTubeRequestClient):
             return url
         return None
 
-    def _process_url_params(self, url):
+    def _process_url_params(self, url, digits_re=re_compile(r'\d+')):
         if not url:
             return url, None
 
@@ -1362,7 +1361,7 @@ class StreamInfo(YouTubeRequestClient):
             if primary and secondary:
                 update_url = {
                     'netloc': separator.join((
-                        re.sub(r'\d+', fvip, prefix),
+                        digits_re.sub(fvip, prefix),
                         server.replace(primary, secondary),
                     )),
                 }
@@ -1848,7 +1847,12 @@ class StreamInfo(YouTubeRequestClient):
 
         return stream_list.values()
 
-    def _process_stream_data(self, stream_data, default_lang_code='und'):
+    def _process_stream_data(self,
+                             stream_data,
+                             default_lang_code='und',
+                             codec_re=re_compile(
+                                 r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
+                             )):
         context = self._context
         settings = context.get_settings()
         audio_only = self._audio_only
@@ -1896,7 +1900,7 @@ class StreamInfo(YouTubeRequestClient):
                 continue
 
             mime_type, codecs = unquote(mime_type).split('; ')
-            codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
+            codec = codec_re.match(codecs)
             if codec:
                 codec = codec.group(1)
                 if codec.startswith('vp9'):
@@ -2443,7 +2447,7 @@ class StreamInfo(YouTubeRequestClient):
             main_stream['multi_audio'] = True
 
         filename = '.'.join((self.video_id, 'mpd'))
-        filepath = os.path.join(self.BASE_PATH, filename)
+        filepath = os_path.join(self.BASE_PATH, filename)
         try:
             with xbmcvfs.File(filepath, 'w') as mpd_file:
                 success = mpd_file.write(output)

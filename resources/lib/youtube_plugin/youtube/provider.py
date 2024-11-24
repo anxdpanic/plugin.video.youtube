@@ -10,10 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
-import json
-import re
+from atexit import register as atexit_register
 from base64 import b64decode
+from json import loads as json_loads
+from re import compile as re_compile
 from weakref import proxy
 
 from .client import APICheck, YouTube
@@ -84,7 +84,7 @@ class Provider(AbstractProvider):
             yt_subscriptions.process,
         )
 
-        atexit.register(self.tear_down)
+        atexit_register(self.tear_down)
 
     @staticmethod
     def get_wizard_steps():
@@ -114,7 +114,7 @@ class Provider(AbstractProvider):
                                 ' deprecated. Please use the'
                                 ' youtube_registration module instead')
             try:
-                dev_config = json.loads(_dev_config)
+                dev_config = json_loads(_dev_config)
             except ValueError:
                 context.log_error('Error loading developer key: |invalid json|')
         if not dev_config and addon_id and dev_configs:
@@ -774,10 +774,18 @@ class Provider(AbstractProvider):
             yt_login.process(mode, provider, context)
         return True
 
-    def _search_channel_or_playlist(self, context, identifier):
-        if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', identifier):
+    def _search_channel_or_playlist(self,
+                                    context,
+                                    identifier,
+                                    channel_re=re_compile(
+                                        r'U[CU][0-9a-zA-Z_\-]{20,24}'
+                                    ),
+                                    playlist_re=re_compile(
+                                        r'[OP]L[0-9a-zA-Z_\-]{30,40}'
+                                    )):
+        if channel_re.match(identifier):
             json_data = self.get_client(context).get_channels(identifier)
-        elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', identifier):
+        elif playlist_re.match(identifier):
             json_data = self.get_client(context).get_playlists(identifier)
         else:
             return None

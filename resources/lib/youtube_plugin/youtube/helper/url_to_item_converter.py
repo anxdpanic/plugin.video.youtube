@@ -10,7 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import re
+from re import (
+    IGNORECASE as re_IGNORECASE,
+    compile as re_compile,
+)
 
 from . import utils
 from ...kodion.compatibility import parse_qsl, urlsplit
@@ -20,7 +23,7 @@ from ...kodion.utils import duration_to_seconds
 
 
 class UrlToItemConverter(object):
-    RE_PATH_ID = re.compile(r'/[^/]+/(?P<id>[^/?#]+)', re.I)
+    RE_PATH_ID = re_compile(r'/[^/]+/(?P<id>[^/?#]+)', re_IGNORECASE)
     VALID_HOSTNAMES = {
         'youtube.com',
         'www.youtube.com',

@@ -10,8 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import re
 from datetime import date
+from re import compile as re_compile
 
 from . import BaseItem
 from ..compatibility import datetime_infolabel, to_str, unescape, urlencode
@@ -369,7 +369,7 @@ class VideoItem(MediaItem):
                              'tvshow', 'season', 'episode',
                              'musicvideo'}
     _DEFAULT_MEDIATYPE = CONTENT.VIDEO_TYPE
-    _RE_IMDB = re.compile(
+    _RE_IMDB = re_compile(
         r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?'
     )
 

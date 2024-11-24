@@ -10,9 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import re
+
 import time
 from math import log10
+from re import compile as re_compile
 
 from ...kodion.compatibility import unquote, urlsplit
 from ...kodion.constants import CONTENT, PATHS
@@ -24,15 +25,15 @@ from ...kodion.utils import (
 )
 
 
-__RE_PLAYLIST = re.compile(
+__RE_PLAYLIST = re_compile(
     r'^(/channel/(?P<channel_id>[^/]+))/playlist/(?P<playlist_id>[^/]+)/?$'
 )
 
-__RE_SEASON_EPISODE = re.compile(
+__RE_SEASON_EPISODE = re_compile(
     r'\b(?:Season\s*|S)(\d+)|(?:\b(?:Part|Ep.|Episode)\s*|#|E)(\d+)'
 )
 
-__RE_URL = re.compile(r'(https?://\S+)')
+__RE_URL = re_compile(r'(https?://\S+)')
 
 
 def extract_urls(text):

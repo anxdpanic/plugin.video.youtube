@@ -12,7 +12,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import os
-import re
 import shutil
 from datetime import timedelta
 from math import floor, log
@@ -24,6 +23,7 @@ from operator import (
     lt as op_lt,
     le as op_le,
 )
+from re import compile as re_compile
 
 from ..compatibility import byte_string_type, string_type, xbmc, xbmcvfs
 from ..logger import Logger
@@ -143,13 +143,14 @@ def select_stream(context,
     return stream_list[selected_stream]
 
 
-def strip_html_from_text(text):
+def strip_html_from_text(text, tag_re=re_compile('<[^<]+?>')):
     """
     Removes html tags
     :param text: html text
+    :param tag_re: RE pattern object used to match html tags
     :return:
     """
-    return re.sub('<[^<]+?>', '', text)
+    return tag_re.sub('', text)
 
 
 def print_items(items):
@@ -208,9 +209,11 @@ def rm_dir(path):
     return False
 
 
-def find_video_id(plugin_path):
-    match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*',
-                      plugin_path)
+def find_video_id(plugin_path,
+                  video_id_re=re_compile(
+                      r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*'
+                  )):
+    match = video_id_re.search(plugin_path)
     if match:
         return match.group('video_id')
     return ''
@@ -229,17 +232,15 @@ def friendly_number(value, precision=3, scale=('', 'K', 'M', 'B'), as_str=True):
     return output if as_str else (output, value)
 
 
-_RE_PERIODS = re.compile(r'([\d.]+)(d|h|m|s|$)')
-_SECONDS_IN_PERIODS = {
-    '': 1,       # 1 second for unitless period
-    's': 1,      # 1 second
-    'm': 60,     # 1 minute
-    'h': 3600,   # 1 hour
-    'd': 86400,  # 1 day
-}
-
-
-def duration_to_seconds(duration):
+def duration_to_seconds(duration,
+                        periods_seconds_map={
+                            '': 1,       # 1 second for unitless period
+                            's': 1,      # 1 second
+                            'm': 60,     # 1 minute
+                            'h': 3600,   # 1 hour
+                            'd': 86400,  # 1 day
+                        },
+                        periods_re=re_compile(r'([\d.]+)(d|h|m|s|$)')):
     if ':' in duration:
         seconds = 0
         for part in duration.split(':'):
@@ -247,8 +248,8 @@ def duration_to_seconds(duration):
         return seconds
     return sum(
         (float(number) if '.' in number else int(number))
-        * _SECONDS_IN_PERIODS.get(period, 1)
-        for number, period in re.findall(_RE_PERIODS, duration.lower())
+        * periods_seconds_map.get(period, 1)
+        for number, period in periods_re.findall(duration.lower())
     )
 
 
@@ -332,8 +333,8 @@ def wait(timeout=None):
     return xbmc.Monitor().waitForAbort(timeout)
 
 
-def redact_ip(url):
-    return re.sub(r'([?&/])ip([=/])[^?&/]+', r'\g<1>ip\g<2><redacted>', url)
+def redact_ip(url, ip_re=re_compile(r'([?&/])ip([=/])[^?&/]+')):
+    return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)
 
 
 _STR_OP_MAP = {
