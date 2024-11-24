@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
-from re import split as re_split
+from re import compile as re_compile
 from traceback import format_stack
 
 from .login_client import LoginClient
@@ -1543,36 +1543,56 @@ class YouTube(LoginClient):
         settings = self._context.get_settings()
 
         if do_filter:
-            subscription_filters = {
+            def _split_criteria(item,
+                                _all_criteria,
+                                criteria_re=re_compile(
+                                    r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
+                                )):
+                criteria = criteria_re.findall(item)
+                if not criteria:
+                    return True
+                _all_criteria.append(criteria)
+                return False
+
+            all_criteria = []
+            channel_filters = {
                 'blacklist': settings.get_bool(
                     'youtube.filter.my_subscriptions_filtered.blacklist', False
                 ),
-                'names': None,
-                'durations': None,
-            }
-            durations = []
-            subscription_filters['names'] = {
-                item.lower()
-                for item in settings.get_string(
-                    'youtube.filter.my_subscriptions_filtered.list', ''
-                ).replace(', ', ',').split(',')
-                if (not item.startswith(('{duration}', '{DURATION}'))
-                    or durations.append(re_split(r'^(\D*)(\d*)$', item[10:])))
-            }
-            durations = {
-                op: int(duration)
-                for _, op, duration, _ in durations
-                if op and duration
+                'names': {
+                    item.lower()
+                    for item in settings.get_string(
+                        'youtube.filter.my_subscriptions_filtered.list', ''
+                    ).replace(', ', ',').split(',')
+                    if item and _split_criteria(item, all_criteria)
+                },
             }
 
-            def callback(item, criteria=durations):
-                duration = item.get_duration()
-                for op, value in criteria.items():
-                    if not str_to_operator(op)(duration, value):
-                        return False
-                return True
+            def callback(item, _all_criteria=all_criteria):
+                for criteria in _all_criteria:
+                    for attr, op, value in criteria:
+                        try:
+                            if attr.startswith('.'):
+                                attr = getattr(item, attr[1:])
+                            else:
+                                attr = getattr(item, 'get_{0}'.format(attr))()
+                            if value.startswith('"'):
+                                value = (
+                                    value[1:-1]
+                                    .replace('%2C', ',')
+                                    .replace('%7D', '}')
+                                )
+                            else:
+                                value = int(value)
+                            if not str_to_operator(op)(attr, value):
+                                break
+                        except (AttributeError, TypeError, ValueError):
+                            break
+                    else:
+                        return True
+                return False
         else:
-            subscription_filters = None
+            channel_filters = None
             callback = None
 
         page = page_token or 1
@@ -1705,7 +1725,7 @@ class YouTube(LoginClient):
                          sort_limits,
                          progress_dialog=None,
                          utf8=self._context.get_system_version().compatible(19),
-                         filters=subscription_filters,
+                         filters=channel_filters,
                          _ns=namespaces,
                          _cache=cache):
             if progress_dialog:
@@ -1764,7 +1784,8 @@ class YouTube(LoginClient):
                     feed_items = cached_items
                 else:
                     continue
-                if filters:
+
+                if filters and filters['names']:
                     filtered = channel_name and channel_name in filters['names']
                     if filters['blacklist']:
                         if not filtered:
@@ -1779,6 +1800,7 @@ class YouTube(LoginClient):
 
             if new_cache:
                 _cache.set_items(new_cache)
+
             # filter, sorting by publish date and trim
             if all_items:
                 return sorted(

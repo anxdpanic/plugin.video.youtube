@@ -22,6 +22,7 @@ from operator import (
     ge as op_ge,
     lt as op_lt,
     le as op_le,
+    contains as op_contains,
 )
 from re import compile as re_compile
 
@@ -337,16 +338,18 @@ def redact_ip(url, ip_re=re_compile(r'([?&/])ip([=/])[^?&/]+')):
     return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)
 
 
-_STR_OP_MAP = {
-    '=': op_eq,
-    '==': op_eq,
-    '!=': op_ne,
-    '>': op_gt,
-    '>=': op_ge,
-    '<': op_lt,
-    '<=': op_le,
-}
-
-
-def str_to_operator(op_str):
-    return _STR_OP_MAP.get(op_str, op_ge)
+def str_to_operator(op_str,
+                    str_op_map={
+                        '=': op_eq,
+                        '==': op_eq,
+                        '!=': op_ne,
+                        '>': op_gt,
+                        '>=': op_ge,
+                        '<': op_lt,
+                        '<=': op_le,
+                        'contains': op_contains,
+                        'endswith': str.endswith,
+                        'startswith': str.startswith,
+                    },
+                    default=op_ge):
+    return str_op_map.get(op_str, default)
