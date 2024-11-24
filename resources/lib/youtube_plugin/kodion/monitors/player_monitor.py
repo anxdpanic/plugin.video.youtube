@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import re
 import threading
 
 from ..compatibility import xbmc
@@ -264,15 +263,12 @@ class PlayerMonitorThread(threading.Thread):
                     items = json_data.get('items', [{'rating': 'none'}])
                     rating = items[0].get('rating', 'none')
                     if rating == 'none':
-                        rating_match = re.search(
-                            r'/(?P<video_id>[^/]+)/(?P<rating>[^/]+)',
-                            '/'.join(('', self.video_id, rating, ''))
-                        )
                         self._provider.on_video_x(
                             self._provider,
                             self._context,
-                            rating_match,
                             command='rate',
+                            video_id=self.video_id,
+                            current_rating=rating,
                         )
 
         if settings.get_bool('youtube.post.play.refresh', False):
