@@ -1524,6 +1524,7 @@ class YouTube(LoginClient):
                              logged_in=False,
                              do_filter=False,
                              refresh=False,
+                             use_subscriptions_cache=False,
                              progress_dialog=None,
                              **kwargs):
         """
@@ -1625,11 +1626,19 @@ class YouTube(LoginClient):
             'mine': True,
         }
 
-        def _get_channels(output, _params=params):
-            json_data = self.api_request(method='GET',
-                                         path='subscriptions',
-                                         params=_params,
-                                         **kwargs)
+        def _get_channels(output,
+                          _params=params,
+                          _refresh=(refresh or not use_subscriptions_cache),
+                          function_cache=self._context.get_function_cache()):
+            json_data = function_cache.run(
+                self.api_request,
+                function_cache.ONE_HOUR,
+                _refresh=_refresh,
+                method='GET',
+                path='subscriptions',
+                params=_params,
+                **kwargs
+            )
             if not json_data:
                 return False, True
 
