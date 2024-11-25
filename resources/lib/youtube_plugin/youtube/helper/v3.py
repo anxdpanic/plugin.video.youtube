@@ -537,6 +537,7 @@ def response_to_items(provider,
                       process_next_page=True,
                       item_filter=None,
                       callback=None,
+                      filler=None,
                       progress_dialog=None):
     kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
     if not is_youtube and not is_plugin:
@@ -566,14 +567,40 @@ def response_to_items(provider,
     else:
         raise KodionException('Unknown kind: %s' % kind)
 
+    current_page = params.get('page')
     if item_filter or do_callbacks or callback:
-        items = filter_videos(items, callback=callback, **item_filter)
+        num_original_items = len(items)
+        filtered_items = filter_videos(items, callback=callback, **item_filter)
+        remaining = num_original_items - len(filtered_items)
+        while remaining > 0 and filler:
+            json_data, callback, filler = filler()
+            if not json_data:
+                break
+            result = _process_list_response(
+                provider,
+                context,
+                json_data,
+                item_filter=item_filter,
+                progress_dialog=progress_dialog,
+            )
+            if not result:
+                break
+            items, do_callbacks = result
+            if not items:
+                break
+            if item_filter or do_callbacks or callback:
+                items = filter_videos(items, callback=callback, **item_filter)
+            if items:
+                filtered_items.extend(items[:remaining])
+                remaining = num_original_items - len(filtered_items)
+            current_page = current_page + 1 if current_page else 2
+        items = filtered_items
 
     if sort is not None:
         items.sort(key=sort, reverse=reverse)
 
     # no processing of next page item
-    if not process_next_page or params.get('hide_next_page'):
+    if not json_data or not process_next_page or params.get('hide_next_page'):
         return items
 
     # next page
@@ -584,7 +611,6 @@ def response_to_items(provider,
     We implemented our own calculation for the token into the YouTube client
     This should work for up to ~2000 entries.
     """
-    current_page = params.get('page')
     next_page = current_page + 1 if current_page else 2
     new_params = dict(params, page=next_page)
 

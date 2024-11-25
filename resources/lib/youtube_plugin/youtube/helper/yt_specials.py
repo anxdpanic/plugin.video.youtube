@@ -302,7 +302,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             ),
     ) as progress_dialog:
         params = context.get_params()
-        json_data, callback = client.get_my_subscriptions(
+        json_data, callback, filler = client.get_my_subscriptions(
             page_token=params.get('page', 1),
             logged_in=provider.is_logged_in(),
             do_filter=filtered,
@@ -318,6 +318,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             json_data,
             progress_dialog=progress_dialog,
             callback=callback,
+            filler=filler,
         )
 
 

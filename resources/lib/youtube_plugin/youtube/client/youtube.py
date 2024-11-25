@@ -1592,9 +1592,20 @@ class YouTube(LoginClient):
                     else:
                         return True
                 return False
+
+            def filler():
+                return self.get_my_subscriptions(
+                    page_token=(page_token + 1),
+                    logged_in=logged_in,
+                    do_filter=do_filter,
+                    refresh=refresh,
+                    use_subscriptions_cache=True,
+                    progress_dialog=progress_dialog,
+                    **kwargs)
         else:
             channel_filters = None
             callback = None
+            filler = None
 
         page = page_token or 1
         totals = {
@@ -1988,18 +1999,18 @@ class YouTube(LoginClient):
             progress_dialog=progress_dialog,
         )
         if not items:
-            return None, None
+            return None, None, None
 
         if totals['num'] > totals['end']:
             v3_response['nextPageToken'] = page + 1
         if totals['num'] > totals['start']:
             items = items[totals['start']:min(totals['num'], totals['end'])]
         else:
-            return None, None
+            return None, None, None
 
         v3_response['pageInfo']['totalResults'] = totals['num']
         v3_response['items'] = items
-        return v3_response, callback
+        return v3_response, callback, filler
 
     def get_saved_playlists(self, page_token, offset):
         if not page_token:
