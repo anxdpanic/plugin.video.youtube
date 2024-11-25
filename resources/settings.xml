@@ -360,7 +360,7 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.filter.my_subscriptions_filtered.blacklist" type="boolean" parent="youtube.folder.my_subscriptions_filtered.show" label="30586" help="">
+                <setting id="youtube.filter.my_subscriptions_filtered.blacklist" type="boolean" parent="youtube.folder.my_subscriptions_filtered.show" label="30586" help="30585">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
@@ -373,7 +373,7 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.filter.my_subscriptions_filtered.list" type="string" parent="youtube.folder.my_subscriptions_filtered.show" label="30585" help="">
+                <setting id="youtube.filter.my_subscriptions_filtered.list" type="string" parent="youtube.folder.my_subscriptions_filtered.show" label="587" help="30583">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -388,7 +388,7 @@
                         </dependency>
                     </dependencies>
                     <control format="string" type="edit">
-                        <heading>30585</heading>
+                        <heading>587</heading>
                     </control>
                 </setting>
                 <setting id="youtube.folder.recommendations.show" type="boolean" label="30551" help="">
