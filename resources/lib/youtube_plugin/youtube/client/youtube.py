@@ -26,7 +26,7 @@ from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser,
-    str_to_operator,
+    filter_parse,
     strip_html_from_text,
     to_unicode,
 )
@@ -1585,7 +1585,7 @@ class YouTube(LoginClient):
                                 )
                             else:
                                 value = int(value)
-                            if not str_to_operator(op)(attr, value):
+                            if not filter_parse(attr, op, value):
                                 break
                         except (AttributeError, TypeError, ValueError):
                             break

@@ -16,15 +16,17 @@ import shutil
 from datetime import timedelta
 from math import floor, log
 from operator import (
-    eq as op_eq,
-    ne as op_ne,
-    gt as op_gt,
-    ge as op_ge,
-    lt as op_lt,
-    le as op_le,
     contains as op_contains,
+    eq as op_eq,
+    ge as op_ge,
+    gt as op_gt,
+    le as op_le,
+    lt as op_lt,
 )
-from re import compile as re_compile
+from re import (
+    compile as re_compile,
+    search as re_search,
+)
 
 from ..compatibility import byte_string_type, string_type, xbmc, xbmcvfs
 from ..logger import Logger
@@ -32,6 +34,7 @@ from ..logger import Logger
 
 __all__ = (
     'duration_to_seconds',
+    'filter_parse',
     'find_video_id',
     'friendly_number',
     'get_kodi_setting_bool',
@@ -45,7 +48,6 @@ __all__ = (
     'rm_dir',
     'seconds_to_duration',
     'select_stream',
-    'str_to_operator',
     'strip_html_from_text',
     'to_unicode',
     'validate_ip_address',
@@ -338,18 +340,25 @@ def redact_ip(url, ip_re=re_compile(r'([?&/])ip([=/])[^?&/]+')):
     return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)
 
 
-def str_to_operator(op_str,
-                    str_op_map={
-                        '=': op_eq,
-                        '==': op_eq,
-                        '!=': op_ne,
-                        '>': op_gt,
-                        '>=': op_ge,
-                        '<': op_lt,
-                        '<=': op_le,
-                        'contains': op_contains,
-                        'endswith': str.endswith,
-                        'startswith': str.startswith,
-                    },
-                    default=op_ge):
-    return str_op_map.get(op_str, default)
+def filter_parse(input_1, op, input_2,
+                 op_map={
+                     '=': op_eq,
+                     '==': op_eq,
+                     '>': op_gt,
+                     '>=': op_ge,
+                     '<': op_lt,
+                     '<=': op_le,
+                     'contains': op_contains,
+                     'endswith': str.endswith,
+                     'startswith': str.startswith,
+                     'search': re_search,
+                 }):
+    _, negate, op = op.rpartition('!')
+    op = op_map.get(op)
+    if not op:
+        return False
+    if op == 'search':
+        input_2, input_1 = input_1, input_2
+    if negate:
+        return not op(input_1, input_2)
+    return op(input_1, input_2)

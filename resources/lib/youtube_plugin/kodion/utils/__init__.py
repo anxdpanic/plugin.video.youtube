@@ -13,6 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from . import datetime_parser
 from .methods import (
     duration_to_seconds,
+    filter_parse,
     find_video_id,
     friendly_number,
     get_kodi_setting_bool,
@@ -25,7 +26,6 @@ from .methods import (
     rm_dir,
     seconds_to_duration,
     select_stream,
-    str_to_operator,
     strip_html_from_text,
     to_unicode,
     validate_ip_address,
@@ -38,6 +38,7 @@ __all__ = (
     'current_system_version',
     'datetime_parser',
     'duration_to_seconds',
+    'filter_parse',
     'find_video_id',
     'friendly_number',
     'get_kodi_setting_bool',
@@ -50,7 +51,6 @@ __all__ = (
     'rm_dir',
     'seconds_to_duration',
     'select_stream',
-    'str_to_operator',
     'strip_html_from_text',
     'to_unicode',
     'validate_ip_address',
