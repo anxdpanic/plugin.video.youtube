@@ -946,7 +946,7 @@ class StreamInfo(YouTubeRequestClient):
         ))
         return yt_format
 
-    def _get_player_page(self, client_name='web', embed=False):
+    def _get_player_config(self, client_name='web', embed=False):
         if embed:
             url = ''.join(('https://www.youtube.com/embed/', self.video_id))
         else:
@@ -970,7 +970,16 @@ class StreamInfo(YouTubeRequestClient):
                 'auth': False,
             },
         )
-        return result
+        if not result:
+            return None
+
+        # pattern source is from youtube-dl
+        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
+        # LICENSE: The Unlicense
+        match = re_compile(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;').search(result)
+        if match:
+            return json_loads(match.group(1))
+        return None
 
     @staticmethod
     def _get_player_client(config):
@@ -990,19 +999,6 @@ class StreamInfo(YouTubeRequestClient):
             return player_key
         return None
 
-    @staticmethod
-    def _get_player_config(page_text):
-        if not page_text:
-            return None
-
-        # pattern source is from youtube-dl
-        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
-        # LICENSE: The Unlicense
-        match = re_compile(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;').search(page_text)
-        if match:
-            return json_loads(match.group(1))
-        return None
-
     def _get_player_js(self):
         data_cache = self._context.get_data_cache()
         cached = data_cache.get_item('player_js_url', data_cache.ONE_HOUR * 4)
@@ -1010,8 +1006,7 @@ class StreamInfo(YouTubeRequestClient):
         js_url = cached if cached not in {'', 'http://', 'https://'} else None
 
         if not js_url:
-            player_page_text = self._get_player_page()
-            player_config = self._get_player_config(player_page_text)
+            player_config = self._get_player_config()
             if not player_config:
                 return ''
             js_url = player_config.get('PLAYER_JS_URL')
