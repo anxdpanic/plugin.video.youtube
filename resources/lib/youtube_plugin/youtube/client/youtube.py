@@ -1776,13 +1776,15 @@ class YouTube(LoginClient):
                                     key=partial(sort_method,
                                                 limits=feed_limits))
                     feed_items = feed_items[:min(1000, feed_limits['num'])]
+                elif cached_items:
+                    feed_items = cached_items
+
+                if refresh_feed:
                     new_cache[channel_id] = {
                         'channel_name': channel_name,
                         'cached_items': feed_items,
                     }
-                elif cached_items:
-                    feed_items = cached_items
-                else:
+                if not feed_items:
                     continue
 
                 if filters and filters['names']:
