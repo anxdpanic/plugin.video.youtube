@@ -291,30 +291,43 @@ def _process_saved_playlists_tv(provider, context, client):
 def _process_my_subscriptions(provider, context, client, filtered=False):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
+    logged_in = provider.is_logged_in()
+    params = context.get_params()
+    refresh = params.get('refresh')
+
     with context.get_ui().create_progress_dialog(
             heading=context.localize('my_subscriptions.loading'),
             message=context.localize('please_wait'),
             background=True,
     ) as progress_dialog:
-        params = context.get_params()
-        json_data, callback, filler = client.get_my_subscriptions(
+        json_data = client.get_my_subscriptions(
             page_token=params.get('page', 1),
-            logged_in=provider.is_logged_in(),
+            logged_in=logged_in,
             do_filter=filtered,
-            refresh=params.get('refresh'),
+            refresh=refresh,
             progress_dialog=progress_dialog,
         )
 
-        if not json_data:
-            return False
-        return v3.response_to_items(
-            provider,
-            context,
-            json_data,
-            progress_dialog=progress_dialog,
-            callback=callback,
-            filler=filler,
-        )
+        if json_data:
+            def filler(json_data, _remaining):
+                page_token = json_data.get('nextPageToken')
+                if not page_token:
+                    return None
+
+                json_data = client.get_my_subscriptions(
+                    page_token=json_data.get('nextPageToken'),
+                    logged_in=logged_in,
+                    do_filter=filtered,
+                    refresh=refresh,
+                    use_subscriptions_cache=True,
+                    progress_dialog=progress_dialog,
+                )
+                json_data['_filler'] = filler
+                return json_data
+
+            json_data['_filler'] = filler
+            return v3.response_to_items(provider, context, json_data)
+    return False
 
 
 def process(provider, context, re_match):

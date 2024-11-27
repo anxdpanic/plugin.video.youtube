@@ -529,69 +529,92 @@ def response_to_items(provider,
                       sort=None,
                       reverse=False,
                       process_next_page=True,
-                      item_filter=None,
-                      callback=None,
-                      filler=None,
-                      progress_dialog=None):
-    kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
-    if not is_youtube and not is_plugin:
-        context.log_debug('v3 response discarded: |%s|' % kind)
-        return []
-
+                      item_filter=None):
     params = context.get_params()
+    settings = context.get_settings()
 
-    if kind_type in _KNOWN_RESPONSE_KINDS:
-        item_filter = context.get_settings().item_filter(
-            update=item_filter,
-            override=params.get('item_filter'),
-        )
-        result = _process_list_response(
-            provider,
-            context,
-            json_data,
-            item_filter=item_filter,
-            progress_dialog=progress_dialog,
-        )
-        if not result:
-            return []
-
-        items, do_callbacks = result
-        if not items:
-            return items
-    else:
-        raise KodionException('Unknown kind: %s' % kind)
-
+    items_per_page = settings.items_per_page()
+    item_filter_param = params.get('item_filter')
     current_page = params.get('page')
-    if item_filter or do_callbacks or callback:
-        num_original_items = len(items)
-        filtered_items = filter_videos(items, callback=callback, **item_filter)
-        remaining = num_original_items - len(filtered_items)
-        while remaining > 0 and filler:
-            json_data, callback, filler = filler()
-            if not json_data:
+    next_page = None
+
+    with context.get_ui().create_progress_dialog(
+            heading=context.localize('loading'),
+            message=context.localize('please_wait'),
+            background=True,
+    ) as progress_dialog:
+        remaining = None
+        filtered_items = []
+        num_original_items = 0
+        while 1:
+            kind, is_youtube, is_plugin, kind_type = _parse_kind(json_data)
+            if not is_youtube and not is_plugin:
+                context.log_debug('v3.response_to_items - Response discarded'
+                                  '\n\tKind: |{kind}|'
+                                  .format(kind=kind))
                 break
+
+            if kind_type not in _KNOWN_RESPONSE_KINDS:
+                context.log_error('v3.response_to_items - Unknown kind'
+                                  '\n\tKind: |{kind}|'
+                                  .format(kind=kind))
+                break
+
+            _item_filter = settings.item_filter(
+                update=(item_filter or json_data.get('_item_filter')),
+                override=item_filter_param,
+            )
             result = _process_list_response(
                 provider,
                 context,
                 json_data,
-                item_filter=item_filter,
+                item_filter=_item_filter,
                 progress_dialog=progress_dialog,
             )
             if not result:
                 break
+
             items, do_callbacks = result
+            callback = json_data.get('_callback')
             if not items:
                 break
-            if item_filter or do_callbacks or callback:
-                items = filter_videos(items, callback=callback, **item_filter)
-            if items:
-                filtered_items.extend(items[:remaining])
-                remaining = num_original_items - len(filtered_items)
-            current_page = current_page + 1 if current_page else 2
-        items = filtered_items
+            elif not num_original_items:
+                num_original_items = max(items_per_page, len(items))
 
-    if sort is not None:
-        items.sort(key=sort, reverse=reverse)
+            if _item_filter or do_callbacks or callback:
+                items = filter_videos(items, callback=callback, **_item_filter)
+            if items:
+                if remaining and remaining < len(items):
+                    items = items[:remaining]
+                filtered_items.extend(items)
+
+            remaining = num_original_items - len(filtered_items)
+            if remaining >= 0:
+                if next_page:
+                    next_page += 1
+                elif current_page:
+                    next_page = current_page + 1
+                else:
+                    next_page = 2
+            if remaining <= 0:
+                break
+
+            filler = json_data.get('_filler')
+            if not filler:
+                break
+
+            _json_data = filler(json_data, remaining)
+            if _json_data:
+                json_data = _json_data
+            else:
+                break
+
+        items = filtered_items
+        if not items:
+            return items
+
+        if sort is not None:
+            items.sort(key=sort, reverse=reverse)
 
     # no processing of next page item
     if not json_data or not process_next_page or params.get('hide_next_page'):
@@ -605,14 +628,15 @@ def response_to_items(provider,
     We implemented our own calculation for the token into the YouTube client
     This should work for up to ~2000 entries.
     """
-    next_page = current_page + 1 if current_page else 2
     new_params = dict(params, page=next_page)
-
+    offset = json_data.get('offset')
     yt_next_page_token = json_data.get('nextPageToken')
     if yt_next_page_token == next_page:
         new_params['page_token'] = ''
     elif yt_next_page_token:
         new_params['page_token'] = yt_next_page_token
+    elif offset:
+        new_params['page_token'] = ''
     else:
         if 'page_token' in new_params:
             del new_params['page_token']
@@ -622,10 +646,11 @@ def response_to_items(provider,
             return items
 
         page_info = json_data.get('pageInfo', {})
-        yt_total_results = int(page_info.get('totalResults', 0))
-        yt_results_per_page = int(page_info.get('resultsPerPage', 50))
+        yt_total_results = int(page_info.get('totalResults') or len(items))
+        yt_results_per_page = int(page_info.get('resultsPerPage')
+                                  or items_per_page)
 
-        if current_page * yt_results_per_page < yt_total_results:
+        if (next_page - 1) * yt_results_per_page < yt_total_results:
             new_params['items_per_page'] = yt_results_per_page
         elif context.is_plugin_path(
                 context.get_infolabel('Container.FolderPath'),
@@ -645,7 +670,6 @@ def response_to_items(provider,
         if yt_click_tracking:
             new_params['click_tracking'] = yt_click_tracking
 
-        offset = json_data.get('offset')
         if offset:
             new_params['offset'] = offset
 

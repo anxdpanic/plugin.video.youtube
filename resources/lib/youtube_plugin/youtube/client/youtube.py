@@ -26,7 +26,6 @@ from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
     datetime_parser,
-    filter_parse,
     strip_html_from_text,
     to_unicode,
 )
@@ -1538,6 +1537,7 @@ class YouTube(LoginClient):
                 'totalResults': 0,
                 'resultsPerPage': self.max_results(),
             },
+            '_item_filter': None,
         }
 
         cache = self._context.get_feed_history()
@@ -1555,7 +1555,9 @@ class YouTube(LoginClient):
                 _all_criteria.append(criteria)
                 return False
 
-            all_criteria = []
+            item_filter = {
+                'custom': [],
+            }
             channel_filters = {
                 'blacklist': settings.get_bool(
                     'youtube.filter.my_subscriptions_filtered.blacklist', False
@@ -1565,47 +1567,12 @@ class YouTube(LoginClient):
                     for item in settings.get_string(
                         'youtube.filter.my_subscriptions_filtered.list', ''
                     ).replace(', ', ',').split(',')
-                    if item and _split_criteria(item, all_criteria)
+                    if item and _split_criteria(item, item_filter['custom'])
                 },
             }
-
-            def callback(item, _all_criteria=all_criteria):
-                for criteria in _all_criteria:
-                    for attr, op, value in criteria:
-                        try:
-                            if attr.startswith('.'):
-                                attr = getattr(item, attr[1:])
-                            else:
-                                attr = getattr(item, 'get_{0}'.format(attr))()
-                            if value.startswith('"'):
-                                value = (
-                                    value[1:-1]
-                                    .replace('%2C', ',')
-                                    .replace('%7D', '}')
-                                )
-                            else:
-                                value = int(value)
-                            if not filter_parse(attr, op, value):
-                                break
-                        except (AttributeError, TypeError, ValueError):
-                            break
-                    else:
-                        return True
-                return False
-
-            def filler():
-                return self.get_my_subscriptions(
-                    page_token=(page_token + 1),
-                    logged_in=logged_in,
-                    do_filter=do_filter,
-                    refresh=refresh,
-                    use_subscriptions_cache=True,
-                    progress_dialog=progress_dialog,
-                    **kwargs)
         else:
+            item_filter = None
             channel_filters = None
-            callback = None
-            filler = None
 
         page = page_token or 1
         totals = {
@@ -1999,18 +1966,19 @@ class YouTube(LoginClient):
             progress_dialog=progress_dialog,
         )
         if not items:
-            return None, None, None
+            return None
 
         if totals['num'] > totals['end']:
             v3_response['nextPageToken'] = page + 1
         if totals['num'] > totals['start']:
             items = items[totals['start']:min(totals['num'], totals['end'])]
         else:
-            return None, None, None
+            return None
 
         v3_response['pageInfo']['totalResults'] = totals['num']
         v3_response['items'] = items
-        return v3_response, callback, filler
+        v3_response['_item_filter'] = item_filter
+        return v3_response
 
     def get_saved_playlists(self, page_token, offset):
         if not page_token:

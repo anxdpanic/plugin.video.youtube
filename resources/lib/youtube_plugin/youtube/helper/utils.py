@@ -10,13 +10,25 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-
 import time
 from math import log10
-from re import compile as re_compile
+from operator import (
+    contains as op_contains,
+    eq as op_eq,
+    ge as op_ge,
+    gt as op_gt,
+    le as op_le,
+    lt as op_lt,
+)
+from re import (
+    compile as re_compile,
+    error as re_error,
+    search as re_search,
+)
 
-from ...kodion.compatibility import unquote, urlsplit
+from ...kodion.compatibility import string_type, unquote, urlsplit
 from ...kodion.constants import CONTENT, PATHS
+from ...kodion.logger import Logger
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
 from ...kodion.utils import (
     datetime_parser,
@@ -1275,6 +1287,7 @@ def filter_videos(items,
                   upcoming=True,
                   completed=True,
                   vod=True,
+                  custom=None,
                   callback=None,
                   **_kwargs):
     return [
@@ -1282,6 +1295,7 @@ def filter_videos(items,
         for item in items
         if ((not item.callback or item.callback(item))
             and (not callback or callback(item))
+            and (not custom or filter_parse(item, custom))
             and (not item.playable
                  or ((completed and item.completed)
                      or (live and item.live and not item.upcoming)
@@ -1290,3 +1304,75 @@ def filter_videos(items,
                      or (vod and shorts and item.vod)
                      or (vod and not shorts and item.vod and not item.short))))
     ]
+
+
+def filter_parse(item,
+                 all_criteria,
+                 criteria_re=re_compile(
+                     r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
+                 ),
+                 op_map = {
+                     '=': op_eq,
+                     '==': op_eq,
+                     '>': op_gt,
+                     '>=': op_ge,
+                     '<': op_lt,
+                     '<=': op_le,
+                     'contains': op_contains,
+                     'endswith': str.endswith,
+                     'startswith': str.startswith,
+                     'search': re_search,
+                 }):
+    replacement_criteria = []
+    criteria_met = False
+    for idx, criteria in enumerate(all_criteria):
+        if isinstance(criteria, string_type):
+            criteria = criteria_re.findall(criteria)
+            replacement_criteria.append((idx, criteria))
+        for input_1, op_str, input_2 in criteria:
+            try:
+                if input_1.startswith('.'):
+                    input_1 = getattr(item, input_1[1:])
+                else:
+                    input_1 = getattr(item, 'get_{0}'.format(input_1))()
+
+                if input_2.startswith('"'):
+                    input_2 = (
+                        input_2[1:-1]
+                        .replace('%2C', ',')
+                        .replace('%7D', '}')
+                    )
+                else:
+                    input_2 = float(input_2)
+
+                _, negate, op_str = op_str.rpartition('!')
+                op = op_map.get(op_str)
+                if not op:
+                    break
+                if op_str == 'search':
+                    input_1, input_2 = input_2, input_1
+
+                result = op(input_1, input_2)
+                if negate:
+                    result = not result
+                if not result:
+                    break
+            except (AttributeError, TypeError, ValueError, re_error) as exc:
+                Logger.log_error('filter_parse - Error'
+                                 '\n\tException: {exc!r}'
+                                 '\n\tCriteria:  |{criteria}|'
+                                 '\n\tinput_1:   |{input_1}|'
+                                 '\n\top:        |{op_str}|'
+                                 '\n\tinput_2:   |{input_2}|'
+                                 .format(exc=exc,
+                                         criteria=criteria,
+                                         input_1=input_1,
+                                         op_str=op_str,
+                                         input_2=input_2))
+                break
+        else:
+            criteria_met = True
+            break
+    for idx, criteria in replacement_criteria:
+        all_criteria[idx] = criteria
+    return criteria_met

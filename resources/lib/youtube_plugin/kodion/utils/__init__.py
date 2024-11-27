@@ -13,7 +13,6 @@ from __future__ import absolute_import, division, unicode_literals
 from . import datetime_parser
 from .methods import (
     duration_to_seconds,
-    filter_parse,
     find_video_id,
     friendly_number,
     get_kodi_setting_bool,
@@ -38,7 +37,6 @@ __all__ = (
     'current_system_version',
     'datetime_parser',
     'duration_to_seconds',
-    'filter_parse',
     'find_video_id',
     'friendly_number',
     'get_kodi_setting_bool',
