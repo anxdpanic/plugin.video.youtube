@@ -118,12 +118,24 @@ def _process_trending(provider, context, client):
     context.set_content(CONTENT.VIDEO_CONTENT)
 
     json_data = client.get_trending_videos(
-        page_token=context.get_param('page_token', '')
+        page_token=context.get_param('page_token')
     )
 
-    if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+    if json_data:
+        def filler(json_data, _remaining):
+            page_token = json_data.get('nextPageToken')
+            if not page_token:
+                return None
+
+            json_data = client.get_trending_videos(
+                page_token=page_token,
+            )
+            json_data['_filler'] = filler
+            return json_data
+
+        json_data['_filler'] = filler
+        return v3.response_to_items(provider, context, json_data)
+    return False
 
 
 def _process_browse_channels(provider, context, client):
