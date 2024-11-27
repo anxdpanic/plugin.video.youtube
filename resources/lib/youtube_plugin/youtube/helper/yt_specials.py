@@ -295,11 +295,6 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
             heading=context.localize('my_subscriptions.loading'),
             message=context.localize('please_wait'),
             background=True,
-            message_template=(
-                    '{wait} {{current}}/{{total}}'.format(
-                        wait=context.localize('please_wait'),
-                    )
-            ),
     ) as progress_dialog:
         params = context.get_params()
         json_data, callback, filler = client.get_my_subscriptions(

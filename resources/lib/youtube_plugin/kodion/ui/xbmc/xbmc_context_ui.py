@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
+from .xbmc_progress_dialog import XbmcProgressDialog
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, REFRESH_CONTAINER
@@ -26,11 +26,19 @@ class XbmcContextUI(AbstractContextUI):
                                heading,
                                message='',
                                background=False,
-                               message_template=None):
-        if background:
-            return XbmcProgressDialogBG(heading, message, message_template)
-
-        return XbmcProgressDialog(heading, message, message_template)
+                               message_template=None,
+                               template_params=None):
+        if not message_template:
+            message_template = ('{wait} {{current}}/{{total}}'.format(
+                wait=self._context.localize('please_wait')
+            ))
+            template_params = {
+                'current': 0,
+                'total': 0,
+            }
+        return XbmcProgressDialog(
+            heading, message, background, message_template, template_params
+        )
 
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)

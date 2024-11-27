@@ -197,11 +197,6 @@ def _play_playlist(provider, context):
             heading=context.localize('playlist.progress.updating'),
             message=context.localize('please_wait'),
             background=True,
-            message_template=(
-                    '{wait} {{current}}/{{total}}'.format(
-                        wait=context.localize('please_wait'),
-                    )
-            ),
     ) as progress_dialog:
         json_data = resource_manager.get_playlist_items(playlist_ids)
 

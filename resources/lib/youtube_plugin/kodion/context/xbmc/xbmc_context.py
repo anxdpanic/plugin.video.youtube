@@ -142,6 +142,7 @@ class XbmcContext(AbstractContext):
         'live': 19664,
         'live.completed': 30647,
         'live.upcoming': 30646,
+        'loading': 575,
         'maintenance.bookmarks': 30800,
         'maintenance.data_cache': 30687,
         'maintenance.feed_history': 30814,
