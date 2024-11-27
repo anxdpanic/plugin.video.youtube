@@ -30,6 +30,7 @@ SUBTITLE_DOWNLOAD = 'kodion.subtitle.download'  # (bool)
 ITEMS_PER_PAGE = 'kodion.content.max_per_page'  # (int)
 HIDE_VIDEOS = 'youtube.view.hide_videos'  # (list[str])
 SHORTS_DURATION = 'youtube.view.shorts.duration'  # (int)
+FILTER_LIST = 'youtube.view.filter.list'  # (str)
 
 SAFE_SEARCH = 'kodion.safe.search'  # (int)
 AGE_GATE = 'kodion.age.gate'  # (bool)

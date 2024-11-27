@@ -573,31 +573,38 @@ class AbstractSettings(object):
         'premieres': True,
         'completed': True,
         'vod': True,
+        'custom': None,
     }
 
     def item_filter(self, update=None, override=None):
-        types = dict.fromkeys(
-            self.get_string_list(SETTINGS.HIDE_VIDEOS)
-            if override is None else
-            override,
-            False
-        )
-        types = dict(self._DEFAULT_FILTER, **types)
+        if override is None:
+            override = self.get_string_list(SETTINGS.HIDE_VIDEOS)
+            override = dict.fromkeys(override, False)
+            override['custom'] = (self.get_string(SETTINGS.FILTER_LIST)
+                                  .split(','))
+        elif isinstance(override, (list, tuple)):
+            _override = {'custom': []}
+            for value in override:
+                if value in self._DEFAULT_FILTER:
+                    _override[value] = False
+                else:
+                    _override['custom'].append(value)
+            override = _override
+        types = dict(self._DEFAULT_FILTER, **override)
+
         if update:
             if 'live_folder' in update:
-                if 'live_folder' in types:
-                    types.update(update)
-                else:
-                    types.update({
+                if 'live_folder' not in types:
+                    update.update({
+                        'vod': False,
                         'upcoming': True,
                         'upcoming_live': True,
                         'live': True,
                         'premieres': True,
                         'completed': True,
                     })
-                types['vod'] = False
-            else:
-                types.update(update)
+            types.update(update)
+
         return types
 
     def shorts_duration(self, value=None):
