@@ -74,12 +74,6 @@ def _process_list_response(provider,
         fanart_type = False
     untitled = context.localize('untitled')
 
-    if progress_dialog:
-        total = len(yt_items)
-        progress_dialog.reset_total(new_total=total,
-                                    current=0,
-                                    total=total)
-
     for yt_item in yt_items:
         kind, is_youtube, is_plugin, kind_type = _parse_kind(yt_item)
         if not (is_youtube or is_plugin) or not kind_type:
@@ -318,14 +312,12 @@ def _process_list_response(provider,
             do_callbacks = True
 
         items.append(item)
-        if progress_dialog:
-            progress_dialog.update(current=len(items))
 
     # this will also update the channel_id_dict with the correct channel_id
     # for each video.
     channel_items_dict = {}
 
-    resource_manager = provider.get_resource_manager(context)
+    resource_manager = provider.get_resource_manager(context, progress_dialog)
     resources = {
         1: {
             'fetcher': resource_manager.get_videos,
@@ -464,9 +456,13 @@ def _process_list_response(provider,
     threads['loop'].set()
 
     if progress_dialog:
-        progress_dialog.reset_total(new_total=remaining,
-                                    current=0,
-                                    total=remaining)
+        total = (len(video_id_dict)
+                 + len(channel_id_dict)
+                 + len(playlist_id_dict)
+                 + len(playlist_item_id_dict)
+                 + len(subscription_id_dict))
+        total = progress_dialog.grow_total(delta=total)
+        progress_dialog.update(steps=0, total=total)
 
     while threads['loop'].wait():
         try:
@@ -486,8 +482,6 @@ def _process_list_response(provider,
         if resource['complete']:
             remaining -= 1
             completed.append(resource_id)
-            if progress_dialog:
-                progress_dialog.update(current=len(completed))
             continue
 
         defer = resource['defer']

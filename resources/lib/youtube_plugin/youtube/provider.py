@@ -312,13 +312,17 @@ class Provider(AbstractProvider):
         self._client = client
         return self._client
 
-    def get_resource_manager(self, context):
+    def get_resource_manager(self, context, progress_dialog=None):
         resource_manager = self._resource_manager
         if not resource_manager or resource_manager.context_changed(context):
-            new_resource_manager = ResourceManager(proxy(self), context)
+            new_resource_manager = ResourceManager(proxy(self),
+                                                   context,
+                                                   progress_dialog)
             if not resource_manager:
                 self._resource_manager = new_resource_manager
             return new_resource_manager
+        if progress_dialog:
+            resource_manager.update_progress_dialog(progress_dialog)
         return resource_manager
 
     @AbstractProvider.register_path('^/uri2addon/?$')

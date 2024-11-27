@@ -14,24 +14,34 @@ from .utils import get_thumbnail
 
 
 class ResourceManager(object):
-    def __init__(self, provider, context):
+    def __init__(self, provider, context, progress_dialog=None):
         self._context = context
         fanart_type = context.get_param('fanart_type')
         if fanart_type is None:
             fanart_type = context.get_settings().fanart_selection()
         self._fanart_type = fanart_type
         self._provider = provider
+        self._progress_dialog = progress_dialog
         self.new_data = {}
 
     def context_changed(self, context):
         return self._context != context
 
-    @staticmethod
-    def _list_batch(input_list, n=50):
+    def update_progress_dialog(self, progress_dialog):
+        old_progress_dialog = self._progress_dialog
+        if not progress_dialog or old_progress_dialog == progress_dialog:
+            return
+        if old_progress_dialog:
+            old_progress_dialog.close()
+        self._progress_dialog = progress_dialog
+
+    def _list_batch(self, input_list, n=50):
         if not isinstance(input_list, (list, tuple)):
             input_list = list(input_list)
         for i in range(0, len(input_list), n):
             yield input_list[i:i + n]
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=n)
 
     def get_channels(self, ids, defer_cache=False):
         context = self._context
@@ -82,6 +92,8 @@ class ResourceManager(object):
                 '\n\tChannel IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             new_data = [client.get_channels(list_of_50)
@@ -154,6 +166,8 @@ class ResourceManager(object):
                 '\n\tChannel IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             client = self._provider.get_client(context)
@@ -235,6 +249,8 @@ class ResourceManager(object):
                 '\n\tVideo IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             client = self._provider.get_client(context)
@@ -319,6 +335,8 @@ class ResourceManager(object):
                 '\n\tBatch IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         client = self._provider.get_client(context)
         new_data = {}
@@ -403,6 +421,8 @@ class ResourceManager(object):
                 '\n\tVideo IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             notify_and_raise = not suppress_errors
