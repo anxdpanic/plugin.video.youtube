@@ -16,6 +16,7 @@ from ..logger import Logger
 from ..compatibility import (
     parse_qsl,
     quote,
+    string_type,
     to_str,
     unquote,
     urlencode,
@@ -280,8 +281,17 @@ class AbstractContext(Logger):
         uri = self._plugin_id.join(('plugin://', uri))
 
         if params:
-            if isinstance(params, (dict, list, tuple)):
-                params = urlencode(params)
+            if not isinstance(params, string_type):
+                if isinstance(params, dict):
+                    params = params.items()
+                params = urlencode([
+                    (param, ','.join([
+                        str(item).replace(',', '%2C') for item in value
+                    ]))
+                    if isinstance(value, (list, tuple)) else
+                    (param, value)
+                    for param, value in params
+                ])
             uri = '?'.join((uri, params))
 
         return ''.join((
@@ -362,7 +372,9 @@ class AbstractContext(Logger):
                     parsed_value = (
                         list(value)
                         if isinstance(value, (list, tuple)) else
-                        [val for val in value.split(',') if val]
+                        [val.replace('%2C', ',')
+                         for val in value.split(',')
+                         if val]
                     )
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)
