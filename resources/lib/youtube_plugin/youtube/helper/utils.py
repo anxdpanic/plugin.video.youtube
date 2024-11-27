@@ -1297,12 +1297,13 @@ def filter_videos(items,
             and (not callback or callback(item))
             and (not custom or filter_parse(item, custom))
             and (not item.playable
-                 or ((completed and item.completed)
-                     or (live and item.live and not item.upcoming)
-                     or (premieres and upcoming and item.upcoming and not item.live)
-                     or (upcoming_live and upcoming and item.upcoming and item.live)
-                     or (vod and shorts and item.vod)
-                     or (vod and not shorts and item.vod and not item.short))))
+                 or not ((not completed and item.completed)
+                         or (not live and item.live and not item.upcoming)
+                         or (not upcoming and item.upcoming)
+                         or (not premieres and item.upcoming and not item.live)
+                         or (not upcoming_live and item.upcoming and item.live)
+                         or (not vod and item.vod)
+                         or (not shorts and item.short))))
     ]
 
 
