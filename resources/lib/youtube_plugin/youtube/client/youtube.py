@@ -442,7 +442,9 @@ class YouTube(LoginClient):
     def get_recommended_for_home(self,
                                  visitor='',
                                  page_token='',
-                                 click_tracking=''):
+                                 click_tracking='',
+                                 offset=None,
+                                 remaining=None):
         post_data = {'browseId': 'FEwhat_to_watch'}
         if page_token:
             post_data['continuation'] = page_token
@@ -519,52 +521,77 @@ class YouTube(LoginClient):
         if not recommended_videos:
             return None
 
+        items = [
+            {
+                'kind': 'youtube#video',
+                'id': video['videoId'],
+                '_partial': True,
+                'snippet': {
+                    'title': self.json_traverse(video, (
+                        ('title', 'runs', 0, 'text'),
+                        ('headline', 'simpleText'),
+                    )),
+                    'thumbnails': video['thumbnail']['thumbnails'],
+                    'channelId': self.json_traverse(video, (
+                        ('longBylineText', 'shortBylineText'),
+                        'runs',
+                        0,
+                        'navigationEndpoint',
+                        'browseEndpoint',
+                        'browseId',
+                    )),
+                }
+            }
+            for videos in recommended_videos
+            for video in
+            (videos if isinstance(videos, list) else (videos,))
+            if video and 'videoId' in video
+        ]
+        if not items:
+            return None
+
+        if remaining is None:
+            remaining = self.max_results()
+        if remaining and offset:
+            remaining = offset + remaining
+            if remaining < len(items):
+                last_item = None
+            else:
+                last_item = recommended_videos[-1]
+            items = items[offset:remaining]
+        elif remaining and remaining < len(items):
+            last_item = None
+            items = items[:remaining]
+        elif offset:
+            last_item = recommended_videos[-1]
+            items = items[offset:]
+        else:
+            last_item = recommended_videos[-1]
+
         v3_response = {
             'kind': 'youtube#activityListResponse',
-            'items': [
-                {
-                    'kind': 'youtube#video',
-                    'id': video['videoId'],
-                    '_partial': True,
-                    'snippet': {
-                        'title': self.json_traverse(video, (
-                            ('title', 'runs', 0, 'text'),
-                            ('headline', 'simpleText'),
-                        )),
-                        'thumbnails': video['thumbnail']['thumbnails'],
-                        'channelId': self.json_traverse(video, (
-                            ('longBylineText', 'shortBylineText'),
-                            'runs',
-                            0,
-                            'navigationEndpoint',
-                            'browseEndpoint',
-                            'browseId',
-                        )),
-                    }
-                }
-                for videos in recommended_videos
-                for video in
-                (videos if isinstance(videos, list) else (videos,))
-                if video and 'videoId' in video
-            ]
+            'items': items,
         }
 
-        last_item = recommended_videos[-1]
         if last_item and 'continuationCommand' in last_item:
-            if 'clickTrackingParams' in last_item:
-                v3_response['clickTracking'] = last_item['clickTrackingParams']
-            token = last_item['continuationCommand'].get('token')
-            if token:
-                v3_response['nextPageToken'] = token
+            click_tracking = last_item.get('clickTrackingParams')
+            if click_tracking:
+                v3_response['clickTracking'] = click_tracking
+            page_token = last_item['continuationCommand'].get('token')
+            if page_token:
+                v3_response['nextPageToken'] = page_token
             visitor = self.json_traverse(result, (
                 'responseContext',
                 'visitorData',
             )) or visitor
             if visitor:
                 v3_response['visitorData'] = visitor
+        else:
+            v3_response['visitorData'] = visitor
+            v3_response['nextPageToken'] = page_token
+            v3_response['clickTracking'] = click_tracking
+            v3_response['offset'] = remaining
 
-        if not v3_response['items']:
-            v3_response = None
         return v3_response
 
     def get_related_for_home(self, page_token='', refresh=False):

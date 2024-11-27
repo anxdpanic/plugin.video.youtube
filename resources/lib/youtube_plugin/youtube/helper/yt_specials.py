@@ -85,14 +85,33 @@ def _process_recommendations(provider, context, client):
         client.get_recommended_for_home,
         function_cache.ONE_HOUR,
         _refresh=params.get('refresh'),
-        visitor=params.get('visitor', ''),
-        page_token=params.get('page_token', ''),
-        click_tracking=params.get('click_tracking', ''),
+        visitor=params.get('visitor'),
+        page_token=params.get('page_token'),
+        click_tracking=params.get('click_tracking'),
+        offset=params.get('offset'),
     )
 
-    if not json_data:
-        return False
-    return v3.response_to_items(provider, context, json_data)
+    if json_data:
+        def filler(json_data, remaining):
+            page_token = json_data.get('nextPageToken')
+            if not page_token:
+                return None
+
+            json_data = function_cache.run(
+                client.get_recommended_for_home,
+                function_cache.ONE_HOUR,
+                _refresh=params.get('refresh'),
+                visitor=json_data.get('visitorData'),
+                page_token=page_token,
+                click_tracking=json_data.get('clickTracking'),
+                remaining=remaining,
+            )
+            json_data['_filler'] = filler
+            return json_data
+
+        json_data['_filler'] = filler
+        return v3.response_to_items(provider, context, json_data)
+    return False
 
 
 def _process_trending(provider, context, client):
