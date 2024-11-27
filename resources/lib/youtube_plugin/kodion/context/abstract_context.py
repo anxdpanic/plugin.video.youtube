@@ -270,7 +270,12 @@ class AbstractContext(Logger):
     def get_system_version():
         return current_system_version
 
-    def create_uri(self, path=None, params=None, run=False):
+    def create_uri(self,
+                   path=None,
+                   params=None,
+                   run=False,
+                   play=False,
+                   replace=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
         elif path:
@@ -294,11 +299,13 @@ class AbstractContext(Logger):
                 ])
             uri = '?'.join((uri, params))
 
-        return ''.join((
-            'RunPlugin(',
-            uri,
-            ')'
-        )) if run else uri
+        if run:
+            return ''.join(('RunPlugin(', uri, ')'))
+        if play:
+            return ''.join(('PlayMedia(', uri, ')'))
+        if replace:
+            return ''.join(('ReplaceWindow(Videos, ', uri, ')'))
+        return uri
 
     def get_parent_uri(self, **kwargs):
         return self.create_uri(self._path_parts[:-1], **kwargs)
