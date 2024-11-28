@@ -1,3 +1,102 @@
+## v7.2.0+beta.1
+### Fixed
+- Fix processing of "q" and "channelId" search query params
+- Fix using incorrect client headers with cURL when ISA is not used
+- Fix incorrect use of str.lstrip
+- Ensure language and region are passed to StreamInfo instances #989
+- Fix not updating cache for empty feeds in My Subscriptions
+- Make parsing and serialising of list type parameters a reversible operation
+- Fix logic used to filter out various type of streams
+  - Was previously checking any inclusion filters
+  - Now any exclusion filter that matches will filter stream out
+- Fix plugin URI redirect from search
+- Fix incorrect path handling during migration of old sqlite databases in Setup Wizard
+- Fix errors with progress dialogs in Kodi 18 #1000
+- Fix remote watch history not updating #1008
+- Fix error when all subtitles are requested
+- Fix Python2 syntax error #1000
+- Fix interaction between certain plugin URI query parameters when used in STRM files
+- Fix playing clips in a playlist #1007
+- Fix not identifying own playlists in personal channel
+- Fix API requests when not signed in #1013
+- Fix potential leak of sensitive data via HTTPServer logging #1016
+- Fix adding/removing subscriptions to/from filter list
+- Fix playback not working when no API key is provided #1018
+- Fix using provided keys for requests that can't use them #1018
+- Fix window redirect on video playback failure #1018
+
+### Changed
+- Re-enable player request clients that require specific OAuth tokens
+- Re-enable OAuth authorisation for YouTube TV
+- Update itags for 30fps HLS VP9.2 streams
+- Update player client details and selections
+- Add some ultra low quality itags
+- Optimise wakeup to ensure http server is only started when required
+- Improve check for Kodi subtitle language
+- Improve handling of audio language selection #989
+- Replace preferred language subtitle option with preferred language + fallback + no ASR option #992
+- Allow for caching of subscriptions API requests in My Subscriptions
+- Only use OAuth tokens if necessary #994 #996
+- Set default live stream type to MPEG-DASH for Kodi 21+ #1004
+- Skip asking or re-ordering playlists if there is only 1 item in the list
+- Prevent caching in incognito mode
+- Improve caching and updating of playlist details #1024
+- Improve listen address config in Setup Wizard #1016
+  - Also make 127.0.0.1 the default listen address
+  - Fallback to 0.0.0.0 if no other local address works
+
+### New
+- Update display of comments to be match other listings
+  - Make comment details follow "Show video details in video lists" setting
+  - Allow various sorting options
+  - Truncate comment to 140 characters in listing, full comment available in info dialog
+  - Show user thumbnail in listing
+  - Show user with thumbnail in info dialog
+  - Show video/comment details in navigation breadcrumb bar
+- Overhaul update of fanart and other channel info for listings
+  - Add additional channel info to all items in listings in one pass
+    - channel name thumbnail in info dialog
+    - channel name in context menu items
+    - channel fanart if enabled
+  - Reduce network requests
+  - Improve cache usage
+  - Reduce thread usage
+- Add custom Shorts duration #984
+- Allow use of HLS streams in external players
+  - Also allows for playing in Kodi without InputStream.Adaptive
+- Add ability to create arbitrary filter criteria to My Subscriptions #984
+  - "{ATTR_1}{OPERATOR_1}{VALUE_1}[{ATTR_X}{OPERATOR_X}{VALUE_X}...]"
+    - where ATTR_X can be any valid item getter or property e.g.
+      - "duration", "title", "artists"/"artists_string", "plot", "date", etc. or
+      - ".live", ".upcoming", ".completed" etc. Note the "." prefix
+    - where OPERATOR_X can be
+      - ">", ">=" (default), "<", "<=", "=", "==", "!=" typically for a int/float/bool type VALUE or
+      - "contains", "startswith", "endswith", "search" for a string type VALUE
+    - where VALUE_X is the desired criteria value.
+      - String type values are wrapped in double quote marks eg. "example"
+        - "," must be encoded as "%2C" eg. "example,test" becomes "example%2Ctest"
+        - "}" must be encoded as "%7D" eg. "example}test" becomes "example%7Dtest"
+    - any number of criteria rules can be used together
+      - rules seperated by a comma are OR rules
+      - rules contained within a comma group are AND rules
+- Add filler parameter to v3.response_to_items
+  - Allows listings to be recursively filled after post request filtering
+  - Also show progress dialog for all listings
+- Add support for sequentially filling Recommendations listing
+- Add support for sequentially filling Trending listing
+- Add new advanced list filter setting
+  - Works in the same manner as the My Subscriptions filter, but for all listings
+  - Can also be set using the item_filter plugin URI query parameter
+- Add option to prefer lower resolution streams for unselected codecs
+- Populate My Subscription listings using feed details
+- Store video details from player requests for local history #991
+- Add separate Shorts sub-folder in Channel folders #988
+  - Implementation by @mhomak
+- Allow adding/removing bookmarks to/from filter list
+- Add direct playback of temporary playlists from YouTube or plugin urls in the form
+  - plugin://plugin.video.youtube/play?video_ids=xxxxxxxx,xxxxxxxx
+
+
 ## v7.1.1.6
 ### Fixed
 - Fix http server not listening on any interface if listen IP is 0.0.0.0 #927
