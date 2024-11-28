@@ -456,13 +456,13 @@ def _process_list_response(provider,
     threads['loop'].set()
 
     if progress_dialog:
-        total = (len(video_id_dict)
+        delta = (len(video_id_dict)
                  + len(channel_id_dict)
                  + len(playlist_id_dict)
                  + len(playlist_item_id_dict)
                  + len(subscription_id_dict))
-        total = progress_dialog.grow_total(delta=total)
-        progress_dialog.update(steps=0, total=total)
+        progress_dialog.grow_total(delta=delta)
+        progress_dialog.update(steps=delta)
 
     while threads['loop'].wait():
         try:
@@ -539,8 +539,8 @@ def response_to_items(provider,
     next_page = None
 
     with context.get_ui().create_progress_dialog(
-            heading=context.localize('loading'),
-            message=context.localize('please_wait'),
+            heading=context.localize('loading.directory'),
+            message_template=context.localize('loading.directory.progress'),
             background=True,
     ) as progress_dialog:
         remaining = None

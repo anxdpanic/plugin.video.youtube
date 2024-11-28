@@ -328,7 +328,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
 
     with context.get_ui().create_progress_dialog(
             heading=context.localize('my_subscriptions.loading'),
-            message=context.localize('please_wait'),
+            message=context.localize('channels'),
             background=True,
     ) as progress_dialog:
         json_data = client.get_my_subscriptions(

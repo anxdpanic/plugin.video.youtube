@@ -29,7 +29,13 @@ class AbstractProgressDialog(object):
 
         self._message = message
         self._message_template = message_template
-        self._template_params = template_params or {}
+        self._template_params = {
+            '_progress': (0, self._total),
+            '_current': 0,
+            '_total': self._total,
+        }
+        if template_params:
+            self._template_params.update(template_params)
 
         # simple reset because KODI won't do it :(
         self.update(position=0)
@@ -97,10 +103,14 @@ class AbstractProgressDialog(object):
         elif self._message_template:
             if template_params:
                 self._template_params.update(template_params)
-            else:
-                self._template_params['current'] = self._position
-                self._template_params['total'] = self._total
-            message = self._message_template.format(**self._template_params)
+            template_params = self._template_params
+            progress = (self._position, self._total)
+            template_params['_progress'] = progress
+            template_params['_current'], template_params['_total'] = progress
+            message = self._message_template.format(
+                *template_params['_progress'],
+                **template_params
+            )
             self._message = message
 
         self._dialog.update(

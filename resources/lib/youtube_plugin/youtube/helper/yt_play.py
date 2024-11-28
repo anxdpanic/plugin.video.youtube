@@ -201,12 +201,7 @@ def _play_playlist(provider, context):
         json_data = resource_manager.get_playlist_items(playlist_ids)
 
         total = sum(len(chunk.get('items', [])) for chunk in json_data.values())
-        progress_dialog.set_total(total)
-        progress_dialog.update(
-            steps=0,
-            current=0,
-            total=total,
-        )
+        progress_dialog.reset_total(total)
 
         # start the loop and fill the list with video items
         for chunk in json_data.values():
@@ -216,11 +211,7 @@ def _play_playlist(provider, context):
                                           process_next_page=False)
             video_items.extend(result)
 
-            progress_dialog.update(
-                steps=len(result),
-                current=len(video_items),
-                total=total,
-            )
+            progress_dialog.update(steps=len(result))
 
         if not video_items:
             return False
