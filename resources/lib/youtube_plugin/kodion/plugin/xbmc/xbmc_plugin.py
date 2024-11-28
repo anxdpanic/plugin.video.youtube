@@ -325,7 +325,7 @@ class XbmcPlugin(AbstractPlugin):
 
         elif context.is_plugin_path(uri, PATHS.PLAY):
             context.log_debug('Redirecting for playback: |{0}|'.format(uri))
-            action = 'PlayMedia({0}, playlist_time_hint=1)'.format(uri)
+            action = 'PlayMedia({0}, playlist_type_hint=1)'.format(uri)
             result = False
 
         elif context.is_plugin_path(uri):
