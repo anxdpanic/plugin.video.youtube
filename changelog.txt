@@ -1,4 +1,4 @@
-## v7.1.1.1
+## v7.1.1.3
 ### Fixed
 - Fix http server not listening on any interface if listen IP is 0.0.0.0 #927
 - Standardise return type of LoginClient.refresh_token #932
@@ -33,6 +33,13 @@
 - Attempt to fix possible deadlock on http server shutdown
 - Fix potential infinite loop with old data from access_manager.json #980
 - Reduce unnecessary window navigation fallback attempts
+- Fix incorrect duration display in Kodi 18 and Kodi 19 #999
+- Fix possible error with getting names of bookmarks that have not been updated with info
+- Fix missing "Live" label in Kodi 18
+- Fix uncaught exception when sign-in does not succeed #985
+- Fix missing "Ask" translation string
+- Fix incorrect parameter name breaking auto-remove from Watch Later #993
+- Fix processing of "q" and "channelId" search query params #1004
 
 ### Changed
 - Improve display and update of bookmarks
@@ -49,6 +56,8 @@
   - path parameters used for folders and sub-folders
   - query parameters used for changing display modes, filtering, sorting and inputs
 - Don't retry server wakeup on error unless settings change
+- Allow ISA and MPD in 720p performance preset in Setup Wizard
+- Only use OAuth tokens if necessary #994 #996
 
 ### New
 - Explicitly enable TCP keep alive #913
