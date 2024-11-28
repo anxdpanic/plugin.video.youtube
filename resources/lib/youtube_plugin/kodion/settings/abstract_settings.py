@@ -388,10 +388,10 @@ class AbstractSettings(object):
 
     def live_stream_type(self, value=None):
         if self.use_isa():
-            default = 2
+            default = 3
             setting = SETTINGS.LIVE_STREAMS + '.1'
         else:
-            default = 0
+            default = 1
             setting = SETTINGS.LIVE_STREAMS + '.2'
         if value is not None:
             return self.set_int(setting, value)
