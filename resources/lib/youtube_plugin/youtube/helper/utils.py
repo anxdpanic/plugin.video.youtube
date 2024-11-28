@@ -1343,8 +1343,12 @@ def filter_parse(item,
                         .replace('%2C', ',')
                         .replace('%7D', '}')
                     )
+                    if input_1 is None:
+                        input_1 = ''
                 else:
                     input_2 = float(input_2)
+                    if input_1 is None:
+                        input_1 = -1
 
                 _, negate, op_str = op_str.rpartition('!')
                 op = op_map.get(op_str)
