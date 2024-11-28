@@ -757,6 +757,7 @@ class StreamInfo(YouTubeRequestClient):
     def __init__(self,
                  context,
                  access_token='',
+                 access_token_tv='',
                  clients=None,
                  ask_for_quality=False,
                  audio_only=False,
@@ -766,6 +767,7 @@ class StreamInfo(YouTubeRequestClient):
         self._context = context
 
         self._access_token = access_token
+        self._access_token_tv = access_token_tv
         self._ask_for_quality = ask_for_quality
         self._audio_only = audio_only
         self._use_mpd = use_mpd
@@ -1445,9 +1447,11 @@ class StreamInfo(YouTubeRequestClient):
             'country',
             'not available',
         }
-        skip_reasons = {
+        reauth_reasons = {
             'age',
             'inappropriate',
+        }
+        skip_reasons = {
             'latest version',
         }
         retry_reasons = {
@@ -1457,12 +1461,15 @@ class StreamInfo(YouTubeRequestClient):
         }
         abort = False
 
-        client_data = {'json': {'videoId': video_id}}
-        if self._access_token:
-            auth = True
-            client_data['_access_token'] = self._access_token
-        else:
-            auth = False
+        has_access_token = bool(self._access_token or self._access_token_tv)
+        client_data = {
+            'json': {
+                'videoId': video_id,
+            },
+            '_auth_required': False,
+            '_access_token': self._access_token,
+            '_access_token_tv': self._access_token_tv,
+        }
 
         for name, clients in self._client_groups.items():
             if not clients:
@@ -1472,81 +1479,94 @@ class StreamInfo(YouTubeRequestClient):
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
 
-            for client_name in clients:
-                _client = self.build_client(client_name, client_data)
-                if not _client:
-                    continue
-
-                _result = self.request(
-                    video_info_url,
-                    'POST',
-                    response_hook=self._response_hook_json,
-                    error_title='Player request failed',
-                    error_hook=self._error_hook,
-                    error_hook_kwargs={
-                        'video_id': video_id,
-                        'client': client_name,
-                        'auth': _client.get('_has_auth', False),
-                    },
-                    **_client
-                ) or {}
-
-                _video_details = _result.get('videoDetails', {})
-                _playability = _result.get('playabilityStatus', {})
-                _status = _playability.get('status', 'ERROR').upper()
-                _reason = _playability.get('reason', 'UNKNOWN')
-
-                if _video_details and video_id != _video_details.get('videoId'):
-                    _status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                    _reason = 'Watch on the latest version of YouTube'
-
-                if (age_gate_enabled
-                        and _playability.get('desktopLegacyAgeGateReason')):
-                    abort = True
-                    break
-                elif _status == 'LIVE_STREAM_OFFLINE':
-                    abort = True
-                    break
-                elif _status == 'OK':
-                    break
-                elif _status in {
-                    'AGE_CHECK_REQUIRED',
-                    'AGE_VERIFICATION_REQUIRED',
-                    'CONTENT_CHECK_REQUIRED',
-                    'LOGIN_REQUIRED',
-                    'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
-                    'ERROR',
-                    'UNPLAYABLE',
-                }:
-                    log_warning(
-                        'Failed to retrieve video info'
-                        '\n\tStatus:   {status}'
-                        '\n\tReason:   {reason}'
-                        '\n\tvideo_id: |{video_id}|'
-                        '\n\tClient:   |{client}|'
-                        '\n\tAuth:     |{auth}|'
-                        .format(
-                            status=_status,
-                            reason=_reason or 'UNKNOWN',
-                            video_id=video_id,
-                            client=_client['_name'],
-                            auth=_client.get('_has_auth', False),
-                        )
-                    )
-                    compare_reason = _reason.lower()
-                    if any(why in compare_reason for why in retry_reasons):
+            restart = False
+            while 1:
+                for client_name in clients:
+                    _client = self.build_client(client_name, client_data)
+                    if not _client:
                         continue
-                    if any(why in compare_reason for why in skip_reasons):
-                        break
-                    if any(why in compare_reason for why in abort_reasons):
+
+                    _result = self.request(
+                        video_info_url,
+                        'POST',
+                        response_hook=self._response_hook_json,
+                        error_title='Player request failed',
+                        error_hook=self._error_hook,
+                        error_hook_kwargs={
+                            'video_id': video_id,
+                            'client': client_name,
+                            'auth': _client.get('_has_auth', False),
+                        },
+                        **_client
+                    ) or {}
+
+                    _video_details = _result.get('videoDetails', {})
+                    _playability = _result.get('playabilityStatus', {})
+                    _status = _playability.get('status', 'ERROR').upper()
+                    _reason = _playability.get('reason', 'UNKNOWN')
+
+                    if (_video_details
+                            and video_id != _video_details.get('videoId')):
+                        _status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
+                        _reason = 'Watch on the latest version of YouTube'
+
+                    if (age_gate_enabled
+                            and _playability.get('desktopLegacyAgeGateReason')):
                         abort = True
                         break
+                    elif _status == 'LIVE_STREAM_OFFLINE':
+                        abort = True
+                        break
+                    elif _status == 'OK':
+                        break
+                    elif _status in {
+                        'AGE_CHECK_REQUIRED',
+                        'AGE_VERIFICATION_REQUIRED',
+                        'CONTENT_CHECK_REQUIRED',
+                        'LOGIN_REQUIRED',
+                        'CONTENT_NOT_AVAILABLE_IN_THIS_APP',
+                        'ERROR',
+                        'UNPLAYABLE',
+                    }:
+                        log_warning(
+                            'Failed to retrieve video info'
+                            '\n\tStatus:   {status}'
+                            '\n\tReason:   {reason}'
+                            '\n\tvideo_id: |{video_id}|'
+                            '\n\tClient:   |{client}|'
+                            '\n\tAuth:     |{auth}|'
+                            .format(
+                                status=_status,
+                                reason=_reason or 'UNKNOWN',
+                                video_id=video_id,
+                                client=_client['_name'],
+                                auth=_client.get('_has_auth', False),
+                            )
+                        )
+                        compare_reason = _reason.lower()
+                        if any(why in compare_reason for why in reauth_reasons):
+                            if has_access_token:
+                                client_data['_auth_required'] = True
+                                restart = True
+                            break
+                        if any(why in compare_reason for why in retry_reasons):
+                            continue
+                        if any(why in compare_reason for why in skip_reasons):
+                            break
+                        if any(why in compare_reason for why in abort_reasons):
+                            abort = True
+                            break
+                    else:
+                        log_debug(
+                            'Unknown playabilityStatus in player response'
+                            '\n\tplayabilityStatus: {0}'
+                            .format(_playability)
+                        )
                 else:
-                    log_debug(
-                        'Unknown playabilityStatus in player response'
-                        '\n\tplayabilityStatus: {0}'
-                        .format(_playability)
-                    )
+                    break
+                if not restart:
+                    break
+                restart = False
 
             if abort:
                 break
@@ -1560,7 +1580,7 @@ class StreamInfo(YouTubeRequestClient):
                     .format(
                         video_id=video_id,
                         client=client_name,
-                        auth=bool(_client.get('_access_token')),
+                        auth=_client.get('_has_auth', False),
                     )
                 )
                 if not self._selected_client:
@@ -1748,7 +1768,7 @@ class StreamInfo(YouTubeRequestClient):
                     error_hook_kwargs={
                         'video_id': video_id,
                         'client': client_name,
-                        'auth': bool(caption_client.get('_access_token')),
+                        'auth': _client.get('_has_auth', False),
                     },
                     **caption_client
                 )

@@ -118,7 +118,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         'android_youtube_tv': {
             '_id': 29,
             '_disabled': True,
-            '_auth_required': 'tv',
+            '_auth_type': 'tv',
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android'],
@@ -173,6 +173,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'ios': {
             '_id': 5,
+            '_auth_type': False,
             '_os': {
                 'major': '18',
                 'minor': '1',
@@ -392,14 +393,15 @@ class YouTubeRequestClient(BaseRequestsClass):
         try:
             params = client['params']
             auth_required = client.get('_auth_required')
-            if auth_required == 'tv':
+            auth_type = client.get('_auth_type')
+            if auth_type == 'tv':
                 auth_token = client.get('_access_token_tv')
-            elif auth_required is not False:
+            elif auth_type is not False:
                 auth_token = client.get('_access_token')
             else:
                 auth_token = None
 
-            if auth_token:
+            if auth_required and auth_token:
                 headers = client['headers']
                 if 'Authorization' in headers:
                     headers = headers.copy()
