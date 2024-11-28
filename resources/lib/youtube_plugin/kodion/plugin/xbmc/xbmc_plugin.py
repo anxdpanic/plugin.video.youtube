@@ -263,7 +263,7 @@ class XbmcPlugin(AbstractPlugin):
                 ui.clear_property(CONTENT_TYPE)
 
                 if not options or options.get(provider.RESULT_FALLBACK, True):
-                    result, post_run_action = self.uri_action(
+                    _, _post_run_action = self.uri_action(
                         context,
                         context.get_parent_uri(params={
                             'window_fallback': True,
@@ -271,6 +271,11 @@ class XbmcPlugin(AbstractPlugin):
                             'window_return': False,
                         }),
                     )
+                    if post_run_action and _post_run_action:
+                        post_run_action = (post_run_action, _post_run_action)
+                    else:
+                        post_run_action = _post_run_action
+
             cache_to_disc = False
             update_listing = True
 
@@ -285,21 +290,24 @@ class XbmcPlugin(AbstractPlugin):
         if container and position:
             context.send_notification(CONTAINER_FOCUS, [container, position])
 
-        if post_run_action:
+        if isinstance(post_run_action, tuple):
+            self.post_run(context, ui, *post_run_action)
+        elif post_run_action:
             self.post_run(context, ui, post_run_action)
         return succeeded
 
     @staticmethod
-    def post_run(context, ui, action, timeout=30):
-        while ui.busy_dialog_active():
-            timeout -= 1
-            if timeout < 0:
-                context.log_error('Multiple busy dialogs active'
-                                  ' - Post run action unable to execute')
-                break
-            context.sleep(1)
-        else:
-            context.execute(action)
+    def post_run(context, ui, *actions, timeout=30):
+        for action in actions:
+            while ui.busy_dialog_active():
+                timeout -= 1
+                if timeout < 0:
+                    context.log_error('Multiple busy dialogs active'
+                                      ' - Post run action unable to execute')
+                    break
+                context.sleep(1)
+            else:
+                context.execute(action)
 
     @staticmethod
     def uri_action(context, uri):
