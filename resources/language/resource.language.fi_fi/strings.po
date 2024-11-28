@@ -31,13 +31,14 @@ msgstr "Google ei tue tätä lisäosaa"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "YouTube-lisäosa"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "YouTube on yksi suurimmista videonjakosivustoista maailmassa."
+# msgstr ""
+# Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Yleistä"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -149,8 +150,8 @@ msgid "Configure %s?"
 msgstr "Määritetäänkö %s?"
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Lisäasetukset"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -215,8 +216,8 @@ msgid "Watch Later"
 msgstr "Katso myöhemmin"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Poista"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -235,8 +236,8 @@ msgid "Sign Out"
 msgstr "Kirjaudu ulos"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Nimeä uudelleen"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -255,8 +256,8 @@ msgid "Remove \"%s\"?"
 msgstr "Poistetaanko \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Poista"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -296,13 +297,15 @@ msgctxt "#30205"
 msgid ""
 msgstr ""
 
+# YouTube
+# empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Kanavat"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Soittolistat"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -357,8 +360,8 @@ msgid "Related Videos"
 msgstr "Aiheeseen liittyvät videot"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Poista \"Katso myöhemmin\" -listalta automaattisesti"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -381,16 +384,16 @@ msgid "Add to..."
 msgstr "Lisää soittolistalle..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Valitse soittolista"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Uusi soittolista..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Kieli"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -421,20 +424,20 @@ msgid "I dislike this"
 msgstr "En tykkää tästä"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Toista kaikki"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Oletus"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Käänteinen"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Sekoitettu"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -453,8 +456,8 @@ msgid "Disliked Videos"
 msgstr "Ei-tykätyt videot"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Live"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -469,8 +472,8 @@ msgid "rtmpe streams are not supported"
 msgstr "RTMPE-suoratoistoa ei tueta"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Päivitä"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -489,16 +492,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Lisävalinnat..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Videovirtoja ei löytynyt"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Alue"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -537,15 +540,15 @@ msgid "Delete settings.xml"
 msgstr "Poista \"settings.xml\" -tiedosto"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Tekstityskieli"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Ei mitään"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
-msgid ""
+msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
@@ -561,8 +564,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "Kysy"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -573,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Poista \"Katso myöhemmin\" -määritys"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Katso myöhemmin\" -määrityksen?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Haluatko varmasti korvata nykyisen \"Katso myöhemmin\" -listan listalla \"%s\"?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -589,12 +592,12 @@ msgid "Remove as History"
 msgstr "Poista \"Historia\" -määritys"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Historia\" -määrityksen?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Haluatko varmasti korvata nykyisen \"Historia\" -listan listalla \"%s\"?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -605,8 +608,8 @@ msgid "Failed"
 msgstr "Epäonnistui"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Asetukset"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -629,8 +632,8 @@ msgid "Autoplay suggested videos"
 msgstr "Toista ehdotetut videot automaattisesti"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Automaattinen"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -689,16 +692,16 @@ msgid "Updated: %s"
 msgstr "Päivitetty: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Henkilökohtaiset API-avaimet otettiin käyttöön"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Henkilökohtaisten API-avainten käyttöönotto epäonnistui. Puuttuu: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
-msgstr "Tekstitykset"
+msgid ""
+msgstr ""
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -757,8 +760,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "Peruuta"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -773,8 +776,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Portti"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -817,8 +820,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "Sallitut IP-osoitteet (pilkuilla eroteltuina)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Tallenna"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -933,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Syötä käyttäjän nimi"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Käyttäjä on nyt \"%s\""
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -957,16 +960,16 @@ msgid "Switch user"
 msgstr "Vaihda käyttäjä"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Vaihdetaanko käyttäjään \"%s\" nyt?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
-msgstr "%s poistettiin"
+msgid "\"%s\" removed"
+msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Käyttäjän \"%s\" uusi nimi on \"%s\""
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1109,8 +1112,8 @@ msgid "Play with subtitles"
 msgstr "Toista tekstityksillä"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Oletko varma?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1253,7 +1256,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1473,12 +1476,12 @@ msgid "Views count display colour"
 msgstr "Katselumäärän väri"
 
 msgctxt "#30794"
-msgid "Likes count display colour"
-msgstr "Tykkäysmäärän väri"
+msgid "Subscriber/Likes count display colour"
+msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
-msgstr "Kommenttimäärän väri"
+msgid "Videos/Comments count display colour"
+msgstr ""
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
@@ -1575,6 +1578,172 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Poista \"Katso myöhemmin\" -listalta automaattisesti"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Katso myöhemmin\" -määrityksen?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Haluatko varmasti korvata nykyisen \"Katso myöhemmin\" -listan listalla \"%s\"?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Haluatko varmasti poistaa \"%s\" -listan \"Historia\" -määrityksen?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Haluatko varmasti korvata nykyisen \"Historia\" -listan listalla \"%s\"?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Käyttäjä on nyt \"%s\""
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Vaihdetaanko käyttäjään \"%s\" nyt?"
+
+#~ msgctxt "#30666"
+#~ msgid "%s removed"
+#~ msgstr "%s poistettiin"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Käyttäjän \"%s\" uusi nimi on \"%s\""
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "YouTube-lisäosa"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube on yksi suurimmista videonjakosivustoista maailmassa."
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Yleistä"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Lisäasetukset"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Poista"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Nimeä uudelleen"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Poista"
+
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Kanavat"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Soittolistat"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Valitse soittolista"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Uusi soittolista..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Kieli"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Toista kaikki"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Oletus"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Sekoitettu"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Live"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Päivitä"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Lisävalinnat..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Alue"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Tekstityskieli"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Ei mitään"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "Kysy"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Asetukset"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Automaattinen"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Henkilökohtaiset API-avaimet otettiin käyttöön"
+
+#~ msgctxt "#30600"
+#~ msgid "Subtitles"
+#~ msgstr "Tekstitykset"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "Peruuta"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Portti"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Tallenna"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Oletko varma?"
+
+#~ msgctxt "#30794"
+#~ msgid "Likes count display colour"
+#~ msgstr "Tykkäysmäärän väri"
+
+#~ msgctxt "#30795"
+#~ msgid "Comments count display colour"
+#~ msgstr "Kommenttimäärän väri"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"

@@ -113,7 +113,7 @@ def set_info(list_item, item, properties, set_play_count=True, resume=True):
                     list_item.addStreamInfo(info_type, {'duration': duration})
 
             if duration is not None:
-                info_labels['duration'] = value
+                info_labels['duration'] = duration
 
         elif isinstance(item, DirectoryItem):
             info_type = 'video'

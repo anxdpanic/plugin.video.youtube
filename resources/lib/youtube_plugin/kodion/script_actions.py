@@ -67,7 +67,7 @@ def _config_actions(context, action, *_args):
 
         sub_opts = [
             localize('none'),
-            localize('ask'),
+            localize('select'),
             localize('subtitles.with_fallback') % (preferred, fallback),
             preferred,
             '%s (%s)' % (preferred, localize('subtitles.no_asr')),

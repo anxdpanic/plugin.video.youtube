@@ -37,8 +37,8 @@ msgstr "Bu eklenti Google tarafından üretilmemiştir"
 # msgstr ""
 # Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Genel"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -151,8 +151,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Gelişmiş"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -217,8 +217,8 @@ msgid "Watch Later"
 msgstr "Daha Sonra İzle"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Kaldır"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -237,8 +237,8 @@ msgid "Sign Out"
 msgstr "Çıkış Yap"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Yeniden Adlandır"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,8 +257,8 @@ msgid "Remove \"%s\"?"
 msgstr "\"%s\" ögesi kaldırılsın mı?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Kaldır"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -301,12 +301,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Kanallar"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Oynatma Listeleri"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -361,8 +361,8 @@ msgid "Related Videos"
 msgstr "İlgili Videolar"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Daha Sonra İzle'den izlenen videoları sonrasında kaldır"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -385,16 +385,16 @@ msgid "Add to..."
 msgstr "Ekle..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Oynatma listesi seç"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Yeni oynatmalistesi..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Diller"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -425,20 +425,20 @@ msgid "I dislike this"
 msgstr "Bunu beğenmedim"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Hepsini oynat"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Varsayılan"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Tersine çevir"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Karıştır"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -457,8 +457,8 @@ msgid "Disliked Videos"
 msgstr "Beğenilmeyen Videolar"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Canlı Yayınlar"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -473,8 +473,8 @@ msgid "rtmpe streams are not supported"
 msgstr "rtmpe yayın akışları deskteklenmiyor"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Yenile"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -493,16 +493,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Daha fazla..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Hiçbir video akışı bulunamadı"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Bölge"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -541,15 +541,15 @@ msgid "Delete settings.xml"
 msgstr "settings.xml dosyasını sil"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Alt yazı dili"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Hiçbiri"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
-msgid ""
+msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
@@ -565,8 +565,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "İstem"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -577,12 +577,12 @@ msgid "Remove as Watch Later"
 msgstr "Daha Sonra İzle'den kaldır"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "'%s' ögesi Daha Sonra İzle listesinden kaldırılacak, emin misiniz?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Şimdiki Daha Sonra İzle listeniz '%s' ile değiştirilecek, emin misiniz?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,12 +593,12 @@ msgid "Remove as History"
 msgstr "Geçmişten kaldır"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "'%s' ögesi Geçmiş listesinizden kaldırılacak, emin misiniz?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Şimdiki Geçmiş listeniz, '%s' ile değiştirilecek, emin misiniz?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -609,8 +609,8 @@ msgid "Failed"
 msgstr "Başarısız"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Ayarlar"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -633,8 +633,8 @@ msgid "Autoplay suggested videos"
 msgstr "Önerilen videoları otomatik oynat"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Otomatik"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -693,15 +693,15 @@ msgid "Updated: %s"
 msgstr "Güncellendi: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Kişisel API anahtarları etkinleştirildi"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Kişisel API anahtarları etkinleştirilemedi. Eksik: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -761,8 +761,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "İptal Et"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -777,8 +777,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Bağlantı Noktası"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -821,8 +821,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "IP beyaz listesi (virgül ile ayrılmış)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Kaydet"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -937,8 +937,8 @@ msgid "Enter a name for this user"
 msgstr "Bu kullanıcı için bir ad gir"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Kullanıcı şu anda '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,16 +961,16 @@ msgid "Switch user"
 msgstr "Kullanıcı değiştir"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "'%s' kullanıcısına geçilsin mi?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Kullanıcının adı, '%s' adından '%s' adına değiştirildi"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1113,8 +1113,8 @@ msgid "Play with subtitles"
 msgstr "Alt yazılar ile oynat"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Emin misiniz?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1257,7 +1257,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1477,11 +1477,11 @@ msgid "Views count display colour"
 msgstr ""
 
 msgctxt "#30794"
-msgid "Likes count display colour"
+msgid "Subscriber/Likes count display colour"
 msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
+msgid "Videos/Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
@@ -1579,6 +1579,159 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Daha Sonra İzle'den izlenen videoları sonrasında kaldır"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "'%s' ögesi Daha Sonra İzle listesinden kaldırılacak, emin misiniz?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Şimdiki Daha Sonra İzle listeniz '%s' ile değiştirilecek, emin misiniz?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "'%s' ögesi Geçmiş listesinizden kaldırılacak, emin misiniz?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Şimdiki Geçmiş listeniz, '%s' ile değiştirilecek, emin misiniz?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Kullanıcı şu anda '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "'%s' kullanıcısına geçilsin mi?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Kullanıcının adı, '%s' adından '%s' adına değiştirildi"
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr ""
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr ""
+# Kodion Settings
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Genel"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Gelişmiş"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Kaldır"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Yeniden Adlandır"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Kaldır"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Kanallar"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Oynatma Listeleri"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Oynatma listesi seç"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Yeni oynatmalistesi..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Diller"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Hepsini oynat"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Varsayılan"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Karıştır"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Canlı Yayınlar"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Yenile"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Daha fazla..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Bölge"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Alt yazı dili"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Hiçbiri"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "İstem"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Ayarlar"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Otomatik"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Kişisel API anahtarları etkinleştirildi"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "İptal Et"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Bağlantı Noktası"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Kaydet"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Emin misiniz?"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"

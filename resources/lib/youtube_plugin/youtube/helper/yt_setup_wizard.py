@@ -123,11 +123,6 @@ def process_performance_settings(context, step, steps, **_kwargs):
                 'max_resolution': 3,  # 720p
                 'stream_features': ('avc1', 'mp4a', 'filter'),
                 'num_items': 10,
-                'settings': (
-                    (settings.use_isa, (False,)),
-                    (settings.use_mpd_videos, (False,)),
-                    (settings.set_subtitle_download, (True,)),
-                ),
             },
             '1080p30_avc': {
                 'max_resolution': 4,  # 1080p

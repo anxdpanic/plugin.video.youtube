@@ -31,13 +31,14 @@ msgstr "Tento doplnok nie je schválený spoločnosťou Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "Plugin pre YouTube"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "YouTube je jednou z najväčších webstránok na zdieľanie videa na svete"
+# msgstr ""
+# Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Hlavné"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -149,8 +150,8 @@ msgid "Configure %s?"
 msgstr "Konfigurovať %s?"
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Pokročilé"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -215,8 +216,8 @@ msgid "Watch Later"
 msgstr "Pozrieť neskôr"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Odstrániť"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -235,8 +236,8 @@ msgid "Sign Out"
 msgstr "Odhlásiť"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Premenovať"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -255,8 +256,8 @@ msgid "Remove \"%s\"?"
 msgstr "Odstrániť \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Odstrániť"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -299,12 +300,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Kanály"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Zoznamy"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -359,8 +360,8 @@ msgid "Related Videos"
 msgstr "Súvisiace videá"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Automaticky odstrániť z 'Pozrieť neskôr'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -383,16 +384,16 @@ msgid "Add to..."
 msgstr "Pridať do..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Vyberte zoznam"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Nový zoznam..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Jazyk"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -423,20 +424,20 @@ msgid "I dislike this"
 msgstr "Nepáči sa mi to"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Prehrať všetko"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Štandardný"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Naopak"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Náhodne"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -455,8 +456,8 @@ msgid "Disliked Videos"
 msgstr "Videá, ktoré sa mi nepáčia"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Živé prenosy"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,8 +472,8 @@ msgid "rtmpe streams are not supported"
 msgstr "rtmpe prúdy nie sú podporované"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Obnoviť"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -491,16 +492,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Viac..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Žiadne video prúdy neboli nájdené"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Región"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -539,15 +540,15 @@ msgid "Delete settings.xml"
 msgstr "Odstrániť settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Jazyk titulkov"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Žiaden"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
-msgid ""
+msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
@@ -563,8 +564,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "Spýtať sa"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -575,12 +576,12 @@ msgid "Remove as Watch Later"
 msgstr "Odstrániť z 'Pozrieť neskôr'"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Naozaj chcete odstrániť '%s' zo zoznamu 'Pozrieť neskôr'?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Naozaj chcete nahradiť aktuálny zoznam 'Pozrieť neskôr' zoznamom '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -591,12 +592,12 @@ msgid "Remove as History"
 msgstr "Odstrániť z histórie"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Naozaj chcete odstrániť '%s' zo zoznamu histórie?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Naozaj chcete nahradiť aktuálny zoznam histórie zoznamom '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -607,8 +608,8 @@ msgid "Failed"
 msgstr "Neúspech"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Nastavenia"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -631,8 +632,8 @@ msgid "Autoplay suggested videos"
 msgstr "Automaticky prehrávať navrhované videá"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Automaticky"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -691,16 +692,16 @@ msgid "Updated: %s"
 msgstr "Aktualizované: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Osobné API kľúče povolené"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Nepodarilo sa zapnúť osobné kľúče API. Chýba: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
-msgstr "Titulky"
+msgid ""
+msgstr ""
 
 msgctxt "#30601"
 msgid "%s with Original/%s fallback"
@@ -759,8 +760,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "Zrušiť"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -775,8 +776,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Port"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -819,8 +820,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "Povolené IP adresy (oddelené čiarkou)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Uložiť"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -935,8 +936,8 @@ msgid "Enter a name for this user"
 msgstr "Zadajte meno používateľa"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Používateľ je teraz '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -959,16 +960,16 @@ msgid "Switch user"
 msgstr "Prepnúť používateľa"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Prepnúť na '%s' teraz?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
-msgstr "%s bolo odstránené"
+msgid "\"%s\" removed"
+msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "'%s' premenované na '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1111,8 +1112,8 @@ msgid "Play with subtitles"
 msgstr "Prehrať s titulkami"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Naozaj to chcete?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1255,7 +1256,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1475,12 +1476,12 @@ msgid "Views count display colour"
 msgstr "Farba zobrazenia počtu videní"
 
 msgctxt "#30794"
-msgid "Likes count display colour"
-msgstr "Farba zobrazenia počtu Lajkov"
+msgid "Subscriber/Likes count display colour"
+msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
-msgstr "Farba zobrazenia počtu komentárov"
+msgid "Videos/Comments count display colour"
+msgstr ""
 
 msgctxt "#30796"
 msgid "1080p/60 fps | Raspberry Pi 4, or similar"
@@ -1577,6 +1578,174 @@ msgstr "Naozaj chcete aktualizovať settings.xml?"
 msgctxt "#30819"
 msgid "Play from start"
 msgstr "Prehrať od začiatku"
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Automaticky odstrániť z 'Pozrieť neskôr'"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Naozaj chcete odstrániť '%s' zo zoznamu 'Pozrieť neskôr'?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Naozaj chcete nahradiť aktuálny zoznam 'Pozrieť neskôr' zoznamom '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Naozaj chcete odstrániť '%s' zo zoznamu histórie?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Naozaj chcete nahradiť aktuálny zoznam histórie zoznamom '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Používateľ je teraz '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Prepnúť na '%s' teraz?"
+
+#~ msgctxt "#30666"
+#~ msgid "%s removed"
+#~ msgstr "%s bolo odstránené"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "'%s' premenované na '%s'"
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Plugin pre YouTube"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube je jednou z najväčších webstránok na zdieľanie videa na svete"
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Hlavné"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Pokročilé"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Odstrániť"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Premenovať"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Odstrániť"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Kanály"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Zoznamy"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Vyberte zoznam"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Nový zoznam..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Jazyk"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Prehrať všetko"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Štandardný"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Náhodne"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Živé prenosy"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Obnoviť"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Viac..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Región"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Jazyk titulkov"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Žiaden"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "Spýtať sa"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Nastavenia"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Automaticky"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Osobné API kľúče povolené"
+
+#~ msgctxt "#30600"
+#~ msgid "Subtitles"
+#~ msgstr "Titulky"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "Zrušiť"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Port"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Uložiť"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Naozaj to chcete?"
+
+#~ msgctxt "#30794"
+#~ msgid "Likes count display colour"
+#~ msgstr "Farba zobrazenia počtu Lajkov"
+
+#~ msgctxt "#30795"
+#~ msgid "Comments count display colour"
+#~ msgstr "Farba zobrazenia počtu komentárov"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"
