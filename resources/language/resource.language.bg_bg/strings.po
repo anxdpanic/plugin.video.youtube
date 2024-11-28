@@ -31,13 +31,14 @@ msgstr ""
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
-# msgstr "Добавка за YouTube"
+# msgstr ""
 # msgctxt "Addon Description"
 # msgid "YouTube is a one of the biggest video-sharing websites of the world."
-# msgstr "YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят."
+# msgstr ""
+# Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Общи"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -149,8 +150,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Допълнителни"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -215,8 +216,8 @@ msgid "Watch Later"
 msgstr "За гледане по-късно"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Премахни"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -235,8 +236,8 @@ msgid "Sign Out"
 msgstr "Изход"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Преименуване"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -255,8 +256,8 @@ msgid "Remove \"%s\"?"
 msgstr "Премахване на \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Изтрий"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -299,12 +300,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Канали"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Плейлисти"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -359,8 +360,8 @@ msgid "Related Videos"
 msgstr "Сродни видеоклипове"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Премахвай автоматично от 'Watch Later'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -383,16 +384,16 @@ msgid "Add to..."
 msgstr "Добавяне към..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Създаване на плейлист"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Нов плейлист..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Език"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -423,20 +424,20 @@ msgid "I dislike this"
 msgstr "Това не ми харесва"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Пускане на всички"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Стандартно"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Обръщане"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Разбъркване"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -455,8 +456,8 @@ msgid "Disliked Videos"
 msgstr "Нехаресани видеоклипове"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "На живо"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -471,8 +472,8 @@ msgid "rtmpe streams are not supported"
 msgstr "Потоци тип rtmpe не се поддържат"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Опресни"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -491,16 +492,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Още..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Не са открити видео потоци"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "държава"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -539,15 +540,15 @@ msgid "Delete settings.xml"
 msgstr ""
 
 msgctxt "#30560"
-msgid "Subtitle language"
+msgid ""
 msgstr ""
 
 msgctxt "#30561"
-msgid "None"
+msgid ""
 msgstr ""
 
 msgctxt "#30562"
-msgid ""
+msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
@@ -563,7 +564,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
+msgid ""
 msgstr ""
 
 msgctxt "#30567"
@@ -575,11 +576,11 @@ msgid "Remove as Watch Later"
 msgstr ""
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
 msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
 msgstr ""
 
 msgctxt "#30571"
@@ -591,11 +592,11 @@ msgid "Remove as History"
 msgstr ""
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
 msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
 msgstr ""
 
 msgctxt "#30575"
@@ -607,7 +608,7 @@ msgid "Failed"
 msgstr ""
 
 msgctxt "#30577"
-msgid "Settings"
+msgid ""
 msgstr ""
 
 msgctxt "#30578"
@@ -631,7 +632,7 @@ msgid "Autoplay suggested videos"
 msgstr ""
 
 msgctxt "#30583"
-msgid "Automatic"
+msgid ""
 msgstr ""
 
 msgctxt "#30584"
@@ -691,7 +692,7 @@ msgid "Updated: %s"
 msgstr ""
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
+msgid ""
 msgstr ""
 
 msgctxt "#30599"
@@ -699,7 +700,7 @@ msgid "Failed to enable personal API keys. Missing: %s"
 msgstr ""
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -759,7 +760,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
+msgid ""
 msgstr ""
 
 msgctxt "#30616"
@@ -775,7 +776,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
+msgid ""
 msgstr ""
 
 msgctxt "#30620"
@@ -819,7 +820,7 @@ msgid "IP whitelist (comma delimited)"
 msgstr ""
 
 msgctxt "#30630"
-msgid "Save"
+msgid ""
 msgstr ""
 
 msgctxt "#30631"
@@ -935,7 +936,7 @@ msgid "Enter a name for this user"
 msgstr ""
 
 msgctxt "#30659"
-msgid "User is now '%s'"
+msgid "User is now \"%s\""
 msgstr ""
 
 msgctxt "#30660"
@@ -959,15 +960,15 @@ msgid "Switch user"
 msgstr ""
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
+msgid "Switch to \"%s\" now?"
 msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
+msgid "Renamed \"%s\" to \"%s\""
 msgstr ""
 
 msgctxt "#30668"
@@ -1111,7 +1112,7 @@ msgid "Play with subtitles"
 msgstr ""
 
 msgctxt "#30703"
-msgid "Are you sure?"
+msgid ""
 msgstr ""
 
 msgctxt "#30704"
@@ -1255,7 +1256,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1475,11 +1476,11 @@ msgid "Views count display colour"
 msgstr ""
 
 msgctxt "#30794"
-msgid "Likes count display colour"
+msgid "Subscriber/Likes count display colour"
 msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
+msgid "Videos/Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
@@ -1577,6 +1578,90 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Премахвай автоматично от 'Watch Later'"
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr "Добавка за YouTube"
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr "YouTube е един от най-големите уеб сайтове за споделяне на видео в целия свят."
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Общи"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Допълнителни"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Премахни"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Преименуване"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Изтрий"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Канали"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Плейлисти"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Създаване на плейлист"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Нов плейлист..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Език"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Пускане на всички"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Стандартно"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Разбъркване"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "На живо"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Опресни"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Още..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "държава"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"
