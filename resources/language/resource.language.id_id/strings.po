@@ -37,8 +37,8 @@ msgstr "Plugin ini tidak didukung oleh Google"
 # msgstr ""
 # Kodion Settings
 msgctxt "#30000"
-msgid "General"
-msgstr "Umum"
+msgid ""
+msgstr ""
 
 msgctxt "#30001"
 msgid ""
@@ -151,8 +151,8 @@ msgid "Configure %s?"
 msgstr ""
 
 msgctxt "#30031"
-msgid "Advanced"
-msgstr "Lanjutan"
+msgid ""
+msgstr ""
 
 msgctxt "#30032"
 msgid "View: TV Shows"
@@ -217,8 +217,8 @@ msgid "Watch Later"
 msgstr "Nonton Nanti"
 
 msgctxt "#30108"
-msgid "Remove"
-msgstr "Hapus"
+msgid ""
+msgstr ""
 
 msgctxt "#30109"
 msgid ""
@@ -237,8 +237,8 @@ msgid "Sign Out"
 msgstr "Keluar"
 
 msgctxt "#30113"
-msgid "Rename"
-msgstr "Nama ulang"
+msgid ""
+msgstr ""
 
 msgctxt "#30114"
 msgid "Confirm delete"
@@ -257,8 +257,8 @@ msgid "Remove \"%s\"?"
 msgstr "Hapus \"%s\"?"
 
 msgctxt "#30118"
-msgid "Delete"
-msgstr "Hapus"
+msgid ""
+msgstr ""
 
 msgctxt "#30119"
 msgid "Please wait..."
@@ -301,12 +301,12 @@ msgstr ""
 # YouTube
 # empty strings from id 30206 to 30499
 msgctxt "#30500"
-msgid "Channels"
-msgstr "Saluran"
+msgid ""
+msgstr ""
 
 msgctxt "#30501"
-msgid "Playlists"
-msgstr "Daftarputar"
+msgid ""
+msgstr ""
 
 msgctxt "#30502"
 msgid "Go to %s"
@@ -361,8 +361,8 @@ msgid "Related Videos"
 msgstr "Video Terkait"
 
 msgctxt "#30515"
-msgid "Auto-Remove from 'Watch Later'"
-msgstr "Hapus Otomatis dari 'Tonton Nanti'"
+msgid "Auto-Remove from Watch Later"
+msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
@@ -385,16 +385,16 @@ msgid "Add to..."
 msgstr "Tambahkan ke..."
 
 msgctxt "#30521"
-msgid "Select playlist"
-msgstr "Pilih daftar putar"
+msgid ""
+msgstr ""
 
 msgctxt "#30522"
-msgid "New playlist..."
-msgstr "Daftar putar baru..."
+msgid ""
+msgstr ""
 
 msgctxt "#30523"
-msgid "Language"
-msgstr "Bahasa"
+msgid ""
+msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
@@ -425,20 +425,20 @@ msgid "I dislike this"
 msgstr "Tidak suka"
 
 msgctxt "#30531"
-msgid "Play all"
-msgstr "Putar semua"
+msgid ""
+msgstr ""
 
 msgctxt "#30532"
-msgid "Default"
-msgstr "Bawaan"
+msgid ""
+msgstr ""
 
 msgctxt "#30533"
 msgid "Reverse"
 msgstr "Balik"
 
 msgctxt "#30534"
-msgid "Shuffle"
-msgstr "Acak"
+msgid ""
+msgstr ""
 
 msgctxt "#30535"
 msgid "Select the order of the playlist"
@@ -457,8 +457,8 @@ msgid "Disliked Videos"
 msgstr "Video yang tak disukai"
 
 msgctxt "#30539"
-msgid "Live"
-msgstr "Langsung"
+msgid ""
+msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
@@ -473,8 +473,8 @@ msgid "rtmpe streams are not supported"
 msgstr "aliran rtmpe tidak didukung"
 
 msgctxt "#30543"
-msgid "Refresh"
-msgstr "Segarkan"
+msgid ""
+msgstr ""
 
 msgctxt "#30544"
 msgid "More Links from the description"
@@ -493,16 +493,16 @@ msgid "You may be prompted to enable two applications so that YouTube is functio
 msgstr ""
 
 msgctxt "#30548"
-msgid "More..."
-msgstr "Lebih..."
+msgid ""
+msgstr ""
 
 msgctxt "#30549"
 msgid "No videos streams found"
 msgstr "Aliran video tidak ditemukan"
 
 msgctxt "#30550"
-msgid "Region"
-msgstr "Wilayah"
+msgid ""
+msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
@@ -541,15 +541,15 @@ msgid "Delete settings.xml"
 msgstr "Hapus settings.xml"
 
 msgctxt "#30560"
-msgid "Subtitle language"
-msgstr "Bahasa takarir"
+msgid ""
+msgstr ""
 
 msgctxt "#30561"
-msgid "None"
-msgstr "Nihil"
+msgid ""
+msgstr ""
 
 msgctxt "#30562"
-msgid ""
+msgid "View all"
 msgstr ""
 
 msgctxt "#30563"
@@ -565,8 +565,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30566"
-msgid "Prompt"
-msgstr "Perintah"
+msgid ""
+msgstr ""
 
 msgctxt "#30567"
 msgid "Set as Watch Later"
@@ -577,12 +577,12 @@ msgid "Remove as Watch Later"
 msgstr "Hapus sebagai Tonton Nanti"
 
 msgctxt "#30569"
-msgid "Are you sure you want to remove '%s' as your Watch Later list?"
-msgstr "Yakin ingin menghapus '%s' sebagai daftar Tonton Nanti?"
+msgid "Are you sure you want to remove \"%s\" as your Watch Later list?"
+msgstr ""
 
 msgctxt "#30570"
-msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
-msgstr "Yakin ingin mengganti daftar Tonton Nanti Anda saat ini dengan '%s'?"
+msgid "Are you sure you want to replace your current Watch Later list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
@@ -593,12 +593,12 @@ msgid "Remove as History"
 msgstr "Hapus sebagai Riwayat"
 
 msgctxt "#30573"
-msgid "Are you sure you want to remove '%s' as your History list?"
-msgstr "Yakin ingin menghapus '%s' sebagai daftar Riwayat Anda?"
+msgid "Are you sure you want to remove \"%s\" as your History list?"
+msgstr ""
 
 msgctxt "#30574"
-msgid "Are you sure you want to replace your current History list with '%s'?"
-msgstr "Yakin ingin mengganti daftar Riwayat Anda saat ini dengan '%s'?"
+msgid "Are you sure you want to replace your current History list with \"%s\"?"
+msgstr ""
 
 msgctxt "#30575"
 msgid "Succeeded"
@@ -609,8 +609,8 @@ msgid "Failed"
 msgstr "Gagal"
 
 msgctxt "#30577"
-msgid "Settings"
-msgstr "Pengaturan"
+msgid ""
+msgstr ""
 
 msgctxt "#30578"
 msgid "Force SSL certificate verification"
@@ -633,8 +633,8 @@ msgid "Autoplay suggested videos"
 msgstr "Putar otomatis video yang disarankan"
 
 msgctxt "#30583"
-msgid "Automatic"
-msgstr "Otomatis"
+msgid ""
+msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
@@ -693,15 +693,15 @@ msgid "Updated: %s"
 msgstr "Diperbarui: %s"
 
 msgctxt "#30598"
-msgid "Personal API keys enabled"
-msgstr "Kunci API pribadi diaktifkan"
+msgid ""
+msgstr ""
 
 msgctxt "#30599"
 msgid "Failed to enable personal API keys. Missing: %s"
 msgstr "Gagal mengaktifkan kunci API pribadi. Tidak ada: %s"
 
 msgctxt "#30600"
-msgid "Subtitles"
+msgid ""
 msgstr ""
 
 msgctxt "#30601"
@@ -761,8 +761,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30615"
-msgid "Cancel"
-msgstr "Batal"
+msgid ""
+msgstr ""
 
 msgctxt "#30616"
 msgid ""
@@ -777,8 +777,8 @@ msgid ""
 msgstr ""
 
 msgctxt "#30619"
-msgid "Port"
-msgstr "Port"
+msgid ""
+msgstr ""
 
 msgctxt "#30620"
 msgid "Port %s already in use. Cannot start http server."
@@ -821,8 +821,8 @@ msgid "IP whitelist (comma delimited)"
 msgstr "Daftar putih IP (dibatasi koma)"
 
 msgctxt "#30630"
-msgid "Save"
-msgstr "Simpan"
+msgid ""
+msgstr ""
 
 msgctxt "#30631"
 msgid "Successfully updated: %s"
@@ -937,8 +937,8 @@ msgid "Enter a name for this user"
 msgstr "Masukkan nama untuk pengguna ini"
 
 msgctxt "#30659"
-msgid "User is now '%s'"
-msgstr "Pengguna sekarang adalah '%s'"
+msgid "User is now \"%s\""
+msgstr ""
 
 msgctxt "#30660"
 msgid "Users"
@@ -961,16 +961,16 @@ msgid "Switch user"
 msgstr "Ganti pengguna"
 
 msgctxt "#30665"
-msgid "Switch to '%s' now?"
-msgstr "Beralih ke '%s' sekarang?"
+msgid "Switch to \"%s\" now?"
+msgstr ""
 
 msgctxt "#30666"
-msgid "%s removed"
+msgid "\"%s\" removed"
 msgstr ""
 
 msgctxt "#30667"
-msgid "Renamed '%s' to '%s'"
-msgstr "Menamakan ulang '%s' ke '%s'"
+msgid "Renamed \"%s\" to \"%s\""
+msgstr ""
 
 msgctxt "#30668"
 msgid "Play count minimum percent"
@@ -1113,8 +1113,8 @@ msgid "Play with subtitles"
 msgstr "Bermain dengan takarir"
 
 msgctxt "#30703"
-msgid "Are you sure?"
-msgstr "Yakin?"
+msgid ""
+msgstr ""
 
 msgctxt "#30704"
 msgid "Use YouTube website urls with default player"
@@ -1257,7 +1257,7 @@ msgid ""
 msgstr ""
 
 msgctxt "#30739"
-msgid ""
+msgid "Subscribers"
 msgstr ""
 
 msgctxt "#30740"
@@ -1477,11 +1477,11 @@ msgid "Views count display colour"
 msgstr ""
 
 msgctxt "#30794"
-msgid "Likes count display colour"
+msgid "Subscriber/Likes count display colour"
 msgstr ""
 
 msgctxt "#30795"
-msgid "Comments count display colour"
+msgid "Videos/Comments count display colour"
 msgstr ""
 
 msgctxt "#30796"
@@ -1579,6 +1579,159 @@ msgstr ""
 msgctxt "#30819"
 msgid "Play from start"
 msgstr ""
+
+msgctxt "#30820"
+msgid "Podcast"
+msgstr ""
+
+#~ msgctxt "#30515"
+#~ msgid "Auto-Remove from 'Watch Later'"
+#~ msgstr "Hapus Otomatis dari 'Tonton Nanti'"
+
+#~ msgctxt "#30569"
+#~ msgid "Are you sure you want to remove '%s' as your Watch Later list?"
+#~ msgstr "Yakin ingin menghapus '%s' sebagai daftar Tonton Nanti?"
+
+#~ msgctxt "#30570"
+#~ msgid "Are you sure you want to replace your current Watch Later list with '%s'?"
+#~ msgstr "Yakin ingin mengganti daftar Tonton Nanti Anda saat ini dengan '%s'?"
+
+#~ msgctxt "#30573"
+#~ msgid "Are you sure you want to remove '%s' as your History list?"
+#~ msgstr "Yakin ingin menghapus '%s' sebagai daftar Riwayat Anda?"
+
+#~ msgctxt "#30574"
+#~ msgid "Are you sure you want to replace your current History list with '%s'?"
+#~ msgstr "Yakin ingin mengganti daftar Riwayat Anda saat ini dengan '%s'?"
+
+#~ msgctxt "#30659"
+#~ msgid "User is now '%s'"
+#~ msgstr "Pengguna sekarang adalah '%s'"
+
+#~ msgctxt "#30665"
+#~ msgid "Switch to '%s' now?"
+#~ msgstr "Beralih ke '%s' sekarang?"
+
+#~ msgctxt "#30667"
+#~ msgid "Renamed '%s' to '%s'"
+#~ msgstr "Menamakan ulang '%s' ke '%s'"
+
+# msgctxt "Addon Summary"
+# msgid "Plugin for YouTube"
+# msgstr ""
+# msgctxt "Addon Description"
+# msgid "YouTube is a one of the biggest video-sharing websites of the world."
+# msgstr ""
+# Kodion Settings
+#~ msgctxt "#30000"
+#~ msgid "General"
+#~ msgstr "Umum"
+
+#~ msgctxt "#30031"
+#~ msgid "Advanced"
+#~ msgstr "Lanjutan"
+
+#~ msgctxt "#30108"
+#~ msgid "Remove"
+#~ msgstr "Hapus"
+
+#~ msgctxt "#30113"
+#~ msgid "Rename"
+#~ msgstr "Nama ulang"
+
+#~ msgctxt "#30118"
+#~ msgid "Delete"
+#~ msgstr "Hapus"
+
+# YouTube
+# empty strings from id 30206 to 30499
+#~ msgctxt "#30500"
+#~ msgid "Channels"
+#~ msgstr "Saluran"
+
+#~ msgctxt "#30501"
+#~ msgid "Playlists"
+#~ msgstr "Daftarputar"
+
+#~ msgctxt "#30521"
+#~ msgid "Select playlist"
+#~ msgstr "Pilih daftar putar"
+
+#~ msgctxt "#30522"
+#~ msgid "New playlist..."
+#~ msgstr "Daftar putar baru..."
+
+#~ msgctxt "#30523"
+#~ msgid "Language"
+#~ msgstr "Bahasa"
+
+#~ msgctxt "#30531"
+#~ msgid "Play all"
+#~ msgstr "Putar semua"
+
+#~ msgctxt "#30532"
+#~ msgid "Default"
+#~ msgstr "Bawaan"
+
+#~ msgctxt "#30534"
+#~ msgid "Shuffle"
+#~ msgstr "Acak"
+
+#~ msgctxt "#30539"
+#~ msgid "Live"
+#~ msgstr "Langsung"
+
+#~ msgctxt "#30543"
+#~ msgid "Refresh"
+#~ msgstr "Segarkan"
+
+#~ msgctxt "#30548"
+#~ msgid "More..."
+#~ msgstr "Lebih..."
+
+#~ msgctxt "#30550"
+#~ msgid "Region"
+#~ msgstr "Wilayah"
+
+#~ msgctxt "#30560"
+#~ msgid "Subtitle language"
+#~ msgstr "Bahasa takarir"
+
+#~ msgctxt "#30561"
+#~ msgid "None"
+#~ msgstr "Nihil"
+
+#~ msgctxt "#30566"
+#~ msgid "Prompt"
+#~ msgstr "Perintah"
+
+#~ msgctxt "#30577"
+#~ msgid "Settings"
+#~ msgstr "Pengaturan"
+
+#~ msgctxt "#30583"
+#~ msgid "Automatic"
+#~ msgstr "Otomatis"
+
+#~ msgctxt "#30598"
+#~ msgid "Personal API keys enabled"
+#~ msgstr "Kunci API pribadi diaktifkan"
+
+#~ msgctxt "#30615"
+#~ msgid "Cancel"
+#~ msgstr "Batal"
+
+#~ msgctxt "#30619"
+#~ msgid "Port"
+#~ msgstr "Port"
+
+#~ msgctxt "#30630"
+#~ msgid "Save"
+#~ msgstr "Simpan"
+
+#~ msgctxt "#30703"
+#~ msgid "Are you sure?"
+#~ msgstr "Yakin?"
 
 #~ msgctxt "#30546"
 #~ msgid "Please log in twice!"
