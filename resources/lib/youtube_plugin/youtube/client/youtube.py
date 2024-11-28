@@ -1430,7 +1430,7 @@ class YouTube(LoginClient):
             'relevanceLanguage': self._language,
         }
 
-        search_query = params.get('q')
+        search_query = params.get('q', '')
         if '|' in search_query:
             search_params['q'] = search_query.replace('|', '%7C')
 
@@ -1444,9 +1444,8 @@ class YouTube(LoginClient):
 
         channel_id = params.get('channelId')
         if channel_id == 'mine':
+            del params['channelId']
             params['forMine'] = True
-        else:
-            params['channelId'] = channel_id
 
         location = params.get('location')
         if location is True:

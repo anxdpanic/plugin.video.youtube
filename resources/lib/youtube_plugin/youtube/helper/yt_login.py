@@ -121,7 +121,7 @@ def process(mode, provider, context, sign_out_refresh=True):
 
         tokens = ['tv', 'personal']
         for token_type, token in enumerate(tokens):
-            new_token = _do_login(token_type) or (None, 0, None)
+            new_token = _do_login(token_type) or ('', -1, '')
             tokens[token_type] = new_token
 
             context.log_debug('YouTube Login:'

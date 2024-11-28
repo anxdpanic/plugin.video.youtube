@@ -1630,6 +1630,7 @@ class Provider(AbstractProvider):
                 if isinstance(item, float):
                     kind = 'youtube#channel'
                     yt_id = item_id
+                    item_name = ''
                     partial = True
                 elif isinstance(item, BaseItem):
                     partial = False
@@ -1644,9 +1645,11 @@ class Provider(AbstractProvider):
                         else:
                             kind = 'youtube#channel'
                             yt_id = getattr(item, 'channel_id', None)
+                    item_name = item.get_name()
                 else:
                     kind = None
                     yt_id = None
+                    item_name = ''
                     partial = False
 
                 if not yt_id:
@@ -1677,7 +1680,7 @@ class Provider(AbstractProvider):
                     '_context_menu': {
                         'context_menu': (
                             menu_items.bookmark_remove(
-                                context, item_id, item.get_name()
+                                context, item_id, item_name
                             ),
                             menu_items.bookmarks_clear(
                                 context
