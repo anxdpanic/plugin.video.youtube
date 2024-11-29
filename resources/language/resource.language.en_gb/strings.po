@@ -1222,7 +1222,7 @@ msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
-msgid ""
+msgid "Prefer lower resolution streams for unselected codecs"
 msgstr ""
 
 msgctxt "#30730"

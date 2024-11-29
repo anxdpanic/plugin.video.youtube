@@ -121,17 +121,17 @@ def process_performance_settings(context, step, steps, **_kwargs):
         device_types = {
             '720p30': {
                 'max_resolution': 3,  # 720p
-                'stream_features': ('avc1', 'mp4a', 'filter'),
+                'stream_features': ('avc1', 'mp4a', 'filter', 'alt_sort'),
                 'num_items': 10,
             },
             '1080p30_avc': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter'),
+                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter', 'alt_sort'),
                 'num_items': 10,
             },
             '1080p30': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'),
+                'stream_features': ('avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'alt_sort'),
                 'num_items': 20,
             },
             '1080p60': {

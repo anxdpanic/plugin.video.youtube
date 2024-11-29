@@ -2120,18 +2120,21 @@ class StreamInfo(YouTubeRequestClient):
             context.log_debug('Generate MPD: No video mime-types found')
             return None, None
 
-        def _stream_sort(stream):
+        def _stream_sort(stream, alt_sort=('alt_sort' in stream_features)):
             if not stream:
                 return (1,)
 
+            preferred = stream['preferred_codec']
             return (
-                - stream['preferred_codec'],
-                - stream['height'],
+                - preferred,
+                - stream['height']
+                if preferred or not alt_sort else
+                stream['height'],
                 - stream['fps'],
                 - stream['hdr'],
                 - stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
-                - stream['preferred_codec'],
+                - preferred,
                 - stream['channels'],
                 - stream['biasedBitrate'],
             )
