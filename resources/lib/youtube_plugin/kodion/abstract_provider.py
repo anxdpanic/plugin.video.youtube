@@ -135,7 +135,7 @@ class AbstractProvider(object):
 
         try:
             if wizard_steps and ui.on_yes_no_input(
-                    localize('setup_wizard'),
+                    ' - '.join((localize('youtube'), localize('setup_wizard'))),
                     (localize('setup_wizard.prompt')
                      % localize('setup_wizard.prompt.settings'))
             ):

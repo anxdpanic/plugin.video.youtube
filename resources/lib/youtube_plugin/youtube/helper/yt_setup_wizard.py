@@ -26,7 +26,12 @@ def process_language(provider, context, step, steps):
 
     step += 1
     if ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.locale'))
     ):
@@ -45,7 +50,12 @@ def process_geo_location(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.my_location'))
     ):
@@ -65,7 +75,12 @@ def process_default_settings(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.defaults'))
     ):
@@ -95,7 +110,12 @@ def process_list_detail_settings(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.list_details'))
     ):
@@ -114,7 +134,12 @@ def process_performance_settings(context, step, steps, **_kwargs):
 
     step += 1
     if ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.performance'))
     ):
@@ -189,7 +214,12 @@ def process_subtitles(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.subtitles'))
     ):
@@ -215,7 +245,12 @@ def process_old_search_db(context, step, steps, **_kwargs):
     search_db_path_str = os.path.join(*search_db_path)
     step += 1
     if xbmcvfs.exists(search_db_path_str) and ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             localize('setup_wizard.prompt.import_search_history'),
     ):
         def _convert_old_search_item(value, item):
@@ -260,7 +295,12 @@ def process_old_history_db(context, step, steps, **_kwargs):
     history_db_path_str = os.path.join(*history_db_path)
     step += 1
     if xbmcvfs.exists(history_db_path_str) and ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             localize('setup_wizard.prompt.import_playback_history'),
     ):
         def _convert_old_history_item(value, item):
@@ -303,7 +343,12 @@ def process_refresh_settings(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             localize('setup_wizard.prompt.settings.refresh'),
     ):
         context.execute(
