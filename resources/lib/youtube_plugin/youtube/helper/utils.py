@@ -828,8 +828,13 @@ def update_video_items(provider, context, video_id_dict,
 
         # date time
         published_at = snippet.get('publishedAt')
-        if published_at:
+        if not published_at:
+            datetime = None
+        elif isinstance(published_at, string_type):
             datetime = datetime_parser.parse(published_at)
+        else:
+            datetime = published_at
+        if datetime:
             media_item.set_added_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
             media_item.set_dateadded_from_datetime(local_datetime)

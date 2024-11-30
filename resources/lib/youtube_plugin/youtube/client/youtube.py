@@ -25,7 +25,7 @@ from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
 from ...kodion.utils import (
-    datetime_parser,
+    datetime_parser as dt,
     strip_html_from_text,
     to_unicode,
 )
@@ -1076,7 +1076,7 @@ class YouTube(LoginClient):
             if isinstance(after, string_type) and after.startswith('{'):
                 after = json.loads(after)
             params['publishedAfter'] = (
-                datetime_parser.yt_datetime_offset(**after)
+                dt.yt_datetime_offset(**after)
                 if isinstance(after, dict) else
                 after
             )
@@ -1495,7 +1495,7 @@ class YouTube(LoginClient):
             if isinstance(published, string_type) and published.startswith('{'):
                 published = json.loads(published)
             search_params['publishedBefore'] = (
-                datetime_parser.yt_datetime_offset(**published)
+                dt.yt_datetime_offset(**published)
                 if isinstance(published, dict) else
                 published
             )
@@ -1505,7 +1505,7 @@ class YouTube(LoginClient):
             if isinstance(published, string_type) and published.startswith('{'):
                 published = json.loads(published)
             search_params['publishedAfter'] = (
-                datetime_parser.yt_datetime_offset(**published)
+                dt.yt_datetime_offset(**published)
                 if isinstance(published, dict) else
                 published
             )
@@ -1616,7 +1616,12 @@ class YouTube(LoginClient):
                 return -1
             limits['num'] += 1
             limits['video_ids'].add(video_id)
-            return item['_timestamp']
+            if '_timestamp' in item:
+                timestamp = item['_timestamp']
+            else:
+                timestamp = dt.since_epoch(item['snippet'].get('publishedAt'))
+                item['_timestamp'] = timestamp
+            return timestamp
 
         threaded_output = {
             'channel_ids': [],
@@ -1759,19 +1764,35 @@ class YouTube(LoginClient):
                     content = to_unicode(content.content).replace('\n', '')
 
                     root = ET.fromstring(content if utf8 else to_str(content))
-                    channel_name = (root.findtext('atom:title', '', _ns)
-                                    .lower().replace(',', ''))
+                    channel_title = root.findtext('atom:title', '', _ns)
+                    channel_name = channel_title.lower().replace(',', '')
+                    dict_get = {}.get
                     feed_items = [{
                         'kind': 'youtube#video',
                         'id': item.findtext('yt:videoId', '', _ns),
                         'snippet': {
                             'channelId': channel_id,
-                        },
-                        '_timestamp': datetime_parser.since_epoch(
-                            datetime_parser.strptime(
+                            'channelTitle': channel_title,
+                            'title': item.findtext('atom:title', '', _ns),
+                            'description': item.findtext(
+                                'media:group/media:description',
+                                '',
+                                _ns,
+                            ),
+                            'publishedAt': dt.strptime(
                                 item.findtext('atom:published', '', _ns)
-                            )
-                        ),
+                            ),
+                        },
+                        'statistics': {
+                            'likeCount': getattr(item.find(
+                                'media:group/media:community/media:starRating',
+                                _ns,
+                            ), 'get', dict_get)('count', 0),
+                            'viewCount': getattr(item.find(
+                                'media:group/media:community/media:statistics',
+                                _ns,
+                            ), 'get', dict_get)('views', 0),
+                        },
                         '_partial': True,
                     } for item in root.findall('atom:entry', _ns)]
                 else:

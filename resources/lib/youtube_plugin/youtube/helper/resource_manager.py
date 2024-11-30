@@ -400,7 +400,8 @@ class ResourceManager(object):
                    ids,
                    live_details=False,
                    suppress_errors=False,
-                   defer_cache=False):
+                   defer_cache=False,
+                   yt_items=None):
         context = self._context
         ids = tuple(ids)
         refresh = context.get_param('refresh')
@@ -455,6 +456,13 @@ class ResourceManager(object):
                             **new_data)
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
+
+        if not result and not new_data and yt_items:
+            result = {
+                yt_item.get('id'): yt_item
+                for yt_item in yt_items
+            }
+            self.cache_data(result, defer=defer_cache)
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
