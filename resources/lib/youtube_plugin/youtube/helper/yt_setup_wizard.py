@@ -207,13 +207,14 @@ def process_old_search_db(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 
-    search_db_path = os.path.join(
-        DATA_PATH,
+    search_db_path = (
+        xbmcvfs.translatePath(DATA_PATH),
         'kodion',
         'search.sqlite'
     )
+    search_db_path_str = os.path.join(*search_db_path)
     step += 1
-    if xbmcvfs.exists(search_db_path) and ui.on_yes_no_input(
+    if xbmcvfs.exists(search_db_path_str) and ui.on_yes_no_input(
             localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
             localize('setup_wizard.prompt.import_search_history'),
     ):
@@ -225,7 +226,7 @@ def process_old_search_db(context, step, steps, **_kwargs):
 
         search_history = context.get_search_history()
         old_search_db = SearchHistory(
-            xbmcvfs.translatePath(search_db_path),
+            search_db_path,
             migrate='storage',
         )
         items = old_search_db.get_items(process=_convert_old_search_item)
@@ -239,7 +240,7 @@ def process_old_search_db(context, step, steps, **_kwargs):
                 action='delete',
                 query=urlencode({
                     'target': 'other_file',
-                    'path': search_db_path,
+                    'path': search_db_path_str,
                 }),
             ),
             wait_for=WAIT_END_FLAG,
@@ -251,13 +252,14 @@ def process_old_history_db(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 
-    history_db_path = os.path.join(
-        DATA_PATH,
+    history_db_path = (
+        xbmcvfs.translatePath(DATA_PATH),
         'playback',
         context.get_access_manager().get_current_user_id() + '.sqlite',
     )
+    history_db_path_str = os.path.join(*history_db_path)
     step += 1
-    if xbmcvfs.exists(history_db_path) and ui.on_yes_no_input(
+    if xbmcvfs.exists(history_db_path_str) and ui.on_yes_no_input(
             localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
             localize('setup_wizard.prompt.import_playback_history'),
     ):
@@ -273,7 +275,7 @@ def process_old_history_db(context, step, steps, **_kwargs):
 
         playback_history = context.get_playback_history()
         old_history_db = PlaybackHistory(
-            xbmcvfs.translatePath(history_db_path),
+            history_db_path,
             migrate='storage',
         )
         items = old_history_db.get_items(process=_convert_old_history_item)
@@ -288,7 +290,7 @@ def process_old_history_db(context, step, steps, **_kwargs):
                 action='delete',
                 query=urlencode({
                     'target': 'other_file',
-                    'path': history_db_path,
+                    'path': history_db_path_str,
                 }),
             ),
             wait_for=WAIT_END_FLAG,
