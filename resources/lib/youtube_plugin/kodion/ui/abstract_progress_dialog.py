@@ -113,7 +113,6 @@ class AbstractProgressDialog(object):
             )
             self._message = message
 
-        self._dialog.update(
-            percent=percent,
-            message=self._message,
-        )
+        # Kodi 18 renamed XbmcProgressDialog.update argument line1 to message.
+        # Only use positional arguments to maintain compatibility
+        self._dialog.update(percent, self._message)
