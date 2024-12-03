@@ -297,7 +297,8 @@ class XbmcPlugin(AbstractPlugin):
         return succeeded
 
     @staticmethod
-    def post_run(context, ui, *actions, timeout=30):
+    def post_run(context, ui, *actions, **kwargs):
+        timeout = kwargs.get('timeout', 30)
         for action in actions:
             while ui.busy_dialog_active():
                 timeout -= 1
