@@ -33,7 +33,7 @@ from ...kodion.utils import (
 
 class YouTube(LoginClient):
     CLIENTS = {
-        1: {
+        'v1': {
             'url': 'https://www.youtube.com/youtubei/v1/{_endpoint}',
             'method': None,
             'json': {
@@ -48,7 +48,7 @@ class YouTube(LoginClient):
                 'Host': 'www.youtube.com',
             },
         },
-        3: {
+        'v3': {
             '_auth_required': True,
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
             'method': None,
@@ -330,7 +330,7 @@ class YouTube(LoginClient):
 
     def unsubscribe_channel(self, channel_id, **kwargs):
         post_data = {'channelIds': [channel_id]}
-        return self.api_request(version=1,
+        return self.api_request(client='v1',
                                 method='POST',
                                 path='subscription/unsubscribe',
                                 post_data=post_data,
@@ -460,7 +460,7 @@ class YouTube(LoginClient):
                 }
             post_data['context'] = context
 
-        result = self.api_request(version=1,
+        result = self.api_request(client='v1',
                                   method='POST',
                                   path='browse',
                                   post_data=post_data)
@@ -1099,8 +1099,9 @@ class YouTube(LoginClient):
         if page_token:
             post_data['continuation'] = page_token
 
-        result = self.api_request(version=('tv' if retry == 1 else
-                                           'tv_embed' if retry == 2 else 1),
+        result = self.api_request(client=('tv' if retry == 1 else
+                                          'tv_embed' if retry == 2 else
+                                          'v1'),
                                   method='POST',
                                   path='next',
                                   post_data=post_data,
@@ -2052,7 +2053,7 @@ class YouTube(LoginClient):
             else:
                 _post_data['browseId'] = 'FEmy_youtube'
 
-            _json_data = self.api_request(version=1,
+            _json_data = self.api_request(client='v1',
                                           method='POST',
                                           path='browse',
                                           post_data=_post_data)
@@ -2147,7 +2148,7 @@ class YouTube(LoginClient):
         }
 
         playlist_index = None
-        json_data = self.api_request(version=1,
+        json_data = self.api_request(client='v1',
                                      method='POST',
                                      path='browse',
                                      post_data=_en_post_data)
@@ -2247,18 +2248,20 @@ class YouTube(LoginClient):
         return '', info, details, data, False, exception
 
     def api_request(self,
-                    version=3,
+                    client='v3',
                     method='GET',
+                    client_data=None,
                     path=None,
                     params=None,
                     post_data=None,
                     headers=None,
                     no_login=False,
                     **kwargs):
-        client_data = {
-            '_endpoint': path.strip('/'),
-            'method': method,
-        }
+        if not client_data:
+            client_data = {}
+        client_data.setdefault('method', method)
+        if path:
+            client_data['_endpoint'] = path.strip('/')
         if headers:
             client_data['headers'] = headers
         if method in {'POST', 'PUT'}:
@@ -2279,7 +2282,7 @@ class YouTube(LoginClient):
             if self._access_token_tv:
                 client_data['_access_token_tv'] = self._access_token_tv
 
-        client = self.build_client(version, client_data)
+        client = self.build_client(client, client_data)
         if not client:
             client = {}
             abort = True
@@ -2323,13 +2326,13 @@ class YouTube(LoginClient):
 
         context = self._context
         context.log_debug('API request:'
-                          '\n\tversion:   |{version}|'
+                          '\n\ttype:      |{type}|'
                           '\n\tmethod:    |{method}|'
                           '\n\tpath:      |{path}|'
                           '\n\tparams:    |{params}|'
                           '\n\tpost_data: |{data}|'
                           '\n\theaders:   |{headers}|'
-                          .format(version=version,
+                          .format(type=client.get('_name'),
                                   method=method,
                                   path=path,
                                   params=log_params,
