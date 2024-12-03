@@ -784,6 +784,7 @@ class StreamInfo(YouTubeRequestClient):
         self._calculate_n = True
         self._cipher = None
 
+        self._auth_client = {}
         self._selected_client = {}
         self._client_groups = {
             'custom': clients if clients else (),
@@ -1424,6 +1425,7 @@ class StreamInfo(YouTubeRequestClient):
         audio_only = self._audio_only
         ask_for_quality = self._ask_for_quality
         use_mpd = self._use_mpd
+        use_remote_history = settings.use_remote_history()
 
         client_name = None
         _client = None
@@ -1467,6 +1469,7 @@ class StreamInfo(YouTubeRequestClient):
                 'videoId': video_id,
             },
             '_auth_required': False,
+            '_auth_requested': 'personal' if use_remote_history else False,
             '_access_token': self._access_token,
             '_access_token_tv': self._access_token_tv,
         }
@@ -1474,7 +1477,7 @@ class StreamInfo(YouTubeRequestClient):
         for name, clients in self._client_groups.items():
             if not clients:
                 continue
-            if name == 'mpd' and not use_mpd:
+            if name == 'mpd' and not (use_mpd or use_remote_history):
                 continue
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
@@ -1588,6 +1591,11 @@ class StreamInfo(YouTubeRequestClient):
                         'client': _client.copy(),
                         'result': _result,
                     }
+                if not self._auth_client and _client.get('_has_auth'):
+                    self._auth_client = {
+                        'client': _client.copy(),
+                        'result': _result,
+                    }
 
                 _streaming_data = _result.get('streamingData', {})
                 if audio_only or ask_for_quality or not use_mpd:
@@ -1667,12 +1675,14 @@ class StreamInfo(YouTubeRequestClient):
             'subtitles': None,
         }
 
-        if settings.use_remote_history():
+        if use_remote_history and self._auth_client:
             playback_stats = {
                 'playback_url': 'videostatsPlaybackUrl',
                 'watchtime_url': 'videostatsWatchtimeUrl',
             }
-            playback_tracking = result.get('playbackTracking', {})
+            playback_tracking = (self._auth_client
+                                 .get('result', {})
+                                 .get('playbackTracking', {}))
             cpn = self._generate_cpn()
 
             for key, url_key in playback_stats.items():
