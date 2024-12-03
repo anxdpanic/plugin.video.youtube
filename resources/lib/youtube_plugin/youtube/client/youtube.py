@@ -85,6 +85,24 @@ class YouTube(LoginClient):
                 'Host': 'www.youtube.com',
             },
         },
+        'watch_history': {
+            '_auth_required': True,
+            '_auth_type': 'personal',
+            '_video_id': None,
+            'headers': {
+                'Host': 's.youtube.com',
+                'Referer': 'https://www.youtube.com/watch?v={_video_id}',
+            },
+            'params': {
+                'referrer': 'https://accounts.google.com/',
+                'ns': 'yt',
+                'el': 'detailpage',
+                'ver': '2',
+                'fs': '0',
+                'volume': '100',
+                'muted': '0',
+            },
+        },
         '_common': {
             '_access_token': None,
             '_access_token_tv': None,
@@ -155,29 +173,13 @@ class YouTube(LoginClient):
                                   et=et,
                                   state=state))
 
-        headers = {
-            'Host': 's.youtube.com',
-            'Connection': 'keep-alive',
-            'Accept-Encoding': 'gzip, deflate',
-            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
-            'Accept': '*/*',
-            'Accept-Language': 'en-US,en;q=0.5',
-            'DNT': '1',
-            'Referer': 'https://www.youtube.com/watch?v=' + video_id,
-            'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
-                           ' AppleWebKit/537.36 (KHTML, like Gecko)'
-                           ' Chrome/80.0.3987.162 Mobile Safari/537.36'),
+        client_data = {
+            '_video_id': video_id,
+            'url': url,
+            'error_title': 'Failed to update watch history',
         }
-        params = {
-            'docid': video_id,
-            'referrer': 'https://accounts.google.com/',
-            'ns': 'yt',
-            'el': 'detailpage',
-            'ver': '2',
-            'fs': '0',
-            'volume': '100',
-            'muted': '0',
-        }
+
+        params = {}
         if cmt is not None:
             params['cmt'] = format(cmt, '.3f')
         if st is not None:
@@ -186,11 +188,11 @@ class YouTube(LoginClient):
             params['et'] = format(et, '.3f')
         if state is not None:
             params['state'] = state
-        if self._access_token:
-            params['access_token'] = self._access_token
 
-        self.request(url, params=params, headers=headers,
-                     error_msg='Failed to update watch history')
+        self.api_request(client='watch_history',
+                         client_data=client_data,
+                         params=params,
+                         no_content=True)
 
     def get_streams(self,
                     context,
