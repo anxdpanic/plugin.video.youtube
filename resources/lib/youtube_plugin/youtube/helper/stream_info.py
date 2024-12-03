@@ -18,7 +18,7 @@ from traceback import format_stack
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
-from .subtitles import Subtitles
+from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
@@ -1761,10 +1761,11 @@ class StreamInfo(YouTubeRequestClient):
 
         subtitles = Subtitles(context, video_id)
         query_subtitles = client.get('_query_subtitles')
-        if ((not is_live or live_dvr)
-                and (query_subtitles is True
-                     or (query_subtitles
-                         and subtitles.sub_selection == subtitles.LANG_ALL))):
+        if ((not is_live or live_dvr) and (
+                query_subtitles is True
+                or (query_subtitles
+                    and subtitles.sub_selection == SUBTITLE_SELECTIONS['all'])
+        )):
             for client_name in ('smart_tv_embedded', 'web'):
                 caption_client = self.build_client(client_name, client_data)
                 if not caption_client:
