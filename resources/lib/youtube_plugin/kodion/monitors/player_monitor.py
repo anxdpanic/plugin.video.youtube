@@ -101,6 +101,7 @@ class PlayerMonitorThread(threading.Thread):
 
         access_manager = self._context.get_access_manager()
         settings = self._context.get_settings()
+        playlist_player = self._context.get_playlist_player()
 
         video_id_param = 'video_id=%s' % self.video_id
         report_url = use_remote_history and playback_stats.get('watchtime_url')
@@ -139,7 +140,10 @@ class PlayerMonitorThread(threading.Thread):
                     waited = 0
                     player.seekTime(player.start_time)
                     continue
-                player.stop()
+                if playlist_player.size() > 1:
+                    playlist_player.play_playlist_item('next')
+                else:
+                    player.stop()
 
             if waited >= report_period:
                 waited = 0
