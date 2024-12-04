@@ -703,7 +703,8 @@ class StreamInfo(YouTubeRequestClient):
         self._calculate_n = True
         self._cipher = None
 
-        self._selected_client = None
+        self._auth_client = {}
+        self._selected_client = {}
         self._client_groups = {
             'custom': clients if clients else (),
             # Access "premium" streams, HLS and DASH
@@ -1357,6 +1358,7 @@ class StreamInfo(YouTubeRequestClient):
         audio_only = self._audio_only
         ask_for_quality = self._ask_for_quality
         use_mpd = self._use_mpd
+        use_remote_history = settings.use_remote_history()
 
         client_name = None
         _client = None
@@ -1394,19 +1396,23 @@ class StreamInfo(YouTubeRequestClient):
         }
         abort = False
 
-        client_data = {'json': {'videoId': video_id}}
-        access_token = self._access_token
-        auth = False
+        has_access_token = bool(self._access_token)
+        client_data = {
+            'json': {
+                'videoId': video_id,
+            },
+            '_auth_required': False,
+            '_auth_requested': 'personal' if use_remote_history else False,
+            '_access_token': self._access_token,
+        }
 
         for name, clients in self._client_groups.items():
             if not clients:
                 continue
-            if name == 'mpd' and not use_mpd:
+            if name == 'mpd' and not (use_mpd or use_remote_history):
                 continue
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
-
-            status = None
 
             restart = False
             while 1:
@@ -1424,7 +1430,7 @@ class StreamInfo(YouTubeRequestClient):
                         error_hook_kwargs={
                             'video_id': video_id,
                             'client': client_name,
-                            'auth': bool(_client.get('_access_token')),
+                            'auth': _client.get('_has_auth', False),
                         },
                         **_client
                     ) or {}
@@ -1469,14 +1475,13 @@ class StreamInfo(YouTubeRequestClient):
                                 reason=reason or 'UNKNOWN',
                                 video_id=video_id,
                                 client=_client['_name'],
-                                auth=auth,
+                                auth=_client.get('_has_auth', False),
                             )
                         )
                         compare_reason = reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
-                            if access_token and not auth:
-                                auth = True
-                                client_data['_access_token'] = access_token
+                            if has_access_token:
+                                client_data['_auth_required'] = True
                                 restart = True
                             break
                         if any(why in compare_reason for why in retry_reasons):
@@ -1510,14 +1515,19 @@ class StreamInfo(YouTubeRequestClient):
                     .format(
                         video_id=video_id,
                         client=client_name,
-                        auth=bool(_client.get('_access_token')),
+                        auth=_client.get('_has_auth', False),
                     )
                 )
                 if not self._selected_client:
-                    client = self._selected_client = _client.copy()
-                    result = _result
-                    video_details = result.get('videoDetails', {})
-                    playability = result.get('playabilityStatus', {})
+                    self._selected_client = {
+                        'client': _client.copy(),
+                        'result': _result,
+                    }
+                if not self._auth_client and _client.get('_has_auth'):
+                    self._auth_client = {
+                        'client': _client.copy(),
+                        'result': _result,
+                    }
 
                 _streaming_data = _result.get('streamingData', {})
                 if audio_only or ask_for_quality or not use_mpd:
@@ -1549,6 +1559,9 @@ class StreamInfo(YouTubeRequestClient):
                 reason = self._get_error_details(playability)
             raise YouTubeException(reason or 'UNKNOWN')
 
+        client = self._selected_client['client']
+        result = self._selected_client['result']
+
         if 'Authorization' in client['headers']:
             del client['headers']['Authorization']
         # Make a set of URL-quoted headers to be sent to Kodi when requesting
@@ -1557,8 +1570,7 @@ class StreamInfo(YouTubeRequestClient):
         # curl_headers = self._make_curl_headers(headers, cookies)
         curl_headers = self._prepare_headers(client['headers'])
 
-        microformat = (result.get('microformat', {})
-                       .get('playerMicroformatRenderer', {}))
+        video_details = result.get('videoDetails', {})
         is_live = video_details.get('isLiveContent', False)
         if is_live:
             is_live = video_details.get('isLive', False)
@@ -1568,6 +1580,8 @@ class StreamInfo(YouTubeRequestClient):
             live_dvr = False
             thumb_suffix = ''
 
+        microformat = (result.get('microformat', {})
+                       .get('playerMicroformatRenderer', {}))
         meta_info = {
             'id': video_id,
             'title': unescape(video_details.get('title', '')
@@ -1597,12 +1611,14 @@ class StreamInfo(YouTubeRequestClient):
             'subtitles': None,
         }
 
-        if settings.use_remote_history():
+        if use_remote_history and self._auth_client:
             playback_stats = {
                 'playback_url': 'videostatsPlaybackUrl',
                 'watchtime_url': 'videostatsWatchtimeUrl',
             }
-            playback_tracking = result.get('playbackTracking', {})
+            playback_tracking = (self._auth_client
+                                 .get('result', {})
+                                 .get('playbackTracking', {}))
             cpn = self._generate_cpn()
 
             for key, url_key in playback_stats.items():
@@ -1637,7 +1653,7 @@ class StreamInfo(YouTubeRequestClient):
                     '',
                     '',
                 )) + '||R{{SSM}}|R',
-                'token': access_token,
+                'token': self._access_token,
             }
             break
         else:
@@ -1699,7 +1715,7 @@ class StreamInfo(YouTubeRequestClient):
                     error_hook_kwargs={
                         'video_id': video_id,
                         'client': client_name,
-                        'auth': bool(caption_client.get('_access_token')),
+                        'auth': _client.get('_has_auth', False),
                     },
                     **caption_client
                 )

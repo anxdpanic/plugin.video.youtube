@@ -87,10 +87,9 @@ class AbstractProgressDialog(object):
             message = self._message_template.format(**self._template_params)
             self._message = message
 
-        self._dialog.update(
-            percent=position,
-            message=message,
-        )
+        # Kodi 18 renamed XbmcProgressDialog.update argument line1 to message.
+        # Only use positional arguments to maintain compatibility
+        self._dialog.update(position, self._message)
 
     def is_aborted(self):
         raise NotImplementedError()
