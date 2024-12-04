@@ -1,4 +1,4 @@
-## v7.1.1.3
+## v7.1.1.4
 ### Fixed
 - Fix http server not listening on any interface if listen IP is 0.0.0.0 #927
 - Standardise return type of LoginClient.refresh_token #932
@@ -40,6 +40,8 @@
 - Fix missing "Ask" translation string
 - Fix incorrect parameter name breaking auto-remove from Watch Later #993
 - Fix processing of "q" and "channelId" search query params #1004
+- Fix errors with progress dialogs in Kodi 18 #1000
+- Fix remote watch history not updating #1008
 
 ### Changed
 - Improve display and update of bookmarks
