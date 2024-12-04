@@ -28,6 +28,7 @@ from ...kodion.constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_WITH,
     SERVER_WAKEUP,
@@ -316,7 +317,7 @@ def process(provider, context, **_kwargs):
     if video_id and not playlist_id:
         # This is required to trigger Kodi resume prompt, along with using
         # RunPlugin. Prompt will not be used if using PlayMedia
-        if force_play:
+        if force_play and not params.get(PLAY_STRM):
             return UriItem('command://Action(Play)')
 
         if context.get_handle() == -1:
