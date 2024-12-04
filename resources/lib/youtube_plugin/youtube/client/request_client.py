@@ -172,6 +172,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'ios': {
             '_id': 5,
+            '_auth_type': False,
             '_os': {
                 'major': '17',
                 'minor': '5',
@@ -261,6 +262,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         '_common': {
             '_access_token': None,
+            '_access_token_tv': None,
             'json': {
                 'contentCheckOk': True,
                 'context': {
@@ -286,13 +288,11 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'videoId': None,
             },
             'headers': {
-                'Origin': 'https://www.youtube.com',
-                'Referer': 'https://www.youtube.com/watch?v={json[videoId]}',
                 'Accept-Encoding': 'gzip, deflate',
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': 'Bearer {_access_token}',
+                'Authorization': None,
             },
             'params': {
                 'key': ValueError,
@@ -369,31 +369,53 @@ class YouTubeRequestClient(BaseRequestsClass):
     def build_client(cls, client_name=None, data=None):
         templates = {}
 
-        client = None
+        base_client = None
         if client_name:
-            client = cls.CLIENTS.get(client_name)
-            if client and client.get('_disabled'):
+            base_client = cls.CLIENTS.get(client_name)
+            if base_client and base_client.get('_disabled'):
                 return None
-        if not client:
-            client = YouTubeRequestClient.CLIENTS['web']
-        client = client.copy()
+        if not base_client:
+            base_client = YouTubeRequestClient.CLIENTS['web']
+        base_client = base_client.copy()
 
         if data:
-            client = merge_dicts(client, data)
+            client = merge_dicts(base_client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
         client['_name'] = client_name
+        if base_client.get('_auth_required'):
+            client['_auth_required'] = True
 
         for values, template_id, template in templates.values():
             if template_id in values:
                 values[template_id] = template.format(**client)
 
+        has_auth = False
         try:
             params = client['params']
-            if client.get('_access_token'):
+            auth_required = client.get('_auth_required')
+            auth_requested = client.get('_auth_requested')
+            auth_type = client.get('_auth_type')
+            if auth_type == 'tv' and auth_requested != 'personal':
+                auth_token = client.get('_access_token_tv')
+            elif auth_type is not False:
+                auth_token = client.get('_access_token')
+            else:
+                auth_token = None
+
+            if auth_token and (auth_required or auth_requested):
+                headers = client['headers']
+                if 'Authorization' in headers:
+                    headers = headers.copy()
+                    headers['Authorization'] = 'Bearer {0}'.format(auth_token)
+                    client['headers'] = headers
+                    has_auth = True
+
                 if 'key' in params:
                     params = params.copy()
                     del params['key']
                     client['params'] = params
+            elif auth_required:
+                return None
             else:
                 headers = client['headers']
                 if 'Authorization' in headers:
@@ -407,5 +429,6 @@ class YouTubeRequestClient(BaseRequestsClass):
                     client['params'] = params
         except KeyError:
             pass
+        client['_has_auth'] = has_auth
 
         return client
