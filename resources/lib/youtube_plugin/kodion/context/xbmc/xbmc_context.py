@@ -235,6 +235,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard.prompt.settings.performance': 30785,
         'setup_wizard.prompt.settings.refresh': 30817,
         'setup_wizard.prompt.subtitles': 287,
+        'shorts': 30736,
         'sign.enter_code': 30519,
         'sign.go_to': 30502,
         'sign.in': 30111,

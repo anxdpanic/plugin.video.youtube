@@ -65,6 +65,7 @@ class AbstractContext(Logger):
         'hide_next_page',
         'hide_playlists',
         'hide_search',
+        'hide_shorts',
         'incognito',
         'location',
         'logged_in',

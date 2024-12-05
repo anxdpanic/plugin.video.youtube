@@ -506,11 +506,14 @@ class Provider(AbstractProvider):
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
                                        channel_id=channel_id)
-        if playlists and 'uploads' in playlists:
+        uploads = playlists.get('uploads')
+        if uploads:
+            if uploads.startswith('UU'):
+                uploads = uploads.replace('UU', 'UULV', 1)
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
                                            _refresh=params.get('refresh'),
-                                           playlist_id=playlists['uploads'],
+                                           playlist_id=uploads,
                                            page_token=page_token)
             if not json_data:
                 return result
@@ -519,6 +522,53 @@ class Provider(AbstractProvider):
                 provider, context, json_data,
                 item_filter={
                     'live_folder': True,
+                },
+            ))
+
+        return result
+
+    @AbstractProvider.register_path(
+        r'^/channel/(?P<channel_id>[^/]+)'
+        r'/shorts/?$')
+    @staticmethod
+    def on_channel_shorts(provider, context, re_match):
+        """
+        List shorts for channel.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/shorts
+
+        * CHANNEL_ID: YouTube Channel ID
+        """
+        context.set_content(CONTENT.VIDEO_CONTENT)
+        result = []
+
+        channel_id = re_match.group('channel_id')
+        params = context.get_params()
+        page_token = params.get('page_token', '')
+
+        client = provider.get_client(context)
+        function_cache = context.get_function_cache()
+        resource_manager = provider.get_resource_manager(context)
+
+        playlists = function_cache.run(resource_manager.get_related_playlists,
+                                       function_cache.ONE_DAY,
+                                       channel_id=channel_id)
+        uploads = playlists.get('uploads')
+        if uploads:
+            if uploads.startswith('UU'):
+                uploads = uploads.replace('UU', 'UUSH', 1)
+            json_data = function_cache.run(client.get_playlist_items,
+                                           function_cache.ONE_MINUTE * 5,
+                                           _refresh=params.get('refresh'),
+                                           playlist_id=uploads,
+                                           page_token=page_token)
+            if not json_data:
+                return result
+
+            result.extend(v3.response_to_items(
+                provider, context, json_data,
+                item_filter={
+                    'shorts': True,
                 },
             ))
 
@@ -627,6 +677,7 @@ class Provider(AbstractProvider):
             hide_playlists = params.get('hide_playlists')
             hide_search = params.get('hide_search')
             hide_live = params.get('hide_live')
+            hide_shorts = params.get('hide_shorts')
 
             if not hide_playlists:
                 item_label = localize('playlists')
@@ -643,16 +694,20 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlists_item)
 
-            if not hide_search:
-                search_item = NewSearchItem(
-                    context, name=ui.bold(localize('search')),
-                    image='{media}/search.png',
+            if not hide_shorts:
+                item_label = localize('shorts')
+                shorts_item = DirectoryItem(
+                    ui.bold(item_label),
+                    create_uri(
+                        ('channel', channel_id, 'shorts'),
+                        new_params,
+                    ),
+                    image='{media}/shorts.png',
                     fanart=fanart,
+                    category_label=item_label,
                     channel_id=channel_id,
-                    incognito=incognito,
-                    addon_id=addon_id,
                 )
-                result.append(search_item)
+                result.append(shorts_item)
 
             if not hide_live:
                 item_label = localize('live')
@@ -669,14 +724,28 @@ class Provider(AbstractProvider):
                 )
                 result.append(live_item)
 
+            if not hide_search:
+                search_item = NewSearchItem(
+                    context, name=ui.bold(localize('search')),
+                    image='{media}/search.png',
+                    fanart=fanart,
+                    channel_id=channel_id,
+                    incognito=incognito,
+                    addon_id=addon_id,
+                )
+                result.append(search_item)
+
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
                                        channel_id=identifier)
-        if playlists and 'uploads' in playlists:
+        uploads = playlists.get('uploads')
+        if uploads:
+            if uploads.startswith('UU'):
+                uploads = uploads.replace('UU', 'UULF', 1)
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
                                            _refresh=params.get('refresh'),
-                                           playlist_id=playlists['uploads'],
+                                           playlist_id=uploads,
                                            page_token=page_token)
             if not json_data:
                 return result
