@@ -485,18 +485,11 @@ def update_playlist_items(provider, context, playlist_id_dict,
             separator,
             menu_items.bookmark_add(
                 context, playlist_item
-            ) if not in_bookmarks_list and channel_id != 'mine' else None,
+            ) if not in_bookmarks_list and not in_my_playlists else None,
         ]
 
         if logged_in:
-            if channel_id != 'mine':
-                # subscribe to the channel via the playlist item
-                context_menu.append(
-                    menu_items.subscribe_to_channel(
-                        context, channel_id, channel_name
-                    )
-                )
-            else:
+            if in_my_playlists:
                 context_menu.extend((
                     # remove my playlist
                     menu_items.delete_playlist(
@@ -523,8 +516,15 @@ def update_playlist_items(provider, context, playlist_id_dict,
                         context, playlist_id, title
                     ),
                 ))
+            else:
+                # subscribe to the channel via the playlist item
+                context_menu.append(
+                    menu_items.subscribe_to_channel(
+                        context, channel_id, channel_name
+                    )
+                )
 
-        if not in_bookmarks_list and channel_id != 'mine':
+        if not in_bookmarks_list and not in_my_playlists:
             context_menu.append(
                 # bookmark channel of the playlist
                 menu_items.bookmark_add_channel(
