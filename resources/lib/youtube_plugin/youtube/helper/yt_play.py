@@ -60,6 +60,7 @@ def _play_stream(provider, context):
         stream = {
             'url': 'https://youtu.be/{0}'.format(video_id),
         }
+        yt_item = None
     else:
         ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
@@ -73,7 +74,7 @@ def _play_stream(provider, context):
                    and context.wakeup(SERVER_WAKEUP, timeout=5))
 
         try:
-            streams = client.get_streams(
+            streams, yt_item = client.get_streams(
                 context,
                 video_id=video_id,
                 ask_for_quality=ask_for_quality,
@@ -141,7 +142,9 @@ def _play_stream(provider, context):
     use_remote_history = use_history and settings.use_remote_history()
     use_local_history = use_history and settings.use_local_history()
 
-    utils.update_play_info(provider, context, video_id, media_item, stream)
+    utils.update_play_info(
+        provider, context, video_id, media_item, stream, yt_item
+    )
 
     seek_time = 0.0 if params.get('resume') else params.get('seek', 0.0)
     start_time = params.get('start', 0.0)

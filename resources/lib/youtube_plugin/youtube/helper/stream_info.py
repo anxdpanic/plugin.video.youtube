@@ -1635,6 +1635,25 @@ class StreamInfo(YouTubeRequestClient):
             del headers['Authorization']
 
         video_details = result.get('videoDetails', {})
+        yt_item = {
+            'id': video_id,
+            'snippet': {
+                'title': video_details.get('title'),
+                'description': video_details.get('shortDescription'),
+                'channelId': video_details.get('channelId'),
+                'channelTitle': video_details.get('author'),
+                'thumbnails': (video_details
+                               .get('thumbnail', {})
+                               .get('thumbnails', [])),
+            },
+            'contentDetails': {
+                'duration': 'P' + video_details.get('lengthSeconds', '0') + 'S',
+            },
+            'statistics': {
+                'viewCount': video_details.get('viewCount', ''),
+            },
+            '_partial': True,
+        }
         is_live = video_details.get('isLiveContent', False)
         if is_live:
             is_live = video_details.get('isLive', False)
@@ -1871,7 +1890,7 @@ class StreamInfo(YouTubeRequestClient):
         if not stream_list:
             raise YouTubeException('No streams found')
 
-        return stream_list.values()
+        return stream_list.values(), yt_item
 
     def _process_stream_data(self,
                              stream_data,

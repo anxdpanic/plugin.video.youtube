@@ -541,7 +541,8 @@ def update_video_items(provider, context, video_id_dict,
                        channel_items_dict=None,
                        live_details=True,
                        item_filter=None,
-                       data=None):
+                       data=None,
+                       yt_items=None):
     if not video_id_dict and not data:
         return
 
@@ -550,7 +551,8 @@ def update_video_items(provider, context, video_id_dict,
         resource_manager = provider.get_resource_manager(context)
         data = resource_manager.get_videos(video_ids,
                                            live_details=live_details,
-                                           suppress_errors=True)
+                                           suppress_errors=True,
+                                           yt_items=yt_items)
 
     if not data:
         return
@@ -1025,8 +1027,15 @@ def update_video_items(provider, context, video_id_dict,
             media_item.add_context_menu(context_menu)
 
 
-def update_play_info(provider, context, video_id, media_item, video_stream):
-    update_video_items(provider, context, {video_id: media_item})
+def update_play_info(provider,
+                     context,
+                     video_id,
+                     media_item,
+                     video_stream,
+                     yt_item=None):
+    update_video_items(
+        provider, context, {video_id: media_item}, yt_items=[yt_item]
+    )
 
     settings = context.get_settings()
 

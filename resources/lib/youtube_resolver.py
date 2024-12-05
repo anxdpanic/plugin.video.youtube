@@ -53,7 +53,7 @@ def resolve(video_id, sort=True, addon_id=None):
             break
 
     if matched_id:
-        streams = client.get_streams(context=context, video_id=matched_id)
+        streams, _ = client.get_streams(context=context, video_id=matched_id)
 
     if sort and streams:
         streams = sorted(streams, key=lambda x: x.get('sort', (0, 0)))
