@@ -48,7 +48,7 @@ class YouTube(LoginClient):
             },
         },
         'v3': {
-            '_auth_required': True,
+            '_auth_requested': True,
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
             'method': None,
             'headers': {
@@ -2198,7 +2198,7 @@ class YouTube(LoginClient):
 
         abort = False
         if not no_login:
-            client_data.setdefault('_auth_required', True)
+            client_data.setdefault('_auth_requested', True)
             # a config can decide if a token is allowed
             if self._access_token and self._config.get('token-allowed', True):
                 client_data['_access_token'] = self._access_token
