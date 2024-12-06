@@ -326,5 +326,6 @@ def wait(timeout=None):
     return xbmc.Monitor().waitForAbort(timeout)
 
 
-def redact_ip(url, ip_re=re_compile(r'([?&/])ip([=/])[^?&/]+')):
+def redact_ip(url,
+              ip_re=re_compile(r'([?&/]|%3F|%26|%2F)ip([=/]|%3D|%2F)[^?&/%]+')):
     return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)
