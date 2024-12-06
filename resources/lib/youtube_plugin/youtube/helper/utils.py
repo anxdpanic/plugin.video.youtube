@@ -1395,3 +1395,15 @@ def filter_parse(item,
     for idx, criteria in replacement_criteria:
         all_criteria[idx] = criteria
     return criteria_met
+
+
+def filter_split(item,
+                 _all_criteria,
+                 criteria_re=re_compile(
+                     r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
+                 )):
+    criteria = criteria_re.findall(item)
+    if not criteria:
+        return True
+    _all_criteria.append(criteria)
+    return False

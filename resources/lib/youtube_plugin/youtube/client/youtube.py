@@ -16,11 +16,11 @@ import xml.etree.ElementTree as ET
 from functools import partial
 from itertools import chain, islice
 from random import randint
-from re import compile as re_compile
 from traceback import format_stack
 
 from .login_client import LoginClient
 from ..helper.stream_info import StreamInfo
+from ..helper.utils import filter_split
 from ..youtube_exceptions import InvalidJSON, YouTubeException
 from ...kodion.compatibility import available_cpu_count, string_type, to_str
 from ...kodion.items import DirectoryItem
@@ -1574,17 +1574,6 @@ class YouTube(LoginClient):
         settings = self._context.get_settings()
 
         if do_filter:
-            def _split_criteria(item,
-                                _all_criteria,
-                                criteria_re=re_compile(
-                                    r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
-                                )):
-                criteria = criteria_re.findall(item)
-                if not criteria:
-                    return True
-                _all_criteria.append(criteria)
-                return False
-
             item_filter = {
                 'custom': [],
             }
@@ -1597,7 +1586,7 @@ class YouTube(LoginClient):
                     for item in settings.get_string(
                         'youtube.filter.my_subscriptions_filtered.list', ''
                     ).replace(', ', ',').split(',')
-                    if item and _split_criteria(item, item_filter['custom'])
+                    if item and filter_split(item, item_filter['custom'])
                 },
             }
         else:
