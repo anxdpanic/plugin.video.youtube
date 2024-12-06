@@ -195,24 +195,29 @@ def update_channel_items(provider, context, channel_id_dict,
     path = context.get_path()
     ui = context.get_ui()
 
-    filter_list = None
     if path.startswith(PATHS.SUBSCRIPTIONS):
         in_bookmarks_list = False
         in_subscription_list = True
-        if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
-                             False):
-            filter_string = settings.get_string(
-                'youtube.filter.my_subscriptions_filtered.list', ''
-            )
-            filter_string = filter_string.replace(', ', ',')
-            filter_list = filter_string.split(',')
-            filter_list = [x.lower() for x in filter_list]
     elif path.startswith(PATHS.BOOKMARKS):
         in_bookmarks_list = True
         in_subscription_list = False
     else:
         in_bookmarks_list = False
         in_subscription_list = False
+
+    filter_list = None
+    if in_bookmarks_list or in_subscription_list:
+        if settings.get_bool('youtube.folder.my_subscriptions_filtered.show',
+                             False):
+            filter_string = settings.get_string(
+                'youtube.filter.my_subscriptions_filtered.list', ''
+            ).replace(', ', ',')
+            custom_filters = []
+            filter_list = {
+                item.lower()
+                for item in filter_string.split(',')
+                if item and filter_split(item, custom_filters)
+            }
 
     thumb_size = settings.get_thumbnail_size()
 
@@ -313,7 +318,7 @@ def update_channel_items(provider, context, channel_id_dict,
             )
 
         # add/remove from filter list
-        if in_subscription_list and filter_list is not None:
+        if filter_list is not None:
             channel = channel_name.lower().replace(',', '')
             context_menu.append(
                 menu_items.remove_my_subscriptions_filter(
