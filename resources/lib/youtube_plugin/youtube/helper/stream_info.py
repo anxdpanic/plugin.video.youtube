@@ -1452,6 +1452,7 @@ class StreamInfo(YouTubeRequestClient):
         reauth_reasons = {
             'age',
             'inappropriate',
+            'sign in',
         }
         skip_reasons = {
             'latest version',
