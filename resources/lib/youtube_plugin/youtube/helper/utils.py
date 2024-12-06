@@ -11,6 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import time
+from datetime import date, datetime
 from math import log10
 from operator import (
     contains as op_contains,
@@ -1364,6 +1365,8 @@ def filter_parse(item,
                     )
                     if input_1 is None:
                         input_1 = ''
+                    elif isinstance(input_1, (date, datetime)):
+                        input_2 = datetime_parser.parse(input_2)
                 else:
                     input_2 = float(input_2)
                     if input_1 is None:
