@@ -2225,6 +2225,8 @@ class YouTube(LoginClient):
                         abort = False
                         params['key'] = key
                     else:
+                        if not client['_has_auth']:
+                            abort = True
                         del params['key']
                     client['params'] = params
 
