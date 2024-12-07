@@ -49,7 +49,7 @@ class YouTube(LoginClient):
             },
         },
         'v3': {
-            '_auth_requested': True,
+            '_auth_requested': 'personal',
             'url': 'https://www.googleapis.com/youtube/v3/{_endpoint}',
             'method': None,
             'headers': {
@@ -2273,6 +2273,14 @@ class YouTube(LoginClient):
             if self._access_token_tv:
                 client_data['_access_token_tv'] = self._access_token_tv
 
+        key = self._config.get('key')
+        if key:
+            client_data['_api_key'] = key
+
+        key = self._config_tv.get('key')
+        if key:
+            client_data['_api_key_tv'] = key
+
         client = self.build_client(client, client_data)
         if not client:
             client = {}
@@ -2283,27 +2291,18 @@ class YouTube(LoginClient):
 
         params = client.get('params')
         if params:
-            if 'key' in params:
-                if params['key']:
-                    abort = False
-                else:
-                    params = params.copy()
-                    key = self._config.get('key') or self._config_tv.get('key')
-                    if key:
-                        abort = False
-                        params['key'] = key
-                    else:
-                        if not client['_has_auth']:
-                            abort = True
-                        del params['key']
-                    client['params'] = params
-
             log_params = params.copy()
-            if 'location' in log_params:
+
+            if 'key' in params:
+                key = params['key']
+                if key:
+                    abort = False
+                    log_params['key'] = '...'.join((key[:3], key[-3:]))
+                elif not client['_has_auth']:
+                    abort = True
+
+            if 'location' in params:
                 log_params['location'] = '|xx.xxxx,xx.xxxx|'
-            if 'key' in log_params:
-                key = log_params['key']
-                log_params['key'] = '...'.join((key[:3], key[-3:]))
         else:
             log_params = None
 

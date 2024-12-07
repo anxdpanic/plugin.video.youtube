@@ -384,8 +384,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             client = merge_dicts(base_client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
         client['_name'] = client_name
-        if base_client.get('_auth_required'):
-            client['_auth_required'] = True
+
+        auth_required = base_client.get('_auth_required')
+        if auth_required:
+            client['_auth_required'] = auth_required
+
+        auth_requested = base_client.get('_auth_requested')
+        if auth_requested:
+            client['_auth_requested'] = auth_requested
 
         for values, template_id, template in templates.values():
             if template_id in values:
@@ -399,10 +405,13 @@ class YouTubeRequestClient(BaseRequestsClass):
             auth_type = client.get('_auth_type')
             if auth_type == 'tv' and auth_requested != 'personal':
                 auth_token = client.get('_access_token_tv')
+                api_key = client.get('_api_key_tv')
             elif auth_type is not False:
                 auth_token = client.get('_access_token')
+                api_key = client.get('_api_key')
             else:
                 auth_token = None
+                api_key = None
 
             if auth_token and (auth_required or auth_requested):
                 headers = client['headers']
@@ -425,10 +434,14 @@ class YouTubeRequestClient(BaseRequestsClass):
                     del headers['Authorization']
                     client['headers'] = headers
 
-                if 'key' in params and params['key'] is ValueError:
+                if 'key' in params:
                     params = params.copy()
-                    del params['key']
+                    if params['key'] is ValueError:
+                        del params['key']
+                    elif api_key:
+                        params['key'] = api_key
                     client['params'] = params
+
         except KeyError:
             pass
         client['_has_auth'] = has_auth
