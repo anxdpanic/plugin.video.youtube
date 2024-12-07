@@ -44,7 +44,7 @@ class ResourceManager(object):
             if self._progress_dialog:
                 self._progress_dialog.update(steps=min(n, num_items))
 
-    def get_channels(self, ids, defer_cache=False):
+    def get_channels(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         client = self._provider.get_client(context)
         data_cache = context.get_data_cache()
@@ -97,9 +97,19 @@ class ResourceManager(object):
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
-            new_data = [client.get_channels(list_of_50)
+            notify_and_raise = not suppress_errors
+            new_data = [client.get_channels(list_of_50,
+                                            notify=notify_and_raise,
+                                            raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
-            if not any(new_data):
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
                 new_data = None
         else:
             new_data = None
@@ -111,12 +121,6 @@ class ResourceManager(object):
                 '\n\tVideo IDs: {ids}'
                 .format(ids=to_update)
             )
-            new_data = {
-                yt_item['id']: yt_item
-                for batch in new_data
-                for yt_item in batch.get('items', [])
-                if yt_item
-            }
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
@@ -135,6 +139,7 @@ class ResourceManager(object):
                          ids,
                          force=False,
                          channel_data=None,
+                         suppress_errors=False,
                          defer_cache=False):
         if force:
             pass
@@ -171,10 +176,20 @@ class ResourceManager(object):
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
+            notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
-            new_data = [client.get_channels(list_of_50)
+            new_data = [client.get_channels(list_of_50,
+                                            notify=notify_and_raise,
+                                            raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
-            if not any(new_data):
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
                 new_data = None
         else:
             new_data = None
@@ -186,12 +201,6 @@ class ResourceManager(object):
                 '\n\tChannel IDs: {ids}'
                 .format(ids=to_update)
             )
-            new_data = {
-                yt_item['id']: yt_item
-                for batch in new_data
-                for yt_item in batch.get('items', [])
-                if yt_item
-            }
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
@@ -229,7 +238,7 @@ class ResourceManager(object):
 
         return result
 
-    def get_playlists(self, ids, defer_cache=False):
+    def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         ids = tuple(ids)
         refresh = context.get_param('refresh')
@@ -254,10 +263,20 @@ class ResourceManager(object):
                 self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
+            notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
-            new_data = [client.get_playlists(list_of_50)
+            new_data = [client.get_playlists(list_of_50,
+                                             notify=notify_and_raise,
+                                             raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
-            if not any(new_data):
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
                 new_data = None
         else:
             new_data = None
@@ -269,12 +288,6 @@ class ResourceManager(object):
                 '\n\tVideo IDs: {ids}'
                 .format(ids=to_update)
             )
-            new_data = {
-                yt_item['id']: yt_item
-                for batch in new_data
-                for yt_item in batch.get('items', [])
-                if yt_item
-            }
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 

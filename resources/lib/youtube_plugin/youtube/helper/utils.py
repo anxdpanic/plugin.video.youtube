@@ -1107,7 +1107,8 @@ def update_channel_info(provider,
         resource_manager = provider.get_resource_manager(context)
         data = resource_manager.get_channel_info(channel_ids,
                                                  force=True,
-                                                 channel_data=channel_data)
+                                                 channel_data=channel_data,
+                                                 suppress_errors=True)
 
     if not data:
         return
