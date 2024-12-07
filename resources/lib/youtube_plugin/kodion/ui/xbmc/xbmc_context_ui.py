@@ -32,11 +32,6 @@ class XbmcContextUI(AbstractContextUI):
             message_template = ('{wait} {{_current}}/{{_total}}'.format(
                 wait=(message or self._context.localize('please_wait'))
             ))
-            template_params = {
-                '_progress': (0, 100),
-                '_current': 0,
-                '_total': 100,
-            }
         return XbmcProgressDialog(
             heading, message, background, message_template, template_params
         )

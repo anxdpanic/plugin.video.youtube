@@ -38,10 +38,11 @@ class ResourceManager(object):
     def _list_batch(self, input_list, n=50):
         if not isinstance(input_list, (list, tuple)):
             input_list = list(input_list)
-        for i in range(0, len(input_list), n):
+        num_items = len(input_list)
+        for i in range(0, num_items, n):
             yield input_list[i:i + n]
             if self._progress_dialog:
-                self._progress_dialog.update(steps=n)
+                self._progress_dialog.update(steps=min(n, num_items))
 
     def get_channels(self, ids, defer_cache=False):
         context = self._context

@@ -25,7 +25,7 @@ class AbstractProgressDialog(object):
         self._dialog.create(heading, message)
 
         self._position = None
-        self._total = int(total) if total else 100
+        self._total = int(total) if total is not None else 100
 
         self._message = message
         self._message_template = message_template

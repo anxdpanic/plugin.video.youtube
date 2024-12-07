@@ -27,7 +27,7 @@ class XbmcProgressDialog(AbstractProgressDialog):
                     xbmcgui.DialogProgress),
             heading=heading,
             message=message,
-            total=100,
+            total=0,
             message_template=message_template,
             template_params=template_params,
         )
