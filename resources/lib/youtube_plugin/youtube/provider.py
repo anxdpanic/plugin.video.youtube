@@ -876,11 +876,11 @@ class Provider(AbstractProvider):
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
-            return UriItem(query)
+            return UriItem(query), None
 
         result = self._search_channel_or_playlist(context, query)
         if result:  # found a channel or playlist matching search query
-            return result
+            return result, None
         result = []
 
         context.set_param('q', query)
@@ -1000,7 +1000,7 @@ class Provider(AbstractProvider):
             params=search_params,
         )
         if not json_data:
-            return False
+            return False, None
 
         # Store current search query for Kodi window history navigation
         if not params.get('incognito'):
@@ -1016,7 +1016,7 @@ class Provider(AbstractProvider):
                 'live': False,
             },
         ))
-        return result
+        return result, None
 
     @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
     @staticmethod
