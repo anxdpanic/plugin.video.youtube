@@ -454,7 +454,7 @@ def update_playlist_items(provider, context, playlist_id_dict,
                 ),
                 ui.new_line(description, cr_after=1) if description else '',
                 ui.new_line('--------', cr_before=1, cr_after=1),
-                'https://youtu.be/playlist?list=' + playlist_id,
+                'https://youtube.com/playlist?list=' + playlist_id,
             ))
         playlist_item.set_plot(description)
 
