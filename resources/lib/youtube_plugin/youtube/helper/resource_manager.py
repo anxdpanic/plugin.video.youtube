@@ -341,7 +341,14 @@ class ResourceManager(object):
                                           notify=notify_and_raise,
                                           raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
-            if not any(new_data):
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
                 new_data = None
         else:
             new_data = None
@@ -353,12 +360,6 @@ class ResourceManager(object):
                 '\n\tVideo IDs: {ids}'
                 .format(ids=to_update)
             )
-            new_data = {
-                yt_item['id']: yt_item
-                for batch in new_data
-                for yt_item in batch.get('items', [])
-                if yt_item
-            }
             new_data = dict(dict.fromkeys(to_update, {'_unavailable': True}),
                             **new_data)
             result.update(new_data)
