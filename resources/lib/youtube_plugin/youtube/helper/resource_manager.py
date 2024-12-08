@@ -22,6 +22,7 @@ class ResourceManager(object):
         self.new_data = {}
 
         params = context.get_params()
+        self._incognito = params.get('incognito')
 
         fanart_type = params.get('fanart_type')
         settings = context.get_settings()
@@ -501,6 +502,9 @@ class ResourceManager(object):
         return result
 
     def cache_data(self, data=None, defer=False):
+        if self._incognito:
+            return
+
         if defer:
             if data:
                 self.new_data.update(data)
