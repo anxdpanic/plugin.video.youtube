@@ -1,4 +1,4 @@
-## v7.1.1.5
+## v7.1.1.6
 ### Fixed
 - Fix http server not listening on any interface if listen IP is 0.0.0.0 #927
 - Standardise return type of LoginClient.refresh_token #932
@@ -43,6 +43,7 @@
 - Fix errors with progress dialogs in Kodi 18 #1000
 - Fix remote watch history not updating #1008
 - Fix API requests when not signed in #1013
+- Fix playback not working when no API key is provided #1018
 
 ### Changed
 - Improve display and update of bookmarks
