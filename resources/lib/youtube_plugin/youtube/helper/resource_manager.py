@@ -15,14 +15,20 @@ from .utils import get_thumbnail
 
 class ResourceManager(object):
     def __init__(self, provider, context, progress_dialog=None):
-        self._context = context
-        fanart_type = context.get_param('fanart_type')
-        if fanart_type is None:
-            fanart_type = context.get_settings().fanart_selection()
-        self._fanart_type = fanart_type
         self._provider = provider
+        self._context = context
         self._progress_dialog = progress_dialog
+
         self.new_data = {}
+
+        params = context.get_params()
+
+        fanart_type = params.get('fanart_type')
+        settings = context.get_settings()
+        if fanart_type is None:
+            fanart_type = settings.fanart_selection()
+        self._channel_fanart = fanart_type == settings.FANART_CHANNEL
+        self._thumb_size = settings.get_thumbnail_size()
 
     def context_changed(self, context):
         return self._context != context
@@ -137,15 +143,9 @@ class ResourceManager(object):
 
     def get_channel_info(self,
                          ids,
-                         force=False,
                          channel_data=None,
                          suppress_errors=False,
                          defer_cache=False):
-        if force:
-            pass
-        elif self._fanart_type != self._context.get_settings().FANART_CHANNEL:
-            return {}
-
         context = self._context
         refresh = context.get_param('refresh')
         if not refresh and channel_data:
@@ -167,7 +167,7 @@ class ResourceManager(object):
 
         if result:
             context.debug_log and context.log_debug(
-                'ResourceManager.get_fanarts'
+                'ResourceManager.get_channel_info'
                 ' - Using cached data for channels'
                 '\n\tChannel IDs: {ids}'
                 .format(ids=list(result))
@@ -196,7 +196,7 @@ class ResourceManager(object):
 
         if new_data:
             context.debug_log and context.log_debug(
-                'ResourceManager.get_fanarts'
+                'ResourceManager.get_channel_info'
                 ' - Retrieved new data for channels'
                 '\n\tChannel IDs: {ids}'
                 .format(ids=to_update)
@@ -211,7 +211,8 @@ class ResourceManager(object):
             'bannerExternalUrl',
         )
         untitled = context.localize('untitled')
-        thumb_size = context.get_settings().get_thumbnail_size()
+        thumb_size = self._thumb_size
+        channel_fanart = self._channel_fanart
 
         # transform
         for key, item in result.items():
@@ -220,12 +221,15 @@ class ResourceManager(object):
                 'image': None,
                 'fanart': None,
             }
-            images = item.get('brandingSettings', {}).get('image', {})
-            for banner in banners:
-                image = images.get(banner)
-                if image:
-                    channel_info['fanart'] = image
-                    break
+
+            if channel_fanart:
+                images = item.get('brandingSettings', {}).get('image', {})
+                for banner in banners:
+                    image = images.get(banner)
+                    if image:
+                        channel_info['fanart'] = image
+                        break
+
             snippet = item.get('snippet')
             if snippet:
                 localised_info = snippet.get('localized') or {}

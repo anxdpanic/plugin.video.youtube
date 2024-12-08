@@ -411,7 +411,7 @@ class Provider(AbstractProvider):
 
         resource_manager = provider.get_resource_manager(context)
         channel_info = resource_manager.get_channel_info(
-            (channel_id,), force=True
+            (channel_id,),
         ).get(channel_id) or {}
         playlists = resource_manager.get_related_playlists(channel_id)
 
@@ -657,7 +657,7 @@ class Provider(AbstractProvider):
             return False
 
         channel_info = resource_manager.get_channel_info(
-            (channel_id,), force=True
+            (channel_id,),
         ).get(channel_id) or {}
         fanart = channel_info.get('fanart') or ''
 
