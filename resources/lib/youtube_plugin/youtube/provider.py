@@ -1463,11 +1463,11 @@ class Provider(AbstractProvider):
                     menu_items.separator(),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.WATCH_LATER,
+                        path=PATHS.WATCH_LATER,
                     ),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.WATCH_LATER,
+                        path=PATHS.WATCH_LATER,
                         order='shuffle',
                     ),
                 ]
@@ -1542,11 +1542,11 @@ class Provider(AbstractProvider):
                     menu_items.separator(),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.HISTORY,
+                        path=PATHS.HISTORY,
                     ),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.HISTORY,
+                        path=PATHS.HISTORY,
                         order='shuffle',
                     ),
                 ]
@@ -1595,11 +1595,11 @@ class Provider(AbstractProvider):
                 menu_items.separator(),
                 menu_items.play_all_from(
                     context,
-                    route=PATHS.BOOKMARKS,
+                    path=PATHS.BOOKMARKS,
                 ),
                 menu_items.play_all_from(
                     context,
-                    route=PATHS.BOOKMARKS,
+                    path=PATHS.BOOKMARKS,
                     order='shuffle',
                 ),
             ]

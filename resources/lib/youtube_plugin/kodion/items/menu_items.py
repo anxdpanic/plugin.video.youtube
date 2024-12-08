@@ -108,13 +108,13 @@ def refresh(context):
     )
 
 
-def play_all_from(context, route, order='normal'):
+def play_all_from(context, path, order='normal'):
     return (
         context.localize('playlist.play.shuffle')
         if order == 'shuffle' else
         context.localize('playlist.play.all'),
         context.create_uri(
-            (route, 'play',),
+            (path, 'play',),
             {
                 'order': order,
             },

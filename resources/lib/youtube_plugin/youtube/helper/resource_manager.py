@@ -118,7 +118,7 @@ class ResourceManager(object):
             context.debug_log and context.log_debug(
                 'ResourceManager.get_channels'
                 ' - Retrieved new data for channels'
-                '\n\tVideo IDs: {ids}'
+                '\n\tChannel IDs: {ids}'
                 .format(ids=to_update)
             )
             result.update(new_data)
@@ -256,7 +256,7 @@ class ResourceManager(object):
             context.debug_log and context.log_debug(
                 'ResourceManager.get_playlists'
                 ' - Using cached data for playlists'
-                '\n\tVideo IDs: {ids}'
+                '\n\tPlaylist IDs: {ids}'
                 .format(ids=list(result))
             )
             if self._progress_dialog:
@@ -285,7 +285,7 @@ class ResourceManager(object):
             context.debug_log and context.log_debug(
                 'ResourceManager.get_playlists'
                 ' - Retrieved new data for playlists'
-                '\n\tVideo IDs: {ids}'
+                '\n\tPlaylist IDs: {ids}'
                 .format(ids=to_update)
             )
             result.update(new_data)

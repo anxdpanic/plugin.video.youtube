@@ -171,6 +171,7 @@ class XbmcPlugin(AbstractPlugin):
         settings = context.get_settings()
         if settings.setup_wizard_enabled():
             provider.run_wizard(context)
+        show_fanart = settings.fanart_selection()
 
         try:
             if route:
@@ -208,7 +209,6 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 ]
 
-            show_fanart = settings.fanart_selection()
             items = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](
                     context,
@@ -233,7 +233,7 @@ class XbmcPlugin(AbstractPlugin):
                 item = self._PLAY_ITEM_MAP[result.__class__.__name__](
                     context,
                     result,
-                    show_fanart=context.get_settings().fanart_selection(),
+                    show_fanart=show_fanart,
                 )
                 uri = result.get_uri()
                 result = xbmcplugin.addDirectoryItem(handle,
