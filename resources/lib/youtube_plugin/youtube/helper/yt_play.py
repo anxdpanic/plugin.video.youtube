@@ -16,7 +16,7 @@ from traceback import format_stack
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
-from ...kodion.compatibility import urlencode, urlunsplit
+from ...kodion.compatibility import string_type, urlencode, urlunsplit
 from ...kodion.constants import (
     BUSY_FLAG,
     CONTENT,
@@ -192,7 +192,6 @@ def _play_playlist(provider, context):
     playlist_ids = params.get('playlist_ids')
     if not playlist_ids:
         playlist_ids = [params.get('playlist_id')]
-    video_id = params.get('video_id')
 
     resource_manager = provider.get_resource_manager(context)
     ui = context.get_ui()
@@ -221,7 +220,7 @@ def _play_playlist(provider, context):
             return False
 
         return (
-            process_items_for_playlist(context, video_items, action, video_id),
+            process_items_for_playlist(context, video_items, action=action),
             {
                 provider.RESULT_CACHE_TO_DISC: action == 'list',
                 provider.RESULT_FORCE_RESOLVE: action != 'list',
@@ -351,11 +350,21 @@ def process(provider, context, **_kwargs):
     return False
 
 
-def process_items_for_playlist(context, items, action=None, play_from=None):
+def process_items_for_playlist(context,
+                               items,
+                               action=None,
+                               play_from=None,
+                               order=None):
+    params = context.get_params()
+
+    if play_from is None:
+        play_from = params.get('video_id')
+
     num_items = len(items) if items else 0
     if num_items > 1:
         # select order
-        order = context.get_param('order')
+        if order is None:
+            order = params.get('order')
         if not order and play_from is None:
             order = 'ask'
         if order == 'ask':
@@ -397,18 +406,21 @@ def process_items_for_playlist(context, items, action=None, play_from=None):
         play_from = -1
     if isinstance(play_from, int):
         playlist_position = play_from
-    else:
+    elif isinstance(play_from, string_type):
         playlist_position = None
+    else:
+        playlist_position = False
 
     # add videos to playlist
+    num_items = 0
     for idx, item in enumerate(items):
         if not item.playable:
             continue
         playlist_player.add(item)
         if playlist_position is None and item.video_id == play_from:
-            playlist_position = idx
+            playlist_position = num_items
+        num_items += 1
 
-    num_items = playlist_player.size()
     if not num_items:
         return False
 
@@ -419,7 +431,7 @@ def process_items_for_playlist(context, items, action=None, play_from=None):
             playlist_position = num_items + play_from
         else:
             playlist_position = 0
-    elif playlist_position is None:
+    elif not playlist_position:
         playlist_position = 0
 
     if action == 'queue':
