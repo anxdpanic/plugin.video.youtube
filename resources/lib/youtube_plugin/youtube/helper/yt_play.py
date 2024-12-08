@@ -352,30 +352,34 @@ def process(provider, context, **_kwargs):
 
 
 def process_items_for_playlist(context, items, action=None, play_from=None):
-    # select order
-    order = context.get_param('order')
-    if not order and play_from is None:
-        order = 'ask'
-    if order == 'ask':
-        order_list = ('default', 'reverse', 'shuffle')
-        selection_list = [
-            (context.localize('playlist.play.%s' % order), order)
-            for order in order_list
-        ]
-        order = context.get_ui().on_select(
-            context.localize('playlist.play.select'),
-            selection_list,
-        )
-        if order not in order_list:
-            order = 'default'
+    num_items = len(items) if items else 0
+    if num_items > 1:
+        # select order
+        order = context.get_param('order')
+        if not order and play_from is None:
+            order = 'ask'
+        if order == 'ask':
+            order_list = ('default', 'reverse', 'shuffle')
+            selection_list = [
+                (context.localize('playlist.play.%s' % order), order)
+                for order in order_list
+            ]
+            order = context.get_ui().on_select(
+                context.localize('playlist.play.select'),
+                selection_list,
+            )
+            if order not in order_list:
+                order = 'default'
 
-    # reverse the list
-    if order == 'reverse':
-        items = items[::-1]
-    elif order == 'shuffle':
-        # we have to shuffle the playlist by our self.
-        # The implementation of XBMC/KODI is quite weak :(
-        random.shuffle(items)
+        # reverse the list
+        if order == 'reverse':
+            items = items[::-1]
+        elif order == 'shuffle':
+            # we have to shuffle the playlist by our self.
+            # The implementation of XBMC/KODI is quite weak :(
+            random.shuffle(items)
+    elif not num_items:
+        return False
 
     if action == 'list':
         context.set_content(CONTENT.VIDEO_CONTENT)
