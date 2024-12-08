@@ -209,6 +209,10 @@ class XbmcPlugin(AbstractPlugin):
                     )
                 ]
 
+            force_resolve = provider.RESULT_FORCE_RESOLVE
+            if not options.pop(force_resolve, False):
+                force_resolve = False
+
             items = [
                 self._LIST_ITEM_MAP[item.__class__.__name__](
                     context,
@@ -217,14 +221,12 @@ class XbmcPlugin(AbstractPlugin):
                     focused=focused,
                 )
                 for item in result
-                if item.__class__.__name__ in self._LIST_ITEM_MAP
+                if self.classify_list_item(item, options, force_resolve)
             ]
             item_count = len(items)
 
-            if options.get(provider.RESULT_FORCE_RESOLVE):
-                result = result[0]
-            else:
-                result = None
+            if force_resolve:
+                result = options.get(force_resolve)
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
             uri = result.get_uri()
@@ -340,3 +342,10 @@ class XbmcPlugin(AbstractPlugin):
             result = False
 
         return result, action
+
+    def classify_list_item(self, item, options, force_resolve):
+        item_type = item.__class__.__name__
+        is_list_item = item_type in self._LIST_ITEM_MAP
+        if force_resolve and item_type in self._PLAY_ITEM_MAP:
+            options.setdefault(force_resolve, item)
+        return is_list_item
