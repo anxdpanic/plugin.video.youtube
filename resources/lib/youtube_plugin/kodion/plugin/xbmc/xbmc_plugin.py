@@ -236,17 +236,13 @@ class XbmcPlugin(AbstractPlugin):
                     show_fanart=show_fanart,
                 )
                 uri = result.get_uri()
-                result = xbmcplugin.addDirectoryItem(handle,
-                                                     url=uri,
-                                                     listitem=item)
-                if route:
+                if options.get(provider.RESULT_FORCE_PLAY):
                     playlist_player = context.get_playlist_player()
                     playlist_player.play_item(item=uri, listitem=item)
                 else:
-                    xbmcplugin.setResolvedUrl(handle,
-                                              succeeded=result,
-                                              listitem=item)
-
+                    xbmcplugin.setResolvedUrl(
+                        handle, succeeded=True, listitem=item
+                    )
             else:
                 result, post_run_action = self.uri_action(context, uri)
 

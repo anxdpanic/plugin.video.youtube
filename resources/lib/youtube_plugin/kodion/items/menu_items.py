@@ -177,11 +177,11 @@ def shuffle_playlist(context, playlist_id):
     return (
         context.localize('playlist.play.shuffle'),
         context.create_uri(
-            (PATHS.ROUTE, PATHS.PLAY,),
+            (PATHS.PLAY,),
             {
                 'playlist_id': playlist_id,
                 'order': 'shuffle',
-                'action': 'list',
+                'action': 'play',
             },
             run=True,
         ),

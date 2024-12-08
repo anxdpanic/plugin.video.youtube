@@ -223,9 +223,9 @@ def _play_playlist(provider, context):
         return (
             process_items_for_playlist(context, video_items, action, video_id),
             {
-                provider.RESULT_CACHE_TO_DISC: False,
-                provider.RESULT_FORCE_RESOLVE: True,
-                provider.RESULT_UPDATE_LISTING: True,
+                provider.RESULT_CACHE_TO_DISC: action == 'list',
+                provider.RESULT_FORCE_RESOLVE: action != 'list',
+                provider.RESULT_UPDATE_LISTING: action != 'list',
             },
         )
 
@@ -426,5 +426,4 @@ def process_items_for_playlist(context, items, action=None, play_from=None):
         return items
     if action == 'play':
         playlist_player.play_playlist_item(playlist_position + 1)
-        return False
     return items[playlist_position]
