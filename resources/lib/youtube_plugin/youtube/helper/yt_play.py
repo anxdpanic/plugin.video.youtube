@@ -426,11 +426,11 @@ def process_items_for_playlist(context,
     elif play_from == 'end':
         play_from = -1
     if isinstance(play_from, int):
-        playlist_position = play_from
+        position = play_from
     elif isinstance(play_from, string_type):
-        playlist_position = None
+        position = None
     else:
-        playlist_position = False
+        position = False
 
     # add videos to playlist
     num_items = 0
@@ -438,25 +438,36 @@ def process_items_for_playlist(context,
         if not item.playable:
             continue
         playlist_player.add(item)
-        if playlist_position is None and item.video_id == play_from:
-            playlist_position = num_items
         num_items += 1
+        if position is None and item.video_id == play_from:
+            position = num_items
 
     if not num_items:
         return False
 
     if isinstance(play_from, int):
         if num_items >= play_from > 0:
-            playlist_position = play_from - 1
+            position = play_from
         elif play_from < 0:
-            playlist_position = num_items + play_from
+            position = num_items + play_from
         else:
-            playlist_position = 0
-    elif not playlist_position:
-        playlist_position = 0
+            position = 1
+    elif not position:
+        position = 1
 
     if action == 'queue':
         return items
     if action == 'play':
-        playlist_player.play_playlist_item(playlist_position + 1)
-    return items[playlist_position]
+        ui = context.get_ui()
+        max_wait_time = position
+        while ui.busy_dialog_active() or playlist_player.size() < position:
+            max_wait_time -= 1
+            if max_wait_time < 0:
+                command = playlist_player.play_playlist_item(position,
+                                                             defer=True)
+                return UriItem(command)
+            context.sleep(1)
+        else:
+            playlist_player.play_playlist_item(position)
+        return
+    return items[position - 1]

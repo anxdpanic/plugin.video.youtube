@@ -141,11 +141,11 @@ class XbmcPlugin(AbstractPlugin):
                 if max_wait_time < 0:
                     context.log_error('Multiple busy dialogs active'
                                       ' - Unable to restart playback')
+                    command = playlist_player.play_playlist_item(position,
+                                                                 defer=True)
                     result, post_run_action = self.uri_action(
                         context,
-                        'command://Playlist.PlayOffset({type},{position})'
-                        .format(type='video',
-                                position=(position - 1)),
+                        command,
                     )
                     succeeded = False
                     continue
@@ -229,24 +229,20 @@ class XbmcPlugin(AbstractPlugin):
                 result = options.get(force_resolve)
 
         if result and result.__class__.__name__ in self._PLAY_ITEM_MAP:
-            uri = result.get_uri()
-
-            if result.playable:
+            if options.get(provider.RESULT_FORCE_PLAY) or not result.playable:
+                result, post_run_action = self.uri_action(
+                    context,
+                    result.get_uri()
+                )
+            else:
                 item = self._PLAY_ITEM_MAP[result.__class__.__name__](
                     context,
                     result,
                     show_fanart=show_fanart,
                 )
-                uri = result.get_uri()
-                if options.get(provider.RESULT_FORCE_PLAY):
-                    playlist_player = context.get_playlist_player()
-                    playlist_player.play_item(item=uri, listitem=item)
-                else:
-                    xbmcplugin.setResolvedUrl(
-                        handle, succeeded=True, listitem=item
-                    )
-            else:
-                result, post_run_action = self.uri_action(context, uri)
+                xbmcplugin.setResolvedUrl(
+                    handle, succeeded=True, listitem=item
+                )
 
         if item_count:
             context.apply_content()

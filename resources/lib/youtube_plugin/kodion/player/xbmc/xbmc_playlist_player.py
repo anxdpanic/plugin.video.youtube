@@ -197,44 +197,50 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
 
         return len(items)
 
-    def play_playlist_item(self, position, resume=False):
+    def play_playlist_item(self, position, resume=False, defer=False):
         """
         Function to play item in playlist from a specified position, where the
         first item in the playlist is position 1
         """
 
+        context = self._context
+        playlist_id = self._playlist.getPlayListId()
+
         if position == 'next':
             position, _ = self.get_position(offset=1)
-        context = self._context
         if not position:
             context.log_warning('Unable to play from playlist position: {0}'
                                 .format(position))
             return
-        context.log_debug('Playing from playlist position: {0}'
-                          .format(position))
+        context.log_debug('Playing from playlist: {id}, position: {position}'
+                          .format(id=playlist_id,
+                                  position=position))
 
         if not resume:
-            self._player.play(self._playlist, startpos=position - 1)
-            return
+            command = 'Playlist.PlayOffset({type},{position})'.format(
+                type=self.PLAYLIST_MAP.get(playlist_id) or 'video',
+                position=position - 1,
+            )
+            if defer:
+                return ''.join(('command://', command))
+            return self._context.execute(command)
+
         # JSON Player.Open can be too slow but is needed if resuming is enabled
         jsonrpc(method='Player.Open',
-                params={'item': {'playlistid': self._playlist.getPlayListId(),
+                params={'item': {'playlistid': playlist_id,
                                  # Convert 1 indexed to 0 indexed position
                                  'position': position - 1}},
                 options={'resume': True},
                 no_response=True)
 
-    def play(self, playlist_index=-1):
+    def play(self, playlist_index=-1, defer=False):
         """
-        We call the player in this way, because 'Player.play(...)' will call the addon again while the instance is
-        running.  This is somehow shitty, because we couldn't release any resources and in our case we couldn't release
-        the cache. So this is the solution to prevent a locked database (sqlite).
+        We call the player in this way, because 'Player.play(...)' will call the
+        addon again while the instance is running. This is somehow shitty,
+        because we couldn't release any resources and in our case we couldn't
+        release the cache. So this is the solution to prevent a locked database
+        (sqlite) and Kodi crashing.
         """
-        playlist_type = self.PLAYLIST_MAP.get(self._playlist.getPlayListId())
-        self._context.execute(
-            'Playlist.PlayOffset({type},{position})'
-            .format(type=playlist_type or 'video', position=playlist_index)
-        )
 
         """
         playlist = None
@@ -248,6 +254,15 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         else:
             xbmc.Player().play(item=playlist)
         """
+
+        playlist_type = self.PLAYLIST_MAP.get(self._playlist.getPlayListId())
+        command = 'Playlist.PlayOffset({type},{position})'.format(
+            type=playlist_type or 'video',
+            position=playlist_index,
+        )
+        if defer:
+            return ''.join(('command://', command))
+        return self._context.execute(command)
 
     def get_position(self, offset=0):
         """
