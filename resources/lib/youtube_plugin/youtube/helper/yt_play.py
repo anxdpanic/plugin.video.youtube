@@ -189,8 +189,10 @@ def _play_playlist(provider, context):
     if not action and context.get_handle() == -1:
         action = 'play'
 
+    playlist_id = params.get('playlist_id')
     playlist_ids = params.get('playlist_ids')
-    if not playlist_ids:
+    video_ids = params.get('video_ids')
+    if not playlist_ids and playlist_id:
         playlist_ids = [params.get('playlist_id')]
 
     resource_manager = provider.get_resource_manager(context)
@@ -201,13 +203,27 @@ def _play_playlist(provider, context):
             message=context.localize('please_wait'),
             background=True,
     ) as progress_dialog:
-        json_data = resource_manager.get_playlist_items(playlist_ids)
+        if playlist_ids:
+            json_data = resource_manager.get_playlist_items(playlist_ids)
+            if not json_data:
+                return False
+            chunks = json_data.values()
+            total = sum(len(chunk.get('items', [])) for chunk in chunks)
+        elif video_ids:
+            json_data = resource_manager.get_videos(video_ids,
+                                                    live_details=True)
+            if not json_data:
+                return False
+            chunks = [{
+                'kind': 'plugin#playlistitemlistresponse',
+                'items': json_data.values(),
+            }]
+            total = len(json_data)
 
-        total = sum(len(chunk.get('items', [])) for chunk in json_data.values())
         progress_dialog.reset_total(total)
 
         # start the loop and fill the list with video items
-        for chunk in json_data.values():
+        for chunk in chunks:
             result = v3.response_to_items(provider,
                                           context,
                                           chunk,
@@ -289,9 +305,8 @@ def process(provider, context, **_kwargs):
     params = context.get_params()
     param_keys = params.keys()
 
-    if {'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}.isdisjoint(
-            param_keys
-    ):
+    if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id', 'video_ids'}
+            .isdisjoint(param_keys)):
         listitem_path = context.get_listitem_info('FileNameAndPath')
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
@@ -304,6 +319,7 @@ def process(provider, context, **_kwargs):
             return False
 
     video_id = params.get('video_id')
+    video_ids = params.get('video_ids')
     playlist_id = params.get('playlist_id')
 
     force_play = False
@@ -316,7 +332,7 @@ def process(provider, context, **_kwargs):
         ui.set_property(param)
         force_play = True
 
-    if video_id and not playlist_id:
+    if video_id and not playlist_id and not video_ids:
         # This is required to trigger Kodi resume prompt, along with using
         # RunPlugin. Prompt will not be used if using PlayMedia
         if force_play and not params.get(PLAY_STRM):
@@ -347,7 +363,7 @@ def process(provider, context, **_kwargs):
 
         return media_item
 
-    if playlist_id or 'playlist_ids' in params:
+    if playlist_id or video_ids or 'playlist_ids' in params:
         return _play_playlist(provider, context)
 
     if 'channel_id' in params:
