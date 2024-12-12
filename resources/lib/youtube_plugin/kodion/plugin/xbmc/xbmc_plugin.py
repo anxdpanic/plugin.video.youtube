@@ -338,6 +338,7 @@ class XbmcPlugin(AbstractPlugin):
             action = context.create_uri(
                 (PATHS.ROUTE, uri.path.rstrip('/') or PATHS.HOME),
                 uri.query,
+                parse_params=True,
                 run=True,
             )
             result = False

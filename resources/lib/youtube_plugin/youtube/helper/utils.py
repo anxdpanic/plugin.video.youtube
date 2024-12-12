@@ -1358,11 +1358,7 @@ def filter_parse(item,
                     input_1 = getattr(item, 'get_{0}'.format(input_1))()
 
                 if input_2.startswith('"'):
-                    input_2 = (
-                        input_2[1:-1]
-                        .replace('%2C', ',')
-                        .replace('%7D', '}')
-                    )
+                    input_2 = unquote(input_2[1:-1])
                     if input_1 is None:
                         input_1 = ''
                     elif isinstance(input_1, (date, datetime)):
