@@ -307,7 +307,7 @@ class AbstractContext(Logger):
         if run:
             return ''.join(('RunPlugin(', uri, ')'))
         if play:
-            return ''.join(('PlayMedia(', uri, ')'))
+            return ''.join(('PlayMedia(', uri, ',playlist_type_hint=1)'))
         if replace:
             return ''.join(('ReplaceWindow(Videos, ', uri, ')'))
         return uri

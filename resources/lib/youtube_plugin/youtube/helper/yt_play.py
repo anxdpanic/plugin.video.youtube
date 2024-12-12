@@ -323,8 +323,13 @@ def process(provider, context, **_kwargs):
             return UriItem('command://Action(Play)')
 
         if context.get_handle() == -1:
-            return UriItem('command://PlayMedia({0}, playlist_type_hint=1)'
-                           .format(context.create_uri((PATHS.PLAY,), params)))
+            return UriItem('command://{0}'.format(
+                context.create_uri(
+                    (PATHS.PLAY,),
+                    params,
+                    play=True,
+                )
+            ))
 
         ui.set_property(BUSY_FLAG)
         playlist_player = context.get_playlist_player()
