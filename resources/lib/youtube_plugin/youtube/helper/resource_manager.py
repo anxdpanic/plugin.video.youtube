@@ -251,7 +251,7 @@ class ResourceManager(object):
             result = {}
         else:
             data_cache = context.get_data_cache()
-            result = data_cache.get_items(ids, data_cache.ONE_MONTH)
+            result = data_cache.get_items(ids, data_cache.ONE_DAY)
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
@@ -414,6 +414,30 @@ class ResourceManager(object):
         if item is None:
             return None
         return item.get('contentDetails', {}).get('relatedPlaylists')
+
+    def get_my_playlists(self, channel_id, page_token, defer_cache=False):
+        context = self._context
+        client = self._provider.get_client(context)
+
+        result = client.get_playlists_of_channel(channel_id, page_token)
+        if not result:
+            return None
+
+        new_data = {
+            yt_item['id']: yt_item
+            for yt_item in result.get('items', [])
+            if yt_item
+        }
+        if new_data:
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_my_playlists'
+                ' - Retrieved new data for playlists'
+                '\n\tPlaylist IDs: {ids}'
+                .format(ids=list(new_data))
+            )
+            self.cache_data(new_data, defer=defer_cache)
+
+        return result
 
     def get_videos(self,
                    ids,

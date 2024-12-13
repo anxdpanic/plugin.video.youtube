@@ -470,9 +470,7 @@ class Provider(AbstractProvider):
         else:
             result = False
 
-        json_data = provider.get_client(context).get_playlists_of_channel(
-            channel_id, page_token
-        )
+        json_data = resource_manager.get_my_playlists(channel_id, page_token)
         if not json_data:
             return result
 

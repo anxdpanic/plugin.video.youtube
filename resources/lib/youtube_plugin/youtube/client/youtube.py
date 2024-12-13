@@ -883,7 +883,7 @@ class YouTube(LoginClient):
                                 **kwargs)
 
     def get_playlists_of_channel(self, channel_id, page_token='', **kwargs):
-        params = {'part': 'snippet',
+        params = {'part': 'snippet,status,contentDetails',
                   'maxResults': str(self.max_results())}
         if channel_id == 'mine':
             params['mine'] = True
