@@ -36,14 +36,14 @@ def tv_videos_to_items(provider, context, json_data):
 
     item_filter = context.get_settings().item_filter()
 
-    utils.update_video_infos(
+    utils.update_video_items(
         provider,
         context,
         video_id_dict,
         channel_items_dict=channel_items_dict,
         item_filter=item_filter,
     )
-    utils.update_fanarts(provider, context, channel_items_dict)
+    utils.update_channel_info(provider, context, channel_items_dict)
 
     if item_filter:
         result = utils.filter_videos(video_id_dict.values(), **item_filter)
@@ -102,11 +102,11 @@ def saved_playlists_to_items(provider, context, json_data):
         playlist_id_dict[playlist_id] = playlist_item
 
     channel_items_dict = {}
-    utils.update_playlist_infos(provider,
+    utils.update_playlist_items(provider,
                                 context,
                                 playlist_id_dict,
-                                channel_items_dict)
-    utils.update_fanarts(provider, context, channel_items_dict)
+                                channel_items_dict=channel_items_dict)
+    utils.update_channel_info(provider, context, channel_items_dict)
 
     # next page
     next_page_token = json_data.get('next_page_token')

@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc_progress_dialog import XbmcProgressDialog, XbmcProgressDialogBG
+from .xbmc_progress_dialog import XbmcProgressDialog
 from ..abstract_context_ui import AbstractContextUI
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, REFRESH_CONTAINER
@@ -26,11 +26,15 @@ class XbmcContextUI(AbstractContextUI):
                                heading,
                                message='',
                                background=False,
-                               message_template=None):
-        if background:
-            return XbmcProgressDialogBG(heading, message, message_template)
-
-        return XbmcProgressDialog(heading, message, message_template)
+                               message_template=None,
+                               template_params=None):
+        if not message_template:
+            message_template = ('{wait} {{_current}}/{{_total}}'.format(
+                wait=(message or self._context.localize('please_wait'))
+            ))
+        return XbmcProgressDialog(
+            heading, message, background, message_template, template_params
+        )
 
     def on_keyboard_input(self, title, default='', hidden=False):
         # Starting with Gotham (13.X > ...)
@@ -79,12 +83,17 @@ class XbmcContextUI(AbstractContextUI):
         )
 
     def on_select(self, title, items=None, preselect=-1, use_details=False):
-        if items is None:
-            items = []
+        if isinstance(items, (list, tuple)):
+            items = enumerate(items)
+        elif isinstance(items, dict):
+            items = items.items()
+        else:
+            return -1
 
         result_map = {}
         dialog_items = []
-        for idx, item in enumerate(items):
+
+        for idx, item in items:
             if isinstance(item, (list, tuple)):
                 num_details = len(item)
                 if num_details > 2:

@@ -13,6 +13,7 @@ from .http_server import (
     get_client_ip_address,
     get_connect_address,
     get_http_server,
+    get_listen_addresses,
     httpd_status,
 )
 from .ip_api import Locator
@@ -23,6 +24,7 @@ __all__ = (
     'get_client_ip_address',
     'get_connect_address',
     'get_http_server',
+    'get_listen_addresses',
     'httpd_status',
     'BaseRequestsClass',
     'InvalidJSONError',

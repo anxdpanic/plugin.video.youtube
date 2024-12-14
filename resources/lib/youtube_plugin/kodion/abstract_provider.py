@@ -10,7 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import re
+from re import (
+    UNICODE as re_UNICODE,
+    compile as re_compile,
+)
 
 from .constants import (
     CHECK_SETTINGS,
@@ -34,6 +37,7 @@ from .utils import to_unicode
 class AbstractProvider(object):
     RESULT_CACHE_TO_DISC = 'cache_to_disc'  # (bool)
     RESULT_FALLBACK = 'fallback'  # (bool)
+    RESULT_FORCE_PLAY = 'force_play'  # (bool)
     RESULT_FORCE_RESOLVE = 'force_resolve'  # (bool)
     RESULT_UPDATE_LISTING = 'update_listing'  # (bool)
 
@@ -110,7 +114,7 @@ class AbstractProvider(object):
                 if not callable(func):
                     return None
 
-            cls._dict_path[re.compile(re_path, re.UNICODE)] = func
+            cls._dict_path[re_compile(re_path, re_UNICODE)] = func
             return command
 
         if command:
@@ -132,7 +136,7 @@ class AbstractProvider(object):
 
         try:
             if wizard_steps and ui.on_yes_no_input(
-                    localize('setup_wizard'),
+                    ' - '.join((localize('youtube'), localize('setup_wizard'))),
                     (localize('setup_wizard.prompt')
                      % localize('setup_wizard.prompt.settings'))
             ):
@@ -169,7 +173,8 @@ class AbstractProvider(object):
             result = handler(provider=self, context=context, re_match=re_match)
             if isinstance(result, tuple):
                 result, new_options = result
-                options.update(new_options)
+                if new_options:
+                    options.update(new_options)
 
             if context.get_param('refresh'):
                 options[self.RESULT_CACHE_TO_DISC] = True
@@ -353,7 +358,7 @@ class AbstractProvider(object):
                     localize('content.remove'),
                     localize('content.remove.check') % query,
             ):
-                return False
+                return False, None
 
             search_history.del_item(query)
             ui.refresh_container()
@@ -363,7 +368,7 @@ class AbstractProvider(object):
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, None
 
         if command == 'rename':
             query = to_unicode(params.get('q', ''))
@@ -374,14 +379,14 @@ class AbstractProvider(object):
                 search_history.del_item(query)
                 search_history.add_item(new_query)
                 ui.refresh_container()
-            return True
+            return True, None
 
         if command == 'clear':
             if not ui.on_yes_no_input(
                     localize('search.clear'),
                     localize('content.clear.check') % localize('search.history')
             ):
-                return False
+                return False, None
 
             search_history.clear()
             ui.refresh_container()
@@ -391,7 +396,7 @@ class AbstractProvider(object):
                 time_ms=2500,
                 audible=False,
             )
-            return True
+            return True, None
 
         if command.startswith('input'):
             query = None
@@ -415,13 +420,15 @@ class AbstractProvider(object):
                     query = input_query
 
             if not query:
-                return False
+                return False, None
 
             context.set_path(PATHS.SEARCH, 'query')
-            return (
-                provider.on_search_run(context=context, query=query),
-                {provider.RESULT_CACHE_TO_DISC: command != 'input_prompt'},
-            )
+            result, options = provider.on_search_run(context, query=query)
+            if not options:
+                options = {
+                    provider.RESULT_CACHE_TO_DISC: command != 'input_prompt',
+                }
+            return result, options
 
         context.set_content(CONTENT.LIST_CONTENT,
                             category_label=localize('search'))

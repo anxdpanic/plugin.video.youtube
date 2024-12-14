@@ -52,7 +52,8 @@ def process(mode, provider, context, sign_out_refresh=True):
         user_code = json_data['user_code']
         verification_url = json_data.get('verification_url')
         if verification_url:
-            verification_url = verification_url.lstrip('https://www.')
+            if verification_url.startswith('https://www.'):
+                verification_url = verification_url[12:]
         else:
             verification_url = 'youtube.com/activate'
 

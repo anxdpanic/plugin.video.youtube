@@ -10,28 +10,48 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from .utils import get_thumbnail
+
 
 class ResourceManager(object):
-    def __init__(self, provider, context):
-        self._context = context
-        fanart_type = context.get_param('fanart_type')
-        if fanart_type is None:
-            fanart_type = context.get_settings().fanart_selection()
-        self._fanart_type = fanart_type
+    def __init__(self, provider, context, progress_dialog=None):
         self._provider = provider
+        self._context = context
+        self._progress_dialog = progress_dialog
+
         self.new_data = {}
+
+        params = context.get_params()
+        self._incognito = params.get('incognito')
+
+        fanart_type = params.get('fanart_type')
+        settings = context.get_settings()
+        if fanart_type is None:
+            fanart_type = settings.fanart_selection()
+        self._channel_fanart = fanart_type == settings.FANART_CHANNEL
+        self._thumb_size = settings.get_thumbnail_size()
 
     def context_changed(self, context):
         return self._context != context
 
-    @staticmethod
-    def _list_batch(input_list, n=50):
+    def update_progress_dialog(self, progress_dialog):
+        old_progress_dialog = self._progress_dialog
+        if not progress_dialog or old_progress_dialog == progress_dialog:
+            return
+        if old_progress_dialog:
+            old_progress_dialog.close()
+        self._progress_dialog = progress_dialog
+
+    def _list_batch(self, input_list, n=50):
         if not isinstance(input_list, (list, tuple)):
             input_list = list(input_list)
-        for i in range(0, len(input_list), n):
+        num_items = len(input_list)
+        for i in range(0, num_items, n):
             yield input_list[i:i + n]
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=min(n, num_items))
 
-    def get_channels(self, ids, defer_cache=False):
+    def get_channels(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         client = self._provider.get_client(context)
         data_cache = context.get_data_cache()
@@ -64,7 +84,7 @@ class ResourceManager(object):
                                   .format(exc=exc, data=data))
 
         ids = updated
-        if refresh:
+        if refresh or not ids:
             result = {}
         else:
             result = data_cache.get_items(ids, data_cache.ONE_MONTH)
@@ -80,11 +100,23 @@ class ResourceManager(object):
                 '\n\tChannel IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
-            new_data = [client.get_channels(list_of_50)
+            notify_and_raise = not suppress_errors
+            new_data = [client.get_channels(list_of_50,
+                                            notify=notify_and_raise,
+                                            raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
-            if not any(new_data):
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
                 new_data = None
         else:
             new_data = None
@@ -93,15 +125,9 @@ class ResourceManager(object):
             context.debug_log and context.log_debug(
                 'ResourceManager.get_channels'
                 ' - Retrieved new data for channels'
-                '\n\tVideo IDs: {ids}'
+                '\n\tChannel IDs: {ids}'
                 .format(ids=to_update)
             )
-            new_data = {
-                yt_item['id']: yt_item
-                for batch in new_data
-                for yt_item in batch.get('items', [])
-                if yt_item
-            }
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
@@ -116,42 +142,116 @@ class ResourceManager(object):
 
         return result
 
-    def get_fanarts(self, channel_ids, force=False, defer_cache=False):
-        if force:
-            pass
-        elif self._fanart_type != self._context.get_settings().FANART_CHANNEL:
-            return {}
+    def get_channel_info(self,
+                         ids,
+                         channel_data=None,
+                         suppress_errors=False,
+                         defer_cache=False):
+        context = self._context
+        refresh = context.get_param('refresh')
+        if not refresh and channel_data:
+            result = channel_data
+        else:
+            result = {}
 
-        result = self.get_channels(channel_ids, defer_cache=defer_cache)
+        to_check = [id_ for id_ in ids
+                    if id_ not in result
+                    or not result[id_]
+                    or result[id_].get('_partial')]
+        if to_check:
+            data_cache = context.get_data_cache()
+            result.update(data_cache.get_items(to_check, data_cache.ONE_MONTH))
+        to_update = [id_ for id_ in ids
+                     if id_ not in result
+                     or not result[id_]
+                     or result[id_].get('_partial')]
+
+        if result:
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_channel_info'
+                ' - Using cached data for channels'
+                '\n\tChannel IDs: {ids}'
+                .format(ids=list(result))
+            )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
+
+        if to_update:
+            notify_and_raise = not suppress_errors
+            client = self._provider.get_client(context)
+            new_data = [client.get_channels(list_of_50,
+                                            notify=notify_and_raise,
+                                            raise_exc=notify_and_raise)
+                        for list_of_50 in self._list_batch(to_update, n=50)]
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
+                new_data = None
+        else:
+            new_data = None
+
+        if new_data:
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_channel_info'
+                ' - Retrieved new data for channels'
+                '\n\tChannel IDs: {ids}'
+                .format(ids=to_update)
+            )
+            result.update(new_data)
+            self.cache_data(new_data, defer=defer_cache)
+
         banners = (
             'bannerTvMediumImageUrl',
             'bannerTvLowImageUrl',
             'bannerTvImageUrl',
             'bannerExternalUrl',
         )
+        untitled = context.localize('untitled')
+        thumb_size = self._thumb_size
+        channel_fanart = self._channel_fanart
+
         # transform
         for key, item in result.items():
-            images = item.get('brandingSettings', {}).get('image', {})
-            for banner in banners:
-                image = images.get(banner)
-                if image:
-                    result[key] = image
-                    break
-            else:
-                # set an empty url
-                result[key] = ''
+            channel_info = {
+                'name': None,
+                'image': None,
+                'fanart': None,
+            }
+
+            if channel_fanart:
+                images = item.get('brandingSettings', {}).get('image', {})
+                for banner in banners:
+                    image = images.get(banner)
+                    if image:
+                        channel_info['fanart'] = image
+                        break
+
+            snippet = item.get('snippet')
+            if snippet:
+                localised_info = snippet.get('localized') or {}
+                channel_info['name'] = (localised_info.get('title')
+                                        or snippet.get('title')
+                                        or untitled)
+                channel_info['image'] = get_thumbnail(thumb_size,
+                                                      snippet.get('thumbnails'))
+            result[key] = channel_info
 
         return result
 
-    def get_playlists(self, ids, defer_cache=False):
+    def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         ids = tuple(ids)
         refresh = context.get_param('refresh')
-        if refresh:
+        if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
-            result = data_cache.get_items(ids, data_cache.ONE_MONTH)
+            result = data_cache.get_items(ids, data_cache.ONE_DAY)
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
@@ -161,15 +261,27 @@ class ResourceManager(object):
             context.debug_log and context.log_debug(
                 'ResourceManager.get_playlists'
                 ' - Using cached data for playlists'
-                '\n\tVideo IDs: {ids}'
+                '\n\tPlaylist IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
+            notify_and_raise = not suppress_errors
             client = self._provider.get_client(context)
-            new_data = [client.get_playlists(list_of_50)
+            new_data = [client.get_playlists(list_of_50,
+                                             notify=notify_and_raise,
+                                             raise_exc=notify_and_raise)
                         for list_of_50 in self._list_batch(to_update, n=50)]
-            if not any(new_data):
+            if any(new_data):
+                new_data = {
+                    yt_item['id']: yt_item
+                    for batch in new_data
+                    for yt_item in batch.get('items', [])
+                    if yt_item
+                }
+            else:
                 new_data = None
         else:
             new_data = None
@@ -178,15 +290,9 @@ class ResourceManager(object):
             context.debug_log and context.log_debug(
                 'ResourceManager.get_playlists'
                 ' - Retrieved new data for playlists'
-                '\n\tVideo IDs: {ids}'
+                '\n\tPlaylist IDs: {ids}'
                 .format(ids=to_update)
             )
-            new_data = {
-                yt_item['id']: yt_item
-                for batch in new_data
-                for yt_item in batch.get('items', [])
-                if yt_item
-            }
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
@@ -248,6 +354,8 @@ class ResourceManager(object):
                 '\n\tBatch IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         client = self._provider.get_client(context)
         new_data = {}
@@ -307,15 +415,40 @@ class ResourceManager(object):
             return None
         return item.get('contentDetails', {}).get('relatedPlaylists')
 
+    def get_my_playlists(self, channel_id, page_token, defer_cache=False):
+        context = self._context
+        client = self._provider.get_client(context)
+
+        result = client.get_playlists_of_channel(channel_id, page_token)
+        if not result:
+            return None
+
+        new_data = {
+            yt_item['id']: yt_item
+            for yt_item in result.get('items', [])
+            if yt_item
+        }
+        if new_data:
+            context.debug_log and context.log_debug(
+                'ResourceManager.get_my_playlists'
+                ' - Retrieved new data for playlists'
+                '\n\tPlaylist IDs: {ids}'
+                .format(ids=list(new_data))
+            )
+            self.cache_data(new_data, defer=defer_cache)
+
+        return result
+
     def get_videos(self,
                    ids,
                    live_details=False,
                    suppress_errors=False,
-                   defer_cache=False):
+                   defer_cache=False,
+                   yt_items=None):
         context = self._context
         ids = tuple(ids)
         refresh = context.get_param('refresh')
-        if refresh:
+        if refresh or not ids:
             result = {}
         else:
             data_cache = context.get_data_cache()
@@ -332,6 +465,8 @@ class ResourceManager(object):
                 '\n\tVideo IDs: {ids}'
                 .format(ids=list(result))
             )
+            if self._progress_dialog:
+                self._progress_dialog.update(steps=len(result) - len(to_update))
 
         if to_update:
             notify_and_raise = not suppress_errors
@@ -365,6 +500,13 @@ class ResourceManager(object):
             result.update(new_data)
             self.cache_data(new_data, defer=defer_cache)
 
+        if not result and not new_data and yt_items:
+            result = {
+                yt_item.get('id'): yt_item
+                for yt_item in yt_items
+            }
+            self.cache_data(result, defer=defer_cache)
+
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
         if list(result) != ids[:len(result)]:
@@ -384,6 +526,9 @@ class ResourceManager(object):
         return result
 
     def cache_data(self, data=None, defer=False):
+        if self._incognito:
+            return
+
         if defer:
             if data:
                 self.new_data.update(data)

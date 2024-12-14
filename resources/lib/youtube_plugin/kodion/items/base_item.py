@@ -54,6 +54,7 @@ class BaseItem(object):
         self._dateadded = None
         self._short_details = None
         self._production_code = None
+        self._track_number = None
 
         self._cast = None
         self._artists = None
@@ -338,6 +339,12 @@ class BaseItem(object):
 
     def get_production_code(self):
         return self._production_code
+
+    def set_track_number(self, track_number):
+        self._track_number = int(track_number)
+
+    def get_track_number(self):
+        return self._track_number
 
 
 class _Encoder(json.JSONEncoder):

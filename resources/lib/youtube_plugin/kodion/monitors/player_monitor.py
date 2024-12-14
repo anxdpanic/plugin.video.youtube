@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import json
-import re
 import threading
 
 from ..compatibility import xbmc
@@ -102,6 +101,7 @@ class PlayerMonitorThread(threading.Thread):
 
         access_manager = self._context.get_access_manager()
         settings = self._context.get_settings()
+        playlist_player = self._context.get_playlist_player()
 
         video_id_param = 'video_id=%s' % self.video_id
         report_url = use_remote_history and playback_stats.get('watchtime_url')
@@ -140,7 +140,10 @@ class PlayerMonitorThread(threading.Thread):
                     waited = 0
                     player.seekTime(player.start_time)
                     continue
-                player.stop()
+                if playlist_player.size() > 1:
+                    playlist_player.play_playlist_item('next')
+                else:
+                    player.stop()
 
             if waited >= report_period:
                 waited = 0
@@ -264,15 +267,12 @@ class PlayerMonitorThread(threading.Thread):
                     items = json_data.get('items', [{'rating': 'none'}])
                     rating = items[0].get('rating', 'none')
                     if rating == 'none':
-                        rating_match = re.search(
-                            r'/(?P<video_id>[^/]+)/(?P<rating>[^/]+)',
-                            '/'.join(('', self.video_id, rating, ''))
-                        )
                         self._provider.on_video_x(
                             self._provider,
                             self._context,
-                            rating_match,
                             command='rate',
+                            video_id=self.video_id,
+                            current_rating=rating,
                         )
 
         if settings.get_bool('youtube.post.play.refresh', False):

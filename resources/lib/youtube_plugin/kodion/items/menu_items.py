@@ -20,9 +20,14 @@ from ..constants import (
 )
 
 
-def more_for_video(context, video_id, logged_in=False, refresh=False):
+def more_for_video(context,
+                   video_id,
+                   video_name=None,
+                   logged_in=False,
+                   refresh=False):
     params = {
         'video_id': video_id,
+        'item_name': video_name,
         'logged_in': logged_in,
     }
     if refresh:
@@ -50,13 +55,14 @@ def related_videos(context, video_id):
     )
 
 
-def video_comments(context, video_id):
+def video_comments(context, video_id, video_name=None):
     return (
         context.localize('video.comments'),
         context.create_uri(
             (PATHS.ROUTE, 'special', 'parent_comments',),
             {
                 'video_id': video_id,
+                'item_name': video_name,
             },
             run=True,
         )
@@ -102,13 +108,13 @@ def refresh(context):
     )
 
 
-def play_all_from(context, route, order='normal'):
+def play_all_from(context, path, order='normal'):
     return (
         context.localize('playlist.play.shuffle')
         if order == 'shuffle' else
         context.localize('playlist.play.all'),
         context.create_uri(
-            (route, 'play',),
+            (path, 'play',),
             {
                 'order': order,
             },
@@ -171,11 +177,11 @@ def shuffle_playlist(context, playlist_id):
     return (
         context.localize('playlist.play.shuffle'),
         context.create_uri(
-            (PATHS.ROUTE, PATHS.PLAY,),
+            (PATHS.PLAY,),
             {
                 'playlist_id': playlist_id,
                 'order': 'shuffle',
-                'action': 'list',
+                'action': 'play',
             },
             run=True,
         ),

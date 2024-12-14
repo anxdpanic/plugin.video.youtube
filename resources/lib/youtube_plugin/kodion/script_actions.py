@@ -10,7 +10,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import os
-import socket
 
 from .compatibility import parse_qsl, urlsplit, xbmc, xbmcaddon, xbmcvfs
 from .constants import (
@@ -23,8 +22,13 @@ from .constants import (
     WAIT_END_FLAG,
 )
 from .context import XbmcContext
-from .network import Locator, get_client_ip_address, httpd_status
-from .utils import rm_dir, validate_ip_address
+from .network import (
+    Locator,
+    get_client_ip_address,
+    get_listen_addresses,
+    httpd_status,
+)
+from .utils import rm_dir
 from ..youtube import Provider
 
 
@@ -64,13 +68,14 @@ def _config_actions(context, action, *_args):
         fallback = ('ASR' if preferred[0].startswith('en') else
                     context.get_language_name('en'))
         preferred = '/'.join(map(context.get_language_name, preferred))
+        preferred_no_asr = '%s (%s)' % (preferred, localize('subtitles.no_asr'))
 
         sub_opts = [
             localize('none'),
             localize('select'),
             localize('subtitles.with_fallback') % (preferred, fallback),
-            preferred,
-            '%s (%s)' % (preferred, localize('subtitles.no_asr')),
+            localize('subtitles.with_fallback') % (preferred_no_asr, fallback),
+            preferred_no_asr,
         ]
 
         if settings.use_mpd_videos():
@@ -99,22 +104,7 @@ def _config_actions(context, action, *_args):
                 settings.set_subtitle_download(result == 1)
 
     elif action == 'listen_ip':
-        local_ranges = (
-            ((10, 0, 0, 0), (10, 255, 255, 255)),
-            ((172, 16, 0, 0), (172, 31, 255, 255)),
-            ((192, 168, 0, 0), (192, 168, 255, 255)),
-        )
-        addresses = [xbmc.getIPAddress()]
-        for interface in socket.getaddrinfo(socket.gethostname(), None):
-            address = interface[4][0]
-            if interface[0] != socket.AF_INET or address in addresses:
-                continue
-            octets = validate_ip_address(address)
-            if not any(octets):
-                continue
-            if any(lo <= octets <= hi for lo, hi in local_ranges):
-                addresses.append(address)
-        addresses += ['127.0.0.1', '0.0.0.0']
+        addresses = get_listen_addresses()
         selected_address = ui.on_select(localize('select.listen.ip'), addresses)
         if selected_address != -1:
             settings.httpd_listen(addresses[selected_address])
