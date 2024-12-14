@@ -10,8 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import re
 from datetime import date
+from re import compile as re_compile
 
 from . import BaseItem
 from ..compatibility import datetime_infolabel, to_str, unescape, urlencode
@@ -54,7 +54,6 @@ class MediaItem(BaseItem):
         self._plot = plot
         self._rating = None
         self._title = self.get_name()
-        self._track_number = None
 
         self._headers = None
         self._license_key = None
@@ -213,12 +212,6 @@ class MediaItem(BaseItem):
     def get_title(self):
         return self._title
 
-    def set_track_number(self, track_number):
-        self._track_number = int(track_number)
-
-    def get_track_number(self):
-        return self._track_number
-
     def set_headers(self, value):
         self._headers = value
 
@@ -376,7 +369,7 @@ class VideoItem(MediaItem):
                              'tvshow', 'season', 'episode',
                              'musicvideo'}
     _DEFAULT_MEDIATYPE = CONTENT.VIDEO_TYPE
-    _RE_IMDB = re.compile(
+    _RE_IMDB = re_compile(
         r'(http(s)?://)?www.imdb.(com|de)/title/(?P<imdbid>[t0-9]+)(/)?'
     )
 

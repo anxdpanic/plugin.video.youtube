@@ -10,10 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import atexit
-import json
-import re
+from atexit import register as atexit_register
 from base64 import b64decode
+from json import loads as json_loads
+from re import compile as re_compile
 from weakref import proxy
 
 from .client import APICheck, YouTube
@@ -30,6 +30,7 @@ from .helper import (
     yt_subscriptions,
     yt_video,
 )
+from .helper.utils import filter_split
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider
 from ..kodion.constants import (
@@ -84,7 +85,7 @@ class Provider(AbstractProvider):
             yt_subscriptions.process,
         )
 
-        atexit.register(self.tear_down)
+        atexit_register(self.tear_down)
 
     @staticmethod
     def get_wizard_steps():
@@ -114,7 +115,7 @@ class Provider(AbstractProvider):
                                 ' deprecated. Please use the'
                                 ' youtube_registration module instead')
             try:
-                dev_config = json.loads(_dev_config)
+                dev_config = json_loads(_dev_config)
             except ValueError:
                 context.log_error('Error loading developer key: |invalid json|')
         if not dev_config and addon_id and dev_configs:
@@ -312,13 +313,17 @@ class Provider(AbstractProvider):
         self._client = client
         return self._client
 
-    def get_resource_manager(self, context):
+    def get_resource_manager(self, context, progress_dialog=None):
         resource_manager = self._resource_manager
         if not resource_manager or resource_manager.context_changed(context):
-            new_resource_manager = ResourceManager(proxy(self), context)
+            new_resource_manager = ResourceManager(proxy(self),
+                                                   context,
+                                                   progress_dialog)
             if not resource_manager:
                 self._resource_manager = new_resource_manager
             return new_resource_manager
+        if progress_dialog:
+            resource_manager.update_progress_dialog(progress_dialog)
         return resource_manager
 
     @AbstractProvider.register_path('^/uri2addon/?$')
@@ -405,9 +410,9 @@ class Provider(AbstractProvider):
             new_params['addon_id'] = addon_id
 
         resource_manager = provider.get_resource_manager(context)
-        fanart = resource_manager.get_fanarts(
-            (channel_id,), force=True
-        ).get(channel_id)
+        channel_info = resource_manager.get_channel_info(
+            (channel_id,),
+        ).get(channel_id) or {}
         playlists = resource_manager.get_related_playlists(channel_id)
 
         playlist_id = playlists.get('uploads')
@@ -420,7 +425,7 @@ class Provider(AbstractProvider):
                     new_params,
                 ),
                 image='{media}/playlist.png',
-                fanart=fanart,
+                fanart=channel_info.get('fanart') or '',
                 category_label=item_label,
                 channel_id=channel_id,
                 playlist_id=playlist_id,
@@ -446,11 +451,15 @@ class Provider(AbstractProvider):
                     ),
                     # subscribe to the channel via the playlist item
                     menu_items.subscribe_to_channel(
-                        context, channel_id,
+                        context,
+                        channel_id,
+                        channel_name=channel_info.get('name') or '',
                     ) if provider.is_logged_in else None,
                     # bookmark channel of the playlist
                     menu_items.bookmark_add_channel(
-                        context, channel_id,
+                        context,
+                        channel_id,
+                        channel_name=channel_info.get('name') or '',
                     )
                 ))
 
@@ -461,9 +470,7 @@ class Provider(AbstractProvider):
         else:
             result = False
 
-        json_data = provider.get_client(context).get_playlists_of_channel(
-            channel_id, page_token
-        )
+        json_data = resource_manager.get_my_playlists(channel_id, page_token)
         if not json_data:
             return result
 
@@ -498,11 +505,14 @@ class Provider(AbstractProvider):
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
                                        channel_id=channel_id)
-        if playlists and 'uploads' in playlists:
+        uploads = playlists.get('uploads')
+        if uploads:
+            if uploads.startswith('UU'):
+                uploads = uploads.replace('UU', 'UULV', 1)
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
                                            _refresh=params.get('refresh'),
-                                           playlist_id=playlists['uploads'],
+                                           playlist_id=uploads,
                                            page_token=page_token)
             if not json_data:
                 return result
@@ -511,6 +521,53 @@ class Provider(AbstractProvider):
                 provider, context, json_data,
                 item_filter={
                     'live_folder': True,
+                },
+            ))
+
+        return result
+
+    @AbstractProvider.register_path(
+        r'^/channel/(?P<channel_id>[^/]+)'
+        r'/shorts/?$')
+    @staticmethod
+    def on_channel_shorts(provider, context, re_match):
+        """
+        List shorts for channel.
+
+        plugin://plugin.video.youtube/channel/<CHANNEL_ID>/shorts
+
+        * CHANNEL_ID: YouTube Channel ID
+        """
+        context.set_content(CONTENT.VIDEO_CONTENT)
+        result = []
+
+        channel_id = re_match.group('channel_id')
+        params = context.get_params()
+        page_token = params.get('page_token', '')
+
+        client = provider.get_client(context)
+        function_cache = context.get_function_cache()
+        resource_manager = provider.get_resource_manager(context)
+
+        playlists = function_cache.run(resource_manager.get_related_playlists,
+                                       function_cache.ONE_DAY,
+                                       channel_id=channel_id)
+        uploads = playlists.get('uploads')
+        if uploads:
+            if uploads.startswith('UU'):
+                uploads = uploads.replace('UU', 'UUSH', 1)
+            json_data = function_cache.run(client.get_playlist_items,
+                                           function_cache.ONE_MINUTE * 5,
+                                           _refresh=params.get('refresh'),
+                                           playlist_id=uploads,
+                                           page_token=page_token)
+            if not json_data:
+                return result
+
+            result.extend(v3.response_to_items(
+                provider, context, json_data,
+                item_filter={
+                    'shorts': True,
                 },
             ))
 
@@ -597,9 +654,10 @@ class Provider(AbstractProvider):
         if not channel_id:
             return False
 
-        fanart = resource_manager.get_fanarts(
-            (channel_id,), force=True
-        ).get(channel_id)
+        channel_info = resource_manager.get_channel_info(
+            (channel_id,),
+        ).get(channel_id) or {}
+        fanart = channel_info.get('fanart') or ''
 
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
@@ -618,6 +676,7 @@ class Provider(AbstractProvider):
             hide_playlists = params.get('hide_playlists')
             hide_search = params.get('hide_search')
             hide_live = params.get('hide_live')
+            hide_shorts = params.get('hide_shorts')
 
             if not hide_playlists:
                 item_label = localize('playlists')
@@ -634,16 +693,20 @@ class Provider(AbstractProvider):
                 )
                 result.append(playlists_item)
 
-            if not hide_search:
-                search_item = NewSearchItem(
-                    context, name=ui.bold(localize('search')),
-                    image='{media}/search.png',
+            if not hide_shorts:
+                item_label = localize('shorts')
+                shorts_item = DirectoryItem(
+                    ui.bold(item_label),
+                    create_uri(
+                        ('channel', channel_id, 'shorts'),
+                        new_params,
+                    ),
+                    image='{media}/shorts.png',
                     fanart=fanart,
+                    category_label=item_label,
                     channel_id=channel_id,
-                    incognito=incognito,
-                    addon_id=addon_id,
                 )
-                result.append(search_item)
+                result.append(shorts_item)
 
             if not hide_live:
                 item_label = localize('live')
@@ -660,14 +723,28 @@ class Provider(AbstractProvider):
                 )
                 result.append(live_item)
 
+            if not hide_search:
+                search_item = NewSearchItem(
+                    context, name=ui.bold(localize('search')),
+                    image='{media}/search.png',
+                    fanart=fanart,
+                    channel_id=channel_id,
+                    incognito=incognito,
+                    addon_id=addon_id,
+                )
+                result.append(search_item)
+
         playlists = function_cache.run(resource_manager.get_related_playlists,
                                        function_cache.ONE_DAY,
                                        channel_id=identifier)
-        if playlists and 'uploads' in playlists:
+        uploads = playlists.get('uploads')
+        if uploads:
+            if uploads.startswith('UU'):
+                uploads = uploads.replace('UU', 'UULF', 1)
             json_data = function_cache.run(client.get_playlist_items,
                                            function_cache.ONE_MINUTE * 5,
                                            _refresh=params.get('refresh'),
-                                           playlist_id=playlists['uploads'],
+                                           playlist_id=uploads,
                                            page_token=page_token)
             if not json_data:
                 return result
@@ -769,10 +846,18 @@ class Provider(AbstractProvider):
             yt_login.process(mode, provider, context)
         return True
 
-    def _search_channel_or_playlist(self, context, identifier):
-        if re.match(r'U[CU][0-9a-zA-Z_\-]{20,24}', identifier):
+    def _search_channel_or_playlist(self,
+                                    context,
+                                    identifier,
+                                    channel_re=re_compile(
+                                        r'U[CU][0-9a-zA-Z_\-]{20,24}'
+                                    ),
+                                    playlist_re=re_compile(
+                                        r'[OP]L[0-9a-zA-Z_\-]{30,40}'
+                                    )):
+        if channel_re.match(identifier):
             json_data = self.get_client(context).get_channels(identifier)
-        elif re.match(r'[OP]L[0-9a-zA-Z_\-]{30,40}', identifier):
+        elif playlist_re.match(identifier):
             json_data = self.get_client(context).get_playlists(identifier)
         else:
             return None
@@ -789,11 +874,11 @@ class Provider(AbstractProvider):
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
-            return UriItem(query)
+            return UriItem(query), None
 
         result = self._search_channel_or_playlist(context, query)
         if result:  # found a channel or playlist matching search query
-            return result
+            return result, None
         result = []
 
         context.set_param('q', query)
@@ -913,7 +998,7 @@ class Provider(AbstractProvider):
             params=search_params,
         )
         if not json_data:
-            return False
+            return False, None
 
         # Store current search query for Kodi window history navigation
         if not params.get('incognito'):
@@ -929,7 +1014,7 @@ class Provider(AbstractProvider):
                 'live': False,
             },
         ))
-        return result
+        return result, None
 
     @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
     @staticmethod
@@ -947,7 +1032,7 @@ class Provider(AbstractProvider):
         '/(?P<command>add|remove)/?$'
     )
     @staticmethod
-    def on_manage_my_subscription_filter(context, re_match):
+    def on_manage_my_subscription_filter(context, re_match, **_kwargs):
         settings = context.get_settings()
         ui = context.get_ui()
 
@@ -956,35 +1041,54 @@ class Provider(AbstractProvider):
         if not channel or not command:
             return
 
-        filter_enabled = settings.get_bool('youtube.folder.my_subscriptions_filtered.show', False)
+        filter_enabled = settings.get_bool(
+            'youtube.folder.my_subscriptions_filtered.show', False
+        )
         if not filter_enabled:
             return
 
         channel_name = channel.lower()
         channel_name = channel_name.replace(',', '')
 
-        filter_string = settings.get_string('youtube.filter.my_subscriptions_filtered.list', '')
-        filter_string = filter_string.replace(', ', ',')
-        filter_list = filter_string.split(',')
-        filter_list = [x.lower() for x in filter_list]
+        filter_string = settings.get_string(
+            'youtube.filter.my_subscriptions_filtered.list', ''
+        ).replace(', ', ',')
+        custom_filters = []
+        filter_list = [
+            item.lower()
+            for item in filter_string.split(',')
+            if item and filter_split(item, custom_filters)
+        ]
 
-        if command == 'add':
-            if channel_name not in filter_list:
+        if channel_name not in filter_list:
+            if command == 'add':
                 filter_list.append(channel_name)
-        elif command == 'remove' and channel_name in filter_list:
-            filter_list = [chan_name for chan_name in filter_list if chan_name != channel_name]
+            else:
+                return False
+        elif command == 'remove':
+            filter_list = [item for item in filter_list if item != channel_name]
+        else:
+            return False
 
+        if custom_filters:
+            filter_list.extend([
+                ''.join([
+                    '{' + part + '}'
+                    for part in condition
+                ])
+                for custom_filter in custom_filters
+                for condition in custom_filter
+            ])
         modified_string = ','.join(filter_list).lstrip(',')
         if filter_string != modified_string:
-            settings.set_string('youtube.filter.my_subscriptions_filtered.list', modified_string)
-            message = ''
-            if command == 'add':
-                message = context.localize('my_subscriptions.filter.added')
-            elif command == 'remove':
-                message = context.localize('my_subscriptions.filter.removed')
-            if message:
-                ui.show_notification(message=message)
-        ui.refresh_container()
+            settings.set_string('youtube.filter.my_subscriptions_filtered.list',
+                                modified_string)
+
+            ui.show_notification(context.localize(
+                'my_subscriptions.filter.added'
+                if command == 'add' else
+                'my_subscriptions.filter.removed'
+            ))
 
     @AbstractProvider.register_path(
         r'^/maintenance'
@@ -1357,11 +1461,11 @@ class Provider(AbstractProvider):
                     menu_items.separator(),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.WATCH_LATER,
+                        path=PATHS.WATCH_LATER,
                     ),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.WATCH_LATER,
+                        path=PATHS.WATCH_LATER,
                         order='shuffle',
                     ),
                 ]
@@ -1436,11 +1540,11 @@ class Provider(AbstractProvider):
                     menu_items.separator(),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.HISTORY,
+                        path=PATHS.HISTORY,
                     ),
                     menu_items.play_all_from(
                         context,
-                        route=PATHS.HISTORY,
+                        path=PATHS.HISTORY,
                         order='shuffle',
                     ),
                 ]
@@ -1489,11 +1593,11 @@ class Provider(AbstractProvider):
                 menu_items.separator(),
                 menu_items.play_all_from(
                     context,
-                    route=PATHS.BOOKMARKS,
+                    path=PATHS.BOOKMARKS,
                 ),
                 menu_items.play_all_from(
                     context,
-                    route=PATHS.BOOKMARKS,
+                    path=PATHS.BOOKMARKS,
                     order='shuffle',
                 ),
             ]
@@ -1602,7 +1706,7 @@ class Provider(AbstractProvider):
                     elif isinstance(old_item, BaseItem):
                         bookmark_timestamp = old_item.get_bookmark_timestamp()
                     else:
-                        return
+                        return True
 
                     if new_item.available:
                         new_item.bookmark_id = _id
@@ -1622,6 +1726,7 @@ class Provider(AbstractProvider):
                         new_item.set_title(context.get_ui().color(
                             'AA808080', new_item.get_title()
                         ))
+                    return True
 
                 return _update
 

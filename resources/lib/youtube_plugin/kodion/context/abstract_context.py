@@ -16,6 +16,7 @@ from ..logger import Logger
 from ..compatibility import (
     parse_qsl,
     quote,
+    string_type,
     to_str,
     unquote,
     urlencode,
@@ -64,6 +65,7 @@ class AbstractContext(Logger):
         'hide_next_page',
         'hide_playlists',
         'hide_search',
+        'hide_shorts',
         'incognito',
         'location',
         'logged_in',
@@ -171,6 +173,9 @@ class AbstractContext(Logger):
     def get_language_name(self, lang_id=None):
         raise NotImplementedError()
 
+    def get_player_language(self):
+        raise NotImplementedError()
+
     def get_subtitle_language(self):
         raise NotImplementedError()
 
@@ -266,7 +271,13 @@ class AbstractContext(Logger):
     def get_system_version():
         return current_system_version
 
-    def create_uri(self, path=None, params=None, run=False):
+    def create_uri(self,
+                   path=None,
+                   params=None,
+                   parse_params=False,
+                   run=False,
+                   play=False,
+                   replace=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
         elif path:
@@ -277,15 +288,29 @@ class AbstractContext(Logger):
         uri = self._plugin_id.join(('plugin://', uri))
 
         if params:
-            if isinstance(params, (dict, list, tuple)):
-                params = urlencode(params)
+            if isinstance(params, string_type):
+                if parse_params:
+                    params = dict(parse_qsl(params, keep_blank_values=True))
+            else:
+                parse_params = True
+            if parse_params:
+                if isinstance(params, dict):
+                    params = params.items()
+                params = urlencode([
+                    ('%' + param, ','.join([quote(item) for item in value]))
+                    if isinstance(value, (list, tuple)) else
+                    (param, value)
+                    for param, value in params
+                ])
             uri = '?'.join((uri, params))
 
-        return ''.join((
-            'RunPlugin(',
-            uri,
-            ')'
-        )) if run else uri
+        if run:
+            return ''.join(('RunPlugin(', uri, ')'))
+        if play:
+            return ''.join(('PlayMedia(', uri, ',playlist_type_hint=1)'))
+        if replace:
+            return ''.join(('ReplaceWindow(Videos, ', uri, ')'))
+        return uri
 
     def get_parent_uri(self, **kwargs):
         return self.create_uri(self._path_parts[:-1], **kwargs)
@@ -344,6 +369,9 @@ class AbstractContext(Logger):
         output = self._params if update else {}
 
         for param, value in params.items():
+            if param.startswith('%'):
+                param = param[1:]
+                value = unquote(value)
             try:
                 if param in self._BOOL_PARAMS:
                     parsed_value = VALUE_FROM_STR.get(str(value), False)
@@ -359,7 +387,7 @@ class AbstractContext(Logger):
                     parsed_value = (
                         list(value)
                         if isinstance(value, (list, tuple)) else
-                        [val for val in value.split(',') if val]
+                        [unquote(val) for val in value.split(',') if val]
                     )
                 elif param in self._STRING_PARAMS:
                     parsed_value = to_str(value)

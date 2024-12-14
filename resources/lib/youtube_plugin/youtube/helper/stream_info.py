@@ -10,15 +10,15 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
-import os
-import random
-import re
+from json import loads as json_loads
+from os import path as os_path
+from random import choice as random_choice
+from re import compile as re_compile
 from traceback import format_stack
 
 from .ratebypass import ratebypass
 from .signature.cipher import Cipher
-from .subtitles import Subtitles
+from .subtitles import SUBTITLE_SELECTIONS, Subtitles
 from .utils import THUMB_TYPES
 from ..client.request_client import YouTubeRequestClient
 from ..youtube_exceptions import InvalidJSON, YouTubeException
@@ -206,6 +206,10 @@ class StreamInfo(YouTubeRequestClient):
                 'video': {'height': 1080, 'codec': 'h.264'},
                 'audio': {'bitrate': 128, 'codec': 'aac'}},
         # === DASH (video only)
+        '597': {'container': 'mp4',
+                'dash/video': True,
+                'fps': 12,
+                'video': {'height': 144, 'codec': 'h.264'}},
         '133': {'container': 'mp4',
                 'dash/video': True,
                 'video': {'height': 240, 'codec': 'h.264'}},
@@ -261,6 +265,16 @@ class StreamInfo(YouTubeRequestClient):
         '248': {'container': 'webm',
                 'dash/video': True,
                 'video': {'height': 1080, 'codec': 'vp9'}},
+        '779': {'container': 'webm',
+                'title': '1080p vertical',
+                'dash/video': True,
+                'fps': 30,
+                'video': {'height': 480, 'width': 1080, 'codec': 'vp9'}},
+        '780': {'container': 'webm',
+                'title': 'Premium 1080p vertical',
+                'dash/video': True,
+                'fps': 30,
+                'video': {'height': 480, 'width': 1080, 'codec': 'vp9'}},
         '264': {'container': 'mp4',
                 'dash/video': True,
                 'video': {'height': 1440, 'codec': 'h.264'}},
@@ -274,6 +288,10 @@ class StreamInfo(YouTubeRequestClient):
                 'dash/video': True,
                 'fps': 60,
                 'video': {'height': 4320, 'codec': 'vp9'}},
+        '598': {'container': 'webm',
+                'dash/video': True,
+                'fps': 12,
+                'video': {'height': 144, 'codec': 'vp9'}},
         '278': {'container': 'webm',
                 'dash/video': True,
                 'video': {'height': 144, 'codec': 'vp9'}},
@@ -430,6 +448,10 @@ class StreamInfo(YouTubeRequestClient):
                 'hdr': True,
                 'video': {'height': 4320, 'codec': 'av1'}},
         # === Dash (audio only)
+        '599': {'container': 'mp4',
+                'title': 'he-aac@32',
+                'dash/audio': True,
+                'audio': {'bitrate': 32, 'codec': 'aac'}},
         '139': {'container': 'mp4',
                 'title': 'he-aac@48',
                 'dash/audio': True,
@@ -470,6 +492,10 @@ class StreamInfo(YouTubeRequestClient):
                 'title': 'vorbis@192',
                 'dash/audio': True,
                 'audio': {'bitrate': 192, 'codec': 'vorbis'}},
+        '600': {'container': 'webm',
+                'title': 'opus@40',
+                'dash/audio': True,
+                'audio': {'bitrate': 40, 'codec': 'opus'}},
         '249': {'container': 'webm',
                 'title': 'opus@50',
                 'dash/audio': True,
@@ -586,6 +612,53 @@ class StreamInfo(YouTubeRequestClient):
                 'hls/video': True,
                 'fps': 60,
                 'video': {'height': 2160, 'codec': 'vp9'}},
+        '631': {'container': 'hls',
+                'title': '144p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 144, 'codec': 'vp9.2'}},
+        '632': {'container': 'hls',
+                'title': '240p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 240, 'codec': 'vp9.2'}},
+        '633': {'container': 'hls',
+                'title': '360p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 360, 'codec': 'vp9.2'}},
+        '634': {'container': 'hls',
+                'title': '480p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 480, 'codec': 'vp9.2'}},
+        '635': {'container': 'hls',
+                'title': '720p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 720, 'codec': 'vp9.2'}},
+        '636': {'container': 'hls',
+                'title': '1080p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 1080, 'codec': 'vp9.2'}},
+        '639': {'container': 'hls',
+                'title': '1440p',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 1440, 'codec': 'vp9.2'}},
+        '642': {'container': 'hls',
+                'title': '4k',
+                'hls/video': True,
+                'hdr': True,
+                'video': {'height': 2160, 'codec': 'vp9.2'}},
+        '9993': {'container': 'hls',
+                 'title': 'HLS',
+                 'hls/audio': True,
+                 'hls/video': True,
+                 'sort': 9993,
+                 'audio': {'bitrate': 0, 'codec': ''},
+                 'video': {'height': 0, 'codec': ''}},
         '9994': {'container': 'hls',
                  'title': 'Adaptive HLS',
                  'hls/audio': True,
@@ -682,9 +755,19 @@ class StreamInfo(YouTubeRequestClient):
         'dtse': 1.3,
     }
 
+    LANG_ROLE_ORDER = {
+        4:  -1,  # Default
+        3:  -2,  # Dubbed
+        6:  -3,  # Secondary
+        10: -4,  # Auto-dubbed
+        2:  -5,  # Descriptive
+        0:  -6,  # Alternate
+    }
+
     def __init__(self,
                  context,
                  access_token='',
+                 access_token_tv='',
                  clients=None,
                  ask_for_quality=False,
                  audio_only=False,
@@ -694,10 +777,18 @@ class StreamInfo(YouTubeRequestClient):
         self._context = context
 
         self._access_token = access_token
+        self._access_token_tv = access_token_tv
         self._ask_for_quality = ask_for_quality
         self._audio_only = audio_only
-        self._language_base = kwargs.get('language', 'en_US')[0:2]
         self._use_mpd = use_mpd
+
+        audio_language = context.get_player_language()
+        if audio_language == 'mediadefault':
+            self._language_base = kwargs.get('language', 'en_US')[0:2]
+        elif audio_language == 'original':
+            self._language_base = ''
+        else:
+            self._language_base = audio_language
 
         self._player_js = None
         self._calculate_n = True
@@ -721,7 +812,7 @@ class StreamInfo(YouTubeRequestClient):
             # Progressive streams
             # Limited video and audio stream availability
             'ask': (
-                'media_connect_frontend',
+                # 'media_connect_frontend',
             ),
         }
 
@@ -797,7 +888,7 @@ class StreamInfo(YouTubeRequestClient):
         cpn_alphabet = ('abcdefghijklmnopqrstuvwxyz'
                         'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
                         '0123456789-_')
-        return ''.join(random.choice(cpn_alphabet) for _ in range(16))
+        return ''.join(random_choice(cpn_alphabet) for _ in range(16))
 
     def _get_stream_format(self, itag, info=None, max_height=None, **kwargs):
         yt_format = self.FORMAT.get(itag)
@@ -868,7 +959,7 @@ class StreamInfo(YouTubeRequestClient):
         ))
         return yt_format
 
-    def _get_player_page(self, client_name='web', embed=False):
+    def _get_player_config(self, client_name='web', embed=False):
         if embed:
             url = ''.join(('https://www.youtube.com/embed/', self.video_id))
         else:
@@ -892,7 +983,16 @@ class StreamInfo(YouTubeRequestClient):
                 'auth': False,
             },
         )
-        return result
+        if not result:
+            return None
+
+        # pattern source is from youtube-dl
+        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
+        # LICENSE: The Unlicense
+        match = re_compile(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;').search(result)
+        if match:
+            return json_loads(match.group(1))
+        return None
 
     @staticmethod
     def _get_player_client(config):
@@ -912,20 +1012,6 @@ class StreamInfo(YouTubeRequestClient):
             return player_key
         return None
 
-    @staticmethod
-    def _get_player_config(page_text):
-        if not page_text:
-            return None
-
-        # pattern source is from youtube-dl
-        # https://github.com/ytdl-org/youtube-dl/blob/master/youtube_dl/extractor/youtube.py#L313
-        # LICENSE: The Unlicense
-        found = re.search(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;', page_text)
-
-        if found:
-            return json.loads(found.group(1))
-        return None
-
     def _get_player_js(self):
         data_cache = self._context.get_data_cache()
         cached = data_cache.get_item('player_js_url', data_cache.ONE_HOUR * 4)
@@ -933,8 +1019,7 @@ class StreamInfo(YouTubeRequestClient):
         js_url = cached if cached not in {'', 'http://', 'https://'} else None
 
         if not js_url:
-            player_page_text = self._get_player_page()
-            player_config = self._get_player_config(player_page_text)
+            player_config = self._get_player_config()
             if not player_config:
                 return ''
             js_url = player_config.get('PLAYER_JS_URL')
@@ -1008,22 +1093,18 @@ class StreamInfo(YouTubeRequestClient):
                          stream_list,
                          urls,
                          is_live=False,
-                         headers=None,
                          meta_info=None,
                          playback_stats=None):
         if not urls:
             return
 
-        if not headers and self._selected_client:
-            client_name = self._selected_client['_name']
-            headers = self._selected_client['headers'].copy()
-            if 'Authorization' in headers:
-                del headers['Authorization']
+        if self._selected_client:
+            client_name = self._selected_client['client']['_name']
+            headers = self._selected_client['client']['headers']
         else:
             client_name = 'web'
             client_data = {'json': {'videoId': self.video_id}}
             headers = self.build_client(client_name, client_data)['headers']
-        curl_headers = self._prepare_headers(headers)
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1059,7 +1140,7 @@ class StreamInfo(YouTubeRequestClient):
             if not result:
                 continue
 
-            for itag in ('9995', '9996') if is_live else ('9994', ):
+            for itag in ('9995', '9996') if is_live else ('9993', '9994'):
                 if itag in stream_list:
                     continue
 
@@ -1067,7 +1148,7 @@ class StreamInfo(YouTubeRequestClient):
                     itag=itag,
                     title='',
                     url=url,
-                    headers=curl_headers,
+                    headers=headers,
                     meta=meta_info,
                     playback_stats=playback_stats,
                 )
@@ -1075,7 +1156,7 @@ class StreamInfo(YouTubeRequestClient):
             # The playlist might include a #EXT-X-MEDIA entry, but it's usually
             # for a default stream with itag 133 (240p) and can be ignored.
             # Capture the URL of a .m3u8 playlist and the itag from that URL.
-            re_playlist_data = re.compile(
+            re_playlist_data = re_compile(
                 r'#EXT-X-STREAM-INF[^#]+'
                 r'(?P<url>http\S+/itag/(?P<itag>\d+)\S+)'
             )
@@ -1090,7 +1171,7 @@ class StreamInfo(YouTubeRequestClient):
                     title='',
                     url=match.group('url'),
                     meta=meta_info,
-                    headers=curl_headers,
+                    headers=headers,
                     playback_stats=playback_stats,
                 )
                 if yt_format is None:
@@ -1113,18 +1194,14 @@ class StreamInfo(YouTubeRequestClient):
                              stream_list,
                              streams,
                              is_live=False,
-                             headers=None,
                              meta_info=None,
                              playback_stats=None):
-        if not headers and self._selected_client:
-            headers = self._selected_client['headers'].copy()
-            if 'Authorization' in headers:
-                del headers['Authorization']
+        if self._selected_client:
+            headers = self._selected_client['client']['headers']
         else:
             client_name = 'web'
             client_data = {'json': {'videoId': self.video_id}}
             headers = self.build_client(client_name, client_data)['headers']
-        curl_headers = self._prepare_headers(headers)
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1171,7 +1248,7 @@ class StreamInfo(YouTubeRequestClient):
                 title='',
                 url=new_url,
                 meta=meta_info,
-                headers=curl_headers,
+                headers=headers,
                 playback_stats=playback_stats,
             )
             if yt_format is None:
@@ -1256,7 +1333,7 @@ class StreamInfo(YouTubeRequestClient):
             return url
         return None
 
-    def _process_url_params(self, url):
+    def _process_url_params(self, url, digits_re=re_compile(r'\d+')):
         if not url:
             return url, None
 
@@ -1292,7 +1369,7 @@ class StreamInfo(YouTubeRequestClient):
             if primary and secondary:
                 update_url = {
                     'netloc': separator.join((
-                        re.sub(r'\d+', fvip, prefix),
+                        digits_re.sub(fvip, prefix),
                         server.replace(primary, secondary),
                     )),
                 }
@@ -1363,9 +1440,9 @@ class StreamInfo(YouTubeRequestClient):
         client_name = None
         _client = None
         _result = None
-        playability = None
-        status = None
-        reason = None
+        _playability = None
+        _status = None
+        _reason = None
 
         stream_list = {}
         streaming_data = {}
@@ -1385,6 +1462,7 @@ class StreamInfo(YouTubeRequestClient):
         reauth_reasons = {
             'age',
             'inappropriate',
+            'sign in',
         }
         skip_reasons = {
             'latest version',
@@ -1396,7 +1474,7 @@ class StreamInfo(YouTubeRequestClient):
         }
         abort = False
 
-        has_access_token = bool(self._access_token)
+        has_access_token = bool(self._access_token or self._access_token_tv)
         client_data = {
             'json': {
                 'videoId': video_id,
@@ -1404,6 +1482,7 @@ class StreamInfo(YouTubeRequestClient):
             '_auth_required': False,
             '_auth_requested': 'personal' if use_remote_history else False,
             '_access_token': self._access_token,
+            '_access_token_tv': self._access_token_tv,
         }
 
         for name, clients in self._client_groups.items():
@@ -1435,26 +1514,26 @@ class StreamInfo(YouTubeRequestClient):
                         **_client
                     ) or {}
 
-                    video_details = _result.get('videoDetails', {})
-                    playability = _result.get('playabilityStatus', {})
-                    status = playability.get('status', 'ERROR').upper()
-                    reason = playability.get('reason', 'UNKNOWN')
+                    _video_details = _result.get('videoDetails', {})
+                    _playability = _result.get('playabilityStatus', {})
+                    _status = _playability.get('status', 'ERROR').upper()
+                    _reason = _playability.get('reason', 'UNKNOWN')
 
-                    if (video_details
-                            and video_id != video_details.get('videoId')):
-                        status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
-                        reason = 'Watch on the latest version of YouTube'
+                    if (_video_details
+                            and video_id != _video_details.get('videoId')):
+                        _status = 'CONTENT_NOT_AVAILABLE_IN_THIS_APP'
+                        _reason = 'Watch on the latest version of YouTube'
 
                     if (age_gate_enabled
-                            and playability.get('desktopLegacyAgeGateReason')):
+                            and _playability.get('desktopLegacyAgeGateReason')):
                         abort = True
                         break
-                    elif status == 'LIVE_STREAM_OFFLINE':
+                    elif _status == 'LIVE_STREAM_OFFLINE':
                         abort = True
                         break
-                    elif status == 'OK':
+                    elif _status == 'OK':
                         break
-                    elif status in {
+                    elif _status in {
                         'AGE_CHECK_REQUIRED',
                         'AGE_VERIFICATION_REQUIRED',
                         'CONTENT_CHECK_REQUIRED',
@@ -1471,14 +1550,14 @@ class StreamInfo(YouTubeRequestClient):
                             '\n\tClient:   |{client}|'
                             '\n\tAuth:     |{auth}|'
                             .format(
-                                status=status,
-                                reason=reason or 'UNKNOWN',
+                                status=_status,
+                                reason=_reason or 'UNKNOWN',
                                 video_id=video_id,
                                 client=_client['_name'],
                                 auth=_client.get('_has_auth', False),
                             )
                         )
-                        compare_reason = reason.lower()
+                        compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
                             if has_access_token:
                                 client_data['_auth_required'] = True
@@ -1495,7 +1574,7 @@ class StreamInfo(YouTubeRequestClient):
                         log_debug(
                             'Unknown playabilityStatus in player response'
                             '\n\tplayabilityStatus: {0}'
-                            .format(playability)
+                            .format(_playability)
                         )
                 else:
                     break
@@ -1506,7 +1585,7 @@ class StreamInfo(YouTubeRequestClient):
             if abort:
                 break
 
-            if status == 'OK':
+            if _status == 'OK':
                 log_debug(
                     'Retrieved video info:'
                     '\n\tvideo_id: |{video_id}|'
@@ -1543,10 +1622,10 @@ class StreamInfo(YouTubeRequestClient):
                 streaming_data.update(_streaming_data)
 
         if not self._selected_client:
-            if status == 'LIVE_STREAM_OFFLINE':
-                if not reason:
-                    reason = self._get_error_details(
-                        playability,
+            if _status == 'LIVE_STREAM_OFFLINE':
+                if not _reason:
+                    _reason = self._get_error_details(
+                        _playability,
                         details=(
                             'liveStreamability',
                             'liveStreamabilityRenderer',
@@ -1555,22 +1634,37 @@ class StreamInfo(YouTubeRequestClient):
                             'mainText'
                         )
                     )
-            elif not reason:
-                reason = self._get_error_details(playability)
-            raise YouTubeException(reason or 'UNKNOWN')
+            elif not _reason:
+                _reason = self._get_error_details(_playability)
+            raise YouTubeException(_reason or 'UNKNOWN')
 
         client = self._selected_client['client']
         result = self._selected_client['result']
 
-        if 'Authorization' in client['headers']:
-            del client['headers']['Authorization']
-        # Make a set of URL-quoted headers to be sent to Kodi when requesting
-        # the stream during playback. The YT player doesn't seem to use any
-        # cookies when doing that, so for now cookies are ignored.
-        # curl_headers = self._make_curl_headers(headers, cookies)
-        curl_headers = self._prepare_headers(client['headers'])
+        headers = client['headers']
+        if 'Authorization' in headers:
+            del headers['Authorization']
 
         video_details = result.get('videoDetails', {})
+        yt_item = {
+            'id': video_id,
+            'snippet': {
+                'title': video_details.get('title'),
+                'description': video_details.get('shortDescription'),
+                'channelId': video_details.get('channelId'),
+                'channelTitle': video_details.get('author'),
+                'thumbnails': (video_details
+                               .get('thumbnail', {})
+                               .get('thumbnails', [])),
+            },
+            'contentDetails': {
+                'duration': 'P' + video_details.get('lengthSeconds', '0') + 'S',
+            },
+            'statistics': {
+                'viewCount': video_details.get('viewCount', ''),
+            },
+            '_partial': True,
+        }
         is_live = video_details.get('isLiveContent', False)
         if is_live:
             is_live = video_details.get('isLive', False)
@@ -1677,7 +1771,7 @@ class StreamInfo(YouTubeRequestClient):
                 title='',
                 url=manifest_url,
                 meta=meta_info,
-                headers=curl_headers,
+                headers=headers,
                 license_info=license_info,
                 playback_stats=playback_stats,
             )
@@ -1691,18 +1785,18 @@ class StreamInfo(YouTubeRequestClient):
                 stream_list,
                 hls_playlists,
                 is_live,
-                client['headers'],
                 meta_info,
                 playback_stats,
             )
 
         subtitles = Subtitles(context, video_id)
         query_subtitles = client.get('_query_subtitles')
-        if ((not is_live or live_dvr)
-                and (query_subtitles is True
-                     or (query_subtitles
-                         and subtitles.sub_selection == subtitles.LANG_ALL))):
-            for client_name in ('smart_tv_embedded', 'web', 'android'):
+        if ((not is_live or live_dvr) and (
+                query_subtitles is True
+                or (query_subtitles
+                    and subtitles.sub_selection == SUBTITLE_SELECTIONS['all'])
+        )):
+            for client_name in ('smart_tv_embedded', 'web'):
                 caption_client = self.build_client(client_name, client_data)
                 if not caption_client:
                     continue
@@ -1720,13 +1814,16 @@ class StreamInfo(YouTubeRequestClient):
                     **caption_client
                 )
                 captions = result and result.get('captions')
+                caption_headers = caption_client['headers']
                 if captions:
                     break
+            else:
+                captions = None
         else:
             captions = result.get('captions')
-            caption_client = client
+            caption_headers = headers.copy()
         if captions:
-            subtitles.load(captions, caption_client['headers'])
+            subtitles.load(captions, caption_headers)
             default_lang = subtitles.get_lang_details()
             subs_data = subtitles.get_subtitles()
             if subs_data and (not use_mpd or subtitles.pre_download):
@@ -1761,7 +1858,7 @@ class StreamInfo(YouTubeRequestClient):
                     title='',
                     url=manifest_url,
                     meta=meta_info,
-                    headers=curl_headers,
+                    headers=headers,
                     license_info=license_info,
                     playback_stats=playback_stats,
                 )
@@ -1797,7 +1894,6 @@ class StreamInfo(YouTubeRequestClient):
                 stream_list,
                 progressive_fmts,
                 is_live,
-                client['headers'],
                 meta_info,
                 playback_stats,
             )
@@ -1805,9 +1901,14 @@ class StreamInfo(YouTubeRequestClient):
         if not stream_list:
             raise YouTubeException('No streams found')
 
-        return stream_list.values()
+        return stream_list.values(), yt_item
 
-    def _process_stream_data(self, stream_data, default_lang_code='und'):
+    def _process_stream_data(self,
+                             stream_data,
+                             default_lang_code='und',
+                             codec_re=re_compile(
+                                 r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
+                             )):
         context = self._context
         settings = context.get_settings()
         audio_only = self._audio_only
@@ -1829,7 +1930,7 @@ class StreamInfo(YouTubeRequestClient):
         preferred_audio = {
             'id': '',
             'language_code': None,
-            'role_type': 0,
+            'role_order': self.LANG_ROLE_ORDER[0],
         }
         for stream in stream_data:
             mime_type = stream.get('mimeType')
@@ -1855,7 +1956,7 @@ class StreamInfo(YouTubeRequestClient):
                 continue
 
             mime_type, codecs = unquote(mime_type).split('; ')
-            codec = re.match(r'codecs="([a-z0-9]+([.\-][0-9](?="))?)', codecs)
+            codec = codec_re.match(codecs)
             if codec:
                 codec = codec.group(1)
                 if codec.startswith('vp9'):
@@ -1911,24 +2012,28 @@ class StreamInfo(YouTubeRequestClient):
                         role = 'alternate'
                         label = localize('stream.alternate')
 
-                    mime_group = ''.join((
-                        mime_type, '_', language_code, '.', role_str,
-                    ))
-                    if language_code == self._language_base and (
-                            not preferred_audio['id']
-                            or role == 'main'
-                            or role_type > preferred_audio['role_type']
-                    ):
+                    role_order = self.LANG_ROLE_ORDER.get(role_type, -6)
+                    is_preferred = role_order > preferred_audio['role_order']
+                    preferred_id = preferred_audio['id']
+                    if self._language_base:
+                        lang_match = language_code == self._language_base
+                    else:
+                        lang_match = True
+                    if lang_match and (not preferred_id or is_preferred):
                         preferred_audio = {
                             'id': ''.join(('_', language_code, '.', role_str)),
                             'language_code': language_code,
-                            'role_type': role_type,
+                            'role_order': role_order,
                         }
+
+                    mime_group = ''.join((
+                        mime_type, '_', language_code, '.', role_str,
+                    ))
                 else:
                     language_code = default_lang_code
                     role = 'main'
-                    role_type = 4
                     role_str = '4'
+                    role_order = self.LANG_ROLE_ORDER[0]
                     label = localize('stream.original')
                     mime_group = mime_type
 
@@ -2003,7 +2108,8 @@ class StreamInfo(YouTubeRequestClient):
                     mime_type,
                     codec,
                 ))
-                channels = language = role = role_type = sample_rate = None
+                channels = sample_rate = None
+                language = role = role_order = None
                 label = quality['label'].format(
                     quality['nom_height'] or compare_height,
                     fps if fps > 30 else '',
@@ -2043,7 +2149,7 @@ class StreamInfo(YouTubeRequestClient):
                 'langCode': language_code,
                 'langName': language,
                 'role': role,
-                'roleType': role_type,
+                'roleOrder': role_order,
                 'sampleRate': sample_rate,
                 'channels': channels,
             }
@@ -2055,18 +2161,21 @@ class StreamInfo(YouTubeRequestClient):
             context.log_debug('Generate MPD: No video mime-types found')
             return None, None
 
-        def _stream_sort(stream):
+        def _stream_sort(stream, alt_sort=('alt_sort' in stream_features)):
             if not stream:
                 return (1,)
 
+            preferred = stream['preferred_codec']
             return (
-                - stream['preferred_codec'],
-                - stream['height'],
+                - preferred,
+                - stream['height']
+                if preferred or not alt_sort else
+                stream['height'],
                 - stream['fps'],
                 - stream['hdr'],
                 - stream['biasedBitrate'],
             ) if stream['mediaType'] == 'video' else (
-                - stream['preferred_codec'],
+                - preferred,
                 - stream['channels'],
                 - stream['biasedBitrate'],
             )
@@ -2081,7 +2190,7 @@ class StreamInfo(YouTubeRequestClient):
                 not group.startswith(main_stream['mimeType']),
                 preferred_audio['id'] not in group,
                 main_stream['langName'],
-                - main_stream['roleType'],
+                - main_stream['roleOrder'],
             )
             return key + _stream_sort(main_stream)
 
@@ -2397,7 +2506,7 @@ class StreamInfo(YouTubeRequestClient):
             main_stream['multi_audio'] = True
 
         filename = '.'.join((self.video_id, 'mpd'))
-        filepath = os.path.join(self.BASE_PATH, filename)
+        filepath = os_path.join(self.BASE_PATH, filename)
         try:
             with xbmcvfs.File(filepath, 'w') as mpd_file:
                 success = mpd_file.write(output)

@@ -16,7 +16,7 @@ from traceback import format_stack
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
-from ...kodion.compatibility import urlencode, urlunsplit
+from ...kodion.compatibility import string_type, urlencode, urlunsplit
 from ...kodion.constants import (
     BUSY_FLAG,
     CONTENT,
@@ -28,6 +28,7 @@ from ...kodion.constants import (
     PLAY_FORCE_AUDIO,
     PLAY_PROMPT_QUALITY,
     PLAY_PROMPT_SUBTITLES,
+    PLAY_STRM,
     PLAY_TIMESHIFT,
     PLAY_WITH,
     SERVER_WAKEUP,
@@ -59,6 +60,7 @@ def _play_stream(provider, context):
         stream = {
             'url': 'https://youtu.be/{0}'.format(video_id),
         }
+        yt_item = None
     else:
         ask_for_quality = settings.ask_for_video_quality()
         if ui.pop_property(PLAY_PROMPT_QUALITY) and not screensaver:
@@ -67,14 +69,12 @@ def _play_stream(provider, context):
             audio_only = True
         else:
             audio_only = settings.audio_only()
-        use_adaptive_formats = (not is_external
-                                or settings.alternative_player_adaptive())
-        use_mpd = (use_adaptive_formats
+        use_mpd = ((not is_external or settings.alternative_player_mpd())
                    and settings.use_mpd_videos()
                    and context.wakeup(SERVER_WAKEUP, timeout=5))
 
         try:
-            streams = client.get_streams(
+            streams, yt_item = client.get_streams(
                 context,
                 video_id=video_id,
                 ask_for_quality=ask_for_quality,
@@ -101,7 +101,7 @@ def _play_stream(provider, context):
             streams,
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
-            use_adaptive_formats=use_adaptive_formats,
+            use_mpd=use_mpd,
         )
 
         if stream is None:
@@ -142,7 +142,9 @@ def _play_stream(provider, context):
     use_remote_history = use_history and settings.use_remote_history()
     use_local_history = use_history and settings.use_local_history()
 
-    utils.update_play_info(provider, context, video_id, media_item, stream)
+    utils.update_play_info(
+        provider, context, video_id, media_item, stream, yt_item
+    )
 
     seek_time = 0.0 if params.get('resume') else params.get('seek', 0.0)
     start_time = params.get('start', 0.0)
@@ -187,10 +189,11 @@ def _play_playlist(provider, context):
     if not action and context.get_handle() == -1:
         action = 'play'
 
+    playlist_id = params.get('playlist_id')
     playlist_ids = params.get('playlist_ids')
-    if not playlist_ids:
+    video_ids = params.get('video_ids')
+    if not playlist_ids and playlist_id:
         playlist_ids = [params.get('playlist_id')]
-    video_id = params.get('video_id')
 
     resource_manager = provider.get_resource_manager(context)
     ui = context.get_ui()
@@ -199,45 +202,45 @@ def _play_playlist(provider, context):
             heading=context.localize('playlist.progress.updating'),
             message=context.localize('please_wait'),
             background=True,
-            message_template=(
-                    '{wait} {{current}}/{{total}}'.format(
-                        wait=context.localize('please_wait'),
-                    )
-            ),
     ) as progress_dialog:
-        json_data = resource_manager.get_playlist_items(playlist_ids)
+        if playlist_ids:
+            json_data = resource_manager.get_playlist_items(playlist_ids)
+            if not json_data:
+                return False
+            chunks = json_data.values()
+            total = sum(len(chunk.get('items', [])) for chunk in chunks)
+        elif video_ids:
+            json_data = resource_manager.get_videos(video_ids,
+                                                    live_details=True)
+            if not json_data:
+                return False
+            chunks = [{
+                'kind': 'plugin#playlistitemlistresponse',
+                'items': json_data.values(),
+            }]
+            total = len(json_data)
 
-        total = sum(len(chunk.get('items', [])) for chunk in json_data.values())
-        progress_dialog.set_total(total)
-        progress_dialog.update(
-            steps=0,
-            current=0,
-            total=total,
-        )
+        progress_dialog.reset_total(total)
 
         # start the loop and fill the list with video items
-        for chunk in json_data.values():
+        for chunk in chunks:
             result = v3.response_to_items(provider,
                                           context,
                                           chunk,
                                           process_next_page=False)
             video_items.extend(result)
 
-            progress_dialog.update(
-                steps=len(result),
-                current=len(video_items),
-                total=total,
-            )
+            progress_dialog.update(steps=len(result))
 
         if not video_items:
             return False
 
         return (
-            process_items_for_playlist(context, video_items, action, video_id),
+            process_items_for_playlist(context, video_items, action=action),
             {
-                provider.RESULT_CACHE_TO_DISC: False,
-                provider.RESULT_FORCE_RESOLVE: True,
-                provider.RESULT_UPDATE_LISTING: True,
+                provider.RESULT_CACHE_TO_DISC: action == 'list',
+                provider.RESULT_FORCE_RESOLVE: action != 'list',
+                provider.RESULT_UPDATE_LISTING: action != 'list',
             },
         )
 
@@ -302,9 +305,8 @@ def process(provider, context, **_kwargs):
     params = context.get_params()
     param_keys = params.keys()
 
-    if {'channel_id', 'playlist_id', 'playlist_ids', 'video_id'}.isdisjoint(
-            param_keys
-    ):
+    if ({'channel_id', 'playlist_id', 'playlist_ids', 'video_id', 'video_ids'}
+            .isdisjoint(param_keys)):
         listitem_path = context.get_listitem_info('FileNameAndPath')
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
@@ -317,6 +319,7 @@ def process(provider, context, **_kwargs):
             return False
 
     video_id = params.get('video_id')
+    video_ids = params.get('video_ids')
     playlist_id = params.get('playlist_id')
 
     force_play = False
@@ -329,15 +332,20 @@ def process(provider, context, **_kwargs):
         ui.set_property(param)
         force_play = True
 
-    if video_id and not playlist_id:
+    if video_id and not playlist_id and not video_ids:
         # This is required to trigger Kodi resume prompt, along with using
         # RunPlugin. Prompt will not be used if using PlayMedia
-        if force_play:
+        if force_play and not params.get(PLAY_STRM):
             return UriItem('command://Action(Play)')
 
         if context.get_handle() == -1:
-            return UriItem('command://PlayMedia({0}, playlist_type_hint=1)'
-                           .format(context.create_uri((PATHS.PLAY,), params)))
+            return UriItem('command://{0}'.format(
+                context.create_uri(
+                    (PATHS.PLAY,),
+                    params,
+                    play=True,
+                )
+            ))
 
         ui.set_property(BUSY_FLAG)
         playlist_player = context.get_playlist_player()
@@ -355,7 +363,7 @@ def process(provider, context, **_kwargs):
 
         return media_item
 
-    if playlist_id or 'playlist_ids' in params:
+    if playlist_id or video_ids or 'playlist_ids' in params:
         return _play_playlist(provider, context)
 
     if 'channel_id' in params:
@@ -363,31 +371,45 @@ def process(provider, context, **_kwargs):
     return False
 
 
-def process_items_for_playlist(context, items, action=None, play_from=None):
-    # select order
-    order = context.get_param('order')
-    if not order and play_from is None:
-        order = 'ask'
-    if order == 'ask':
-        order_list = ('default', 'reverse', 'shuffle')
-        selection_list = [
-            (context.localize('playlist.play.%s' % order), order)
-            for order in order_list
-        ]
-        order = context.get_ui().on_select(
-            context.localize('playlist.play.select'),
-            selection_list,
-        )
-        if order not in order_list:
-            order = 'default'
+def process_items_for_playlist(context,
+                               items,
+                               action=None,
+                               play_from=None,
+                               order=None):
+    params = context.get_params()
 
-    # reverse the list
-    if order == 'reverse':
-        items = items[::-1]
-    elif order == 'shuffle':
-        # we have to shuffle the playlist by our self.
-        # The implementation of XBMC/KODI is quite weak :(
-        random.shuffle(items)
+    if play_from is None:
+        play_from = params.get('video_id')
+
+    num_items = len(items) if items else 0
+    if num_items > 1:
+        # select order
+        if order is None:
+            order = params.get('order')
+        if not order and play_from is None:
+            order = 'ask'
+        if order == 'ask':
+            order_list = ('default', 'reverse', 'shuffle')
+            selection_list = [
+                (context.localize('playlist.play.%s' % order), order)
+                for order in order_list
+            ]
+            order = context.get_ui().on_select(
+                context.localize('playlist.play.select'),
+                selection_list,
+            )
+            if order not in order_list:
+                order = 'default'
+
+        # reverse the list
+        if order == 'reverse':
+            items = items[::-1]
+        elif order == 'shuffle':
+            # we have to shuffle the playlist by our self.
+            # The implementation of XBMC/KODI is quite weak :(
+            random.shuffle(items)
+    elif not num_items:
+        return False
 
     if action == 'list':
         context.set_content(CONTENT.VIDEO_CONTENT)
@@ -404,35 +426,48 @@ def process_items_for_playlist(context, items, action=None, play_from=None):
     elif play_from == 'end':
         play_from = -1
     if isinstance(play_from, int):
-        playlist_position = play_from
+        position = play_from
+    elif isinstance(play_from, string_type):
+        position = None
     else:
-        playlist_position = None
+        position = False
 
     # add videos to playlist
+    num_items = 0
     for idx, item in enumerate(items):
         if not item.playable:
             continue
         playlist_player.add(item)
-        if playlist_position is None and item.video_id == play_from:
-            playlist_position = idx
+        num_items += 1
+        if position is None and item.video_id == play_from:
+            position = num_items
 
-    num_items = playlist_player.size()
     if not num_items:
         return False
 
     if isinstance(play_from, int):
         if num_items >= play_from > 0:
-            playlist_position = play_from - 1
+            position = play_from
         elif play_from < 0:
-            playlist_position = num_items + play_from
+            position = num_items + play_from
         else:
-            playlist_position = 0
-    elif playlist_position is None:
-        playlist_position = 0
+            position = 1
+    elif not position:
+        position = 1
 
     if action == 'queue':
         return items
     if action == 'play':
-        playlist_player.play_playlist_item(playlist_position + 1)
-        return False
-    return items[playlist_position]
+        ui = context.get_ui()
+        max_wait_time = position
+        while ui.busy_dialog_active() or playlist_player.size() < position:
+            max_wait_time -= 1
+            if max_wait_time < 0:
+                command = playlist_player.play_playlist_item(position,
+                                                             defer=True)
+                return UriItem(command)
+            context.sleep(1)
+        else:
+            playlist_player.play_playlist_item(position)
+        return
+    return items[position - 1]

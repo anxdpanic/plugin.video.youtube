@@ -190,7 +190,7 @@ class BaseRequestsClass(Logger):
                                   .format(exc=exc))
 
             if response_text:
-                response_text = ('Response:   {0}'
+                response_text = ('Response:  {0}'
                                  .format(response_text))
 
             if stack:

@@ -36,7 +36,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID',
-                        'clientVersion': '19.29.37',
+                        'clientVersion': '19.44.38',
                         'androidSdkVersion': '30',
                         'osName': 'Android',
                         'osVersion': '11',
@@ -118,6 +118,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         'android_youtube_tv': {
             '_id': 29,
             '_disabled': True,
+            '_auth_type': 'tv',
             '_query_subtitles': True,
             'json': {
                 'params': _PLAYER_PARAMS['android'],
@@ -128,7 +129,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                         'androidSdkVersion': '30',
                         'osName': 'Android',
                         'osVersion': '11',
-                        'platform': 'MOBILE',
+                        'platform': 'TV',
                     },
                 },
                 'thirdParty': {
@@ -151,7 +152,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_VR',
-                        'clientVersion': '1.57.29',
+                        'clientVersion': '1.60.19',
                         'deviceMake': 'Oculus',
                         'deviceModel': 'Quest 3',
                         'osName': 'Android',
@@ -174,16 +175,16 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_id': 5,
             '_auth_type': False,
             '_os': {
-                'major': '17',
-                'minor': '5',
-                'patch': '1',
-                'build': '21F90',
+                'major': '18',
+                'minor': '1',
+                'patch': '0',
+                'build': '22B83',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.29.1',
+                        'clientVersion': '19.45.4',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
@@ -205,6 +206,7 @@ class YouTubeRequestClient(BaseRequestsClass):
         },
         'media_connect_frontend': {
             '_id': 95,
+            '_disabled': True,
             '_query_subtitles': True,
             'json': {
                 'context': {
@@ -382,8 +384,14 @@ class YouTubeRequestClient(BaseRequestsClass):
             client = merge_dicts(base_client, data)
         client = merge_dicts(cls.CLIENTS['_common'], client, templates)
         client['_name'] = client_name
-        if base_client.get('_auth_required'):
-            client['_auth_required'] = True
+
+        auth_required = base_client.get('_auth_required')
+        if auth_required:
+            client['_auth_required'] = auth_required
+
+        auth_requested = base_client.get('_auth_requested')
+        if auth_requested:
+            client['_auth_requested'] = auth_requested
 
         for values, template_id, template in templates.values():
             if template_id in values:
@@ -397,10 +405,13 @@ class YouTubeRequestClient(BaseRequestsClass):
             auth_type = client.get('_auth_type')
             if auth_type == 'tv' and auth_requested != 'personal':
                 auth_token = client.get('_access_token_tv')
+                api_key = client.get('_api_key_tv')
             elif auth_type is not False:
                 auth_token = client.get('_access_token')
+                api_key = client.get('_api_key')
             else:
                 auth_token = None
+                api_key = None
 
             if auth_token and (auth_required or auth_requested):
                 headers = client['headers']
@@ -423,10 +434,14 @@ class YouTubeRequestClient(BaseRequestsClass):
                     del headers['Authorization']
                     client['headers'] = headers
 
-                if 'key' in params and params['key'] is ValueError:
+                if 'key' in params:
                     params = params.copy()
-                    del params['key']
+                    if params['key'] is ValueError:
+                        del params['key']
+                    elif api_key:
+                        params['key'] = api_key
                     client['params'] = params
+
         except KeyError:
             pass
         client['_has_auth'] = has_auth

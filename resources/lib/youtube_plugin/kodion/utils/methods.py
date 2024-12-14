@@ -12,10 +12,12 @@ from __future__ import absolute_import, division, unicode_literals
 
 import json
 import os
-import re
 import shutil
 from datetime import timedelta
 from math import floor, log
+from re import (
+    compile as re_compile,
+)
 
 from ..compatibility import byte_string_type, string_type, xbmc, xbmcvfs
 from ..logger import Logger
@@ -60,14 +62,17 @@ def select_stream(context,
                   stream_data_list,
                   ask_for_quality,
                   audio_only,
-                  use_adaptive_formats=True):
+                  use_mpd=True):
     settings = context.get_settings()
-    isa_capabilities = context.inputstream_adaptive_capabilities()
-    use_adaptive = (use_adaptive_formats
-                    and settings.use_isa()
-                    and bool(isa_capabilities))
-    live_type = ('live' in isa_capabilities
-                 and settings.live_stream_type()) or 'hls'
+    if settings.use_isa():
+        isa_capabilities = context.inputstream_adaptive_capabilities()
+        use_adaptive = bool(isa_capabilities)
+        use_live_adaptive = use_adaptive and 'live' in isa_capabilities
+        use_live_mpd = use_live_adaptive and settings.use_mpd_live_streams()
+    else:
+        use_adaptive = False
+        use_live_adaptive = False
+        use_live_mpd = False
 
     if audio_only:
         context.log_debug('Select stream - Audio only')
@@ -77,11 +82,12 @@ def select_stream(context,
         stream_list = [
             item for item in stream_data_list
             if (not item.get('adaptive')
-                or (not item.get('live') and use_adaptive)
+                or (not item.get('live')
+                    and ((use_mpd and item.get('dash/video'))
+                         or (use_adaptive and item.get('hls/video'))))
                 or (item.get('live')
-                    and live_type.startswith('isa')
-                    and ((live_type == 'isa_mpd' and item.get('dash/video'))
-                         or item.get('hls/video'))))
+                    and ((use_live_mpd and item.get('dash/video'))
+                         or (use_live_adaptive and item.get('hls/video')))))
         ]
 
     if not stream_list:
@@ -130,13 +136,14 @@ def select_stream(context,
     return stream_list[selected_stream]
 
 
-def strip_html_from_text(text):
+def strip_html_from_text(text, tag_re=re_compile('<[^<]+?>')):
     """
     Removes html tags
     :param text: html text
+    :param tag_re: RE pattern object used to match html tags
     :return:
     """
-    return re.sub('<[^<]+?>', '', text)
+    return tag_re.sub('', text)
 
 
 def print_items(items):
@@ -195,9 +202,11 @@ def rm_dir(path):
     return False
 
 
-def find_video_id(plugin_path):
-    match = re.search(r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*',
-                      plugin_path)
+def find_video_id(plugin_path,
+                  video_id_re=re_compile(
+                      r'.*video_id=(?P<video_id>[a-zA-Z0-9_\-]{11}).*'
+                  )):
+    match = video_id_re.search(plugin_path)
     if match:
         return match.group('video_id')
     return ''
@@ -216,17 +225,15 @@ def friendly_number(value, precision=3, scale=('', 'K', 'M', 'B'), as_str=True):
     return output if as_str else (output, value)
 
 
-_RE_PERIODS = re.compile(r'([\d.]+)(d|h|m|s|$)')
-_SECONDS_IN_PERIODS = {
-    '': 1,       # 1 second for unitless period
-    's': 1,      # 1 second
-    'm': 60,     # 1 minute
-    'h': 3600,   # 1 hour
-    'd': 86400,  # 1 day
-}
-
-
-def duration_to_seconds(duration):
+def duration_to_seconds(duration,
+                        periods_seconds_map={
+                            '': 1,       # 1 second for unitless period
+                            's': 1,      # 1 second
+                            'm': 60,     # 1 minute
+                            'h': 3600,   # 1 hour
+                            'd': 86400,  # 1 day
+                        },
+                        periods_re=re_compile(r'([\d.]+)(d|h|m|s|$)')):
     if ':' in duration:
         seconds = 0
         for part in duration.split(':'):
@@ -234,8 +241,8 @@ def duration_to_seconds(duration):
         return seconds
     return sum(
         (float(number) if '.' in number else int(number))
-        * _SECONDS_IN_PERIODS.get(period, 1)
-        for number, period in re.findall(_RE_PERIODS, duration.lower())
+        * periods_seconds_map.get(period, 1)
+        for number, period in periods_re.findall(duration.lower())
     )
 
 
@@ -319,5 +326,6 @@ def wait(timeout=None):
     return xbmc.Monitor().waitForAbort(timeout)
 
 
-def redact_ip(url):
-    return re.sub(r'([?&/])ip([=/])[^?&/]+', r'\g<1>ip\g<2><redacted>', url)
+def redact_ip(url,
+              ip_re=re_compile(r'([?&/]|%3F|%26|%2F)ip([=/]|%3D|%2F)[^?&/%]+')):
+    return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)

@@ -21,6 +21,7 @@ from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
     parse_qsl,
+    urlencode,
     urlsplit,
     urlunsplit,
     xbmc,
@@ -72,45 +73,85 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         self.whitelist_ips = self._context.get_settings().httpd_whitelist()
         super(RequestHandler, self).__init__(*args, **kwargs)
 
-    def connection_allowed(self, method):
-        client_ip = self.client_address[0]
-        is_whitelisted = client_ip in self.whitelist_ips
-        conn_allowed = is_whitelisted
+    def ip_address_status(self, ip_address):
+        is_whitelisted = ip_address in self.whitelist_ips
+        ip_allowed = is_whitelisted
 
-        if not conn_allowed:
-            octets = validate_ip_address(client_ip)
+        if not ip_allowed:
+            octets = validate_ip_address(ip_address)
             for ip_range in self.local_ranges:
                 if ((any(octets)
                      and isinstance(ip_range, tuple)
                      and ip_range[0] <= octets <= ip_range[1])
-                        or client_ip == ip_range):
-                    in_local_range = True
-                    conn_allowed = True
+                        or ip_address == ip_range):
+                    is_local = True
+                    ip_allowed = True
                     break
             else:
-                in_local_range = False
+                is_local = False
         else:
-            in_local_range = 'Undetermined'
+            is_local = None
 
-        if self.path != PATHS.PING:
+        return ip_allowed, is_local, is_whitelisted
+
+    def connection_allowed(self, method):
+        client_ip = self.client_address[0]
+        ip_allowed, is_local, is_whitelisted = self.ip_address_status(client_ip)
+
+        path_parts = urlsplit(self.path)
+        if path_parts.query:
+            params = dict(parse_qsl(path_parts.query))
+            log_params = params.copy()
+            for param, value in params.items():
+                if param in {'key', 'api_key', 'api_secret', 'client_secret'}:
+                    log_params[param] = '...'.join((value[:3], value[-3:]))
+                elif param in {'api_id', 'client_id'}:
+                    log_params[param] = '...'.join((value[:3], value[-5:]))
+                elif param in {'access_token', 'refresh_token', 'token'}:
+                    log_params[param] = '<redacted>'
+                elif param == 'url':
+                    log_params[param] = redact_ip(value)
+                elif param == 'location':
+                    log_params[param] = '|xx.xxxx,xx.xxxx|'
+            log_path = urlunsplit((
+                '', '', path_parts.path, urlencode(log_params), '',
+            ))
+        else:
+            params = log_params = None
+            log_path = path_parts.path
+        path = {
+            'full': self.path,
+            'path': path_parts.path,
+            'query': path_parts.query,
+            'params': params,
+            'log_params': log_params,
+            'log_path': log_path,
+        }
+
+        if not path['path'].startswith(PATHS.PING):
             msg = ('HTTPServer - {method}'
                    '\n\tPath:        |{path}|'
+                   '\n\tParams:      |{params}|'
                    '\n\tAddress:     |{client_ip}|'
                    '\n\tWhitelisted: {is_whitelisted}'
-                   '\n\tLocal range: {in_local_range}'
+                   '\n\tLocal range: {is_local}'
                    '\n\tStatus:      {status}'
                    .format(method=method,
-                           path=redact_ip(self.path),
+                           path=path['path'],
+                           params=path['log_params'],
                            client_ip=client_ip,
                            is_whitelisted=is_whitelisted,
-                           in_local_range=in_local_range,
-                           status='Allowed' if conn_allowed else 'Blocked'))
+                           is_local=('Undetermined'
+                                     if is_local is None else
+                                     is_local),
+                           status='Allowed' if ip_allowed else 'Blocked'))
             self._context.log_debug(msg)
-        return conn_allowed
+        return ip_allowed, path
 
     # noinspection PyPep8Naming
     def do_GET(self):
-        if not self.connection_allowed('GET'):
+        allowed, path = self.connection_allowed('GET')
+        if not allowed:
             self.send_error(403)
             return
 
@@ -120,10 +161,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         settings = context.get_settings()
         api_config_enabled = settings.api_config_page()
 
-        # Strip trailing slash if present
-        stripped_path = self.path.rstrip('/')
-
-        if stripped_path == PATHS.IP:
+        if path['path'] == PATHS.IP:
             client_json = json.dumps({'ip': self.client_address[0]})
             self.send_response(200)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -131,9 +169,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.end_headers()
             self.wfile.write(client_json.encode('utf-8'))
 
-        elif stripped_path.startswith(PATHS.MPD):
+        elif path['path'].startswith(PATHS.MPD):
             try:
-                file = dict(parse_qsl(urlsplit(self.path).query)).get('file')
+                file = path['params'].get('file')
                 if file:
                     filepath = os.path.join(self.BASE_PATH, file)
                 else:
@@ -154,10 +192,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                             self.wfile.write(file_chunk)
             except IOError:
                 response = ('File Not Found: |{path}| -> |{filepath}|'
-                            .format(path=self.path, filepath=filepath))
+                            .format(path=path['log_path'], filepath=filepath))
                 self.send_error(404, response)
 
-        elif api_config_enabled and stripped_path == PATHS.API:
+        elif api_config_enabled and path['path'] == PATHS.API:
             html = self.api_config_page()
             html = html.encode('utf-8')
 
@@ -169,11 +207,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif api_config_enabled and stripped_path.startswith(PATHS.API_SUBMIT):
+        elif api_config_enabled and path['path'].startswith(PATHS.API_SUBMIT):
             xbmc.executebuiltin('Dialog.Close(addonsettings,true)')
 
-            query = urlsplit(self.path).query
-            params = dict(parse_qsl(query))
+            query = path['query']
+            params = path['params']
             updated = []
 
             api_key = params.get('api_key')
@@ -227,11 +265,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             for chunk in self.get_chunks(html):
                 self.wfile.write(chunk)
 
-        elif stripped_path == PATHS.PING:
+        elif path['path'] == PATHS.PING:
             self.send_error(204)
 
-        elif stripped_path.startswith(PATHS.REDIRECT):
-            url = dict(parse_qsl(urlsplit(self.path).query)).get('url')
+        elif path['path'].startswith(PATHS.REDIRECT):
+            url = path['params'].get('url')
             if url:
                 wait(1)
                 self.send_response(301)
@@ -246,13 +284,14 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_HEAD(self):
-        if not self.connection_allowed('HEAD'):
+        allowed, path = self.connection_allowed('HEAD')
+        if not allowed:
             self.send_error(403)
             return
 
-        if self.path.startswith(PATHS.MPD):
+        if path['path'].startswith(PATHS.MPD):
             try:
-                file = dict(parse_qsl(urlsplit(self.path).query)).get('file')
+                file = path['params'].get('file')
                 if file:
                     file_path = os.path.join(self.BASE_PATH, file)
                 else:
@@ -266,10 +305,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 self.end_headers()
             except IOError:
                 response = ('File Not Found: |{path}| -> |{file_path}|'
-                            .format(path=self.path, file_path=file_path))
+                            .format(path=path['log_path'], file_path=file_path))
                 self.send_error(404, response)
 
-        elif self.path.startswith(PATHS.REDIRECT):
+        elif path['path'].startswith(PATHS.REDIRECT):
             self.send_error(404)
 
         else:
@@ -277,11 +316,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
     # noinspection PyPep8Naming
     def do_POST(self):
-        if not self.connection_allowed('POST'):
+        allowed, path = self.connection_allowed('POST')
+        if not allowed:
             self.send_error(403)
             return
 
-        if self.path.startswith(PATHS.DRM):
+        if path['path'].startswith(PATHS.DRM):
             home = xbmcgui.Window(10000)
 
             lic_url = home.getProperty('-'.join((ADDON_ID, LICENSE_URL)))
@@ -611,8 +651,8 @@ def get_http_server(address, port, context):
         return None
 
 
-def httpd_status(context):
-    netloc = get_connect_address(context, as_netloc=True)
+def httpd_status(context, address=None):
+    netloc = get_connect_address(context, as_netloc=True, address=address)
     url = urlunsplit((
         'http',
         netloc,
@@ -654,10 +694,13 @@ def get_client_ip_address(context):
     return ip_address
 
 
-def get_connect_address(context, as_netloc=False):
-    settings = context.get_settings()
-    listen_address = settings.httpd_listen()
-    listen_port = settings.httpd_port()
+def get_connect_address(context, as_netloc=False, address=None):
+    if address is None:
+        settings = context.get_settings()
+        listen_address = settings.httpd_listen()
+        listen_port = settings.httpd_port()
+    else:
+        listen_address, listen_port = address
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -701,3 +744,23 @@ def get_connect_address(context, as_netloc=False):
     if as_netloc:
         return ':'.join((connect_address, str(listen_port)))
     return listen_address, listen_port
+
+
+def get_listen_addresses():
+    local_ranges = (
+        ((10, 0, 0, 0), (10, 255, 255, 255)),
+        ((172, 16, 0, 0), (172, 31, 255, 255)),
+        ((192, 168, 0, 0), (192, 168, 255, 255)),
+    )
+    addresses = ['127.0.0.1', xbmc.getIPAddress()]
+    for interface in socket.getaddrinfo(socket.gethostname(), None):
+        address = interface[4][0]
+        if interface[0] != socket.AF_INET or address in addresses:
+            continue
+        octets = validate_ip_address(address)
+        if not any(octets):
+            continue
+        if any(lo <= octets <= hi for lo, hi in local_ranges):
+            addresses.append(address)
+    addresses.append('0.0.0.0')
+    return addresses

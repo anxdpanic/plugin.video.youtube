@@ -46,7 +46,22 @@ from ...utils import (
 
 
 class XbmcContext(AbstractContext):
-    _KODI_UI_SUBTITLE_OPTIONS = None
+    # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1230
+    _KODI_UI_PLAYER_LANGUAGE_OPTIONS = {
+        None,  # No setting value
+        'mediadefault',
+        'original',
+        'default',  # UI language
+    }
+
+    # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
+    _KODI_UI_SUBTITLE_LANGUAGE_OPTIONS = {
+        None,  # No setting value
+        'none',
+        'forced_only',
+        'original',
+        'default',  # UI language
+    }
 
     LOCAL_MAP = {
         'api.config': 30634,
@@ -62,6 +77,7 @@ class XbmcContext(AbstractContext):
         'api.personal.failed': 30599,
         'api.secret': 30203,
         'are_you_sure': 750,
+        'author': 21863,
         'bookmark': 30101,
         'bookmark.channel': 30803,
         'bookmark.created': 21362,
@@ -118,7 +134,9 @@ class XbmcContext(AbstractContext):
         'history.remove': 15015,
         'history.reset.resume_point': 30674,
         'home': 10000,
+        'httpd': 30628,
         'httpd.not.running': 30699,
+        'httpd.connect.failed': 1001,
         'inputstreamhelper.is_installed': 30625,
         'isa.enable.check': 30579,
         'key.requirement': 30731,
@@ -126,6 +144,9 @@ class XbmcContext(AbstractContext):
         'live': 19664,
         'live.completed': 30647,
         'live.upcoming': 30646,
+        'loading': 575,
+        'loading.directory': 1040,
+        'loading.directory.progress': 1042,
         'maintenance.bookmarks': 30800,
         'maintenance.data_cache': 30687,
         'maintenance.feed_history': 30814,
@@ -136,7 +157,7 @@ class XbmcContext(AbstractContext):
         'my_channel': 30507,
         'my_location': 30654,
         'my_subscriptions': 30510,
-        'my_subscriptions.loading': 575,
+        'my_subscriptions.loading': 30510,
         'my_subscriptions.filter.add': 30587,
         'my_subscriptions.filter.added': 30589,
         'my_subscriptions.filter.remove': 30588,
@@ -216,6 +237,7 @@ class XbmcContext(AbstractContext):
         'setup_wizard.prompt.settings.performance': 30785,
         'setup_wizard.prompt.settings.refresh': 30817,
         'setup_wizard.prompt.subtitles': 287,
+        'shorts': 30736,
         'sign.enter_code': 30519,
         'sign.go_to': 30502,
         'sign.in': 30111,
@@ -335,14 +357,6 @@ class XbmcContext(AbstractContext):
             addon = xbmcaddon.Addon(ADDON_ID)
             cls._addon = addon
             cls._settings = XbmcPluginSettings(addon)
-
-            cls._KODI_UI_SUBTITLE_OPTIONS = {
-                None,                 # No setting value
-                self.localize(231),    # None
-                self.localize(13207),  # Forced only
-                self.localize(308),    # Original language
-                self.localize(309),    # UI language
-            }
 
             # Update default allowable params
             cls._NON_EMPTY_STRING_PARAMS.update(self.SEARCH_PARAMS)
@@ -465,14 +479,25 @@ class XbmcContext(AbstractContext):
             lang_id = self.get_language()
         return xbmc.convertLanguage(lang_id, xbmc.ENGLISH_NAME).split(';')[0]
 
+    def get_player_language(self):
+        language = get_kodi_setting_value('locale.audiolanguage')
+        if language == 'default':
+            language = get_kodi_setting_value('locale.language')
+            language = language.replace('resource.language.', '').split('_')[0]
+        elif language not in self._KODI_UI_PLAYER_LANGUAGE_OPTIONS:
+            language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+        return language
+
     def get_subtitle_language(self):
-        sub_language = get_kodi_setting_value('locale.subtitlelanguage')
-        # https://github.com/xbmc/xbmc/blob/master/xbmc/LangInfo.cpp#L1242
-        if sub_language not in self._KODI_UI_SUBTITLE_OPTIONS:
-            sub_language = xbmc.convertLanguage(sub_language, xbmc.ISO_639_1)
+        language = get_kodi_setting_value('locale.subtitlelanguage')
+        if language == 'default':
+            language = get_kodi_setting_value('locale.language')
+            language = language.replace('resource.language.', '').split('_')[0]
+        elif language in self._KODI_UI_SUBTITLE_LANGUAGE_OPTIONS:
+            language = None
         else:
-            sub_language = None
-        return sub_language
+            language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
+        return language
 
     def get_playlist_player(self, playlist_type=None):
         if not self._playlist or playlist_type:
@@ -575,6 +600,20 @@ class XbmcContext(AbstractContext):
                 (SORT.PLAYCOUNT,),
                 (SORT.UNSORTED,),
                 (SORT.LABEL,),
+            )
+        elif sub_type == 'comments':
+            self.add_sort_method(
+                (SORT.CHANNEL,          '[%A - ]%T \u2022 %P',       '%J'),
+                (SORT.ARTIST,           '[%J - ]%T \u2022 %P',       '%A'),
+                (SORT.PROGRAM_COUNT,    '[%A - ]%T \u2022 %P | %J',  '%C'),
+                (SORT.DATE,             '[%A - ]%T \u2022 %P',       '%J'),
+                (SORT.TRACKNUM,         '[%N. ][%A - ]%T \u2022 %P', '%J'),
+            ) if detailed_labels else self.add_sort_method(
+                (SORT.CHANNEL,          '[%A - ]%T'),
+                (SORT.ARTIST,           '[%A - ]%T'),
+                (SORT.PROGRAM_COUNT,    '[%A - ]%T'),
+                (SORT.DATE,             '[%A - ]%T'),
+                (SORT.TRACKNUM,         '[%N. ][%A - ]%T '),
             )
         else:
             self.add_sort_method(

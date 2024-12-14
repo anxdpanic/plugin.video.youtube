@@ -15,28 +15,19 @@ from ...compatibility import xbmcgui
 
 
 class XbmcProgressDialog(AbstractProgressDialog):
-    def __init__(self, heading, message='', message_template=None):
+    def __init__(self,
+                 heading,
+                 message='',
+                 background=False,
+                 message_template=None,
+                 template_params=None):
         super(XbmcProgressDialog, self).__init__(
-            dialog=xbmcgui.DialogProgress,
+            dialog=(xbmcgui.DialogProgressBG
+                    if background else
+                    xbmcgui.DialogProgress),
             heading=heading,
             message=message,
-            total=100,
+            total=0,
             message_template=message_template,
+            template_params=template_params,
         )
-
-    def is_aborted(self):
-        return self._dialog.iscanceled()
-
-
-class XbmcProgressDialogBG(AbstractProgressDialog):
-    def __init__(self, heading, message='', message_template=None):
-        super(XbmcProgressDialogBG, self).__init__(
-            dialog=xbmcgui.DialogProgressBG,
-            heading=heading,
-            message=message,
-            total=100,
-            message_template=message_template,
-        )
-
-    def is_aborted(self):
-        return False

@@ -10,7 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import re
+from re import (
+    IGNORECASE as re_IGNORECASE,
+    compile as re_compile,
+)
 
 from . import utils
 from ...kodion.compatibility import parse_qsl, urlsplit
@@ -20,7 +23,7 @@ from ...kodion.utils import duration_to_seconds
 
 
 class UrlToItemConverter(object):
-    RE_PATH_ID = re.compile(r'/[^/]+/(?P<id>[^/?#]+)', re.I)
+    RE_PATH_ID = re_compile(r'/[^/]+/(?P<id>[^/?#]+)', re_IGNORECASE)
     VALID_HOSTNAMES = {
         'youtube.com',
         'www.youtube.com',
@@ -213,14 +216,14 @@ class UrlToItemConverter(object):
         if self._video_items:
             return self._video_items
 
-        channel_id_dict = {}
-        utils.update_video_infos(
+        channel_items_dict = {}
+        utils.update_video_items(
             provider,
             context,
             self._video_id_dict,
-            channel_items_dict=channel_id_dict,
+            channel_items_dict=channel_items_dict,
         )
-        utils.update_fanarts(provider, context, channel_id_dict)
+        utils.update_channel_info(provider, context, channel_items_dict)
 
         self._video_items = [
             video_item
@@ -233,11 +236,11 @@ class UrlToItemConverter(object):
         if self._playlist_items:
             return self._playlist_items
 
-        channel_id_dict = {}
-        utils.update_playlist_infos(provider, context,
+        channel_items_dict = {}
+        utils.update_playlist_items(provider, context,
                                     self._playlist_id_dict,
-                                    channel_items_dict=channel_id_dict)
-        utils.update_fanarts(provider, context, channel_id_dict)
+                                    channel_items_dict=channel_items_dict)
+        utils.update_channel_info(provider, context, channel_items_dict)
 
         self._playlist_items = [
             playlist_item
@@ -246,12 +249,9 @@ class UrlToItemConverter(object):
         ]
         return self._playlist_items
 
-    def get_channel_items(self, provider, context, skip_title=False):
+    def get_channel_items(self, _provider, _context, skip_title=False):
         if self._channel_items:
             return self._channel_items
-
-        channel_id_dict = {}
-        utils.update_fanarts(provider, context, channel_id_dict)
 
         self._channel_items = [
             channel_item

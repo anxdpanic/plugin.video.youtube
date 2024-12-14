@@ -14,7 +14,7 @@ import os
 
 from ...kodion.compatibility import urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
-from ...kodion.network import httpd_status
+from ...kodion.network import httpd_status, get_listen_addresses
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils import to_unicode
 from ...kodion.utils.datetime_parser import strptime
@@ -26,7 +26,12 @@ def process_language(provider, context, step, steps):
 
     step += 1
     if ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.locale'))
     ):
@@ -45,7 +50,12 @@ def process_geo_location(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.my_location'))
     ):
@@ -62,10 +72,16 @@ def process_geo_location(context, step, steps, **_kwargs):
 def process_default_settings(context, step, steps, **_kwargs):
     localize = context.localize
     settings = context.get_settings()
+    ui = context.get_ui()
 
     step += 1
-    if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+    if ui.on_yes_no_input(
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.defaults'))
     ):
@@ -74,18 +90,28 @@ def process_default_settings(context, step, steps, **_kwargs):
         settings.stream_select(4 if settings.ask_for_video_quality() else 3)
         settings.set_subtitle_download(False)
         if context.get_system_version().compatible(21):
-            settings.live_stream_type(2)
+            settings.live_stream_type(3)
         else:
             settings.live_stream_type(1)
         if not xbmcvfs.exists('special://profile/playercorefactory.xml'):
             settings.support_alternative_player(False)
             settings.default_player_web_urls(False)
             settings.alternative_player_web_urls(False)
-            settings.alternative_player_adaptive(False)
+            settings.alternative_player_mpd(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
-        if settings.use_isa() and not httpd_status(context):
-            settings.httpd_listen('0.0.0.0')
+        if not httpd_status(context):
+            port = settings.httpd_port()
+            for address in get_listen_addresses():
+                if httpd_status(context, (address, port)):
+                    settings.httpd_listen(address)
+                    break
+            else:
+                ui.show_notification(
+                    localize('httpd.connect.failed'),
+                    header=localize('httpd'),
+                )
+                settings.httpd_listen('0.0.0.0')
     return step
 
 
@@ -95,7 +121,12 @@ def process_list_detail_settings(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.list_details'))
     ):
@@ -114,24 +145,29 @@ def process_performance_settings(context, step, steps, **_kwargs):
 
     step += 1
     if ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.settings.performance'))
     ):
         device_types = {
             '720p30': {
                 'max_resolution': 3,  # 720p
-                'stream_features': ('avc1', 'mp4a', 'filter'),
+                'stream_features': ('avc1', 'mp4a', 'filter', 'alt_sort'),
                 'num_items': 10,
             },
             '1080p30_avc': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter'),
+                'stream_features': ('avc1', 'vorbis', 'mp4a', 'filter', 'alt_sort'),
                 'num_items': 10,
             },
             '1080p30': {
                 'max_resolution': 4,  # 1080p
-                'stream_features': ('avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter'),
+                'stream_features': ('avc1', 'vp9', 'vorbis', 'mp4a', 'ssa', 'ac-3', 'ec-3', 'dts', 'filter', 'alt_sort'),
                 'num_items': 20,
             },
             '1080p60': {
@@ -189,7 +225,12 @@ def process_subtitles(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             (localize('setup_wizard.prompt')
              % localize('setup_wizard.prompt.subtitles'))
     ):
@@ -207,14 +248,20 @@ def process_old_search_db(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 
-    search_db_path = os.path.join(
-        DATA_PATH,
+    search_db_path = (
+        xbmcvfs.translatePath(DATA_PATH),
         'kodion',
         'search.sqlite'
     )
+    search_db_path_str = os.path.join(*search_db_path)
     step += 1
-    if xbmcvfs.exists(search_db_path) and ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+    if xbmcvfs.exists(search_db_path_str) and ui.on_yes_no_input(
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             localize('setup_wizard.prompt.import_search_history'),
     ):
         def _convert_old_search_item(value, item):
@@ -225,7 +272,7 @@ def process_old_search_db(context, step, steps, **_kwargs):
 
         search_history = context.get_search_history()
         old_search_db = SearchHistory(
-            xbmcvfs.translatePath(search_db_path),
+            search_db_path,
             migrate='storage',
         )
         items = old_search_db.get_items(process=_convert_old_search_item)
@@ -239,7 +286,7 @@ def process_old_search_db(context, step, steps, **_kwargs):
                 action='delete',
                 query=urlencode({
                     'target': 'other_file',
-                    'path': search_db_path,
+                    'path': search_db_path_str,
                 }),
             ),
             wait_for=WAIT_END_FLAG,
@@ -251,14 +298,20 @@ def process_old_history_db(context, step, steps, **_kwargs):
     localize = context.localize
     ui = context.get_ui()
 
-    history_db_path = os.path.join(
-        DATA_PATH,
+    history_db_path = (
+        xbmcvfs.translatePath(DATA_PATH),
         'playback',
         context.get_access_manager().get_current_user_id() + '.sqlite',
     )
+    history_db_path_str = os.path.join(*history_db_path)
     step += 1
-    if xbmcvfs.exists(history_db_path) and ui.on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+    if xbmcvfs.exists(history_db_path_str) and ui.on_yes_no_input(
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             localize('setup_wizard.prompt.import_playback_history'),
     ):
         def _convert_old_history_item(value, item):
@@ -273,7 +326,7 @@ def process_old_history_db(context, step, steps, **_kwargs):
 
         playback_history = context.get_playback_history()
         old_history_db = PlaybackHistory(
-            xbmcvfs.translatePath(history_db_path),
+            history_db_path,
             migrate='storage',
         )
         items = old_history_db.get_items(process=_convert_old_history_item)
@@ -288,7 +341,7 @@ def process_old_history_db(context, step, steps, **_kwargs):
                 action='delete',
                 query=urlencode({
                     'target': 'other_file',
-                    'path': history_db_path,
+                    'path': history_db_path_str,
                 }),
             ),
             wait_for=WAIT_END_FLAG,
@@ -301,7 +354,12 @@ def process_refresh_settings(context, step, steps, **_kwargs):
 
     step += 1
     if context.get_ui().on_yes_no_input(
-            localize('setup_wizard') + ' ({0}/{1})'.format(step, steps),
+            '{youtube} - {setup_wizard} ({step}/{steps})'.format(
+                youtube=localize('youtube'),
+                setup_wizard=localize('setup_wizard'),
+                step=step,
+                steps=steps,
+            ),
             localize('setup_wizard.prompt.settings.refresh'),
     ):
         context.execute(

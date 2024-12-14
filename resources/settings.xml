@@ -2,7 +2,7 @@
 <settings version="1">
     <section id="plugin.video.youtube">
         <category id="general" label="128" help="">
-            <group id="1">
+            <group id="setup_wizard">
                 <setting id="kodion.setup_wizard" type="boolean" label="30025" help="">
                     <level>0</level>
                     <default>true</default>
@@ -16,7 +16,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="2">
+            <group id="player_settings">
                 <setting id="kodion.mpd.videos" type="boolean" label="30688" help="30723">
                     <level>0</level>
                     <default>true</default>
@@ -138,6 +138,7 @@
                         - no HFR at max quality
                         - no fractional framerate hinting
                         - no framerate hinting
+                        - alternate sorting of unselected codecs
                     -->
                     <default>avc1,vp9,av01,hdr,hfr,vorbis,mp4a,ssa,ac-3,ec-3,dts,filter</default>
                     <constraints>
@@ -158,6 +159,7 @@
                             <option label="30755">ec-3</option>
                             <option label="30756">dts</option>
                             <option label="30757">filter</option>
+                            <option label="30729">alt_sort</option>
                         </options>
                         <delimiter>,</delimiter>
                         <minimumitems>1</minimumitems>
@@ -221,7 +223,7 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="3">
+            <group id="list_views">
                 <setting id="kodion.content.max_per_page" type="integer" label="30022" help="">
                     <level>0</level>
                     <default>50</default>
@@ -255,7 +257,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="4">
+            <group id="post_play">
                 <setting id="youtube.suggested_videos" type="boolean" label="30582" help="">
                     <level>0</level>
                     <default>false</default>
@@ -277,7 +279,7 @@
                     <control type="toggle"/>
                 </setting>
             </group>
-            <group id="5">
+            <group id="content_restrictions">
                 <setting id="kodion.safe.search" type="integer" label="30594" help="">
                     <level>0</level>
                     <default>0</default>
@@ -360,7 +362,7 @@
                     <default>false</default>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.filter.my_subscriptions_filtered.blacklist" type="boolean" parent="youtube.folder.my_subscriptions_filtered.show" label="30586" help="">
+                <setting id="youtube.filter.my_subscriptions_filtered.blacklist" type="boolean" parent="youtube.folder.my_subscriptions_filtered.show" label="30586" help="30585">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
@@ -373,7 +375,7 @@
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="youtube.filter.my_subscriptions_filtered.list" type="string" parent="youtube.folder.my_subscriptions_filtered.show" label="30585" help="">
+                <setting id="youtube.filter.my_subscriptions_filtered.list" type="string" parent="youtube.folder.my_subscriptions_filtered.show" label="587" help="30583">
                     <level>0</level>
                     <default/>
                     <constraints>
@@ -388,7 +390,7 @@
                         </dependency>
                     </dependencies>
                     <control format="string" type="edit">
-                        <heading>30585</heading>
+                        <heading>587</heading>
                     </control>
                 </setting>
                 <setting id="youtube.folder.recommendations.show" type="boolean" label="30551" help="">
@@ -614,13 +616,13 @@
                         <dependency type="enable">
                             <and>
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
-                                <condition setting="kodion.alternative_player.adaptive" operator="is">false</condition>
+                                <condition setting="kodion.alternative_player.mpd" operator="is">false</condition>
                             </and>
                         </dependency>
                     </dependencies>
                     <control type="toggle"/>
                 </setting>
-                <setting id="kodion.alternative_player.adaptive" type="boolean" parent="kodion.support.alternative_player" label="30805" help="">
+                <setting id="kodion.alternative_player.mpd" type="boolean" parent="kodion.support.alternative_player" label="30805" help="">
                     <level>0</level>
                     <default>false</default>
                     <dependencies>
@@ -628,7 +630,7 @@
                             <and>
                                 <condition setting="kodion.support.alternative_player" operator="is">true</condition>
                                 <or>
-                                    <condition setting="kodion.alternative_player.adaptive" operator="is">true</condition>
+                                    <condition setting="kodion.alternative_player.mpd" operator="is">true</condition>
                                     <condition setting="kodion.alternative_player.web_urls" operator="is">false</condition>
                                 </or>
                             </and>
@@ -688,7 +690,7 @@
                 </setting>
                 <setting id="kodion.live_stream.selection.1" type="integer" label="30689" help="30690">
                     <level>0</level>
-                    <default>2</default>  <!-- isa_hls -->
+                    <default>3</default>  <!-- isa_mpd -->
                     <constraints>
                         <options>
                             <option label="30740">0</option>  <!-- mpegts -->
@@ -767,6 +769,28 @@
                     <level>0</level>
                     <default>true</default>
                     <control type="toggle"/>
+                </setting>
+                <setting id="youtube.view.shorts.duration" type="integer" label="30737" help="">
+                    <level>0</level>
+                    <default>60</default>
+                    <constraints>
+                        <minimum>30</minimum>
+                        <step>30</step>
+                        <maximum>180</maximum>
+                    </constraints>
+                    <control format="integer" type="slider">
+                        <popup>false</popup>
+                    </control>
+                </setting>
+                <setting id="youtube.view.filter.list" type="string" label="587" help="30583">
+                    <level>0</level>
+                    <default/>
+                    <constraints>
+                        <allowempty>true</allowempty>
+                    </constraints>
+                    <control format="string" type="edit">
+                        <heading>587</heading>
+                    </control>
                 </setting>
                 <setting id="youtube.view.channel_name.aliases" type="list[string]" label="30807" help="">
                     <level>0</level>
@@ -946,7 +970,7 @@
                     </control>
                 </setting>
             </group>
-            <group id="mark_as_watched" label="16103">
+            <group id="post_play" label="16103">
                 <setting id="kodion.play_count.percent" type="integer" label="30668" help="">
                     <level>0</level>
                     <default>90</default>
@@ -1089,7 +1113,7 @@
             <group id="http_server" label="30628">
                 <setting id="kodion.http.listen" type="string" label="30643" help="">
                     <level>0</level>
-                    <default>0.0.0.0</default>
+                    <default>127.0.0.1</default>
                     <control format="ip" type="edit">
                         <heading>30643</heading>
                     </control>

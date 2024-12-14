@@ -633,7 +633,7 @@ msgid "Autoplay suggested videos"
 msgstr "自動播放建議影片"
 
 msgctxt "#30583"
-msgid ""
+msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
 msgstr ""
 
 msgctxt "#30584"
@@ -641,8 +641,8 @@ msgid "My Subscriptions (Filtered)"
 msgstr "我的訂閱 (已過濾)"
 
 msgctxt "#30585"
-msgid "Filtered channel list (comma delimited)"
-msgstr "過濾頻道列表 (使用,分隔)"
+msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
+msgstr ""
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -1217,8 +1217,8 @@ msgid "Enable VP9 video"
 msgstr ""
 
 msgctxt "#30729"
-msgid ""
-msgstr "易於用遙控器的搜尋"
+msgid "Prefer lower resolution streams for unselected codecs"
+msgstr ""
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
@@ -1245,11 +1245,11 @@ msgid "Edited"
 msgstr "已編輯"
 
 msgctxt "#30736"
-msgid "Shorts (1 minute or less)"
+msgid "Shorts"
 msgstr ""
 
 msgctxt "#30737"
-msgid ""
+msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"
@@ -1521,7 +1521,7 @@ msgid "Use YouTube website urls with external player"
 msgstr ""
 
 msgctxt "#30805"
-msgid "Use adaptive streaming formats with external player"
+msgid "Use MPEG-DASH with external player"
 msgstr ""
 
 msgctxt "#30806"
@@ -1583,6 +1583,14 @@ msgstr ""
 msgctxt "#30820"
 msgid "Podcast"
 msgstr ""
+
+#~ msgctxt "#30585"
+#~ msgid "Filtered channel list (comma delimited)"
+#~ msgstr "過濾頻道列表 (使用,分隔)"
+
+#~ msgctxt "#30729"
+#~ msgid ""
+#~ msgstr "易於用遙控器的搜尋"
 
 #~ msgctxt "#30515"
 #~ msgid "Auto-Remove from 'Watch Later'"

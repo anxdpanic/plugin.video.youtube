@@ -16,7 +16,11 @@ from ...kodion.items import menu_items
 from ...kodion.utils import find_video_id
 
 
-def _process_rate_video(provider, context, re_match):
+def _process_rate_video(provider,
+                        context,
+                        re_match=None,
+                        video_id=None,
+                        current_rating=None):
     listitem_path = context.get_listitem_info('FileNameAndPath')
     ratings = ['like', 'dislike', 'none']
 
@@ -24,7 +28,8 @@ def _process_rate_video(provider, context, re_match):
     if rating_param:
         rating_param = rating_param.lower() if rating_param.lower() in ratings else ''
 
-    video_id = context.get_param('video_id', '')
+    if video_id is None:
+        video_id = context.get_param('video_id')
     if not video_id:
         try:
             video_id = re_match.group('video_id')
@@ -35,11 +40,11 @@ def _process_rate_video(provider, context, re_match):
             if not video_id:
                 raise KodionException('video/rate/: missing video_id')
 
-    try:
-        current_rating = re_match.group('rating')
-    except IndexError:
-        current_rating = None
-
+    if current_rating is None:
+        try:
+            current_rating = re_match.group('rating')
+        except IndexError:
+            current_rating = None
     if not current_rating:
         client = provider.get_client(context)
         json_data = client.get_video_rating(video_id)
@@ -100,14 +105,12 @@ def _process_more_for_video(context):
     items = [
         menu_items.add_video_to_playlist(context, video_id),
         menu_items.related_videos(context, video_id),
-        menu_items.video_comments(context, video_id),
+        menu_items.video_comments(context, video_id, params.get('item_name')),
         menu_items.content_from_description(context, video_id),
-        menu_items.rate_video(context,
-                              video_id,
-                              params.get('refresh')),
+        menu_items.rate_video(context, video_id, params.get('refresh')),
     ] if params.get('logged_in') else [
         menu_items.related_videos(context, video_id),
-        menu_items.video_comments(context, video_id),
+        menu_items.video_comments(context, video_id, params.get('item_name')),
         menu_items.content_from_description(context, video_id),
     ]
 
@@ -116,12 +119,12 @@ def _process_more_for_video(context):
         context.execute(result)
 
 
-def process(provider, context, re_match=None, command=None):
+def process(provider, context, re_match=None, command=None, **kwargs):
     if re_match and command is None:
         command = re_match.group('command')
 
     if command == 'rate':
-        return _process_rate_video(provider, context, re_match)
+        return _process_rate_video(provider, context, re_match, **kwargs)
 
     if command == 'more':
         return _process_more_for_video(context)

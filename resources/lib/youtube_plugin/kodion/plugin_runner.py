@@ -56,11 +56,13 @@ def run(context=_context,
     context.log_notice('Plugin: Running v{version}'
                        '\n\tKodi:   v{kodi}'
                        '\n\tPython: v{python}'
+                       '\n\tHandle: {handle}'
                        '\n\tPath:   |{path}|'
                        '\n\tParams: |{params}|'
                        .format(version=context.get_version(),
                                kodi=str(system_version),
                                python=system_version.get_python_version(),
+                               handle=context.get_handle(),
                                path=context.get_path(),
                                params=params))
 

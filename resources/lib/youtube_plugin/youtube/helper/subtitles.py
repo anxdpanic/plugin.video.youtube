@@ -27,14 +27,37 @@ from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import make_dirs
 
 
-class Subtitles(object):
-    LANG_NONE = 0
-    LANG_PROMPT = 1
-    LANG_CURR_FALLBACK = 2
-    LANG_CURR = 3
-    LANG_CURR_NO_ASR = 4
-    LANG_ALL = 5
+SUBTITLE_OPTIONS = {
+    'none': 0,
+    'prompt': 1,
+    'preferred': 2,
+    'fallback': 4,
+    'no_asr': 8,
+    'all': 16,
+}
 
+
+SUBTITLE_SELECTIONS = {
+    0: SUBTITLE_OPTIONS['none'],
+    1: SUBTITLE_OPTIONS['all']
+       + SUBTITLE_OPTIONS['prompt'],
+    2: SUBTITLE_OPTIONS['preferred']
+       + SUBTITLE_OPTIONS['fallback'],
+    3: SUBTITLE_OPTIONS['preferred']
+       + SUBTITLE_OPTIONS['fallback']
+       + SUBTITLE_OPTIONS['no_asr'],
+    4: SUBTITLE_OPTIONS['preferred']
+       + SUBTITLE_OPTIONS['no_asr'],
+    5: SUBTITLE_OPTIONS['all'],
+    'none': 0,
+    'prompt': 1,
+    'preferred_fallback_asr': 2,
+    'preferred_fallback': 3,
+    'preferred': 4,
+    'all': 5,
+}
+
+class Subtitles(object):
     BASE_PATH = make_dirs(TEMP_PATH)
 
     FORMATS = {
@@ -180,49 +203,60 @@ class Subtitles(object):
 
     def get_subtitles(self):
         if self.prompt_override:
-            selection = self.LANG_PROMPT
+            selection = SUBTITLE_SELECTIONS['prompt']
         else:
             selection = self.sub_selection
 
-        if selection == self.LANG_NONE:
+        if selection == SUBTITLE_SELECTIONS['none']:
             return None
 
-        if selection == self.LANG_ALL:
+        if selection == SUBTITLE_SELECTIONS['all']:
             return self.get_all()
 
-        if selection == self.LANG_PROMPT:
+        if selection == SUBTITLE_SELECTIONS['prompt']:
             return self._prompt()
 
-        preferred_lang = self.preferred_lang
-        original_lang = self.defaults['original_lang']
+        selected_options = SUBTITLE_SELECTIONS[selection]
 
         allowed_langs = []
+
+        preferred_lang = self.preferred_lang
         for lang in preferred_lang:
             allowed_langs.append(lang)
             if '-' in lang:
                 allowed_langs.append(lang.partition('-')[0])
 
         use_asr = None
-        if selection == self.LANG_CURR_NO_ASR:
+        if selected_options & SUBTITLE_OPTIONS['no_asr']:
             use_asr = False
-        elif selection == self.LANG_CURR_FALLBACK:
-            for lang in (original_lang, 'en', 'en-US', 'en-GB', 'ASR'):
-                if lang not in preferred_lang:
+
+        original_lang = self.defaults['original_lang']
+        if selected_options & SUBTITLE_OPTIONS['fallback']:
+            fallback_langs = (original_lang, 'en', 'en-US', 'en-GB')
+            for lang in fallback_langs:
+                if lang not in allowed_langs:
                     allowed_langs.append(lang)
+            allowed_langs.append('ASR')
+        else:
+            fallback_langs = None
 
         subtitles = {}
-        has_asr = False
         for lang in allowed_langs:
-            track, track_lang, track_language, track_kind = (
-                self._get_track(lang, use_asr=use_asr)
-            )
+            if lang != 'ASR':
+                track_details = self._get_track(lang, use_asr=use_asr)
+            elif subtitles:
+                continue
+            else:
+                track_details = self._get_track(
+                    lang=None,
+                    use_asr=(use_asr is None or None),
+                    fallbacks=fallback_langs,
+                )
+
+            track, track_lang, track_language, track_kind = track_details
             if not track:
                 continue
             if track_kind:
-                if track_kind == 'asr':
-                    if has_asr:
-                        continue
-                    has_asr = True
                 track_key = '_'.join((track_lang, track_kind))
             else:
                 track_key = track_lang
@@ -391,11 +425,10 @@ class Subtitles(object):
             ('fmt', sub_format),
             ('tlang', tlang) if tlang else (None, None),
         )
-        if not tlang:
-            self._context.log_debug('Subtitles._get_url'
-                                    ' - found new subtitle for: |{lang}|'
-                                    '\n\tURL: {url}'
-                                    .format(lang=lang, url=subtitle_url))
+        self._context.log_debug('Subtitles._get_url'
+                                ' - found new subtitle for: |{lang}|'
+                                '\n\tURL: {url}'
+                                .format(lang=lang, url=subtitle_url))
 
         if not download:
             return subtitle_url, self.FORMATS[sub_format]['mime_type']
@@ -429,41 +462,39 @@ class Subtitles(object):
     def _get_track(self,
                    lang='en',
                    language=None,
-                   use_asr=None):
+                   use_asr=None,
+                   fallbacks=None):
         sel_track = sel_lang = sel_language = sel_kind = None
-
-        if lang == 'ASR':
-            if use_asr is False:
-                return None, None, None, None
-            if use_asr is None:
-                use_asr = True
-                lang = None
 
         for track in self.caption_tracks:
             track_lang = track.get('languageCode')
             track_language = self._get_language_name(track)
             track_kind = track.get('kind')
             is_asr = track_kind == 'asr'
-            if not lang or lang == track_lang:
-                if language is not None:
-                    if language == track_language:
-                        sel_track = track
-                        sel_lang = track_lang
-                        sel_language = track_language
-                        sel_kind = track_kind
-                        break
-                elif (use_asr is False and is_asr) or (use_asr and not is_asr):
-                    continue
-                elif (not sel_track
-                      or (use_asr is None and sel_kind == 'asr')
-                      or (use_asr and is_asr)):
+            if lang and lang != track_lang:
+                continue
+            if not lang and fallbacks and track_lang not in fallbacks:
+                continue
+            if language is not None:
+                if language == track_language:
                     sel_track = track
                     sel_lang = track_lang
                     sel_language = track_language
                     sel_kind = track_kind
+                    break
+            elif (use_asr is False and is_asr) or (use_asr and not is_asr):
+                continue
+            elif (not sel_track
+                  or (use_asr is None and sel_kind == 'asr')
+                  or (use_asr and is_asr)):
+                sel_track = track
+                sel_lang = track_lang
+                sel_language = track_language
+                sel_kind = track_kind
 
         if (not sel_track
-                and not use_asr
+                and lang
+                and use_asr is None
                 and self.defaults['base']
                 and lang != self.defaults['base_lang']):
             for track in self.translation_langs:

@@ -169,7 +169,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: ${{ github.ref }}
           body: ${{ steps.changelog.outputs.body }}
-          draft: false
+          draft: true
           prerelease: ${{ steps.release.outputs.pre-release }}
 
       - name: Upload Zip
