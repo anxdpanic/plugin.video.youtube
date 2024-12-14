@@ -14,7 +14,7 @@ import os
 
 from ...kodion.compatibility import urlencode, xbmcvfs
 from ...kodion.constants import ADDON_ID, DATA_PATH, WAIT_END_FLAG
-from ...kodion.network import httpd_status
+from ...kodion.network import httpd_status, get_listen_addresses
 from ...kodion.sql_store import PlaybackHistory, SearchHistory
 from ...kodion.utils import to_unicode
 from ...kodion.utils.datetime_parser import strptime
@@ -72,9 +72,10 @@ def process_geo_location(context, step, steps, **_kwargs):
 def process_default_settings(context, step, steps, **_kwargs):
     localize = context.localize
     settings = context.get_settings()
+    ui = context.get_ui()
 
     step += 1
-    if context.get_ui().on_yes_no_input(
+    if ui.on_yes_no_input(
             '{youtube} - {setup_wizard} ({step}/{steps})'.format(
                 youtube=localize('youtube'),
                 setup_wizard=localize('setup_wizard'),
@@ -100,7 +101,17 @@ def process_default_settings(context, step, steps, **_kwargs):
         if settings.cache_size() < 20:
             settings.cache_size(20)
         if not httpd_status(context):
-            settings.httpd_listen('0.0.0.0')
+            port = settings.httpd_port()
+            for address in get_listen_addresses():
+                if httpd_status(context, (address, port)):
+                    settings.httpd_listen(address)
+                    break
+            else:
+                ui.show_notification(
+                    localize('httpd.connect.failed'),
+                    header=localize('httpd'),
+                )
+                settings.httpd_listen('0.0.0.0')
     return step
 
 

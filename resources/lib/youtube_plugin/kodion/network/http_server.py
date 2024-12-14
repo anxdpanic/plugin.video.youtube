@@ -73,25 +73,30 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         self.whitelist_ips = self._context.get_settings().httpd_whitelist()
         super(RequestHandler, self).__init__(*args, **kwargs)
 
-    def connection_allowed(self, method):
-        client_ip = self.client_address[0]
-        is_whitelisted = client_ip in self.whitelist_ips
-        conn_allowed = is_whitelisted
+    def ip_address_status(self, ip_address):
+        is_whitelisted = ip_address in self.whitelist_ips
+        ip_allowed = is_whitelisted
 
-        if not conn_allowed:
-            octets = validate_ip_address(client_ip)
+        if not ip_allowed:
+            octets = validate_ip_address(ip_address)
             for ip_range in self.local_ranges:
                 if ((any(octets)
                      and isinstance(ip_range, tuple)
                      and ip_range[0] <= octets <= ip_range[1])
-                        or client_ip == ip_range):
-                    in_local_range = True
-                    conn_allowed = True
+                        or ip_address == ip_range):
+                    is_local = True
+                    ip_allowed = True
                     break
             else:
-                in_local_range = False
+                is_local = False
         else:
-            in_local_range = 'Undetermined'
+            is_local = None
+
+        return ip_allowed, is_local, is_whitelisted
+
+    def connection_allowed(self, method):
+        client_ip = self.client_address[0]
+        ip_allowed, is_local, is_whitelisted = self.ip_address_status(client_ip)
 
         path_parts = urlsplit(self.path)
         if path_parts.query:
@@ -129,17 +134,19 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                    '\n\tParams:      |{params}|'
                    '\n\tAddress:     |{client_ip}|'
                    '\n\tWhitelisted: {is_whitelisted}'
-                   '\n\tLocal range: {in_local_range}'
+                   '\n\tLocal range: {is_local}'
                    '\n\tStatus:      {status}'
                    .format(method=method,
                            path=path['path'],
                            params=path['log_params'],
                            client_ip=client_ip,
                            is_whitelisted=is_whitelisted,
-                           in_local_range=in_local_range,
-                           status='Allowed' if conn_allowed else 'Blocked'))
+                           is_local=('Undetermined'
+                                     if is_local is None else
+                                     is_local),
+                           status='Allowed' if ip_allowed else 'Blocked'))
             self._context.log_debug(msg)
-        return conn_allowed, path
+        return ip_allowed, path
 
     # noinspection PyPep8Naming
     def do_GET(self):
@@ -644,8 +651,8 @@ def get_http_server(address, port, context):
         return None
 
 
-def httpd_status(context):
-    netloc = get_connect_address(context, as_netloc=True)
+def httpd_status(context, address=None):
+    netloc = get_connect_address(context, as_netloc=True, address=address)
     url = urlunsplit((
         'http',
         netloc,
@@ -687,10 +694,13 @@ def get_client_ip_address(context):
     return ip_address
 
 
-def get_connect_address(context, as_netloc=False):
-    settings = context.get_settings()
-    listen_address = settings.httpd_listen()
-    listen_port = settings.httpd_port()
+def get_connect_address(context, as_netloc=False, address=None):
+    if address is None:
+        settings = context.get_settings()
+        listen_address = settings.httpd_listen()
+        listen_port = settings.httpd_port()
+    else:
+        listen_address, listen_port = address
 
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -734,3 +744,23 @@ def get_connect_address(context, as_netloc=False):
     if as_netloc:
         return ':'.join((connect_address, str(listen_port)))
     return listen_address, listen_port
+
+
+def get_listen_addresses():
+    local_ranges = (
+        ((10, 0, 0, 0), (10, 255, 255, 255)),
+        ((172, 16, 0, 0), (172, 31, 255, 255)),
+        ((192, 168, 0, 0), (192, 168, 255, 255)),
+    )
+    addresses = ['127.0.0.1', xbmc.getIPAddress()]
+    for interface in socket.getaddrinfo(socket.gethostname(), None):
+        address = interface[4][0]
+        if interface[0] != socket.AF_INET or address in addresses:
+            continue
+        octets = validate_ip_address(address)
+        if not any(octets):
+            continue
+        if any(lo <= octets <= hi for lo, hi in local_ranges):
+            addresses.append(address)
+    addresses.append('0.0.0.0')
+    return addresses

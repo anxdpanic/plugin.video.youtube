@@ -1084,7 +1084,7 @@
             <group id="http_server" label="30628">
                 <setting id="kodion.http.listen" type="string" label="30643" help="">
                     <level>0</level>
-                    <default>0.0.0.0</default>
+                    <default>127.0.0.1</default>
                     <control format="ip" type="edit">
                         <heading>30643</heading>
                     </control>
