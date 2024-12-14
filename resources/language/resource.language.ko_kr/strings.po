@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2024-11-20 18:38+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
@@ -632,7 +632,7 @@ msgid "Autoplay suggested videos"
 msgstr "추천 동영상 자동 재생"
 
 msgctxt "#30583"
-msgid ""
+msgid "Filters can be channel names separated by a comma eg. 'The Best Channel,The 2nd Best Channel', and/or custom video filters in the form '{ATTR}{OP}{VALUE}' eg. '{duration}{>=}{180}{artists_string}{=}{\"The Best Channel\"},{duration}{<}{180}'"
 msgstr ""
 
 msgctxt "#30584"
@@ -640,8 +640,8 @@ msgid "My Subscriptions (Filtered)"
 msgstr "내 구독 (필터)"
 
 msgctxt "#30585"
-msgid "Filtered channel list (comma delimited)"
-msgstr "필터된 채널목록 (쉼표로 나눔)"
+msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
+msgstr ""
 
 msgctxt "#30586"
 msgid "Blacklist"
@@ -1216,8 +1216,8 @@ msgid "Enable VP9 video"
 msgstr "VP9 비디오 사용"
 
 msgctxt "#30729"
-msgid ""
-msgstr "원격 친화적 검색"
+msgid "Prefer lower resolution streams for unselected codecs"
+msgstr ""
 
 msgctxt "#30730"
 msgid "Play (Ask for quality)"
@@ -1244,11 +1244,11 @@ msgid "Edited"
 msgstr "수정됨"
 
 msgctxt "#30736"
-msgid "Shorts (1 minute or less)"
-msgstr "Shorts (1분 이내)"
+msgid "Shorts"
+msgstr ""
 
 msgctxt "#30737"
-msgid ""
+msgid "Shorts - Max duration"
 msgstr ""
 
 msgctxt "#30738"
@@ -1520,8 +1520,8 @@ msgid "Use YouTube website urls with external player"
 msgstr "외부 플레이어로 유튜브 웹사이트 URL 사용"
 
 msgctxt "#30805"
-msgid "Use adaptive streaming formats with external player"
-msgstr "외부 플레이어로 적응형 스트리밍 형식 사용"
+msgid "Use MPEG-DASH with external player"
+msgstr ""
 
 msgctxt "#30806"
 msgid "Jump to page..."
@@ -1582,6 +1582,22 @@ msgstr "처음부터 재생"
 msgctxt "#30820"
 msgid "Podcast"
 msgstr "팟캐스트"
+
+#~ msgctxt "#30585"
+#~ msgid "Filtered channel list (comma delimited)"
+#~ msgstr "필터된 채널목록 (쉼표로 나눔)"
+
+#~ msgctxt "#30729"
+#~ msgid ""
+#~ msgstr "원격 친화적 검색"
+
+#~ msgctxt "#30736"
+#~ msgid "Shorts (1 minute or less)"
+#~ msgstr "Shorts (1분 이내)"
+
+#~ msgctxt "#30805"
+#~ msgid "Use adaptive streaming formats with external player"
+#~ msgstr "외부 플레이어로 적응형 스트리밍 형식 사용"
 
 #~ msgctxt "#30515"
 #~ msgid "Auto-Remove from 'Watch Later'"
