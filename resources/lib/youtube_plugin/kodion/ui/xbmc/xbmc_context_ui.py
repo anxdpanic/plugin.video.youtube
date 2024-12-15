@@ -10,8 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from .xbmc_progress_dialog import XbmcProgressDialog
-from ..abstract_context_ui import AbstractContextUI
+from ..abstract_context_ui import AbstractContextUI, AbstractProgressDialog
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, REFRESH_CONTAINER
 from ...utils import to_unicode
@@ -25,6 +24,7 @@ class XbmcContextUI(AbstractContextUI):
     def create_progress_dialog(self,
                                heading,
                                message='',
+                               total=None,
                                background=False,
                                message_template=None,
                                template_params=None):
@@ -32,8 +32,16 @@ class XbmcContextUI(AbstractContextUI):
             message_template = ('{wait} {{_current}}/{{_total}}'.format(
                 wait=(message or self._context.localize('please_wait'))
             ))
-        return XbmcProgressDialog(
-            heading, message, background, message_template, template_params
+
+        return AbstractProgressDialog(
+            dialog=(xbmcgui.DialogProgressBG
+                    if background else
+                    xbmcgui.DialogProgress),
+            heading=heading,
+            message=message,
+            total=int(total) if total is not None else 0,
+            message_template=message_template,
+            template_params=template_params,
         )
 
     def on_keyboard_input(self, title, default='', hidden=False):
