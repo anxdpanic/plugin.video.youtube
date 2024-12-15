@@ -318,6 +318,11 @@ class XbmcPlugin(AbstractPlugin):
             action = uri
             result = True
 
+        elif uri.startswith('PlayMedia('):
+            context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+            action = uri
+            result = True
+
         elif context.is_plugin_path(uri, PATHS.PLAY):
             context.log_debug('Redirecting for playback: |{0}|'.format(uri))
             uri = urlsplit(uri)
@@ -332,7 +337,7 @@ class XbmcPlugin(AbstractPlugin):
         elif uri.startswith('RunPlugin('):
             context.log_debug('Running plugin: |{0}|'.format(uri))
             action = uri
-            result = False
+            result = True
 
         elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
