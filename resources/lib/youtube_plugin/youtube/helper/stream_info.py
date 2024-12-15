@@ -1931,6 +1931,7 @@ class StreamInfo(YouTubeRequestClient):
             'id': '',
             'language_code': None,
             'role_order': self.LANG_ROLE_ORDER[0],
+            'fallback': True,
         }
         for stream in stream_data:
             mime_type = stream.get('mimeType')
@@ -2014,16 +2015,20 @@ class StreamInfo(YouTubeRequestClient):
 
                     role_order = self.LANG_ROLE_ORDER.get(role_type, -6)
                     is_preferred = role_order > preferred_audio['role_order']
-                    preferred_id = preferred_audio['id']
-                    if self._language_base:
-                        lang_match = language_code == self._language_base
+                    language_fallback = preferred_audio['fallback']
+                    if (self._language_base
+                            and language_code == self._language_base):
+                        lang_match = language_fallback or is_preferred
+                        language_fallback = False
                     else:
-                        lang_match = True
-                    if lang_match and (not preferred_id or is_preferred):
+                        lang_match = language_fallback and is_preferred
+                        language_fallback = True
+                    if lang_match:
                         preferred_audio = {
                             'id': ''.join(('_', language_code, '.', role_str)),
                             'language_code': language_code,
                             'role_order': role_order,
+                            'fallback': language_fallback,
                         }
 
                     mime_group = ''.join((
@@ -2343,7 +2348,10 @@ class StreamInfo(YouTubeRequestClient):
             if role == 'main':
                 if not default:
                     role = 'alternate'
-                original = True
+                if media_type == 'audio':
+                    original = stream['role'] == 'main'
+                else:
+                    original = True
             elif role == 'description':
                 impaired = True
 
