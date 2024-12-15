@@ -348,9 +348,9 @@ class Provider(AbstractProvider):
                                         context=context,
                                         skip_title=skip_title)
         if items:
-            return items if listing else items[0]
+            return (items if listing else items[0]), None
 
-        return False
+        return False, None
 
     @AbstractProvider.register_path(
         r'^(?:/channel/(?P<channel_id>[^/]+))?'
