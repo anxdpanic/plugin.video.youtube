@@ -907,3 +907,8 @@ class XbmcContext(AbstractContext):
             self.log_error('Wakeup |{0}| timed out in {1}ms'
                            .format(target, timeout))
         return False
+
+    def is_plugin_folder(self, folder_name=None):
+        if folder_name is None:
+            folder_name = xbmc.getInfoLabel('Container.FolderName')
+        return folder_name == self._plugin_name

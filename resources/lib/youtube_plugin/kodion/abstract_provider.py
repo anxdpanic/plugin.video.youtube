@@ -402,17 +402,17 @@ class AbstractProvider(object):
             query = None
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
+            old_path = context.get_infolabel('Container.FolderPath')
             if (not params.get('refresh')
-                    and context.is_plugin_path(
-                        context.get_infolabel('Container.FolderPath'),
-                        ((PATHS.SEARCH, 'query',),
-                         (PATHS.SEARCH, 'input',)),
-                    )):
-                data_cache = context.get_data_cache()
-                cached = data_cache.get_item('search_query', data_cache.ONE_DAY)
-                if cached:
-                    query = to_unicode(cached)
-            else:
+                    and context.is_plugin_folder()
+                    and context.is_plugin_path(old_path)):
+                old_path, old_params = context.parse_uri(old_path)
+                if old_path.startswith(PATHS.SEARCH):
+                    query = old_params.get('q', False)
+
+            if query:
+                query = to_unicode(query)
+            elif query is None:
                 result, input_query = ui.on_keyboard_input(
                     localize('search.title')
                 )
@@ -425,9 +425,7 @@ class AbstractProvider(object):
             context.set_path(PATHS.SEARCH, 'query')
             result, options = provider.on_search_run(context, query=query)
             if not options:
-                options = {
-                    provider.RESULT_CACHE_TO_DISC: command != 'input_prompt',
-                }
+                options = {provider.RESULT_CACHE_TO_DISC: False}
             return result, options
 
         context.set_content(CONTENT.LIST_CONTENT,

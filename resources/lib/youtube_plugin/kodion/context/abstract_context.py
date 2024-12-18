@@ -518,3 +518,7 @@ class AbstractContext(Logger):
 
     def wakeup(self, target, timeout=None):
         raise NotImplementedError()
+
+    @staticmethod
+    def is_plugin_folder(folder_name=None):
+        raise NotImplementedError()
