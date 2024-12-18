@@ -155,30 +155,34 @@ class XbmcContextUI(AbstractContextUI):
     def refresh_container(self):
         self._context.send_notification(REFRESH_CONTAINER)
 
-    @staticmethod
-    def set_property(property_id, value='true'):
-        property_id = '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).setProperty(property_id, value)
+    def set_property(self, property_id, value='true'):
+        self._context.log_debug('Set property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
+        _property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
-    @staticmethod
-    def get_property(property_id):
-        property_id = '-'.join((ADDON_ID, property_id))
-        return xbmcgui.Window(10000).getProperty(property_id)
+    def get_property(self, property_id):
+        _property_id = '-'.join((ADDON_ID, property_id))
+        value = xbmcgui.Window(10000).getProperty(_property_id)
+        self._context.log_debug('Get property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
+        return value
 
-    @staticmethod
-    def pop_property(property_id):
-        property_id = '-'.join((ADDON_ID, property_id))
+    def pop_property(self, property_id):
+        _property_id = '-'.join((ADDON_ID, property_id))
         window = xbmcgui.Window(10000)
-        value = window.getProperty(property_id)
+        value = window.getProperty(_property_id)
         if value:
-            window.clearProperty(property_id)
+            window.clearProperty(_property_id)
+        self._context.log_debug('Pop property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
         return value
 
-    @staticmethod
-    def clear_property(property_id):
-        property_id = '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).clearProperty(property_id)
+    def clear_property(self, property_id):
+        self._context.log_debug('Clear property |{id}|'.format(id=property_id))
+        _property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
     @staticmethod
