@@ -202,7 +202,7 @@ class XbmcPlugin(AbstractPlugin):
                 result = [
                     CommandItem(
                         name=context.localize('page.back'),
-                        command='Action(ParentDir)',
+                        command='Action(Back)',
                         context=context,
                         image='DefaultFolderBack.png',
                         plot=context.localize('page.empty'),
@@ -257,14 +257,23 @@ class XbmcPlugin(AbstractPlugin):
                 ui.clear_property(CONTENT_TYPE)
 
                 if not options or options.get(provider.RESULT_FALLBACK, True):
-                    _, _post_run_action = self.uri_action(
-                        context,
-                        context.get_parent_uri(params={
-                            'window_fallback': True,
-                            'window_replace': True,
-                            'window_return': False,
-                        }),
-                    )
+                    if (context.is_plugin_folder()
+                            and context.is_plugin_path(
+                                context.get_infolabel('Container.FolderPath')
+                            )):
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            context.get_parent_uri(params={
+                                'window_fallback': True,
+                                'window_replace': True,
+                                'window_return': False,
+                            }),
+                        )
+                    else:
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            'command://Action(Back)',
+                        )
                     if post_run_action and _post_run_action:
                         post_run_action = (post_run_action, _post_run_action)
                     else:
