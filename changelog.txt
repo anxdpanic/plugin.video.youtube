@@ -1,3 +1,35 @@
+## v7.2.0+beta.2
+### Fixed
+- Fix audio langauge fallback selection #989 #1036
+  - Also correctly distinguish between original vs default audio streams
+  - Respect Kodi Prefer default audio streams setting
+    - Applies to both default audio and original audio
+- Fix search context menu items for Next Page and New Search items
+- Fix lock acquire/release logic in My Subscriptions #1032
+- Avoid potential player request loop
+- Revert using configured language settings for player requests
+- Fix missing message argument for InvalidGrant #1038
+- Fix incorrectly trying to refresh access tokens when no refresh tokens exist #1038
+- Fix issues with handling duplicated and unavailable items in lists
+- Fix issues with processing channel handles
+
+### Changed
+- Further improvements to fallback window handling to minimise crashes and loss of window history
+  - Enable intercepting and redirecting PlayMedia calls
+  - Improve handling of search keyboard input when navigating through window history
+    - Also allow bookmarks/favourites to be created for Quick Search
+    - Remove need to store search query in data cache
+    - Improve handling of searching for YouTube urls
+- Store modified date from player requests as publishedAt for local history #991
+- Update player request client details
+- Reorganise video item context menu
+
+### New
+- Allow channels and playlists to be played from Info dialog
+- Add IPv6 support for http server #1039
+- Show total number of uploads, shorts and live videos in channel playlists
+- Add support for more channel url formats
+
 ## v7.2.0+beta.1
 ### Fixed
 - Fix processing of "q" and "channelId" search query params
