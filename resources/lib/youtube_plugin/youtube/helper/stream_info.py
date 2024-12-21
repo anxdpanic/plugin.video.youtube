@@ -1493,7 +1493,7 @@ class StreamInfo(YouTubeRequestClient):
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
 
-            restart = False
+            restart = None
             while 1:
                 for client_name in clients:
                     _client = self.build_client(client_name, client_data)
@@ -1559,7 +1559,10 @@ class StreamInfo(YouTubeRequestClient):
                         )
                         compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
-                            if has_access_token:
+                            if client_data.get('_auth_required'):
+                                restart = False
+                                abort = True
+                            elif restart is None and has_access_token:
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
