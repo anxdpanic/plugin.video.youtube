@@ -1852,11 +1852,10 @@ class YouTube(LoginClient):
                 elif kwargs:
                     _kwargs = kwargs.pop()
                 elif input_wait:
-                    input_wait.acquire(True)
-                    input_wait.release()
-                    if kwargs:
-                        continue
-                    break
+                    with input_wait:
+                        if kwargs:
+                            continue
+                        break
                 else:
                     complete = True
                     break
@@ -1964,15 +1963,18 @@ class YouTube(LoginClient):
                 completed.append(pool_id)
                 continue
 
-            if payload['kwargs']:
-                input_wait = payload['input_wait']
-                if input_wait and input_wait.locked():
-                    input_wait.release()
-            else:
-                input_wait_for = payload['input_wait_for']
-                if not input_wait_for or input_wait_for not in payloads:
-                    completed.append(pool_id)
-                continue
+            input_wait = payload['input_wait']
+            if input_wait:
+                if payload['kwargs']:
+                    if input_wait.locked():
+                        input_wait.release()
+                else:
+                    input_wait_for = payload['input_wait_for']
+                    if input_wait_for in payloads:
+                        input_wait.acquire(False)
+                    else:
+                        completed.append(pool_id)
+                    continue
 
             available = max_threads - counts['all']
             limit = payload['limit']
