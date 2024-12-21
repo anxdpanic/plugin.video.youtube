@@ -27,6 +27,7 @@ class NextPageItem(DirectoryItem):
                     and not path.startswith(('/channel',
                                              PATHS.RECOMMENDATIONS,
                                              PATHS.RELATED_VIDEOS)))
+        can_search = not path.startswith(PATHS.SEARCH)
         if 'page_token' not in params and can_jump:
             params['page_token'] = self.create_page_token(page, items_per_page)
 
@@ -45,7 +46,7 @@ class NextPageItem(DirectoryItem):
             menu_items.refresh(context),
             menu_items.goto_page(context, params) if can_jump else None,
             menu_items.goto_home(context),
-            menu_items.goto_quick_search(context),
+            menu_items.goto_quick_search(context) if can_search else None,
         ]
         self.add_context_menu(context_menu)
 
