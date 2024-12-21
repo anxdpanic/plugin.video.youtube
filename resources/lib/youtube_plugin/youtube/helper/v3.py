@@ -269,7 +269,7 @@ def _process_list_response(provider,
                 snippet = snippet['topLevelComment']['snippet']
                 if reply_count:
                     item_uri = context.create_uri(
-                        ('special', 'child_comments'),
+                        PATHS.VIDEO_COMMENTS_THREAD,
                         {'parent_id': item_id}
                     )
                 else:

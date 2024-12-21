@@ -12,6 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import menu_items
 from .directory_item import DirectoryItem
+from ..constants import PATHS
 
 
 class NextPageItem(DirectoryItem):
@@ -24,8 +25,8 @@ class NextPageItem(DirectoryItem):
         items_per_page = params.get('items_per_page', 50)
         can_jump = ('next_page_token' not in params
                     and not path.startswith(('/channel',
-                                             '/special/recommendations',
-                                             '/special/related_videos')))
+                                             PATHS.RECOMMENDATIONS,
+                                             PATHS.RELATED_VIDEOS)))
         if 'page_token' not in params and can_jump:
             params['page_token'] = self.create_page_token(page, items_per_page)
 

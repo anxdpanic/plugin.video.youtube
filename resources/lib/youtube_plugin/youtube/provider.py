@@ -782,7 +782,7 @@ class Provider(AbstractProvider):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
                 create_uri(
-                    ('special', 'completed_live'),
+                    PATHS.LIVE_VIDEOS_COMPLETED,
                     params={'location': True},
                 ),
                 image='{media}/live.png',
@@ -794,7 +794,7 @@ class Provider(AbstractProvider):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
                 create_uri(
-                    ('special', 'upcoming_live'),
+                    PATHS.LIVE_VIDEOS_UPCOMING,
                     params={'location': True},
                 ),
                 image='{media}/live.png',
@@ -805,7 +805,7 @@ class Provider(AbstractProvider):
         live_events_item = DirectoryItem(
             localize('live'),
             create_uri(
-                ('special', 'live'),
+                PATHS.LIVE_VIDEOS,
                 params={'location': True},
             ),
             image='{media}/live.png',
@@ -1334,7 +1334,7 @@ class Provider(AbstractProvider):
             item_label = localize('my_subscriptions')
             my_subscriptions_item = DirectoryItem(
                 bold(item_label),
-                create_uri(('special', 'my_subscriptions')),
+                create_uri(PATHS.MY_SUBSCRIPTIONS),
                 image='{media}/new_uploads.png',
                 category_label=item_label,
             )
@@ -1344,7 +1344,7 @@ class Provider(AbstractProvider):
             # my subscriptions filtered
             my_subscriptions_filtered_item = DirectoryItem(
                 localize('my_subscriptions.filtered'),
-                create_uri(('special', 'my_subscriptions_filtered')),
+                create_uri(PATHS.MY_SUBSCRIPTIONS_FILTERED),
                 image='{media}/new_uploads.png',
             )
             result.append(my_subscriptions_filtered_item)
@@ -1358,7 +1358,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool('youtube.folder.recommendations.show', True):
             recommendations_item = DirectoryItem(
                 localize('recommendations'),
-                create_uri(('special', 'recommendations')),
+                create_uri(PATHS.RECOMMENDATIONS),
                 image='{media}/home.png',
             )
             result.append(recommendations_item)
@@ -1368,7 +1368,7 @@ class Provider(AbstractProvider):
             if history_id or local_history:
                 related_item = DirectoryItem(
                     localize('related_videos'),
-                    create_uri(('special', 'related_videos')),
+                    create_uri(PATHS.RELATED_VIDEOS),
                     image='{media}/related_videos.png',
                 )
                 result.append(related_item)
@@ -1377,7 +1377,7 @@ class Provider(AbstractProvider):
         if settings_bool('youtube.folder.popular_right_now.show', True):
             trending_item = DirectoryItem(
                 localize('trending'),
-                create_uri(('special', 'popular_right_now')),
+                create_uri(PATHS.TRENDING),
                 image='{media}/trending.png',
             )
             result.append(trending_item)
@@ -1496,7 +1496,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool('youtube.folder.disliked_videos.show', True):
             disliked_videos_item = DirectoryItem(
                 localize('video.disliked'),
-                create_uri(('special', 'disliked_videos')),
+                create_uri(PATHS.DISLIKED_VIDEOS),
                 image='{media}/dislikes.png',
             )
             result.append(disliked_videos_item)
@@ -1612,7 +1612,7 @@ class Provider(AbstractProvider):
         if settings_bool('youtube.folder.completed.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.completed'),
-                create_uri(('special', 'completed_live')),
+                create_uri(PATHS.LIVE_VIDEOS_COMPLETED),
                 image='{media}/live.png',
             )
             result.append(live_events_item)
@@ -1621,7 +1621,7 @@ class Provider(AbstractProvider):
         if settings_bool('youtube.folder.upcoming.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live.upcoming'),
-                create_uri(('special', 'upcoming_live')),
+                create_uri(PATHS.LIVE_VIDEOS_UPCOMING),
                 image='{media}/live.png',
             )
             result.append(live_events_item)
@@ -1630,7 +1630,7 @@ class Provider(AbstractProvider):
         if settings_bool('youtube.folder.live.show', True):
             live_events_item = DirectoryItem(
                 localize('live'),
-                create_uri(('special', 'live')),
+                create_uri(PATHS.LIVE_VIDEOS),
                 image='{media}/live.png',
             )
             result.append(live_events_item)
