@@ -37,6 +37,7 @@ from ...kodion.compatibility import (
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
 from ...kodion.utils import make_dirs, redact_ip
+from ...kodion.utils.datetime_parser import fromtimestamp
 
 
 class StreamInfo(YouTubeRequestClient):
@@ -774,6 +775,7 @@ class StreamInfo(YouTubeRequestClient):
                  use_mpd=True,
                  **kwargs):
         self.video_id = None
+        self.yt_item = None
         self._context = context
 
         self._access_token = access_token
@@ -1372,6 +1374,15 @@ class StreamInfo(YouTubeRequestClient):
                     server.replace(primary, secondary),
                 ))
 
+        if 'lmt' in params:
+            snippet = (self.yt_item or {}).get('snippet')
+            if snippet and 'publishedAt' not in snippet:
+                try:
+                    modified = fromtimestamp(int(params['lmt'][0]) // 1000000)
+                except (OSError, OverflowError, ValueError):
+                    modified = None
+                snippet['publishedAt'] = modified
+
         if new_params:
             params.update(new_params)
             query_str = urlencode(params, doseq=True)
@@ -1643,7 +1654,7 @@ class StreamInfo(YouTubeRequestClient):
             del headers['Authorization']
 
         video_details = result.get('videoDetails', {})
-        yt_item = {
+        self.yt_item = {
             'id': video_id,
             'snippet': {
                 'title': video_details.get('title'),
@@ -1898,7 +1909,7 @@ class StreamInfo(YouTubeRequestClient):
         if not stream_list:
             raise YouTubeException('No streams found')
 
-        return stream_list.values(), yt_item
+        return stream_list.values(), self.yt_item
 
     def _process_stream_data(self,
                              stream_data,
