@@ -1338,11 +1338,11 @@ class StreamInfo(YouTubeRequestClient):
             return url, None
 
         parts = urlsplit(url)
-        query = parse_qs(parts.query)
-        new_query = {}
-        update_url = {}
+        params = parse_qs(parts.query)
+        new_params = {}
+        update_url = None
 
-        if self._calculate_n and 'n' in query:
+        if self._calculate_n and 'n' in params:
             if self._player_js is None:
                 self._player_js = self._get_player_js()
             if self._calculate_n is True:
@@ -1350,46 +1350,40 @@ class StreamInfo(YouTubeRequestClient):
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
-            new_n = self._calculate_n.calculate_n(query['n'])
+            new_n = self._calculate_n.calculate_n(params['n'])
             if new_n:
-                new_query['n'] = new_n
-                new_query['ratebypass'] = 'yes'
+                new_params['n'] = new_n
+                new_params['ratebypass'] = 'yes'
             else:
                 self._context.log_error('nsig handling failed')
                 self._calculate_n = False
 
-        if 'range' not in query:
-            content_length = query.get('clen', [''])[0]
-            new_query['range'] = '0-{0}'.format(content_length)
+        if 'range' not in params:
+            content_length = params.get('clen', [''])[0]
+            new_params['range'] = '0-{0}'.format(content_length)
 
-        if 'mn' in query and 'fvip' in query:
-            fvip = query['fvip'][0]
-            primary, _, secondary = query['mn'][0].partition(',')
+        if 'mn' in params and 'fvip' in params:
+            fvip = params['fvip'][0]
+            primary, _, secondary = params['mn'][0].partition(',')
             prefix, separator, server = parts.netloc.partition('---')
             if primary and secondary:
-                update_url = {
-                    'netloc': separator.join((
-                        digits_re.sub(fvip, prefix),
-                        server.replace(primary, secondary),
-                    )),
-                }
+                update_url = separator.join((
+                    digits_re.sub(fvip, prefix),
+                    server.replace(primary, secondary),
+                ))
 
-        if new_query:
-            query.update(new_query)
-            query = urlencode(query, doseq=True)
+        if new_params:
+            params.update(new_params)
+            query_str = urlencode(params, doseq=True)
         elif update_url:
-            query = parts.query
+            query_str = parts.query
         else:
             return url, None
 
-        if update_url:
-            return (
-                parts._replace(query=query).geturl(),
-                parts._replace(query=query, **update_url).geturl(),
-            )
+        parts._replace(query=query_str)
         return (
-            parts._replace(query=query).geturl(),
-            None,
+            parts.geturl(),
+            parts._replace(netloc=update_url).geturl() if update_url else None,
         )
 
     def _get_error_details(self, playability_status, details=None):
