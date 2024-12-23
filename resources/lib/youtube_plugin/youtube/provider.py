@@ -370,6 +370,10 @@ class Provider(AbstractProvider):
         * CHANNEL_ID: ['mine'|YouTube Channel ID]
         * PLAYLIST_ID: YouTube Playlist ID
         """
+        context.parse_params({
+            'playlist_id': re_match.group('playlist_id'),
+        })
+
         context.set_content(CONTENT.VIDEO_CONTENT)
         resource_manager = provider.get_resource_manager(context)
 
@@ -610,12 +614,6 @@ class Provider(AbstractProvider):
         if command == 'channel' and not identifier:
             return False
 
-        context.set_content(CONTENT.VIDEO_CONTENT)
-
-        resource_manager = provider.get_resource_manager(context)
-
-        result = []
-
         """
         This is a helper routine that will retrieve the correct channel ID if we
         only have the handle or username of a channel.
@@ -653,6 +651,14 @@ class Provider(AbstractProvider):
 
         if not channel_id:
             return False
+
+        context.parse_params({
+            'channel_id': channel_id,
+        })
+
+        context.set_content(CONTENT.VIDEO_CONTENT)
+        resource_manager = provider.get_resource_manager(context)
+        result = []
 
         channel_info = resource_manager.get_channel_info(
             (channel_id,),
@@ -748,6 +754,10 @@ class Provider(AbstractProvider):
                                            page_token=page_token)
             if not json_data:
                 return result
+
+            context.parse_params({
+                'playlist_id': uploads,
+            })
 
             result.extend(v3.response_to_items(
                 provider, context, json_data,

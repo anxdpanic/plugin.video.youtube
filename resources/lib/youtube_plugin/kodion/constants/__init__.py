@@ -72,6 +72,7 @@ WAKEUP = 'wakeup'
 
 # Play options
 PLAY_FORCE_AUDIO = 'audio_only'
+PLAY_FORCED = 'play_forced'
 PLAY_PROMPT_QUALITY = 'ask_for_quality'
 PLAY_PROMPT_SUBTITLES = 'prompt_for_subtitles'
 PLAY_STRM = 'strm'
@@ -132,6 +133,7 @@ __all__ = (
 
     # Play options
     'PLAY_FORCE_AUDIO',
+    'PLAY_FORCED',
     'PLAY_PROMPT_QUALITY',
     'PLAY_PROMPT_SUBTITLES',
     'PLAY_STRM',

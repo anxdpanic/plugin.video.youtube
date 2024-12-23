@@ -21,6 +21,7 @@ from ...constants import (
     CONTAINER_POSITION,
     CONTENT_TYPE,
     PATHS,
+    PLAY_FORCED,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -281,6 +282,10 @@ class XbmcPlugin(AbstractPlugin):
 
             cache_to_disc = False
             update_listing = True
+
+        if ui.pop_property(PLAY_FORCED):
+            context.set_path(PATHS.PLAY)
+            return self.run(provider, context, focused=focused)
 
         xbmcplugin.endOfDirectory(
             handle,
