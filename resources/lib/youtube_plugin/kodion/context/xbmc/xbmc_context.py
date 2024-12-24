@@ -36,6 +36,7 @@ from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
+    get_kodi_setting_bool,
     get_kodi_setting_value,
     jsonrpc,
     loose_version,
@@ -253,13 +254,15 @@ class XbmcContext(AbstractContext):
         'stats.subscriberCount': 30739,
         'stats.videoCount': 3,
         'stats.viewCount': 30767,
-        'stream.alternate': 30747,
+        'stream.alt': 30747,
         'stream.automatic': 36588,
         'stream.descriptive': 30746,
-        'stream.dubbed': 30745,
+        'stream.dub': 30745,
+        'stream.dub.auto': 30745,
         'stream.multi_audio': 30763,
         'stream.multi_language': 30762,
         'stream.original': 30744,
+        'stream.secondary': 30747,
         'subscribe': 30506,
         'subscribe_to': 30517,
         'subscribed.to.channel': 30719,
@@ -487,7 +490,7 @@ class XbmcContext(AbstractContext):
             language = language.replace('resource.language.', '').split('_')[0]
         elif language not in self._KODI_UI_PLAYER_LANGUAGE_OPTIONS:
             language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
-        return language
+        return language, get_kodi_setting_bool('videoplayer.preferdefaultflag')
 
     def get_subtitle_language(self):
         language = get_kodi_setting_value('locale.subtitlelanguage')
