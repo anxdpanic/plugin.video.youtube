@@ -208,8 +208,6 @@ class YouTube(LoginClient):
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
             use_mpd=use_mpd,
-            language=self._language,
-            region=self._region,
         ).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
