@@ -1505,6 +1505,10 @@ class StreamInfo(YouTubeRequestClient):
                 for client_name in clients:
                     _client = self.build_client(client_name, client_data)
                     if not _client:
+                        _result = None
+                        _playability = None
+                        _status = None
+                        _reason = None
                         continue
 
                     _result = self.request(
