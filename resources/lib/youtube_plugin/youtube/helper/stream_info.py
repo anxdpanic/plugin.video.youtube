@@ -805,6 +805,7 @@ class StreamInfo(YouTubeRequestClient):
             # Access "premium" streams, HLS and DASH
             # Limited video stream availability
             'default': (
+                'ios_youtube_tv',
                 'ios',
             ),
             # Will play most videos with subtitles at full resolution with HDR
@@ -812,6 +813,7 @@ class StreamInfo(YouTubeRequestClient):
             # Limited audio stream availability with some clients
             'mpd': (
                 'android_vr',
+                'android_youtube_tv',
             ),
             # Progressive streams
             # Limited video and audio stream availability
