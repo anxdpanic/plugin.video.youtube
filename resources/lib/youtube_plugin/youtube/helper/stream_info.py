@@ -1823,7 +1823,7 @@ class StreamInfo(YouTubeRequestClient):
                     error_hook_kwargs={
                         'video_id': video_id,
                         'client': client_name,
-                        'auth': _client.get('_has_auth', False),
+                        'auth': caption_client.get('_has_auth', False),
                     },
                     **caption_client
                 )
