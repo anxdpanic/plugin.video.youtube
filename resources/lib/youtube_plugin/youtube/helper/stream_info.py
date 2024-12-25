@@ -787,8 +787,7 @@ class StreamInfo(YouTubeRequestClient):
 
         audio_language, prefer_default = context.get_player_language()
         if audio_language == 'mediadefault':
-            prefer_default = True
-            self._language_base = kwargs.get('language', 'en_US')[0:2]
+            self._language_base = context.get_settings().get_language()[0:2]
         elif audio_language == 'original':
             self._language_base = ''
         else:
