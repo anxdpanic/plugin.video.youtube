@@ -128,7 +128,7 @@ class YouTube(LoginClient):
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': None,
+                'Authorization': 'Bearer {{0}}',
                 'DNT': '1',
                 'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
                                ' AppleWebKit/537.36 (KHTML, like Gecko)'

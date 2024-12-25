@@ -294,7 +294,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': None,
+                'Authorization': 'Bearer {{0}}',
             },
             'params': {
                 'key': ValueError,
@@ -417,7 +417,8 @@ class YouTubeRequestClient(BaseRequestsClass):
                 headers = client['headers']
                 if 'Authorization' in headers:
                     headers = headers.copy()
-                    headers['Authorization'] = 'Bearer {0}'.format(auth_token)
+                    auth_header = headers.get('Authorization') or 'Bearer {0}'
+                    headers['Authorization'] = auth_header.format(auth_token)
                     client['headers'] = headers
                     has_auth = True
 
