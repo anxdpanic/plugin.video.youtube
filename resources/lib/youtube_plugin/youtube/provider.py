@@ -75,7 +75,7 @@ class Provider(AbstractProvider):
             yt_play.process,
         )
 
-        self.register_path(
+        self.on_specials_x = self.register_path(
             '^/special/(?P<category>[^/]+)/?$',
             yt_specials.process,
         )
@@ -874,6 +874,8 @@ class Provider(AbstractProvider):
         return None
 
     def on_search_run(self, context, query):
+        context.set_param('q', query)
+
         # Search by url to access unlisted videos
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
@@ -885,7 +887,6 @@ class Provider(AbstractProvider):
             return result, None
         result = []
 
-        context.set_param('q', query)
         context.set_param('category_label', query)
 
         params = context.get_params()

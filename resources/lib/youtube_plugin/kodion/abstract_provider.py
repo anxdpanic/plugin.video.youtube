@@ -85,7 +85,7 @@ class AbstractProvider(object):
         self.register_path(r''.join((
             '^',
             '(', PATHS.SEARCH, '|', PATHS.EXTERNAL_SEARCH, ')',
-            '/(?P<command>input|input_prompt|query|list|remove|clear|rename)?/?$'
+            '/(?P<command>input|input_prompt|query|list|links|remove|clear|rename)?/?$'
         )), self.on_search)
 
         self.register_path(r''.join((
@@ -399,6 +399,13 @@ class AbstractProvider(object):
             )
             return True, None
 
+        if command == 'links':
+            return provider.on_specials_x(
+                provider,
+                context,
+                category='description_links',
+            )
+
         if command.startswith('input'):
             query = None
             query_path = (PATHS.SEARCH, 'query')
@@ -427,14 +434,15 @@ class AbstractProvider(object):
                 if result:
                     query = input_query
 
-            if not query:
-                return False, None
-
-            context.set_path(query_path, parts=parts, force=True)
-            result, options = provider.on_search_run(context, query=query)
-            if not options:
-                options = {provider.RESULT_CACHE_TO_DISC: False}
-            return result, options
+            if query:
+                context.set_path(query_path, parts=parts, force=True)
+                result, options = provider.on_search_run(context, query=query)
+                if not options:
+                    options = {provider.RESULT_CACHE_TO_DISC: False}
+                return result, options
+            else:
+                command = 'list'
+                context.set_path(PATHS.SEARCH, command)
 
         context.set_content(CONTENT.LIST_CONTENT,
                             category_label=localize('search'))

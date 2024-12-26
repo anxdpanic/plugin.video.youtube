@@ -152,6 +152,7 @@ class UrlToItemConverter(object):
 
     def get_items(self, provider, context, skip_title=False):
         result = []
+        query = context.get_param('q')
 
         if self._channel_ids:
             # remove duplicates
@@ -161,7 +162,13 @@ class UrlToItemConverter(object):
             channels_item = DirectoryItem(
                 context.get_ui().bold(item_label),
                 context.create_uri(
-                    ('special', 'description_links',),
+                    (PATHS.SEARCH, 'links',),
+                    {
+                        'channel_ids': ','.join(self._channel_ids),
+                        'q': query,
+                    },
+                ) if query else context.create_uri(
+                    (PATHS.DESCRIPTION_LINKS,),
                     {
                         'channel_ids': ','.join(self._channel_ids),
                     },
@@ -191,7 +198,13 @@ class UrlToItemConverter(object):
                 playlists_item = DirectoryItem(
                     context.get_ui().bold(item_label),
                     context.create_uri(
-                        ('special', 'description_links',),
+                        (PATHS.SEARCH, 'links',),
+                        {
+                            'playlist_ids': ','.join(self._playlist_ids),
+                            'q': query,
+                        },
+                    ) if query else context.create_uri(
+                        (PATHS.DESCRIPTION_LINKS,),
                         {
                             'playlist_ids': ','.join(self._playlist_ids),
                         },
