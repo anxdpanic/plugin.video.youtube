@@ -250,11 +250,8 @@ class Provider(AbstractProvider):
                          configs=configs)
 
         with client:
-            if not refresh_tokens:
-                self._client = client
-
             # create new access tokens
-            elif num_access_tokens != num_refresh_tokens:
+            if num_refresh_tokens and num_access_tokens != num_refresh_tokens:
                 access_tokens = [None, None]
                 token_expiry = 0
                 try:
