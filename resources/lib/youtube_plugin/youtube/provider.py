@@ -280,7 +280,7 @@ class Provider(AbstractProvider):
                             expiry=token_expiry,
                         )
                     else:
-                        raise InvalidGrant
+                        raise InvalidGrant('Failed to refresh access token(s)')
 
                 except (InvalidGrant, LoginException) as exc:
                     self.handle_exception(context, exc)
