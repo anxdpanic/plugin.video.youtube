@@ -174,16 +174,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             try:
                 file = path['params'].get('file')
                 if file:
-                    filepath = os.path.join(self.BASE_PATH, file)
+                    file_path = os.path.join(self.BASE_PATH, file)
                 else:
-                    filepath = None
+                    file_path = None
                     raise IOError
 
-                with open(filepath, 'rb') as f:
+                with open(file_path, 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/dash+xml')
                     self.send_header('Content-Length',
-                                     str(os.path.getsize(filepath)))
+                                     str(os.path.getsize(file_path)))
                     self.end_headers()
 
                     file_chunk = True
@@ -192,8 +192,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         if file_chunk:
                             self.wfile.write(file_chunk)
             except IOError:
-                response = ('File Not Found: |{path}| -> |{filepath}|'
-                            .format(path=path['log_path'], filepath=filepath))
+                response = ('File Not Found: |{path}| -> |{file_path}|'
+                            .format(path=path['log_path'], file_path=file_path))
                 self.send_error(404, response)
 
         elif api_config_enabled and path['path'] == PATHS.API:

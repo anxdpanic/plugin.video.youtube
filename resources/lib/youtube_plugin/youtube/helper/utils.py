@@ -29,8 +29,8 @@ from re import (
 
 from ...kodion.compatibility import string_type, unquote, urlsplit
 from ...kodion.constants import CONTENT, PATHS
-from ...kodion.logger import Logger
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
+from ...kodion.logger import Logger
 from ...kodion.utils import (
     datetime_parser,
     friendly_number,
@@ -1338,7 +1338,7 @@ def filter_parse(item,
                  criteria_re=re_compile(
                      r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
                  ),
-                 op_map = {
+                 op_map={
                      '=': op_eq,
                      '==': op_eq,
                      '>': op_gt,
