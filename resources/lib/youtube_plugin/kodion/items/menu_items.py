@@ -123,6 +123,13 @@ def play_all_from(context, path, order='normal'):
     )
 
 
+def play_video(context):
+    return (
+        context.localize('video.play'),
+        'Action(Play)'
+    )
+
+
 def queue_video(context):
     return (
         context.localize('video.queue'),

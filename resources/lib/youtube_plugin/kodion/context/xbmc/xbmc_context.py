@@ -302,6 +302,7 @@ class XbmcContext(AbstractContext):
         'video.disliked': 30538,
         'video.liked': 30508,
         'video.more': 22082,
+        'video.play': 208,
         'video.play.ask_for_quality': 30730,
         'video.play.audio_only': 30708,
         'video.play.timeshift': 30819,

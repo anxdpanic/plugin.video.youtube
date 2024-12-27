@@ -875,13 +875,6 @@ def update_video_items(provider, context, video_id_dict,
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(media_item)
 
-        context_menu = [
-            # Refresh
-            menu_items.refresh(context),
-            # Queue Video
-            menu_items.queue_video(context) if available else None,
-        ]
-
         """
         Play all videos of the playlist.
 
@@ -895,14 +888,46 @@ def update_video_items(provider, context, video_id_dict,
         else:
             playlist_id = media_item.playlist_id
 
-        if playlist_id:
+        # provide 'remove' in my playlists that have a real playlist_id
+        if (playlist_id
+                and logged_in
+                and playlist_channel_id == 'mine'
+                and playlist_id.strip().lower() not in {'wl', 'hl'}):
+            context_menu = [
+                menu_items.remove_video_from_playlist(
+                    context,
+                    playlist_id=playlist_id,
+                    video_id=media_item.playlist_item_id,
+                    video_name=title,
+                ),
+                menu_items.separator(),
+            ]
+        else:
+            context_menu = []
+
+        if available:
             context_menu.extend((
+                menu_items.play_video(context),
+                menu_items.play_with_subtitles(
+                    context, video_id
+                ) if not subtitles_prompt else None,
+                menu_items.play_audio_only(
+                    context, video_id
+                ) if not audio_only else None,
+                menu_items.play_ask_for_quality(
+                    context, video_id
+                ) if not ask_quality else None,
+                menu_items.play_timeshift(
+                    context, video_id
+                ) if media_item.live else None,
+                # 'play with...' (external player)
+                menu_items.play_with(
+                    context, video_id
+                ) if alternate_player else None,
                 menu_items.play_playlist_from(
                     context, playlist_id, video_id
-                ) if available else None,
-                menu_items.play_playlist(
-                    context, playlist_id
-                ),
+                ) if playlist_id else None,
+                menu_items.queue_video(context),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
@@ -926,21 +951,6 @@ def update_video_items(provider, context, video_id_dict,
             context_menu.append(
                 menu_items.bookmark_add(
                     context, media_item
-                )
-            )
-
-        # provide 'remove' for videos in my playlists
-        # we support all playlist except 'Watch History'
-        if (logged_in
-                and playlist_id
-                and playlist_channel_id == 'mine'
-                and playlist_id.strip().lower() not in {'hl', 'wl'}):
-            context_menu.append(
-                menu_items.remove_video_from_playlist(
-                    context,
-                    playlist_id=playlist_id,
-                    video_id=media_item.playlist_item_id,
-                    video_name=title,
                 )
             )
 
@@ -997,48 +1007,16 @@ def update_video_items(provider, context, video_id_dict,
 
         # more...
         refresh = path.startswith((PATHS.LIKED_VIDEOS, PATHS.DISLIKED_VIDEOS))
-        context_menu.append(
+        context_menu.extend((
+            menu_items.refresh(context),
             menu_items.more_for_video(
                 context,
                 video_id,
                 video_name=title,
                 logged_in=logged_in,
                 refresh=refresh,
-            )
-        )
-
-        if available:
-            # 'play with...' (external player)
-            if alternate_player:
-                context_menu.append(menu_items.play_with(context, video_id))
-
-            if not subtitles_prompt:
-                context_menu.append(
-                    menu_items.play_with_subtitles(
-                        context, video_id
-                    )
-                )
-
-            if not audio_only:
-                context_menu.append(
-                    menu_items.play_audio_only(
-                        context, video_id
-                    )
-                )
-
-            if not ask_quality:
-                context_menu.append(
-                    menu_items.play_ask_for_quality(
-                        context, video_id
-                    )
-                )
-
-            if media_item.live:
-                context_menu.append(
-                    menu_items.play_timeshift(
-                        context, video_id
-                    )
-                )
+            ),
+        ))
 
         if context_menu:
             media_item.add_context_menu(context_menu)
