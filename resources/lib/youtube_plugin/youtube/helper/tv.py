@@ -10,6 +10,8 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from collections import deque
+
 from ..helper import utils
 from ...kodion.constants import PATHS
 from ...kodion.items import DirectoryItem, NextPageItem, VideoItem
@@ -22,17 +24,25 @@ def tv_videos_to_items(provider, context, json_data):
     if context.get_param('incognito'):
         item_params['incognito'] = True
 
+    items = []
     video_id_dict = {}
     channel_items_dict = {}
 
     for item in json_data.get('items', []):
         video_id = item['id']
         item_params['video_id'] = video_id
-        video_id_dict[video_id] = VideoItem(
+        item = VideoItem(
             name=item['title'],
             uri=context.create_uri((PATHS.PLAY,), item_params),
             video_id=video_id,
         )
+        items.append(item)
+        if video_id in video_id_dict:
+            fifo_queue = video_id_dict[video_id]
+        else:
+            fifo_queue = deque()
+            video_id_dict[video_id] = fifo_queue
+        fifo_queue.appendleft(item)
 
     item_filter = context.get_settings().item_filter()
 
@@ -46,9 +56,9 @@ def tv_videos_to_items(provider, context, json_data):
     utils.update_channel_info(provider, context, channel_items_dict)
 
     if item_filter:
-        result = utils.filter_videos(video_id_dict.values(), **item_filter)
+        result = utils.filter_videos(items, **item_filter)
     else:
-        result = list(video_id_dict.values())
+        result = items
 
     # next page
     next_page_token = json_data.get('next_page_token')

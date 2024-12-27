@@ -10,6 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+from collections import deque
 from re import (
     IGNORECASE as re_IGNORECASE,
     compile as re_compile,
@@ -98,7 +99,12 @@ class UrlToItemConverter(object):
                     ),
                     video_id=video_id,
                 )
-                self._video_id_dict[video_id] = item
+                if video_id in self._video_id_dict:
+                    fifo_queue = self._video_id_dict[video_id]
+                else:
+                    fifo_queue = deque()
+                    self._video_id_dict[video_id] = fifo_queue
+                fifo_queue.appendleft(item)
 
         elif 'video_id' in new_params:
             video_id = new_params['video_id']
@@ -108,7 +114,12 @@ class UrlToItemConverter(object):
                 uri=context.create_uri((PATHS.PLAY,), new_params),
                 video_id=video_id,
             )
-            self._video_id_dict[video_id] = item
+            if video_id in self._video_id_dict:
+                fifo_queue = self._video_id_dict[video_id]
+            else:
+                fifo_queue = deque()
+                self._video_id_dict[video_id] = fifo_queue
+            fifo_queue.appendleft(item)
 
         if 'playlist_id' in new_params:
             playlist_id = new_params['playlist_id']
@@ -229,6 +240,12 @@ class UrlToItemConverter(object):
         if self._video_items:
             return self._video_items
 
+        video_items = [
+            video_item
+            for video_items in self._video_id_dict.values()
+            for video_item in video_items
+        ]
+
         channel_items_dict = {}
         utils.update_video_items(
             provider,
@@ -240,7 +257,7 @@ class UrlToItemConverter(object):
 
         self._video_items = [
             video_item
-            for video_item in self._video_id_dict.values()
+            for video_item in video_items
             if skip_title or video_item.get_title()
         ]
         return self._video_items

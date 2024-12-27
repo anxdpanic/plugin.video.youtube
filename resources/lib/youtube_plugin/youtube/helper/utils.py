@@ -611,12 +611,20 @@ def update_video_items(provider, context, video_id_dict,
         in_watched_later_list = False
         playlist_match = __RE_PLAYLIST.match(path)
 
+    media_items = None
+    media_item = None
+
     for video_id, yt_item in data.items():
+        if media_items and media_item:
+            update_duplicate_items(media_item, media_items)
+
         if not yt_item:
             continue
 
-        media_item = video_id_dict.get(video_id)
-        if not media_item:
+        media_items = video_id_dict.get(video_id)
+        if media_items:
+            media_item = media_items.pop()
+        else:
             continue
 
         available = True
@@ -1046,7 +1054,7 @@ def update_play_info(provider,
                      video_stream,
                      yt_item=None):
     update_video_items(
-        provider, context, {video_id: media_item}, yt_items=[yt_item]
+        provider, context, {video_id: [media_item]}, yt_items=[yt_item]
     )
 
     settings = context.get_settings()
