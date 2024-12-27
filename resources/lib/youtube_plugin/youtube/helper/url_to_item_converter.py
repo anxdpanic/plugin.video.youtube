@@ -23,7 +23,7 @@ from ...kodion.utils import duration_to_seconds
 
 
 class UrlToItemConverter(object):
-    RE_PATH_ID = re_compile(r'/[^/]+/(?P<id>[^/?#]+)', re_IGNORECASE)
+    RE_PATH_ID = re_compile(r'/[^/]*?[/@](?P<id>[^/?#]+)', re_IGNORECASE)
     VALID_HOSTNAMES = {
         'youtube.com',
         'www.youtube.com',
@@ -71,7 +71,7 @@ class UrlToItemConverter(object):
         path = parsed_url.path.rstrip('/').lower()
         if path.startswith(('/playlist', '/watch')):
             pass
-        elif path.startswith('/channel/'):
+        elif path.startswith(('/channel/', '/u/', '/user/', '/@')):
             re_match = self.RE_PATH_ID.match(parsed_url.path)
             new_params['channel_id'] = re_match.group('id')
             if ('live' not in new_params
