@@ -50,7 +50,6 @@ def _process_list_response(provider,
     video_id_dict = {}
     channel_id_dict = {}
     playlist_id_dict = {}
-    playlist_item_id_dict = {}
     subscription_id_dict = {}
 
     items = []
@@ -148,7 +147,9 @@ def _process_list_response(provider,
                              image=image,
                              fanart=fanart,
                              plot=description,
-                             video_id=item_id)
+                             video_id=item_id,
+                             channel_id=(snippet.get('videoOwnerChannelId')
+                                         or snippet.get('channelId')))
 
         elif kind_type == 'channel':
             item_uri = context.create_uri(
@@ -223,8 +224,6 @@ def _process_list_response(provider,
         elif kind_type == 'playlistitem':
             playlist_item_id = item_id
             item_id = snippet['resourceId']['videoId']
-            # store the id of the playlistItem - needed for deleting item
-            playlist_item_id_dict[item_id] = playlist_item_id
 
             item_params['video_id'] = item_id
             item_uri = context.create_uri(
@@ -237,6 +236,8 @@ def _process_list_response(provider,
                              fanart=fanart,
                              plot=description,
                              video_id=item_id,
+                             channel_id=snippet.get('videoOwnerChannelId'),
+                             playlist_id=snippet.get('playlistId'),
                              playlist_item_id=playlist_item_id)
 
         elif kind_type == 'activity':
@@ -341,7 +342,6 @@ def _process_list_response(provider,
                 provider,
                 context,
                 video_id_dict,
-                playlist_item_id_dict,
                 channel_items_dict,
             ),
             'upd_kwargs': {
@@ -465,7 +465,6 @@ def _process_list_response(provider,
         delta = (len(video_id_dict)
                  + len(channel_id_dict)
                  + len(playlist_id_dict)
-                 + len(playlist_item_id_dict)
                  + len(subscription_id_dict))
         progress_dialog.grow_total(delta=delta)
         progress_dialog.update(steps=delta)

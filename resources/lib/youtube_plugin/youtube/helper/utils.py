@@ -543,7 +543,6 @@ def update_playlist_items(provider, context, playlist_id_dict,
 
 
 def update_video_items(provider, context, video_id_dict,
-                       playlist_item_id_dict=None,
                        channel_items_dict=None,
                        live_details=True,
                        item_filter=None,
@@ -562,9 +561,6 @@ def update_video_items(provider, context, video_id_dict,
 
     if not data:
         return
-
-    if not playlist_item_id_dict:
-        playlist_item_id_dict = {}
 
     logged_in = provider.is_logged_in()
     if logged_in:
@@ -892,11 +888,14 @@ def update_video_items(provider, context, video_id_dict,
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        playlist_id = playlist_channel_id = ''
+        playlist_channel_id = ''
         if playlist_match:
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
+        else:
+            playlist_id = media_item.playlist_id
 
+        if playlist_id:
             context_menu.extend((
                 menu_items.play_playlist_from(
                     context, playlist_id, video_id
@@ -932,17 +931,15 @@ def update_video_items(provider, context, video_id_dict,
 
         # provide 'remove' for videos in my playlists
         # we support all playlist except 'Watch History'
-        if (logged_in and video_id in playlist_item_id_dict and playlist_id
+        if (logged_in
+                and playlist_id
                 and playlist_channel_id == 'mine'
                 and playlist_id.strip().lower() not in {'hl', 'wl'}):
-            playlist_item_id = playlist_item_id_dict[video_id]
-            media_item.playlist_id = playlist_id
-            media_item.playlist_item_id = playlist_item_id
             context_menu.append(
                 menu_items.remove_video_from_playlist(
                     context,
                     playlist_id=playlist_id,
-                    video_id=playlist_item_id,
+                    video_id=media_item.playlist_item_id,
                     video_name=title,
                 )
             )
