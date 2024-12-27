@@ -30,7 +30,7 @@ from .helper import (
     yt_subscriptions,
     yt_video,
 )
-from .helper.utils import filter_split
+from .helper.utils import filter_split, update_duplicate_items
 from .youtube_exceptions import InvalidGrant, LoginException
 from ..kodion import AbstractProvider
 from ..kodion.constants import (
@@ -1672,7 +1672,7 @@ class Provider(AbstractProvider):
                             bookmark_timestamp,
                         )
                     else:
-                        new_item.__dict__.update(old_item.__dict__)
+                        update_duplicate_items(old_item, [new_item])
                         new_item.bookmark_id = _id
                         new_item.set_bookmark_timestamp(bookmark_timestamp)
                         new_item.available = False

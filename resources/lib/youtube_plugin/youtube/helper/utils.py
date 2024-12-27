@@ -1417,3 +1417,22 @@ def filter_split(item,
         return True
     _all_criteria.append(criteria)
     return False
+
+
+def update_duplicate_items(item,
+                           duplicates,
+                           skip_keys={
+                               '_bookmark_id',
+                               '_bookmark_timestamp',
+                               '_callback',
+                               '_track_number',
+                           },
+                           skip_vals=(None, '', -1)):
+    item = item.__dict__
+    keys = set(item.keys()).difference(skip_keys)
+    for duplicate in duplicates:
+        duplicate = duplicate.__dict__
+        for key in keys:
+            val = item[key]
+            if val not in skip_vals:
+                duplicate[key] = val
