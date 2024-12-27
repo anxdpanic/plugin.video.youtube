@@ -87,7 +87,7 @@ class ResourceManager(object):
         if refresh or not ids:
             result = {}
         else:
-            result = data_cache.get_items(ids, data_cache.ONE_MONTH)
+            result = data_cache.get_items(ids, data_cache.ONE_DAY)
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
