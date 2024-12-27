@@ -760,17 +760,22 @@ def get_connect_address(context, as_netloc=False, address=None):
 
 
 def get_listen_addresses():
-    addresses = ['127.0.0.1', xbmc.getIPAddress(), '::1']
-    allowed_address_families = {
-        getattr(socket, 'AF_INET', None),
+    ipv4_addresses = ['127.0.0.1']
+    ipv6_addresses = ['::1']
+    allowed_address_families = [
+        socket.AF_INET,
         getattr(socket, 'AF_INET6', None)
-    }
+    ]
     for interface in socket.getaddrinfo(socket.gethostname(), None):
         ip_address = interface[4][0]
         address_family = interface[0]
-        if (not address_family
-                or address_family not in allowed_address_families
-                or ip_address in addresses):
+        if not address_family or address_family not in allowed_address_families:
+            continue
+        if address_family == allowed_address_families[0]:
+            addresses = ipv4_addresses
+        else:
+            addresses = ipv6_addresses
+        if ip_address in addresses:
             continue
 
         octets = validate_ip_address(ip_address, ipv6_string=False)
@@ -788,8 +793,9 @@ def get_listen_addresses():
                 addresses.append(ip_address)
                 break
 
-    addresses.extend(('0.0.0.0', '::'))
-    return addresses
+    ipv4_addresses.append('0.0.0.0')
+    ipv6_addresses.append('::')
+    return ipv6_addresses + ipv4_addresses
 
 
 def is_ipv6(ip_address):
