@@ -619,12 +619,15 @@ def update_video_items(provider, context, video_id_dict,
         if not media_item:
             continue
 
-        if 'snippet' not in yt_item:
+        available = True
+        if 'snippet' in yt_item:
+            snippet = yt_item['snippet']
+        else:
+            snippet = {}
             if yt_item.get('_unavailable'):
+                available = False
                 media_item.playable = False
                 media_item.available = False
-            continue
-        snippet = yt_item['snippet']
 
         media_item.set_mediatype(
             CONTENT.AUDIO_TYPE
@@ -872,7 +875,7 @@ def update_video_items(provider, context, video_id_dict,
             # Refresh
             menu_items.refresh(context),
             # Queue Video
-            menu_items.queue_video(context),
+            menu_items.queue_video(context) if available else None,
         ]
 
         """
@@ -889,14 +892,16 @@ def update_video_items(provider, context, video_id_dict,
             context_menu.extend((
                 menu_items.play_playlist_from(
                     context, playlist_id, video_id
-                ),
+                ) if available else None,
                 menu_items.play_playlist(
                     context, playlist_id
                 ),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
-        if watch_later_id:
+        if not available:
+            pass
+        elif watch_later_id:
             if not playlist_id or watch_later_id != playlist_id:
                 context_menu.append(
                     menu_items.watch_later_add(
@@ -934,39 +939,39 @@ def update_video_items(provider, context, video_id_dict,
                 )
             )
 
-        # got to [CHANNEL] only if we are not directly in the channel
-        if (channel_id and channel_name and
-                context.create_path('channel', channel_id) != path):
-            media_item.channel_id = channel_id
-            context_menu.append(
-                menu_items.go_to_channel(
-                    context, channel_id, channel_name
+        if channel_id:
+            # got to [CHANNEL] only if we are not directly in the channel
+            if context.create_path('channel', channel_id) != path:
+                media_item.channel_id = channel_id
+                context_menu.append(
+                    menu_items.go_to_channel(
+                        context, channel_id, channel_name
+                    )
                 )
-            )
 
-        if logged_in:
-            context_menu.append(
-                # unsubscribe from the channel of the video
-                menu_items.unsubscribe_from_channel(
-                    context, channel_id=channel_id
-                ) if in_my_subscriptions_list else
-                # subscribe to the channel of the video
-                menu_items.subscribe_to_channel(
-                    context, channel_id, channel_name
+            if logged_in:
+                context_menu.append(
+                    # unsubscribe from the channel of the video
+                    menu_items.unsubscribe_from_channel(
+                        context, channel_id=channel_id
+                    ) if in_my_subscriptions_list else
+                    # subscribe to the channel of the video
+                    menu_items.subscribe_to_channel(
+                        context, channel_id, channel_name
+                    )
                 )
-            )
 
-        if not in_bookmarks_list:
-            context_menu.append(
-                # remove bookmarked channel of the video
-                menu_items.bookmark_remove(
-                    context, channel_id, channel_name
-                ) if in_my_subscriptions_list else
-                # bookmark channel of the video
-                menu_items.bookmark_add_channel(
-                    context, channel_id, channel_name
+            if not in_bookmarks_list:
+                context_menu.append(
+                    # remove bookmarked channel of the video
+                    menu_items.bookmark_remove(
+                        context, channel_id, channel_name
+                    ) if in_my_subscriptions_list else
+                    # bookmark channel of the video
+                    menu_items.bookmark_add_channel(
+                        context, channel_id, channel_name
+                    )
                 )
-            )
 
         if use_play_data:
             context_menu.append(
@@ -997,37 +1002,38 @@ def update_video_items(provider, context, video_id_dict,
             )
         )
 
-        # 'play with...' (external player)
-        if alternate_player:
-            context_menu.append(menu_items.play_with(context, video_id))
+        if available:
+            # 'play with...' (external player)
+            if alternate_player:
+                context_menu.append(menu_items.play_with(context, video_id))
 
-        if not subtitles_prompt:
-            context_menu.append(
-                menu_items.play_with_subtitles(
-                    context, video_id
+            if not subtitles_prompt:
+                context_menu.append(
+                    menu_items.play_with_subtitles(
+                        context, video_id
+                    )
                 )
-            )
 
-        if not audio_only:
-            context_menu.append(
-                menu_items.play_audio_only(
-                    context, video_id
+            if not audio_only:
+                context_menu.append(
+                    menu_items.play_audio_only(
+                        context, video_id
+                    )
                 )
-            )
 
-        if not ask_quality:
-            context_menu.append(
-                menu_items.play_ask_for_quality(
-                    context, video_id
+            if not ask_quality:
+                context_menu.append(
+                    menu_items.play_ask_for_quality(
+                        context, video_id
+                    )
                 )
-            )
 
-        if media_item.live:
-            context_menu.append(
-                menu_items.play_timeshift(
-                    context, video_id
+            if media_item.live:
+                context_menu.append(
+                    menu_items.play_timeshift(
+                        context, video_id
+                    )
                 )
-            )
 
         if context_menu:
             media_item.add_context_menu(context_menu)
