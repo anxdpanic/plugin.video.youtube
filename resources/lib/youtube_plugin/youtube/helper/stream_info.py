@@ -2025,12 +2025,11 @@ class StreamInfo(YouTubeRequestClient):
 
                     if default_lang and language_code.startswith(default_lang):
                         is_fallback = False
-                        if audio_track.get('audioIsDefault'):
-                            if prefer_default_lang:
-                                role = 'main'
-                                role_order = 0
-                            elif role_type.startswith('dub'):
-                                is_fallback = True
+                        if prefer_default_lang:
+                            role = 'main'
+                            role_order = 0
+                        elif role_type.startswith('dub'):
+                            is_fallback = True
                         lang_match = (
                                 (language_fallback and not is_fallback)
                                 or preferred_order is None
