@@ -35,10 +35,11 @@ from ..constants import (
     PATHS,
     TEMP_PATH,
 )
-from ..utils import redact_ip, validate_ip_address, wait
+from ..utils import redact_ip, wait
 
 
 class HTTPServer(TCPServer):
+    address_family = socket.AF_INET
     allow_reuse_address = True
     allow_reuse_port = True
 
@@ -58,14 +59,6 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     requests = None
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
     chunk_size = 1024 * 64
-    local_ranges = (
-        ((10, 0, 0, 0), (10, 255, 255, 255)),
-        ((172, 16, 0, 0), (172, 31, 255, 255)),
-        ((192, 168, 0, 0), (192, 168, 255, 255)),
-        '127.0.0.1',
-        'localhost',
-        '::1',
-    )
 
     def __init__(self, *args, **kwargs):
         if not RequestHandler.requests:
@@ -78,12 +71,20 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         ip_allowed = is_whitelisted
 
         if not ip_allowed:
-            octets = validate_ip_address(ip_address)
-            for ip_range in self.local_ranges:
-                if ((any(octets)
-                     and isinstance(ip_range, tuple)
-                     and ip_range[0] <= octets <= ip_range[1])
-                        or ip_address == ip_range):
+            octets = validate_ip_address(ip_address, ipv6_string=False)
+            num_octets = len(octets) if any(octets) else 0
+            if not num_octets:
+                is_local = False
+                return ip_allowed, is_local, is_whitelisted
+
+            for ip_range in _LOCAL_RANGES:
+                if isinstance(ip_range, tuple):
+                    if (num_octets == len(ip_range[0])
+                            and ip_range[0] < octets < ip_range[1]):
+                        is_local = True
+                        ip_allowed = True
+                        break
+                elif ip_address == ip_range:
                     is_local = True
                     ip_allowed = True
                     break
@@ -173,16 +174,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             try:
                 file = path['params'].get('file')
                 if file:
-                    filepath = os.path.join(self.BASE_PATH, file)
+                    file_path = os.path.join(self.BASE_PATH, file)
                 else:
-                    filepath = None
+                    file_path = None
                     raise IOError
 
-                with open(filepath, 'rb') as f:
+                with open(file_path, 'rb') as f:
                     self.send_response(200)
                     self.send_header('Content-Type', 'application/dash+xml')
                     self.send_header('Content-Length',
-                                     str(os.path.getsize(filepath)))
+                                     str(os.path.getsize(file_path)))
                     self.end_headers()
 
                     file_chunk = True
@@ -191,8 +192,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         if file_chunk:
                             self.wfile.write(file_chunk)
             except IOError:
-                response = ('File Not Found: |{path}| -> |{filepath}|'
-                            .format(path=path['log_path'], filepath=filepath))
+                response = ('File Not Found: |{path}| -> |{file_path}|'
+                            .format(path=path['log_path'], file_path=file_path))
                 self.send_error(404, response)
 
         elif api_config_enabled and path['path'] == PATHS.API:
@@ -635,6 +636,10 @@ class Pages(object):
 
 def get_http_server(address, port, context):
     RequestHandler._context = context
+    if is_ipv6(address):
+        HTTPServer.address_family = socket.AF_INET6
+    else:
+        HTTPServer.address_family = socket.AF_INET
     try:
         server = HTTPServer((address, port), RequestHandler)
         return server
@@ -702,10 +707,16 @@ def get_connect_address(context, as_netloc=False, address=None):
     else:
         listen_address, listen_port = address
 
+    if is_ipv6(listen_address):
+        address_family = socket.AF_INET6
+        broadcast_address = 'ff02::1'
+    else:
+        address_family = socket.AF_INET
+        broadcast_address = '<broadcast>'
+
     try:
-        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        if listen_address == '0.0.0.0':
-            broadcast_address = '<broadcast>'
+        sock = socket.socket(address_family, socket.SOCK_DGRAM)
+        if listen_address in {'0.0.0.0', '::'}:
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         else:
             broadcast_address = listen_address
@@ -742,25 +753,96 @@ def get_connect_address(context, as_netloc=False, address=None):
             sock.close()
 
     if as_netloc:
+        if is_ipv6(connect_address):
+            connect_address = connect_address.join(('[', ']'))
         return ':'.join((connect_address, str(listen_port)))
     return listen_address, listen_port
 
 
 def get_listen_addresses():
-    local_ranges = (
-        ((10, 0, 0, 0), (10, 255, 255, 255)),
-        ((172, 16, 0, 0), (172, 31, 255, 255)),
-        ((192, 168, 0, 0), (192, 168, 255, 255)),
-    )
-    addresses = ['127.0.0.1', xbmc.getIPAddress()]
+    ipv4_addresses = ['127.0.0.1']
+    ipv6_addresses = ['::1']
+    allowed_address_families = [
+        socket.AF_INET,
+        getattr(socket, 'AF_INET6', None)
+    ]
     for interface in socket.getaddrinfo(socket.gethostname(), None):
-        address = interface[4][0]
-        if interface[0] != socket.AF_INET or address in addresses:
+        ip_address = interface[4][0]
+        address_family = interface[0]
+        if not address_family or address_family not in allowed_address_families:
             continue
-        octets = validate_ip_address(address)
-        if not any(octets):
+        if address_family == allowed_address_families[0]:
+            addresses = ipv4_addresses
+        else:
+            addresses = ipv6_addresses
+        if ip_address in addresses:
             continue
-        if any(lo <= octets <= hi for lo, hi in local_ranges):
-            addresses.append(address)
-    addresses.append('0.0.0.0')
-    return addresses
+
+        octets = validate_ip_address(ip_address, ipv6_string=False)
+        num_octets = len(octets) if any(octets) else 0
+        if not num_octets:
+            continue
+
+        for ip_range in _LOCAL_RANGES:
+            if isinstance(ip_range, tuple):
+                if (num_octets == len(ip_range[0])
+                        and ip_range[0] < octets < ip_range[1]):
+                    addresses.append(ip_address)
+                    break
+            elif ip_address == ip_range:
+                addresses.append(ip_address)
+                break
+
+    ipv4_addresses.append('0.0.0.0')
+    ipv6_addresses.append('::')
+    return ipv6_addresses + ipv4_addresses
+
+
+def is_ipv6(ip_address):
+    try:
+        socket.inet_pton(socket.AF_INET6, ip_address)
+        return True
+    except (AttributeError, socket.error):
+        return False
+
+
+def ipv6_octets(ip_address):
+    try:
+        return tuple(socket.inet_pton(socket.AF_INET6, ip_address))
+    except (AttributeError, socket.error):
+        return ()
+
+
+def validate_ip_address(ip_address, ipv6_string=True):
+    if ipv6_string:
+        if is_ipv6(ip_address):
+            return (ip_address,)
+    else:
+        octets = ipv6_octets(ip_address)
+        if octets:
+            return octets
+
+    try:
+        socket.inet_aton(ip_address)
+        try:
+            octets = [octet for octet in map(int, ip_address.split('.'))
+                      if 0 <= octet <= 255]
+            if len(octets) != 4:
+                raise ValueError
+        except ValueError:
+            return 0, 0, 0, 0
+        return tuple(octets)
+    except socket.error:
+        return 0, 0, 0, 0
+
+
+_LOCAL_RANGES = (
+    ((127, 0, 0, 0), (127, 255, 255, 255)),
+    ((10, 0, 0, 0), (10, 255, 255, 255)),
+    ((172, 16, 0, 0), (172, 31, 255, 255)),
+    ((192, 168, 0, 0), (192, 168, 255, 255)),
+    'localhost',
+    (ipv6_octets('fc00::'), ipv6_octets('fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff')),
+    (ipv6_octets('fe80::'), ipv6_octets('fe80::ffff:ffff:ffff:ffff')),
+    '::1',
+)

@@ -21,6 +21,7 @@ from ...constants import (
     CONTAINER_POSITION,
     CONTENT_TYPE,
     PATHS,
+    PLAY_FORCED,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -202,7 +203,7 @@ class XbmcPlugin(AbstractPlugin):
                 result = [
                     CommandItem(
                         name=context.localize('page.back'),
-                        command='Action(ParentDir)',
+                        command='Action(Back)',
                         context=context,
                         image='DefaultFolderBack.png',
                         plot=context.localize('page.empty'),
@@ -265,14 +266,23 @@ class XbmcPlugin(AbstractPlugin):
                 ui.clear_property(CONTENT_TYPE)
 
                 if not options or options.get(provider.RESULT_FALLBACK, True):
-                    _, _post_run_action = self.uri_action(
-                        context,
-                        context.get_parent_uri(params={
-                            'window_fallback': True,
-                            'window_replace': True,
-                            'window_return': False,
-                        }),
-                    )
+                    if (context.is_plugin_folder()
+                            and context.is_plugin_path(
+                                context.get_infolabel('Container.FolderPath')
+                            )):
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            context.get_parent_uri(params={
+                                'window_fallback': True,
+                                'window_replace': True,
+                                'window_return': False,
+                            }),
+                        )
+                    else:
+                        _, _post_run_action = self.uri_action(
+                            context,
+                            'command://Action(Back)',
+                        )
                     if post_run_action and _post_run_action:
                         post_run_action = (post_run_action, _post_run_action)
                     else:
@@ -280,6 +290,10 @@ class XbmcPlugin(AbstractPlugin):
 
             cache_to_disc = False
             update_listing = True
+
+        if ui.pop_property(PLAY_FORCED):
+            context.set_path(PATHS.PLAY)
+            return self.run(provider, context, focused=focused)
 
         xbmcplugin.endOfDirectory(
             handle,
@@ -326,6 +340,11 @@ class XbmcPlugin(AbstractPlugin):
             action = uri
             result = True
 
+        elif uri.startswith('PlayMedia('):
+            context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+            action = uri
+            result = True
+
         elif context.is_plugin_path(uri, PATHS.PLAY):
             context.log_debug('Redirecting for playback: |{0}|'.format(uri))
             uri = urlsplit(uri)
@@ -340,7 +359,7 @@ class XbmcPlugin(AbstractPlugin):
         elif uri.startswith('RunPlugin('):
             context.log_debug('Running plugin: |{0}|'.format(uri))
             action = uri
-            result = False
+            result = True
 
         elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))

@@ -46,7 +46,7 @@ def related_videos(context, video_id):
     return (
         context.localize('related_videos'),
         context.create_uri(
-            (PATHS.ROUTE, 'special', 'related_videos',),
+            (PATHS.ROUTE, PATHS.RELATED_VIDEOS,),
             {
                 'video_id': video_id,
             },
@@ -59,7 +59,7 @@ def video_comments(context, video_id, video_name=None):
     return (
         context.localize('video.comments'),
         context.create_uri(
-            (PATHS.ROUTE, 'special', 'parent_comments',),
+            (PATHS.ROUTE, PATHS.VIDEO_COMMENTS),
             {
                 'video_id': video_id,
                 'item_name': video_name,
@@ -73,7 +73,7 @@ def content_from_description(context, video_id):
     return (
         context.localize('video.description.links'),
         context.create_uri(
-            (PATHS.ROUTE, 'special', 'description_links',),
+            (PATHS.ROUTE, PATHS.DESCRIPTION_LINKS),
             {
                 'video_id': video_id,
             },
@@ -120,6 +120,13 @@ def play_all_from(context, path, order='normal'):
             },
             run=True,
         ),
+    )
+
+
+def play_video(context):
+    return (
+        context.localize('video.play'),
+        'Action(Play)'
     )
 
 

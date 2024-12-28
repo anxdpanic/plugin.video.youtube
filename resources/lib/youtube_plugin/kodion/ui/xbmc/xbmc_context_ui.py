@@ -11,8 +11,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from .view_manager import ViewManager
-from .xbmc_progress_dialog import XbmcProgressDialog
-from ..abstract_context_ui import AbstractContextUI
+from ..abstract_context_ui import AbstractContextUI, AbstractProgressDialog
 from ...compatibility import xbmc, xbmcgui
 from ...constants import ADDON_ID, REFRESH_CONTAINER
 from ...utils import to_unicode
@@ -27,6 +26,7 @@ class XbmcContextUI(AbstractContextUI):
     def create_progress_dialog(self,
                                heading,
                                message='',
+                               total=None,
                                background=False,
                                message_template=None,
                                template_params=None):
@@ -34,8 +34,16 @@ class XbmcContextUI(AbstractContextUI):
             message_template = ('{wait} {{_current}}/{{_total}}'.format(
                 wait=(message or self._context.localize('please_wait'))
             ))
-        return XbmcProgressDialog(
-            heading, message, background, message_template, template_params
+
+        return AbstractProgressDialog(
+            dialog=(xbmcgui.DialogProgressBG
+                    if background else
+                    xbmcgui.DialogProgress),
+            heading=heading,
+            message=message,
+            total=int(total) if total is not None else 0,
+            message_template=message_template,
+            template_params=template_params,
         )
 
     def get_view_manager(self):
@@ -155,30 +163,34 @@ class XbmcContextUI(AbstractContextUI):
     def refresh_container(self):
         self._context.send_notification(REFRESH_CONTAINER)
 
-    @staticmethod
-    def set_property(property_id, value='true'):
-        property_id = '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).setProperty(property_id, value)
+    def set_property(self, property_id, value='true'):
+        self._context.log_debug('Set property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
+        _property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).setProperty(_property_id, value)
         return value
 
-    @staticmethod
-    def get_property(property_id):
-        property_id = '-'.join((ADDON_ID, property_id))
-        return xbmcgui.Window(10000).getProperty(property_id)
+    def get_property(self, property_id):
+        _property_id = '-'.join((ADDON_ID, property_id))
+        value = xbmcgui.Window(10000).getProperty(_property_id)
+        self._context.log_debug('Get property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
+        return value
 
-    @staticmethod
-    def pop_property(property_id):
-        property_id = '-'.join((ADDON_ID, property_id))
+    def pop_property(self, property_id):
+        _property_id = '-'.join((ADDON_ID, property_id))
         window = xbmcgui.Window(10000)
-        value = window.getProperty(property_id)
+        value = window.getProperty(_property_id)
         if value:
-            window.clearProperty(property_id)
+            window.clearProperty(_property_id)
+        self._context.log_debug('Pop property |{id}|: {value!r}'
+                                .format(id=property_id, value=value))
         return value
 
-    @staticmethod
-    def clear_property(property_id):
-        property_id = '-'.join((ADDON_ID, property_id))
-        xbmcgui.Window(10000).clearProperty(property_id)
+    def clear_property(self, property_id):
+        self._context.log_debug('Clear property |{id}|'.format(id=property_id))
+        _property_id = '-'.join((ADDON_ID, property_id))
+        xbmcgui.Window(10000).clearProperty(_property_id)
         return None
 
     @staticmethod

@@ -574,6 +574,7 @@ def directory_listitem(context, directory_item, show_fanart=None, **_kwargs):
     art = {'icon': image}
     if image:
         art['thumb'] = image
+        art['poster'] = image
     if show_fanart:
         art['fanart'] = directory_item.get_fanart()
     list_item.setArt(art)

@@ -29,8 +29,8 @@ from re import (
 
 from ...kodion.compatibility import string_type, unquote, urlsplit
 from ...kodion.constants import CONTENT, PATHS
-from ...kodion.logger import Logger
 from ...kodion.items import AudioItem, CommandItem, DirectoryItem, menu_items
+from ...kodion.logger import Logger
 from ...kodion.utils import (
     datetime_parser,
     friendly_number,
@@ -281,7 +281,9 @@ def update_channel_items(provider, context, channel_id_dict,
                 ui.new_line(stats, cr_after=1) if stats else '',
                 ui.new_line(description, cr_after=1) if description else '',
                 ui.new_line('--------', cr_before=1, cr_after=1),
-                'https://youtu.be/channel' + channel_id,
+                'https://www.youtube.com/' + channel_id
+                if channel_id.startswith('@') else
+                'https://www.youtube.com/channel/' + channel_id,
             ))
         channel_item.set_plot(description)
 
@@ -543,7 +545,6 @@ def update_playlist_items(provider, context, playlist_id_dict,
 
 
 def update_video_items(provider, context, video_id_dict,
-                       playlist_item_id_dict=None,
                        channel_items_dict=None,
                        live_details=True,
                        item_filter=None,
@@ -562,9 +563,6 @@ def update_video_items(provider, context, video_id_dict,
 
     if not data:
         return
-
-    if not playlist_item_id_dict:
-        playlist_item_id_dict = {}
 
     logged_in = provider.is_logged_in()
     if logged_in:
@@ -611,20 +609,31 @@ def update_video_items(provider, context, video_id_dict,
         in_watched_later_list = False
         playlist_match = __RE_PLAYLIST.match(path)
 
+    media_items = None
+    media_item = None
+
     for video_id, yt_item in data.items():
+        if media_items and media_item:
+            update_duplicate_items(media_item, media_items)
+
         if not yt_item:
             continue
 
-        media_item = video_id_dict.get(video_id)
-        if not media_item:
+        media_items = video_id_dict.get(video_id)
+        if media_items:
+            media_item = media_items.pop()
+        else:
             continue
 
-        if 'snippet' not in yt_item:
+        available = True
+        if 'snippet' in yt_item:
+            snippet = yt_item['snippet']
+        else:
+            snippet = {}
             if yt_item.get('_unavailable'):
+                available = False
                 media_item.playable = False
                 media_item.available = False
-            continue
-        snippet = yt_item['snippet']
 
         media_item.set_mediatype(
             CONTENT.AUDIO_TYPE
@@ -868,35 +877,65 @@ def update_video_items(provider, context, video_id_dict,
                 channel_items_dict[channel_id] = []
             channel_items_dict[channel_id].append(media_item)
 
-        context_menu = [
-            # Refresh
-            menu_items.refresh(context),
-            # Queue Video
-            menu_items.queue_video(context),
-        ]
-
         """
         Play all videos of the playlist.
 
         /channel/[CHANNEL_ID]/playlist/[PLAYLIST_ID]/
         /playlist/[PLAYLIST_ID]/
         """
-        playlist_id = playlist_channel_id = ''
+        playlist_channel_id = ''
         if playlist_match:
             playlist_id = playlist_match.group('playlist_id')
             playlist_channel_id = playlist_match.group('channel_id')
+        else:
+            playlist_id = media_item.playlist_id
 
+        # provide 'remove' in my playlists that have a real playlist_id
+        if (playlist_id
+                and logged_in
+                and playlist_channel_id == 'mine'
+                and playlist_id.strip().lower() not in {'wl', 'hl'}):
+            context_menu = [
+                menu_items.remove_video_from_playlist(
+                    context,
+                    playlist_id=playlist_id,
+                    video_id=media_item.playlist_item_id,
+                    video_name=title,
+                ),
+                menu_items.separator(),
+            ]
+        else:
+            context_menu = []
+
+        if available:
             context_menu.extend((
+                menu_items.play_video(context),
+                menu_items.play_with_subtitles(
+                    context, video_id
+                ) if not subtitles_prompt else None,
+                menu_items.play_audio_only(
+                    context, video_id
+                ) if not audio_only else None,
+                menu_items.play_ask_for_quality(
+                    context, video_id
+                ) if not ask_quality else None,
+                menu_items.play_timeshift(
+                    context, video_id
+                ) if media_item.live else None,
+                # 'play with...' (external player)
+                menu_items.play_with(
+                    context, video_id
+                ) if alternate_player else None,
                 menu_items.play_playlist_from(
                     context, playlist_id, video_id
-                ),
-                menu_items.play_playlist(
-                    context, playlist_id
-                ),
+                ) if playlist_id else None,
+                menu_items.queue_video(context),
             ))
 
         # add 'Watch Later' only if we are not in my 'Watch Later' list
-        if watch_later_id:
+        if not available:
+            pass
+        elif watch_later_id:
             if not playlist_id or watch_later_id != playlist_id:
                 context_menu.append(
                     menu_items.watch_later_add(
@@ -917,56 +956,39 @@ def update_video_items(provider, context, video_id_dict,
                 )
             )
 
-        # provide 'remove' for videos in my playlists
-        # we support all playlist except 'Watch History'
-        if (logged_in and video_id in playlist_item_id_dict and playlist_id
-                and playlist_channel_id == 'mine'
-                and playlist_id.strip().lower() not in {'hl', 'wl'}):
-            playlist_item_id = playlist_item_id_dict[video_id]
-            media_item.playlist_id = playlist_id
-            media_item.playlist_item_id = playlist_item_id
-            context_menu.append(
-                menu_items.remove_video_from_playlist(
-                    context,
-                    playlist_id=playlist_id,
-                    video_id=playlist_item_id,
-                    video_name=title,
+        if channel_id:
+            # got to [CHANNEL] only if we are not directly in the channel
+            if context.create_path('channel', channel_id) != path:
+                media_item.channel_id = channel_id
+                context_menu.append(
+                    menu_items.go_to_channel(
+                        context, channel_id, channel_name
+                    )
                 )
-            )
 
-        # got to [CHANNEL] only if we are not directly in the channel
-        if (channel_id and channel_name and
-                context.create_path('channel', channel_id) != path):
-            media_item.channel_id = channel_id
-            context_menu.append(
-                menu_items.go_to_channel(
-                    context, channel_id, channel_name
+            if logged_in:
+                context_menu.append(
+                    # unsubscribe from the channel of the video
+                    menu_items.unsubscribe_from_channel(
+                        context, channel_id=channel_id
+                    ) if in_my_subscriptions_list else
+                    # subscribe to the channel of the video
+                    menu_items.subscribe_to_channel(
+                        context, channel_id, channel_name
+                    )
                 )
-            )
 
-        if logged_in:
-            context_menu.append(
-                # unsubscribe from the channel of the video
-                menu_items.unsubscribe_from_channel(
-                    context, channel_id=channel_id
-                ) if in_my_subscriptions_list else
-                # subscribe to the channel of the video
-                menu_items.subscribe_to_channel(
-                    context, channel_id, channel_name
+            if not in_bookmarks_list:
+                context_menu.append(
+                    # remove bookmarked channel of the video
+                    menu_items.bookmark_remove(
+                        context, channel_id, channel_name
+                    ) if in_my_subscriptions_list else
+                    # bookmark channel of the video
+                    menu_items.bookmark_add_channel(
+                        context, channel_id, channel_name
+                    )
                 )
-            )
-
-        if not in_bookmarks_list:
-            context_menu.append(
-                # remove bookmarked channel of the video
-                menu_items.bookmark_remove(
-                    context, channel_id, channel_name
-                ) if in_my_subscriptions_list else
-                # bookmark channel of the video
-                menu_items.bookmark_add_channel(
-                    context, channel_id, channel_name
-                )
-            )
 
         if use_play_data:
             context_menu.append(
@@ -987,47 +1009,16 @@ def update_video_items(provider, context, video_id_dict,
 
         # more...
         refresh = path.startswith((PATHS.LIKED_VIDEOS, PATHS.DISLIKED_VIDEOS))
-        context_menu.append(
+        context_menu.extend((
+            menu_items.refresh(context),
             menu_items.more_for_video(
                 context,
                 video_id,
                 video_name=title,
                 logged_in=logged_in,
                 refresh=refresh,
-            )
-        )
-
-        # 'play with...' (external player)
-        if alternate_player:
-            context_menu.append(menu_items.play_with(context, video_id))
-
-        if not subtitles_prompt:
-            context_menu.append(
-                menu_items.play_with_subtitles(
-                    context, video_id
-                )
-            )
-
-        if not audio_only:
-            context_menu.append(
-                menu_items.play_audio_only(
-                    context, video_id
-                )
-            )
-
-        if not ask_quality:
-            context_menu.append(
-                menu_items.play_ask_for_quality(
-                    context, video_id
-                )
-            )
-
-        if media_item.live:
-            context_menu.append(
-                menu_items.play_timeshift(
-                    context, video_id
-                )
-            )
+            ),
+        ))
 
         if context_menu:
             media_item.add_context_menu(context_menu)
@@ -1040,7 +1031,7 @@ def update_play_info(provider,
                      video_stream,
                      yt_item=None):
     update_video_items(
-        provider, context, {video_id: media_item}, yt_items=[yt_item]
+        provider, context, {video_id: [media_item]}, yt_items=[yt_item]
     )
 
     settings = context.get_settings()
@@ -1332,7 +1323,7 @@ def filter_parse(item,
                  criteria_re=re_compile(
                      r'{?{([^}]+)}{([^}]+)}{([^}]+)}}?'
                  ),
-                 op_map = {
+                 op_map={
                      '=': op_eq,
                      '==': op_eq,
                      '>': op_gt,
@@ -1411,3 +1402,22 @@ def filter_split(item,
         return True
     _all_criteria.append(criteria)
     return False
+
+
+def update_duplicate_items(item,
+                           duplicates,
+                           skip_keys={
+                               '_bookmark_id',
+                               '_bookmark_timestamp',
+                               '_callback',
+                               '_track_number',
+                           },
+                           skip_vals=(None, '', -1)):
+    item = item.__dict__
+    keys = set(item.keys()).difference(skip_keys)
+    for duplicate in duplicates:
+        duplicate = duplicate.__dict__
+        for key in keys:
+            val = item[key]
+            if val not in skip_vals:
+                duplicate[key] = val

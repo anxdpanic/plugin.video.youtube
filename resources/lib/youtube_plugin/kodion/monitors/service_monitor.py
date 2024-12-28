@@ -18,6 +18,7 @@ from ..constants import (
     CHECK_SETTINGS,
     CONTAINER_FOCUS,
     PATHS,
+    PLAY_FORCED,
     PLUGIN_WAKEUP,
     REFRESH_CONTAINER,
     RELOAD_ACCESS_MANAGER,
@@ -119,6 +120,21 @@ class ServiceMonitor(xbmc.Monitor):
                             self.httpd_sleep_allowed = None
                 except RuntimeError:
                     pass
+
+            elif method == 'Playlist.OnAdd':
+                context = self._context
+
+                data = json.loads(data)
+                position = data.get('position', 0)
+                item_path = context.get_infolabel(
+                    'Player.position({0}).FilenameAndPath'.format(position)
+                )
+
+                if context.is_plugin_path(item_path):
+                    if not context.is_plugin_path(item_path, PATHS.PLAY):
+                        context.log_warning('Playlist.OnAdd - non-playable path'
+                                            '\n\tPath: {0}'.format(item_path))
+                        self.set_property(PLAY_FORCED)
 
             return
 

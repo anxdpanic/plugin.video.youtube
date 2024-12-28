@@ -346,8 +346,16 @@ class AbstractContext(Logger):
 
     def set_path(self, *path, **kwargs):
         if kwargs.get('force'):
-            path = unquote(path[0]).split('/')
-        self._path, self._path_parts = self.create_path(*path, parts=True)
+            parts = kwargs.get('parts')
+            path = unquote(path[0])
+            if parts is None:
+                path = path.split('/')
+                path, parts = self.create_path(*path, parts=True)
+        else:
+            path, parts = self.create_path(*path, parts=True)
+
+        self._path = path
+        self._path_parts = parts
 
     def get_params(self):
         return self._params
@@ -357,12 +365,11 @@ class AbstractContext(Logger):
 
     def parse_uri(self, uri):
         uri = urlsplit(uri)
-        path = uri.path.rstrip('/')
         params = self.parse_params(
             dict(parse_qsl(uri.query, keep_blank_values=True)),
             update=False,
         )
-        return path, params
+        return uri.path, params
 
     def parse_params(self, params, update=True):
         to_delete = []
@@ -517,4 +524,8 @@ class AbstractContext(Logger):
         pass
 
     def wakeup(self, target, timeout=None):
+        raise NotImplementedError()
+
+    @staticmethod
+    def is_plugin_folder(folder_name=None):
         raise NotImplementedError()

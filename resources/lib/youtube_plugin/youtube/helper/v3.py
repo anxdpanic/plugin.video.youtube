@@ -10,9 +10,10 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import threading
+from collections import deque
 from sys import exc_info
 from traceback import format_stack
-import threading
 
 from .utils import (
     THUMB_TYPES,
@@ -49,7 +50,6 @@ def _process_list_response(provider,
     video_id_dict = {}
     channel_id_dict = {}
     playlist_id_dict = {}
-    playlist_item_id_dict = {}
     subscription_id_dict = {}
 
     items = []
@@ -147,8 +147,9 @@ def _process_list_response(provider,
                              image=image,
                              fanart=fanart,
                              plot=description,
-                             video_id=item_id)
-            video_id_dict[item_id] = item
+                             video_id=item_id,
+                             channel_id=(snippet.get('videoOwnerChannelId')
+                                         or snippet.get('channelId')))
 
         elif kind_type == 'channel':
             item_uri = context.create_uri(
@@ -223,8 +224,6 @@ def _process_list_response(provider,
         elif kind_type == 'playlistitem':
             playlist_item_id = item_id
             item_id = snippet['resourceId']['videoId']
-            # store the id of the playlistItem - needed for deleting item
-            playlist_item_id_dict[item_id] = playlist_item_id
 
             item_params['video_id'] = item_id
             item_uri = context.create_uri(
@@ -237,8 +236,9 @@ def _process_list_response(provider,
                              fanart=fanart,
                              plot=description,
                              video_id=item_id,
+                             channel_id=snippet.get('videoOwnerChannelId'),
+                             playlist_id=snippet.get('playlistId'),
                              playlist_item_id=playlist_item_id)
-            video_id_dict[item_id] = item
 
         elif kind_type == 'activity':
             details = yt_item['contentDetails']
@@ -261,7 +261,6 @@ def _process_list_response(provider,
                              fanart=fanart,
                              plot=description,
                              video_id=item_id)
-            video_id_dict[item_id] = item
 
         elif kind_type.startswith('comment'):
             if kind_type == 'commentthread':
@@ -269,7 +268,7 @@ def _process_list_response(provider,
                 snippet = snippet['topLevelComment']['snippet']
                 if reply_count:
                     item_uri = context.create_uri(
-                        ('special', 'child_comments'),
+                        PATHS.VIDEO_COMMENTS_THREAD,
                         {'parent_id': item_id}
                     )
                 else:
@@ -306,6 +305,13 @@ def _process_list_response(provider,
             # match "Default" (unsorted) sort order
             position = snippet.get('position') or len(items)
             item.set_track_number(position + 1)
+            item_id = item.video_id
+            if item_id in video_id_dict:
+                fifo_queue = video_id_dict[item_id]
+            else:
+                fifo_queue = deque()
+                video_id_dict[item_id] = fifo_queue
+            fifo_queue.appendleft(item)
 
         if '_callback' in yt_item:
             item.callback = yt_item['_callback']
@@ -336,7 +342,6 @@ def _process_list_response(provider,
                 provider,
                 context,
                 video_id_dict,
-                playlist_item_id_dict,
                 channel_items_dict,
             ),
             'upd_kwargs': {
@@ -460,7 +465,6 @@ def _process_list_response(provider,
         delta = (len(video_id_dict)
                  + len(channel_id_dict)
                  + len(playlist_id_dict)
-                 + len(playlist_item_id_dict)
                  + len(subscription_id_dict))
         progress_dialog.grow_total(delta=delta)
         progress_dialog.update(steps=delta)

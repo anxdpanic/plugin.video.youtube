@@ -36,6 +36,7 @@ from ...settings import XbmcPluginSettings
 from ...ui import XbmcContextUI
 from ...utils import (
     current_system_version,
+    get_kodi_setting_bool,
     get_kodi_setting_value,
     jsonrpc,
     loose_version,
@@ -136,6 +137,7 @@ class XbmcContext(AbstractContext):
         'home': 10000,
         'httpd': 30628,
         'httpd.not.running': 30699,
+        'httpd.connect.wait': 13028,
         'httpd.connect.failed': 1001,
         'inputstreamhelper.is_installed': 30625,
         'isa.enable.check': 30579,
@@ -252,13 +254,15 @@ class XbmcContext(AbstractContext):
         'stats.subscriberCount': 30739,
         'stats.videoCount': 3,
         'stats.viewCount': 30767,
-        'stream.alternate': 30747,
+        'stream.alt': 30747,
         'stream.automatic': 36588,
         'stream.descriptive': 30746,
-        'stream.dubbed': 30745,
+        'stream.dub': 30745,
+        'stream.dub.auto': 30745,
         'stream.multi_audio': 30763,
         'stream.multi_language': 30762,
         'stream.original': 30744,
+        'stream.secondary': 30747,
         'subscribe': 30506,
         'subscribe_to': 30517,
         'subscribed.to.channel': 30719,
@@ -298,6 +302,7 @@ class XbmcContext(AbstractContext):
         'video.disliked': 30538,
         'video.liked': 30508,
         'video.more': 22082,
+        'video.play': 208,
         'video.play.ask_for_quality': 30730,
         'video.play.audio_only': 30708,
         'video.play.timeshift': 30819,
@@ -486,7 +491,7 @@ class XbmcContext(AbstractContext):
             language = language.replace('resource.language.', '').split('_')[0]
         elif language not in self._KODI_UI_PLAYER_LANGUAGE_OPTIONS:
             language = xbmc.convertLanguage(language, xbmc.ISO_639_1)
-        return language
+        return language, get_kodi_setting_bool('videoplayer.preferdefaultflag')
 
     def get_subtitle_language(self):
         language = get_kodi_setting_value('locale.subtitlelanguage')
@@ -907,3 +912,8 @@ class XbmcContext(AbstractContext):
             self.log_error('Wakeup |{0}| timed out in {1}ms'
                            .format(target, timeout))
         return False
+
+    def is_plugin_folder(self, folder_name=None):
+        if folder_name is None:
+            folder_name = xbmc.getInfoLabel('Container.FolderName')
+        return folder_name == self._plugin_name
