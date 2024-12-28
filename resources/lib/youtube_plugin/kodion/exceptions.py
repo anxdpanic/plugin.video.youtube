@@ -10,7 +10,7 @@
 
 
 class KodionException(Exception):
-    def __init__(self, message, **kwargs):
+    def __init__(self, message='', **kwargs):
         super(KodionException, self).__init__(message)
         attrs = self.__dict__
         for attr, value in kwargs.items():

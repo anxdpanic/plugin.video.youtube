@@ -100,18 +100,29 @@ def process_default_settings(context, step, steps, **_kwargs):
             settings.alternative_player_mpd(False)
         if settings.cache_size() < 20:
             settings.cache_size(20)
-        if not httpd_status(context):
-            port = settings.httpd_port()
-            for address in get_listen_addresses():
-                if httpd_status(context, (address, port)):
-                    settings.httpd_listen(address)
-                    break
-            else:
-                ui.show_notification(
-                    localize('httpd.connect.failed'),
-                    header=localize('httpd'),
-                )
-                settings.httpd_listen('0.0.0.0')
+        with ui.create_progress_dialog(
+                heading=localize('httpd'),
+                message=localize('httpd.connect.wait'),
+                total=1,
+                background=False,
+        ) as progress_dialog:
+            progress_dialog.update()
+            if not httpd_status(context):
+                port = settings.httpd_port()
+                addresses = get_listen_addresses()
+                progress_dialog.grow_total(delta=len(addresses))
+                for address in addresses:
+                    progress_dialog.update()
+                    if httpd_status(context, (address, port)):
+                        settings.httpd_listen(address)
+                        break
+                    context.sleep(5)
+                else:
+                    ui.show_notification(
+                        localize('httpd.connect.failed'),
+                        header=localize('httpd'),
+                    )
+                    settings.httpd_listen('0.0.0.0')
     return step
 
 

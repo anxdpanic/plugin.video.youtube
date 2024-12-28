@@ -17,8 +17,8 @@ from ..utils import (
     current_system_version,
     get_kodi_setting_bool,
     get_kodi_setting_value,
-    validate_ip_address,
 )
+from ..network.http_server import validate_ip_address
 
 
 class AbstractSettings(object):

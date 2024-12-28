@@ -361,8 +361,9 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
     return False
 
 
-def process(provider, context, re_match):
-    category = re_match.group('category')
+def process(provider, context, re_match=None, category=None):
+    if re_match and category is None:
+        category = re_match.group('category')
 
     # required for provider.is_logged_in()
     client = provider.get_client(context)

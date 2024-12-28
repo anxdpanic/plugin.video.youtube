@@ -28,6 +28,8 @@ class YouTubeRequestClient(BaseRequestsClass):
     }
 
     CLIENTS = {
+        # Disabled - requires PO token
+        # Requests for stream urls result in HTTP 403 errors
         'android': {
             '_id': 3,
             '_disabled': True,
@@ -46,98 +48,6 @@ class YouTubeRequestClient(BaseRequestsClass):
             },
             'headers': {
                 'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-        },
-        # Only for videos that allow embedding
-        # Limited to 720p on some videos
-        'android_embedded': {
-            '_id': 55,
-            '_disabled': True,
-            '_query_subtitles': 'optional',
-            'json': {
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_EMBEDDED_PLAYER',
-                        'clientScreen': 'EMBED',
-                        'clientVersion': '19.29.37',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
-                    },
-                },
-                'thirdParty': {
-                    'embedUrl': 'https://www.youtube.com/',
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-        },
-        # 4k no VP9 HDR
-        # Limited subtitle availability
-        'android_testsuite': {
-            '_id': 30,
-            '_disabled': True,
-            '_query_subtitles': True,
-            'json': {
-                'params': _PLAYER_PARAMS['android_testsuite'],
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_TESTSUITE',
-                        'clientVersion': '1.9',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'MOBILE',
-                    },
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.youtube/'
-                               '{json[context][client][clientVersion]}'
-                               ' (Linux; U; {json[context][client][osName]}'
-                               ' {json[context][client][osVersion]}) gzip'),
-                'X-YouTube-Client-Name': '{_id}',
-                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
-            },
-        },
-        # 4k with HDR
-        # Some videos block this client, may also require embedding enabled
-        # Limited subtitle availability
-        'android_youtube_tv': {
-            '_id': 29,
-            '_disabled': True,
-            '_auth_type': 'tv',
-            '_query_subtitles': True,
-            'json': {
-                'params': _PLAYER_PARAMS['android'],
-                'context': {
-                    'client': {
-                        'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '8.12.0',
-                        'androidSdkVersion': '30',
-                        'osName': 'Android',
-                        'osVersion': '11',
-                        'platform': 'TV',
-                    },
-                },
-                'thirdParty': {
-                    'embedUrl': 'https://www.google.com/',
-                },
-            },
-            'headers': {
-                'User-Agent': ('com.google.android.apps.youtube.unplugged/'
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
                                ' {json[context][client][osVersion]}) gzip'),
@@ -167,6 +77,99 @@ class YouTubeRequestClient(BaseRequestsClass):
                                ' (Linux; U; {json[context][client][osName]}'
                                ' {json[context][client][osVersion]};'
                                ' eureka-user Build/SQ3A.220605.009.A1) gzip'),
+                'X-YouTube-Client-Name': '{_id}',
+                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+            },
+        },
+        # 4k with HDR
+        # Some videos block this client, may also require embedding enabled
+        # Limited subtitle availability
+        # Limited audio streams
+        'android_youtube_tv': {
+            '_id': 29,
+            '_auth_required': True,
+            '_auth_type': 'personal',
+            '_query_subtitles': True,
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'ANDROID_UNPLUGGED',
+                        'clientVersion': '8.49.0',
+                        'androidSdkVersion': '32',
+                        'osName': 'Android',
+                        'osVersion': '12',
+                        'platform': 'TV',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': ('com.google.android.apps.youtube.unplugged/'
+                               '{json[context][client][clientVersion]}'
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]}) gzip'),
+                'X-YouTube-Client-Name': '{_id}',
+                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+            },
+        },
+        # Disabled - all player requests result in following response
+        # UNPLAYABLE - This video is not available
+        # 4k no VP9 HDR
+        # Limited subtitle availability
+        'android_testsuite': {
+            '_id': 30,
+            '_disabled': True,
+            '_query_subtitles': True,
+            'json': {
+                # 'params': _PLAYER_PARAMS['android_testsuite'],
+                'context': {
+                    'client': {
+                        'clientName': 'ANDROID_TESTSUITE',
+                        'clientVersion': '1.9',
+                        'androidSdkVersion': '30',
+                        'osName': 'Android',
+                        'osVersion': '11',
+                        'platform': 'MOBILE',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': ('com.google.android.youtube/'
+                               '{json[context][client][clientVersion]}'
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]}) gzip'),
+                'X-YouTube-Client-Name': '{_id}',
+                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+            },
+        },
+        # Disabled - requires PO token
+        # Requests for stream urls result in HTTP 403 errors
+        # Only for videos that allow embedding
+        # Limited to 720p on some videos
+        'android_embedded': {
+            '_id': 55,
+            '_disabled': True,
+            '_query_subtitles': 'optional',
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'ANDROID_EMBEDDED_PLAYER',
+                        'clientScreen': 'EMBED',
+                        'clientVersion': '19.29.37',
+                        'androidSdkVersion': '30',
+                        'osName': 'Android',
+                        'osVersion': '11',
+                        'platform': 'MOBILE',
+                    },
+                },
+                'thirdParty': {
+                    'embedUrl': 'https://www.youtube.com/',
+                },
+            },
+            'headers': {
+                'User-Agent': ('com.google.android.youtube/'
+                               '{json[context][client][clientVersion]}'
+                               ' (Linux; U; {json[context][client][osName]}'
+                               ' {json[context][client][osVersion]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -204,6 +207,43 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
         },
+        'ios_youtube_tv': {
+            '_id': 33,
+            '_auth_required': True,
+            '_auth_type': 'personal',
+            '_os': {
+                'major': '18',
+                'minor': '1',
+                'patch': '0',
+                'build': '22B83',
+            },
+            'json': {
+                'context': {
+                    'client': {
+                        'clientName': 'IOS_UNPLUGGED',
+                        'clientVersion': '8.49',
+                        'deviceMake': 'Apple',
+                        'deviceModel': 'iPhone16,2',
+                        'osName': 'iOS',
+                        'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
+                        'platform': 'TV',
+                    },
+                },
+            },
+            'headers': {
+                'User-Agent': ('com.google.ios.youtubeunplugged/'
+                               '{json[context][client][clientVersion]}'
+                               ' ({json[context][client][deviceModel]};'
+                               ' U; CPU {json[context][client][osName]}'
+                               ' {_os[major]}_{_os[minor]}_{_os[patch]}'
+                               ' like Mac OS X)'),
+                'X-YouTube-Client-Name': '{_id}',
+                'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
+            },
+        },
+        # Disabled - request are now blocked with following response
+        # 403 Forbidden - The caller does not have permission
+        # Provides progressive streams
         'media_connect_frontend': {
             '_id': 95,
             '_disabled': True,
@@ -294,7 +334,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': None,
+                'Authorization': 'Bearer {{0}}',
             },
             'params': {
                 'key': ValueError,
@@ -417,7 +457,8 @@ class YouTubeRequestClient(BaseRequestsClass):
                 headers = client['headers']
                 if 'Authorization' in headers:
                     headers = headers.copy()
-                    headers['Authorization'] = 'Bearer {0}'.format(auth_token)
+                    auth_header = headers.get('Authorization') or 'Bearer {0}'
+                    headers['Authorization'] = auth_header.format(auth_token)
                     client['headers'] = headers
                     has_auth = True
 

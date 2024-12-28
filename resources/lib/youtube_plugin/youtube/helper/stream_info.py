@@ -37,6 +37,7 @@ from ...kodion.compatibility import (
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
 from ...kodion.utils import make_dirs, redact_ip
+from ...kodion.utils.datetime_parser import fromtimestamp
 
 
 class StreamInfo(YouTubeRequestClient):
@@ -755,13 +756,14 @@ class StreamInfo(YouTubeRequestClient):
         'dtse': 1.3,
     }
 
-    LANG_ROLE_ORDER = {
-        4:  -1,  # Default
-        3:  -2,  # Dubbed
-        6:  -3,  # Secondary
-        10: -4,  # Auto-dubbed
-        2:  -5,  # Descriptive
-        0:  -6,  # Alternate
+    LANG_ROLE_DETAILS = {
+        4:  ('original', 'main', -1),
+        3:  ('dub', 'dub', -2),
+        6:  ('secondary', 'alternate', -3),
+        10: ('dub.auto', 'dub', -4),
+        2:  ('descriptive', 'description', -5),
+        0:  ('alt', 'alternate', -6),
+        -1: ('original', 'main', -6),
     }
 
     def __init__(self,
@@ -774,6 +776,7 @@ class StreamInfo(YouTubeRequestClient):
                  use_mpd=True,
                  **kwargs):
         self.video_id = None
+        self.yt_item = None
         self._context = context
 
         self._access_token = access_token
@@ -782,13 +785,14 @@ class StreamInfo(YouTubeRequestClient):
         self._audio_only = audio_only
         self._use_mpd = use_mpd
 
-        audio_language = context.get_player_language()
+        audio_language, prefer_default = context.get_player_language()
         if audio_language == 'mediadefault':
-            self._language_base = kwargs.get('language', 'en_US')[0:2]
+            self._language_base = context.get_settings().get_language()[0:2]
         elif audio_language == 'original':
             self._language_base = ''
         else:
             self._language_base = audio_language
+        self._language_prefer_default = prefer_default
 
         self._player_js = None
         self._calculate_n = True
@@ -801,6 +805,7 @@ class StreamInfo(YouTubeRequestClient):
             # Access "premium" streams, HLS and DASH
             # Limited video stream availability
             'default': (
+                'ios_youtube_tv',
                 'ios',
             ),
             # Will play most videos with subtitles at full resolution with HDR
@@ -808,6 +813,7 @@ class StreamInfo(YouTubeRequestClient):
             # Limited audio stream availability with some clients
             'mpd': (
                 'android_vr',
+                'android_youtube_tv',
             ),
             # Progressive streams
             # Limited video and audio stream availability
@@ -1338,11 +1344,11 @@ class StreamInfo(YouTubeRequestClient):
             return url, None
 
         parts = urlsplit(url)
-        query = parse_qs(parts.query)
-        new_query = {}
-        update_url = {}
+        params = parse_qs(parts.query)
+        new_params = {}
+        update_url = None
 
-        if self._calculate_n and 'n' in query:
+        if self._calculate_n and 'n' in params:
             if self._player_js is None:
                 self._player_js = self._get_player_js()
             if self._calculate_n is True:
@@ -1350,46 +1356,49 @@ class StreamInfo(YouTubeRequestClient):
                 self._calculate_n = ratebypass.CalculateN(self._player_js)
 
             # Cipher n to get the updated value
-            new_n = self._calculate_n.calculate_n(query['n'])
+            new_n = self._calculate_n.calculate_n(params['n'])
             if new_n:
-                new_query['n'] = new_n
-                new_query['ratebypass'] = 'yes'
+                new_params['n'] = new_n
+                new_params['ratebypass'] = 'yes'
             else:
                 self._context.log_error('nsig handling failed')
                 self._calculate_n = False
 
-        if 'range' not in query:
-            content_length = query.get('clen', [''])[0]
-            new_query['range'] = '0-{0}'.format(content_length)
+        if 'range' not in params:
+            content_length = params.get('clen', [''])[0]
+            new_params['range'] = '0-{0}'.format(content_length)
 
-        if 'mn' in query and 'fvip' in query:
-            fvip = query['fvip'][0]
-            primary, _, secondary = query['mn'][0].partition(',')
+        if 'mn' in params and 'fvip' in params:
+            fvip = params['fvip'][0]
+            primary, _, secondary = params['mn'][0].partition(',')
             prefix, separator, server = parts.netloc.partition('---')
             if primary and secondary:
-                update_url = {
-                    'netloc': separator.join((
-                        digits_re.sub(fvip, prefix),
-                        server.replace(primary, secondary),
-                    )),
-                }
+                update_url = separator.join((
+                    digits_re.sub(fvip, prefix),
+                    server.replace(primary, secondary),
+                ))
 
-        if new_query:
-            query.update(new_query)
-            query = urlencode(query, doseq=True)
+        if 'lmt' in params:
+            snippet = (self.yt_item or {}).get('snippet')
+            if snippet and 'publishedAt' not in snippet:
+                try:
+                    modified = fromtimestamp(int(params['lmt'][0]) // 1000000)
+                except (OSError, OverflowError, ValueError):
+                    modified = None
+                snippet['publishedAt'] = modified
+
+        if new_params:
+            params.update(new_params)
+            query_str = urlencode(params, doseq=True)
         elif update_url:
-            query = parts.query
+            query_str = parts.query
         else:
             return url, None
 
-        if update_url:
-            return (
-                parts._replace(query=query).geturl(),
-                parts._replace(query=query, **update_url).geturl(),
-            )
+        parts._replace(query=query_str)
         return (
-            parts._replace(query=query).geturl(),
-            None,
+            parts.geturl(),
+            parts._replace(netloc=update_url).geturl() if update_url else None,
         )
 
     def _get_error_details(self, playability_status, details=None):
@@ -1493,11 +1502,15 @@ class StreamInfo(YouTubeRequestClient):
             if name == 'ask' and use_mpd and not ask_for_quality:
                 continue
 
-            restart = False
+            restart = None
             while 1:
                 for client_name in clients:
                     _client = self.build_client(client_name, client_data)
                     if not _client:
+                        _result = None
+                        _playability = None
+                        _status = None
+                        _reason = None
                         continue
 
                     _result = self.request(
@@ -1559,7 +1572,10 @@ class StreamInfo(YouTubeRequestClient):
                         )
                         compare_reason = _reason.lower()
                         if any(why in compare_reason for why in reauth_reasons):
-                            if has_access_token:
+                            if client_data.get('_auth_required'):
+                                restart = False
+                                abort = True
+                            elif restart is None and has_access_token:
                                 client_data['_auth_required'] = True
                                 restart = True
                             break
@@ -1646,7 +1662,7 @@ class StreamInfo(YouTubeRequestClient):
             del headers['Authorization']
 
         video_details = result.get('videoDetails', {})
-        yt_item = {
+        self.yt_item = {
             'id': video_id,
             'snippet': {
                 'title': video_details.get('title'),
@@ -1809,7 +1825,7 @@ class StreamInfo(YouTubeRequestClient):
                     error_hook_kwargs={
                         'video_id': video_id,
                         'client': client_name,
-                        'auth': _client.get('_has_auth', False),
+                        'auth': caption_client.get('_has_auth', False),
                     },
                     **caption_client
                 )
@@ -1901,7 +1917,7 @@ class StreamInfo(YouTubeRequestClient):
         if not stream_list:
             raise YouTubeException('No streams found')
 
-        return stream_list.values(), yt_item
+        return stream_list.values(), self.yt_item
 
     def _process_stream_data(self,
                              stream_data,
@@ -1922,6 +1938,7 @@ class StreamInfo(YouTubeRequestClient):
         fps_map = (self.INTEGER_FPS_SCALE
                    if 'no_frac_fr_hint' in stream_features else
                    self.FRACTIONAL_FPS_SCALE)
+        quality_factor_map = self.QUALITY_FACTOR
         stream_select = settings.stream_select()
         localize = context.localize
 
@@ -1930,8 +1947,13 @@ class StreamInfo(YouTubeRequestClient):
         preferred_audio = {
             'id': '',
             'language_code': None,
-            'role_order': self.LANG_ROLE_ORDER[0],
+            'role_order': None,
+            'fallback': True,
         }
+        default_lang = self._language_base
+        prefer_default_lang = self._language_prefer_default
+        lang_role_details = self.LANG_ROLE_DETAILS
+
         for stream in stream_data:
             mime_type = stream.get('mimeType')
             if not mime_type:
@@ -1983,47 +2005,51 @@ class StreamInfo(YouTubeRequestClient):
                     language = audio_track.get('id', default_lang_code)
                     if '.' in language:
                         language_code, role_str = language.split('.')
-                        role_type = int(role_str)
+                        role_id = int(role_str)
                     else:
                         language_code = language
-                        role_type = 4
+                        role_id = 4
                         role_str = '4'
 
-                    if role_type == 4 or audio_track.get('audioIsDefault'):
-                        role = 'main'
-                        label = localize('stream.original')
-                    elif role_type == 3:
-                        role = 'dub'
-                        label = localize('stream.dubbed')
-                    elif role_type == 2:
-                        role = 'description'
-                        label = localize('stream.descriptive')
-                    # Secondary language track
-                    elif role_type == 6:
-                        role = 'alternate'
-                        label = localize('stream.alternate')
-                    # Auto-dubbed language track
-                    elif role_type == 10:
-                        role = 'dub'
-                        label = localize('stream.dubbed')
+                    role_details = lang_role_details.get(role_id)
                     # Unsure of what other audio types are actually available
                     # Role set to "alternate" as default fallback
-                    else:
-                        role = 'alternate'
-                        label = localize('stream.alternate')
+                    if not role_details:
+                        role_details = lang_role_details[0]
 
-                    role_order = self.LANG_ROLE_ORDER.get(role_type, -6)
-                    is_preferred = role_order > preferred_audio['role_order']
-                    preferred_id = preferred_audio['id']
-                    if self._language_base:
-                        lang_match = language_code == self._language_base
+                    role_type, role, role_order = role_details
+                    label = localize('stream.{0}'.format(role_type))
+
+                    preferred_order = preferred_audio['role_order']
+                    language_fallback = preferred_audio['fallback']
+
+                    if default_lang and language_code.startswith(default_lang):
+                        is_fallback = False
+                        if prefer_default_lang:
+                            role = 'main'
+                            role_order = 0
+                        elif role_type.startswith('dub'):
+                            is_fallback = True
+                        lang_match = (
+                                (language_fallback and not is_fallback)
+                                or preferred_order is None
+                                or role_order > preferred_order
+                        )
+                        language_fallback = is_fallback
                     else:
-                        lang_match = True
-                    if lang_match and (not preferred_id or is_preferred):
+                        lang_match = (
+                                language_fallback
+                                and (preferred_order is None
+                                     or role_order > preferred_order)
+                        )
+                        language_fallback = True
+
+                    if lang_match:
                         preferred_audio = {
                             'id': ''.join(('_', language_code, '.', role_str)),
                             'language_code': language_code,
                             'role_order': role_order,
+                            'fallback': language_fallback,
                         }
 
                     mime_group = ''.join((
@@ -2031,10 +2057,11 @@ class StreamInfo(YouTubeRequestClient):
                     ))
                 else:
                     language_code = default_lang_code
-                    role = 'main'
-                    role_str = '4'
-                    role_order = self.LANG_ROLE_ORDER[0]
-                    label = localize('stream.original')
+                    role_id = -1
+                    role_str = str(role_id)
+                    role_details = lang_role_details[role_id]
+                    role_type, role, role_order = role_details
+                    label = localize('stream.{0}'.format(role_type))
                     mime_group = mime_type
 
                 sample_rate = int(stream.get('audioSampleRate', '0'), 10)
@@ -2138,7 +2165,7 @@ class StreamInfo(YouTubeRequestClient):
                 'height': height,
                 'label': label,
                 'bitrate': bitrate,
-                'biasedBitrate': bitrate * self.QUALITY_FACTOR.get(codec, 1),
+                'biasedBitrate': bitrate * quality_factor_map.get(codec, 1),
                 # integer round up
                 'duration': -(-int(stream.get('approxDurationMs', 0)) // 1000),
                 'fps': fps,
@@ -2343,7 +2370,10 @@ class StreamInfo(YouTubeRequestClient):
             if role == 'main':
                 if not default:
                     role = 'alternate'
-                original = True
+                if media_type == 'audio':
+                    original = stream['role'] == 'main'
+                else:
+                    original = True
             elif role == 'description':
                 impaired = True
 

@@ -118,7 +118,7 @@ class NewSearchItem(DirectoryItem):
                                             image=image,
                                             fanart=fanart)
 
-        if context.is_plugin_path(context.get_uri(), (PATHS.SEARCH, 'list',)):
+        if context.is_plugin_path(context.get_uri(), ((PATHS.SEARCH, 'list'),)):
             context_menu = [
                 menu_items.search_clear(context),
                 menu_items.separator(),

@@ -128,7 +128,7 @@ class YouTube(LoginClient):
                 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.7',
                 'Accept': '*/*',
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Authorization': None,
+                'Authorization': 'Bearer {{0}}',
                 'DNT': '1',
                 'User-Agent': ('Mozilla/5.0 (Linux; Android 10; SM-G981B)'
                                ' AppleWebKit/537.36 (KHTML, like Gecko)'
@@ -208,8 +208,6 @@ class YouTube(LoginClient):
             ask_for_quality=ask_for_quality,
             audio_only=audio_only,
             use_mpd=use_mpd,
-            language=self._language,
-            region=self._region,
         ).load_stream_info(video_id)
 
     def remove_playlist(self, playlist_id, **kwargs):
@@ -1852,11 +1850,10 @@ class YouTube(LoginClient):
                 elif kwargs:
                     _kwargs = kwargs.pop()
                 elif input_wait:
-                    input_wait.acquire(True)
-                    input_wait.release()
-                    if kwargs:
-                        continue
-                    break
+                    with input_wait:
+                        if kwargs:
+                            continue
+                        break
                 else:
                     complete = True
                     break
@@ -1964,15 +1961,18 @@ class YouTube(LoginClient):
                 completed.append(pool_id)
                 continue
 
-            if payload['kwargs']:
-                input_wait = payload['input_wait']
-                if input_wait and input_wait.locked():
-                    input_wait.release()
-            else:
-                input_wait_for = payload['input_wait_for']
-                if not input_wait_for or input_wait_for not in payloads:
-                    completed.append(pool_id)
-                continue
+            input_wait = payload['input_wait']
+            if input_wait:
+                if payload['kwargs']:
+                    if input_wait.locked():
+                        input_wait.release()
+                else:
+                    input_wait_for = payload['input_wait_for']
+                    if input_wait_for in payloads:
+                        input_wait.acquire(False)
+                    else:
+                        completed.append(pool_id)
+                    continue
 
             available = max_threads - counts['all']
             limit = payload['limit']

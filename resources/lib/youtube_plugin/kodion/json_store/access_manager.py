@@ -425,7 +425,7 @@ class AccessManager(JSONStore):
         :return:
         """
         details = self.get_current_user_details(addon_id)
-        access_token = details.get('access_token', '')
+        access_token = details.get('access_token')
         expires = int(details.get('token_expires', -1))
 
         if access_token and expires <= int(time.time()):

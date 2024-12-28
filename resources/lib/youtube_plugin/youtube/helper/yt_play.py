@@ -469,5 +469,4 @@ def process_items_for_playlist(context,
             context.sleep(1)
         else:
             playlist_player.play_playlist_item(position)
-        return
     return items[position - 1]

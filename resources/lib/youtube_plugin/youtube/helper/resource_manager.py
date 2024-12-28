@@ -58,11 +58,12 @@ class ResourceManager(object):
         function_cache = context.get_function_cache()
         refresh = context.get_param('refresh')
         updated = []
+        handles = {}
         for identifier in ids:
             if not identifier:
                 continue
 
-            if identifier != 'mine':
+            if identifier != 'mine' and not identifier.startswith('@'):
                 updated.append(identifier)
                 continue
 
@@ -75,7 +76,10 @@ class ResourceManager(object):
             items = data.get('items')
 
             try:
-                updated.append(items[0]['id'])
+                channel_id = items[0]['id']
+                updated.append(channel_id)
+                if channel_id != identifier:
+                    handles[channel_id] = identifier
             except (IndexError, KeyError, TypeError) as exc:
                 context.log_error('ResourceManager.get_channels'
                                   ' - Own channel_id not found'
@@ -87,7 +91,7 @@ class ResourceManager(object):
         if refresh or not ids:
             result = {}
         else:
-            result = data_cache.get_items(ids, data_cache.ONE_MONTH)
+            result = data_cache.get_items(ids, data_cache.ONE_DAY)
         to_update = [id_ for id_ in ids
                      if id_ not in result
                      or not result[id_]
@@ -133,9 +137,9 @@ class ResourceManager(object):
 
         # Re-sort result to match order of requested IDs
         # Will only work in Python v3.7+
-        if list(result) != ids[:len(result)]:
+        if handles or list(result) != ids[:len(result)]:
             result = {
-                id_: result[id_]
+                handles.get(id_, id_): result[id_]
                 for id_ in ids
                 if id_ in result
             }
