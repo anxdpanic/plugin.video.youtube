@@ -281,7 +281,9 @@ def update_channel_items(provider, context, channel_id_dict,
                 ui.new_line(stats, cr_after=1) if stats else '',
                 ui.new_line(description, cr_after=1) if description else '',
                 ui.new_line('--------', cr_before=1, cr_after=1),
-                'https://youtu.be/channel' + channel_id,
+                'https://www.youtube.com/' + channel_id
+                if channel_id.startswith('@') else
+                'https://www.youtube.com/channel/' + channel_id,
             ))
         channel_item.set_plot(description)
 

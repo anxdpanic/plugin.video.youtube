@@ -72,7 +72,7 @@ class UrlToItemConverter(object):
         path = parsed_url.path.rstrip('/').lower()
         if path.startswith(('/playlist', '/watch')):
             pass
-        elif path.startswith(('/channel/', '/u/', '/user/', '/@')):
+        elif path.startswith(('/c/', '/channel/', '/u/', '/user/', '/@')):
             re_match = self.RE_PATH_ID.match(parsed_url.path)
             new_params['channel_id'] = re_match.group('id')
             if ('live' not in new_params
