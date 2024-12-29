@@ -1643,7 +1643,7 @@ class StreamInfo(YouTubeRequestClient):
                     progressive_fmts.extend(
                         _streaming_data.get('formats', [])
                     )
-                if use_mpd:
+                if use_mpd and _client.get('_use_adaptive', True):
                     adaptive_fmts.extend(
                         _streaming_data.get('adaptiveFormats', [])
                     )
