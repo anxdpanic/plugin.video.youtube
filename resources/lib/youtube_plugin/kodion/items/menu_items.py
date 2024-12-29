@@ -199,7 +199,7 @@ def add_video_to_playlist(context, video_id):
     return (
         context.localize('video.add_to_playlist'),
         context.create_uri(
-            ('playlist', 'select', 'playlist',),
+            (PATHS.PLAYLIST, 'select', 'playlist',),
             {
                 'video_id': video_id,
             },
@@ -212,7 +212,7 @@ def remove_video_from_playlist(context, playlist_id, video_id, video_name):
     return (
         context.localize('remove'),
         context.create_uri(
-            ('playlist', 'remove', 'video',),
+            (PATHS.PLAYLIST, 'remove', 'video',),
             dict(
                 context.get_params(),
                 playlist_id=playlist_id,
@@ -229,7 +229,7 @@ def rename_playlist(context, playlist_id, playlist_name):
     return (
         context.localize('rename'),
         context.create_uri(
-            ('playlist', 'rename', 'playlist',),
+            (PATHS.PLAYLIST, 'rename', 'playlist',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -243,7 +243,7 @@ def delete_playlist(context, playlist_id, playlist_name):
     return (
         context.localize('delete'),
         context.create_uri(
-            ('playlist', 'remove', 'playlist',),
+            (PATHS.PLAYLIST, 'remove', 'playlist',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -257,7 +257,7 @@ def remove_as_watch_later(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.remove'),
         context.create_uri(
-            ('playlist', 'remove', 'watch_later',),
+            (PATHS.PLAYLIST, 'remove', 'watch_later',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -271,7 +271,7 @@ def set_as_watch_later(context, playlist_id, playlist_name):
     return (
         context.localize('watch_later.list.set'),
         context.create_uri(
-            ('playlist', 'set', 'watch_later',),
+            (PATHS.PLAYLIST, 'set', 'watch_later',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -285,7 +285,7 @@ def remove_as_history(context, playlist_id, playlist_name):
     return (
         context.localize('history.list.remove'),
         context.create_uri(
-            ('playlist', 'remove', 'history',),
+            (PATHS.PLAYLIST, 'remove', 'history',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -299,7 +299,7 @@ def set_as_history(context, playlist_id, playlist_name):
     return (
         context.localize('history.list.set'),
         context.create_uri(
-            ('playlist', 'set', 'history',),
+            (PATHS.PLAYLIST, 'set', 'history',),
             {
                 'playlist_id': playlist_id,
                 'item_name': playlist_name
@@ -355,7 +355,7 @@ def watch_later_add(context, playlist_id, video_id):
     return (
         context.localize('watch_later.add'),
         context.create_uri(
-            ('playlist', 'add', 'video',),
+            (PATHS.PLAYLIST, 'add', 'video',),
             {
                 'playlist_id': playlist_id,
                 'video_id': video_id,
@@ -407,7 +407,7 @@ def go_to_channel(context, channel_id, channel_name):
     return (
         context.localize('go_to_channel') % context.get_ui().bold(channel_name),
         context.create_uri(
-            (PATHS.ROUTE, 'channel', channel_id,),
+            (PATHS.ROUTE, PATHS.CHANNEL, channel_id,),
             run=True,
         ),
     )

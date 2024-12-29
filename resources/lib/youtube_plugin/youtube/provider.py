@@ -561,7 +561,9 @@ class Provider(AbstractProvider):
                 and listitem_channel_id
                 and listitem_channel_id.lower().startswith(('mine', 'uc'))):
             context.execute('ActivateWindow(Videos, {channel}, return)'.format(
-                channel=create_uri(('channel', listitem_channel_id))
+                channel=create_uri(
+                    (PATHS.CHANNEL, listitem_channel_id,),
+                )
             ))
 
         if command == 'channel' and not identifier:
@@ -642,7 +644,7 @@ class Provider(AbstractProvider):
                 playlists_item = DirectoryItem(
                     ui.bold(item_label),
                     create_uri(
-                        ('channel', channel_id, 'playlists'),
+                        (PATHS.CHANNEL, channel_id, 'playlists'),
                         new_params,
                     ),
                     image='{media}/playlist.png',
@@ -657,7 +659,7 @@ class Provider(AbstractProvider):
                 shorts_item = DirectoryItem(
                     ui.bold(item_label),
                     create_uri(
-                        ('channel', channel_id, 'shorts'),
+                        (PATHS.CHANNEL, channel_id, 'shorts'),
                         new_params,
                     ),
                     image='{media}/shorts.png',
@@ -672,7 +674,7 @@ class Provider(AbstractProvider):
                 live_item = DirectoryItem(
                     ui.bold(item_label),
                     create_uri(
-                        ('channel', channel_id, 'live'),
+                        (PATHS.CHANNEL, channel_id, 'live'),
                         new_params,
                     ),
                     image='{media}/live.png',
@@ -1378,7 +1380,7 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool('youtube.folder.my_channel.show', True):
             my_channel_item = DirectoryItem(
                 localize('my_channel'),
-                create_uri(('channel', 'mine')),
+                create_uri((PATHS.CHANNEL, 'mine')),
                 image='{media}/user.png',
             )
             result.append(my_channel_item)
@@ -1388,7 +1390,9 @@ class Provider(AbstractProvider):
             if watch_later_id:
                 watch_later_item = DirectoryItem(
                     localize('watch_later'),
-                    create_uri(('channel', 'mine', 'playlist', watch_later_id)),
+                    create_uri(
+                        (PATHS.CHANNEL, 'mine', 'playlist', watch_later_id,),
+                    ),
                     image='{media}/watch_later.png',
                 )
                 context_menu = [
@@ -1434,7 +1438,9 @@ class Provider(AbstractProvider):
                 liked_list_id = playlists['likes']
                 liked_videos_item = DirectoryItem(
                     localize('video.liked'),
-                    create_uri(('channel', 'mine', 'playlist', liked_list_id)),
+                    create_uri(
+                        (PATHS.CHANNEL, 'mine', 'playlist', liked_list_id,),
+                    ),
                     image='{media}/likes.png',
                 )
                 context_menu = [
@@ -1465,7 +1471,9 @@ class Provider(AbstractProvider):
             if history_id:
                 watch_history_item = DirectoryItem(
                     localize('history'),
-                    create_uri(('channel', 'mine', 'playlist', history_id)),
+                    create_uri(
+                        (PATHS.CHANNEL, 'mine', 'playlist', history_id,),
+                    ),
                     image='{media}/history.png',
                 )
                 context_menu = [
@@ -1509,7 +1517,9 @@ class Provider(AbstractProvider):
         if logged_in and settings_bool('youtube.folder.playlists.show', True):
             playlists_item = DirectoryItem(
                 localize('playlists'),
-                create_uri(('channel', 'mine', 'playlists')),
+                create_uri(
+                    (PATHS.CHANNEL, 'mine', 'playlists',),
+                ),
                 image='{media}/playlist.png',
             )
             result.append(playlists_item)

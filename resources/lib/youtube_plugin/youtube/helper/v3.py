@@ -153,7 +153,7 @@ def _process_list_response(provider,
 
         elif kind_type == 'channel':
             item_uri = context.create_uri(
-                ('channel', item_id),
+                (PATHS.CHANNEL, item_id,),
                 item_params,
             )
             item = DirectoryItem(title,
@@ -183,7 +183,7 @@ def _process_list_response(provider,
             subscription_id_dict[item_id] = subscription_id
 
             item_uri = context.create_uri(
-                ('channel', item_id),
+                (PATHS.CHANNEL, item_id,),
                 item_params
             )
             item = DirectoryItem(title,
@@ -204,12 +204,12 @@ def _process_list_response(provider,
                 uri_channel_id = channel_id
             if uri_channel_id:
                 item_uri = context.create_uri(
-                    ('channel', uri_channel_id, 'playlist', item_id),
+                    (PATHS.CHANNEL, uri_channel_id, 'playlist', item_id,),
                     item_params,
                 )
             else:
                 item_uri = context.create_uri(
-                    ('playlist', item_id),
+                    (PATHS.PLAYLIST, item_id,),
                     item_params,
                 )
             item = DirectoryItem(title,

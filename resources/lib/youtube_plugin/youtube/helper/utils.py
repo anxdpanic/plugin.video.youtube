@@ -958,7 +958,7 @@ def update_video_items(provider, context, video_id_dict,
 
         if channel_id:
             # got to [CHANNEL] only if we are not directly in the channel
-            if context.create_path('channel', channel_id) != path:
+            if context.create_path(PATHS.CHANNEL, channel_id) != path:
                 media_item.channel_id = channel_id
                 context_menu.append(
                     menu_items.go_to_channel(
