@@ -1339,14 +1339,18 @@ class StreamInfo(YouTubeRequestClient):
             return url
         return None
 
-    def _process_url_params(self, url, digits_re=re_compile(r'\d+')):
+    def _process_url_params(self,
+                            url,
+                            update_primary=False,
+                            digits_re=re_compile(r'\d+')):
         if not url:
             return url, None
 
         parts = urlsplit(url)
         params = parse_qs(parts.query)
         new_params = {}
-        update_url = None
+        primary_update_url = None
+        secondary_update_url = None
 
         if self._calculate_n and 'n' in params:
             if self._player_js is None:
@@ -1372,9 +1376,15 @@ class StreamInfo(YouTubeRequestClient):
             fvip = params['fvip'][0]
             primary, _, secondary = params['mn'][0].partition(',')
             prefix, separator, server = parts.netloc.partition('---')
+            new_prefix = digits_re.sub(fvip, prefix)
+            if update_primary and new_prefix != prefix:
+                primary_update_url = separator.join((
+                    new_prefix,
+                    server,
+                ))
             if primary and secondary:
-                update_url = separator.join((
-                    digits_re.sub(fvip, prefix),
+                secondary_update_url = separator.join((
+                    new_prefix,
                     server.replace(primary, secondary),
                 ))
 
@@ -1390,15 +1400,19 @@ class StreamInfo(YouTubeRequestClient):
         if new_params:
             params.update(new_params)
             query_str = urlencode(params, doseq=True)
-        elif update_url:
+        elif primary_update_url or secondary_update_url:
             query_str = parts.query
         else:
             return url, None
 
         parts._replace(query=query_str)
         return (
+            parts._replace(netloc=primary_update_url).geturl()
+            if primary_update_url else
             parts.geturl(),
-            parts._replace(netloc=update_url).geturl() if update_url else None,
+            parts._replace(netloc=secondary_update_url).geturl()
+            if secondary_update_url else
+            None,
         )
 
     def _get_error_details(self, playability_status, details=None):
