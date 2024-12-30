@@ -177,7 +177,6 @@ class YouTubeRequestClient(BaseRequestsClass):
         'ios': {
             '_id': 5,
             '_auth_type': False,
-            '_use_adaptive': False,
             '_os': {
                 'major': '18',
                 'minor': '1',
