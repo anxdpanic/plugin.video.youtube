@@ -1095,12 +1095,12 @@ class StreamInfo(YouTubeRequestClient):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _update_from_hls(self,
-                         stream_list,
-                         urls,
-                         is_live=False,
-                         meta_info=None,
-                         playback_stats=None):
+    def _process_hls(self,
+                     stream_list,
+                     urls,
+                     is_live=False,
+                     meta_info=None,
+                     playback_stats=None):
         if not urls:
             return
 
@@ -1196,12 +1196,12 @@ class StreamInfo(YouTubeRequestClient):
 
                 stream_list[itag] = yt_format
 
-    def _update_from_streams(self,
-                             stream_list,
-                             streams,
-                             is_live=False,
-                             meta_info=None,
-                             playback_stats=None):
+    def _process_progressive_streams(self,
+                                     stream_list,
+                                     streams,
+                                     is_live=False,
+                                     meta_info=None,
+                                     playback_stats=None):
         if self._selected_client:
             headers = self._selected_client['client']['headers']
         else:
@@ -1811,7 +1811,7 @@ class StreamInfo(YouTubeRequestClient):
                 or ask_for_quality
                 or not use_mpd
         ):
-            self._update_from_hls(
+            self._process_hls(
                 stream_list,
                 hls_playlists,
                 is_live,
@@ -1871,7 +1871,7 @@ class StreamInfo(YouTubeRequestClient):
 
         # extract adaptive streams and create MPEG-DASH manifest
         if adaptive_fmts and not audio_only:
-            video_data, audio_data = self._process_stream_data(
+            video_data, audio_data = self._process_adaptive_streams(
                 adaptive_fmts,
                 default_lang['default']
                 if default_lang['original'] == 'und' else
@@ -1920,7 +1920,7 @@ class StreamInfo(YouTubeRequestClient):
         if adaptive_fmts and (audio_only or ask_for_quality):
             progressive_fmts.extend(adaptive_fmts)
         if progressive_fmts:
-            self._update_from_streams(
+            self._process_progressive_streams(
                 stream_list,
                 progressive_fmts,
                 is_live,
@@ -1933,12 +1933,12 @@ class StreamInfo(YouTubeRequestClient):
 
         return stream_list.values(), self.yt_item
 
-    def _process_stream_data(self,
-                             stream_data,
-                             default_lang_code='und',
-                             codec_re=re_compile(
-                                 r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
-                             )):
+    def _process_adaptive_streams(self,
+                                  stream_data,
+                                  default_lang_code='und',
+                                  codec_re=re_compile(
+                                      r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
+                                  )):
         context = self._context
         settings = context.get_settings()
         audio_only = self._audio_only
