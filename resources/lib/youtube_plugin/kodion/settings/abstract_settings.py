@@ -428,7 +428,7 @@ class AbstractSettings(object):
         return port
 
     def httpd_listen(self, value=None):
-        default = '0.0.0.0'
+        default = '127.0.0.1'
 
         if value is None:
             ip_address = self.get_string(SETTINGS.HTTPD_LISTEN, default)

@@ -930,7 +930,10 @@ def get_listen_addresses():
         socket.AF_INET,
         getattr(socket, 'AF_INET6', None)
     ]
-    for interface in socket.getaddrinfo(socket.gethostname(), None):
+    for interface in (
+            socket.getaddrinfo(socket.gethostname(), None)
+            + socket.getaddrinfo(xbmc.getIPAddress(), None)
+    ):
         ip_address = interface[4][0]
         address_family = interface[0]
         if not address_family or address_family not in allowed_address_families:
