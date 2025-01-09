@@ -458,6 +458,11 @@ class AbstractSettings(object):
             return self.set_bool(SETTINGS.HTTPD_IDLE_SLEEP, value)
         return self.get_bool(SETTINGS.HTTPD_IDLE_SLEEP, True)
 
+    def httpd_stream_redirect(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.HTTPD_STREAM_REDIRECT, value)
+        return self.get_bool(SETTINGS.HTTPD_STREAM_REDIRECT, False)
+
     def api_config_page(self):
         return self.get_bool(SETTINGS.API_CONFIG_PAGE, False)
 

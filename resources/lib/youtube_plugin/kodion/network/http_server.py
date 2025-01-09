@@ -392,6 +392,8 @@ class RequestHandler(BaseHTTPRequestHandler):
 
             original_query_str = urlencode(params, doseq=True)
 
+            stream_redirect = settings.httpd_stream_redirect()
+
             response = None
             for server in servers:
                 if not server:
@@ -404,6 +406,13 @@ class RequestHandler(BaseHTTPRequestHandler):
                     original_query_str,
                     '',
                 ))
+
+                if stream_redirect and server in _server_list:
+                    self.send_response(301)
+                    self.send_header('Location', stream_url)
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    break
 
                 headers['Host'] = server
                 with self.requests.request(stream_url,

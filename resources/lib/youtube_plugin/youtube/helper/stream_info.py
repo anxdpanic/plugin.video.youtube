@@ -1925,6 +1925,9 @@ class StreamInfo(YouTubeRequestClient):
                     title='',
                     url=manifest_url,
                     meta=meta_info,
+                    headers={
+                        'User-Agent': 'youtube/0.1 ({0})'.format(self.video_id),
+                    },
                     playback_stats=playback_stats,
                 )
 
