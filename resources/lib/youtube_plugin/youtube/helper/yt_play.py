@@ -362,6 +362,8 @@ def process(provider, context, **_kwargs):
                 ui.set_property(PLAYLIST_POSITION, str(position))
         else:
             ui.clear_property(BUSY_FLAG)
+            for param in force_play_params:
+                ui.clear_property(param)
 
         return media_item
 
