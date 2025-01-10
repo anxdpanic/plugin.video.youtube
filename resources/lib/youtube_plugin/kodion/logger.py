@@ -14,8 +14,6 @@ from .compatibility import xbmc
 from .constants import ADDON_ID
 
 
-
-
 class Logger(object):
     LOGDEBUG = xbmc.LOGDEBUG
     LOGINFO = xbmc.LOGINFO

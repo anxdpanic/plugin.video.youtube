@@ -1967,10 +1967,12 @@ class YouTube(LoginClient):
                     if input_wait.locked():
                         input_wait.release()
                 else:
-                    input_wait_for = payload['input_wait_for']
-                    if input_wait_for in payloads:
-                        input_wait.acquire(False)
+                    if payload['input_wait_for'] in payloads:
+                        if not input_wait.locked():
+                            input_wait.acquire(True)
                     else:
+                        if input_wait.locked():
+                            input_wait.release()
                         completed.append(pool_id)
                     continue
 

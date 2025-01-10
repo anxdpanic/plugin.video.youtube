@@ -107,6 +107,8 @@ def process_default_settings(context, step, steps, **_kwargs):
                 background=False,
         ) as progress_dialog:
             progress_dialog.update()
+            if settings.httpd_listen() == '0.0.0.0':
+                settings.httpd_listen('127.0.0.1')
             if not httpd_status(context):
                 port = settings.httpd_port()
                 addresses = get_listen_addresses()

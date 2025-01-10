@@ -36,7 +36,6 @@ SUBTITLE_OPTIONS = {
     'all': 16,
 }
 
-
 SUBTITLE_SELECTIONS = {
     0: SUBTITLE_OPTIONS['none'],
     1: SUBTITLE_OPTIONS['all']
@@ -56,6 +55,7 @@ SUBTITLE_SELECTIONS = {
     'preferred': 4,
     'all': 5,
 }
+
 
 class Subtitles(object):
     BASE_PATH = make_dirs(TEMP_PATH)
@@ -405,13 +405,13 @@ class Subtitles(object):
                                         ' - Unable to access temp directory')
                 return None, None
 
-            filepath = os.path.join(self.BASE_PATH, filename)
-            if xbmcvfs.exists(filepath):
+            file_path = os.path.join(self.BASE_PATH, filename)
+            if xbmcvfs.exists(file_path):
                 self._context.log_debug('Subtitles._get_url'
                                         ' - Use existing subtitle for: |{lang}|'
                                         '\n\tFile: {file}'
-                                        .format(lang=lang, file=filepath))
-                return filepath, self.FORMATS[sub_format]['mime_type']
+                                        .format(lang=lang, file=file_path))
+                return file_path, self.FORMATS[sub_format]['mime_type']
 
         base_url = self._normalize_url(track.get('baseUrl'))
         if not base_url:
@@ -448,15 +448,15 @@ class Subtitles(object):
                            encoding='utf8',
                            errors='ignore')
         try:
-            with xbmcvfs.File(filepath, 'w') as sub_file:
+            with xbmcvfs.File(file_path, 'w') as sub_file:
                 success = sub_file.write(output)
         except (IOError, OSError):
             self._context.log_error('Subtitles._get_url'
                                     ' - write failed for: |{lang}|'
                                     '\n\tFile: {file}'
-                                    .format(lang=lang, file=filepath))
+                                    .format(lang=lang, file=file_path))
         if success:
-            return filepath, self.FORMATS[sub_format]['mime_type']
+            return file_path, self.FORMATS[sub_format]['mime_type']
         return None, None
 
     def _get_track(self,

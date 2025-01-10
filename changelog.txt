@@ -1,3 +1,20 @@
+## v7.2.0+beta.3
+### Fixed
+- Fix possible exception in creating request clients if client_data is not provided
+- Only force playback if plugin invocation was triggered through UI
+- Ensure that any set UI playback properties are cleared if playback does not start
+- Fix episode and season getter/setter not being available for AudioItem
+- Fix full playlist listings not being able to be redirected
+
+### Changed
+- Proxy stream requests using HTTPServer #527 #1040
+  - Correct primary video server url #1040
+  - Allow skipping adaptive formats for clients that may need PO tokens #1040
+  - Add option to redirect streams using stream proxy #1040
+    - As headers are not matched this can lead to detection of Kodi being used as a client
+- Use default http server listen address of 127.0.0.1
+- Allow playback parameters to be applied for entire listings
+
 ## v7.2.0+beta.2
 ### Fixed
 - Fix audio langauge fallback selection #989 #1036

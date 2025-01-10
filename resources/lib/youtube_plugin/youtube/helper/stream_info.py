@@ -10,7 +10,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-from json import loads as json_loads
+from json import dumps as json_dumps, loads as json_loads
 from os import path as os_path
 from random import choice as random_choice
 from re import compile as re_compile
@@ -36,7 +36,7 @@ from ...kodion.compatibility import (
 )
 from ...kodion.constants import PATHS, TEMP_PATH
 from ...kodion.network import get_connect_address
-from ...kodion.utils import make_dirs, redact_ip
+from ...kodion.utils import make_dirs, merge_dicts, redact_ip
 from ...kodion.utils.datetime_parser import fromtimestamp
 
 
@@ -799,7 +799,6 @@ class StreamInfo(YouTubeRequestClient):
         self._cipher = None
 
         self._auth_client = {}
-        self._selected_client = {}
         self._client_groups = {
             'custom': clients if clients else (),
             # Access "premium" streams, HLS and DASH
@@ -812,8 +811,8 @@ class StreamInfo(YouTubeRequestClient):
             # Some restricted videos require additional requests for subtitles
             # Limited audio stream availability with some clients
             'mpd': (
-                'android_vr',
                 'android_youtube_tv',
+                'android_vr',
             ),
             # Progressive streams
             # Limited video and audio stream availability
@@ -1095,22 +1094,59 @@ class StreamInfo(YouTubeRequestClient):
             url = urljoin('https://www.youtube.com', url)
         return url
 
-    def _update_from_hls(self,
-                         stream_list,
-                         urls,
-                         is_live=False,
-                         meta_info=None,
-                         playback_stats=None):
-        if not urls:
+    def _process_mpd(self,
+                     stream_list,
+                     responses,
+                     meta_info=None,
+                     playback_stats=None):
+        if not responses:
             return
 
-        if self._selected_client:
-            client_name = self._selected_client['client']['_name']
-            headers = self._selected_client['client']['headers']
-        else:
-            client_name = 'web'
-            client_data = {'json': {'videoId': self.video_id}}
-            headers = self.build_client(client_name, client_data)['headers']
+        if meta_info is None:
+            meta_info = {'video': {},
+                         'channel': {},
+                         'thumbnails': {},
+                         'subtitles': []}
+
+        if playback_stats is None:
+            playback_stats = {}
+
+        itag = '9998'
+
+        for client_name, response in responses.items():
+            if itag in stream_list:
+                break
+
+            url = response['mpd_manifest']
+            if not url:
+                continue
+
+            headers = response['client']['headers']
+
+            if '?' in url:
+                url += '&mpd_version=5'
+            elif url.endswith('/'):
+                url += 'mpd_version/5'
+            else:
+                url += '/mpd_version/5'
+
+            stream_list[itag] = self._get_stream_format(
+                itag=itag,
+                title='',
+                url=url,
+                meta=meta_info,
+                headers=headers,
+                playback_stats=playback_stats,
+            )
+
+    def _process_hls(self,
+                     stream_list,
+                     responses,
+                     is_live=False,
+                     meta_info=None,
+                     playback_stats=None):
+        if not responses:
+            return
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1130,7 +1166,13 @@ class StreamInfo(YouTubeRequestClient):
             selected_height = settings.fixed_video_quality()
         log_debug = context.log_debug
 
-        for url in urls:
+        for client_name, response in responses.items():
+            url = response['hls_manifest']
+            if not url:
+                continue
+
+            headers = response['client']['headers']
+
             result = self.request(
                 url,
                 headers=headers,
@@ -1154,8 +1196,8 @@ class StreamInfo(YouTubeRequestClient):
                     itag=itag,
                     title='',
                     url=url,
-                    headers=headers,
                     meta=meta_info,
+                    headers=headers,
                     playback_stats=playback_stats,
                 )
 
@@ -1196,18 +1238,15 @@ class StreamInfo(YouTubeRequestClient):
 
                 stream_list[itag] = yt_format
 
-    def _update_from_streams(self,
-                             stream_list,
-                             streams,
-                             is_live=False,
-                             meta_info=None,
-                             playback_stats=None):
-        if self._selected_client:
-            headers = self._selected_client['client']['headers']
-        else:
-            client_name = 'web'
-            client_data = {'json': {'videoId': self.video_id}}
-            headers = self.build_client(client_name, client_data)['headers']
+    def _process_progressive_streams(self,
+                                     stream_list,
+                                     responses,
+                                     is_live=False,
+                                     use_adaptive=False,
+                                     meta_info=None,
+                                     playback_stats=None):
+        if not responses:
+            return
 
         if meta_info is None:
             meta_info = {'video': {},
@@ -1227,74 +1266,89 @@ class StreamInfo(YouTubeRequestClient):
             selected_height = settings.fixed_video_quality()
         log_debug = context.log_debug
 
-        for stream_map in streams:
-            itag = str(stream_map['itag'])
-            if itag in stream_list:
+        for client_name, response in responses.items():
+            streams = response['progressive_fmts']
+            if use_adaptive:
+                _streams = response['adaptive_fmts']
+                if _streams:
+                    if streams:
+                        streams += _streams
+                    else:
+                        streams = _streams
+            if not streams:
                 continue
 
-            url = stream_map.get('url')
-            conn = stream_map.get('conn')
-            stream = stream_map.get('stream')
+            headers = response['client']['headers']
 
-            if not url and conn and stream:
-                new_url = '%s?%s' % (conn, unquote(stream))
-            elif not url and 'signatureCipher' in stream_map:
-                new_url = self._process_signature_cipher(stream_map)
-            else:
-                new_url = url
+            for stream_map in streams:
+                itag = str(stream_map['itag'])
+                if itag in stream_list:
+                    continue
 
-            if not new_url:
-                continue
-            new_url, _ = self._process_url_params(new_url)
+                url = stream_map.get('url')
+                conn = stream_map.get('conn')
+                stream = stream_map.get('stream')
 
-            stream_map['itag'] = itag
-            yt_format = self._get_stream_format(
-                itag=itag,
-                max_height=selected_height,
-                title='',
-                url=new_url,
-                meta=meta_info,
-                headers=headers,
-                playback_stats=playback_stats,
-            )
-            if yt_format is None:
-                if url:
-                    stream_map['url'] = redact_ip(url)
-                if conn:
-                    stream_map['conn'] = redact_ip(conn)
-                if stream:
-                    stream_map['stream'] = redact_ip(stream)
-                log_debug('Unknown itag - {itag}'
-                          '\n\t{stream}'
-                          .format(itag=itag, stream=stream_map))
-            if (not yt_format
-                    or (yt_format.get('dash/video')
-                        and not yt_format.get('dash/audio'))):
-                continue
+                if not url and conn and stream:
+                    new_url = '%s?%s' % (conn, unquote(stream))
+                elif not url and 'signatureCipher' in stream_map:
+                    new_url = self._process_signature_cipher(stream_map)
+                else:
+                    new_url = url
 
-            if is_live:
-                yt_format['live'] = True
-                yt_format['title'] = 'Live ' + yt_format['title']
+                if not new_url:
+                    continue
+                new_url = self._process_url_params(new_url, mpd=False)
 
-            audio_track = stream_map.get('audioTrack')
-            if audio_track:
-                track_id = audio_track['id']
-                track_name = audio_track['displayName']
-                itag = '.'.join((
-                    itag,
-                    track_id,
-                ))
-                yt_format['title'] = ' '.join((
-                    yt_format['title'],
-                    track_name,
-                )).strip()
-                yt_format['sort'].extend((
-                    track_id.startswith(self._language_base),
-                    'original' in track_name or audio_track['audioIsDefault'],
-                    track_name,
-                ))
+                stream_map['itag'] = itag
+                yt_format = self._get_stream_format(
+                    itag=itag,
+                    max_height=selected_height,
+                    title='',
+                    url=new_url,
+                    meta=meta_info,
+                    headers=headers,
+                    playback_stats=playback_stats,
+                )
+                if yt_format is None:
+                    if url:
+                        stream_map['url'] = redact_ip(url)
+                    if conn:
+                        stream_map['conn'] = redact_ip(conn)
+                    if stream:
+                        stream_map['stream'] = redact_ip(stream)
+                    log_debug('Unknown itag - {itag}'
+                              '\n\t{stream}'
+                              .format(itag=itag, stream=stream_map))
+                if (not yt_format
+                        or (yt_format.get('dash/video')
+                            and not yt_format.get('dash/audio'))):
+                    continue
 
-            stream_list[itag] = yt_format
+                if is_live:
+                    yt_format['live'] = True
+                    yt_format['title'] = 'Live ' + yt_format['title']
+
+                audio_track = stream_map.get('audioTrack')
+                if audio_track:
+                    track_id = audio_track['id']
+                    track_name = audio_track['displayName']
+                    is_default = audio_track['audioIsDefault']
+                    itag = '.'.join((
+                        itag,
+                        track_id,
+                    ))
+                    yt_format['title'] = ' '.join((
+                        yt_format['title'],
+                        track_name,
+                    )).strip()
+                    yt_format['sort'].extend((
+                        track_id.startswith(self._language_base),
+                        is_default or 'original' in track_name,
+                        track_name,
+                    ))
+
+                stream_list[itag] = yt_format
 
     def _process_signature_cipher(self, stream_map):
         if self._cipher is None:
@@ -1339,14 +1393,17 @@ class StreamInfo(YouTubeRequestClient):
             return url
         return None
 
-    def _process_url_params(self, url, digits_re=re_compile(r'\d+')):
+    def _process_url_params(self,
+                            url,
+                            mpd=True,
+                            headers=None,
+                            digits_re=re_compile(r'\d+')):
         if not url:
-            return url, None
+            return url
 
         parts = urlsplit(url)
         params = parse_qs(parts.query)
         new_params = {}
-        update_url = None
 
         if self._calculate_n and 'n' in params:
             if self._player_js is None:
@@ -1364,20 +1421,6 @@ class StreamInfo(YouTubeRequestClient):
                 self._context.log_error('nsig handling failed')
                 self._calculate_n = False
 
-        if 'range' not in params:
-            content_length = params.get('clen', [''])[0]
-            new_params['range'] = '0-{0}'.format(content_length)
-
-        if 'mn' in params and 'fvip' in params:
-            fvip = params['fvip'][0]
-            primary, _, secondary = params['mn'][0].partition(',')
-            prefix, separator, server = parts.netloc.partition('---')
-            if primary and secondary:
-                update_url = separator.join((
-                    digits_re.sub(fvip, prefix),
-                    server.replace(primary, secondary),
-                ))
-
         if 'lmt' in params:
             snippet = (self.yt_item or {}).get('snippet')
             if snippet and 'publishedAt' not in snippet:
@@ -1387,19 +1430,98 @@ class StreamInfo(YouTubeRequestClient):
                     modified = None
                 snippet['publishedAt'] = modified
 
+        if mpd:
+            new_params['__id'] = self.video_id
+            new_params['__netloc'] = [parts.netloc]
+            new_params['__path'] = parts.path
+            new_params['__headers'] = json_dumps(headers or {})
+
+            if 'mn' in params and 'fvip' in params:
+                fvip = params['fvip'][0]
+                primary, _, secondary = params['mn'][0].partition(',')
+                prefix, separator, server = parts.netloc.partition('---')
+                if primary and secondary:
+                    new_params['__netloc'].append(separator.join((
+                        digits_re.sub(fvip, prefix),
+                        server.replace(primary, secondary),
+                    )))
+
+            params.update(new_params)
+            query_str = urlencode(params, doseq=True)
+
+            return parts._replace(
+                scheme='http',
+                netloc=get_connect_address(self._context, as_netloc=True),
+                path=PATHS.STREAM_PROXY,
+                query=query_str,
+            ).geturl()
+
+        elif 'range' not in params:
+            content_length = params.get('clen', [''])[0]
+            new_params['range'] = '0-{0}'.format(content_length)
+
         if new_params:
             params.update(new_params)
             query_str = urlencode(params, doseq=True)
-        elif update_url:
-            query_str = parts.query
-        else:
-            return url, None
+            return parts._replace(query=query_str).geturl()
 
-        parts._replace(query=query_str)
-        return (
-            parts.geturl(),
-            parts._replace(netloc=update_url).geturl() if update_url else None,
-        )
+        return parts.geturl()
+
+    def _process_captions(self, subtitles, responses):
+        all_subs = SUBTITLE_SELECTIONS['all']
+        default_lang = None
+        subs_data = None
+
+        for client_name, response in responses.items():
+            if subs_data:
+                break
+
+            captions = response['captions']
+            client = response['client']
+            do_query = client.get('_query_subtitles')
+
+            if (not captions
+                    or do_query is True
+                    or (do_query and subtitles.sub_selection == all_subs)):
+                continue
+
+            subtitles.load(captions, client['headers'].copy())
+            default_lang = subtitles.get_lang_details()
+            subs_data = subtitles.get_subtitles()
+
+        if subs_data:
+            return default_lang, subs_data
+
+        video_id = self.video_id
+        client_data = {'json': {'videoId': video_id}}
+        video_info_url = 'https://www.youtube.com/youtubei/v1/player'
+
+        for client_name in ('smart_tv_embedded', 'web'):
+            client = self.build_client(client_name, client_data)
+            if not client:
+                continue
+            result = self.request(
+                video_info_url,
+                'POST',
+                response_hook=self._response_hook_json,
+                error_title='Caption player request failed',
+                error_hook=self._error_hook,
+                error_hook_kwargs={
+                    'video_id': video_id,
+                    'client': client_name,
+                    'auth': client.get('_has_auth', False),
+                },
+                **client
+            )
+
+            captions = result and result.get('captions')
+            caption_headers = client['headers']
+            if captions:
+                subtitles.load(captions, caption_headers)
+                default_lang = subtitles.get_lang_details()
+                subs_data = subtitles.get_subtitles()
+
+        return default_lang, subs_data
 
     def _get_error_details(self, playability_status, details=None):
         if not playability_status:
@@ -1449,15 +1571,17 @@ class StreamInfo(YouTubeRequestClient):
         client_name = None
         _client = None
         _result = None
+        _video_details = None
+        _microformat = None
+        _streaming_data = None
         _playability = None
         _status = None
         _reason = None
 
+        video_details = {}
+        microformat = {}
+        responses = {}
         stream_list = {}
-        streaming_data = {}
-        adaptive_fmts = []
-        progressive_fmts = []
-        hls_playlists = []
 
         video_info_url = 'https://www.youtube.com/youtubei/v1/player'
 
@@ -1508,6 +1632,9 @@ class StreamInfo(YouTubeRequestClient):
                     _client = self.build_client(client_name, client_data)
                     if not _client:
                         _result = None
+                        _video_details = None
+                        _microformat = None
+                        _streaming_data = None
                         _playability = None
                         _status = None
                         _reason = None
@@ -1528,6 +1655,10 @@ class StreamInfo(YouTubeRequestClient):
                     ) or {}
 
                     _video_details = _result.get('videoDetails', {})
+                    _microformat = (_result
+                                    .get('microformat', {})
+                                    .get('playerMicroformatRenderer'))
+                    _streaming_data = _result.get('streamingData', {})
                     _playability = _result.get('playabilityStatus', {})
                     _status = _playability.get('status', 'ERROR').upper()
                     _reason = _playability.get('reason', 'UNKNOWN')
@@ -1613,31 +1744,35 @@ class StreamInfo(YouTubeRequestClient):
                         auth=_client.get('_has_auth', False),
                     )
                 )
-                if not self._selected_client:
-                    self._selected_client = {
-                        'client': _client.copy(),
-                        'result': _result,
-                    }
+
+                video_details = merge_dicts(
+                    _video_details,
+                    video_details,
+                    compare_str=True,
+                )
+
+                microformat = merge_dicts(
+                    _microformat,
+                    microformat,
+                    compare_str=True,
+                )
+
                 if not self._auth_client and _client.get('_has_auth'):
                     self._auth_client = {
                         'client': _client.copy(),
                         'result': _result,
                     }
 
-                _streaming_data = _result.get('streamingData', {})
-                if audio_only or ask_for_quality or not use_mpd:
-                    progressive_fmts.extend(
-                        _streaming_data.get('formats', [])
-                    )
-                if use_mpd:
-                    adaptive_fmts.extend(
-                        _streaming_data.get('adaptiveFormats', [])
-                    )
-                if 'hlsManifestUrl' in _streaming_data:
-                    hls_playlists.append(_streaming_data['hlsManifestUrl'])
-                streaming_data.update(_streaming_data)
+                responses[client_name] = {
+                    'client': _client,
+                    'progressive_fmts': _streaming_data.get('formats'),
+                    'adaptive_fmts': _streaming_data.get('adaptiveFormats'),
+                    'mpd_manifest': _streaming_data.get('dashManifestUrl'),
+                    'hls_manifest': _streaming_data.get('hlsManifestUrl'),
+                    'captions': _result.get('captions'),
+                }
 
-        if not self._selected_client:
+        if not responses:
             if _status == 'LIVE_STREAM_OFFLINE':
                 if not _reason:
                     _reason = self._get_error_details(
@@ -1654,14 +1789,6 @@ class StreamInfo(YouTubeRequestClient):
                 _reason = self._get_error_details(_playability)
             raise YouTubeException(_reason or 'UNKNOWN')
 
-        client = self._selected_client['client']
-        result = self._selected_client['result']
-
-        headers = client['headers']
-        if 'Authorization' in headers:
-            del headers['Authorization']
-
-        video_details = result.get('videoDetails', {})
         self.yt_item = {
             'id': video_id,
             'snippet': {
@@ -1690,8 +1817,6 @@ class StreamInfo(YouTubeRequestClient):
             live_dvr = False
             thumb_suffix = ''
 
-        microformat = (result.get('microformat', {})
-                       .get('playerMicroformatRenderer', {}))
         meta_info = {
             'id': video_id,
             'title': unescape(video_details.get('title', '')
@@ -1743,128 +1868,54 @@ class StreamInfo(YouTubeRequestClient):
                 'watchtime_url': '',
             }
 
-        pa_li_info = streaming_data.get('licenseInfos', [])
-        if any(pa_li_info) and not settings.use_isa():
-            raise YouTubeException('InputStream.Adaptive not enabled')
-        for li_info in pa_li_info:
-            if li_info.get('drmFamily') != 'WIDEVINE':
-                continue
-            url = li_info.get('url')
-            if not url:
-                continue
-            self._context.log_debug('Found widevine license url: {0}'
-                                    .format(url))
-            license_info = {
-                'url': url,
-                'proxy': urlunsplit((
-                    'http',
-                    get_connect_address(self._context, as_netloc=True),
-                    PATHS.DRM,
-                    '',
-                    '',
-                )) + '||R{{SSM}}|R',
-                'token': self._access_token,
-            }
-            break
-        else:
-            license_info = {
-                'url': None,
-                'proxy': None,
-                'token': None
-            }
-
-        if 'dashManifestUrl' in streaming_data:
-            manifest_url = streaming_data['dashManifestUrl']
-            if '?' in manifest_url:
-                manifest_url += '&mpd_version=5'
-            elif manifest_url.endswith('/'):
-                manifest_url += 'mpd_version/5'
-            else:
-                manifest_url += '/mpd_version/5'
-
-            stream_list['9998'] = self._get_stream_format(
-                itag='9998',
-                title='',
-                url=manifest_url,
-                meta=meta_info,
-                headers=headers,
-                license_info=license_info,
+        if is_live or live_dvr or ask_for_quality or not use_mpd:
+            self._process_hls(
+                stream_list=stream_list,
+                responses=responses,
+                is_live=is_live,
+                meta_info=meta_info,
                 playback_stats=playback_stats,
             )
-        if hls_playlists and (
-                is_live
-                or live_dvr
-                or ask_for_quality
-                or not use_mpd
-        ):
-            self._update_from_hls(
-                stream_list,
-                hls_playlists,
-                is_live,
-                meta_info,
-                playback_stats,
-            )
 
-        subtitles = Subtitles(context, video_id)
-        query_subtitles = client.get('_query_subtitles')
-        if ((not is_live or live_dvr) and (
-                query_subtitles is True
-                or (query_subtitles
-                    and subtitles.sub_selection == SUBTITLE_SELECTIONS['all'])
-        )):
-            for client_name in ('smart_tv_embedded', 'web'):
-                caption_client = self.build_client(client_name, client_data)
-                if not caption_client:
-                    continue
-                result = self.request(
-                    video_info_url,
-                    'POST',
-                    response_hook=self._response_hook_json,
-                    error_title='Caption player request failed',
-                    error_hook=self._error_hook,
-                    error_hook_kwargs={
-                        'video_id': video_id,
-                        'client': client_name,
-                        'auth': caption_client.get('_has_auth', False),
-                    },
-                    **caption_client
-                )
-                captions = result and result.get('captions')
-                caption_headers = caption_client['headers']
-                if captions:
-                    break
-            else:
-                captions = None
-        else:
-            captions = result.get('captions')
-            caption_headers = headers.copy()
-        if captions:
-            subtitles.load(captions, caption_headers)
-            default_lang = subtitles.get_lang_details()
-            subs_data = subtitles.get_subtitles()
+        if not is_live or live_dvr:
+            subtitles = Subtitles(context, video_id)
+            default_lang, subs_data = self._process_captions(
+                subtitles=subtitles,
+                responses=responses,
+            )
             if subs_data and (not use_mpd or subtitles.pre_download):
                 meta_info['subtitles'] = [
                     subtitle['url'] for subtitle in subs_data.values()
                 ]
                 subs_data = None
         else:
+            default_lang = None
+            subs_data = None
+
+        if not default_lang:
             default_lang = {
                 'default': 'und',
                 'original': 'und',
                 'is_asr': False,
             }
-            subs_data = None
 
         # extract adaptive streams and create MPEG-DASH manifest
-        if adaptive_fmts and not audio_only:
-            video_data, audio_data = self._process_stream_data(
-                adaptive_fmts,
-                default_lang['default']
-                if default_lang['original'] == 'und' else
-                default_lang['original']
+        if use_mpd and not audio_only:
+            self._process_mpd(
+                stream_list=stream_list,
+                responses=responses,
+                meta_info=meta_info,
+                playback_stats=playback_stats,
+            )
+
+            video_data, audio_data = self._process_adaptive_streams(
+                responses=responses,
+                default_lang_code=(default_lang['default']
+                                   if default_lang['original'] == 'und' else
+                                   default_lang['original']),
             )
             manifest_url, main_stream = self._generate_mpd_manifest(
-                video_data, audio_data, subs_data, license_info.get('url')
+                video_data, audio_data, subs_data,
             )
 
             if main_stream:
@@ -1874,8 +1925,9 @@ class StreamInfo(YouTubeRequestClient):
                     title='',
                     url=manifest_url,
                     meta=meta_info,
-                    headers=headers,
-                    license_info=license_info,
+                    headers={
+                        'User-Agent': 'youtube/0.1 ({0})'.format(self.video_id),
+                    },
                     playback_stats=playback_stats,
                 )
 
@@ -1903,15 +1955,14 @@ class StreamInfo(YouTubeRequestClient):
                 stream_list['9999'] = yt_format
 
         # extract non-adaptive streams
-        if adaptive_fmts and (audio_only or ask_for_quality):
-            progressive_fmts.extend(adaptive_fmts)
-        if progressive_fmts:
-            self._update_from_streams(
-                stream_list,
-                progressive_fmts,
-                is_live,
-                meta_info,
-                playback_stats,
+        if audio_only or ask_for_quality or not use_mpd:
+            self._process_progressive_streams(
+                stream_list=stream_list,
+                responses=responses,
+                is_live=is_live,
+                use_adaptive=use_mpd,
+                meta_info=meta_info,
+                playback_stats=playback_stats,
             )
 
         if not stream_list:
@@ -1919,12 +1970,12 @@ class StreamInfo(YouTubeRequestClient):
 
         return stream_list.values(), self.yt_item
 
-    def _process_stream_data(self,
-                             stream_data,
-                             default_lang_code='und',
-                             codec_re=re_compile(
-                                 r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
-                             )):
+    def _process_adaptive_streams(self,
+                                  responses,
+                                  default_lang_code='und',
+                                  codec_re=re_compile(
+                                      r'codecs="([a-z0-9]+([.\-][0-9](?="))?)'
+                                  )):
         context = self._context
         settings = context.get_settings()
         audio_only = self._audio_only
@@ -1954,235 +2005,253 @@ class StreamInfo(YouTubeRequestClient):
         prefer_default_lang = self._language_prefer_default
         lang_role_details = self.LANG_ROLE_DETAILS
 
-        for stream in stream_data:
-            mime_type = stream.get('mimeType')
-            if not mime_type:
+        for client_name, response in responses.items():
+            client = response['client']
+            if not client.get('_use_adaptive', True):
                 continue
 
-            itag = stream.get('itag')
-            if not itag:
+            stream_data = response['adaptive_fmts']
+            if not stream_data:
                 continue
 
-            index_range = stream.get('indexRange')
-            if not index_range:
-                continue
-
-            init_range = stream.get('initRange')
-            if not init_range:
-                continue
-
-            url = stream.get('url')
-            if not url and 'signatureCipher' in stream:
-                url = self._process_signature_cipher(stream)
-            if not url:
-                continue
-
-            mime_type, codecs = unquote(mime_type).split('; ')
-            codec = codec_re.match(codecs)
-            if codec:
-                codec = codec.group(1)
-                if codec.startswith('vp9'):
-                    codec = 'vp9'
-                elif codec.startswith('vp09'):
-                    codec = 'vp9.2'
-                elif codec.startswith('dts'):
-                    codec = 'dts'
-            if codec not in isa_capabilities:
-                continue
-            preferred_codec = codec.split('.')[0] in stream_features
-            media_type, container = mime_type.split('/')
-            bitrate = stream.get('bitrate', 0)
-
-            if media_type == 'audio':
-                data = audio_data
-                channels = stream.get('audioChannels', 2)
-                if channels > 2 and not allow_ssa:
+            for stream in stream_data:
+                mime_type = stream.get('mimeType')
+                if not mime_type:
                     continue
 
-                if 'audioTrack' in stream:
-                    audio_track = stream['audioTrack']
+                itag = stream.get('itag')
+                if not itag:
+                    continue
 
-                    language = audio_track.get('id', default_lang_code)
-                    if '.' in language:
-                        language_code, role_str = language.split('.')
-                        role_id = int(role_str)
+                index_range = stream.get('indexRange')
+                if not index_range:
+                    continue
+
+                init_range = stream.get('initRange')
+                if not init_range:
+                    continue
+
+                url = stream.get('url')
+                if not url and 'signatureCipher' in stream:
+                    url = self._process_signature_cipher(stream)
+                if not url:
+                    continue
+
+                mime_type, codecs = unquote(mime_type).split('; ')
+                codec = codec_re.match(codecs)
+                if codec:
+                    codec = codec.group(1)
+                    if codec.startswith('vp9'):
+                        codec = 'vp9'
+                    elif codec.startswith('vp09'):
+                        codec = 'vp9.2'
+                    elif codec.startswith('dts'):
+                        codec = 'dts'
+                if codec not in isa_capabilities:
+                    continue
+                preferred_codec = codec.split('.')[0] in stream_features
+                media_type, container = mime_type.split('/')
+                bitrate = stream.get('bitrate', 0)
+
+                if media_type == 'audio':
+                    data = audio_data
+                    channels = stream.get('audioChannels', 2)
+                    if channels > 2 and not allow_ssa:
+                        continue
+
+                    if 'audioTrack' in stream:
+                        audio_track = stream['audioTrack']
+
+                        language = audio_track.get('id', default_lang_code)
+                        if '.' in language:
+                            language_code, role_str = language.split('.')
+                            role_id = int(role_str)
+                        else:
+                            language_code = language
+                            role_id = 4
+                            role_str = '4'
+
+                        role_details = lang_role_details.get(role_id)
+                        # Unsure of what other audio types are available
+                        # Role set to "alternate" as default fallback
+                        if not role_details:
+                            role_details = lang_role_details[0]
+
+                        role_type, role, role_order = role_details
+                        label = localize('stream.{0}'.format(role_type))
+
+                        preferred_order = preferred_audio['role_order']
+                        language_fallback = preferred_audio['fallback']
+
+                        if (default_lang
+                                and language_code.startswith(default_lang)):
+                            is_fallback = False
+                            if prefer_default_lang:
+                                role = 'main'
+                                role_order = 0
+                            elif role_type.startswith('dub'):
+                                is_fallback = True
+                            lang_match = (
+                                    (language_fallback and not is_fallback)
+                                    or preferred_order is None
+                                    or role_order > preferred_order
+                            )
+                            language_fallback = is_fallback
+                        else:
+                            lang_match = (
+                                    language_fallback
+                                    and (preferred_order is None
+                                         or role_order > preferred_order)
+                            )
+                            language_fallback = True
+
+                        if lang_match:
+                            preferred_audio = {
+                                'id': ''.join((
+                                    '_',
+                                    language_code,
+                                    '.',
+                                    role_str,
+                                )),
+                                'language_code': language_code,
+                                'role_order': role_order,
+                                'fallback': language_fallback,
+                            }
+
+                        mime_group = ''.join((
+                            mime_type, '_', language_code, '.', role_str,
+                        ))
                     else:
-                        language_code = language
-                        role_id = 4
-                        role_str = '4'
+                        language_code = default_lang_code
+                        role_id = -1
+                        role_str = str(role_id)
+                        role_details = lang_role_details[role_id]
+                        role_type, role, role_order = role_details
+                        label = localize('stream.{0}'.format(role_type))
+                        mime_group = mime_type
 
-                    role_details = lang_role_details.get(role_id)
-                    # Unsure of what other audio types are actually available
-                    # Role set to "alternate" as default fallback
-                    if not role_details:
-                        role_details = lang_role_details[0]
-
-                    role_type, role, role_order = role_details
-                    label = localize('stream.{0}'.format(role_type))
-
-                    preferred_order = preferred_audio['role_order']
-                    language_fallback = preferred_audio['fallback']
-
-                    if default_lang and language_code.startswith(default_lang):
-                        is_fallback = False
-                        if prefer_default_lang:
-                            role = 'main'
-                            role_order = 0
-                        elif role_type.startswith('dub'):
-                            is_fallback = True
-                        lang_match = (
-                                (language_fallback and not is_fallback)
-                                or preferred_order is None
-                                or role_order > preferred_order
-                        )
-                        language_fallback = is_fallback
+                    sample_rate = int(stream.get('audioSampleRate', '0'), 10)
+                    height = width = fps = frame_rate = hdr = None
+                    language = context.get_language_name(language_code)
+                    label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
+                    if channels > 2 or 'auto' not in stream_select:
+                        quality_group = ''.join((
+                            container, '_', codec, '_', language_code,
+                            '.', role_str,
+                        ))
                     else:
-                        lang_match = (
-                                language_fallback
-                                and (preferred_order is None
-                                     or role_order > preferred_order)
-                        )
-                        language_fallback = True
+                        quality_group = mime_group
+                elif audio_only:
+                    continue
+                else:
+                    data = video_data
+                    # Could use "zxx" language code for
+                    # "Non-Linguistic, Not Applicable" but that is too verbose
+                    language_code = ''
 
-                    if lang_match:
-                        preferred_audio = {
-                            'id': ''.join(('_', language_code, '.', role_str)),
-                            'language_code': language_code,
-                            'role_order': role_order,
-                            'fallback': language_fallback,
-                        }
+                    fps = stream.get('fps', 0)
+                    if fps > 30 and not allow_hfr:
+                        continue
 
-                    mime_group = ''.join((
-                        mime_type, '_', language_code, '.', role_str,
+                    if 'colorInfo' in stream:
+                        hdr = not any(value.endswith('BT709')
+                                      for value in stream['colorInfo'].values())
+                    else:
+                        hdr = 'HDR' in stream.get('qualityLabel', '')
+                    if hdr and not allow_hdr:
+                        continue
+
+                    height = stream.get('height')
+                    width = stream.get('width')
+                    if height > width:
+                        compare_width = height
+                        compare_height = width
+                    else:
+                        compare_width = width
+                        compare_height = height
+
+                    bound = None
+                    for quality in qualities:
+                        if compare_width > quality['width']:
+                            if bound:
+                                if compare_height >= bound['min_height']:
+                                    quality = bound
+                                elif compare_height < quality['min_height']:
+                                    quality = qualities[-1]
+                            if fps > 30 and disable_hfr_max:
+                                bound = None
+                            break
+                        disable_hfr_max = disable_hfr_max and not bound
+                        bound = quality
+                    if not bound:
+                        continue
+
+                    # map frame rates to a more common representation to lessen
+                    # the chance of double refresh changes
+                    if fps:
+                        frame_rate = fps_map.get(fps) or fps_map[0].format(fps)
+                    else:
+                        frame_rate = None
+
+                    mime_group = '_'.join((
+                        mime_type,
+                        codec,
+                        'hdr',
+                    ) if hdr else (
+                        mime_type,
+                        codec,
                     ))
-                else:
-                    language_code = default_lang_code
-                    role_id = -1
-                    role_str = str(role_id)
-                    role_details = lang_role_details[role_id]
-                    role_type, role, role_order = role_details
-                    label = localize('stream.{0}'.format(role_type))
-                    mime_group = mime_type
+                    channels = sample_rate = None
+                    language = role = role_order = None
+                    label = quality['label'].format(
+                        quality['nom_height'] or compare_height,
+                        fps if fps > 30 else '',
+                        ' HDR' if hdr else '',
+                    )
+                    quality_group = '_'.join((container, codec, label))
 
-                sample_rate = int(stream.get('audioSampleRate', '0'), 10)
-                height = width = fps = frame_rate = hdr = None
-                language = context.get_language_name(language_code)
-                label = '{0} ({1} kbps)'.format(label, bitrate // 1000)
-                if channels > 2 or 'auto' not in stream_select:
-                    quality_group = ''.join((
-                        container, '_', codec, '_', language_code,
-                        '.', role_str,
-                    ))
-                else:
-                    quality_group = mime_group
-            elif audio_only:
-                continue
-            else:
-                data = video_data
-                # Could use "zxx" language code for
-                # "Non-Linguistic, Not Applicable" but that is too verbose
-                language_code = ''
+                if mime_group not in data:
+                    data[mime_group] = {}
+                if quality_group not in data:
+                    data[quality_group] = {}
 
-                fps = stream.get('fps', 0)
-                if fps > 30 and not allow_hfr:
-                    continue
-
-                if 'colorInfo' in stream:
-                    hdr = not any(value.endswith('BT709')
-                                  for value in stream['colorInfo'].values())
-                else:
-                    hdr = 'HDR' in stream.get('qualityLabel', '')
-                if hdr and not allow_hdr:
-                    continue
-
-                height = stream.get('height')
-                width = stream.get('width')
-                if height > width:
-                    compare_width = height
-                    compare_height = width
-                else:
-                    compare_width = width
-                    compare_height = height
-
-                bounded_quality = None
-                for quality in qualities:
-                    if compare_width > quality['width']:
-                        if bounded_quality:
-                            if compare_height >= bounded_quality['min_height']:
-                                quality = bounded_quality
-                            elif compare_height < quality['min_height']:
-                                quality = qualities[-1]
-                        if fps > 30 and disable_hfr_max:
-                            bounded_quality = None
-                        break
-                    disable_hfr_max = disable_hfr_max and not bounded_quality
-                    bounded_quality = quality
-                if not bounded_quality:
-                    continue
-
-                # map frame rates to a more common representation to lessen the
-                # chance of double refresh changes
-                if fps:
-                    frame_rate = fps_map.get(fps) or fps_map[0].format(fps)
-                else:
-                    frame_rate = None
-
-                mime_group = '_'.join((
-                    mime_type,
-                    codec,
-                    'hdr',
-                ) if hdr else (
-                    mime_type,
-                    codec,
-                ))
-                channels = sample_rate = None
-                language = role = role_order = None
-                label = quality['label'].format(
-                    quality['nom_height'] or compare_height,
-                    fps if fps > 30 else '',
-                    ' HDR' if hdr else '',
+                urls = self._process_url_params(
+                    unquote(url),
+                    headers=client['headers'],
                 )
-                quality_group = '_'.join((container, codec, label))
+                if not urls:
+                    continue
 
-            if mime_group not in data:
-                data[mime_group] = {}
-            if quality_group not in data:
-                data[quality_group] = {}
-
-            url = unquote(url)
-            primary_url, secondary_url = self._process_url_params(url)
-
-            details = {
-                'mimeType': mime_type,
-                'baseUrl': entity_escape(primary_url),
-                'mediaType': media_type,
-                'container': container,
-                'codecs': codecs,
-                'codec': codec,
-                'preferred_codec': preferred_codec,
-                'id': itag,
-                'width': width,
-                'height': height,
-                'label': label,
-                'bitrate': bitrate,
-                'biasedBitrate': bitrate * quality_factor_map.get(codec, 1),
-                # integer round up
-                'duration': -(-int(stream.get('approxDurationMs', 0)) // 1000),
-                'fps': fps,
-                'frameRate': frame_rate,
-                'hdr': hdr,
-                'indexRange': '{start}-{end}'.format(**index_range),
-                'initRange': '{start}-{end}'.format(**init_range),
-                'langCode': language_code,
-                'langName': language,
-                'role': role,
-                'roleOrder': role_order,
-                'sampleRate': sample_rate,
-                'channels': channels,
-            }
-            if secondary_url:
-                details['baseUrlSecondary'] = entity_escape(secondary_url)
-            data[mime_group][itag] = data[quality_group][itag] = details
+                details = {
+                    'mimeType': mime_type,
+                    'baseUrl': entity_escape(urls),
+                    'mediaType': media_type,
+                    'container': container,
+                    'codecs': codecs,
+                    'codec': codec,
+                    'preferred_codec': preferred_codec,
+                    'id': itag,
+                    'width': width,
+                    'height': height,
+                    'label': label,
+                    'bitrate': bitrate,
+                    'biasedBitrate': bitrate * quality_factor_map.get(codec, 1),
+                    # integer round up
+                    'duration': -(-int(stream.get('approxDurationMs', 0))
+                                  // 1000),
+                    'fps': fps,
+                    'frameRate': frame_rate,
+                    'hdr': hdr,
+                    'indexRange': '{start}-{end}'.format(**index_range),
+                    'initRange': '{start}-{end}'.format(**init_range),
+                    'langCode': language_code,
+                    'langName': language,
+                    'role': role,
+                    'roleOrder': role_order,
+                    'sampleRate': sample_rate,
+                    'channels': channels,
+                }
+                data[mime_group][itag] = data[quality_group][itag] = details
 
         if not video_data and not audio_only:
             context.log_debug('Generate MPD: No video mime-types found')
@@ -2236,8 +2305,7 @@ class StreamInfo(YouTubeRequestClient):
     def _generate_mpd_manifest(self,
                                video_data,
                                audio_data,
-                               subs_data,
-                               license_url):
+                               subs_data):
         # Following line can be uncommented if needed to use mpd for audio only
         # if (not video_data and not self._audio_only) or not audio_data:
         if not video_data or not audio_data:
@@ -2405,20 +2473,6 @@ class StreamInfo(YouTubeRequestClient):
                     '/>\n'
             ))
 
-            if license_url:
-                license_url = entity_escape(license_url)
-                output.extend((
-                    '\t\t\t<ContentProtection'
-                        ' schemeIdUri="http://youtube.com/drm/2012/10/10"'
-                        '>\n'
-                    '\t\t\t\t<yt:SystemURL'
-                        ' type="widevine"'
-                        '>',
-                        license_url,
-                        '</yt:SystemURL>\n'
-                    '\t\t\t</ContentProtection>\n'
-                ))
-
             num_streams = len(streams)
             if media_type == 'audio':
                 output.extend([(
@@ -2439,9 +2493,11 @@ class StreamInfo(YouTubeRequestClient):
                         '/>\n'
                     # Representation Label element is not used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n' +
-                    ('\t\t\t\t<BaseURL>{baseUrlSecondary}</BaseURL>\n'
-                     if 'baseUrlSecondary' in stream else '') +
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    # '\t\t\t\t<BaseURL>{url}</BaseURL>\n'
+                    # + ''.join([''.join([
+                    # '\t\t\t\t<BaseURL>', entity_escape(url), '</BaseURL>\n',
+                    # ]) for url in stream['baseUrl'] if url]) +
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
@@ -2449,8 +2505,14 @@ class StreamInfo(YouTubeRequestClient):
                 ).format(
                     quality=(idx + 1),
                     priority=(num_streams - idx),
+                    # url=entity_escape(url),
                     **stream
-                ) for idx, stream in enumerate(streams)])
+                )
+                    for idx, stream in enumerate(streams)
+                    # for url in stream['baseUrl']
+                    # if url
+                ])
+
             elif media_type == 'video':
                 output.extend([(
                     '\t\t\t<Representation'
@@ -2467,9 +2529,11 @@ class StreamInfo(YouTubeRequestClient):
                         '>\n'
                     # Representation Label element is not used by ISA
                     '\t\t\t\t<Label>{label}</Label>\n'
-                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n' +
-                    ('\t\t\t\t<BaseURL>{baseUrlSecondary}</BaseURL>\n'
-                     if 'baseUrlSecondary' in stream else '') +
+                    '\t\t\t\t<BaseURL>{baseUrl}</BaseURL>\n'
+                    # '\t\t\t\t<BaseURL>{url}</BaseURL>\n'
+                    # + ''.join([''.join([
+                    # '\t\t\t\t<BaseURL>', entity_escape(url), '</BaseURL>\n',
+                    # ]) for url in stream['baseUrl'] if url]) +
                     '\t\t\t\t<SegmentBase indexRange="{indexRange}">\n'
                     '\t\t\t\t\t<Initialization range="{initRange}"/>\n'
                     '\t\t\t\t</SegmentBase>\n'
@@ -2477,8 +2541,13 @@ class StreamInfo(YouTubeRequestClient):
                 ).format(
                     quality=(idx + 1),
                     priority=(num_streams - idx),
+                    # url=entity_escape(url),
                     **stream
-                ) for idx, stream in enumerate(streams)])
+                )
+                    for idx, stream in enumerate(streams)
+                    # for url in stream['baseUrl']
+                    # if url
+                ])
 
             output.append('\t\t</AdaptationSet>\n')
             set_id += 1

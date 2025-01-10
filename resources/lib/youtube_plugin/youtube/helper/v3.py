@@ -25,7 +25,14 @@ from .utils import (
     update_video_items,
 )
 from ...kodion import KodionException
-from ...kodion.constants import PATHS
+from ...kodion.constants import (
+    PATHS,
+    PLAY_FORCE_AUDIO,
+    PLAY_PROMPT_QUALITY,
+    PLAY_PROMPT_SUBTITLES,
+    PLAY_TIMESHIFT,
+    PLAY_WITH,
+)
 from ...kodion.items import (
     CommandItem,
     DirectoryItem,
@@ -57,11 +64,17 @@ def _process_list_response(provider,
 
     new_params = {}
     params = context.get_params()
-    if params.get('incognito'):
-        new_params['incognito'] = True
-    addon_id = params.get('addon_id', '')
-    if addon_id:
-        new_params['addon_id'] = addon_id
+    copy_params = {
+        'addon_id',
+        'incognito',
+        PLAY_FORCE_AUDIO,
+        PLAY_TIMESHIFT,
+        PLAY_PROMPT_QUALITY,
+        PLAY_PROMPT_SUBTITLES,
+        PLAY_WITH,
+    }.intersection(params.keys())
+    for param in copy_params:
+        new_params[param] = params[param]
 
     settings = context.get_settings()
     thumb_size = settings.get_thumbnail_size()
@@ -153,7 +166,7 @@ def _process_list_response(provider,
 
         elif kind_type == 'channel':
             item_uri = context.create_uri(
-                ('channel', item_id),
+                (PATHS.CHANNEL, item_id,),
                 item_params,
             )
             item = DirectoryItem(title,
@@ -183,7 +196,7 @@ def _process_list_response(provider,
             subscription_id_dict[item_id] = subscription_id
 
             item_uri = context.create_uri(
-                ('channel', item_id),
+                (PATHS.CHANNEL, item_id,),
                 item_params
             )
             item = DirectoryItem(title,
@@ -204,12 +217,12 @@ def _process_list_response(provider,
                 uri_channel_id = channel_id
             if uri_channel_id:
                 item_uri = context.create_uri(
-                    ('channel', uri_channel_id, 'playlist', item_id),
+                    (PATHS.CHANNEL, uri_channel_id, 'playlist', item_id,),
                     item_params,
                 )
             else:
                 item_uri = context.create_uri(
-                    ('playlist', item_id),
+                    (PATHS.PLAYLIST, item_id,),
                     item_params,
                 )
             item = DirectoryItem(title,

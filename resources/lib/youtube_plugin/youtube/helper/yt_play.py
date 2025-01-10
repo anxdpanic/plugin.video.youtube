@@ -322,23 +322,25 @@ def process(provider, context, **_kwargs):
     video_ids = params.get('video_ids')
     playlist_id = params.get('playlist_id')
 
-    force_play = False
-    for param in {PLAY_FORCE_AUDIO,
-                  PLAY_TIMESHIFT,
-                  PLAY_PROMPT_QUALITY,
-                  PLAY_PROMPT_SUBTITLES,
-                  PLAY_WITH}.intersection(param_keys):
-        del params[param]
-        ui.set_property(param)
-        force_play = True
+    force_play_params = {
+        PLAY_FORCE_AUDIO,
+        PLAY_TIMESHIFT,
+        PLAY_PROMPT_QUALITY,
+        PLAY_PROMPT_SUBTITLES,
+        PLAY_WITH,
+    }.intersection(param_keys)
 
     if video_id and not playlist_id and not video_ids:
-        # This is required to trigger Kodi resume prompt, along with using
-        # RunPlugin. Prompt will not be used if using PlayMedia
-        if force_play and not params.get(PLAY_STRM):
-            return UriItem('command://Action(Play)')
+        for param in force_play_params:
+            del params[param]
+            ui.set_property(param)
 
         if context.get_handle() == -1:
+            # This is required to trigger Kodi resume prompt, along with using
+            # RunPlugin. Prompt will not be used if using PlayMedia
+            if force_play_params and not params.get(PLAY_STRM):
+                return UriItem('command://Action(Play)')
+
             return UriItem('command://{0}'.format(
                 context.create_uri(
                     (PATHS.PLAY,),
@@ -360,6 +362,8 @@ def process(provider, context, **_kwargs):
                 ui.set_property(PLAYLIST_POSITION, str(position))
         else:
             ui.clear_property(BUSY_FLAG)
+            for param in force_play_params:
+                ui.clear_property(param)
 
         return media_item
 

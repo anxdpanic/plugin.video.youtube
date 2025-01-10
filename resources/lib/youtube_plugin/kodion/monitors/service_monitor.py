@@ -303,7 +303,7 @@ class ServiceMonitor(xbmc.Monitor):
             if not thread.is_alive():
                 continue
             try:
-                thread.join(5)
+                thread.join(2)
             except RuntimeError:
                 pass
 

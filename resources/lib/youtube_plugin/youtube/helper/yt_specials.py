@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 from . import UrlResolver, UrlToItemConverter, tv, utils, v3
 from ...kodion import KodionException
-from ...kodion.constants import CONTENT
+from ...kodion.constants import CONTENT, PATHS
 from ...kodion.items import DirectoryItem, UriItem
 from ...kodion.utils import strip_html_from_text
 
@@ -250,7 +250,10 @@ def _process_description_links(provider, context):
         for channel_id in channel_ids:
             channel_item = DirectoryItem(
                 name='',
-                uri=context.create_uri(('channel', channel_id,), item_params),
+                uri=context.create_uri(
+                    (PATHS.CHANNEL, channel_id,),
+                    item_params,
+                ),
                 channel_id=channel_id,
             )
             channel_id_dict[channel_id] = channel_item
@@ -273,7 +276,10 @@ def _process_description_links(provider, context):
         for playlist_id in playlist_ids:
             playlist_item = DirectoryItem(
                 name='',
-                uri=context.create_uri(('playlist', playlist_id,), item_params),
+                uri=context.create_uri(
+                    (PATHS.PLAYLIST, playlist_id,),
+                    item_params,
+                ),
                 playlist_id=playlist_id,
             )
             playlist_id_dict[playlist_id] = playlist_item

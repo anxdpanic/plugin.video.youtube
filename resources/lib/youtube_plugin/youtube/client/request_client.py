@@ -418,18 +418,17 @@ class YouTubeRequestClient(BaseRequestsClass):
                 return None
         if not base_client:
             base_client = YouTubeRequestClient.CLIENTS['web']
-        base_client = base_client.copy()
-
-        if data:
-            client = merge_dicts(base_client, data)
-        client = merge_dicts(cls.CLIENTS['_common'], client, templates)
-        client['_name'] = client_name
 
         auth_required = base_client.get('_auth_required')
+        auth_requested = base_client.get('_auth_requested')
+
+        if data:
+            base_client = merge_dicts(base_client, data)
+        client = merge_dicts(cls.CLIENTS['_common'], base_client, templates)
+        client['_name'] = client_name
+
         if auth_required:
             client['_auth_required'] = auth_required
-
-        auth_requested = base_client.get('_auth_requested')
         if auth_requested:
             client['_auth_requested'] = auth_requested
 
