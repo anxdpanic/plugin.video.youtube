@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: translations@kodi.tv\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
 "PO-Revision-Date: 2024-12-20 16:31+0000\n"
 "Last-Translator: Minho Park <parkmino@gmail.com>\n"
@@ -772,11 +772,11 @@ msgid "InputStream.Adaptive"
 msgstr "InputStream.Adaptive"
 
 msgctxt "#30618"
-msgid ""
+msgid "Stream redirect"
 msgstr ""
 
 msgctxt "#30619"
-msgid ""
+msgid "Enable to reduce resource usage on less powerful devices, but could lead to IP bans. Use at own risk."
 msgstr ""
 
 msgctxt "#30620"

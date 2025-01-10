@@ -775,11 +775,11 @@ msgid "InputStream.Adaptive"
 msgstr ""
 
 msgctxt "#30618"
-msgid ""
+msgid "Stream redirect"
 msgstr ""
 
 msgctxt "#30619"
-msgid ""
+msgid "Enable to reduce resource usage on less powerful devices, but could lead to IP bans. Use at own risk."
 msgstr ""
 
 msgctxt "#30620"
