@@ -9,18 +9,21 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import json
 import os
 import re
 import socket
+from errno import ECONNABORTED, ECONNREFUSED, ECONNRESET
 from io import open
+from json import dumps as json_dumps, loads as json_loads
+from select import select
 from textwrap import dedent
 
 from .requests import BaseRequestsClass
 from ..compatibility import (
     BaseHTTPRequestHandler,
     TCPServer,
-    parse_qsl,
+    ThreadingMixIn,
+    parse_qs,
     urlencode,
     urlsplit,
     urlunsplit,
@@ -35,36 +38,113 @@ from ..constants import (
     PATHS,
     TEMP_PATH,
 )
-from ..utils import redact_ip, wait
+from ..utils import redact_auth, redact_ip, wait
 
 
-class HTTPServer(TCPServer):
+class HTTPServer(ThreadingMixIn, TCPServer):
     address_family = socket.AF_INET
+    socket_type = socket.SOCK_STREAM
+    request_queue_size = 5
     allow_reuse_address = True
     allow_reuse_port = True
 
-    def server_close(self):
+    daemon_threads = False
+    block_on_close = True
+
+    _handlers = []
+
+    def finish_request(self, request, client_address):
+        handler = self.RequestHandlerClass(request, client_address, self)
+        HTTPServer._handlers.append(handler)
+
         try:
-            self.socket.shutdown(socket.SHUT_RDWR)
-        except (OSError, socket.error):
-            pass
-        self.socket.close()
+            handler.handle()
+        finally:
+            handler.finish()
+
+    def server_close(self):
+        request_handler = self.RequestHandlerClass
+        request_handler.timeout = 0
+        request_handler._close_all = True
+
+        for handler in HTTPServer._handlers:
+            handler.finish()
+
+        threads = getattr(self._threads, 'pop_all', tuple)()
+        for thread in threads:
+            if not thread.is_alive():
+                continue
+            request = thread._args[0]
+            try:
+                request.shutdown(socket.SHUT_RDWR)
+            except (OSError, socket.error):
+                pass
+            request.close()
+            try:
+                thread.join(2)
+                if not thread.is_alive():
+                    continue
+            except RuntimeError:
+                pass
 
 
-class RequestHandler(BaseHTTPRequestHandler, object):
+class RequestHandler(BaseHTTPRequestHandler):
     protocol_version = 'HTTP/1.1'
     server_version = 'plugin.video.youtube/1.0'
 
     _context = None
+    _close_all = False
+
     requests = None
     BASE_PATH = xbmcvfs.translatePath(TEMP_PATH)
     chunk_size = 1024 * 64
 
-    def __init__(self, *args, **kwargs):
+    server_priority_list = {
+        'id': None,
+        'list': [],
+    }
+
+    def __init__(self, request, client_address, server):
         if not RequestHandler.requests:
             RequestHandler.requests = BaseRequestsClass(context=self._context)
         self.whitelist_ips = self._context.get_settings().httpd_whitelist()
-        super(RequestHandler, self).__init__(*args, **kwargs)
+
+        # Rather than calling BaseHTTPRequestHandler.__init__ we reimplement
+        # the same setup so that RequestHandlerClass instance can be stored
+        # after creation in HTTPServer.finish_request allowing
+        # RequestHandler.finish to be called in HTTPServer.server_close to
+        # ensure that all connections are properly closed.
+        #
+        # super(RequestHandler, self).__init__(request, client_address, server)
+
+        self.request = request
+        self.client_address = client_address
+        self.server = server
+        self.setup()
+
+        # try/finally block implemented separately in HTTPServer.finish_request
+        #
+        # try:
+        #     self.handle()
+        # finally:
+        #     self.finish()
+
+    def handle_one_request(self):
+        # Allow self.rfile.readline call to be interrupted by
+        # HTTPServer.server_close when connection is kept open by keep-alive
+        while not select((self.rfile,), (), (), 0)[0] and not self._close_all:
+            pass
+        if self._close_all or self.rfile.closed:
+            self.close_connection = True
+            return
+
+        try:
+            super(RequestHandler, self).handle_one_request()
+            return
+        except OSError as exc:
+            self.close_connection = True
+            if exc.errno not in {ECONNABORTED, ECONNREFUSED, ECONNRESET}:
+                raise exc
 
     def ip_address_status(self, ip_address):
         is_whitelisted = ip_address in self.whitelist_ips
@@ -101,9 +181,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
         path_parts = urlsplit(self.path)
         if path_parts.query:
-            params = dict(parse_qsl(path_parts.query))
+            params = parse_qs(path_parts.query)
             log_params = params.copy()
             for param, value in params.items():
+                value = value[0]
                 if param in {'key', 'api_key', 'api_secret', 'client_secret'}:
                     log_params[param] = '...'.join((value[:3], value[-3:]))
                 elif param in {'api_id', 'client_id'}:
@@ -112,8 +193,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     log_params[param] = '<redacted>'
                 elif param == 'url':
                     log_params[param] = redact_ip(value)
+                elif param == 'ip':
+                    log_params[param] = '<redacted>'
                 elif param == 'location':
                     log_params[param] = '|xx.xxxx,xx.xxxx|'
+                elif param == '__headers':
+                    log_params[param] = redact_auth(value)
             log_path = urlunsplit((
                 '', '', path_parts.path, urlencode(log_params), '',
             ))
@@ -162,8 +247,10 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         settings = context.get_settings()
         api_config_enabled = settings.api_config_page()
 
+        empty = [None]
+
         if path['path'] == PATHS.IP:
-            client_json = json.dumps({'ip': self.client_address[0]})
+            client_json = json_dumps({'ip': self.client_address[0]})
             self.send_response(200)
             self.send_header('Content-Type', 'application/json; charset=utf-8')
             self.send_header('Content-Length', str(len(client_json)))
@@ -172,25 +259,25 @@ class RequestHandler(BaseHTTPRequestHandler, object):
 
         elif path['path'].startswith(PATHS.MPD):
             try:
-                file = path['params'].get('file')
+                file = path['params'].get('file', empty)[0]
                 if file:
                     file_path = os.path.join(self.BASE_PATH, file)
                 else:
                     file_path = None
                     raise IOError
 
-                with open(file_path, 'rb') as f:
-                    self.send_response(200)
-                    self.send_header('Content-Type', 'application/dash+xml')
-                    self.send_header('Content-Length',
-                                     str(os.path.getsize(file_path)))
-                    self.end_headers()
+                file_size = os.path.getsize(file_path)
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/dash+xml')
+                self.send_header('Content-Length', str(file_size))
+                self.end_headers()
 
-                    file_chunk = True
-                    while file_chunk:
-                        file_chunk = f.read(self.chunk_size)
-                        if file_chunk:
-                            self.wfile.write(file_chunk)
+                with open(file_path, 'rb', buffering=self.chunk_size) as f:
+                    while 1:
+                        file_chunk = f.read()
+                        if not file_chunk:
+                            break
+                        self.wfile.write(file_chunk)
             except IOError:
                 response = ('File Not Found: |{path}| -> |{file_path}|'
                             .format(path=path['log_path'], file_path=file_path))
@@ -205,7 +292,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_header('Content-Length', str(len(html)))
             self.end_headers()
 
-            for chunk in self.get_chunks(html):
+            for chunk in self._get_chunks(html):
                 self.wfile.write(chunk)
 
         elif api_config_enabled and path['path'].startswith(PATHS.API_SUBMIT):
@@ -215,9 +302,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             params = path['params']
             updated = []
 
-            api_key = params.get('api_key')
-            api_id = params.get('api_id')
-            api_secret = params.get('api_secret')
+            api_key = params.get('api_key', empty)[0]
+            api_id = params.get('api_id', empty)[0]
+            api_secret = params.get('api_secret', empty)[0]
             # Bookmark this page
             if api_key and api_id and api_secret:
                 footer = localize('api.config.bookmark')
@@ -263,14 +350,14 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_header('Content-Length', str(len(html)))
             self.end_headers()
 
-            for chunk in self.get_chunks(html):
+            for chunk in self._get_chunks(html):
                 self.wfile.write(chunk)
 
         elif path['path'] == PATHS.PING:
             self.send_error(204)
 
         elif path['path'].startswith(PATHS.REDIRECT):
-            url = path['params'].get('url')
+            url = path['params'].get('url', empty)[0]
             if url:
                 wait(1)
                 self.send_response(301)
@@ -279,6 +366,79 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 self.end_headers()
             else:
                 self.send_error(501)
+
+        elif path['path'].startswith(PATHS.STREAM_PROXY):
+            params = path['params']
+
+            original_path = params.pop('__path', empty)[0] or '/videoplayback'
+
+            servers = params.pop('__netloc', empty)
+            stream_id = params.pop('__id', empty)[0]
+            if stream_id != self.server_priority_list['id']:
+                self.server_priority_list['id'] = stream_id
+                _server_list = []
+                self.server_priority_list['list'] = _server_list
+            else:
+                _server_list = self.server_priority_list['list']
+                servers.sort(key=self._sort_servers, reverse=True)
+
+            headers = params.pop('__headers', empty)[0]
+            if headers:
+                headers = json_loads(headers)
+                if 'Range' in self.headers:
+                    headers['Range'] = self.headers['Range']
+            else:
+                headers = self.headers
+
+            original_query_str = urlencode(params, doseq=True)
+
+            stream_redirect = settings.httpd_stream_redirect()
+
+            response = None
+            for server in servers:
+                if not server:
+                    continue
+
+                stream_url = urlunsplit((
+                    'https',
+                    server,
+                    original_path,
+                    original_query_str,
+                    '',
+                ))
+
+                if stream_redirect and server in _server_list:
+                    self.send_response(301)
+                    self.send_header('Location', stream_url)
+                    self.send_header('Connection', 'close')
+                    self.end_headers()
+                    break
+
+                headers['Host'] = server
+                with self.requests.request(stream_url,
+                                           method='GET',
+                                           headers=headers,
+                                           stream=True) as response:
+                    if not response or not response.ok:
+                        continue
+                    if server not in _server_list:
+                        _server_list.append(server)
+
+                    self.send_response(response.status_code)
+                    for header, value in response.headers.items():
+                        self.send_header(header, value)
+                    self.end_headers()
+
+                    for chunk in response.iter_content(chunk_size=None):
+                        while (not select((), (self.wfile,), (), 0)[1]
+                               and not self._close_all):
+                            pass
+                        if self._close_all or self.wfile.closed:
+                            break
+                        self.wfile.write(chunk)
+                break
+            else:
+                self.send_error(response and response.status_code or 500)
 
         else:
             self.send_error(501)
@@ -290,9 +450,11 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             self.send_error(403)
             return
 
+        empty = [None]
+
         if path['path'].startswith(PATHS.MPD):
             try:
-                file = path['params'].get('file')
+                file = path['params'].get('file', empty)[0]
                 if file:
                     file_path = os.path.join(self.BASE_PATH, file)
                 else:
@@ -321,6 +483,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
         if not allowed:
             self.send_error(403)
             return
+
+        empty = [None]
 
         if path['path'].startswith(PATHS.DRM):
             home = xbmcgui.Window(10000)
@@ -398,7 +562,7 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                     self.send_header(header, value)
             self.end_headers()
 
-            for chunk in self.get_chunks(response_body):
+            for chunk in self._get_chunks(response_body):
                 self.wfile.write(chunk)
 
         else:
@@ -408,9 +572,17 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     def log_message(self, format, *args):
         return
 
-    def get_chunks(self, data):
+    def _get_chunks(self, data):
         for i in range(0, len(data), self.chunk_size):
             yield data[i:i + self.chunk_size]
+
+    def _sort_servers(self, server):
+        _server_list = self.server_priority_list['list']
+        try:
+            index = _server_list.index(server)
+        except ValueError:
+            return -1
+        return len(_server_list) - index
 
     @classmethod
     def api_config_page(cls):
@@ -636,6 +808,7 @@ class Pages(object):
 
 def get_http_server(address, port, context):
     RequestHandler._context = context
+    RequestHandler._close_all = False
     if is_ipv6(address):
         HTTPServer.address_family = socket.AF_INET6
     else:
@@ -766,7 +939,10 @@ def get_listen_addresses():
         socket.AF_INET,
         getattr(socket, 'AF_INET6', None)
     ]
-    for interface in socket.getaddrinfo(socket.gethostname(), None):
+    for interface in (
+            socket.getaddrinfo(socket.gethostname(), None)
+            + socket.getaddrinfo(xbmc.getIPAddress(), None)
+    ):
         ip_address = interface[4][0]
         address_family = interface[0]
         if not address_family or address_family not in allowed_address_families:

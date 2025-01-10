@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import urlsplit, xbmcplugin
+from ...compatibility import parse_qsl, urlsplit, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -345,28 +345,37 @@ class XbmcPlugin(AbstractPlugin):
             action = uri
             result = True
 
-        elif context.is_plugin_path(uri, PATHS.PLAY):
-            context.log_debug('Redirecting for playback: |{0}|'.format(uri))
-            uri = urlsplit(uri)
-            action = context.create_uri(
-                (uri.path.rstrip('/'),),
-                uri.query,
-                parse_params=True,
-                play=True,
-            )
-            result = True
-
         elif uri.startswith('RunPlugin('):
             context.log_debug('Running plugin: |{0}|'.format(uri))
             action = uri
             result = True
 
+        elif context.is_plugin_path(uri, PATHS.PLAY):
+            _uri = urlsplit(uri)
+            params = dict(parse_qsl(_uri.query, keep_blank_values=True))
+            if params.get('action') == 'list':
+                context.log_debug('Redirecting to: |{0}|'.format(uri))
+                action = context.create_uri(
+                    (PATHS.ROUTE, _uri.path.rstrip('/')),
+                    params,
+                    run=True,
+                )
+                result = False
+            else:
+                context.log_debug('Redirecting for playback: |{0}|'.format(uri))
+                action = context.create_uri(
+                    (_uri.path.rstrip('/'),),
+                    params,
+                    play=True,
+                )
+                result = True
+
         elif context.is_plugin_path(uri):
             context.log_debug('Redirecting to: |{0}|'.format(uri))
-            uri = urlsplit(uri)
+            _uri = urlsplit(uri)
             action = context.create_uri(
-                (PATHS.ROUTE, uri.path.rstrip('/') or PATHS.HOME),
-                uri.query,
+                (PATHS.ROUTE, _uri.path.rstrip('/') or PATHS.HOME),
+                _uri.query,
                 parse_params=True,
                 run=True,
             )

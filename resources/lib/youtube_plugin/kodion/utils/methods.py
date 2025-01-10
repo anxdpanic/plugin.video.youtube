@@ -34,6 +34,7 @@ __all__ = (
     'make_dirs',
     'merge_dicts',
     'print_items',
+    'redact_auth',
     'redact_ip',
     'rm_dir',
     'seconds_to_duration',
@@ -249,8 +250,12 @@ def seconds_to_duration(seconds):
     return str(timedelta(seconds=seconds))
 
 
-def merge_dicts(item1, item2, templates=None, _=Ellipsis):
+def merge_dicts(item1, item2, templates=None, compare_str=False, _=Ellipsis):
     if not isinstance(item1, dict) or not isinstance(item2, dict):
+        if (compare_str
+                and isinstance(item1, string_type)
+                and isinstance(item2, string_type)):
+            return item1 if len(item1) > len(item2) else item2
         return (
             item1 if item2 is _ else
             _ if (item1 is KeyError or item2 is KeyError) else
@@ -317,3 +322,8 @@ def wait(timeout=None):
 def redact_ip(url,
               ip_re=re_compile(r'([?&/]|%3F|%26|%2F)ip([=/]|%3D|%2F)[^?&/%]+')):
     return ip_re.sub(r'\g<1>ip\g<2><redacted>', url)
+
+
+def redact_auth(header_string,
+                ip_re=re_compile(r'"Authorization": "[^"]+"')):
+    return ip_re.sub(r'"Authorization": "<redacted>"', header_string)

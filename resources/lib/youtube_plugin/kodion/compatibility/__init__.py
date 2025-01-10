@@ -10,6 +10,7 @@
 __all__ = (
     'BaseHTTPRequestHandler',
     'TCPServer',
+    'ThreadingMixIn',
     'available_cpu_count',
     'byte_string_type',
     'datetime_infolabel',
@@ -36,7 +37,7 @@ __all__ = (
 try:
     from html import unescape
     from http.server import BaseHTTPRequestHandler
-    from socketserver import TCPServer
+    from socketserver import TCPServer, ThreadingMixIn
     from urllib.parse import (
         parse_qs,
         parse_qsl,
@@ -77,7 +78,7 @@ try:
 except ImportError:
     from BaseHTTPServer import BaseHTTPRequestHandler
     from contextlib import contextmanager as _contextmanager
-    from SocketServer import TCPServer
+    from SocketServer import TCPServer, ThreadingMixIn
     from urllib import (
         quote as _quote,
         unquote as _unquote,

@@ -5,9 +5,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: XBMC-Addons\n"
-"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"Report-Msgid-Bugs-To: translations@kodi.tv\n"
 "POT-Creation-Date: 2015-09-21 11:01+0000\n"
-"PO-Revision-Date: 2024-09-26 19:52+0000\n"
+"PO-Revision-Date: 2025-01-08 17:27+0000\n"
 "Last-Translator: Jakub Fabijan <animatorzpolski@gmail.com>\n"
 "Language-Team: Esperanto <https://kodi.weblate.cloud/projects/kodi-add-ons-video/plugin-video-youtube/eo/>\n"
 "Language: eo\n"
@@ -15,7 +15,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.7.2\n"
+"X-Generator: Weblate 5.9.2\n"
 
 msgctxt "Addon Summary"
 msgid "Plugin for YouTube"
@@ -27,7 +27,7 @@ msgstr ""
 
 msgctxt "Addon Disclaimer"
 msgid "This plugin is not endorsed by Google"
-msgstr ""
+msgstr "Tiu aldonaĵo ne estas aprobita de Google"
 
 # msgctxt "Addon Summary"
 # msgid "Plugin for YouTube"
@@ -120,11 +120,11 @@ msgstr "Eroj paĝe"
 
 msgctxt "#30023"
 msgid "Search history size"
-msgstr ""
+msgstr "Grando de serĉhistorio"
 
 msgctxt "#30024"
 msgid "Cache size (MB)"
-msgstr ""
+msgstr "Kaŝmemora grando (MB)"
 
 msgctxt "#30025"
 msgid "Enable Setup Wizard"
@@ -346,11 +346,11 @@ msgstr "Miaj abonoj"
 
 msgctxt "#30511"
 msgid "Queue video"
-msgstr ""
+msgstr "Vicigi videaĵon"
 
 msgctxt "#30512"
 msgid "Browse Channels"
-msgstr ""
+msgstr "Foliumi kanalojn"
 
 msgctxt "#30513"
 msgid "Trending"
@@ -358,7 +358,7 @@ msgstr ""
 
 msgctxt "#30514"
 msgid "Related Videos"
-msgstr ""
+msgstr "Rilataj videaĵoj"
 
 msgctxt "#30515"
 msgid "Auto-Remove from Watch Later"
@@ -366,11 +366,11 @@ msgstr ""
 
 msgctxt "#30516"
 msgid "Folders"
-msgstr ""
+msgstr "Dosierujoj"
 
 msgctxt "#30517"
 msgid "Subscribe to %s"
-msgstr ""
+msgstr "Aboni al %s"
 
 msgctxt "#30518"
 msgid ""
@@ -382,7 +382,7 @@ msgstr ""
 
 msgctxt "#30520"
 msgid "Add to..."
-msgstr ""
+msgstr "Aldoni al..."
 
 msgctxt "#30521"
 msgid ""
@@ -398,7 +398,7 @@ msgstr ""
 
 msgctxt "#30524"
 msgid "Select language"
-msgstr ""
+msgstr "Elekti lingvon"
 
 msgctxt "#30525"
 msgid "Select region"
@@ -410,19 +410,19 @@ msgstr ""
 
 msgctxt "#30527"
 msgid "Language and Region"
-msgstr ""
+msgstr "Lingvo kaj regiono"
 
 msgctxt "#30528"
 msgid "Rate..."
-msgstr ""
+msgstr "Taksi..."
 
 msgctxt "#30529"
 msgid "I like this"
-msgstr ""
+msgstr "Mi ŝatas tion"
 
 msgctxt "#30530"
 msgid "I dislike this"
-msgstr ""
+msgstr "Mi ne ŝatas tion"
 
 msgctxt "#30531"
 msgid ""
@@ -446,7 +446,7 @@ msgstr ""
 
 msgctxt "#30536"
 msgid "Updating Playlist..."
-msgstr ""
+msgstr "Ĝisdatigas ludliston..."
 
 msgctxt "#30537"
 msgid "Play from here"
@@ -454,7 +454,7 @@ msgstr ""
 
 msgctxt "#30538"
 msgid "Disliked Videos"
-msgstr ""
+msgstr "Malŝatitaj videaĵoj"
 
 msgctxt "#30539"
 msgid ""
@@ -462,7 +462,7 @@ msgstr ""
 
 msgctxt "#30540"
 msgid "Play with..."
-msgstr ""
+msgstr "Ludi per..."
 
 msgctxt "#30541"
 msgid "Show channel name and video details in description"
@@ -506,7 +506,7 @@ msgstr ""
 
 msgctxt "#30551"
 msgid "Recommendations"
-msgstr ""
+msgstr "Rekomendoj"
 
 msgctxt "#30552"
 msgid "Maintenance"
@@ -534,11 +534,11 @@ msgstr ""
 
 msgctxt "#30558"
 msgid "search history"
-msgstr ""
+msgstr "serĉhistorio"
 
 msgctxt "#30559"
 msgid "Delete settings.xml"
-msgstr ""
+msgstr "Forigi settings.xml"
 
 msgctxt "#30560"
 msgid ""
@@ -586,11 +586,11 @@ msgstr ""
 
 msgctxt "#30571"
 msgid "Set as History"
-msgstr ""
+msgstr "Agordi kiel historio"
 
 msgctxt "#30572"
 msgid "Remove as History"
-msgstr ""
+msgstr "Forigi kiel historio"
 
 msgctxt "#30573"
 msgid "Are you sure you want to remove \"%s\" as your History list?"
@@ -606,7 +606,7 @@ msgstr ""
 
 msgctxt "#30576"
 msgid "Failed"
-msgstr ""
+msgstr "Malsukcesis"
 
 msgctxt "#30577"
 msgid ""
@@ -638,7 +638,7 @@ msgstr ""
 
 msgctxt "#30584"
 msgid "My Subscriptions (Filtered)"
-msgstr ""
+msgstr "Miaj abonoj (filtritaj)"
 
 msgctxt "#30585"
 msgid "Enable Blacklist to exclude channel names in Filters from My Subscriptions, disable to include channel names"
@@ -646,7 +646,7 @@ msgstr ""
 
 msgctxt "#30586"
 msgid "Blacklist"
-msgstr ""
+msgstr "Nigra listo"
 
 msgctxt "#30587"
 msgid "Add to My Subscriptions filter"
@@ -666,15 +666,15 @@ msgstr ""
 
 msgctxt "#30591"
 msgid "Thumbnail size"
-msgstr ""
+msgstr "Grando de miniaturoj"
 
 msgctxt "#30592"
 msgid "Medium (16:9)"
-msgstr ""
+msgstr "Meza (16:9)"
 
 msgctxt "#30593"
 msgid "High (4:3)"
-msgstr ""
+msgstr "Granda (4:3)"
 
 msgctxt "#30594"
 msgid "Safe search"
@@ -730,7 +730,7 @@ msgstr ""
 
 msgctxt "#30607"
 msgid "Audio only"
-msgstr ""
+msgstr "Nur aŭdio"
 
 msgctxt "#30608"
 msgid "Allow developer keys"

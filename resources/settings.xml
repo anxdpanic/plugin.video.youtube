@@ -1162,6 +1162,11 @@
                     <default>true</default>
                     <control type="toggle"/>
                 </setting>
+                <setting id="youtube.http.stream_redirect" type="boolean" label="30618" help="30619">
+                    <level>0</level>
+                    <default>False</default>
+                    <control type="toggle"/>
+                </setting>
             </group>
             <group id="logging" label="14092">
                 <setting id="kodion.logging.enabled" type="boolean" label="20191" help="36392">

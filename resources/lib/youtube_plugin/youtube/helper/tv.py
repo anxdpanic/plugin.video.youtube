@@ -93,12 +93,12 @@ def saved_playlists_to_items(provider, context, json_data):
 
         if channel_id:
             item_uri = context.create_uri(
-                ('channel', channel_id, 'playlist', playlist_id,),
+                (PATHS.CHANNEL, channel_id, 'playlist', playlist_id,),
                 item_params,
             )
         else:
             item_uri = context.create_uri(
-                ('playlist', playlist_id),
+                (PATHS.PLAYLIST, playlist_id,),
                 item_params,
             )
 

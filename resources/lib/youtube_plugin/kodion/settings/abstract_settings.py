@@ -428,7 +428,7 @@ class AbstractSettings(object):
         return port
 
     def httpd_listen(self, value=None):
-        default = '0.0.0.0'
+        default = '127.0.0.1'
 
         if value is None:
             ip_address = self.get_string(SETTINGS.HTTPD_LISTEN, default)
@@ -457,6 +457,11 @@ class AbstractSettings(object):
         if value is not None:
             return self.set_bool(SETTINGS.HTTPD_IDLE_SLEEP, value)
         return self.get_bool(SETTINGS.HTTPD_IDLE_SLEEP, True)
+
+    def httpd_stream_redirect(self, value=None):
+        if value is not None:
+            return self.set_bool(SETTINGS.HTTPD_STREAM_REDIRECT, value)
+        return self.get_bool(SETTINGS.HTTPD_STREAM_REDIRECT, False)
 
     def api_config_page(self):
         return self.get_bool(SETTINGS.API_CONFIG_PAGE, False)
