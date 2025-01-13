@@ -43,10 +43,9 @@ class XbmcPlaylistPlayer(AbstractPlaylistPlayer):
         if playlist_type is None:
             playlist_id = self.get_playlist_id(retry=retry)
         else:
-            playlist_id = (
-                    self.PLAYLIST_MAP.get(playlist_type)
-                    or self.PLAYLIST_MAP['video']
-            )
+            playlist_id = self.PLAYLIST_MAP.get(playlist_type)
+            if playlist_id is None:
+                playlist_id = self.PLAYLIST_MAP['video']
         self.set_playlist_id(playlist_id)
 
         self._playlist = xbmc.PlayList(playlist_id)

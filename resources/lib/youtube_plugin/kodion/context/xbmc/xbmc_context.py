@@ -28,6 +28,7 @@ from ...constants import (
     ADDON_ID,
     CONTENT,
     CONTENT_TYPE,
+    PLAY_FORCE_AUDIO,
     SORT,
     WAKEUP,
 )
@@ -505,6 +506,8 @@ class XbmcContext(AbstractContext):
         return language
 
     def get_playlist_player(self, playlist_type=None):
+        if self.get_param(PLAY_FORCE_AUDIO) or self.get_settings().audio_only():
+            playlist_type = 'audio'
         if not self._playlist or playlist_type:
             self._playlist = XbmcPlaylistPlayer(proxy(self), playlist_type)
         return self._playlist
