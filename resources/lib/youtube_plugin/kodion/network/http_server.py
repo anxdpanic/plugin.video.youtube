@@ -60,17 +60,27 @@ class HTTPServer(ThreadingMixIn, TCPServer):
         try:
             handler.handle()
         finally:
+            while (not handler._close_all
+                   and not handler.wfile.closed
+                   and not select((), (handler.wfile,), (), 0)[1]):
+                pass
+            if handler._close_all or handler.wfile.closed:
+                return
             handler.finish()
 
     def server_close(self):
         request_handler = self.RequestHandlerClass
-        request_handler.timeout = 0
         request_handler._close_all = True
+        request_handler.timeout = 0
 
         for handler in HTTPServer._handlers:
             handler.finish()
+        HTTPServer._handlers = []
 
-        threads = getattr(self._threads, 'pop_all', tuple)()
+        try:
+            threads = self._threads.pop_all()
+        except AttributeError:
+            return
         for thread in threads:
             if not thread.is_alive():
                 continue
@@ -88,7 +98,7 @@ class HTTPServer(ThreadingMixIn, TCPServer):
                 pass
 
 
-class RequestHandler(BaseHTTPRequestHandler):
+class RequestHandler(BaseHTTPRequestHandler, object):
     protocol_version = 'HTTP/1.1'
     server_version = 'plugin.video.youtube/1.0'
 
@@ -132,7 +142,9 @@ class RequestHandler(BaseHTTPRequestHandler):
     def handle_one_request(self):
         # Allow self.rfile.readline call to be interrupted by
         # HTTPServer.server_close when connection is kept open by keep-alive
-        while not select((self.rfile,), (), (), 0)[0] and not self._close_all:
+        while (not self._close_all
+               and not self.rfile.closed
+               and not select((self.rfile,), (), (), 0)[0]):
             pass
         if self._close_all or self.rfile.closed:
             self.close_connection = True
@@ -430,8 +442,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                     self.end_headers()
 
                     for chunk in response.iter_content(chunk_size=None):
-                        while (not select((), (self.wfile,), (), 0)[1]
-                               and not self._close_all):
+                        while (not self._close_all
+                               and not self.wfile.closed
+                               and not select((), (self.wfile,), (), 0)[1]):
                             pass
                         if self._close_all or self.wfile.closed:
                             break
@@ -809,6 +822,7 @@ class Pages(object):
 def get_http_server(address, port, context):
     RequestHandler._context = context
     RequestHandler._close_all = False
+    RequestHandler.timeout = None
     if is_ipv6(address):
         HTTPServer.address_family = socket.AF_INET6
     else:
