@@ -1,3 +1,20 @@
+## v7.2.0+beta.4
+### Fixed
+- Fix repeated subtitle queries/prompts #1056
+- Fix always using video playlist even for audio items
+- Improve error handling and http server shutdown/restart #1056
+
+### Changed
+- Disable http server idle shutdown on Linux systems #1056
+- Fetch last updated subscription feeds first and fetch playlists feeds in My Subscriptions
+- Hide empty/unavailable standard playlists in channels #1060
+- Store date added to playlist for playlist items #1059
+- Add indication to Next page item if listing has been filtered #1035
+
+### New
+- Add "Play recently added" context menu item to playlists #1059
+  - Will play all videos added to the playlist in the last day
+
 ## v7.2.0+beta.3
 ### Fixed
 - Fix possible exception in creating request clients if client_data is not provided
