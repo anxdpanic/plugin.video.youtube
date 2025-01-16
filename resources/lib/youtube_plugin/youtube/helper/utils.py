@@ -401,21 +401,25 @@ def update_playlist_items(provider, context, playlist_id_dict,
         in_my_playlists = False
 
     for playlist_id, yt_item in data.items():
-        if not yt_item or 'snippet' not in yt_item:
-            continue
-        snippet = yt_item['snippet']
-
         playlist_item = playlist_id_dict.get(playlist_id)
         if not playlist_item:
             continue
 
-        is_podcast = yt_item.get('status', {}).get('podcastStatus') == 'enabled'
+        if not yt_item or 'snippet' not in yt_item:
+            continue
+        snippet = yt_item['snippet']
+
         item_count_str, item_count = friendly_number(
             yt_item.get('contentDetails', {}).get('itemCount', 0),
             as_str=False,
         )
-        count_label = episode_count_label if is_podcast else video_count_label
+        if not item_count and playlist_id.startswith('UU'):
+            continue
 
+        playlist_item.available = True
+
+        is_podcast = yt_item.get('status', {}).get('podcastStatus') == 'enabled'
+        count_label = episode_count_label if is_podcast else video_count_label
         label_details = ' | '.join([item for item in (
             ui.bold('((○))') if is_podcast else '',
             ui.color(item_count_color, item_count_str),
