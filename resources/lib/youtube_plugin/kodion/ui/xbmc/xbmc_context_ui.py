@@ -29,16 +29,15 @@ class XbmcContextUI(AbstractContextUI):
                                message_template=None,
                                template_params=None):
         if not message_template:
-            message_template = ('{wait} {{_current}}/{{_total}}'.format(
-                wait=(message or self._context.localize('please_wait'))
-            ))
+            message_template = '{_message} {_current}/{_total}'
 
         return AbstractProgressDialog(
             dialog=(xbmcgui.DialogProgressBG
                     if background else
                     xbmcgui.DialogProgress),
+            background=background,
             heading=heading,
-            message=message,
+            message=message or self._context.localize('please_wait'),
             total=int(total) if total is not None else 0,
             message_template=message_template,
             template_params=template_params,

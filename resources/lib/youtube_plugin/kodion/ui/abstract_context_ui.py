@@ -65,6 +65,7 @@ class AbstractContextUI(object):
 class AbstractProgressDialog(object):
     def __init__(self,
                  dialog,
+                 background,
                  heading,
                  message='',
                  total=0,
@@ -72,14 +73,17 @@ class AbstractProgressDialog(object):
                  template_params=None):
         self._dialog = dialog()
         self._dialog.create(heading, message)
+        self._background = background
 
         self._position = None
         self._total = total
 
+        self._heading = heading
         self._message = message
         if message_template:
             self._message_template = message_template
             self._template_params = {
+                '_message': message,
                 '_progress': (0, self._total),
                 '_current': 0,
                 '_total': self._total,
@@ -168,4 +172,7 @@ class AbstractProgressDialog(object):
 
         # Kodi 18 renamed XbmcProgressDialog.update argument line1 to message.
         # Only use positional arguments to maintain compatibility
-        self._dialog.update(percent, self._message)
+        if self._background:
+            self._dialog.update(percent, self._heading, self._message)
+        else:
+            self._dialog.update(percent, self._message)
