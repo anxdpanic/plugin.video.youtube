@@ -462,7 +462,7 @@ msgid "Disliked Videos"
 msgstr ""
 
 msgctxt "#30539"
-msgid ""
+msgid "Play recently added"
 msgstr ""
 
 msgctxt "#30540"

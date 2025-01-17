@@ -1388,6 +1388,9 @@ class Provider(AbstractProvider):
                     menu_items.play_playlist(
                         context, watch_later_id
                     ),
+                    menu_items.play_playlist_recently_added(
+                        context, watch_later_id
+                    ),
                     menu_items.view_playlist(
                         context, watch_later_id
                     ),
@@ -1436,6 +1439,9 @@ class Provider(AbstractProvider):
                     menu_items.play_playlist(
                         context, liked_list_id
                     ),
+                    menu_items.play_playlist_recently_added(
+                        context, liked_list_id
+                    ),
                     menu_items.view_playlist(
                         context, liked_list_id
                     ),
@@ -1467,6 +1473,9 @@ class Provider(AbstractProvider):
                 )
                 context_menu = [
                     menu_items.play_playlist(
+                        context, history_id
+                    ),
+                    menu_items.play_playlist_recently_added(
                         context, history_id
                     ),
                     menu_items.view_playlist(

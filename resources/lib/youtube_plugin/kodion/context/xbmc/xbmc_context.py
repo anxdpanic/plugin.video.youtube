@@ -176,6 +176,7 @@ class XbmcContext(AbstractContext):
         'playlist.play.all': 22083,
         'playlist.play.default': 571,
         'playlist.play.from_here': 30537,
+        'playlist.play.recently_added': 30539,
         'playlist.play.reverse': 30533,
         'playlist.play.select': 30535,
         'playlist.play.shuffle': 191,

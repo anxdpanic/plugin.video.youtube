@@ -176,7 +176,7 @@ def utc_to_local(dt):
     return dt + offset
 
 
-def datetime_to_since(context, dt, local=True):
+def datetime_to_since(context, dt, local=True, as_seconds=False):
     if timezone:
         _now = now(tz=timezone.utc)
         if local:
@@ -185,12 +185,15 @@ def datetime_to_since(context, dt, local=True):
         _now = now() if local else datetime.utcnow()
 
     diff = _now - dt
+    seconds = diff.total_seconds()
+    if as_seconds:
+        return seconds
+
     yesterday = _now - timedelta(days=1)
     yyesterday = _now - timedelta(days=2)
     use_yesterday = (_now - yesterday).total_seconds() > 10800
     today = _now.date()
     tomorrow = today + timedelta(days=1)
-    seconds = diff.total_seconds()
 
     if seconds > 0:
         if seconds < 60:

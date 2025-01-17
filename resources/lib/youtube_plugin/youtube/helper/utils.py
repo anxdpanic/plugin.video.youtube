@@ -488,6 +488,9 @@ def update_playlist_items(provider, context, playlist_id_dict,
             menu_items.play_playlist(
                 context, playlist_id
             ),
+            menu_items.play_playlist_recently_added(
+                context, playlist_id
+            ),
             menu_items.view_playlist(
                 context, playlist_id
             ),

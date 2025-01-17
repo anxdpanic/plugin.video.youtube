@@ -35,7 +35,7 @@ from ...kodion.constants import (
 )
 from ...kodion.items import AudioItem, UriItem, VideoItem
 from ...kodion.network import get_connect_address
-from ...kodion.utils import find_video_id, select_stream
+from ...kodion.utils import datetime_parser, find_video_id, select_stream
 
 
 def _play_stream(provider, context):
@@ -215,7 +215,7 @@ def _play_playlist(provider, context):
             if not json_data:
                 return False
             chunks = [{
-                'kind': 'plugin#playlistitemlistresponse',
+                'kind': 'plugin#playlistItemListResponse',
                 'items': json_data.values(),
             }]
             total = len(json_data)
@@ -379,18 +379,22 @@ def process_items_for_playlist(context,
                                items,
                                action=None,
                                play_from=None,
-                               order=None):
+                               order=None,
+                               recent_days=None):
     params = context.get_params()
 
     if play_from is None:
         play_from = params.get('video_id')
+
+    if recent_days is None:
+        recent_days = params.get('recent_days')
 
     num_items = len(items) if items else 0
     if num_items > 1:
         # select order
         if order is None:
             order = params.get('order')
-        if not order and play_from is None:
+        if not order and play_from is None and recent_days is None:
             order = 'ask'
         if order == 'ask':
             order_list = ('default', 'reverse', 'shuffle')
@@ -438,8 +442,16 @@ def process_items_for_playlist(context,
 
     # add videos to playlist
     num_items = 0
+    # convert from days to seconds
+    recent_limit = recent_days * 24 * 60 * 60 if recent_days else None
     for idx, item in enumerate(items):
         if not item.playable:
+            continue
+        if (recent_limit and datetime_parser.datetime_to_since(
+                context,
+                item.get_dateadded(),
+                as_seconds=True,
+        ) > recent_limit):
             continue
         playlist_player.add(item)
         num_items += 1
