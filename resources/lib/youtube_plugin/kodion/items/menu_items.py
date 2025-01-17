@@ -165,6 +165,20 @@ def play_playlist_from(context, playlist_id, video_id):
     )
 
 
+def play_playlist_recently_added(context, playlist_id):
+    return (
+        context.localize('playlist.play.recently_added'),
+        context.create_uri(
+            (PATHS.PLAY,),
+            {
+                'playlist_id': playlist_id,
+                'recent_days': 1,
+            },
+            run=True,
+        ),
+    )
+
+
 def view_playlist(context, playlist_id):
     return (
         context.localize('playlist.view.all'),

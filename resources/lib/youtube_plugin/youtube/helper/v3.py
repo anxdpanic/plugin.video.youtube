@@ -37,11 +37,12 @@ from ...kodion.items import (
     CommandItem,
     DirectoryItem,
     MediaItem,
+    NewSearchItem,
     NextPageItem,
     VideoItem,
     menu_items,
 )
-from ...kodion.utils import strip_html_from_text
+from ...kodion.utils import datetime_parser, strip_html_from_text
 
 
 def _process_list_response(provider,
@@ -85,6 +86,7 @@ def _process_list_response(provider,
         fanart_type = settings.get_thumbnail_size(settings.THUMB_SIZE_BEST)
     else:
         fanart_type = False
+    ui = context.get_ui()
     untitled = context.localize('untitled')
 
     for yt_item in yt_items:
@@ -169,11 +171,12 @@ def _process_list_response(provider,
                 (PATHS.CHANNEL, item_id,),
                 item_params,
             )
-            item = DirectoryItem(title,
+            item = DirectoryItem(ui.bold(title),
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
                                  plot=description,
+                                 category_label=title,
                                  channel_id=item_id)
             channel_id_dict[item_id] = item
 
@@ -183,11 +186,12 @@ def _process_list_response(provider,
                 ('special', 'browse_channels'),
                 item_params,
             )
-            item = DirectoryItem(title,
+            item = DirectoryItem(ui.bold(title),
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
-                                 plot=description)
+                                 plot=description,
+                                 category_label=title)
 
         elif kind_type == 'subscription':
             subscription_id = item_id
@@ -199,14 +203,46 @@ def _process_list_response(provider,
                 (PATHS.CHANNEL, item_id,),
                 item_params
             )
-            item = DirectoryItem(title,
+            item = DirectoryItem(ui.bold(title),
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
                                  plot=description,
+                                 category_label = title,
                                  channel_id=item_id,
                                  subscription_id=subscription_id)
             channel_id_dict[item_id] = item
+
+        elif kind_type == 'searchfolder':
+            channel_id = snippet.get('channelId')
+            item = NewSearchItem(context,
+                                 ui.bold(title),
+                                 image=image,
+                                 fanart=fanart,
+                                 channel_id=channel_id)
+
+        elif kind_type == 'playlistfolder':
+            # set channel id to 'mine' if the path is for a playlist of our own
+            channel_id = snippet.get('channelId')
+            if context.get_path().startswith(PATHS.MY_PLAYLISTS):
+                uri_channel_id = 'mine'
+            else:
+                uri_channel_id = channel_id
+            if not uri_channel_id:
+                continue
+
+            item_uri = context.create_uri(
+                (PATHS.CHANNEL, uri_channel_id, item_id,),
+                item_params,
+            )
+            item = DirectoryItem(ui.bold(title),
+                                 item_uri,
+                                 image=image,
+                                 fanart=fanart,
+                                 plot=description,
+                                 category_label=title,
+                                 channel_id=channel_id,
+                                 playlist_id=item_id)
 
         elif kind_type == 'playlist':
             # set channel id to 'mine' if the path is for a playlist of our own
@@ -225,14 +261,16 @@ def _process_list_response(provider,
                     (PATHS.PLAYLIST, item_id,),
                     item_params,
                 )
-            item = DirectoryItem(title,
+            item = DirectoryItem(ui.bold(title),
                                  item_uri,
                                  image=image,
                                  fanart=fanart,
                                  plot=description,
+                                 category_label=title,
                                  channel_id=channel_id,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
+            item.available = False
 
         elif kind_type == 'playlistitem':
             playlist_item_id = item_id
@@ -252,6 +290,14 @@ def _process_list_response(provider,
                              channel_id=snippet.get('videoOwnerChannelId'),
                              playlist_id=snippet.get('playlistId'),
                              playlist_item_id=playlist_item_id)
+
+            # date time
+            published_at = snippet.get('publishedAt')
+            if published_at:
+                datetime = datetime_parser.parse(published_at)
+                local_datetime = datetime_parser.utc_to_local(datetime)
+                # If item is in a playlist, then set data added to playlist
+                item.set_dateadded_from_datetime(local_datetime)
 
         elif kind_type == 'activity':
             details = yt_item['contentDetails']

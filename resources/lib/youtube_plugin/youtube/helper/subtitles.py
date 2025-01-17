@@ -19,9 +19,9 @@ from ...kodion.compatibility import (
     xbmcvfs,
 )
 from ...kodion.constants import (
-    TRANSLATION_LANGUAGES,
     PLAY_PROMPT_SUBTITLES,
     TEMP_PATH,
+    TRANSLATION_LANGUAGES,
 )
 from ...kodion.network import BaseRequestsClass
 from ...kodion.utils import make_dirs
@@ -202,19 +202,16 @@ class Subtitles(object):
         }
 
     def get_subtitles(self):
-        if self.prompt_override:
-            selection = SUBTITLE_SELECTIONS['prompt']
-        else:
-            selection = self.sub_selection
+        selection = self.sub_selection
+
+        if self.prompt_override or selection == SUBTITLE_SELECTIONS['prompt']:
+            return self._prompt()
 
         if selection == SUBTITLE_SELECTIONS['none']:
             return None
 
         if selection == SUBTITLE_SELECTIONS['all']:
             return self.get_all()
-
-        if selection == SUBTITLE_SELECTIONS['prompt']:
-            return self._prompt()
 
         selected_options = SUBTITLE_SELECTIONS[selection]
 
@@ -359,7 +356,7 @@ class Subtitles(object):
             else:
                 self._context.log_debug('Subtitles._prompt'
                                         ' - Subtitle selection cancelled')
-                return None
+                return False
 
             lang, language = choice
             self._context.log_debug('Subtitles._prompt - selected: |{lang}|'

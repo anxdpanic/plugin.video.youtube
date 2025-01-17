@@ -401,21 +401,25 @@ def update_playlist_items(provider, context, playlist_id_dict,
         in_my_playlists = False
 
     for playlist_id, yt_item in data.items():
-        if not yt_item or 'snippet' not in yt_item:
-            continue
-        snippet = yt_item['snippet']
-
         playlist_item = playlist_id_dict.get(playlist_id)
         if not playlist_item:
             continue
 
-        is_podcast = yt_item.get('status', {}).get('podcastStatus') == 'enabled'
+        if not yt_item or 'snippet' not in yt_item:
+            continue
+        snippet = yt_item['snippet']
+
         item_count_str, item_count = friendly_number(
             yt_item.get('contentDetails', {}).get('itemCount', 0),
             as_str=False,
         )
-        count_label = episode_count_label if is_podcast else video_count_label
+        if not item_count and playlist_id.startswith('UU'):
+            continue
 
+        playlist_item.available = True
+
+        is_podcast = yt_item.get('status', {}).get('podcastStatus') == 'enabled'
+        count_label = episode_count_label if is_podcast else video_count_label
         label_details = ' | '.join([item for item in (
             ui.bold('((○))') if is_podcast else '',
             ui.color(item_count_color, item_count_str),
@@ -482,6 +486,9 @@ def update_playlist_items(provider, context, playlist_id_dict,
         # play all videos of the playlist
         context_menu = [
             menu_items.play_playlist(
+                context, playlist_id
+            ),
+            menu_items.play_playlist_recently_added(
                 context, playlist_id
             ),
             menu_items.view_playlist(
@@ -854,7 +861,10 @@ def update_video_items(provider, context, video_id_dict,
         if datetime:
             media_item.set_added_utc(datetime)
             local_datetime = datetime_parser.utc_to_local(datetime)
-            media_item.set_dateadded_from_datetime(local_datetime)
+            # If item is in a playlist, then use data added to playlist rather
+            # than date that item was published to YouTube
+            if not media_item.get_dateadded():
+                media_item.set_dateadded_from_datetime(local_datetime)
             if not start_at:
                 media_item.set_year_from_datetime(local_datetime)
                 media_item.set_aired_from_datetime(local_datetime)

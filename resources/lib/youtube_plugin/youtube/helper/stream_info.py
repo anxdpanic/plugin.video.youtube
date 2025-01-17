@@ -1473,9 +1473,6 @@ class StreamInfo(YouTubeRequestClient):
         subs_data = None
 
         for client_name, response in responses.items():
-            if subs_data:
-                break
-
             captions = response['captions']
             client = response['client']
             do_query = client.get('_query_subtitles')
@@ -1488,9 +1485,8 @@ class StreamInfo(YouTubeRequestClient):
             subtitles.load(captions, client['headers'].copy())
             default_lang = subtitles.get_lang_details()
             subs_data = subtitles.get_subtitles()
-
-        if subs_data:
-            return default_lang, subs_data
+            if subs_data or subs_data is False:
+                return default_lang, subs_data
 
         video_id = self.video_id
         client_data = {'json': {'videoId': video_id}}
@@ -1520,6 +1516,8 @@ class StreamInfo(YouTubeRequestClient):
                 subtitles.load(captions, caption_headers)
                 default_lang = subtitles.get_lang_details()
                 subs_data = subtitles.get_subtitles()
+                if subs_data or subs_data is False:
+                    return default_lang, subs_data
 
         return default_lang, subs_data
 

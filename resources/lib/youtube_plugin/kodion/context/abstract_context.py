@@ -89,6 +89,7 @@ class AbstractContext(Logger):
     }
     _FLOAT_PARAMS = {
         'end',
+        'recent_days',
         'seek',
         'start',
     }

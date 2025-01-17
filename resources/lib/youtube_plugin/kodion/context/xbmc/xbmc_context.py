@@ -28,6 +28,7 @@ from ...constants import (
     ADDON_ID,
     CONTENT,
     CONTENT_TYPE,
+    PLAY_FORCE_AUDIO,
     SORT,
     WAKEUP,
 )
@@ -122,6 +123,7 @@ class XbmcContext(AbstractContext):
         'error.no_video_streams_found': 30549,
         'error.rtmpe_not_supported': 30542,
         'failed': 30576,
+        'filtered': 30105,
         'go_to_channel': 30502,
         'history': 30509,
         'history.clear': 30609,
@@ -175,6 +177,7 @@ class XbmcContext(AbstractContext):
         'playlist.play.all': 22083,
         'playlist.play.default': 571,
         'playlist.play.from_here': 30537,
+        'playlist.play.recently_added': 30539,
         'playlist.play.reverse': 30533,
         'playlist.play.select': 30535,
         'playlist.play.shuffle': 191,
@@ -505,6 +508,8 @@ class XbmcContext(AbstractContext):
         return language
 
     def get_playlist_player(self, playlist_type=None):
+        if self.get_param(PLAY_FORCE_AUDIO) or self.get_settings().audio_only():
+            playlist_type = 'audio'
         if not self._playlist or playlist_type:
             self._playlist = XbmcPlaylistPlayer(proxy(self), playlist_type)
         return self._playlist
