@@ -356,7 +356,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
                     logged_in=logged_in,
                     do_filter=filtered,
                     refresh=refresh,
-                    use_subscriptions_cache=True,
+                    use_cache=True,
                     progress_dialog=progress_dialog,
                 )
                 json_data['_filler'] = filler

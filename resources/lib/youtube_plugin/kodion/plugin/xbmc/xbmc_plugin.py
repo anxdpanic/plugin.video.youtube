@@ -389,7 +389,11 @@ class XbmcPlugin(AbstractPlugin):
 
     def classify_list_item(self, item, options, force_resolve):
         item_type = item.__class__.__name__
-        is_list_item = item_type in self._LIST_ITEM_MAP
+        listitem_type = self._LIST_ITEM_MAP.get(item_type)
         if force_resolve and item_type in self._PLAY_ITEM_MAP:
             options.setdefault(force_resolve, item)
-        return is_list_item
+        if listitem_type:
+            if listitem_type == directory_listitem:
+                return item.available
+            return True
+        return False

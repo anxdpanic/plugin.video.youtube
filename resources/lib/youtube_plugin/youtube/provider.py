@@ -413,7 +413,7 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads')
-        if uploads:
+        if uploads and uploads.startswith('UU'):
             result = [
                 {
                     'kind': 'youtube#playlist',
@@ -421,6 +421,9 @@ class Provider(AbstractProvider):
                     'snippet': {
                         'channelId': channel_id,
                         'title': context.localize('uploads'),
+                        'thumbnails': {'default': {
+                            'url': 'DefaultVideo.png',
+                        }},
                     },
                     '_partial': True,
                 },
@@ -430,6 +433,9 @@ class Provider(AbstractProvider):
                     'snippet': {
                         'channelId': channel_id,
                         'title': context.localize('shorts'),
+                        'thumbnails': {'default': {
+                            'url': '{media}/shorts.png',
+                        }},
                     },
                     '_partial': True,
                 },
@@ -439,9 +445,12 @@ class Provider(AbstractProvider):
                     'snippet': {
                         'channelId': channel_id,
                         'title': context.localize('live'),
+                        'thumbnails': {'default': {
+                            'url': '{media}/live.png',
+                        }},
                     },
                     '_partial': True,
-                }
+                },
             ]
         else:
             result = False
@@ -475,9 +484,8 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads')
-        if uploads:
-            if uploads.startswith('UU'):
-                uploads = uploads.replace('UU', 'UULV', 1)
+        if uploads and uploads.startswith('UU'):
+            uploads = uploads.replace('UU', 'UULV', 1)
             batch_id = (uploads, context.get_param('page_token') or 0)
         else:
             return False
@@ -512,9 +520,8 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads')
-        if uploads:
-            if uploads.startswith('UU'):
-                uploads = uploads.replace('UU', 'UUSH', 1)
+        if uploads and uploads.startswith('UU'):
+            uploads = uploads.replace('UU', 'UUSH', 1)
             batch_id = (uploads, context.get_param('page_token') or 0)
         else:
             return False
@@ -615,91 +622,73 @@ class Provider(AbstractProvider):
         resource_manager = provider.get_resource_manager(context)
         result = []
 
-        channel_info = resource_manager.get_channel_info(
-            (channel_id,),
-        ).get(channel_id) or {}
-        fanart = channel_info.get('fanart') or ''
-
         page = params.get('page', 1)
         page_token = params.get('page_token', '')
-        incognito = params.get('incognito')
-        addon_id = params.get('addon_id')
-
-        new_params = {}
-        if incognito:
-            new_params['incognito'] = incognito
-        if addon_id:
-            new_params['addon_id'] = addon_id
-
         hide_folders = params.get('hide_folders')
-
-        if page == 1 and not hide_folders:
-            hide_playlists = params.get('hide_playlists')
-            hide_search = params.get('hide_search')
-            hide_live = params.get('hide_live')
-            hide_shorts = params.get('hide_shorts')
-
-            if not hide_playlists:
-                item_label = localize('playlists')
-                playlists_item = DirectoryItem(
-                    ui.bold(item_label),
-                    create_uri(
-                        (PATHS.CHANNEL, channel_id, 'playlists'),
-                        new_params,
-                    ),
-                    image='{media}/playlist.png',
-                    fanart=fanart,
-                    category_label=item_label,
-                    channel_id=channel_id,
-                )
-                result.append(playlists_item)
-
-            if not hide_shorts:
-                item_label = localize('shorts')
-                shorts_item = DirectoryItem(
-                    ui.bold(item_label),
-                    create_uri(
-                        (PATHS.CHANNEL, channel_id, 'shorts'),
-                        new_params,
-                    ),
-                    image='{media}/shorts.png',
-                    fanart=fanart,
-                    category_label=item_label,
-                    channel_id=channel_id,
-                )
-                result.append(shorts_item)
-
-            if not hide_live:
-                item_label = localize('live')
-                live_item = DirectoryItem(
-                    ui.bold(item_label),
-                    create_uri(
-                        (PATHS.CHANNEL, channel_id, 'live'),
-                        new_params,
-                    ),
-                    image='{media}/live.png',
-                    fanart=fanart,
-                    category_label=item_label,
-                    channel_id=channel_id,
-                )
-                result.append(live_item)
-
-            if not hide_search:
-                search_item = NewSearchItem(
-                    context, name=ui.bold(localize('search')),
-                    image='{media}/search.png',
-                    fanart=fanart,
-                    channel_id=channel_id,
-                    incognito=incognito,
-                    addon_id=addon_id,
-                )
-                result.append(search_item)
 
         playlists = resource_manager.get_related_playlists(channel_id)
         uploads = playlists.get('uploads')
+        if uploads and not uploads.startswith('UU'):
+            uploads = None
+
+        if page == 1 and not hide_folders:
+            v3_response = {
+                'kind': 'youtube#pluginListResponse',
+                'items': [
+                    {
+                        'kind': 'youtube#playlistFolder',
+                        'id': 'playlists',
+                        'snippet': {
+                            'channelId': channel_id,
+                            'title': context.localize('playlists'),
+                            'thumbnails': {'default': {
+                                'url': '{media}/playlist.png',
+                            }},
+                        },
+                        '_partial': True,
+                    } if not params.get('hide_playlists') else None,
+                    {
+                        'kind': 'youtube#searchFolder',
+                        'id': 'search',
+                        'snippet': {
+                            'channelId': channel_id,
+                            'title': context.localize('search'),
+                            'thumbnails': {'default': {
+                                'url': '{media}/search.png',
+                            }},
+                        },
+                        '_partial': True,
+                    } if not params.get('hide_search') else None,
+                    {
+                        'kind': 'youtube#playlist',
+                        'id': uploads.replace('UU', 'UUSH', 1),
+                        'snippet': {
+                            'channelId': channel_id,
+                            'title': context.localize('shorts'),
+                            'thumbnails': {'default': {
+                                'url': '{media}/shorts.png',
+                            }},
+                        },
+                        '_partial': True,
+                    } if uploads and not params.get('hide_shorts') else None,
+                    {
+                        'kind': 'youtube#playlist',
+                        'id': uploads.replace('UU', 'UULV', 1),
+                        'snippet': {
+                            'channelId': channel_id,
+                            'title': context.localize('live'),
+                            'thumbnails': {'default': {
+                                'url': '{media}/live.png',
+                            }},
+                        },
+                        '_partial': True,
+                    } if uploads and not params.get('hide_live') else None,
+                ],
+            }
+            result.extend(v3.response_to_items(provider, context, v3_response))
+
         if uploads:
-            if uploads.startswith('UU'):
-                uploads = uploads.replace('UU', 'UULF', 1)
+            uploads = uploads.replace('UU', 'UULF', 1)
             batch_id = (uploads, page_token or 0)
 
             json_data = resource_manager.get_playlist_items(batch_id=batch_id)
@@ -1399,6 +1388,9 @@ class Provider(AbstractProvider):
                     menu_items.play_playlist(
                         context, watch_later_id
                     ),
+                    menu_items.play_playlist_recently_added(
+                        context, watch_later_id
+                    ),
                     menu_items.view_playlist(
                         context, watch_later_id
                     ),
@@ -1447,6 +1439,9 @@ class Provider(AbstractProvider):
                     menu_items.play_playlist(
                         context, liked_list_id
                     ),
+                    menu_items.play_playlist_recently_added(
+                        context, liked_list_id
+                    ),
                     menu_items.view_playlist(
                         context, liked_list_id
                     ),
@@ -1478,6 +1473,9 @@ class Provider(AbstractProvider):
                 )
                 context_menu = [
                     menu_items.play_playlist(
+                        context, history_id
+                    ),
+                    menu_items.play_playlist_recently_added(
                         context, history_id
                     ),
                     menu_items.view_playlist(
