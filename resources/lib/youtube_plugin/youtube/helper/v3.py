@@ -42,7 +42,7 @@ from ...kodion.items import (
     VideoItem,
     menu_items,
 )
-from ...kodion.utils import strip_html_from_text
+from ...kodion.utils import datetime_parser, strip_html_from_text
 
 
 def _process_list_response(provider,
@@ -290,6 +290,14 @@ def _process_list_response(provider,
                              channel_id=snippet.get('videoOwnerChannelId'),
                              playlist_id=snippet.get('playlistId'),
                              playlist_item_id=playlist_item_id)
+
+            # date time
+            published_at = snippet.get('publishedAt')
+            if published_at:
+                datetime = datetime_parser.parse(published_at)
+                local_datetime = datetime_parser.utc_to_local(datetime)
+                # If item is in a playlist, then set data added to playlist
+                item.set_dateadded_from_datetime(local_datetime)
 
         elif kind_type == 'activity':
             details = yt_item['contentDetails']
