@@ -123,6 +123,7 @@ class XbmcContext(AbstractContext):
         'error.no_video_streams_found': 30549,
         'error.rtmpe_not_supported': 30542,
         'failed': 30576,
+        'feeds': 30518,
         'filtered': 30105,
         'go_to_channel': 30502,
         'history': 30509,

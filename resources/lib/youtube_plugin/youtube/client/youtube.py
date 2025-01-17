@@ -1752,7 +1752,10 @@ class YouTube(LoginClient):
                          _cache=cache):
             if progress_dialog:
                 total = len(feeds)
-                progress_dialog.reset_total(total)
+                progress_dialog.reset_total(
+                    total,
+                    _message=context.localize('feeds'),
+                )
 
             all_items = {}
             new_cache = {}
@@ -2043,7 +2046,8 @@ class YouTube(LoginClient):
                 iterator = iter(payloads)
                 if progress_dialog:
                     progress_dialog.grow_total(
-                        len(threaded_output['channel_ids']),
+                        len(threaded_output['channel_ids'])
+                        + len(threaded_output['playlist_ids']),
                     )
                     progress_dialog.update(
                         position=len(threaded_output['feeds']),
