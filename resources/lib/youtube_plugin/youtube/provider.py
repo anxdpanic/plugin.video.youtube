@@ -339,6 +339,9 @@ class Provider(AbstractProvider):
 
         url_resolver = UrlResolver(context)
         resolved_url = url_resolver.resolve(uri)
+        if not resolved_url:
+            return False, None
+
         url_converter = UrlToItemConverter(flatten=True)
         url_converter.add_url(resolved_url, context)
         items = url_converter.get_items(provider=provider,

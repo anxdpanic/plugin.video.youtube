@@ -47,7 +47,8 @@ class UrlToItemConverter(object):
 
     def add_url(self, url, context):
         parsed_url = urlsplit(url)
-        if parsed_url.hostname.lower() not in self.VALID_HOSTNAMES:
+        if (not parsed_url.hostname
+                or parsed_url.hostname.lower() not in self.VALID_HOSTNAMES):
             context.log_debug('Unknown hostname "{0}" in url "{1}"'.format(
                 parsed_url.hostname, url
             ))

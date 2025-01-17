@@ -194,7 +194,8 @@ class YouTubeResolver(AbstractResolver):
                     return url_components._replace(
                         query=urlencode(params)
                     ).geturl()
-                return url
+                if url != 'undefined':
+                    return url
 
         return response.url
 
