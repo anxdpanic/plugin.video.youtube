@@ -277,7 +277,7 @@ class AbstractContext(Logger):
                    params=None,
                    parse_params=False,
                    run=False,
-                   play=False,
+                   play=None,
                    replace=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
@@ -307,8 +307,12 @@ class AbstractContext(Logger):
 
         if run:
             return ''.join(('RunPlugin(', uri, ')'))
-        if play:
-            return ''.join(('PlayMedia(', uri, ',playlist_type_hint=1)'))
+        if play is not None:
+            return ''.join((
+                'PlayMedia(',
+                uri,
+                ',playlist_type_hint=', str(play), ')',
+            ))
         if replace:
             return ''.join(('ReplaceWindow(Videos, ', uri, ')'))
         return uri

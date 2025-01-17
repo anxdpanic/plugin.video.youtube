@@ -16,7 +16,7 @@ from traceback import format_stack
 
 from ..helper import utils, v3
 from ..youtube_exceptions import YouTubeException
-from ...kodion.compatibility import string_type, urlencode, urlunsplit
+from ...kodion.compatibility import string_type, urlencode, urlunsplit, xbmc
 from ...kodion.constants import (
     BUSY_FLAG,
     CONTENT,
@@ -345,7 +345,10 @@ def process(provider, context, **_kwargs):
                 context.create_uri(
                     (PATHS.PLAY,),
                     params,
-                    play=True,
+                    play=(xbmc.PLAYLIST_MUSIC
+                          if (ui.get_property(PLAY_FORCE_AUDIO)
+                              or context.get_settings().audio_only()) else
+                          xbmc.PLAYLIST_VIDEO),
                 )
             ))
 

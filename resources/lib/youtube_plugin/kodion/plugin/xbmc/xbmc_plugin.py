@@ -13,7 +13,7 @@ from __future__ import absolute_import, division, unicode_literals
 from traceback import format_stack
 
 from ..abstract_plugin import AbstractPlugin
-from ...compatibility import parse_qsl, urlsplit, xbmcplugin
+from ...compatibility import parse_qsl, urlsplit, xbmc, xbmcplugin
 from ...constants import (
     BUSY_FLAG,
     CONTAINER_FOCUS,
@@ -22,6 +22,7 @@ from ...constants import (
     CONTENT_TYPE,
     PATHS,
     PLAY_FORCED,
+    PLAY_FORCE_AUDIO,
     PLAYLIST_PATH,
     PLAYLIST_POSITION,
     PLUGIN_SLEEPING,
@@ -358,7 +359,10 @@ class XbmcPlugin(AbstractPlugin):
                 action = context.create_uri(
                     (_uri.path.rstrip('/'),),
                     params,
-                    play=True,
+                    play=(xbmc.PLAYLIST_MUSIC
+                          if (context.get_ui().get_property(PLAY_FORCE_AUDIO)
+                              or context.get_settings().audio_only()) else
+                          xbmc.PLAYLIST_VIDEO),
                 )
                 result = True
 
