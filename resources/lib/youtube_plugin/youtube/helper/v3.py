@@ -270,7 +270,7 @@ def _process_list_response(provider,
                                  channel_id=channel_id,
                                  playlist_id=item_id)
             playlist_id_dict[item_id] = item
-            item.available = False
+            item.available = yt_item.get('_available', False)
 
         elif kind_type == 'playlistitem':
             playlist_item_id = item_id

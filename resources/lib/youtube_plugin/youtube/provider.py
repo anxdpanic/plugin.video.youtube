@@ -428,6 +428,7 @@ class Provider(AbstractProvider):
                             'url': 'DefaultVideo.png',
                         }},
                     },
+                    '_available': True,
                     '_partial': True,
                 },
                 {
@@ -691,7 +692,9 @@ class Provider(AbstractProvider):
             result.extend(v3.response_to_items(provider, context, v3_response))
 
         if uploads:
-            uploads = uploads.replace('UU', 'UULF', 1)
+            # The "UULF" videos playlist can only be used if videos in a channel
+            # are made public. Use "UU" all uploads playlist and filter instead
+            # uploads = uploads.replace('UU', 'UULF', 1)
             batch_id = (uploads, page_token or 0)
 
             json_data = resource_manager.get_playlist_items(batch_id=batch_id)
@@ -705,6 +708,7 @@ class Provider(AbstractProvider):
             result.extend(v3.response_to_items(
                 provider, context, json_data[batch_id],
                 item_filter={
+                    # 'shorts': False,
                     'live': False,
                     'upcoming_live': False,
                 },
