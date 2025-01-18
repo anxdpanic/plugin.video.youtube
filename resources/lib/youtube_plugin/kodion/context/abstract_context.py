@@ -333,7 +333,7 @@ class AbstractContext(Logger):
         include_parts = kwargs.get('parts')
         parts = [
             part for part in [
-                str(arg).strip('/').replace('\\', '/').replace('//', '/')
+                to_str(arg).strip('/').replace('\\', '/').replace('//', '/')
                 for arg in args
             ] if part
         ]
