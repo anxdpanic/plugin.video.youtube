@@ -17,6 +17,7 @@ from ..constants import (
     PLAY_PROMPT_SUBTITLES,
     PLAY_TIMESHIFT,
     PLAY_WITH,
+    WINDOW_RETURN,
 )
 
 
@@ -706,7 +707,7 @@ def goto_home(context):
         context.create_uri(
             (PATHS.ROUTE, PATHS.HOME,),
             {
-                'window_return': False,
+                WINDOW_RETURN: False,
             },
             run=True,
         ),

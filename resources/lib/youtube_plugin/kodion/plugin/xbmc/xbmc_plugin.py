@@ -31,6 +31,9 @@ from ...constants import (
     RELOAD_ACCESS_MANAGER,
     REROUTE_PATH,
     VIDEO_ID,
+    WINDOW_FALLBACK,
+    WINDOW_REPLACE,
+    WINDOW_RETURN,
 )
 from ...exceptions import KodionException
 from ...items import (
@@ -266,9 +269,9 @@ class XbmcPlugin(AbstractPlugin):
                         _, _post_run_action = self.uri_action(
                             context,
                             context.get_parent_uri(params={
-                                'window_fallback': True,
-                                'window_replace': True,
-                                'window_return': False,
+                                WINDOW_FALLBACK: True,
+                                WINDOW_REPLACE: True,
+                                WINDOW_RETURN: False,
                             }),
                         )
                     else:

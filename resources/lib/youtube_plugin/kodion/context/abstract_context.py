@@ -31,6 +31,10 @@ from ..constants import (
     PLAY_TIMESHIFT,
     PLAY_WITH,
     VALUE_FROM_STR,
+    WINDOW_CACHE,
+    WINDOW_FALLBACK,
+    WINDOW_REPLACE,
+    WINDOW_RETURN,
 )
 from ..json_store import AccessManager
 from ..sql_store import (
@@ -71,9 +75,10 @@ class AbstractContext(Logger):
         'logged_in',
         'resume',
         'screensaver',
-        'window_fallback',
-        'window_replace',
-        'window_return',
+        WINDOW_CACHE,
+        WINDOW_FALLBACK,
+        WINDOW_REPLACE,
+        WINDOW_RETURN,
     }
     _INT_PARAMS = {
         'fanart_type',
