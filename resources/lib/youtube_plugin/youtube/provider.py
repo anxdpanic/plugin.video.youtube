@@ -822,23 +822,24 @@ class Provider(AbstractProvider):
             return v3.response_to_items(self, context, json_data)
         return None
 
-    def on_search_run(self, context, query):
-        context.set_param('q', query)
+    def on_search_run(self, context, query=None):
+        params = context.get_params()
+        if query is None:
+            query = to_unicode(params.get('q', ''))
 
         # Search by url to access unlisted videos
         if query.startswith(('https://', 'http://')):
             return self.on_uri2addon(provider=self, context=context, uri=query)
         if context.is_plugin_path(query):
-            return UriItem(query), None
+            return UriItem(query), {self.RESULT_CACHE_TO_DISC: False}
 
         result = self._search_channel_or_playlist(context, query)
         if result:  # found a channel or playlist matching search query
-            return result, None
+            return result, {self.RESULT_CACHE_TO_DISC: False}
         result = []
 
         context.set_param('category_label', query)
 
-        params = context.get_params()
         channel_id = params.get('channel_id') or params.get('channelId')
         event_type = params.get('event_type') or params.get('eventType')
         hide_folders = params.get('hide_folders')
@@ -966,7 +967,7 @@ class Provider(AbstractProvider):
                 'live': False,
             },
         ))
-        return result, None
+        return result, {self.RESULT_CACHE_TO_DISC: False}
 
     @AbstractProvider.register_path('^/config/(?P<action>[^/]+)/?$')
     @staticmethod

@@ -421,8 +421,6 @@ class AbstractProvider(object):
 
         if command.startswith('input'):
             query = None
-            query_path = (PATHS.SEARCH, 'query')
-            query_path, parts = context.create_path(*query_path, parts=True)
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
             old_path = context.get_infolabel('Container.FolderPath')
@@ -433,10 +431,11 @@ class AbstractProvider(object):
                                                partial=True)):
                 old_path, old_params = context.parse_uri(old_path)
                 query = old_params.get('q')
-                if not query:
-                    input_path = context.create_path(PATHS.SEARCH, 'input')
-                    if old_path.startswith((input_path, query_path)):
-                        query = False
+                if not query and old_path.startswith((
+                        context.create_path(PATHS.SEARCH, 'input'),
+                        context.create_path(PATHS.SEARCH, 'query'),
+                )):
+                    query = False
 
             if query:
                 query = to_unicode(query)
@@ -448,11 +447,12 @@ class AbstractProvider(object):
                     query = input_query
 
             if query:
-                context.set_path(query_path, parts=parts, force=True)
-                result, options = provider.on_search_run(context, query=query)
-                if not options:
-                    options = {provider.RESULT_CACHE_TO_DISC: False}
-                return result, options
+                context.execute('Action(Back)', wait=True)
+                return UriItem(context.create_uri(
+                    (PATHS.ROUTE, PATHS.SEARCH, 'query'),
+                    dict(params, q=query),
+                    run=True,
+                ))
             else:
                 command = 'list'
                 context.set_path(PATHS.SEARCH, command)
