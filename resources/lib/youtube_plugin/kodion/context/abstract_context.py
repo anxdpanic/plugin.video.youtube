@@ -283,7 +283,8 @@ class AbstractContext(Logger):
                    parse_params=False,
                    run=False,
                    play=None,
-                   replace=False):
+                   replace=False,
+                   command=False):
         if isinstance(path, (list, tuple)):
             uri = self.create_path(*path, is_uri=True)
         elif path:
@@ -310,16 +311,18 @@ class AbstractContext(Logger):
                 ])
             uri = '?'.join((uri, params))
 
+        command = 'command://' if command else ''
         if run:
-            return ''.join(('RunPlugin(', uri, ')'))
+            return ''.join((command, 'RunPlugin(', uri, ')'))
         if play is not None:
             return ''.join((
+                command,
                 'PlayMedia(',
                 uri,
                 ',playlist_type_hint=', str(play), ')',
             ))
         if replace:
-            return ''.join(('ReplaceWindow(Videos, ', uri, ')'))
+            return ''.join((command, 'ReplaceWindow(Videos, ', uri, ')'))
         return uri
 
     def get_parent_uri(self, **kwargs):
