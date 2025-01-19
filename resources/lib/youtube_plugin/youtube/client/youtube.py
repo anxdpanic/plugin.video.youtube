@@ -1551,7 +1551,7 @@ class YouTube(LoginClient):
                              logged_in=False,
                              do_filter=False,
                              refresh=False,
-                             use_cache=False,
+                             use_cache=True,
                              progress_dialog=None,
                              **kwargs):
         """
@@ -1920,7 +1920,7 @@ class YouTube(LoginClient):
             function_cache = context.get_function_cache()
 
             channel_params = {
-                'part': 'snippet',
+                'part': 'snippet,contentDetails',
                 'maxResults': str(self.max_results()),
                 'order': 'unread',
                 'mine': True,
@@ -1932,7 +1932,9 @@ class YouTube(LoginClient):
                               function_cache=function_cache):
                 json_data = function_cache.run(
                     self.api_request,
-                    function_cache.ONE_HOUR,
+                    function_cache.ONE_HOUR
+                    if 'pageToken' in _params else
+                    5 * function_cache.ONE_MINUTE,
                     _refresh=_refresh,
                     method='GET',
                     path='subscriptions',
@@ -1942,9 +1944,18 @@ class YouTube(LoginClient):
                 if not json_data:
                     return False, True
 
-                output['channel_ids'].extend([{
-                    'channel_id': item['snippet']['resourceId']['channelId']
-                } for item in json_data.get('items', [])])
+                items = json_data.get('items', [])
+                if not items:
+                    return False, True
+
+                updated_items = [
+                    {'channel_id': item['snippet']['resourceId']['channelId']}
+                    for item in items
+                    if item['contentDetails']['newItemCount']
+                ]
+                output['channel_ids'].extend(updated_items)
+                if len(items) != len(updated_items):
+                    return True, True
 
                 subs_page_token = json_data.get('nextPageToken')
                 if subs_page_token:
