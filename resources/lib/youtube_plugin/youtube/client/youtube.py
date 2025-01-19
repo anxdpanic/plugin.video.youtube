@@ -1856,7 +1856,7 @@ class YouTube(LoginClient):
                             worker,
                             threads,
                             pool_id,
-                            input_wait,
+                            check_inputs,
                             **_kwargs):
             complete = False
             while not threads['balance'].is_set():
@@ -1865,11 +1865,11 @@ class YouTube(LoginClient):
                     _kwargs = {}
                 elif kwargs:
                     _kwargs = kwargs.pop()
-                elif input_wait:
-                    with input_wait:
+                elif check_inputs:
+                    if check_inputs.wait(0.1):
                         if kwargs:
                             continue
-                        break
+                    break
                 else:
                     complete = True
                     break
@@ -1999,8 +1999,8 @@ class YouTube(LoginClient):
                 'output': threaded_output,
                 'threads': threads,
                 'limit': 1,
-                'input_wait': None,
-                'input_wait_for': None,
+                'check_inputs': False,
+                'inputs_to_check': None,
             }
             # payloads[2] = {
             #     'worker': _get_playlists,
@@ -2008,8 +2008,8 @@ class YouTube(LoginClient):
             #     'output': threaded_output,
             #     'threads': threads,
             #     'limit': 1,
-            #     'input_wait': None,
-            #     'input_wait_for': None,
+            #     'check_inputs': False,
+            #     'inputs_to_check': None,
             # }
         payloads[3] = {
             'worker': _get_channel_feed_cache,
@@ -2017,8 +2017,8 @@ class YouTube(LoginClient):
             'output': threaded_output,
             'threads': threads,
             'limit': 1,
-            'input_wait': threading.Lock(),
-            'input_wait_for': (1,),
+            'check_inputs': threading.Event(),
+            'inputs_to_check': {1},
         }
         payloads[4] = {
             'worker': _get_playlist_feed_cache,
@@ -2026,10 +2026,10 @@ class YouTube(LoginClient):
             'output': threaded_output,
             'threads': threads,
             'limit': 1,
-            # 'input_wait': threading.Lock(),
-            # 'input_wait_for': (2,),
-            'input_wait': None,
-            'input_wait_for': None,
+            # 'check_inputs': threading.Event(),
+            # 'inputs_to_check': {2},
+            'check_inputs': False,
+            'inputs_to_check': None,
         }
         payloads[5] = {
             'worker': _get_feed,
@@ -2037,11 +2037,12 @@ class YouTube(LoginClient):
             'output': threaded_output,
             'threads': threads,
             'limit': None,
-            'input_wait': threading.Lock(),
-            'input_wait_for': (3, 4,),
+            'check_inputs': threading.Event(),
+            'inputs_to_check': {3, 4},
         }
 
         completed = []
+        remaining = payloads.keys()
         iterator = iter(payloads)
         loop_enable.set()
         while loop_enable.wait():
@@ -2054,6 +2055,7 @@ class YouTube(LoginClient):
                 for pool_id in completed:
                     del payloads[pool_id]
                 completed = []
+                remaining = payloads.keys()
                 iterator = iter(payloads)
                 if progress_dialog:
                     progress_dialog.grow_total(
@@ -2072,19 +2074,14 @@ class YouTube(LoginClient):
                 completed.append(pool_id)
                 continue
 
-            input_wait = payload['input_wait']
-            if input_wait:
+            check_inputs = payload['check_inputs']
+            if check_inputs:
                 if payload['kwargs']:
-                    if input_wait.locked():
-                        input_wait.release()
+                    check_inputs.set()
                 else:
-                    waiting = payload['input_wait_for']
-                    if waiting and any(wait in payloads for wait in waiting):
-                        if not input_wait.locked():
-                            input_wait.acquire(True)
-                    else:
-                        if input_wait.locked():
-                            input_wait.release()
+                    inputs = payload['inputs_to_check']
+                    if not inputs or inputs.isdisjoint(remaining):
+                        check_inputs.set()
                         completed.append(pool_id)
                     continue
 
