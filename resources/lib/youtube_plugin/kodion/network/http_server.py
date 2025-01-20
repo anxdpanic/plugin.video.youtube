@@ -430,8 +430,9 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                 with self.requests.request(stream_url,
                                            method='GET',
                                            headers=headers,
-                                           stream=True) as response:
-                    if not response or not response.ok:
+                                           stream=True,
+                                           allow_redirects=False) as response:
+                    if not response or not response.ok or response.is_redirect:
                         continue
                     if server not in _server_list:
                         _server_list.append(server)
