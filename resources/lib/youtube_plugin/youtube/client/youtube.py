@@ -1757,9 +1757,13 @@ class YouTube(LoginClient):
                     _message=context.localize('feeds'),
                 )
 
+            dict_get = {}.get
+            find = ET.Element.find
+            findtext = ET.Element.findtext
+
             all_items = {}
             new_cache = {}
-            for channel_id, feed in feeds.items():
+            for item_id, feed in feeds.items():
                 channel_name = feed.get('channel_name')
                 cached_items = feed.get('cached_items')
                 refresh_feed = feed.get('refresh')
@@ -1770,31 +1774,44 @@ class YouTube(LoginClient):
                     content = to_unicode(content.content).replace('\n', '')
 
                     root = ET.fromstring(content if utf8 else to_str(content))
-                    channel_title = root.findtext('atom:title', '', _ns)
+                    channel_title = findtext(root, 'atom:title', '', _ns)
+                    channel_id = findtext(root, 'yt:channelId', '', _ns)
+                    playlist_id = findtext(root, 'yt:playlistId', '', _ns)
                     channel_name = channel_title.lower().replace(',', '')
-                    dict_get = {}.get
+
                     feed_items = [{
-                        'kind': 'youtube#video',
-                        'id': item.findtext('yt:videoId', '', _ns),
+                        'kind': ('youtube#video'
+                                 if channel_id else
+                                 'youtube#playlistitem'),
+                        'id': (findtext(item, 'yt:videoId', '', _ns)
+                               if channel_id else
+                               None),
                         'snippet': {
-                            'channelId': channel_id,
+                            'videoOwnerChannelId': channel_id,
+                            'playlistId': playlist_id,
                             'channelTitle': channel_title,
-                            'title': item.findtext('atom:title', '', _ns),
-                            'description': item.findtext(
+                            'resourceId': {
+                                'videoId': findtext(item, 'yt:videoId', '', _ns)
+                            } if playlist_id else None,
+                            'title': findtext(item, 'atom:title', '', _ns),
+                            'description': findtext(
+                                item,
                                 'media:group/media:description',
                                 '',
                                 _ns,
                             ),
                             'publishedAt': dt.strptime(
-                                item.findtext('atom:published', '', _ns)
+                                findtext(item, 'atom:published', '', _ns)
                             ),
                         },
                         'statistics': {
-                            'likeCount': getattr(item.find(
+                            'likeCount': getattr(find(
+                                item,
                                 'media:group/media:community/media:starRating',
                                 _ns,
                             ), 'get', dict_get)('count', 0),
-                            'viewCount': getattr(item.find(
+                            'viewCount': getattr(find(
+                                item,
                                 'media:group/media:community/media:statistics',
                                 _ns,
                             ), 'get', dict_get)('views', 0),
@@ -1819,7 +1836,7 @@ class YouTube(LoginClient):
                     feed_items = cached_items
 
                 if refresh_feed:
-                    new_cache[channel_id] = {
+                    new_cache[item_id] = {
                         'channel_name': channel_name,
                         'cached_items': feed_items,
                     }
@@ -1830,11 +1847,11 @@ class YouTube(LoginClient):
                     filtered = channel_name and channel_name in filters['names']
                     if filters['blacklist']:
                         if not filtered:
-                            all_items[channel_id] = feed_items
+                            all_items[item_id] = feed_items
                     elif filtered:
-                        all_items[channel_id] = feed_items
+                        all_items[item_id] = feed_items
                 else:
-                    all_items[channel_id] = feed_items
+                    all_items[item_id] = feed_items
 
                 if progress_dialog:
                     progress_dialog.update(position=len(all_items))

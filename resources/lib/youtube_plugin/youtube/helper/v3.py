@@ -287,7 +287,8 @@ def _process_list_response(provider,
                              fanart=fanart,
                              plot=description,
                              video_id=item_id,
-                             channel_id=snippet.get('videoOwnerChannelId'),
+                             channel_id=(snippet.get('videoOwnerChannelId')
+                                         or snippet.get('channelId')),
                              playlist_id=snippet.get('playlistId'),
                              playlist_item_id=playlist_item_id)
 
