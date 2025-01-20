@@ -385,7 +385,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
             original_path = params.pop('__path', empty)[0] or '/videoplayback'
 
             servers = params.pop('__netloc', empty)
-            stream_id = params.pop('__id', empty)[0]
+            stream_id = (params.pop('__id', empty)[0],
+                         params.get('itag', empty)[0])
             if stream_id != self.server_priority_list['id']:
                 self.server_priority_list['id'] = stream_id
                 _server_list = []
@@ -433,6 +434,8 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                                            stream=True,
                                            allow_redirects=False) as response:
                     if not response or not response.ok or response.is_redirect:
+                        if server in _server_list:
+                            _server_list.remove(server)
                         continue
                     if server not in _server_list:
                         _server_list.append(server)
