@@ -14,10 +14,8 @@ from datetime import date, datetime, time as dt_time, timedelta
 from importlib import import_module
 from re import compile as re_compile
 from sys import modules
-from threading import Lock
 
 from ..exceptions import KodionException
-from ..logger import Logger
 
 
 try:
@@ -241,7 +239,13 @@ def datetime_to_since(context, dt, local=True, as_seconds=False):
     return ' '.join((context.format_date_short(dt), context.format_time(dt)))
 
 
-def strptime(datetime_str, fmt=None):
+# Python strptime bug workaround
+# https://github.com/python/cpython/issues/71587
+if '_strptime' not in modules:
+    modules['_strptime'] = import_module('_strptime')
+
+
+def strptime(datetime_str, fmt=None, _strptime=modules['_strptime']):
     if fmt is None:
         fmt = '%Y-%m-%d%H%M%S'
 
@@ -280,24 +284,9 @@ def strptime(datetime_str, fmt=None):
         else:
             datetime_str = time_part
 
-    try:
-        return datetime.strptime(datetime_str, fmt)
-    except TypeError:
-        with strptime.loading:
-            if '_strptime' not in modules:
-                _strptime = import_module('_strptime')
-                modules['_strptime'] = _strptime
-                Logger.log_error('Python strptime bug workaround'
-                                 ' - https://github.com/python/cpython/issues/71587')
-            else:
-                _strptime = modules['_strptime']
-
-        if timezone:
-            return _strptime._strptime_datetime(datetime, datetime_str, fmt)
-        return datetime(*(_strptime._strptime(datetime_str, fmt)[0][0:6]))
-
-
-strptime.loading = Lock()
+    if timezone:
+        return _strptime._strptime_datetime(datetime, datetime_str, fmt)
+    return datetime(*(_strptime._strptime(datetime_str, fmt)[0][0:6]))
 
 
 def since_epoch(dt_object=None):
