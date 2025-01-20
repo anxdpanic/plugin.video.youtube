@@ -811,8 +811,8 @@ class StreamInfo(YouTubeRequestClient):
             # Some restricted videos require additional requests for subtitles
             # Limited audio stream availability with some clients
             'mpd': (
-                'android_youtube_tv',
                 'android_vr',
+                'android_youtube_tv',
             ),
             # Progressive streams
             # Limited video and audio stream availability
@@ -1566,8 +1566,9 @@ class StreamInfo(YouTubeRequestClient):
         use_mpd = self._use_mpd
         use_remote_history = settings.use_remote_history()
 
-        client_name = None
+        _client_name = None
         _client = None
+        _has_auth = None
         _result = None
         _video_details = None
         _microformat = None
@@ -1626,9 +1627,14 @@ class StreamInfo(YouTubeRequestClient):
 
             restart = None
             while 1:
-                for client_name in clients:
-                    _client = self.build_client(client_name, client_data)
-                    if not _client:
+                for _client_name in clients:
+                    _client = self.build_client(_client_name, client_data)
+                    if _client:
+                        _has_auth = _client.get('_has_auth', False)
+                        if _has_auth:
+                            restart = False
+                    else:
+                        _has_auth = None
                         _result = None
                         _video_details = None
                         _microformat = None
@@ -1646,8 +1652,8 @@ class StreamInfo(YouTubeRequestClient):
                         error_hook=self._error_hook,
                         error_hook_kwargs={
                             'video_id': video_id,
-                            'client': client_name,
-                            'auth': _client.get('_has_auth', False),
+                            'client': _client_name,
+                            'auth': _has_auth,
                         },
                         **_client
                     ) or {}
@@ -1695,8 +1701,8 @@ class StreamInfo(YouTubeRequestClient):
                                 status=_status,
                                 reason=_reason or 'UNKNOWN',
                                 video_id=video_id,
-                                client=_client['_name'],
-                                auth=_client.get('_has_auth', False),
+                                client=_client_name,
+                                auth=_has_auth,
                             )
                         )
                         compare_reason = _reason.lower()
@@ -1738,8 +1744,8 @@ class StreamInfo(YouTubeRequestClient):
                     '\n\tAuth:     |{auth}|'
                     .format(
                         video_id=video_id,
-                        client=client_name,
-                        auth=_client.get('_has_auth', False),
+                        client=_client_name,
+                        auth=_has_auth,
                     )
                 )
 
@@ -1755,13 +1761,13 @@ class StreamInfo(YouTubeRequestClient):
                     compare_str=True,
                 )
 
-                if not self._auth_client and _client.get('_has_auth'):
+                if not self._auth_client and _has_auth:
                     self._auth_client = {
                         'client': _client.copy(),
                         'result': _result,
                     }
 
-                responses[client_name] = {
+                responses[_client_name] = {
                     'client': _client,
                     'progressive_fmts': _streaming_data.get('formats'),
                     'adaptive_fmts': _streaming_data.get('adaptiveFormats'),

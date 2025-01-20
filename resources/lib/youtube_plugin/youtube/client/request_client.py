@@ -179,15 +179,15 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_auth_type': False,
             '_os': {
                 'major': '18',
-                'minor': '1',
-                'patch': '0',
-                'build': '22B83',
+                'minor': '2',
+                'patch': '1',
+                'build': '22C161',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '19.45.4',
+                        'clientVersion': '20.02.3',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
