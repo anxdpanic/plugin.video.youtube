@@ -2033,7 +2033,7 @@ class YouTube(LoginClient):
             'kwargs': threaded_output['channel_ids'],
             'output': threaded_output,
             'threads': threads,
-            'limit': 1,
+            'limit': None,
             'check_inputs': threading.Event(),
             'inputs_to_check': {1},
         }
@@ -2042,7 +2042,7 @@ class YouTube(LoginClient):
             'kwargs': threaded_output['playlist_ids'],
             'output': threaded_output,
             'threads': threads,
-            'limit': 1,
+            'limit': None,
             # 'check_inputs': threading.Event(),
             # 'inputs_to_check': {2},
             'check_inputs': False,
