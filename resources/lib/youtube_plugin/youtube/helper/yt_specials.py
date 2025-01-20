@@ -23,7 +23,7 @@ def _process_related_videos(provider, context, client):
 
     params = context.get_params()
     video_id = params.get('video_id')
-    refresh = params.get('refresh')
+    refresh = params.get('refresh', 0) > 0
     if video_id:
         json_data = function_cache.run(
             client.get_related_videos,
@@ -84,7 +84,7 @@ def _process_recommendations(provider, context, client):
     json_data = function_cache.run(
         client.get_recommended_for_home,
         function_cache.ONE_HOUR,
-        _refresh=params.get('refresh'),
+        _refresh=params.get('refresh', 0) > 0,
         visitor=params.get('visitor'),
         page_token=params.get('page_token'),
         click_tracking=params.get('click_tracking'),
@@ -100,7 +100,7 @@ def _process_recommendations(provider, context, client):
             json_data = function_cache.run(
                 client.get_recommended_for_home,
                 function_cache.ONE_HOUR,
-                _refresh=params.get('refresh'),
+                _refresh=params.get('refresh', 0) > 0,
                 visitor=json_data.get('visitorData'),
                 page_token=page_token,
                 click_tracking=json_data.get('clickTracking'),
@@ -141,14 +141,17 @@ def _process_trending(provider, context, client):
 def _process_browse_channels(provider, context, client):
     context.set_content(CONTENT.LIST_CONTENT)
 
-    guide_id = context.get_param('guide_id', '')
+    params = context.get_params()
+    guide_id = params.get('guide_id')
     if guide_id:
         json_data = client.get_guide_category(guide_id)
     else:
         function_cache = context.get_function_cache()
-        json_data = function_cache.run(client.get_guide_categories,
-                                       function_cache.ONE_MONTH,
-                                       _refresh=context.get_param('refresh'))
+        json_data = function_cache.run(
+            client.get_guide_categories,
+            function_cache.ONE_MONTH,
+            _refresh=params.get('refresh', 0) > 0,
+        )
 
     if not json_data:
         return False
@@ -210,10 +213,12 @@ def _process_description_links(provider, context):
             description = strip_html_from_text(snippet['description'])
 
             function_cache = context.get_function_cache()
-            urls = function_cache.run(utils.extract_urls,
-                                      function_cache.ONE_DAY,
-                                      _refresh=params.get('refresh'),
-                                      text=description)
+            urls = function_cache.run(
+                utils.extract_urls,
+                function_cache.ONE_DAY,
+                _refresh=params.get('refresh', 0) > 0,
+                text=description,
+            )
 
             progress_dialog.set_total(len(urls))
 
@@ -330,7 +335,7 @@ def _process_my_subscriptions(provider, context, client, filtered=False):
 
     logged_in = provider.is_logged_in()
     params = context.get_params()
-    refresh = params.get('refresh')
+    refresh = params.get('refresh', 0) > 0
 
     with context.get_ui().create_progress_dialog(
             heading=context.localize('my_subscriptions.loading'),

@@ -56,7 +56,7 @@ class ResourceManager(object):
         client = self._provider.get_client(context)
         data_cache = context.get_data_cache()
         function_cache = context.get_function_cache()
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         updated = []
         handles = {}
         for identifier in ids:
@@ -152,7 +152,7 @@ class ResourceManager(object):
                          suppress_errors=False,
                          defer_cache=False):
         context = self._context
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         if not refresh and channel_data:
             result = channel_data
         else:
@@ -250,7 +250,7 @@ class ResourceManager(object):
     def get_playlists(self, ids, suppress_errors=False, defer_cache=False):
         context = self._context
         ids = tuple(ids)
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         if refresh or not ids:
             result = {}
         else:
@@ -316,7 +316,7 @@ class ResourceManager(object):
             return None
 
         context = self._context
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
 
         if batch_id:
             ids = [batch_id[0]]
@@ -451,7 +451,7 @@ class ResourceManager(object):
                    yt_items=None):
         context = self._context
         ids = tuple(ids)
-        refresh = context.get_param('refresh')
+        refresh = context.get_param('refresh', 0) > 0
         if refresh or not ids:
             result = {}
         else:

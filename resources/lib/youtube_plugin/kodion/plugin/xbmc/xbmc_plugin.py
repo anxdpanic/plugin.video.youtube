@@ -69,7 +69,7 @@ class XbmcPlugin(AbstractPlugin):
     def __init__(self):
         super(XbmcPlugin, self).__init__()
 
-    def run(self, provider, context, focused=None):
+    def run(self, provider, context, forced=None):
         handle = context.get_handle()
         ui = context.get_ui()
 
@@ -165,9 +165,9 @@ class XbmcPlugin(AbstractPlugin):
         if ui.get_property(PLUGIN_SLEEPING):
             context.wakeup(PLUGIN_WAKEUP)
 
-        if ui.pop_property(REFRESH_CONTAINER):
+        if ui.pop_property(REFRESH_CONTAINER) or not forced:
             focused = False
-        elif focused:
+        elif forced:
             focused = ui.get_property(VIDEO_ID)
 
         if ui.pop_property(RELOAD_ACCESS_MANAGER):
@@ -289,7 +289,7 @@ class XbmcPlugin(AbstractPlugin):
 
         if ui.pop_property(PLAY_FORCED):
             context.set_path(PATHS.PLAY)
-            return self.run(provider, context, focused=focused)
+            return self.run(provider, context, forced=forced)
 
         xbmcplugin.endOfDirectory(
             handle,

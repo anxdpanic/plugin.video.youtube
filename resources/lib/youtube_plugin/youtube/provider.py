@@ -598,10 +598,12 @@ class Provider(AbstractProvider):
             context.log_debug('Trying to get channel ID for |{0}|'.format(
                 identifier['identifier']
             ))
-            json_data = function_cache.run(client.get_channel_by_identifier,
-                                           function_cache.ONE_DAY,
-                                           _refresh=params.get('refresh'),
-                                           **identifier)
+            json_data = function_cache.run(
+                client.get_channel_by_identifier,
+                function_cache.ONE_DAY,
+                _refresh=params.get('refresh', 0) > 0,
+                **identifier
+            )
             if not json_data:
                 return False
 
@@ -949,7 +951,7 @@ class Provider(AbstractProvider):
         search_params, json_data = function_cache.run(
             self.get_client(context).search_with_params,
             function_cache.ONE_MINUTE * 10,
-            _refresh=params.get('refresh'),
+            _refresh=params.get('refresh', 0) > 0,
             params=search_params,
         )
         if not json_data:

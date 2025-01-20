@@ -180,7 +180,7 @@ class AbstractProvider(object):
                 if new_options:
                     options.update(new_options)
 
-            if context.get_param('refresh'):
+            if context.get_param('refresh', 0) > 0:
                 options[self.RESULT_CACHE_TO_DISC] = True
                 options[self.RESULT_UPDATE_LISTING] = True
 
@@ -275,10 +275,14 @@ class AbstractProvider(object):
                 context.log_debug('Rerouting - Fallback route not required')
                 return False, {self.RESULT_FALLBACK: False}
 
-        if 'refresh' in params:
-            container = context.get_infolabel('System.CurrentControlId')
-            position = context.get_infolabel('Container.CurrentItem')
-            params['refresh'] += 1
+        refresh = params.get('refresh', 0)
+        if refresh:
+            if refresh < 0:
+                del params['refresh']
+            else:
+                container = context.get_infolabel('System.CurrentControlId')
+                position = context.get_infolabel('Container.CurrentItem')
+                params['refresh'] = refresh + 1
         elif (params == current_params
               and path.rstrip('/') == current_path.rstrip('/')):
             context.log_error('Rerouting - Unable to reroute to current path')
@@ -424,7 +428,7 @@ class AbstractProvider(object):
             #  came from page 1 of search query by '..'/back
             #  user doesn't want to input on this path
             old_path = context.get_infolabel('Container.FolderPath')
-            if (not params.get('refresh')
+            if (not params.get('refresh', 0) > 0
                     and context.is_plugin_folder()
                     and context.is_plugin_path(old_path,
                                                PATHS.SEARCH,

@@ -31,8 +31,11 @@ def more_for_video(context,
         'item_name': video_name,
         'logged_in': logged_in,
     }
-    if refresh:
-        params['refresh'] = context.get_param('refresh', 0) + 1
+    _refresh = context.get_param('refresh', 0)
+    if refresh or _refresh:
+        if _refresh < 0:
+            _refresh = -_refresh
+        params['refresh'] = _refresh + 1
     return (
         context.localize('video.more'),
         context.create_uri(
@@ -99,11 +102,14 @@ def play_with(context, video_id):
 
 def refresh(context):
     params = context.get_params()
+    refresh = params.get('refresh', 0)
+    if refresh < 0:
+        refresh = -refresh
     return (
         context.localize('refresh'),
         context.create_uri(
             (PATHS.ROUTE, context.get_path(),),
-            dict(params, refresh=params.get('refresh', 0) + 1),
+            dict(params, refresh=refresh + 1),
             run=True,
         ),
     )
@@ -354,8 +360,11 @@ def rate_video(context, video_id, refresh=False):
     params = {
         'video_id': video_id,
     }
-    if refresh:
-        params['refresh'] = context.get_param('refresh', 0) + 1
+    _refresh = context.get_param('refresh', 0)
+    if refresh or _refresh:
+        if _refresh < 0:
+            _refresh = -_refresh
+        params['refresh'] = _refresh + 1
     return (
         context.localize('video.rate'),
         context.create_uri(
