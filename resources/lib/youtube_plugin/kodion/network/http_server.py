@@ -60,11 +60,12 @@ class HTTPServer(ThreadingMixIn, TCPServer):
         try:
             handler.handle()
         finally:
+            output = handler.wfile
             while (not handler._close_all
-                   and not handler.wfile.closed
-                   and not select((), (handler.wfile,), (), 0)[1]):
+                   and not output.closed
+                   and not select((), (output,), (), 0)[1]):
                 pass
-            if handler._close_all or handler.wfile.closed:
+            if handler._close_all or output.closed:
                 return
             handler.finish()
 
@@ -142,11 +143,12 @@ class RequestHandler(BaseHTTPRequestHandler, object):
     def handle_one_request(self):
         # Allow self.rfile.readline call to be interrupted by
         # HTTPServer.server_close when connection is kept open by keep-alive
+        input = self.rfile
         while (not self._close_all
-               and not self.rfile.closed
-               and not select((self.rfile,), (), (), 0)[0]):
+               and not input.closed
+               and not select((input,), (), (), 0)[0]):
             pass
-        if self._close_all or self.rfile.closed:
+        if self._close_all or input.closed:
             self.close_connection = True
             return
 
@@ -445,14 +447,16 @@ class RequestHandler(BaseHTTPRequestHandler, object):
                         self.send_header(header, value)
                     self.end_headers()
 
-                    for chunk in response.iter_content(chunk_size=None):
-                        while (not self._close_all
-                               and not self.wfile.closed
-                               and not select((), (self.wfile,), (), 0)[1]):
-                            pass
-                        if self._close_all or self.wfile.closed:
-                            break
-                        self.wfile.write(chunk)
+                    input = response.raw
+                    output = self.wfile
+                    while (not self._close_all
+                           and not output.closed
+                           and not select((), (output,), (), 0)[1]):
+                        pass
+                    if self._close_all or output.closed:
+                        break
+                    for chunk in input.stream(None, decode_content=False):
+                        output.write(chunk)
                 break
             else:
                 self.send_error(response and response.status_code or 500)
