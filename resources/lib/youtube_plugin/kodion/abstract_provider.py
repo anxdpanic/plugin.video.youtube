@@ -213,12 +213,15 @@ class AbstractProvider(object):
 
     @staticmethod
     def on_goto_page(provider, context, re_match):
+        ui = context.get_ui()
+
         page = re_match.group('page')
         if page:
             page = int(page.lstrip('/'))
         else:
-            result, page = context.get_ui().on_numeric_input(
-                context.localize('page.choose'), 1
+            result, page = ui.on_numeric_input(
+                title=context.localize('page.choose'),
+                default=1,
             )
             if not result:
                 return False
@@ -233,7 +236,7 @@ class AbstractProvider(object):
             page_token = ''
         params = dict(params, page=page, page_token=page_token)
 
-        if (not context.get_infobool('System.HasActiveModalDialog')
+        if (not ui.busy_dialog_active()
                 and context.is_plugin_path(
                     context.get_infolabel('Container.FolderPath'),
                     partial=True,
