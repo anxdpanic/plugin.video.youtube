@@ -58,11 +58,15 @@ class YouTubeRequestClient(BaseRequestsClass):
         'android_vr': {
             '_id': 28,
             '_query_subtitles': False,
+            '_os': {
+                'deviceCodename': 'eureka',
+                'build': 'SQ3A.220605.009.A1',
+            },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_VR',
-                        'clientVersion': '1.60.19',
+                        'clientVersion': '1.61.48',
                         'deviceMake': 'Oculus',
                         'deviceModel': 'Quest 3',
                         'osName': 'Android',
@@ -76,7 +80,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                                '{json[context][client][clientVersion]}'
                                ' (Linux; U; {json[context][client][osName]}'
                                ' {json[context][client][osVersion]};'
-                               ' eureka-user Build/SQ3A.220605.009.A1) gzip'),
+                               ' {_os[deviceCodename]}-user Build/{_os[build]}) gzip'),
                 'X-YouTube-Client-Name': '{_id}',
                 'X-YouTube-Client-Version': '{json[context][client][clientVersion]}',
             },
@@ -431,6 +435,10 @@ class YouTubeRequestClient(BaseRequestsClass):
             client['_auth_required'] = auth_required
         if auth_requested:
             client['_auth_requested'] = auth_requested
+
+        visitor_data = client.get('_visitor_data')
+        if visitor_data:
+            client['json']['context']['client']['visitorData'] = visitor_data
 
         for values, template_id, template in templates.values():
             if template_id in values:

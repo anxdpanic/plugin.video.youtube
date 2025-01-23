@@ -1570,6 +1570,7 @@ class StreamInfo(YouTubeRequestClient):
         _client = None
         _has_auth = None
         _result = None
+        _visitor_data = None
         _video_details = None
         _microformat = None
         _streaming_data = None
@@ -1615,6 +1616,7 @@ class StreamInfo(YouTubeRequestClient):
             '_auth_requested': 'personal' if use_remote_history else False,
             '_access_token': self._access_token,
             '_access_token_tv': self._access_token_tv,
+            '_visitor_data': None,
         }
 
         for name, clients in self._client_groups.items():
@@ -1658,6 +1660,12 @@ class StreamInfo(YouTubeRequestClient):
                         **_client
                     ) or {}
 
+                    if not _visitor_data:
+                        _visitor_data = (_result
+                                         .get('responseContext', {})
+                                         .get('visitorData'))
+                        if _visitor_data:
+                            client_data['_visitor_data'] = _visitor_data
                     _video_details = _result.get('videoDetails', {})
                     _microformat = (_result
                                     .get('microformat', {})
