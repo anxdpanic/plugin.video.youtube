@@ -261,7 +261,7 @@ class Storage(object):
             'PRAGMA mmap_size = 4096000;',
             'PRAGMA page_size = 4096;',
             'PRAGMA cache_size = 1000;',
-            'PRAGMA journal_mode = WAL;',
+            'PRAGMA journal_mode = PERSIST;',
         ]
 
         if not self._table_updated:
