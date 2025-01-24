@@ -98,7 +98,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'ANDROID_UNPLUGGED',
-                        'clientVersion': '8.49.0',
+                        'clientVersion': '9.03.2',
                         'androidSdkVersion': '32',
                         'osName': 'Android',
                         'osVersion': '12',
@@ -191,7 +191,7 @@ class YouTubeRequestClient(BaseRequestsClass):
                 'context': {
                     'client': {
                         'clientName': 'IOS',
-                        'clientVersion': '20.02.3',
+                        'clientVersion': '20.03.02',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
@@ -217,20 +217,20 @@ class YouTubeRequestClient(BaseRequestsClass):
             '_auth_type': 'personal',
             '_os': {
                 'major': '18',
-                'minor': '1',
-                'patch': '0',
-                'build': '22B83',
+                'minor': '2',
+                'patch': '1',
+                'build': '22C161',
             },
             'json': {
                 'context': {
                     'client': {
                         'clientName': 'IOS_UNPLUGGED',
-                        'clientVersion': '8.49',
+                        'clientVersion': '9.04',
                         'deviceMake': 'Apple',
                         'deviceModel': 'iPhone16,2',
                         'osName': 'iOS',
                         'osVersion': '{_os[major]}.{_os[minor]}.{_os[patch]}.{_os[build]}',
-                        'platform': 'TV',
+                        'platform': 'MOBILE',
                     },
                 },
             },
