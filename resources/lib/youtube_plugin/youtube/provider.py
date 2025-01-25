@@ -840,7 +840,7 @@ class Provider(AbstractProvider):
             return result, {self.RESULT_CACHE_TO_DISC: False}
         result = []
 
-        context.set_param('category_label', query)
+        context.set_params(category_label=query)
 
         channel_id = params.get('channel_id') or params.get('channelId')
         event_type = params.get('event_type') or params.get('eventType')
@@ -1273,7 +1273,7 @@ class Provider(AbstractProvider):
         # _.get_my_playlists()
 
         # context.set_content(CONTENT.LIST_CONTENT)
-        context.set_param('category_label', localize('youtube'))
+        context.set_params(category_label=localize('youtube'))
 
         result = []
 

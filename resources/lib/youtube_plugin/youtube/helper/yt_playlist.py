@@ -205,7 +205,7 @@ def _process_select_playlist(provider, context):
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
             if video_id:
-                context.set_param('video_id', video_id)
+                context.set_params(video_id=video_id)
                 keymap_action = True
         if not video_id:
             raise KodionException('Playlist/Select: missing video_id')

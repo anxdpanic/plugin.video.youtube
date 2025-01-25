@@ -454,8 +454,8 @@ class AbstractContext(Logger):
 
         return output
 
-    def set_param(self, name, value):
-        self.parse_params({name: value})
+    def set_params(self, **kwargs):
+        self.parse_params(kwargs)
 
     def get_data_path(self):
         """

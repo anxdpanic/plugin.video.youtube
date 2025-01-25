@@ -311,7 +311,7 @@ def process(provider, context, **_kwargs):
         if context.is_plugin_path(listitem_path, PATHS.PLAY):
             video_id = find_video_id(listitem_path)
             if video_id:
-                context.set_param('video_id', video_id)
+                context.set_params(video_id=video_id)
                 params['video_id'] = video_id
             else:
                 return False
