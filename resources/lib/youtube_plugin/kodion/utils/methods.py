@@ -42,7 +42,6 @@ __all__ = (
     'loose_version',
     'make_dirs',
     'merge_dicts',
-    'print_items',
     'parse_and_redact_uri',
     'redact_auth_header',
     'redact_ip_in_uri',
@@ -155,19 +154,6 @@ def strip_html_from_text(text, tag_re=re_compile('<[^<]+?>')):
     :return:
     """
     return tag_re.sub('', text)
-
-
-def print_items(items):
-    """
-    Prints the given test_items. Basically for tests
-    :param items: list of instances of base_item
-    :return:
-    """
-    if not items:
-        items = []
-
-    for item in items:
-        print(item)
 
 
 def make_dirs(path):
